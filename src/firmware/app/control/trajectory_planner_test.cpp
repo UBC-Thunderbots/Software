@@ -1137,9 +1137,9 @@ TEST_F(TrajectoryPlannerTest,
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-            path_parameters.num_elements, segment_lengths_linear,
+            path_parameters.initial_linear_speed, segment_lengths_linear,
             path_parameters.max_allowable_linear_acceleration,
-            path_parameters.initial_linear_speed, speed_profile);
+            path_parameters.num_elements, speed_profile);
     EXPECT_EQ(status, OK);
 
     EXPECT_NEAR(speed_profile[0], sqrt(7), 0.0001);
@@ -1177,9 +1177,9 @@ TEST_F(TrajectoryPlannerTest, test_backwards_continuity_variable_segment_length_
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-            path_parameters.num_elements, segment_lengths_linear,
+            path_parameters.initial_linear_speed, segment_lengths_linear,
             path_parameters.max_allowable_linear_acceleration,
-            path_parameters.initial_linear_speed, speed_profile);
+            path_parameters.num_elements, speed_profile);
     EXPECT_EQ(status, OK);
 
     EXPECT_NEAR(speed_profile[0], sqrt(11), 0.0001);
@@ -1220,9 +1220,9 @@ TEST_F(
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-            path_parameters.num_elements, segment_lengths_linear,
+            path_parameters.initial_linear_speed, segment_lengths_linear,
             path_parameters.max_allowable_linear_acceleration,
-            path_parameters.initial_linear_speed, speed_profile);
+            path_parameters.num_elements, speed_profile);
 
     EXPECT_EQ(status, INITIAL_VELOCITY_TOO_HIGH);
 }
@@ -1252,8 +1252,9 @@ TEST_F(TrajectoryPlannerTest,
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-            path_parameters.num_elements, segment_lengths_angular,
-            path_parameters.max_allowable_angular_acceleration, 0.0f, speed_profile);
+            0.0f, segment_lengths_angular,
+            path_parameters.max_allowable_angular_acceleration,
+            path_parameters.num_elements, speed_profile);
     EXPECT_EQ(status, OK);
 
     EXPECT_NEAR(speed_profile[0], 0, 0.0001);
@@ -1286,8 +1287,8 @@ TEST_F(TrajectoryPlannerTest,
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-            path_parameters.num_elements, segment_lengths,
-            path_parameters.max_allowable_angular_acceleration, 0.0f, speed_profile);
+            0.0f, segment_lengths, path_parameters.max_allowable_angular_acceleration,
+            path_parameters.num_elements, speed_profile);
     EXPECT_EQ(status, OK);
 
     EXPECT_NEAR(speed_profile[0], 0, 0.0001);
@@ -1410,12 +1411,12 @@ TEST_F(TrajectoryPlannerTest,
     }
 
     app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-        path_parameters.num_elements, segment_lengths_linear,
-        path_parameters.max_allowable_linear_acceleration,
-        path_parameters.initial_linear_speed, linear_speed_profile);
+        path_parameters.initial_linear_speed, segment_lengths_linear,
+        path_parameters.max_allowable_linear_acceleration, path_parameters.num_elements,
+        linear_speed_profile);
     app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-        path_parameters.num_elements, segment_lengths_angular,
-        path_parameters.max_allowable_angular_acceleration, 0.0f, angular_speed_profile);
+        0.0f, segment_lengths_angular, path_parameters.max_allowable_angular_acceleration,
+        path_parameters.num_elements, angular_speed_profile);
 
     // Check that the decceleration period is correct
     // Check that the values of the acceleration period are correct
@@ -1658,7 +1659,7 @@ TEST_F(TrajectoryPlannerTest, test_rebalance_trajectory_segment_to_mach_duration
 
     segment_lengths_meters[0] = 1.0;
 
-    speeds[1] = app_trajectory_planner_modifySpeedToMatchDuration_impl(
+    speeds[1] = app_trajectory_planner_impl_modifySpeedToMatchDuration(
         speeds[0], desired_time_seconds, segment_lengths_meters[0]);
     EXPECT_FLOAT_EQ(speeds[1], 201);
     EXPECT_FLOAT_EQ(speeds[0], 1);

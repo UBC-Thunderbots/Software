@@ -9,7 +9,8 @@
 
 void app_trajectory_planner_impl_getMaximumSpeedProfile(
     Polynomial2dOrder3_t path, unsigned int num_elements, float t_start, float t_end,
-    float max_allowable_acceleration, float speed_cap, float *max_allowable_speed_profile)
+    float max_allowable_acceleration, float speed_cap,
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     const float t_increment = (t_end - t_start) / (num_elements - 1);
 
@@ -28,7 +29,8 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
 
 void app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
     float t_start, float t_end, Polynomial1dOrder3_t path_1d, unsigned int num_elements,
-    float *node_values, float *segment_lengths)
+    float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     // Check that the pre conditions are met
     assert(num_elements > 2);
@@ -55,7 +57,9 @@ void app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
 
 void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
     float t_start, float t_end, Polynomial2dOrder3_t path_2d, unsigned int num_elements,
-    float *x_values, float *y_values, float *segment_lengths)
+    float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     // Hold into the x and y segment lengths to calculate the combined segment length
     float x_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -73,9 +77,10 @@ void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
     }
 }
 
-void app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
-    float *segment_lengths, float *speeds, unsigned int num_elements,
-    float *trajectory_durations)
+void app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], unsigned int num_elements,
+    float trajectory_durations[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     // Calculate the time required to move between the first and last nodes of a
     // trajectory segment
@@ -100,7 +105,7 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
     }
 }
 
-float app_trajectory_planner_modifySpeedToMatchDuration_impl(float initial_speed,
+float app_trajectory_planner_impl_modifySpeedToMatchDuration(float initial_speed,
                                                              float duration,
                                                              float displacement)
 {
@@ -111,9 +116,14 @@ float app_trajectory_planner_modifySpeedToMatchDuration_impl(float initial_speed
 
 
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
-    float *displacement1, float *displacement2, float *durations1, float *durations2,
-    float num_elements, float *speeds1, float *speeds2, float *complete_time_profile)
+app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
+    float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float num_elements,
+    float speeds1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float complete_time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     // The time profile is relative to the first element, thus is starts at zero
     complete_time_profile[0] = 0.0f;
@@ -130,7 +140,7 @@ app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
             float *final_speed_to_change = &speeds2[i + 1];
 
             *final_speed_to_change =
-                app_trajectory_planner_modifySpeedToMatchDuration_impl(
+                app_trajectory_planner_impl_modifySpeedToMatchDuration(
                     current_speed, desired_duration, displacement);
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
@@ -142,7 +152,7 @@ app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
             float *final_speed_to_change = &speeds1[i + 1];
 
             *final_speed_to_change =
-                app_trajectory_planner_modifySpeedToMatchDuration_impl(
+                app_trajectory_planner_impl_modifySpeedToMatchDuration(
                     current_speed, desired_duration, displacement);
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
@@ -157,9 +167,10 @@ app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
-    unsigned int num_elements, float *segment_lengths, float *max_allowable_speed_profile,
+    unsigned int num_elements, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float max_allowable_acceleration, float initial_speed, float final_speed,
-    float *speeds)
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     // Set the initial speed
     speeds[0] = initial_speed;
@@ -191,8 +202,9 @@ app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-    unsigned int num_segments, float *segment_lengths, float max_allowable_acceleration,
-    float initial_speed, float *speeds)
+    float initial_speed, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_acceleration, unsigned int num_segments,
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     for (unsigned int i = num_segments - 1; i > 0; i--)
     {

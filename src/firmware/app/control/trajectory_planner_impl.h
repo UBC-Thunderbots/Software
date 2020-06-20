@@ -105,8 +105,8 @@ void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-    unsigned int num_segments, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float max_allowable_acceleration, float initial_speed,
+    float initial_speed, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_acceleration, unsigned int num_segments,
     float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
@@ -204,8 +204,9 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
  * @param trajectory_durations [out] The duration between successive speed elements in the
  * profile. In seconds. This array is of length num_elements-1
  */
-void app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float [TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS, unsigned int num_elements,
+void app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], unsigned int num_elements,
     float trajectory_durations[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
@@ -253,7 +254,7 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
+app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
     float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
@@ -280,6 +281,6 @@ app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
  *
  * @return final_speed The final speed at the end of the segment.
  */
-float app_trajectory_planner_modifySpeedToMatchDuration_impl(float initial_speed,
+float app_trajectory_planner_impl_modifySpeedToMatchDuration(float initial_speed,
                                                              float duration,
                                                              float displacement);
