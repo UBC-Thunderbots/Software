@@ -1,4 +1,4 @@
-#include "software/gui/visualizer/drawing/robot.h"
+#include "software/gui/drawing/robot.h"
 
 #include <QtWidgets/QGraphicsEllipseItem>
 

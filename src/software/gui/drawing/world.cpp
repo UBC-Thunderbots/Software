@@ -1,8 +1,8 @@
-#include "software/gui/visualizer/drawing/world.h"
+#include "software/gui/drawing/world.h"
 
-#include "software/gui/visualizer/drawing/ball.h"
-#include "software/gui/visualizer/drawing/field.h"
-#include "software/gui/visualizer/drawing/team.h"
+#include "software/gui/drawing/ball.h"
+#include "software/gui/drawing/field.h"
+#include "software/gui/drawing/team.h"
 
 void drawWorld(QGraphicsScene* scene, const World& world)
 {

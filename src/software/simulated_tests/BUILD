@@ -7,8 +7,8 @@ cc_library(
     hdrs = ["simulated_test_fixture.h"],
     deps = [
         "//software/ai",
+        "//software/gui/drawing:navigator",
         "//software/gui/visualizer:visualizer_wrapper",
-        "//software/gui/visualizer/drawing:navigator",
         "//software/logger",
         "//software/sensor_fusion",
         "//software/simulated_tests/validation:non_terminating_function_validator",

@@ -1,6 +1,6 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
-#include "software/gui/visualizer/drawing/navigator.h"
+#include "software/gui/drawing/navigator.h"
 #include "software/logger/logger.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
