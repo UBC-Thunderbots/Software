@@ -45,7 +45,10 @@ void drawSSLWrapperPacket(QGraphicsScene* scene,
     }
 }
 
-WorldDrawFunction getDrawSSLWrapperPacketFunction(const SSL_WrapperPacket& ssl_wrapper_packet) {
-    auto draw_function = [ssl_wrapper_packet] (QGraphicsScene* scene) {drawSSLWrapperPacket(scene, ssl_wrapper_packet);};
+DrawFunction getDrawSSLWrapperPacketFunction(const SSL_WrapperPacket& ssl_wrapper_packet)
+{
+    auto draw_function = [ssl_wrapper_packet](QGraphicsScene* scene) {
+        drawSSLWrapperPacket(scene, ssl_wrapper_packet);
+    };
     return WorldDrawFunction(draw_function);
 }

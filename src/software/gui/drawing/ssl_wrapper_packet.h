@@ -2,8 +2,8 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/gui/drawing/draw_functions.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
 /**
  * This file contains all the functions that allow us to draw the contents
@@ -28,4 +28,4 @@ void drawSSLWrapperPacket(QGraphicsScene* scene,
  *
  * @return A function that represents how to draw the provided world.
  */
-WorldDrawFunction getDrawSSLWrapperPacketFunction(const SSL_WrapperPacket& ssl_wrapper_packet);
+DrawFunction getDrawSSLWrapperPacketFunction(const SSL_WrapperPacket& ssl_wrapper_packet);
