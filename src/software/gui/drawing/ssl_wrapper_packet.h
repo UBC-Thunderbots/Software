@@ -15,4 +15,5 @@
  * @param scene The scene to draw on
  * @param ssl_wrapper_packet The packet who's contents should be drawn
  */
-void drawSSLWrapperPacket(QGraphicsScene* scene, const SSL_WrapperPacket& ssl_wrapper_packet);
+void drawSSLWrapperPacket(QGraphicsScene* scene,
+                          const SSL_WrapperPacket& ssl_wrapper_packet);

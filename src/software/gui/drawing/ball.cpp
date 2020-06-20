@@ -1,11 +1,12 @@
 #include "software/gui/drawing/ball.h"
 
 #include "shared/constants.h"
+#include "software/gui/drawing/geom.h"
 #include "software/math/math_functions.h"
 #include "software/new_geom/segment.h"
-#include "software/gui/drawing/geom.h"
 
-void drawBallVelocity(QGraphicsScene *scene, const Point& position, const Vector& velocity, const QColor &color)
+void drawBallVelocity(QGraphicsScene *scene, const Point &position,
+                      const Vector &velocity, const QColor &color)
 {
     QPen pen(color);
     pen.setWidth(2);
@@ -17,7 +18,8 @@ void drawBallVelocity(QGraphicsScene *scene, const Point& position, const Vector
     drawSegment(scene, Segment(position, position + velocity), pen);
 }
 
-void drawBallPosition(QGraphicsScene *scene, const Point& position, const double height, const QColor &color)
+void drawBallPosition(QGraphicsScene *scene, const Point &position, const double height,
+                      const QColor &color)
 {
     QPen pen(color);
     pen.setWidth(2);
@@ -25,14 +27,16 @@ void drawBallPosition(QGraphicsScene *scene, const Point& position, const double
 
     QColor fill_colour = color;
     // Decrease the alpha value as the ball's height increases
-    double alpha = 1.0 - normalizeValueToRange<double>(height, 0, ROBOT_MAX_HEIGHT_METERS, 0.0, 0.5);
+    double alpha =
+        1.0 - normalizeValueToRange<double>(height, 0, ROBOT_MAX_HEIGHT_METERS, 0.0, 0.5);
     fill_colour.setAlphaF(alpha);
     QBrush brush(color);
     brush.setStyle(Qt::BrushStyle::SolidPattern);
 
     // Increase the radius of the ball the higher it is.
     // 2.0 is an estimate upper bound on how high the ball will go
-    double ball_radius = normalizeValueToRange<double>(height, 0, 2.0, BALL_MAX_RADIUS_METERS, 3 * BALL_MAX_RADIUS_METERS);
+    double ball_radius = normalizeValueToRange<double>(
+        height, 0, 2.0, BALL_MAX_RADIUS_METERS, 3 * BALL_MAX_RADIUS_METERS);
     drawCircle(scene, Circle(position, ball_radius), pen, brush);
 }
 
@@ -42,11 +46,12 @@ void drawBall(QGraphicsScene *scene, const BallState &ball)
     drawBallVelocity(scene, ball.position(), ball.velocity(), ball_color);
 }
 
-void drawBall(QGraphicsScene *scene, const BallDetection &ball) {
+void drawBall(QGraphicsScene *scene, const BallDetection &ball)
+{
     drawBallPosition(scene, ball.position, ball.height, ball_color);
 }
 
-void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Point& position,
+void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Point &position,
                                const Field &field)
 {
     QColor ball_cone_color = ball_color;

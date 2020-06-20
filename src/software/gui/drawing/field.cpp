@@ -1,4 +1,5 @@
 #include "software/gui/drawing/field.h"
+
 #include "software/gui/drawing/geom.h"
 
 void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)

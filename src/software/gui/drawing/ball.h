@@ -3,10 +3,9 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/gui/drawing/colors.h"
+#include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/world/ball_state.h"
 #include "software/world/field.h"
-#include "software/sensor_fusion/filter/vision_detection.h"
-#include "software/gui/drawing/colors.h"
 
 /**
  * This file contains all the functions that allow us to draw a Ball in a
@@ -20,7 +19,8 @@
  * @param ball The ball to draw
  * @param color The color to draw the ball's velocity
  */
-void drawBallVelocity(QGraphicsScene *scene, const Point &position, const Vector& velocity, const QColor &color);
+void drawBallVelocity(QGraphicsScene *scene, const Point &position,
+                      const Vector &velocity, const QColor &color);
 
 /**
  * Draws the ball's position on the given scene.
@@ -30,7 +30,8 @@ void drawBallVelocity(QGraphicsScene *scene, const Point &position, const Vector
  * @param height the height of the ball
  * @param color The color to draw the ball's position
  */
-void drawBallPosition(QGraphicsScene *scene, const Point &position, double height, const QColor &color);
+void drawBallPosition(QGraphicsScene *scene, const Point &position, double height,
+                      const QColor &color);
 
 /**
  * Draws the ball on the given scene.
@@ -55,5 +56,5 @@ void drawBall(QGraphicsScene *scene, const BallDetection &ball);
  * @param position The position of the ball
  * @param field The field to draw the cone on
  */
-void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Point& position,
+void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Point &position,
                                const Field &field);

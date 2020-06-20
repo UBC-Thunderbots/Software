@@ -195,8 +195,8 @@ class BallFilterTest : public ::testing::Test
             Point ball_position_with_noise = current_ball_position + position_noise;
 
             // Create the detection that would have been seen by the vision system
-            std::vector<BallDetection> ball_detections = {
-                BallDetection{ball_position_with_noise, BALL_HEIGHT_METRES, current_timestamp}};
+            std::vector<BallDetection> ball_detections = {BallDetection{
+                ball_position_with_noise, BALL_HEIGHT_METRES, current_timestamp}};
 
             // Get the filtered result given the new detection information
             auto filtered_ball = ball_filter.getFilteredData(ball_detections, field);

@@ -3,8 +3,8 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/gui/drawing/colors.h"
-#include "software/world/robot_state.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
+#include "software/world/robot_state.h"
 
 /**
  * This file contains all the functions that allow us to draw a Robot in a
@@ -19,7 +19,8 @@
  * @param velocity The velocity of the robot
  * @param color The color to draw the robot's velocity
  */
-void drawRobotVelocity(QGraphicsScene* scene, const Point& position, const Vector& velocity, const QColor& color);
+void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
+                       const Vector& velocity, const QColor& color);
 
 /**
  * Draws the robot's position on the given scene.
@@ -29,7 +30,8 @@ void drawRobotVelocity(QGraphicsScene* scene, const Point& position, const Vecto
  * @param orientation The orientation of the robot
  * @param color The color to draw the robot's position
  */
-void drawRobotPosition(QGraphicsScene* scene, const Point& position, const Angle& orientation, const QColor& color);
+void drawRobotPosition(QGraphicsScene* scene, const Point& position,
+                       const Angle& orientation, const QColor& color);
 
 /**
  * Draws the robot's ID on the given scene.
