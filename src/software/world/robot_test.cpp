@@ -79,8 +79,8 @@ TEST_F(RobotTest, update_state_with_optional_params)
 
     RobotState updated_state = new_timestamped_robot_state.robotState();
     updated_state.setBallInMouth(true);
-    updated_state.setTimeSinceLastChip(11);
-    updated_state.setTimeSinceLastKick(5);
+    updated_state.setTimeSinceLastChip(Duration::fromMilliseconds(11));
+    updated_state.setTimeSinceLastKick(Duration::fromMilliseconds(5));
     new_timestamped_robot_state.setRobotState(updated_state);
 
     robot.updateState(new_timestamped_robot_state);
@@ -92,8 +92,8 @@ TEST_F(RobotTest, update_state_with_optional_params)
     EXPECT_EQ(AngularVelocity::fromRadians(1.1), robot.angularVelocity());
     EXPECT_EQ(half_second_future, robot.lastUpdateTimestamp());
     EXPECT_EQ(true, robot.ballInMouth());
-    EXPECT_EQ(11, robot.timeSinceLastChip());
-    EXPECT_EQ(5, robot.timeSinceLastKick());
+    EXPECT_EQ(Duration::fromMilliseconds(11), robot.timeSinceLastChip());
+    EXPECT_EQ(Duration::fromMilliseconds(5), robot.timeSinceLastKick());
 }
 
 TEST_F(RobotTest, update_state_with_new_robot)

@@ -94,10 +94,10 @@ void SensorFusion::updateWorld(
             if (tbots_robot_msg.has_chipper_kicker_status())
             {
                 auto chipper_kicker_status = tbots_robot_msg.chipper_kicker_status();
-                state_to_update.setTimeSinceLastChip(
-                    tbots_robot_msg.chipper_kicker_status().ms_since_chipper_fired());
-                state_to_update.setTimeSinceLastKick(
-                    tbots_robot_msg.chipper_kicker_status().ms_since_kicker_fired());
+                state_to_update.setTimeSinceLastChip(Duration::fromMilliseconds(
+                    tbots_robot_msg.chipper_kicker_status().ms_since_chipper_fired()));
+                state_to_update.setTimeSinceLastKick(Duration::fromMilliseconds(
+                    tbots_robot_msg.chipper_kicker_status().ms_since_kicker_fired()));
             }
         }
     }

@@ -90,14 +90,16 @@ TEST(RobotStateWithTimestampTest, update_with_set_robot_state)
     EXPECT_EQ(timestamped_robot_state_1, timestamped_robot_state_2);
 
     timestamped_robot_state_2.robotState().setBallInMouth(true);
-    timestamped_robot_state_2.robotState().setTimeSinceLastChip(11);
-    timestamped_robot_state_2.robotState().setTimeSinceLastKick(5);
+    timestamped_robot_state_2.robotState().setTimeSinceLastChip(
+        Duration::fromMilliseconds(11));
+    timestamped_robot_state_2.robotState().setTimeSinceLastKick(
+        Duration::fromMilliseconds(5));
     EXPECT_EQ(timestamped_robot_state_1, timestamped_robot_state_2);
 
     RobotState updated_state = timestamped_robot_state_2.robotState();
     updated_state.setBallInMouth(true);
-    updated_state.setTimeSinceLastChip(11);
-    updated_state.setTimeSinceLastKick(5);
+    updated_state.setTimeSinceLastChip(Duration::fromMilliseconds(11));
+    updated_state.setTimeSinceLastKick(Duration::fromMilliseconds(5));
     timestamped_robot_state_2.setRobotState(updated_state);
 
     EXPECT_NE(timestamped_robot_state_1, timestamped_robot_state_2);

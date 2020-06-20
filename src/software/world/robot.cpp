@@ -150,12 +150,12 @@ bool Robot::ballInMouth() const
     return states_.front().robotState().ballInMouth();
 }
 
-std::optional<unsigned long> Robot::timeSinceLastChip() const
+std::optional<Duration> Robot::timeSinceLastChip() const
 {
     return states_.front().robotState().timeSinceLastChip();
 }
 
-std::optional<unsigned long> Robot::timeSinceLastKick() const
+std::optional<Duration> Robot::timeSinceLastKick() const
 {
     return states_.front().robotState().timeSinceLastKick();
 }

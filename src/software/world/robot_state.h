@@ -7,6 +7,7 @@
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
+#include "software/time/duration.h"
 #include "software/world/team_colour.h"
 
 using RobotId = unsigned int;
@@ -70,35 +71,35 @@ class RobotState
      *
      * @param ball_in_mouth whether ball is in beam
      */
-    void setBallInMouth(bool ball_in_beam);
+    void setBallInMouth(bool ball_in_mouth);
 
     /**
      * Returns time in milliseconds since last chip if available
      *
      * @return ms since last chip
      */
-    std::optional<unsigned long> timeSinceLastChip() const;
+    std::optional<Duration> timeSinceLastChip() const;
 
     /**
      * Set time in milliseconds since last chip
      *
      * @param time ms since last chip
      */
-    void setTimeSinceLastChip(unsigned long time_ms);
+    void setTimeSinceLastChip(Duration time_ms);
 
     /**
      * Returns time in milliseconds since last kick if available
      *
      * @return ms since last kick
      */
-    std::optional<unsigned long> timeSinceLastKick() const;
+    std::optional<Duration> timeSinceLastKick() const;
 
     /**
      * Set time in milliseconds since last kick
      *
      * @param time ms since last kick
      */
-    void setTimeSinceLastKick(unsigned long time_ms);
+    void setTimeSinceLastKick(Duration time_ms);
 
     /**
      * Defines the equality operator for a RobotState. RobotStates are equal if
@@ -126,9 +127,9 @@ class RobotState
     Vector velocity_;
     Angle orientation_;
     AngularVelocity angular_velocity_;
-    bool ball_in_beam_;
-    std::optional<unsigned long> time_since_last_chip_ms_;
-    std::optional<unsigned long> time_since_last_kick_ms_;
+    bool ball_in_mouth_;
+    std::optional<Duration> time_since_last_chip_ms_;
+    std::optional<Duration> time_since_last_kick_ms_;
 };
 
 /**

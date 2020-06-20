@@ -7,6 +7,7 @@
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
+#include "software/time/duration.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 #include "software/world/timestamped_robot_state.h"
@@ -186,14 +187,14 @@ class Robot
      *
      * @return ms since last chip
      */
-    std::optional<unsigned long> timeSinceLastChip() const;
+    std::optional<Duration> timeSinceLastChip() const;
 
     /**
      * Returns time in milliseconds since last kick if available
      *
      * @return ms since last kick
      */
-    std::optional<unsigned long> timeSinceLastKick() const;
+    std::optional<Duration> timeSinceLastKick() const;
 
     /**
      * Returns the estimated angular velocity of the robot at a future time, relative to
