@@ -3,11 +3,12 @@
 #include <boost/polygon/voronoi.hpp>
 
 #include "software/logger/logger.h"
-#include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/contains.h"
+#include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
 #define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
 #include "software/new_geom/point_boost_geometry_compatability.h"
+#include "software/new_geom/util/furthest_point.h"
 
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_vertex;
@@ -55,7 +56,7 @@ std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(
                 // Extend the edge out to beyond the rectangle to ensure interception
                 // functions work.
                 Point end = Point(Vector(endX, endY) *
-                                  (bounding_box.furthestCorner(p2) - p2).length());
+                                  (furthestPoint(bounding_box, p2) - p2).length());
 
                 std::unordered_set<Point> edgeIntersects = intersection(
                     bounding_box, Segment(Point(start->x(), start->y()), end));

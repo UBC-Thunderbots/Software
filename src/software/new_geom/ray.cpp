@@ -46,4 +46,3 @@ Vector Ray::toUnitVector() const
 {
     return Vector::createFromAngle(direction_);
 }
-

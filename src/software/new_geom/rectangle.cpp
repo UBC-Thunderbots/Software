@@ -71,18 +71,6 @@ double Rectangle::yMin() const
     return negXNegYCorner().y();
 }
 
-Point Rectangle::furthestCorner(const Point &p) const
-{
-    std::vector<Point> corners = points_;
-
-    // TODO: fix this!
-    return *corners.begin();
-//    return *std::max_element(
-//        corners.begin(), corners.end(), [&](const Point &corner1, const Point &corner2) {
-//            return p.distanceFromPoint(corner1) < p.distanceFromPoint(corner2);
-//        });
-}
-
 bool Rectangle::inflate(double amount)
 {
     // Ensures rectangle cannot be shrunk to less than a point

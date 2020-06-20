@@ -102,30 +102,6 @@ TEST(RectangleCornerTests, test_min_max_values)
     EXPECT_EQ(r.yMax(), 2);
 }
 
-TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_top_right)
-{
-    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(0.5, 0.5)),
-              Point(8, 4));
-}
-
-TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_top_left)
-{
-    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(7, 0.5)),
-              Point(0, 4));
-}
-
-TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_bottom_right)
-{
-    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(0.5, 3)),
-              Point(8, 0));
-}
-
-TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_bottom_left)
-{
-    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(7, 3)),
-              Point(0, 0));
-}
-
 TEST(RectangleExpandTests, test_expand_positive)
 {
     Rectangle r = Rectangle(Point(2, -2), Point(-3, 5));

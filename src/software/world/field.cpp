@@ -228,24 +228,24 @@ double Field::boundaryMargin() const
 
 bool Field::pointInFriendlyDefenseArea(const Point &p) const
 {
-    return contains(friendlyDefenseArea(),p);
+    return contains(friendlyDefenseArea(), p);
 }
 
 bool Field::pointInEnemyDefenseArea(const Point &p) const
 {
-    return contains(enemyDefenseArea(),p);
+    return contains(enemyDefenseArea(), p);
 }
 
 bool Field::pointInFieldLines(const Point &p) const
 {
-    return contains(fieldLines(),p);
+    return contains(fieldLines(), p);
 }
 
 bool Field::pointInEntireField(const Point &p) const
 {
     Rectangle entire_field = Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
                                        Point(totalXLength() / 2, totalYLength() / 2));
-    return contains(entire_field,p);
+    return contains(entire_field, p);
 }
 
 bool Field::operator==(const Field &other) const

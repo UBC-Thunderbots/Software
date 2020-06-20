@@ -88,7 +88,7 @@ TEST(ContainsTest, test_polygon_triangle_not_contains_point)
     Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 1.0f};
     Point point{2.0f, 2.0f};
     Polygon triangle{p1, p2, p3};
-    EXPECT_FALSE(contains(triangle,point));
+    EXPECT_FALSE(contains(triangle, point));
 }
 
 TEST(ContainsTest, test_polygon_hexagon_contains_point)
@@ -101,18 +101,18 @@ TEST(ContainsTest, test_polygon_hexagon_contains_point)
                     {-2.0f, -1.0f},  // bottom left vertex
                     {-2.0f, 1.0f}};  // top left vertex
 
-    EXPECT_TRUE(contains(hexagon,Point()));
-    EXPECT_FALSE(contains(hexagon,Point(0, 2.01)));
+    EXPECT_TRUE(contains(hexagon, Point()));
+    EXPECT_FALSE(contains(hexagon, Point(0, 2.01)));
     EXPECT_FALSE(contains(hexagon, Point(0, -2.01)));
     EXPECT_FALSE(contains(hexagon, Point(2.01, 0)));
     EXPECT_FALSE(contains(hexagon, Point(-2.01, 0)));
-    EXPECT_FALSE(contains(hexagon,
-        Point(2.0f, 0.0f)));  // on right edge, see NOTE on Polygon::contains
+    EXPECT_FALSE(contains(
+        hexagon, Point(2.0f, 0.0f)));  // on right edge, see NOTE on Polygon::contains
     EXPECT_TRUE(contains(hexagon, Point(-2, 0)));  // on left edge
     EXPECT_TRUE(
         contains(hexagon, Point(-2, -1)));  // the bottom left vertex of the hexagon
-    EXPECT_TRUE(contains(hexagon,Point(1, -1)));
-    EXPECT_TRUE(contains(hexagon,Point(-1.5, 0.75)));
+    EXPECT_TRUE(contains(hexagon, Point(1, -1)));
+    EXPECT_TRUE(contains(hexagon, Point(-1.5, 0.75)));
 }
 
 TEST(ContainsTest, test_self_intersecting_polygon_contains)
@@ -131,18 +131,19 @@ TEST(ContainsTest, test_self_intersecting_polygon_contains)
         {0.0f, 0.0f}, {0.0f, 2.0f}, {2.0f, 2.0f}, {2.0f, 1.0f}, {0.0f, 1.0f}};
 
     EXPECT_FALSE(contains(intersecting_poly,
-        Point()));  // on a "right" edge, see NOTE on Polygon::contains
+                          Point()));  // on a "right" edge, see NOTE on Polygon::contains
     EXPECT_FALSE(contains(intersecting_poly, Point(2, 0)));
     EXPECT_FALSE(contains(intersecting_poly, Point(0.5, 0.5)));
+    EXPECT_FALSE(
+        contains(intersecting_poly,
+                 Point(0, 0.5)));  // on a "right" edge, see NOTE on Polygon::contains
+    EXPECT_TRUE(contains(intersecting_poly, Point(0, 1)));
+    EXPECT_TRUE(contains(intersecting_poly, Point(1, 1.5)));
     EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, 0.5)));  // on a "right" edge, see NOTE on Polygon::contains
-    EXPECT_TRUE(contains(intersecting_poly,Point(0, 1)));
-    EXPECT_TRUE(contains(intersecting_poly,Point(1, 1.5)));
-    EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, 2)));  // on a top edge, see NOTE on Polygon::contains
+                          Point(0, 2)));  // on a top edge, see NOTE on Polygon::contains
     EXPECT_TRUE(contains(intersecting_poly, Point(1, 1)));
     EXPECT_FALSE(contains(intersecting_poly,
-        Point(1, 2)));  // on a top edge, see NOTE on Polygon::contains
+                          Point(1, 2)));  // on a top edge, see NOTE on Polygon::contains
     EXPECT_TRUE(contains(intersecting_poly, Point(0, 1.5)));
 }
 
@@ -168,26 +169,29 @@ TEST(ContainsTest, test_complex_self_intersecting_polygon_contains)
                               {-2.0f, -2.0f}, {-2.0f, -1.0f}, {0.0f, -1.0f}};
 
     EXPECT_FALSE(contains(intersecting_poly,
-        Point()));  // on a "right" edge, see NOTE on poly::contains
+                          Point()));  // on a "right" edge, see NOTE on poly::contains
     EXPECT_FALSE(contains(intersecting_poly, Point(2, 0)));
     EXPECT_FALSE(contains(intersecting_poly, Point(0.5, 0.5)));
+    EXPECT_FALSE(
+        contains(intersecting_poly,
+                 Point(0, 0.5)));  // on a "right" edge, see NOTE on poly::contains
     EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, 0.5)));  // on a "right" edge, see NOTE on poly::contains
+                          Point(0, 2)));  // on a top edge, see NOTE on poly::contains
     EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, 2)));  // on a top edge, see NOTE on poly::contains
-    EXPECT_FALSE(contains(intersecting_poly,
-        Point(1, 2)));  // on a top edge, see NOTE on poly::contains
+                          Point(1, 2)));  // on a top edge, see NOTE on poly::contains
     EXPECT_FALSE(contains(intersecting_poly, Point(-2, 0)));
     EXPECT_FALSE(contains(intersecting_poly, Point(-0.5, -0.5)));
+    EXPECT_FALSE(
+        contains(intersecting_poly,
+                 Point(0, -0.5)));  // on a "right" edge, see NOTE on poly::contains
     EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, -0.5)));  // on a "right" edge, see NOTE on poly::contains
-    EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, -2)));  // on a top edge, see NOTE on poly::contains
+                          Point(0, -2)));  // on a top edge, see NOTE on poly::contains
     EXPECT_FALSE(contains(intersecting_poly, Point(0, -1)));
     EXPECT_FALSE(contains(intersecting_poly,
-        Point(-1, -1)));  // on a "top" edge, see NOTE on poly::contains
-    EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, -1.5)));  // on a "right" edge, see NOTE on poly::contains
+                          Point(-1, -1)));  // on a "top" edge, see NOTE on poly::contains
+    EXPECT_FALSE(
+        contains(intersecting_poly,
+                 Point(0, -1.5)));  // on a "right" edge, see NOTE on poly::contains
     EXPECT_TRUE(contains(intersecting_poly, Point(-1, -2)));
     EXPECT_TRUE(contains(intersecting_poly, Point(0, 1)));
     EXPECT_TRUE(contains(intersecting_poly, Point(1, 1.5)));
@@ -216,13 +220,14 @@ TEST(ContainsTest, test_self_intersecting_loop_polygon_contains)
     Polygon intersecting_poly{{-3.0f, 0.0f}, {-3.0f, 3.0f}, {3.0f, 3.0f},
                               {3.0f, 0.0f},  {-2.0f, 2.0f}, {2.0f, 2.0f}};
 
-    EXPECT_FALSE(contains(intersecting_poly,
-        Point(3, 2)));  // on a right edge, see NOTE on Polygon::contains
-    EXPECT_TRUE(
-        contains(intersecting_poly, Point(2, 2)));  // inner right edge should be contained
+    EXPECT_FALSE(
+        contains(intersecting_poly,
+                 Point(3, 2)));  // on a right edge, see NOTE on Polygon::contains
+    EXPECT_TRUE(contains(intersecting_poly,
+                         Point(2, 2)));  // inner right edge should be contained
 
     EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, 3)));  // on a top edge, see NOTE on Polygon::contains
+                          Point(0, 3)));  // on a top edge, see NOTE on Polygon::contains
     EXPECT_TRUE(
         contains(intersecting_poly, Point(0, 2)));  // inner top edge should be contained
 
@@ -231,9 +236,9 @@ TEST(ContainsTest, test_self_intersecting_loop_polygon_contains)
 
     EXPECT_FALSE(contains(intersecting_poly, Point()));
     EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, 1.9)));  // in the hole of the polygon, not contained
+                          Point(0, 1.9)));  // in the hole of the polygon, not contained
     EXPECT_FALSE(contains(intersecting_poly,
-        Point(0, 1.5)));  // in the hole of the polygon, not contained
+                          Point(0, 1.5)));  // in the hole of the polygon, not contained
     EXPECT_FALSE(contains(intersecting_poly, Point(3, 0)));
 
     EXPECT_TRUE(contains(intersecting_poly, Point(-2, 2)));
@@ -290,49 +295,49 @@ TEST(ContainsTest, test_polygon_triangle_contains_point_with_point_on_side)
 
 TEST(ContainsTest, test_point_in_different_quadrant)
 {
-    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-2, -2)),Point(1, 1)));
-    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(-2, -2)),Point(-1, -1)));
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-2, -2)), Point(1, 1)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(-2, -2)), Point(-1, -1)));
 }
 
 TEST(ContainsTest, test_point_in_same_quadrant)
 {
-    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)),Point(1, 2)));
-    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(-2, 3)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)), Point(1, 2)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(-4, 4)), Point(-2, 3)));
 }
 
 TEST(ContainsTest, test_point_on_rectangle_corner)
 {
-    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(2, 2)),Point(0, 0)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(2, 2)), Point(0, 0)));
 }
 
 TEST(ContainsTest, test_point_on_rectangle_edge)
 {
-    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)),Point(3, 3)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)), Point(3, 3)));
 }
 
 TEST(ContainsTest, test_point_off_left_of_rectangle)
 {
-    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(-7, 2)));
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)), Point(-7, 2)));
 }
 
 TEST(ContainsTest, test_point_off_right_of_rectangle)
 {
-    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(1, 0)));
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)), Point(1, 0)));
 }
 
 TEST(ContainsTest, test_point_off_below_rectangle)
 {
-    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(-2, -1)));
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)), Point(-2, -1)));
 }
 
 TEST(ContainsTest, test_point_off_above_rectangle)
 {
-    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(-2, 5)));
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)), Point(-2, 5)));
 }
 
 TEST(ContainsTest, test_point_centre_of_rectangle)
 {
-    EXPECT_TRUE(contains(Rectangle(Point(1, 1), Point(-1, -1)),Point(0.5, 0.5)));
+    EXPECT_TRUE(contains(Rectangle(Point(1, 1), Point(-1, -1)), Point(0.5, 0.5)));
 }
 
 TEST(ContainsTest, test_ray_contains_point_no_x_deviation)
@@ -340,7 +345,7 @@ TEST(ContainsTest, test_ray_contains_point_no_x_deviation)
     Ray ray     = Ray(Point(0, 0), Vector(0, 1));
     Point point = Point(0, 0.5);
 
-    EXPECT_TRUE(contains(ray,point));
+    EXPECT_TRUE(contains(ray, point));
 }
 
 TEST(ContainsTest, test_ray_doesnt_contain_point_behind_start)
@@ -348,7 +353,7 @@ TEST(ContainsTest, test_ray_doesnt_contain_point_behind_start)
     Ray ray     = Ray(Point(0, 0), Vector(0, 1));
     Point point = Point(0, -0.5);
 
-    EXPECT_FALSE(contains(ray,point));
+    EXPECT_FALSE(contains(ray, point));
 }
 
 TEST(ContainsTest, test_ray_doesnt_contain_point)
@@ -356,7 +361,7 @@ TEST(ContainsTest, test_ray_doesnt_contain_point)
     Ray ray     = Ray(Point(0, 0), Vector(0, 1));
     Point point = Point(-5, 10);
 
-    EXPECT_FALSE(contains(ray,point));
+    EXPECT_FALSE(contains(ray, point));
 }
 
 TEST(ContainsTest, test_ray_contains_point_no_y_deviation)
@@ -364,7 +369,7 @@ TEST(ContainsTest, test_ray_contains_point_no_y_deviation)
     Ray ray     = Ray(Point(0, 0), Vector(1, 0));
     Point point = Point(0.5, 0);
 
-    EXPECT_TRUE(contains(ray,point));
+    EXPECT_TRUE(contains(ray, point));
 }
 
 TEST(ContainsTest, test_diagonal_ray_contains_point)
@@ -372,7 +377,7 @@ TEST(ContainsTest, test_diagonal_ray_contains_point)
     Ray ray     = Ray(Point(2, 2), Vector(-1, -1));
     Point point = Point(1, 1);
 
-    EXPECT_TRUE(contains(ray,point));
+    EXPECT_TRUE(contains(ray, point));
 }
 
 TEST(ContainsTest, test_ray_contains_distant_point)
@@ -380,14 +385,14 @@ TEST(ContainsTest, test_ray_contains_distant_point)
     Ray ray     = Ray(Point(2, 2), Vector(-1, -1));
     Point point = Point(-20, -20);
 
-    EXPECT_TRUE(contains(ray,point));
+    EXPECT_TRUE(contains(ray, point));
 }
 
 TEST(ContainsTest, test_ray_contains_ray_start)
 {
     Ray ray = Ray(Point(2, 2), Vector(-1, -1));
 
-    EXPECT_TRUE(contains(ray,ray.getStart()));
+    EXPECT_TRUE(contains(ray, ray.getStart()));
 }
 
 TEST(ContainsTest, test_segment_contains_point_no_x_deviation)
@@ -395,7 +400,7 @@ TEST(ContainsTest, test_segment_contains_point_no_x_deviation)
     Segment segment = Segment(Point(0, 0), Point(0, 1));
     Point point     = Point(0, 0.5);
 
-    EXPECT_TRUE(contains(segment,point));
+    EXPECT_TRUE(contains(segment, point));
 }
 
 TEST(ContainsTest, test_segment_contains_point_no_y_deviation)
@@ -403,7 +408,7 @@ TEST(ContainsTest, test_segment_contains_point_no_y_deviation)
     Segment segment = Segment(Point(0, 0), Point(1, 0));
     Point point     = Point(0.5, 0);
 
-    EXPECT_TRUE(contains(segment,point));
+    EXPECT_TRUE(contains(segment, point));
 }
 
 TEST(ContainsTest, test_diagonal_segment_contains_point)
@@ -411,7 +416,7 @@ TEST(ContainsTest, test_diagonal_segment_contains_point)
     Segment segment = Segment(Point(2, 2), Point(-1, -1));
     Point point     = Point(1, 1);
 
-    EXPECT_TRUE(contains(segment,point));
+    EXPECT_TRUE(contains(segment, point));
 }
 
 TEST(ContainsTest, test_segment_doesnt_contain_point)
@@ -419,15 +424,15 @@ TEST(ContainsTest, test_segment_doesnt_contain_point)
     Segment segment = Segment(Point(2, 2), Point(-1, -1));
     Point point     = Point(-2, -2);
 
-    EXPECT_FALSE(contains(segment,point));
+    EXPECT_FALSE(contains(segment, point));
 }
 
 TEST(ContainsTest, test_segment_contains_endpoints)
 {
     Segment segment = Segment(Point(2, 2), Point(-1, -1));
 
-    EXPECT_TRUE(contains(segment,segment.getSegStart()));
-    EXPECT_TRUE(contains(segment,segment.getEnd()));
+    EXPECT_TRUE(contains(segment, segment.getSegStart()));
+    EXPECT_TRUE(contains(segment, segment.getEnd()));
 }
 
 TEST(ContainsTest, vertical_segment_contains_point)
@@ -436,5 +441,5 @@ TEST(ContainsTest, vertical_segment_contains_point)
     Segment segment(Point(202, 15), Point(202, -15));
     Point point(202.00000000000003, -0.5);
 
-    EXPECT_TRUE(contains(segment,point));
+    EXPECT_TRUE(contains(segment, point));
 }

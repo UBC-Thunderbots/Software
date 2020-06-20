@@ -75,4 +75,3 @@ TEST(RayTest, to_unit_vector)
     Ray r   = Ray(Point(1, 1), a);
     EXPECT_EQ(r.toUnitVector(), Vector(sqrt(3), 1).normalize());
 }
-

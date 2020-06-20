@@ -101,9 +101,7 @@ std::ostream &operator<<(std::ostream &os, const Point &p)
 
 bool operator==(const Point &p, const Point &q)
 {
-    // TODO: see if this causes issues
-    return (p.x() ==q.x()) && (p.y() == q.x());
-    //return p.isClose(q, GeomConstants::FIXED_EPSILON);
+    return (p - q).lengthSquared() < GeomConstants::FIXED_EPSILON;
 }
 
 bool operator!=(const Point &p, const Point &q)

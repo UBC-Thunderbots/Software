@@ -100,15 +100,6 @@ class Rectangle : public ConvexPolygon
     double yMin() const;
 
     /**
-     * Returns the corner point of the rectangle that is the furthest from the input
-     * point.
-     *
-     * @param p The point to test
-     * @return The corner point that is furthest from the test point
-     */
-    Point furthestCorner(const Point &p) const;
-
-    /**
      * Returns a vector from negXNegY point of the rectangle to the posXPosY point
      *
      * @return The vector representing the diagonal of the rectangle

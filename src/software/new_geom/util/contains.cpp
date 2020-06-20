@@ -1,8 +1,9 @@
 // TODO: rename `util` to algorithms
+#include "software/new_geom/util/contains.h"
+
 #include "software/new_geom/geom_constants.h"
 #include "software/new_geom/util/almost_equal.h"
 #include "software/new_geom/util/collinear.h"
-#include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/distance.h"
 
 bool contains(const Circle& container, const Segment& contained)
@@ -102,7 +103,8 @@ bool contains(const Segment& container, const Point& contained, double fixed_eps
     return false;
 }
 
-bool contains(const Rectangle& container, const Point& contained){
+bool contains(const Rectangle& container, const Point& contained)
+{
     auto& p = contained;
     auto& r = container;
     return p.x() >= r.negXNegYCorner().x() && p.y() >= r.negXNegYCorner().y() &&

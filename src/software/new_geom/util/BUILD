@@ -9,6 +9,7 @@ cc_library(
         "contains.cpp",
         "distance.cpp",
         "find_open_circles.cpp",
+        "furthest_point.cpp",
         "intersection.cpp",
         "intersects.cpp",
         "voronoi_diagram.cpp",
@@ -20,6 +21,7 @@ cc_library(
         "contains.h",
         "distance.h",
         "find_open_circles.h",
+        "furthest_point.h",
         "intersection.h",
         "intersects.h",
         "voronoi_diagram.h",
@@ -141,6 +143,15 @@ cc_test(
     deps = [
         ":algorithms",
         "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "furthest_point_test",
+    srcs = ["furthest_point_test.cpp"],
+    deps = [
+        ":algorithms",
         "@gtest//:gtest_main",
     ],
 )

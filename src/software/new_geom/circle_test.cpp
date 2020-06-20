@@ -69,4 +69,3 @@ TEST(CircleAreaTest, circle_area_tests)
     Circle zero = Circle();
     EXPECT_EQ(0, zero.area());
 }
-
