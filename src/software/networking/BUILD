@@ -13,6 +13,19 @@ cc_library(
 )
 
 cc_library(
+    name = "threaded_proto_multicast_listener",
+    hdrs = [
+        "threaded_proto_multicast_listener.h",
+        "threaded_proto_multicast_listener.tpp",
+    ],
+    deps = [
+        ":proto_multicast_listener",
+        "//software/logger",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
     name = "proto_multicast_sender",
     hdrs = [
         "proto_multicast_sender.h",
