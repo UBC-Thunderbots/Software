@@ -36,10 +36,10 @@ void circular_buffer_destroy(CircularBuffer_t *cbuffer)
 void circular_buffer_push(CircularBuffer_t *cbuffer, float data)
 {
     cbuffer->buffer_data[cbuffer->head] = data;
-    cbuffer->head                       = ++(cbuffer->head) % cbuffer->max_size;
+    cbuffer->head                       = (cbuffer->head + 1) % cbuffer->max_size;
     if (circular_buffer_isFull(cbuffer) == true)
     {
-        cbuffer->tail = ++(cbuffer->tail) % cbuffer->max_size;
+        cbuffer->tail = (cbuffer->tail + 1) % cbuffer->max_size;
     }
 
     // Implementation assumes head and tail are equal when full

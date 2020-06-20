@@ -61,7 +61,6 @@ cc_test(
     deps = [
         ":theta_star_path_planner",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
-        "//software/test_util",
         "//software/world:field",
         "@gtest//:gtest_main",
     ],

@@ -80,7 +80,6 @@ cc_test(
     deps = [
         ":physics_ball",
         ":physics_field",
-        "//software/test_util",
         "//software/world:field",
         "@box2d",
         "@gtest//:gtest_main",
@@ -126,7 +125,7 @@ cc_test(
     deps = [
         ":physics_ball",
         ":physics_robot",
-        "//software/test_util",
+        "//software/time:duration",
         "//software/world:robot",
         "@box2d",
         "@gtest//:gtest_main",
@@ -185,6 +184,7 @@ cc_test(
     deps = [
         ":physics_object_user_data",
         ":simulation_contact_listener",
+        "//software/test_util",
         "//software/world:ball",
         "//software/world:robot",
         "@box2d",

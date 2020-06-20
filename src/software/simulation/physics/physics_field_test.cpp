@@ -5,7 +5,6 @@
 #include <math.h>
 
 #include "software/simulation/physics/physics_ball.h"
-#include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
 TEST(PhysicsFieldTest, test_get_field)
