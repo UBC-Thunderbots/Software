@@ -28,8 +28,8 @@ cc_library(
     hdrs = ["ai_wrapper.h"],
     deps = [
         "//software/ai",
-        "//software/gui/visualizer/drawing:draw_functions",
-        "//software/gui/visualizer/drawing:navigator",
+        "//software/gui/drawing:draw_functions",
+        "//software/gui/drawing:navigator",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/parameter:dynamic_parameters",

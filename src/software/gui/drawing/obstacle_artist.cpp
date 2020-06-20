@@ -1,4 +1,4 @@
-#include "software/gui/visualizer/drawing/obstacle_artist.h"
+#include "software/gui/drawing/obstacle_artist.h"
 
 ObstacleArtist::ObstacleArtist(QGraphicsScene* scene, const QPen& pen)
     : scene_(scene), pen_(pen)
