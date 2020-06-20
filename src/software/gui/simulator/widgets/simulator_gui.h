@@ -3,10 +3,10 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QMainWindow>
 
-#include "software/multithreading/thread_safe_buffer.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/gui/simulator/widgets/main_widget.h"
+#include "software/multithreading/thread_safe_buffer.h"
 #include "software/new_geom/rectangle.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
 /**
  * This is the main window / application object for the SimulatorGUI.
@@ -16,10 +16,11 @@
  * This class uses ThreadSafeBuffers to receive new data, and updates the GUI with
  * the new data at a defined rate using a timer.
  */
-class SimulatorGUI : public QMainWindow {
+class SimulatorGUI : public QMainWindow
+{
     Q_OBJECT
 
-public:
+   public:
     /**
      * Creates a new SimulatorGUI
      *
@@ -27,16 +28,18 @@ public:
      * @param view_area_buffer The buffer used to receive Rectangles that specify the area
      * of the world to display in the view
      */
-    explicit SimulatorGUI(std::shared_ptr<ThreadSafeBuffer<SSL_WrapperPacket>> ssl_wrapper_packet_buffer, std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer);
+    explicit SimulatorGUI(
+        std::shared_ptr<ThreadSafeBuffer<SSL_WrapperPacket>> ssl_wrapper_packet_buffer,
+        std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer);
 
-public slots:
+   public slots:
     /**
      * Draws all the contents of the most recently received SSL_WrapperPacket,
      * and updates the view area if necessary.
      */
     void drawSimulatorContents();
 
-private:
+   private:
     /**
      * Updates the area of the World being drawn in the Visualizer
      */

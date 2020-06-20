@@ -1,4 +1,5 @@
 #include "software/gui/simulator/widgets/main_widget.h"
+
 #include "software/gui/generic_widgets/world_view/world_view.h"
 
 MainWidget::MainWidget(QWidget* parent)
@@ -22,9 +23,11 @@ MainWidget::MainWidget(QWidget* parent)
     update();
 }
 
-void MainWidget::draw(const std::vector<DrawFunction>& draw_functions) {
+void MainWidget::draw(const std::vector<DrawFunction>& draw_functions)
+{
     scene->clear();
-    for(auto draw_function : draw_functions) {
+    for (auto draw_function : draw_functions)
+    {
         draw_function.execute(scene);
     }
 }
@@ -33,5 +36,5 @@ void MainWidget::setDrawViewArea(const QRectF& new_view_area)
 {
     scene->setSceneRect(new_view_area);
     main_widget->simulation_graphics_view->fitInView(scene->sceneRect(),
-                                                           Qt::KeepAspectRatio);
+                                                     Qt::KeepAspectRatio);
 }

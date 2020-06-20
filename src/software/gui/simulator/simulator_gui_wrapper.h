@@ -8,8 +8,8 @@
 
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/multithreading/threaded_observer.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/new_geom/rectangle.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
 /**
  * This class wraps our SimulatorGUI object which is responsible for

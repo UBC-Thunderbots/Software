@@ -1,8 +1,9 @@
 #include "software/gui/simulator/simulator_gui_wrapper.h"
-#include "software/gui/simulator/widgets/simulator_gui.h"
 
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
+
+#include "software/gui/simulator/widgets/simulator_gui.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 
 SimulatorGUIWrapper::SimulatorGUIWrapper(int argc, char** argv)
@@ -11,7 +12,7 @@ SimulatorGUIWrapper::SimulatorGUIWrapper(int argc, char** argv)
       ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
           ssl_wrapper_packet_buffer_size, false)),
       view_area_buffer(
-              std::make_shared<ThreadSafeBuffer<Rectangle>>(view_area_buffer_size, false)),
+          std::make_shared<ThreadSafeBuffer<Rectangle>>(view_area_buffer_size, false)),
       application_shutting_down(false),
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
@@ -41,7 +42,8 @@ void SimulatorGUIWrapper::createAndRunSimulator(int argc, char** argv)
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    SimulatorGUI* simulator_gui = new SimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer);
+    SimulatorGUI* simulator_gui =
+        new SimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer);
     simulator_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -65,9 +67,11 @@ void SimulatorGUIWrapper::onValueReceived(SSL_WrapperPacket wrapper_packet)
 
     if (remaining_attempts_to_set_view_area > 0)
     {
-        if(wrapper_packet.has_geometry()) {
+        if (wrapper_packet.has_geometry())
+        {
             auto field = createField(wrapper_packet.geometry());
-            if(field) {
+            if (field)
+            {
                 remaining_attempts_to_set_view_area--;
                 view_area_buffer->push(field->fieldBoundary());
             }
