@@ -6,6 +6,7 @@ cc_library(
         "proto_multicast_listener.h",
         "proto_multicast_listener.tpp",
     ],
+    visibility = ["//visibility:private"],
     deps = [
         "//software/logger",
         "@boost//:asio",
@@ -30,6 +31,7 @@ cc_library(
         "proto_multicast_sender.h",
         "proto_multicast_sender.tpp",
     ],
+    visibility = ["//visibility:private"],
     deps = [
         "//software/logger",
         "@boost//:asio",

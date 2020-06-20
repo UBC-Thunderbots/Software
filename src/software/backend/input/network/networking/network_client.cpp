@@ -16,76 +16,19 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                              std::shared_ptr<const RefboxConfig> refbox_config,
                              std::shared_ptr<const CameraConfig> camera_config)
     : network_filter(refbox_config),
-      io_service(),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
       received_world_callback(received_world_callback),
       refbox_config(refbox_config),
       camera_config(camera_config)
 {
-    setupVisionClient(vision_multicast_address, vision_multicast_port);
-
-    setupGameControllerClient(gamecontroller_multicast_address,
-                              gamecontroller_multicast_port);
-
-    startIoServiceThreadInBackground();
-}
-
-void NetworkClient::setupVisionClient(std::string vision_address, int vision_port)
-{
-    // Set up our connection over udp to receive vision packets
-    try
-    {
-        ssl_vision_client = std::make_unique<ProtoMulticastListener<SSL_WrapperPacket>>(
-            io_service, vision_address, vision_port,
+    ssl_vision_client = std::make_unique<ThreadedProtoMulticastListener<SSL_WrapperPacket>>(
+            vision_multicast_address, vision_multicast_port,
             boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
-    }
-    catch (const boost::exception& ex)
-    {
-        // LOG(FATAL) will terminate this process
-        LOG(FATAL) << "An error occured while setting up the SSL Vision Client:"
-                   << std::endl
-                   << boost::diagnostic_information(ex) << std::endl;
-    }
-}
 
-void NetworkClient::setupGameControllerClient(std::string gamecontroller_address,
-                                              int gamecontroller_port)
-{
-    // Set up our connection over udp to receive gamecontroller packets
-    try
-    {
-        ssl_gamecontroller_client = std::make_unique<ProtoMulticastListener<Referee>>(
-            io_service, gamecontroller_address, gamecontroller_port,
+    ssl_gamecontroller_client = std::make_unique<ThreadedProtoMulticastListener<Referee>>(
+            gamecontroller_multicast_address, gamecontroller_multicast_port,
             boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
-    }
-    catch (const boost::exception& ex)
-    {
-        // LOG(FATAL) will terminate this process
-        LOG(FATAL) << "An error occured while setting up the SSL GameController Client:"
-                   << std::endl
-                   << boost::diagnostic_information(ex) << std::endl;
-    }
-}
-
-void NetworkClient::startIoServiceThreadInBackground()
-{
-    // Start the thread to run the io_service in the background
-    io_service_thread = std::thread([this]() { io_service.run(); });
-}
-
-NetworkClient::~NetworkClient()
-{
-    // Stop the io_service. This is safe to call from another thread.
-    // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service
-    // This MUST be done before attempting to join the thread because otherwise the
-    // io_service will not stop and the thread will not join
-    io_service.stop();
-
-    // Join the io_service_thread so that we wait for it to exit before destructing the
-    // thread object. If we do not wait for the thread to finish executing, it will call
-    // `std::terminate` when we deallocate the thread object and kill our whole program
-    io_service_thread.join();
 }
 
 void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)

@@ -1,19 +1,13 @@
 #include <chrono>
 #include <thread>
 
-#include "boost/array.hpp"
-#include "boost/asio.hpp"
-#include "boost/bind.hpp"
 #include "firmware_new/boards/frankie_v1/constants.h"
 #include "firmware_new/proto/control.pb.h"
 #include "google/protobuf/message.h"
-#include "software/logger/logger.h"
-#include "software/networking/proto_multicast_sender.h"
-
+#include "software/networking/threaded_proto_multicast_sender.h"
 
 using boost::asio::ip::udp;
 using google::protobuf::Message;
-
 
 /*
  * This file serves as a testing file to easily send proto at a fixed rate.
@@ -49,13 +43,9 @@ int main(int argc, char* argv[])
     control_req.mutable_wheel_2_control()->CopyFrom(WheelControl);
     control_req.mutable_wheel_2_control()->CopyFrom(WheelControl);
 
-    // create an io service and run it in a thread to handle async calls
-    boost::asio::io_service io_service;
-    auto io_service_thread = std::thread([&]() { io_service.run(); });
-
     // create ProtoMulticastSender to send proto
-    auto sender = std::make_unique<ProtoMulticastSender<ControlMsg>>(
-        io_service, std::string(AI_MULTICAST_ADDRESS) + "%" + std::string(argv[1]),
+    auto sender = std::make_unique<ThreadedProtoMulticastSender<ControlMsg>>(
+        std::string(AI_MULTICAST_ADDRESS) + "%" + std::string(argv[1]),
         AI_MULTICAST_SEND_PORT);
 
     while (1)
