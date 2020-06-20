@@ -1,4 +1,8 @@
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = [
+    "//software/ai:__pkg__",
+    "//software/gui:__subpackages__",
+    "//software/simulated_tests:__pkg__",
+])
 
 cc_library(
     name = "colors",
@@ -15,7 +19,7 @@ cc_library(
     hdrs = ["geom.h"],
     deps = [
         "//software/geom",
-        "//software/gui/visualizer/geom:geometry_conversion",
+        "//software/gui:geometry_conversion",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_widgets",
@@ -31,8 +35,10 @@ cc_library(
         ":geom",
         "//shared:constants",
         "//software/geom",
-        "//software/gui/visualizer/geom:geometry_conversion",
-        "//software/world:ball",
+        "//software/gui:geometry_conversion",
+        "//software/math:math_functions",
+        "//software/sensor_fusion/filter:vision_detection",
+        "//software/world:ball_state",
         "//software/world:field",
         "@qt//:qt_widgets",
     ],
@@ -45,8 +51,6 @@ cc_library(
     deps = [
         ":colors",
         ":geom",
-        "//shared:constants",
-        "//software/gui/visualizer/geom:geometry_conversion",
         "//software/world:field",
         "@qt//:qt_widgets",
     ],
@@ -57,11 +61,13 @@ cc_library(
     srcs = ["robot.cpp"],
     hdrs = ["robot.h"],
     deps = [
+        ":colors",
         ":geom",
         "//shared:constants",
         "//software/geom",
-        "//software/gui/visualizer/geom:geometry_conversion",
-        "//software/world:robot",
+        "//software/gui:geometry_conversion",
+        "//software/sensor_fusion/filter:vision_detection",
+        "//software/world:robot_state",
         "@qt//:qt_widgets",
     ],
 )
@@ -103,7 +109,7 @@ cc_library(
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/obstacle:obstacle_visitor",
         "//software/geom",
-        "//software/gui/visualizer/geom:geometry_conversion",
+        "//software/gui:geometry_conversion",
         "@qt//:qt_widgets",
     ],
 )
@@ -119,7 +125,7 @@ cc_library(
         ":obstacle_artist",
         "//software/ai/navigator",
         "//software/geom",
-        "//software/gui/visualizer/geom:geometry_conversion",
+        "//software/gui:geometry_conversion",
         "@qt//:qt_widgets",
     ],
 )
@@ -130,5 +136,21 @@ cc_library(
     hdrs = ["draw_functions.h"],
     deps = [
         "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "ssl_wrapper_packet",
+    srcs = ["ssl_wrapper_packet.cpp"],
+    hdrs = ["ssl_wrapper_packet.h"],
+    deps = [
+        ":ball",
+        ":colors",
+        ":draw_functions",
+        ":field",
+        ":robot",
+        "//software/proto:ssl_cc_proto",
+        "//software/proto/message_translation:ssl_detection",
+        "//software/proto/message_translation:ssl_geometry",
     ],
 )

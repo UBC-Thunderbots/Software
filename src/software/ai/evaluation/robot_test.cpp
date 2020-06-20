@@ -221,7 +221,7 @@ TEST(RobotEvaluationTest, pass_with_stationary_ball)
     Vector ball_velocity = Vector(0, 0);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::TestUtil::createSSLDivBField();
+    Field field          = Field::createSSLDivisionBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
@@ -240,7 +240,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast)
     Vector ball_velocity = Vector(5, 5);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::TestUtil::createSSLDivBField();
+    Field field          = Field::createSSLDivisionBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
@@ -259,7 +259,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast_at_future_timestamp)
     Vector ball_velocity = Vector(5, 5);
     Timestamp timestamp  = Timestamp::fromSeconds(1);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::TestUtil::createSSLDivBField();
+    Field field          = Field::createSSLDivisionBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
@@ -278,7 +278,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_slow)
     Vector ball_velocity = Vector(0.1, 0.1);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::TestUtil::createSSLDivBField();
+    Field field          = Field::createSSLDivisionBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
@@ -297,7 +297,7 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_wrong_way)
     Vector ball_velocity = Vector(-5, -5);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::TestUtil::createSSLDivBField();
+    Field field          = Field::createSSLDivisionBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
@@ -316,7 +316,7 @@ TEST(RobotEvaluationTest, pass_with_ball_slightly_off)
     Vector ball_velocity = Vector(4, 4.5);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::TestUtil::createSSLDivBField();
+    Field field          = Field::createSSLDivisionBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 
@@ -335,7 +335,7 @@ TEST(RobotEvaluationTest, pass_ball_robot_timestamp_too_far_past)
     Vector ball_velocity = Vector(4, 4.5);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
-    Field field          = ::TestUtil::createSSLDivBField();
+    Field field          = Field::createSSLDivisionBField();
     World world(field, ball, Team(Duration::fromSeconds(10)),
                 Team(Duration::fromSeconds(10)));
 

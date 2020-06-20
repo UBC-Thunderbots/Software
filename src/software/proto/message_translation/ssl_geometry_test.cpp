@@ -601,7 +601,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_data_with_negative_thickness)
 
 TEST_F(SSLGeometryTest, test_convert_field_to_proto_and_back)
 {
-    Field field           = ::TestUtil::createSSLDivBField();
+    Field field           = Field::createSSLDivisionBField();
     const float thickness = 0.005f;
 
     auto field_proto = createGeometryData(field, thickness);

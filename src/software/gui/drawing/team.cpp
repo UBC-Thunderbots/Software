@@ -1,13 +1,15 @@
-#include "software/gui/visualizer/drawing/team.h"
+#include "software/gui/drawing/team.h"
 
-#include "software/gui/visualizer/drawing/colors.h"
-#include "software/gui/visualizer/drawing/robot.h"
+#include "software/gui/drawing/colors.h"
+#include "software/gui/drawing/robot.h"
 
 void drawTeam(QGraphicsScene* scene, const Team& team, QColor color)
 {
     for (const Robot& robot : team.getAllRobots())
     {
-        drawRobot(scene, robot, color);
+        auto robot_state = RobotStateWithId{
+            .id = robot.id(), .robot_state = robot.currentState().robotState()};
+        drawRobot(scene, robot_state, color);
     }
 }
 

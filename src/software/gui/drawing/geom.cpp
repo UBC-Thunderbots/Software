@@ -1,7 +1,7 @@
-#include "software/gui/visualizer/drawing/geom.h"
+#include "software/gui/drawing/geom.h"
 
 void drawRectangle(QGraphicsScene* scene, const Rectangle& rectangle, const QPen& pen,
-                   std::optional<QBrush> brush_opt)
+                   const std::optional<QBrush>& brush_opt)
 {
     QRectF qrect = createQRectF(rectangle);
     if (brush_opt)
@@ -15,7 +15,7 @@ void drawRectangle(QGraphicsScene* scene, const Rectangle& rectangle, const QPen
 }
 
 void drawPolygon(QGraphicsScene* scene, const Polygon& polygon, const QPen& pen,
-                 std::optional<QBrush> brush_opt)
+                 const std::optional<QBrush>& brush_opt)
 {
     auto poly = createQPolygonF(polygon);
     if (brush_opt)
@@ -29,7 +29,7 @@ void drawPolygon(QGraphicsScene* scene, const Polygon& polygon, const QPen& pen,
 }
 
 void drawCircle(QGraphicsScene* scene, const Circle& circle, const QPen& pen,
-                std::optional<QBrush> brush_opt)
+                const std::optional<QBrush>& brush_opt)
 {
     // The addEllipse function does not center the ellipse at the given coordinates, so it
     // is slightly easier to define the bounding rect within which the ellipse is drawn

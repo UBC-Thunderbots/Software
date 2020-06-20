@@ -61,7 +61,7 @@ std::vector<PlannerTestCase>
                   {.name  = "Circle of robots surrounding friendly robot at distance 3",
                    .start = Point(0, 0),
                    .end   = Point(4, 0),
-                   .navigable_area = Rectangle({-5, -5}, {5, 5}),
+                   .navigable_area = Rectangle({-4.5, -4.5}, {4.5, 4.5}),
                    .obstacles =
                        {
                            robot_navigation_obstacle_factory.createFromRobotPosition(

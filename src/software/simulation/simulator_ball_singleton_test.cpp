@@ -17,7 +17,7 @@ extern "C"
 
 TEST(SimulatorBallSingletonTest, test_create_firmware_ball_with_single_simulator_ball)
 {
-    auto physics_world = std::make_unique<PhysicsWorld>(::TestUtil::createSSLDivBField());
+    auto physics_world = std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
     physics_world->setBallState(BallState(Point(0.4, 0), Vector(-1.3, 2.01)));
     auto simulator_ball =
         std::make_shared<SimulatorBall>(physics_world->getPhysicsBall());
@@ -33,13 +33,13 @@ TEST(SimulatorBallSingletonTest, test_create_firmware_ball_with_single_simulator
 TEST(SimulatorBallSingletonTest, test_change_simulator_ball)
 {
     auto physics_world_1 =
-        std::make_unique<PhysicsWorld>(::TestUtil::createSSLDivBField());
+        std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
     physics_world_1->setBallState(BallState(Point(0.4, 0), Vector(-1.3, 2.01)));
     auto simulator_ball_1 =
         std::make_shared<SimulatorBall>(physics_world_1->getPhysicsBall());
 
     auto physics_world_2 =
-        std::make_unique<PhysicsWorld>(::TestUtil::createSSLDivBField());
+        std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
     physics_world_2->setBallState(BallState(Point(0, -3), Vector(0, 1)));
 
     auto simulator_ball_2 =
