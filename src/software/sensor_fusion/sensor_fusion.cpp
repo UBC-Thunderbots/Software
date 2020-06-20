@@ -1,6 +1,7 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
 #include "software/constants.h"
+#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 
 SensorFusion::SensorFusion()
@@ -11,9 +12,8 @@ SensorFusion::SensorFusion()
 {
 }
 
-void SensorFusion::onValueReceived(SensorMsg sensor_msg)
+std::optional<World> SensorFusion::getWorld() const
 {
-    updateWorld(sensor_msg);
     if (field && ball)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
@@ -26,7 +26,11 @@ void SensorFusion::onValueReceived(SensorMsg sensor_msg)
         {
             new_world.updateGameState(refbox_game_state);
         }
-        Subject<World>::sendValueToObservers(new_world);
+        return new_world;
+    }
+    else
+    {
+        return std::nullopt;
     }
 }
 

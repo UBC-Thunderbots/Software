@@ -1,4 +1,4 @@
-#include "software/simulated_tests/validation/continuous_function_validator.h"
+#include "software/simulated_tests/validation/non_terminating_function_validator.h"
 
 #include <gtest/gtest.h>
 
@@ -7,7 +7,7 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 
-TEST(ContinuousFunctionValidatorTest,
+TEST(NonTerminatingFunctionValidatorTest,
      test_validation_function_that_does_nothing_does_not_report_failure)
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
@@ -16,7 +16,7 @@ TEST(ContinuousFunctionValidatorTest,
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     world->updateBallStateWithTimestamp(
         TimestampedBallState(Point(-0.1, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
-    ContinuousFunctionValidator function_validator(validation_function, world);
+    NonTerminatingFunctionValidator function_validator(validation_function, world);
 
     for (unsigned int i = 0; i < 10; i++)
     {
@@ -24,7 +24,7 @@ TEST(ContinuousFunctionValidatorTest,
     }
 }
 
-TEST(ContinuousFunctionValidatorTest,
+TEST(NonTerminatingFunctionValidatorTest,
      test_world_updated_correctly_between_validation_function_restarts)
 {
     // This validation_functions uses exceptions as a way for the test to observe it's
@@ -47,7 +47,7 @@ TEST(ContinuousFunctionValidatorTest,
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
-    ContinuousFunctionValidator function_validator(validation_function, world);
+    NonTerminatingFunctionValidator function_validator(validation_function, world);
     world->updateBallStateWithTimestamp(
         TimestampedBallState(Point(-2, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
     try
@@ -96,7 +96,7 @@ TEST(ContinuousFunctionValidatorTest,
     }
 }
 
-TEST(ContinuousFunctionValidatorTest,
+TEST(NonTerminatingFunctionValidatorTest,
      test_coroutines_yield_correctly_in_validation_function)
 {
     // This validation_functions uses exceptions as a way for the test to observe it's
@@ -109,7 +109,7 @@ TEST(ContinuousFunctionValidatorTest,
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
-    ContinuousFunctionValidator function_validator(validation_function, world);
+    NonTerminatingFunctionValidator function_validator(validation_function, world);
 
     function_validator.executeAndCheckForFailures();
     function_validator.executeAndCheckForFailures();
