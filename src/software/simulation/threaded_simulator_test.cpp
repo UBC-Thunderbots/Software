@@ -9,7 +9,7 @@
 class ThreadedSimulatorTest : public ::testing::Test
 {
    protected:
-    ThreadedSimulatorTest() : threaded_simulator(::TestUtil::createSSLDivBField()) {}
+    ThreadedSimulatorTest() : threaded_simulator(Field::createSSLDivisionBField()) {}
 
     void SetUp() override
     {
