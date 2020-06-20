@@ -144,3 +144,24 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "threaded_simulator",
+    srcs = ["threaded_simulator.cpp"],
+    hdrs = ["threaded_simulator.h"],
+    deps = [
+        ":simulator",
+        "//software/proto:ssl_cc_proto",
+    ],
+)
+
+cc_test(
+    name = "threaded_simulator_test",
+    srcs = ["threaded_simulator_test.cpp"],
+    deps = [
+        ":threaded_simulator",
+        "//software/test_util",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)

@@ -10,23 +10,23 @@
  * This class will run the provided coroutine continuously by restarting it every time the
  * coroutine has completed.
  */
-class ContinuousFunctionValidator
+class NonTerminatingFunctionValidator
 {
    public:
     /**
-     * Creates a new ContinousFunctionValidator.
+     * Creates a new NonTerminatingFunctionValidator.
      *
-     * @param validation_function The ValidationFunction this FunctionValidator should
-     * manage and run
+     * @param validation_function The ValidationFunction this
+     * NonTerminatingFunctionValidator should manage and run
      * @param world The world that will be given to the ValidationFunction in order to run
      * it
      */
-    explicit ContinuousFunctionValidator(ValidationFunction validation_function,
-                                         std::shared_ptr<World> world);
+    explicit NonTerminatingFunctionValidator(ValidationFunction validation_function,
+                                             std::shared_ptr<World> world);
 
     /**
-     * Runs the ValidationFunction that was given to this FunctionValidator on
-     * construction. The ValidationFunction will be restarted if it has completed. As
+     * Runs the ValidationFunction that was given to this NonTerminatingFunctionValidator
+     * on construction. The ValidationFunction will be restarted if it has completed. As
      * such, the ValidationFunction can never be "done" and will only terminate due to
      * failures within the ValidationFunction, such as a failed GoogleTest assert
      */

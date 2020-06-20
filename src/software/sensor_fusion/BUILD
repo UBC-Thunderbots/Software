@@ -24,8 +24,7 @@ cc_library(
     deps = [
         ":refbox_data",
         "//software/backend:robot_status",
-        "//software/multithreading:subject",
-        "//software/multithreading:threaded_observer",
+        "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/primitive",
         "//software/proto:sensor_msg_cc_proto",
@@ -35,5 +34,16 @@ cc_library(
         "//software/sensor_fusion/filter:sensor_fusion_filters",
         "//software/sensor_fusion/filter:vision_detection",
         "//software/world",
+    ],
+)
+
+cc_library(
+    name = "threaded_sensor_fusion",
+    srcs = ["threaded_sensor_fusion.cpp"],
+    hdrs = ["threaded_sensor_fusion.h"],
+    deps = [
+        ":sensor_fusion",
+        "//software/multithreading:subject",
+        "//software/multithreading:threaded_observer",
     ],
 )
