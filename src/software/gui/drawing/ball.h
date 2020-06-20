@@ -6,6 +6,7 @@
 #include "software/world/ball_state.h"
 #include "software/world/field.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
+#include "software/gui/drawing/colors.h"
 
 /**
  * This file contains all the functions that allow us to draw a Ball in a

@@ -2,10 +2,8 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/gui/drawing/geom.h"
-#include "software/gui/geometry_conversion.h"
-#include "software/new_geom/segment.h"
-#include "software/world/robot.h"
+#include "software/gui/drawing/colors.h"
+#include "software/world/robot_state.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
 
 /**

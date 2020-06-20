@@ -4,8 +4,6 @@
 #include "software/math/math_functions.h"
 #include "software/new_geom/segment.h"
 #include "software/gui/drawing/geom.h"
-#include "software/gui/drawing/colors.h"
-#include "software/gui/geometry_conversion/geometry_conversion.h"
 
 void drawBallVelocity(QGraphicsScene *scene, const Point& position, const Vector& velocity, const QColor &color)
 {

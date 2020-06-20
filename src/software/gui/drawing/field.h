@@ -3,8 +3,6 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/gui/drawing/colors.h"
-#include "software/gui/drawing/geom.h"
-#include "software/gui/geometry_conversion.h"
 #include "software/world/field.h"
 
 /**

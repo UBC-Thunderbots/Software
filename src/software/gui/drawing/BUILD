@@ -51,8 +51,6 @@ cc_library(
     deps = [
         ":colors",
         ":geom",
-        "//shared:constants",
-        "//software/gui:geometry_conversion",
         "//software/world:field",
         "@qt//:qt_widgets",
     ],
@@ -137,5 +135,20 @@ cc_library(
     hdrs = ["draw_functions.h"],
     deps = [
         "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "ssl_wrapper_packet",
+    srcs = ["ssl_wrapper_packet.cpp"],
+    hdrs = ["ssl_wrapper_packet.h"],
+    deps = [
+        ":ball",
+        ":colors",
+        ":field",
+        ":robot",
+        "//software/proto:ssl_cc_proto",
+        "//software/proto/message_translation:ssl_detection",
+        "//software/proto/message_translation:ssl_geometry",
     ],
 )
