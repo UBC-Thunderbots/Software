@@ -4,7 +4,7 @@
 
 #include "software/gui/drawing/colors.h"
 #include "software/gui/drawing/geom.h"
-#include "software/gui/geometry_conversion/geometry_conversion.h"
+#include "software/gui/geometry_conversion.h"
 #include "software/new_geom/segment.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"

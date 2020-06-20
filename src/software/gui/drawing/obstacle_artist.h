@@ -7,7 +7,7 @@
 #include "software/gui/drawing/colors.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/drawing/geom.h"
-#include "software/gui/geometry_conversion/geometry_conversion.h"
+#include "software/gui/geometry_conversion.h"
 
 /**
  * The ObstacleArtist draws Obstacles with artistic flair

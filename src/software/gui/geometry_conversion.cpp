@@ -1,4 +1,4 @@
-#include "software/gui/geometry_conversion/geometry_conversion.h"
+#include "software/gui/geometry_conversion.h"
 
 QPointF createQPointF(const Point& point)
 {

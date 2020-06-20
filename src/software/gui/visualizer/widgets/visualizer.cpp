@@ -1,6 +1,6 @@
 #include "software/gui/visualizer/widgets/visualizer.h"
 
-#include "software/gui/geometry_conversion/geometry_conversion.h"
+#include "software/gui/geometry_conversion.h"
 
 Visualizer::Visualizer(
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,

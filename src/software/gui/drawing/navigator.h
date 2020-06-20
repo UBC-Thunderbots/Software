@@ -8,7 +8,7 @@
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/drawing/geom.h"
 #include "software/gui/drawing/obstacle_artist.h"
-#include "software/gui/geometry_conversion/geometry_conversion.h"
+#include "software/gui/geometry_conversion.h"
 
 /**
  * Gets the draw function for drawing the navigator
