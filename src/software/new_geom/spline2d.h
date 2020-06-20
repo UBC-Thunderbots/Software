@@ -95,7 +95,11 @@ class Spline2d
      * Get the parametrization values corresponding to the knots of this spline
      *
      * So for example, if we had a 3-knot spline that is linearly interpolated, this
-     * function would return {0, 0.5, 1}
+     * function would return {0, 0.5, 1}.
+     *
+     * NOTE: There is no guarantee that the knots will be at linearly interpolated
+     *       (equally spaced) intervals. This could return `{0, 0.25, 1.0}` and still be
+     *       well defined.
      *
      * @return The parametrization values corresponding to the knots of this spline
      */

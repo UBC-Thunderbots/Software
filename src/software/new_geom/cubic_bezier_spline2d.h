@@ -80,6 +80,9 @@ class CubicBezierSpline2d : public Spline2d
 
 
    private:
+    // The degree of the bezier curves that make up this spline
+    static const size_t BEZIER_CURVE_DEGREE = 3;
+
     /**
      * Get the segment of this spline at the given index
      *

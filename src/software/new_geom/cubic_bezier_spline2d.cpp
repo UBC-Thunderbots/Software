@@ -42,7 +42,7 @@ const Point CubicBezierSpline2d::getValueAt(double t) const
 const std::vector<Point> CubicBezierSpline2d::getKnots() const
 {
     std::vector<Point> knots;
-    for (size_t i = 0; i < control_points.size(); i += 3)
+    for (size_t i = 0; i < control_points.size(); i += BEZIER_CURVE_DEGREE)
     {
         knots.emplace_back(control_points[i]);
     }
@@ -52,9 +52,9 @@ const std::vector<Point> CubicBezierSpline2d::getKnots() const
 
 size_t CubicBezierSpline2d::getNumKnots() const
 {
-    // We are guaranteed to have 3*n + 1 control points (where `n` is some integer > 0) so
-    // we can safely do integer division here.
-    return static_cast<size_t>((control_points.size() - 1) / 3 + 1);
+    // We are guaranteed to have BEZIER_CURVE_DEGREE*n + 1 control points (where `n` is
+    // some integer > 0) so we can safely do integer division here.
+    return static_cast<size_t>((control_points.size() - 1) / BEZIER_CURVE_DEGREE + 1);
 }
 
 std::vector<double> CubicBezierSpline2d::getKnotParametrizationValues() const
@@ -107,8 +107,10 @@ size_t CubicBezierSpline2d::getNumSegments() const
 
 BezierCurve2d CubicBezierSpline2d::getSegmentAtIndex(size_t index) const
 {
-    return BezierCurve2d({control_points[index * 3], control_points[index * 3 + 1],
-                          control_points[index * 3 + 2], control_points[index * 3 + 3]});
+    return BezierCurve2d({control_points[index * BEZIER_CURVE_DEGREE],
+                          control_points[index * BEZIER_CURVE_DEGREE + 1],
+                          control_points[index * BEZIER_CURVE_DEGREE + 2],
+                          control_points[index * BEZIER_CURVE_DEGREE + 3]});
 }
 
 std::vector<Point> CubicBezierSpline2d::computeControlPoints(
@@ -164,7 +166,7 @@ std::vector<Point> CubicBezierSpline2d::computeControlPoints(
         }
     }
 
-    assert((control_points.size() - 1) % 3 == 0);
+    assert((control_points.size() - 1) % BEZIER_CURVE_DEGREE == 0);
 
     return control_points;
 }
