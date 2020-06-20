@@ -61,4 +61,4 @@ class ProtoMulticastListener
     std::function<void(ReceiveProto)> receive_callback;
 };
 
-#include "software/networking/proto_multicast_listener.hpp"
+#include "software/networking/proto_multicast_listener.tpp"
