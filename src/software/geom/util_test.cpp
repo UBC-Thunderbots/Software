@@ -15,7 +15,6 @@
 #include "software/test_util/test_util.h"
 #include "software/time/timestamp.h"
 
-
 TEST(GeomUtilTest, test_collinear)
 {
     for (unsigned int i = 0; i < 10; ++i)

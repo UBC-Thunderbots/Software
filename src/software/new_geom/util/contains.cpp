@@ -1,4 +1,3 @@
-// TODO: rename `util` to algorithms
 #include "software/new_geom/util/contains.h"
 
 #include "software/new_geom/geom_constants.h"
