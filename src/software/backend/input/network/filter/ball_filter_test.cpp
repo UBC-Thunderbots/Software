@@ -196,7 +196,7 @@ class BallFilterTest : public ::testing::Test
 
             // Create the detection that would have been seen by the vision system
             std::vector<BallDetection> ball_detections = {BallDetection{
-                    ball_position_with_noise, BALL_DISTANCE_FROM_GROUND, current_timestamp}};
+                ball_position_with_noise, BALL_DISTANCE_FROM_GROUND, current_timestamp}};
 
             // Get the filtered result given the new detection information
             auto filtered_ball = ball_filter.getFilteredData(ball_detections, field);
@@ -513,8 +513,10 @@ TEST_F(BallFilterTest,
     boost::circular_buffer<BallDetection> ball_detections(2);
     Point p1(0, 0);
     Point p2(1, 0.5);
-    ball_detections.push_front({p1, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(1)});
-    ball_detections.push_front({p2, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(2)});
+    ball_detections.push_front(
+        {p1, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(1)});
+    ball_detections.push_front(
+        {p2, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(2)});
     auto x_vs_y_regression = ball_filter.getLinearRegressionLine(ball_detections);
 
     double d1 = distance(x_vs_y_regression.regression_line, p1);
