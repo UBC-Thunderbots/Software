@@ -1,12 +1,12 @@
-#include "software/gui/simulator/simulator_gui_wrapper.h"
+#include "software/gui/standalone_simulator/standalone_simulator_gui_wrapper.h"
 
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
 
-#include "software/gui/simulator/widgets/simulator_gui.h"
+#include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 
-SimulatorGUIWrapper::SimulatorGUIWrapper(int argc, char** argv)
+StandaloneSimulatorGUIWrapper::StandaloneSimulatorGUIWrapper(int argc, char** argv)
     : ThreadedObserver<SSL_WrapperPacket>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
@@ -17,10 +17,10 @@ SimulatorGUIWrapper::SimulatorGUIWrapper(int argc, char** argv)
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
     run_simulator_gui_thread =
-        std::thread(&SimulatorGUIWrapper::createAndRunSimulator, this, argc, argv);
+        std::thread(&StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI, this, argc, argv);
 }
 
-SimulatorGUIWrapper::~SimulatorGUIWrapper()
+StandaloneSimulatorGUIWrapper::~StandaloneSimulatorGUIWrapper()
 {
     QCoreApplication* application_ptr = QApplication::instance();
     if (!application_shutting_down.load() && application_ptr != nullptr)
@@ -34,7 +34,7 @@ SimulatorGUIWrapper::~SimulatorGUIWrapper()
     run_simulator_gui_thread.join();
 }
 
-void SimulatorGUIWrapper::createAndRunSimulator(int argc, char** argv)
+void StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI(int argc, char** argv)
 {
     // We use raw pointers to have explicit control over the order of destruction.
     // For some reason, putting the QApplication and SimulatorGUI on the stack does
@@ -42,8 +42,8 @@ void SimulatorGUIWrapper::createAndRunSimulator(int argc, char** argv)
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    SimulatorGUI* simulator_gui =
-        new SimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer);
+    StandaloneSimulatorGUI* simulator_gui =
+        new StandaloneSimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer);
     simulator_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -61,7 +61,7 @@ void SimulatorGUIWrapper::createAndRunSimulator(int argc, char** argv)
     termination_promise_ptr->set_value();
 }
 
-void SimulatorGUIWrapper::onValueReceived(SSL_WrapperPacket wrapper_packet)
+void StandaloneSimulatorGUIWrapper::onValueReceived(SSL_WrapperPacket wrapper_packet)
 {
     ssl_wrapper_packet_buffer->push(wrapper_packet);
 
@@ -79,7 +79,7 @@ void SimulatorGUIWrapper::onValueReceived(SSL_WrapperPacket wrapper_packet)
     }
 }
 
-std::shared_ptr<std::promise<void>> SimulatorGUIWrapper::getTerminationPromise()
+std::shared_ptr<std::promise<void>> StandaloneSimulatorGUIWrapper::getTerminationPromise()
 {
     return termination_promise_ptr;
 }

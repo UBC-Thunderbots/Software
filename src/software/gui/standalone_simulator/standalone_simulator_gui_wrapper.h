@@ -13,12 +13,12 @@
 
 /**
  * This class wraps our SimulatorGUI object which is responsible for
- * visualizing the state of the simulator and allowing users to control it.
+ * visualizing simulation and allowing users to control it.
  */
-class SimulatorGUIWrapper : public ThreadedObserver<SSL_WrapperPacket>
+class StandaloneSimulatorGUIWrapper : public ThreadedObserver<SSL_WrapperPacket>
 {
    public:
-    SimulatorGUIWrapper() = delete;
+    StandaloneSimulatorGUIWrapper() = delete;
 
     /**
      * Create a new Simulator GUI wrapper. The argc and argv arguments are required
@@ -27,9 +27,9 @@ class SimulatorGUIWrapper : public ThreadedObserver<SSL_WrapperPacket>
      * @param argc The number of arguments being passed
      * @param argv Keyword arguments
      */
-    explicit SimulatorGUIWrapper(int argc, char** argv);
+    explicit StandaloneSimulatorGUIWrapper(int argc, char** argv);
 
-    ~SimulatorGUIWrapper() override;
+    ~StandaloneSimulatorGUIWrapper() override;
 
     /**
      * Returns a shared_ptr to a promise that can be waited on, and that will
@@ -53,7 +53,7 @@ class SimulatorGUIWrapper : public ThreadedObserver<SSL_WrapperPacket>
      * @param argc The number of arguments being passed
      * @param argv Keyword arguments for the Visualizer QApplication
      */
-    void createAndRunSimulator(int argc, char** argv);
+    void createAndRunStandaloneSimulatorGUI(int argc, char** argv);
 
     std::thread run_simulator_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;

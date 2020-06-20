@@ -1,9 +1,9 @@
-#include "software/gui/simulator/widgets/simulator_gui.h"
+#include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 
 #include "software/gui/drawing/ssl_wrapper_packet.h"
 #include "software/gui/geometry_conversion.h"
 
-SimulatorGUI::SimulatorGUI(
+StandaloneSimulatorGUI::StandaloneSimulatorGUI(
     std::shared_ptr<ThreadSafeBuffer<SSL_WrapperPacket>> ssl_wrapper_packet_buffer,
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer)
     : QMainWindow(),
@@ -13,12 +13,12 @@ SimulatorGUI::SimulatorGUI(
       view_area_buffer(view_area_buffer)
 {
     setCentralWidget(main_widget);
-    connect(update_timer, &QTimer::timeout, this, &SimulatorGUI::drawSimulatorContents);
+    connect(update_timer, &QTimer::timeout, this, &StandaloneSimulatorGUI::drawSimulatorContents);
     update_timer->start(static_cast<int>(
         Duration::fromSeconds(DRAW_UPDATE_INTERVAL_SECONDS).getMilliseconds()));
 }
 
-void SimulatorGUI::drawSimulatorContents()
+void StandaloneSimulatorGUI::drawSimulatorContents()
 {
     auto ssl_wrapper_packet = ssl_wrapper_packet_buffer->popMostRecentlyAddedValue();
     if (ssl_wrapper_packet)
@@ -30,7 +30,7 @@ void SimulatorGUI::drawSimulatorContents()
     updateDrawViewArea();
 }
 
-void SimulatorGUI::updateDrawViewArea()
+void StandaloneSimulatorGUI::updateDrawViewArea()
 {
     std::optional<Rectangle> view_area = view_area_buffer->popLeastRecentlyAddedValue();
     if (view_area)

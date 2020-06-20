@@ -1,4 +1,4 @@
-#include "software/gui/simulator/widgets/main_widget.h"
+#include "software/gui/standalone_simulator/widgets/main_widget.h"
 
 #include "software/gui/generic_widgets/world_view/world_view.h"
 
