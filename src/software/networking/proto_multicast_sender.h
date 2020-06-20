@@ -43,4 +43,4 @@ class ProtoMulticastSender
     std::string data_buffer;
 };
 
-#include "software/networking/proto_multicast_sender.tpp"
+#include "software/networking/proto_multicast_sender.hpp"

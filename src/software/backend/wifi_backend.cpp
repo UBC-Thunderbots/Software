@@ -15,7 +15,7 @@ WifiBackend::WifiBackend()
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&WifiBackend::receiveWorld, this, _1),
                     Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    Util::DynamicParameters->getCameraConfig()),
+                    Util::DynamicParameters->getCameraConfig())
 {
     std::string network_interface =
         Util::DynamicParameters->getNetworkConfig()->NetworkInterface()->value();

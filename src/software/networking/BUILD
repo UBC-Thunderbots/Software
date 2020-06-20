@@ -1,37 +1,17 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "proto_multicast_listener",
-    hdrs = [
-        "proto_multicast_listener.h",
-        "proto_multicast_listener.tpp",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        "//software/logger",
-        "@boost//:asio",
-    ],
-)
-
-cc_library(
     name = "threaded_proto_multicast_listener",
+    # We include the non-threaded class as srcs so the headers
+    # cannot accidentally be seen or included by other code
+    srcs = [
+        "proto_multicast_listener.h",
+        "proto_multicast_listener.hpp",
+    ],
     hdrs = [
         "threaded_proto_multicast_listener.h",
         "threaded_proto_multicast_listener.tpp",
     ],
-    deps = [
-        ":proto_multicast_listener",
-        "@boost//:asio",
-    ],
-)
-
-cc_library(
-    name = "proto_multicast_sender",
-    hdrs = [
-        "proto_multicast_sender.h",
-        "proto_multicast_sender.tpp",
-    ],
-    visibility = ["//visibility:private"],
     deps = [
         "//software/logger",
         "@boost//:asio",
@@ -40,12 +20,18 @@ cc_library(
 
 cc_library(
     name = "threaded_proto_multicast_sender",
+    # We include the non-threaded class as srcs so the headers
+    # cannot accidentally be seen or included by other code
+    srcs = [
+        "proto_multicast_sender.h",
+        "proto_multicast_sender.hpp",
+    ],
     hdrs = [
         "threaded_proto_multicast_sender.h",
         "threaded_proto_multicast_sender.tpp",
     ],
     deps = [
-        ":proto_multicast_sender",
+        "//software/logger",
         "@boost//:asio",
     ],
 )

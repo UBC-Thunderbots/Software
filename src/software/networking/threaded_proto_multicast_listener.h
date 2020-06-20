@@ -7,6 +7,9 @@
 #include "software/networking/proto_multicast_listener.h"
 
 template <class ReceiveProto>
+class ProtoMulticastListener;
+
+template <class ReceiveProto>
 class ThreadedProtoMulticastListener
 {
    public:
