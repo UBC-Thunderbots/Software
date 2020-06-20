@@ -49,6 +49,11 @@ class CubicBezierSpline2d : public Spline2d
      *                         "symmetric" with `start_vector`
      * @param intermediate_knots The intermediate points between `start_point` and
      *                                    `end_point` that this spline will pass through
+     *
+     * The direction of the start and end vectors determine the direction of the curve at
+     * the start and end points. The magnitude of these vectors determine how far the
+     * curve is stretched in the direction of the vector before connecting with the
+     * intermediate points
      */
     explicit CubicBezierSpline2d(const Point& start_point, const Vector& start_vector,
                                  const Point& end_point, const Vector& end_vector,
