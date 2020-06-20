@@ -36,6 +36,27 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "wheel_controller",
+    srcs = ["wheel_controller.c"],
+    hdrs = ["wheel_controller.h"],
+    visibility = [
+        "//visibility:private",
+    ],
+    deps = [
+        "//firmware/shared:circular_buffer",
+    ],
+)
+
+cc_test(
+    name = "wheel_controller_test",
+    srcs = ["wheel_controller_test.cpp"],
+    deps = [
+        ":wheel_controller" +
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_test(
     name = "trajectory_planner_test",
     srcs = ["trajectory_planner_test.cpp"],
