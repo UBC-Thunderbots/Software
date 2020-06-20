@@ -14,11 +14,10 @@
  * solution to that.
  *
  * DrawFunctions can capture any data that supports copying and
- * "store" it for later. That way the entire function can be copied
+ * "store" it for later. That way the entire DrawFunction can be copied
  * and passed around the system, until some consumer calls it to
- * draw its contents. This way we can hide the details of "how"
- * something is drawn, but still pass around complex DrawFunctions
- * in order to draw non-copyable objects.
+ * draw its contents. This allows us to draw larger non-copyable objects
+ * by creating a DrawFunction from it's copyable components / members.
  */
 class DrawFunction
 {
