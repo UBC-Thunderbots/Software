@@ -4,6 +4,7 @@
 
 #include "software/logger/logger.h"
 #include "software/new_geom/util/distance.h"
+#include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/intersection.h"
 #define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
 #include "software/new_geom/point_boost_geometry_compatability.h"
@@ -85,7 +86,7 @@ std::vector<Circle> VoronoiDiagram::voronoiVerticesToOpenCircles(
     for (auto vertex : diagram->vertices())
     {
         // We only want to consider vertices within our rectangle
-        if (bounding_box.contains(Point(vertex.x(), vertex.y())))
+        if (contains(bounding_box, Point(vertex.x(), vertex.y())))
         {
             std::vector<Point> triangle;
             auto edge = vertex.incident_edge();

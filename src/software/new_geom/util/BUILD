@@ -8,10 +8,10 @@ cc_library(
         "collinear.cpp",
         "contains.cpp",
         "distance.cpp",
-        # TODO: uncomment
-        #"find_open_circles.cpp",
+        "find_open_circles.cpp",
         "intersection.cpp",
         "intersects.cpp",
+        "voronoi_diagram.cpp",
     ],
     hdrs = [
         "almost_equal.h",
@@ -19,10 +19,10 @@ cc_library(
         "collinear.h",
         "contains.h",
         "distance.h",
-        # TODO: uncomment
-        #"find_open_circles.h",
+        "find_open_circles.h",
         "intersection.h",
         "intersects.h",
+        "voronoi_diagram.h",
     ],
     deps = [
         "//software/logger",
@@ -104,7 +104,7 @@ cc_test(
         "closest_point_test.cpp",
     ],
     deps = [
-        ":closest_point",
+        ":algorithms",
         "@gtest//:gtest_main",
     ],
 )
@@ -115,7 +115,7 @@ cc_test(
         "distance_test.cpp",
     ],
     deps = [
-        ":distance",
+        ":algorithms",
         "//software/new_geom:rectangle",
         "@gtest//:gtest_main",
     ],
@@ -127,40 +127,20 @@ cc_test(
         "find_open_circles_test.cpp",
     ],
     deps = [
-        ":find_open_circles",
+        ":algorithms",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
 
-# TODO: uncomment
-#cc_library(
-#    name = "voronoi_diagram",
-#    srcs = [
-#        "voronoi_diagram.cpp",
-#    ],
-#    hdrs = [
-#        "voronoi_diagram.h",
-#    ],
-#    deps = [
-#        ":distance",
-#        ":intersection",
-#        "//software/logger",
-#        "//software/new_geom:circle",
-#        "//software/new_geom:point",
-#        "//software/new_geom:point_boost_geometry_compatability",
-#        "//software/new_geom:rectangle",
-#    ],
-#)
-#
-#cc_test(
-#    name = "voronoi_diagram_test",
-#    srcs = [
-#        "voronoi_diagram_test.cpp",
-#    ],
-#    deps = [
-#        ":voronoi_diagram",
-#        "//software/test_util",
-#        "@gtest//:gtest_main",
-#    ],
-#)
+cc_test(
+    name = "voronoi_diagram_test",
+    srcs = [
+        "voronoi_diagram_test.cpp",
+    ],
+    deps = [
+        ":algorithms",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

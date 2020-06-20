@@ -249,17 +249,7 @@ cc_test(
     ],
     deps = [
         ":ray",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "segment_test",
-    srcs = [
-        "segment_test.cpp",
-    ],
-    deps = [
-        ":segment",
+        "//software/new_geom/util:algorithms",
         "@gtest//:gtest_main",
     ],
 )
@@ -334,12 +324,13 @@ cc_test(
 )
 
 cc_test(
-    name = "linear_spline_test",
+    name = "linear_spline2d_test",
     srcs = [
         "linear_spline2d_test.cpp",
     ],
     deps = [
         ":linear_spline2d",
+        "//software/new_geom/util:algorithms",
         "@gtest//:gtest_main",
     ],
 )

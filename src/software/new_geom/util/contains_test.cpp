@@ -287,3 +287,154 @@ TEST(ContainsTest, test_polygon_triangle_contains_point_with_point_on_side)
     bool result = contains(polygon, point);
     EXPECT_TRUE(result);
 }
+
+TEST(ContainsTest, test_point_in_different_quadrant)
+{
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-2, -2)),Point(1, 1)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(-2, -2)),Point(-1, -1)));
+}
+
+TEST(ContainsTest, test_point_in_same_quadrant)
+{
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)),Point(1, 2)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(-2, 3)));
+}
+
+TEST(ContainsTest, test_point_on_rectangle_corner)
+{
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(2, 2)),Point(0, 0)));
+}
+
+TEST(ContainsTest, test_point_on_rectangle_edge)
+{
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)),Point(3, 3)));
+}
+
+TEST(ContainsTest, test_point_off_left_of_rectangle)
+{
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(-7, 2)));
+}
+
+TEST(ContainsTest, test_point_off_right_of_rectangle)
+{
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(1, 0)));
+}
+
+TEST(ContainsTest, test_point_off_below_rectangle)
+{
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(-2, -1)));
+}
+
+TEST(ContainsTest, test_point_off_above_rectangle)
+{
+    EXPECT_FALSE(contains(Rectangle(Point(0, 0), Point(-4, 4)),Point(-2, 5)));
+}
+
+TEST(ContainsTest, test_point_centre_of_rectangle)
+{
+    EXPECT_TRUE(contains(Rectangle(Point(1, 1), Point(-1, -1)),Point(0.5, 0.5)));
+}
+
+TEST(ContainsTest, test_ray_contains_point_no_x_deviation)
+{
+    Ray ray     = Ray(Point(0, 0), Vector(0, 1));
+    Point point = Point(0, 0.5);
+
+    EXPECT_TRUE(contains(ray,point));
+}
+
+TEST(ContainsTest, test_ray_doesnt_contain_point_behind_start)
+{
+    Ray ray     = Ray(Point(0, 0), Vector(0, 1));
+    Point point = Point(0, -0.5);
+
+    EXPECT_FALSE(contains(ray,point));
+}
+
+TEST(ContainsTest, test_ray_doesnt_contain_point)
+{
+    Ray ray     = Ray(Point(0, 0), Vector(0, 1));
+    Point point = Point(-5, 10);
+
+    EXPECT_FALSE(contains(ray,point));
+}
+
+TEST(ContainsTest, test_ray_contains_point_no_y_deviation)
+{
+    Ray ray     = Ray(Point(0, 0), Vector(1, 0));
+    Point point = Point(0.5, 0);
+
+    EXPECT_TRUE(contains(ray,point));
+}
+
+TEST(ContainsTest, test_diagonal_ray_contains_point)
+{
+    Ray ray     = Ray(Point(2, 2), Vector(-1, -1));
+    Point point = Point(1, 1);
+
+    EXPECT_TRUE(contains(ray,point));
+}
+
+TEST(ContainsTest, test_ray_contains_distant_point)
+{
+    Ray ray     = Ray(Point(2, 2), Vector(-1, -1));
+    Point point = Point(-20, -20);
+
+    EXPECT_TRUE(contains(ray,point));
+}
+
+TEST(ContainsTest, test_ray_contains_ray_start)
+{
+    Ray ray = Ray(Point(2, 2), Vector(-1, -1));
+
+    EXPECT_TRUE(contains(ray,ray.getStart()));
+}
+
+TEST(ContainsTest, test_segment_contains_point_no_x_deviation)
+{
+    Segment segment = Segment(Point(0, 0), Point(0, 1));
+    Point point     = Point(0, 0.5);
+
+    EXPECT_TRUE(contains(segment,point));
+}
+
+TEST(ContainsTest, test_segment_contains_point_no_y_deviation)
+{
+    Segment segment = Segment(Point(0, 0), Point(1, 0));
+    Point point     = Point(0.5, 0);
+
+    EXPECT_TRUE(contains(segment,point));
+}
+
+TEST(ContainsTest, test_diagonal_segment_contains_point)
+{
+    Segment segment = Segment(Point(2, 2), Point(-1, -1));
+    Point point     = Point(1, 1);
+
+    EXPECT_TRUE(contains(segment,point));
+}
+
+TEST(ContainsTest, test_segment_doesnt_contain_point)
+{
+    Segment segment = Segment(Point(2, 2), Point(-1, -1));
+    Point point     = Point(-2, -2);
+
+    EXPECT_FALSE(contains(segment,point));
+}
+
+TEST(ContainsTest, test_segment_contains_endpoints)
+{
+    Segment segment = Segment(Point(2, 2), Point(-1, -1));
+
+    EXPECT_TRUE(contains(segment,segment.getSegStart()));
+    EXPECT_TRUE(contains(segment,segment.getEnd()));
+}
+
+TEST(ContainsTest, vertical_segment_contains_point)
+{
+    // A point that is very close to being collinear with a vertical segment
+    Segment segment(Point(202, 15), Point(202, -15));
+    Point point(202.00000000000003, -0.5);
+
+    EXPECT_TRUE(contains(segment,point));
+}

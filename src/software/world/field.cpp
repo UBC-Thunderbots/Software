@@ -4,6 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/new_geom/rectangle.h"
+#include "software/new_geom/util/contains.h"
 #include "software/time/timestamp.h"
 
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
@@ -227,24 +228,24 @@ double Field::boundaryMargin() const
 
 bool Field::pointInFriendlyDefenseArea(const Point &p) const
 {
-    return friendlyDefenseArea().contains(p);
+    return contains(friendlyDefenseArea(),p);
 }
 
 bool Field::pointInEnemyDefenseArea(const Point &p) const
 {
-    return enemyDefenseArea().contains(p);
+    return contains(enemyDefenseArea(),p);
 }
 
 bool Field::pointInFieldLines(const Point &p) const
 {
-    return fieldLines().contains(p);
+    return contains(fieldLines(),p);
 }
 
 bool Field::pointInEntireField(const Point &p) const
 {
     Rectangle entire_field = Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
                                        Point(totalXLength() / 2, totalYLength() / 2));
-    return entire_field.contains(p);
+    return contains(entire_field,p);
 }
 
 bool Field::operator==(const Field &other) const

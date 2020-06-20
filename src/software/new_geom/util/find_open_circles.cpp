@@ -2,6 +2,7 @@
 
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
+#include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/voronoi_diagram.h"
 
 std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
@@ -25,7 +26,7 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
     // Filters out points that are outside of the bounding box
     points.erase(std::remove_if(points.begin(), points.end(),
                                 [&bounding_box](const Point &p) {
-                                    return !bounding_box.contains(p);
+                                    return !contains(bounding_box, p);
                                 }),
                  points.end());
 
