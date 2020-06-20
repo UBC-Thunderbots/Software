@@ -35,7 +35,10 @@
 #include "io/motor.h"
 #include "io/mrf.h"
 #include "main.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
 #include "priority.h"
+#include "shared/proto/radio_primitive.pb.h"
 
 /**
  * \brief The number of robots in the drive packet.
@@ -107,7 +110,8 @@ static void receive_task(void *UNUSED(param))
                     // Note that camera packets have a variable length.
                     if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x0FU)
                     {
-                        handle_drive_packet(dma_buffer);
+                        handle_drive_packet(&dma_buffer[MESSAGE_PAYLOAD_ADDR],
+                                            frame_length - HEADER_LENGTH - FOOTER_LENGTH);
                     }
                     else if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x10U)
                     {
@@ -195,48 +199,56 @@ void receive_tick(log_record_t *record)
 /**
  * \brief Returns the serial number of the most recent drive packet.
  */
+// TODO: we're no longer updating the serial. Update or delete
 uint8_t receive_last_serial(void)
 {
     return __atomic_load_n(&last_serial, __ATOMIC_RELAXED);
 }
 
-void handle_drive_packet(uint8_t *dma_buffer)
+void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
 {
-    // Grab emergency stop status from the end of the frame.
-    bool estop_run =
-        !!dma_buffer[MESSAGE_PAYLOAD_ADDR + NUM_ROBOTS * RECEIVE_DRIVE_BYTES_PER_ROBOT];
-
-    // Grab a pointer to the robot’s own data block.
-    const uint8_t *robot_data =
-        dma_buffer + MESSAGE_PAYLOAD_ADDR + RECEIVE_DRIVE_BYTES_PER_ROBOT * robot_index;
+    uint8_t packet_robot_id                 = packet_data[packet_size - 3];
+    bool estop_run                          = !!packet_data[packet_size - 2];
+    bool feedback_requested_from_this_robot = packet_data[packet_size - 1] == robot_index;
 
     // Check if feedback should be sent.
-    if (robot_data[0] & 0x80)
+    if (feedback_requested_from_this_robot)
     {
         feedback_pend_normal();
     }
 
-    // Extract the serial number.
-    uint8_t serial = *robot_data++ & 0x0F;
 
-    // Construct the individual 16-bit words sent from the host.
-    uint16_t words[4U];
-    for (unsigned int i = 0U; i < 4U; ++i)
+    // Check if this drive packet was intended for us, if not we can stop here
+    if (packet_robot_id != robot_index)
     {
-        words[i] = *robot_data++;
-        words[i] |= (uint16_t)*robot_data++ << 8;
+        return;
     }
 
-    // In case of emergency stop, treat everything as zero
-    // except the chicker discharge bit (that can keep its
-    // status).
-    if (!estop_run)
+    // Decode the primitive
+    pb_istream_t pb_in_stream  = pb_istream_from_buffer(packet_data, packet_size - 3);
+    RadioPrimitiveMsg prim_msg = RadioPrimitiveMsg_init_zero;
+    if (!pb_decode(&pb_in_stream, RadioPrimitiveMsg_fields, &prim_msg))
     {
-        static const uint16_t MASK[4] = {0x0000, 0x4000, 0x0000, 0x0000};
-        for (unsigned int i = 0; i != 4; ++i)
-        {
-            words[i] &= MASK[i];
-        }
+        // TODO: log or do something here
+        return;
+    }
+
+    primitive_params_t pparams = {.slow   = prim_msg.slow,
+                                        .extra  = prim_msg.extra_bits,
+                                        .params = {
+                                            prim_msg.parameter1,
+                                            prim_msg.parameter2,
+                                            prim_msg.parameter3,
+                                            prim_msg.parameter4,
+                                        }};
+
+    if (!estop_run){
+        pparams.params[0]  = 0;
+        pparams.params[1]  = 0;
+        pparams.params[2]  = 0;
+        pparams.params[3]  = 0;
+        pparams.slow = true;
+        pparams.extra = 0;
     }
 
     // Take the drive mutex.
@@ -246,9 +258,15 @@ void handle_drive_packet(uint8_t *dma_buffer)
     timeout_ticks = 1000U / portTICK_PERIOD_MS;
 
     // Apply the charge and discharge mode.
-    charger_enable(words[1] & 0x8000);
-    chicker_discharge(words[1] & 0x4000);
+    if (!estop_run){
+        charger_enable(false);
+        chicker_discharge(true);
+    } else {
+        charger_enable(true);
+        chicker_discharge(false);
+    }
 
+    // TODO: check that we're still abiding by this monstrosity
     // If the serial number, the emergency stop has just
     // been switched to stop, or the current primitive is
     // direct, a new movement primitive needs to start. Do
@@ -261,26 +279,8 @@ void handle_drive_packet(uint8_t *dma_buffer)
     // is switched from stop to run, but this is
     // unnecessary as direct primitives shouldn’t care
     // about being started more often than necessary.
-    unsigned int primitive;
-    primitive_params_t pparams;
-    for (unsigned int i = 0; i != 4; ++i)
-    {
-        int16_t value = words[i] & 0x3FF;
-        if (words[i] & 0x400)
-        {
-            value = -value;
-        }
-        if (words[i] & 0x800)
-        {
-            value *= 10;
-        }
-        pparams.params[i] = value;
-    }
-    primitive     = words[0] >> 12;
-    pparams.extra = (words[2] >> 12) | ((words[3] >> 12) << 4);
-    pparams.slow  = !!(pparams.extra & 0x80);
-    pparams.extra &= 0x7F;
-    if ((serial != last_serial /* Non-atomic because we are only writer */) ||
+    unsigned int primitive = prim_msg.prim_type;
+    if (
         !estop_run || app_primitive_manager_primitiveIsDirect(primitive))
     {
         app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
@@ -290,8 +290,9 @@ void handle_drive_packet(uint8_t *dma_buffer)
     // Release the drive mutex.
     xSemaphoreGive(drive_mtx);
 
+    // TODO: update or delete
     // Update the last values.
-    __atomic_store_n(&last_serial, serial, __ATOMIC_RELAXED);
+    //__atomic_store_n(&last_serial, serial, __ATOMIC_RELAXED);
 }
 
 void handle_camera_packet(uint8_t *dma_buffer, uint8_t buffer_position)

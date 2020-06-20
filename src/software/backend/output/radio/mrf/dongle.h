@@ -110,6 +110,10 @@ class MRFDongle final
     EStopState estop_state;
 
    private:
+    // This is currently defined as the maximum packet size that we can send over in a
+    // single libusb transfer
+    static const size_t MAX_RADIO_PACKET_SIZE = 64;
+
     friend class SendReliableMessageOperation;
 
     /* libusb objects for the dongle */
@@ -120,9 +124,25 @@ class MRFDongle final
     uint8_t channel_;
     uint16_t pan_;
 
+    /**
+     * Encode the given primitive for transmission over radio
+     *
+     * @param prim The primitive to encode
+     *
+     * @return The serialization of the proto equivalent of the primitive
+     */
+    std::vector<uint8_t> encode_primitive(const std::unique_ptr<Primitive> &prim);
+
+    /**
+     * Attempt to pack and send the given data over libusb to the radio
+     *
+     * @param data The data to send
+     *
+     * @throw std::runtime_error If data.size() > MAX_RADIO_PACKET_SIZE
+     */
+    void submit_drive_transfer(std::vector<uint8_t> data);
+
     /* Functions that handle encoding and sending drive packets. */
-    void encode_primitive(const std::unique_ptr<Primitive> &prim, void *out);
-    bool submit_drive_transfer();
     void handle_drive_transfer_done(AsyncOperation<void> &);
     uint8_t drive_packet[64];
     std::size_t drive_packet_length;

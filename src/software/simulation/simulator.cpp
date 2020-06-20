@@ -213,9 +213,14 @@ primitive_params_t Simulator::getPrimitiveParams(
     // The CreateProtoPrimitiveVisitor handles most of the encoding for us
     CreateProtoPrimitiveVisitor mrf_pv;
     primitive->accept(mrf_pv);
-    RadioPrimitive_t radio_primitive = mrf_pv.getProto();
+    RadioPrimitiveMsg radio_primitive = mrf_pv.getProto();
     primitive_params_t primitive_params;
-    std::array<double, 4> param_array = radio_primitive.param_array;
+    std::array<double, 4> param_array = {
+        radio_primitive.parameter1(),
+        radio_primitive.parameter2(),
+        radio_primitive.parameter3(),
+        radio_primitive.parameter4(),
+    };
     for (unsigned int i = 0; i < param_array.size(); i++)
     {
         // The data is already scaled appropriately for us from the
@@ -225,8 +230,8 @@ primitive_params_t Simulator::getPrimitiveParams(
         primitive_params.params[i] = static_cast<int16_t>(std::round(data));
     }
 
-    primitive_params.slow  = radio_primitive.slow;
-    primitive_params.extra = radio_primitive.extra_bits;
+    primitive_params.slow  = radio_primitive.slow();
+    primitive_params.extra = radio_primitive.extra_bits();
 
     return primitive_params;
 }
@@ -235,8 +240,8 @@ unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& prim
 {
     CreateProtoPrimitiveVisitor mrf_pv;
     primitive->accept(mrf_pv);
-    RadioPrimitive_t radio_primitive = mrf_pv.getProto();
-    auto primitive_index = static_cast<unsigned int>(radio_primitive.prim_type);
+    RadioPrimitiveMsg radio_primitive = mrf_pv.getProto();
+    auto primitive_index = static_cast<unsigned int>(radio_primitive.prim_type());
 
     return primitive_index;
 }

@@ -1,5 +1,8 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
+# TODO: more sane location for this file
+load("//firmware_new:nanopb.bzl", "nanopb_proto_library")
+
 package(default_visibility = ["//visibility:public"])
 
 proto_library(
@@ -18,5 +21,10 @@ proto_library(
 
 cc_proto_library(
     name = "tbots_cc_proto",
+    deps = [":tbots_proto"],
+)
+
+nanopb_proto_library(
+    name = "tbots_nanopb_proto",
     deps = [":tbots_proto"],
 )

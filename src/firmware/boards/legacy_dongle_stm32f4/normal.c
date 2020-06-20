@@ -27,14 +27,14 @@
 #include "radio_config.h"
 
 /**
- * \brief The number of robots.
+ * The maximum expected drive packet size
  */
-#define NUM_ROBOTS 8
+#define MAX_DRIVE_PACKET_SIZE 64
 
 /**
- * \brief The number of bytes in the drive data block for each robot.
+ * The maximum expected number of robots
  */
-#define DRIVE_BYTES_PER_ROBOT 8
+#define MAX_NUM_ROBOTS 8
 
 /**
  * \brief The number of bytes in the camera data block for each robot.
@@ -423,7 +423,7 @@ static void send_camera_packet(const void *packet)
  *
  * \pre The transmit mutex must be held by the caller.
  */
-static void send_drive_packet(const void *packet, const uint8_t *serials)
+static void send_drive_packet(const void *packet, const size_t packet_size)
 {
     unsigned int address = MRF_REG_LONG_TXNFIFO;
 
@@ -447,27 +447,20 @@ static void send_drive_packet(const void *packet, const uint8_t *serials)
     // Message purpose
     mrf_write_long(address++, 0X0FU);
 
-    // Write out the payload sent from the host, interleaved with the prefix
-    // byte for each robot.
+    // Write out the payload sent from the host
     const uint8_t *rptr = packet;
-    for (size_t i = 0; i != NUM_ROBOTS; ++i)
-    {
-        mrf_write_long(address++,
-                       (serials[i] & 0x0F) | ((poll_index == i) ? 0x80 : 0x00));
-        for (size_t j = 0; j != DRIVE_BYTES_PER_ROBOT; ++j)
-        {
-            mrf_write_long(address++, *rptr++);
-        }
+    for (size_t i = 0; i < packet_size; i++){
+        mrf_write_long(address++, *rptr++);
     }
-
-    // Write out the footer, which comprises the emergency stop status
+    // append the emergency stop status and feedback request robot id
     mrf_write_long(address++, estop_read() == ESTOP_RUN);
+    mrf_write_long(address++, poll_index);
 
     // Record the frame length, now that the frame is finished.
     mrf_write_long(frame_length_address, address - header_start_address);
 
     // Advance the feedback polling index.
-    poll_index = (poll_index + 1U) % NUM_ROBOTS;
+    poll_index = (poll_index + 1U) % MAX_NUM_ROBOTS;
 
     // Initiate transmission with no acknowledgement.
     mrf_write_short(MRF_REG_SHORT_TXNCON, 0b00000001U);
@@ -493,13 +486,19 @@ static void drive_task(void *UNUSED(param))
     {
         // Wait to be instructed to start doing work.
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        // Allocate space to store packet serial numbers and packet buffers.
-        uint8_t serials[NUM_ROBOTS] = {};
-        static uint8_t packet_buffer[NUM_ROBOTS * DRIVE_BYTES_PER_ROBOT];
-        static uint8_t usb_buffer[NUM_ROBOTS * DRIVE_BYTES_PER_ROBOT];
+
+        // The buffer to receive data over usb
+        static uint8_t usb_buffer[MAX_DRIVE_PACKET_SIZE];
+
+        // The buffer to send over radio to the robots
+        static uint8_t packet_buffer[MAX_DRIVE_PACKET_SIZE];
+
+        // The number of currently used elements in the packet buffer, from the start of
+        // the array
+        static uint8_t packet_buffer_length = 0;
 
         // Fill the packet buffer with a safe default.
-        memset(packet_buffer, 0, NUM_ROBOTS * DRIVE_BYTES_PER_ROBOT);
+        memset(packet_buffer, 0, MAX_DRIVE_PACKET_SIZE);
 
         // Set up timer 6 to overflow every 20 milliseconds for the drive packet.
         // Timer 6 input is 72 MHz from the APB.
@@ -537,7 +536,7 @@ static void drive_task(void *UNUSED(param))
             if (!ep_running)
             {
                 if (uep_async_read_start(0x01U, usb_buffer,
-                                         NUM_ROBOTS * DRIVE_BYTES_PER_ROBOT,
+                                         MAX_DRIVE_PACKET_SIZE,
                                          &handle_drive_endpoint_done))
                 {
                     ep_running = true;
@@ -566,37 +565,10 @@ static void drive_task(void *UNUSED(param))
                 size_t transfer_length;
                 if (uep_async_read_finish(0x01U, &transfer_length))
                 {
+                    // Transfer successful, update packet buffer
                     ep_running = false;
-                    if (transfer_length == NUM_ROBOTS * DRIVE_BYTES_PER_ROBOT)
-                    {
-                        // This transfer contains new data for every robot.
-                        memcpy(packet_buffer, usb_buffer,
-                               NUM_ROBOTS * DRIVE_BYTES_PER_ROBOT);
-                        for (unsigned int i = 0; i != NUM_ROBOTS; ++i)
-                        {
-                            ++serials[i];
-                        }
-                    }
-                    else if (transfer_length &&
-                             !(transfer_length % (DRIVE_BYTES_PER_ROBOT + 1)))
-                    {
-                        // This transfer contains a list of new drive data blocks
-                        // prefixed with robot indices.
-                        const uint8_t *rptr = usb_buffer;
-                        while (rptr != usb_buffer + transfer_length)
-                        {
-                            unsigned int index = *rptr++;
-                            memcpy(packet_buffer + index * DRIVE_BYTES_PER_ROBOT, rptr,
-                                   DRIVE_BYTES_PER_ROBOT);
-                            rptr += DRIVE_BYTES_PER_ROBOT;
-                            ++serials[index];
-                        }
-                    }
-                    else
-                    {
-                        // Transfer is wrong length; reject.
-                        uep_halt(0x01U);
-                    }
+                    memcpy(packet_buffer, usb_buffer, transfer_length);
+                    packet_buffer_length = transfer_length;
                 }
                 else if (errno == ECONNRESET)
                 {
@@ -620,7 +592,7 @@ static void drive_task(void *UNUSED(param))
             {
                 // Send a packet.
                 xSemaphoreTake(transmit_mutex, portMAX_DELAY);
-                send_drive_packet(packet_buffer, serials);
+                send_drive_packet(packet_buffer, packet_buffer_length);
                 xSemaphoreTake(transmit_complete_sem, portMAX_DELAY);
                 xSemaphoreGive(transmit_mutex);
             }
