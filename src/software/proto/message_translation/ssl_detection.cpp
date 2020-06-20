@@ -16,7 +16,8 @@ std::unique_ptr<SSL_DetectionBall> createSSLDetectionBall(const BallState& ball)
     auto y_position_mm = static_cast<float>(ball.position().y() * MILLIMETERS_PER_METER);
     detection_ball->set_x(x_position_mm);
     detection_ball->set_y(y_position_mm);
-    detection_ball->set_z(static_cast<float>(ball.height() * MILLIMETERS_PER_METER));
+    detection_ball->set_z(
+        static_cast<float>(ball.distanceFromGround() * MILLIMETERS_PER_METER));
     // We don't have the information to simulate a camera, so we use the position values
     // as pixel values
     detection_ball->set_pixel_x(x_position_mm);
@@ -98,10 +99,11 @@ std::vector<BallDetection> createBallDetections(
         {
             // Convert all data to meters and radians
             BallDetection ball_detection{
-                .position   = Point(ball.x() * METERS_PER_MILLIMETER,
+                .position             = Point(ball.x() * METERS_PER_MILLIMETER,
                                   ball.y() * METERS_PER_MILLIMETER),
-                .timestamp  = Timestamp::fromSeconds(detection.t_capture()),
-                .confidence = ball.confidence()};
+                .distance_from_ground = ball.z() * METERS_PER_MILLIMETER,
+                .timestamp            = Timestamp::fromSeconds(detection.t_capture()),
+                .confidence           = ball.confidence()};
 
             bool ignore_ball = ignore_invalid_camera_data &&
                                (min_valid_x > ball_detection.position.x() ||
