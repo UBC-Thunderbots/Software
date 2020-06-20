@@ -22,6 +22,7 @@ class BezierCurve2d
 
     /**
      * Construct a bezier curve from the given control points
+     *
      * @param control_points The control points for the bezier curve
      *
      * @throws std::invalid_argument If there are not at least two control points
@@ -48,6 +49,13 @@ class BezierCurve2d
      *         last control point
      */
     Polynomial2d getPolynomial() const;
+
+    /**
+     * The equality operator for BezierCurve2d
+     * @param other The other BezierCurve2d to compare this one to for equality.
+     * @return True if this curve is equal to other
+     */
+    bool operator==(const BezierCurve2d& other) const;
 
    private:
     /*

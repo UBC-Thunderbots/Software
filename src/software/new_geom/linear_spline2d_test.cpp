@@ -104,3 +104,10 @@ TEST(LinearSpline2dTest, test_spline_points_vector_constructor)
     EXPECT_EQ(s.getStartPoint(), points[0]);
     EXPECT_EQ(s.getEndPoint(), points[2]);
 }
+
+TEST(LinearSpline2dTest, test_get_knot_parametrization_values)
+{
+    LinearSpline2d s({Point(1, 2), Point(2, 3), Point(0, -1)});
+
+    EXPECT_EQ(std::vector<double>({0, 0.5, 1}), s.getKnotParametrizationValues());
+}
