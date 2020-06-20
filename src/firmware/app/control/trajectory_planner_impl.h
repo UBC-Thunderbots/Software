@@ -45,7 +45,8 @@ typedef enum TrajectoryPlannerGenerationStatus
  */
 void app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
     float t_start, float t_end, Polynomial1dOrder3_t path_1d, unsigned int num_elements,
-    float *node_values, float *segment_lengths);
+    float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 
 /**
@@ -74,7 +75,9 @@ void app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
  */
 void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
     float t_start, float t_end, Polynomial2dOrder3_t path_2d, unsigned int num_elements,
-    float *x_values, float *y_values, float *segment_lengths);
+    float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function that modifies an existing speed profile to be backwards continuous. This means
@@ -102,8 +105,9 @@ void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
-    unsigned int num_segments, float *segment_lengths, float max_allowable_acceleration,
-    float initial_speed, float *speeds);
+    unsigned int num_segments, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_acceleration, float initial_speed,
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function creates a forwards continuous speed profile based on the specified parameters.
@@ -141,9 +145,10 @@ app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
-    unsigned int num_elements, float *segment_lengths, float *max_allowable_speed_profile,
+    unsigned int num_elements, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float max_allowable_acceleration, float initial_speed, float final_speed,
-    float *speeds);
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function generates the absolute maximum speed that can occur at any points along the
@@ -177,7 +182,7 @@ app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
 void app_trajectory_planner_impl_getMaximumSpeedProfile(
     Polynomial2dOrder3_t path, unsigned int num_elements, float t_start, float t_end,
     float max_allowable_acceleration, float speed_cap,
-    float *max_allowable_speed_profile);
+    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function generates the time profile for a speed profile with given segment lengths and
@@ -200,8 +205,8 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
  * profile. In seconds. This array is of length num_elements-1
  */
 void app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
-    float *segment_lengths, float *speeds, unsigned int num_elements,
-    float *trajectory_durations);
+    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float [TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS, unsigned int num_elements,
+    float trajectory_durations[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 /**
  * Function balances the segment time durations of 2 separate speed profiles. The segment
@@ -249,8 +254,13 @@ void app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
  */
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
-    float *displacement1, float *displacement2, float *durations1, float *durations2,
-    float num_elements, float *speeds1, float *speeds2, float *complete_time_profile);
+    float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float durations2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS], float num_elements,
+    float speeds1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float speeds2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float complete_time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
 
 /**
