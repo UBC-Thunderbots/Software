@@ -7,6 +7,6 @@
  * Computes the furthest point on `a` from any point on `b`
  * @param a
  * @param b
- * @return
+ * @return The furthest point on `a` from any point on `b`
  */
 Point furthestPoint(const Rectangle& a, const Point& b);
