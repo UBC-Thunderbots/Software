@@ -1,6 +1,7 @@
 package(default_visibility = [
     "//software/ai:__pkg__",
     "//software/gui:__subpackages__",
+    "//software/simulated_tests:__pkg__",
 ])
 
 cc_library(
