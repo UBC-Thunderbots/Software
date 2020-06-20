@@ -47,16 +47,14 @@ void WifiBackend::receiveTbotsRobotMsg(TbotsRobotMsg robot_msg)
 void WifiBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ThreadedProtoMulticastSender<VisionMsg>(
-        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface,
-        VISION_PORT));
+        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT));
 
     primitive_output.reset(new ThreadedProtoMulticastSender<PrimitiveMsg>(
-        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface,
-        PRIMITIVE_PORT));
+        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, PRIMITIVE_PORT));
 
     robot_msg_input.reset(new ThreadedProtoMulticastListener<TbotsRobotMsg>(
-        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface,
-        ROBOT_STATUS_PORT, boost::bind(&WifiBackend::receiveTbotsRobotMsg, this, _1)));
+        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
+        boost::bind(&WifiBackend::receiveTbotsRobotMsg, this, _1)));
 }
 
 // Register this backend in the genericFactory

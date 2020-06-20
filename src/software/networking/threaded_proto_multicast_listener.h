@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <string>
 #include <thread>
+
 #include "software/networking/proto_multicast_listener.h"
 
 template <class ReceiveProto>
@@ -10,9 +11,10 @@ class ThreadedProtoMulticastListener
 {
    public:
     /**
-     * Creates a ThreadedProtoMulticastListener that will listen for ReceiveProto packets from
-     * the network on the given address and port. For every ReceiveProto packet received,
-     * the receive_callback will be called to perform any operations desired by the caller.
+     * Creates a ThreadedProtoMulticastListener that will listen for ReceiveProto packets
+     * from the network on the given address and port. For every ReceiveProto packet
+     * received, the receive_callback will be called to perform any operations desired by
+     * the caller.
      *
      * @param ip_address The ip address of the multicast group on which to listen for
      * the given ReceiveProto packets (IPv4 in dotted decimal or IPv6 in hex string)
@@ -23,7 +25,7 @@ class ThreadedProtoMulticastListener
      * from the network
      */
     ThreadedProtoMulticastListener(const std::string& ip_address, unsigned short port,
-                           std::function<void(ReceiveProto)> receive_callback);
+                                   std::function<void(ReceiveProto)> receive_callback);
 
     ~ThreadedProtoMulticastListener();
 

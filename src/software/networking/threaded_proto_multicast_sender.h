@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <string>
+
 #include "software/networking/proto_multicast_sender.h"
 
 template <class SendProto>
@@ -31,7 +32,7 @@ class ThreadedProtoMulticastSender
      */
     void sendProto(const SendProto& message);
 
-private:
+   private:
     boost::asio::io_service io_service;
     std::thread io_service_thread;
     ProtoMulticastSender<SendProto> multicast_sender;
