@@ -41,8 +41,8 @@ TEST(RadioPrimitiveTest, test_equality_operator)
 
 TEST(MRFPrimitiveVisitorTest, get_radio_primitive_without_visting_anything)
 {
-    MRFPrimitiveVisitor prim_visitor;
-    EXPECT_THROW(prim_visitor.getSerializedRadioPacket(), std::runtime_error);
+    CreateProtoPrimitiveVisitor prim_visitor;
+    EXPECT_THROW(prim_visitor.getProto(), std::runtime_error);
 }
 
 TEST(MRFPrimitiveVisitorTest, visit_catch_primitive)
@@ -53,9 +53,9 @@ TEST(MRFPrimitiveVisitorTest, visit_catch_primitive)
     expected_radio_primitive.param_array = {33.456, 10000, 0.000038};
     expected_radio_primitive.extra_bits  = 0;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -68,9 +68,9 @@ TEST(MRFPrimitiveVisitorTest, visit_chip_primitive)
                                             Angle::half().toRadians() * 100, 0.038};
     expected_radio_primitive.extra_bits  = 3;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -82,9 +82,9 @@ TEST(MRFPrimitiveVisitorTest, visit_direct_velocity_primitive)
     expected_radio_primitive.param_array = {23.2 * 1000, 32.3 * 1000, 556 * 100};
     expected_radio_primitive.extra_bits  = 100;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -96,9 +96,9 @@ TEST(MRFPrimitiveVisitorTest, visit_direct_wheels_primitive)
     expected_radio_primitive.param_array = {22, 33, 44, 160};
     expected_radio_primitive.extra_bits  = 100;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -111,9 +111,9 @@ TEST(MRFPrimitiveVisitorTest, visit_dribble_primitive)
                                             Angle::half().toRadians() * 100, 30000};
     expected_radio_primitive.extra_bits  = 1;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -126,9 +126,9 @@ TEST(MRFPrimitiveVisitorTest, visit_kick_primitive)
                                             Angle::half().toRadians() * 100, 2.33 * 1000};
     expected_radio_primitive.extra_bits  = 2;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -142,9 +142,9 @@ TEST(MRFPrimitiveVisitorTest, visit_move_primitive_autokick_and_dribble_off)
                                             Angle::half().toRadians() * 100, 2.33 * 1000};
     expected_radio_primitive.extra_bits  = 0;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -158,9 +158,9 @@ TEST(MRFPrimitiveVisitorTest, visit_move_primitive_autokick_enabled_dribble_off)
                                             Angle::half().toRadians() * 100, 2.33 * 1000};
     expected_radio_primitive.extra_bits  = 1;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -174,9 +174,9 @@ TEST(MRFPrimitiveVisitorTest, visit_move_primitive_dribble_enabled_autokick_off)
                                             Angle::half().toRadians() * 100, 2.33 * 1000};
     expected_radio_primitive.extra_bits  = 2;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -190,9 +190,9 @@ TEST(MRFPrimitiveVisitorTest, visit_move_primitive_autokick_and_dribble_enabled)
                                             Angle::half().toRadians() * 100, 2.33 * 1000};
     expected_radio_primitive.extra_bits  = 3;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -205,9 +205,9 @@ TEST(MRFPrimitiveVisitorTest, visit_movespin_primitive)
                                             Angle::half().toRadians() * 100, 1.0 * 1000};
     expected_radio_primitive.extra_bits  = 0;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -222,9 +222,9 @@ TEST(MRFPrimitiveVisitorTest, visit_pivot_primitive)
                                             Angle::fromRadians(2.71).toRadians() * 100};
     expected_radio_primitive.extra_bits  = 1;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
@@ -236,8 +236,8 @@ TEST(MRFPrimitiveVisitorTest, visit_stop_primitive)
     expected_radio_primitive.param_array = {};
     expected_radio_primitive.extra_bits  = 1;
 
-    MRFPrimitiveVisitor prim_visitor;
+    CreateProtoPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
-    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    RadioPrimitive actual_radio_primitive = prim_visitor.getProto();
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }

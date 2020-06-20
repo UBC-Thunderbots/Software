@@ -210,16 +210,16 @@ Timestamp Simulator::getTimestamp() const
 primitive_params_t Simulator::getPrimitiveParams(
     const std::unique_ptr<Primitive>& primitive)
 {
-    // The MRFPrimitiveVisitor handles most of the encoding for us
-    MRFPrimitiveVisitor mrf_pv;
+    // The CreateProtoPrimitiveVisitor handles most of the encoding for us
+    CreateProtoPrimitiveVisitor mrf_pv;
     primitive->accept(mrf_pv);
-    RadioPrimitive_t radio_primitive = mrf_pv.getSerializedRadioPacket();
+    RadioPrimitive_t radio_primitive = mrf_pv.getProto();
     primitive_params_t primitive_params;
     std::array<double, 4> param_array = radio_primitive.param_array;
     for (unsigned int i = 0; i < param_array.size(); i++)
     {
         // The data is already scaled appropriately for us from the
-        // getSerializedRadioPacket function. We just need to pack it
+        // getProto function. We just need to pack it
         // into an int16_t
         double data                = param_array[i];
         primitive_params.params[i] = static_cast<int16_t>(std::round(data));
@@ -233,9 +233,9 @@ primitive_params_t Simulator::getPrimitiveParams(
 
 unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive)
 {
-    MRFPrimitiveVisitor mrf_pv;
+    CreateProtoPrimitiveVisitor mrf_pv;
     primitive->accept(mrf_pv);
-    RadioPrimitive_t radio_primitive = mrf_pv.getSerializedRadioPacket();
+    RadioPrimitive_t radio_primitive = mrf_pv.getProto();
     auto primitive_index = static_cast<unsigned int>(radio_primitive.prim_type);
 
     return primitive_index;

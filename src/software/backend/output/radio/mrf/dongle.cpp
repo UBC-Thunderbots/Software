@@ -470,11 +470,11 @@ bool MRFDongle::submit_drive_transfer()
 void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *out)
 {
     uint16_t words[4];
-    MRFPrimitiveVisitor visitor = MRFPrimitiveVisitor();
+    CreateProtoPrimitiveVisitor visitor = CreateProtoPrimitiveVisitor();
 
     // Visit the primitive.
     prim->accept(visitor);
-    RadioPrimitive r_prim = visitor.getSerializedRadioPacket();
+    RadioPrimitive r_prim = visitor.getProto();
 
     // Encode the parameter words.
     for (std::size_t i = 0; i < r_prim.param_array.size(); ++i)
