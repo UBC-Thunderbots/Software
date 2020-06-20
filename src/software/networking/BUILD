@@ -20,7 +20,6 @@ cc_library(
     ],
     deps = [
         ":proto_multicast_listener",
-        "//software/logger",
         "@boost//:asio",
     ],
 )
@@ -33,6 +32,18 @@ cc_library(
     ],
     deps = [
         "//software/logger",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "threaded_proto_multicast_sender",
+    hdrs = [
+        "threaded_proto_multicast_sender.h",
+        "threaded_proto_multicast_sender.tpp",
+    ],
+    deps = [
+        ":proto_multicast_sender",
         "@boost//:asio",
     ],
 )
