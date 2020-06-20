@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 
-void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor& color)
+void drawRobotVelocity(QGraphicsScene* scene, const Point& position, const Vector& velocity, const QColor& color)
 {
     QPen pen(color);
     pen.setWidth(2);
@@ -13,11 +13,10 @@ void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor& 
     pen.setCapStyle(Qt::PenCapStyle::RoundCap);
     pen.setCosmetic(true);
 
-    drawSegment(scene, Segment(robot.position(), robot.position() + robot.velocity()),
-                pen);
+    drawSegment(scene, Segment(position, position + velocity), pen);
 }
 
-void drawRobotPosition(QGraphicsScene* scene, const Robot& robot, const QColor& color)
+void drawRobotPosition(QGraphicsScene* scene, const Point& position, const Angle& orientation, const QColor& color)
 {
     QPen pen(Qt::black);
     pen.setWidth(1);
@@ -30,25 +29,25 @@ void drawRobotPosition(QGraphicsScene* scene, const Robot& robot, const QColor& 
     // This is what allows us to easily draw the flat front of the robot. We create an
     // invisible smaller "window" rectangle that the robot ellipse is shown through
     Point robot_clipping_bounding_box_top_left =
-        robot.position() + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
+        position + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
     Point robot_clipping_bounding_box_bottom_right =
-        robot.position() +
+        position +
         Vector(DIST_TO_FRONT_OF_ROBOT_METERS, -ROBOT_MAX_RADIUS_METERS);
     QRectF robot_clipping_bounding_box(
         createQPointF(robot_clipping_bounding_box_top_left),
         createQPointF(robot_clipping_bounding_box_bottom_right));
     QGraphicsRectItem* robot_clipping_rect =
         new QGraphicsRectItem(robot_clipping_bounding_box);
-    robot_clipping_rect->setTransformOriginPoint(createQPointF(robot.position()));
-    robot_clipping_rect->setRotation(robot.orientation().toDegrees());
+    robot_clipping_rect->setTransformOriginPoint(createQPointF(position));
+    robot_clipping_rect->setRotation(orientation.toDegrees());
     robot_clipping_rect->setFlag(QGraphicsItem::ItemClipsChildrenToShape, true);
     robot_clipping_rect->setPen(Qt::NoPen);
     robot_clipping_rect->setBrush(Qt::NoBrush);
 
     Point robot_bounding_box_top_left =
-        robot.position() + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
+        position + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
     Point robot_bounding_box_bottom_right =
-        robot.position() + Vector(ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS);
+        position + Vector(ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS);
     // This robot ellipse graphics item is a child of the robot_clipping_rect above so
     // that is can be covered / clipped by the clipping rect
     QGraphicsEllipseItem* robot_ellipse =
@@ -61,17 +60,17 @@ void drawRobotPosition(QGraphicsScene* scene, const Robot& robot, const QColor& 
     scene->addItem(robot_clipping_rect);
 }
 
-void drawRobotId(QGraphicsScene* scene, const Robot& robot)
+void drawRobotId(QGraphicsScene* scene, const Point& position, const RobotId id)
 {
     Point robot_bounding_box_top_left =
-        robot.position() + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
+        position + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
     Point robot_bounding_box_bottom_right =
-        robot.position() + Vector(ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS);
+        position + Vector(ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS);
     QRectF robot_bounding_box(createQPointF(robot_bounding_box_top_left),
                               createQPointF(robot_bounding_box_bottom_right));
 
     QGraphicsSimpleTextItem* robot_id =
-        new QGraphicsSimpleTextItem(QString::number(robot.id()));
+        new QGraphicsSimpleTextItem(QString::number(id));
     QFont sansFont("Helvetica [Cronyx]");
     sansFont.setPointSizeF(1);
     robot_id->setFont(sansFont);
@@ -97,11 +96,17 @@ void drawRobotId(QGraphicsScene* scene, const Robot& robot)
     scene->addItem(robot_id);
 }
 
-void drawRobot(QGraphicsScene* scene, const Robot& robot, const QColor& color)
+void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColor& color)
 {
-    drawRobotPosition(scene, robot, color);
-    drawRobotVelocity(scene, robot, color);
-    drawRobotId(scene, robot);
+    drawRobotPosition(scene, robot.robot_state.position(), robot.robot_state.orientation(), color);
+    drawRobotVelocity(scene, robot.robot_state.position(), robot.robot_state.velocity(), color);
+    drawRobotId(scene, robot.robot_state.position(), robot.id);
 
     // TODO: Show robot charge state
+    // https://github.com/UBC-Thunderbots/Software/issues/1492
+}
+
+void drawRobot(QGraphicsScene* scene, const RobotDetection& robot, const QColor& color) {
+    drawRobotPosition(scene, robot.position, robot.orientation, color);
+    drawRobotId(scene, robot.position, robot.id);
 }

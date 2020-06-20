@@ -100,6 +100,7 @@ std::vector<BallDetection> createBallDetections(
             BallDetection ball_detection{
                 .position   = Point(ball.x() * METERS_PER_MILLIMETER,
                                   ball.y() * METERS_PER_MILLIMETER),
+                .height = ball.z() * METERS_PER_MILLIMETER,
                 .timestamp  = Timestamp::fromSeconds(detection.t_capture()),
                 .confidence = ball.confidence()};
 

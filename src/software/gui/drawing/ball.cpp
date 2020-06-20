@@ -44,6 +44,10 @@ void drawBall(QGraphicsScene *scene, const BallState &ball)
     drawBallVelocity(scene, ball.position(), ball.velocity(), ball_color);
 }
 
+void drawBall(QGraphicsScene *scene, const BallDetection &ball) {
+    drawBallPosition(scene, ball.position, ball.height, ball_color);
+}
+
 void drawBallConeToFriendlyNet(QGraphicsScene *scene, const Point& position,
                                const Field &field)
 {

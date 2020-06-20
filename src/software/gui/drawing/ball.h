@@ -5,6 +5,7 @@
 #include "software/gui/drawing/colors.h"
 #include "software/world/ball_state.h"
 #include "software/world/field.h"
+#include "software/sensor_fusion/filter/vision_detection.h"
 
 /**
  * This file contains all the functions that allow us to draw a Ball in a
@@ -37,6 +38,14 @@ void drawBallPosition(QGraphicsScene *scene, const Point &position, double heigh
  * @param ball The ball to draw
  */
 void drawBall(QGraphicsScene *scene, const BallState &ball);
+
+/**
+ * Draws the ball on the given scene.
+ *
+ * @param scene The scene to draw on
+ * @param ball The ball to draw
+ */
+void drawBall(QGraphicsScene *scene, const BallDetection &ball);
 
 /**
  * Draws a cone between the ball and friendly goal posts
