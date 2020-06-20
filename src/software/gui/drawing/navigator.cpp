@@ -1,4 +1,4 @@
-#include "software/gui/visualizer/drawing/navigator.h"
+#include "software/gui/drawing/navigator.h"
 
 AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 {

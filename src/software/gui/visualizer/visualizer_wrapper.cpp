@@ -3,7 +3,7 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
 
-#include "software/gui/visualizer/drawing/world.h"
+#include "software/gui/drawing/world.h"
 
 VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
     : ThreadedObserver<World>(),

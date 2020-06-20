@@ -8,7 +8,7 @@
 
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
-#include "software/gui/visualizer/drawing/draw_functions.h"
+#include "software/gui/drawing/draw_functions.h"
 #include "software/gui/visualizer/widgets/visualizer.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/multithreading/threaded_observer.h"

@@ -2,9 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "software/../shared/constants.h"
-
-
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
 {
     Angle target_angle = Angle::half();

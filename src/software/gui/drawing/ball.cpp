@@ -1,4 +1,4 @@
-#include "software/gui/visualizer/drawing/ball.h"
+#include "software/gui/drawing/ball.h"
 
 #include "shared/constants.h"
 
