@@ -57,9 +57,8 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
 
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
-            num_elements, linear_segment_lengths, max_allowable_speed_profile,
-            max_linear_acceleration, initial_linear_speed, final_linear_speed,
-            linear_speed);
+            final_linear_speed, linear_segment_lengths, max_allowable_speed_profile,
+            max_linear_acceleration, initial_linear_speed, num_elements, linear_speed);
     if (status != OK)
     {
         return status;
@@ -76,9 +75,8 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     const float final_angular_speed   = 0;
     // Generate the forwards continuous angular speed profile
     status = app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
-        num_elements, angular_segment_lengths, max_allowable_speed_profile,
-        max_angular_acceleration, initial_angular_speed, final_angular_speed,
-        angular_speed);
+        final_angular_speed, angular_segment_lengths, max_allowable_speed_profile,
+        max_angular_acceleration, initial_angular_speed, num_elements, angular_speed);
     if (status != OK)
     {
         return status;
@@ -120,7 +118,7 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
 }
 
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+app_trajectory_planner_generateConstantPeriodPositionTrajectory(
     float interpolation_period, FirmwareRobotPathParameters_t* path_parameters,
     PositionTrajectory_t* constant_period_trajectory)
 {

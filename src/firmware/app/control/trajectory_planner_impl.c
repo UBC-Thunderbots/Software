@@ -167,9 +167,9 @@ app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
-    unsigned int num_elements, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
+    float final_speed, float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
-    float max_allowable_acceleration, float initial_speed, float final_speed,
+    float max_allowable_acceleration, float initial_speed, unsigned int num_elements,
     float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
     // Set the initial speed

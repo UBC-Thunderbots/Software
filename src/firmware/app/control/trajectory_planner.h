@@ -19,7 +19,7 @@ typedef struct FirmwareRobotPathParameters
     /*
      * NOTE: Units must be consistent across the linear and angular domains. For example,
      * if the linear 'path' is represented in inits of millimeters the linear velocity
-     * must be in mm/s and the accleleration in mm/s^2. The same goes for the angular
+     * must be in mm/s and the acceleration in mm/s^2. The same goes for the angular
      * domain. If the angular path is specified in radians the angular velocity must be in
      * rad/s.
      */
@@ -55,8 +55,6 @@ typedef struct FirmwareRobotPathParameters
     float initial_linear_speed;
     // The final speed at the end of the trajectory [m/s]
     float final_linear_speed;
-
-
 } FirmwareRobotPathParameters_t;
 
 typedef struct PositionTrajectory
@@ -177,7 +175,7 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+app_trajectory_planner_generateConstantPeriodPositionTrajectory(
     float interpolation_period, FirmwareRobotPathParameters_t *path_parameters,
     PositionTrajectory_t *constant_period_trajectory);
 
