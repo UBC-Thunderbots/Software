@@ -191,6 +191,8 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
+                        # -Werror can be overridden by copts argument in cc_binary
+                        # Warnings are added in .bazelrc
                         flags = ["-Werror"] +
                                 ctx.attr.host_compiler_warnings,
                     ),

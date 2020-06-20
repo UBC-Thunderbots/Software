@@ -18,6 +18,10 @@ std::optional<World> SensorFusion::getWorld() const
     {
         return World(*field, *ball, friendly_team, enemy_team);
     }
+    else
+    {
+        return std::nullopt;
+    }
 }
 
 void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
