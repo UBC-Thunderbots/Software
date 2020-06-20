@@ -17,6 +17,7 @@ cc_test(
     srcs = ["chip_action_test.cpp"],
     deps = [
         ":chip_action",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -52,9 +53,7 @@ cc_library(
         "//software/ai/intent:move_intent",
         "//software/geom",
         "//software/logger",
-        "//software/new_geom/util:closest_point",
-        "//software/new_geom/util:distance",
-        "//software/new_geom/util:intersection",
+        "//software/new_geom/util:algorithms",
         "//software/world:ball",
         "//software/world:field",
     ],
@@ -90,6 +89,7 @@ cc_test(
     srcs = ["kick_action_test.cpp"],
     deps = [
         ":kick_action",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

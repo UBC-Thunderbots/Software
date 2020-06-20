@@ -179,7 +179,7 @@ void validatePath(const Path &path, const Point &start, const Point &end,
             }
         }
 
-        if (!navigable_area.contains(pt))
+        if (!contains(navigable_area, pt))
         {
             // fail because path exited navigable area
             std::stringstream fail_ss;

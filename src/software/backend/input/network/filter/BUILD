@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//software/geom",
         "//software/math:math_functions",
-        "//software/new_geom/util",
+        "//software/new_geom/util:algorithms",
         "//software/sensor_fusion/filter:vision_detection",
         "//software/world:ball",
         "//software/world:field",

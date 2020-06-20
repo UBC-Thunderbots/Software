@@ -13,7 +13,7 @@ cc_library(
         "//shared:constants",
         "//software/new_geom:point",
         "//software/new_geom:segment",
-        "//software/new_geom/util",
+        "//software/new_geom/util:algorithms",
     ],
 )
 

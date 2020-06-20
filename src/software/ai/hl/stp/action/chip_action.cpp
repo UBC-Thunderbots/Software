@@ -3,8 +3,9 @@
 #include "shared/constants.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/util.h"
 #include "software/new_geom/polygon.h"
+#include "software/new_geom/triangle.h"
+#include "software/new_geom/util/contains.h"
 
 ChipAction::ChipAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
 {
@@ -107,7 +108,7 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     Triangle behind_ball_region =
         Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
 
-    bool robot_behind_ball = behind_ball_region.contains(robot->position());
+    bool robot_behind_ball = contains(behind_ball_region, robot->position());
     // The point in the middle of the region behind the ball
     Point point_behind_ball =
         chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);

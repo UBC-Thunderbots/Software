@@ -11,8 +11,10 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/triangle.h"
+#include "software/new_geom/util/collinear.h"
 #include "software/test_util/test_util.h"
 #include "software/time/timestamp.h"
+
 
 TEST(GeomUtilTest, test_collinear)
 {

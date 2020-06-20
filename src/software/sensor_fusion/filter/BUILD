@@ -21,7 +21,7 @@ cc_library(
         ":vision_detection",
         "//software/geom",
         "//software/math:math_functions",
-        "//software/new_geom/util",
+        "//software/new_geom/util:algorithms",
         "//software/world:ball",
         "//software/world:field",
         "@eigen",
