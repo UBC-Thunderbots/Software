@@ -8,7 +8,8 @@ int main(int argc, char *argv[])
 
     SimulatorGUIWrapper simulator_gui_wrapper(argc, argv);
     // TODO: temporary hack creating a Division B field until static field constructors
-    // are moved to the Field class
+    // are moved to the Field class. Will be fixed once
+    // https://github.com/UBC-Thunderbots/Software/pull/1497 is merged
     Field field                 = Field(9.0, 6.0, 1.0, 2.0, 0.18, 1.0, 0.3, 0.5);
     ThreadedSimulator simulator = ThreadedSimulator(field);
     simulator.registerOnSSLWrapperPacketReadyCallback(
