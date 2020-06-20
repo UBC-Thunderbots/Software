@@ -13,7 +13,8 @@ StandaloneSimulatorGUI::StandaloneSimulatorGUI(
       view_area_buffer(view_area_buffer)
 {
     setCentralWidget(main_widget);
-    connect(update_timer, &QTimer::timeout, this, &StandaloneSimulatorGUI::drawSimulatorContents);
+    connect(update_timer, &QTimer::timeout, this,
+            &StandaloneSimulatorGUI::drawSimulatorContents);
     update_timer->start(static_cast<int>(
         Duration::fromSeconds(DRAW_UPDATE_INTERVAL_SECONDS).getMilliseconds()));
 }

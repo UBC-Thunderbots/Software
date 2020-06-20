@@ -17,7 +17,8 @@ StandaloneSimulatorGUIWrapper::StandaloneSimulatorGUIWrapper(int argc, char** ar
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
     run_simulator_gui_thread =
-        std::thread(&StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI, this, argc, argv);
+        std::thread(&StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI,
+                    this, argc, argv);
 }
 
 StandaloneSimulatorGUIWrapper::~StandaloneSimulatorGUIWrapper()
@@ -34,7 +35,8 @@ StandaloneSimulatorGUIWrapper::~StandaloneSimulatorGUIWrapper()
     run_simulator_gui_thread.join();
 }
 
-void StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI(int argc, char** argv)
+void StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI(int argc,
+                                                                       char** argv)
 {
     // We use raw pointers to have explicit control over the order of destruction.
     // For some reason, putting the QApplication and SimulatorGUI on the stack does
