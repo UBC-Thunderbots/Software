@@ -236,8 +236,7 @@ void app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
  * trajectories. This profile is absolute time to each point on the profile starting from
  * zero. In seconds. This array is of length num_elements.
  */
-void
-app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
+void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
     float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],

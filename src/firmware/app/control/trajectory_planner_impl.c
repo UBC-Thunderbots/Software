@@ -116,8 +116,7 @@ float app_trajectory_planner_impl_modifySpeedToMatchDuration(float initial_speed
 }
 
 
-void
-app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
+void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
     float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float durations1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
