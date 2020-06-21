@@ -49,13 +49,6 @@ void circular_buffer_push(CircularBuffer_t *cbuffer, float data)
     }
 }
 
-void *circular_buffer_clear(CircularBuffer_t *cbuffer)
-{
-    cbuffer->head        = 0;
-    cbuffer->tail        = 0;
-    cbuffer->is_full     = false;
-}
-
 float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, size_t index)
 {
     // Check if index is larger than the maximum buffer size

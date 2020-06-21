@@ -1,5 +1,17 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@rules_python//python:defs.bzl", "py_binary")
+load("@python_control_deps//:requirements.bzl", "requirement")
+
+py_binary(
+    name = "generate_difference_equation",
+    srcs = [":generate_difference_equation.py"],
+    main = ":generate_difference_equation.py",
+    deps = [
+        requirement("control"),
+    ],
+)
+
 cc_library(
     name = "bangbang",
     srcs = ["bangbang.c"],

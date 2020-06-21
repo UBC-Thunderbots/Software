@@ -34,13 +34,6 @@ void circular_buffer_destroy(CircularBuffer_t *cbuffer);
 void circular_buffer_push(CircularBuffer_t *cbuffer, float data);
 
 /**
- * Clear circular_buffer by resetting head/tail to 0 and setting isFull to false
- *
- * @param cbuffer The circular_buffer
- */
-void *circular_buffer_clear(CircularBuffer_t *cbuffer);
-
-/**
  * Retrieve a relative recent value in the circular_buffer
  *
  * @param cbuffer The circular_buffer
