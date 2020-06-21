@@ -97,9 +97,6 @@ cc_test(
 
 cc_library(
     name = "all_backends",
-    hdrs = [
-        "all_backends.h",
-    ],
     deps = [
         ":grsim_backend",
         ":radio_backend",
