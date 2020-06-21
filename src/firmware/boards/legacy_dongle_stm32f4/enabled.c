@@ -19,7 +19,7 @@
 static const struct __attribute__((packed))
 {
     usb_configuration_descriptor_t config;
-    cdcacm_descriptors_t acm;
+    //cdcacm_descriptors_t acm;
     usb_interface_descriptor_t radio_off_intf;
     usb_interface_descriptor_t normal_intf;
     usb_endpoint_descriptor_t drive_data_ep;
@@ -49,7 +49,7 @@ static const struct __attribute__((packed))
                 },
             .bMaxPower = 150U,
         },
-    .acm = CDCACM_DESCRIPTORS_INIT(0U, 0U, 0U, 0U, 1U, 2U, 2U),
+//    .acm = CDCACM_DESCRIPTORS_INIT(3U, 0U, 0U, 0U, 1U, 2U, 2U),
     .radio_off_intf =
         {
             .bLength            = sizeof(usb_interface_descriptor_t),
@@ -396,7 +396,7 @@ static const udev_interface_info_t DFU_INTERFACE_INFO = {
 
 static void config_on_enter(void)
 {
-    cdcacm_start();
+//    cdcacm_start();
     led_on(LED_POWER);
 }
 
@@ -404,7 +404,7 @@ static void config_on_exit(void)
 {
     led_off(LED_POWER);
     buzzer_stop();
-    cdcacm_stop();
+//    cdcacm_stop();
 }
 
 

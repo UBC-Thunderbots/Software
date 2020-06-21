@@ -238,7 +238,7 @@ void cdcacm_init(unsigned int in_data_ep_num, unsigned int task_priority)
     static StaticTask_t cdcacm_task_tcb;
     STACK_ALLOCATE(cdcacm_task_stack, 4096);
     cdcacm_task_handle = xTaskCreateStatic(
-        &cdcacm_task, "legacy_cdcacm", sizeof(cdcacm_task_stack) / sizeof(*cdcacm_task_stack),
+        &cdcacm_task, "cdcacm", sizeof(cdcacm_task_stack) / sizeof(*cdcacm_task_stack),
         (void *)(in_data_ep_num | 0x80), task_priority, cdcacm_task_stack,
         &cdcacm_task_tcb);
 }

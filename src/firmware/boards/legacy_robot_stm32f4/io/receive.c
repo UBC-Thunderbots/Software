@@ -1,8 +1,7 @@
 
 /**
  * \defgroup RECEIVE Receive Functions
- *
- * \brief These functions handle receiving radio packets and acting on them.
+ * * \brief These functions handle receiving radio packets and acting on them.
  *
  * For drive packets, each received packet is decoded, and the most recent data is made
  * available for the tick functions elsewhere to act on. Also, a drive packet that
@@ -72,10 +71,10 @@ static uint8_t last_serial        = 0xFF;
 static const size_t HEADER_LENGTH = 2U /* Frame control */ + 1U /* Seq# */ +
                                     2U /* Dest PAN */ + 2U /* Dest */ + 2U /* Src */;
 static const size_t FOOTER_LENGTH         = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
-static const int16_t MESSAGE_PURPOSE_ADDR = 2U /* Frame control */ + 1U /* Seq# */ +
+static const int16_t MESSAGE_PURPOSE_INDEX = 2U /* Frame control */ + 1U /* Seq# */ +
                                             2U /* Dest PAN */ + 2U /* Dest */ +
                                             2U /* Src */;
-static const uint16_t MESSAGE_PAYLOAD_ADDR = 2U /* Frame control */ + 1U /* Seq# */ +
+static const uint16_t MESSAGE_PAYLOAD_INDEX = 2U /* Frame control */ + 1U /* Seq# */ +
                                              2U /* Dest PAN */ + 2U /* Dest */ +
                                              2U /* Src */ + 1U /* Msg Purpose*/;
 
@@ -108,14 +107,18 @@ static void receive_task(void *UNUSED(param))
                 {
                     // Broadcast frame must contain a camera packet or drive packet
                     // Note that camera packets have a variable length.
-                    if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x0FU)
+                    if (dma_buffer[MESSAGE_PURPOSE_INDEX] == 0x0FU)
                     {
-                        handle_drive_packet(&dma_buffer[MESSAGE_PAYLOAD_ADDR],
-                                            frame_length - HEADER_LENGTH - FOOTER_LENGTH);
+                        iprintf("Frame length: %d\r\n", frame_length);
+                        iprintf("Frame header length: %d\r\n", HEADER_LENGTH);
+                        iprintf("Frame footer length: %d\r\n", FOOTER_LENGTH);
+                        iprintf("MESSAGE_PURPOSE_INDEX: %d\r\n", MESSAGE_PURPOSE_INDEX);
+                        handle_drive_packet(&dma_buffer[MESSAGE_PAYLOAD_INDEX],
+                                            frame_length - MESSAGE_PAYLOAD_INDEX - FOOTER_LENGTH);
                     }
-                    else if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x10U)
+                    else if (dma_buffer[MESSAGE_PURPOSE_INDEX] == 0x10U)
                     {
-                        uint8_t buffer_position = MESSAGE_PAYLOAD_ADDR;
+                        uint8_t buffer_position = MESSAGE_PAYLOAD_INDEX;
                         handle_camera_packet(dma_buffer, buffer_position);
                     }
                 }
@@ -217,6 +220,9 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
         feedback_pend_normal();
     }
 
+    iprintf("packet_robot_id: %d \r\n", packet_robot_id);
+    iprintf("feedback_requested: %d \r\n", feedback_requested_from_this_robot);
+    iprintf("estop_run: %d \r\n", estop_run);
 
     // Check if this drive packet was intended for us, if not we can stop here
     if (packet_robot_id != robot_index)
@@ -230,8 +236,10 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     if (!pb_decode(&pb_in_stream, RadioPrimitiveMsg_fields, &prim_msg))
     {
         // TODO: log or do something here
+        iprintf("Protobuf decode failed!\r\n");
         return;
     }
+    iprintf("Protobuf decode succeded!\r\n");
 
     primitive_params_t pparams = {.slow   = prim_msg.slow,
                                         .extra  = prim_msg.extra_bits,
@@ -241,6 +249,12 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
                                             prim_msg.parameter3,
                                             prim_msg.parameter4,
                                         }};
+    iprintf("Primitive params: %d, %d, %d, %d \n",
+        prim_msg.parameter1,
+            prim_msg.parameter2,
+            prim_msg.parameter3,
+            prim_msg.parameter4
+        );
 
     if (!estop_run){
         pparams.params[0]  = 0;
@@ -259,12 +273,14 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
 
     // Apply the charge and discharge mode.
     if (!estop_run){
-        charger_enable(false);
-        chicker_discharge(true);
+//        charger_enable(false);
+//        chicker_discharge(true);
     } else {
-        charger_enable(true);
-        chicker_discharge(false);
+//        charger_enable(true);
+//        chicker_discharge(false);
     }
+
+    iprintf("HELLO THERE! \r\n");
 
     // TODO: check that we're still abiding by this monstrosity
     // If the serial number, the emergency stop has just
@@ -283,8 +299,9 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     if (
         !estop_run || app_primitive_manager_primitiveIsDirect(primitive))
     {
-        app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
-                                                &pparams);
+        // TODO: uncomment me
+//        app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
+//                                                &pparams);
     }
 
     // Release the drive mutex.
@@ -368,28 +385,28 @@ void handle_camera_packet(uint8_t *dma_buffer, uint8_t buffer_position)
 
 void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
 {
-    // printf("got a message with purpose: %i", dma_buffer[MESSAGE_PURPOSE_ADDR]);
-    // printf("var index: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 1]);
-    // printf("value: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 2]);
-    switch (dma_buffer[MESSAGE_PURPOSE_ADDR])
+    // printf("got a message with purpose: %i", dma_buffer[MESSAGE_PURPOSE_INDEX]);
+    // printf("var index: %i", dma_buffer[MESSAGE_PURPOSE_INDEX + 1]);
+    // printf("value: %i", dma_buffer[MESSAGE_PURPOSE_INDEX + 2]);
+    switch (dma_buffer[MESSAGE_PURPOSE_INDEX])
     {
         case 0x00:
             if (frame_length == HEADER_LENGTH + 4U + FOOTER_LENGTH)
             {
-                uint8_t which  = dma_buffer[MESSAGE_PAYLOAD_ADDR];
-                uint16_t width = dma_buffer[MESSAGE_PAYLOAD_ADDR + 2U];
+                uint8_t which  = dma_buffer[MESSAGE_PAYLOAD_INDEX];
+                uint16_t width = dma_buffer[MESSAGE_PAYLOAD_INDEX + 2U];
                 width <<= 8U;
-                width |= dma_buffer[MESSAGE_PAYLOAD_ADDR + 1U];
+                width |= dma_buffer[MESSAGE_PAYLOAD_INDEX + 1U];
                 chicker_fire_with_pulsewidth(which ? CHICKER_CHIP : CHICKER_KICK, width);
             }
             break;
         case 0x01U:  // Arm autokick
             if (frame_length == HEADER_LENGTH + 4U + FOOTER_LENGTH)
             {
-                uint8_t which  = dma_buffer[MESSAGE_PAYLOAD_ADDR];
-                uint16_t width = dma_buffer[MESSAGE_PAYLOAD_ADDR + 2U];
+                uint8_t which  = dma_buffer[MESSAGE_PAYLOAD_INDEX];
+                uint16_t width = dma_buffer[MESSAGE_PAYLOAD_INDEX + 2U];
                 width <<= 8U;
-                width |= dma_buffer[MESSAGE_PAYLOAD_ADDR + 1U];
+                width |= dma_buffer[MESSAGE_PAYLOAD_INDEX + 1U];
                 chicker_auto_arm(which ? CHICKER_CHIP : CHICKER_KICK, width);
             }
             break;
@@ -403,7 +420,7 @@ void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
         case 0x03U:  // Set LED mode
             if (frame_length == HEADER_LENGTH + 2U + FOOTER_LENGTH)
             {
-                uint8_t mode = dma_buffer[MESSAGE_PAYLOAD_ADDR];
+                uint8_t mode = dma_buffer[MESSAGE_PAYLOAD_INDEX];
                 if (mode <= 4U)
                 {
                     leds_test_set_mode(LEDS_TEST_MODE_HALL, mode);
@@ -447,14 +464,14 @@ void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
 
         case 0x0EU:  // Set capacitor bits.
             xSemaphoreTake(drive_mtx, portMAX_DELAY);
-            char capacitor_flag = dma_buffer[MESSAGE_PAYLOAD_ADDR];
+            char capacitor_flag = dma_buffer[MESSAGE_PAYLOAD_INDEX];
             charger_enable(capacitor_flag & 0x02);
             chicker_discharge(capacitor_flag & 0x01);
             xSemaphoreGive(drive_mtx);
             break;
             // case 0x20U: // Update tunable variable
-            //    update_var(dma_buffer[MESSAGE_PAYLOAD_ADDR],
-            //    dma_buffer[MESSAGE_PAYLOAD_ADDR + 1]); uint8_t i =
-            //    get_var(dma_buffer[MESSAGE_PAYLOAD_ADDR]); break;
+            //    update_var(dma_buffer[MESSAGE_PAYLOAD_INDEX],
+            //    dma_buffer[MESSAGE_PAYLOAD_INDEX + 1]); uint8_t i =
+            //    get_var(dma_buffer[MESSAGE_PAYLOAD_INDEX]); break;
     }
 }

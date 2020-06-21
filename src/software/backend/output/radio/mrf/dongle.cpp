@@ -445,6 +445,7 @@ void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
     // TODO: actually do something if we can't send?
     if (!drive_transfer)
     {
+        std::cout << "sending data of size: " << data.size() << std::endl;
         drive_transfer.reset(new USB::BulkOutTransfer(device, 1, &data[0], data.size(),
                                                       MAX_RADIO_PACKET_SIZE, 0));
         drive_transfer->signal_done.connect(

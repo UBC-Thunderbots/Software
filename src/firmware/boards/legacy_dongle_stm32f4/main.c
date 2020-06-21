@@ -301,7 +301,10 @@ vTaskDelay(100U / 1000U);
         }
     }
 
-    cdcacm_init(2U, 1U);
+    // TODO: figure out how to enable CDCACM while still allowing the dongle to be
+    //       properly recogniz
+    // TODO: nuke cdcacm setup
+    //cdcacm_init(3U, 1U);
 
 // Initialize USB.
     udev_init(&USB_INFO);

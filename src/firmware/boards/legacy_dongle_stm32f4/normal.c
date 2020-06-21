@@ -432,7 +432,7 @@ static void send_drive_packet(const void *packet, const size_t packet_size)
     unsigned int frame_length_address  = address++;
     unsigned int header_start_address  = address;
     mrf_write_long(address++, 0b01000001U);                // Frame control LSB
-    mrf_write_long(address++, 0b10001000U);                // Frame control MSB
+    mrf_write_long(address++, 0b10001000U);               // Frame control MSB
     mrf_write_long(address++, ++mrf_tx_seqnum);            // Sequence number
     mrf_write_long(address++, radio_config.pan_id);        // Destination PAN ID LSB
     mrf_write_long(address++, radio_config.pan_id >> 8U);  // Destination PAN ID MSB
@@ -464,6 +464,9 @@ static void send_drive_packet(const void *packet, const size_t packet_size)
 
     // Initiate transmission with no acknowledgement.
     mrf_write_short(MRF_REG_SHORT_TXNCON, 0b00000001U);
+
+    // TODO: need to TRIPLE check that we're not sending packets larger then 64 bytes
+    //       here, and indicate that somehow to the user
 
     // Blink the transmit light.
     // led_blink(LED_TX);
@@ -870,8 +873,6 @@ static void usbrx_task(void *UNUSED(param))
     for (;;)
     {
 
-        iprintf("HELLO WORLD\n");
-        printf("HELLO WORLD\n");
         // Wait to be instructed to start doing work.
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
