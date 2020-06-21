@@ -173,8 +173,7 @@ app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
 
         // Vf = sqrtf( Vi^2 + 2*constant_segment_length*max_acceleration)
         float temp_vel =
-                shared_physics_getFinalSpeed(
-                        speed, displacement, max_allowable_acceleration);
+            shared_physics_getFinalSpeed(speed, displacement, max_allowable_acceleration);
 
         // Pick  the lowest of the maximum the available speeds
         const float lowest_speed = fmin(max_allowable_speed_profile[i], temp_vel);
@@ -202,9 +201,8 @@ app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
         const float previous_speed = speeds[i - 1];
         const float segment_length = segment_lengths[i - 1];
 
-        float temp_speed =
-                shared_physics_getFinalSpeed(
-                        current_speed, segment_length, max_allowable_acceleration);
+        float temp_speed = shared_physics_getFinalSpeed(current_speed, segment_length,
+                                                        max_allowable_acceleration);
 
         // If the velocity at [i-1] is larger than it physically possible to decelerate
         // from, pull the speed at [i-1] lower
