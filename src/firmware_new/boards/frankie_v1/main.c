@@ -93,9 +93,9 @@ ProtoMulticastCommunicationProfile_t *tbots_robot_msg_sender_profile;
 ProtoMulticastCommunicationProfile_t *vision_msg_listener_profile;
 ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
 
-VisionMsg vision_msg;
-TbotsRobotMsg tbots_robot_msg;
-PrimitiveMsg primitive_msg;
+static VisionMsg vision_msg;
+static TbotsRobotMsg tbots_robot_msg;
+static PrimitiveMsg primitive_msg;
 
 /* USER CODE END PV */
 
@@ -606,9 +606,9 @@ static void MX_GPIO_Init(void)
     HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
     /*Configure GPIO pins : wheel_motor_back_right_esf_Pin
-       wheel_motor_front_right_reset_Pin wheel_motor_front_right_coast_Pin
-       wheel_motor_front_right_mode_Pin wheel_motor_front_right_direction_Pin
-       wheel_motor_front_right_brake_Pin wheel_motor_front_right_esf_Pin */
+      wheel_motor_front_right_reset_Pin wheel_motor_front_right_coast_Pin
+      wheel_motor_front_right_mode_Pin wheel_motor_front_right_direction_Pin
+      wheel_motor_front_right_brake_Pin wheel_motor_front_right_esf_Pin */
     GPIO_InitStruct.Pin =
         wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
         wheel_motor_front_right_coast_Pin | wheel_motor_front_right_mode_Pin |
@@ -639,12 +639,12 @@ static void MX_GPIO_Init(void)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /*Configure GPIO pins : wheel_motor_back_left_brake_Pin wheel_motor_back_left_esf_Pin
-       wheel_motor_front_left_esf_Pin wheel_motor_back_left_reset_Pin
-                             wheel_motor_back_left_coast_Pin LD3_Pin
-       wheel_motor_back_left_mode_Pin wheel_motor_front_left_reset_Pin
-                             wheel_motor_front_left_coast_Pin
-       wheel_motor_front_left_mode_Pin LD2_Pin wheel_motor_front_left_direction_Pin
-                             wheel_motor_front_left_brake_Pin */
+      wheel_motor_front_left_esf_Pin wheel_motor_back_left_reset_Pin
+      wheel_motor_back_left_coast_Pin LD3_Pin
+      wheel_motor_back_left_mode_Pin wheel_motor_front_left_reset_Pin
+      wheel_motor_front_left_coast_Pin
+      wheel_motor_front_left_mode_Pin LD2_Pin wheel_motor_front_left_direction_Pin
+      wheel_motor_front_left_brake_Pin */
     GPIO_InitStruct.Pin =
         wheel_motor_back_left_brake_Pin | wheel_motor_back_left_esf_Pin |
         wheel_motor_front_left_esf_Pin | wheel_motor_back_left_reset_Pin |
@@ -712,6 +712,9 @@ __weak void io_proto_multicast_startNetworkingTask(void *argument)
 void test_msg_update(void *argument)
 {
     /* USER CODE BEGIN test_msg_update */
+
+    // TODO this is a placeholder task to test NOT associated with a ticket
+    // because how the msgs will be passed around fw is not finalized yet
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
@@ -719,8 +722,11 @@ void test_msg_update(void *argument)
     for (;;)
     {
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
-        osDelay(100);
+        tbots_robot_msg.time_sent.epoch_timestamp_seconds = sys_now();
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
+        io_proto_multicast_communication_profile_notifyEvents(comm_profile,
+                                                              UPDATED_INTERNAL_PROTO);
+        osDelay(100);
     }
     /* USER CODE END test_msg_update */
 }
@@ -806,7 +812,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
     /* USER CODE BEGIN 6 */
     /* User can add his own implementation to report the file name and line number,
-       tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
     /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

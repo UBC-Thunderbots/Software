@@ -6,9 +6,12 @@
 #include "boost/bind.hpp"
 #include "google/protobuf/message.h"
 #include "shared/constants.h"
+#include "shared/proto/tbots_robot_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 #include "software/networking/proto_multicast_listener.h"
+#include "software/networking/proto_multicast_sender.h"
+#include "software/proto/message_translation/protobuf_message_translation.h"
 
 
 using boost::asio::ip::udp;
@@ -26,7 +29,18 @@ using google::protobuf::Message;
  * bazel run //firmware_new/tools:send_proto_over_udp -- your_interface_here
  *
  */
-void callback(VisionMsg test) {}
+void callback(TbotsRobotMsg test)
+{
+    if (test.has_time_sent())
+    {
+        std::cout << "robot status received: "
+                  << test.time_sent().epoch_timestamp_seconds() << std::endl;
+    }
+    else
+    {
+        std::cout << "robot status received: but no time set" << std::endl;
+    }
+}
 
 int main(int argc, char* argv[])
 {
@@ -38,23 +52,38 @@ int main(int argc, char* argv[])
 
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-    VisionMsg test;
+    VisionMsg test_vision_msg;
+    PrimitiveMsg test_primitive_msg;
 
     // create an io service and run it in a thread to handle async calls
     boost::asio::io_service io_service;
     auto io_service_thread = std::thread([&]() { io_service.run(); });
 
-    // create ProtoMulticastSender to send proto
-    auto sender = std::make_unique<ProtoMulticastListener<VisionMsg>>(
+    // create ProtoMulticastSender to send test vision
+    auto vision_sender = std::make_unique<ProtoMulticastSender<VisionMsg>>(
+        io_service, std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+        VISION_PORT);
+
+    // create ProtoMulticastSender to send test vision
+    auto primitive_sender = std::make_unique<ProtoMulticastSender<PrimitiveMsg>>(
+        io_service, std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+        PRIMITIVE_PORT);
+
+    // create ProtoMulticastSender to send test vision
+    auto status_listener = std::make_unique<ProtoMulticastListener<TbotsRobotMsg>>(
         io_service, std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
         ROBOT_STATUS_PORT, &callback);
 
     while (1)
     {
-        // sender->sendProto(control_req);
+        // primitive and vision sender
+        test_primitive_msg.set_allocated_time_sent(getCurrentTimestampMsg().release());
+        primitive_sender->sendProto(test_primitive_msg);
+        test_vision_msg.set_allocated_time_sent(getCurrentTimestampMsg().release());
+        vision_sender->sendProto(test_vision_msg);
 
-        // 4000 hz test
-        std::this_thread::sleep_for(std::chrono::nanoseconds(250000));
+        // 40 hz test
+        std::this_thread::sleep_for(std::chrono::nanoseconds(25000000));
     }
 
     google::protobuf::ShutdownProtobufLibrary();

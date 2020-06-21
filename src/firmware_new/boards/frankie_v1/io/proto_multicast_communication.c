@@ -171,7 +171,7 @@ void io_proto_multicast_listener_Task(void* arg)
 
                 io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
-                if (!protobuf_err)
+                if (protobuf_err)
                 {
                     io_proto_multicast_communication_profile_notifyEvents(
                         comm_profile, RECEIVED_EXTERNAL_PROTO);
