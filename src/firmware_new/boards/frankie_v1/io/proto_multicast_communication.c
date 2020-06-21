@@ -29,7 +29,7 @@ typedef struct ProtoMulticastCommunicationProfile
 
     // multicast group info: the address and the port to bind to and
     // join to send/recv proto
-    ip_addr_t* multicast_address;
+    ip_addr_t multicast_address;
     uint16_t port;
 
     // protobuf info: the pb_field_t array fully defines the protobuf_struct,
@@ -69,8 +69,7 @@ ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_c
     profile->protobuf_struct     = protobuf_struct;
     profile->profile_mutex       = osMutexNew(&mutex_attr);
     profile->communication_event = osEventFlagsNew(NULL);
-    profile->multicast_address   = (ip_addr_t*)malloc(sizeof(ip_addr_t));
-    ip6addr_aton(multicast_address, profile->multicast_address);
+    ip6addr_aton(multicast_address, &profile->multicast_address);
 
     return profile;
 }
@@ -88,7 +87,7 @@ void io_proto_multicast_sender_Task(void* arg)
     // We use IP6_ADDR_ANY which will default to the ethernet interface on the STM32H7
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
     netconn_bind(conn, IP6_ADDR_ANY, comm_profile->port);
-    netconn_join_leave_group(conn, comm_profile->multicast_address, IP6_ADDR_ANY,
+    netconn_join_leave_group(conn, &comm_profile->multicast_address, IP6_ADDR_ANY,
                              NETCONN_JOIN);
 
     // this buffer is used to hold serialized proto
@@ -99,21 +98,24 @@ void io_proto_multicast_sender_Task(void* arg)
 
     for (;;)
     {
-        osEventFlagsWait(comm_profile->communication_event, UPDATED_PROTO,
-         osFlagsWaitAny,
-        osWaitForever);
+        // UNCOMMENT ME WHEN EVERYTHING IS WORKING
+        // osEventFlagsWait(comm_profile->communication_event, UPDATED_PROTO,
+        //         osFlagsWaitAny, osWaitForever);
+
+        // REMOVE ME WHEN EVERYTHING IS WORKING
+        osDelay(100);
 
         tx_buf = netbuf_new();
         netbuf_alloc(tx_buf, comm_profile->message_max_size);
 
         // serialize proto
         pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-        pb_encode(&stream, comm_profile->message_fields,
-         comm_profile->protobuf_struct);
+        pb_encode(&stream, comm_profile->message_fields, comm_profile->protobuf_struct);
 
         // package payload and send over udp
         tx_buf->p->payload = buffer;
-        netconn_sendto(conn, tx_buf, comm_profile->multicast_address, comm_profile->port);
+        netconn_sendto(conn, tx_buf, &comm_profile->multicast_address,
+                       comm_profile->port);
 
         netbuf_delete(tx_buf);
     }
@@ -124,55 +126,101 @@ void io_proto_multicast_listener_Task(void* arg)
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)arg;
 
-    osEventFlagsWait(networking_event, NETIF_CONFIGURED, osFlagsWaitAny, osWaitForever);
+    /*osEventFlagsWait(networking_event, NETIF_CONFIGURED, osFlagsWaitAny,
+     * osWaitForever);*/
 
     // Bind the socket to the multicast address and port we then use that comm_profile
     // profile to join the specified multicast group.
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
+
     netconn_set_ipv6only(conn, true);
-    netconn_bind(conn, comm_profile->multicast_address, comm_profile->port);
-    netconn_join_leave_group(conn, comm_profile->multicast_address, IP6_ADDR_ANY,
+    netconn_set_recvtimeout(conn, 1000);
+
+    netconn_bind(conn, &comm_profile->multicast_address, comm_profile->port);
+    netconn_join_leave_group(conn, &comm_profile->multicast_address, IP6_ADDR_ANY,
                              NETCONN_JOIN);
 
     // network buffer
     struct netbuf* rx_buf = NULL;
 
-    // TODO proper err handling, for now all errs are ignored
-    // https://github.com/UBC-Thunderbots/Software/issues/1190
-    err_t err;
+    err_t network_err;
+    int protobuf_err;
 
     for (;;)
     {
-        err = netconn_recv(conn, &rx_buf);
+        network_err = netconn_recv(conn, &rx_buf);
 
-        if (err == ERR_OK)
+        switch (network_err)
         {
-            // Create a stream that reads from the buffer
-            pb_istream_t in_stream =
-                pb_istream_from_buffer((uint8_t*)rx_buf->p->payload, rx_buf->p->tot_len);
-
-            if (pb_decode(&in_stream, comm_profile->message_fields,
-                          comm_profile->protobuf_struct))
+            case ERR_TIMEOUT:
             {
-                // TODO HANDLE MALFORMED PROTO
+                io_proto_multicast_communication_profile_notifyEvent(comm_profile,
+                                                                     RECEIVE_TIMEOUT);
+                break;
+            }
+
+            case ERR_OK:
+            {
+                pb_istream_t in_stream = pb_istream_from_buffer(
+                    (uint8_t*)rx_buf->p->payload, rx_buf->p->tot_len);
+
+                io_proto_multicast_communication_profile_acquireLock(comm_profile);
+
+                protobuf_err = pb_decode(&in_stream, comm_profile->message_fields,
+                                         comm_profile->protobuf_struct);
+
+                io_proto_multicast_communication_profile_releaseLock(comm_profile);
+
+                if (!protobuf_err)
+                {
+                    io_proto_multicast_communication_profile_notifyEvent(comm_profile,
+                                                                         RECEIVED_PROTO);
+                }
+                break;
+            }
+            default:
+            {
+                netbuf_delete(rx_buf);
             }
         }
-
-        netbuf_delete(rx_buf);
     }
+}
+void io_proto_multicast_communication_profile_acquireLock(
+    ProtoMulticastCommunicationProfile_t* profile)
+{
+}
+
+void io_proto_multicast_communication_profile_releaseLock(
+    ProtoMulticastCommunicationProfile_t* profile)
+{
+}
+
+void io_proto_multicast_communication_profile_notifyEvent(
+    ProtoMulticastCommunicationProfile_t* profile,
+    ProtoMulticastCommunicationEvent_t event)
+{
+}
+
+void io_proto_multicast_communication_profile_blockUntilEvent(
+    ProtoMulticastCommunicationProfile_t* profile,
+    ProtoMulticastCommunicationEvent_t event)
+{
 }
 
 void io_proto_multicast_startNetworkingTask(void* arg)
 {
     MX_LWIP_Init();
     osEventFlagsSet(networking_event, NETIF_CONFIGURED);
-    osThreadExit();
+
+    for (;;)
+    {
+        osDelay(1);
+    }
 }
 
 void io_proto_multicast_communication_profile_destroy(
     ProtoMulticastCommunicationProfile_t* profile)
 {
     osMutexDelete(profile->profile_mutex);
-    free(profile->multicast_address);
     free(profile);
 }
