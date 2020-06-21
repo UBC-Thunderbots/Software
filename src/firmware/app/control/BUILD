@@ -45,14 +45,15 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "wheel_controller_test",
-#    srcs = ["wheel_controller_test.cpp"],
-#    deps = [
-#        ":wheel_controller" +
-#        "@gtest//:gtest_main",
-#    ],
-#)
+cc_test(
+    name = "wheel_controller_test",
+    srcs = ["wheel_controller_test.cpp"],
+    deps = [
+        ":wheel_controller",
+        "//firmware/shared:circular_buffer",
+        "@gtest//:gtest_main",
+    ],
+)
 
 cc_test(
     name = "trajectory_planner_test",

@@ -1,7 +1,6 @@
-#pragma once
+#include "firmware/app/control/wheel_controller.h"
 
 #include "firmware/shared/circular_buffer.h"
-#include "firmware/app/control/wheel_controller.h"
 
 WheelController_t* app_wheel_controller_create(float* command_coefficients,
                                                unsigned int num_command_coefficients,
@@ -44,13 +43,14 @@ WheelController_t* app_wheel_controller_create(float* command_coefficients,
     wheel_controller->previous_output_samples_buffer = samples_buffer;
 }
 
-void app_wheel_controller_pushNewCommand(WheelController_t* wheel_controller, float command)
+void app_wheel_controller_pushNewCommand(WheelController_t* wheel_controller,
+                                         float command)
 {
     circular_buffer_push(wheel_controller->previous_command_buffer, command);
 }
 
 void app_wheel_controller_pushNewSampleOutput(WheelController_t* wheel_controller,
-                                         float output_sample)
+                                              float output_sample)
 {
     circular_buffer_push(wheel_controller->previous_output_samples_buffer, output_sample);
 }
@@ -64,7 +64,7 @@ float app_wheel_controller_getWheelVoltage(WheelController_t* wheel_controller)
     {
         output_voltage += wheel_controller->command_coefficients[i] *
                           circular_buffer_getAtIndex(
-                              wheel_controller->previous_command_buffer, (size_t)i + 1);
+                              wheel_controller->previous_command_buffer, (size_t)i);
     }
 
     // Get the contribution from previous sampled outputs
@@ -73,7 +73,7 @@ float app_wheel_controller_getWheelVoltage(WheelController_t* wheel_controller)
         output_voltage -=
             wheel_controller->sampled_output_coefficients[i] *
             circular_buffer_getAtIndex(wheel_controller->previous_output_samples_buffer,
-                                       (size_t)i + 1);
+                                       (size_t)i);
     }
 }
 
