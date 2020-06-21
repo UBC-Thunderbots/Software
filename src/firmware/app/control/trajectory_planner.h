@@ -2,9 +2,24 @@
 
 #include <stdbool.h>
 
-#include "firmware/app/control/trajectory_planner_impl.h"
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/math/vector_2d.h"
+
+// The maximum size of the array containing trajectory elements. Assuming the
+// longest possible path is 9 meters with 1mm segments
+#define TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS 9000
+
+typedef enum TrajectoryPlannerGenerationStatus
+{
+    OK,
+    FINAL_VELOCITY_TOO_HIGH,
+    INITIAL_VELOCITY_TOO_HIGH,
+    // INTERPOLATION_ELEMENT_MAXED_OUT is returned when the constant period interpolation
+    // function uses up all the available array space provided to it. This can happen
+    // because constant period trajectories do not necessarily have the same
+    // number of elements as their constant parameterization counterparts
+    INTERPOLATION_ELEMENT_MAXED_OUT,
+} TrajectoryPlannerGenerationStatus_t;
 
 /*
  * NOTE: constant period means that the duration of time between each point
@@ -16,6 +31,14 @@
 
 typedef struct FirmwareRobotPathParameters
 {
+    /*
+     * NOTE: Units must be consistent across the linear and angular domains. For example,
+     * if the linear 'path' is represented in inits of millimeters the linear velocity
+     * must be in mm/s and the acceleration in mm/s^2. The same goes for the angular
+     * domain. If the angular path is specified in radians the angular velocity must be in
+     * rad/s.
+     */
+
     // The 2D polynomial representation of the path to be followed
     Polynomial2dOrder3_t path;
     // The 1D polynomial representation of the orientation to be followed
@@ -47,8 +70,6 @@ typedef struct FirmwareRobotPathParameters
     float initial_linear_speed;
     // The final speed at the end of the trajectory [m/s]
     float final_linear_speed;
-
-
 } FirmwareRobotPathParameters_t;
 
 typedef struct PositionTrajectory
@@ -169,7 +190,7 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
  * @return A status indicating whether or not generation was successful
  */
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+app_trajectory_planner_generateConstantPeriodPositionTrajectory(
     float interpolation_period, FirmwareRobotPathParameters_t *path_parameters,
     PositionTrajectory_t *constant_period_trajectory);
 

@@ -1,6 +1,8 @@
 extern "C"
 {
 #include "firmware/app/control/trajectory_planner.h"
+
+#include "firmware/app/control/trajectory_planner_impl.h"
 }
 
 #include <gtest/gtest.h>
@@ -358,7 +360,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_interpolation_straight_line
 
     PositionTrajectory_t const_interp_trajectory;
 
-    status = app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+    status = app_trajectory_planner_generateConstantPeriodPositionTrajectory(
         0.001f, &path_parameters, &const_interp_trajectory);
 
     EXPECT_EQ(OK, status);
@@ -414,7 +416,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_iteration_curved_line)
     const unsigned int variable_period_num_segments = path_parameters.num_elements;
 
     PositionTrajectory_t const_interp_trajectory;
-    status = app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+    status = app_trajectory_planner_generateConstantPeriodPositionTrajectory(
         0.001, &path_parameters, &const_interp_trajectory);
 
     EXPECT_NEAR(trajectory.x_position[variable_period_num_segments - 1],
@@ -468,7 +470,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_tion_too_many_elements)
 
     // Calculate the constant-tion period equivalent of the trajectory
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+        app_trajectory_planner_generateConstantPeriodPositionTrajectory(
             0.01, &path_parameters, &const_interp_trajectory);
 
     EXPECT_EQ(INTERPOLATION_ELEMENT_MAXED_OUT, status);
@@ -570,11 +572,6 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_straight_line_high_acceleratio
 
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t position_trajectory;
-
-    app_trajectory_planner_getMaximumSpeedProfile_impl(
-        path_parameters.path, path_parameters.num_elements, path_parameters.t_start,
-        path_parameters.t_end, path_parameters.max_allowable_linear_acceleration,
-        path_parameters.max_allowable_linear_speed, max_allowable_speed_profile);
 
     app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
         path_parameters, &position_trajectory);
@@ -715,724 +712,6 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_curved_path_low_acceleration)
     }
 }
 
-TEST_F(TrajectoryPlannerTest, test_robot_state_generation_at_constant_t_intervals)
-{
-    Polynomial2dOrder3_t path = {
-        .x = {.coefficients = {0, 0, 1, 0}},
-        .y = {.coefficients = {0, 0, 1, 0}},
-
-    };
-
-    Polynomial1dOrder3_t orientation_profile = {.coefficients = {0, 0, 1, 0}};
-    // Generate parameters for a trajectory
-    FirmwareRobotPathParameters_t path_parameters{
-        .path                               = path,
-        .orientation_profile                = orientation_profile,
-        .t_start                            = 0,
-        .t_end                              = 1,
-        .num_elements                       = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS,
-        .max_allowable_linear_acceleration  = 3,
-        .max_allowable_linear_speed         = 3,
-        .max_allowable_angular_acceleration = 9,
-        .max_allowable_angular_speed        = 6,
-        .initial_linear_speed               = 0,
-        .final_linear_speed                 = 0,
-
-    };
-
-    float segment_lengths_linear[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float segment_lengths_angular[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float theta_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
-        path_parameters.t_start, path_parameters.t_end, path_parameters.path,
-        path_parameters.num_elements, x_values, y_values, segment_lengths_linear);
-    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
-        path_parameters.t_start, path_parameters.t_end,
-        path_parameters.orientation_profile, path_parameters.num_elements, theta_values,
-        segment_lengths_angular);
-
-    const float delta_t = (path_parameters.t_end - path_parameters.t_start) /
-                          (path_parameters.num_elements - 1);
-
-    // Check that all of the state variables are correct
-    for (unsigned int i = 0; i < path_parameters.num_elements; i++)
-    {
-        const Vector2d_t expected_position =
-            shared_polynomial2d_getValueOrder3(path, i * delta_t);
-        const float expected_orientation =
-            shared_polynomial1d_getValueOrder3(orientation_profile, i * delta_t);
-
-        EXPECT_FLOAT_EQ(expected_orientation, theta_values[i]);
-        EXPECT_FLOAT_EQ(expected_position.x, x_values[i]);
-        EXPECT_FLOAT_EQ(expected_position.y, y_values[i]);
-    }
-    EXPECT_FLOAT_EQ(y_values[path_parameters.num_elements - 1], 1);
-    EXPECT_FLOAT_EQ(x_values[path_parameters.num_elements - 1], 1);
-    EXPECT_FLOAT_EQ(theta_values[path_parameters.num_elements - 1], 1);
-}
-
-TEST_F(TrajectoryPlannerTest, test_robot_segment_size_generation_at_constant_t_intervals)
-{
-    const float total_path_length_linear  = sqrt(2.0);
-    const float total_path_length_angular = 1;
-    Polynomial2dOrder3_t path             = {
-        .x = {.coefficients = {0, 0, 1, 0}},
-        .y = {.coefficients = {0, 0, 1, 0}},
-    };
-
-    Polynomial1dOrder3_t orientation_profile = {.coefficients = {0, 0, 1, 0}};
-    // Generate parameters for a trajectory
-    FirmwareRobotPathParameters_t path_parameters{
-        .path                               = path,
-        .orientation_profile                = orientation_profile,
-        .t_start                            = 0,
-        .t_end                              = 1,
-        .num_elements                       = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS,
-        .max_allowable_linear_acceleration  = 3,
-        .max_allowable_linear_speed         = 3,
-        .max_allowable_angular_acceleration = 9,
-        .max_allowable_angular_speed        = 6,
-        .initial_linear_speed               = 0,
-        .final_linear_speed                 = 0,
-
-    };
-
-    float segment_lengths_linear[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float segment_lengths_angular[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float theta_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
-        path_parameters.t_start, path_parameters.t_end, path_parameters.path,
-        path_parameters.num_elements, x_values, y_values, segment_lengths_linear);
-    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
-        path_parameters.t_start, path_parameters.t_end,
-        path_parameters.orientation_profile, path_parameters.num_elements, theta_values,
-        segment_lengths_angular);
-
-    const float delta_length = total_path_length_linear / path_parameters.num_elements;
-    const float delta_length_orientation =
-        total_path_length_angular / path_parameters.num_elements;
-    // Check that all of the segment lengths are correct
-    for (unsigned int i = 0; i < path_parameters.num_elements - 1; i++)
-    {
-        EXPECT_NEAR(segment_lengths_linear[i], delta_length, 0.00001);
-        EXPECT_NEAR(segment_lengths_angular[i], delta_length_orientation, 0.00001);
-    }
-}
-
-TEST_F(TrajectoryPlannerTest,
-       test_robot_segment_size_generation_at_constant_t_intervals_low_segment_count)
-{
-    const float total_path_length_linear  = sqrt(2.0);
-    const float total_path_length_angular = 1;
-    Polynomial2dOrder3_t path             = {
-        .x = {.coefficients = {0, 0, 1, 0}},
-        .y = {.coefficients = {0, 0, 1, 0}},
-
-    };
-
-    Polynomial1dOrder3_t orientation_profile = {.coefficients = {0, 0, 1, 0}};
-    // Generate parameters for a trajectory
-    FirmwareRobotPathParameters_t path_parameters{
-        .path                               = path,
-        .orientation_profile                = orientation_profile,
-        .t_start                            = 0,
-        .t_end                              = 1,
-        .num_elements                       = 5,
-        .max_allowable_linear_acceleration  = 3,
-        .max_allowable_linear_speed         = 3,
-        .max_allowable_angular_acceleration = 9,
-        .max_allowable_angular_speed        = 6,
-        .initial_linear_speed               = 0,
-        .final_linear_speed                 = 0,
-
-    };
-
-    float segment_lengths_linear[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float segment_lengths_angular[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    float x_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float y_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float theta_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
-        path_parameters.t_start, path_parameters.t_end, path_parameters.path,
-        path_parameters.num_elements, x_values, y_values, segment_lengths_linear);
-    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
-        path_parameters.t_start, path_parameters.t_end,
-        path_parameters.orientation_profile, path_parameters.num_elements, theta_values,
-        segment_lengths_angular);
-
-    const float delta_length =
-        total_path_length_linear / (path_parameters.num_elements - 1);
-    const float delta_length_orientation =
-        total_path_length_angular / (path_parameters.num_elements - 1);
-    // Check that all of the segment lengths are correct
-    for (unsigned int i = 0; i < path_parameters.num_elements - 1; i++)
-    {
-        EXPECT_NEAR(segment_lengths_linear[i], delta_length, 0.00001);
-        EXPECT_NEAR(segment_lengths_angular[i], delta_length_orientation, 0.00001);
-    }
-}
-
-TEST_F(TrajectoryPlannerTest,
-       test_forward_continuity_path_curvature_max_speed_limited_constant_segment_length)
-{
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    const unsigned int num_segments = 10;
-
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        max_allowable_speed_profile[i] = 1;
-    }
-
-    float linear_segments[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float max_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    max_speed_profile[0]  = 1;
-    max_speed_profile[1]  = 1;
-    max_speed_profile[2]  = 1;
-    max_speed_profile[3]  = 1;
-    max_speed_profile[4]  = 1;
-    max_speed_profile[5]  = 1;
-    max_speed_profile[6]  = 1;
-    max_speed_profile[7]  = 1;
-    max_speed_profile[8]  = 1;
-    max_speed_profile[9]  = 1;
-    max_speed_profile[10] = 1;
-
-    linear_segments[0] = 1.0;
-    linear_segments[1] = 1.0;
-    linear_segments[2] = 1.0;
-    linear_segments[3] = 1.0;
-    linear_segments[4] = 1.0;
-    linear_segments[5] = 1.0;
-    linear_segments[6] = 1.0;
-    linear_segments[7] = 1.0;
-    linear_segments[8] = 1.0;
-
-    Polynomial2dOrder3_t path                = {.x = {0, 0, 0, 0}, .y = {0, 0, 0, 0}};
-    Polynomial1dOrder3_t orientation_profile = {.coefficients = {0, 0, 1, 0}};
-    // Generate parameters for a trajectory
-    FirmwareRobotPathParameters_t path_parameters{
-        .path                               = path,
-        .orientation_profile                = orientation_profile,
-        .t_start                            = 0,
-        .t_end                              = 1,
-        .num_elements                       = num_segments,
-        .max_allowable_linear_acceleration  = 3,
-        .max_allowable_linear_speed         = 3,
-        .max_allowable_angular_acceleration = 8,
-        .max_allowable_angular_speed        = 3,
-        .initial_linear_speed               = 1,
-        .final_linear_speed                 = 1,
-
-    };
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
-        path_parameters.num_elements, linear_segments, max_speed_profile,
-        path_parameters.max_allowable_linear_acceleration,
-        path_parameters.initial_linear_speed, path_parameters.final_linear_speed,
-        speed_profile);
-
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        EXPECT_TRUE(speed_profile[i] <= 1);
-    }
-}
-
-TEST_F(TrajectoryPlannerTest, test_forwards_continuity_varying_segment_length)
-{
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    const unsigned int num_segments = 5;
-
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        max_allowable_speed_profile[i] = 10;
-    }
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_angular_acceleration = 8;
-    path_parameters.max_allowable_angular_speed        = 3;
-    path_parameters.max_allowable_linear_acceleration  = 1;
-    path_parameters.max_allowable_linear_speed         = 10;
-    path_parameters.num_elements                       = num_segments;
-    path_parameters.initial_linear_speed               = 1;
-    path_parameters.final_linear_speed                 = 2;
-
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    segment_lengths[0] = 1.0;
-    segment_lengths[1] = 2.0;
-    segment_lengths[2] = 3.0;
-    segment_lengths[3] = 4.0;
-
-    TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
-            path_parameters.num_elements, segment_lengths, max_allowable_speed_profile,
-            path_parameters.max_allowable_linear_acceleration,
-            path_parameters.initial_linear_speed, path_parameters.final_linear_speed,
-            speed_profile);
-    EXPECT_EQ(status, OK);
-
-    EXPECT_NEAR(speed_profile[0], path_parameters.initial_linear_speed, 0.0001);
-    EXPECT_NEAR(speed_profile[1], sqrt(3), 0.00001);
-    EXPECT_NEAR(speed_profile[2], sqrt(7), 0.00001);
-    EXPECT_NEAR(speed_profile[3], sqrt(13), 0.00001);
-    EXPECT_NEAR(speed_profile[4], 2, 0.00001);
-}
-
-TEST_F(TrajectoryPlannerTest, test_forwards_continuity_final_velocity_too_high)
-{
-    // Create a trajectory where the final velocity is much to high to reach given the
-    // path length and acceleration
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    const unsigned int num_segments = 5;
-
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        max_allowable_speed_profile[i] = 10;
-    }
-
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    segment_lengths[0] = 1.0;
-    segment_lengths[1] = 2.0;
-    segment_lengths[2] = 3.0;
-    segment_lengths[3] = 4.0;
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_angular_acceleration = 8;
-    path_parameters.max_allowable_angular_speed        = 3;
-    path_parameters.max_allowable_linear_acceleration  = 1;
-    path_parameters.max_allowable_linear_speed         = 10;
-    path_parameters.num_elements                       = num_segments;
-    path_parameters.initial_linear_speed               = 0;
-    path_parameters.final_linear_speed                 = 200;
-
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
-            path_parameters.num_elements, segment_lengths, max_allowable_speed_profile,
-            path_parameters.max_allowable_linear_acceleration,
-            path_parameters.initial_linear_speed, path_parameters.final_linear_speed,
-            speed_profile);
-    EXPECT_EQ(status, FINAL_VELOCITY_TOO_HIGH);
-}
-
-TEST_F(TrajectoryPlannerTest, test_forwards_continuity_varying_segment_length_angular)
-{
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    const unsigned int num_segments = 5;
-
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        max_allowable_speed_profile[i] = 10;
-    }
-
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    segment_lengths[0] = 1.0;
-    segment_lengths[1] = 2.0;
-    segment_lengths[2] = 3.0;
-    segment_lengths[3] = 4.0;
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_angular_acceleration = 1;
-    path_parameters.max_allowable_angular_speed        = 10;
-    path_parameters.num_elements                       = num_segments;
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
-            path_parameters.num_elements, segment_lengths, max_allowable_speed_profile,
-            path_parameters.max_allowable_angular_acceleration, 0.0f, 0.0f,
-            speed_profile);
-    EXPECT_EQ(status, OK);
-    EXPECT_NEAR(speed_profile[0], 0, 0.0001);
-    EXPECT_NEAR(speed_profile[1], sqrt(2), 0.00001);
-    EXPECT_NEAR(speed_profile[2], sqrt(6), 0.00001);
-    EXPECT_NEAR(speed_profile[3], sqrt(12), 0.00001);
-    EXPECT_NEAR(speed_profile[4], 0, 0.00001);
-}
-
-TEST_F(TrajectoryPlannerTest,
-       test_forwards_continuity_constant_segment_speed_limited_angular)
-{
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    const unsigned int num_segments = 5;
-
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        max_allowable_speed_profile[i] = 1;
-    }
-
-    float segment_lengths_angular[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    segment_lengths_angular[0] = 1.0;
-    segment_lengths_angular[1] = 1.0;
-    segment_lengths_angular[2] = 1.0;
-    segment_lengths_angular[3] = 1.0;
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_angular_acceleration = 10;
-    path_parameters.num_elements                       = num_segments;
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
-            path_parameters.num_elements, segment_lengths_angular,
-            max_allowable_speed_profile,
-            path_parameters.max_allowable_angular_acceleration, 0.0f, 0.0f,
-            speed_profile);
-    EXPECT_EQ(status, OK);
-
-    EXPECT_NEAR(speed_profile[0], 0, 0.0001);
-    EXPECT_NEAR(speed_profile[1], 1, 0.00001);
-    EXPECT_NEAR(speed_profile[2], 1, 0.00001);
-    EXPECT_NEAR(speed_profile[3], 1, 0.00001);
-    EXPECT_NEAR(speed_profile[4], 0, 0.00001);
-}
-
-TEST_F(TrajectoryPlannerTest,
-       test_backwards_continuity_constant_segment_length_continuous)
-{
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    const unsigned int num_segments = 4;
-
-
-    float segment_lengths_linear[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    segment_lengths_linear[0] = 1.0;
-    segment_lengths_linear[1] = 1.0;
-    segment_lengths_linear[2] = 1.0;
-
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_linear_acceleration = 1;
-    path_parameters.max_allowable_linear_speed        = 1;
-    path_parameters.num_elements                      = num_segments;
-    path_parameters.initial_linear_speed              = sqrt(7);
-    path_parameters.final_linear_speed                = 1;
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    speed_profile[0] = 4;
-    speed_profile[1] = 3;
-    speed_profile[2] = 2;
-    speed_profile[3] = 1;
-
-
-    TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
-            path_parameters.num_elements, segment_lengths_linear,
-            path_parameters.max_allowable_linear_acceleration,
-            path_parameters.initial_linear_speed, speed_profile);
-    EXPECT_EQ(status, OK);
-
-    EXPECT_NEAR(speed_profile[0], sqrt(7), 0.0001);
-    EXPECT_NEAR(speed_profile[1], sqrt(5), 0.0001);
-    EXPECT_NEAR(speed_profile[2], sqrt(3), 0.0001);
-    EXPECT_NEAR(speed_profile[3], 1, 0.0001);
-}
-
-TEST_F(TrajectoryPlannerTest, test_backwards_continuity_variable_segment_length_input)
-{
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    const unsigned int num_segments = 4;
-
-
-    float segment_lengths_linear[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    segment_lengths_linear[0] = 1.0;
-    segment_lengths_linear[1] = 2.0;
-    segment_lengths_linear[2] = 3.0;
-
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_linear_acceleration = 1;
-    path_parameters.max_allowable_linear_speed        = 1;
-    path_parameters.num_elements                      = num_segments;
-    path_parameters.initial_linear_speed              = sqrt(7);
-    path_parameters.final_linear_speed                = 1;
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    speed_profile[0] = 4;
-    speed_profile[1] = 3;
-    speed_profile[2] = 10;
-    speed_profile[3] = 1;
-
-    TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
-            path_parameters.num_elements, segment_lengths_linear,
-            path_parameters.max_allowable_linear_acceleration,
-            path_parameters.initial_linear_speed, speed_profile);
-    EXPECT_EQ(status, OK);
-
-    EXPECT_NEAR(speed_profile[0], sqrt(11), 0.0001);
-    EXPECT_NEAR(speed_profile[1], 3, 0.0001);
-    EXPECT_NEAR(speed_profile[2], sqrt(7), 0.0001);
-    EXPECT_NEAR(speed_profile[3], 1, 0.0001);
-}
-
-TEST_F(
-    TrajectoryPlannerTest,
-    test_backwards_continuity_variable_segment_length_input_and_initial_velocity_too_high)
-{
-    // Create an 'initial velocity too high' state by requesting an initial velocity that
-    // is much greater than physically possible given the path length and acceleration
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    const unsigned int num_segments = 4;
-
-
-    float segment_lengths_linear[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    segment_lengths_linear[0] = 1.0;
-    segment_lengths_linear[1] = 2.0;
-    segment_lengths_linear[2] = 3.0;
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_linear_acceleration = 1;
-    path_parameters.max_allowable_linear_speed        = 1;
-    path_parameters.num_elements                      = num_segments;
-    path_parameters.initial_linear_speed              = 20;
-    path_parameters.final_linear_speed                = 1;
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    speed_profile[0] = 20;
-    speed_profile[1] = 3;
-    speed_profile[2] = 10;
-    speed_profile[3] = 1;
-
-    TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
-            path_parameters.num_elements, segment_lengths_linear,
-            path_parameters.max_allowable_linear_acceleration,
-            path_parameters.initial_linear_speed, speed_profile);
-
-    EXPECT_EQ(status, INITIAL_VELOCITY_TOO_HIGH);
-}
-
-TEST_F(TrajectoryPlannerTest,
-       test_backwards_continuity_constant_segment_length_input_to_angular_profile)
-{
-    const unsigned int num_segments = 4;
-
-    float segment_lengths_angular[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    segment_lengths_angular[0] = 1.0;
-    segment_lengths_angular[1] = 1.0;
-    segment_lengths_angular[2] = 1.0;
-
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_angular_acceleration = 1;
-    path_parameters.max_allowable_angular_speed        = 1;
-    path_parameters.num_elements                       = num_segments;
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    speed_profile[0] = 0;
-    speed_profile[1] = 3;
-    speed_profile[2] = 2;
-    speed_profile[3] = 0;
-
-
-    TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
-            path_parameters.num_elements, segment_lengths_angular,
-            path_parameters.max_allowable_angular_acceleration, 0.0f, speed_profile);
-    EXPECT_EQ(status, OK);
-
-    EXPECT_NEAR(speed_profile[0], 0, 0.0001);
-    EXPECT_NEAR(speed_profile[1], sqrt(4), 0.0001);
-    EXPECT_NEAR(speed_profile[2], sqrt(2), 0.0001);
-    EXPECT_NEAR(speed_profile[3], 0, 0.0001);
-}
-
-TEST_F(TrajectoryPlannerTest,
-       test_backwards_continuity_variable_segment_length_input_angular_profile)
-{
-    const unsigned int num_segments = 4;
-
-    float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    segment_lengths[0] = 1.0;
-    segment_lengths[1] = 2.0;
-    segment_lengths[2] = 3.0;
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_angular_acceleration = 1;
-    path_parameters.max_allowable_angular_speed        = 1;
-    path_parameters.num_elements                       = num_segments;
-
-    float speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    speed_profile[0] = 0;
-    speed_profile[1] = 3;
-    speed_profile[2] = 10;
-    speed_profile[3] = 0;
-
-    TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
-            path_parameters.num_elements, segment_lengths,
-            path_parameters.max_allowable_angular_acceleration, 0.0f, speed_profile);
-    EXPECT_EQ(status, OK);
-
-    EXPECT_NEAR(speed_profile[0], 0, 0.0001);
-    EXPECT_NEAR(speed_profile[1], 3, 0.0001);
-    EXPECT_NEAR(speed_profile[2], sqrt(6), 0.0001);
-    EXPECT_NEAR(speed_profile[3], 0, 0.0001);
-}
-
-TEST_F(TrajectoryPlannerTest, test_generate_maximum_speed_curve_for_a_straight_line)
-{
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    FirmwareRobotPathParameters_t path_parameters;
-    path_parameters.max_allowable_linear_acceleration = 1;
-    path_parameters.max_allowable_linear_speed        = FLT_MAX;
-    path_parameters.num_elements         = TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS - 1;
-    path_parameters.initial_linear_speed = 1;
-    path_parameters.final_linear_speed   = 1;
-    path_parameters.path                 = {.x = {0, 0, 1, 0}, .y = {0, 0, 1, 0}};
-    path_parameters.t_start              = 0;
-    path_parameters.t_end                = 1;
-
-    app_trajectory_planner_getMaximumSpeedProfile_impl(
-        path_parameters.path, path_parameters.num_elements, path_parameters.t_start,
-        path_parameters.t_end, path_parameters.max_allowable_linear_acceleration,
-        path_parameters.max_allowable_linear_speed, max_allowable_speed_profile);
-
-    for (unsigned int i = 0; i < path_parameters.num_elements; i++)
-    {
-        EXPECT_GE(max_allowable_speed_profile[i], 1e+10);
-    }
-}
-
-TEST_F(TrajectoryPlannerTest,
-       test_generate_forwards_and_backwards_continuous_speed_profiles_angular_and_linear)
-
-{
-    Polynomial1dOrder3_t orientation_profile = {.coefficients = {0, 0, 1, 0}};
-    Polynomial2dOrder3_t path                = {.x = {0, 0, 1, 0}, .y = {0, 0, 1, 0}};
-    // Generate parameters for a trajectory
-    FirmwareRobotPathParameters_t path_parameters{
-        .path                               = path,
-        .orientation_profile                = orientation_profile,
-        .t_start                            = 1,
-        .t_end                              = 2,
-        .num_elements                       = 10,
-        .max_allowable_linear_acceleration  = 1,
-        .max_allowable_linear_speed         = 1,
-        .max_allowable_angular_acceleration = 1,
-        .max_allowable_angular_speed        = 1,
-        .initial_linear_speed               = 0,
-        .final_linear_speed                 = 0,
-
-    };
-
-    float linear_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float angular_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    float segment_lengths_linear[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float segment_lengths_angular[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    float angular_states[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float x_states[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float y_states[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    // Get the segment states and the segment lengths
-    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
-        path_parameters.t_start, path_parameters.t_end,
-        path_parameters.orientation_profile, path_parameters.num_elements, angular_states,
-        segment_lengths_angular);
-    app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
-        path_parameters.t_start, path_parameters.t_end, path_parameters.path,
-        path_parameters.num_elements, x_states, y_states, segment_lengths_linear);
-
-    // Get the forwards linear speed profile
-    app_trajectory_planner_getMaximumSpeedProfile_impl(
-        path_parameters.path, path_parameters.num_elements, path_parameters.t_start,
-        path_parameters.t_end, path_parameters.max_allowable_linear_acceleration,
-        path_parameters.max_allowable_linear_speed, max_allowable_speed_profile);
-    app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
-        path_parameters.num_elements, segment_lengths_linear, max_allowable_speed_profile,
-        path_parameters.max_allowable_linear_acceleration,
-        path_parameters.initial_linear_speed, path_parameters.final_linear_speed,
-        linear_speed_profile);
-
-    // Get the forwards angular speed profile
-    Polynomial2dOrder3_t orientation_2d = {.x = path_parameters.orientation_profile,
-                                           .y = {0, 0, 0, 0}};
-    app_trajectory_planner_getMaximumSpeedProfile_impl(
-        orientation_2d, path_parameters.num_elements, path_parameters.t_start,
-        path_parameters.t_end, path_parameters.max_allowable_angular_acceleration,
-        path_parameters.max_allowable_angular_speed, max_allowable_speed_profile);
-    app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
-        path_parameters.num_elements, segment_lengths_angular,
-        max_allowable_speed_profile, path_parameters.max_allowable_angular_acceleration,
-        0.0f, 0.0f, angular_speed_profile);
-
-    // Check that the values of the acceleration period are correct
-    EXPECT_NEAR(linear_speed_profile[0], 0, 0.0001);
-    EXPECT_NEAR(linear_speed_profile[1], 0.5606, 0.0001);
-    EXPECT_NEAR(linear_speed_profile[2], 0.7928, 0.0001);
-    EXPECT_NEAR(linear_speed_profile[3], 0.9709, 0.0001);
-    EXPECT_NEAR(linear_speed_profile[4], 1.0, 0.0001);
-
-    EXPECT_NEAR(angular_speed_profile[0], 0, 0.0001);
-    EXPECT_NEAR(angular_speed_profile[1], 0.4714, 0.0001);
-    EXPECT_NEAR(angular_speed_profile[2], 0.6666, 0.0001);
-    EXPECT_NEAR(angular_speed_profile[3], 0.8165, 0.0001);
-    EXPECT_NEAR(angular_speed_profile[4], 0.9428, 0.0001);
-
-    // Check that the path speed is limited by the maximum value set in the path
-    // parameters
-    for (unsigned int i = 5; i < path_parameters.num_elements - 2; i++)
-    {
-        EXPECT_FLOAT_EQ(linear_speed_profile[i],
-                        path_parameters.max_allowable_linear_speed);
-        EXPECT_FLOAT_EQ(angular_speed_profile[i],
-                        path_parameters.max_allowable_angular_speed);
-    }
-
-    app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
-        path_parameters.num_elements, segment_lengths_linear,
-        path_parameters.max_allowable_linear_acceleration,
-        path_parameters.initial_linear_speed, linear_speed_profile);
-    app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
-        path_parameters.num_elements, segment_lengths_angular,
-        path_parameters.max_allowable_angular_acceleration, 0.0f, angular_speed_profile);
-
-    // Check that the decceleration period is correct
-    // Check that the values of the acceleration period are correct
-    EXPECT_NEAR(linear_speed_profile[path_parameters.num_elements - 5], 1 - 0, 0.0001);
-    EXPECT_NEAR(linear_speed_profile[path_parameters.num_elements - 4], 0.9709, 0.0001);
-    EXPECT_NEAR(linear_speed_profile[path_parameters.num_elements - 3], 0.7928, 0.0001);
-    EXPECT_NEAR(linear_speed_profile[path_parameters.num_elements - 2], 0.5606, 0.0001);
-    EXPECT_NEAR(linear_speed_profile[path_parameters.num_elements - 1],
-                path_parameters.final_linear_speed, 0.0001);
-
-    EXPECT_NEAR(angular_speed_profile[path_parameters.num_elements - 5], 0.9428, 0.0001);
-    EXPECT_NEAR(angular_speed_profile[path_parameters.num_elements - 4], 0.8165, 0.0001);
-    EXPECT_NEAR(angular_speed_profile[path_parameters.num_elements - 3], 0.6666, 0.0001);
-    EXPECT_NEAR(angular_speed_profile[path_parameters.num_elements - 2], 0.4714, 0.0001);
-    EXPECT_NEAR(angular_speed_profile[path_parameters.num_elements - 1], 0, 0.0001);
-}
-
 TEST_F(TrajectoryPlannerTest, test_generate_time_profile_no_angular_profile)
 {
     // Create a scenario where the linear path parameters will limit the speed of the
@@ -1462,7 +741,7 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_no_angular_profile)
 
     PositionTrajectory_t trajectory;
 
-    app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
+    app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
         path_parameters.t_start, path_parameters.t_end, path_parameters.path,
         path_parameters.num_elements, x_states, y_states, segment_lengths);
     TrajectoryPlannerGenerationStatus_t status =
@@ -1511,7 +790,7 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_linear_limiting_angular
 
     PositionTrajectory_t trajectory;
 
-    app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
+    app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
         path_parameters.t_start, path_parameters.t_end, path_parameters.path,
         path_parameters.num_elements, x_states, y_states, segment_lengths);
     TrajectoryPlannerGenerationStatus_t status =
@@ -1559,7 +838,7 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_no_linear_profile)
 
     PositionTrajectory_t trajectory;
 
-    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+    app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
         path_parameters.t_start, path_parameters.t_end,
         path_parameters.orientation_profile, path_parameters.num_elements, theta_states,
         segment_lengths);
@@ -1616,13 +895,14 @@ TEST_F(TrajectoryPlannerTest,
 
     PositionTrajectory_t trajectory;
 
-    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+    app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
         path_parameters.t_start, path_parameters.t_end,
         path_parameters.orientation_profile, path_parameters.num_elements, theta_states,
         segment_lengths);
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
             path_parameters, &trajectory);
+    EXPECT_EQ(status, OK);
 
     EXPECT_FLOAT_EQ(trajectory.time_profile[0], 0.0);
     EXPECT_NEAR(trajectory.time_profile[1],
@@ -1638,30 +918,9 @@ TEST_F(TrajectoryPlannerTest,
             trajectory.time_profile[i - 1] +
                 segment_lengths[i - 1] / path_parameters.max_allowable_angular_speed);
     }
-    const float radians_moved_in_acceleration_phase =
-        trajectory.orientation[path_parameters.num_elements - 1] -
-        trajectory.orientation[path_parameters.num_elements - 2];
 
     EXPECT_NEAR(trajectory.time_profile[path_parameters.num_elements - 1], 9.1818,
                 0.0001);
-}
-
-TEST_F(TrajectoryPlannerTest, test_rebalance_trajectory_segment_to_mach_duration)
-{
-    float segment_lengths_meters[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
-    // Create an artificial trajectory here for testing
-    speeds[0]                  = 1;
-    speeds[1]                  = 4;
-    float desired_time_seconds = 0.01f;
-
-    segment_lengths_meters[0] = 1.0;
-
-    speeds[1] = app_trajectory_planner_modifySpeedToMatchDuration_impl(
-        speeds[0], desired_time_seconds, segment_lengths_meters[0]);
-    EXPECT_FLOAT_EQ(speeds[1], 201);
-    EXPECT_FLOAT_EQ(speeds[0], 1);
 }
 
 TEST_F(TrajectoryPlannerTest, test_generate_velocity_trajectory_zeros)
@@ -1880,7 +1139,7 @@ TEST_F(TrajectoryPlannerTest,
     PositionTrajectory_t position_trajectory;
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+        app_trajectory_planner_generateConstantPeriodPositionTrajectory(
             0.01f, &path_parameters, &position_trajectory);
     EXPECT_EQ(status, OK);
     app_trajectory_planner_generateVelocityTrajectory(
@@ -1924,7 +1183,7 @@ TEST_F(
     PositionTrajectory_t position_trajectory;
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+        app_trajectory_planner_generateConstantPeriodPositionTrajectory(
             0.01f, &path_parameters, &position_trajectory);
     EXPECT_EQ(status, OK);
     app_trajectory_planner_generateVelocityTrajectory(
@@ -1933,8 +1192,6 @@ TEST_F(
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
-
-    const float segment_length = sqrt(8.0) / (path_parameters.num_elements - 1);
 
     for (unsigned int i = 0; i < path_parameters.num_elements - 1; i++)
     {

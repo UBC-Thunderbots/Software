@@ -1,15 +1,13 @@
 #include "firmware/app/control/trajectory_planner.h"
 
 #include <assert.h>
-#include <float.h>
 #include <math.h>
-#include <stdbool.h>
 
 #include "assert.h"
+#include "firmware/app/control/trajectory_planner_impl.h"
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/math/tbots_math.h"
-#include "firmware/shared/physics.h"
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
@@ -40,26 +38,25 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     float angular_segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     // Generate the states and segment lengths for each dimension
-    app_trajectory_planner_generate2dSegmentNodesAndLengths_impl(
+    app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
         t_start, t_end, path_parameters.path, num_elements, x_profile, y_profile,
         linear_segment_lengths);
 
-    app_trajectory_planner_generate1dSegmentNodesAndLengths_impl(
+    app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
         t_start, t_end, theta_poly, num_elements, orientation_profile,
         angular_segment_lengths);
 
     // Generate the max allowable speed profile for linear and angular profile
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
-    app_trajectory_planner_getMaximumSpeedProfile_impl(
+    app_trajectory_planner_impl_getMaximumSpeedProfile(
         path_parameters.path, num_elements, t_start, t_end, max_linear_acceleration,
         max_linear_speed, max_allowable_speed_profile);
 
     TrajectoryPlannerGenerationStatus_t status =
-        app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
-            num_elements, linear_segment_lengths, max_allowable_speed_profile,
-            max_linear_acceleration, initial_linear_speed, final_linear_speed,
-            linear_speed);
+        app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
+            final_linear_speed, linear_segment_lengths, max_allowable_speed_profile,
+            max_linear_acceleration, initial_linear_speed, num_elements, linear_speed);
     if (status != OK)
     {
         return status;
@@ -67,7 +64,7 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
 
     // Create a 2d polynomial out of the theta profile and a polynomial of all zeros
     Polynomial2dOrder3_t theta_poly_2d = {.x = theta_poly, .y = {0, 0, 0, 0}};
-    app_trajectory_planner_getMaximumSpeedProfile_impl(
+    app_trajectory_planner_impl_getMaximumSpeedProfile(
         theta_poly_2d, num_elements, t_start, t_end, max_angular_acceleration,
         max_angular_speed, max_allowable_speed_profile);
 
@@ -75,27 +72,28 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     const float initial_angular_speed = 0;
     const float final_angular_speed   = 0;
     // Generate the forwards continuous angular speed profile
-    status = app_trajectory_planner_createForwardsContinuousSpeedProfile_impl(
-        num_elements, angular_segment_lengths, max_allowable_speed_profile,
-        max_angular_acceleration, initial_angular_speed, final_angular_speed,
-        angular_speed);
+    status = app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
+        final_angular_speed, angular_segment_lengths, max_allowable_speed_profile,
+        max_angular_acceleration, initial_angular_speed, num_elements, angular_speed);
     if (status != OK)
     {
         return status;
     }
 
     // Make the speed profiles backwards continuous
-    status = app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
-        num_elements, linear_segment_lengths, max_linear_acceleration,
-        initial_linear_speed, linear_speed);
+    status = app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
+        initial_linear_speed, linear_segment_lengths, max_linear_acceleration,
+        num_elements, linear_speed);
+
     if (status != OK)
     {
         return status;
     }
 
-    status = app_trajectory_planner_modifySpeedsToBeBackwardsContinuous_impl(
-        num_elements, angular_segment_lengths, max_angular_acceleration,
-        initial_angular_speed, angular_speed);
+    status = app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
+        initial_angular_speed, angular_segment_lengths, max_angular_acceleration,
+        num_elements, angular_speed);
+
     if (status != OK)
     {
         return status;
@@ -105,13 +103,13 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     float angular_time_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
     // Generate the segment-based duration of each trajectory
-    app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
+    app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
         linear_segment_lengths, linear_speed, num_elements, linear_time_profile);
-    app_trajectory_planner_generatePositionTrajectoryTimeProfile_impl(
+    app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
         angular_segment_lengths, angular_speed, num_elements, angular_time_profile);
 
     // Calculate the time duration of the trajectory at each segment node
-    app_trajectory_planner_modifySpeedsToMatchLongestSegmentDuration_impl(
+    app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
         linear_segment_lengths, angular_segment_lengths, linear_time_profile,
         angular_time_profile, num_elements, linear_speed, angular_speed,
         position_trajectory->time_profile);
@@ -120,7 +118,7 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
 }
 
 TrajectoryPlannerGenerationStatus_t
-app_trajectory_planner_generateConstantInterpolationPeriodPositionTrajectory(
+app_trajectory_planner_generateConstantPeriodPositionTrajectory(
     float interpolation_period, FirmwareRobotPathParameters_t* path_parameters,
     PositionTrajectory_t* constant_period_trajectory)
 {
