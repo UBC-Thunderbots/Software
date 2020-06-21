@@ -176,15 +176,15 @@ void initIoNetworking()
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
-        &primitive_msg, PrimitiveMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &primitive_msg, PrimitiveMsg_fields, 150);
 
     vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
-        &vision_msg, VisionMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &vision_msg, VisionMsg_fields, 150);
 
     tbots_robot_msg_sender_profile = io_proto_multicast_communication_profile_create(
         "tbots_robot_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
-        &tbots_robot_msg, TbotsRobotMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &tbots_robot_msg, TbotsRobotMsg_fields, 150);
 }
 
 
