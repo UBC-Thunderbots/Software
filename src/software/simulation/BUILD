@@ -124,7 +124,7 @@ cc_library(
         ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//software/backend/output/radio/mrf:mrf_primitive_visitor",
+        "//software/backend/output/shared:proto_creator_primitive_visitor",
         "//software/primitive",
         "//software/proto/message_translation:ssl_detection",
         "//software/proto/message_translation:ssl_geometry",

@@ -9,17 +9,15 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 
 #include "shared/constants.h"
 #include "software/backend/output/radio/mrf/messages.h"
-#include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
-#include "software/logger/logger.h"
-
-namespace
+#include "software/backend/output/shared/proto_creator_primitive_visitor.h"
+#include "software/logger/logger.h" namespace
 {
     struct RadioConfig
     {
@@ -457,9 +455,9 @@ void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
 std::vector<uint8_t> MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
 {
     // Get the proto representation of the primitive
-    CreateProtoPrimitiveVisitor visitor;
+    ProtoCreatorPrimitiveVisitor visitor;
     prim->accept(visitor);
-    RadioPrimitiveMsg prim_proto = visitor.getProto();
+    PrimitiveMsg prim_proto = visitor.getProto();
 
     // Serialize the proto representation
     std::vector<uint8_t> serialized_proto(prim_proto.ByteSizeLong());
@@ -467,6 +465,8 @@ std::vector<uint8_t> MRFDongle::encode_primitive(const std::unique_ptr<Primitive
                                 static_cast<int>(prim_proto.ByteSizeLong()));
 
     // Append the robot id
+    // We place this outside the proto so that we can check on the robot if the message
+    // was intended for that robot with de-serializing the message
     serialized_proto.emplace_back(prim->getRobotId());
 
     return serialized_proto;

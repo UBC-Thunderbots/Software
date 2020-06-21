@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "shared/proto/vision.proto";
-import "shared/proto/radio_primitive.proto";
+import "shared/proto/primitive.proto";
 import "shared/proto/tbots_timestamp_msg.proto";
 
 message VisionMsg
@@ -16,11 +16,11 @@ message VisionMsg
     BallStateMsg ball_state = 3;
 }
 
-message PrimitiveMsg
+message PrimitiveSetMsg
 {
     // Epoch timestamp when primitives were assigned
     TimestampMsg time_sent = 1;
 
     // Robot ID to RadioPrimitive map
-    map<uint32, RadioPrimitiveMsg> robot_primitives = 2;
+    map<uint32, PrimitiveMsg> robot_primitives = 2;
 }

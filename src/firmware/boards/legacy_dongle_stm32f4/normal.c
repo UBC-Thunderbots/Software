@@ -432,7 +432,7 @@ static void send_drive_packet(const void *packet, const size_t packet_size)
     unsigned int frame_length_address  = address++;
     unsigned int header_start_address  = address;
     mrf_write_long(address++, 0b01000001U);                // Frame control LSB
-    mrf_write_long(address++, 0b10001000U);               // Frame control MSB
+    mrf_write_long(address++, 0b10001000U);                // Frame control MSB
     mrf_write_long(address++, ++mrf_tx_seqnum);            // Sequence number
     mrf_write_long(address++, radio_config.pan_id);        // Destination PAN ID LSB
     mrf_write_long(address++, radio_config.pan_id >> 8U);  // Destination PAN ID MSB
@@ -449,24 +449,27 @@ static void send_drive_packet(const void *packet, const size_t packet_size)
 
     // Write out the payload sent from the host
     const uint8_t *rptr = packet;
-    for (size_t i = 0; i < packet_size; i++){
+    for (size_t i = 0; i < packet_size; i++)
+    {
         mrf_write_long(address++, *rptr++);
     }
     // append the emergency stop status and feedback request robot id
     mrf_write_long(address++, estop_read() == ESTOP_RUN);
     mrf_write_long(address++, poll_index);
 
+    // TODO: need to add some sort of checksum here
+
     // Record the frame length, now that the frame is finished.
     mrf_write_long(frame_length_address, address - header_start_address);
+
+    // TODO: need to TRIPLE check that we're not sending packets larger then 64 bytes
+    //       here, and indicate that somehow to the user
 
     // Advance the feedback polling index.
     poll_index = (poll_index + 1U) % MAX_NUM_ROBOTS;
 
     // Initiate transmission with no acknowledgement.
     mrf_write_short(MRF_REG_SHORT_TXNCON, 0b00000001U);
-
-    // TODO: need to TRIPLE check that we're not sending packets larger then 64 bytes
-    //       here, and indicate that somehow to the user
 
     // Blink the transmit light.
     // led_blink(LED_TX);
@@ -538,8 +541,7 @@ static void drive_task(void *UNUSED(param))
             // Start the endpoint if possible.
             if (!ep_running)
             {
-                if (uep_async_read_start(0x01U, usb_buffer,
-                                         MAX_DRIVE_PACKET_SIZE,
+                if (uep_async_read_start(0x01U, usb_buffer, MAX_DRIVE_PACKET_SIZE,
                                          &handle_drive_endpoint_done))
                 {
                     ep_running = true;
@@ -872,7 +874,6 @@ static void usbrx_task(void *UNUSED(param))
 {
     for (;;)
     {
-
         // Wait to be instructed to start doing work.
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 

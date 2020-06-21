@@ -1,7 +1,7 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
 # TODO: more sane location for this file
-load("//firmware_new:nanopb.bzl", "nanopb_proto_library")
+load("//defs:nanopb.bzl", "nanopb_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -9,7 +9,7 @@ proto_library(
     name = "tbots_proto",
     srcs = [
         "geometry.proto",
-        "radio_primitive.proto",
+        "primitive.proto",
         "robot_component_status.proto",
         "tbots_robot_msg.proto",
         "tbots_software_msgs.proto",

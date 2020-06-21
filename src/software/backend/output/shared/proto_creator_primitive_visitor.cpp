@@ -1,11 +1,11 @@
-#include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
+#include "software/backend/output/shared/proto_creator_primitive_visitor.h"
 
 #include "shared/constants.h"
 #include "software/primitive/all_primitives.h"
 
 // TODO: update tests for this!
 
-RadioPrimitiveMsg CreateProtoPrimitiveVisitor::getProto()
+PrimitiveMsg ProtoCreatorPrimitiveVisitor::getProto()
 {
     // If we've never visited a primitive (and so have never populated the
     // `radio_prim`) then throw an exception
@@ -19,11 +19,11 @@ RadioPrimitiveMsg CreateProtoPrimitiveVisitor::getProto()
     return *radio_prim;
 }
 
-void CreateProtoPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
+void ProtoCreatorPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
+    radio_prim = PrimitiveMsg();
     radio_prim->set_prim_type(
-        RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_CATCH);
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_CATCH);
     radio_prim->set_parameter1(catch_primitive.getVelocity());
     radio_prim->set_parameter2(catch_primitive.getDribblerSpeed());
     radio_prim->set_parameter3(catch_primitive.getMargin());
@@ -32,11 +32,11 @@ void CreateProtoPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
     radio_prim->set_slow(false);
 }
 
-void CreateProtoPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
+void ProtoCreatorPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
+    radio_prim = PrimitiveMsg();
     radio_prim->set_prim_type(
-        RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_SHOOT);
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_SHOOT);
     radio_prim->set_parameter1(chip_primitive.getChipOrigin().x() *
                                MILLIMETERS_PER_METER);
     radio_prim->set_parameter2(chip_primitive.getChipOrigin().y() *
@@ -48,12 +48,12 @@ void CreateProtoPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
     radio_prim->set_slow(false);
 }
 
-void CreateProtoPrimitiveVisitor::visit(
+void ProtoCreatorPrimitiveVisitor::visit(
     const DirectVelocityPrimitive &direct_velocity_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
-    radio_prim->set_prim_type(RadioPrimitiveMsg::PrimitiveType::
-                                  RadioPrimitiveMsg_PrimitiveType_DIRECT_VELOCITY);
+    radio_prim = PrimitiveMsg();
+    radio_prim->set_prim_type(PrimitiveMsg::PrimitiveType::
+                                  PrimitiveMsg_PrimitiveType_DIRECT_VELOCITY);
     radio_prim->set_parameter1(direct_velocity_primitive.getXVelocity() *
                                MILLIMETERS_PER_METER);
     radio_prim->set_parameter2(direct_velocity_primitive.getYVelocity() *
@@ -66,12 +66,12 @@ void CreateProtoPrimitiveVisitor::visit(
     radio_prim->set_slow(false);
 }
 
-void CreateProtoPrimitiveVisitor::visit(
+void ProtoCreatorPrimitiveVisitor::visit(
     const DirectWheelsPrimitive &direct_wheels_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
+    radio_prim = PrimitiveMsg();
     radio_prim->set_prim_type(
-        RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_DIRECT_WHEELS);
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_DIRECT_WHEELS);
     radio_prim->set_parameter1(
         static_cast<float>(direct_wheels_primitive.getWheel0Power()));
     radio_prim->set_parameter2(
@@ -85,11 +85,11 @@ void CreateProtoPrimitiveVisitor::visit(
     radio_prim->set_slow(false);
 }
 
-void CreateProtoPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
+void ProtoCreatorPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
+    radio_prim = PrimitiveMsg();
     radio_prim->set_prim_type(
-        RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_DRIBBLE);
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_DRIBBLE);
     radio_prim->set_parameter1(dribble_primitive.getDestination().x() *
                                MILLIMETERS_PER_METER);
     radio_prim->set_parameter2(dribble_primitive.getDestination().y() *
@@ -104,11 +104,11 @@ void CreateProtoPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitiv
 
 // TODO: make sure all comments were carried over in this file!!!!
 
-void CreateProtoPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
+void ProtoCreatorPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
+    radio_prim = PrimitiveMsg();
     radio_prim->set_prim_type(
-        RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_SHOOT);
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_SHOOT);
     radio_prim->set_parameter1(kick_primitive.getKickOrigin().x() *
                                MILLIMETERS_PER_METER);
     radio_prim->set_parameter2(kick_primitive.getKickOrigin().y() *
@@ -120,11 +120,11 @@ void CreateProtoPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
     radio_prim->set_slow(false);
 }
 
-void CreateProtoPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
+void ProtoCreatorPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
+    radio_prim = PrimitiveMsg();
     radio_prim->set_prim_type(
-        RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_MOVE);
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_MOVE);
     radio_prim->set_parameter1(move_primitive.getDestination().x() *
                                MILLIMETERS_PER_METER);
     radio_prim->set_parameter2(move_primitive.getDestination().y() *
@@ -140,11 +140,11 @@ void CreateProtoPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
     radio_prim->set_slow(move_primitive.getMoveType() == MoveType::SLOW);
 }
 
-void CreateProtoPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive)
+void ProtoCreatorPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
+    radio_prim = PrimitiveMsg();
     radio_prim->set_prim_type(
-        RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_SPIN);
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_SPIN);
     radio_prim->set_parameter1(movespin_primitive.getDestination().x() *
                                MILLIMETERS_PER_METER);
     radio_prim->set_parameter2(movespin_primitive.getDestination().y() *
@@ -157,11 +157,11 @@ void CreateProtoPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primit
     radio_prim->set_slow(false);
 }
 
-void CreateProtoPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
+void ProtoCreatorPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
+    radio_prim = PrimitiveMsg();
     radio_prim->set_prim_type(
-        RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_PIVOT);
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_PIVOT);
     radio_prim->set_parameter1(pivot_primitive.getPivotPoint().x() *
                                MILLIMETERS_PER_METER);
     radio_prim->set_parameter2(pivot_primitive.getPivotPoint().y() *
@@ -174,11 +174,11 @@ void CreateProtoPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     radio_prim->set_slow(false);
 }
 
-void CreateProtoPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
+void ProtoCreatorPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
-    radio_prim = RadioPrimitiveMsg();
+    radio_prim = PrimitiveMsg();
     radio_prim->set_prim_type(
-        RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_STOP);
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_STOP);
     radio_prim->set_parameter1(0);
     radio_prim->set_parameter2(0);
     radio_prim->set_parameter3(0);

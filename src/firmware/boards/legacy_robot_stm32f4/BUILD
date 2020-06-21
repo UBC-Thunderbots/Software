@@ -71,8 +71,7 @@ cc_binary(
         "//shared:constants",
         "//shared:robot_constants",
         "//shared/proto:tbots_nanopb_proto",
-        # TODO: we should just get this by depending on a nanopb lib
-        "@com_github_nanopb_nanopb//:nanopb",
+        "@nanopb",
     ],
 )
 

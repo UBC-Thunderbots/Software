@@ -139,11 +139,20 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              unsigned int primitive_index,
                                              const primitive_params_t *params)
 {
-    assert(primitive_index < PRIMITIVE_COUNT);
+    // We have both a assert statement and a if statement because we want to easily
+    // be able to see this case while debugging, but don't want to accidentally
+    // run a totally random primitive if we're compiling in optimized mode with no
+    // assertions
+    const bool primitive_index_is_valid = primitive_index < PRIMITIVE_COUNT;
+    assert(primitive_index_is_valid);
+    if (!primitive_index_is_valid){
+        return;
+    }
+
     app_primitive_manager_lockPrimitiveMutex(manager);
 
     if (!primitive_params_are_equal(manager->previous_primitive_params, params) ||
-        manager->current_primitive_index != primitive_index  ||
+        manager->current_primitive_index != primitive_index ||
         app_primitive_manager_primitiveIsDirect(primitive_index))
     {
         if (manager->current_primitive_functions)
@@ -202,6 +211,3 @@ bool app_primitive_manager_primitiveIsDirect(unsigned int primitive)
     return PRIMITIVES[primitive]->direct;
 }
 
-unsigned int app_primitive_manager_getStopPrimitiveId(PrimitiveManager_t *manager){
-    return 0;
-}

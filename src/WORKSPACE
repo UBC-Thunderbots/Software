@@ -50,13 +50,13 @@ http_archive(
 )
 
 # nanopb: lightweight protobuf library used on the STM32. The build file in the
-# repo does not build the proto compiler (protoc) as a target, and is really compilicated
+# repo does not build the proto compiler (protoc) as a target, and is really complicated
 # to set it up as a protobuf plugin due to lack of bazel support. So we use the archive
 # which has both the headers and compiled protoc w/ the c support baked in.
 
 http_archive(
-    name = "com_github_nanopb_nanopb",
-    build_file = "@//external:com_github_nanopb_nanopb.BUILD",
+    name = "nanopb",
+    build_file = "@//external:nanopb.BUILD",
     sha256 = "e98dd6403ab8c5b271d32a6bc025e7e596bb181c7bc7e0492c5daa21fc44c940",
     strip_prefix = "nanopb-0.3.9.4-linux-x86",
     urls = [

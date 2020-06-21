@@ -1,6 +1,6 @@
 #include "software/simulation/simulator.h"
 
-#include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
+#include "software/backend/output/shared/proto_creator_primitive_visitor.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
@@ -210,16 +210,16 @@ Timestamp Simulator::getTimestamp() const
 primitive_params_t Simulator::getPrimitiveParams(
     const std::unique_ptr<Primitive>& primitive)
 {
-    // The CreateProtoPrimitiveVisitor handles most of the encoding for us
-    CreateProtoPrimitiveVisitor mrf_pv;
+    // The ProtoCreatorPrimitiveVisitor handles most of the encoding for us
+    ProtoCreatorPrimitiveVisitor mrf_pv;
     primitive->accept(mrf_pv);
-    RadioPrimitiveMsg radio_primitive = mrf_pv.getProto();
+    PrimitiveMsg primitive_proto = mrf_pv.getProto();
     primitive_params_t primitive_params;
     std::array<double, 4> param_array = {
-        radio_primitive.parameter1(),
-        radio_primitive.parameter2(),
-        radio_primitive.parameter3(),
-        radio_primitive.parameter4(),
+        primitive_proto.parameter1(),
+        primitive_proto.parameter2(),
+        primitive_proto.parameter3(),
+        primitive_proto.parameter4(),
     };
     for (unsigned int i = 0; i < param_array.size(); i++)
     {
@@ -230,18 +230,18 @@ primitive_params_t Simulator::getPrimitiveParams(
         primitive_params.params[i] = static_cast<int16_t>(std::round(data));
     }
 
-    primitive_params.slow  = radio_primitive.slow();
-    primitive_params.extra = radio_primitive.extra_bits();
+    primitive_params.slow  = primitive_proto.slow();
+    primitive_params.extra = primitive_proto.extra_bits();
 
     return primitive_params;
 }
 
 unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive)
 {
-    CreateProtoPrimitiveVisitor mrf_pv;
+    ProtoCreatorPrimitiveVisitor mrf_pv;
     primitive->accept(mrf_pv);
-    RadioPrimitiveMsg radio_primitive = mrf_pv.getProto();
-    auto primitive_index = static_cast<unsigned int>(radio_primitive.prim_type());
+    PrimitiveMsg primitive_proto = mrf_pv.getProto();
+    auto primitive_index = static_cast<unsigned int>(primitive_proto.prim_type());
 
     return primitive_index;
 }

@@ -110,9 +110,9 @@ class MRFDongle final
     EStopState estop_state;
 
    private:
-    // This is currently defined as the maximum packet size that we can send over in a
-    // single libusb transfer
-    static const size_t MAX_RADIO_PACKET_SIZE = 64;
+    // We are currently uncertain if the limit on radio messages is 64 or 100 bytes. So
+    // to be safe we assume 64, then leave two bytes for the E-Stop and Feedback requests
+    static const size_t MAX_RADIO_PACKET_SIZE = 62;
 
     friend class SendReliableMessageOperation;
 

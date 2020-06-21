@@ -3,27 +3,23 @@
 #include <array>
 #include <optional>
 
-#include "shared/proto/radio_primitive.pb.h"
-#include "software/primitive/primitive.h"
 #include "software/primitive/primitive_visitor.h"
+#include "shared/proto/primitive.pb.h"
 
 /**
- * This class implements a Visitor that converts the Primitive classes into
- * RadioPrimitiveMsgs
+ * This class allows for the creation of a ProtoBuf message for a given primitive
  */
-class ProtobufPrimitiveVisitor : public PrimitiveVisitor
+class ProtoCreatorPrimitiveVisitor : public PrimitiveVisitor
 {
    public:
-    /**
-     * Creates a new ProtobufPrimitiveVisitor
-     */
-    ProtobufPrimitiveVisitor() = default;
+    ProtoCreatorPrimitiveVisitor() = default;
 
     /**
-     * Visit the corresponding primitive and creates the necessary
-     * protobuf for that primitive
-     *
-     * @param *_primitive The primitive to convert to protobuf
+     * Serializes the given Primitive into a radio packet
+     * * @param The Primitive to serialize */
+
+    /**
+     * Visits a given primitive
      */
     void visit(const CatchPrimitive &catch_primitive) override;
     void visit(const ChipPrimitive &chip_primitive) override;
@@ -37,13 +33,14 @@ class ProtobufPrimitiveVisitor : public PrimitiveVisitor
     void visit(const StopPrimitive &stop_primitive) override;
 
     /**
-     * Converts a primitive to a RadioPrimitiveMsg
+     * Get the proto representation of the most recently visited primitive
      *
-     * @param The primitive to visit and convert
-     * @return A unique_ptr to the respective RadioPrimitiveMsg
+     * @throws std::runtime_error If this visitor has never visited a primitive
+     *
+     * @return The proto representation of the most recently visited primitive
      */
-    std::unique_ptr<RadioPrimitiveMsg> getRadioPrimitiveMsg(const Primitive &primitive);
+    PrimitiveMsg getProto();
 
    private:
-    std::unique_ptr<RadioPrimitiveMsg> prim_msg_ptr;
+    std::optional<PrimitiveMsg> radio_prim;
 };

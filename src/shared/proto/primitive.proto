@@ -1,18 +1,9 @@
 syntax = "proto3";
 
-// TODO: rename this message and file once we've removed the old radio primitives
-// We call this a RadioPrimitiveMsg and not just a "Primitive"
-// because the contents of this message are a 1-1 mapping
-// with the existing `RadioPrimitive` we send over radio
-// using the MRF-Dongle.
-message RadioPrimitiveMsg
+message PrimitiveMsg
 {
     /*
      * This enum represents the IDs of the primitives
-     *
-     * TODO remove duplication w/ firmware_primitive_type.h and radio msgs once radio backend
-     * is on proto https://github.com/UBC-Thunderbots/Software/issues/1216
-     *
      */
     enum PrimitiveType
     {
@@ -110,10 +101,10 @@ message RadioPrimitiveMsg
         DIRECT_VELOCITY = 8;
     };
 
-    // A numeric id representing the primitive for firmware
+    // The primitive type to run
     PrimitiveType prim_type = 1;
 
-    // The parameters to be encoded into the packet
+    // The parameters for the primitive
     float parameter1 = 2;
     float parameter2 = 3;
     float parameter3 = 4;

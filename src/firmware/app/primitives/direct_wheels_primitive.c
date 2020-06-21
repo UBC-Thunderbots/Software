@@ -10,7 +10,6 @@ static void direct_wheels_start(const primitive_params_t* params, void* void_sta
 {
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    iprintf("in direct_wheels_start \r\n");
     app_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot),
                          ((float)params->params[0]) / 100.0);
     app_wheel_applyForce(app_firmware_robot_getBackLeftWheel(robot),
