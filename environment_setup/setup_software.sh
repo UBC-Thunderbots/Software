@@ -55,6 +55,7 @@ host_software_packages=(
                       # properly manage this as a bazel dependency, so we have 
                       # to manually install it ourselves
     kcachegrind # This lets us view the profiles output by callgrind
+    codespell # Fixes typos
 )
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then

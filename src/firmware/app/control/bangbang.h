@@ -11,13 +11,13 @@
  * future(app_bangbang_getState). Finally, users may wish to use the information to
  * compute an acceleration to apply as a form of control law.
  *
- * There are many control laws which one could apply to a planed trajectory, such as
+ * There are many control laws which one could apply to a planned trajectory, such as
  * simply taking a1 and using that. However, such simple approaches will tend to oscillate
  * severely and their use is discouraged. The default method is app_bangbang_computeAccel
  * which takes a point in the future at which to look. At this future time it computes the
  * expected velocity and position and then asks the question, if I were to apply a
  * trajectory of constant jerk from now until this final horizon time, what should my
- * initial acceleration and jerk be to acheive this final state.
+ * initial acceleration and jerk be to achieve this final state.
  *
  * It should be noted however that there are many possible control laws which could be
  * mapped on top of a computed BB plan. Take for example the plan of looking some time
