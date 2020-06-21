@@ -11,8 +11,6 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-using namespace Passing;
-
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
 CornerKickPlay::CornerKickPlay()

@@ -7,7 +7,7 @@
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_ball.h"
-#include "software/test_util/test_util.h"
+#include "software/time/duration.h"
 #include "software/world/robot_state.h"
 
 class PhysicsRobotTest : public testing::Test
@@ -445,9 +445,8 @@ TEST_P(PhysicsRobotWheelForceTest, test_wheel_force_creates_angular_velocity)
 {
     auto params = GetParam();
     Point robot_position(std::get<0>(params), std::get<1>(params));
-    Angle robot_orientation = Angle::fromDegrees(std::get<2>(params));
-    RobotWheel wheel        = std::get<3>(params);
-    double wheel_force      = std::get<4>(params);
+    RobotWheel wheel   = std::get<3>(params);
+    double wheel_force = std::get<4>(params);
 
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);

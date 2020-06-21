@@ -43,7 +43,7 @@ void NetworkClient::setupVisionClient(std::string vision_address, int vision_por
     catch (const boost::exception& ex)
     {
         // LOG(FATAL) will terminate this process
-        LOG(FATAL) << "An error occured while setting up the SSL Vision Client:"
+        LOG(FATAL) << "An error occurred while setting up the SSL Vision Client:"
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;
     }
@@ -62,7 +62,7 @@ void NetworkClient::setupGameControllerClient(std::string gamecontroller_address
     catch (const boost::exception& ex)
     {
         // LOG(FATAL) will terminate this process
-        LOG(FATAL) << "An error occured while setting up the SSL GameController Client:"
+        LOG(FATAL) << "An error occurred while setting up the SSL GameController Client:"
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;
     }
@@ -161,7 +161,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
                     break;
                 default:
                     LOG(WARNING)
-                        << "An unkown camera id was detected, disabled by default "
+                        << "An unknown camera id was detected, disabled by default "
                         << "id: " << detection.camera_id() << std::endl;
                     camera_disabled = true;
                     break;
@@ -205,7 +205,7 @@ void NetworkClient::filterAndPublishGameControllerData(Referee packet)
     {
         RefboxGameState game_state = network_filter.getRefboxGameState(packet);
         World world(*field, *ball, friendly_team, enemy_team);
-        world.updateRefboxGameState(game_state);
+        world.updateGameState(game_state);
         received_world_callback(world);
     }
 }

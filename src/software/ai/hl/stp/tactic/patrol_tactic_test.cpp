@@ -24,7 +24,7 @@ class PatrolTacticTest : public testing::Test
     void generateExpectedActions(Robot robot, std::vector<Point> patrol_points,
                                  Angle angle, double speed_at_patrol_points)
     {
-        for (int i = 0; i < patrol_points.size(); i++)
+        for (size_t i = 0; i < patrol_points.size(); i++)
         {
             auto expected_action = std::make_shared<MoveAction>(false);
             expected_action->updateControlParams(
@@ -44,7 +44,7 @@ class PatrolTacticTest : public testing::Test
     void generateRobotStatesToCompleteAction(std::vector<Point> patrol_points,
                                              Vector velocity)
     {
-        for (int i = 0; i < patrol_points.size(); i++)
+        for (size_t i = 0; i < patrol_points.size(); i++)
         {
             TimestampedRobotState robotState = TimestampedRobotState(
                 patrol_points[i], velocity, Angle::zero(), AngularVelocity::zero(),
@@ -179,7 +179,7 @@ TEST_F(PatrolTacticTest, patrol_three_points)
 
     // Act and Assert
 
-    for (int i = 0; i < patrol_points.size(); i++)
+    for (size_t i = 0; i < patrol_points.size(); i++)
     {
         std::shared_ptr<Action> action_ptr = tactic.getNextAction();
         ASSERT_NE(nullptr, action_ptr);
@@ -222,7 +222,7 @@ TEST_F(PatrolTacticTest, patrol_two_points_and_restart)
 
     for (int j = 0; j < 2; j++)
     {
-        for (int i = 0; i < patrol_points.size(); i++)
+        for (size_t i = 0; i < patrol_points.size(); i++)
         {
             std::shared_ptr<Action> action_ptr = tactic.getNextAction();
             ASSERT_NE(nullptr, action_ptr);

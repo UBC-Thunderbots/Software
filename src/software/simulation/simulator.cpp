@@ -1,9 +1,9 @@
 #include "software/simulation/simulator.h"
 
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
-#include "software/proto/message_translation/ssl_detection_message_translator.h"
-#include "software/proto/message_translation/ssl_geometry_message_translator.h"
-#include "software/proto/message_translation/ssl_wrapper_message_translator.h"
+#include "software/proto/message_translation/ssl_detection.h"
+#include "software/proto/message_translation/ssl_geometry.h"
+#include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/simulation/simulator_robot_singleton.h"
 
@@ -14,7 +14,10 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-Simulator::Simulator(const Field& field) : physics_world(field), frame_number(0) {}
+Simulator::Simulator(const Field& field, const Duration& physics_time_step)
+    : physics_world(field), frame_number(0), physics_time_step(physics_time_step)
+{
+}
 
 void Simulator::setBallState(const BallState& ball_state)
 {
@@ -112,23 +115,31 @@ void Simulator::stepSimulation(const Duration& time_step)
     // can see and interact with the same ball
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
 
-    for (auto& iter : yellow_simulator_robots)
+    Duration remaining_time = time_step;
+    while (remaining_time > Duration::fromSeconds(0))
     {
-        auto simulator_robot = iter.first;
-        auto firmware_world  = iter.second;
-        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
-    }
+        for (auto& iter : yellow_simulator_robots)
+        {
+            auto simulator_robot = iter.first;
+            auto firmware_world  = iter.second;
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
+        }
 
-    for (auto& iter : blue_simulator_robots)
-    {
-        auto simulator_robot = iter.first;
-        auto firmware_world  = iter.second;
-        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
-    }
+        for (auto& iter : blue_simulator_robots)
+        {
+            auto simulator_robot = iter.first;
+            auto firmware_world  = iter.second;
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
+        }
 
-    physics_world.stepSimulation(time_step);
+        // We take as many steps of `physics_time_step` as possible, and then
+        // simulate the remainder of the time
+        Duration dt = std::min(remaining_time, physics_time_step);
+        physics_world.stepSimulation(dt);
+        remaining_time = remaining_time - physics_time_step;
+    }
 
     frame_number++;
 }
@@ -170,13 +181,13 @@ World Simulator::getWorld() const
     return world;
 }
 
-std::unique_ptr<SSL_WrapperPacket> Simulator::getSslWrapperPacket() const
+std::unique_ptr<SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
 {
     auto ball_state  = physics_world.getBallState();
     auto ball_states = ball_state.has_value()
                            ? std::vector<BallState>({ball_state.value()})
                            : std::vector<BallState>();
-    auto detection_frame = createSslDetectionFrame(
+    auto detection_frame = createSSLDetectionFrame(
         CAMERA_ID, physics_world.getTimestamp(), frame_number, ball_states,
         physics_world.getYellowRobotStates(), physics_world.getBlueRobotStates());
     auto geometry_data =
@@ -184,6 +195,16 @@ std::unique_ptr<SSL_WrapperPacket> Simulator::getSslWrapperPacket() const
     auto wrapper_packet =
         createWrapperPacket(std::move(geometry_data), std::move(detection_frame));
     return std::move(wrapper_packet);
+}
+
+Field Simulator::getField() const
+{
+    return physics_world.getField();
+}
+
+Timestamp Simulator::getTimestamp() const
+{
+    return physics_world.getTimestamp();
 }
 
 primitive_params_t Simulator::getPrimitiveParams(

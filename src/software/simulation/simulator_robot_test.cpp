@@ -18,7 +18,7 @@ class SimulatorRobotTest : public testing::Test
     createWorld(Robot robot, Ball ball)
     {
         auto physics_world =
-            std::make_shared<PhysicsWorld>(::TestUtil::createSSLDivBField());
+            std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField());
         physics_world->setBallState(ball.currentState().ballState());
         physics_world->addYellowRobots({RobotStateWithId{
             .id = robot.id(), .robot_state = robot.currentState().robotState()}});
@@ -64,4 +64,6 @@ TEST_F(SimulatorRobotTest, test_robot_id)
     auto [world, simulator_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
     EXPECT_EQ(simulator_robot->getRobotId(), 7);
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }

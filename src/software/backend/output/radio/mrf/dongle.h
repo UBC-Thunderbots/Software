@@ -52,7 +52,7 @@ class MRFDongle final
      * Given a vector of primitives, constructs a single drive packet to send over radio
      * to all robots.
      *
-     * @param prims vector of primatives from HL
+     * @param prims vector of primitives from HL
      */
     void send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims);
 

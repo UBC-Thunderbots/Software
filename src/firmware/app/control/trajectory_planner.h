@@ -168,7 +168,7 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
  * @param arc_segment_length [in] The length of each segment in the trajectory
  *
  */
-static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
+void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
     PositionTrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     Polynomial2dOrder3_t path, const unsigned int num_elements,
     ArcLengthParametrization_t arc_length_parameterization,
@@ -273,7 +273,7 @@ void app_trajectory_planner_generateBackwardsContinuousVelocityProfile(
  * @param velocity_profile [in] The forwards and backwards continuous velocity profile of
  * the trajectory
  */
-void static app_trajectory_planner_generatePositionTrajectoryTimeProfile(
+void app_trajectory_planner_generatePositionTrajectoryTimeProfile(
     PositionTrajectoryElement_t* traj_elements, const float num_segments,
     const float arc_segment_length, float* velocity_profile);
 
@@ -286,7 +286,7 @@ void static app_trajectory_planner_generatePositionTrajectoryTimeProfile(
  * @param forwards_trajectory This is the trajectory that will be modified in place to
  * become a reverse trajectory
  */
-void static app_trajectory_planner_reversePositionTrajectoryDirection(
+void app_trajectory_planner_reversePositionTrajectoryDirection(
     PositionTrajectory_t* forwards_trajectory);
 
 /**

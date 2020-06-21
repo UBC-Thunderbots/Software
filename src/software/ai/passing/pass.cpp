@@ -1,12 +1,6 @@
-/**
- * Implementation of the "Pass" class
- */
-
 #include "software/ai/passing/pass.h"
 
 #include "software/geom/util.h"
-
-using namespace Passing;
 
 Pass::Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
            Timestamp pass_start_time)
@@ -63,15 +57,12 @@ Duration Pass::estimatePassDuration() const
                                  pass_speed_m_per_s);
 }
 
-namespace Passing
+std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
 {
-    std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
-    {
-        output_stream << "Receiver: " << pass.receiver_point
-                      << ", Passer: " << pass.passer_point
-                      << " Speed (m/s): " << pass.pass_speed_m_per_s
-                      << " Start Time (s): " << pass.pass_start_time.getSeconds();
+    output_stream << "Receiver: " << pass.receiver_point
+                  << ", Passer: " << pass.passer_point
+                  << " Speed (m/s): " << pass.pass_speed_m_per_s
+                  << " Start Time (s): " << pass.pass_start_time.getSeconds();
 
-        return output_stream;
-    }
-}  // namespace Passing
+    return output_stream;
+}

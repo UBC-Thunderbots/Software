@@ -23,7 +23,7 @@ class NoPathNavigatorTest : public testing::Test
                     robot_navigation_obstacle_factory,
                     Util::DynamicParameters->getAIConfig()->getNavigatorConfig()),
           current_time(Timestamp::fromSeconds(123)),
-          field(::TestUtil::createSSLDivBField()),
+          field(Field::createSSLDivisionBField()),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
           friendly_team(Team(Duration::fromMilliseconds(1000))),
           enemy_team(Team(Duration::fromMilliseconds(1000)))
@@ -256,7 +256,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 
     // An arbitrary fixed point in time
     // We use this fixed point in time to make the tests deterministic.
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
 
     Robot friendly_robot_0 = Robot(0, poi, Vector(-1, -2), Angle::half(),
                                    AngularVelocity::threeQuarter(), current_time);

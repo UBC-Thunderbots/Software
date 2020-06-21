@@ -1,7 +1,3 @@
-/**
- * Tests for the Ball Filter
- */
-
 #include "software/backend/input/network/filter/ball_filter.h"
 
 #include <gtest/gtest.h>
@@ -26,7 +22,7 @@ class BallFilterTest : public ::testing::Test
     {
         // Initialize the time
         current_timestamp = Timestamp::fromSeconds(123);
-        field             = ::TestUtil::createSSLDivBField();
+        field             = Field::createSSLDivisionBField();
         ball_filter       = BallFilter(4, 10);
         time_step         = Duration::fromSeconds(1.0 / 60.0);
         // Use a constant seed to results are deterministic
@@ -200,7 +196,8 @@ class BallFilterTest : public ::testing::Test
 
             // Create the detection that would have been seen by the vision system
             std::vector<BallDetection> ball_detections = {
-                BallDetection{ball_position_with_noise, current_timestamp}};
+                BallDetection{ball_position_with_noise, BALL_DISTANCE_FROM_GROUND,
+                              current_timestamp, 0.9}};
 
             // Get the filtered result given the new detection information
             auto filtered_ball = ball_filter.getFilteredData(ball_detections, field);
@@ -239,11 +236,14 @@ class BallFilterTest : public ::testing::Test
         }
     }
 
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     BallFilter ball_filter;
     Duration time_step;
     std::mt19937 random_generator;
     Timestamp current_timestamp;
+    // For these tests, the ball is always on the ground. The filters
+    // are not designed for filtering balls in the air
+    static constexpr double BALL_DISTANCE_FROM_GROUND = 0.0;
 };
 
 TEST_F(BallFilterTest, ball_sitting_still_with_low_noise)
@@ -514,8 +514,10 @@ TEST_F(BallFilterTest,
     boost::circular_buffer<BallDetection> ball_detections(2);
     Point p1(0, 0);
     Point p2(1, 0.5);
-    ball_detections.push_front({p1, Timestamp::fromSeconds(1)});
-    ball_detections.push_front({p2, Timestamp::fromSeconds(2)});
+    ball_detections.push_front(
+        {p1, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(1), 1.0});
+    ball_detections.push_front(
+        {p2, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(2), 1.0});
     auto x_vs_y_regression = ball_filter.getLinearRegressionLine(ball_detections);
 
     double d1 = distance(x_vs_y_regression.regression_line, p1);
