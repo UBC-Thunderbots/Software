@@ -132,7 +132,7 @@ class Spline2d
      * Create a SplineSegment2d
      *
      * The reason that this function exists is because friendship is not inherited, and
-     * we do not want to publically expose the constructor for SplineSegment2d. So we
+     * we do not want to publicly expose the constructor for SplineSegment2d. So we
      * allow subclasses to create segments via this function.
      *
      * @param start_val The first value at which to evaluate the polynomial that lies on

@@ -274,7 +274,7 @@ bool SensorFusion::isCameraEnabled(const SSL_DetectionFrame &detection)
                 Util::DynamicParameters->getCameraConfig()->IgnoreCamera_3()->value();
             break;
         default:
-            LOG(WARNING) << "An unkown camera id was detected, disabled by default "
+            LOG(WARNING) << "An unknown camera id was detected, disabled by default "
                          << "id: " << detection.camera_id() << std::endl;
             camera_disabled = true;
             break;

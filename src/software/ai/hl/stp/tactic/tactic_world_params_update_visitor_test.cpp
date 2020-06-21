@@ -142,7 +142,7 @@ TEST(TacticUpdateVisitorTest, update_receiver_tactic)
     EXPECT_EQ(tactic.getBall(), initial_world.ball());
     TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(update_world);
     tactic.accept(visitor);
-    // ReceiverTactic doesnt update field
+    // ReceiverTactic doesn't update field
     EXPECT_EQ(tactic.getEnemyTeam(), update_world.enemyTeam());
     EXPECT_EQ(tactic.getFriendlyTeam(), update_world.friendlyTeam());
     EXPECT_EQ(tactic.getBall(), update_world.ball());
@@ -183,7 +183,7 @@ TEST(TacticUpdateVisitorTest, update_shadow_freekicker_tactic)
     EXPECT_EQ(tactic.getBall(), initial_world.ball());
     TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(update_world);
     tactic.accept(visitor);
-    // ShadowFreeKickerTactic doesnt update field
+    // ShadowFreeKickerTactic doesn't update field
     EXPECT_EQ(tactic.getEnemyTeam(), update_world.enemyTeam());
     EXPECT_EQ(tactic.getBall(), update_world.ball());
 }
