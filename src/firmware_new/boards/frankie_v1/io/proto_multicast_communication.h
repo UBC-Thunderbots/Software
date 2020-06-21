@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pb.h"
+#include <pb.h>
 
 typedef struct ProtoMulticastCommunicationProfile ProtoMulticastCommunicationProfile_t;
 
