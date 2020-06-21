@@ -104,11 +104,9 @@ TEST(RobotStateWithTimestampTest, update_with_set_robot_state)
     updated_state.setTimeSinceLastKick(Duration::fromMilliseconds(5));
     timestamped_robot_state_2.setRobotState(updated_state);
 
-    EXPECT_TRUE(timestamped_robot_state_2.robotState().timeSinceLastChip());
-    EXPECT_TRUE(timestamped_robot_state_2.robotState().timeSinceLastKick());
-    EXPECT_EQ(*timestamped_robot_state_2.robotState().timeSinceLastChip(),
+    EXPECT_EQ(timestamped_robot_state_2.robotState().timeSinceLastChip(),
               Duration::fromMilliseconds(11));
-    EXPECT_EQ(*timestamped_robot_state_2.robotState().timeSinceLastKick(),
+    EXPECT_EQ(timestamped_robot_state_2.robotState().timeSinceLastKick(),
               Duration::fromMilliseconds(5));
     EXPECT_NE(timestamped_robot_state_1, timestamped_robot_state_2);
 }
