@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"
+
 /**
  * These maps, along with the enums in the .h file, contain all the different
  * field lines and arcs that can be sent by SSL Vision.
@@ -19,24 +20,24 @@
  * - "Penalty" really refers to the defense area
  */
 static const std::map<SSLFieldLines, const std::string> ssl_field_line_names = {
-    {SSLFieldLines::TOP_TOUCH_LINE, "TopTouchLine"},
-    {SSLFieldLines::BOTTOM_TOUCH_LINE, "BottomTouchLine"},
-    {SSLFieldLines::LEFT_GOAL_LINE, "LeftGoalLine"},
-    {SSLFieldLines::RIGHT_GOAL_LINE, "RightGoalLine"},
+    {SSLFieldLines::POS_Y_FIELD_LINE, "TopTouchLine"},
+    {SSLFieldLines::NEG_Y_FIELD_LINE, "BottomTouchLine"},
+    {SSLFieldLines::NEG_X_FIELD_LINE, "LeftGoalLine"},
+    {SSLFieldLines::POS_X_FIELD_LINE, "RightGoalLine"},
     {SSLFieldLines::HALFWAY_LINE, "HalfwayLine"},
     {SSLFieldLines::CENTER_LINE, "CenterLine"},
-    {SSLFieldLines::LEFT_PENALTY_STRETCH, "LeftPenaltyStretch"},
-    {SSLFieldLines::RIGHT_PENALTY_STRETCH, "RightPenaltyStretch"},
-    {SSLFieldLines::RIGHT_GOAL_TOP_LINE, "RightGoalTopLine"},
-    {SSLFieldLines::RIGHT_GOAL_BOTTOM_LINE, "RightGoalBottomLine"},
-    {SSLFieldLines::RIGHT_GOAL_DEPTH_LINE, "RightGoalDepthLine"},
-    {SSLFieldLines::LEFT_GOAL_TOP_LINE, "LeftGoalTopLine"},
-    {SSLFieldLines::LEFT_GOAL_BOTTOM_LINE, "LeftGoalBottomLine"},
-    {SSLFieldLines::LEFT_GOAL_DEPTH_LINE, "LeftGoalDepthLine"},
-    {SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH, "LeftFieldLeftPenaltyStretch"},
-    {SSLFieldLines::LEFT_FIELD_RIGHT_PENALTY_STRETCH, "LeftFieldRightPenaltyStretch"},
-    {SSLFieldLines::RIGHT_FIELD_LEFT_PENALTY_STRETCH, "RightFieldLeftPenaltyStretch"},
-    {SSLFieldLines::RIGHT_FIELD_RIGHT_PENALTY_STRETCH, "RightFieldRightPenaltyStretch"},
+    {SSLFieldLines::NEG_X_DEFENSE_AREA_FRONT_LINE, "LeftPenaltyStretch"},
+    {SSLFieldLines::POS_X_DEFENSE_AREA_FRONT_LINE, "RightPenaltyStretch"},
+    {SSLFieldLines::POS_Y_LINE_OF_POS_X_GOAL, "RightGoalTopLine"},
+    {SSLFieldLines::NEG_Y_LINE_OF_POS_X_GOAL, "RightGoalBottomLine"},
+    {SSLFieldLines::POS_X_GOAL_REAR_LINE, "RightGoalDepthLine"},
+    {SSLFieldLines::POS_Y_LINE_OF_NEG_X_GOAL, "LeftGoalTopLine"},
+    {SSLFieldLines::NEG_Y_LINE_OF_NEG_X_GOAL, "LeftGoalBottomLine"},
+    {SSLFieldLines::NEG_X_GOAL_REAR_LINE, "LeftGoalDepthLine"},
+    {SSLFieldLines::POS_Y_LINE_OF_NEG_X_DEFENSE_AREA, "LeftFieldLeftPenaltyStretch"},
+    {SSLFieldLines::NEG_Y_LINE_OF_NEG_X_DEFENSE_AREA, "LeftFieldRightPenaltyStretch"},
+    {SSLFieldLines::NEG_Y_LINE_OF_POS_X_DEFENSE_AREA, "RightFieldLeftPenaltyStretch"},
+    {SSLFieldLines::POS_Y_LINE_OF_POS_X_DEFENSE_AREA, "RightFieldRightPenaltyStretch"},
 };
 
 static const std::map<SSLCircularArcs, const std::string> ssl_circular_arc_names = {
@@ -165,7 +166,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment top_touch_line(field.fieldLines().negXPosYCorner(),
                            field.fieldLines().posXPosYCorner());
     *line =
-        *(createFieldLineSegment(top_touch_line, thickness, SSLFieldLines::TOP_TOUCH_LINE,
+        *(createFieldLineSegment(top_touch_line, thickness, SSLFieldLines::POS_Y_FIELD_LINE,
                                  SSL_FieldShapeType::TopTouchLine)
               .release());
 
@@ -173,7 +174,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment bottom_touch_line(field.fieldLines().negXNegYCorner(),
                               field.fieldLines().posXNegYCorner());
     *line = *(createFieldLineSegment(bottom_touch_line, thickness,
-                                     SSLFieldLines::BOTTOM_TOUCH_LINE,
+                                     SSLFieldLines::NEG_Y_FIELD_LINE,
                                      SSL_FieldShapeType::BottomTouchLine)
                   .release());
 
@@ -181,7 +182,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment left_goal_line(field.fieldLines().negXPosYCorner(),
                            field.fieldLines().negXNegYCorner());
     *line =
-        *(createFieldLineSegment(left_goal_line, thickness, SSLFieldLines::LEFT_GOAL_LINE,
+        *(createFieldLineSegment(left_goal_line, thickness, SSLFieldLines::NEG_X_FIELD_LINE,
                                  SSL_FieldShapeType::LeftGoalLine)
               .release());
 
@@ -189,7 +190,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment right_goal_line(field.fieldLines().posXPosYCorner(),
                             field.fieldLines().posXNegYCorner());
     *line = *(createFieldLineSegment(right_goal_line, thickness,
-                                     SSLFieldLines::RIGHT_GOAL_LINE,
+                                     SSLFieldLines::POS_X_FIELD_LINE,
                                      SSL_FieldShapeType::RightGoalLine)
                   .release());
 
@@ -209,7 +210,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment left_penalty_stretch = Segment(field.friendlyDefenseArea().posXNegYCorner(),
                                            field.friendlyDefenseArea().posXPosYCorner());
     *line = *(createFieldLineSegment(left_penalty_stretch, thickness,
-                                     SSLFieldLines::LEFT_PENALTY_STRETCH,
+                                     SSLFieldLines::NEG_X_DEFENSE_AREA_FRONT_LINE,
                                      SSL_FieldShapeType::LeftPenaltyStretch)
                   .release());
 
@@ -217,7 +218,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment right_penalty_stretch = Segment(field.enemyDefenseArea().negXNegYCorner(),
                                             field.enemyDefenseArea().negXPosYCorner());
     *line = *(createFieldLineSegment(right_penalty_stretch, thickness,
-                                     SSLFieldLines::RIGHT_PENALTY_STRETCH,
+                                     SSLFieldLines::POS_X_DEFENSE_AREA_FRONT_LINE,
                                      SSL_FieldShapeType::RightPenaltyStretch)
                   .release());
 
@@ -225,7 +226,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment right_goal_top_line =
         Segment(field.enemyGoal().negXPosYCorner(), field.enemyGoal().posXPosYCorner());
     *line = *(createFieldLineSegment(right_goal_top_line, thickness,
-                                     SSLFieldLines::RIGHT_GOAL_TOP_LINE,
+                                     SSLFieldLines::POS_Y_LINE_OF_POS_X_GOAL,
                                      SSL_FieldShapeType::Undefined)
                   .release());
 
@@ -233,7 +234,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment right_goal_bottom_line =
         Segment(field.enemyGoal().negXNegYCorner(), field.enemyGoal().posXNegYCorner());
     *line = *(createFieldLineSegment(right_goal_bottom_line, thickness,
-                                     SSLFieldLines::RIGHT_GOAL_BOTTOM_LINE,
+                                     SSLFieldLines::NEG_Y_LINE_OF_POS_X_GOAL,
                                      SSL_FieldShapeType::Undefined)
                   .release());
 
@@ -241,7 +242,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment right_goal_depth_line =
         Segment(field.enemyGoal().posXPosYCorner(), field.enemyGoal().posXNegYCorner());
     *line = *(createFieldLineSegment(right_goal_depth_line, thickness,
-                                     SSLFieldLines::RIGHT_GOAL_DEPTH_LINE,
+                                     SSLFieldLines::POS_X_GOAL_REAR_LINE,
                                      SSL_FieldShapeType::Undefined)
                   .release());
 
@@ -249,7 +250,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment left_goal_top_line = Segment(field.friendlyGoal().negXPosYCorner(),
                                          field.friendlyGoal().posXPosYCorner());
     *line                      = *(createFieldLineSegment(left_goal_top_line, thickness,
-                                     SSLFieldLines::LEFT_GOAL_TOP_LINE,
+                                     SSLFieldLines::POS_Y_LINE_OF_NEG_X_GOAL,
                                      SSL_FieldShapeType::Undefined)
                   .release());
 
@@ -257,7 +258,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment left_goal_bottom_line = Segment(field.friendlyGoal().negXNegYCorner(),
                                             field.friendlyGoal().posXNegYCorner());
     *line = *(createFieldLineSegment(left_goal_bottom_line, thickness,
-                                     SSLFieldLines::LEFT_GOAL_BOTTOM_LINE,
+                                     SSLFieldLines::NEG_Y_LINE_OF_NEG_X_GOAL,
                                      SSL_FieldShapeType::Undefined)
                   .release());
 
@@ -265,7 +266,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
     Segment left_goal_depth_line = Segment(field.friendlyGoal().negXPosYCorner(),
                                            field.friendlyGoal().negXNegYCorner());
     *line = *(createFieldLineSegment(left_goal_depth_line, thickness,
-                                     SSLFieldLines::LEFT_GOAL_DEPTH_LINE,
+                                     SSLFieldLines::NEG_X_GOAL_REAR_LINE,
                                      SSL_FieldShapeType::Undefined)
                   .release());
 
@@ -274,7 +275,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
         Segment(field.friendlyDefenseArea().negXPosYCorner(),
                 field.friendlyDefenseArea().posXPosYCorner());
     *line = *(createFieldLineSegment(left_field_left_penalty_stretch, thickness,
-                                     SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH,
+                                     SSLFieldLines::POS_Y_LINE_OF_NEG_X_DEFENSE_AREA,
                                      SSL_FieldShapeType::LeftFieldLeftPenaltyStretch)
                   .release());
 
@@ -283,7 +284,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
         Segment(field.friendlyDefenseArea().negXNegYCorner(),
                 field.friendlyDefenseArea().posXNegYCorner());
     *line = *(createFieldLineSegment(left_field_right_penalty_stretch, thickness,
-                                     SSLFieldLines::LEFT_FIELD_RIGHT_PENALTY_STRETCH,
+                                     SSLFieldLines::NEG_Y_LINE_OF_NEG_X_DEFENSE_AREA,
                                      SSL_FieldShapeType::LeftFieldRightPenaltyStretch)
                   .release());
 
@@ -292,7 +293,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
         Segment(field.enemyDefenseArea().negXNegYCorner(),
                 field.enemyDefenseArea().posXNegYCorner());
     *line = *(createFieldLineSegment(right_field_left_penalty_stretch, thickness,
-                                     SSLFieldLines::RIGHT_FIELD_LEFT_PENALTY_STRETCH,
+                                     SSLFieldLines::NEG_Y_LINE_OF_POS_X_DEFENSE_AREA,
                                      SSL_FieldShapeType::RightFieldLeftPenaltyStretch)
                   .release());
 
@@ -301,7 +302,7 @@ std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& fiel
         Segment(field.enemyDefenseArea().negXPosYCorner(),
                 field.enemyDefenseArea().posXPosYCorner());
     *line = *(createFieldLineSegment(right_field_right_penalty_stretch, thickness,
-                                     SSLFieldLines::RIGHT_FIELD_RIGHT_PENALTY_STRETCH,
+                                     SSLFieldLines::POS_Y_LINE_OF_POS_X_DEFENSE_AREA,
                                      SSL_FieldShapeType::RightFieldRightPenaltyStretch)
                   .release());
 
@@ -354,7 +355,7 @@ std::optional<Field> createField(const SSL_GeometryData& geometry_packet)
     double center_circle_radius = ssl_center_circle->radius() * METERS_PER_MILLIMETER;
 
     auto ssl_left_field_left_penalty_stretch = findLineSegment(
-        field_data.field_lines(), SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH);
+        field_data.field_lines(), SSLFieldLines::POS_Y_LINE_OF_NEG_X_DEFENSE_AREA);
     if (!ssl_left_field_left_penalty_stretch)
     {
         return std::nullopt;
@@ -369,7 +370,7 @@ std::optional<Field> createField(const SSL_GeometryData& geometry_packet)
         (defense_length_p2 - defense_length_p1).length() * METERS_PER_MILLIMETER;
 
     auto ssl_left_penalty_stretch =
-        findLineSegment(field_data.field_lines(), SSLFieldLines::LEFT_PENALTY_STRETCH);
+        findLineSegment(field_data.field_lines(), SSLFieldLines::NEG_X_DEFENSE_AREA_FRONT_LINE);
     if (!ssl_left_penalty_stretch)
     {
         return std::nullopt;

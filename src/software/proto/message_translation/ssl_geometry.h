@@ -26,39 +26,41 @@
  */
 // clang-format off
 MAKE_ENUM(SSLFieldLines,
-          TOP_TOUCH_LINE,
-          BOTTOM_TOUCH_LINE,
-          LEFT_GOAL_LINE,
-          RIGHT_GOAL_LINE,
+          POS_Y_FIELD_LINE,
+          NEG_Y_FIELD_LINE,
+          NEG_X_FIELD_LINE,
+          POS_X_FIELD_LINE,
           HALFWAY_LINE,
           // Runs perpendicular to the HALFWAY_LINE, from net to net
           CENTER_LINE,
-          LEFT_PENALTY_STRETCH,
-          RIGHT_PENALTY_STRETCH,
+          NEG_X_DEFENSE_AREA_FRONT_LINE,
+          POS_X_DEFENSE_AREA_FRONT_LINE,
           // TOP is +y, BOTTOM is -y
-          RIGHT_GOAL_TOP_LINE,
-          RIGHT_GOAL_BOTTOM_LINE,
+          POS_Y_LINE_OF_POS_X_GOAL,
+          NEG_Y_LINE_OF_POS_X_GOAL,
           // The DEPTH_LINE is the back of the net
-          RIGHT_GOAL_DEPTH_LINE,
+          POS_X_GOAL_REAR_LINE,
           // TOP is +y, BOTTOM is -y
-          LEFT_GOAL_TOP_LINE,
-          LEFT_GOAL_BOTTOM_LINE,
+          POS_Y_LINE_OF_NEG_X_GOAL,
+          NEG_Y_LINE_OF_NEG_X_GOAL,
           // The DEPTH_LINE is the back of the net
-          LEFT_GOAL_DEPTH_LINE,
+          NEG_X_GOAL_REAR_LINE,
           // For the LEFT_FIELD, LEFT and RIGHT are from the POV of the net
           // on the left of the field looking in towards the center of the
           // field. ie. LEFT is +y, RIGHT is -y
-          LEFT_FIELD_LEFT_PENALTY_STRETCH,
-          LEFT_FIELD_RIGHT_PENALTY_STRETCH,  // right is positive y
+          POS_Y_LINE_OF_NEG_X_DEFENSE_AREA,
+          NEG_Y_LINE_OF_NEG_X_DEFENSE_AREA,  // right is positive y
           // For the RIGHT_FIELD, LEFT and RIGHT are from the POV of the net
           // on the right of the field looking in towards the center of the
           // field. ie. LEFT is +y, RIGHT is -y
-          RIGHT_FIELD_LEFT_PENALTY_STRETCH,
-          RIGHT_FIELD_RIGHT_PENALTY_STRETCH,
+          NEG_Y_LINE_OF_POS_X_DEFENSE_AREA,
+          POS_Y_LINE_OF_POS_X_DEFENSE_AREA,
+          )
+
+MAKE_ENUM(SSLCircularArcs,
+          CENTER_CIRCLE,
           )
 // clang-format on
-
-MAKE_ENUM(SSLCircularArcs, CENTER_CIRCLE)
 
 /**
  * Find an SSL FieldLineSegment by name. Returns the first instance of a line segment

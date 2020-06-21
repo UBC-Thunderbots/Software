@@ -101,7 +101,7 @@ class SSLGeometryTest : public ::testing::Test
 TEST_F(SSLGeometryTest, test_find_line_segment_with_no_segments)
 {
     google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
-    auto result = findLineSegment(segments, SSLFieldLines::LEFT_PENALTY_STRETCH);
+    auto result = findLineSegment(segments, SSLFieldLines::NEG_X_DEFENSE_AREA_FRONT_LINE);
     EXPECT_FALSE(result);
 }
 
@@ -156,7 +156,7 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_valid_name)
     segment_2->set_thickness(0.01);
     segments.AddAllocated(segment_2.release());
 
-    auto result = findLineSegment(segments, SSLFieldLines::BOTTOM_TOUCH_LINE);
+    auto result = findLineSegment(segments, SSLFieldLines::NEG_Y_FIELD_LINE);
     ASSERT_TRUE(result);
     EXPECT_EQ("BottomTouchLine", result->name());
 }
@@ -191,7 +191,7 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_duplicate_names)
     segment_2->set_thickness(0.05);
     segments.AddAllocated(segment_2.release());
 
-    auto result = findLineSegment(segments, SSLFieldLines::TOP_TOUCH_LINE);
+    auto result = findLineSegment(segments, SSLFieldLines::POS_Y_FIELD_LINE);
     ASSERT_TRUE(result);
     EXPECT_EQ("TopTouchLine", result->name());
     // Sanity check we got the first segment
@@ -308,7 +308,7 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_valid_values)
 {
     const Segment segment(Point(-0.05, 1.0), Point(4, 0));
     const float thickness         = 0.005f;
-    const SSLFieldLines line_type = SSLFieldLines::TOP_TOUCH_LINE;
+    const SSLFieldLines line_type = SSLFieldLines::POS_Y_FIELD_LINE;
 
     auto field_line_msg = createFieldLineSegment(segment, thickness, line_type,
                                                  SSL_FieldShapeType::CenterLine);
@@ -326,7 +326,7 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_negative_thickness)
 {
     const Segment segment(Point(-0.05, 1.0), Point(4, 0));
     const float thickness         = -0.005f;
-    const SSLFieldLines line_type = SSLFieldLines::TOP_TOUCH_LINE;
+    const SSLFieldLines line_type = SSLFieldLines::POS_Y_FIELD_LINE;
 
     EXPECT_THROW(createFieldLineSegment(segment, thickness, line_type,
                                         SSL_FieldShapeType::Undefined),
@@ -383,7 +383,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     // Field lines
 
     auto top_touch_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::TOP_TOUCH_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::POS_Y_FIELD_LINE);
     ASSERT_TRUE(top_touch_line);
     EXPECT_TRUE(equalWithinTolerance(top_touch_line.value(),
                                      Segment(Point(-4.5, 3), Point(4.5, 3)), thickness,
@@ -392,7 +392,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::TopTouchLine, top_touch_line->type());
 
     auto bottom_touch_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::BOTTOM_TOUCH_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::NEG_Y_FIELD_LINE);
     ASSERT_TRUE(bottom_touch_line);
     EXPECT_TRUE(equalWithinTolerance(bottom_touch_line.value(),
                                      Segment(Point(-4.5, -3), Point(4.5, -3)), thickness,
@@ -401,7 +401,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::BottomTouchLine, bottom_touch_line->type());
 
     auto left_goal_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_GOAL_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::NEG_X_FIELD_LINE);
     ASSERT_TRUE(left_goal_line);
     EXPECT_TRUE(equalWithinTolerance(left_goal_line.value(),
                                      Segment(Point(-4.5, 3), Point(-4.5, -3)), thickness,
@@ -410,7 +410,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::LeftGoalLine, left_goal_line->type());
 
     auto right_goal_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_GOAL_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::POS_X_FIELD_LINE);
     ASSERT_TRUE(right_goal_line);
     EXPECT_TRUE(equalWithinTolerance(right_goal_line.value(),
                                      Segment(Point(4.5, 3), Point(4.5, -3)), thickness,
@@ -436,7 +436,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::CenterLine, center_line->type());
 
     auto left_penalty_stretch =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_PENALTY_STRETCH);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::NEG_X_DEFENSE_AREA_FRONT_LINE);
     ASSERT_TRUE(left_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(left_penalty_stretch.value(),
                                      Segment(Point(-3.5, 1), Point(-3.5, -1)), thickness,
@@ -445,7 +445,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::LeftPenaltyStretch, left_penalty_stretch->type());
 
     auto right_penalty_stretch =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_PENALTY_STRETCH);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::POS_X_DEFENSE_AREA_FRONT_LINE);
     ASSERT_TRUE(right_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(right_penalty_stretch.value(),
                                      Segment(Point(3.5, 1), Point(3.5, -1)), thickness,
@@ -454,7 +454,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::RightPenaltyStretch, right_penalty_stretch->type());
 
     auto right_goal_top_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_GOAL_TOP_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::POS_Y_LINE_OF_POS_X_GOAL);
     ASSERT_TRUE(right_goal_top_line);
     EXPECT_TRUE(equalWithinTolerance(right_goal_top_line.value(),
                                      Segment(Point(4.5, 0.5), Point(4.7, 0.5)), thickness,
@@ -463,7 +463,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::Undefined, right_goal_top_line->type());
 
     auto right_goal_bottom_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_GOAL_BOTTOM_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::NEG_Y_LINE_OF_POS_X_GOAL);
     ASSERT_TRUE(right_goal_bottom_line);
     EXPECT_TRUE(equalWithinTolerance(right_goal_bottom_line.value(),
                                      Segment(Point(4.5, -0.5), Point(4.7, -0.5)),
@@ -472,7 +472,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::Undefined, right_goal_bottom_line->type());
 
     auto right_goal_depth_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::RIGHT_GOAL_DEPTH_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::POS_X_GOAL_REAR_LINE);
     ASSERT_TRUE(right_goal_depth_line);
     EXPECT_TRUE(equalWithinTolerance(right_goal_depth_line.value(),
                                      Segment(Point(4.7, 0.5), Point(4.7, -0.5)),
@@ -481,7 +481,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::Undefined, right_goal_depth_line->type());
 
     auto left_goal_top_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_GOAL_TOP_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::POS_Y_LINE_OF_NEG_X_GOAL);
     ASSERT_TRUE(left_goal_top_line);
     EXPECT_TRUE(equalWithinTolerance(left_goal_top_line.value(),
                                      Segment(Point(-4.5, 0.5), Point(-4.7, 0.5)),
@@ -490,7 +490,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::Undefined, left_goal_top_line->type());
 
     auto left_goal_bottom_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_GOAL_BOTTOM_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::NEG_Y_LINE_OF_NEG_X_GOAL);
     ASSERT_TRUE(left_goal_bottom_line);
     EXPECT_TRUE(equalWithinTolerance(left_goal_bottom_line.value(),
                                      Segment(Point(-4.5, -0.5), Point(-4.7, -0.5)),
@@ -499,7 +499,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::Undefined, left_goal_bottom_line->type());
 
     auto left_goal_depth_line =
-        findLineSegment(field_msg->field_lines(), SSLFieldLines::LEFT_GOAL_DEPTH_LINE);
+        findLineSegment(field_msg->field_lines(), SSLFieldLines::NEG_X_GOAL_REAR_LINE);
     ASSERT_TRUE(left_goal_depth_line);
     EXPECT_TRUE(equalWithinTolerance(left_goal_depth_line.value(),
                                      Segment(Point(-4.7, 0.5), Point(-4.7, -0.5)),
@@ -508,7 +508,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_EQ(SSL_FieldShapeType::Undefined, left_goal_depth_line->type());
 
     auto left_field_left_penalty_stretch = findLineSegment(
-        field_msg->field_lines(), SSLFieldLines::LEFT_FIELD_LEFT_PENALTY_STRETCH);
+        field_msg->field_lines(), SSLFieldLines::POS_Y_LINE_OF_NEG_X_DEFENSE_AREA);
     ASSERT_TRUE(left_field_left_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(left_field_left_penalty_stretch.value(),
                                      Segment(Point(-4.5, 1), Point(-3.5, 1)), thickness,
@@ -518,7 +518,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
               left_field_left_penalty_stretch->type());
 
     auto left_field_right_penalty_stretch = findLineSegment(
-        field_msg->field_lines(), SSLFieldLines::LEFT_FIELD_RIGHT_PENALTY_STRETCH);
+        field_msg->field_lines(), SSLFieldLines::NEG_Y_LINE_OF_NEG_X_DEFENSE_AREA);
     ASSERT_TRUE(left_field_right_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(left_field_right_penalty_stretch.value(),
                                      Segment(Point(-4.5, -1), Point(-3.5, -1)), thickness,
@@ -528,7 +528,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
               left_field_right_penalty_stretch->type());
 
     auto right_field_left_penalty_stretch = findLineSegment(
-        field_msg->field_lines(), SSLFieldLines::RIGHT_FIELD_LEFT_PENALTY_STRETCH);
+        field_msg->field_lines(), SSLFieldLines::NEG_Y_LINE_OF_POS_X_DEFENSE_AREA);
     ASSERT_TRUE(right_field_left_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(right_field_left_penalty_stretch.value(),
                                      Segment(Point(4.5, -1), Point(3.5, -1)), thickness,
@@ -538,7 +538,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
               right_field_left_penalty_stretch->type());
 
     auto right_field_right_penalty_stretch = findLineSegment(
-        field_msg->field_lines(), SSLFieldLines::RIGHT_FIELD_RIGHT_PENALTY_STRETCH);
+        field_msg->field_lines(), SSLFieldLines::POS_Y_LINE_OF_POS_X_DEFENSE_AREA);
     ASSERT_TRUE(right_field_right_penalty_stretch);
     EXPECT_TRUE(equalWithinTolerance(right_field_right_penalty_stretch.value(),
                                      Segment(Point(4.5, 1), Point(3.5, 1)), thickness,
