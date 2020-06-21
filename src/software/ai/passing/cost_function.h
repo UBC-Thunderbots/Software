@@ -11,7 +11,7 @@
 // The types of passes we can perform
 enum PassType
 {
-    // Receive the pass and keep posession by just dribbling it
+    // Receive the pass and keep possession by just dribbling it
     RECEIVE_AND_DRIBBLE,
     // One-touch shot where the receiving robot immediately takes a shot on net
     ONE_TOUCH_SHOT,
@@ -104,7 +104,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass);
  *                        is not on `friendly_team`
  *
  * @return A value in [0,1] indicating how likely it would be for a robot on the
- *         friendly team to recieve the given pass, with 1 being very likely, 0
+ *         friendly team to receive the given pass, with 1 being very likely, 0
  *         being impossible
  */
 double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,

@@ -22,7 +22,7 @@ bool ballInFriendlyHalf(const Field &field, const Ball &ball);
 bool ballInEnemyHalf(const Field &field, const Ball &ball);
 
 /**
- * Returns true if the ball is in withing the provided radius in one of the friendly
+ * Returns true if the ball is in within the provided radius in one of the friendly
  * corner.
  *
  * @param field The field
@@ -33,7 +33,7 @@ bool ballInEnemyHalf(const Field &field, const Ball &ball);
 bool ballInFriendlyCorner(const Field &field, const Ball &ball, double radius);
 
 /**
- * Returns true if the ball is in withing the provided radius in one of the enemy
+ * Returns true if the ball is in within the provided radius in one of the enemy
  * corner.
  *
  * @param field The field

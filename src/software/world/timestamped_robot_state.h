@@ -73,6 +73,6 @@ class TimestampedRobotState
     bool operator!=(const TimestampedRobotState &other) const;
 
    private:
-    Timestamp timestamp_;
     RobotState robot_state_;
+    Timestamp timestamp_;
 };

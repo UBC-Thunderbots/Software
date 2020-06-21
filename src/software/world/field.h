@@ -1,10 +1,8 @@
 #pragma once
 
-#include "boost/circular_buffer.hpp"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"
-#include "software/time/timestamp.h"
 
 typedef enum
 {
@@ -35,6 +33,20 @@ typedef enum
 class Field
 {
    public:
+    /**
+     * Creates a field with the standard SSL Division B dimensions
+     *
+     * @return a field with the standard SSL Division B dimensions
+     */
+    static Field createSSLDivisionBField();
+
+    /**
+     * Creates a field with the standard SSL Division A dimensions
+     *
+     * @return a field with the standard SSL Division A dimensions
+     */
+    static Field createSSLDivisionAField();
+
     Field() = delete;
 
     /**
@@ -388,10 +400,10 @@ class Field
     double defense_x_length_;
     // The width of the defense area in metres
     double defense_y_length_;
-    // The width of the goal (between the goalposts) in metres
-    double goal_y_length_;
     // How "deep" the goal is along the x-axis in metres
     double goal_x_length_;
+    // The width of the goal (between the goalposts) in metres
+    double goal_y_length_;
     // The width of the boundary (between the edge of the marked field lines and the
     // physical border around the field) in metres
     double boundary_buffer_size_;

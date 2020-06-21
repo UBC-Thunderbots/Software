@@ -290,7 +290,7 @@ TEST_F(BallTest, get_position_history)
     boost::circular_buffer<TimestampedBallState> previous_states =
         ball.getPreviousStates();
     std::vector<Point> previous_positions{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_positions.push_back(previous_states.at(i).ballState().position());
     }
@@ -310,7 +310,7 @@ TEST_F(BallTest, get_velocity_history)
     boost::circular_buffer<TimestampedBallState> previous_states =
         ball.getPreviousStates();
     std::vector<Vector> previous_velocities{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_velocities.push_back(previous_states.at(i).ballState().velocity());
     }
@@ -331,7 +331,7 @@ TEST_F(BallTest, get_timestamp_history)
     boost::circular_buffer<TimestampedBallState> previous_states =
         ball.getPreviousStates();
     std::vector<Timestamp> previous_timestamps{};
-    for (int i = 0; i < previous_states.size(); i++)
+    for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_timestamps.push_back(previous_states.at(i).timestamp());
     }

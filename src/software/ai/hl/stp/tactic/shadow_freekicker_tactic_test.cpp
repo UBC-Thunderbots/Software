@@ -37,7 +37,7 @@ class ShadowFreekickerTacticTest : public testing::Test
 
         Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({friendly_robot});
+        world.updateFriendlyTeamState(Team({friendly_robot}));
 
         // setup tactic and acquire move action from it
         ShadowFreekickerTactic tactic = ShadowFreekickerTactic(
@@ -88,7 +88,7 @@ class ShadowFreekickerTacticTest : public testing::Test
             ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
         Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({friendly_robot});
+        world.updateFriendlyTeamState(Team({friendly_robot}));
 
         // setup tactic and acquire move action from it
         ShadowFreekickerTactic tactic = ShadowFreekickerTactic(

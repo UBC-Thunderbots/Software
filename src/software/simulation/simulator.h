@@ -64,8 +64,12 @@ class Simulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param physics_time_step The time step used to simulated physics
+     * and robot primitives.
      */
-    explicit Simulator(const Field& field);
+    explicit Simulator(const Field& field,
+                       const Duration& physics_time_step =
+                           Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;
 
     /**
@@ -108,7 +112,7 @@ class Simulator
 
     /**
      * Advances the simulation by the given time step. This will simulate
-     * physics and primitives
+     * one "camera frame" of data and increase the camera_frame value by 1.
      *
      * @param time_step how much to advance the simulation by
      */
@@ -121,7 +125,28 @@ class Simulator
      */
     World getWorld() const;
 
-    std::unique_ptr<SSL_WrapperPacket> getSslWrapperPacket() const;
+    /**
+     * Returns an SSL_WrapperPacket representing the most recent state
+     * of the simulation
+     *
+     * @return an SSL_WrapperPacket representing the most recent state
+     * of the simulation
+     */
+    std::unique_ptr<SSL_WrapperPacket> getSSLWrapperPacket() const;
+
+    /**
+     * Returns the field in the simulation
+     *
+     * @return the field in the simulation
+     */
+    Field getField() const;
+
+    /**
+     * Returns the current time in the simulation
+     *
+     * @return the current time in the simulation
+     */
+    Timestamp getTimestamp() const;
 
    private:
     /**
@@ -176,8 +201,14 @@ class Simulator
 
     unsigned int frame_number;
 
+    // The time step used to simulate physics and primitives
+    const Duration physics_time_step;
+
     // The camera ID of all SSLDetectionFrames published by the simulator.
     // This simulates having a single camera that can see the entire field
     static constexpr unsigned int CAMERA_ID            = 0;
-    static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01;
+    static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01f;
+    // 200Hz is approximately how fast our robot firmware runs, so we
+    // mimic that here for physics and primitive updates
+    static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / 200.0;
 };

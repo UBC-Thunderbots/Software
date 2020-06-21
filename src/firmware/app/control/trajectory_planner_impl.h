@@ -235,10 +235,8 @@ void app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
  * @param complete_time_profile [out] The complete time profile of the two balanced
  * trajectories. This profile is absolute time to each point on the profile starting from
  * zero. In seconds. This array is of length num_elements.
- *
- * @return A status indicating whether or not generation was successful
  */
-TrajectoryPlannerGenerationStatus_t
+void
 app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
     float displacement1[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float displacement2[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],

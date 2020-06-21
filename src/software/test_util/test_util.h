@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+
 #include "shared/constants.h"
 #include "software/new_geom/geom_constants.h"
 #include "software/new_geom/point.h"
@@ -13,18 +15,14 @@
 #include "software/world/team.h"
 #include "software/world/world.h"
 
+#define UNUSED(x) (void)(x)
+
 /**
  * Utility functions to our unit test suite, primarily for assisting with test setup (such
  * as creating World or Field objects)
  */
 namespace TestUtil
 {
-    /**
-     * Creates a field with the standard SSL Division B dimensions
-     * @return a field with the standard SSL Division B dimensions
-     */
-    Field createSSLDivBField();
-
     /**
      * Creates a World object with a normal SSL Division B field, default (empty)
      * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the

@@ -179,14 +179,7 @@ TEST(TrajectoryPlannerImplTest,
 TEST(TrajectoryPlannerImplTest,
      test_forward_continuity_path_curvature_max_speed_limited_constant_segment_length)
 {
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
     const unsigned int num_segments = 10;
-
-    for (unsigned int i = 0; i < num_segments; i++)
-    {
-        max_allowable_speed_profile[i] = 1;
-    }
 
     float linear_segments[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float max_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
@@ -407,8 +400,6 @@ TEST(TrajectoryPlannerImplTest,
 TEST(TrajectoryPlannerImplTest,
      test_backwards_continuity_constant_segment_length_continuous)
 {
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
     const unsigned int num_segments = 4;
 
 
@@ -448,8 +439,6 @@ TEST(TrajectoryPlannerImplTest,
 
 TEST(TrajectoryPlannerImplTest, test_backwards_continuity_variable_segment_length_input)
 {
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
     const unsigned int num_segments = 4;
 
 
@@ -492,8 +481,6 @@ TEST(
 {
     // Create an 'initial velocity too high' state by requesting an initial velocity that
     // is much greater than physically possible given the path length and acceleration
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
     const unsigned int num_segments = 4;
 
 

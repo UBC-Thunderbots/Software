@@ -28,7 +28,7 @@ TEST(Observer, receiveValue_value_not_yet_available)
 {
     TestObserver test_observer;
 
-    // Create a seperate thread to grab the value for us
+    // Create a separate thread to grab the value for us
     std::optional<int> result = std::nullopt;
     std::thread receive_value_thread([&]() {
         while (!result)

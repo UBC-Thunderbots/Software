@@ -227,7 +227,7 @@ p, li { white-space: pre-wrap; }
   <customwidget>
    <class>ZoomableQGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>software/gui/visualizer/widgets/zoomable_qgraphics_view.h</header>
+   <header>software/gui/generic_widgets/world_view/zoomable_qgraphics_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

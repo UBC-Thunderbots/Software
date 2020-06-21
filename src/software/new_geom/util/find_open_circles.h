@@ -19,7 +19,7 @@
  * @param points The points that must not lie within the circles
  *
  * @return A list of circles, sorted in descending order of radius. If no points were
- * provided, returns an empty list. Any points outside the bounding_box are ommitted.
+ * provided, returns an empty list. Any points outside the bounding_box are omitted.
  */
 std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
                                     std::vector<Point> points);
