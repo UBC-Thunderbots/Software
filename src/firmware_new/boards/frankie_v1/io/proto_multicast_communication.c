@@ -19,7 +19,7 @@
 // internal event to signal network interface configured
 static osEventFlagsId_t networking_event;
 
-// flag mask for network interface cofigured event
+// flag mask for network interface configured event
 static uint32_t NETIF_CONFIGURED = 1 << 0;
 
 // the timeout to recv a network packet
@@ -94,6 +94,8 @@ void io_proto_multicast_sender_Task(void* arg)
     //
     // We use IP6_ADDR_ANY which will default to the ethernet interface on the STM32H7
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
+    netconn_set_ipv6only(conn, true);
+
     netconn_bind(conn, IP6_ADDR_ANY, comm_profile->port);
     netconn_join_leave_group(conn, &comm_profile->multicast_address, IP6_ADDR_ANY,
                              NETCONN_JOIN);
@@ -126,6 +128,7 @@ void io_proto_multicast_sender_Task(void* arg)
     }
 
     netbuf_delete(tx_buf);
+    netconn_delete(conn);
 }
 
 void io_proto_multicast_listener_Task(void* arg)
@@ -138,9 +141,8 @@ void io_proto_multicast_listener_Task(void* arg)
     // Bind the socket to the multicast address and port we then use that comm_profile
     // to join the specified multicast group.
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
-
     netconn_set_ipv6only(conn, true);
-    netconn_set_recvtimeout(conn, 1000);
+    netconn_set_recvtimeout(conn, NETWORK_TIMEOUT_MS);
 
     netconn_bind(conn, &comm_profile->multicast_address, comm_profile->port);
     netconn_join_leave_group(conn, &comm_profile->multicast_address, IP6_ADDR_ANY,
@@ -148,7 +150,7 @@ void io_proto_multicast_listener_Task(void* arg)
 
     struct netbuf* rx_buf = NULL;
     err_t network_err;
-    int protobuf_err;
+    int no_protobuf_err;
 
     for (;;)
     {
@@ -170,12 +172,12 @@ void io_proto_multicast_listener_Task(void* arg)
 
                 // deserialize into buffer
                 io_proto_multicast_communication_profile_acquireLock(comm_profile);
-                protobuf_err = pb_decode(&in_stream, comm_profile->message_fields,
-                                         comm_profile->protobuf_struct);
+                no_protobuf_err = pb_decode(&in_stream, comm_profile->message_fields,
+                                            comm_profile->protobuf_struct);
                 io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
                 // nanopb err logic is inverted, false = error
-                if (protobuf_err)
+                if (no_protobuf_err)
                 {
                     io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                                           RECEIVED_PROTO);
@@ -188,6 +190,7 @@ void io_proto_multicast_listener_Task(void* arg)
             }
         }
     }
+    netconn_delete(conn);
 }
 
 void io_proto_multicast_startNetworkingTask(void* arg)

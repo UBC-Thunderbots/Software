@@ -201,7 +201,7 @@ extern "C"
 #define USE_HAL_SAI_REGISTER_CALLBACKS 0U    /* SAI register callback disabled     */
 #define USE_HAL_SD_REGISTER_CALLBACKS 0U     /* SD register callback disabled      */
 #define USE_HAL_SMARTCARD_REGISTER_CALLBACKS                                             \
-    0U /* SMARTCARD register callback disabled  \ \ \ \ \ \ \ \                                                                                       \
+    0U /* SMARTCARD register callback disabled  \ \ \ \ \ \ \ \                          \
         */
 #define USE_HAL_SPDIFRX_REGISTER_CALLBACKS 0U /* SPDIFRX register callback disabled */
 #define USE_HAL_SMBUS_REGISTER_CALLBACKS 0U   /* SMBUS register callback disabled   */

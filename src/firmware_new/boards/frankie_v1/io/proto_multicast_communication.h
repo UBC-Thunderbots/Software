@@ -54,6 +54,8 @@ void io_proto_multicast_listener_Task(void* arg);
  *
  * We take over control so we can signal other networking tasks when MX_LWIP_Init()
  * is finished running and the network link is configured and up.
+ *
+ * @param arg Unused
  */
 void io_proto_multicast_startNetworkingTask(void* arg);
 
@@ -70,12 +72,11 @@ void io_proto_multicast_communication_init(void);
  *
  * @param multicast_address [in] The multicast channel the robot should join
  * @param port [in] The port to bind to
+ * @param message_fields [in] The nanopb message fields used to seriallize/deserialize
+ * @param message_max_size [in] The maximum known size of the protobuf.
  * @param protobuf_struct [in/out] The serialized proto in the incoming network packet,
  *        will get deserialized into this struct in the listener task. The sender task
  *        will serialize the protobuf_struct and send it over the network.
- * @param message_fields [in] The nanopb message fields used to seriallize/deserialize
- * @param message_max_size [in] The maximum known size of the protobuf.
- *
  * @return ProtoMulticastCommunicationProfile_t the profile to provide to the task
  *
  */
