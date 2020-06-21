@@ -179,7 +179,7 @@ void CreateProtoPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
     radio_prim = RadioPrimitiveMsg();
     radio_prim->set_prim_type(
         RadioPrimitiveMsg::PrimitiveType::RadioPrimitiveMsg_PrimitiveType_STOP);
-    radio_prim->set_parameter1(9002);
+    radio_prim->set_parameter1(0);
     radio_prim->set_parameter2(0);
     radio_prim->set_parameter3(0);
     radio_prim->set_parameter4(0);

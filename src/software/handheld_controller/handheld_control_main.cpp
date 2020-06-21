@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
     while(true){
         std::vector<std::unique_ptr<Primitive>> new_primitives;
-        auto primitive = std::make_unique<StopPrimitive>(0, 0);
+        auto primitive = std::make_unique<DirectWheelsPrimitive>(0, 100, 0, 0,0, 0);
         new_primitives.emplace_back(std::move(primitive));
         auto new_primitives_ptr =
         std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(

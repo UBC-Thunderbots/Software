@@ -143,7 +143,8 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     app_primitive_manager_lockPrimitiveMutex(manager);
 
     if (!primitive_params_are_equal(manager->previous_primitive_params, params) ||
-        manager->current_primitive_index != primitive_index)
+        manager->current_primitive_index != primitive_index  ||
+        app_primitive_manager_primitiveIsDirect(primitive_index))
     {
         if (manager->current_primitive_functions)
         {
@@ -199,4 +200,8 @@ unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t *
 bool app_primitive_manager_primitiveIsDirect(unsigned int primitive)
 {
     return PRIMITIVES[primitive]->direct;
+}
+
+unsigned int app_primitive_manager_getStopPrimitiveId(PrimitiveManager_t *manager){
+    return 0;
 }

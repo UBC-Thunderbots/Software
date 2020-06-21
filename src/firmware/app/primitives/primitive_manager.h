@@ -56,3 +56,6 @@ unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t *
  * @return true if the primitive is direct primitive, false otherwise
  */
 bool app_primitive_manager_primitiveIsDirect(unsigned int primitive);
+
+// TODO: jdoc and test
+unsigned int app_primitive_manager_getStopPrimitiveId(PrimitiveManager_t *manager);

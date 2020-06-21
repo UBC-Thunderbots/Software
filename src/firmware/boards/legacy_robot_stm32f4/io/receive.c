@@ -24,6 +24,7 @@
 #include <unused.h>
 
 #include "firmware/app/primitives/primitive.h"
+#include "firmware/app/primitives/stop_primitive.h"
 #include "firmware/shared/physics.h"
 #include "io/charger.h"
 #include "io/chicker.h"
@@ -70,13 +71,13 @@ static unsigned int timeout_ticks;
 static uint8_t last_serial        = 0xFF;
 static const size_t HEADER_LENGTH = 2U /* Frame control */ + 1U /* Seq# */ +
                                     2U /* Dest PAN */ + 2U /* Dest */ + 2U /* Src */;
-static const size_t FOOTER_LENGTH         = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
+static const size_t FOOTER_LENGTH          = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
 static const int16_t MESSAGE_PURPOSE_INDEX = 2U /* Frame control */ + 1U /* Seq# */ +
-                                            2U /* Dest PAN */ + 2U /* Dest */ +
-                                            2U /* Src */;
-static const uint16_t MESSAGE_PAYLOAD_INDEX = 2U /* Frame control */ + 1U /* Seq# */ +
                                              2U /* Dest PAN */ + 2U /* Dest */ +
-                                             2U /* Src */ + 1U /* Msg Purpose*/;
+                                             2U /* Src */;
+static const uint16_t MESSAGE_PAYLOAD_INDEX = 2U /* Frame control */ + 1U /* Seq# */ +
+                                              2U /* Dest PAN */ + 2U /* Dest */ +
+                                              2U /* Src */ + 1U /* Msg Purpose*/;
 
 static void receive_task(void *UNUSED(param))
 {
@@ -113,8 +114,9 @@ static void receive_task(void *UNUSED(param))
                         iprintf("Frame header length: %d\r\n", HEADER_LENGTH);
                         iprintf("Frame footer length: %d\r\n", FOOTER_LENGTH);
                         iprintf("MESSAGE_PURPOSE_INDEX: %d\r\n", MESSAGE_PURPOSE_INDEX);
-                        handle_drive_packet(&dma_buffer[MESSAGE_PAYLOAD_INDEX],
-                                            frame_length - MESSAGE_PAYLOAD_INDEX - FOOTER_LENGTH);
+                        handle_drive_packet(
+                            &dma_buffer[MESSAGE_PAYLOAD_INDEX],
+                            frame_length - MESSAGE_PAYLOAD_INDEX - FOOTER_LENGTH);
                     }
                     else if (dma_buffer[MESSAGE_PURPOSE_INDEX] == 0x10U)
                     {
@@ -214,6 +216,8 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     bool estop_run                          = !!packet_data[packet_size - 2];
     bool feedback_requested_from_this_robot = packet_data[packet_size - 1] == robot_index;
 
+    // TODO: delete printouts
+
     // Check if feedback should be sent.
     if (feedback_requested_from_this_robot)
     {
@@ -230,6 +234,10 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
         return;
     }
 
+    // Reset timeout.
+    timeout_ticks = 1000U / portTICK_PERIOD_MS;
+
+
     // Decode the primitive
     pb_istream_t pb_in_stream  = pb_istream_from_buffer(packet_data, packet_size - 3);
     RadioPrimitiveMsg prim_msg = RadioPrimitiveMsg_init_zero;
@@ -242,67 +250,47 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     iprintf("Protobuf decode succeded!\r\n");
 
     primitive_params_t pparams = {.slow   = prim_msg.slow,
-                                        .extra  = prim_msg.extra_bits,
-                                        .params = {
-                                            prim_msg.parameter1,
-                                            prim_msg.parameter2,
-                                            prim_msg.parameter3,
-                                            prim_msg.parameter4,
-                                        }};
-    iprintf("Primitive params: %d, %d, %d, %d \n",
-        prim_msg.parameter1,
-            prim_msg.parameter2,
-            prim_msg.parameter3,
-            prim_msg.parameter4
-        );
+                                  .extra  = prim_msg.extra_bits,
+                                  .params = {
+                                      prim_msg.parameter1,
+                                      prim_msg.parameter2,
+                                      prim_msg.parameter3,
+                                      prim_msg.parameter4,
+                                  }};
+    iprintf("Primitive params: %d, %d, %d, %d \n", (int)(prim_msg.parameter1 * 1.0e2),
+            (int)(prim_msg.parameter2 * 1.0e2), (int)(prim_msg.parameter3 * 1.0e2),
+            (int)(prim_msg.parameter4 * 1.0e2));
 
-    if (!estop_run){
-        pparams.params[0]  = 0;
-        pparams.params[1]  = 0;
-        pparams.params[2]  = 0;
-        pparams.params[3]  = 0;
-        pparams.slow = true;
-        pparams.extra = 0;
+    unsigned int primitive = prim_msg.prim_type;
+    if (!estop_run)
+    {
+        // Set the primitive to be a stop primitive
+        primitive = app_primitive_manager_getStopPrimitiveId(primitive_manager);
+        pparams.params[0] = 0;
+        pparams.params[1] = 0;
+        pparams.params[2] = 0;
+        pparams.params[3] = 0;
+        pparams.slow      = true;
+        pparams.extra     = 0;
+
+        // Disable charging and discharge through chicker
+        charger_enable(false);
+        chicker_discharge(true);
+    } else {
+        // Enable charging
+        charger_enable(true);
+        chicker_discharge(false);
     }
+
+    iprintf("Primitive type is: %d\r\n", primitive);
+
+    iprintf("Starting primitive \r\n");
 
     // Take the drive mutex.
     xSemaphoreTake(drive_mtx, portMAX_DELAY);
 
-    // Reset timeout.
-    timeout_ticks = 1000U / portTICK_PERIOD_MS;
-
-    // Apply the charge and discharge mode.
-    if (!estop_run){
-//        charger_enable(false);
-//        chicker_discharge(true);
-    } else {
-//        charger_enable(true);
-//        chicker_discharge(false);
-    }
-
-    iprintf("HELLO THERE! \r\n");
-
-    // TODO: check that we're still abiding by this monstrosity
-    // If the serial number, the emergency stop has just
-    // been switched to stop, or the current primitive is
-    // direct, a new movement primitive needs to start. Do
-    // not start a movement primitive if the emergency stop
-    // has just been switched to run and the current
-    // primitive is not direct, because we can’t usefully
-    // restart the stopped prior primitive—instead, wait
-    // for the host to send new data. Strictly speaking, we
-    // only need to start direct primitives when the estop
-    // is switched from stop to run, but this is
-    // unnecessary as direct primitives shouldn’t care
-    // about being started more often than necessary.
-    unsigned int primitive = prim_msg.prim_type;
-    if (
-        !estop_run || app_primitive_manager_primitiveIsDirect(primitive))
-    {
-        // TODO: uncomment me
-//        app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
-//                                                &pparams);
-    }
+    app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
+                                            &pparams);
 
     // Release the drive mutex.
     xSemaphoreGive(drive_mtx);

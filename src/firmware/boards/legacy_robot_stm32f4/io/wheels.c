@@ -294,6 +294,7 @@ float wheels_get_back_right_rpm(void)
  */
 void apply_wheel_force(int wheel_index, float force_in_newtons)
 {
+    iprintf("Applying force %d to wheel %d\r\n", (int)(force_in_newtons*1e2), wheel_index);
     float battery = adc_battery();
 
     float torque = force_in_newtons * WHEEL_RADIUS * GEAR_RATIO;
@@ -310,6 +311,7 @@ void apply_wheel_force_front_right(float force_in_newtons)
 
 void apply_wheel_force_front_left(float force_in_newtons)
 {
+    iprintf("Applying wheel force of %d to front left wheel \r\n", (int)(force_in_newtons*1e2));
     apply_wheel_force(0, force_in_newtons);
 }
 

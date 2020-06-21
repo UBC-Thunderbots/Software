@@ -15,16 +15,15 @@ class FirmwareRobotTest : public testing::Test
                                             .robot_radius      = 1.3,
                                             .jerk_limit        = 1.4};
 
-        controller_state = (ControllerState_t*)malloc(sizeof(ControllerState_t));
-        controller_state->last_applied_acceleration_x       = 2.33f;
-        controller_state->last_applied_acceleration_y       = 1.22f;
-        controller_state->last_applied_acceleration_angular = 3.22f;
+        controller_state.last_applied_acceleration_x       = 2.33f;
+        controller_state.last_applied_acceleration_y       = 1.22f;
+        controller_state.last_applied_acceleration_angular = 3.22f;
 
         firmware_robot = app_firmware_robot_create(
             chicker, dribbler, &(this->returnEight), &(this->returnNine),
             &(this->returnTen), &(this->returnEleven), &(this->returnTwelve),
             &(this->returnThirteen), &(this->returnFourteen), front_right_wheel,
-            front_left_wheel, back_right_wheel, back_left_wheel, controller_state,
+            front_left_wheel, back_right_wheel, back_left_wheel, &controller_state,
             robot_constants);
     }
 
@@ -36,8 +35,6 @@ class FirmwareRobotTest : public testing::Test
     Chicker* chicker = (Chicker*)7;
 
     Dribbler* dribbler = (Dribbler*)8;
-
-    ControllerState_t* controller_state;
 
     static float returnEight(void)
     {
@@ -90,6 +87,7 @@ class FirmwareRobotTest : public testing::Test
     Wheel* back_right_wheel  = (Wheel*)14;
 
     FirmwareRobot_t* firmware_robot;
+    ControllerState_t controller_state;
 };
 
 TEST_F(FirmwareRobotTest, getChicker)
