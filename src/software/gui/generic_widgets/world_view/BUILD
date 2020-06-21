@@ -1,13 +1,13 @@
 load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
 
-package(default_visibility = ["//software/gui/visualizer:__subpackages__"])
+package(default_visibility = ["//software/gui:__subpackages__"])
 
 qt_cc_library(
     name = "world_view",
     src = "world_view.cpp",
     hdr = "world_view.h",
     deps = [
-        "//software/gui/generic_widgets/world_view:zoomable_qgraphics_view",
+        ":zoomable_qgraphics_view",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ],

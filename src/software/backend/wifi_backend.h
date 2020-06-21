@@ -4,15 +4,13 @@
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/input/network/networking/network_client.h"
-#include "software/networking/proto_multicast_listener.h"
-#include "software/networking/proto_multicast_sender.h"
+#include "software/networking/threaded_proto_multicast_listener.h"
+#include "software/networking/threaded_proto_multicast_sender.h"
 
 class WifiBackend : public Backend
 {
    public:
     WifiBackend();
-
-    virtual ~WifiBackend();
 
     static const std::string name;
 
@@ -44,7 +42,7 @@ class WifiBackend : public Backend
     /**
      * Joins the specified multicast group on the vision_output, primitive_output
      * and robot_msg_input. Multicast Channel and Multicast Group are used
-     * interchangably.
+     * interchangeably.
      *
      * NOTE: This will terminate the existing connection on the previous channel
      * if it exists.
@@ -61,14 +59,7 @@ class WifiBackend : public Backend
     NetworkClient network_input;
 
     // ProtoMulticast** to communicate with robots
-    std::unique_ptr<ProtoMulticastSender<VisionMsg>> vision_output;
-    std::unique_ptr<ProtoMulticastSender<PrimitiveSetMsg>> primitive_output;
-    std::unique_ptr<ProtoMulticastListener<TbotsRobotMsg>> robot_msg_input;
-
-    // The io_service that will be used to serivce all network requests
-    boost::asio::io_service io_service;
-
-    // The thread running the io_service in the background. This thread will run for the
-    // entire lifetime of the class
-    std::thread io_service_thread;
+    std::unique_ptr<ThreadedProtoMulticastSender<VisionMsg>> vision_output;
+    std::unique_ptr<ThreadedProtoMulticastSender<PrimitiveMsg>> primitive_output;
+    std::unique_ptr<ThreadedProtoMulticastListener<TbotsRobotMsg>> robot_msg_input;
 };

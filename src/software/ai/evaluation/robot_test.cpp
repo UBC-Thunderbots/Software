@@ -110,7 +110,7 @@ TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot_at_future_ti
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         timestamp);
 
-    // we dont have data for future timestamps, should return nullopt
+    // we don't have data for future timestamps, should return nullopt
     EXPECT_FALSE(robotHasPossession(ball, robot, Timestamp::fromSeconds(2)).has_value());
 }
 

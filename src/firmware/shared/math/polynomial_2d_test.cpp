@@ -413,9 +413,6 @@ TEST_F(Polynomial2dTest, get_t_value_on_arc_length_above_arc_lengths_in_parametr
 
 TEST_F(Polynomial2dTest, get_total_arc_length)
 {
-    Polynomial2dOrder1_t poly = {.x = {.coefficients = {4, 0}},
-                                 .y = {.coefficients = {2, 0}}};
-
     // Create the parmeterization to contain the desired number of segments
     ArcLengthParametrization_t arc_length_parameterization;
     arc_length_parameterization.num_values = 3;

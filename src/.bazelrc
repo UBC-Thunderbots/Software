@@ -9,6 +9,12 @@ test --test_output=all
 # Use Our Custom Toolchain
 build --crosstool_top=//cc_toolchain:toolchain
 
+# Add warnings to Thunderbots code only
+build --per_file_copt=//software/.*,//shared/.*,//firmware/.*,//firmware_new/.*@-Wall,-Wextra,-Wno-unused-parameter
+
+# Warn variable length arrays only when compiling cpp
+build --per_file_copt=.*\.cpp@-Wvla
+
 # Automatically set the CPU environment based on the `--cpu` flag as per our
 # defined CPU environments
 build --auto_cpu_environment_group=//cc_toolchain:cpus

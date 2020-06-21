@@ -49,6 +49,8 @@ cc_binary(
         "-isystem firmware/boards/shared/legacy_stm32lib/include",
         "-isystem firmware/boards/shared/legacy_cdcacm/include",
         "-isystem firmware/boards/shared/legacy_usb/include",
+        # We don't want to mark warnings as errors for legacy code
+        "-Wno-error",
     ],
     includes = [
         "legacy_cdcacm/include",

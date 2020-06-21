@@ -6,7 +6,6 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/new_geom/point.h"
-#include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
 class TestThetaStarPathPlanner : public testing::Test
@@ -165,7 +164,7 @@ TEST_F(TestThetaStarPathPlanner,
        test_theta_star_path_planner_single_obstacle_outside_of_path)
 {
     // Test where we need to navigate around a single obstacle along the x-axis
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Point start{3, 0}, dest{-3, 0};
 
     // Place a rectangle over our destination location

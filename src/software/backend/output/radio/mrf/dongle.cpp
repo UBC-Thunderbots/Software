@@ -119,8 +119,8 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     // Switch to configuration mode and configure the radio parameters.
     device.set_interface_alt_setting(radio_interface, configuration_altsetting);
     {
-        if (config < 0 || static_cast<std::size_t>(config) >=
-                              sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
+        if (static_cast<std::size_t>(config) >=
+            sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
         {
             throw std::out_of_range("Config index must be between 0 and " +
                                     std::to_string(NUM_DEFAULT_CONFIGS - 1));
@@ -503,9 +503,10 @@ void MRFDongle::send_unreliable(unsigned int robot, unsigned int tries, const vo
         throw std::out_of_range("Number of tries must be between 1 and 256 (inclusive)");
     }
 
-    uint8_t buffer[len + 2];
-    buffer[0] = static_cast<uint8_t>(robot);
-    buffer[1] = static_cast<uint8_t>(tries & 0xFF);
+    std::vector<uint8_t> buffer_vec(len + 2);
+    buffer_vec[0]   = static_cast<uint8_t>(robot);
+    buffer_vec[1]   = static_cast<uint8_t>(tries & 0xFF);
+    uint8_t *buffer = buffer_vec.data();
     std::memcpy(buffer + 2, data, len);
     std::unique_ptr<USB::BulkOutTransfer> elt(
         new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));
