@@ -68,6 +68,8 @@ function run_code_spell(){
     echo "Fixing spellings..."
     cd $CURR_DIR/../src/software && codespell -w
     cd $CURR_DIR/../src/firmware_new && codespell -w
+    cd $CURR_DIR/../src/firmware/app && codespell -w
+    cd $CURR_DIR/../src/shared && codespell -w
 }
 
 # Run formatting
