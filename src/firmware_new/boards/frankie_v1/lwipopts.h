@@ -54,12 +54,6 @@ extern "C"
 #define MEMP_NUM_UDP_PCB 10
 /*----- Value in opt.h for LWIP_TCP: 1 -----*/
 #define LWIP_TCP 0
-/*----- Default Value for LWIP_MPU_COMPATIBLE: 0 ---*/
-#define LWIP_MPU_COMPATIBLE 1
-/*----- Default Value for LWIP_TCPIP_CORE_LOCKING: 0 ---*/
-#define LWIP_TCPIP_CORE_LOCKING 1
-/*----- Default Value for LWIP_TCPIP_CORE_LOCKING_INPUT: 0 ---*/
-#define LWIP_TCPIP_CORE_LOCKING_INPUT 1
 /*----- Default Value for MEM_LIBC_MALLOC: 0 ---*/
 #define MEM_LIBC_MALLOC 1
 /*----- Default Value for MEMP_MEM_MALLOC: 0 ---*/

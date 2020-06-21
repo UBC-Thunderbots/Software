@@ -81,6 +81,12 @@ osThreadId_t PrimMsgTaskHandle;
 const osThreadAttr_t PrimMsgTask_attributes = {.name     = "PrimMsgTask",
                                                .priority = (osPriority_t)osPriorityHigh7,
                                                .stack_size = 1024 * 4};
+/* Definitions for testMsgUpdate */
+osThreadId_t testMsgUpdateHandle;
+const osThreadAttr_t testMsgUpdate_attributes = {
+    .name       = "testMsgUpdate",
+    .priority   = (osPriority_t)osPriorityNormal1,
+    .stack_size = 1024 * 4};
 /* USER CODE BEGIN PV */
 
 ProtoMulticastCommunicationProfile_t *tbots_robot_msg_sender_profile;
@@ -104,6 +110,7 @@ static void MX_TIM4_Init(void);
 void io_proto_multicast_startNetworkingTask(void *argument);
 extern void io_proto_multicast_sender_Task(void *argument);
 extern void io_proto_multicast_listener_Task(void *argument);
+void test_msg_update(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -271,10 +278,15 @@ int main(void)
         osThreadNew(io_proto_multicast_listener_Task, (void *)vision_msg_listener_profile,
                     &VisionMsgTask_attributes);
 
-    /*[> creation of PrimMsgTask <]*/
+    /* creation of PrimMsgTask */
     PrimMsgTaskHandle =
         osThreadNew(io_proto_multicast_listener_Task,
                     (void *)primitive_msg_listener_profile, &PrimMsgTask_attributes);
+
+    /* creation of testMsgUpdate */
+    testMsgUpdateHandle =
+        osThreadNew(test_msg_update, (void *)tbots_robot_msg_sender_profile,
+                    &testMsgUpdate_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
 
@@ -688,6 +700,29 @@ __weak void io_proto_multicast_startNetworkingTask(void *argument)
         osDelay(1);
     }
     /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_test_msg_update */
+/**
+ * @brief Function implementing the testMsgUpdate thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_test_msg_update */
+void test_msg_update(void *argument)
+{
+    /* USER CODE BEGIN test_msg_update */
+    ProtoMulticastCommunicationProfile_t *comm_profile =
+        (ProtoMulticastCommunicationProfile_t *)argument;
+
+    /* Infinite loop */
+    for (;;)
+    {
+        io_proto_multicast_communication_profile_acquireLock(comm_profile);
+        osDelay(100);
+        io_proto_multicast_communication_profile_releaseLock(comm_profile);
+    }
+    /* USER CODE END test_msg_update */
 }
 
 /* MPU Configuration */

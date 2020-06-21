@@ -1,7 +1,7 @@
 def stm32h7_hal_library_files_genrule(name):
     """ Downloads and extracts the Drivers / Middleware For The STM32H7 MCU's """
 
-    # First download the firmware. We have this as a seperate genrule in case we need to
+    # First download the firmware. We have this as a separate genrule in case we need to
     # debug later rules, don't want to have to re-download every time
     # TODO: more descriptive name?
     native.genrule(

@@ -16,15 +16,19 @@
 #include "pb_decode.h"
 #include "pb_encode.h"
 
-static uint32_t NETIF_CONFIGURED = 1 << 0;
+// internal event to signal network interface configured
+static uint32_t NETIF_CONFIGURED_FLAG = 1 << 0;
+static uint32_t NETWORK_TIMEOUT       = 1000;
 static osEventFlagsId_t networking_event;
 
 /**
- * ProtoMulticastCommunicationProfile_t contains the common information
- * between to join a multicast group and then send or receive protobuf.
+ * ProtoMulticastCommunicationProfile_t contains the information required
+ * to join a multicast group and then send or receive protobuf.
  */
 typedef struct ProtoMulticastCommunicationProfile
 {
+    // name of the profile to pass down to other
+    // elements that may require a name (mutex, etc..)
     const char* profile_name;
 
     // multicast group info: the address and the port to bind to and
@@ -39,7 +43,7 @@ typedef struct ProtoMulticastCommunicationProfile
     uint16_t message_max_size;
 
     // communication_event: these events will be used to control when the networking
-    // tasks run. The networking tasks will also signal certain events
+    // tasks run. The networking tasks will also signal certain events.
     osEventFlagsId_t communication_event;
 
     // mutex to protect the protobuf struct
@@ -94,31 +98,30 @@ void io_proto_multicast_sender_Task(void* arg)
     uint8_t buffer[comm_profile->message_max_size];
 
     // network buffer
-    struct netbuf* tx_buf = NULL;
+    struct netbuf* tx_buf = netbuf_new();
 
     for (;;)
     {
-        // UNCOMMENT ME WHEN EVERYTHING IS WORKING
-        // osEventFlagsWait(comm_profile->communication_event, UPDATED_PROTO,
-        //         osFlagsWaitAny, osWaitForever);
-
-        // REMOVE ME WHEN EVERYTHING IS WORKING
-        osDelay(100);
-
-        tx_buf = netbuf_new();
-        netbuf_alloc(tx_buf, comm_profile->message_max_size);
-
-        // serialize proto
         pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
+
+        // block until protobuf has been updated
+        io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
+                                                                  UPDATED_INTERNAL_PROTO);
+
+        // serialize proto into buffer
+        io_proto_multicast_communication_profile_acquireLock(comm_profile);
         pb_encode(&stream, comm_profile->message_fields, comm_profile->protobuf_struct);
+        io_proto_multicast_communication_profile_releaseLock(comm_profile);
+
+        netbuf_alloc(tx_buf, stream.bytes_written);
 
         // package payload and send over udp
         tx_buf->p->payload = buffer;
         netconn_sendto(conn, tx_buf, &comm_profile->multicast_address,
                        comm_profile->port);
-
-        netbuf_delete(tx_buf);
     }
+
+    netbuf_delete(tx_buf);
 }
 
 void io_proto_multicast_listener_Task(void* arg)
@@ -126,11 +129,10 @@ void io_proto_multicast_listener_Task(void* arg)
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)arg;
 
-    /*osEventFlagsWait(networking_event, NETIF_CONFIGURED, osFlagsWaitAny,
-     * osWaitForever);*/
+    osEventFlagsWait(networking_event, NETIF_CONFIGURED, osFlagsWaitAny, osWaitForever);
 
     // Bind the socket to the multicast address and port we then use that comm_profile
-    // profile to join the specified multicast group.
+    // to join the specified multicast group.
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
 
     netconn_set_ipv6only(conn, true);
@@ -140,9 +142,7 @@ void io_proto_multicast_listener_Task(void* arg)
     netconn_join_leave_group(conn, &comm_profile->multicast_address, IP6_ADDR_ANY,
                              NETCONN_JOIN);
 
-    // network buffer
     struct netbuf* rx_buf = NULL;
-
     err_t network_err;
     int protobuf_err;
 
@@ -154,8 +154,8 @@ void io_proto_multicast_listener_Task(void* arg)
         {
             case ERR_TIMEOUT:
             {
-                io_proto_multicast_communication_profile_notifyEvent(comm_profile,
-                                                                     RECEIVE_TIMEOUT);
+                io_proto_multicast_communication_profile_notifyEvents(comm_profile,
+                                                                      RECEIVE_TIMEOUT);
                 break;
             }
 
@@ -173,8 +173,8 @@ void io_proto_multicast_listener_Task(void* arg)
 
                 if (!protobuf_err)
                 {
-                    io_proto_multicast_communication_profile_notifyEvent(comm_profile,
-                                                                         RECEIVED_PROTO);
+                    io_proto_multicast_communication_profile_notifyEvents(
+                        comm_profile, RECEIVED_EXTERNAL_PROTO);
                 }
                 break;
             }
@@ -185,37 +185,37 @@ void io_proto_multicast_listener_Task(void* arg)
         }
     }
 }
-void io_proto_multicast_communication_profile_acquireLock(
-    ProtoMulticastCommunicationProfile_t* profile)
-{
-}
-
-void io_proto_multicast_communication_profile_releaseLock(
-    ProtoMulticastCommunicationProfile_t* profile)
-{
-}
-
-void io_proto_multicast_communication_profile_notifyEvent(
-    ProtoMulticastCommunicationProfile_t* profile,
-    ProtoMulticastCommunicationEvent_t event)
-{
-}
-
-void io_proto_multicast_communication_profile_blockUntilEvent(
-    ProtoMulticastCommunicationProfile_t* profile,
-    ProtoMulticastCommunicationEvent_t event)
-{
-}
 
 void io_proto_multicast_startNetworkingTask(void* arg)
 {
     MX_LWIP_Init();
     osEventFlagsSet(networking_event, NETIF_CONFIGURED);
+    osThreadExit();
+}
 
-    for (;;)
-    {
-        osDelay(1);
-    }
+void io_proto_multicast_communication_profile_acquireLock(
+    ProtoMulticastCommunicationProfile_t* profile)
+{
+    osMutexAcquire(profile->profile_mutex, osWaitForever);
+}
+
+void io_proto_multicast_communication_profile_releaseLock(
+    ProtoMulticastCommunicationProfile_t* profile)
+{
+    osMutexRelease(profile->profile_mutex);
+}
+
+void io_proto_multicast_communication_profile_notifyEvents(
+    ProtoMulticastCommunicationProfile_t* profile, uint32_t events)
+{
+    osEventFlagsSet(profile->communication_event, events);
+}
+
+uint32_t io_proto_multicast_communication_profile_blockUntilEvents(
+    ProtoMulticastCommunicationProfile_t* profile, uint32_t events)
+{
+    return osEventFlagsWait(profile->communication_event, events, osFlagsWaitAny,
+                            osWaitForever);
 }
 
 void io_proto_multicast_communication_profile_destroy(

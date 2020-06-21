@@ -103,11 +103,11 @@ const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] 
 };
 
 // the port robots are listening to for vision and primitives
-const uint16_t VISION_PORT    = 42069;
-const uint16_t PRIMITIVE_PORT = 42070;
+const unsigned VISION_PORT    = 42069;
+const unsigned PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
-const uint16_t ROBOT_STATUS_PORT = 42071;
+const unsigned ROBOT_STATUS_PORT = 42071;
 
 // maximum transfer unit size in bytes
-const uint16_t MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+const unsigned MAXIMUM_TRANSFER_UNIT_BYTES = 1500;

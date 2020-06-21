@@ -5,14 +5,15 @@
 typedef struct ProtoMulticastCommunicationProfile ProtoMulticastCommunicationProfile_t;
 
 /**
- * EVENTS
+ * Event Flags: used to signal tasks to unblock and run specific actions
  */
 typedef enum
 {
-    UPDATED_PROTO   = 1 << 0,  // protobuf struct has been updated
-    RECEIVED_PROTO  = 1 << 1,  // new protobuf has been received
-    RECEIVE_TIMEOUT = 1 << 2,  // blocking takes longer than NETWORK_TIMEOUT_MILLISECONDS
-} ProtoMulticastCommunicationEvent_t;
+    NETIF_CONFIGURED        = 1 << 0,  // network interface has been configured
+    UPDATED_INTERNAL_PROTO  = 1 << 1,  // protobuf struct has been updated
+    RECEIVED_EXTERNAL_PROTO = 1 << 2,  // new protobuf has been received
+    RECEIVE_TIMEOUT         = 1 << 3,  // blocking takes longer than NETWORK_TIMEOUT_MS
+} ProtoMulticastCommunicationEventFlags_t;
 
 /***
  * TASKS:
@@ -47,13 +48,13 @@ void io_proto_multicast_listener_Task(void* arg);
  * call internally creates another tcpip task, and the default task just loops
  * forever.
  *
- * Cube forces us to generate this function, in main.c we mark it as __weak and define
- * the implementation in this library (proto_mutlicast_communication). When the proto
- * communication library is linked w/ the main frankie_v1 binary, the __weak reference
- * is resolved to the "stronger" reference to the function defined below.
+ * Cube forces us to generate this function, in main.c where we mark it as __weak and
+ * define the implementation in this library (proto_mutlicast_communication). When the
+ * proto communication library is linked w/ the main frankie_v1 binary, the __weak
+ * reference is resolved to the "stronger" reference to the function defined below.
  *
  * We take over control so we can signal other networking tasks when MX_LWIP_Init()
- * has been called and the network link is configured and up.
+ * is finished running and the network link is configured and up.
  */
 void io_proto_multicast_startNetworkingTask(void* arg);
 
@@ -92,7 +93,7 @@ ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_c
  * priority task waiting for the mutex, the task holding this lock will
  * inherit the waiting tasks priority. (osMutexPrioInherit)
  *
- * @param ProtoMulticastSender/ListenerProfile_t the profile to lock
+ * @param communication_profile The profile to lock
  */
 void io_proto_multicast_communication_profile_acquireLock(
     ProtoMulticastCommunicationProfile_t* communication_profile);
@@ -101,34 +102,37 @@ void io_proto_multicast_communication_profile_acquireLock(
  * Release the profile lock.
  *
  * @pre lock must be acquired through the communication_profile_acquireLock call
- * @param profile The profile to release the mutex for
+ * @param communication_profile The profile to release the mutex for
  */
 void io_proto_multicast_communication_profile_releaseLock(
     ProtoMulticastCommunicationProfile_t* communication_profile);
 
 /**
- * Signal the proto_multicast_sender_Task that the protobuf is ready
- * to be serialized and sent over the network.
+ * Signal the tasks waiting on the communication_profile with the provided events.
  *
- * @pre must have called sender_profile_releaseLock
- * @param sender_profile The profile used to notify the corresponding sending task
- * @param event The event to send to all tasks using the communication profile
+ * @pre do NOT hold the profile lock, this will cause everything to grind to a halt
+ *
+ * @param communication_profile The profile that the notification will be "sent on". Any
+ * task blocking with io_proto_multicast_communication_profile_blockUntilEvents will be
+ * notified.
+ * @param events The events to notify, bitwise or of
+ * ProtoMulticastCommunicationEventFlags_t
  */
-void io_proto_multicast_communication_profile_notifyEvent(
-    ProtoMulticastCommunicationProfile_t* communication_profile,
-    ProtoMulticastCommunicationEvent_t event);
+void io_proto_multicast_communication_profile_notifyEvents(
+    ProtoMulticastCommunicationProfile_t* communication_profile, uint32_t events);
 
 /**
- * Block the calling function/task until a new protobuf value has been
- * received over the network.
+ * Block the calling function until a new protobuf value has been received over the
+ * network.
  *
- * @pre must have called listener_profile_releaseLock
+ * @pre do NOT hold the profile lock, this will cause everything to grind to a halt
+ *
  * @param communication_profile The profile that the notification will occur on
- * @param event The event to wait block on
+ * @param events The events to block on, bitwise or of
+ * ProtoMulticastCommunicationEventFlags_t
  */
-void io_proto_multicast_communication_profile_blockUntilEvent(
-    ProtoMulticastCommunicationProfile_t* communication_profile,
-    ProtoMulticastCommunicationEvent_t event);
+uint32_t io_proto_multicast_communication_profile_blockUntilEvents(
+    ProtoMulticastCommunicationProfile_t* communication_profile, uint32_t events);
 
 /**
  * Destroy the given ProtoMulticastCommunicationProfile_t
