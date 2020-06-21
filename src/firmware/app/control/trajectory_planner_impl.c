@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <math.h>
 
+#include "firmware/app/control/trajectory_planner.h"
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/physics.h"

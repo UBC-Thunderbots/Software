@@ -1,15 +1,13 @@
 #include "firmware/app/control/trajectory_planner.h"
 
 #include <assert.h>
-#include <float.h>
 #include <math.h>
-#include <stdbool.h>
 
 #include "assert.h"
+#include "firmware/app/control/trajectory_planner_impl.h"
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/math/tbots_math.h"
-#include "firmware/shared/physics.h"
 
 TrajectoryPlannerGenerationStatus_t
 app_trajectory_planner_generateConstantParameterizationPositionTrajectory(

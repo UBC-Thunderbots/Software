@@ -1,23 +1,8 @@
 #pragma once
 
+#include "firmware/app/control/trajectory_planner.h"
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
-
-// The maximum size of the array containing trajectory elements. Assuming the
-// longest possible path is 9 meters with 1mm segments
-#define TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS 9000
-
-typedef enum TrajectoryPlannerGenerationStatus
-{
-    OK,
-    FINAL_VELOCITY_TOO_HIGH,
-    INITIAL_VELOCITY_TOO_HIGH,
-    // INTERPOLATION_ELEMENT_MAXED_OUT is returned when the constant period interpolation
-    // function uses up all the available array space provided to it. This can happen
-    // because constant period trajectories do not necessarily have the same
-    // number of elements as their constant parameterization counterparts
-    INTERPOLATION_ELEMENT_MAXED_OUT,
-} TrajectoryPlannerGenerationStatus_t;
 
 /**
  * Function generates the segment lengths and the states at each node along the specified

@@ -27,7 +27,6 @@ cc_library(
 cc_test(
     name = "trajectory_planner_test",
     srcs = [
-        "trajectory_planner_impl.h",
         "trajectory_planner_test.cpp",
     ],
     deps = [

@@ -1,6 +1,8 @@
 extern "C"
 {
 #include "firmware/app/control/trajectory_planner.h"
+
+#include "firmware/app/control/trajectory_planner_impl.h"
 }
 
 #include <gtest/gtest.h>
@@ -570,11 +572,6 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_straight_line_high_acceleratio
 
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t position_trajectory;
-
-    app_trajectory_planner_impl_getMaximumSpeedProfile(
-        path_parameters.path, path_parameters.num_elements, path_parameters.t_start,
-        path_parameters.t_end, path_parameters.max_allowable_linear_acceleration,
-        path_parameters.max_allowable_linear_speed, max_allowable_speed_profile);
 
     app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
         path_parameters, &position_trajectory);
