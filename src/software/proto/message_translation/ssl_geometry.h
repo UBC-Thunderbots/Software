@@ -17,48 +17,88 @@
  *
  * Several values like the various goal lines are not listed in the wiki
  * and so have been determined "experimentally" by inspecting messages
- * received from SSL Vision or Grsim
+ * received from SSL Vision or Grsim.
  *
- * Conventions and naming from the SSL
- * - "Top" refers to +y in our coordinate system. "Bottom" refers to -y
- * - "Left" refers to -x in our coordinate system. "Right" refers to +x
- * - "Penalty" really refers to the defense area
+ * We have named the enums according to our own style to be more descriptive
+ * than the SSL defaults. See the map in the .cpp file for how these map to
+ * the SSL names.
+ *
+ * See the diagram below for what names correspond to what lines. This is in
+ * the coordinate frame of the "raw" field data we would get from a camera.
+ * (ie. +/- x is not related to friendly/enemy like in our normal coordinate
+ * convention)
+ *
+ *                             N
+ *                             |
+ *                             V
+ *           C           +-------------+
+ *           |      M -> |             | <- L
+ *           V           |             |
+ *       +----------+----+------+------+----+----------+
+ *       |          |           |           |          |
+ *       |          |           |           |          |
+ *       |          |           |           |          |
+ *       |          | <- P      |      O -> |          |
+ *       |          |           |           |          |
+ *       |          |           |           |          |
+ *       |          |           |           |          |
+ *       |          +-----------------------+          |
+ *       |                      |      ^               |
+ *       |                 F -> |      |               |
+ *       |                      |      G               |
+ *  B -> |                    XXXXX                    | <- A
+ *       |      E           XXX | XXX                  |
+ *       |      |         XXX   |   XXX                |
+ *       |      V         X     |     X                |
+ *       +---------------XX-----------XX---------------+       +-----> +y
+ *       |                X     |     X                |       |
+ *       |                XXX   |   XXX  <- S          |       |
+ *       |                  XXX | XXX                  |       V
+ *       |                    XXXXXX                   |       +x
+ *       |                      |      H               |
+ *       |                      |      |               |
+ *       |                      |      V               |
+ *       |          +-----------------------+          |
+ *       |          |           |           |          |
+ *       |          |           |           |          |
+ *       |          |           |           |          |
+ *       |          |           |           |          |
+ *       |          | <- Q      |      R -> |          |
+ *       |          |           |           |          |
+ *       |          |           |           |          |
+ *       |          |           |           |          |
+ *       +----------+----+------+------+----+----------+
+ *          ^            |             |
+ *          |       J -> |             | <- I
+ *          D            +-------------+
+ *                             ^
+ *                             |
+ *                             K
  */
 // clang-format off
 MAKE_ENUM(SSLFieldLines,
-          POS_Y_FIELD_LINE,
-          NEG_Y_FIELD_LINE,
-          NEG_X_FIELD_LINE,
-          POS_X_FIELD_LINE,
-          HALFWAY_LINE,
-          // Runs perpendicular to the HALFWAY_LINE, from net to net
-          CENTER_LINE,
-          NEG_X_DEFENSE_AREA_FRONT_LINE,
-          POS_X_DEFENSE_AREA_FRONT_LINE,
-          // TOP is +y, BOTTOM is -y
-          POS_Y_LINE_OF_POS_X_GOAL,
-          NEG_Y_LINE_OF_POS_X_GOAL,
-          // The DEPTH_LINE is the back of the net
-          POS_X_GOAL_REAR_LINE,
-          // TOP is +y, BOTTOM is -y
-          POS_Y_LINE_OF_NEG_X_GOAL,
-          NEG_Y_LINE_OF_NEG_X_GOAL,
-          // The DEPTH_LINE is the back of the net
-          NEG_X_GOAL_REAR_LINE,
-          // For the LEFT_FIELD, LEFT and RIGHT are from the POV of the net
-          // on the left of the field looking in towards the center of the
-          // field. ie. LEFT is +y, RIGHT is -y
-          POS_Y_LINE_OF_NEG_X_DEFENSE_AREA,
-          NEG_Y_LINE_OF_NEG_X_DEFENSE_AREA,  // right is positive y
-          // For the RIGHT_FIELD, LEFT and RIGHT are from the POV of the net
-          // on the right of the field looking in towards the center of the
-          // field. ie. LEFT is +y, RIGHT is -y
-          NEG_Y_LINE_OF_POS_X_DEFENSE_AREA,
-          POS_Y_LINE_OF_POS_X_DEFENSE_AREA,
+          POS_Y_FIELD_LINE,                  // A
+          NEG_Y_FIELD_LINE,                  // B
+          NEG_X_FIELD_LINE,                  // C
+          POS_X_FIELD_LINE,                  // D
+          HALFWAY_LINE,                      // E
+          CENTER_LINE,                       // F
+          NEG_X_DEFENSE_AREA_FRONT_LINE,     // G
+          POS_X_DEFENSE_AREA_FRONT_LINE,     // H
+          POS_Y_LINE_OF_POS_X_GOAL,          // I
+          NEG_Y_LINE_OF_POS_X_GOAL,          // J
+          POS_X_GOAL_REAR_LINE,              // K
+          POS_Y_LINE_OF_NEG_X_GOAL,          // L
+          NEG_Y_LINE_OF_NEG_X_GOAL,          // M
+          NEG_X_GOAL_REAR_LINE,              // N
+          POS_Y_LINE_OF_NEG_X_DEFENSE_AREA,  // O
+          NEG_Y_LINE_OF_NEG_X_DEFENSE_AREA,  // P
+          NEG_Y_LINE_OF_POS_X_DEFENSE_AREA,  // Q
+          POS_Y_LINE_OF_POS_X_DEFENSE_AREA,  // R
           )
 
 MAKE_ENUM(SSLCircularArcs,
-          CENTER_CIRCLE,
+          CENTER_CIRCLE,                     // S
           )
 // clang-format on
 
