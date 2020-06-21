@@ -23,4 +23,14 @@ class Backend : public Subject<SensorMsg>,
     Backend() = default;
 
     virtual ~Backend() = default;
+
+    /**
+     * Callback function to send components of SensorMsg via Subject<SensorMsg>
+     *
+     * @param msg The component of SensorMsg
+     */
+    void receiveTbotsRobotMsg(TbotsRobotMsg msg);
+    void receiveTbotsRobotMsgs(std::vector<TbotsRobotMsg> msgs);
+    void receiveSSLWrapperPacket(SSL_WrapperPacket msg);
+    void receiveSSLReferee(Referee msg);
 };

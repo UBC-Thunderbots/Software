@@ -15,6 +15,8 @@ RadioBackend::RadioBackend()
                     boost::bind(&RadioBackend::receiveWorld, this, _1),
                     Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
                     Util::DynamicParameters->getCameraConfig()),
+      ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
+                       boost::bind(&Backend::receiveSSLReferee, this, _1)),
       radio_output(DEFAULT_RADIO_CONFIG,
                    boost::bind(&RadioBackend::receiveRobotStatus, this, _1))
 {

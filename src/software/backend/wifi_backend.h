@@ -4,6 +4,7 @@
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/input/network/networking/network_client.h"
+#include "software/backend/ssl_proto_client.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
 
@@ -22,14 +23,6 @@ class WifiBackend : public Backend
      * @param world The new world
      */
     void receiveWorld(World world);
-
-    /**
-     * This is registered as an async callback function on the robot_msg_input
-     * to receive msgs from the robot.
-     *
-     * @param robot_msg The robot_msg from a robot
-     */
-    void receiveTbotsRobotMsg(TbotsRobotMsg robot_msg);
 
     /**
      * This is called when we receive a primitive vector because
@@ -57,6 +50,9 @@ class WifiBackend : public Backend
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
+
+    // Client for listener to SSL protobufs
+    SSLProtoClient ssl_proto_client;
 
     // ProtoMulticast** to communicate with robots
     std::unique_ptr<ThreadedProtoMulticastSender<VisionMsg>> vision_output;
