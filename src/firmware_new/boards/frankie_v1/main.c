@@ -713,8 +713,9 @@ void test_msg_update(void *argument)
 {
     /* USER CODE BEGIN test_msg_update */
 
-    // TODO this is a placeholder task to test NOT associated with a ticket
-    // because how the msgs will be passed around fw is not finalized yet
+    // TODO this is a placeholder task to test sending robot status NOT
+    // associated with a ticket because how the robot status msgs will be
+    // updated and sent is TBD
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
@@ -722,11 +723,12 @@ void test_msg_update(void *argument)
     for (;;)
     {
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
+        // TODO enable SNTP sys_now is currently only time since reset
         tbots_robot_msg.time_sent.epoch_timestamp_seconds = sys_now();
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
-                                                              UPDATED_INTERNAL_PROTO);
-        osDelay(100);
+                                                              PROTO_UPDATED);
+        osDelay(10);
     }
     /* USER CODE END test_msg_update */
 }

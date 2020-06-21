@@ -20,7 +20,7 @@
 static osEventFlagsId_t networking_event;
 
 // flag mask for network interface cofigured event
-static uint32_t NETIF_CONFIGURED_FLAG = 1 << 0;
+static uint32_t NETIF_CONFIGURED = 1 << 0;
 
 // the timeout to recv a network packet
 static uint32_t NETWORK_TIMEOUT_MS = 1000;
