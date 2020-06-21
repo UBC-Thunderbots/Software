@@ -59,17 +59,14 @@ int main(int argc, char* argv[])
     boost::asio::io_service io_service;
     auto io_service_thread = std::thread([&]() { io_service.run(); });
 
-    // create ProtoMulticastSender to send test vision
     auto vision_sender = std::make_unique<ProtoMulticastSender<VisionMsg>>(
         io_service, std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
         VISION_PORT);
 
-    // create ProtoMulticastSender to send test vision
     auto primitive_sender = std::make_unique<ProtoMulticastSender<PrimitiveMsg>>(
         io_service, std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
         PRIMITIVE_PORT);
 
-    // create ProtoMulticastSender to send test vision
     auto status_listener = std::make_unique<ProtoMulticastListener<TbotsRobotMsg>>(
         io_service, std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
         ROBOT_STATUS_PORT, &callback);
