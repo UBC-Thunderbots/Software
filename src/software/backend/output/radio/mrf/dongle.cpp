@@ -16,8 +16,9 @@
 
 #include "shared/constants.h"
 #include "software/backend/output/radio/mrf/messages.h"
-#include "software/backend/output/shared/proto_creator_primitive_visitor.h"
-#include "software/logger/logger.h" namespace
+#include "software/logger/logger.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
+namespace
 {
     struct RadioConfig
     {
@@ -433,9 +434,11 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
 void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
 {
     // Check the data is of valid size
-    if (data.size() > MAX_RADIO_PACKET_SIZE){
+    if (data.size() > MAX_RADIO_PACKET_SIZE)
+    {
         std::stringstream ss;
-        ss << "Tried to send packet with length " << data.size() << " over radio, max size is " << MAX_RADIO_PACKET_SIZE;
+        ss << "Tried to send packet with length " << data.size()
+           << " over radio, max size is " << MAX_RADIO_PACKET_SIZE;
         throw std::runtime_error(ss.str());
     }
 

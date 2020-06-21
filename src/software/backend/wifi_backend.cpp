@@ -36,7 +36,7 @@ WifiBackend::~WifiBackend()
 
 void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
 {
-    primitive_output->sendProto(*createPrimitiveMsg(primitives_ptr));
+    primitive_output->sendProto(*createPrimitiveSetMsg(primitives_ptr));
 }
 
 void WifiBackend::receiveWorld(World world)
@@ -59,7 +59,7 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
         io_service, std::string(MULTICAST_CHANNELS[channel]) + "%" + interface,
         VISION_PORT));
 
-    primitive_output.reset(new ProtoMulticastSender<PrimitiveMsg>(
+    primitive_output.reset(new ProtoMulticastSender<PrimitiveSetMsg>(
         io_service, std::string(MULTICAST_CHANNELS[channel]) + "%" + interface,
         PRIMITIVE_PORT));
 

@@ -1,6 +1,6 @@
 #include "software/simulation/simulator.h"
 
-#include "software/backend/output/shared/proto_creator_primitive_visitor.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"

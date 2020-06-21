@@ -1,4 +1,4 @@
-#include "software/backend/output/shared/proto_creator_primitive_visitor.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 
 #include "shared/constants.h"
 #include "software/primitive/all_primitives.h"

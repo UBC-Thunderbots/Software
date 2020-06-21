@@ -1,4 +1,4 @@
-#include "software/backend/output/shared/proto_creator_primitive_visitor.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>

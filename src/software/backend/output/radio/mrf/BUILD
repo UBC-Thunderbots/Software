@@ -25,8 +25,8 @@ cc_library(
         "//software:constants",
         "//software/backend:robot_status",
         "//software/backend/output/radio/mrf/usb:libusb",
-        "//software/backend/output/shared:proto_creator_primitive_visitor",
         "//software/geom",
         "//software/primitive",
+        "//software/proto/message_translation:proto_creator_primitive_visitor",
     ],
 )
