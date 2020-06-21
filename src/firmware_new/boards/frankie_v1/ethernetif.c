@@ -298,7 +298,7 @@ static void low_level_init(struct netif *netif)
     heth.Init.RxBuffLen      = 1524;
 
     /* USER CODE BEGIN MACADDRESS */
-
+    // TODO configure MAC address based on ROBOT ID
     /* USER CODE END MACADDRESS */
 
     hal_eth_init_status = HAL_ETH_Init(&heth);
