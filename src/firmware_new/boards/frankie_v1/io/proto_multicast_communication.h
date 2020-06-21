@@ -9,10 +9,9 @@ typedef struct ProtoMulticastCommunicationProfile ProtoMulticastCommunicationPro
  */
 typedef enum
 {
-    NETIF_CONFIGURED        = 1 << 0,  // network interface has been configured
-    UPDATED_INTERNAL_PROTO  = 1 << 1,  // protobuf struct has been updated
-    RECEIVED_EXTERNAL_PROTO = 1 << 2,  // new protobuf has been received
-    RECEIVE_TIMEOUT         = 1 << 3,  // blocking takes longer than NETWORK_TIMEOUT_MS
+    PROTO_UPDATED   = 1 << 0,  // protobuf struct has been updated
+    RECEIVED_PROTO  = 1 << 1,  // new protobuf has been received
+    RECEIVE_TIMEOUT = 1 << 2,  // blocking takes longer than NETWORK_TIMEOUT_MS
 } ProtoMulticastCommunicationEventFlags_t;
 
 /***
@@ -21,7 +20,7 @@ typedef enum
  *                    Sender Task                             Listener Task
  *         +-------------------------------+         +------------------------------+
  *         |                               |         |                              |
- *         |  wait for LWIP_NETIF_UP       |         |  wait for LWIP_NETIF_UP      |
+ *         |  wait for NETIF_CONFIGURED    |         |  wait for NETIF_CONFIGURED   |
  *         |                               |         |                              |
  *         |  join multicast group         |         |  join multicast group        |
  *         |                               |         |                              |
@@ -33,7 +32,7 @@ typedef enum
  *     |   |                               |     |   |                              |
  *     |   |  release lock                 |     |   |  release lock                |
  *     |   |                               |     |   |                              |
- *     +----+ send buffer to group         |     +----+ notify PROTO_RECEIVED event |
+ *     +----+ send buffer to group         |     +----+ notify RECEIVED_PROTO event |
  *         |                               |         |                              |
  *         +-------------------------------+         +------------------------------+
  *

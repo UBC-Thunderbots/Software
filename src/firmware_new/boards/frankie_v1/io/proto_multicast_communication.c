@@ -17,9 +17,13 @@
 #include "pb_encode.h"
 
 // internal event to signal network interface configured
-static uint32_t NETIF_CONFIGURED_FLAG = 1 << 0;
-static uint32_t NETWORK_TIMEOUT       = 1000;
 static osEventFlagsId_t networking_event;
+
+// flag mask for network interface cofigured event
+static uint32_t NETIF_CONFIGURED_FLAG = 1 << 0;
+
+// the timeout to recv a network packet
+static uint32_t NETWORK_TIMEOUT_MS = 1000;
 
 /**
  * ProtoMulticastCommunicationProfile_t contains the information required
@@ -106,7 +110,7 @@ void io_proto_multicast_sender_Task(void* arg)
 
         // block until protobuf has been updated
         io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
-                                                                  UPDATED_INTERNAL_PROTO);
+                                                                  PROTO_UPDATED);
 
         // serialize proto into buffer
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
@@ -164,17 +168,17 @@ void io_proto_multicast_listener_Task(void* arg)
                 pb_istream_t in_stream = pb_istream_from_buffer(
                     (uint8_t*)rx_buf->p->payload, rx_buf->p->tot_len);
 
+                // deserialize into buffer
                 io_proto_multicast_communication_profile_acquireLock(comm_profile);
-
                 protobuf_err = pb_decode(&in_stream, comm_profile->message_fields,
                                          comm_profile->protobuf_struct);
-
                 io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
+                // nanopb err logic is inverted, false = error
                 if (protobuf_err)
                 {
-                    io_proto_multicast_communication_profile_notifyEvents(
-                        comm_profile, RECEIVED_EXTERNAL_PROTO);
+                    io_proto_multicast_communication_profile_notifyEvents(comm_profile,
+                                                                          RECEIVED_PROTO);
                 }
                 break;
             }
