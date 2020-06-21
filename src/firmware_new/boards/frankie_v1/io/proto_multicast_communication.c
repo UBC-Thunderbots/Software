@@ -20,6 +20,7 @@
 static osEventFlagsId_t networking_event;
 
 // flag mask for network interface configured event
+// this flag is set on the networking_event to indicate "link up"
 static uint32_t NETIF_CONFIGURED = 1 << 0;
 
 // the timeout to recv a network packet
