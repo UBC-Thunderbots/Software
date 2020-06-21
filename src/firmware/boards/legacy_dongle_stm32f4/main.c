@@ -13,10 +13,12 @@
 #include <registers/systick.h>
 #include <rtc.h>
 #include <sleep.h>
+#include <cdcacm.h>
 #include <stack.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <unused.h>
 #include <usb.h>
 
@@ -285,7 +287,9 @@ static void main_task(void *UNUSED(param))
     normal_init();
     promiscuous_init();
 
-    // Fill in the device serial number.
+vTaskDelay(100U / 1000U);
+
+// Fill in the device serial number.
     {
         char temp[24U];
         formathex32(&temp[0U], U_ID.H);
@@ -297,9 +301,13 @@ static void main_task(void *UNUSED(param))
         }
     }
 
-    // Initialize USB.
+    cdcacm_init(2U, 1U);
+
+// Initialize USB.
     udev_init(&USB_INFO);
     udev_attach();
+
+    iprintf("Dongle is up! And printing over serial is working! :) \r\n");
 
     // Done setting up.
     vTaskSuspend(0);

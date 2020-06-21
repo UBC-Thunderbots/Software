@@ -869,8 +869,12 @@ static void usbrx_task(void *UNUSED(param))
 {
     for (;;)
     {
+
+        iprintf("HELLO WORLD\n");
+        printf("HELLO WORLD\n");
         // Wait to be instructed to start doing work.
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
 
         // Run.
         bool shutting_down = false;
