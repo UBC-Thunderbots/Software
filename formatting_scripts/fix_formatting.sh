@@ -5,7 +5,7 @@
 #
 
 # The version of the clang executable to use
-export CLANG_VERSION=7.0
+export CLANG_VERSION=10.0
 # The version of black to use
 export BLACK_VERSION=19-10b0
 
