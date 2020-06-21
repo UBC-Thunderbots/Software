@@ -12,7 +12,7 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({robot});
+    world.updateFriendlyTeamState(Team({robot}));
     TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
                                    Timestamp::fromSeconds(0));
     world.updateBallStateWithTimestamp(ballState);
@@ -42,7 +42,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({robot});
+    world.updateFriendlyTeamState(Team({robot}));
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(4.5, 0.25)},
                                                Timestamp::fromSeconds(0));
     TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
@@ -115,7 +115,7 @@ TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({robot});
+    world.updateFriendlyTeamState(Team({robot}));
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(1, 0)},
                                                Timestamp::fromSeconds(0));
     TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
@@ -147,7 +147,7 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({robot});
+    world.updateFriendlyTeamState(Team({robot}));
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(0.25, 0)},
                                                Timestamp::fromSeconds(0));
     TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
@@ -179,7 +179,7 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({robot});
+    world.updateFriendlyTeamState(Team({robot}));
 
     TimestampedBallState ballState(Point(0.5, 0), Vector(0, 0),
                                    Timestamp::fromSeconds(0));
@@ -199,7 +199,7 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({robot});
+    world.updateFriendlyTeamState(Team({robot}));
 
     TimestampedBallState ballState(Point(3, -2.5), Vector(0, 0),
                                    Timestamp::fromSeconds(0));

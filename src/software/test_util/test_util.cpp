@@ -2,25 +2,9 @@
 
 namespace TestUtil
 {
-    Field createSSLDivBField()
-    {
-        // Using the dimensions of a standard Division B SSL field
-        // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_field_setup
-        Field field = Field(9.0, 6.0, 1.0, 2.0, 0.18, 1.0, 0.3, 0.5);
-        return field;
-    }
-
-    Field createSSLDivAField()
-    {
-        // Using the dimensions of a standard Division A SSL field
-        // https://robocup-ssl.github.io/ssl-rules/sslrules.html#_field_setup
-        Field field = Field(12.0, 9.0, 1.8, 3.6, 0.18, 1.8, 0.3, 0.5);
-        return field;
-    }
-
     World createBlankTestingWorld()
     {
-        Field field        = createSSLDivBField();
+        Field field        = Field::createSSLDivisionBField();
         Team friendly_team = Team(Duration::fromMilliseconds(1000));
         Team enemy_team    = Team(Duration::fromMilliseconds(1000));
         Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
@@ -55,7 +39,6 @@ namespace TestUtil
     {
         Team new_friendly_team =
             setRobotPositionsHelper(world.friendlyTeam(), robot_positions, timestamp);
-        world.mutableFriendlyTeam().clearAllRobots();
         world.updateFriendlyTeamState(new_friendly_team);
 
         return world;
@@ -66,7 +49,6 @@ namespace TestUtil
     {
         Team new_enemy_team =
             setRobotPositionsHelper(world.enemyTeam(), robot_positions, timestamp);
-        world.mutableEnemyTeam().clearAllRobots();
         world.updateEnemyTeamState(new_enemy_team);
 
         return world;

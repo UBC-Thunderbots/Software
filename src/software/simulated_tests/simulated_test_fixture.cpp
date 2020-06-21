@@ -6,7 +6,7 @@
 #include "software/time/duration.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
-    : simulator(std::make_unique<Simulator>(::TestUtil::createSSLDivBField())),
+    : simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField())),
       ai(Util::DynamicParameters->getAIConfig(),
          Util::DynamicParameters->getAIControlConfig()),
       run_simulation_in_realtime(false)
@@ -25,7 +25,7 @@ void SimulatedTestFixture::SetUp()
     // every time. Because the simulator is created initially in the constructor's
     // initialization list, and before every test in this SetUp function, we can
     // guarantee the pointer will never be null / empty
-    simulator     = std::make_unique<Simulator>(::TestUtil::createSSLDivBField());
+    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
     ai            = AI(Util::DynamicParameters->getAIConfig(),
             Util::DynamicParameters->getAIControlConfig());
     sensor_fusion = SensorFusion();

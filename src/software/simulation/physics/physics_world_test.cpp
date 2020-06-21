@@ -17,9 +17,9 @@ MATCHER(RobotStateWithIdEq, "Robot State with Id Equal")
 
 TEST(PhysicsWorldTest, default_construct_physics_world)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
-    EXPECT_EQ(::TestUtil::createSSLDivBField(), physics_world.getField());
+    EXPECT_EQ(Field::createSSLDivisionBField(), physics_world.getField());
     EXPECT_FALSE(physics_world.getBallState().has_value());
     EXPECT_TRUE(physics_world.getYellowRobotStates().empty());
     EXPECT_TRUE(physics_world.getBlueRobotStates().empty());
@@ -28,7 +28,7 @@ TEST(PhysicsWorldTest, default_construct_physics_world)
 
 TEST(PhysicsWorldTest, test_set_ball_state_when_no_ball_exists)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     BallState ball_state(Point(1, -2), Vector(0, 0.5));
     physics_world.setBallState(ball_state);
@@ -39,7 +39,7 @@ TEST(PhysicsWorldTest, test_set_ball_state_when_no_ball_exists)
 
 TEST(PhysicsWorldTest, test_set_ball_state_when_ball_already_exists)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     BallState ball_state1(Point(1, -2), Vector(0, 0.5));
     physics_world.setBallState(ball_state1);
@@ -53,7 +53,7 @@ TEST(PhysicsWorldTest, test_set_ball_state_when_ball_already_exists)
 
 TEST(PhysicsWorldTest, test_remove_existing_ball)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     BallState ball_state(Point(1, -2), Vector(0, 0.5));
     physics_world.setBallState(ball_state);
@@ -67,7 +67,7 @@ TEST(PhysicsWorldTest, test_remove_existing_ball)
 
 TEST(PhysicsWorldTest, test_remove_nonexistant_ball)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     physics_world.removeBall();
     EXPECT_FALSE(physics_world.getBallState());
@@ -75,7 +75,7 @@ TEST(PhysicsWorldTest, test_remove_nonexistant_ball)
 
 TEST(PhysicsWorldTest, test_add_zero_yellow_robots)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     physics_world.addYellowRobots({});
 
@@ -84,7 +84,7 @@ TEST(PhysicsWorldTest, test_add_zero_yellow_robots)
 
 TEST(PhysicsWorldTest, test_add_single_yellow_robot_with_valid_id)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::quarter(),
                            AngularVelocity::half());
@@ -99,7 +99,7 @@ TEST(PhysicsWorldTest, test_add_single_yellow_robot_with_valid_id)
 
 TEST(PhysicsWorldTest, test_add_multiple_yellow_robot_with_valid_ids)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -122,7 +122,7 @@ TEST(PhysicsWorldTest, test_add_multiple_yellow_robot_with_valid_ids)
 
 TEST(PhysicsWorldTest, test_add_yellow_robots_with_duplicate_ids)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -138,7 +138,7 @@ TEST(PhysicsWorldTest, test_add_yellow_robots_with_duplicate_ids)
 
 TEST(PhysicsWorldTest, test_add_yellow_robots_to_physics_world_with_existing_ids)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -159,7 +159,7 @@ TEST(PhysicsWorldTest, test_add_yellow_robots_to_physics_world_with_existing_ids
 
 TEST(PhysicsWorldTest, test_add_zero_blue_robots)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     physics_world.addBlueRobots({});
 
@@ -168,7 +168,7 @@ TEST(PhysicsWorldTest, test_add_zero_blue_robots)
 
 TEST(PhysicsWorldTest, test_add_single_blue_robot_with_valid_id)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::quarter(),
                            AngularVelocity::half());
@@ -183,7 +183,7 @@ TEST(PhysicsWorldTest, test_add_single_blue_robot_with_valid_id)
 
 TEST(PhysicsWorldTest, test_add_multiple_blue_robot_with_valid_ids)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -206,7 +206,7 @@ TEST(PhysicsWorldTest, test_add_multiple_blue_robot_with_valid_ids)
 
 TEST(PhysicsWorldTest, test_add_blue_robots_with_duplicate_ids)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -222,7 +222,7 @@ TEST(PhysicsWorldTest, test_add_blue_robots_with_duplicate_ids)
 
 TEST(PhysicsWorldTest, test_add_blue_robots_to_physics_world_with_existing_ids)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -243,14 +243,14 @@ TEST(PhysicsWorldTest, test_add_blue_robots_to_physics_world_with_existing_ids)
 
 TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_no_existing_robots)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     EXPECT_EQ(0, physics_world.getAvailableYellowRobotId());
 }
 
 TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_existing_robots)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -267,14 +267,14 @@ TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_existing_robots)
 
 TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_no_existing_robots)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     EXPECT_EQ(0, physics_world.getAvailableBlueRobotId());
 }
 
 TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_existing_robots)
 {
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -305,7 +305,7 @@ TEST(PhysicsSimulatorTest, test_world_does_not_change_if_time_step_is_zero)
         RobotStateWithId{.id = 0, .robot_state = blue_robot_state},
     };
 
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     physics_world.setBallState(ball_state);
     physics_world.addYellowRobots(yellow_robot_states);
@@ -328,7 +328,7 @@ TEST(PhysicsSimulatorTest, test_world_does_not_change_if_time_step_is_zero)
         ::testing::UnorderedPointwise(RobotStateWithIdEq(), updated_yellow_robot_states));
     EXPECT_THAT(blue_robot_states, ::testing::UnorderedPointwise(
                                        RobotStateWithIdEq(), updated_blue_robot_states));
-    EXPECT_EQ(physics_world.getField(), ::TestUtil::createSSLDivBField());
+    EXPECT_EQ(physics_world.getField(), Field::createSSLDivisionBField());
 }
 
 TEST(PhysicsSimulatorTest, test_single_small_time_step)
@@ -347,7 +347,7 @@ TEST(PhysicsSimulatorTest, test_single_small_time_step)
         RobotStateWithId{.id = 0, .robot_state = blue_robot_state},
     };
 
-    PhysicsWorld physics_world(::TestUtil::createSSLDivBField());
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     physics_world.setBallState(ball_state);
     physics_world.addYellowRobots(yellow_robot_states);
@@ -386,5 +386,5 @@ TEST(PhysicsSimulatorTest, test_single_small_time_step)
     EXPECT_THAT(expected_blue_robot_states,
                 ::testing::Not(::testing::UnorderedPointwise(RobotStateWithIdEq(),
                                                              updated_blue_robot_states)));
-    EXPECT_EQ(physics_world.getField(), ::TestUtil::createSSLDivBField());
+    EXPECT_EQ(physics_world.getField(), Field::createSSLDivisionBField());
 }

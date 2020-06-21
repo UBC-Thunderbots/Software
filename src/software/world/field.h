@@ -1,10 +1,8 @@
 #pragma once
 
-#include "boost/circular_buffer.hpp"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"
-#include "software/time/timestamp.h"
 
 typedef enum
 {
@@ -35,6 +33,20 @@ typedef enum
 class Field
 {
    public:
+    /**
+     * Creates a field with the standard SSL Division B dimensions
+     *
+     * @return a field with the standard SSL Division B dimensions
+     */
+    static Field createSSLDivisionBField();
+
+    /**
+     * Creates a field with the standard SSL Division A dimensions
+     *
+     * @return a field with the standard SSL Division A dimensions
+     */
+    static Field createSSLDivisionAField();
+
     Field() = delete;
 
     /**
