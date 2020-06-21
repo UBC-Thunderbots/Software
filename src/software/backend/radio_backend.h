@@ -11,10 +11,9 @@ class RadioBackend : public Backend
 
     RadioBackend();
 
+    void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
    private:
     static const int DEFAULT_RADIO_CONFIG = 0;
-
-    void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
     /**
      * This is registered as an async callback function so that it is called
