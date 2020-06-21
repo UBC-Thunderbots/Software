@@ -333,7 +333,7 @@ TEST(SortEnemyThreatsTest, multiple_robots_have_possession_simultaneously)
         robot2, true,  Angle::fromDegrees(60), Angle::fromDegrees(30), Point(-4, 0),
         1,      robot1};
 
-    // Both robots have posession but robot2 has a better shot on the friendly goal, so
+    // Both robots have possession but robot2 has a better shot on the friendly goal, so
     // it should be more threatening
     std::vector<EnemyThreat> expected_result = {threat2, threat1};
 

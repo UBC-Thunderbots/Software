@@ -87,7 +87,7 @@ class FreeKickPlay : public Play
         PassWithRating &best_pass_and_score_so_far, const World &world);
 
     /**
-     * Update the tactic that aligns the robot to the ball in preperation to pass
+     * Update the tactic that aligns the robot to the ball in preparation to pass
      *
      * @param align_to_ball_tactic
      * @param world The current state of the world

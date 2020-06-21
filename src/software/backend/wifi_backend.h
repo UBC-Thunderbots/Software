@@ -42,7 +42,7 @@ class WifiBackend : public Backend
     /**
      * Joins the specified multicast group on the vision_output, primitive_output
      * and robot_msg_input. Multicast Channel and Multicast Group are used
-     * interchangably.
+     * interchangeably.
      *
      * NOTE: This will terminate the existing connection on the previous channel
      * if it exists.

@@ -31,7 +31,7 @@ class CornerKickPlay : public Play
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 
     /**
-     * Update the tactic that aligns the robot to the ball in preperation to pass
+     * Update the tactic that aligns the robot to the ball in preparation to pass
      *
      * @param align_to_ball_tactic
      * @param world The current state of the world

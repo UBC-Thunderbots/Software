@@ -105,7 +105,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
                     break;
                 default:
                     LOG(WARNING)
-                        << "An unkown camera id was detected, disabled by default "
+                        << "An unknown camera id was detected, disabled by default "
                         << "id: " << detection.camera_id() << std::endl;
                     camera_disabled = true;
                     break;
