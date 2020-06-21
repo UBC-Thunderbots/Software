@@ -64,7 +64,14 @@ function run_black_formatting () {
     fi
 }
 
+function run_code_spell(){
+    echo "Fixing spellings..."
+    cd $CURR_DIR/../src/software && codespell -w
+    cd $CURR_DIR/../src/firmware_new && codespell -w
+}
+
 # Run formatting
+run_code_spell
 run_clang_format
 run_bazel_formatting
 run_black_formatting
