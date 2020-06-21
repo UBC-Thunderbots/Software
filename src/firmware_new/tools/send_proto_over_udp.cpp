@@ -11,7 +11,7 @@
 #include "software/logger/logger.h"
 #include "software/networking/proto_multicast_listener.h"
 #include "software/networking/proto_multicast_sender.h"
-#include "software/proto/message_translation/protobuf_message_translation.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 
 
 using boost::asio::ip::udp;
@@ -74,9 +74,9 @@ int main(int argc, char* argv[])
     while (1)
     {
         // primitive and vision sender
-        test_primitive_msg.set_allocated_time_sent(getCurrentTimestampMsg().release());
+        test_primitive_msg.set_allocated_time_sent(createCurrentTimestampMsg().release());
         primitive_sender->sendProto(test_primitive_msg);
-        test_vision_msg.set_allocated_time_sent(getCurrentTimestampMsg().release());
+        test_vision_msg.set_allocated_time_sent(createCurrentTimestampMsg().release());
         vision_sender->sendProto(test_vision_msg);
 
         // 40 hz test

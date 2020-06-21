@@ -27,7 +27,7 @@ cc_binary(
         "//software/logger",
         "//software/networking:proto_multicast_listener",
         "//software/networking:proto_multicast_sender",
-        "//software/proto/message_translation:protobuf_message_translation",
+        "//software/proto/message_translation:tbots_protobuf",
         "@boost//:asio",
         "@com_google_protobuf//:protobuf",
     ],
