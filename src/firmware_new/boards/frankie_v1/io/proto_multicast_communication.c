@@ -177,11 +177,13 @@ void io_proto_multicast_listener_task(void* communication_profile)
 
                 // deserialize into buffer
                 io_proto_multicast_communication_profile_acquireLock(listener_profile);
-                no_protobuf_err = pb_decode(&in_stream, listener_profile->message_fields,
-                                            listener_profile->protobuf_struct);
-                io_proto_multicast_communication_profile_releaseLock(listener_profile);
 
                 // nanopb err logic is inverted, false = error
+                no_protobuf_err = pb_decode(&in_stream, listener_profile->message_fields,
+                                            listener_profile->protobuf_struct);
+
+                io_proto_multicast_communication_profile_releaseLock(listener_profile);
+
                 if (no_protobuf_err)
                 {
                     io_proto_multicast_communication_profile_notifyEvents(

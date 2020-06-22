@@ -79,6 +79,7 @@ void io_proto_multicast_communication_init(void);
  * @param protobuf_struct [in/out] The serialized proto in the incoming network packet,
  *        will get deserialized into this struct in the listener task. The sender task
  *        will serialize the protobuf_struct and send it over the network.
+ *
  * @return ProtoMulticastCommunicationProfile_t the profile to provide to the task
  *
  */
@@ -133,6 +134,9 @@ void io_proto_multicast_communication_profile_notifyEvents(
  * @param communication_profile The profile that the notification will occur on
  * @param events The events to block on, bitwise or of
  * ProtoMulticastCommunicationEventFlags_t
+ *
+ * @return The event flags that were notified causing this function to return.
+ *         bitwise OR of ProtoMulticastCommunicationEventFlags
  */
 uint32_t io_proto_multicast_communication_profile_blockUntilEvents(
     ProtoMulticastCommunicationProfile_t* communication_profile, uint32_t events);
