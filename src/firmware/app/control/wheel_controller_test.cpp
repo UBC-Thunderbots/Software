@@ -42,7 +42,7 @@ TEST(WheelControllerTest, test_create_wheel_controller)
     for (unsigned int i = 0; i < num_sample_coeffs; i++)
     {
         const float buffer_value = circular_buffer_getAtIndex(
-            wheel_controller->previous_output_samples_buffer, i);
+            wheel_controller->previous_output_sample_buffer, i);
         EXPECT_EQ(buffer_value, 0);
     }
 
@@ -69,11 +69,11 @@ TEST(WheelControllerTest, test_push_wheel_controller)
 
     // Check the output sample buffer push
     EXPECT_EQ(
-        circular_buffer_getAtIndex(wheel_controller->previous_output_samples_buffer, 0),
+        circular_buffer_getAtIndex(wheel_controller->previous_output_sample_buffer, 0),
         0);
     app_wheel_controller_pushNewSampleOutput(wheel_controller, 100);
     EXPECT_EQ(
-        circular_buffer_getAtIndex(wheel_controller->previous_output_samples_buffer, 0),
+        circular_buffer_getAtIndex(wheel_controller->previous_output_sample_buffer, 0),
         100);
 
     app_wheel_controller_destroy(wheel_controller);

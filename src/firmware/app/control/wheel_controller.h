@@ -6,11 +6,11 @@
 typedef struct WheelController
 {
     CircularBuffer_t* previous_command_buffer;
-    CircularBuffer_t* previous_output_samples_buffer;
+    CircularBuffer_t* previous_output_sample_buffer;
     float* command_coefficients;
-    float* sampled_output_coefficients;
+    float* output_sample_coefficients;
     unsigned int num_command_coefficients;
-    unsigned int num_samples_coefficients;
+    unsigned int num_output_sample_coefficients;
 } WheelController_t;
 
 /**
@@ -39,7 +39,7 @@ typedef struct WheelController
  * @param num_command_coefficients [in] The number of elements in the command_coefficients
  array
  *
- * @param sampled_output_coefficients [in] The coefficients for the controller sampled
+ * @param output_sample_coefficients [in] The coefficients for the controller sampled
  output. These are the coefficients relating to how the sampled output(wheel state)
  effects the controller output.
 
@@ -48,10 +48,9 @@ typedef struct WheelController
  *
  * @return Pointer to the newly created WheelController_t
  */
-WheelController_t* app_wheel_controller_create(float* command_coefficients,
-                                               unsigned int num_command_coefficients,
-                                               float* sampled_output_coefficients,
-                                               unsigned int num_sample_coefficients);
+WheelController_t* app_wheel_controller_create(
+    float* command_coefficients, unsigned int num_command_coefficients,
+    float* output_sample_coefficients, unsigned int num_output_sample_coefficients);
 /**
  * Function pushes a new command value to the specified WheelController.
  *
