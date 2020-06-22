@@ -83,10 +83,10 @@ ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_c
     return profile;
 }
 
-void io_proto_multicast_sender_task(void* arg)
+void io_proto_multicast_sender_task(void* communication_profile)
 {
-    ProtoMulticastCommunicationProfile_t* comm_profile =
-        (ProtoMulticastCommunicationProfile_t*)arg;
+    ProtoMulticastCommunicationProfile_t* sender_profile =
+        (ProtoMulticastCommunicationProfile_t*)communication_profile;
 
     osEventFlagsWait(networking_event, NETIF_CONFIGURED, osFlagsWaitAny, osWaitForever);
 
@@ -97,12 +97,12 @@ void io_proto_multicast_sender_task(void* arg)
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
     netconn_set_ipv6only(conn, true);
 
-    netconn_bind(conn, IP6_ADDR_ANY, comm_profile->port);
-    netconn_join_leave_group(conn, &comm_profile->multicast_address, IP6_ADDR_ANY,
+    netconn_bind(conn, IP6_ADDR_ANY, sender_profile->port);
+    netconn_join_leave_group(conn, &sender_profile->multicast_address, IP6_ADDR_ANY,
                              NETCONN_JOIN);
 
     // this buffer is used to hold serialized proto
-    uint8_t buffer[comm_profile->message_max_size];
+    uint8_t buffer[sender_profile->message_max_size];
 
     // network buffer
     struct netbuf* tx_buf = netbuf_new();
@@ -112,22 +112,23 @@ void io_proto_multicast_sender_task(void* arg)
         pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
 
         // block until this task receives a signal that the protobuf has been updated
-        io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
+        io_proto_multicast_communication_profile_blockUntilEvents(sender_profile,
                                                                   PROTO_UPDATED);
 
         // serialize proto into buffer
         // we ingore the error returned by pb_encode, it is up to the receiver to handle
         // malformed proto, so we send the buffer regardless
-        io_proto_multicast_communication_profile_acquireLock(comm_profile);
-        pb_encode(&stream, comm_profile->message_fields, comm_profile->protobuf_struct);
-        io_proto_multicast_communication_profile_releaseLock(comm_profile);
+        io_proto_multicast_communication_profile_acquireLock(sender_profile);
+        pb_encode(&stream, sender_profile->message_fields,
+                  sender_profile->protobuf_struct);
+        io_proto_multicast_communication_profile_releaseLock(sender_profile);
 
         netbuf_alloc(tx_buf, stream.bytes_written);
 
         // package payload and send over udp
         tx_buf->p->payload = buffer;
-        netconn_sendto(conn, tx_buf, &comm_profile->multicast_address,
-                       comm_profile->port);
+        netconn_sendto(conn, tx_buf, &sender_profile->multicast_address,
+                       sender_profile->port);
     }
 
     // we should never get here
@@ -135,21 +136,21 @@ void io_proto_multicast_sender_task(void* arg)
     netconn_delete(conn);
 }
 
-void io_proto_multicast_listener_task(void* arg)
+void io_proto_multicast_listener_task(void* communication_profile)
 {
-    ProtoMulticastCommunicationProfile_t* comm_profile =
-        (ProtoMulticastCommunicationProfile_t*)arg;
+    ProtoMulticastCommunicationProfile_t* listener_profile =
+        (ProtoMulticastCommunicationProfile_t*)communication_profile;
 
     osEventFlagsWait(networking_event, NETIF_CONFIGURED, osFlagsWaitAny, osWaitForever);
 
-    // Bind the socket to the multicast address and port we then use that comm_profile
-    // to join the specified multicast group.
+    // Bind the socket to the multicast address and port we then use that
+    // communication profile to join the specified multicast group.
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
     netconn_set_ipv6only(conn, true);
     netconn_set_recvtimeout(conn, NETWORK_TIMEOUT_MS);
 
-    netconn_bind(conn, &comm_profile->multicast_address, comm_profile->port);
-    netconn_join_leave_group(conn, &comm_profile->multicast_address, IP6_ADDR_ANY,
+    netconn_bind(conn, &listener_profile->multicast_address, listener_profile->port);
+    netconn_join_leave_group(conn, &listener_profile->multicast_address, IP6_ADDR_ANY,
                              NETCONN_JOIN);
 
     struct netbuf* rx_buf = NULL;
@@ -164,7 +165,7 @@ void io_proto_multicast_listener_task(void* arg)
         {
             case ERR_TIMEOUT:
             {
-                io_proto_multicast_communication_profile_notifyEvents(comm_profile,
+                io_proto_multicast_communication_profile_notifyEvents(listener_profile,
                                                                       RECEIVE_TIMEOUT);
                 break;
             }
@@ -175,16 +176,16 @@ void io_proto_multicast_listener_task(void* arg)
                     (uint8_t*)rx_buf->p->payload, rx_buf->p->tot_len);
 
                 // deserialize into buffer
-                io_proto_multicast_communication_profile_acquireLock(comm_profile);
-                no_protobuf_err = pb_decode(&in_stream, comm_profile->message_fields,
-                                            comm_profile->protobuf_struct);
-                io_proto_multicast_communication_profile_releaseLock(comm_profile);
+                io_proto_multicast_communication_profile_acquireLock(listener_profile);
+                no_protobuf_err = pb_decode(&in_stream, listener_profile->message_fields,
+                                            listener_profile->protobuf_struct);
+                io_proto_multicast_communication_profile_releaseLock(listener_profile);
 
                 // nanopb err logic is inverted, false = error
                 if (no_protobuf_err)
                 {
-                    io_proto_multicast_communication_profile_notifyEvents(comm_profile,
-                                                                          RECEIVED_PROTO);
+                    io_proto_multicast_communication_profile_notifyEvents(
+                        listener_profile, RECEIVED_PROTO);
                 }
                 break;
             }

@@ -36,19 +36,21 @@ typedef enum
  *         |                               |         |                              |
  *         +-------------------------------+         +------------------------------+
  *
- * @param arg The pointer to the allocated communication profile to use for the Task
+ * @param communication_profile The pointer to the allocated communication profile
+ * to use for the Task
+ *
  * NOTE: These functions must run as a new Task
  */
-void io_proto_multicast_sender_task(void* arg);
-void io_proto_multicast_listener_task(void* arg);
+void io_proto_multicast_sender_task(void* communication_profile);
+void io_proto_multicast_listener_task(void* communication_profile);
 
 /**
  * LWIP automatically places MX_LWIP_Init() in a default task. That function
- * call internally creates another tcpip task, and the default task just loops
+ * call internally creates another TCP/IP task, and the default task just loops
  * forever.
  *
  * Cube forces us to generate this function, in main.c where we mark it as __weak and
- * define the implementation in this library (proto_mutlicast_communication). When the
+ * define the implementation in this library (proto_multicast_communication). When the
  * proto communication library is linked w/ the main frankie_v1 binary, the __weak
  * reference is resolved to the "stronger" reference to the function defined below.
  *
@@ -60,7 +62,7 @@ void io_proto_multicast_listener_task(void* arg);
 void io_proto_multicast_startNetworkingTask(void* arg);
 
 /**
- * Initiallizes the proto_multicast_communication library
+ * Initializes the proto_multicast_communication library
  */
 void io_proto_multicast_communication_init(void);
 
@@ -101,7 +103,7 @@ void io_proto_multicast_communication_profile_acquireLock(
 /**
  * Release the profile lock.
  *
- * @pre lock must be acquired through the communication_profile_acquireLock call
+ * @pre lock must be acquired through the call to "communication_profile_acquireLock"
  *
  * @param communication_profile The profile to release the mutex for
  */
