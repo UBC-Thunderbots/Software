@@ -422,6 +422,9 @@ std::vector<std::string> Annunciator::handle_dongle_messages(uint8_t status)
     {
         dongle_messages.push_back(MRF::RECEIVE_QUEUE_FULL_MESSAGE);
     }
+    if (status & 64U){
+       dongle_messages.push_back(MRF::PACKET_ABOVE_MAX_SIZE);
+    }
 
     return dongle_messages;
 }

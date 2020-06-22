@@ -250,6 +250,11 @@ static TaskHandle_t rdrx_task_handle;
 static TickType_t second_dongle_last;
 
 /**
+ * Whether or not we have attempted to send a packet larger then the maximum packet size
+ */
+static bool attempted_to_send_packet_larger_then_max_packet_size = false;
+
+/**
  * \brief Handles rising edge interrupts on the MRF interrupt line.
  */
 static void mrf_int_isr(void)
@@ -460,8 +465,17 @@ static void send_drive_packet(const void *packet, const size_t packet_size)
     // TODO: need to add some sort of checksum here
 
     // Record the frame length, now that the frame is finished.
-    mrf_write_long(frame_length_address, address - header_start_address);
+    const size_t frame_length = address - header_start_address;
+    mrf_write_long(frame_length_address, frame_length);
 
+    // TODO: need to test this
+    // Do a final check that we're not going to exceed the max packet size, set an
+    // error if we are
+    if (frame_length > MAX_DRIVE_PACKET_SIZE)
+    {
+        __atomic_store_n(&attempted_to_send_packet_larger_then_max_packet_size, true,
+                         __ATOMIC_RELAXED);
+    }
     // TODO: need to TRIPLE check that we're not sending packets larger then 64 bytes
     //       here, and indicate that somehow to the user
 
@@ -951,6 +965,12 @@ static void dongle_status_task(void *UNUSED(param))
                 (second_dongle ? 0x08U : 0x00U);
             state |= ((transmit_queue_full ? 0x10U : 0x00U) |
                       (receive_queue_full ? 0x20U : 0x00U));
+            state |=
+                __atomic_exchange_n(&attempted_to_send_packet_larger_then_max_packet_size,
+                                    false, __ATOMIC_RELAXED)
+                    ? 0x40U
+                    : 0x00U;
+
             bool ok;
             while (!(ok = uep_write(0x83U, &state, sizeof(state), false)) &&
                    errno == EPIPE)
