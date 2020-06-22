@@ -7,7 +7,9 @@ void drawTeam(QGraphicsScene* scene, const Team& team, QColor color)
 {
     for (const Robot& robot : team.getAllRobots())
     {
-        drawRobot(scene, robot, color);
+        auto robot_state = RobotStateWithId{
+            .id = robot.id(), .robot_state = robot.currentState().robotState()};
+        drawRobot(scene, robot_state, color);
     }
 }
 

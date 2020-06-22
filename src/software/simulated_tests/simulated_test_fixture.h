@@ -154,7 +154,7 @@ class SimulatedTestFixture : public ::testing::Test
 
     std::shared_ptr<VisualizerWrapper> visualizer;
     // If false, runs the simulation as fast as possible.
-    // If true, introduces artifical delay so that simulation
+    // If true, introduces artificial delay so that simulation
     // time passes at the same speed a real life time
     bool run_simulation_in_realtime;
 

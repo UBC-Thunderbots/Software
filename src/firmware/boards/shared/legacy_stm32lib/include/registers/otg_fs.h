@@ -171,7 +171,8 @@ typedef struct
 } OTG_FS_GRXSTSR_device_t;
 _Static_assert(sizeof(OTG_FS_GRXSTSR_device_t) == 4U,
                "OTG_FS_GRXSTSR_device_t is wrong size");
-typedef union {
+typedef union
+{
     OTG_FS_GRXSTSR_host_t host;
     OTG_FS_GRXSTSR_device_t device;
 } OTG_FS_GRXSTSR_t;
@@ -517,7 +518,8 @@ typedef struct
     OTG_FS_GRXSTSR_t GRXSTSR;
     OTG_FS_GRXSTSR_t GRXSTSP;
     OTG_FS_GRXFSIZ_t GRXFSIZ;
-    union {
+    union
+    {
         OTG_FS_HNPTXFSIZ_t HNPTXFSIZ;
         OTG_FS_DIEPTXF0_t DIEPTXF0;
     };

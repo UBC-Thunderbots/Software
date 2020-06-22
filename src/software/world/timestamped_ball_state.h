@@ -66,6 +66,6 @@ class TimestampedBallState
     bool operator!=(const TimestampedBallState &other) const;
 
    private:
-    Timestamp timestamp_;
     BallState ball_state_;
+    Timestamp timestamp_;
 };

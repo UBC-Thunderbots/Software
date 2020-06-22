@@ -36,7 +36,9 @@ cc_library(
         "//shared:constants",
         "//software/geom",
         "//software/gui:geometry_conversion",
-        "//software/world:ball",
+        "//software/math:math_functions",
+        "//software/sensor_fusion/filter:vision_detection",
+        "//software/world:ball_state",
         "//software/world:field",
         "@qt//:qt_widgets",
     ],
@@ -49,8 +51,6 @@ cc_library(
     deps = [
         ":colors",
         ":geom",
-        "//shared:constants",
-        "//software/gui:geometry_conversion",
         "//software/world:field",
         "@qt//:qt_widgets",
     ],
@@ -61,11 +61,13 @@ cc_library(
     srcs = ["robot.cpp"],
     hdrs = ["robot.h"],
     deps = [
+        ":colors",
         ":geom",
         "//shared:constants",
         "//software/geom",
         "//software/gui:geometry_conversion",
-        "//software/world:robot",
+        "//software/sensor_fusion/filter:vision_detection",
+        "//software/world:robot_state",
         "@qt//:qt_widgets",
     ],
 )
@@ -134,5 +136,21 @@ cc_library(
     hdrs = ["draw_functions.h"],
     deps = [
         "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "ssl_wrapper_packet",
+    srcs = ["ssl_wrapper_packet.cpp"],
+    hdrs = ["ssl_wrapper_packet.h"],
+    deps = [
+        ":ball",
+        ":colors",
+        ":draw_functions",
+        ":field",
+        ":robot",
+        "//software/proto:ssl_cc_proto",
+        "//software/proto/message_translation:ssl_detection",
+        "//software/proto/message_translation:ssl_geometry",
     ],
 )

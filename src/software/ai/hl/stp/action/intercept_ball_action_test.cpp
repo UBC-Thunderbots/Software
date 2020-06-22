@@ -8,7 +8,7 @@
 
 TEST(InterceptBallActionTest, test_robot_ahead_of_ball_moves_in_front_of_ball)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(Point(0, 0), Vector(1, 0), Timestamp::fromSeconds(0));
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -41,7 +41,7 @@ TEST(InterceptBallActionTest, test_robot_ahead_of_ball_moves_in_front_of_ball)
 
 TEST(InterceptBallActionTest, test_robot_moves_to_edge_of_field_if_ball_moving_too_fast)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(Point(0, 0), Vector(8, 0), Timestamp::fromSeconds(0));
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -74,7 +74,7 @@ TEST(InterceptBallActionTest, test_robot_moves_to_edge_of_field_if_ball_moving_t
 
 TEST(InterceptBallActionTest, test_robot_moves_to_the_ball_if_the_ball_is_moving_slowly)
 {
-    Field field = ::TestUtil::createSSLDivBField();
+    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(Point(0, 0), Vector(0.2, 0), Timestamp::fromSeconds(0));
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));

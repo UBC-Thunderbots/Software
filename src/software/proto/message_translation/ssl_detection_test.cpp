@@ -102,6 +102,7 @@ TEST(SSLDetectionTest, test_convert_ball_state_to_proto_and_back)
     BallDetection ball_detection = ball_detections.at(0);
     EXPECT_FLOAT_EQ(-1.2f, static_cast<float>(ball_detection.position.x()));
     EXPECT_FLOAT_EQ(-0.0f, static_cast<float>(ball_detection.position.y()));
+    EXPECT_FLOAT_EQ(0.2f, static_cast<float>(ball_detection.distance_from_ground));
 }
 
 TEST(SSLDetectionTest, test_convert_invalid_position_ball_state_to_proto_and_back)
@@ -109,7 +110,7 @@ TEST(SSLDetectionTest, test_convert_invalid_position_ball_state_to_proto_and_bac
     const uint32_t camera_id    = 0;
     const Timestamp t_capture   = Timestamp::fromSeconds(8.03);
     const uint32_t frame_number = 40391;
-    const BallState ball_state(Point(-1.2, 0), Vector(0.01, 3), 0.2);
+    const BallState ball_state(Point(-1.2, 0), Vector(0.01, 3), 0.3);
 
     auto detection_frame =
         createSSLDetectionFrame(camera_id, t_capture, frame_number, {ball_state}, {}, {});
@@ -137,6 +138,7 @@ TEST(SSLDetectionTest, test_convert_valid_position_ball_state_to_proto_and_back)
     BallDetection ball_detection = ball_detections.at(0);
     EXPECT_FLOAT_EQ(0.2f, static_cast<float>(ball_detection.position.x()));
     EXPECT_FLOAT_EQ(2.0f, static_cast<float>(ball_detection.position.y()));
+    EXPECT_FLOAT_EQ(0.2f, static_cast<float>(ball_detection.distance_from_ground));
 }
 
 TEST(SSLDetectionTest, test_convert_robot_states_to_proto_and_back)

@@ -18,7 +18,7 @@ unsigned int Intent::getPriority(void) const
 
 void Intent::setPriority(unsigned int new_priority)
 {
-    if (new_priority < 0 || new_priority > 100)
+    if (new_priority > 100)
     {
         LOG(WARNING) << "Intent set with out of range priority value: " << new_priority
                      << ". Clamping to range [0, 100]" << std::endl;

@@ -34,6 +34,7 @@ TEST(StopPlayTest, test_stop_play_returns_correct_tactics)
         {
             StopTactic *unused;
             unused = dynamic_cast<StopTactic *>(t.get());
+            UNUSED(unused);
         }
         catch (...)
         {

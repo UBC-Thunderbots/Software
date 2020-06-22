@@ -279,7 +279,8 @@ typedef struct
      */
     unsigned int interface;
 
-    union {
+    union
+    {
         struct
         {
             /**

@@ -16,7 +16,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
 
     EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
                              std::nullopt, 0,     std::nullopt};
-    Field field        = ::TestUtil::createSSLDivBField();
+    Field field        = Field::createSSLDivisionBField();
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -56,7 +56,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
                              std::nullopt,
                              1,
                              std::make_optional(enemy_robot_2)};
-    Field field        = ::TestUtil::createSSLDivBField();
+    Field field        = Field::createSSLDivisionBField();
     Team enemy_team    = Team({enemy_robot, enemy_robot_2}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -91,7 +91,7 @@ TEST(ShadowEnemyTacticTest,
 
     EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
                              std::nullopt, 0,     std::nullopt};
-    Field field        = ::TestUtil::createSSLDivBField();
+    Field field        = Field::createSSLDivisionBField();
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
@@ -128,7 +128,7 @@ TEST(
 
     EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
                              std::nullopt, 0,     std::nullopt};
-    Field field        = ::TestUtil::createSSLDivBField();
+    Field field        = Field::createSSLDivisionBField();
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(4, 3),

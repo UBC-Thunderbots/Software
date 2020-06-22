@@ -1,6 +1,8 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@dynamic_parameter_deps//:requirements.bzl", "requirement")
 
+package(default_visibility = ["//visibility:public"])
+
 py_binary(
     name = "generate_dynamic_parameters",
     srcs = [":generate_dynamic_parameters.py"],

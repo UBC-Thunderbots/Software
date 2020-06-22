@@ -113,7 +113,7 @@ class ReceiverTactic : public Tactic
      */
     std::optional<Shot> findFeasibleShot();
 
-    // The field the pass is occuring on
+    // The field the pass is occurring on
     Field field;
 
     // The pass this tactic is executing

@@ -186,12 +186,9 @@ TEST_F(TrajectoryPlannerTest, test_forward_continuity_max_speed_limited)
 
 TEST_F(TrajectoryPlannerTest, test_backwards_continuity)
 {
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
     const unsigned int num_segments        = 3;
     const float arc_segment_length         = 1.0;
     const float max_allowable_acceleration = 1.3;
-    const float max_allowable_speed        = 15;
 
     float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
@@ -209,12 +206,9 @@ TEST_F(TrajectoryPlannerTest, test_backwards_continuity)
 
 TEST_F(TrajectoryPlannerTest, test_backwards_continuity_to_initial_velocity)
 {
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
-
     const unsigned int num_segments        = 3;
     const float arc_segment_length         = 1.0;
     const float max_allowable_acceleration = 1.3;
-    const float max_allowable_speed        = 15;
 
     float velocity_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
 
@@ -804,8 +798,6 @@ TEST_F(TrajectoryPlannerTest, dynamics_dont_exceed_maximums_curved_path)
     // segments)
     shared_polynomial_getArcLengthParametrizationOrder3(
         path, path_parameters.t_start, path_parameters.t_end, arc_length_param);
-
-    float velocities[trajectory.path_parameters.num_segments];
 
     std::vector<double> velocity     = getSpeedsFromTrajectory(path_parameters);
     std::vector<double> acceleration = getAccelerationsFromSpeed(velocity, &trajectory);

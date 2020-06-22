@@ -54,7 +54,7 @@ float polygonArea(const b2PolygonShape& polygon)
     // counter-clockwise.
     double area    = 0.0;
     unsigned int j = polygon.m_count - 1;
-    for (unsigned int i = 0; i < polygon.m_count; i++)
+    for (int i = 0; i < polygon.m_count; i++)
     {
         double x_sum        = polygon.m_vertices[j].x + polygon.m_vertices[i].x;
         double y_difference = polygon.m_vertices[j].y - polygon.m_vertices[i].y;
