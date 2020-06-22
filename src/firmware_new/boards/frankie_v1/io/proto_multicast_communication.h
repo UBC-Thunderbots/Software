@@ -5,7 +5,7 @@
 typedef struct ProtoMulticastCommunicationProfile ProtoMulticastCommunicationProfile_t;
 
 /**
- * Event Flags: used to signal tasks to unblock and run specific actions
+ * Event Flags: masks used to signal tasks to unblock and run specific actions
  */
 typedef enum
 {
@@ -39,8 +39,8 @@ typedef enum
  * @param arg The pointer to the allocated communication profile to use for the Task
  * NOTE: These functions must run as a new Task
  */
-void io_proto_multicast_sender_Task(void* arg);
-void io_proto_multicast_listener_Task(void* arg);
+void io_proto_multicast_sender_task(void* arg);
+void io_proto_multicast_listener_task(void* arg);
 
 /**
  * LWIP automatically places MX_LWIP_Init() in a default task. That function
@@ -102,6 +102,7 @@ void io_proto_multicast_communication_profile_acquireLock(
  * Release the profile lock.
  *
  * @pre lock must be acquired through the communication_profile_acquireLock call
+ *
  * @param communication_profile The profile to release the mutex for
  */
 void io_proto_multicast_communication_profile_releaseLock(

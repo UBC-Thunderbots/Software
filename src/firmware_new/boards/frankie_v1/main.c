@@ -108,8 +108,8 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM4_Init(void);
 void io_proto_multicast_startNetworkingTask(void *argument);
-extern void io_proto_multicast_sender_Task(void *argument);
-extern void io_proto_multicast_listener_Task(void *argument);
+extern void io_proto_multicast_sender_task(void *argument);
+extern void io_proto_multicast_listener_task(void *argument);
 void test_msg_update(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -270,17 +270,17 @@ int main(void)
 
     /* creation of RobotStatusTask */
     RobotStatusTaskHandle =
-        osThreadNew(io_proto_multicast_sender_Task,
+        osThreadNew(io_proto_multicast_sender_task,
                     (void *)tbots_robot_msg_sender_profile, &RobotStatusTask_attributes);
 
     /* creation of VisionMsgTask */
     VisionMsgTaskHandle =
-        osThreadNew(io_proto_multicast_listener_Task, (void *)vision_msg_listener_profile,
+        osThreadNew(io_proto_multicast_listener_task, (void *)vision_msg_listener_profile,
                     &VisionMsgTask_attributes);
 
     /* creation of PrimMsgTask */
     PrimMsgTaskHandle =
-        osThreadNew(io_proto_multicast_listener_Task,
+        osThreadNew(io_proto_multicast_listener_task,
                     (void *)primitive_msg_listener_profile, &PrimMsgTask_attributes);
 
     /* creation of testMsgUpdate */
@@ -606,9 +606,9 @@ static void MX_GPIO_Init(void)
     HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
     /*Configure GPIO pins : wheel_motor_back_right_esf_Pin
-      wheel_motor_front_right_reset_Pin wheel_motor_front_right_coast_Pin
-      wheel_motor_front_right_mode_Pin wheel_motor_front_right_direction_Pin
-      wheel_motor_front_right_brake_Pin wheel_motor_front_right_esf_Pin */
+       wheel_motor_front_right_reset_Pin wheel_motor_front_right_coast_Pin
+       wheel_motor_front_right_mode_Pin wheel_motor_front_right_direction_Pin
+       wheel_motor_front_right_brake_Pin wheel_motor_front_right_esf_Pin */
     GPIO_InitStruct.Pin =
         wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
         wheel_motor_front_right_coast_Pin | wheel_motor_front_right_mode_Pin |
@@ -639,12 +639,12 @@ static void MX_GPIO_Init(void)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /*Configure GPIO pins : wheel_motor_back_left_brake_Pin wheel_motor_back_left_esf_Pin
-      wheel_motor_front_left_esf_Pin wheel_motor_back_left_reset_Pin
-      wheel_motor_back_left_coast_Pin LD3_Pin
-      wheel_motor_back_left_mode_Pin wheel_motor_front_left_reset_Pin
-      wheel_motor_front_left_coast_Pin
-      wheel_motor_front_left_mode_Pin LD2_Pin wheel_motor_front_left_direction_Pin
-      wheel_motor_front_left_brake_Pin */
+       wheel_motor_front_left_esf_Pin wheel_motor_back_left_reset_Pin
+                             wheel_motor_back_left_coast_Pin LD3_Pin
+       wheel_motor_back_left_mode_Pin wheel_motor_front_left_reset_Pin
+                             wheel_motor_front_left_coast_Pin
+       wheel_motor_front_left_mode_Pin LD2_Pin wheel_motor_front_left_direction_Pin
+                             wheel_motor_front_left_brake_Pin */
     GPIO_InitStruct.Pin =
         wheel_motor_back_left_brake_Pin | wheel_motor_back_left_esf_Pin |
         wheel_motor_front_left_esf_Pin | wheel_motor_back_left_reset_Pin |

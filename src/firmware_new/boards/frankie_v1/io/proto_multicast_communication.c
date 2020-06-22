@@ -83,7 +83,7 @@ ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_c
     return profile;
 }
 
-void io_proto_multicast_sender_Task(void* arg)
+void io_proto_multicast_sender_task(void* arg)
 {
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)arg;
@@ -111,11 +111,13 @@ void io_proto_multicast_sender_Task(void* arg)
     {
         pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
 
-        // block until protobuf has been updated
+        // block until this task receives a signal that the protobuf has been updated
         io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
                                                                   PROTO_UPDATED);
 
         // serialize proto into buffer
+        // we ingore the error returned by pb_encode, it is up to the receiver to handle
+        // malformed proto, so we send the buffer regardless
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
         pb_encode(&stream, comm_profile->message_fields, comm_profile->protobuf_struct);
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
@@ -128,11 +130,12 @@ void io_proto_multicast_sender_Task(void* arg)
                        comm_profile->port);
     }
 
+    // we should never get here
     netbuf_delete(tx_buf);
     netconn_delete(conn);
 }
 
-void io_proto_multicast_listener_Task(void* arg)
+void io_proto_multicast_listener_task(void* arg)
 {
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)arg;
@@ -191,6 +194,8 @@ void io_proto_multicast_listener_Task(void* arg)
             }
         }
     }
+
+    // we should never get here
     netconn_delete(conn);
 }
 
