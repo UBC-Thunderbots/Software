@@ -22,10 +22,6 @@ cc_library(
     name = "network_client",
     srcs = [
         "network_client.cpp",
-        # TODO: We shouldn't have to have the *_client.cpp files here, but full_system
-        #       fails to link if we don't.......
-        #        "ssl_vision_client.cpp",
-        #        "ssl_gamecontroller_client.cpp",
     ],
     hdrs = ["network_client.h"],
     deps = [
@@ -34,7 +30,7 @@ cc_library(
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
         "//software/logger",
-        "//software/networking:proto_multicast_listener",
+        "//software/networking:threaded_proto_multicast_listener",
         "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
         "//software/world",

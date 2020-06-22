@@ -17,7 +17,6 @@
 using boost::asio::ip::udp;
 using google::protobuf::Message;
 
-
 /*
  * This file serves as a testing file to easily send proto at a fixed rate.
  * Plug the computers ethernet port into an ethernet switch/router.

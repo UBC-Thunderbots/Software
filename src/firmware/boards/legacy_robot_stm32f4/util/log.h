@@ -77,7 +77,8 @@ typedef struct
     uint32_t magic;
     uint32_t epoch;
     uint64_t time;
-    union {
+    union
+    {
         log_tick_t tick;
         uint8_t padding[LOG_RECORD_SIZE - 4U - 4U - 8U];
     };
