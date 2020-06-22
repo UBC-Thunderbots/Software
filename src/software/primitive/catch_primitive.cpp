@@ -1,7 +1,5 @@
 #include "software/primitive/catch_primitive.h"
 
-#include "software/primitive/primitive_visitor.h"
-
 const std::string CatchPrimitive::PRIMITIVE_NAME = "Catch Primitive";
 
 CatchPrimitive::CatchPrimitive(unsigned int robot_id, double velocity,

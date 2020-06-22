@@ -24,10 +24,7 @@
 class World final
 {
    public:
-    /**
-     * Creates an Empty World
-     */
-    explicit World();
+    World() = delete;
 
     /**
      * Creates a new world.
@@ -39,13 +36,6 @@ class World final
      */
     explicit World(const Field& field, const Ball& ball, const Team& friendly_team,
                    const Team& enemy_team, unsigned int buffer_size = 20);
-
-    /**
-     * Updates the state of the field in the world with the new field data
-     *
-     * @param new_field_data A Field containing new field information
-     */
-    void updateFieldGeometry(const Field& new_field_data);
 
     /**
      * Updates the state of the ball in the world with the new ball data
@@ -73,7 +63,15 @@ class World final
      *
      * @param game_state the game state sent by refbox
      */
-    void updateRefboxGameState(const RefboxGameState& game_state);
+    void updateGameState(const RefboxGameState& game_state);
+
+    /**
+     * Updates the refbox game state
+     *
+     * @param game_state the game state sent by refbox
+     * @param ball_placement_point ball placement point
+     */
+    void updateGameState(const RefboxGameState& game_state, Point ball_placement_point);
 
     /**
      * Updates the refbox stage
@@ -90,25 +88,11 @@ class World final
     const Field& field() const;
 
     /**
-     * Returns a mutable reference to the Field in the world
-     *
-     * @return a mutable reference to the Field in the world
-     */
-    Field& mutableField();
-
-    /**
      * Returns a const reference to the Ball in the world
      *
      * @return a const reference to the Ball in the world
      */
     const Ball& ball() const;
-
-    /**
-     * Returns a mutable reference to the Ball in the world
-     *
-     * @return a mutable reference to the Ball in the world
-     */
-    Ball& mutableBall();
 
     /**
      * Returns a const reference to the Friendly Team in the world
@@ -118,25 +102,11 @@ class World final
     const Team& friendlyTeam() const;
 
     /**
-     * Returns a mutable reference to the Friendly Team in the world
-     *
-     * @return a mutable reference to the Friendly Team in the world
-     */
-    Team& mutableFriendlyTeam();
-
-    /**
      * Returns a const reference to the Enemy Team in the world
      *
      * @return a const reference to the Enemy Team in the world
      */
     const Team& enemyTeam() const;
-
-    /**
-     * Returns a mutable reference to the Enemy Team in the world
-     *
-     * @return a mutable reference to the Enemy Team in the world
-     */
-    Team& mutableEnemyTeam();
 
     /**
      * Returns a const reference to the Game State
@@ -153,9 +123,11 @@ class World final
     GameState& mutableGameState();
 
     /**
-     * Gets the most recent Timestamp stored in the history of the World
+     * Returns the most recent timestamp value of all timestamped member
+     * objects of the world
      *
-     * @return returns Timestamp : The most recent Timestamp stored in the history
+     * @return the most recent timestamp value of all timestamped member
+     * objects of the world
      */
     const Timestamp getMostRecentTimestamp() const;
 
@@ -205,7 +177,7 @@ class World final
     Ball ball_;
     Team friendly_team_;
     Team enemy_team_;
-    GameState current_refbox_game_state_;
+    GameState current_game_state_;
     RefboxStage current_refbox_stage_;
     // All previous timestamps of when the world was updated, with the most recent
     // timestamp at the front of the queue,

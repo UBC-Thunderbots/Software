@@ -18,7 +18,8 @@ typedef struct __attribute__((packed))
     /**
      * \brief The gyro data.
      */
-    union __attribute__((packed)) {
+    union __attribute__((packed))
+    {
         /**
          * \brief A successful gyro reading, if the gyro is working.
          */
@@ -49,7 +50,8 @@ typedef struct __attribute__((packed))
     /**
      * \brief The accelerometer data.
      */
-    union __attribute__((packed)) {
+    union __attribute__((packed))
+    {
         /**
          * \brief A succesful accelerometer reading, if the gyro is working.
          */

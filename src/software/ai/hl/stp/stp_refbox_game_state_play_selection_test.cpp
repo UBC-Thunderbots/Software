@@ -32,24 +32,19 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
     }
 
    protected:
-    void SetUp() override
-    {
-        world.mutableField() = ::Test::TestUtil::createSSLDivBField();
-    }
-
     STP stp;
-    World world;
+    World world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
        test_play_selection_for_states_and_positions)
 {
     // set up the friendly team
-    ::Test::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
-                                                Timestamp());
-    ::Test::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions,
-                                             Timestamp());
-    world.mutableBall() = Ball(GetParam().ball_position, Vector(), Timestamp());
+    ::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
+                                          Timestamp());
+    ::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions, Timestamp());
+    world.updateBallStateWithTimestamp(
+        TimestampedBallState(GetParam().ball_position, Vector(), Timestamp()));
 
     // to set restart reason, etc. properly
     world.mutableGameState().updateRefboxGameState(GetParam().first_game_state);
@@ -204,8 +199,7 @@ class STPRefboxGameStatePlaySelectionTest
             return std::make_unique<HaltPlay>();
         };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp                  = STP(default_play_constructor, 0);
-        world.mutableField() = ::Test::TestUtil::createSSLDivBField();
+        stp = STP(default_play_constructor, 0);
 
         Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
@@ -213,7 +207,7 @@ class STPRefboxGameStatePlaySelectionTest
                       Timestamp::fromSeconds(0));
         Robot robot_2(2, Point(0, 5.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({robot_0, robot_1, robot_2});
+        world.updateFriendlyTeamState(Team({robot_0, robot_1, robot_2}));
 
         Robot enemy_robot_0(0, Point(1.1, 1), Vector(), Angle::zero(),
                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -221,12 +215,11 @@ class STPRefboxGameStatePlaySelectionTest
                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
         Robot enemy_robot_2(2, Point(0, -5.0), Vector(), Angle::zero(),
                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableEnemyTeam().updateRobots(
-            {enemy_robot_0, enemy_robot_1, enemy_robot_2});
+        world.updateEnemyTeamState(Team({enemy_robot_0, enemy_robot_1, enemy_robot_2}));
     }
 
     STP stp;
-    World world;
+    World world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_P(STPRefboxGameStatePlaySelectionTest,
@@ -247,7 +240,7 @@ TEST_P(STPRefboxGameStatePlaySelectionTest,
     }
 }
 
-auto all_refbox_game_states = ::Test::TestUtil::getAllRefboxGameStates();
+auto all_refbox_game_states = ::TestUtil::getAllRefboxGameStates();
 
 // TODO (Issue #1330): Reenable these tests
 // INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,

@@ -1,6 +1,6 @@
 #include "udp_multicast.h"
 
-#include "firmware_new/proto/control_fw.pb.h"
+#include "firmware_new/proto/control.pb.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
 #include "lwip/ip_addr.h"
@@ -50,7 +50,7 @@ static void blocking_udp_multicast_loop(void *arg)
     err_t err;
 
     // create two new UDP connections on the heap
-    // NOTE: we need two seperate UDP sockets as we will be
+    // NOTE: we need two separate UDP sockets as we will be
     // receiving multicast but sending unicast packets to avoid
     // network congestion (peer robots don't need to know the status
     // of other robots)

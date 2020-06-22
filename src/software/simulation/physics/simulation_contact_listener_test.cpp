@@ -7,6 +7,7 @@
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 #include "software/simulation/physics/physics_robot.h"
+#include "software/test_util/test_util.h"
 #include "software/world/ball.h"
 #include "software/world/robot.h"
 
@@ -19,8 +20,10 @@ class SimulationContactListenerTest : public testing::Test
     {
         b2Vec2 gravity(0, 0);
         physics_world = std::make_shared<b2World>(gravity);
-        physics_ball  = std::make_shared<PhysicsBall>(physics_world, ball, 1.0, 9.8);
-        physics_robot = std::make_shared<PhysicsRobot>(physics_world, robot, 1.0);
+        physics_ball  = std::make_shared<PhysicsBall>(
+            physics_world, ball.currentState().ballState(), 1.0, 9.8);
+        physics_robot = std::make_shared<PhysicsRobot>(
+            robot.id(), physics_world, robot.currentState().robotState(), 1.0);
 
         return std::make_tuple(physics_world, physics_robot, physics_ball);
     }
@@ -58,6 +61,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_contact)
 
     ASSERT_TRUE(result);
     EXPECT_EQ(result, physics_ball.get());
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_contact_with_reversed_args)
@@ -77,6 +81,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_contact_with_reversed_args)
 
     ASSERT_TRUE(result);
     EXPECT_EQ(result, physics_ball.get());
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact)
@@ -99,6 +104,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact)
     EXPECT_EQ(result->first, physics_ball.get());
     ASSERT_TRUE(result->second);
     EXPECT_EQ(result->second, physics_robot.get());
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact_with_reversed_args)
@@ -121,6 +127,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact_with_reversed
     EXPECT_EQ(result->first, physics_ball.get());
     ASSERT_TRUE(result->second);
     EXPECT_EQ(result->second, physics_robot.get());
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_dribbler_contact)
@@ -143,6 +150,7 @@ TEST_F(SimulationContactListenerTest, test_is_ball_dribbler_contact)
     EXPECT_EQ(result->first, physics_ball.get());
     ASSERT_TRUE(result->second);
     EXPECT_EQ(result->second, physics_robot.get());
+    UNUSED(physics_world);
 }
 
 TEST_F(SimulationContactListenerTest, test_is_ball_dribbler_contact_with_reversed_args)
@@ -165,4 +173,5 @@ TEST_F(SimulationContactListenerTest, test_is_ball_dribbler_contact_with_reverse
     EXPECT_EQ(result->first, physics_ball.get());
     ASSERT_TRUE(result->second);
     EXPECT_EQ(result->second, physics_robot.get());
+    UNUSED(physics_world);
 }

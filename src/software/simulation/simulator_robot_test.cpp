@@ -17,13 +17,14 @@ class SimulatorRobotTest : public testing::Test
                std::shared_ptr<SimulatorBall>>
     createWorld(Robot robot, Ball ball)
     {
-        World world = ::Test::TestUtil::createBlankTestingWorld();
-        world.mutableFriendlyTeam().updateRobots({robot});
-        world.mutableBall() = ball;
-        auto physics_world  = std::make_shared<PhysicsWorld>(world);
+        auto physics_world =
+            std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField());
+        physics_world->setBallState(ball.currentState().ballState());
+        physics_world->addYellowRobots({RobotStateWithId{
+            .id = robot.id(), .robot_state = robot.currentState().robotState()}});
 
         std::shared_ptr<SimulatorRobot> simulator_robot;
-        auto physics_robot = physics_world->getFriendlyPhysicsRobots().at(0);
+        auto physics_robot = physics_world->getYellowPhysicsRobots().at(0);
         if (physics_robot.lock())
         {
             simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
@@ -63,4 +64,6 @@ TEST_F(SimulatorRobotTest, test_robot_id)
     auto [world, simulator_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
     EXPECT_EQ(simulator_robot->getRobotId(), 7);
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }

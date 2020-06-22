@@ -16,7 +16,6 @@
 #include "software/world/game_state.h"
 
 
-using namespace Evaluation;
 
 const std::string ShootOrChipPlay::name = "ShootOrChip Play";
 
@@ -30,16 +29,17 @@ std::string ShootOrChipPlay::getName() const
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
+           teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
+           teamHasPossession(world, world.friendlyTeam());
 }
 
-void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                     const World &world)
 {
     /**
      * Our general strategy here is:
@@ -88,7 +88,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
     double fallback_chip_target_x_offset = 1.5;
 
     Point fallback_chip_target =
-        world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
+        world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
     auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),

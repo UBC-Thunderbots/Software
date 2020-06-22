@@ -184,14 +184,16 @@ def _make_common_features(ctx):
         enabled = True,
     )
 
-    result["warnings_feature"] = feature(
-        name = "warnings",
+    result["warnings_as_errors_feature"] = feature(
+        name = "warnings_as_errors",
         flag_sets = [
             flag_set(
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wconversion"] +
+                        # -Werror can be overridden by copts argument in cc_binary
+                        # Warnings are added in .bazelrc
+                        flags = ["-Werror"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -545,7 +547,7 @@ def _linux_gcc_impl(ctx):
             "c++17",
             "colour",
             "determinism",
-            "warnings",
+            "warnings_as_errors",
             "hardening",
             "build-id",
             "no-canonical-prefixes",
@@ -721,8 +723,8 @@ def _stm32_impl(ctx):
             "stdlib",
             "c++17",
             "colour",
+            "warnings_as_errors",
             "determinism",
-            "warnings",
             "no-canonical-prefixes",
         ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
             "stm32f4",

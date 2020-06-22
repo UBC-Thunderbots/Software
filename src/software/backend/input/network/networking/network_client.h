@@ -5,7 +5,7 @@
 #include <thread>
 
 #include "software/backend/input/network/networking/network_filter.h"
-#include "software/backend/input/network/networking/proto_multicast_listener.h"
+#include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/parameter/config.hpp"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
@@ -42,12 +42,6 @@ class NetworkClient
                            std::shared_ptr<const RefboxConfig> refbox_config,
                            std::shared_ptr<const CameraConfig> camera_config);
 
-    /**
-     * Safely destructs this NetworkClient object. Stops any running IO services and
-     * gracefully joins the thread before exiting.
-     */
-    ~NetworkClient();
-
     // Delete the copy and assignment operators because this class really shouldn't need
     // them and we don't want to risk doing anything nasty with the internal
     // threading this class uses
@@ -56,32 +50,6 @@ class NetworkClient
     NetworkClient()                                = delete;
 
    private:
-    /**
-     * Sets up the vision client to the point where it will receive packets on the
-     * given address/port
-     *
-     * @param vision_address String representation of the vision IP address
-     * @param vision_port The port vision is running on
-     */
-    void setupVisionClient(std::string vision_address, int vision_port);
-
-    /**
-     * Sets up the gamecontroller client to the point where it will receive packets on the
-     * given address/port
-     *
-     * @param gamecontroller_address String representation of the gamecontroller IP
-     * address
-     * @param gamecontroller_port The port gamecontroller is running on
-     */
-    void setupGameControllerClient(std::string gamecontroller_address,
-                                   int gamecontroller_port);
-
-    /**
-     * Starts up the IO service thread to run and service network requests in the
-     * background
-     */
-    void startIoServiceThreadInBackground();
-
     // TODO: Remove this wrapper function once we move to a better simulator
     // https://github.com/UBC-Thunderbots/Software/issues/609
     /**
@@ -127,20 +95,16 @@ class NetworkClient
     NetworkFilter network_filter;
 
     // The client that handles data reception, filtering, and publishing for vision data
-    std::unique_ptr<ProtoMulticastListener<SSL_WrapperPacket>> ssl_vision_client;
+    std::unique_ptr<ThreadedProtoMulticastListener<SSL_WrapperPacket>> ssl_vision_client;
     // The client that handles data reception, filtering , and publishing for
     // gamecontroller data
-    std::unique_ptr<ProtoMulticastListener<Referee>> ssl_gamecontroller_client;
+    std::unique_ptr<ThreadedProtoMulticastListener<Referee>> ssl_gamecontroller_client;
 
-    // The most up-to-date state of the world
-    World world;
-
-    // The io_service that will be used to serivce all network requests
-    boost::asio::io_service io_service;
-
-    // The thread running the io_service in the background. This thread will run for the
-    // entire lifetime of the class
-    std::thread io_service_thread;
+    // The most up-to-date state of the world components
+    std::optional<Field> field;
+    std::optional<Ball> ball;
+    Team friendly_team;
+    Team enemy_team;
 
     // Both these values are used for the filterAndPublishVisionDataWrapper function
     // and should be removed when the function is removed

@@ -1,10 +1,8 @@
 #pragma once
 
-#include "boost/circular_buffer.hpp"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"
-#include "software/time/timestamp.h"
 
 typedef enum
 {
@@ -36,47 +34,42 @@ class Field
 {
    public:
     /**
+     * Creates a field with the standard SSL Division B dimensions
+     *
+     * @return a field with the standard SSL Division B dimensions
+     */
+    static Field createSSLDivisionBField();
+
+    /**
+     * Creates a field with the standard SSL Division A dimensions
+     *
+     * @return a field with the standard SSL Division A dimensions
+     */
+    static Field createSSLDivisionAField();
+
+    Field() = delete;
+
+    /**
      * Constructs a new field with the given dimensions
+     *
+     * @pre all dimensions (except for the boundary buffer) must be > 0.
+     * @pre the boundary buffer must be >= 0
+     *
+     * @throws invalid_argument if at least one dimension is <= 0
      *
      * @param field_x_length the length of the playing area (along the x-axis)
      * @param field_y_length the length of the playing area (along the y-axis)
      * @param defense_x_length the length of the defense area (along the x-axis)
      * @param defense_y_length the length of the defense area (along the y-axis)
+     * @param goal_x_length the length of the goal (along the x-axis)
      * @param goal_y_length the length of the goal (along the y-axis)
      * @param boundary_buffer_size the size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
-     * @param timestamp the Timestamp associated with the creation of the Field object
      */
     explicit Field(double field_x_length, double field_y_length, double defense_x_length,
-                   double defense_y_length, double goal_y_length,
-                   double boundary_buffer_size, double center_circle_radius,
-                   const Timestamp &timestamp, unsigned int buffer_size = 20);
-
-    /**
-     * Updates the dimensions of the field. All units should be in metres.
-     *
-     * @param field_x_length the length of the playing area (along the x-axis)
-     * @param field_y_length the length of the playing area (along the y-axis)
-     * @param defense_x_length the length of the defense area (along the x-axis)
-     * @param defense_y_length the length of the defense area (along the y-axis)
-     * @param goal_y_length the length of the goal (along the y-axis)
-     * @param boundary_buffer_size the size of the boundary area between the edge of thet
-     * playing area and the physical border/perimeter of the field
-     * @param center_circle_radius the radius of the center circle
-     * @param timestamp the Timestamp corresponding to any updates to the Field object
-     */
-    void updateDimensions(double field_x_length, double field_y_length,
-                          double defense_x_length, double defense_y_length,
-                          double goal_y_length, double boundary_buffer_size,
-                          double center_circle_radius, const Timestamp &timestamp);
-
-    /**
-     * Updates the field with new data
-     *
-     * @param new_ball_data A field containing new field data
-     */
-    void updateDimensions(const Field &new_field_data);
+                   double defense_y_length, double goal_x_length, double goal_y_length,
+                   double boundary_buffer_size, double center_circle_radius);
 
     /**
      * Gets the x-axis length of the field from goal-line to goal-line in metres.
@@ -145,6 +138,14 @@ class Field
     Point centerPoint() const;
 
     /**
+     * Returns the halfway line of the field (as a segment)
+     * The segment is on the Y axis and is bounded by the field lines
+     *
+     * @return the center line of the field
+     */
+    Segment halfwayLine() const;
+
+    /**
      * Gets the width of the defense area in metres, which runs along the y-axis. This is
      * the total width of how far the defense area stretches from one side of the goal to
      * the other.
@@ -176,7 +177,7 @@ class Field
     Rectangle enemyDefenseArea() const;
 
     /**
-     * Gets the friendly half of the field
+     * Gets the friendly half of the field within field lines
      *
      * @return the friendly half of the field
      */
@@ -197,7 +198,7 @@ class Field
     Rectangle friendlyNegativeYQuadrant() const;
 
     /**
-     * Gets the enemy half of the field
+     * Gets the enemy half of the field within field lines
      *
      * @return the enemy half of the field
      */
@@ -235,25 +236,32 @@ class Field
     Rectangle fieldBoundary() const;
 
     /**
-     * Returns true if field x and y total lengths are valid, false otherwise
-     *
-     * @return true if field x and y total lengths are valid, false otherwise
-     */
-    bool isValid() const;
-
-    /**
      * Gets the position of the centre of the friendly goal.
      *
      * @return the position of the friendly goal.
      */
-    Point friendlyGoal() const;
+    Point friendlyGoalCenter() const;
 
     /**
      * Gets the position of the centre of the enemy goal.
      *
      * @return the position of the enemy goal.
      */
-    Point enemyGoal() const;
+    Point enemyGoalCenter() const;
+
+    /**
+     * Gets the area within the friendly goal.
+     *
+     * @return the area within the friendly goal.
+     */
+    Rectangle friendlyGoal() const;
+
+    /**
+     * Gets the area within the enemy goal.
+     *
+     * @return the area within the enemy goal.
+     */
+    Rectangle enemyGoal() const;
 
     /**
      * Gets the position of the penalty mark near the enemy goal.
@@ -329,23 +337,23 @@ class Field
      * Gets the margin for being out of bounds on the top or bottom of the
      * field in metres.
      *
-     * @return the size of the margin/bounds around the field
+     * @return the size of the margin/bounds around the field in metres
      */
-    double boundaryYLength() const;
+    double boundaryMargin() const;
 
     /**
      * Returns whether p is in the friendly defense area
      *
      * @returns true if point p is in friendly defense area
      */
-    bool pointInFriendlyDefenseArea(const Point p) const;
+    bool pointInFriendlyDefenseArea(const Point &p) const;
 
     /**
      * Returns whether p is in the enemy defense area
      *
      * @returns true if point p is in enemy defense area
      */
-    bool pointInEnemyDefenseArea(const Point p) const;
+    bool pointInEnemyDefenseArea(const Point &p) const;
 
     /**
      * Returns whether p is within the field lines of the this field.
@@ -376,21 +384,6 @@ class Field
     bool operator==(const Field &other) const;
 
     /**
-     * Returns the entire update Timestamp history for Field object
-     *
-     * @return boost::circular_buffer of Timestamp history for the Field object
-     */
-    boost::circular_buffer<Timestamp> getTimestampHistory() const;
-
-    /**
-     * Returns the most Timestamp corresponding to the most recent update to Field object
-     *
-     * @return Timestamp : The Timestamp corresponding to the most recent update to the
-     * Field object
-     */
-    Timestamp getMostRecentTimestamp() const;
-
-    /**
      * Compares two fields for inequality
      *
      * @param other the field the compare to
@@ -398,17 +391,7 @@ class Field
      */
     bool operator!=(const Field &other) const;
 
-    /**
-     * Updates the timestamp history for the Field object
-     *
-     * @param time_stamp : The timestamp at which the Field object was updated
-     */
-    void updateTimestamp(Timestamp time_stamp);
-
    private:
-    // Private variables have underscores at the end of their names
-    // to avoid conflicts with function names
-
     // The length of the playable field (between the goal lines) in metres
     double field_x_length_;
     // The width of the playable field (between the sidelines) in metres
@@ -417,17 +400,13 @@ class Field
     double defense_x_length_;
     // The width of the defense area in metres
     double defense_y_length_;
-    // The width of the goal (between the goalposts) in metres
-    double goal_y_length_;
     // How "deep" the goal is along the x-axis in metres
     double goal_x_length_;
-
+    // The width of the goal (between the goalposts) in metres
+    double goal_y_length_;
     // The width of the boundary (between the edge of the marked field lines and the
     // physical border around the field) in metres
     double boundary_buffer_size_;
     // The radius of the center circle in metres
     double center_circle_radius_;
-    // All previous timestamps of when the field was updated, with the most recent
-    // timestamp at the front of the queue,
-    boost::circular_buffer<Timestamp> last_update_timestamps;
 };

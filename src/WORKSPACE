@@ -55,8 +55,8 @@ http_archive(
 # which has both the headers and compiled protoc w/ the c support baked in.
 
 http_archive(
-    name = "nanopb",
-    build_file = "@//external:nanopb.BUILD",
+    name = "com_github_nanopb_nanopb",
+    build_file = "@//external:com_github_nanopb_nanopb.BUILD",
     sha256 = "e98dd6403ab8c5b271d32a6bc025e7e596bb181c7bc7e0492c5daa21fc44c940",
     strip_prefix = "nanopb-0.3.9.4-linux-x86",
     urls = [
@@ -97,7 +97,7 @@ git_repository(
 new_local_repository(
     name = "qt",
     build_file = "@bazel_rules_qt//:qt.BUILD",
-    path = "external/qt",  # This directory is symlinked in the setup script
+    path = "/usr/include/x86_64-linux-gnu/qt5/",
 )
 
 new_local_repository(
@@ -171,3 +171,38 @@ http_archive(
     strip_prefix = "buildtools-9e63c6f02e63adaab63e21a3a8feb75f4f7503cb",
     url = "https://github.com/bazelbuild/buildtools/archive/9e63c6f02e63adaab63e21a3a8feb75f4f7503cb.zip",
 )
+
+git_repository(
+    name = "rules_python",
+    commit = "a0fbf98d4e3a232144df4d0d80b577c7a693b570",
+    remote = "https://github.com/bazelbuild/rules_python.git",
+    shallow_since = "1586444447 +0200",
+)
+
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+load("@rules_python//python:pip.bzl", "pip_repositories")
+
+pip_repositories()
+
+load("@rules_python//python:pip.bzl", "pip3_import")
+
+pip3_import(
+    name = "python_control_deps",
+    requirements = "//firmware/app/control/python_controller:requirements.txt",
+)
+
+load("@python_control_deps//:requirements.bzl", "pip_install")
+
+pip_install()
+
+pip3_import(
+    name = "dynamic_parameter_deps",
+    requirements = "//shared/parameter_v2/scripts:requirements.txt",
+)
+
+load("@dynamic_parameter_deps//:requirements.bzl", "pip_install")
+
+pip_install()

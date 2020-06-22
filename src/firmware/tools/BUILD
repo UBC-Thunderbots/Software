@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 sh_binary(
     name = "legacy_flash_firmware",
     srcs = ["legacy_flash_firmware.sh"],

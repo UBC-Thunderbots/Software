@@ -106,16 +106,37 @@ cc_library(
         ":angle",
         ":geom_constants",
         ":vector",
+    ],
+)
+
+cc_library(
+    name = "point_boost_geometry_compatability",
+    hdrs = ["point_boost_geometry_compatability.h"],
+    deps = [
+        ":point",
         "@boost//:geometry",
         "@boost//:polygon",
     ],
 )
 
 cc_library(
-    name = "polynomial",
-    srcs = ["polynomial.cpp"],
-    hdrs = ["polynomial.h"],
-    deps = [":geom_constants"],
+    name = "polynomial1d",
+    srcs = ["polynomial1d.cpp"],
+    hdrs = ["polynomial1d.h"],
+    deps = [
+        ":geom_constants",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "polynomial2d",
+    srcs = ["polynomial2d.cpp"],
+    hdrs = ["polynomial2d.h"],
+    deps = [
+        ":point",
+        ":polynomial1d",
+    ],
 )
 
 cc_library(
@@ -136,6 +157,45 @@ cc_library(
         "angle",
         "geom_constants",
         "@boost//:geometry",
+    ],
+)
+
+cc_library(
+    name = "spline2d",
+    srcs = ["spline2d.cpp"],
+    hdrs = ["spline2d.h"],
+    deps = [
+        ":point",
+        ":polynomial2d",
+    ],
+)
+
+cc_library(
+    name = "linear_spline2d",
+    srcs = ["linear_spline2d.cpp"],
+    hdrs = ["linear_spline2d.h"],
+    deps = [
+        ":spline2d",
+    ],
+)
+
+cc_library(
+    name = "bezier_curve2d",
+    srcs = ["bezier_curve2d.cpp"],
+    hdrs = ["bezier_curve2d.h"],
+    deps = [
+        ":point",
+        ":spline2d",
+    ],
+)
+
+cc_library(
+    name = "cubic_bezier_spline2d",
+    srcs = ["cubic_bezier_spline2d.cpp"],
+    hdrs = ["cubic_bezier_spline2d.h"],
+    deps = [
+        ":bezier_curve2d",
+        ":spline2d",
     ],
 )
 
@@ -173,12 +233,24 @@ cc_test(
 )
 
 cc_test(
-    name = "polynomial_test",
+    name = "polynomial1d_test",
     srcs = [
-        "polynomial_test.cpp",
+        "polynomial1d_test.cpp",
     ],
     deps = [
-        ":polynomial",
+        ":polynomial1d",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "polynomial2d_test",
+    srcs = [
+        "polynomial2d_test.cpp",
+    ],
+    deps = [
+        ":polynomial2d",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -235,6 +307,7 @@ cc_test(
     ],
     deps = [
         ":polygon",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -269,6 +342,37 @@ cc_test(
     ],
     deps = [
         ":triangle",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "linear_spline_test",
+    srcs = [
+        "linear_spline2d_test.cpp",
+    ],
+    deps = [
+        ":linear_spline2d",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "bezier_curve2d_test",
+    srcs = ["bezier_curve2d_test.cpp"],
+    deps = [
+        ":bezier_curve2d",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "cubic_bezier_spline2d_test",
+    srcs = ["cubic_bezier_spline2d_test.cpp"],
+    deps = [
+        ":cubic_bezier_spline2d",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

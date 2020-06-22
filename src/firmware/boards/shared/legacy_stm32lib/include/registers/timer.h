@@ -221,13 +221,15 @@ typedef struct
 _Static_assert(sizeof(TIM10_14_CCMR1_input_t) == 4U,
                "TIM10_14_CCMR1_input_t is wrong size");
 
-typedef union {
+typedef union
+{
     TIM9_12_CCMR1_output_t O;
     TIM9_12_CCMR1_input_t I;
 } TIM9_12_CCMR1_t;
 _Static_assert(sizeof(TIM9_12_CCMR1_t) == 4U, "TIM9_12_CCMR1_t is wrong size");
 
-typedef union {
+typedef union
+{
     TIM10_14_CCMR1_output_t O;
     TIM10_14_CCMR1_input_t I;
 } TIM10_14_CCMR1_t;
@@ -441,7 +443,8 @@ typedef struct
 } TIM2_5_CCMR1_input_t;
 _Static_assert(sizeof(TIM2_5_CCMR1_input_t) == 4U, "TIM2_5_CCMR1_input_t is wrong size");
 
-typedef union {
+typedef union
+{
     TIM2_5_CCMR1_output_t O;
     TIM2_5_CCMR1_input_t I;
 } TIM2_5_CCMR1_t;
@@ -476,7 +479,8 @@ typedef struct
 } TIM2_5_CCMR2_input_t;
 _Static_assert(sizeof(TIM2_5_CCMR2_input_t) == 4U, "TIM2_5_CCMR2_input_t is wrong size");
 
-typedef union {
+typedef union
+{
     TIM2_5_CCMR2_output_t O;
     TIM2_5_CCMR2_input_t I;
 } TIM2_5_CCMR2_t;

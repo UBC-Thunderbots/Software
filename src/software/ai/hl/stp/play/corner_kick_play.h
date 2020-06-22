@@ -20,7 +20,7 @@ class CornerKickPlay : public Play
 
     bool invariantHolds(const World &world) const override;
 
-    void getNextTactics(TacticCoroutine::push_type &yield) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
     // The maximum distance from the corner that the ball can be for it to be
     // considered a corner kick
@@ -31,16 +31,19 @@ class CornerKickPlay : public Play
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 
     /**
-     * Update the tactic that aligns the robot to the ball in preperation to pass
+     * Update the tactic that aligns the robot to the ball in preparation to pass
      *
      * @param align_to_ball_tactic
+     * @param world The current state of the world
      */
-    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic);
+    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
+                                 const World &world);
 
     /**
      * Updates the pass generator
      *
      * @param pass_generator
+     * @param world The current state of the world
      */
-    void updatePassGenerator(Passing::PassGenerator &pass_generator);
+    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
 };

@@ -1,8 +1,8 @@
 #include "software/simulation/physics/physics_robot.h"
 
 #include <algorithm>
-#include <numeric>
 
+#include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 #include "software/simulation/physics/physics_robot_model.h"
@@ -23,29 +23,30 @@ const double PhysicsRobot::chicker_thickness = 0.005;
 const double PhysicsRobot::total_chicker_depth =
     PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
 
-PhysicsRobot::PhysicsRobot(std::shared_ptr<b2World> world, const Robot& robot,
-                           double mass_kg)
-    : robot_id(robot.id())
+PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
+                           const RobotState& robot_state, const double mass_kg)
+    : robot_id(id)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
-    robot_body_def.position.Set(robot.position().x(), robot.position().y());
-    robot_body_def.linearVelocity.Set(robot.velocity().x(), robot.velocity().y());
-    robot_body_def.angle           = robot.orientation().toRadians();
-    robot_body_def.angularVelocity = robot.angularVelocity().toRadians();
+    robot_body_def.position.Set(robot_state.position().x(), robot_state.position().y());
+    robot_body_def.linearVelocity.Set(robot_state.velocity().x(),
+                                      robot_state.velocity().y());
+    robot_body_def.angle           = robot_state.orientation().toRadians();
+    robot_body_def.angularVelocity = robot_state.angularVelocity().toRadians();
     robot_body_def.linearDamping   = robot_linear_damping;
     robot_body_def.angularDamping  = robot_angular_damping;
 
     robot_body = world->CreateBody(&robot_body_def);
 
-    setupRobotBodyFixtures(robot, PhysicsRobot::total_chicker_depth, mass_kg);
-    setupDribblerFixture(robot, PhysicsRobot::dribbler_depth);
-    setupChickerFixture(robot, PhysicsRobot::total_chicker_depth,
+    setupRobotBodyFixtures(robot_state, PhysicsRobot::total_chicker_depth, mass_kg);
+    setupDribblerFixture(robot_state, PhysicsRobot::dribbler_depth);
+    setupChickerFixture(robot_state, PhysicsRobot::total_chicker_depth,
                         PhysicsRobot::chicker_thickness);
 
     // For some reason adding fixtures with mass slightly changes the linear velocity
     // of the body, so we make sure to reset it to the desired value at the end
-    robot_body->SetLinearVelocity(createVec2(robot.velocity()));
+    robot_body->SetLinearVelocity(createVec2(robot_state.velocity()));
 }
 
 PhysicsRobot::~PhysicsRobot()
@@ -59,8 +60,9 @@ PhysicsRobot::~PhysicsRobot()
     }
 }
 
-void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double total_chicker_depth,
-                                          double mass_kg)
+void PhysicsRobot::setupRobotBodyFixtures(const RobotState& robot_state,
+                                          double total_chicker_depth,
+                                          const double mass_kg)
 {
     b2FixtureDef robot_body_fixture_def;
     robot_body_fixture_def.restitution = robot_body_restitution;
@@ -69,11 +71,11 @@ void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double total_chick
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_BODY, this});
 
     b2PolygonShape* main_body_shape =
-        PhysicsRobotModel::getMainRobotBodyShape(robot, total_chicker_depth);
+        PhysicsRobotModel::getMainRobotBodyShape(total_chicker_depth);
     b2PolygonShape* front_left_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontLeft(robot, total_chicker_depth);
+        PhysicsRobotModel::getRobotBodyShapeFrontLeft(total_chicker_depth);
     b2PolygonShape* front_right_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontRight(robot, total_chicker_depth);
+        PhysicsRobotModel::getRobotBodyShapeFrontRight(total_chicker_depth);
 
     auto body_shapes = {main_body_shape, front_left_body_shape, front_right_body_shape};
     double total_shape_area = 0.0;
@@ -90,7 +92,8 @@ void PhysicsRobot::setupRobotBodyFixtures(const Robot& robot, double total_chick
     }
 }
 
-void PhysicsRobot::setupDribblerFixture(const Robot& robot, double dribbler_depth)
+void PhysicsRobot::setupDribblerFixture(const RobotState& robot_state,
+                                        double dribbler_depth)
 {
     b2FixtureDef robot_dribbler_fixture_def;
     robot_dribbler_fixture_def.density = robot_dribbler_density;
@@ -120,7 +123,8 @@ void PhysicsRobot::setupDribblerFixture(const Robot& robot, double dribbler_dept
     robot_body->CreateFixture(&robot_dribbler_fixture_def);
 }
 
-void PhysicsRobot::setupChickerFixture(const Robot& robot, double total_chicker_depth,
+void PhysicsRobot::setupChickerFixture(const RobotState& robot_state,
+                                       double total_chicker_depth,
                                        double chicker_thickness)
 {
     b2FixtureDef robot_chicker_fixture_def;
@@ -150,6 +154,11 @@ void PhysicsRobot::setupChickerFixture(const Robot& robot, double total_chicker_
     chicker_shape->Set(chicker_shape_vertices, num_vertices);
     robot_chicker_fixture_def.shape = chicker_shape;
     robot_body->CreateFixture(&robot_chicker_fixture_def);
+}
+
+RobotId PhysicsRobot::getRobotId() const
+{
+    return robot_id;
 }
 
 void PhysicsRobot::registerDribblerBallContactCallback(
@@ -200,16 +209,9 @@ PhysicsRobot::getChickerBallStartContactCallbacks() const
     return chicker_ball_contact_callbacks;
 }
 
-Robot PhysicsRobot::getRobotWithTimestamp(const Timestamp& timestamp) const
+RobotState PhysicsRobot::getRobotState() const
 {
-    Robot robot = Robot(robot_id, position(), velocity(), orientation(),
-                        angularVelocity(), timestamp);
-    return robot;
-}
-
-RobotId PhysicsRobot::getRobotId() const
-{
-    return robot_id;
+    return RobotState(position(), velocity(), orientation(), angularVelocity());
 }
 
 Point PhysicsRobot::position() const
@@ -343,5 +345,5 @@ float PhysicsRobot::getMotorBrakeForce(float motor_speed) const
     //
     // The scaling factor has been tuned to stop the robot in a reasonable
     // amount of time via the unit tests
-    return -0.5 * robot_body->GetMass() * motor_speed;
+    return -0.5f * robot_body->GetMass() * motor_speed;
 }

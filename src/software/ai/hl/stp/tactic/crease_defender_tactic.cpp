@@ -4,7 +4,6 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/point.h"
@@ -131,9 +130,9 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
         std::optional<Point> defender_position;
 
         // Find the best shot
-        auto best_shot = Evaluation::calcBestShotOnFriendlyGoal(
-            field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
-            {robot});
+        auto best_shot =
+            calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, ball.position(),
+                                       ROBOT_MAX_RADIUS_METERS, {robot});
         Vector shot_vector = best_shot->getPointToShootAt() - ball.position();
         Ray shot_ray       = Ray(ball.position(), shot_vector);
 

@@ -12,12 +12,9 @@ class SimulatorBallTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        World world = ::Test::TestUtil::createBlankTestingWorld();
-        Ball non_zero_state_ball_parameter(Point(1.01, -0.4), Vector(0.02, -4.5),
-                                           Timestamp::fromSeconds(0));
-        world.mutableBall() = non_zero_state_ball_parameter;
+        physics_world = std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
+        physics_world->setBallState(BallState(Point(1.01, -0.4), Vector(0.02, -4.5)));
 
-        physics_world     = std::make_unique<PhysicsWorld>(world);
         auto physics_ball = physics_world->getPhysicsBall();
         if (physics_ball.lock())
         {

@@ -1,8 +1,3 @@
-/**
- * Implementation of evaluation functions for passing
- */
-
-
 #include "software/ai/passing/cost_function.h"
 
 #include <numeric>
@@ -14,12 +9,9 @@
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 
-using namespace Passing;
-using namespace AI::Evaluation;
-
-double Passing::ratePass(const World& world, const Passing::Pass& pass,
-                         const std::optional<Rectangle>& target_region,
-                         std::optional<unsigned int> passer_robot_id, PassType pass_type)
+double ratePass(const World& world, const Pass& pass,
+                const std::optional<Rectangle>& target_region,
+                std::optional<unsigned int> passer_robot_id, PassType pass_type)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
@@ -88,8 +80,7 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
     return pass_quality;
 }
 
-double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
-                                   const Passing::Pass& pass)
+double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass)
 {
     // TODO: You don't even use this first parameter, but stuff is hardcoded below
     double ideal_max_rotation_to_shoot_degrees = Util::DynamicParameters->getAIConfig()
@@ -99,12 +90,11 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
-    auto shot_opt =
-        Evaluation::calcBestShotOnGoal(field.enemyGoalpostNeg(), field.enemyGoalpostPos(),
+    auto shot_opt = calcBestShotOnGoal(field.enemyGoalpostNeg(), field.enemyGoalpostPos(),
                                        pass.receiverPoint(), enemy_team.getAllRobots());
 
     Angle open_angle_to_goal = Angle::zero();
-    Point shot_target        = field.enemyGoal();
+    Point shot_target        = field.enemyGoalCenter();
     if (shot_opt && shot_opt->getOpenAngle().abs() > Angle::fromDegrees(0))
     {
         open_angle_to_goal = shot_opt->getOpenAngle();
@@ -135,7 +125,7 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
     return shot_openness_score * required_rotation_for_shot_score;
 }
 
-double Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
+double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
 {
     double enemy_proximity_importance = Util::DynamicParameters->getAIConfig()
                                             ->getPassingConfig()
@@ -164,7 +154,7 @@ double Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
     return 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
 }
 
-double Passing::calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
+double calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
 {
     // Return the highest risk for all the enemy robots, if there are any
     const std::vector<Robot>& enemy_robots = enemy_team.getAllRobots();
@@ -179,7 +169,7 @@ double Passing::calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double Passing::calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
+double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
 {
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to
@@ -241,8 +231,8 @@ double Passing::calculateInterceptRisk(const Robot& enemy_robot, const Pass& pas
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
-                                           std::optional<unsigned int> passer_robot_id)
+double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
+                                  std::optional<unsigned int> passer_robot_id)
 {
     // Remove the passer robot from the friendly team before evaluating, as we assume
     // the passer is not passing to itself
@@ -306,7 +296,7 @@ double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
                    latest_time_to_reciever_state.getSeconds() + 0.25, 0.5);
 }
 
-double Passing::getStaticPositionQuality(const Field& field, const Point& position)
+double getStaticPositionQuality(const Field& field, const Point& position)
 {
     // This constant is used to determine how steep the sigmoid slopes below are
     static const double sig_width = 0.1;
@@ -335,8 +325,8 @@ double Passing::getStaticPositionQuality(const Field& field, const Point& positi
     double on_field_quality = rectangleSigmoid(reduced_size_field, position, sig_width);
 
     // Add a negative weight for positions closer to our goal
-    Vector vec_to_friendly_goal      = Vector(field.friendlyGoal().x() - position.x(),
-                                         field.friendlyGoal().y() - position.y());
+    Vector vec_to_friendly_goal = Vector(field.friendlyGoalCenter().x() - position.x(),
+                                         field.friendlyGoalCenter().y() - position.y());
     double distance_to_friendly_goal = vec_to_friendly_goal.length();
     double near_friendly_goal_quality =
         (1 -

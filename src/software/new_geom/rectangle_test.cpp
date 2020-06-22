@@ -93,6 +93,15 @@ TEST(RectangleCornerTests, test_positive_and_negative_points)
     EXPECT_EQ(r.negXPosYCorner(), Point(-4, 2));
 }
 
+TEST(RectangleCornerTests, test_min_max_values)
+{
+    Rectangle r = Rectangle(Point(-4, -3), Point(1, 2));
+    EXPECT_EQ(r.xMin(), -4);
+    EXPECT_EQ(r.xMax(), 1);
+    EXPECT_EQ(r.yMin(), -3);
+    EXPECT_EQ(r.yMax(), 2);
+}
+
 TEST(RectangleContainsPointTests, test_point_in_different_quadrant)
 {
     EXPECT_FALSE(Rectangle(Point(0, 0), Point(-2, -2)).contains(Point(1, 1)));

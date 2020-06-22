@@ -1,14 +1,6 @@
-/**
- * Tests for the pass evaluation functions
- */
-
 #include "software/ai/evaluation/pass.h"
 
 #include <gtest/gtest.h>
-
-#include "software/../shared/constants.h"
-
-using namespace AI::Evaluation;
 
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
 {

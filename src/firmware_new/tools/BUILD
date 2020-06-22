@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 sh_binary(
     name = "debug_firmware_on_arm_board",
     srcs = ["debug_firmware_on_arm_board.sh"],
@@ -22,11 +24,7 @@ cc_binary(
     deps = [
         "//firmware_new/boards/frankie_v1:constants",
         "//firmware_new/proto:fw_cc_proto",
-        "//firmware_new/tools/communication:robot_communicator",
-        "//firmware_new/tools/communication/transfer_media:network_medium",
-        "//firmware_new/tools/communication/transfer_media:transfer_medium",
-        "//software/logger",
-        "@boost//:asio",
+        "//software/networking:threaded_proto_multicast_sender",
         "@com_google_protobuf//:protobuf",
     ],
 )

@@ -55,5 +55,8 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     // comes from when implementing Plays. The World is passed as a reference, so when
     // the world member variable is updated the implemented Plays will have access
     // to the updated world as well.
-    getNextTactics(yield);
+    if (world)
+    {
+        getNextTactics(yield, world.value());
+    }
 }

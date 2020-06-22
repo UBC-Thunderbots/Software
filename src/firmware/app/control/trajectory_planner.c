@@ -236,7 +236,7 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
     return OK;
 }
 
-static void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
+void app_trajectory_planner_generateConstArclengthTrajectoryPositions(
     PositionTrajectoryElement_t traj_elements[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     Polynomial2dOrder3_t path, const unsigned int num_elements,
     ArcLengthParametrization_t arc_length_parameterization,

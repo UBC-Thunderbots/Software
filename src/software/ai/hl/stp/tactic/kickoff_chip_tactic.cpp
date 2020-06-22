@@ -3,8 +3,6 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/chip_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-
 
 KickoffChipTactic::KickoffChipTactic(const Ball& ball, bool loop_forever)
     : ChipTactic(ball, loop_forever)

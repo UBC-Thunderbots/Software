@@ -5,7 +5,7 @@
 
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
-#include "software/sensor_fusion/ball_detection.h"
+#include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
@@ -69,7 +69,7 @@ class BallFilter
      *
      * @return The updated state of the ball given the new data
      */
-    std::optional<Ball> getFilteredData(
+    std::optional<TimestampedBallState> getFilteredData(
         const std::vector<BallDetection> &new_ball_detections, const Field &field);
 
     /**

@@ -6,7 +6,6 @@
 
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
-#include "software/test_util/test_util.h"
 #include "software/world/ball.h"
 #include "software/world/world.h"
 
@@ -17,10 +16,8 @@ extern "C"
 
 TEST(SimulatorBallSingletonTest, test_create_firmware_ball_with_single_simulator_ball)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    world.mutableBall() =
-        Ball(Point(0.4, 0), Vector(-1.3, 2.01), Timestamp::fromSeconds(0));
-    auto physics_world = std::make_unique<PhysicsWorld>(world);
+    auto physics_world = std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
+    physics_world->setBallState(BallState(Point(0.4, 0), Vector(-1.3, 2.01)));
     auto simulator_ball =
         std::make_shared<SimulatorBall>(physics_world->getPhysicsBall());
 
@@ -34,16 +31,16 @@ TEST(SimulatorBallSingletonTest, test_create_firmware_ball_with_single_simulator
 
 TEST(SimulatorBallSingletonTest, test_change_simulator_ball)
 {
-    World world_1 = ::Test::TestUtil::createBlankTestingWorld();
-    world_1.mutableBall() =
-        Ball(Point(0.4, 0), Vector(-1.3, 2.01), Timestamp::fromSeconds(0));
-    auto physics_world_1 = std::make_unique<PhysicsWorld>(world_1);
+    auto physics_world_1 =
+        std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
+    physics_world_1->setBallState(BallState(Point(0.4, 0), Vector(-1.3, 2.01)));
     auto simulator_ball_1 =
         std::make_shared<SimulatorBall>(physics_world_1->getPhysicsBall());
 
-    World world_2         = ::Test::TestUtil::createBlankTestingWorld();
-    world_2.mutableBall() = Ball(Point(0, -3), Vector(0, 1), Timestamp::fromSeconds(0));
-    auto physics_world_2  = std::make_unique<PhysicsWorld>(world_2);
+    auto physics_world_2 =
+        std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
+    physics_world_2->setBallState(BallState(Point(0, -3), Vector(0, 1)));
+
     auto simulator_ball_2 =
         std::make_shared<SimulatorBall>(physics_world_2->getPhysicsBall());
 

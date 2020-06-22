@@ -26,18 +26,18 @@ class ShadowFreekickerTacticTest : public testing::Test
                                    ShadowFreekickerTactic::FreekickShadower left_or_right)
     {
         // set up world, robots, balls
-        world = ::Test::TestUtil::createBlankTestingWorld();
-        world = ::Test::TestUtil::setEnemyRobotPositions(world, enemy_robot_positions,
-                                                         Timestamp::fromSeconds(0));
+        world = ::TestUtil::createBlankTestingWorld();
+        world = ::TestUtil::setEnemyRobotPositions(world, enemy_robot_positions,
+                                                   Timestamp::fromSeconds(0));
 
-        world = ::Test::TestUtil::setBallPosition(world, ball_position,
-                                                  Timestamp::fromSeconds(0));
-        world = ::Test::TestUtil::setBallVelocity(world, Vector(0, 0),
-                                                  Timestamp::fromSeconds(0));
+        world =
+            ::TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
+        world =
+            ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
         Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({friendly_robot});
+        world.updateFriendlyTeamState(Team({friendly_robot}));
 
         // setup tactic and acquire move action from it
         ShadowFreekickerTactic tactic = ShadowFreekickerTactic(
@@ -80,15 +80,15 @@ class ShadowFreekickerTacticTest : public testing::Test
         Point ball_position, ShadowFreekickerTactic::FreekickShadower left_or_right)
     {
         // set up world, robot, balls
-        World world = ::Test::TestUtil::createBlankTestingWorld();
+        World world = ::TestUtil::createBlankTestingWorld();
 
-        world = ::Test::TestUtil::setBallPosition(world, ball_position,
-                                                  Timestamp::fromSeconds(0));
-        world = ::Test::TestUtil::setBallVelocity(world, Vector(0, 0),
-                                                  Timestamp::fromSeconds(0));
+        world =
+            ::TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
+        world =
+            ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
         Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({friendly_robot});
+        world.updateFriendlyTeamState(Team({friendly_robot}));
 
         // setup tactic and acquire move action from it
         ShadowFreekickerTactic tactic = ShadowFreekickerTactic(
@@ -104,18 +104,19 @@ class ShadowFreekickerTacticTest : public testing::Test
             (world.ball().position() - move_action->getDestination()).length();
 
         Line ball_to_goal_line =
-            Line(world.ball().position(), world.field().friendlyGoal());
+            Line(world.ball().position(), world.field().friendlyGoalCenter());
 
         middle_line_to_friendly_robot_distance =
             distance(ball_to_goal_line, move_action->getDestination());
 
         goal_to_ball_angle =
-            (world.ball().position() - world.field().friendlyGoal()).orientation();
+            (world.ball().position() - world.field().friendlyGoalCenter()).orientation();
         goal_to_dest_angle =
-            (move_action->getDestination() - world.field().friendlyGoal()).orientation();
+            (move_action->getDestination() - world.field().friendlyGoalCenter())
+                .orientation();
     }
 
-    World world;
+    World world = ::TestUtil::createBlankTestingWorld();
 
     /**
      *

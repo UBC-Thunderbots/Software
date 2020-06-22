@@ -1,9 +1,10 @@
 #pragma once
 
-// We forward-declare all the actions because if we include them we induce a
-// circular dependency between the individual library for each action and this
-// visitor. Ex. `MoveAction` includes `MutableActionVisitor`, but `MutableActionVisitor`
-// also includes `MoveAction`
+// We forward-declare all the actions because if we include them we induce a circular
+// dependency between the individual library for each action and this visitor. This is
+// because action.h includes action_visitor.h, and each individual library includes
+// action.h. Note: every subclass of this visitor must include all of the classes listed
+// below
 class ChipAction;
 class DribbleAction;
 class InterceptBallAction;

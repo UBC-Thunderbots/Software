@@ -1,13 +1,13 @@
 #include "software/ai/evaluation/find_open_areas.h"
 
-#include "software/geom/util.h"
+#include "software/new_geom/util/find_open_circles.h"
 #include "software/parameter/dynamic_parameters.h"
 
-std::vector<Circle> Evaluation::findGoodChipTargets(const World& world)
+std::vector<Circle> findGoodChipTargets(const World& world)
 {
     double inset     = 0.3;  // Determined experimentally to be a reasonable value
     double ballX     = world.ball().position().x();
-    double fieldX    = world.field().enemyGoal().x() - inset;
+    double fieldX    = world.field().enemyGoalCenter().x() - inset;
     double negFieldY = world.field().enemyCornerNeg().y() + inset;
     double posFieldY = world.field().enemyCornerPos().y() - inset;
 

@@ -20,10 +20,7 @@
 # helps prevent bugs and odd behaviour if this script is run through a symlink
 # or from a different directory.
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
-cd $CURR_DIR
-# The root directory of the reopsitory and git tree
-GIT_ROOT="$CURR_DIR/.."
-
+cd "$CURR_DIR" || exit
 
 echo "================================================================"
 echo "Installing Utilities and Dependencies"
@@ -46,6 +43,8 @@ host_software_packages=(
     qt5-default # The GUI library for our visualizer
     libudev-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
+    python3       # Python 3
+    python3-pip   # Required for bazel to install python dependencies for build targets
     python3-yaml # yaml for cfg generation (Dynamic Parameters)
     python-minimal # This is required for bazel, we've seen some issues where
                    # the bazel install hasn't installed it properly
@@ -56,10 +55,10 @@ host_software_packages=(
                       # properly manage this as a bazel dependency, so we have 
                       # to manually install it ourselves
     kcachegrind # This lets us view the profiles output by callgrind
+    codespell # Fixes typos
 )
-sudo apt-get install ${host_software_packages[@]} -y
 
-if [ $? -ne 0 ]; then
+if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     echo "##############################################################"
     echo "Error: Installing utilities and dependencies failed"
     echo "##############################################################"
@@ -80,19 +79,12 @@ sudo apt install curl gnupg
 curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
 sudo apt update
-sudo apt install bazel -y
-if [ $? -ne 0 ]; then
+if ! sudo apt install bazel -y ; then
     echo "##############################################################"
     echo "Error: Installing Bazel failed"
     echo "##############################################################"
     exit 1
 fi
-
-# Symlink qt include directory
-# As the Qt Bazel rules depend on an include directory which varies between Linux
-# platforms, we symlink this directory to one place in our source tree
-# and platform-dependent properties stay in the setup script
-ln -snf /usr/include/x86_64-linux-gnu/qt5 $GIT_ROOT/src/external/qt
 
 # Done
 echo "================================================================"

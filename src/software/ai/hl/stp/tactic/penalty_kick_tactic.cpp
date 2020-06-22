@@ -8,7 +8,6 @@
 #include "software/ai/hl/stp/action/dribble_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/util/intersection.h"
@@ -145,7 +144,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
     do
     {
-        Vector behind_ball_vector = (ball.position() - field.enemyGoal());
+        Vector behind_ball_vector = (ball.position() - field.enemyGoalCenter());
         // A point behind the ball that leaves 5cm between the ball and kicker of the
         // robot
         Point behind_ball = ball.position() + behind_ball_vector.normalize(

@@ -11,6 +11,8 @@
 class Ball final
 {
    public:
+    Ball() = delete;
+
     /**
      * Creates a new ball with the given initial state
      *

@@ -8,15 +8,15 @@
 
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-    ::Test::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
-    ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
-                                             Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+    ::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
+                                       Timestamp::fromSeconds(0));
 
     Robot friendly_robot = Robot(0, Point(-2, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({friendly_robot});
+    world.updateFriendlyTeamState(Team({friendly_robot}));
 
     CreaseDefenderTactic tactic =
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
@@ -38,19 +38,20 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
 
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-    ::Test::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
-    ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
-                                             Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+    ::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
+                                       Timestamp::fromSeconds(0));
 
     Robot friendly_robot = Robot(0, Point(-2, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot friendly_goalie =
-        Robot(1, world.field().friendlyGoal(), Vector(0, 0), Angle::zero(),
+        Robot(1, world.field().friendlyGoalCenter(), Vector(0, 0), Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({friendly_robot, friendly_goalie});
-    world.mutableFriendlyTeam().assignGoalie(1);
+    Team new_team({friendly_robot, friendly_goalie});
+    new_team.assignGoalie(1);
+    world.updateFriendlyTeamState(new_team);
 
     CreaseDefenderTactic tactic =
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
@@ -75,19 +76,21 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
 
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_side)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
-    ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-    ::Test::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
-    ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
-                                             Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+    ::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
+                                       Timestamp::fromSeconds(0));
 
     Robot friendly_robot = Robot(0, Point(-2, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot friendly_goalie =
-        Robot(1, world.field().friendlyGoal(), Vector(0, 0), Angle::zero(),
+        Robot(1, world.field().friendlyGoalCenter(), Vector(0, 0), Angle::zero(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableFriendlyTeam().updateRobots({friendly_robot, friendly_goalie});
-    world.mutableFriendlyTeam().assignGoalie(1);
+
+    Team new_team({friendly_robot, friendly_goalie});
+    new_team.assignGoalie(1);
+    world.updateFriendlyTeamState(new_team);
 
     CreaseDefenderTactic tactic =
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),

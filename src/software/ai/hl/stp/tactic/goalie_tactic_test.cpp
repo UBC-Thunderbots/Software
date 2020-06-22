@@ -45,7 +45,7 @@ class GoalieRestrainTest : public ::testing::TestWithParam<Point>
 
 TEST_P(GoalieRestrainTest, goalie_position_safe)
 {
-    World world         = ::Test::TestUtil::createBlankTestingWorld();
+    World world         = ::TestUtil::createBlankTestingWorld();
     GoalieTactic tactic = GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
                                        world.enemyTeam());
 
@@ -87,13 +87,15 @@ class GoalieTacticTest : public testing::Test
    protected:
     void expectMoveAction(Ball ball, Point destination)
     {
-        World world         = ::Test::TestUtil::createBlankTestingWorld();
-        world.mutableBall() = std::move(ball);
+        World world = ::TestUtil::createBlankTestingWorld();
+        world.updateBallStateWithTimestamp(ball.currentState());
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({goalie});
-        world.mutableFriendlyTeam().assignGoalie(0);
+
+        Team new_team({goalie});
+        new_team.assignGoalie(0);
+        world.updateFriendlyTeamState(new_team);
 
         GoalieTactic tactic = GoalieTactic(world.ball(), world.field(),
                                            world.friendlyTeam(), world.enemyTeam());
@@ -110,13 +112,14 @@ class GoalieTacticTest : public testing::Test
 
     void expectStopAction(Ball ball)
     {
-        World world         = ::Test::TestUtil::createBlankTestingWorld();
-        world.mutableBall() = std::move(ball);
+        World world = ::TestUtil::createBlankTestingWorld();
+        world.updateBallStateWithTimestamp(ball.currentState());
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({goalie});
-        world.mutableFriendlyTeam().assignGoalie(0);
+        Team new_team({goalie});
+        new_team.assignGoalie(0);
+        world.updateFriendlyTeamState(new_team);
 
         GoalieTactic tactic = GoalieTactic(world.ball(), world.field(),
                                            world.friendlyTeam(), world.enemyTeam());
@@ -131,13 +134,14 @@ class GoalieTacticTest : public testing::Test
 
     void expectChipAction(Ball ball)
     {
-        World world         = ::Test::TestUtil::createBlankTestingWorld();
-        world.mutableBall() = std::move(ball);
+        World world = ::TestUtil::createBlankTestingWorld();
+        world.updateBallStateWithTimestamp(ball.currentState());
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
-        world.mutableFriendlyTeam().updateRobots({goalie});
-        world.mutableFriendlyTeam().assignGoalie(0);
+        Team new_team({goalie});
+        new_team.assignGoalie(0);
+        world.updateFriendlyTeamState(new_team);
 
         GoalieTactic tactic = GoalieTactic(world.ball(), world.field(),
                                            world.friendlyTeam(), world.enemyTeam());
@@ -149,8 +153,9 @@ class GoalieTacticTest : public testing::Test
         auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
         ASSERT_NE(chip_action, nullptr);
         EXPECT_TRUE(chip_action->getChipOrigin().isClose(world.ball().position(), 0.001));
-        EXPECT_EQ(chip_action->getChipDirection(),
-                  (world.ball().position() - world.field().friendlyGoal()).orientation());
+        EXPECT_EQ(
+            chip_action->getChipDirection(),
+            (world.ball().position() - world.field().friendlyGoalCenter()).orientation());
         EXPECT_NEAR(chip_action->getChipDistanceMeters(), 2, 0.001);
     }
 };

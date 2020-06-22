@@ -3,7 +3,6 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
     : Tactic(loop_forever,

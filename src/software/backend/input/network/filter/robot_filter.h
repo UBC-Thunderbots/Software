@@ -5,7 +5,7 @@
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
-#include "software/sensor_fusion/robot_detection.h"
+#include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot.h"
 

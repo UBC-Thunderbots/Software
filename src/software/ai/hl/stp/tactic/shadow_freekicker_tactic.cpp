@@ -4,7 +4,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/parameter/dynamic_parameters.h"
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
@@ -45,7 +44,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
     do
     {
         std::optional<Robot> enemy_with_ball =
-            Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
+            getRobotWithEffectiveBallPossession(enemy_team, ball, field);
 
         if (enemy_with_ball.has_value())
         {
@@ -66,7 +65,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
         else
         {
             const Vector ball_to_net_direction =
-                (field.friendlyGoal() - ball.position())
+                (field.friendlyGoalCenter() - ball.position())
                     .normalize(FREE_KICK_MAX_PROXIMITY + ROBOT_MAX_RADIUS_METERS);
 
             Vector perpendicular_to_ball_direction =

@@ -1,7 +1,5 @@
 #include "software/primitive/dribble_primitive.h"
 
-#include "software/primitive/primitive_visitor.h"
-
 const std::string DribblePrimitive::PRIMITIVE_NAME = "Dribble Primitive";
 
 DribblePrimitive::DribblePrimitive(unsigned int robot_id, const Point &dest,

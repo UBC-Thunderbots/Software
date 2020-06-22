@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include "software/new_geom/circle.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"
@@ -83,7 +85,7 @@ double sigmoid(const double& v, const double& offset, const double& sig_width);
  * @tparam T The type of the data to normalize. Must be an integral or floating point type
  * @param value The value to normalize. Must be in the range [value_min, value_max]
  * @param value_min The minimum possible value of the input value
- * @param value_max The maximum possible value of the intput value
+ * @param value_max The maximum possible value of the input value
  * @param range_min The minimum end of the range to normalize to
  * @param range_max The maximum end of the range to normalize to
  *
@@ -94,7 +96,7 @@ T normalizeValueToRange(T value, const T& value_min, const T& value_max,
                         const T& range_min, const T& range_max)
 {
     static_assert(std::is_integral<T>::value || std::is_floating_point<T>::value,
-                  "Integral of float point type required.");
+                  "Integral or floating point type required.");
     value         = std::clamp<T>(value, value_min, value_max);
     T value_range = value_max - value_min;
     T new_range   = range_max - range_min;

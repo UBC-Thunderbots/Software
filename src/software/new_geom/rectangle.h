@@ -48,28 +48,56 @@ class Rectangle : public ConvexPolygon
      *
      * @return The <+x,+y> corner of the rectangle
      */
-    Point posXPosYCorner() const;
+    const Point &posXPosYCorner() const;
 
     /**
      * Returns the <-x,+y> corner of the rectangle
      *
      * @return The <-x,+y> corner of the rectangle
      */
-    Point negXPosYCorner() const;
+    const Point &negXPosYCorner() const;
 
     /**
      * Returns the <-x,-y> corner of the rectangle
      *
      * @return The <-x,-y> corner of the rectangle
      */
-    Point negXNegYCorner() const;
+    const Point &negXNegYCorner() const;
 
     /**
      * Returns the <+x,-y> corner of the rectangle
      *
      * @return The <+x,-y> corner of the rectangle
      */
-    Point posXNegYCorner() const;
+    const Point &posXNegYCorner() const;
+
+    /**
+     * Gets the maximum x value of the rectangle
+     *
+     * return max x value
+     */
+    double xMax() const;
+
+    /**
+     * Gets the minimum x value of the rectangle
+     *
+     * return min x value
+     */
+    double xMin() const;
+
+    /**
+     * Gets the maximum y value of the rectangle
+     *
+     * return max y value
+     */
+    double yMax() const;
+
+    /**
+     * Gets the minimum y value of the rectangle
+     *
+     * return min y value
+     */
+    double yMin() const;
 
     /**
      * Determines whether the given Point is contained within this Rectangle.
@@ -85,7 +113,7 @@ class Rectangle : public ConvexPolygon
      * @param p The point to test
      * @return The corner point that is furthest from the test point
      */
-    Point furthestCorner(const Point &p);
+    Point furthestCorner(const Point &p) const;
 
     /**
      * Returns a vector from negXNegY point of the rectangle to the posXPosY point

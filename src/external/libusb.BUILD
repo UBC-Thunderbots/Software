@@ -4,7 +4,6 @@
 cc_library(
     name = "libusb",
     srcs = glob([
-        "usr/lib/libusb*.so",  # Arch Linux
         "usr/lib/x86_64-linux-gnu/libusb*.so",  # Ubuntu
     ]),
     hdrs = glob(["usr/include/libusb-1.0/*"]),
