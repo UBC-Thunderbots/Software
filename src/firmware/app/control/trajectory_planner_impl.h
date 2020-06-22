@@ -33,6 +33,7 @@ void app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
     float node_values[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS],
     float segment_lengths[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS]);
 
+
 /**
  * Function generates the length of segments in a 2d polynomial. It works as an wrapper
  * for the euclidean distance and values of 2d polynomials.
@@ -69,26 +70,16 @@ void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
  *
  * @pre All arrays are pre-allocated up to at least TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
-<<<<<<< HEAD
-=======
  * @param initial_speed [in] The initial speed at the beginning of the trajectory.  Units
  * of parameters must be in consistent magnitudes, Ex: distances in mm and acceleration in
  * mm/s.
  *
->>>>>>> 912cb81268aa214bee48b33824373639015f32c0
  * @param segment_lengths [in] The length of each segment in the trajectory.  Units of
  * parameters must be in consistent magnitudes, Ex: distances in mm and speed in mm/s.
  *
  * @param max_allowable_acceleration [in] The maximum acceleration that can occur anywhere
  * on the trajectory
  *
-<<<<<<< HEAD
- * @param initial_speed [in] The initial speed at the beginning of the trajectory.  Units
- * of parameters must be in consistent magnitudes, Ex: distances in mm and acceleration in
- * mm/s.
- *
-=======
->>>>>>> 912cb81268aa214bee48b33824373639015f32c0
  * @param num_segments [in] The number of nodes(elements) in the trajectory
  *
  * @param speeds [in/out] The existing speed profile to be modified in-place to be
@@ -111,12 +102,9 @@ app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
  * @pre All arrays must be pre-allocated up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
-<<<<<<< HEAD
-=======
  * @param final_speed  [in] The final speed at the last element of the profile.  Units of
  * parameters must be in consistent magnitudes, Ex: distances in mm and speed in mm/s.
  *
->>>>>>> 912cb81268aa214bee48b33824373639015f32c0
  * @param segment_lengths [in] The length of each segment between data points on the speed
  * profile. In meters.
  *
@@ -131,12 +119,6 @@ app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
  * @param initial_speed [in] The initial speed at the first element of the profile.  Units
  * of parameters must be in consistent magnitudes, Ex: distances in mm and speed in mm/s.
  *
-<<<<<<< HEAD
- * @param final_speed  [in] The final speed at the last element of the profile.  Units of
- * parameters must be in consistent magnitudes, Ex: distances in mm and speed in mm/s.
- *
-=======
->>>>>>> 912cb81268aa214bee48b33824373639015f32c0
  * @param num_elements [in] The number of elements in the speed profile
  *
  * @param speeds [out] The pre-allocated array that will be modified to contain a forwards
