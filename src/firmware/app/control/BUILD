@@ -47,7 +47,9 @@ cc_library(
 
 cc_test(
     name = "wheel_controller_test",
-    srcs = ["wheel_controller_test.cpp"],
+    srcs = [
+        "wheel_controller_test.cpp",
+    ],
     deps = [
         ":wheel_controller",
         "//firmware/shared:circular_buffer",
