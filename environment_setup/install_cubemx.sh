@@ -21,7 +21,7 @@ if [ -d "$CUBEMX_INSTALL_DIR" ]; then
     echo "================================================================"
 else
     echo "================================================================"
-    echo "Installing CubeMX $CUBE_VERSION"
+    echo "Installing CubeMX $CUBE_VERSION" 
     echo "================================================================"
 
     # setup a clean directory to install cubemx in
@@ -46,9 +46,8 @@ else
     echo -n $AUTO_INSTALL_XML > auto-install.xml
 
     # create script to cd and run STM32CubeMX
-    STM32_SCRIPT="pushd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd"
-
-    echo -n "$STM32_SCRIPT" > cuberunner.sh
+    echo -n $'#!/bin/bash \n\n ' > cuberunner.sh
+    echo -n "pushd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd" >> cuberunner.sh
     
     curl -O $CUBE_LINK
     unzip $CUBE_ZIP_FILENAME
