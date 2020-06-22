@@ -570,7 +570,6 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_straight_line_high_acceleratio
 
     };
 
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t position_trajectory;
 
     app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
@@ -624,7 +623,6 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_parabola_path_high_acceleratio
 
     };
 
-    float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     PositionTrajectory_t position_trajectory;
 
     app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
@@ -859,9 +857,6 @@ TEST_F(TrajectoryPlannerTest, test_generate_time_profile_no_linear_profile)
             trajectory.time_profile[i - 1] +
                 segment_lengths[i - 1] / path_parameters.max_allowable_angular_speed);
     }
-    const float radians_moved_in_acceleration_phase =
-        trajectory.orientation[path_parameters.num_elements - 1] -
-        trajectory.orientation[path_parameters.num_elements - 2];
 
     EXPECT_NEAR(trajectory.time_profile[path_parameters.num_elements - 1], 1.0202,
                 0.0001);
@@ -1094,8 +1089,6 @@ TEST_F(TrajectoryPlannerTest,
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
-    const float segment_length           = sqrt(8.0) / (path_parameters.num_elements - 1);
-    const float initial_segment_duration = (2 * segment_length) / (1);
 
     for (unsigned int i = 0; i < path_parameters.num_elements - 1; i++)
     {

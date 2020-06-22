@@ -76,7 +76,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Fi
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
     // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
-    // check isn't relevent in that case
+    // check isn't relevant in that case
     if (ball.velocity().length() != 0 &&
         std::abs(ball_robot_time_diff.getSeconds()) > descent_weight)
     {

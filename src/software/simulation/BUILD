@@ -106,7 +106,6 @@ cc_test(
         "//software/new_geom:point",
         "//software/new_geom:vector",
         "//software/simulation/physics:physics_world",
-        "//software/test_util",
         "//software/time:timestamp",
         "//software/world",
         "@gtest//:gtest_main",
@@ -126,9 +125,9 @@ cc_library(
         "//firmware/app/world:firmware_world",
         "//software/backend/output/radio/mrf:mrf_primitive_visitor",
         "//software/primitive",
-        "//software/proto/message_translation:ssl_detection_message_translator",
-        "//software/proto/message_translation:ssl_geometry_message_translator",
-        "//software/proto/message_translation:ssl_wrapper_message_translator",
+        "//software/proto/message_translation:ssl_detection",
+        "//software/proto/message_translation:ssl_geometry",
+        "//software/proto/message_translation:ssl_wrapper",
         "//software/simulation/physics:physics_world",
         "//software/world",
     ],
@@ -142,5 +141,37 @@ cc_test(
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "threaded_simulator",
+    srcs = ["threaded_simulator.cpp"],
+    hdrs = ["threaded_simulator.h"],
+    deps = [
+        ":simulator",
+        "//software/proto:ssl_cc_proto",
+    ],
+)
+
+cc_test(
+    name = "threaded_simulator_test",
+    srcs = ["threaded_simulator_test.cpp"],
+    deps = [
+        ":threaded_simulator",
+        "//software/test_util",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_binary(
+    name = "standalone_simulator_main",
+    srcs = ["standalone_simulator_main.cpp"],
+    deps = [
+        ":threaded_simulator",
+        "//software/gui/standalone_simulator:standalone_simulator_gui_wrapper",
+        "//software/logger",
+        "//software/world:field",
     ],
 )

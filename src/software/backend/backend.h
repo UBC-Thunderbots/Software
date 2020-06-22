@@ -23,10 +23,4 @@ class Backend : public Subject<SensorMsg>,
     Backend() = default;
 
     virtual ~Backend() = default;
-
-    // Delete the copy and assignment operators because this class really shouldn't need
-    // them and we don't want to risk doing anything nasty with the internal
-    // multithreading this class potentially uses
-    Backend& operator=(const Backend&) = delete;
-    Backend(const Backend&)            = delete;
 };

@@ -23,7 +23,7 @@ typedef boost::coroutines2::coroutine<std::vector<std::shared_ptr<Tactic>>>
  * play a full game of soccer, as long a we provide a Play for any given scenario.
  *
  * Plays must define what conditions must be met for them to start (with the isApplicable
- * function), and what conditions must be continously met for the Play to continue
+ * function), and what conditions must be continuously met for the Play to continue
  * running (with the invariantHolds function). These are very important to get right,
  * so that we can always run at least 1 Play in every scenario, and that Plays don't
  * unexpectedly stop.

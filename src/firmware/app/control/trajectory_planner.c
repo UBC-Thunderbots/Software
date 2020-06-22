@@ -63,7 +63,7 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     }
 
     // Create a 2d polynomial out of the theta profile and a polynomial of all zeros
-    Polynomial2dOrder3_t theta_poly_2d = {.x = theta_poly, .y = {0, 0, 0, 0}};
+    Polynomial2dOrder3_t theta_poly_2d = {.x = theta_poly, .y = {{0, 0, 0, 0}}};
     app_trajectory_planner_impl_getMaximumSpeedProfile(
         theta_poly_2d, num_elements, t_start, t_end, max_angular_acceleration,
         max_angular_speed, max_allowable_speed_profile);

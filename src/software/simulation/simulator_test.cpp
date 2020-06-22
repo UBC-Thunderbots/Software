@@ -6,14 +6,34 @@
 #include "software/primitive/primitive.h"
 #include "software/test_util/test_util.h"
 
+TEST(SimulatorTest, get_field)
+{
+    Field field = Field::createSSLDivisionBField();
+    Simulator simulator(field);
+    EXPECT_EQ(field, simulator.getField());
+}
+
+TEST(SimulatorTest, get_initial_timestamp)
+{
+    Simulator simulator(Field::createSSLDivisionBField());
+    EXPECT_EQ(Timestamp::fromSeconds(0), simulator.getTimestamp());
+}
+
+TEST(SimulatorTest, timestamp_updates_with_simulation_steps)
+{
+    Simulator simulator(Field::createSSLDivisionBField());
+    simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    EXPECT_EQ(Timestamp::fromSeconds(1.0 / 60.0), simulator.getTimestamp());
+}
+
 TEST(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator.setBallState(ball_state);
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -25,7 +45,7 @@ TEST(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 
 TEST(SimulatorTest, set_ball_state_when_ball_already_exists)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator.setBallState(ball_state);
@@ -33,7 +53,7 @@ TEST(SimulatorTest, set_ball_state_when_ball_already_exists)
     BallState new_ball_state(Point(-3.5, 0.02), Vector(1, 1));
     simulator.setBallState(new_ball_state);
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -45,11 +65,11 @@ TEST(SimulatorTest, set_ball_state_when_ball_already_exists)
 
 TEST(SimulatorTest, remove_ball_when_no_ball_exists)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     simulator.removeBall();
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -58,13 +78,13 @@ TEST(SimulatorTest, remove_ball_when_no_ball_exists)
 
 TEST(SimulatorTest, remove_ball_when_the_ball_already_exists)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator.setBallState(ball_state);
     simulator.removeBall();
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -73,11 +93,11 @@ TEST(SimulatorTest, remove_ball_when_the_ball_already_exists)
 
 TEST(SimualtorTest, add_zero_yellow_robots)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     simulator.addYellowRobots({});
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -86,7 +106,7 @@ TEST(SimualtorTest, add_zero_yellow_robots)
 
 TEST(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -101,7 +121,7 @@ TEST(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
     };
     simulator.addYellowRobots(states);
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -110,7 +130,7 @@ TEST(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
 
 TEST(SimulatorTest, add_yellow_robots_with_duplicate_ids)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -126,7 +146,7 @@ TEST(SimulatorTest, add_yellow_robots_with_duplicate_ids)
 
 TEST(SimulatorTest, add_yellow_robots_with_ids_that_already_exist_in_the_simulation)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -147,11 +167,11 @@ TEST(SimulatorTest, add_yellow_robots_with_ids_that_already_exist_in_the_simulat
 
 TEST(SimualtorTest, add_zero_blue_robots)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     simulator.addBlueRobots({});
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -160,7 +180,7 @@ TEST(SimualtorTest, add_zero_blue_robots)
 
 TEST(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -175,7 +195,7 @@ TEST(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
     };
     simulator.addBlueRobots(states);
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -184,7 +204,7 @@ TEST(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
 
 TEST(SimulatorTest, add_blue_robots_with_duplicate_ids)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -200,7 +220,7 @@ TEST(SimulatorTest, add_blue_robots_with_duplicate_ids)
 
 TEST(SimulatorTest, add_blue_robots_with_ids_that_already_exist_in_the_simulation)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
@@ -224,12 +244,12 @@ TEST(SimulatorTest, simulation_step_updates_the_ball)
     // A sanity test to make sure stepping the simulation actually updates
     // the state of the world
 
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
     simulator.setBallState(BallState(Point(0.4, 0), Vector(-1.3, 2.01)));
 
     simulator.stepSimulation(Duration::fromSeconds(0.1));
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -241,7 +261,7 @@ TEST(SimulatorTest, simulation_step_updates_the_ball)
 
 TEST(SimulatorTest, simulate_yellow_robots_with_no_primitives)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -256,7 +276,7 @@ TEST(SimulatorTest, simulate_yellow_robots_with_no_primitives)
     }
 
     // Robots have not been assigned primitives and so should not move
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -273,7 +293,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
     // because it is very commonly used and so unlikely to be significantly changed
     // or removed, and its behaviour is easy to validate
 
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -296,7 +316,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
         simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -308,7 +328,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
 
 TEST(SimulatorTest, simulate_blue_robots_with_no_primitives)
 {
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -323,7 +343,7 @@ TEST(SimulatorTest, simulate_blue_robots_with_no_primitives)
     }
 
     // Robots have not been assigned primitives and so should not move
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -340,7 +360,7 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
     // because it is very commonly used and so unlikely to be significantly changed
     // or removed, and its behaviour is easy to validate
 
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -363,7 +383,7 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
         simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
@@ -381,7 +401,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     // unlikely to be significantly changed or removed, and its behaviour is easy to
     // validate
 
-    Simulator simulator(::TestUtil::createSSLDivBField());
+    Simulator simulator(Field::createSSLDivisionBField());
 
     RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero());
@@ -444,7 +464,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     //  new controller is implemented.
     //  https://github.com/UBC-Thunderbots/Software/issues/1187
 
-    auto ssl_wrapper_packet = simulator.getSslWrapperPacket();
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
     ASSERT_TRUE(ssl_wrapper_packet);
     ASSERT_TRUE(ssl_wrapper_packet->has_detection());
     auto detection_frame = ssl_wrapper_packet->detection();
