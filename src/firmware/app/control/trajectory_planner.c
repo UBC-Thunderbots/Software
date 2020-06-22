@@ -84,7 +84,6 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     status = app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
         initial_linear_speed, linear_segment_lengths, max_linear_acceleration,
         num_elements, linear_speed);
-
     if (status != OK)
     {
         return status;
@@ -93,7 +92,6 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     status = app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
         initial_angular_speed, angular_segment_lengths, max_angular_acceleration,
         num_elements, angular_speed);
-
     if (status != OK)
     {
         return status;
