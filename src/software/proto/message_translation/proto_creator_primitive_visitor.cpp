@@ -52,8 +52,8 @@ void ProtoCreatorPrimitiveVisitor::visit(
     const DirectVelocityPrimitive &direct_velocity_primitive)
 {
     radio_prim = PrimitiveMsg();
-    radio_prim->set_prim_type(PrimitiveMsg::PrimitiveType::
-                                  PrimitiveMsg_PrimitiveType_DIRECT_VELOCITY);
+    radio_prim->set_prim_type(
+        PrimitiveMsg::PrimitiveType::PrimitiveMsg_PrimitiveType_DIRECT_VELOCITY);
     radio_prim->set_parameter1(direct_velocity_primitive.getXVelocity() *
                                MILLIMETERS_PER_METER);
     radio_prim->set_parameter2(direct_velocity_primitive.getYVelocity() *

@@ -3,8 +3,8 @@
 #include <array>
 #include <optional>
 
-#include "software/primitive/primitive_visitor.h"
 #include "shared/proto/primitive.pb.h"
+#include "software/primitive/primitive_visitor.h"
 
 /**
  * This class allows for the creation of a ProtoBuf message for a given primitive

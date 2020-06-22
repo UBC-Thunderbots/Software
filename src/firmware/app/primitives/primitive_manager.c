@@ -145,7 +145,8 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     // assertions
     const bool primitive_index_is_valid = primitive_index < PRIMITIVE_COUNT;
     assert(primitive_index_is_valid);
-    if (!primitive_index_is_valid){
+    if (!primitive_index_is_valid)
+    {
         return;
     }
 
@@ -210,4 +211,3 @@ bool app_primitive_manager_primitiveIsDirect(unsigned int primitive)
 {
     return PRIMITIVES[primitive]->direct;
 }
-

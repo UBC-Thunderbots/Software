@@ -241,8 +241,8 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     else
     {
         // Decode the primitive
-        pb_istream_t pb_in_stream  = pb_istream_from_buffer(packet_data, packet_size - 3);
-        PrimitiveMsg prim_msg = PrimitiveMsg_init_zero;
+        pb_istream_t pb_in_stream = pb_istream_from_buffer(packet_data, packet_size - 3);
+        PrimitiveMsg prim_msg     = PrimitiveMsg_init_zero;
         if (!pb_decode(&pb_in_stream, PrimitiveMsg_fields, &prim_msg))
         {
             // TODO: log or do something here

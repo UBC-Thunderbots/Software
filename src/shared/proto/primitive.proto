@@ -116,4 +116,3 @@ message PrimitiveMsg
     // Indicates whether the robot should move slowly (<1.5 m/s)
     bool slow = 7;
 }
-

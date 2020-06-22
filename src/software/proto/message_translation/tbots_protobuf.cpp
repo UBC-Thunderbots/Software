@@ -51,8 +51,7 @@ std::unique_ptr<PrimitiveSetMsg> createPrimitiveSetMsg(
     // Since the unique_ptr immediately loses scope after the copy, the memory is
     // freed
     std::for_each(primitives->begin(), primitives->end(), [&](const auto& primitive) {
-        robot_primitives_map[primitive->getRobotId()] =
-            primitive_visitor.getProto();
+        robot_primitives_map[primitive->getRobotId()] = primitive_visitor.getProto();
     });
 
     return std::move(primitive_set_msg);

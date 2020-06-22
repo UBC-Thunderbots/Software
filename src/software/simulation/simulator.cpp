@@ -241,7 +241,7 @@ unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& prim
     ProtoCreatorPrimitiveVisitor mrf_pv;
     primitive->accept(mrf_pv);
     PrimitiveMsg primitive_proto = mrf_pv.getProto();
-    auto primitive_index = static_cast<unsigned int>(primitive_proto.prim_type());
+    auto primitive_index         = static_cast<unsigned int>(primitive_proto.prim_type());
 
     return primitive_index;
 }
