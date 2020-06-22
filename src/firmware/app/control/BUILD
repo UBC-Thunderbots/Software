@@ -9,6 +9,9 @@ py_binary(
     main = ":generate_difference_equation.py",
     deps = [
         requirement("control"),
+        requirement("pyparsing"),
+        requirement("cycler"),
+        requirement("kiwisolver"),
     ],
 )
 
