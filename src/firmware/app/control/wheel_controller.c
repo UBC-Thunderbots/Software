@@ -41,6 +41,8 @@ WheelController_t* app_wheel_controller_create(float* command_coefficients,
     wheel_controller->num_samples_coefficients       = num_sample_coefficients;
     wheel_controller->previous_command_buffer        = command_buffer;
     wheel_controller->previous_output_samples_buffer = samples_buffer;
+
+    return wheel_controller;
 }
 
 void app_wheel_controller_pushNewCommand(WheelController_t* wheel_controller,
@@ -75,6 +77,7 @@ float app_wheel_controller_getWheelVoltage(WheelController_t* wheel_controller)
             circular_buffer_getAtIndex(wheel_controller->previous_output_samples_buffer,
                                        (size_t)i);
     }
+    return output_voltage;
 }
 
 void app_wheel_controller_destroy(WheelController_t* wheel_controller)
