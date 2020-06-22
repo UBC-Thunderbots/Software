@@ -67,7 +67,7 @@ void app_wheel_controller_pushNewSampleOutput(WheelController_t* wheel_controlle
     circular_buffer_push(wheel_controller->previous_output_sample_buffer, output_sample);
 }
 
-float app_wheel_controller_getWheelVoltage(WheelController_t* wheel_controller)
+float app_wheel_controller_getWheelVoltageToApply(WheelController_t* wheel_controller)
 {
     float output_voltage = 0;
 

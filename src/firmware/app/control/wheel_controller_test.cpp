@@ -21,7 +21,7 @@ TEST(WheelControllerTest, test_create_wheel_controller)
 
     // The since all buffer values are initialized to zero the voltage output should be
     // zero
-    EXPECT_EQ(app_wheel_controller_getWheelVoltage(wheel_controller), 0);
+    EXPECT_EQ(app_wheel_controller_getWheelVoltageToApply(wheel_controller), 0);
     app_wheel_controller_destroy(wheel_controller);
 }
 
@@ -38,12 +38,12 @@ TEST(WheelControllerTest, test_push_wheel_controller)
 
     app_wheel_controller_pushNewSampleOutput(wheel_controller, 10);
 
-    float output_voltage = app_wheel_controller_getWheelVoltage(wheel_controller);
+    float output_voltage = app_wheel_controller_getWheelVoltageToApply(wheel_controller);
     EXPECT_FLOAT_EQ(output_voltage, -60.0f);
 
     app_wheel_controller_pushNewCommand(wheel_controller, 9);
     app_wheel_controller_pushNewCommand(wheel_controller, 5);
-    output_voltage = app_wheel_controller_getWheelVoltage(wheel_controller);
+    output_voltage = app_wheel_controller_getWheelVoltageToApply(wheel_controller);
     EXPECT_FLOAT_EQ(output_voltage, (18.0f + 5.0f - 60.0f));
 
     app_wheel_controller_destroy(wheel_controller);
@@ -70,7 +70,7 @@ TEST(WheelControllerTest, test_get_value_wheel_controller)
         app_wheel_controller_pushNewSampleOutput(wheel_controller, 1);
     }
 
-    const float output = app_wheel_controller_getWheelVoltage(wheel_controller);
+    const float output = app_wheel_controller_getWheelVoltageToApply(wheel_controller);
 
     EXPECT_FLOAT_EQ(output, -25.0f);
 

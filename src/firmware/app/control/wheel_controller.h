@@ -15,14 +15,17 @@ typedef struct WheelController WheelController_t;
  * coefficient_array[0] is the most recent value.
  *
  * The convention is as follows:
- * coeff[0] -> z^0
- * coeff[1] -> z^-1
- * coeff[2] -> z^-2
+ * Where 'z' is the discrete time operator and z^M is equivalent to M time-steps BACKWARDS
+ * in time. coeff[0] -> z^0 coeff[1] -> z^-1 coeff[2] -> z^-2
  * ...
  * coeff[N] -> z^-N
  *
  * NOTE: All coefficients MUST be specified. That is if the difference equation is A*z^-3
  * + B*z^-1 the z^-2 coefficient MUST be included. Ex, A*z^-3 + 0*z^-2 + B*z^-1.
+ *
+ * The difference equation created is:
+ *      Output_voltage = Command_coefficients*Command_values -
+ * Output_sample_coefficients*output_values
  *
  * @param command_coefficients [in] The coefficients for the controller command inputs.
  * These are the coefficients relating to how previous input effects the controller
@@ -52,7 +55,8 @@ WheelController_t* app_wheel_controller_create(
  * @param wheel_controller [in] The WheelController that is the target of the new command
  * value.
  *
- * @param command [in] The value of the commanded state requested.
+ * @param command [in] The value of the commanded state requested. The units are the same
+ * as the desired output. Ex, m/s.
  */
 void app_wheel_controller_pushNewCommand(WheelController_t* wheel_controller,
                                          float command);
@@ -79,7 +83,7 @@ void app_wheel_controller_pushNewSampleOutput(WheelController_t* wheel_controlle
  *
  * @return Wheel voltage to apply to achieve the desired state.
  */
-float app_wheel_controller_getWheelVoltage(WheelController_t* wheel_controller);
+float app_wheel_controller_getWheelVoltageToApply(WheelController_t* wheel_controller);
 
 /**
  * Function destroys the specified instance of WheelController, de-allocating all memory
