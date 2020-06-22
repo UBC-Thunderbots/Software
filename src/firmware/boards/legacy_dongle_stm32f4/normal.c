@@ -462,22 +462,17 @@ static void send_drive_packet(const void *packet, const size_t packet_size)
     mrf_write_long(address++, estop_read() == ESTOP_RUN);
     mrf_write_long(address++, poll_index);
 
-    // TODO: need to add some sort of checksum here
-
     // Record the frame length, now that the frame is finished.
     const size_t frame_length = address - header_start_address;
     mrf_write_long(frame_length_address, frame_length);
 
     // TODO: need to test this
-    // Do a final check that we're not going to exceed the max packet size, set an
-    // error if we are
+    // Do a final check that we're not going to exceed the max packet size
     if (frame_length > MAX_DRIVE_PACKET_SIZE)
     {
         __atomic_store_n(&attempted_to_send_packet_larger_then_max_packet_size, true,
                          __ATOMIC_RELAXED);
     }
-    // TODO: need to TRIPLE check that we're not sending packets larger then 64 bytes
-    //       here, and indicate that somehow to the user
 
     // Advance the feedback polling index.
     poll_index = (poll_index + 1U) % MAX_NUM_ROBOTS;

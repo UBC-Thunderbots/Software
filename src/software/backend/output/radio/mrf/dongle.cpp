@@ -443,7 +443,6 @@ void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
     }
 
     // Submit drive_packet when possible.
-    // TODO: actually do something if we can't send?
     if (!drive_transfer)
     {
         std::cout << "sending data of size: " << data.size() << std::endl;

@@ -52,9 +52,6 @@ cc_binary(
         # We don't want to mark warnings as errors for legacy code
         "-Wno-error",
     ],
-    includes = [
-        "legacy_cdcacm/include",
-    ],
     linkopts = [
         "-T$(location :legacy_stm32f405.ld)",
         "-Wl,--build-id=none",

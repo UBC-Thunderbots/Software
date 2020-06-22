@@ -286,8 +286,6 @@ static void main_task(void *UNUSED(param))
     normal_init();
     promiscuous_init();
 
-    vTaskDelay(100U / 1000U);
-
     // Fill in the device serial number.
     {
         char temp[24U];

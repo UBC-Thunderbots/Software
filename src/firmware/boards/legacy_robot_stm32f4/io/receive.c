@@ -1,7 +1,8 @@
 
 /**
  * \defgroup RECEIVE Receive Functions
- * * \brief These functions handle receiving radio packets and acting on them.
+ *
+ * \brief These functions handle receiving radio packets and acting on them.
  *
  * For drive packets, each received packet is decoded, and the most recent data is made
  * available for the tick functions elsewhere to act on. Also, a drive packet that
@@ -245,7 +246,8 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
         PrimitiveMsg prim_msg     = PrimitiveMsg_init_zero;
         if (!pb_decode(&pb_in_stream, PrimitiveMsg_fields, &prim_msg))
         {
-            // TODO: log or do something here
+            // If we failed to decode the message, it's likely malformed, so we should not
+            // proceed
             return;
         }
 
