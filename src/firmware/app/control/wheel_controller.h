@@ -4,6 +4,19 @@
 
 typedef struct WheelController WheelController_t;
 
+/*
+ * NOTE: THIS FUNCTIONS IN THIS FILE OPERATE UNDER THE ASSUMPTION THAT THEY ARE BEING USED
+ * IN A DISCRETE TIME CONTROLLED SYSTEM. THIS MEANS THAT FOR A CONSTANT INTERPOLATION
+ * PERIOD OF 'T' ONLY ONE DATA SAMPLE IS ADDED TO THE SAMPLE BUFFER AND ONLY ONE COMMAND
+ * IS ADDED TO THE COMMAND BUFFER.
+ *
+ * THIS MEANS THAT OVER THE PERIOD OF 'T' SECONDS THERE IS NO CHANGE TO THE APPLIED
+ * VOLTAGE. THIS IS KNOWN AS 'ZERO-ORDER-HOLD' (ZOH).
+ *
+ * For more information:
+ * https://ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Lectures/Digital-Control-Systems/Slides_DigReg_2013.pdf
+ *
+ */
 /**
  * Function creates a WheelController_t with the specified parameters and returns a
  * pointer to it. The wheel_controller_destroy function MUST be called before the
@@ -48,15 +61,15 @@ WheelController_t* app_wheel_controller_create(
     float* output_sample_coefficients, unsigned int num_output_sample_coefficients);
 
 /**
- * Function pushes a new command value to the specified WheelController. The command has
- * the same units as the desired output. Ex. Command = 1m/s means that the user desires a
- * wheel speed of 1m/s.
+ * Function pushes a new command value to the specified WheelController. The command
+ * SHOULD have the same units as the desired output. Ex. Command = 1m/s means that the
+ * user desires a wheel speed of 1m/s.
  *
  * @param wheel_controller [in] The WheelController that is the target of the new command
  * value.
  *
- * @param command [in] The value of the commanded state requested. The units are the same
- * as the desired output. Ex, m/s.
+ * @param command [in] The value of the commanded state requested. This is the desired
+ * state of the wheel. The units are the same as the desired output. Ex, m/s.
  */
 void app_wheel_controller_pushNewCommand(WheelController_t* wheel_controller,
                                          float command);
@@ -77,6 +90,9 @@ void app_wheel_controller_pushNewSampleOutput(WheelController_t* wheel_controlle
 /**
  * Function returns a new wheel voltage to apply to the wheel motor (V) based on previous
  * command input and previous sampled wheel states.
+ *
+ * Note: Positive voltages correspond to the 'forwards' direction, and negative voltages
+ * to the 'negative' direction
  *
  * @param wheel_controller [in] The WheelController to calculate the new applied voltage
  * for.
