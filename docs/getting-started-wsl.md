@@ -31,6 +31,7 @@ Windows has a Windows Subsystem for Linux component that can be used to develop 
     ``` 
     - Reboot your machine.
 3. Now, let's install Ubuntu.
+    - Download the WSL2 kernel from [here](https://docs.microsoft.com/en-us/windows/wsl/wsl2-kernel).
     - Open a PowerShell window and run command `wsl --set-default-version 2` to use WSL2 by default.
     - Install Ubuntu 18.04 LTS from the Microsoft Store.
     - Open the Ubuntu app in the Start menu. It will open a command prompt and ask you to create a new UNIX username and password for your WSL2 Ubuntu installation. 
