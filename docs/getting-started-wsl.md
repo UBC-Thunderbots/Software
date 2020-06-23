@@ -44,8 +44,9 @@ Windows has a Windows Subsystem for Linux component that can be used to develop 
 3. Start an X server by opening Xlaunch through the Start menu.
     - Choose 'Multiple windows' on the first screen
     - Choose 'Start no client' on the second screen
-    - On the third screen, name sure 'Native opengl' is UNCHECKED and 'Disable access control' is CHECKED
+    - On the third screen, make sure 'Native opengl' is UNCHECKED and 'Disable access control' is CHECKED
 4. Shut down WSL with `wsl --shutdown` on the Windows command line. Open WSL again through the Ubuntu app in the Start menu.
-5. Verify that your system is configured correctly by running `glxgears -info` on the Linux command line. You should see a window pop up with spinning gears and the line `GL_RENDERER   = llvmpipe (LLVM 9.0, 256 bits)` at the top of the output.
+5. Install glxgears with `sudo apt install mesa-utils`. glxgears is a tool we will use to validate that everything is set up correctly.
+6. Verify that your system is configured correctly by running `glxgears -info` on the Linux command line. You should see a window pop up with spinning gears and the line `GL_RENDERER   = llvmpipe (LLVM 9.0, 256 bits)` at the top of the output.
 
 Once you have completed all of the above, complete the [Software Setup](./getting-started.md).
