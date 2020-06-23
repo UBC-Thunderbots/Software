@@ -103,3 +103,21 @@ void rotate(float speed3[2], float angle);
 float dot_product(const float vec1[], const float vec2[], const int size);
 
 float dot2D(float vec1[2], float vec2[2]);
+
+/**
+ * Function calculates the final speed at the end of a displacement given an initial speed
+ * and constant acceleration
+ *
+ * Source:
+ * https://www.khanacademy.org/science/physics/one-dimensional-motion/kinematic-formulas/a/what-are-the-kinematic-formulas
+ *
+ * @pre All values are positive
+ *
+ * @param initial_speed [in] The initial speed in meters/second
+ * @param displacement [in] The total displacement accelerated over in meters
+ * @param acceleration [in] The constant acceleration over the displacement in
+ * meters/second^2
+ * @return The final speed in meters/second
+ */
+float shared_physics_getFinalSpeed(float initial_speed, float displacement,
+                                   float acceleration);
