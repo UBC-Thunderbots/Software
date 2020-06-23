@@ -9,8 +9,8 @@
 #include "shared/proto/tbots_robot_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
-#include "software/networking/proto_multicast_listener.h"
-#include "software/networking/proto_multicast_sender.h"
+#include "software/networking/threaded_proto_multicast_listener.h"
+#include "software/networking/threaded_proto_multicast_sender.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
 
 
@@ -58,16 +58,16 @@ int main(int argc, char* argv[])
     boost::asio::io_service io_service;
     auto io_service_thread = std::thread([&]() { io_service.run(); });
 
-    auto vision_sender = std::make_unique<ProtoMulticastSender<VisionMsg>>(
-        io_service, std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+    auto vision_sender = std::make_unique<ThreadedProtoMulticastSender<VisionMsg>>(
+        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
         VISION_PORT);
 
-    auto primitive_sender = std::make_unique<ProtoMulticastSender<PrimitiveMsg>>(
-        io_service, std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+    auto primitive_sender = std::make_unique<ThreadedProtoMulticastSender<PrimitiveMsg>>(
+        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
         PRIMITIVE_PORT);
 
-    auto status_listener = std::make_unique<ProtoMulticastListener<TbotsRobotMsg>>(
-        io_service, std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+    auto status_listener = std::make_unique<ThreadedProtoMulticastListener<TbotsRobotMsg>>(
+        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
         ROBOT_STATUS_PORT, &callback);
 
     while (1)
