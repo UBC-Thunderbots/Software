@@ -17,6 +17,7 @@ typedef struct WheelController WheelController_t;
  * https://ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Lectures/Digital-Control-Systems/Slides_DigReg_2013.pdf
  *
  */
+
 /**
  * Function creates a WheelController_t with the specified parameters and returns a
  * pointer to it. The wheel_controller_destroy function MUST be called before the
