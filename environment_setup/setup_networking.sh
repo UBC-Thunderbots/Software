@@ -53,7 +53,7 @@ done
 PS3="Select ethernet interface (input 0 to skip): "
 
 echo "==================================================="
-echo " Configure WiFi interface ($TBOTS_ETHERNET_INTERFACE)"
+echo " Configure Ethernet interface ($TBOTS_ETHERNET_INTERFACE)"
 echo "==================================================="
 select INTERFACE in $(ls -I $TBOTS_WIFI_INTERFACE /sys/class/net );
 do
