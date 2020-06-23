@@ -1,5 +1,7 @@
 #include "software/world/field.h"
 
+#include "software/new_geom/util/contains.h"
+
 Field Field::createSSLDivisionBField()
 {
     // Using the dimensions of a standard Division B SSL field
