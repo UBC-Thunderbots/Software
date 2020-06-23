@@ -42,5 +42,5 @@ class ProtoCreatorPrimitiveVisitor : public PrimitiveVisitor
     PrimitiveMsg getProto();
 
    private:
-    std::optional<PrimitiveMsg> radio_prim;
+    std::optional<PrimitiveMsg> prim;
 };

@@ -110,10 +110,6 @@ static void receive_task(void *UNUSED(param))
                     // Note that camera packets have a variable length.
                     if (dma_buffer[MESSAGE_PURPOSE_INDEX] == 0x0FU)
                     {
-                        iprintf("Frame length: %d\r\n", frame_length);
-                        iprintf("Frame header length: %d\r\n", HEADER_LENGTH);
-                        iprintf("Frame footer length: %d\r\n", FOOTER_LENGTH);
-                        iprintf("MESSAGE_PURPOSE_INDEX: %d\r\n", MESSAGE_PURPOSE_INDEX);
                         handle_drive_packet(
                             &dma_buffer[MESSAGE_PAYLOAD_INDEX],
                             frame_length - MESSAGE_PAYLOAD_INDEX - FOOTER_LENGTH);
@@ -202,9 +198,9 @@ void receive_tick(log_record_t *record)
 
 void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
 {
-    uint8_t packet_robot_id                 = packet_data[packet_size - 3];
-    bool estop_triggered                    = packet_data[packet_size - 2] != 1;
-    bool feedback_requested_from_this_robot = packet_data[packet_size - 1] == robot_index;
+    bool estop_triggered                    = packet_data[0] != 1;
+    bool feedback_requested_from_this_robot = packet_data[1] == robot_index;
+    uint8_t packet_robot_id                 = packet_data[2];
 
     // Check if feedback should be sent.
     if (feedback_requested_from_this_robot)

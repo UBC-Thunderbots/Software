@@ -27,12 +27,12 @@
 #include "radio_config.h"
 
 /**
- * The maximum expected drive packet size
+ * \brief The maximum expected drive packet size, in bytes
  */
 #define MAX_DRIVE_PACKET_SIZE 64
 
 /**
- * The maximum expected number of robots
+ * \brief The maximum expected number of robots
  */
 #define MAX_NUM_ROBOTS 8
 
@@ -252,7 +252,7 @@ static TickType_t second_dongle_last;
 /**
  * Whether or not we have attempted to send a packet larger then the maximum packet size
  */
-static bool attempted_to_send_packet_larger_then_max_packet_size = false;
+static bool attempted_to_send_packet_greater_then_max_packet_size = false;
 
 /**
  * \brief Handles rising edge interrupts on the MRF interrupt line.
@@ -422,9 +422,8 @@ static void send_camera_packet(const void *packet)
  *
  * This function also blinks the transmit LED.
  *
- * \param[in] packet the 64-byte drive packet
- * \param[in] serials the 1-byte data serial number for each robot, incremented
- * when new data arrives
+ * \param[in] packet the drive packet to send to the robot
+ * \param[in] packet_size The length of the drive packet, in bytes
  *
  * \pre The transmit mutex must be held by the caller.
  */
@@ -452,15 +451,16 @@ static void send_drive_packet(const void *packet, const size_t packet_size)
     // Message purpose
     mrf_write_long(address++, 0X0FU);
 
+    // Prepend the emergency stop status and feedback request robot id
+    mrf_write_long(address++, estop_read() == ESTOP_RUN);
+    mrf_write_long(address++, poll_index);
+
     // Write out the payload sent from the host
-    const uint8_t *rptr = packet;
+    const uint8_t *rptr = (uint8_t *)packet;
     for (size_t i = 0; i < packet_size; i++)
     {
         mrf_write_long(address++, *rptr++);
     }
-    // append the emergency stop status and feedback request robot id
-    mrf_write_long(address++, estop_read() == ESTOP_RUN);
-    mrf_write_long(address++, poll_index);
 
     // Record the frame length, now that the frame is finished.
     const size_t frame_length = address - header_start_address;
@@ -470,7 +470,7 @@ static void send_drive_packet(const void *packet, const size_t packet_size)
     // Do a final check that we're not going to exceed the max packet size
     if (frame_length > MAX_DRIVE_PACKET_SIZE)
     {
-        __atomic_store_n(&attempted_to_send_packet_larger_then_max_packet_size, true,
+        __atomic_store_n(&attempted_to_send_packet_greater_then_max_packet_size, true,
                          __ATOMIC_RELAXED);
     }
 
@@ -960,11 +960,11 @@ static void dongle_status_task(void *UNUSED(param))
                 (second_dongle ? 0x08U : 0x00U);
             state |= ((transmit_queue_full ? 0x10U : 0x00U) |
                       (receive_queue_full ? 0x20U : 0x00U));
-            state |=
-                __atomic_exchange_n(&attempted_to_send_packet_larger_then_max_packet_size,
-                                    false, __ATOMIC_RELAXED)
-                    ? 0x40U
-                    : 0x00U;
+            state |= __atomic_exchange_n(
+                         &attempted_to_send_packet_greater_then_max_packet_size, false,
+                         __ATOMIC_RELAXED)
+                         ? 0x40U
+                         : 0x00U;
 
             bool ok;
             while (!(ok = uep_write(0x83U, &state, sizeof(state), false)) &&

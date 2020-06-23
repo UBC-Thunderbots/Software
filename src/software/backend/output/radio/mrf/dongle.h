@@ -112,6 +112,7 @@ class MRFDongle final
    private:
     // We are currently uncertain if the limit on radio messages is 64 or 100 bytes. So
     // to be safe we assume 64, then leave two bytes for the E-Stop and Feedback requests
+    // The robot id is assumed to be set at the start of the packet
     static const size_t MAX_RADIO_PACKET_SIZE = 62;
 
     friend class SendReliableMessageOperation;
