@@ -17,6 +17,7 @@
 class Backend : public Subject<SensorMsg>,
                 public Subject<World>,
                 public Subject<RobotStatus>,
+                public ThreadedObserver<World>,
                 public ThreadedObserver<ConstPrimitiveVectorPtr>
 {
    public:

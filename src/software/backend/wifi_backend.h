@@ -24,14 +24,8 @@ class WifiBackend : public Backend
      */
     void receiveWorld(World world);
 
-    /**
-     * This is called when we receive a primitive vector because
-     * the backend is a ThreadedObserver of the ConstantPrimitiveVectorPtr
-     *
-     * @param primitives The vector of primitives to pack and send to robots
-     */
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
-
+    void onValueReceived(World world) override;
     /**
      * Joins the specified multicast group on the vision_output, primitive_output
      * and robot_msg_input. Multicast Channel and Multicast Group are used

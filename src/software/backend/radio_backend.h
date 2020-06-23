@@ -16,6 +16,7 @@ class RadioBackend : public Backend
     static const int DEFAULT_RADIO_CONFIG = 0;
 
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
+    void onValueReceived(World world) override;
 
     /**
      * This is registered as an async callback function so that it is called

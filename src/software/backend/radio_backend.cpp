@@ -27,6 +27,12 @@ void RadioBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
     radio_output.sendPrimitives(*primitives_ptr);
 }
 
+void RadioBackend::onValueReceived(World world)
+{
+    // Send the world to the robots directly via radio
+    radio_output.sendVisionPacket(world.friendlyTeam(), world.ball());
+}
+
 void RadioBackend::receiveWorld(World world)
 {
     // Send the world to the robots directly via radio
