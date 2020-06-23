@@ -56,6 +56,7 @@ host_software_packages=(
                       # to manually install it ourselves
     kcachegrind # This lets us view the profiles output by callgrind
     codespell # Fixes typos
+    bridge-utils # Used to configure network in setup_networking.sh
 )
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
