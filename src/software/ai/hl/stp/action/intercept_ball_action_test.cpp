@@ -27,7 +27,8 @@ TEST(InterceptBallActionTest, test_robot_ahead_of_ball_moves_in_front_of_ball)
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(Point(3, 0).isClose(move_intent.getDestination(), 0.01));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(3, 0),
+                                                   move_intent.getDestination(), 0.01));
         Angle angle_facing_ball = (ball.position() - robot.position()).orientation();
         EXPECT_EQ(angle_facing_ball, move_intent.getFinalAngle());
         EXPECT_EQ(AutokickType::NONE, move_intent.getAutoKickType());
@@ -59,7 +60,8 @@ TEST(InterceptBallActionTest, test_robot_moves_to_edge_of_field_if_ball_moving_t
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(field.enemyGoalCenter().isClose(move_intent.getDestination(), 0.01));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(field.enemyGoalCenter(),
+                                                   move_intent.getDestination(), 0.01));
         Angle angle_facing_ball = (ball.position() - robot.position()).orientation();
         EXPECT_EQ(angle_facing_ball, move_intent.getFinalAngle());
         EXPECT_EQ(AutokickType::NONE, move_intent.getAutoKickType());
@@ -91,7 +93,8 @@ TEST(InterceptBallActionTest, test_robot_moves_to_the_ball_if_the_ball_is_moving
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(ball.position().isClose(move_intent.getDestination(), 0.01));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(ball.position(),
+                                                   move_intent.getDestination(), 0.01));
         Angle angle_facing_ball = (ball.position() - robot.position()).orientation();
         EXPECT_EQ(angle_facing_ball, move_intent.getFinalAngle());
         EXPECT_EQ(AutokickType::NONE, move_intent.getAutoKickType());

@@ -32,8 +32,7 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
-        "//software/new_geom/util:distance",
-        "//software/new_geom/util:intersects",
+        "//software/new_geom/util:algorithms",
     ],
 )
 

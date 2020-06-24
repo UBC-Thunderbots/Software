@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
-#include "software/geom/util.h"
+#include "software/new_geom/util/contains.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 const std::string HaltTestPlay::name = "Halt Test Play";
@@ -18,8 +18,9 @@ bool HaltTestPlay::isApplicable(const World &world) const
 
 bool HaltTestPlay::invariantHolds(const World &world) const
 {
-    return Rectangle(world.field().enemyCornerNeg(), world.field().friendlyCornerPos())
-        .contains(world.ball().position());
+    return contains(
+        Rectangle(world.field().enemyCornerNeg(), world.field().friendlyCornerPos()),
+        world.ball().position());
 }
 
 void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
