@@ -59,16 +59,15 @@ int main(int argc, char* argv[])
     auto io_service_thread = std::thread([&]() { io_service.run(); });
 
     auto vision_sender = std::make_unique<ThreadedProtoMulticastSender<VisionMsg>>(
-        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
-        VISION_PORT);
+        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]), VISION_PORT);
 
     auto primitive_sender = std::make_unique<ThreadedProtoMulticastSender<PrimitiveMsg>>(
-        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
-        PRIMITIVE_PORT);
+        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]), PRIMITIVE_PORT);
 
-    auto status_listener = std::make_unique<ThreadedProtoMulticastListener<TbotsRobotMsg>>(
-        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
-        ROBOT_STATUS_PORT, &callback);
+    auto status_listener =
+        std::make_unique<ThreadedProtoMulticastListener<TbotsRobotMsg>>(
+            std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+            ROBOT_STATUS_PORT, &callback);
 
     while (1)
     {

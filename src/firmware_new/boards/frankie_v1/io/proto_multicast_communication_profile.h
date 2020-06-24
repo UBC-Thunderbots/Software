@@ -1,6 +1,18 @@
 #pragma once
 
 #include <pb.h>
+#include "lwip.h"
+#include "lwip/api.h"
+#include "lwip/inet.h"
+#include "lwip/ip_addr.h"
+#include "lwip/memp.h"
+#include "lwip/opt.h"
+#include "lwip/pbuf.h"
+#include "lwip/sys.h"
+#include "lwip/tcp.h"
+#include "lwip/udp.h"
+
+#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 
 typedef struct ProtoMulticastCommunicationProfile ProtoMulticastCommunicationProfile_t;
 
@@ -13,58 +25,6 @@ typedef enum
     RECEIVED_PROTO  = 1 << 1,  // new protobuf has been received
     RECEIVE_TIMEOUT = 1 << 2,  // blocking takes longer than NETWORK_TIMEOUT_MS
 } ProtoMulticastCommunicationEventFlags_t;
-
-/***
- * TASKS:
- *
- *                    Sender Task                             Listener Task
- *         +-------------------------------+         +------------------------------+
- *         |                               |         |                              |
- *         |  wait for NETIF_CONFIGURED    |         |  wait for NETIF_CONFIGURED   |
- *         |                               |         |                              |
- *         |  join multicast group         |         |  join multicast group        |
- *         |                               |         |                              |
- *     +----> wait for PROTO_UPDATED event |     +----> wait for new proto on netif |
- *     |   |                               |     |   |                              |
- *     |   |  acquire lock                 |     |   |  acquire lock                |
- *     |   |                               |     |   |                              |
- *     |   |  serialize proto to buffer    |     |   |  deserialize buffer to proto |
- *     |   |                               |     |   |                              |
- *     |   |  release lock                 |     |   |  release lock                |
- *     |   |                               |     |   |                              |
- *     +----+ send buffer to group         |     +----+ notify RECEIVED_PROTO event |
- *         |                               |         |                              |
- *         +-------------------------------+         +------------------------------+
- *
- * @param communication_profile The pointer to the allocated communication profile
- * to use for the Task
- *
- * NOTE: These functions must run as a new Task
- */
-void io_proto_multicast_sender_task(void* communication_profile);
-void io_proto_multicast_listener_task(void* communication_profile);
-
-/**
- * LWIP automatically places MX_LWIP_Init() in a default task. That function
- * call internally creates another TCP/IP task, and the default task just loops
- * forever.
- *
- * Cube forces us to generate this function, in main.c where we mark it as __weak and
- * define the implementation in this library (proto_multicast_communication). When the
- * proto communication library is linked w/ the main frankie_v1 binary, the __weak
- * reference is resolved to the "stronger" reference to the function defined below.
- *
- * We take over control so we can signal other networking tasks when MX_LWIP_Init()
- * is finished running and the network link is configured and up.
- *
- * @param arg Unused
- */
-void io_proto_multicast_startNetworkingTask(void* arg);
-
-/**
- * Initializes the proto_multicast_communication library
- */
-void io_proto_multicast_communication_init(void);
 
 /**
  * Create an ProtoMulticastCommunicationProfile
@@ -86,6 +46,24 @@ void io_proto_multicast_communication_init(void);
 ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_create(
     const char* profile_name, const char* multicast_address, uint16_t port,
     void* protobuf_struct, const pb_field_t* message_fields, uint16_t message_max_size);
+
+const char* io_proto_multicast_communication_profile_getProfileName(
+    ProtoMulticastCommunicationProfile_t* profile);
+
+const ip_addr_t* io_proto_multicast_communication_profile_getAddress(
+    ProtoMulticastCommunicationProfile_t* profile);
+
+uint16_t io_proto_multicast_communication_profile_getPort(
+    ProtoMulticastCommunicationProfile_t* profile);
+
+void* io_proto_multicast_communication_profile_getProtoStruct(
+    ProtoMulticastCommunicationProfile_t* profile);
+
+const pb_field_t* io_proto_multicast_communication_profile_getProtoFields(
+    ProtoMulticastCommunicationProfile_t* profile);
+
+uint16_t io_proto_multicast_communication_profile_getMaxProtoSize(
+    ProtoMulticastCommunicationProfile_t* profile);
 
 /**
  * Locks the profile to implicitly lock the internally tracked pointer
