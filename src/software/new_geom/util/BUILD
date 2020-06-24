@@ -1,41 +1,44 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "util",
-    deps = [
-        ":closest_point",
-        ":distance",
-        ":intersects",
-    ],
-)
-
-cc_library(
-    name = "closest_point",
-    srcs = [
-        "closest_point.cpp",
-    ],
-    hdrs = [
-        "closest_point.h",
-    ],
-    deps = [
-        "//software/new_geom:angle",
-        "//software/new_geom:geom_constants",
-        "//software/new_geom:line",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
-    ],
-)
-
-cc_library(
-    name = "almost_equal",
+    name = "algorithms",
     srcs = [
         "almost_equal.cpp",
+        "closest_point.cpp",
+        "collinear.cpp",
+        "contains.cpp",
+        "distance.cpp",
+        "find_open_circles.cpp",
+        "furthest_point.cpp",
+        "intersection.cpp",
+        "intersects.cpp",
+        "voronoi_diagram.cpp",
     ],
     hdrs = [
         "almost_equal.h",
+        "closest_point.h",
+        "collinear.h",
+        "contains.h",
+        "distance.h",
+        "find_open_circles.h",
+        "furthest_point.h",
+        "intersection.h",
+        "intersects.h",
+        "voronoi_diagram.h",
     ],
     deps = [
+        "//software/logger",
+        "//software/new_geom:angle",
+        "//software/new_geom:circle",
         "//software/new_geom:geom_constants",
+        "//software/new_geom:line",
+        "//software/new_geom:point",
+        "//software/new_geom:point_boost_geometry_compatability",
+        "//software/new_geom:polygon",
+        "//software/new_geom:ray",
+        "//software/new_geom:rectangle",
+        "//software/new_geom:segment",
+        "//software/new_geom:vector",
     ],
 )
 
@@ -45,28 +48,8 @@ cc_test(
         "almost_equal_test.cpp",
     ],
     deps = [
-        ":almost_equal",
+        ":algorithms",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "intersects",
-    srcs = [
-        "intersects.cpp",
-    ],
-    hdrs = [
-        "intersects.h",
-    ],
-    deps = [
-        ":contains",
-        ":distance",
-        ":intersection",
-        "//software/new_geom:circle",
-        "//software/new_geom:line",
-        "//software/new_geom:polygon",
-        "//software/new_geom:ray",
-        "//software/new_geom:segment",
     ],
 )
 
@@ -76,29 +59,10 @@ cc_test(
         "intersects_test.cpp",
     ],
     deps = [
-        ":intersects",
+        ":algorithms",
         "//software/new_geom:rectangle",
         "//software/new_geom:triangle",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "intersection",
-    srcs = [
-        "intersection.cpp",
-    ],
-    hdrs = [
-        "intersection.h",
-    ],
-    deps = [
-        ":almost_equal",
-        ":collinear",
-        "//software/new_geom:line",
-        "//software/new_geom:point_boost_geometry_compatability",
-        "//software/new_geom:polygon",
-        "//software/new_geom:ray",
-        "//software/new_geom:segment",
     ],
 )
 
@@ -108,23 +72,9 @@ cc_test(
         "intersection_test.cpp",
     ],
     deps = [
-        ":intersection",
+        ":algorithms",
         "//software/new_geom:rectangle",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "collinear",
-    srcs = [
-        "collinear.cpp",
-    ],
-    hdrs = [
-        "collinear.h",
-    ],
-    deps = [
-        ":almost_equal",
-        "//software/new_geom:point",
     ],
 )
 
@@ -134,23 +84,8 @@ cc_test(
         "collinear_test.cpp",
     ],
     deps = [
-        ":collinear",
+        ":algorithms",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "contains",
-    srcs = [
-        "contains.cpp",
-    ],
-    hdrs = [
-        "contains.h",
-    ],
-    deps = [
-        ":distance",
-        "//software/new_geom:circle",
-        "//software/new_geom:segment",
     ],
 )
 
@@ -160,29 +95,8 @@ cc_test(
         "contains_test.cpp",
     ],
     deps = [
-        ":contains",
+        ":algorithms",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "distance",
-    srcs = [
-        "distance.cpp",
-    ],
-    hdrs = [
-        "distance.h",
-    ],
-    deps = [
-        "//software/new_geom:angle",
-        "//software/new_geom:circle",
-        "//software/new_geom:geom_constants",
-        "//software/new_geom:line",
-        "//software/new_geom:point",
-        "//software/new_geom:point_boost_geometry_compatability",
-        "//software/new_geom:polygon",
-        "//software/new_geom:segment",
-        "//software/new_geom:vector",
     ],
 )
 
@@ -192,7 +106,7 @@ cc_test(
         "closest_point_test.cpp",
     ],
     deps = [
-        ":closest_point",
+        ":algorithms",
         "@gtest//:gtest_main",
     ],
 )
@@ -203,28 +117,9 @@ cc_test(
         "distance_test.cpp",
     ],
     deps = [
-        ":distance",
+        ":algorithms",
         "//software/new_geom:rectangle",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "find_open_circles",
-    srcs = [
-        "find_open_circles.cpp",
-    ],
-    hdrs = [
-        "find_open_circles.h",
-    ],
-    deps = [
-        ":distance",
-        ":intersection",
-        ":voronoi_diagram",
-        "//software/logger",
-        "//software/new_geom:circle",
-        "//software/new_geom:point",
-        "//software/new_geom:rectangle",
     ],
 )
 
@@ -234,28 +129,9 @@ cc_test(
         "find_open_circles_test.cpp",
     ],
     deps = [
-        ":find_open_circles",
+        ":algorithms",
         "//software/test_util",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "voronoi_diagram",
-    srcs = [
-        "voronoi_diagram.cpp",
-    ],
-    hdrs = [
-        "voronoi_diagram.h",
-    ],
-    deps = [
-        ":distance",
-        ":intersection",
-        "//software/logger",
-        "//software/new_geom:circle",
-        "//software/new_geom:point",
-        "//software/new_geom:point_boost_geometry_compatability",
-        "//software/new_geom:rectangle",
     ],
 )
 
@@ -265,8 +141,17 @@ cc_test(
         "voronoi_diagram_test.cpp",
     ],
     deps = [
-        ":voronoi_diagram",
+        ":algorithms",
         "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "furthest_point_test",
+    srcs = ["furthest_point_test.cpp"],
+    deps = [
+        ":algorithms",
         "@gtest//:gtest_main",
     ],
 )

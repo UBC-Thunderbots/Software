@@ -9,7 +9,7 @@ cc_library(
         "//shared:constants",
         "//software/new_geom:angle",
         "//software/new_geom:point",
-        "//software/new_geom/util:closest_point",
+        "//software/new_geom/util:algorithms",
         "//software/primitive:all_primitives",
         "//software/primitive:primitive_visitor",
         "//software/world:ball",

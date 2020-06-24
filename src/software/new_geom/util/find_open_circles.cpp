@@ -1,6 +1,8 @@
 #include "software/new_geom/util/find_open_circles.h"
 
+#include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/distance.h"
+#include "software/new_geom/util/furthest_point.h"
 #include "software/new_geom/util/intersection.h"
 #include "software/new_geom/util/voronoi_diagram.h"
 
@@ -25,7 +27,7 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
     // Filters out points that are outside of the bounding box
     points.erase(std::remove_if(points.begin(), points.end(),
                                 [&bounding_box](const Point &p) {
-                                    return !bounding_box.contains(p);
+                                    return !contains(bounding_box, p);
                                 }),
                  points.end());
 
@@ -63,10 +65,10 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
             bounding_box,
             Segment(halfPoint +
                         (perpVec *
-                         (bounding_box.furthestCorner(halfPoint) - halfPoint).length()),
+                         (furthestPoint(bounding_box, halfPoint) - halfPoint).length()),
                     halfPoint -
                         (perpVec *
-                         (bounding_box.furthestCorner(halfPoint) - halfPoint).length())));
+                         (furthestPoint(bounding_box, halfPoint) - halfPoint).length())));
         std::vector<Point> corners = bounding_box.getPoints();
         std::copy(corners.begin(), corners.end(),
                   std::inserter(intersections, intersections.end()));

@@ -4,6 +4,7 @@
 
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
+#include "software/test_util/test_util.h"
 
 TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)
 {
@@ -158,7 +159,8 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.18, 0), 0.1));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
+                                                   Point(-0.18, 0), 0.1));
         EXPECT_EQ(Angle::zero(), move_intent.getFinalAngle());
         EXPECT_EQ(0.0, move_intent.getFinalSpeed());
     }
@@ -188,7 +190,8 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(-2.45, 2.25), 0.1));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
+                                                   Point(-2.45, 2.25), 0.1));
         EXPECT_EQ(Angle::fromDegrees(105), move_intent.getFinalAngle());
         EXPECT_EQ(0.0, move_intent.getFinalSpeed());
     }
@@ -218,7 +221,8 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.85, -3.75), 0.1));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
+                                                   Point(-0.85, -3.75), 0.1));
         EXPECT_EQ(Angle::fromDegrees(255), move_intent.getFinalAngle());
         EXPECT_EQ(0.0, move_intent.getFinalSpeed());
     }
@@ -248,7 +252,8 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_negative_
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
-        EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.15, 0.25), 0.1));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
+                                                   Point(-0.15, 0.25), 0.1));
         EXPECT_EQ(Angle::fromDegrees(306), move_intent.getFinalAngle());
         EXPECT_EQ(0.0, move_intent.getFinalSpeed());
     }
