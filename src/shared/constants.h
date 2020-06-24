@@ -110,4 +110,4 @@ const unsigned PRIMITIVE_PORT = 42070;
 const unsigned ROBOT_STATUS_PORT = 42071;
 
 // the timeout to recv a network packet
-static uint32_t NETWORK_TIMEOUT_MS = 1000;
+const unsigned NETWORK_TIMEOUT_MS = 1000;

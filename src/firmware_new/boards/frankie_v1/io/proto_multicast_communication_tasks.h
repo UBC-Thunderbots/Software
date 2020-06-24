@@ -45,9 +45,9 @@ void io_proto_multicast_listener_task(void* communication_profile);
  * We take over control so we can signal other networking tasks when MX_LWIP_Init()
  * is finished running and the network link is configured and up.
  *
- * @param arg Unused
+ * @param unused
  */
-void io_proto_multicast_startNetworkingTask(void* arg);
+void io_proto_multicast_startNetworkingTask(void* unused);
 
 /**
  * Initializes the proto_multicast_communication library

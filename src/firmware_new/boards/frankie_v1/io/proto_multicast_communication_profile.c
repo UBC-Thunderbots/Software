@@ -79,7 +79,7 @@ uint16_t io_proto_multicast_communication_profile_getPort(
 void* io_proto_multicast_communication_profile_getProtoStruct(
     ProtoMulticastCommunicationProfile_t* profile)
 {
-    return (void*)profile->protobuf_struct;
+    return profile->protobuf_struct;
 }
 
 const pb_field_t* io_proto_multicast_communication_profile_getProtoFields(

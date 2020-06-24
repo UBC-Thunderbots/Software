@@ -46,7 +46,9 @@ void io_proto_multicast_sender_task(void* communication_profile)
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
     netconn_set_ipv6only(conn, true);
 
-    netconn_bind(conn, IP6_ADDR_ANY, io_proto_multicast_communication_profile_getPort(profile));
+    netconn_bind(conn, IP6_ADDR_ANY,
+                 io_proto_multicast_communication_profile_getPort(profile));
+
     netconn_join_leave_group(conn,
                              io_proto_multicast_communication_profile_getAddress(profile),
                              IP6_ADDR_ANY, NETCONN_JOIN);
@@ -104,6 +106,7 @@ void io_proto_multicast_listener_task(void* communication_profile)
 
     netconn_bind(conn, io_proto_multicast_communication_profile_getAddress(profile),
                  io_proto_multicast_communication_profile_getPort(profile));
+
     netconn_join_leave_group(conn,
                              io_proto_multicast_communication_profile_getAddress(profile),
                              IP6_ADDR_ANY, NETCONN_JOIN);
@@ -130,10 +133,9 @@ void io_proto_multicast_listener_task(void* communication_profile)
                 pb_istream_t in_stream = pb_istream_from_buffer(
                     (uint8_t*)rx_buf->p->payload, rx_buf->p->tot_len);
 
-                // deserialize into buffer
                 io_proto_multicast_communication_profile_acquireLock(profile);
 
-                // nanopb err logic is inverted, false = error
+                // deserialize into buffer, nanopb err logic is inverted, false = error
                 no_protobuf_err = pb_decode(
                     &in_stream,
                     io_proto_multicast_communication_profile_getProtoFields(profile),
@@ -159,7 +161,7 @@ void io_proto_multicast_listener_task(void* communication_profile)
     netconn_delete(conn);
 }
 
-void io_proto_multicast_startNetworkingTask(void* arg)
+void io_proto_multicast_startNetworkingTask(void* unused)
 {
     MX_LWIP_Init();
     osEventFlagsSet(networking_event, NETIF_CONFIGURED);
