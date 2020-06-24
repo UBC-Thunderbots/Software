@@ -62,7 +62,6 @@ cc_library(
         "//firmware_new/boards/frankie_v1:frankie_v1_lwip",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:lwip",
-        "//shared:constants",
         "//shared/proto:tbots_c_proto",
         "@com_github_nanopb_nanopb//:nanopb",
     ],

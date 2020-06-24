@@ -20,16 +20,17 @@
 // internal event to signal network interface configured
 static osEventFlagsId_t networking_event;
 
+// the timeout to recv a network packet
+static uint32_t network_timeout_ms;
+
 // flag mask for network interface configured event
 // this flag is set on the networking_event to indicate "link up"
 static uint32_t NETIF_CONFIGURED = 1 << 0;
 
-// the timeout to recv a network packet
-static uint32_t NETWORK_TIMEOUT_MS = 1000;
-
-void io_proto_multicast_communication_init(void)
+void io_proto_multicast_communication_init(uint32_t net_timeout_ms)
 {
-    networking_event = osEventFlagsNew(NULL);
+    networking_event   = osEventFlagsNew(NULL);
+    network_timeout_ms = net_timeout_ms;
 }
 
 void io_proto_multicast_sender_task(void* communication_profile)
@@ -102,7 +103,7 @@ void io_proto_multicast_listener_task(void* communication_profile)
     // communication profile to join the specified multicast group.
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
     netconn_set_ipv6only(conn, true);
-    netconn_set_recvtimeout(conn, NETWORK_TIMEOUT_MS);
+    netconn_set_recvtimeout(conn, network_timeout_ms);
 
     netconn_bind(conn, io_proto_multicast_communication_profile_getAddress(profile),
                  io_proto_multicast_communication_profile_getPort(profile));

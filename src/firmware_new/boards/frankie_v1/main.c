@@ -180,7 +180,7 @@ void initIoNetworking()
     // TODO this needs to be hooked up to the channel dial on the robot, when available
     unsigned channel = 0;
 
-    io_proto_multicast_communication_init();
+    io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,

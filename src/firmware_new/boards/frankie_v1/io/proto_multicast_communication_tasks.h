@@ -51,5 +51,8 @@ void io_proto_multicast_startNetworkingTask(void* unused);
 
 /**
  * Initializes the proto_multicast_communication library
+ *
+ * @param net_timeout_msg How long the receivers should wait before signaling
+ *        a timeout event in ms
  */
-void io_proto_multicast_communication_init(void);
+void io_proto_multicast_communication_init(uint32_t net_timeout_ms);
