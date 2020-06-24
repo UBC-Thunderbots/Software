@@ -52,7 +52,7 @@ typedef struct WheelController WheelController_t;
  * effects the controller output.
  *
  * @param num_sample_coefficient [in] The number of elements in the
- * sampled_output)coefficients array.
+ * sampled_output coefficients array.
  *
  * @return Pointer to the newly created WheelController_t
  */

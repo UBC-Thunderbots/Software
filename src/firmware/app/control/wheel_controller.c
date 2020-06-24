@@ -33,7 +33,7 @@ WheelController_t* app_wheel_controller_create(
 
     // Copy the input coefficients to the internal arrays and
     // fill the circular buffers with zeros as the initial state
-    for (unsigned int i = 0; i < num_command_coefficients; i++)
+    for (size_t i = 0; i < num_command_coefficients; i++)
     {
         internal_command_coefficients[i] = command_coefficients[i];
         circular_buffer_push(command_buffer, 0.0f);
