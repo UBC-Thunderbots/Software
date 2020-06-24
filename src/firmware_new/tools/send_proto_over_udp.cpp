@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
         vision_sender->sendProto(test_vision_msg);
 
         // 100 hz test
-        std::this_thread::sleep_for(std::chrono::nanoseconds(10000000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     google::protobuf::ShutdownProtobufLibrary();
