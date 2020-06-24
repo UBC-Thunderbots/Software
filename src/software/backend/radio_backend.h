@@ -36,7 +36,7 @@ class RadioBackend : public Backend
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
 
-    // Client for listener to SSL protobufs
+    // Client to listen for SSL protobufs
     SSLProtoClient ssl_proto_client;
 
     // The interface that lets us send primitives to the robots over radio

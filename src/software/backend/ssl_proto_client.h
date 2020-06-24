@@ -7,8 +7,8 @@
 
 /**
  * This class encapsulates ProtoMulticastListener<SSL_WrapperPacket> and
- * ProtoMulticastListener<Referee> to abstract all networking operations behind a single
- * interface.
+ * ProtoMulticastListener<Referee> to abstract all ssl protobuf networking operations
+ * behind a single interface.
  */
 class SSLProtoClient
 {

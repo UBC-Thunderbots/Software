@@ -26,6 +26,7 @@ class WifiBackend : public Backend
 
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
     void onValueReceived(World world) override;
+
     /**
      * Joins the specified multicast group on the vision_output, primitive_output
      * and robot_msg_input. Multicast Channel and Multicast Group are used
@@ -45,7 +46,7 @@ class WifiBackend : public Backend
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
 
-    // Client for listener to SSL protobufs
+    // Client to listen for SSL protobufs
     SSLProtoClient ssl_proto_client;
 
     // ProtoMulticast** to communicate with robots

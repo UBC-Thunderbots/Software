@@ -27,11 +27,11 @@ class Backend : public Subject<SensorMsg>,
 
     /**
      * Callback function to send components of SensorMsg via Subject<SensorMsg>
+     * Immediately makes a SensorMsg from msg and sends it to Observers
      *
      * @param msg The component of SensorMsg
      */
     void receiveTbotsRobotMsg(TbotsRobotMsg msg);
-    void receiveTbotsRobotMsgs(std::vector<TbotsRobotMsg> msgs);
     void receiveSSLWrapperPacket(SSL_WrapperPacket msg);
     void receiveSSLReferee(Referee msg);
 };

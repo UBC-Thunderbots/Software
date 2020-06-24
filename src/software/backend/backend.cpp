@@ -7,16 +7,6 @@ void Backend::receiveTbotsRobotMsg(TbotsRobotMsg msg)
     Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
 
-void Backend::receiveTbotsRobotMsgs(std::vector<TbotsRobotMsg> msgs)
-{
-    SensorMsg sensor_msg;
-    for (const auto& msg : msgs)
-    {
-        *(sensor_msg.add_tbots_robot_msg()) = msg;
-    }
-    Subject<SensorMsg>::sendValueToObservers(sensor_msg);
-}
-
 void Backend::receiveSSLWrapperPacket(SSL_WrapperPacket msg)
 {
     SensorMsg sensor_msg;
