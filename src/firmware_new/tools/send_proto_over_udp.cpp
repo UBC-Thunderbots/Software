@@ -77,8 +77,8 @@ int main(int argc, char* argv[])
         test_vision_msg.set_allocated_time_sent(createCurrentTimestampMsg().release());
         vision_sender->sendProto(test_vision_msg);
 
-        // 40 hz test
-        std::this_thread::sleep_for(std::chrono::nanoseconds(25000000));
+        // 100 hz test
+        std::this_thread::sleep_for(std::chrono::nanoseconds(10000000));
     }
 
     google::protobuf::ShutdownProtobufLibrary();

@@ -184,15 +184,15 @@ void initIoNetworking()
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
-        &primitive_msg, PrimitiveMsg_fields, 150);
+        &primitive_msg, PrimitiveMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
-        &vision_msg, VisionMsg_fields, 150);
+        &vision_msg, VisionMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     tbots_robot_msg_sender_profile = io_proto_multicast_communication_profile_create(
         "tbots_robot_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
-        &tbots_robot_msg, TbotsRobotMsg_fields, 150);
+        &tbots_robot_msg, TbotsRobotMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 }
 
 
@@ -729,7 +729,8 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
-        osDelay(10);
+        // run loop at 100hz
+        osDelay(1 / 100 * 1e3);
     }
     /* USER CODE END test_msg_update */
 }
