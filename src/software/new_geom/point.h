@@ -83,13 +83,6 @@ class Point final
     double distanceFromOrigin() const;
 
     /**
-     * Returns the distance between this Point and the given point p
-     *
-     * @return the distance
-     */
-    double distanceFromPoint(const Point &p) const;
-
-    /**
      * Returns a new Vector from this Point
      *
      * @return A new vector from this Point
@@ -105,18 +98,6 @@ class Point final
      * @return the new Point rotated by rot
      */
     Point rotate(const Angle &rot) const;
-
-    /**
-     * Checks whether this Point is close to another Point
-     *
-     * @param other the other point to check against
-     *
-     * @param dist the distance to check against
-     *
-     * @return true if the other point is within the given distance (not inclusive) of
-     * this Point
-     */
-    bool isClose(const Point &other, double dist) const;
 
     /**
      * Assigns one Point to another

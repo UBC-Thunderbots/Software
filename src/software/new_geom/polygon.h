@@ -27,13 +27,6 @@ class Polygon : public virtual Shape
     explicit Polygon(const std::initializer_list<Point>& points);
 
     /**
-     * Determines whether the given Point is contained within this Polygon.
-     *
-     * @return whether the Point p is contained within this Polygon.
-     */
-    bool contains(const Point& p) const override;
-
-    /**
      * Returns the centroid of this polygon
      *
      * @return The centroid of this polygon

@@ -6,6 +6,7 @@
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/angle.h"
+#include "software/new_geom/util/distance.h"
 #include "software/parameter/dynamic_parameters.h"
 
 PivotAction::PivotAction() : Action(true) {}
@@ -29,7 +30,7 @@ void PivotAction::accept(MutableActionVisitor& visitor)
 void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // If we're not in position to pivot, move to grab the ball
-    if (!(robot->position()).isClose(pivot_point, 1.15))
+    if (distance(robot->position(), pivot_point) > 1.15)
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), pivot_point, (pivot_point - robot->position()).orientation(),

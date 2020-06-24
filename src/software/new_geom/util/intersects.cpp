@@ -13,7 +13,7 @@ bool intersects(const Polygon &first, const Segment &second)
             return true;
         }
     }
-    if (first.contains(second.getSegStart()))
+    if (contains(first, second.getSegStart()))
     {
         return true;
     }
@@ -44,7 +44,7 @@ bool intersects(const Ray &first, const Polygon &second)
 
 bool intersects(const Polygon &first, const Circle &second)
 {
-    if (first.contains(second.getOrigin()))
+    if (contains(first, second.getOrigin()))
     {
         return true;
     }
@@ -153,12 +153,12 @@ bool intersects(const Ray &first, const Segment &second)
     // intersection is within their definitions
     if (intersectionValue.has_value())
     {
-        return first.contains(intersectionValue.value()) &&
-               second.contains(intersectionValue.value());
+        return contains(first, intersectionValue.value()) &&
+               contains(second, intersectionValue.value());
     }
     // If there is no intersection, the ray and segment may be parallel, check if they are
     // overlapped
-    return first.contains(second.getSegStart()) || first.contains(second.getEnd());
+    return contains(first, second.getSegStart()) || contains(first, second.getEnd());
 }
 
 bool intersects(const Segment &first, const Ray &second)
