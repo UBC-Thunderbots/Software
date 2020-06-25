@@ -5,7 +5,7 @@
 double distance(const Line &first, const Point &second)
 {
     Line::Coeffs coeffs = first.getCoeffs();
-    return abs(coeffs.a * second.x() + coeffs.b * second.y() + coeffs.c) /
+    return std::abs(coeffs.a * second.x() + coeffs.b * second.y() + coeffs.c) /
            hypot(coeffs.a, coeffs.b);
 }
 
