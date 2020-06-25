@@ -17,10 +17,21 @@
 class Backend : public Subject<SensorMsg>,
                 public Subject<World>,
                 public Subject<RobotStatus>,
+                public ThreadedObserver<World>,
                 public ThreadedObserver<ConstPrimitiveVectorPtr>
 {
    public:
     Backend() = default;
 
     virtual ~Backend() = default;
+
+    /**
+     * Callback function to send components of SensorMsg via Subject<SensorMsg>
+     * Immediately makes a SensorMsg from msg and sends it to Observers
+     *
+     * @param msg The component of SensorMsg
+     */
+    void receiveTbotsRobotMsg(TbotsRobotMsg msg);
+    void receiveSSLWrapperPacket(SSL_WrapperPacket msg);
+    void receiveSSLReferee(Referee msg);
 };
