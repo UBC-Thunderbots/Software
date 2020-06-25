@@ -50,7 +50,7 @@ static void catch_start(const primitive_params_t* params, void* void_state_ptr,
 
     Dribbler_t* dribbler =
         app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
-    app_dribbler_setSpeed(dribbler, state->dribbler_speed);
+    app_dribbler_setSpeed(dribbler, (unsigned int)state->dribbler_speed);
 }
 
 static void catch_end(void* void_state_ptr, FirmwareWorld_t* world) {}
@@ -100,13 +100,13 @@ static void catch_tick(void* void_state_ptr, FirmwareWorld_t* world)
         // major_vel shows how fast the robot is approaching to the ball
         // minor_vel is perpendicular to major axis
         major_vec[0] =
-            (ballpos[0] - pos[0] - ROBOTRADIUS * cos(relativeangle)) / distance;
+            (ballpos[0] - pos[0] - ROBOTRADIUS * (float)cos(relativeangle)) / distance;
         major_vec[1] =
-            (ballpos[1] - pos[1] - ROBOTRADIUS * sin(relativeangle)) / distance;
+            (ballpos[1] - pos[1] - ROBOTRADIUS * (float)sin(relativeangle)) / distance;
         minor_vec[0] = major_vec[0];
         minor_vec[1] = major_vec[1];
 
-        rotate(minor_vec, M_PI / 2);
+        rotate(minor_vec, (float)M_PI / 2);
         major_angle = atan2f(major_vec[1], major_vec[0]);
 
         relative_destination[0] = ballpos[0] - pos[0];
@@ -162,7 +162,7 @@ static void catch_tick(void* void_state_ptr, FirmwareWorld_t* world)
         // Rotate 90 degrees to get minor axis
         minor_vec[0] = major_vec[0];
         minor_vec[1] = major_vec[1];
-        rotate(minor_vec, M_PI / 2);
+        rotate(minor_vec, (float)M_PI / 2);
 
         // plan getting onto the minor with 0 end vel
         float minor_vel_cur = minor_vec[0] * vel[0] + minor_vec[1] * vel[1];
@@ -211,14 +211,15 @@ static void catch_tick(void* void_state_ptr, FirmwareWorld_t* world)
         major_accel = app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON);
 
         major_angle      = atan2f(major_vec[1], major_vec[0]);
-        float angle_disp = min_angle_delta(pos[2], major_angle + M_PI);
+        float angle_disp = min_angle_delta(pos[2], major_angle + (float)M_PI);
         float targetVel  = 8 * angle_disp / timeTarget;
         accel[2]         = (targetVel - vel[2]) / timeTarget;
     }
 
     // get robot local coordinates
     float local_x_norm_vec[2] = {cosf(pos[2]), sinf(pos[2])};
-    float local_y_norm_vec[2] = {cosf(pos[2] + M_PI / 2), sinf(pos[2] + M_PI / 2)};
+    float local_y_norm_vec[2] = {cosf(pos[2] + (float)M_PI / 2),
+                                 sinf(pos[2] + (float)M_PI / 2)};
 
     // rotate acceleration onto robot local coordinates
     accel[0] = minor_accel *

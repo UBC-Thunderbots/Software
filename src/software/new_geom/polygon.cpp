@@ -41,8 +41,8 @@ bool Polygon::contains(const Point& p) const
     // should two distinct polygons share an edge, any point along this edge will be
     // located in one and only one polygon.
     bool point_is_contained = false;
-    unsigned i              = 0;
-    unsigned j              = points_.size() - 1;
+    size_t i                = 0;
+    size_t j                = points_.size() - 1;
     double px               = p.x();
     double py               = p.y();
     while (i < points_.size())

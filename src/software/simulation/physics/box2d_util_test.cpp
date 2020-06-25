@@ -71,18 +71,18 @@ TEST(Box2DUtilTest, test_existence_of_body_in_world_with_multiple_bodies)
 
     b2BodyDef body_def_2;
     body_def_2.type = b2_dynamicBody;
-    body_def_2.position.Set(1, 0.8);
+    body_def_2.position.Set(1, 0.8f);
     body_def_2.linearVelocity.Set(0, 0);
     auto body_2 = world->CreateBody(&body_def_2);
 
     b2BodyDef body_def_3;
     body_def_3.type = b2_staticBody;
-    body_def_3.position.Set(1, 0.8);
+    body_def_3.position.Set(1, 0.8f);
     auto body_3 = world->CreateBody(&body_def_3);
 
     b2BodyDef body_def_4;
     body_def_4.type = b2_dynamicBody;
-    body_def_4.position.Set(1, 0.8);
+    body_def_4.position.Set(1, 0.8f);
     body_def_4.linearVelocity.Set(0, 0);
     auto body_4 = other_world->CreateBody(&body_def_4);
 
@@ -101,38 +101,38 @@ TEST(Box2DUtilTest, test_existence_of_body_in_world_with_multiple_bodies)
 
 TEST(Box2DUtilTest, test_create_b2Vec2_from_point)
 {
-    b2Vec2 expected = {-1.02, 5.4};
+    b2Vec2 expected = {-1.02f, 5.4f};
     EXPECT_EQ(expected, createVec2(Point(-1.02, 5.4)));
 
-    expected = {0.0, 100.100};
+    expected = {0.0f, 100.100f};
     EXPECT_EQ(expected, createVec2(Point(0.0, 100.100)));
 }
 
 TEST(Box2DUtilTest, test_create_b2Vec2_from_vector)
 {
-    b2Vec2 expected = {-1.02, 5.4};
-    EXPECT_EQ(expected, createVec2(Vector(-1.02, 5.4)));
+    b2Vec2 expected = {-1.02f, 5.4f};
+    EXPECT_EQ(expected, createVec2(Vector(-1.02f, 5.4f)));
 
-    expected = {0.0, 100.100};
+    expected = {0.0f, 100.100f};
     EXPECT_EQ(expected, createVec2(Vector(0.0, 100.100)));
 }
 
 TEST(Box2DUtilTest, test_create_point_from_b2Vec2)
 {
     Point expected(-1.02, 5.4);
-    EXPECT_LT((expected - createPoint(b2Vec2({-1.02, 5.4}))).length(), 0.001);
+    EXPECT_LT((expected - createPoint(b2Vec2({-1.02f, 5.4f}))).length(), 0.001);
 
     expected = Point(0.0, 100.100);
-    EXPECT_LT((expected - createPoint(b2Vec2({0.0, 100.100}))).length(), 0.001);
+    EXPECT_LT((expected - createPoint(b2Vec2({0.0f, 100.100f}))).length(), 0.001);
 }
 
 TEST(Box2DUtilTest, test_create_vector_from_b2Vec2)
 {
     Vector expected(-1.02, 5.4);
-    EXPECT_LT((expected - createVector(b2Vec2({-1.02, 5.4}))).length(), 0.001);
+    EXPECT_LT((expected - createVector(b2Vec2({-1.02f, 5.4f}))).length(), 0.001);
 
     expected = Vector(0.0, 100.100);
-    EXPECT_LT((expected - createVector(b2Vec2({0.0, 100.100}))).length(), 0.001);
+    EXPECT_LT((expected - createVector(b2Vec2({0.0f, 100.100f}))).length(), 0.001);
 }
 
 TEST(Box2DUtilTest, test_polygon_area_with_triangle)

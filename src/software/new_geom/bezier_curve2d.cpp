@@ -27,8 +27,8 @@ Polynomial2d BezierCurve2d::getPolynomial() const
     {
         Polynomial1d poly_x, poly_y;
         const Vector coeffs = computePolynomialCoefficients(j);
-        poly_x.setCoeff(j, coeffs.x());
-        poly_y.setCoeff(j, coeffs.y());
+        poly_x.setCoeff(static_cast<unsigned int>(j), coeffs.x());
+        poly_y.setCoeff(static_cast<unsigned int>(j), coeffs.y());
 
         result += Polynomial2d(poly_x, poly_y);
     }

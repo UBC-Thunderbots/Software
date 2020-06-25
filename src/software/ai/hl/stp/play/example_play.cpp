@@ -36,7 +36,8 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     do
     {
         // The angle between each robot spaced out in a circle around the ball
-        Angle angle_between_robots = Angle::full() / world.friendlyTeam().numRobots();
+        Angle angle_between_robots =
+            Angle::full() / static_cast<double>(world.friendlyTeam().numRobots());
 
         // Move the robots in a circle around the ball, facing the ball
         move_tactic_1->updateControlParams(
