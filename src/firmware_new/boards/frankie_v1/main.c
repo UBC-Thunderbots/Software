@@ -151,9 +151,6 @@ static void vTimerControllerCallback(xTimerHandle pxTimer) {
 
 void initWheelControllerTimer(void){
 
-    float command_coefficients = {1,1,1,1,1};
-    float sample_output_coefficients = {1,1,1,1,1};
-    
     // Create a timer with expiry of CONTROLLER_INTERPOLATION_PERIOD with auto-renew on
     TimerHandle_t timer_handle_controller = xTimerCreate(
             "controllerTimer",
