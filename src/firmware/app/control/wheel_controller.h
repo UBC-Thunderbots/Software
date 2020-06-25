@@ -13,6 +13,21 @@ typedef struct WheelController WheelController_t;
  * THIS MEANS THAT OVER THE PERIOD OF 'T' SECONDS THERE IS NO CHANGE TO THE APPLIED
  * VOLTAGE. THIS IS KNOWN AS 'ZERO-ORDER-HOLD' (ZOH).
  *
+ * Example Usage:
+ *
+ *  while(trajectory_is_not_done) {
+ *
+ *      wheel_speed = sampleEncoder();
+ *      new_wheel_speed = getNextWheelSpeedFromPlanner();
+ *      pushNewCommand(new_wheel_speed);
+ *      pushSampledOutput(wheel_speed);
+ *
+ *      new_voltage_to_apply = getWheelVoltageToApply();
+ *      applyMotorVoltage(new_voltage_to_apply)
+ *
+ *      sleep(INTERPOLATION_PERIOD)
+ *   }
+ *
  * For more information:
  * https://ethz.ch/content/dam/ethz/special-interest/mavt/dynamic-systems-n-control/idsc-dam/Lectures/Digital-Control-Systems/Slides_DigReg_2013.pdf
  *
