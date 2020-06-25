@@ -16,7 +16,8 @@ float shared_polynomial1d_getValue(const float* coefficients,
     float result = 0;
     for (size_t order = 0; order < num_coefficients; order++)
     {
-        result += coefficients[num_coefficients - 1 - order] * pow(x, order);
+        result +=
+            (float)(coefficients[num_coefficients - 1 - order] * pow(x, (double)order));
     }
     return result;
 }
@@ -36,7 +37,7 @@ void shared_polynomial1d_differentiate(const float* coefficients, size_t num_coe
 {
     for (size_t i = 0; i < num_coefficients - 1; i++)
     {
-        derivative_coefficients[i] = coefficients[i] * (num_coefficients - i - 1);
+        derivative_coefficients[i] = coefficients[i] * (float)(num_coefficients - i - 1);
     }
 }
 

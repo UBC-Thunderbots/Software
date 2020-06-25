@@ -109,7 +109,7 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
     // Calculate the time duration of the trajectory at each segment node
     app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
         linear_segment_lengths, angular_segment_lengths, linear_time_profile,
-        angular_time_profile, num_elements, linear_speed, angular_speed,
+        angular_time_profile, (float)num_elements, linear_speed, angular_speed,
         position_trajectory->time_profile);
 
     return OK;
@@ -164,7 +164,7 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
     // Keep track of the current time we are searching for in the constant
     // parameterization trajectory
     unsigned int time_periods = 1;
-    float trajectory_time     = interpolation_period * time_periods;
+    float trajectory_time     = interpolation_period * (float)time_periods;
 
     // Loop until we find a value JUST larger than the expected
     // Check the element prior and perform linear interpolation
@@ -212,9 +212,9 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
 
             // Step forwards one interpolation period
             constant_period_trajectory->time_profile[time_periods] =
-                interpolation_period * time_periods;
+                interpolation_period * (float)time_periods;
             time_periods++;
-            trajectory_time = interpolation_period * time_periods;
+            trajectory_time = interpolation_period * (float)time_periods;
         }
     }
 

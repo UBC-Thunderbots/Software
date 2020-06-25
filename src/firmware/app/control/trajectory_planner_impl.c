@@ -13,18 +13,18 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
     float max_allowable_acceleration, float speed_cap,
     float max_allowable_speed_profile[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS])
 {
-    const float t_increment = (t_end - t_start) / (num_elements - 1);
+    const float t_increment = (t_end - t_start) / (float)(num_elements - 1);
 
     for (unsigned int i = 0; i < num_elements; i++)
     {
-        const float current_t = t_start + i * t_increment;
+        const float current_t = (float)t_start + (float)i * t_increment;
 
         const float radius_of_curvature =
             shared_polynomial2d_getCurvatureAtPositionOrder3(path, current_t);
 
         const float max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
 
-        max_allowable_speed_profile[i] = fmin(max_speed, speed_cap);
+        max_allowable_speed_profile[i] = (float)fmin(max_speed, speed_cap);
     }
 }
 
@@ -40,11 +40,11 @@ void app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
 
     node_values[0] = shared_polynomial1d_getValueOrder3(path_1d, t_start);
 
-    const float t_segment_size = (t_end - t_start) / (num_elements - 1);
+    const float t_segment_size = (t_end - t_start) / (float)(num_elements - 1);
 
     for (unsigned int i = 1; i < num_elements; i++)
     {
-        const float current_t = t_start + i * t_segment_size;
+        const float current_t = (float)t_start + (float)i * t_segment_size;
 
         // Grab the states at each 't' value
         node_values[i] = shared_polynomial1d_getValueOrder3(path_1d, current_t);
@@ -186,7 +186,7 @@ app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
             shared_physics_getFinalSpeed(speed, displacement, max_allowable_acceleration);
 
         // Pick  the lowest of the maximum the available speeds
-        const float lowest_speed = fmin(max_allowable_speed_profile[i], temp_vel);
+        const float lowest_speed = (float)fmin(max_allowable_speed_profile[i], temp_vel);
 
         speeds[i] = lowest_speed;
     }
