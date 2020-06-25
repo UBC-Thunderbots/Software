@@ -26,3 +26,28 @@ py_test(
         ":difference_equation",
     ],
 )
+
+py_binary(
+    name = "generate_difference_equation",
+    srcs = [":generate_difference_equation.py"],
+    main = ":generate_difference_equation.py",
+    deps = [
+        requirement("control"),
+        requirement("pyparsing"),
+        requirement("cycler"),
+        requirement("kiwisolver"),
+    ],
+)
+
+genrule(
+    name = "config_cc_generate",
+    outs = [
+        "generated_controller_coefficients.h",
+    ],
+    cmd = "python3 $(location :generate_difference_equation) \
+           $(OUTS)",
+    tools = [
+        ":generate_difference_equation",
+    ],
+    visibility = ["//visibility:private"],
+)
