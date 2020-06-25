@@ -15,7 +15,9 @@ WifiBackend::WifiBackend()
                     Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&WifiBackend::receiveWorld, this, _1),
                     Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    Util::DynamicParameters->getCameraConfig())
+                    Util::DynamicParameters->getCameraConfig()),
+      ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
+                       boost::bind(&Backend::receiveSSLReferee, this, _1))
 {
     std::string network_interface =
         Util::DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
@@ -30,18 +32,15 @@ void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
     primitive_output->sendProto(*createPrimitiveMsg(primitives_ptr));
 }
 
+void WifiBackend::onValueReceived(World world)
+{
+    vision_output->sendProto(*createVisionMsg(world));
+}
+
 void WifiBackend::receiveWorld(World world)
 {
     vision_output->sendProto(*createVisionMsg(world));
     Subject<World>::sendValueToObservers(world);
-}
-
-void WifiBackend::receiveTbotsRobotMsg(TbotsRobotMsg robot_msg)
-{
-    SensorMsg sensor_msg;
-    TbotsRobotMsg* added_robot_msg = sensor_msg.add_tbots_robot_msg();
-    *added_robot_msg               = robot_msg;
-    Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
 
 void WifiBackend::joinMulticastChannel(int channel, const std::string& interface)
@@ -54,7 +53,7 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
 
     robot_msg_input.reset(new ThreadedProtoMulticastListener<TbotsRobotMsg>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
-        boost::bind(&WifiBackend::receiveTbotsRobotMsg, this, _1)));
+        boost::bind(&Backend::receiveTbotsRobotMsg, this, _1)));
 }
 
 // Register this backend in the genericFactory

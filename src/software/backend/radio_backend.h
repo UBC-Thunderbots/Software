@@ -3,6 +3,7 @@
 #include "software/backend/backend.h"
 #include "software/backend/input/network/networking/network_client.h"
 #include "software/backend/output/radio/radio_output.h"
+#include "software/backend/ssl_proto_client.h"
 
 class RadioBackend : public Backend
 {
@@ -15,6 +16,7 @@ class RadioBackend : public Backend
     static const int DEFAULT_RADIO_CONFIG = 0;
 
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
+    void onValueReceived(World world) override;
 
     /**
      * This is registered as an async callback function so that it is called
@@ -33,6 +35,9 @@ class RadioBackend : public Backend
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
+
+    // Client to listen for SSL protobufs
+    SSLProtoClient ssl_proto_client;
 
     // The interface that lets us send primitives to the robots over radio
     RadioOutput radio_output;
