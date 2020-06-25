@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware/app//control/wheel_controller.h"
 #include "udp_multicast.h"
 #include "timers.h"
 
@@ -80,7 +81,7 @@ void StartDefaultTask(void *argument);
 
 static void initIoLayer(void);
 static void initIoDrivetrain(void);
-
+static void initWheelControllerTimer(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -136,23 +137,39 @@ void initIoDrivetrain(void)
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
 }
 
-static void vTimerCallback10MsExpired(xTimerHandle pxTimer) {
+static void vTimerControllerCallback(xTimerHandle pxTimer) {
+    // Sample wheel state
+    float sampled_wheel_state  = 1;
+    // Push to buffer
+    // Get new command
+    // push to buffer
 
+    // Get voltage
+
+    // Set motor voltage
 }
 
-void initWheelController(void){
-     TimerHandle_t timerHndl1Sec = xTimerCreate(
-            "controllerTimer", /* name */
-            pdMS_TO_TICKS(10), /* period/time */
-            pdTRUE, /* auto reload */
-            (void*)0, /* timer ID */
-            vTimerCallback10MsExpired); /* callback */
-    if (timerHndl1Sec==NULL) {
-        for(;;); /* failure! */
+void initWheelControllerTimer(void){
+
+    float command_coefficients = {1,1,1,1,1};
+    float sample_output_coefficients = {1,1,1,1,1};
+    
+    // Create a timer with expiry of CONTROLLER_INTERPOLATION_PERIOD with auto-renew on
+    TimerHandle_t timer_handle_controller = xTimerCreate(
+            "controllerTimer",
+            pdMS_TO_TICKS(10),
+            pdTRUE,
+            (void *) 0,
+            vTimerControllerCallback);
+
+    // Check that the controller was created properly
+    if (timer_handle_controller == NULL) {
+        Error_Handler();
     }
 
-    if (xTimerStart(timerHndl1Sec, 0)!=pdPASS) {
-        for(;;); /* failure!?! */
+    // Check that the timer started properly
+    if (xTimerStart(timer_handle_controller, 0) != pdPASS) {
+        Error_Handler();
     }
 }
 
@@ -202,7 +219,7 @@ int main(void)
     /* USER CODE BEGIN 2 */
 
     initIoLayer();
-
+    initWheelControllerTimer();
     /* USER CODE END 2 */
 
     /* Init scheduler */
