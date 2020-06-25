@@ -2,9 +2,6 @@
 
 #include "software/new_geom/util/contains.h"
 
-#define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
-#include "software/new_geom/point_boost_geometry_compatability.h"
-
 double distance(const Line &first, const Point &second)
 {
     Line::Coeffs coeffs = first.getCoeffs();
@@ -20,25 +17,6 @@ double distance(const Point &first, const Line &second)
 double distance(const Point &first, const Point &second)
 {
     return (first - second).length();
-}
-
-double distance(const Segment &first, const Segment &second)
-{
-    boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
-    boost::geometry::model::segment<Point> CD(second.getSegStart(),
-                                              second.getEnd());  // similar code
-    bool intersects = boost::geometry::intersects(AB, CD);
-    if (intersects)
-    {
-        return 0.0;
-    }
-    double first_to_second_start_distsq = distanceSquared(first, second.getSegStart());
-    double first_to_second_end_distsq   = distanceSquared(first, second.getEnd());
-    double second_to_first_start_distsq = distanceSquared(second, first.getSegStart());
-    double second_to_first_end_distsq   = distanceSquared(second, first.getEnd());
-    return std::sqrt(
-        std::min({first_to_second_start_distsq, first_to_second_end_distsq,
-                  second_to_first_start_distsq, second_to_first_end_distsq}));
 }
 
 double distance(const Point &first, const Segment &second)

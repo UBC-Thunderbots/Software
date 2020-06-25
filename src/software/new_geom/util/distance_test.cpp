@@ -59,46 +59,6 @@ TEST(DistanceTest, different_points)
     EXPECT_DOUBLE_EQ(distance(p1, p2), expected);
 }
 
-TEST(DistanceTest, same_segments)
-{
-    Segment s1(Point(-4, 7), Point(4, 2));
-    Segment s2(Point(-4, 7), Point(4, 2));
-    double expected = 0;
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
-TEST(DistanceTest, different_parallel_segments)
-{
-    Segment s1(Point(-4, 7), Point(4, 2));
-    Segment s2(Point(-8, 6), Point(4, -1.5));
-    double expected = std::abs(4.5 - 1) / std::sqrt(std::pow((-5.0 / 8.0), 2) + 1);
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
-TEST(DistanceTest, intersecting_segments)
-{
-    Segment s1(Point(-4, 4), Point(4, 4));
-    Segment s2(Point(-5, 8), Point(2, 0));
-    double expected = 0;
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
-TEST(DistanceTest, non_intersecting_segments)
-{
-    Segment s1(Point(-4, 4), Point(4, 2));
-    Segment s2(Point(6, 8), Point(-2, 7));
-    double expected = std::abs(1.0 / 4.0 * -2 + 7 + -3) / std::hypot(1.0 / 4.0, 1);
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
-TEST(DistanceTest, degenerate_segments)
-{
-    Segment s1(Point(-4, 4), Point(-4, 4));
-    Segment s2(Point(1, 9), Point(1, 9));
-    double expected = std::hypot(5, 5);
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
 TEST(DistanceTest, point_on_segment_end)
 {
     Point p(12, 5);
