@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "udp_multicast.h"
+#include "timers.h"
 
 /* USER CODE END Includes */
 
@@ -133,6 +134,26 @@ void initIoDrivetrain(void)
 
     io_drivetrain_init(drivetrain_unit_front_left, drivetrain_unit_front_right,
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
+}
+
+static void vTimerCallback10MsExpired(xTimerHandle pxTimer) {
+
+}
+
+void initWheelController(void){
+     TimerHandle_t timerHndl1Sec = xTimerCreate(
+            "controllerTimer", /* name */
+            pdMS_TO_TICKS(10), /* period/time */
+            pdTRUE, /* auto reload */
+            (void*)0, /* timer ID */
+            vTimerCallback10MsExpired); /* callback */
+    if (timerHndl1Sec==NULL) {
+        for(;;); /* failure! */
+    }
+
+    if (xTimerStart(timerHndl1Sec, 0)!=pdPASS) {
+        for(;;); /* failure!?! */
+    }
 }
 
 /* USER CODE END 0 */
