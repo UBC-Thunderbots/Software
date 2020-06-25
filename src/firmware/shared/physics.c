@@ -81,8 +81,8 @@ void force3_to_force4(float force3[3], float force4[4])
 // test with angle2 increased or decreased by 2pi
 float min_angle_delta(float angle1, float angle2)
 {
-    angle1 = (float)fmod(angle1, 2 * P_PI);
-    angle2 = (float)fmod(angle2, 2 * P_PI);
+    angle1 = fmodf(angle1, 2 * P_PI);
+    angle2 = fmodf(angle2, 2 * P_PI);
     if (angle2 >= angle1)
     {
         float ang_sub = angle2 - 2 * P_PI;

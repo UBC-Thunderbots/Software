@@ -11,8 +11,8 @@ float shared_tbots_math_linearInterpolation(const float x0, const float y0,
     assert(x0 != x1);
 
     // Clamp the xp variable to be within the interpolation region
-    const float min_x = (float)fmin(x0, x1);
-    const float max_x = (float)fmax(x0, x1);
+    const float min_x = fminf(x0, x1);
+    const float max_x = fmaxf(x0, x1);
     if (xp > max_x)
     {
         xp = x1;

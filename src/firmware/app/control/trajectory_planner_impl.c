@@ -24,7 +24,7 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
 
         const float max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
 
-        max_allowable_speed_profile[i] = (float)fmin(max_speed, speed_cap);
+        max_allowable_speed_profile[i] = fminf(max_speed, speed_cap);
     }
 }
 
@@ -74,7 +74,7 @@ void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
     // total length is the root sum-squared of the individual values
     for (unsigned int i = 0; i < num_elements; i++)
     {
-        segment_lengths[i] = (float)sqrtf(powf(x_lengths[i], 2) + powf(y_lengths[i], 2));
+        segment_lengths[i] = sqrtf(powf(x_lengths[i], 2) + powf(y_lengths[i], 2));
     }
 }
 
@@ -186,7 +186,7 @@ app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
             shared_physics_getFinalSpeed(speed, displacement, max_allowable_acceleration);
 
         // Pick  the lowest of the maximum the available speeds
-        const float lowest_speed = (float)fmin(max_allowable_speed_profile[i], temp_vel);
+        const float lowest_speed = fminf(max_allowable_speed_profile[i], temp_vel);
 
         speeds[i] = lowest_speed;
     }

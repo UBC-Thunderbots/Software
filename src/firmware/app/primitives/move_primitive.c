@@ -96,8 +96,7 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
     {
         float relative_angle_to_movement = min_angle_delta(wheel_axes[i], theta_norm);
         float initial_rotation           = current_angle + relative_angle_to_movement;
-        float abs_final_rotation =
-            (float)fabs(min_angle_delta(initial_rotation, final_angle));
+        float abs_final_rotation = fabsf(min_angle_delta(initial_rotation, final_angle));
         // if we have found a smaller angle, then update the minimum rotation
         // and chosen index
         if (abs_final_rotation < minimum_rotation)
@@ -126,7 +125,7 @@ void choose_rotation_destination(unsigned optimal_wheel_axes_index, PhysBot* pb,
 {
     // if we are close enough then we should just allow the bot to rotate
     // onto its destination angle, so skip this if block
-    if ((float)fabs(pb->maj.disp) > APPROACH_LIMIT)
+    if (fabsf(pb->maj.disp) > APPROACH_LIMIT)
     {
         float wheel_axes[8];
         build_wheel_axes(&wheel_axes, angle);

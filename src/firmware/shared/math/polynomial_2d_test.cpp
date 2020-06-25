@@ -178,9 +178,9 @@ TEST_F(Polynomial2dTest, get_arc_length_parametrization_diagonal_line_2_division
     shared_polynomial_getArcLengthParametrizationOrder1(poly, -3, 3, parametrization);
 
     float expected_t_values_storage[4]          = {-3, -1, 1, 3};
-    float expected_arc_length_values_storage[4] = {
-        0.0, (float)sqrt(4 + 4), (float)sqrt(16 + 16), (float)sqrt(36 + 36)};
-    ArcLengthParametrization_t expected = {
+    float expected_arc_length_values_storage[4] = {0.0, sqrtf(4 + 4), sqrtf(16 + 16),
+                                                   sqrtf(36 + 36)};
+    ArcLengthParametrization_t expected         = {
         .t_values          = expected_t_values_storage,
         .arc_length_values = expected_arc_length_values_storage,
         .num_values        = 4};

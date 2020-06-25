@@ -156,7 +156,7 @@ static void accurate_shoot_tick(void* void_state_ptr, FirmwareWorld_t* world)
         major_accel -=
             app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
 
-        float outDisp = minor_disp / (float)fabs(minor_disp) * (float)TARGET_RADIUS / 2;
+        float outDisp = minor_disp / fabsf(minor_disp) * (float)TARGET_RADIUS / 2;
         app_bangbang_prepareTrajectoryMaxV(&minor_profile, outDisp, minor_vel, 1,
                                            MAX_ROT_SPEED, MAX_ROT_SPEED);
         app_bangbang_planTrajectory(&minor_profile);

@@ -51,15 +51,15 @@ TEST(TrajectoryPlannerImplTest, test_robot_state_generation_at_constant_t_interv
         segment_lengths_angular);
 
     const float delta_t = (path_parameters.t_end - path_parameters.t_start) /
-                          (float)(path_parameters.num_elements - 1);
+                          static_cast<float>(path_parameters.num_elements - 1);
 
     // Check that all of the state variables are correct
     for (unsigned int i = 0; i < path_parameters.num_elements; i++)
     {
         const Vector2d_t expected_position =
-            shared_polynomial2d_getValueOrder3(path, (float)i * delta_t);
-        const float expected_orientation =
-            shared_polynomial1d_getValueOrder3(orientation_profile, (float)i * delta_t);
+            shared_polynomial2d_getValueOrder3(path, static_cast<float>(i) * delta_t);
+        const float expected_orientation = shared_polynomial1d_getValueOrder3(
+            orientation_profile, static_cast<float>(i) * delta_t);
 
         EXPECT_FLOAT_EQ(expected_orientation, theta_values[i]);
         EXPECT_FLOAT_EQ(expected_position.x, x_values[i]);
@@ -73,7 +73,7 @@ TEST(TrajectoryPlannerImplTest, test_robot_state_generation_at_constant_t_interv
 TEST(TrajectoryPlannerImplTest,
      test_robot_segment_size_generation_at_constant_t_intervals)
 {
-    const float total_path_length_linear  = (float)sqrt(2.0);
+    const float total_path_length_linear  = sqrtf(2.0f);
     const float total_path_length_angular = 1;
     Polynomial2dOrder3_t path             = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -112,9 +112,9 @@ TEST(TrajectoryPlannerImplTest,
         segment_lengths_angular);
 
     const float delta_length =
-        total_path_length_linear / (float)path_parameters.num_elements;
+        total_path_length_linear / static_cast<float>(path_parameters.num_elements);
     const float delta_length_orientation =
-        total_path_length_angular / (float)path_parameters.num_elements;
+        total_path_length_angular / static_cast<float>(path_parameters.num_elements);
     // Check that all of the segment lengths are correct
     for (unsigned int i = 0; i < path_parameters.num_elements - 1; i++)
     {
@@ -126,7 +126,7 @@ TEST(TrajectoryPlannerImplTest,
 TEST(TrajectoryPlannerImplTest,
      test_robot_segment_size_generation_at_constant_t_intervals_low_segment_count)
 {
-    const float total_path_length_linear  = (float)sqrt(2.0f);
+    const float total_path_length_linear  = sqrtf(2.0f);
     const float total_path_length_angular = 1;
     Polynomial2dOrder3_t path             = {
         .x = {.coefficients = {0, 0, 1, 0}},
@@ -166,9 +166,9 @@ TEST(TrajectoryPlannerImplTest,
         segment_lengths_angular);
 
     const float delta_length =
-        total_path_length_linear / (float)(path_parameters.num_elements - 1);
+        total_path_length_linear / static_cast<float>(path_parameters.num_elements - 1);
     const float delta_length_orientation =
-        total_path_length_angular / (float)(path_parameters.num_elements - 1);
+        total_path_length_angular / static_cast<float>(path_parameters.num_elements - 1);
     // Check that all of the segment lengths are correct
     for (unsigned int i = 0; i < path_parameters.num_elements - 1; i++)
     {

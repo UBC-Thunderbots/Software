@@ -645,12 +645,12 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_parabola_path_high_acceleratio
                                           powf(velocity_trajectory.y_velocity[i], 2));
         EXPECT_FLOAT_EQ(position_trajectory.linear_speed[i], element_speed);
 
-        EXPECT_FLOAT_EQ(
-            (float)direction_unit_vectors[i].x() * position_trajectory.linear_speed[i],
-            velocity_trajectory.x_velocity[i]);
-        EXPECT_FLOAT_EQ(
-            (float)direction_unit_vectors[i].y() * position_trajectory.linear_speed[i],
-            velocity_trajectory.y_velocity[i]);
+        EXPECT_FLOAT_EQ(static_cast<float>(direction_unit_vectors[i].x()) *
+                            position_trajectory.linear_speed[i],
+                        velocity_trajectory.x_velocity[i]);
+        EXPECT_FLOAT_EQ(static_cast<float>(direction_unit_vectors[i].y()) *
+                            position_trajectory.linear_speed[i],
+                        velocity_trajectory.y_velocity[i]);
     }
 }
 
@@ -701,12 +701,12 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_curved_path_low_acceleration)
                                           powf(velocity_trajectory.y_velocity[i], 2));
         EXPECT_FLOAT_EQ(position_trajectory.linear_speed[i], element_speed);
 
-        EXPECT_FLOAT_EQ(
-            (float)direction_unit_vectors[i].x() * position_trajectory.linear_speed[i],
-            velocity_trajectory.x_velocity[i]);
-        EXPECT_FLOAT_EQ(
-            (float)direction_unit_vectors[i].y() * position_trajectory.linear_speed[i],
-            velocity_trajectory.y_velocity[i]);
+        EXPECT_FLOAT_EQ(static_cast<float>(direction_unit_vectors[i].x()) *
+                            position_trajectory.linear_speed[i],
+                        velocity_trajectory.x_velocity[i]);
+        EXPECT_FLOAT_EQ(static_cast<float>(direction_unit_vectors[i].y()) *
+                            position_trajectory.linear_speed[i],
+                        velocity_trajectory.y_velocity[i]);
     }
 }
 
@@ -992,15 +992,18 @@ TEST_F(TrajectoryPlannerTest,
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
-    const float segment_length = 9 * sqrtf(2) / (float)(path_parameters.num_elements - 1);
+    const float segment_length =
+        9 * sqrtf(2) / static_cast<float>(path_parameters.num_elements - 1);
 
     for (unsigned int i = 0; i < path_parameters.num_elements; i++)
     {
         EXPECT_FLOAT_EQ(velocity_trajectory.angular_velocity[i], 0);
-        EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i], (float)directions[i].x());
-        EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i], (float)directions[i].y());
-        EXPECT_NEAR(velocity_trajectory.time_profile[i], (float)i * segment_length,
-                    0.00001);
+        EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i],
+                        static_cast<float>(directions[i].x()));
+        EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i],
+                        static_cast<float>(directions[i].y()));
+        EXPECT_NEAR(velocity_trajectory.time_profile[i],
+                    static_cast<float>(i) * segment_length, 0.00001);
     }
 }
 
@@ -1038,7 +1041,8 @@ TEST_F(TrajectoryPlannerTest,
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
-    const float segment_length = 9.0f / (float)(path_parameters.num_elements - 1);
+    const float segment_length =
+        9.0f / static_cast<float>(path_parameters.num_elements - 1);
     const float initial_segment_duration = (2 * segment_length) / (1);
 
     EXPECT_FLOAT_EQ(velocity_trajectory.angular_velocity[0], 0);
@@ -1048,7 +1052,8 @@ TEST_F(TrajectoryPlannerTest,
         EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i], 0);
         EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i], 0);
         EXPECT_NEAR(velocity_trajectory.time_profile[i],
-                    initial_segment_duration + (float)(i - 1) * segment_length, 0.00001);
+                    initial_segment_duration + static_cast<float>(i - 1) * segment_length,
+                    0.00001);
     }
     EXPECT_FLOAT_EQ(
         velocity_trajectory.angular_velocity[path_parameters.num_elements - 1],
@@ -1095,10 +1100,12 @@ TEST_F(TrajectoryPlannerTest,
     {
         EXPECT_FLOAT_EQ(velocity_trajectory.angular_velocity[i],
                         position_trajectory.angular_speed[i]);
-        EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i],
-                        position_trajectory.linear_speed[i] * (float)directions[i].x());
-        EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i],
-                        position_trajectory.linear_speed[i] * (float)directions[i].y());
+        EXPECT_FLOAT_EQ(
+            velocity_trajectory.x_velocity[i],
+            position_trajectory.linear_speed[i] * static_cast<float>(directions[i].x()));
+        EXPECT_FLOAT_EQ(
+            velocity_trajectory.y_velocity[i],
+            position_trajectory.linear_speed[i] * static_cast<float>(directions[i].y()));
         EXPECT_NEAR(velocity_trajectory.time_profile[i],
                     position_trajectory.time_profile[i], 0.00001);
     }
@@ -1191,10 +1198,12 @@ TEST_F(
     {
         EXPECT_FLOAT_EQ(velocity_trajectory.angular_velocity[i],
                         position_trajectory.angular_speed[i]);
-        EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i],
-                        position_trajectory.linear_speed[i] * (float)directions[i].x());
-        EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i],
-                        position_trajectory.linear_speed[i] * (float)directions[i].y());
+        EXPECT_FLOAT_EQ(
+            velocity_trajectory.x_velocity[i],
+            position_trajectory.linear_speed[i] * static_cast<float>(directions[i].x()));
+        EXPECT_FLOAT_EQ(
+            velocity_trajectory.y_velocity[i],
+            position_trajectory.linear_speed[i] * static_cast<float>(directions[i].y()));
         EXPECT_NEAR(velocity_trajectory.time_profile[i],
                     position_trajectory.time_profile[i], 0.00001);
     }
