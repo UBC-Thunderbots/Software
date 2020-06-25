@@ -13,7 +13,7 @@ cc_library(
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/ai/navigator/path_manager",
         "//software/logger",
-        "//software/new_geom/util:distance",
+        "//software/new_geom/util:algorithms",
         "//software/parameter:dynamic_parameters",
         "//software/primitive:all_primitives",
         "//software/world",

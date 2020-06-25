@@ -15,6 +15,7 @@
 #include "software/new_geom/segment.h"
 #include "software/new_geom/triangle.h"
 #include "software/new_geom/util/collinear.h"
+#include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
 #include "software/new_geom/util/intersects.h"
@@ -189,7 +190,7 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
 {
     // If the point is already inside the circe arccos won't work so just return
     // the perp points
-    if (circle.contains(start))
+    if (contains(circle, start))
     {
         double perpDist = std::sqrt(circle.getRadius() * circle.getRadius() -
                                     (circle.getOrigin() - start).lengthSquared());
@@ -399,7 +400,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
         return redundant_segment;
     }
     // Check if the beginning of segment2 lays inside segment1
-    else if (segment1.contains(segment2.getSegStart()))
+    else if (contains(segment1, segment2.getSegStart()))
     {
         // If segment2.getSegStart() lays in segment1, then the combined segment is
         // segment2,getEnd() and the point furthest from segment2.getEnd()
@@ -409,7 +410,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                    : Segment(segment1.getEnd(), segment2.getEnd());
     }
     // Now check if the end of segment2 lays inside segment1
-    else if (segment1.contains(segment2.getEnd()))
+    else if (contains(segment1, segment2.getEnd()))
     {
         // If segment2.getSegStart() lays in segment1, then the combined segment is
         // segment2,getEnd() and the point furtherst from segmen2.getEnd()
@@ -445,8 +446,8 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 
     // The segment is redundant if both points of the smallest segment are contained in
     // the largest segment
-    if (largest_segment.contains(smallest_segment.getSegStart()) &&
-        largest_segment.contains(smallest_segment.getEnd()))
+    if (contains(largest_segment, smallest_segment.getSegStart()) &&
+        contains(largest_segment, smallest_segment.getEnd()))
     {
         return std::make_optional(largest_segment);
     }
@@ -529,7 +530,7 @@ std::vector<Segment> projectCirclesOntoSegment(Segment segment,
     for (Circle circle : circles)
     {
         // If the reference is inside an obstacle there is no open direction
-        if (circle.contains(origin))
+        if (contains(circle, origin))
         {
             obstacle_segment_projections.push_back(segment);
             return obstacle_segment_projections;

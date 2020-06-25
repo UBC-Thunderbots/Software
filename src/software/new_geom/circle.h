@@ -53,13 +53,6 @@ class Circle final : public ConvexShape
     double getRadius() const;
 
     /**
-     * Determines whether the given Point is contained within this Circle.
-     *
-     * @return whether the Point p is contained within this Circle.
-     */
-    bool contains(const Point &p) const override;
-
-    /**
      * Returns the area of this Circle.
      *
      * @return the area of this Circle.

@@ -1,5 +1,7 @@
 #include "software/test_util/test_util.h"
 
+#include "software/new_geom/util/distance.h"
+
 namespace TestUtil
 {
     World createBlankTestingWorld()
@@ -165,8 +167,8 @@ namespace TestUtil
     ::testing::AssertionResult equalWithinTolerance(const Point &pt1, const Point &pt2,
                                                     double tolerance)
     {
-        double distance = pt1.distanceFromPoint(pt2);
-        if (equalWithinTolerance(distance, 0, tolerance))
+        double dist = distance(pt1, pt2);
+        if (equalWithinTolerance(dist, 0, tolerance))
         {
             return ::testing::AssertionSuccess();
         }

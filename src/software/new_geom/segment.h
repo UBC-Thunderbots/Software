@@ -1,8 +1,6 @@
 #pragma once
 
 #include "software/new_geom/point.h"
-#include "software/new_geom/util/almost_equal.h"
-#include "software/new_geom/util/collinear.h"
 
 // This is a direct copy of geom/segment.h, this is needed to unblock work on the new_geom
 // shape hierarchy.
@@ -91,39 +89,6 @@ class Segment final
     inline bool operator==(const Segment& other) const
     {
         return start == other.start && end == other.end;
-    }
-
-    /**
-     * Returns true if this segment contains the given point, false otherwise.
-     *
-     * @param point
-     *
-     * @return true if this segment contains the given point, false otherwise
-     */
-    bool contains(const Point& point, double fixed_epsilon = GeomConstants::FIXED_EPSILON,
-                  int ulps_distance = GeomConstants::ULPS_EPSILON_TEN) const
-    {
-        if (collinear(point, getSegStart(), getEnd()))
-        {
-            // If the segment and point are in a perfect vertical line, we must use Y
-            // coordinate centric logic
-            if (almostEqual(point.x(), getEnd().x(), fixed_epsilon, ulps_distance) &&
-                almostEqual(getEnd().x(), getSegStart().x(), fixed_epsilon,
-                            ulps_distance))
-            {
-                // Since segment and point are collinear we only need to check one of the
-                // coordinates, in this case we select Y because all X values are equal
-                return (point.y() <= getSegStart().y() && point.y() >= getEnd().y()) ||
-                       (point.y() <= getEnd().y() && point.y() >= getSegStart().y());
-            }
-
-            // Since segment and point are collinear we only need to check one of the
-            // coordinates, choose x because we know there is variance in these values
-            return (point.x() <= getSegStart().x() && point.x() >= getEnd().x()) ||
-                   (point.x() <= getEnd().x() && point.x() >= getSegStart().x());
-        }
-
-        return false;
     }
 
    private:

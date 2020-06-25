@@ -11,7 +11,7 @@ cc_library(
         "//software/ai/passing:pass_generator",
         "//software/geom",
         "//software/logger",
-        "//software/new_geom/util:distance",
+        "//software/new_geom/util:algorithms",
         "//software/world",
     ],
 )
@@ -94,7 +94,7 @@ cc_library(
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
         "//software/logger",
-        "//software/new_geom/util:intersection",
+        "//software/new_geom/util:algorithms",
     ],
 )
 
@@ -151,7 +151,7 @@ cc_library(
         "//software/geom",
         "//software/logger",
         "//software/new_geom:line",
-        "//software/new_geom/util:intersection",
+        "//software/new_geom/util:algorithms",
     ],
 )
 
@@ -254,7 +254,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
         "//software/logger",
-        "//software/new_geom/util:intersection",
+        "//software/new_geom/util:algorithms",
     ],
 )
 
@@ -286,7 +286,7 @@ cc_library(
         "//software/ai/passing:pass",
         "//software/geom",
         "//software/logger",
-        "//software/new_geom/util",
+        "//software/new_geom/util:algorithms",
     ],
 )
 
@@ -337,7 +337,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
         "//software/logger",
-        "//software/new_geom/util:distance",
+        "//software/new_geom/util:algorithms",
         "//software/parameter:dynamic_parameters",
     ],
 )

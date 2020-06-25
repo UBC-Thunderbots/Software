@@ -39,11 +39,6 @@ double Point::distanceFromOrigin() const
     return std::hypot(x_, y_);
 }
 
-double Point::distanceFromPoint(const Point &p) const
-{
-    return sqrt(pow((x_ - p.x()), 2) + pow((y_ - p.y()), 2));
-}
-
 Vector Point::toVector() const
 {
     return Vector(x_, y_);
@@ -52,11 +47,6 @@ Vector Point::toVector() const
 Point Point::rotate(const Angle &rot) const
 {
     return Point(x_ * rot.cos() - y_ * rot.sin(), x_ * rot.sin() + y_ * rot.cos());
-}
-
-bool Point::isClose(const Point &other, double dist) const
-{
-    return distanceFromPoint(other) < dist;
 }
 
 Point &Point::operator=(const Point &q)
@@ -111,7 +101,7 @@ std::ostream &operator<<(std::ostream &os, const Point &p)
 
 bool operator==(const Point &p, const Point &q)
 {
-    return p.isClose(q, GeomConstants::FIXED_EPSILON);
+    return (p - q).lengthSquared() < GeomConstants::FIXED_EPSILON;
 }
 
 bool operator!=(const Point &p, const Point &q)

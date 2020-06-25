@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/new_geom/util/contains.h"
 
 template <typename GEOM_TYPE>
 GeomObstacle<GEOM_TYPE>::GeomObstacle(const GEOM_TYPE& geom) : geom_(geom)
@@ -10,7 +11,7 @@ GeomObstacle<GEOM_TYPE>::GeomObstacle(const GEOM_TYPE& geom) : geom_(geom)
 template <typename GEOM_TYPE>
 bool GeomObstacle<GEOM_TYPE>::contains(const Point& p) const
 {
-    return geom_.contains(p);
+    return ::contains(geom_, p);
 }
 
 template <typename GEOM_TYPE>

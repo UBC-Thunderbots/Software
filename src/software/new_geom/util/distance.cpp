@@ -1,5 +1,7 @@
 #include "software/new_geom/util/distance.h"
 
+#include "software/new_geom/util/contains.h"
+
 #define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
 #include "software/new_geom/point_boost_geometry_compatability.h"
 
@@ -51,7 +53,7 @@ double distance(const Segment &first, const Point &second)
 
 double distance(const Point &first, const Polygon &second)
 {
-    if (second.contains(first))
+    if (contains(second, first))
     {
         return 0;
     }
