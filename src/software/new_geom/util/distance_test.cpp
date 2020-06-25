@@ -18,20 +18,6 @@ TEST(DistanceTest, point_on_line)
 TEST(DistanceTest, point_near_vertical_line)
 {
     Line l(Point(0, 1), Point(0, 0));
-    Point p(2, 0);
-    double expected = 2;
-    EXPECT_DOUBLE_EQ(distance(l, p), expected);
-    EXPECT_DOUBLE_EQ(distance(p, l), expected);
-}
-
-TEST(DistanceTest, test_absolute)
-{
-    EXPECT_EQ(5.1, abs(-5.1));
-}
-
-TEST(DistanceTest, point_near_vertical_line_fp)
-{
-    Line l(Point(0, 1), Point(0, 0));
     Point p(2.1, 0);
     double expected = 2.1;
     EXPECT_DOUBLE_EQ(distance(l, p), expected);
