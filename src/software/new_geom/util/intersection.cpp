@@ -2,8 +2,6 @@
 
 #include "software/new_geom/util/almost_equal.h"
 #include "software/new_geom/util/collinear.h"
-#define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
-#include "software/new_geom/point_boost_geometry_compatability.h"
 #include "software/new_geom/util/contains.h"
 
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
@@ -54,11 +52,48 @@ constexpr int sign(double n)
 
 std::vector<Point> intersection(const Segment &first, const Segment &second)
 {
+    if (first == second)
+    {
+        return {first.getSegStart(), first.getEnd()};
+    }
+
     std::vector<Point> output;
 
-    boost::geometry::model::segment<Point> seg_1(first.getSegStart(), first.getEnd());
-    boost::geometry::model::segment<Point> seg_2(second.getSegStart(), second.getEnd());
-    boost::geometry::intersection(seg_1, seg_2, output);
+    Point a = first.getSegStart();
+    Point b = first.getEnd();
+    Point c = second.getSegStart();
+    Point d = second.getEnd();
+
+    // check for overlaps
+    if (contains(second, a))
+    {
+        output.emplace_back(a);
+    }
+    if (contains(second, b))
+    {
+        output.emplace_back(b);
+    }
+    if (contains(second, c))
+    {
+        output.emplace_back(c);
+    }
+    if (contains(second, d))
+    {
+        output.emplace_back(d);
+    }
+    if (output.size() > 0)
+    {
+        return output;
+    }
+
+    auto intersection_value = intersection(a, b, c, d);
+    if (intersection_value)
+    {
+        if (contains(first, *intersection_value) && contains(second, *intersection_value))
+        {
+            output.emplace_back(*intersection_value);
+        }
+    }
 
     return output;
 }
