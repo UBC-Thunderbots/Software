@@ -457,9 +457,7 @@ void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
 std::vector<uint8_t> MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
 {
     // Get the proto representation of the primitive
-    ProtoCreatorPrimitiveVisitor visitor;
-    prim->accept(visitor);
-    PrimitiveMsg prim_proto = visitor.getProto();
+    PrimitiveMsg prim_proto = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*prim);
 
     // Serialize the proto representation
     std::vector<uint8_t> serialized_proto(prim_proto.ByteSizeLong());

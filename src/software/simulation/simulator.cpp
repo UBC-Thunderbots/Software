@@ -212,8 +212,8 @@ primitive_params_t Simulator::getPrimitiveParams(
 {
     // The ProtoCreatorPrimitiveVisitor handles most of the encoding for us
     ProtoCreatorPrimitiveVisitor mrf_pv;
-    primitive->accept(mrf_pv);
-    PrimitiveMsg primitive_proto = mrf_pv.getProto();
+    PrimitiveMsg primitive_proto =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*primitive);
     primitive_params_t primitive_params;
     std::array<double, 4> param_array = {
         primitive_proto.parameter1(),
@@ -238,10 +238,9 @@ primitive_params_t Simulator::getPrimitiveParams(
 
 unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive)
 {
-    ProtoCreatorPrimitiveVisitor mrf_pv;
-    primitive->accept(mrf_pv);
-    PrimitiveMsg primitive_proto = mrf_pv.getProto();
-    auto primitive_index         = static_cast<unsigned int>(primitive_proto.prim_type());
+    PrimitiveMsg primitive_proto =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*primitive);
+    auto primitive_index = static_cast<unsigned int>(primitive_proto.prim_type());
 
     return primitive_index;
 }

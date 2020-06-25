@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "shared/proto/primitive.pb.h"
+#include "software/primitive/primitive.h"
 #include "software/primitive/primitive_visitor.h"
 
 /**
@@ -33,6 +34,14 @@ class ProtoCreatorPrimitiveVisitor : public PrimitiveVisitor
     void visit(const StopPrimitive &stop_primitive) override;
 
     /**
+     * Create a PrimitiveMsg from the given Primitive
+     * @param primitive The primitive to create the PrimitiveMsg from
+     * @return A PrimitiveMsg representation of the given primitive
+     */
+    PrimitiveMsg createPrimitiveMsg(const Primitive &primitive);
+
+   private:
+    /**
      * Get the proto representation of the most recently visited primitive
      *
      * @throws std::runtime_error If this visitor has never visited a primitive
@@ -41,6 +50,5 @@ class ProtoCreatorPrimitiveVisitor : public PrimitiveVisitor
      */
     PrimitiveMsg getProto();
 
-   private:
     std::optional<PrimitiveMsg> prim;
 };

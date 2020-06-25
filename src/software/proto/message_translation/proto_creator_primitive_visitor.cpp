@@ -17,6 +17,12 @@ PrimitiveMsg ProtoCreatorPrimitiveVisitor::getProto()
     return *prim;
 }
 
+PrimitiveMsg ProtoCreatorPrimitiveVisitor::createPrimitiveMsg(const Primitive &primitive)
+{
+    primitive.accept(*static_cast<PrimitiveVisitor *>(this));
+    return getProto();
+}
+
 void ProtoCreatorPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 {
     prim = PrimitiveMsg();

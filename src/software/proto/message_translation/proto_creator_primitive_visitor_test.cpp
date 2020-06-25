@@ -5,12 +5,6 @@
 
 #include "software/primitive/all_primitives.h"
 
-TEST(ProtoCreatorPrimitiveVisitor, get_radio_primitive_without_visting_anything)
-{
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    EXPECT_THROW(prim_visitor.getProto(), std::runtime_error);
-}
-
 TEST(ProtoCreatorPrimitiveVisitor, visit_catch_primitive)
 {
     CatchPrimitive primitive(12, 33.456, 10000, 0.000038);
@@ -21,9 +15,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_catch_primitive)
     expected_primitive.set_parameter3(0.000038);
     expected_primitive.set_extra_bits(0);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
 
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
@@ -40,9 +33,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_chip_primitive)
     expected_primitive.set_parameter4(0.038);
     expected_primitive.set_extra_bits(3);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -58,9 +50,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_direct_velocity_primitive)
     expected_primitive.set_parameter4(0);
     expected_primitive.set_extra_bits(100);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -76,9 +67,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_direct_wheels_primitive)
     expected_primitive.set_parameter4(160);
     expected_primitive.set_extra_bits(100);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -94,9 +84,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_dribble_primitive)
     expected_primitive.set_parameter4(30000);
     expected_primitive.set_extra_bits(1);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -112,9 +101,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_kick_primitive)
     expected_primitive.set_parameter4(2.33 * 1000);
     expected_primitive.set_extra_bits(2);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_and_dribble_off)
@@ -129,9 +117,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_and_dribble_off
     expected_primitive.set_parameter4(2.33 * 1000);
     expected_primitive.set_extra_bits(0);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -148,9 +135,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_enabled_dribble
     expected_primitive.set_parameter4(2.33 * 1000);
     expected_primitive.set_extra_bits(1);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -167,9 +153,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_dribble_enabled_autokick
     expected_primitive.set_parameter4(2.33 * 1000);
     expected_primitive.set_extra_bits(2);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -186,9 +171,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_and_dribble_ena
     expected_primitive.set_parameter4(2.33 * 1000);
     expected_primitive.set_extra_bits(3);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -204,9 +188,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_movespin_primitive)
     expected_primitive.set_parameter4(1.0 * 1000);
     expected_primitive.set_extra_bits(0);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -223,9 +206,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_pivot_primitive)
     expected_primitive.set_parameter4(Angle::fromRadians(2.71).toRadians() * 100);
     expected_primitive.set_extra_bits(1);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
@@ -241,9 +223,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_stop_primitive)
     expected_primitive.set_parameter4(0);
     expected_primitive.set_extra_bits(1);
 
-    ProtoCreatorPrimitiveVisitor prim_visitor;
-    primitive.accept(prim_visitor);
-    PrimitiveMsg actual_radio_primitive = prim_visitor.getProto();
+    PrimitiveMsg actual_radio_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, actual_radio_primitive));
 }
