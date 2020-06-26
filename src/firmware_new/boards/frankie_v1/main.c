@@ -178,6 +178,7 @@ void initIoDrivetrain(void)
 void initIoNetworking()
 {
     // TODO this needs to be hooked up to the channel dial on the robot, when available
+    // https://github.com/UBC-Thunderbots/Software/issues/1517
     unsigned channel = 0;
 
     io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
@@ -725,6 +726,7 @@ void test_msg_update(void *argument)
     {
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
         // TODO enable SNTP sys_now is currently only time since reset
+        // https://github.com/UBC-Thunderbots/Software/issues/1518
         tbots_robot_msg.time_sent.epoch_timestamp_seconds = sys_now();
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,

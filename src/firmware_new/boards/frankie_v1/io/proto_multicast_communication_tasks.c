@@ -21,13 +21,13 @@
 static osEventFlagsId_t networking_event;
 
 // the timeout to recv a network packet
-static uint32_t network_timeout_ms;
+static int network_timeout_ms;
 
 // flag mask for network interface configured event
 // this flag is set on the networking_event to indicate "link up"
 static uint32_t NETIF_CONFIGURED = 1 << 0;
 
-void io_proto_multicast_communication_init(uint32_t net_timeout_ms)
+void io_proto_multicast_communication_init(int net_timeout_ms)
 {
     networking_event   = osEventFlagsNew(NULL);
     network_timeout_ms = net_timeout_ms;
@@ -45,7 +45,6 @@ void io_proto_multicast_sender_task(void* communication_profile)
     //
     // We use IP6_ADDR_ANY which will default to the ethernet interface on the STM32H7
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
-    netconn_set_ipv6only(conn, true);
 
     netconn_bind(conn, IP6_ADDR_ANY,
                  io_proto_multicast_communication_profile_getPort(profile));
@@ -78,7 +77,10 @@ void io_proto_multicast_sender_task(void* communication_profile)
 
         io_proto_multicast_communication_profile_releaseLock(profile);
 
-        netbuf_alloc(tx_buf, stream.bytes_written);
+        // Max uint16 is 65535, which is significantly over the theoretical max
+        // tranfser unit that can be configured at 9000 bytes. We can safely cast
+        // stream.bytes_written to a (u16_t)
+        netbuf_alloc(tx_buf, (u16_t)stream.bytes_written);
 
         // package payload and send over udp
         tx_buf->p->payload = buffer;
@@ -102,7 +104,6 @@ void io_proto_multicast_listener_task(void* communication_profile)
     // Bind the socket to the multicast address and port we then use that
     // communication profile to join the specified multicast group.
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
-    netconn_set_ipv6only(conn, true);
     netconn_set_recvtimeout(conn, network_timeout_ms);
 
     netconn_bind(conn, io_proto_multicast_communication_profile_getAddress(profile),

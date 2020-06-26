@@ -113,4 +113,5 @@ const unsigned ROBOT_STATUS_PORT = 42071;
 const unsigned NETWORK_TIMEOUT_MS = 1000;
 
 // maximum transfer unit of the network interface
-const unsigned MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+// this is an int to avoid Wconversion with lwip
+const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
