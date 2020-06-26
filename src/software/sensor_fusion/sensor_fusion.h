@@ -96,8 +96,8 @@ class SensorFusion
      *
      *@return inverted Detection
      */
-    RobotDetection invert(RobotDetection robot_detection);
-    BallDetection invert(BallDetection ball_detection);
+    RobotDetection invert(RobotDetection robot_detection) const;
+    BallDetection invert(BallDetection ball_detection) const;
 
     /**
      * Given a detection, figures out if the camera is enabled
@@ -106,7 +106,7 @@ class SensorFusion
      *
      * @return whether the camera is enabled
      */
-    bool isCameraEnabled(const SSL_DetectionFrame &detection);
+    bool isCameraEnabled(const SSL_DetectionFrame &detection) const;
 
     unsigned int history_size;
     std::optional<Field> field;

@@ -319,7 +319,7 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
     return new_enemy_team;
 }
 
-bool SensorFusion::isCameraEnabled(const SSL_DetectionFrame &detection)
+bool SensorFusion::isCameraEnabled(const SSL_DetectionFrame &detection) const
 {
     bool camera_disabled = false;
     switch (detection.camera_id())
@@ -351,7 +351,7 @@ bool SensorFusion::isCameraEnabled(const SSL_DetectionFrame &detection)
     return !camera_disabled;
 }
 
-RobotDetection SensorFusion::invert(RobotDetection robot_detection)
+RobotDetection SensorFusion::invert(RobotDetection robot_detection) const
 {
     robot_detection.position =
         Point(-robot_detection.position.x(), -robot_detection.position.y());
@@ -359,7 +359,7 @@ RobotDetection SensorFusion::invert(RobotDetection robot_detection)
     return robot_detection;
 }
 
-BallDetection SensorFusion::invert(BallDetection ball_detection)
+BallDetection SensorFusion::invert(BallDetection ball_detection) const
 {
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());
