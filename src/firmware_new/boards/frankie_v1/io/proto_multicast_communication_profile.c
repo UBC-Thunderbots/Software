@@ -58,6 +58,13 @@ ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_c
     return profile;
 }
 
+void io_proto_multicast_communication_profile_destroy(
+    ProtoMulticastCommunicationProfile_t* profile)
+{
+    osMutexDelete(profile->profile_mutex);
+    free(profile);
+}
+
 const char* io_proto_multicast_communication_profile_getProfileName(
     ProtoMulticastCommunicationProfile_t* profile)
 {
@@ -117,11 +124,4 @@ uint32_t io_proto_multicast_communication_profile_blockUntilEvents(
 {
     return osEventFlagsWait(profile->communication_event, events, osFlagsWaitAny,
                             osWaitForever);
-}
-
-void io_proto_multicast_communication_profile_destroy(
-    ProtoMulticastCommunicationProfile_t* profile)
-{
-    osMutexDelete(profile->profile_mutex);
-    free(profile);
 }

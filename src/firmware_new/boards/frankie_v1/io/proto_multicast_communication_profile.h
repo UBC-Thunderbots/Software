@@ -48,6 +48,14 @@ ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_c
     void* protobuf_struct, const pb_field_t* message_fields, uint16_t message_max_size);
 
 /**
+ * Destroy the given ProtoMulticastCommunicationProfile_t
+ *
+ * @param communication_profile The profile to delete
+ */
+void io_proto_multicast_communication_profile_destroy(
+    ProtoMulticastCommunicationProfile_t* profile);
+
+/**
  * Get the name of the profile
  *
  * @param profile The profile to get the name from
@@ -162,11 +170,3 @@ void io_proto_multicast_communication_profile_notifyEvents(
  */
 uint32_t io_proto_multicast_communication_profile_blockUntilEvents(
     ProtoMulticastCommunicationProfile_t* profile, uint32_t events);
-
-/**
- * Destroy the given ProtoMulticastCommunicationProfile_t
- *
- * @param communication_profile The profile to delete
- */
-void io_proto_multicast_communication_profile_destroy(
-    ProtoMulticastCommunicationProfile_t* profile);
