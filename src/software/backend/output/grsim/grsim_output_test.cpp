@@ -13,7 +13,7 @@ TEST(GrSimOutputTest, create_grsim_packet_zero_vel)
 {
     GrSimOutput backend =
         GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         0, true, Vector(), Angle::zero(), 0.0, false, false);
@@ -47,7 +47,7 @@ TEST(GrSimOutputTest, create_grsim_packet_positive_vel)
 {
     GrSimOutput backend =
         GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         6, false, Vector(89.6, 0.1589), Angle::fromRadians(1.23), 0.0, false, false);
@@ -81,7 +81,7 @@ TEST(GrSimOutputTest, create_grsim_packet_negative_vel)
 {
     GrSimOutput backend =
         GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         1, true, Vector(-0.001, 2.49), Angle::fromRadians(-0.04), 0.0, false, false);
@@ -115,7 +115,7 @@ TEST(GrSimOutputTest, create_grsim_packet_at_numeric_limits)
 {
     GrSimOutput backend =
         GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -151,7 +151,7 @@ TEST(GrSimOutputTest, create_grsim_packet_beyond_numeric_limits)
 {
     GrSimOutput backend =
         GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -187,7 +187,7 @@ TEST(GrSimOutputTest, create_grsim_packet_with_kick)
 {
     GrSimOutput backend =
         GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         0, true, Vector(), Angle::zero(), 4.0, false, false);
@@ -221,7 +221,7 @@ TEST(GrSimOutputTest, create_grsim_packet_with_chip)
 {
     GrSimOutput backend =
         GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -257,7 +257,7 @@ TEST(GrSimOutputTest, create_grsim_packet_with_dribbler_on)
 {
     GrSimOutput backend =
         GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,

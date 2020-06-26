@@ -29,12 +29,12 @@ class SSLProtoClient
         std::function<void(SSL_WrapperPacket)> received_vision_callback,
         std::function<void(Referee)> received_referee_callback,
         std::string vision_multicast_address =
-            Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
-        int vision_multicast_port = Util::Constants::SSL_VISION_MULTICAST_PORT,
+            SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
+        int vision_multicast_port = SSL_VISION_MULTICAST_PORT,
         std::string gamecontroller_multicast_address =
-            Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
+            SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
         int gamecontroller_multicast_port =
-            Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT);
+            SSL_GAMECONTROLLER_MULTICAST_PORT);
 
    private:
     // The client that handles data reception, filtering, and publishing for vision data

@@ -15,7 +15,7 @@ const std::string CornerKickPlay::name = "Corner Kick Play";
 
 CornerKickPlay::CornerKickPlay()
     : MAX_TIME_TO_COMMIT_TO_PASS(
-          Duration::fromSeconds(Util::DynamicParameters->getAIConfig()
+          Duration::fromSeconds(DynamicParameters->getAIConfig()
                                     ->getCornerKickPlayConfig()
                                     ->MaxTimeCommitToPassSeconds()
                                     ->value()))

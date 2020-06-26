@@ -79,11 +79,11 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     Vector front_of_robot_dir =
         Vector(robot->orientation().cos(), robot->orientation().sin());
 
-    auto steal_ball_rect_width = Util::DynamicParameters->getAIConfig()
+    auto steal_ball_rect_width = DynamicParameters->getAIConfig()
                                      ->getShootGoalTacticConfig()
                                      ->EnemyAboutToStealBallRectangleWidth()
                                      ->value();
-    auto steal_ball_rect_length = Util::DynamicParameters->getAIConfig()
+    auto steal_ball_rect_length = DynamicParameters->getAIConfig()
                                       ->getShootGoalTacticConfig()
                                       ->EnemyAboutToStealBallRectangleExtensionLength()
                                       ->value();

@@ -7,8 +7,8 @@
 
 SimulatedTestFixture::SimulatedTestFixture()
     : simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField())),
-      ai(Util::DynamicParameters->getAIConfig(),
-         Util::DynamicParameters->getAIControlConfig()),
+      ai(DynamicParameters->getAIConfig(),
+         DynamicParameters->getAIControlConfig()),
       run_simulation_in_realtime(false)
 {
 }
@@ -26,20 +26,20 @@ void SimulatedTestFixture::SetUp()
     // initialization list, and before every test in this SetUp function, we can
     // guarantee the pointer will never be null / empty
     simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
-    ai            = AI(Util::DynamicParameters->getAIConfig(),
-            Util::DynamicParameters->getAIControlConfig());
+    ai            = AI(DynamicParameters->getAIConfig(),
+            DynamicParameters->getAIControlConfig());
     sensor_fusion = SensorFusion();
 
-    Util::MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(
+    MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(
         true);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableAIControlConfig()
         ->getMutableRefboxConfig()
         ->mutableOverrideRefboxDefendingSide()
         ->setValue(true);
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableAIControlConfig()
         ->getMutableRefboxConfig()
         ->mutableDefendingPositiveSide()
         ->setValue(false);
@@ -48,11 +48,11 @@ void SimulatedTestFixture::SetUp()
     // is always defending the "negative" side of the field. This is so that the
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableAIControlConfig()
         ->getMutableRefboxConfig()
         ->mutableOverrideRefboxFriendlyTeamColor()
         ->setValue(true);
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableAIControlConfig()
         ->getMutableRefboxConfig()
         ->mutableFriendlyColorYellow()
         ->setValue(true);
@@ -80,7 +80,7 @@ Field SimulatedTestFixture::field() const
 
 void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableAIControlConfig()
         ->getMutableRefboxConfig()
         ->mutableFriendlyGoalieId()
         ->setValue(static_cast<int>(goalie_id));
@@ -88,7 +88,7 @@ void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
 
 void SimulatedTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableAIControlConfig()
         ->getMutableRefboxConfig()
         ->mutableEnemyGoalieId()
         ->setValue(static_cast<int>(goalie_id));
@@ -96,10 +96,10 @@ void SimulatedTestFixture::setEnemyGoalie(RobotId goalie_id)
 
 void SimulatedTestFixture::setPlay(const std::string &play_name)
 {
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableAIControlConfig()
         ->mutableOverrideAIPlay()
         ->setValue(true);
-    Util::MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableAIControlConfig()
         ->mutableCurrentAIPlay()
         ->setValue(play_name);
 }

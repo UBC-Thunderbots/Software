@@ -9,19 +9,19 @@
 const std::string WifiBackend::name = "wifi";
 
 WifiBackend::WifiBackend()
-    : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_VISION_MULTICAST_PORT,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
+    : network_input(SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
+                    SSL_VISION_MULTICAST_PORT,
+                    SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
+                    SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&WifiBackend::receiveWorld, this, _1),
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    Util::DynamicParameters->getCameraConfig()),
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig(),
+                    DynamicParameters->getCameraConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1))
 {
     std::string network_interface =
-        Util::DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
-    int channel = Util::DynamicParameters->getNetworkConfig()->Channel()->value();
+        DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
+    int channel = DynamicParameters->getNetworkConfig()->Channel()->value();
 
     // connect to current channel
     joinMulticastChannel(channel, network_interface);

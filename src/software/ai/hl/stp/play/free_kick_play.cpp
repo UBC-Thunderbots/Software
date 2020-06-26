@@ -129,7 +129,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     LOG(DEBUG) << "Finished aligning to ball";
 
     Angle min_open_angle_for_shot =
-        Angle::fromDegrees(Util::DynamicParameters->getAIConfig()
+        Angle::fromDegrees(DynamicParameters->getAIConfig()
                                ->getShootOrPassPlayConfig()
                                ->MinOpenAngleForShotDeg()
                                ->value());

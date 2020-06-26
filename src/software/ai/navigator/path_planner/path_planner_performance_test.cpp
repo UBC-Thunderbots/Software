@@ -30,7 +30,7 @@ class PathPlannerTestCaseFactory
     static std::vector<PlannerTestCase> getTestCases()
     {
         RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
-            Util::DynamicParameters->getAIConfig()
+            DynamicParameters->getAIConfig()
                 ->getRobotNavigationObstacleFactoryConfig());
 
         std::vector<ObstaclePtr> circle_obstacles_10 = {

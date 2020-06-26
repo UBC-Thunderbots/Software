@@ -52,7 +52,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Fi
     // We make the weight here an inverse of the ball speed, so that the gradient
     // descent takes smaller steps when the ball is moving faster
     double descent_weight = 1 / (std::exp(ball.velocity().length() * 0.5));
-    Util::GradientDescentOptimizer<1> optimizer({descent_weight},
+    GradientDescentOptimizer<1> optimizer({descent_weight},
                                                 gradient_approx_step_size);
     Duration best_ball_travel_duration = Duration::fromSeconds(
         std::abs(optimizer.minimize(objective_function, {0}, 50).at(0)));

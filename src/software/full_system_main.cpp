@@ -135,12 +135,12 @@ int main(int argc, char **argv)
     {
         // Setup dynamic parameters
         // TODO (Issue #960): Once we're using injected parameters everywhere (instead of
-        //                    just global accesses, `Util::DynamicParameters` should be
+        //                    just global accesses, `DynamicParameters` should be
         //                    deleted, and we should just create an instance here instead)
         std::shared_ptr<const AIConfig> ai_config =
-            Util::DynamicParameters->getAIConfig();
+            DynamicParameters->getAIConfig();
         std::shared_ptr<const AIControlConfig> ai_control_config =
-            Util::DynamicParameters->getAIControlConfig();
+            DynamicParameters->getAIControlConfig();
 
         // The ai has to be initialized after the backend (which is started in
         // parseCommandLineArgs) This is a bug. See #834

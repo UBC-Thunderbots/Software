@@ -23,7 +23,7 @@ Team RobotTeamFilter::getFilteredData(
                  RobotFilter(
                      detection,
                      Duration::fromMilliseconds(
-                         Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS))});
+                         ROBOT_DEBOUNCE_DURATION_MILLISECONDS))});
         }
     }
 
