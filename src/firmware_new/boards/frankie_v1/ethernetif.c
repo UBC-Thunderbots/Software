@@ -299,6 +299,7 @@ static void low_level_init(struct netif *netif)
 
     /* USER CODE BEGIN MACADDRESS */
     // TODO configure MAC address based on ROBOT ID
+    // https://github.com/UBC-Thunderbots/Software/issues/1517
     /* USER CODE END MACADDRESS */
 
     hal_eth_init_status = HAL_ETH_Init(&heth);
