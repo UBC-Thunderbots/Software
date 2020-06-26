@@ -57,6 +57,19 @@ class SensorFusion
     void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
+     * Updates relevant components with a new ball state
+     *
+     * @param new_ball_state new TimestampedBallState
+     */
+    void updateBall(TimestampedBallState new_ball_state);
+
+    /**
+     * Updates friendly_robot_states_map and enemy_robot_states_map using friendly_team
+     * and enemy_team
+     */
+    void updateRobotStatesMap();
+
+    /**
      * Create state of the ball from a list of ball detections
      *
      * @param ball_detections list of ball detections to filter
@@ -95,6 +108,7 @@ class SensorFusion
      */
     bool isCameraEnabled(const SSL_DetectionFrame &detection);
 
+    unsigned int history_size;
     std::optional<Field> field;
     std::optional<Ball> ball;
     Team friendly_team;
@@ -106,4 +120,10 @@ class SensorFusion
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+
+    boost::circular_buffer<TimestampedBallState> ball_states;
+    std::map<RobotId, boost::circular_buffer<TimestampedRobotState>>
+        friendly_robot_states_map;
+    std::map<RobotId, boost::circular_buffer<TimestampedRobotState>>
+        enemy_robot_states_map;
 };

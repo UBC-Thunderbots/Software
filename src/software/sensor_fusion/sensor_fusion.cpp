@@ -5,7 +5,8 @@
 #include "software/parameter/dynamic_parameters.h"
 
 SensorFusion::SensorFusion()
-    : field(std::nullopt),
+    : history_size(20),
+      field(std::nullopt),
       ball(std::nullopt),
       friendly_team(),
       enemy_team(),
@@ -15,7 +16,10 @@ SensorFusion::SensorFusion()
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
-      enemy_team_filter()
+      enemy_team_filter(),
+      ball_states(history_size),
+      friendly_robot_states_map(),
+      enemy_robot_states_map()
 {
 }
 
@@ -203,17 +207,79 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
             friendly_team = createFriendlyTeam(blue_team);
             enemy_team    = createEnemyTeam(yellow_team);
         }
+        updateRobotStatesMap();
     }
 
     if (new_ball_state)
     {
-        if (ball)
+        updateBall(*new_ball_state);
+    }
+}
+
+void SensorFusion::updateBall(TimestampedBallState new_ball_state)
+{
+    if (!ball_states.empty() &&
+        new_ball_state.timestamp() < ball_states.front().timestamp())
+    {
+        throw std::invalid_argument(
+            "Error: Trying to update ball state using a state older then the current state");
+    }
+
+    ball_states.push_front(new_ball_state);
+
+    if (ball)
+    {
+        ball->updateState(new_ball_state);
+    }
+    else
+    {
+        ball = Ball(new_ball_state);
+    }
+}
+
+void SensorFusion::updateRobotStatesMap()
+{
+    for (const auto &robot : friendly_team.getAllRobots())
+    {
+        auto it = friendly_robot_states_map.find(robot.id());
+        if (it != friendly_robot_states_map.end())
         {
-            ball->updateState(*new_ball_state);
+            if (!it->second.empty() &&
+                robot.currentState().timestamp() < it->second.front().timestamp())
+            {
+                throw std::invalid_argument(
+                    "Error: Trying to update robot state using a state older then the current state");
+            }
+
+            it->second.push_front(robot.currentState());
         }
         else
         {
-            ball = Ball(*new_ball_state);
+            friendly_robot_states_map[robot.id()] =
+                boost::circular_buffer<TimestampedRobotState>(history_size);
+            friendly_robot_states_map[robot.id()].push_front(robot.currentState());
+        }
+    }
+
+    for (const auto &robot : enemy_team.getAllRobots())
+    {
+        auto it = enemy_robot_states_map.find(robot.id());
+        if (it != enemy_robot_states_map.end())
+        {
+            if (!it->second.empty() &&
+                robot.currentState().timestamp() < it->second.front().timestamp())
+            {
+                throw std::invalid_argument(
+                    "Error: Trying to update robot state using a state older then the current state");
+            }
+
+            it->second.push_front(robot.currentState());
+        }
+        else
+        {
+            enemy_robot_states_map[robot.id()] =
+                boost::circular_buffer<TimestampedRobotState>(history_size);
+            enemy_robot_states_map[robot.id()].push_front(robot.currentState());
         }
     }
 }
