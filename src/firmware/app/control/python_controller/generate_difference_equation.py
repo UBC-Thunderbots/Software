@@ -37,7 +37,8 @@ def generate(discrete_tf: ct.TransferFunction):
 #######################################################################
 if __name__ == "__main__":
     with open(sys.argv[-1], "w") as controller_coefficient_generator:
-        # TODO hard-coded ATM, need to pass parameters from controller design file
+        # TODO need to pass parameters from controller design file
+        # https://github.com/UBC-Thunderbots/Software/issues/1520
         numerator = [1, 1]
         denominator = [1, 1, 1]
         interpolation_period = 0.1
