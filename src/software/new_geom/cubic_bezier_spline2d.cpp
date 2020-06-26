@@ -64,7 +64,8 @@ std::vector<double> CubicBezierSpline2d::getKnotParametrizationValues() const
     const size_t num_knots = getNumKnots();
     for (size_t i = 0; i < num_knots; i++)
     {
-        knot_vector.emplace_back(i * 1.0 / static_cast<double>(num_knots - 1));
+        knot_vector.emplace_back(static_cast<double>(i) * 1.0 /
+                                 static_cast<double>(num_knots - 1));
     }
     return knot_vector;
 }

@@ -13,7 +13,7 @@ cc_library(
         "//software/new_geom:point",
         "//software/new_geom:polygon",
         "//software/new_geom:vector",
-        "//software/new_geom/util:almost_equal",
+        "//software/new_geom/util:algorithms",
         "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:robot_state",

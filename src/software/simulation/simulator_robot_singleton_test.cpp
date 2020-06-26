@@ -117,8 +117,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_position)
 {
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
-    EXPECT_FLOAT_EQ(app_firmware_robot_getPositionX(firmware_robot.get()), 1.04);
-    EXPECT_FLOAT_EQ(app_firmware_robot_getPositionY(firmware_robot.get()), -0.8);
+    EXPECT_FLOAT_EQ(app_firmware_robot_getPositionX(firmware_robot.get()), 1.04f);
+    EXPECT_FLOAT_EQ(app_firmware_robot_getPositionY(firmware_robot.get()), -0.8f);
     UNUSED(world);
     UNUSED(simulator_ball);
 }
@@ -127,7 +127,7 @@ TEST_F(SimulatorRobotSingletonTest, test_get_orientation)
 {
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
-    EXPECT_FLOAT_EQ(app_firmware_robot_getOrientation(firmware_robot.get()), 2.12);
+    EXPECT_FLOAT_EQ(app_firmware_robot_getOrientation(firmware_robot.get()), 2.12f);
     UNUSED(world);
     UNUSED(simulator_ball);
 }
@@ -368,7 +368,7 @@ TEST_F(SimulatorRobotSingletonTest,
     // ejected in a random direction at high speed.
     EXPECT_GT(simulator_ball->velocity().x(), 1);
     EXPECT_LT(simulator_ball->velocity().x(), 3);
-    EXPECT_FLOAT_EQ(simulator_ball->velocity().y(), 0.0);
+    EXPECT_EQ(simulator_ball->velocity().y(), 0.0);
     EXPECT_GT(simulator_ball->position().x(), 2.0);
 }
 
@@ -599,16 +599,16 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
     {
         Wheel_t* front_left_wheel =
             app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-        app_wheel_applyForce(front_left_wheel, 0.3);
+        app_wheel_applyForce(front_left_wheel, 0.3f);
         Wheel_t* back_left_wheel =
             app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-        app_wheel_applyForce(back_left_wheel, 0.3);
+        app_wheel_applyForce(back_left_wheel, 0.3f);
         Wheel_t* back_right_wheel =
             app_firmware_robot_getBackRightWheel(firmware_robot.get());
-        app_wheel_applyForce(back_right_wheel, 0.3);
+        app_wheel_applyForce(back_right_wheel, 0.3f);
         Wheel_t* front_right_wheel =
             app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-        app_wheel_applyForce(front_right_wheel, 0.3);
+        app_wheel_applyForce(front_right_wheel, 0.3f);
 
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
@@ -1088,11 +1088,11 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
 
     SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_7);
     auto firmware_robot_7 = SimulatorRobotSingleton::createFirmwareRobot();
-    EXPECT_FLOAT_EQ(1.2, app_firmware_robot_getPositionX(firmware_robot_7.get()));
-    EXPECT_FLOAT_EQ(0, app_firmware_robot_getPositionY(firmware_robot_7.get()));
-    EXPECT_FLOAT_EQ(-2.3, app_firmware_robot_getVelocityX(firmware_robot_7.get()));
-    EXPECT_FLOAT_EQ(0.2, app_firmware_robot_getVelocityY(firmware_robot_7.get()));
-    EXPECT_FLOAT_EQ(-1.2, app_firmware_robot_getOrientation(firmware_robot_7.get()));
+    EXPECT_FLOAT_EQ(1.2f, app_firmware_robot_getPositionX(firmware_robot_7.get()));
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionY(firmware_robot_7.get()));
+    EXPECT_FLOAT_EQ(-2.3f, app_firmware_robot_getVelocityX(firmware_robot_7.get()));
+    EXPECT_FLOAT_EQ(0.2f, app_firmware_robot_getVelocityY(firmware_robot_7.get()));
+    EXPECT_FLOAT_EQ(-1.2f, app_firmware_robot_getOrientation(firmware_robot_7.get()));
 
     // The firmware functions should now return the data for simulator_robot_2, even
     // though we didn't need to create a new FirmwareRobot_t
@@ -1100,9 +1100,9 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
         std::make_shared<SimulatorRobot>(friendly_physics_robots.at(1));
     SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_2);
     auto firmware_robot_2 = SimulatorRobotSingleton::createFirmwareRobot();
-    EXPECT_FLOAT_EQ(0, app_firmware_robot_getPositionX(firmware_robot_2.get()));
-    EXPECT_FLOAT_EQ(-4.03, app_firmware_robot_getPositionY(firmware_robot_2.get()));
-    EXPECT_FLOAT_EQ(0, app_firmware_robot_getVelocityX(firmware_robot_2.get()));
-    EXPECT_FLOAT_EQ(1, app_firmware_robot_getVelocityY(firmware_robot_2.get()));
-    EXPECT_FLOAT_EQ(0.3, app_firmware_robot_getOrientation(firmware_robot_2.get()));
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionX(firmware_robot_2.get()));
+    EXPECT_FLOAT_EQ(-4.03f, app_firmware_robot_getPositionY(firmware_robot_2.get()));
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getVelocityX(firmware_robot_2.get()));
+    EXPECT_FLOAT_EQ(1.0f, app_firmware_robot_getVelocityY(firmware_robot_2.get()));
+    EXPECT_FLOAT_EQ(0.3f, app_firmware_robot_getOrientation(firmware_robot_2.get()));
 }

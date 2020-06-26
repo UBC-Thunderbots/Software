@@ -4,6 +4,7 @@
 #include "software/new_geom/util/collinear.h"
 #define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
 #include "software/new_geom/point_boost_geometry_compatability.h"
+#include "software/new_geom/util/contains.h"
 
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
                                   const Point &d, double fixed_epsilon, int ulps_epsilon)
@@ -89,8 +90,8 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
     // If there exists a single intersection, and it exists on the ray and within the
     // segment
     if (point_of_intersection.has_value() &&
-        ray.contains(point_of_intersection.value()) &&
-        segment.contains(point_of_intersection.value()))
+        contains(ray, point_of_intersection.value()) &&
+        contains(segment, point_of_intersection.value()))
     {
         intersections = {point_of_intersection.value()};
         return intersections;

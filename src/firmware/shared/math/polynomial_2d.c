@@ -19,7 +19,7 @@
         const float x_value = shared_polynomial1d_getValueOrder##N(p.x, t);              \
         const float y_value = shared_polynomial1d_getValueOrder##N(p.y, t);              \
                                                                                          \
-        return sqrt(pow(x_value, 2.0) + pow(y_value, 2.0));                              \
+        return sqrtf(powf(x_value, 2.0f) + powf(y_value, 2.0f));                         \
     }
 GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITION(3);
 GENERATE_2D_POLYNOMIAL_CALCULATE_L2_NORM_DEFINITION(2);
@@ -67,7 +67,7 @@ GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(1, 0)
         if (parametrization.num_values == 1)                                             \
         {                                                                                \
             parametrization.arc_length_values[0] = 0;                                    \
-            parametrization.t_values[0]          = (t_max + t_min) / 2.0;                \
+            parametrization.t_values[0]          = (t_max + t_min) / 2.0f;               \
             return;                                                                      \
         }                                                                                \
                                                                                          \
@@ -77,7 +77,7 @@ GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(1, 0)
         /* We divide dt by two here because we want to ensure we get the number of */    \
         /* values that the user requested, but simpsons rule requires that we use */     \
         /* an even number of points */                                                   \
-        float dt = (t_max - t_min) / ((parametrization.num_values - 1) * 2);             \
+        float dt = (t_max - t_min) / (float)((parametrization.num_values - 1) * 2);      \
                                                                                          \
         /* Populate the entries of the parametrization by numerically integrating the */ \
         /* derivative with Simpson's rule: */                                            \
@@ -89,10 +89,10 @@ GENERATE_2D_POLYNOMIAL_DIFFERENTIATE_FUNCTION_DEFINITION(1, 0)
         parametrization.t_values[0]          = t_min;                                    \
         for (size_t i = 1; i < parametrization.num_values; i++)                          \
         {                                                                                \
-            const float t_i     = t_min + 2 * i * dt;                                    \
+            const float t_i     = t_min + (float)(2 * i) * dt;                           \
             const float value_i = calculateL2NormAtValueOrder##N_minus_1(deriv, t_i);    \
                                                                                          \
-            const float t_i_minus_1 = t_min + (2 * i - 1) * dt;                          \
+            const float t_i_minus_1 = t_min + (float)(2 * i - 1) * dt;                   \
             const float value_i_minus_1 =                                                \
                 calculateL2NormAtValueOrder##N_minus_1(deriv, t_i_minus_1);              \
             sum_of_odd_arc_length_values += value_i_minus_1;                             \
@@ -158,7 +158,7 @@ GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
                                                                                          \
         size_t upper = arc_length_parametrization.num_values - 1;                        \
         size_t lower = 0;                                                                \
-        size_t pivot = lower + (int)floor((upper - lower) / 2);                          \
+        size_t pivot = lower + (size_t)floor((double)(upper - lower) / 2.0);             \
         float arc_length_below_pivot =                                                   \
             arc_length_parametrization.arc_length_values[pivot];                         \
         float arc_length_above_pivot =                                                   \
@@ -174,7 +174,7 @@ GENERATE_2D_POLYNOMIAL_GET_POSITION_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
             {                                                                            \
                 upper = pivot;                                                           \
             }                                                                            \
-            pivot = lower + floor((upper - lower) / 2);                                  \
+            pivot = lower + (size_t)floor((double)(upper - lower) / 2.0);                \
             arc_length_below_pivot =                                                     \
                 arc_length_parametrization.arc_length_values[pivot];                     \
             arc_length_above_pivot =                                                     \
@@ -226,10 +226,10 @@ GENERATE_2D_POLYNOMIAL_GET_T_VALUE_AT_ARC_LENGTH_FUNCTION_DEFINITION(1)
         const float y_second_deriv_value =                                               \
             shared_polynomial1d_getValueOrder##ORDER_MINUS_TWO(second_deriv.y, t);       \
                                                                                          \
-        const float numerator = fabs(x_first_deriv_value * y_second_deriv_value -        \
-                                     y_first_deriv_value * x_second_deriv_value);        \
-        const float denominator =                                                        \
-            pow(pow(x_first_deriv_value, 2) + pow(y_first_deriv_value, 2), 3.0f / 2.0f); \
+        const float numerator   = fabsf(x_first_deriv_value * y_second_deriv_value -     \
+                                      y_first_deriv_value * x_second_deriv_value);     \
+        const float denominator = powf(                                                  \
+            powf(x_first_deriv_value, 2) + powf(y_first_deriv_value, 2), 3.0f / 2.0f);   \
                                                                                          \
         if (numerator == 0)                                                              \
         {                                                                                \

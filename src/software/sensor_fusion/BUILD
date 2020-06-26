@@ -37,6 +37,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "sensor_fusion_test",
+    srcs = ["sensor_fusion_test.cpp"],
+    deps = [
+        ":sensor_fusion",
+        "//software/proto/message_translation:ssl_detection",
+        "//software/proto/message_translation:ssl_geometry",
+        "//software/proto/message_translation:ssl_wrapper",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "threaded_sensor_fusion",
     srcs = ["threaded_sensor_fusion.cpp"],

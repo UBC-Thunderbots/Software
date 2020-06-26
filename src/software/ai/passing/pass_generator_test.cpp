@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "software/ai/passing/cost_function.h"
+#include "software/new_geom/util/contains.h"
 #include "software/test_util/test_util.h"
 
 class PassGeneratorTest : public testing::Test
@@ -319,6 +320,6 @@ TEST_F(PassGeneratorTest, test_receiver_point_converges_to_point_in_target_regio
     // With a target region set, we expect the receiver point to be within the
     // target region instead.
     auto [converged_pass, score] = pass_generator->getBestPassSoFar();
-    EXPECT_TRUE(target_region.contains(converged_pass.receiverPoint()));
+    EXPECT_TRUE(contains(target_region, converged_pass.receiverPoint()));
     UNUSED(score);
 }

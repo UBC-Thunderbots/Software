@@ -47,11 +47,11 @@ TEST(TbotsMathTest, test_linear_interp_mid_point_negative)
 
 TEST(TbotsMathTest, test_linear_interp_mid_point_negative_shifted)
 {
-    const float x0 = -1;
-    const float y0 = -1;
-    const float x1 = -2;
-    const float y1 = -2;
-    const float xp = -1.5;
+    const float x0 = -1.0f;
+    const float y0 = -1.0f;
+    const float x1 = -2.0f;
+    const float y1 = -2.0f;
+    const float xp = -1.5f;
 
     const float yp = shared_tbots_math_linearInterpolation(x0, y0, x1, y1, xp);
 
@@ -60,11 +60,11 @@ TEST(TbotsMathTest, test_linear_interp_mid_point_negative_shifted)
 
 TEST(TbotsMathTest, test_linear_interp_xp_greater_than_x1)
 {
-    const float x0 = 0;
-    const float y0 = 0;
-    const float x1 = 1;
-    const float y1 = 1;
-    const float xp = 2;
+    const float x0 = 0.0f;
+    const float y0 = 0.0f;
+    const float x1 = 1.0f;
+    const float y1 = 1.0f;
+    const float xp = 2.0f;
 
     const float yp = shared_tbots_math_linearInterpolation(x0, y0, x1, y1, xp);
 
@@ -73,11 +73,11 @@ TEST(TbotsMathTest, test_linear_interp_xp_greater_than_x1)
 
 TEST(TbotsMathTest, test_linear_interp_xp_less_than_x0)
 {
-    const float x0 = 0;
-    const float y0 = 0;
-    const float x1 = 1;
-    const float y1 = 1;
-    const float xp = -2;
+    const float x0 = 0.0f;
+    const float y0 = 0.0f;
+    const float x1 = 1.0f;
+    const float y1 = 1.0f;
+    const float xp = -2.0f;
 
     const float yp = shared_tbots_math_linearInterpolation(x0, y0, x1, y1, xp);
 
@@ -86,11 +86,11 @@ TEST(TbotsMathTest, test_linear_interp_xp_less_than_x0)
 
 TEST(TbotsMathTest, test_linear_interp_x0_equal_to_x1)
 {
-    const float x0 = 0.5;
-    const float y0 = 1;
-    const float x1 = 0.5;
-    const float y1 = 2;
-    const float xp = 0.6;
+    const float x0 = 0.5f;
+    const float y0 = 1.0f;
+    const float x1 = 0.5f;
+    const float y1 = 2.0f;
+    const float xp = 0.6f;
 
     EXPECT_DEATH(shared_tbots_math_linearInterpolation(x0, y0, x1, y1, xp), "");
 }

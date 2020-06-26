@@ -69,25 +69,3 @@ TEST(CircleAreaTest, circle_area_tests)
     Circle zero = Circle();
     EXPECT_EQ(0, zero.area());
 }
-
-TEST(CircleContainsPointTests, zero_circle_contans_point_test)
-{
-    Circle zero = Circle();
-    Point p     = Point(1, 1);
-    EXPECT_FALSE(zero.contains(p));
-    EXPECT_TRUE(zero.contains(Point()));
-}
-
-TEST(CircleContainsPointTests, circle_at_origin_contains_point_test)
-{
-    Circle c = Circle(Point(), 5);
-    EXPECT_FALSE(c.contains(Point(-6, -6)));
-    EXPECT_TRUE(c.contains(Point(-2, 3)));
-}
-
-TEST(CircleContainsPointTests, circle_not_at_origin_contains_point_test)
-{
-    Circle d = Circle(Point(-5, -5), 5);
-    EXPECT_FALSE(d.contains(Point()));
-    EXPECT_TRUE(d.contains(Point(-10, -5)));
-}

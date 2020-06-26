@@ -10,6 +10,7 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
 
@@ -65,7 +66,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
 
     // if the goalie restricted area already contains the point, then we are
     // safe to move there.
-    if (goalie_restricted_area.contains(goalie_desired_position))
+    if (contains(goalie_restricted_area, goalie_desired_position))
     {
         return std::make_optional<Point>(goalie_desired_position);
     }
@@ -229,7 +230,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // if the ball is slow but its not safe to chip it out, don't.
             // TODO finesse the ball out of the goal using the dribbler.
             // for now we just stop https://github.com/UBC-Thunderbots/Software/issues/744
-            if (dont_chip_rectangle.contains(ball.position()) == true)
+            if (contains(dont_chip_rectangle, ball.position()) == true)
             {
                 stop_action->updateControlParams(*robot, false);
                 next_action = stop_action;

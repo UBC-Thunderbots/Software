@@ -3,6 +3,7 @@
 #include "shared/constants.h"
 #include "software/geom/util.h"
 #include "software/new_geom/triangle.h"
+#include "software/new_geom/util/contains.h"
 #include "software/world/world.h"
 
 Point deflect_off_enemy_target(World world)
@@ -29,7 +30,7 @@ Point deflect_off_enemy_target(World world)
     // field
     for (Robot enemy_robot : world.enemyTeam().getAllRobots())
     {
-        if ((chip_target_area.contains(enemy_robot.position()) ||
+        if ((contains(chip_target_area, enemy_robot.position()) ||
              offsetToLine(enemy_goal_negative, world.ball().position(),
                           enemy_robot.position()) <= ROBOT_MAX_RADIUS_METERS ||
              offsetToLine(enemy_goal_positive, world.ball().position(),

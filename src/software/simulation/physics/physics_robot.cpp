@@ -29,13 +29,15 @@ PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
-    robot_body_def.position.Set(robot_state.position().x(), robot_state.position().y());
-    robot_body_def.linearVelocity.Set(robot_state.velocity().x(),
-                                      robot_state.velocity().y());
-    robot_body_def.angle           = robot_state.orientation().toRadians();
-    robot_body_def.angularVelocity = robot_state.angularVelocity().toRadians();
-    robot_body_def.linearDamping   = robot_linear_damping;
-    robot_body_def.angularDamping  = robot_angular_damping;
+    robot_body_def.position.Set(static_cast<float>(robot_state.position().x()),
+                                static_cast<float>(robot_state.position().y()));
+    robot_body_def.linearVelocity.Set(static_cast<float>(robot_state.velocity().x()),
+                                      static_cast<float>(robot_state.velocity().y()));
+    robot_body_def.angle = static_cast<float>(robot_state.orientation().toRadians());
+    robot_body_def.angularVelocity =
+        static_cast<float>(robot_state.angularVelocity().toRadians());
+    robot_body_def.linearDamping  = static_cast<float>(robot_linear_damping);
+    robot_body_def.angularDamping = static_cast<float>(robot_angular_damping);
 
     robot_body = world->CreateBody(&robot_body_def);
 
@@ -65,8 +67,8 @@ void PhysicsRobot::setupRobotBodyFixtures(const RobotState& robot_state,
                                           const double mass_kg)
 {
     b2FixtureDef robot_body_fixture_def;
-    robot_body_fixture_def.restitution = robot_body_restitution;
-    robot_body_fixture_def.friction    = robot_body_friction;
+    robot_body_fixture_def.restitution = static_cast<float>(robot_body_restitution);
+    robot_body_fixture_def.friction    = static_cast<float>(robot_body_friction);
     robot_body_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_BODY, this});
 
@@ -83,7 +85,7 @@ void PhysicsRobot::setupRobotBodyFixtures(const RobotState& robot_state,
     {
         total_shape_area += polygonArea(*shape);
     }
-    robot_body_fixture_def.density = mass_kg / total_shape_area;
+    robot_body_fixture_def.density = static_cast<float>(mass_kg / total_shape_area);
 
     for (const auto shape : body_shapes)
     {
@@ -96,13 +98,14 @@ void PhysicsRobot::setupDribblerFixture(const RobotState& robot_state,
                                         double dribbler_depth)
 {
     b2FixtureDef robot_dribbler_fixture_def;
-    robot_dribbler_fixture_def.density = robot_dribbler_density;
+    robot_dribbler_fixture_def.density = static_cast<float>(robot_dribbler_density);
     // We explicitly choose to make the dribbler NOT a sensor, because sensor fixtures do
     // not trigger PreSolve contact callbacks, which we rely on to apply dribbling force
     // at every physics step
-    robot_dribbler_fixture_def.isSensor    = false;
-    robot_dribbler_fixture_def.restitution = robot_dribbler_restitution;
-    robot_dribbler_fixture_def.friction    = robot_dribbler_friction;
+    robot_dribbler_fixture_def.isSensor = false;
+    robot_dribbler_fixture_def.restitution =
+        static_cast<float>(robot_dribbler_restitution);
+    robot_dribbler_fixture_def.friction = static_cast<float>(robot_dribbler_friction);
     robot_dribbler_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_DRIBBLER, this});
 
@@ -128,9 +131,9 @@ void PhysicsRobot::setupChickerFixture(const RobotState& robot_state,
                                        double chicker_thickness)
 {
     b2FixtureDef robot_chicker_fixture_def;
-    robot_chicker_fixture_def.restitution = robot_chicker_restitution;
-    robot_chicker_fixture_def.friction    = robot_chicker_friction;
-    robot_chicker_fixture_def.density     = robot_chicker_density;
+    robot_chicker_fixture_def.restitution = static_cast<float>(robot_chicker_restitution);
+    robot_chicker_fixture_def.friction    = static_cast<float>(robot_chicker_friction);
+    robot_chicker_fixture_def.density     = static_cast<float>(robot_chicker_density);
     robot_chicker_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_CHICKER, this});
 

@@ -466,7 +466,8 @@ std::vector<uint8_t> MRFDongle::encode_primitive(const std::unique_ptr<Primitive
     // Prepend the robot id
     // We place this outside the proto so that we can check on the robot if the message
     // was intended for that robot with de-serializing the message
-    serialized_proto.insert(serialized_proto.begin(), prim->getRobotId());
+    serialized_proto.insert(serialized_proto.begin(),
+                            static_cast<uint8_t>(prim->getRobotId()));
 
 
     return serialized_proto;

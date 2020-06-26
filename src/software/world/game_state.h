@@ -49,13 +49,15 @@ class GameState
 
     // The point at which the ball should be placed by robots before a restart. See
     // Robocup SSL Rules 9.2.
-    Point ball_placement_point;
+    std::optional<Point> ball_placement_point;
 
     GameState()
         : state(HALT),
           restart_reason(NONE),
           game_state(RefboxGameState::HALT),
-          our_restart(false)
+          ball_state(std::nullopt),
+          our_restart(false),
+          ball_placement_point(std::nullopt)
     {
     }
 
@@ -85,7 +87,7 @@ class GameState
      *
      * @return the current Refbox game state
      */
-    RefboxGameState getRefboxGameState() const;
+    const RefboxGameState& getRefboxGameState() const;
 
     /**
      * Returns the current restart reason

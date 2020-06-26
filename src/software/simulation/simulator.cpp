@@ -231,7 +231,7 @@ primitive_params_t Simulator::getPrimitiveParams(
     }
 
     primitive_params.slow  = primitive_proto.slow();
-    primitive_params.extra = primitive_proto.extra_bits();
+    primitive_params.extra = static_cast<uint8_t>(primitive_proto.extra_bits());
 
     return primitive_params;
 }

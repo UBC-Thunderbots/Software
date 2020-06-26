@@ -221,7 +221,8 @@ void PassGenerator::pruneAndReplacePasses()
         passes_to_optimize.end());
 
     // Generate new passes to replace the ones we just removed
-    int num_new_passes = getNumPassesToOptimize() - passes_to_optimize.size();
+    int num_new_passes =
+        getNumPassesToOptimize() - static_cast<int>(passes_to_optimize.size());
     if (num_new_passes > 0)
     {
         std::vector<Pass> new_passes = generatePasses(num_new_passes);
