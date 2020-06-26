@@ -256,7 +256,7 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
         // Set default values. If the robot can't be passed to we set the number of passes
         // to the size of the enemy team so it is the largest reasonable value, and the
         // passer to be an empty optional
-        int num_passes              = enemy_team.numRobots();
+        int num_passes              = static_cast<int>(enemy_team.numRobots());
         std::optional<Robot> passer = std::nullopt;
         auto robot_with_effective_possession =
             getRobotWithEffectiveBallPossession(enemy_team, ball, field);

@@ -23,10 +23,10 @@ TEST(SimulatorBallSingletonTest, test_create_firmware_ball_with_single_simulator
 
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
     auto firmware_ball = SimulatorBallSingleton::createFirmwareBall();
-    EXPECT_FLOAT_EQ(0.4, app_firmware_ball_getPositionX(firmware_ball.get()));
-    EXPECT_FLOAT_EQ(0.0, app_firmware_ball_getPositionY(firmware_ball.get()));
-    EXPECT_FLOAT_EQ(-1.3, app_firmware_ball_getVelocityX(firmware_ball.get()));
-    EXPECT_FLOAT_EQ(2.01, app_firmware_ball_getVelocityY(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(0.4f, app_firmware_ball_getPositionX(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_ball_getPositionY(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(-1.3f, app_firmware_ball_getVelocityX(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(2.01f, app_firmware_ball_getVelocityY(firmware_ball.get()));
 }
 
 TEST(SimulatorBallSingletonTest, test_change_simulator_ball)
@@ -46,17 +46,17 @@ TEST(SimulatorBallSingletonTest, test_change_simulator_ball)
 
     SimulatorBallSingleton::setSimulatorBall(simulator_ball_1);
     auto firmware_ball = SimulatorBallSingleton::createFirmwareBall();
-    EXPECT_FLOAT_EQ(0.4, app_firmware_ball_getPositionX(firmware_ball.get()));
-    EXPECT_FLOAT_EQ(0.0, app_firmware_ball_getPositionY(firmware_ball.get()));
-    EXPECT_FLOAT_EQ(-1.3, app_firmware_ball_getVelocityX(firmware_ball.get()));
-    EXPECT_FLOAT_EQ(2.01, app_firmware_ball_getVelocityY(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(0.4f, app_firmware_ball_getPositionX(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_ball_getPositionY(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(-1.3f, app_firmware_ball_getVelocityX(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(2.01f, app_firmware_ball_getVelocityY(firmware_ball.get()));
 
     // The firmware functions should now return the data for simulator_ball_2, even though
     // we didn't need to create a new FirmwareBall_t
     SimulatorBallSingleton::setSimulatorBall(simulator_ball_2);
     firmware_ball = SimulatorBallSingleton::createFirmwareBall();
-    EXPECT_FLOAT_EQ(0, app_firmware_ball_getPositionX(firmware_ball.get()));
-    EXPECT_FLOAT_EQ(-3, app_firmware_ball_getPositionY(firmware_ball.get()));
-    EXPECT_FLOAT_EQ(0, app_firmware_ball_getVelocityX(firmware_ball.get()));
-    EXPECT_FLOAT_EQ(1, app_firmware_ball_getVelocityY(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_ball_getPositionX(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(-3.0f, app_firmware_ball_getPositionY(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_ball_getVelocityX(firmware_ball.get()));
+    EXPECT_FLOAT_EQ(1.0f, app_firmware_ball_getVelocityY(firmware_ball.get()));
 }

@@ -96,7 +96,7 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
     {
         float relative_angle_to_movement = min_angle_delta(wheel_axes[i], theta_norm);
         float initial_rotation           = current_angle + relative_angle_to_movement;
-        float abs_final_rotation = fabs(min_angle_delta(initial_rotation, final_angle));
+        float abs_final_rotation = fabsf(min_angle_delta(initial_rotation, final_angle));
         // if we have found a smaller angle, then update the minimum rotation
         // and chosen index
         if (abs_final_rotation < minimum_rotation)
@@ -125,7 +125,7 @@ void choose_rotation_destination(unsigned optimal_wheel_axes_index, PhysBot* pb,
 {
     // if we are close enough then we should just allow the bot to rotate
     // onto its destination angle, so skip this if block
-    if ((float)fabs(pb->maj.disp) > APPROACH_LIMIT)
+    if (fabsf(pb->maj.disp) > APPROACH_LIMIT)
     {
         float wheel_axes[8];
         build_wheel_axes(&wheel_axes, angle);
@@ -170,7 +170,7 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
     float dx = state->destination[0] - app_firmware_robot_getPositionX(robot);
     float dy = state->destination[1] - app_firmware_robot_getPositionY(robot);
     // Add a small number to avoid division by zero
-    float total_disp    = sqrtf(dx * dx + dy * dy) + 1e-6;
+    float total_disp    = sqrtf(dx * dx + dy * dy) + 1e-6f;
     state->major_vec[0] = dx / total_disp;
     state->major_vec[1] = dy / total_disp;
     state->minor_vec[0] = state->major_vec[0];
@@ -185,7 +185,7 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
 
     if (params->extra & 0x01)
-        app_chicker_enableAutokick(chicker, BALL_MAX_SPEED_METERS_PER_SECOND - 1);
+        app_chicker_enableAutokick(chicker, (float)BALL_MAX_SPEED_METERS_PER_SECOND - 1);
     if (params->extra & 0x02)
         app_dribbler_setSpeed(dribbler, 16000);
     if (params->extra & 0x04)

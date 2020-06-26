@@ -5,10 +5,10 @@
 TEST(Polynomial1dTest, test_default_constructor)
 {
     Polynomial1d p;
-    for (size_t i = 0; i < 10; i++)
+    for (unsigned int i = 0; i < 10; i++)
     {
-        EXPECT_DOUBLE_EQ(p.getCoeff(i), 0);
-        EXPECT_DOUBLE_EQ(p.valueAt(i), 0);
+        EXPECT_DOUBLE_EQ(p.getCoeff(i), 0.0);
+        EXPECT_DOUBLE_EQ(p.valueAt(i), 0.0);
     }
     EXPECT_DOUBLE_EQ(p.getOrder(), 0);
 }

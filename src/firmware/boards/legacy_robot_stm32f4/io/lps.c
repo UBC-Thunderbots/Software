@@ -161,9 +161,9 @@ void lps_tick(void)
         // lps_mean += lps_norm[i] * (i-1.5f) * LPS_SENSOR_SPACING;
         // lps_var += lps_norm[i] * (i-1.5f)*(i-1.5f) * LPS_SENSOR_SPACING *
         // LPS_SENSOR_SPACING;
-        x += lps_norm[i] * lps_moment_x[i] + (float)fabs(lps_norm[i]) * lps_abs_x[i] +
+        x += lps_norm[i] * lps_moment_x[i] + fabsf(lps_norm[i]) * lps_abs_x[i] +
              lps_norm[i] * lps_norm[i] * lps_variance_x[i];
-        y += lps_norm[i] * lps_moment_y[i] + (float)fabs(lps_norm[i]) * lps_abs_y[i] +
+        y += lps_norm[i] * lps_moment_y[i] + fabsf(lps_norm[i]) * lps_abs_y[i] +
              lps_norm[i] * lps_norm[i] * lps_variance_y[i];
         lps_sum += lps_norm[i];
     }

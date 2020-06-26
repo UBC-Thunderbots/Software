@@ -4,8 +4,8 @@ void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
                          std::function<void(double)> value_changed_callback, double min,
                          double max, double slider_step_size)
 {
-    slider->setMinimum(min * slider_step_size);
-    slider->setMaximum(max * slider_step_size);
+    slider->setMinimum(static_cast<int>(min * slider_step_size));
+    slider->setMaximum(static_cast<int>(max * slider_step_size));
     slider->setValue(0);
     line_edit->setText(QString::number(0));
 
@@ -35,7 +35,7 @@ void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
             {
                 line_edit->setText(QString::number(value));
             }
-            slider->setValue(value * slider_step_size);
+            slider->setValue(static_cast<int>(value * slider_step_size));
         }
         else
         {

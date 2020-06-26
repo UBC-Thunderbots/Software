@@ -90,7 +90,7 @@ TEST(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulation_
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();
@@ -113,7 +113,7 @@ TEST(PhysicsBallTest, test_ball_acceleration_and_velocity_updates_during_simulat
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();
@@ -152,7 +152,7 @@ TEST(PhysicsBallTest, test_ball_reverses_direction_after_object_collision)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();
@@ -170,7 +170,7 @@ TEST(PhysicsBallTest, test_ball_changes_direction_after_object_deflection)
     b2BodyDef wall_body_def;
     wall_body_def.type = b2_staticBody;
     wall_body_def.position.Set(2.0, 0.5);
-    wall_body_def.angle = M_PI_4;
+    wall_body_def.angle = static_cast<float>(M_PI_4);
     b2Body* wall_body   = world->CreateBody(&wall_body_def);
 
     b2PolygonShape wall_shape;
@@ -193,7 +193,7 @@ TEST(PhysicsBallTest, test_ball_changes_direction_after_object_deflection)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();
@@ -217,7 +217,7 @@ TEST(PhysicsBallTest, test_apply_force_to_stationary_ball)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();
@@ -241,7 +241,7 @@ TEST(PhysicsBallTest, test_apply_force_to_reverse_direction_of_moving_ball)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();
@@ -265,7 +265,7 @@ TEST(PhysicsBallTest, test_apply_force_to_change_direction_of_moving_ball)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();
@@ -283,7 +283,7 @@ TEST(PhysicsBallTest, test_apply_impulse_to_stationary_ball)
     // 5 and 8 here are somewhat arbitrary values for the velocity and position
     // iterations but are the recommended defaults from
     // https://www.iforce2d.net/b2dtut/worlds
-    world->Step(1.0 / 60.0, 5, 8);
+    world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
 
     auto ball = physics_ball.getBallState();
     EXPECT_LT((ball.velocity() - Vector(1, 2)).length(), 0.05);
@@ -300,7 +300,7 @@ TEST(PhysicsBallTest, test_apply_impulse_to_stop_moving_ball)
     // 5 and 8 here are somewhat arbitrary values for the velocity and position
     // iterations but are the recommended defaults from
     // https://www.iforce2d.net/b2dtut/worlds
-    world->Step(1.0 / 60.0, 5, 8);
+    world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
 
     auto ball = physics_ball.getBallState();
     EXPECT_LT((ball.velocity() - Vector(0, 0)).length(), 0.05);
@@ -317,7 +317,7 @@ TEST(PhysicsBallTest, test_apply_impulse_to_change_direction_of_moving_ball)
     // 5 and 8 here are somewhat arbitrary values for the velocity and position
     // iterations but are the recommended defaults from
     // https://www.iforce2d.net/b2dtut/worlds
-    world->Step(1.0 / 60.0, 5, 8);
+    world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
 
     auto ball = physics_ball.getBallState();
     EXPECT_LT((ball.velocity() - Vector(-1, 0)).length(), 0.05);
@@ -334,7 +334,7 @@ TEST(PhysicsBallTest, test_kick_stationary_ball)
     // 5 and 8 here are somewhat arbitrary values for the velocity and position
     // iterations but are the recommended defaults from
     // https://www.iforce2d.net/b2dtut/worlds
-    world->Step(1.0 / 60.0, 5, 8);
+    world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     auto ball = physics_ball.getBallState();
     EXPECT_LT((ball.velocity() - Vector(-2, 3)).length(), 0.05);
 }
@@ -350,7 +350,7 @@ TEST(PhysicsBallTest, test_kick_moving_ball)
     // 5 and 8 here are somewhat arbitrary values for the velocity and position
     // iterations but are the recommended defaults from
     // https://www.iforce2d.net/b2dtut/worlds
-    world->Step(1.0 / 60.0, 5, 8);
+    world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     auto ball = physics_ball.getBallState();
     EXPECT_LT((ball.velocity() - Vector(3, 0)).length(), 0.05);
 }
@@ -371,7 +371,7 @@ TEST(PhysicsBallTest, test_chip_stationary_ball_without_collisions)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
         auto ball = physics_ball.getBallState();
         if (ball.position().x() < 1.0)
         {
@@ -415,7 +415,7 @@ TEST(PhysicsBallTest, test_chip_ball_with_collisions)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
 
         // The ball should be in flight until it has passed the obstacle box
         auto ball = physics_ball.getBallState();
