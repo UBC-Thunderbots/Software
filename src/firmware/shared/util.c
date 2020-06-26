@@ -85,7 +85,7 @@ void fabs_of_array(float array[], float abs_array[], unsigned size)
     unsigned i;
     for (i = 0; i < size; i++)
     {
-        abs_array[i] = fabs(array[i]);
+        abs_array[i] = fabsf(array[i]);
     }
 }
 

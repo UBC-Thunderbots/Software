@@ -47,8 +47,9 @@ void ProtobufPrimitiveVisitor::visit(
                                  MILLIMETERS_PER_METER);
     prim_msg_ptr->set_parameter3(direct_velocity_primitive.getAngularVelocity() *
                                  CENTIRADIANS_PER_RADIAN);
-    prim_msg_ptr->set_extra_bits(direct_velocity_primitive.getDribblerRpm() *
-                                 DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR);
+    prim_msg_ptr->set_extra_bits(
+        static_cast<unsigned int>(direct_velocity_primitive.getDribblerRpm() *
+                                  DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR));
 }
 
 void ProtobufPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_primitive)
@@ -63,8 +64,9 @@ void ProtobufPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_
         static_cast<double>(direct_wheels_primitive.getWheel2Power()));
     prim_msg_ptr->set_parameter4(
         static_cast<double>(direct_wheels_primitive.getWheel3Power()));
-    prim_msg_ptr->set_extra_bits(direct_wheels_primitive.getDribblerRPM() *
-                                 DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR);
+    prim_msg_ptr->set_extra_bits(
+        static_cast<unsigned int>(direct_wheels_primitive.getDribblerRPM() *
+                                  DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR));
 }
 
 void ProtobufPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)

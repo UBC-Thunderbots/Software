@@ -85,7 +85,7 @@ static void accurate_shoot_start(const primitive_params_t* params, void* void_st
     state->major_vec[1] = sinf(state->destination[2]);
     state->minor_vec[0] = state->major_vec[0];
     state->minor_vec[1] = state->major_vec[1];
-    rotate(state->minor_vec, M_PI / 2);
+    rotate(state->minor_vec, (float)M_PI / 2);
 }
 
 static void accurate_shoot_end(void* void_state_ptr, FirmwareWorld_t* world)
@@ -114,7 +114,7 @@ static void accurate_shoot_tick(void* void_state_ptr, FirmwareWorld_t* world)
 
     // get angle to face ball
     float angle_face_ball = atanf(relative_destination[1] / relative_destination[0]);
-    angle_face_ball += relative_destination[0] < 0 ? M_PI : 0;
+    angle_face_ball += relative_destination[0] < 0 ? (float)M_PI : 0.0f;
 
     // sets relative destination so that code later will cause bot to face ball
     relative_destination[2] =
@@ -156,7 +156,7 @@ static void accurate_shoot_tick(void* void_state_ptr, FirmwareWorld_t* world)
         major_accel -=
             app_bangbang_computeAvgAccel(&major_profile, TIME_HORIZON) * TANGENTIAL_COEFF;
 
-        float outDisp = minor_disp / fabs(minor_disp) * TARGET_RADIUS / 2;
+        float outDisp = minor_disp / fabsf(minor_disp) * (float)TARGET_RADIUS / 2;
         app_bangbang_prepareTrajectoryMaxV(&minor_profile, outDisp, minor_vel, 1,
                                            MAX_ROT_SPEED, MAX_ROT_SPEED);
         app_bangbang_planTrajectory(&minor_profile);
@@ -286,8 +286,8 @@ static void accurate_shoot_tick(void* void_state_ptr, FirmwareWorld_t* world)
     // gets matrix for converting from maj/min axes to local bot coords
     const float current_orientation = app_firmware_robot_getOrientation(robot);
     float local_x_norm_vec[2] = {cosf(current_orientation), sinf(current_orientation)};
-    float local_y_norm_vec[2] = {cosf(current_orientation + M_PI / 2),
-                                 sinf(current_orientation + M_PI / 2)};
+    float local_y_norm_vec[2] = {cosf(current_orientation + (float)M_PI / 2),
+                                 sinf(current_orientation + (float)M_PI / 2)};
 
     // converts maj/min accel to local bot coordinates (matrix mult)
     accel[0] = minor_accel * (local_x_norm_vec[0] * state->minor_vec[0] +

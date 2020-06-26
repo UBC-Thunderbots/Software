@@ -417,22 +417,22 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_iteration_curved_line)
 
     PositionTrajectory_t const_interp_trajectory;
     status = app_trajectory_planner_generateConstantPeriodPositionTrajectory(
-        0.001, &path_parameters, &const_interp_trajectory);
+        0.001f, &path_parameters, &const_interp_trajectory);
 
     EXPECT_NEAR(trajectory.x_position[variable_period_num_segments - 1],
                 const_interp_trajectory.x_position[path_parameters.num_elements - 1],
-                0.001);
+                0.001f);
     EXPECT_NEAR(trajectory.y_position[variable_period_num_segments - 1],
                 const_interp_trajectory.y_position[path_parameters.num_elements - 1],
-                0.001);
+                0.001f);
     EXPECT_NEAR(trajectory.time_profile[variable_period_num_segments - 1],
                 const_interp_trajectory.time_profile[path_parameters.num_elements - 1],
-                0.001);
+                0.001f);
 
-    EXPECT_NEAR(trajectory.x_position[0], const_interp_trajectory.x_position[0], 0.001);
-    EXPECT_NEAR(trajectory.y_position[0], const_interp_trajectory.x_position[0], 0.001);
+    EXPECT_NEAR(trajectory.x_position[0], const_interp_trajectory.x_position[0], 0.001f);
+    EXPECT_NEAR(trajectory.y_position[0], const_interp_trajectory.x_position[0], 0.001f);
     EXPECT_NEAR(trajectory.time_profile[0], const_interp_trajectory.time_profile[0],
-                0.001);
+                0.001f);
 }
 
 
@@ -471,7 +471,7 @@ TEST_F(TrajectoryPlannerTest, test_get_constant_time_tion_too_many_elements)
     // Calculate the constant-tion period equivalent of the trajectory
     TrajectoryPlannerGenerationStatus_t status =
         app_trajectory_planner_generateConstantPeriodPositionTrajectory(
-            0.01, &path_parameters, &const_interp_trajectory);
+            0.01f, &path_parameters, &const_interp_trajectory);
 
     EXPECT_EQ(INTERPOLATION_ELEMENT_MAXED_OUT, status);
 }
@@ -588,8 +588,8 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_straight_line_high_acceleratio
     // Check that every velocity has the correct magnitude
     for (unsigned int i = 0; i < path_parameters.num_elements; i++)
     {
-        const float element_speed = sqrt(pow(velocity_trajectory.x_velocity[i], 2) +
-                                         pow(velocity_trajectory.y_velocity[i], 2));
+        const float element_speed = sqrtf(powf(velocity_trajectory.x_velocity[i], 2) +
+                                          powf(velocity_trajectory.y_velocity[i], 2));
         EXPECT_NEAR(position_trajectory.linear_speed[i], element_speed, 0.001);
 
         EXPECT_NEAR(direction_unit_vectors[i].x() * position_trajectory.linear_speed[i],
@@ -641,16 +641,16 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_parabola_path_high_acceleratio
     // Check that every velocity has the correct magnitude
     for (unsigned int i = 0; i < path_parameters.num_elements; i++)
     {
-        const float element_speed = sqrt(pow(velocity_trajectory.x_velocity[i], 2) +
-                                         pow(velocity_trajectory.y_velocity[i], 2));
+        const float element_speed = sqrtf(powf(velocity_trajectory.x_velocity[i], 2) +
+                                          powf(velocity_trajectory.y_velocity[i], 2));
         EXPECT_FLOAT_EQ(position_trajectory.linear_speed[i], element_speed);
 
-        EXPECT_FLOAT_EQ(
-            direction_unit_vectors[i].x() * position_trajectory.linear_speed[i],
-            velocity_trajectory.x_velocity[i]);
-        EXPECT_FLOAT_EQ(
-            direction_unit_vectors[i].y() * position_trajectory.linear_speed[i],
-            velocity_trajectory.y_velocity[i]);
+        EXPECT_FLOAT_EQ(static_cast<float>(direction_unit_vectors[i].x()) *
+                            position_trajectory.linear_speed[i],
+                        velocity_trajectory.x_velocity[i]);
+        EXPECT_FLOAT_EQ(static_cast<float>(direction_unit_vectors[i].y()) *
+                            position_trajectory.linear_speed[i],
+                        velocity_trajectory.y_velocity[i]);
     }
 }
 
@@ -697,16 +697,16 @@ TEST_F(TrajectoryPlannerTest, velocity_trajectory_curved_path_low_acceleration)
     // Check that every velocity has the correct magnitude
     for (unsigned int i = 0; i < path_parameters.num_elements; i++)
     {
-        const float element_speed = sqrt(pow(velocity_trajectory.x_velocity[i], 2) +
-                                         pow(velocity_trajectory.y_velocity[i], 2));
+        const float element_speed = sqrtf(powf(velocity_trajectory.x_velocity[i], 2) +
+                                          powf(velocity_trajectory.y_velocity[i], 2));
         EXPECT_FLOAT_EQ(position_trajectory.linear_speed[i], element_speed);
 
-        EXPECT_FLOAT_EQ(
-            direction_unit_vectors[i].x() * position_trajectory.linear_speed[i],
-            velocity_trajectory.x_velocity[i]);
-        EXPECT_FLOAT_EQ(
-            direction_unit_vectors[i].y() * position_trajectory.linear_speed[i],
-            velocity_trajectory.y_velocity[i]);
+        EXPECT_FLOAT_EQ(static_cast<float>(direction_unit_vectors[i].x()) *
+                            position_trajectory.linear_speed[i],
+                        velocity_trajectory.x_velocity[i]);
+        EXPECT_FLOAT_EQ(static_cast<float>(direction_unit_vectors[i].y()) *
+                            position_trajectory.linear_speed[i],
+                        velocity_trajectory.y_velocity[i]);
     }
 }
 
@@ -992,14 +992,18 @@ TEST_F(TrajectoryPlannerTest,
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
-    const float segment_length = 9 * sqrt(2) / (path_parameters.num_elements - 1);
+    const float segment_length =
+        9 * sqrtf(2) / static_cast<float>(path_parameters.num_elements - 1);
 
     for (unsigned int i = 0; i < path_parameters.num_elements; i++)
     {
         EXPECT_FLOAT_EQ(velocity_trajectory.angular_velocity[i], 0);
-        EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i], directions[i].x());
-        EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i], directions[i].y());
-        EXPECT_NEAR(velocity_trajectory.time_profile[i], i * segment_length, 0.00001);
+        EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i],
+                        static_cast<float>(directions[i].x()));
+        EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i],
+                        static_cast<float>(directions[i].y()));
+        EXPECT_NEAR(velocity_trajectory.time_profile[i],
+                    static_cast<float>(i) * segment_length, 0.00001);
     }
 }
 
@@ -1037,7 +1041,8 @@ TEST_F(TrajectoryPlannerTest,
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
-    const float segment_length           = 9.0 / (path_parameters.num_elements - 1);
+    const float segment_length =
+        9.0f / static_cast<float>(path_parameters.num_elements - 1);
     const float initial_segment_duration = (2 * segment_length) / (1);
 
     EXPECT_FLOAT_EQ(velocity_trajectory.angular_velocity[0], 0);
@@ -1047,7 +1052,8 @@ TEST_F(TrajectoryPlannerTest,
         EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i], 0);
         EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i], 0);
         EXPECT_NEAR(velocity_trajectory.time_profile[i],
-                    initial_segment_duration + (i - 1) * segment_length, 0.00001);
+                    initial_segment_duration + static_cast<float>(i - 1) * segment_length,
+                    0.00001);
     }
     EXPECT_FLOAT_EQ(
         velocity_trajectory.angular_velocity[path_parameters.num_elements - 1],
@@ -1094,10 +1100,12 @@ TEST_F(TrajectoryPlannerTest,
     {
         EXPECT_FLOAT_EQ(velocity_trajectory.angular_velocity[i],
                         position_trajectory.angular_speed[i]);
-        EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i],
-                        position_trajectory.linear_speed[i] * directions[i].x());
-        EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i],
-                        position_trajectory.linear_speed[i] * directions[i].y());
+        EXPECT_FLOAT_EQ(
+            velocity_trajectory.x_velocity[i],
+            position_trajectory.linear_speed[i] * static_cast<float>(directions[i].x()));
+        EXPECT_FLOAT_EQ(
+            velocity_trajectory.y_velocity[i],
+            position_trajectory.linear_speed[i] * static_cast<float>(directions[i].y()));
         EXPECT_NEAR(velocity_trajectory.time_profile[i],
                     position_trajectory.time_profile[i], 0.00001);
     }
@@ -1190,10 +1198,12 @@ TEST_F(
     {
         EXPECT_FLOAT_EQ(velocity_trajectory.angular_velocity[i],
                         position_trajectory.angular_speed[i]);
-        EXPECT_FLOAT_EQ(velocity_trajectory.x_velocity[i],
-                        position_trajectory.linear_speed[i] * directions[i].x());
-        EXPECT_FLOAT_EQ(velocity_trajectory.y_velocity[i],
-                        position_trajectory.linear_speed[i] * directions[i].y());
+        EXPECT_FLOAT_EQ(
+            velocity_trajectory.x_velocity[i],
+            position_trajectory.linear_speed[i] * static_cast<float>(directions[i].x()));
+        EXPECT_FLOAT_EQ(
+            velocity_trajectory.y_velocity[i],
+            position_trajectory.linear_speed[i] * static_cast<float>(directions[i].y()));
         EXPECT_NEAR(velocity_trajectory.time_profile[i],
                     position_trajectory.time_profile[i], 0.00001);
     }

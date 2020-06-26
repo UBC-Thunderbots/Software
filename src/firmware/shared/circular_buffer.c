@@ -57,12 +57,12 @@ float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, size_t index)
     // Check if enough items are in the buffer for index
     assert(circular_buffer_isFull(cbuffer) == true || index <= cbuffer->head);
 
-    int requested_index = (cbuffer->head % cbuffer->max_size) - index - 1;
+    int requested_index = (int)((cbuffer->head % cbuffer->max_size) - index - 1);
 
     // Check if requestedIndex needs to be looped
     if (requested_index < 0)
     {
-        requested_index = cbuffer->max_size + requested_index;
+        requested_index = (int)cbuffer->max_size + requested_index;
     }
     float res = cbuffer->buffer_data[requested_index];
     return res;

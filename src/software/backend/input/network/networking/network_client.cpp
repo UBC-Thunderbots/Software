@@ -167,7 +167,7 @@ void NetworkClient::invertFieldSide(SSL_DetectionFrame& frame)
         {
             robot.set_x(-robot.x());
             robot.set_y(-robot.y());
-            robot.set_orientation(robot.orientation() + M_PI);
+            robot.set_orientation(robot.orientation() + static_cast<float>(M_PI));
         }
     }
 }

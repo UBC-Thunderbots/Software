@@ -88,8 +88,8 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest, visit_pivot_primtive_clock
 
     // if c is less than 0, then direction vector is on the clockwise side of radial
     // vector, which means the robot is rotating clockwise
-    float c = radial_vector.x() * direction_vector.y() -
-              radial_vector.y() * direction_vector.x();
+    float c = static_cast<float>(radial_vector.x() * direction_vector.y() -
+                                 radial_vector.y() * direction_vector.x());
     EXPECT_LE(c, 0);
 }
 
@@ -122,8 +122,8 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest,
 
     // if c is greater than 0, then direction vector is on the counter-clockwise side of
     // radial vector, which means the robot is rotating counter-clockwise
-    float c = radial_vector.x() * direction_vector.y() -
-              radial_vector.y() * direction_vector.x();
+    float c = static_cast<float>(radial_vector.x() * direction_vector.y() -
+                                 radial_vector.y() * direction_vector.x());
     EXPECT_GE(c, 0);
 }
 

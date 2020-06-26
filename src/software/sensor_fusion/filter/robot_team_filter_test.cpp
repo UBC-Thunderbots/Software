@@ -51,7 +51,7 @@ TEST(RobotTeamFilterTest, detections_with_same_timestamp_test)
         robot_detection.id          = i;
         robot_detection.position    = Point(Vector(0.5, -0.25) * i);
         robot_detection.orientation = Angle::fromRadians(0.1 * i);
-        robot_detection.confidence  = i / ((double)num_robots);
+        robot_detection.confidence  = i / (static_cast<double>(num_robots));
         robot_detection.timestamp   = Timestamp::fromSeconds(.5);
         robot_detections.push_back(robot_detection);
     }
@@ -85,7 +85,7 @@ TEST(RobotTeamFilterTest, detections_with_different_times_test)
         robot_detection.id          = i;
         robot_detection.position    = Point(Vector(0.5, -0.25) * i);
         robot_detection.orientation = Angle::fromRadians(0.1 * i);
-        robot_detection.confidence  = i / ((double)num_robots);
+        robot_detection.confidence  = i / (static_cast<double>(num_robots));
         // use different timestamps for each detection
         robot_detection.timestamp = Timestamp::fromSeconds(i);
         robot_detections.push_back(robot_detection);

@@ -33,7 +33,8 @@ void RadioOutput::sendVisionPacket(const Team &friendly_team, Ball ball)
     for (const Robot &robot : friendly_team.getAllRobots())
     {
         robot_tuples.emplace_back(std::make_tuple<uint8_t, Point, Angle>(
-            robot.id(), robot.position(), robot.orientation()));
+            static_cast<unsigned char>(robot.id()), robot.position(),
+            robot.orientation()));
     }
     sendVisionPacket(robot_tuples, ball);
 }

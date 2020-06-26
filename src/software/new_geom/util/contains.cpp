@@ -33,8 +33,8 @@ bool contains(const Polygon& container, const Point& contained)
     // located in one and only one polygon.
     auto& points            = container.getPoints();
     bool point_is_contained = false;
-    unsigned i              = 0;
-    unsigned j              = points.size() - 1;
+    size_t i                = 0;
+    size_t j                = points.size() - 1;
     double px               = contained.x();
     double py               = contained.y();
     while (i < points.size())

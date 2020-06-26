@@ -12,9 +12,10 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
     // Changes made after aren't reflected
     b2BodyDef ball_body_def;
     ball_body_def.type = b2_dynamicBody;
-    ball_body_def.position.Set(ball_state.position().x(), ball_state.position().y());
-    ball_body_def.linearVelocity.Set(ball_state.velocity().x(),
-                                     ball_state.velocity().y());
+    ball_body_def.position.Set(static_cast<float>(ball_state.position().x()),
+                               static_cast<float>(ball_state.position().y()));
+    ball_body_def.linearVelocity.Set(static_cast<float>(ball_state.velocity().x()),
+                                     static_cast<float>(ball_state.velocity().y()));
     // The ball can potentially move relatively quickly, so treating it as a "bullet"
     // helps prevent tunneling and other collision problems
     // See the "Breakdown of a collision" section of:
@@ -23,16 +24,17 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
     ball_body            = world->CreateBody(&ball_body_def);
 
     b2CircleShape ball_shape;
-    ball_shape.m_radius = BALL_MAX_RADIUS_METERS;
+    ball_shape.m_radius = static_cast<float>(BALL_MAX_RADIUS_METERS);
 
     b2FixtureDef ball_fixture_def;
     ball_fixture_def.shape = &ball_shape;
     // Calculate the density the fixture / ball must have in order for it to have the
     // desired mass. The density is uniform across the shape.
-    float ball_area              = M_PI * ball_shape.m_radius * ball_shape.m_radius;
-    ball_fixture_def.density     = mass_kg / ball_area;
-    ball_fixture_def.restitution = ball_restitution;
-    ball_fixture_def.friction    = ball_friction;
+    float ball_area =
+        static_cast<float>(M_PI * ball_shape.m_radius * ball_shape.m_radius);
+    ball_fixture_def.density     = static_cast<float>(mass_kg / ball_area);
+    ball_fixture_def.restitution = static_cast<float>(ball_restitution);
+    ball_fixture_def.friction    = static_cast<float>(ball_friction);
     ball_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
 
