@@ -56,8 +56,8 @@ void RobotStatusTable::updateStatusAge()
 
     for (auto iter = status_messages.begin(); iter != status_messages.end(); iter++)
     {
-        iter->second = iter->second +
-                       Duration::fromMilliseconds(milliseconds_since_last_update.count());
+        iter->second = iter->second + Duration::fromMilliseconds(static_cast<double>(
+                                          milliseconds_since_last_update.count()));
     }
     updateTableView();
 }
@@ -90,7 +90,7 @@ void RobotStatusTable::updateTableView()
     // Resize the number of rows to only have as many rows as we have messages. This will
     // automatically delete any extra rows / messages for us, and then we overwrite the
     // existing rows with new messages
-    setRowCount(status_messages.size());
+    setRowCount(static_cast<int>(status_messages.size()));
     int row = 0;
     for (const auto& status_message : status_messages)
     {

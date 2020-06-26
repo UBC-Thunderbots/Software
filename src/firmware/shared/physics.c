@@ -15,16 +15,16 @@
 // torque as the matrix is unitless (multiply by ROBOT_RADIUS to unnormalize)
 // the transpose of this matrix is the velocity coupling matrix and can convert
 // speeds in the robot coordinates into linear wheel speeds
-static const float force4_to_force3_mat[3][4] = {{-0.8192, -0.7071, 0.7071, 0.8192},
-                                                 {0.5736, -0.7071, -0.7071, 0.5736},
-                                                 {1.0000, 1.0000, 1.0000, 1.0000}};
+static const float force4_to_force3_mat[3][4] = {{-0.8192f, -0.7071f, 0.7071f, 0.8192f},
+                                                 {0.5736f, -0.7071f, -0.7071f, 0.5736f},
+                                                 {1.0000f, 1.0000f, 1.0000f, 1.0000f}};
 
 // Transformation matricies to convert a 4 velocity to
 // a 3 velocity (derived as pinv(force4_to_force3^t)
 // this is also the transpose of force3_to_force4 mat
-static const float speed4_to_speed3_mat[3][4] = {{-0.3498, -0.3019, 0.3019, 0.3498},
-                                                 {0.3904, -0.3904, -0.3904, 0.3904},
-                                                 {0.2761, 0.2239, 0.2239, 0.2761}};
+static const float speed4_to_speed3_mat[3][4] = {{-0.3498f, -0.3019f, 0.3019f, 0.3498f},
+                                                 {0.3904f, -0.3904f, -0.3904f, 0.3904f},
+                                                 {0.2761f, 0.2239f, 0.2239f, 0.2761f}};
 
 // mass vector (consists linear robot mass and interial mass)
 const float ROBOT_MASS[3] = {ROBOT_POINT_MASS, ROBOT_POINT_MASS, ROT_MASS};
@@ -81,8 +81,8 @@ void force3_to_force4(float force3[3], float force4[4])
 // test with angle2 increased or decreased by 2pi
 float min_angle_delta(float angle1, float angle2)
 {
-    angle1 = fmod(angle1, 2 * P_PI);
-    angle2 = fmod(angle2, 2 * P_PI);
+    angle1 = fmodf(angle1, 2 * P_PI);
+    angle2 = fmodf(angle2, 2 * P_PI);
     if (angle2 >= angle1)
     {
         float ang_sub = angle2 - 2 * P_PI;

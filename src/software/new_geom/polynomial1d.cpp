@@ -85,11 +85,11 @@ unsigned int Polynomial1d::getOrder() const
 {
     if (coeffs.size() != 0)
     {
-        for (unsigned int i = coeffs.size(); i > 0; i--)
+        for (size_t i = coeffs.size(); i > 0; i--)
         {
             if (std::abs(coeffs[i - 1]) >= GeomConstants::FIXED_EPSILON)
             {
-                return i - 1;
+                return static_cast<unsigned int>(i) - 1;
             }
         }
     }

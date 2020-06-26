@@ -31,7 +31,8 @@ class SSLGeometryTest : public ::testing::Test
         const SSL_FieldLineSegment& field_segment, const Segment& segment,
         const float thickness, const float tolerance)
     {
-        EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, field_segment.thickness());
+        EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
+                        field_segment.thickness());
 
         auto segment_eq =
             equalWithinTolerance(segment.getSegStart(), field_segment.p1(), tolerance) &&
@@ -58,8 +59,10 @@ class SSLGeometryTest : public ::testing::Test
                                                     const float thickness,
                                                     const float tolerance)
     {
-        EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, field_arc.thickness());
-        EXPECT_FLOAT_EQ(circle.getRadius() * MILLIMETERS_PER_METER, field_arc.radius());
+        EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
+                        field_arc.thickness());
+        EXPECT_FLOAT_EQ(static_cast<float>(circle.getRadius() * MILLIMETERS_PER_METER),
+                        field_arc.radius());
 
         auto result = ::testing::AssertionSuccess();
 
@@ -95,7 +98,7 @@ class SSLGeometryTest : public ::testing::Test
     // An approximate epsilon tolerance for floating point values. This corresponds
     // to micrometer precision on the field, which is much more precise than the data
     // we get in real life
-    const float tolerance = 1e-6;
+    const float tolerance = 1e-6f;
 };
 
 TEST_F(SSLGeometryTest, test_find_line_segment_with_no_segments)
@@ -119,7 +122,7 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_nonexistent_name)
     segment_1_p2->set_x(2.0);
     segment_1_p2->set_y(2.5);
     segment_1->set_allocated_p2(segment_1_p2.release());
-    segment_1->set_thickness(0.01);
+    segment_1->set_thickness(0.01f);
     segments.AddAllocated(segment_1.release());
 
     auto result = findLineSegment(segments, SSLFieldLines::CENTER_LINE);
@@ -140,7 +143,7 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_valid_name)
     segment_1_p2->set_x(2.0);
     segment_1_p2->set_y(2.5);
     segment_1->set_allocated_p2(segment_1_p2.release());
-    segment_1->set_thickness(0.01);
+    segment_1->set_thickness(0.01f);
     segments.AddAllocated(segment_1.release());
 
     auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
@@ -153,7 +156,7 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_valid_name)
     segment_2_p2->set_x(2.0);
     segment_2_p2->set_y(2.5);
     segment_2->set_allocated_p2(segment_2_p2.release());
-    segment_2->set_thickness(0.01);
+    segment_2->set_thickness(0.01f);
     segments.AddAllocated(segment_2.release());
 
     auto result = findLineSegment(segments, SSLFieldLines::NEG_Y_FIELD_LINE);
@@ -175,7 +178,7 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_duplicate_names)
     segment_1_p2->set_x(2.0);
     segment_1_p2->set_y(2.5);
     segment_1->set_allocated_p2(segment_1_p2.release());
-    segment_1->set_thickness(0.01);
+    segment_1->set_thickness(0.01f);
     segments.AddAllocated(segment_1.release());
 
     auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
@@ -188,7 +191,7 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_duplicate_names)
     segment_2_p2->set_x(5.0);
     segment_2_p2->set_y(6.0);
     segment_2->set_allocated_p2(segment_2_p2.release());
-    segment_2->set_thickness(0.05);
+    segment_2->set_thickness(0.05f);
     segments.AddAllocated(segment_2.release());
 
     auto result = findLineSegment(segments, SSLFieldLines::POS_Y_FIELD_LINE);
@@ -219,7 +222,7 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_nonexistent_name)
     arc_1->set_radius(0.5);
     arc_1->set_a1(0.0);
     arc_1->set_a2(5.0);
-    arc_1->set_thickness(0.01);
+    arc_1->set_thickness(0.01f);
     arcs.AddAllocated(arc_1.release());
 
     auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
@@ -239,7 +242,7 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_valid_name)
     arc_1->set_radius(0.5);
     arc_1->set_a1(0.0);
     arc_1->set_a2(5.0);
-    arc_1->set_thickness(0.01);
+    arc_1->set_thickness(0.01f);
     arcs.AddAllocated(arc_1.release());
 
     auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
@@ -251,7 +254,7 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_valid_name)
     arc_2->set_radius(0.5);
     arc_2->set_a1(0.0);
     arc_2->set_a2(5.0);
-    arc_2->set_thickness(0.01);
+    arc_2->set_thickness(0.01f);
     arcs.AddAllocated(arc_2.release());
 
     auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
@@ -272,7 +275,7 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_duplicate_names)
     arc_1->set_radius(0.5);
     arc_1->set_a1(0.0);
     arc_1->set_a2(5.0);
-    arc_1->set_thickness(0.01);
+    arc_1->set_thickness(0.01f);
     arcs.AddAllocated(arc_1.release());
 
     auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
@@ -281,7 +284,7 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_duplicate_names)
     arc_2_center->set_x(-2.0);
     arc_2_center->set_y(3.0);
     arc_2->set_allocated_center(arc_2_center.release());
-    arc_2->set_radius(0.2);
+    arc_2->set_radius(0.2f);
     arc_2->set_a1(0.5);
     arc_2->set_a2(3.0);
     arc_2->set_thickness(0.5);
@@ -315,7 +318,8 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_valid_values)
 
     ASSERT_TRUE(field_line_msg);
     EXPECT_EQ("TopTouchLine", field_line_msg->name());
-    EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, field_line_msg->thickness());
+    EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
+                    field_line_msg->thickness());
     EXPECT_TRUE(
         equalWithinTolerance(segment.getSegStart(), field_line_msg->p1(), tolerance));
     EXPECT_TRUE(equalWithinTolerance(segment.getEnd(), field_line_msg->p2(), tolerance));
@@ -344,10 +348,11 @@ TEST_F(SSLGeometryTest, test_create_field_circular_arc_with_valid_values)
 
     ASSERT_TRUE(circular_arc_msg);
     EXPECT_EQ("CenterCircle", circular_arc_msg->name());
-    EXPECT_FLOAT_EQ(thickness * MILLIMETERS_PER_METER, circular_arc_msg->thickness());
+    EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
+                    circular_arc_msg->thickness());
     EXPECT_TRUE(
         equalWithinTolerance(circle.getOrigin(), circular_arc_msg->center(), tolerance));
-    EXPECT_FLOAT_EQ(circle.getRadius() * MILLIMETERS_PER_METER,
+    EXPECT_FLOAT_EQ(static_cast<float>(circle.getRadius() * MILLIMETERS_PER_METER),
                     circular_arc_msg->radius());
     EXPECT_EQ(SSL_FieldShapeType::CenterCircle, circular_arc_msg->type());
 }

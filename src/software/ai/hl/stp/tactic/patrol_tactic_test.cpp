@@ -48,7 +48,7 @@ class PatrolTacticTest : public testing::Test
         {
             TimestampedRobotState robotState = TimestampedRobotState(
                 patrol_points[i], velocity, Angle::zero(), AngularVelocity::zero(),
-                Timestamp::fromSeconds(std::time(nullptr)));
+                Timestamp::fromSeconds(static_cast<double>(std::time(nullptr))));
             robot_state_to_complete_actions.push_back(robotState);
         }
     }

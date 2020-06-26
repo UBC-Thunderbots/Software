@@ -215,14 +215,14 @@ TEST(NormalizeToRangeTest, test_integral_type_initial_value_out_of_range)
 
 TEST(NormalizeToRangeTest, test_floating_point_type_normalize_to_same_range)
 {
-    float result = normalizeValueToRange<float>(39.05, 0.0, 50.0, 0.0, 50.0);
-    EXPECT_FLOAT_EQ(39.05, result);
+    float result = normalizeValueToRange<float>(39.05f, 0.0f, 50.0f, 0.0f, 50.0f);
+    EXPECT_FLOAT_EQ(39.05f, result);
 }
 
 TEST(NormalizeToRangeTest, test_floating_point_type_normalize_to_different_range)
 {
-    float result = normalizeValueToRange<float>(39.05, 0.0, 50.0, 0.0, 1.0);
-    EXPECT_FLOAT_EQ(0.781, result);
+    float result = normalizeValueToRange<float>(39.05f, 0.0f, 50.0f, 0.0f, 1.0f);
+    EXPECT_FLOAT_EQ(0.781f, result);
 }
 
 TEST(NormalizeToRangeTest, test_floating_point_type_initial_value_out_of_range)

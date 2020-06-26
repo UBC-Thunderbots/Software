@@ -46,10 +46,10 @@ static void pivot_start(const primitive_params_t *params, void *void_state_ptr,
                         FirmwareWorld_t *world)
 {
     PivotPrimitiveState_t *state = (PivotPrimitiveState_t *)void_state_ptr;
-    state->center[0]             = params->params[0] / 1000.0;
-    state->center[1]             = params->params[1] / 1000.0;
-    state->angle                 = params->params[2] / 100.0;
-    state->speed                 = params->params[3] / 100.0;
+    state->center[0]             = params->params[0] / 1000.0f;
+    state->center[1]             = params->params[1] / 1000.0f;
+    state->angle                 = params->params[2] / 100.0f;
+    state->speed                 = params->params[3] / 100.0f;
 
     if (params->extra & 0x01)
     {
@@ -58,7 +58,7 @@ static void pivot_start(const primitive_params_t *params, void *void_state_ptr,
         app_dribbler_setSpeed(dribbler, 16000);
     }
 
-    state->radius = 0.15;  // ball radius + robot radius + buffer
+    state->radius = 0.15f;  // ball radius + robot radius + buffer
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 
@@ -104,8 +104,8 @@ static void pivot_tick(void *void_state_ptr, FirmwareWorld_t *world)
     float cur_radius = compute_magnitude(rel_dest);
 
     // direction to travel to rotate around the bot, dir is selected at the start
-    tangential_dir[0] = -state->dir * rel_dest[1] / cur_radius;
-    tangential_dir[1] = state->dir * rel_dest[0] / cur_radius;
+    tangential_dir[0] = -(float)state->dir * rel_dest[1] / cur_radius;
+    tangential_dir[1] = (float)state->dir * rel_dest[0] / cur_radius;
 
     BBProfile rotation_profile;
 

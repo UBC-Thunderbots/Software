@@ -25,7 +25,7 @@ void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
     //       control each wheel by applying "force" to it, but rather by directly
     //       applying voltage
 
-    float pwm_percentage = fmin(1.0f, fabs(force_newtons) / 255.0f);
+    float pwm_percentage = fminf(1.0f, fabsf(force_newtons) / 255.0f);
 
     if (force_newtons > 0)
     {

@@ -157,9 +157,9 @@ double ConvexPolygon::area() const
     double first_term  = 0;
     double second_term = 0;
 
-    unsigned num_points = reversePoints.size();
+    size_t num_points = reversePoints.size();
 
-    for (unsigned i = 0; i < num_points; i++)
+    for (size_t i = 0; i < num_points; i++)
     {
         first_term += reversePoints[i].x() * reversePoints[(i + 1) % num_points].y();
         second_term += reversePoints[i].y() * reversePoints[(i + 1) % num_points].x();

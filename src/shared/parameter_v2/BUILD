@@ -1,6 +1,6 @@
 load(":parameter.bzl", "c_dynamic_parameters", "cpp_dynamic_parameters")
 
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//visibility:private"])
 
 cpp_dynamic_parameters(
     name = "cpp_params",

@@ -69,7 +69,7 @@ TEST(PhysicsFieldTest, test_field_dimensions_do_not_change_during_simulation_ste
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto field = physics_field.getField();
@@ -95,7 +95,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_field_boundary)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();
@@ -121,7 +121,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();
@@ -147,7 +147,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(1.0 / 60.0, 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
     }
 
     auto ball = physics_ball.getBallState();

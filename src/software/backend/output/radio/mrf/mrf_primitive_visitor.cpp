@@ -47,8 +47,9 @@ void MRFPrimitiveVisitor::visit(const DirectVelocityPrimitive &direct_velocity_p
         direct_velocity_primitive.getXVelocity() * MILLIMETERS_PER_METER,
         direct_velocity_primitive.getYVelocity() * MILLIMETERS_PER_METER,
         direct_velocity_primitive.getAngularVelocity() * CENTIRADIANS_PER_RADIAN, 0};
-    radio_prim->extra_bits = direct_velocity_primitive.getDribblerRpm() *
-                             DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR;
+    radio_prim->extra_bits =
+        static_cast<uint8_t>(direct_velocity_primitive.getDribblerRpm() *
+                             DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR);
 }
 
 void MRFPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_primitive)
@@ -60,8 +61,9 @@ void MRFPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_primi
         static_cast<double>(direct_wheels_primitive.getWheel1Power()),
         static_cast<double>(direct_wheels_primitive.getWheel2Power()),
         static_cast<double>(direct_wheels_primitive.getWheel3Power())};
-    radio_prim->extra_bits = direct_wheels_primitive.getDribblerRPM() *
-                             DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR;
+    radio_prim->extra_bits =
+        static_cast<uint8_t>(direct_wheels_primitive.getDribblerRPM() *
+                             DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR);
 }
 
 void MRFPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
@@ -100,10 +102,13 @@ void MRFPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
         move_primitive.getFinalSpeed() * MILLIMETERS_PER_METER};
     radio_prim->slow       = move_primitive.getMoveType() == MoveType::SLOW;
     radio_prim->extra_bits = 0;
-    radio_prim->extra_bits |= (move_primitive.getAutoKickType() == AUTOKICK) * 0x01;
-    radio_prim->extra_bits |=
-        (move_primitive.getDribblerEnable() == DribblerEnable::ON) * 0x02;
-    radio_prim->extra_bits |= (move_primitive.getAutoKickType() == AUTOCHIP) * 0x04;
+    radio_prim->extra_bits = static_cast<uint8_t>(
+        radio_prim->extra_bits | ((move_primitive.getAutoKickType() == AUTOKICK) * 0x01));
+    radio_prim->extra_bits = static_cast<uint8_t>(
+        radio_prim->extra_bits |
+        ((move_primitive.getDribblerEnable() == DribblerEnable::ON) * 0x02));
+    radio_prim->extra_bits = static_cast<uint8_t>(
+        radio_prim->extra_bits | ((move_primitive.getAutoKickType() == AUTOCHIP) * 0x04));
 }
 
 void MRFPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive)
@@ -135,5 +140,5 @@ void MRFPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
     radio_prim              = RadioPrimitive();
     radio_prim->prim_type   = FirmwarePrimitiveType::STOP;
     radio_prim->param_array = {0, 0, 0, 0};
-    radio_prim->extra_bits  = (uint8_t)stop_primitive.robotShouldCoast();
+    radio_prim->extra_bits  = static_cast<uint8_t>(stop_primitive.robotShouldCoast());
 }

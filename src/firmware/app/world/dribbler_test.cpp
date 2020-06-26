@@ -24,7 +24,7 @@ class DribblerTest : public testing::Test
 
     static void setRequestedRpm(uint32_t rpm)
     {
-        requested_rpm = rpm;
+        requested_rpm = static_cast<float>(rpm);
     }
 
     static unsigned int returnSeven(void)
