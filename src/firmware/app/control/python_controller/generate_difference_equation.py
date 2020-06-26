@@ -17,8 +17,9 @@ float GENERATED_PREVIOUS_WHEEL_SPEED_COMMAND_COEFFICIENTS[GENERATED_NUM_PREVIOUS
 
 def generate(discrete_tf: ct.TransferFunction):
     # Copy the numerator and denominator of the input TF
-    numerator_coefficients = discrete_tf.num[0][0]
-    denominator_coefficients = discrete_tf.den[0][0]
+    # Convert from list to string to remove list brackets
+    numerator_coefficients = str(discrete_tf.num[0][0].tolist())[1:-1]
+    denominator_coefficients = str(discrete_tf.den[0][0].tolist())[1:-1]
 
     numerator_length = len(numerator_coefficients)
     denominator_length = len(denominator_coefficients)
@@ -35,8 +36,8 @@ def generate(discrete_tf: ct.TransferFunction):
 #                                MAIN                                 #
 #######################################################################
 if __name__ == "__main__":
-    with open(sys.argv[-1], "w") as controller_difference_coefficient_generator:
-        # TODO hard-coded ATM, need to read discrete_function somewhere
+    with open(sys.argv[-1], "w") as controller_coefficient_generator:
+        # TODO hard-coded ATM, need to pass parameters from controller design file
         numerator = [1, 1]
         denominator = [1, 1, 1]
         interpolation_period = 0.1
@@ -44,20 +45,9 @@ if __name__ == "__main__":
 
         transfer_function = tf(numerator, denominator, interpolation_period)
 
-        res = generate(transfer_function)
+        controller_coefficients = generate(transfer_function)
 
-        # header
-        controller_difference_coefficient_generator.write(res)
-
-        # Generates generated_controller_coefficients.h ATM:
-        """
-        #define WHEEL_SPEED_CONTROLLER_TICK_TIME 1e7
-        #define GENERATED_NUM_WHEEL_SPEED_COEFFICIENTS 2;
-        #define GENERATED_NUM_PREVIOUS_WHEEL_SPEED_COMMAND_COEFFICIENTS 3;
-        float GENERATED_WHEEL_SPEED_COEFFICIENTS[GENERATED_NUM_WHEEL_SPEED_COEFFICIENTS] =
-        {[1 1]};
-        float GENERATED_PREVIOUS_WHEEL_SPEED_COMMAND_COEFFICIENTS[GENERATED_NUM_PREVIOUS_WHEEL_SPEED_COMMAND_COEFFICIENTS] =
-        {[1 1 1]};
-        """
+        # Generate difference equation coefficients
+        controller_coefficient_generator.write(controller_coefficients)
 
     print("INFO: Generated Difference Equation Controller Coefficients")
