@@ -51,3 +51,17 @@ std::optional<bool> robotHasPossession(const Ball& ball, const Robot& robot,
  */
 std::optional<bool> robotBeingPassedTo(const World& world, const Robot& robot,
                                        std::optional<Timestamp> timestamp = std::nullopt);
+
+/**
+ * Finds an update timestamp that is close to the provided timestamp and returns the
+ * STATE corresponding to that timestamp in the history buffer.
+ *
+ * @param timestamp timestamp of the update state index we wish to fetch
+ * @param states circular buffer of STATE to scan
+ *
+ * @return STATE corresponding to timestamp or std::nullopt if no ball state found
+ * matching timestamp.
+ */
+template <typename STATE>
+std::optional<STATE> findState(boost::circular_buffer<STATE> states,
+                               Timestamp& timestamp);

@@ -121,16 +121,6 @@ class Ball final
     boost::circular_buffer<TimestampedBallState> getPreviousStates() const;
 
     /**
-     * Finds an update timestamp that is close to the provided timestamp and returns the
-     * index of the timestamp in the history buffer.
-     *
-     * @param timestamp timestamp of the update state index we wish to fetch
-     * @return Index of the ball's update timestamp closest to the desired time or a
-     * std::nullopt if there is not matching timestamp.
-     */
-    std::optional<int> getHistoryIndexFromTimestamp(const Timestamp &timestamp) const;
-
-    /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
      * velocities are the same
      *

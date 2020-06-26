@@ -338,52 +338,6 @@ TEST_F(BallTest, get_timestamp_history)
     EXPECT_EQ(prevAngularVelocities, previous_timestamps);
 }
 
-TEST_F(BallTest, get_timestamp_index_fetches_first_index)
-{
-    std::vector prevAngularVelocities = {half_second_future, half_second_future,
-                                         current_time};
-
-    Ball ball = Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time);
-    ball.updateState(
-        TimestampedBallState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future));
-    ball.updateState(
-        TimestampedBallState(Point(-1.3, 3), Vector(2.3, -0.05), one_second_future));
-
-    EXPECT_EQ(0, ball.getHistoryIndexFromTimestamp(one_second_future));
-}
-
-TEST_F(BallTest, get_timestamp_index_fetches_last_index)
-{
-    std::vector prevAngularVelocities = {half_second_future, half_second_future,
-                                         current_time};
-
-    Ball ball = Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time);
-    ball.updateState(
-        TimestampedBallState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future));
-    ball.updateState(
-        TimestampedBallState(Point(-1.3, 3), Vector(2.3, -0.05), one_second_future));
-
-    EXPECT_EQ(2, ball.getHistoryIndexFromTimestamp(current_time));
-}
-
-TEST_F(BallTest, get_timestamp_index_no_matching_timestamp)
-{
-    std::vector prevAngularVelocities = {half_second_future, half_second_future,
-                                         current_time};
-
-    Ball ball = Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time);
-    ball.updateState(
-        TimestampedBallState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future));
-    ball.updateState(
-        TimestampedBallState(Point(-1.3, 3), Vector(2.3, -0.05), one_second_future));
-
-    Timestamp no_matching_time =
-        half_second_future +
-        Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS + 1);
-
-    EXPECT_EQ(std::nullopt, ball.getHistoryIndexFromTimestamp(no_matching_time));
-}
-
 TEST_F(BallTest, initialize_ball_with_history_size_0)
 {
     EXPECT_THROW(Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time, 0),

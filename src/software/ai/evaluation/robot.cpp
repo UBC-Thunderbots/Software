@@ -28,40 +28,41 @@ std::optional<bool> robotHasPossession(const Ball& ball, const Robot& robot,
         robot_pos_at_time = robot.position();
         robot_ori_at_time = robot.orientation();
     }
-    else if (robot.getHistoryIndexFromTimestamp(*timestamp))
-    {
-        robot_pos_at_time = robot.getPreviousStates()
-                                .at(*robot.getHistoryIndexFromTimestamp(*timestamp))
-                                .robotState()
-                                .position();
-        robot_ori_at_time = robot.getPreviousStates()
-                                .at(*robot.getHistoryIndexFromTimestamp(*timestamp))
-                                .robotState()
-                                .orientation();
-    }
     else
     {
-        // we have no information about the robot at this time because it is too far back.
-        // return nullopt
-        return std::nullopt;
+        auto robot_state =
+            findState<TimestampedRobotState>(robot.getPreviousStates(), *timestamp);
+        if (robot_state)
+        {
+            robot_pos_at_time = robot_state->robotState().position();
+            robot_ori_at_time = robot_state->robotState().orientation();
+        }
+        else
+        {
+            // we have no information about the robot at this time because it is too far
+            // back. return nullopt
+            return std::nullopt;
+        }
     }
 
     if (!timestamp.has_value())
     {
         ball_pos_at_time = ball.position();
     }
-    else if (ball.getHistoryIndexFromTimestamp(*timestamp))
-    {
-        ball_pos_at_time = ball.getPreviousStates()
-                               .at(*ball.getHistoryIndexFromTimestamp(*timestamp))
-                               .ballState()
-                               .position();
-    }
     else
     {
-        // we have no information about the ball at this time because it is too far back.
-        // return nullopt
-        return std::nullopt;
+        auto ball_state =
+            findState<TimestampedBallState>(ball.getPreviousStates(), *timestamp);
+        if (ball_state)
+        {
+            ball_pos_at_time = ball_state->ballState().position();
+        }
+        else
+        {
+            // we have no information about the ball at this time because it is too far
+            // back. return nullopt
+            return std::nullopt;
+        }
     }
 
 
@@ -92,29 +93,25 @@ std::optional<bool> robotBeingPassedTo(const World& world, const Robot& robot,
         ball_pos      = world.ball().position();
         ball_velocity = world.ball().velocity();
     }
-    else if (robot.getHistoryIndexFromTimestamp(*timestamp) &&
-             world.ball().getHistoryIndexFromTimestamp(*timestamp))
-    {
-        robot_pos = robot.getPreviousStates()
-                        .at(*robot.getHistoryIndexFromTimestamp(*timestamp))
-                        .robotState()
-                        .position();
-        ball_pos = world.ball()
-                       .getPreviousStates()
-                       .at(*world.ball().getHistoryIndexFromTimestamp(*timestamp))
-                       .ballState()
-                       .position();
-        ball_velocity = world.ball()
-                            .getPreviousStates()
-                            .at(*world.ball().getHistoryIndexFromTimestamp(*timestamp))
-                            .ballState()
-                            .velocity();
-    }
     else
     {
-        // we don't have information about the state of the robot and/or ball
-        // at the given timestamp, return nullopt
-        return std::nullopt;
+        auto robot_state =
+            findState<TimestampedRobotState>(robot.getPreviousStates(), *timestamp);
+        auto ball_state =
+            findState<TimestampedBallState>(world.ball().getPreviousStates(), *timestamp);
+
+        if (robot_state && ball_state)
+        {
+            robot_pos     = robot_state->robotState().position();
+            ball_pos      = ball_state->ballState().position();
+            ball_velocity = ball_state->ballState().velocity();
+        }
+        else
+        {
+            // we don't have information about the state of the robot and/or ball
+            // at the given timestamp, return nullopt
+            return std::nullopt;
+        }
     }
 
     auto ball_to_robot_vector = robot_pos - ball_pos;
@@ -129,3 +126,20 @@ std::optional<bool> robotBeingPassedTo(const World& world, const Robot& robot,
     return std::make_optional<bool>(ball_angle_deviation < pass_angle_tolerance &&
                                     pass_axis_speed > min_pass_speed_m_s);
 };
+
+template <typename STATE>
+std::optional<STATE> findState(boost::circular_buffer<STATE> states, Timestamp& timestamp)
+{
+    for (const auto& state : states)
+    {
+        double timestamp_diff =
+            std::abs((timestamp - state.timestamp()).getMilliseconds());
+
+        // If timestamp is close to desired timestamp, return the index.
+        if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
+        {
+            return state;
+        }
+    }
+    return std::nullopt;
+}

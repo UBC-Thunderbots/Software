@@ -346,3 +346,96 @@ TEST(RobotEvaluationTest, pass_ball_robot_timestamp_too_far_past)
     auto result = robotBeingPassedTo(world, robot, Timestamp::fromSeconds(1000));
     EXPECT_FALSE(result.has_value());
 }
+
+class RobotEvaluationFindStateTest : public ::testing::Test
+{
+   protected:
+    RobotEvaluationFindStateTest()
+        : current_time(Timestamp::fromSeconds(123)),
+          half_second_future(current_time + Duration::fromMilliseconds(500)),
+          one_second_future(current_time + Duration::fromSeconds(1)),
+          one_second_past(current_time - Duration::fromSeconds(1)),
+          robot_state_current_time(
+              TimestampedRobotState(Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+                                    AngularVelocity::fromDegrees(25), current_time)),
+          robot_state_half_second_future(TimestampedRobotState(
+              Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+              AngularVelocity::fromRadians(1.1), half_second_future)),
+          robot_state_one_second_future(TimestampedRobotState(
+              Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+              AngularVelocity::fromRadians(1.2), one_second_future)),
+          robot_states(3),
+          ball_state_current_time(
+              TimestampedBallState(Point(3, 1.2), Vector(2.2, -0.05), current_time)),
+          ball_state_half_second_future(TimestampedBallState(
+              Point(-1.2, 3), Vector(2.2, -0.05), half_second_future)),
+          ball_state_one_second_future(TimestampedBallState(
+              Point(-1.3, 3), Vector(2.3, -0.05), one_second_future)),
+          ball_states(3)
+    {
+        robot_states.push_front(robot_state_current_time);
+        robot_states.push_front(robot_state_half_second_future);
+        robot_states.push_front(robot_state_one_second_future);
+
+        ball_states.push_front(ball_state_current_time);
+        ball_states.push_front(ball_state_half_second_future);
+        ball_states.push_front(ball_state_one_second_future);
+    }
+
+    Timestamp current_time;
+    Timestamp half_second_future;
+    Timestamp one_second_future;
+    Timestamp one_second_past;
+
+    TimestampedRobotState robot_state_current_time;
+    TimestampedRobotState robot_state_half_second_future;
+    TimestampedRobotState robot_state_one_second_future;
+    boost::circular_buffer<TimestampedRobotState> robot_states;
+
+    TimestampedBallState ball_state_current_time;
+    TimestampedBallState ball_state_half_second_future;
+    TimestampedBallState ball_state_one_second_future;
+    boost::circular_buffer<TimestampedBallState> ball_states;
+};
+
+TEST_F(RobotEvaluationFindStateTest, find_robot_state_fetches_one_second_future)
+{
+    EXPECT_EQ(robot_state_one_second_future,
+              findState<TimestampedRobotState>(robot_states, one_second_future));
+}
+
+TEST_F(RobotEvaluationFindStateTest, find_robot_state_fetches_current_time)
+{
+    EXPECT_EQ(robot_state_current_time,
+              findState<TimestampedRobotState>(robot_states, current_time));
+}
+
+TEST_F(RobotEvaluationFindStateTest, find_robot_state_no_matching_time)
+{
+    Timestamp no_matching_time =
+        half_second_future +
+        Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS + 1.0);
+    EXPECT_EQ(std::nullopt,
+              findState<TimestampedRobotState>(robot_states, no_matching_time));
+}
+
+TEST_F(RobotEvaluationFindStateTest, find_ball_state_fetches_one_second_future)
+{
+    EXPECT_EQ(ball_state_one_second_future,
+              findState<TimestampedBallState>(ball_states, one_second_future));
+}
+
+TEST_F(RobotEvaluationFindStateTest, find_ball_state_fetches_current_time)
+{
+    EXPECT_EQ(ball_state_current_time,
+              findState<TimestampedBallState>(ball_states, current_time));
+}
+
+TEST_F(RobotEvaluationFindStateTest, find_ball_state_no_matching_time)
+{
+    Timestamp no_matching_time =
+        half_second_future +
+        Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS + 1.0);
+    EXPECT_EQ(std::nullopt,
+              findState<TimestampedBallState>(ball_states, no_matching_time));
+}

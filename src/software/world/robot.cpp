@@ -166,20 +166,6 @@ boost::circular_buffer<TimestampedRobotState> Robot::getPreviousStates() const
     return states_;
 }
 
-std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
-{
-    for (unsigned i = 0; i < states_.size(); i++)
-    {
-        double timestamp_diff =
-            fabs((timestamp - states_.at(i).timestamp()).getMilliseconds());
-
-        // If timestamp is close to desired timestamp, return the index.
-        if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
-            return i;
-    }
-    return std::nullopt;
-}
-
 bool Robot::operator==(const Robot &other) const
 {
     return this->id_ == other.id_ && this->position() == other.position() &&
