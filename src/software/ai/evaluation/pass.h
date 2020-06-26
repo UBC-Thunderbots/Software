@@ -30,7 +30,7 @@ Duration getTimeToOrientationForRobot(const Robot& robot,
  *
  * This is only a rough calculation in order to be as performant as possible
  *
- * @param robot The robot to calculate the time for
+ * @param start The starting point of robot
  * @param dest The destination that the robot is going to
  * @param max_velocity The maximum linear velocity the robot can travel at (m/s)
  * @param max_acceleration The maximum acceleration of the robot (m/s^2)
@@ -40,7 +40,7 @@ Duration getTimeToOrientationForRobot(const Robot& robot,
  * @return The minimum theoretical time it would take the robot to reach the dest
  * point
  */
-Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
-                                   const double& max_velocity,
-                                   const double& max_acceleration,
-                                   const double& tolerance_meters = 0);
+Duration getTimeToPositionForRobot(const Point& start, const Point& dest,
+                                   const double max_velocity,
+                                   const double max_acceleration,
+                                   const double tolerance_meters = 0);

@@ -4,7 +4,6 @@
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/evaluation/team.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 
@@ -17,14 +16,15 @@ std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
         return std::nullopt;
     }
 
-    auto best_intercept =
-        findBestInterceptForBall(ball, field, team.getAllRobots().at(0));
+    auto best_intercept = findBestInterceptForBall(
+        ball.currentState(), field, team.getAllRobots().at(0).currentState());
     auto baller_robot = team.getAllRobots().at(0);
 
     // Find the robot that can intercept the ball the quickest
     for (const auto &robot : team.getAllRobots())
     {
-        auto intercept = findBestInterceptForBall(ball, field, robot);
+        auto intercept =
+            findBestInterceptForBall(ball.currentState(), field, robot.currentState());
         if (!best_intercept || (intercept && intercept->second < best_intercept->second))
         {
             best_intercept = intercept;
