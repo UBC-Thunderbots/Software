@@ -108,8 +108,8 @@ int main(int argc, char **argv)
         std::shared_ptr<VisualizerWrapper> visualizer;
 
         // Connect observers
-        backend->Subject<World>::registerObserver(ai);
         ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
+        backend->Subject<World>::registerObserver(ai);
         if (!args.headless)
         {
             visualizer = std::make_shared<VisualizerWrapper>(argc, argv);

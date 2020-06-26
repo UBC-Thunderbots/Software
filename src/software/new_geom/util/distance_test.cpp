@@ -154,8 +154,8 @@ TEST(DistanceTest, point_near_polygon_closest_to_edge)
     Polygon polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
     Point point(0.5, 1.1);
     double expected = 0.1;
-    EXPECT_NEAR(distance(point, polygon), expected, GeomConstants::FIXED_EPSILON);
-    EXPECT_NEAR(distance(polygon, point), expected, GeomConstants::FIXED_EPSILON);
+    EXPECT_NEAR(distance(point, polygon), expected, ::FIXED_EPSILON);
+    EXPECT_NEAR(distance(polygon, point), expected, ::FIXED_EPSILON);
 }
 
 TEST(DistanceTest, point_far_from_polygon)

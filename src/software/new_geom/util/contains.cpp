@@ -67,7 +67,7 @@ bool contains(const Ray& container, const Point& contained)
         collinear(contained, container.getStart(), point_in_ray_direction);
     bool point_is_in_ray_direction =
         ((contained - container.getStart()).normalize() - container.toUnitVector())
-            .length() < GeomConstants::FIXED_EPSILON;
+            .length() < FIXED_EPSILON;
     return point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
 }
 

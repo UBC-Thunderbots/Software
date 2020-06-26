@@ -136,7 +136,7 @@ namespace TestUtil
         // - angle absolute value (internal to minDiff)
         // - the tolerance abs()
         auto difference =
-            a1.minDiff(a2) - Angle::fromRadians(GeomConstants::FIXED_EPSILON * 4);
+            a1.minDiff(a2) - Angle::fromRadians(::FIXED_EPSILON * 4);
         if (difference < tolerance.abs())
         {
             return ::testing::AssertionSuccess();
@@ -184,7 +184,7 @@ namespace TestUtil
     {
         // subtracting one fixed epsilon to account for the error in fabs and one fixed
         // epsilon to account for the error in subtracting the two vals
-        double difference = fabs(val1 - val2) - GeomConstants::FIXED_EPSILON * 2;
+        double difference = fabs(val1 - val2) - ::FIXED_EPSILON * 2;
         if (difference < tolerance)
         {
             return ::testing::AssertionSuccess();
