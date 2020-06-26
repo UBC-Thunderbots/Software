@@ -14,8 +14,7 @@
 class STPTest : public ::testing::Test
 {
    public:
-    STPTest()
-        : stp([]() { return nullptr; }, DynamicParameters->getAIControlConfig(), 0)
+    STPTest() : stp([]() { return nullptr; }, DynamicParameters->getAIControlConfig(), 0)
     {
     }
 
@@ -26,8 +25,7 @@ class STPTest : public ::testing::Test
             return std::make_unique<HaltTestPlay>();
         };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp = STP(default_play_constructor, DynamicParameters->getAIControlConfig(),
-                  0);
+        stp   = STP(default_play_constructor, DynamicParameters->getAIControlConfig(), 0);
         world = ::TestUtil::createBlankTestingWorld();
     }
 

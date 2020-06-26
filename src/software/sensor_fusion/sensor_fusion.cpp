@@ -131,14 +131,10 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    double min_valid_x = DynamicParameters->getAIControlConfig()
-                             ->getRefboxConfig()
-                             ->MinValidX()
-                             ->value();
-    double max_valid_x = DynamicParameters->getAIControlConfig()
-                             ->getRefboxConfig()
-                             ->MaxValidX()
-                             ->value();
+    double min_valid_x =
+        DynamicParameters->getAIControlConfig()->getRefboxConfig()->MinValidX()->value();
+    double max_valid_x =
+        DynamicParameters->getAIControlConfig()->getRefboxConfig()->MaxValidX()->value();
     bool ignore_invalid_camera_data = DynamicParameters->getAIControlConfig()
                                           ->getRefboxConfig()
                                           ->IgnoreInvalidCameraData()

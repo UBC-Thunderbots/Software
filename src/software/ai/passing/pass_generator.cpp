@@ -323,15 +323,14 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
                                        ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
-    std::uniform_real_distribution speed_distribution(
-        DynamicParameters->getAIConfig()
-            ->getPassingConfig()
-            ->MinPassSpeedMPerS()
-            ->value(),
-        DynamicParameters->getAIConfig()
-            ->getPassingConfig()
-            ->MaxPassSpeedMPerS()
-            ->value());
+    std::uniform_real_distribution speed_distribution(DynamicParameters->getAIConfig()
+                                                          ->getPassingConfig()
+                                                          ->MinPassSpeedMPerS()
+                                                          ->value(),
+                                                      DynamicParameters->getAIConfig()
+                                                          ->getPassingConfig()
+                                                          ->MaxPassSpeedMPerS()
+                                                          ->value());
 
     std::vector<Pass> passes;
     for (unsigned i = 0; i < num_passes_to_gen; i++)

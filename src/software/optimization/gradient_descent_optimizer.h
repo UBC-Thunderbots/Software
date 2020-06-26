@@ -77,8 +77,7 @@ class GradientDescentOptimizer
      * @param gradient_approx_step_size The size of step to take forward when
      *                                  approximating the gradient of a function
      */
-    GradientDescentOptimizer(ParamArray param_weights,
-                             double gradient_approx_step_size);
+    GradientDescentOptimizer(ParamArray param_weights, double gradient_approx_step_size);
 
     /**
      * Creates a GradientDescentOptimizer
@@ -96,8 +95,7 @@ class GradientDescentOptimizer
      *                                         rate, see corresponding class member
      *                                         variable for details
      */
-    GradientDescentOptimizer(ParamArray param_weights,
-                             double gradient_approx_step_size,
+    GradientDescentOptimizer(ParamArray param_weights, double gradient_approx_step_size,
                              double past_gradient_decay_rate,
                              double past_squared_gradient_decay_rate);
 
@@ -152,8 +150,8 @@ class GradientDescentOptimizer
      *         objective found, depending on what gradient_movement_func was given
      */
     ParamArray followGradient(
-        std::function<double(ParamArray)> objective_function,
-        ParamArray initial_value, unsigned int num_iters,
+        std::function<double(ParamArray)> objective_function, ParamArray initial_value,
+        unsigned int num_iters,
         std::function<double(double, double)> gradient_movement_func);
 
     /**
@@ -164,8 +162,8 @@ class GradientDescentOptimizer
      * @return A ParamArray, where each "param" is the derivative with respect to the
      *         corresponding input param.
      */
-    ParamArray approximateGradient(
-        ParamArray params, std::function<double(ParamArray)> objective_function);
+    ParamArray approximateGradient(ParamArray params,
+                                   std::function<double(ParamArray)> objective_function);
 
     // This constant is used to prevent division by 0 in our implementation of Adam
     // (gradient descent)

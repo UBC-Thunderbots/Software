@@ -137,8 +137,7 @@ std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::followGradi
 }
 
 template <size_t NUM_PARAMS>
-std::array<double, NUM_PARAMS>
-GradientDescentOptimizer<NUM_PARAMS>::approximateGradient(
+std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::approximateGradient(
     std::array<double, NUM_PARAMS> params,
     std::function<double(std::array<double, NUM_PARAMS>)> objective_function)
 {

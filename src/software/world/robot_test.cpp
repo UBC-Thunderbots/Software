@@ -602,8 +602,7 @@ TEST_F(RobotTest, get_capabilities_whitelist)
                         AngularVelocity::fromDegrees(25), current_time, 3, blacklist);
 
     // whitelist = all capabilities - blacklist
-    std::set<RobotCapability> all_capabilities =
-            allRobotCapabilities();
+    std::set<RobotCapability> all_capabilities = allRobotCapabilities();
     std::set<RobotCapability> expected_whitelist;
     std::set_difference(all_capabilities.begin(), all_capabilities.end(),
                         blacklist.begin(), blacklist.end(),

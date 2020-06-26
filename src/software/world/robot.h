@@ -32,12 +32,11 @@ class Robot
      * be > 0
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      */
-    explicit Robot(
-        RobotId id, const Point &position, const Vector &velocity,
-        const Angle &orientation, const AngularVelocity &angular_velocity,
-        const Timestamp &timestamp, unsigned int history_size = 20,
-        const std::set<RobotCapability> &unavailable_capabilities =
-            std::set<RobotCapability>());
+    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
+                   const Angle &orientation, const AngularVelocity &angular_velocity,
+                   const Timestamp &timestamp, unsigned int history_size = 20,
+                   const std::set<RobotCapability> &unavailable_capabilities =
+                       std::set<RobotCapability>());
 
     /**
      * Creates a new robot with the given initial state
@@ -48,11 +47,10 @@ class Robot
      * be > 0
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      */
-    explicit Robot(
-        RobotId id, const TimestampedRobotState &initial_state,
-        unsigned int history_size = 20,
-        const std::set<RobotCapability> &unavailable_capabilities =
-            std::set<RobotCapability>());
+    explicit Robot(RobotId id, const TimestampedRobotState &initial_state,
+                   unsigned int history_size = 20,
+                   const std::set<RobotCapability> &unavailable_capabilities =
+                       std::set<RobotCapability>());
 
     /**
      * Updates the robot with new data, updating the current state as well as the

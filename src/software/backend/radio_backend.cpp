@@ -8,8 +8,7 @@
 const std::string RadioBackend::name = "radio";
 
 RadioBackend::RadioBackend()
-    : network_input(SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
-                    SSL_VISION_MULTICAST_PORT,
+    : network_input(SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT,
                     SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
                     SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&RadioBackend::receiveWorld, this, _1),

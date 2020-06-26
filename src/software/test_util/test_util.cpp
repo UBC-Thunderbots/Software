@@ -135,8 +135,7 @@ namespace TestUtil
         // - angle clamping (internal to minDiff)
         // - angle absolute value (internal to minDiff)
         // - the tolerance abs()
-        auto difference =
-            a1.minDiff(a2) - Angle::fromRadians(::FIXED_EPSILON * 4);
+        auto difference = a1.minDiff(a2) - Angle::fromRadians(::FIXED_EPSILON * 4);
         if (difference < tolerance.abs())
         {
             return ::testing::AssertionSuccess();

@@ -7,8 +7,7 @@
 
 SimulatedTestFixture::SimulatedTestFixture()
     : simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField())),
-      ai(DynamicParameters->getAIConfig(),
-         DynamicParameters->getAIControlConfig()),
+      ai(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig()),
       run_simulation_in_realtime(false)
 {
 }
@@ -25,13 +24,11 @@ void SimulatedTestFixture::SetUp()
     // every time. Because the simulator is created initially in the constructor's
     // initialization list, and before every test in this SetUp function, we can
     // guarantee the pointer will never be null / empty
-    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
-    ai            = AI(DynamicParameters->getAIConfig(),
-            DynamicParameters->getAIControlConfig());
+    simulator = std::make_unique<Simulator>(Field::createSSLDivisionBField());
+    ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
     sensor_fusion = SensorFusion();
 
-    MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(
-        true);
+    MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team

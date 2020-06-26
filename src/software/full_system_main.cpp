@@ -98,12 +98,12 @@ int main(int argc, char **argv)
         // TODO (Issue #960): Once we're using injected parameters everywhere (instead of
         //                    just global accesses, `DynamicParameters` should be
         //                    deleted, and we should just create an instance here instead)
-        std::shared_ptr<const AIConfig> ai_config =
-            DynamicParameters->getAIConfig();
+        std::shared_ptr<const AIConfig> ai_config = DynamicParameters->getAIConfig();
         std::shared_ptr<const AIControlConfig> ai_control_config =
             DynamicParameters->getAIControlConfig();
 
-        std::shared_ptr<Backend> backend = GenericFactory<std::string, Backend>::create(args.backend_name);
+        std::shared_ptr<Backend> backend =
+            GenericFactory<std::string, Backend>::create(args.backend_name);
         auto ai = std::make_shared<AIWrapper>(ai_config, ai_control_config);
         std::shared_ptr<VisualizerWrapper> visualizer;
 

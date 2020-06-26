@@ -285,8 +285,8 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
             RobotNavigationObstacleFactory(
                 DynamicParameters->getAIConfig()
                     ->getRobotNavigationObstacleFactoryConfig())),
-        RobotNavigationObstacleFactory(DynamicParameters->getAIConfig()
-                                           ->getRobotNavigationObstacleFactoryConfig()),
+        RobotNavigationObstacleFactory(
+            DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig()),
         std::make_shared<NavigatorConfig>());
 
     std::vector<std::unique_ptr<Intent>> intents;

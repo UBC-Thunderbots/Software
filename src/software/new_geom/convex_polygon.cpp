@@ -118,13 +118,11 @@ bool ConvexPolygon::isConvex()
         {
             w_sign = w;
         }
-        else if (w_sign > ::FIXED_EPSILON &&
-                 w < -::FIXED_EPSILON)
+        else if (w_sign > ::FIXED_EPSILON && w < -::FIXED_EPSILON)
         {
             return false;
         }
-        else if (w_sign < -::FIXED_EPSILON &&
-                 w > ::FIXED_EPSILON)
+        else if (w_sign < -::FIXED_EPSILON && w > ::FIXED_EPSILON)
         {
             return false;
         }

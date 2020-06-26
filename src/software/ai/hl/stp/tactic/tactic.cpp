@@ -2,8 +2,7 @@
 
 #include "software/logger/logger.h"
 
-Tactic::Tactic(bool loop_forever,
-               const std::set<RobotCapability> &capability_reqs_)
+Tactic::Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_)
     : action_sequence(boost::bind(&Tactic::calculateNextActionWrapper, this, _1)),
       done_(false),
       loop_forever(loop_forever),

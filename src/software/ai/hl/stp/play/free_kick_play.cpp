@@ -128,11 +128,10 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     LOG(DEBUG) << "Finished aligning to ball";
 
-    Angle min_open_angle_for_shot =
-        Angle::fromDegrees(DynamicParameters->getAIConfig()
-                               ->getShootOrPassPlayConfig()
-                               ->MinOpenAngleForShotDeg()
-                               ->value());
+    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAIConfig()
+                                                           ->getShootOrPassPlayConfig()
+                                                           ->MinOpenAngleForShotDeg()
+                                                           ->value());
 
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),

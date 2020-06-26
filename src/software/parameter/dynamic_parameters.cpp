@@ -5,6 +5,6 @@
 // instance created here TODO remove this as part of
 // https://github.com/UBC-Thunderbots/Software/issues/960
 extern const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
-std::make_shared<ThunderbotsConfig>();
+    std::make_shared<ThunderbotsConfig>();
 extern const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
-std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
+    std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);

@@ -35,6 +35,7 @@ TEST(RobotCapabilitiesTest, test_subset_superset_operators_subset)
 TEST(RobotCapabilitiesTest, test_all_capabilities)
 {
     std::set<RobotCapability> all = allRobotCapabilities();
-    EXPECT_TRUE((all == std::set<RobotCapability>{RobotCapability::Dribble, RobotCapability::Move,
-                                             RobotCapability::Chip, RobotCapability::Kick}));
+    EXPECT_TRUE(
+        (all == std::set<RobotCapability>{RobotCapability::Dribble, RobotCapability::Move,
+                                          RobotCapability::Chip, RobotCapability::Kick}));
 }

@@ -9,8 +9,7 @@
 const std::string WifiBackend::name = "wifi";
 
 WifiBackend::WifiBackend()
-    : network_input(SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
-                    SSL_VISION_MULTICAST_PORT,
+    : network_input(SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT,
                     SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
                     SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&WifiBackend::receiveWorld, this, _1),

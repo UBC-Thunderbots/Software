@@ -47,9 +47,7 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
  */
 constexpr int sign(double n)
 {
-    return n > ::FIXED_EPSILON
-               ? 1
-               : (n < -::FIXED_EPSILON ? -1 : 0);
+    return n > ::FIXED_EPSILON ? 1 : (n < -::FIXED_EPSILON ? -1 : 0);
 }
 
 std::vector<Point> intersection(const Segment &first, const Segment &second)
