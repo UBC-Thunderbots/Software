@@ -77,11 +77,14 @@ class SensorFusion
     Team createEnemyTeam(const std::vector<RobotDetection> &robot_detections);
 
     /**
-     * Inverts all positions and orientations across the x and y axis of the field
+     *Inverts all positions and orientations across the x and y axis
      *
-     * @param frame The frame to invert. It will be mutated in-place
+     * @param Detection to invert
+     *
+     *@return inverted Detection
      */
-    void invertFieldSide(SSL_DetectionFrame &frame);
+    RobotDetection invert(RobotDetection robot_detection);
+    BallDetection invert(BallDetection ball_detection);
 
     /**
      * Given a detection, figures out if the camera is enabled
@@ -97,7 +100,7 @@ class SensorFusion
     Team friendly_team;
     Team enemy_team;
     RefboxGameState refbox_game_state;
-    RefboxStage refbox_stage;
+    std::optional<RefboxStage> refbox_stage;
     std::optional<Point> ball_placement_point;
 
     BallFilter ball_filter;

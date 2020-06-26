@@ -3,7 +3,7 @@
 void Backend::receiveTbotsRobotMsg(TbotsRobotMsg msg)
 {
     SensorMsg sensor_msg;
-    *(sensor_msg.add_tbots_robot_msg()) = msg;
+    *(sensor_msg.add_tbots_robot_msgs()) = msg;
     Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
 

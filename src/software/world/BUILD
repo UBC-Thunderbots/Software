@@ -122,6 +122,7 @@ cc_library(
         ":robot_capabilities",
         ":timestamped_robot_state",
         "//software/geom",
+        "//software/time:duration",
         "//software/time:timestamp",
         "@boost//:circular_buffer",
     ],
@@ -170,6 +171,7 @@ cc_library(
         "//software/new_geom:angular_velocity",
         "//software/new_geom:point",
         "//software/new_geom:vector",
+        "//software/time:duration",
     ],
 )
 
