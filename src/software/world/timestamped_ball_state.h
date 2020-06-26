@@ -44,7 +44,7 @@ class TimestampedBallState
      *
      * @return the ball state without any timestamp information
      */
-    BallState ballState() const;
+    BallState state() const;
 
     /**
      * Defines the equality operator for a TimestampedBallState. TimestampedBallStates

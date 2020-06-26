@@ -32,9 +32,9 @@ TEST(RobotTeamFilterTest, one_robot_detection_update_test)
     auto robots = new_team.getAllRobots();
 
     EXPECT_EQ(1, robots.size());
-    EXPECT_EQ(robot_detection.position, robots[0].currentState().robotState().position());
+    EXPECT_EQ(robot_detection.position, robots[0].currentState().state().position());
     EXPECT_EQ(robot_detection.orientation,
-              robots[0].currentState().robotState().orientation());
+              robots[0].currentState().state().orientation());
     EXPECT_EQ(robot_detection.timestamp, robots[0].currentState().timestamp());
 }
 
@@ -64,10 +64,9 @@ TEST(RobotTeamFilterTest, detections_with_same_timestamp_test)
     {
         EXPECT_NE(std::nullopt, new_team.getRobotById(i));
         Robot robot = *new_team.getRobotById(i);
-        EXPECT_EQ(robot_detections[i].position,
-                  robot.currentState().robotState().position());
+        EXPECT_EQ(robot_detections[i].position, robot.currentState().state().position());
         EXPECT_EQ(robot_detections[i].orientation,
-                  robot.currentState().robotState().orientation());
+                  robot.currentState().state().orientation());
         EXPECT_EQ(robot_detections[i].timestamp, robot.currentState().timestamp());
     }
 }

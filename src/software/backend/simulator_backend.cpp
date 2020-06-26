@@ -79,7 +79,7 @@ void SimulatorBackend::runSimulationLoop(World world)
         std::ceil(world_time_increment.getSeconds() / physics_time_step.getSeconds()));
 
     Simulator simulator(world.field());
-    simulator.setBallState(world.ball().currentState().ballState());
+    simulator.setBallState(world.ball().currentState().state());
     // Note: The SimulatorBackend currently maintains the invariant that the
     // friendly team is the yellow team
     // This should be resolved along with
@@ -87,13 +87,13 @@ void SimulatorBackend::runSimulationLoop(World world)
     for (const auto& robot : world.friendlyTeam().getAllRobots())
     {
         RobotStateWithId state = {.id          = robot.id(),
-                                  .robot_state = robot.currentState().robotState()};
+                                  .robot_state = robot.currentState().state()};
         simulator.addYellowRobots({state});
     }
     for (const auto& robot : world.enemyTeam().getAllRobots())
     {
         RobotStateWithId state = {.id          = robot.id(),
-                                  .robot_state = robot.currentState().robotState()};
+                                  .robot_state = robot.currentState().state()};
         simulator.addBlueRobots({state});
     }
 

@@ -50,7 +50,7 @@ class TimestampedRobotState
      *
      * @return the robot state without any timestamp information
      */
-    RobotState robotState() const;
+    RobotState state() const;
 
     /**
      * Defines the equality operator for a TimestampedRobotState.

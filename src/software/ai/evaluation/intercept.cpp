@@ -29,14 +29,13 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(
 
         // Estimate the ball position
         Point new_ball_pos = estimateBallPositionAtFutureTime(
-            ball.ballState().position(), ball.ballState().velocity(),
+            ball.state().position(), ball.state().velocity(),
             Duration::fromSeconds(duration));
 
         // Figure out how long it will take the robot to get to the new ball position
-        Duration time_to_ball_pos =
-            getTimeToPositionForRobot(robot.robotState().position(), new_ball_pos,
-                                      ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                                      ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+        Duration time_to_ball_pos = getTimeToPositionForRobot(
+            robot.state().position(), new_ball_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
         // Figure out when the robot will reach the new ball position relative to the
         // time that the ball will get there (ie. will we get there in time?)
@@ -52,7 +51,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(
     // the ball position as a function of it's travel time
     // We make the weight here an inverse of the ball speed, so that the gradient
     // descent takes smaller steps when the ball is moving faster
-    double descent_weight = 1 / (std::exp(ball.ballState().velocity().length() * 0.5));
+    double descent_weight = 1 / (std::exp(ball.state().velocity().length() * 0.5));
     Util::GradientDescentOptimizer<1> optimizer({descent_weight},
                                                 gradient_approx_step_size);
     Duration best_ball_travel_duration = Duration::fromSeconds(
@@ -68,18 +67,17 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(
     }
 
     Point best_ball_intercept_pos = estimateBallPositionAtFutureTime(
-        ball.ballState().position(), ball.ballState().velocity(),
-        best_ball_travel_duration);
+        ball.state().position(), ball.state().velocity(), best_ball_travel_duration);
 
     // Check that we can get to the best position in time
     Duration time_to_ball_pos =
-        getTimeToPositionForRobot(robot.robotState().position(), best_ball_intercept_pos,
+        getTimeToPositionForRobot(robot.state().position(), best_ball_intercept_pos,
                                   ROBOT_MAX_SPEED_METERS_PER_SECOND,
                                   ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
     // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
     // check isn't relevant in that case
-    if (ball.ballState().velocity().length() != 0 &&
+    if (ball.state().velocity().length() != 0 &&
         std::abs(ball_robot_time_diff.getSeconds()) > descent_weight)
     {
         return std::nullopt;

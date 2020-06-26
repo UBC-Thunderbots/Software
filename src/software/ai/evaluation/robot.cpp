@@ -27,16 +27,16 @@ std::optional<bool> robotHasPossession(
 
     if (!timestamp.has_value())
     {
-        robot_pos_at_time = robot_states.front().robotState().position();
-        robot_ori_at_time = robot_states.front().robotState().orientation();
+        robot_pos_at_time = robot_states.front().state().position();
+        robot_ori_at_time = robot_states.front().state().orientation();
     }
     else
     {
         auto robot_state = findState<TimestampedRobotState>(robot_states, *timestamp);
         if (robot_state)
         {
-            robot_pos_at_time = robot_state->robotState().position();
-            robot_ori_at_time = robot_state->robotState().orientation();
+            robot_pos_at_time = robot_state->state().position();
+            robot_ori_at_time = robot_state->state().orientation();
         }
         else
         {
@@ -48,14 +48,14 @@ std::optional<bool> robotHasPossession(
 
     if (!timestamp.has_value())
     {
-        ball_pos_at_time = ball_states.front().ballState().position();
+        ball_pos_at_time = ball_states.front().state().position();
     }
     else
     {
         auto ball_state = findState<TimestampedBallState>(ball_states, *timestamp);
         if (ball_state)
         {
-            ball_pos_at_time = ball_state->ballState().position();
+            ball_pos_at_time = ball_state->state().position();
         }
         else
         {
@@ -91,9 +91,9 @@ std::optional<bool> robotBeingPassedTo(
     Vector ball_velocity;
     if (!timestamp.has_value())
     {
-        robot_pos     = robot_states.front().robotState().position();
-        ball_pos      = ball_states.front().ballState().position();
-        ball_velocity = ball_states.front().ballState().velocity();
+        robot_pos     = robot_states.front().state().position();
+        ball_pos      = ball_states.front().state().position();
+        ball_velocity = ball_states.front().state().velocity();
     }
     else
     {
@@ -102,9 +102,9 @@ std::optional<bool> robotBeingPassedTo(
 
         if (robot_state && ball_state)
         {
-            robot_pos     = robot_state->robotState().position();
-            ball_pos      = ball_state->ballState().position();
-            ball_velocity = ball_state->ballState().velocity();
+            robot_pos     = robot_state->state().position();
+            ball_pos      = ball_state->state().position();
+            ball_velocity = ball_state->state().velocity();
         }
         else
         {

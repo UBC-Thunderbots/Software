@@ -429,7 +429,7 @@ TEST_F(RobotTest, get_position_history)
     std::vector<Point> previous_positions{};
     for (size_t i = 0; i < previous_states.size(); i++)
     {
-        previous_positions.push_back(previous_states.at(i).robotState().position());
+        previous_positions.push_back(previous_states.at(i).state().position());
     }
     EXPECT_EQ(prevPositions, previous_positions);
 }
@@ -452,7 +452,7 @@ TEST_F(RobotTest, get_velocity_history)
     std::vector<Vector> previous_velocities{};
     for (size_t i = 0; i < previous_states.size(); i++)
     {
-        previous_velocities.push_back(previous_states.at(i).robotState().velocity());
+        previous_velocities.push_back(previous_states.at(i).state().velocity());
     }
     EXPECT_EQ(prevVelocities, previous_velocities);
 }
@@ -476,7 +476,7 @@ TEST_F(RobotTest, get_orientation_history)
     std::vector<Angle> previous_orientations{};
     for (size_t i = 0; i < previous_states.size(); i++)
     {
-        previous_orientations.push_back(previous_states.at(i).robotState().orientation());
+        previous_orientations.push_back(previous_states.at(i).state().orientation());
     }
     EXPECT_EQ(prevOrientations, previous_orientations);
 }
@@ -504,7 +504,7 @@ TEST_F(RobotTest, get_angular_velocity_history)
     for (size_t i = 0; i < previous_states.size(); i++)
     {
         previous_angular_velocities.push_back(
-            previous_states.at(i).robotState().angularVelocity());
+            previous_states.at(i).state().angularVelocity());
     }
     EXPECT_EQ(prevAngularVelocities, previous_angular_velocities);
 }
