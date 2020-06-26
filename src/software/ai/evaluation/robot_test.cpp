@@ -111,7 +111,9 @@ TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot_at_future_ti
                         timestamp);
 
     // we don't have data for future timestamps, should return nullopt
-    EXPECT_FALSE(robotHasPossession(ball.getPreviousStates(), robot.getPreviousStates(), Timestamp::fromSeconds(2)).has_value());
+    EXPECT_FALSE(robotHasPossession(ball.getPreviousStates(), robot.getPreviousStates(),
+                                    Timestamp::fromSeconds(2))
+                     .has_value());
 }
 
 TEST(RobotEvaluationTest, has_possession_ball_to_side_of_robot)
@@ -197,7 +199,8 @@ TEST(RobotEvaluationTest, possession_robot_timestamp_too_far_past)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    auto result = robotHasPossession(ball.getPreviousStates(), robot.getPreviousStates(), Timestamp::fromSeconds(1000));
+    auto result = robotHasPossession(ball.getPreviousStates(), robot.getPreviousStates(),
+                                     Timestamp::fromSeconds(1000));
     EXPECT_FALSE(result.has_value());
 }
 
@@ -210,7 +213,8 @@ TEST(RobotEvaluationTest, possession_ball_timestamp_too_far_past)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(1000));
 
-    auto result = robotHasPossession(ball.getPreviousStates(), robot.getPreviousStates(), Timestamp::fromSeconds(1000));
+    auto result = robotHasPossession(ball.getPreviousStates(), robot.getPreviousStates(),
+                                     Timestamp::fromSeconds(1000));
     EXPECT_FALSE(result.has_value());
 }
 
@@ -229,7 +233,8 @@ TEST(RobotEvaluationTest, pass_with_stationary_ball)
                         AngularVelocity::zero(), timestamp);
     world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
+    auto result =
+        robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
     EXPECT_TRUE(result.has_value());
     EXPECT_FALSE(*result);
 }
@@ -248,7 +253,8 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast)
                         AngularVelocity::zero(), timestamp);
     world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
+    auto result =
+        robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -267,7 +273,8 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast_at_future_timestamp)
                         AngularVelocity::zero(), timestamp);
     world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
+    auto result =
+        robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -286,7 +293,8 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_slow)
                         AngularVelocity::zero(), timestamp);
     world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
+    auto result =
+        robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
     EXPECT_TRUE(result.has_value());
     EXPECT_FALSE(*result);
 }
@@ -305,7 +313,8 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_wrong_way)
                         AngularVelocity::zero(), timestamp);
     world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
+    auto result =
+        robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
     EXPECT_TRUE(result.has_value());
     EXPECT_FALSE(*result);
 }
@@ -324,7 +333,8 @@ TEST(RobotEvaluationTest, pass_with_ball_slightly_off)
                         AngularVelocity::zero(), timestamp);
     world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
+    auto result =
+        robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates());
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
 }
@@ -343,7 +353,9 @@ TEST(RobotEvaluationTest, pass_ball_robot_timestamp_too_far_past)
                         AngularVelocity::zero(), timestamp);
     world.updateFriendlyTeamState(Team({robot}, Duration::fromSeconds(10)));
 
-    auto result = robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates(), Timestamp::fromSeconds(1000));
+    auto result =
+        robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates(),
+                           Timestamp::fromSeconds(1000));
     EXPECT_FALSE(result.has_value());
 }
 

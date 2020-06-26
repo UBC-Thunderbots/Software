@@ -1,6 +1,6 @@
 #include "software/ai/evaluation/pass.h"
 
-Duration getTimeToOrientationForRobot(const Robot& robot,
+Duration getTimeToOrientationForRobot(const Angle& current_orientation,
                                       const Angle& desired_orientation,
                                       const double& max_velocity,
                                       const double& max_acceleration)
@@ -18,7 +18,7 @@ Duration getTimeToOrientationForRobot(const Robot& robot,
     // We re-arrange (3) to get:
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    double dist = robot.orientation().minDiff(desired_orientation).toRadians();
+    double dist = current_orientation.minDiff(desired_orientation).toRadians();
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)

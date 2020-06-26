@@ -8,8 +8,9 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
     Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::fromDegrees(0),
                 Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(Duration::fromSeconds(0),
-              getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10.0));
+    EXPECT_EQ(
+        Duration::fromSeconds(0),
+        getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10.0));
 }
 
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desired_angle)
@@ -33,11 +34,14 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desir
     // For the upper bound, just choose a time that's much greater then we would expect
     double max_time_to_rotate = 4.0;
 
-    Duration t = getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10);
-    EXPECT_LE(Duration::fromSeconds(min_time_to_rotate),
-              getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10));
-    EXPECT_GE(Duration::fromSeconds(max_time_to_rotate),
-              getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10));
+    Duration t =
+        getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10);
+    EXPECT_LE(
+        Duration::fromSeconds(min_time_to_rotate),
+        getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10));
+    EXPECT_GE(
+        Duration::fromSeconds(max_time_to_rotate),
+        getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10));
 }
 
 TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest)

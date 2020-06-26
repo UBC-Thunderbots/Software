@@ -282,7 +282,7 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
     // Figure out what angle the robot would have to be at to receive the ball
     Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
     Duration time_to_receive_angle = getTimeToOrientationForRobot(
-        best_receiver, receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+        best_receiver.orientation(), receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
         ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.lastUpdateTimestamp() + time_to_receive_angle;

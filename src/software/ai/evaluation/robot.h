@@ -35,7 +35,10 @@ bool robotOrientationWithinAngleThresholdOfTarget(Point position, Angle orientat
  *          and nullopt if we don't have information for the given timestamp. This
  * function is guaranteed to return non-nullopt if no timestamp is passed in.
  */
-std::optional<bool> robotHasPossession(const boost::circular_buffer<TimestampedBallState>& ball_states, const boost::circular_buffer<TimestampedRobotState>& robot_states, std::optional<Timestamp> timestamp = std::nullopt);
+std::optional<bool> robotHasPossession(
+    const boost::circular_buffer<TimestampedBallState>& ball_states,
+    const boost::circular_buffer<TimestampedRobotState>& robot_states,
+    std::optional<Timestamp> timestamp = std::nullopt);
 
 /**
  * Returns true if the robot is being passed to. A robot is considered to be being
@@ -49,7 +52,10 @@ std::optional<bool> robotHasPossession(const boost::circular_buffer<TimestampedB
  * timestamp. This function is guaranteed to return non-nullopt if no timestamp is
  * passed in.
  */
-std::optional<bool> robotBeingPassedTo(const boost::circular_buffer<TimestampedBallState>& ball_states, const boost::circular_buffer<TimestampedRobotState>& robot_states, std::optional<Timestamp> timestamp = std::nullopt);
+std::optional<bool> robotBeingPassedTo(
+    const boost::circular_buffer<TimestampedBallState>& ball_states,
+    const boost::circular_buffer<TimestampedRobotState>& robot_states,
+    std::optional<Timestamp> timestamp = std::nullopt);
 
 /**
  * Finds an update timestamp that is close to the provided timestamp and returns the

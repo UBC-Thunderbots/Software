@@ -12,7 +12,7 @@
 /**
  * Calculate how long it would take the given robot to turn to the given orientation
  *
- * @param robot The robot to calculate the rotation time for
+ * @param current_orientation The current orientation of the robot
  * @param desired_orientation The orientation which we want the robot to be at
  * @param max_velocity The maximum angular velocity that robot can turn at (rad/s)
  * @param max_acceleration The maximum angular rate at which the robot can
@@ -20,7 +20,7 @@
  *
  * @return The time required for the given robot to rotate to the given orientation
  */
-Duration getTimeToOrientationForRobot(const Robot& robot,
+Duration getTimeToOrientationForRobot(const Angle& current_orientation,
                                       const Angle& desired_orientation,
                                       const double& max_velocity,
                                       const double& max_acceleration);

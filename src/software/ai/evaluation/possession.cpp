@@ -64,8 +64,9 @@ bool teamHasPossession(const World &world, const Team &team)
                previous_states.front().timestamp() - robot_history_timestamps[i] <=
                    Duration::fromSeconds(3.5))
         {
-            std::optional<bool> robot_has_possession =
-                robotHasPossession(world.ball().getPreviousStates(), robot.getPreviousStates(), robot_history_timestamps[i]);
+            std::optional<bool> robot_has_possession = robotHasPossession(
+                world.ball().getPreviousStates(), robot.getPreviousStates(),
+                robot_history_timestamps[i]);
             if (robot_has_possession.has_value() && *robot_has_possession)
                 return true;
             i++;
@@ -92,8 +93,9 @@ bool teamPassInProgress(const World &world, const Team &team)
         while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
                Duration::fromSeconds(1.0))
         {
-            std::optional<bool> robot_being_passed_to =
-                robotBeingPassedTo(world.ball().getPreviousStates(), robot.getPreviousStates(), robot_history_timestamps[i]);
+            std::optional<bool> robot_being_passed_to = robotBeingPassedTo(
+                world.ball().getPreviousStates(), robot.getPreviousStates(),
+                robot_history_timestamps[i]);
             if (robot_being_passed_to.has_value() && *robot_being_passed_to)
                 return true;
             i++;
