@@ -16,8 +16,7 @@ bool robotOrientationWithinAngleThresholdOfTarget(const Point position,
     return diff_orientation < threshold;
 }
 
-std::optional<bool> robotHasPossession(const Ball& ball, const Robot& robot,
-                                       std::optional<Timestamp> timestamp)
+std::optional<bool> robotHasPossession(const boost::circular_buffer<TimestampedBallState>& ball_states, const boost::circular_buffer<TimestampedRobotState>& robot_states, std::optional<Timestamp> timestamp)
 {
     Point robot_pos_at_time;
     Angle robot_ori_at_time;
@@ -25,13 +24,13 @@ std::optional<bool> robotHasPossession(const Ball& ball, const Robot& robot,
 
     if (!timestamp.has_value())
     {
-        robot_pos_at_time = robot.position();
-        robot_ori_at_time = robot.orientation();
+        robot_pos_at_time = robot_states.front().robotState().position();
+        robot_ori_at_time = robot_states.front().robotState().orientation();
     }
     else
     {
         auto robot_state =
-            findState<TimestampedRobotState>(robot.getPreviousStates(), *timestamp);
+            findState<TimestampedRobotState>(robot_states, *timestamp);
         if (robot_state)
         {
             robot_pos_at_time = robot_state->robotState().position();
@@ -47,12 +46,12 @@ std::optional<bool> robotHasPossession(const Ball& ball, const Robot& robot,
 
     if (!timestamp.has_value())
     {
-        ball_pos_at_time = ball.position();
+        ball_pos_at_time = ball_states.front().ballState().position();
     }
     else
     {
         auto ball_state =
-            findState<TimestampedBallState>(ball.getPreviousStates(), *timestamp);
+            findState<TimestampedBallState>(ball_states, *timestamp);
         if (ball_state)
         {
             ball_pos_at_time = ball_state->ballState().position();
@@ -82,23 +81,22 @@ std::optional<bool> robotHasPossession(const Ball& ball, const Robot& robot,
     }
 }
 
-std::optional<bool> robotBeingPassedTo(const World& world, const Robot& robot,
-                                       std::optional<Timestamp> timestamp)
+std::optional<bool> robotBeingPassedTo(const boost::circular_buffer<TimestampedBallState>& ball_states, const boost::circular_buffer<TimestampedRobotState>& robot_states, std::optional<Timestamp> timestamp)
 {
     Point robot_pos, ball_pos;
     Vector ball_velocity;
     if (!timestamp.has_value())
     {
-        robot_pos     = robot.position();
-        ball_pos      = world.ball().position();
-        ball_velocity = world.ball().velocity();
+        robot_pos     = robot_states.front().robotState().position();
+        ball_pos      = ball_states.front().ballState().position();
+        ball_velocity = ball_states.front().ballState().velocity();
     }
     else
     {
         auto robot_state =
-            findState<TimestampedRobotState>(robot.getPreviousStates(), *timestamp);
+            findState<TimestampedRobotState>(robot_states, *timestamp);
         auto ball_state =
-            findState<TimestampedBallState>(world.ball().getPreviousStates(), *timestamp);
+            findState<TimestampedBallState>(ball_states, *timestamp);
 
         if (robot_state && ball_state)
         {

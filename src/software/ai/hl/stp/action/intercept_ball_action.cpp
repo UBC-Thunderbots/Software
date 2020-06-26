@@ -121,7 +121,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                 DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
                 BallCollisionType::ALLOW));
         }
-    } while (!robotHasPossession(ball, *robot));
+    } while (!robotHasPossession(ball.getPreviousStates(), robot->getPreviousStates()));
 }
 
 void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yield,
