@@ -73,7 +73,7 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
     }
 }
 
-void SensorFusion::updateWorld(const Referee &packet)
+void SensorFusion::updateWorld(const SSL_Referee &packet)
 {
     // TODO remove Util::DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960

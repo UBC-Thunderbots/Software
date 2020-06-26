@@ -82,7 +82,7 @@ class NetworkClient
      *
      * @param packet The newly received GameController packet
      */
-    void filterAndPublishGameControllerData(Referee packet);
+    void filterAndPublishGameControllerData(SSL_Referee packet);
 
     /**
      * Inverts all positions and orientations across the x and y axis of the field
@@ -98,7 +98,8 @@ class NetworkClient
     std::unique_ptr<ThreadedProtoMulticastListener<SSL_WrapperPacket>> ssl_vision_client;
     // The client that handles data reception, filtering , and publishing for
     // gamecontroller data
-    std::unique_ptr<ThreadedProtoMulticastListener<Referee>> ssl_gamecontroller_client;
+    std::unique_ptr<ThreadedProtoMulticastListener<SSL_Referee>>
+        ssl_gamecontroller_client;
 
     // The most up-to-date state of the world components
     std::optional<Field> field;

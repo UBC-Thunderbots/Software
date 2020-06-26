@@ -45,7 +45,7 @@ const static std::unordered_map<Referee::Command, RefboxGameState>
         {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_THEM},
         {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_US}};
 
-RefboxGameState createRefboxGameState(const Referee &packet, TeamColour team_colour)
+RefboxGameState createRefboxGameState(const SSL_Referee &packet, TeamColour team_colour)
 {
     if (team_colour == TeamColour::YELLOW)
     {
@@ -74,12 +74,12 @@ const static std::unordered_map<Referee::Stage, RefboxStage> refbox_stage_map = 
     {Referee_Stage_PENALTY_SHOOTOUT, RefboxStage::PENALTY_SHOOTOUT},
     {Referee_Stage_POST_GAME, RefboxStage::POST_GAME}};
 
-RefboxStage createRefboxStage(const Referee &packet)
+RefboxStage createRefboxStage(const SSL_Referee &packet)
 {
     return refbox_stage_map.at(packet.stage());
 }
 
-std::optional<Point> getBallPlacementPoint(const Referee &packet)
+std::optional<Point> getBallPlacementPoint(const SSL_Referee &packet)
 {
     if (packet.has_designated_position())
     {
