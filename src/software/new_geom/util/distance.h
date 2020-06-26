@@ -28,15 +28,6 @@ double distance(const Point &first, const Line &second);
 double distance(const Point &first, const Point &second);
 
 /**
- * Finds the shortest distance between two Segments
- *
- * @param first
- * @param second
- * @return the shortest distance between first and second
- */
-double distance(const Segment &first, const Segment &second);
-
-/**
  * Finds the shortest distance between a Point and a Segment
  *
  * @param first
