@@ -36,8 +36,8 @@ class Robot
         RobotId id, const Point &position, const Vector &velocity,
         const Angle &orientation, const AngularVelocity &angular_velocity,
         const Timestamp &timestamp, unsigned int history_size = 20,
-        const std::set<RobotCapabilities::Capability> &unavailable_capabilities =
-            std::set<RobotCapabilities::Capability>());
+        const std::set<RobotCapability> &unavailable_capabilities =
+            std::set<RobotCapability>());
 
     /**
      * Creates a new robot with the given initial state
@@ -51,8 +51,8 @@ class Robot
     explicit Robot(
         RobotId id, const TimestampedRobotState &initial_state,
         unsigned int history_size = 20,
-        const std::set<RobotCapabilities::Capability> &unavailable_capabilities =
-            std::set<RobotCapabilities::Capability>());
+        const std::set<RobotCapability> &unavailable_capabilities =
+            std::set<RobotCapability>());
 
     /**
      * Updates the robot with new data, updating the current state as well as the
@@ -214,21 +214,21 @@ class Robot
      *
      * @return the missing capabilities of the robot
      */
-    const std::set<RobotCapabilities::Capability> &getCapabilitiesBlacklist() const;
+    const std::set<RobotCapability> &getCapabilitiesBlacklist() const;
 
     /**
      * Returns all capabilities this robot has
      *
      * @return Returns all capabilities this robot has
      */
-    std::set<RobotCapabilities::Capability> getCapabilitiesWhitelist() const;
+    std::set<RobotCapability> getCapabilitiesWhitelist() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot
      *
      * @return the mutable hardware capabilities of the robot
      */
-    std::set<RobotCapabilities::Capability> &getMutableRobotCapabilities();
+    std::set<RobotCapability> &getMutableRobotCapabilities();
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
@@ -278,5 +278,5 @@ class Robot
     boost::circular_buffer<TimestampedRobotState> states_;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
-    std::set<RobotCapabilities::Capability> unavailable_capabilities_;
+    std::set<RobotCapability> unavailable_capabilities_;
 };
