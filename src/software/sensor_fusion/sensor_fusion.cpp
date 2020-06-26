@@ -5,7 +5,14 @@
 #include "software/parameter/dynamic_parameters.h"
 
 SensorFusion::SensorFusion()
-    : ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
+    : field(std::nullopt),
+      ball(std::nullopt),
+      friendly_team(),
+      enemy_team(),
+      refbox_game_state(RefboxGameState::HALT),
+      refbox_stage(std::nullopt),
+      ball_placement_point(std::nullopt),
+      ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
       enemy_team_filter()
@@ -17,7 +24,10 @@ std::optional<World> SensorFusion::getWorld() const
     if (field && ball)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
-        new_world.updateRefboxStage(refbox_stage);
+        if (refbox_stage)
+        {
+            new_world.updateRefboxStage(*refbox_stage);
+        }
         if (ball_placement_point)
         {
             new_world.updateGameState(refbox_game_state, *ball_placement_point);
@@ -46,7 +56,7 @@ void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
         updateWorld(sensor_msg.ssl_refbox_msg());
     }
 
-    updateWorld(sensor_msg.tbots_robot_msg());
+    updateWorld(sensor_msg.tbots_robot_msgs());
 }
 
 void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
@@ -133,46 +143,57 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
                                           ->getRefboxConfig()
                                           ->IgnoreInvalidCameraData()
                                           ->value();
-    ;
 
-
-
-    SSL_DetectionFrame detection_frame = ssl_detection_frame;
     // We invert the field side if we explicitly choose to override the values
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    if (Util::DynamicParameters->getAIControlConfig()
-            ->getRefboxConfig()
-            ->OverrideRefboxDefendingSide()
-            ->value() &&
-        Util::DynamicParameters->getAIControlConfig()
-            ->getRefboxConfig()
-            ->DefendingPositiveSide()
-            ->value())
-    {
-        invertFieldSide(detection_frame);
-    }
+    bool should_invert_field = Util::DynamicParameters->getAIControlConfig()
+                                   ->getRefboxConfig()
+                                   ->OverrideRefboxDefendingSide()
+                                   ->value() &&
+                               Util::DynamicParameters->getAIControlConfig()
+                                   ->getRefboxConfig()
+                                   ->DefendingPositiveSide()
+                                   ->value();
+
+    // TODO remove Util::DynamicParameters as part of
+    // https://github.com/UBC-Thunderbots/Software/issues/960
+    bool friendly_team_is_yellow = Util::DynamicParameters->getAIControlConfig()
+                                       ->getRefboxConfig()
+                                       ->FriendlyColorYellow()
+                                       ->value();
 
     std::optional<TimestampedBallState> new_ball_state;
-    if (isCameraEnabled(detection_frame))
+    if (isCameraEnabled(ssl_detection_frame))
     {
-        new_ball_state = createTimestampedBallState(createBallDetections(
-            {detection_frame}, min_valid_x, max_valid_x, ignore_invalid_camera_data));
-
+        auto ball_detections = createBallDetections(
+            {ssl_detection_frame}, min_valid_x, max_valid_x, ignore_invalid_camera_data);
         auto yellow_team =
-            createTeamDetection({detection_frame}, TeamColour::YELLOW, min_valid_x,
+            createTeamDetection({ssl_detection_frame}, TeamColour::YELLOW, min_valid_x,
                                 max_valid_x, ignore_invalid_camera_data);
         auto blue_team =
-            createTeamDetection({detection_frame}, TeamColour::BLUE, min_valid_x,
+            createTeamDetection({ssl_detection_frame}, TeamColour::BLUE, min_valid_x,
                                 max_valid_x, ignore_invalid_camera_data);
 
-        // TODO remove Util::DynamicParameters as part of
-        // https://github.com/UBC-Thunderbots/Software/issues/960
-        if (Util::DynamicParameters->getAIControlConfig()
-                ->getRefboxConfig()
-                ->FriendlyColorYellow()
-                ->value())
+        if (should_invert_field)
+        {
+            for (auto &detection : ball_detections)
+            {
+                invert(detection);
+            }
+            for (auto &detection : yellow_team)
+            {
+                invert(detection);
+            }
+            for (auto &detection : blue_team)
+            {
+                invert(detection);
+            }
+        }
+
+        new_ball_state = createTimestampedBallState(ball_detections);
+        if (friendly_team_is_yellow)
         {
             friendly_team = createFriendlyTeam(yellow_team);
             enemy_team    = createEnemyTeam(blue_team);
@@ -232,24 +253,6 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
     return new_enemy_team;
 }
 
-void SensorFusion::invertFieldSide(SSL_DetectionFrame &frame)
-{
-    for (SSL_DetectionBall &ball : *frame.mutable_balls())
-    {
-        ball.set_x(-ball.x());
-        ball.set_y(-ball.y());
-    }
-    for (const auto &team : {frame.mutable_robots_yellow(), frame.mutable_robots_blue()})
-    {
-        for (SSL_DetectionRobot &robot : *team)
-        {
-            robot.set_x(-robot.x());
-            robot.set_y(-robot.y());
-            robot.set_orientation(robot.orientation() + static_cast<float>(M_PI));
-        }
-    }
-}
-
 bool SensorFusion::isCameraEnabled(const SSL_DetectionFrame &detection)
 {
     bool camera_disabled = false;
@@ -280,4 +283,19 @@ bool SensorFusion::isCameraEnabled(const SSL_DetectionFrame &detection)
             break;
     }
     return !camera_disabled;
+}
+
+RobotDetection SensorFusion::invert(RobotDetection robot_detection)
+{
+    robot_detection.position =
+        Point(-robot_detection.position.x(), -robot_detection.position.y());
+    robot_detection.orientation = robot_detection.orientation + Angle::half();
+    return robot_detection;
+}
+
+BallDetection SensorFusion::invert(BallDetection ball_detection)
+{
+    ball_detection.position =
+        Point(-ball_detection.position.x(), -ball_detection.position.y());
+    return ball_detection;
 }

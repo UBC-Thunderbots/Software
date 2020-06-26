@@ -43,8 +43,7 @@ void RadioBackend::receiveWorld(World world)
 
 void RadioBackend::receiveRobotStatus(RobotStatus robot_status)
 {
-    Backend::receiveTbotsRobotMsg(
-        *convertRobotStatusToTbotsRobotMsg(robot_status).release());
+    Backend::receiveTbotsRobotMsg(*convertRobotStatusToTbotsRobotMsg(robot_status));
 }
 
 // Register this play in the genericFactory
