@@ -10,19 +10,14 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/rectangle.h"
 
-namespace Util
-{
-    /**
-     * Linearly maps an input value to an output value in the range [0,1]
-     *
-     * @param value The input value
-     * @param offset The input value at which the linear function will return 0.5
-     * @param linear_width the total length required for the output value to go from 0 to
-     * 1
-     */
-    double linear(double value, double offset, double linear_width);
-
-}  // namespace Util
+/**
+ * Linearly maps an input value to an output value in the range [0,1]
+ *
+ * @param value The input value
+ * @param offset The input value at which the linear function will return 0.5
+ * @param linear_width the total length required for the output value to go from 0 to 1
+ */
+double linear(double value, double offset, double linear_width);
 
 /**
  * Calculates the value at the given point over a 2D sigmoid over the given rectangle

@@ -177,23 +177,23 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
         // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
-        auto ball_speed_panic = Util::DynamicParameters->getAIConfig()
+        auto ball_speed_panic = DynamicParameters->getAIConfig()
                                     ->getGoalieTacticConfig()
                                     ->BallSpeedPanic()
                                     ->value();
         // what should the final goalie speed be, so that the goalie accelerates faster
-        auto goalie_final_speed = Util::DynamicParameters->getAIConfig()
+        auto goalie_final_speed = DynamicParameters->getAIConfig()
                                       ->getGoalieTacticConfig()
                                       ->GoalieFinalSpeed()
                                       ->value();
         // how far in should the goalie wedge itself into the block cone, to block balls
-        auto block_cone_radius = Util::DynamicParameters->getAIConfig()
+        auto block_cone_radius = DynamicParameters->getAIConfig()
                                      ->getGoalieTacticConfig()
                                      ->BlockConeRadius()
                                      ->value();
         // by how much should the defense area be decreased so the goalie stays close
         // towards the net
-        auto defense_area_deflation = Util::DynamicParameters->getAIConfig()
+        auto defense_area_deflation = DynamicParameters->getAIConfig()
                                           ->getGoalieTacticConfig()
                                           ->DefenseAreaDeflation()
                                           ->value();

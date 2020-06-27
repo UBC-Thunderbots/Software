@@ -85,9 +85,9 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
 
 void SensorFusion::updateWorld(const Referee &packet)
 {
-    // TODO remove Util::DynamicParameters as part of
+    // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    if (Util::DynamicParameters->getAIControlConfig()
+    if (DynamicParameters->getAIControlConfig()
             ->getRefboxConfig()
             ->FriendlyColorYellow()
             ->value())
@@ -129,17 +129,13 @@ void SensorFusion::updateWorld(
 
 void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 {
-    // TODO remove Util::DynamicParameters as part of
+    // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    double min_valid_x = Util::DynamicParameters->getAIControlConfig()
-                             ->getRefboxConfig()
-                             ->MinValidX()
-                             ->value();
-    double max_valid_x = Util::DynamicParameters->getAIControlConfig()
-                             ->getRefboxConfig()
-                             ->MaxValidX()
-                             ->value();
-    bool ignore_invalid_camera_data = Util::DynamicParameters->getAIControlConfig()
+    double min_valid_x =
+        DynamicParameters->getAIControlConfig()->getRefboxConfig()->MinValidX()->value();
+    double max_valid_x =
+        DynamicParameters->getAIControlConfig()->getRefboxConfig()->MaxValidX()->value();
+    bool ignore_invalid_camera_data = DynamicParameters->getAIControlConfig()
                                           ->getRefboxConfig()
                                           ->IgnoreInvalidCameraData()
                                           ->value();
@@ -148,18 +144,18 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    bool should_invert_field = Util::DynamicParameters->getAIControlConfig()
+    bool should_invert_field = DynamicParameters->getAIControlConfig()
                                    ->getRefboxConfig()
                                    ->OverrideRefboxDefendingSide()
                                    ->value() &&
-                               Util::DynamicParameters->getAIControlConfig()
+                               DynamicParameters->getAIControlConfig()
                                    ->getRefboxConfig()
                                    ->DefendingPositiveSide()
                                    ->value();
 
-    // TODO remove Util::DynamicParameters as part of
+    // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    bool friendly_team_is_yellow = Util::DynamicParameters->getAIControlConfig()
+    bool friendly_team_is_yellow = DynamicParameters->getAIControlConfig()
                                        ->getRefboxConfig()
                                        ->FriendlyColorYellow()
                                        ->value();
@@ -234,7 +230,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-    RobotId friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
+    RobotId friendly_goalie_id = DynamicParameters->getAIControlConfig()
                                      ->getRefboxConfig()
                                      ->FriendlyGoalieId()
                                      ->value();
@@ -245,7 +241,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
-    RobotId enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
+    RobotId enemy_goalie_id = DynamicParameters->getAIControlConfig()
                                   ->getRefboxConfig()
                                   ->EnemyGoalieId()
                                   ->value();
@@ -262,19 +258,19 @@ bool SensorFusion::isCameraEnabled(const SSL_DetectionFrame &detection)
         // may be resolved by https://github.com/UBC-Thunderbots/Software/issues/960
         case 0:
             camera_disabled =
-                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
+                DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
             break;
         case 1:
             camera_disabled =
-                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_1()->value();
+                DynamicParameters->getCameraConfig()->IgnoreCamera_1()->value();
             break;
         case 2:
             camera_disabled =
-                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_2()->value();
+                DynamicParameters->getCameraConfig()->IgnoreCamera_2()->value();
             break;
         case 3:
             camera_disabled =
-                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_3()->value();
+                DynamicParameters->getCameraConfig()->IgnoreCamera_3()->value();
             break;
         default:
             LOG(WARNING) << "An unknown camera id was detected, disabled by default "

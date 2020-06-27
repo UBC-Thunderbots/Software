@@ -7,7 +7,7 @@
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_size,
-             const std::set<RobotCapabilities::Capability> &unavailable_capabilities)
+             const std::set<RobotCapability> &unavailable_capabilities)
     : id_(id), states_(history_size), unavailable_capabilities_(unavailable_capabilities)
 {
     if (history_size < 1)
@@ -21,7 +21,7 @@ Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
 
 Robot::Robot(RobotId id, const TimestampedRobotState &initial_state,
              unsigned int history_size,
-             const std::set<RobotCapabilities::Capability> &unavailable_capabilities)
+             const std::set<RobotCapability> &unavailable_capabilities)
     : id_(id), states_(history_size), unavailable_capabilities_(unavailable_capabilities)
 {
     if (history_size < 1)
@@ -193,18 +193,17 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const std::set<RobotCapabilities::Capability> &Robot::getCapabilitiesBlacklist() const
+const std::set<RobotCapability> &Robot::getCapabilitiesBlacklist() const
 {
     return unavailable_capabilities_;
 }
 
-std::set<RobotCapabilities::Capability> Robot::getCapabilitiesWhitelist() const
+std::set<RobotCapability> Robot::getCapabilitiesWhitelist() const
 {
     // robot capabilities = all possible capabilities - unavailable capabilities
 
-    std::set<RobotCapabilities::Capability> all_capabilities =
-        RobotCapabilities::allCapabilities();
-    std::set<RobotCapabilities::Capability> robot_capabilities;
+    std::set<RobotCapability> all_capabilities = allRobotCapabilities();
+    std::set<RobotCapability> robot_capabilities;
     std::set_difference(all_capabilities.begin(), all_capabilities.end(),
                         getCapabilitiesBlacklist().begin(),
                         getCapabilitiesBlacklist().end(),
@@ -213,7 +212,7 @@ std::set<RobotCapabilities::Capability> Robot::getCapabilitiesWhitelist() const
     return robot_capabilities;
 }
 
-std::set<RobotCapabilities::Capability> &Robot::getMutableRobotCapabilities()
+std::set<RobotCapability> &Robot::getMutableRobotCapabilities()
 {
     return unavailable_capabilities_;
 }

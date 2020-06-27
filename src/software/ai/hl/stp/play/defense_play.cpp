@@ -38,7 +38,7 @@ bool DefensePlay::invariantHolds(const World &world) const
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     bool enemy_team_can_pass =
-        Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
+        DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());

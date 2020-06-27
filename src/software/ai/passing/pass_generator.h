@@ -302,7 +302,7 @@ class PassGenerator
     std::vector<Pass> passes_to_optimize;
 
     // The optimizer we're using to find passes
-    Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
+    GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
 
     // The mutex for the passer_point
     std::mutex passer_point_mutex;

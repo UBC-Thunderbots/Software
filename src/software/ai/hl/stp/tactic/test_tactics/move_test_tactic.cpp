@@ -6,8 +6,7 @@
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
     : Tactic(loop_forever,
-             {RobotCapabilities::Capability::Dribble, RobotCapabilities::Capability::Kick,
-              RobotCapabilities::Capability::Chip})
+             {RobotCapability::Dribble, RobotCapability::Kick, RobotCapability::Chip})
 {
 }
 

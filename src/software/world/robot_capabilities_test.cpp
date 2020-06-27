@@ -2,12 +2,10 @@
 
 #include <gtest/gtest.h>
 
-using namespace RobotCapabilities;
-
 TEST(RobotCapabilitiesTest, test_subset_superset_operators_both_empty)
 {
-    std::set<Capability> lhs{};
-    std::set<Capability> rhs{};
+    std::set<RobotCapability> lhs{};
+    std::set<RobotCapability> rhs{};
     EXPECT_TRUE(lhs <= rhs);
     EXPECT_TRUE(lhs >= rhs);
     EXPECT_TRUE(rhs >= lhs);
@@ -16,8 +14,8 @@ TEST(RobotCapabilitiesTest, test_subset_superset_operators_both_empty)
 
 TEST(RobotCapabilitiesTest, test_subset_superset_operators_same)
 {
-    std::set<Capability> lhs{Capability::Kick};
-    std::set<Capability> rhs{Capability::Kick};
+    std::set<RobotCapability> lhs{RobotCapability::Kick};
+    std::set<RobotCapability> rhs{RobotCapability::Kick};
     EXPECT_TRUE(lhs <= rhs);
     EXPECT_TRUE(rhs >= lhs);
     EXPECT_TRUE(lhs >= rhs);
@@ -26,8 +24,8 @@ TEST(RobotCapabilitiesTest, test_subset_superset_operators_same)
 
 TEST(RobotCapabilitiesTest, test_subset_superset_operators_subset)
 {
-    std::set<Capability> lhs{Capability::Kick};
-    std::set<Capability> rhs{Capability::Kick, Capability::Chip};
+    std::set<RobotCapability> lhs{RobotCapability::Kick};
+    std::set<RobotCapability> rhs{RobotCapability::Kick, RobotCapability::Chip};
     EXPECT_TRUE(lhs <= rhs);
     EXPECT_TRUE(rhs >= lhs);
     EXPECT_FALSE(lhs >= rhs);
@@ -36,7 +34,8 @@ TEST(RobotCapabilitiesTest, test_subset_superset_operators_subset)
 
 TEST(RobotCapabilitiesTest, test_all_capabilities)
 {
-    std::set<Capability> all = allCapabilities();
-    EXPECT_TRUE((all == std::set<Capability>{Capability::Dribble, Capability::Move,
-                                             Capability::Chip, Capability::Kick}));
+    std::set<RobotCapability> all = allRobotCapabilities();
+    EXPECT_TRUE(
+        (all == std::set<RobotCapability>{RobotCapability::Dribble, RobotCapability::Move,
+                                          RobotCapability::Chip, RobotCapability::Kick}));
 }

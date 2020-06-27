@@ -13,5 +13,4 @@
  * @return true if the given points are collinear, false otherwise
  */
 bool collinear(const Point &a, const Point &b, const Point &c,
-               double fixed_epsilon = GeomConstants::FIXED_EPSILON,
-               int ulps_epsilon     = GeomConstants::ULPS_EPSILON_TEN);
+               double fixed_epsilon = FIXED_EPSILON, int ulps_epsilon = ULPS_EPSILON_TEN);
