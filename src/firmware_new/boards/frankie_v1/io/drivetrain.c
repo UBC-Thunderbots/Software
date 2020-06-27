@@ -1,38 +1,46 @@
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware/shared/math/matrix.h"
 
 #include <assert.h>
 #include <stdbool.h>
 
-struct Drivetrain_t{
+struct Drivetrain {
     DrivetrainUnit_t* front_left_drive_unit;
     DrivetrainUnit_t* front_right_drive_unit;
     DrivetrainUnit_t* back_left_drive_unit;
     DrivetrainUnit_t* back_right_drive_unit;
+    Matrix robot_wheel_geometry;
 };
-static bool initialized = false;
 
-DrivetrainUnit_t* io_drivetrain_init(DrivetrainUnit_t *front_left_drive_unit,
-                        DrivetrainUnit_t *front_right_drive_unit,
-                        DrivetrainUnit_t *back_left_drive_unit,
-                        DrivetrainUnit_t *back_right_drive_unit)
+DrivetrainUnit_t* io_drivetrain_init(DrivetrainUnit_t* front_left_drive_unit,
+                        DrivetrainUnit_t* front_right_drive_unit,
+                        DrivetrainUnit_t* back_left_drive_unit,
+                        DrivetrainUnit_t* back_right_drive_unit, Matrix robot_wheel_geometry)
 {
-    DrivetrainUnit_t* front_left = (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
-    DrivetrainUnit_t* front_right = (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
-    DrivetrainUnit_t* back_left = (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
-    DrivetrainUnit_t* back_right = (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
+    Drivetrain_t* drive_train = (Drivetrain_t*)malloc(sizeof(Drivetrain_t));
 
-    DrivetrainUnit_t* 
-
-    initialized = true;
+    drive_train->front_left_drive_unit = front_left_drive_unit;
+    drive_train->front_right_drive_unit = front_right_drive_unit;
+    drive_train->back_left_drive_unit = back_left_drive_unit;
+    drive_train->back_right_drive_unit = back_right_drive_unit;
+    drive_train->robot_wheel_geometry = robot_wheel_geometry;
 }
 
-static void io_robot_controller_localRobotSpeed2WheelSpeeds(float x_speed, float y_speed, float wheel_speed[4]) {
+void io_drivetrain_destroy(Drivetrain_t* drivetrain){
+    free(drivetrain);
+}
 
-/*            ___                                 ___    _   _
- *  Wheel_0 = | -0.03954606  0.04478002  0.09785249 |   | Vx |
- *  Wheel_1 = | -0.03954606 -0.04478002 -0.09785249 |   | Vy |
- *  Wheel_2 = | -0.03238922 -0.04478002  0.07214751 |   | W  |
- *  Wheel_3 = | -0.03238922  0.04478002 -0.07214751 |   |_  _|
- *            |__                                 __|
+static Matrix io_drivetrain_localRobotSpeed2WheelSpeeds(Drivetrain_t* drive_train, Matrix local_speeds, float wheel_speed[4]) {
+/*            ___        __
+ *  Wheel_0 = | A0  B0  C0 |   | Vx |
+ *  Wheel_1 = | A1  B1  C1 |   | Vy |
+ *  Wheel_2 = | A2  B2  C3 | * | W  |
+ *  Wheel_3 = | A3  B3  C3 |   |_  _|
+ *            |__        __|
+ *            fd
+ * The speed of each wheel can be determined through the inverse matrix of the forwards kinematic matrix of the robot
+ * The matrix defined about is generated from a matrix pseud-inverse and under-determined and therefore there are infinite possibilities of what it could be.
  */
+
+return matmul(drive_train->robot_wheel_geometry, local_speeds);
 }
