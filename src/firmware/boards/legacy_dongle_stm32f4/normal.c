@@ -466,7 +466,6 @@ static void send_drive_packet(const void *packet, const size_t packet_size)
     const size_t frame_length = address - header_start_address;
     mrf_write_long(frame_length_address, frame_length);
 
-    // TODO: need to test this
     // Do a final check that we're not going to exceed the max packet size
     if (frame_length > MAX_DRIVE_PACKET_SIZE)
     {

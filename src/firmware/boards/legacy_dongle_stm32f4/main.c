@@ -16,7 +16,6 @@
 #include <stack.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unused.h>
 #include <usb.h>
