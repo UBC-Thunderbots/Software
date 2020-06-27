@@ -26,7 +26,7 @@ DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_dri
  * @param new_sampled_speed [in] The most recent data of the actual wheel speed from sensor data
  *
  */
-void io_drivetrain_unit_updateControl(DrivetrainUnit_t* drive_train_unit, const float new_speed_command, const float new_sampled_speed)
+void io_drivetrain_unit_updateControl(DrivetrainUnit_t* drive_train_unit, float new_speed_command, float new_sampled_speed)
 
 /**
  * Returns the rotational speed of a drivetrain unit measured at the motor in rad/s.

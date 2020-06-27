@@ -1,43 +1,38 @@
-#include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
+#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 
-#include <math.h>
-#include <stdlib.h>
+#include <assert.h>
+#include <stdbool.h>
 
-typedef struct DrivetrainUnit
+struct Drivetrain_t{
+    DrivetrainUnit_t* front_left_drive_unit;
+    DrivetrainUnit_t* front_right_drive_unit;
+    DrivetrainUnit_t* back_left_drive_unit;
+    DrivetrainUnit_t* back_right_drive_unit;
+};
+static bool initialized = false;
+
+DrivetrainUnit_t* io_drivetrain_init(DrivetrainUnit_t *front_left_drive_unit,
+                        DrivetrainUnit_t *front_right_drive_unit,
+                        DrivetrainUnit_t *back_left_drive_unit,
+                        DrivetrainUnit_t *back_right_drive_unit)
 {
-    AllegroA3931MotorDriver_t* motor_driver;
-} DrivetrainUnit_t;
+    DrivetrainUnit_t* front_left = (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
+    DrivetrainUnit_t* front_right = (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
+    DrivetrainUnit_t* back_left = (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
+    DrivetrainUnit_t* back_right = (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
 
-DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_driver)
-{
-    DrivetrainUnit_t* drivetrain_unit =
-            (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
+    DrivetrainUnit_t* 
 
-    drivetrain_unit->motor_driver = motor_driver;
-
-    return drivetrain_unit;
+    initialized = true;
 }
 
-void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
-                                   float force_newtons)
-{
-    // NOTE: This is a placeholder implementation. With the new controller we will not
-    //       control each wheel by applying "force" to it, but rather by directly
-    //       applying voltage
+static void io_robot_controller_localRobotSpeed2WheelSpeeds(float x_speed, float y_speed, float wheel_speed[4]) {
 
-    float pwm_percentage = fminf(1.0f, fabsf(force_newtons) / 255.0f);
-
-    if (force_newtons > 0)
-    {
-        io_allegro_a3931_motor_driver_setDirection(drive_train_unit->motor_driver,
-                                                   CLOCKWISE);
-    }
-    else
-    {
-        io_allegro_a3931_motor_driver_setDirection(drive_train_unit->motor_driver,
-                                                   COUNTERCLOCKWISE);
-    }
-
-    io_allegro_a3931_motor_setPwmPercentage(drive_train_unit->motor_driver,
-                                            pwm_percentage);
+/*            ___                                 ___    _   _
+ *  Wheel_0 = | -0.03954606  0.04478002  0.09785249 |   | Vx |
+ *  Wheel_1 = | -0.03954606 -0.04478002 -0.09785249 |   | Vy |
+ *  Wheel_2 = | -0.03238922 -0.04478002  0.07214751 |   | W  |
+ *  Wheel_3 = | -0.03238922  0.04478002 -0.07214751 |   |_  _|
+ *            |__                                 __|
+ */
 }

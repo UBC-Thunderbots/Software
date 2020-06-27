@@ -37,14 +37,5 @@ void io_robot_controller_updateTrajectory(VelocityTrajectory_t* trajectory, size
     _trajectory_index = 0;
 }
 
-static void io_robot_controller_localRobotSpeed2WheelSpeeds(float x_speed, float y_speed, float wheel_speed[4]) {
 
-/*            ___                                 ___    _   _
- *  Wheel_0 = | -0.03954606  0.04478002  0.09785249 |   | Vx |
- *  Wheel_1 = | -0.03954606 -0.04478002 -0.09785249 |   | Vy |
- *  Wheel_2 = | -0.03238922 -0.04478002  0.07214751 |   | W  |
- *  Wheel_3 = | -0.03238922  0.04478002 -0.07214751 |   |_  _|
- *            |__                                 __|
- */
-}
 

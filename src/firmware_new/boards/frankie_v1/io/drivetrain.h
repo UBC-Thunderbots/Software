@@ -1,21 +1,19 @@
 #pragma once
 
-#include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
-
-typedef struct DrivetrainUnit DrivetrainUnit_t;
+#include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
 
 /**
- * Create a drivetrain unit
- * @param [in] motor_driver The driver attached to the motor in this drivetrain unit
- * @return The created DrivetrainUnit
- */
-DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_driver);
-
-/**
- * Apply the given force to the given DrivetrainUnit
+ * Initialize the IO layer for the Drivetrain
  *
- * @param [in] drive_train_unit The DrivetrainUnit to apply force to
- * @param force_newtons The force to apply, in newtons.
+ * NOTE: This does not take ownership of the given drive units. The driveunit's must
+ *       remain valid until this function is called again.
+ *
+ * @param [in] front_left_drive_unit
+ * @param [in] front_right_drive_unit
+ * @param [in] back_left_drive_unit
+ * @param [in] back_right_drive_unit
  */
-void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
-                                   float force_newtons);
+void io_drivetrain_init(DrivetrainUnit_t* front_left_drive_unit,
+                        DrivetrainUnit_t* front_right_drive_unit,
+                        DrivetrainUnit_t* back_left_drive_unit,
+                        DrivetrainUnit_t* back_right_drive_unit);
