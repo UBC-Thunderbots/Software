@@ -6,13 +6,11 @@
 
 const std::string GrSimBackend::name = "grsim";
 
-GrSimBackend::GrSimBackend()
-    : network_input(SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT,
-                    SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-                    SSL_GAMECONTROLLER_MULTICAST_PORT,
-                    boost::bind(&GrSimBackend::receiveWorld, this, _1),
-                    DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    DynamicParameters->getCameraConfig()),
+GrSimBackend::GrSimBackend(std::shared_ptr<const NetworkConfig> network_config)
+    : network_config(network_config),
+    network_input(setupNetworkClient(network_config,
+    DynamicParameters->getAIControlConfig()->getRefboxConfig(),
+    DynamicParameters->getCameraConfig(), [this](World world) {this->receiveWorld(world);})),
       grsim_output(GRSIM_COMMAND_NETWORK_ADDRESS, GRSIM_COMMAND_NETWORK_PORT,
                    DynamicParameters->getAIControlConfig()->getRefboxConfig())
 {
@@ -55,6 +53,18 @@ void GrSimBackend::updateGrSim()
                                     most_recently_received_world->friendlyTeam(),
                                     most_recently_received_world->ball());
     }
+}
+
+NetworkClient GrSimBackend::setupNetworkClient(std::shared_ptr<const NetworkConfig> network_config,
+                                               std::shared_ptr<const RefboxConfig> refbox_config,
+                                               std::shared_ptr<const CameraConfig> camera_config,
+                                               const std::function<void(World)>& received_world_callback) {
+    return NetworkClient(network_config->VisionIP()->value(),
+                         network_config->VisionPort()->value(),
+                         network_config->GamecontrollerIP()->value(),
+                         network_config->GamecontrollerPort()->value(),
+                         received_world_callback,
+                         refbox_config, camera_config);
 }
 
 // Register this play in the genericFactory
