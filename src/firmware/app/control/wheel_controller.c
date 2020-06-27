@@ -92,8 +92,10 @@ float app_wheel_controller_getWheelVoltageToApply(WheelController_t* wheel_contr
 void app_wheel_controller_destroy(WheelController_t* wheel_controller)
 {
     // Free all of the allocated memory
-    free(wheel_controller->previous_output_sample_buffer);
-    free(wheel_controller->previous_command_buffer);
     free(wheel_controller->output_sample_coefficients);
     free(wheel_controller->command_coefficients);
+    circular_buffer_destroy(wheel_controller->previous_command_buffer);
+    circular_buffer_destroy(wheel_controller->previous_output_sample_buffer);
+
+    free(wheel_controller);
 }
