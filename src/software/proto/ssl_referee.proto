@@ -29,8 +29,7 @@ message SSL_Referee
         // The break before extra time.
         EXTRA_TIME_BREAK = 5;
         // The first half of extra time is about to start.
-        // A kickoff is called within this stage.
-        // This stage ends with the NORMAL_START.
+        // A kickoff is called within this stage.  This stage ends with the NORMAL_START.
         EXTRA_FIRST_HALF_PRE = 6;
         // The first half of extra time.
         EXTRA_FIRST_HALF = 7;
