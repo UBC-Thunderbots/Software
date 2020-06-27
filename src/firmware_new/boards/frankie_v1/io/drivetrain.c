@@ -1,48 +1,43 @@
-#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
 
-#include <assert.h>
-#include <stdbool.h>
+#include <math.h>
+#include <stdlib.h>
 
-static DrivetrainUnit_t *_front_left_drive_unit;
-static DrivetrainUnit_t *_front_right_drive_unit;
-static DrivetrainUnit_t *_back_left_drive_unit;
-static DrivetrainUnit_t *_back_right_drive_unit;
-
-static bool initialized = false;
-
-void io_drivetrain_init(DrivetrainUnit_t *front_left_drive_unit,
-                        DrivetrainUnit_t *front_right_drive_unit,
-                        DrivetrainUnit_t *back_left_drive_unit,
-                        DrivetrainUnit_t *back_right_drive_unit)
+typedef struct DrivetrainUnit
 {
-    _front_left_drive_unit  = front_left_drive_unit;
-    _front_right_drive_unit = front_right_drive_unit;
-    _back_left_drive_unit   = back_left_drive_unit;
-    _back_right_drive_unit  = back_right_drive_unit;
+    AllegroA3931MotorDriver_t* motor_driver;
+} DrivetrainUnit_t;
 
-    initialized = true;
+DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_driver)
+{
+    DrivetrainUnit_t* drivetrain_unit =
+            (DrivetrainUnit_t*)malloc(sizeof(DrivetrainUnit_t));
+
+    drivetrain_unit->motor_driver = motor_driver;
+
+    return drivetrain_unit;
 }
 
-void io_drivetrain_applyForceFrontLeftWheel(float force_newtons)
+void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
+                                   float force_newtons)
 {
-    assert(initialized);
-    io_drivetrain_unit_applyForce(_front_left_drive_unit, force_newtons);
-}
+    // NOTE: This is a placeholder implementation. With the new controller we will not
+    //       control each wheel by applying "force" to it, but rather by directly
+    //       applying voltage
 
-void io_drivetrain_applyForceFrontRightWheel(float force_newtons)
-{
-    assert(initialized);
-    io_drivetrain_unit_applyForce(_front_right_drive_unit, force_newtons);
-}
+    float pwm_percentage = fminf(1.0f, fabsf(force_newtons) / 255.0f);
 
-void io_drivetrain_applyForceBackLeftWheel(float force_newtons)
-{
-    assert(initialized);
-    io_drivetrain_unit_applyForce(_back_left_drive_unit, force_newtons);
-}
+    if (force_newtons > 0)
+    {
+        io_allegro_a3931_motor_driver_setDirection(drive_train_unit->motor_driver,
+                                                   CLOCKWISE);
+    }
+    else
+    {
+        io_allegro_a3931_motor_driver_setDirection(drive_train_unit->motor_driver,
+                                                   COUNTERCLOCKWISE);
+    }
 
-void io_drivetrain_applyForceBackRightWheel(float force_newtons)
-{
-    assert(initialized);
-    io_drivetrain_unit_applyForce(_back_right_drive_unit, force_newtons);
+    io_allegro_a3931_motor_setPwmPercentage(drive_train_unit->motor_driver,
+                                            pwm_percentage);
 }

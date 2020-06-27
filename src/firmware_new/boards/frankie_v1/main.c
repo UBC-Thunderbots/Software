@@ -26,10 +26,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "firmware/app//control/wheel_controller.h"
-#include "udp_multicast.h"
+#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "timers.h"
+#include "udp_multicast.h"
 
 /* USER CODE END Includes */
 
@@ -137,9 +137,10 @@ void initIoDrivetrain(void)
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
 }
 
-static void vTimerControllerCallback(xTimerHandle pxTimer) {
+static void vTimerControllerCallback(xTimerHandle pxTimer)
+{
     // Sample wheel state
-    float sampled_wheel_state  = 1;
+    float sampled_wheel_state = 1;
     // Push to buffer
     // Get new command
     // push to buffer
@@ -149,23 +150,22 @@ static void vTimerControllerCallback(xTimerHandle pxTimer) {
     // Set motor voltage
 }
 
-void initWheelControllerTimer(void){
-
+void initWheelControllerTimer(void)
+{
     // Create a timer with expiry of CONTROLLER_INTERPOLATION_PERIOD with auto-renew on
-    TimerHandle_t timer_handle_controller = xTimerCreate(
-            "controllerTimer",
-            pdMS_TO_TICKS(10),
-            pdTRUE,
-            (void *) 0,
-            vTimerControllerCallback);
+    TimerHandle_t timer_handle_controller =
+        xTimerCreate("controllerTimer", pdMS_TO_TICKS(10), pdTRUE, (void *)0,
+                     vTimerControllerCallback);
 
     // Check that the controller was created properly
-    if (timer_handle_controller == NULL) {
+    if (timer_handle_controller == NULL)
+    {
         Error_Handler();
     }
 
     // Check that the timer started properly
-    if (xTimerStart(timer_handle_controller, 0) != pdPASS) {
+    if (xTimerStart(timer_handle_controller, 0) != pdPASS)
+    {
         Error_Handler();
     }
 }
