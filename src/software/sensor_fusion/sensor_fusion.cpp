@@ -237,51 +237,34 @@ void SensorFusion::updateBall(TimestampedBallState new_ball_state)
     }
 }
 
+void SensorFusion::updateRobotStatesMap(const Team &team, TeamHistoryMap &map_to_update)
+{
+    for (const auto &robot : team.getAllRobots())
+    {
+        auto it = map_to_update.find(robot.id());
+        if (it != map_to_update.end())
+        {
+            if (!it->second.empty() &&
+                robot.currentState().timestamp() < it->second.front().timestamp())
+            {
+                throw std::invalid_argument(
+                    "Error: Trying to update robot state using a state older then the current state");
+            }
+
+            it->second.push_front(robot.currentState());
+        }
+        else
+        {
+            map_to_update[robot.id()] = RobotHistory(history_size);
+            map_to_update[robot.id()].push_front(robot.currentState());
+        }
+    }
+}
+
 void SensorFusion::updateRobotStatesMap()
 {
-    for (const auto &robot : friendly_team.getAllRobots())
-    {
-        auto it = friendly_robot_states_map.find(robot.id());
-        if (it != friendly_robot_states_map.end())
-        {
-            if (!it->second.empty() &&
-                robot.currentState().timestamp() < it->second.front().timestamp())
-            {
-                throw std::invalid_argument(
-                    "Error: Trying to update robot state using a state older then the current state");
-            }
-
-            it->second.push_front(robot.currentState());
-        }
-        else
-        {
-            friendly_robot_states_map[robot.id()] =
-                boost::circular_buffer<TimestampedRobotState>(history_size);
-            friendly_robot_states_map[robot.id()].push_front(robot.currentState());
-        }
-    }
-
-    for (const auto &robot : enemy_team.getAllRobots())
-    {
-        auto it = enemy_robot_states_map.find(robot.id());
-        if (it != enemy_robot_states_map.end())
-        {
-            if (!it->second.empty() &&
-                robot.currentState().timestamp() < it->second.front().timestamp())
-            {
-                throw std::invalid_argument(
-                    "Error: Trying to update robot state using a state older then the current state");
-            }
-
-            it->second.push_front(robot.currentState());
-        }
-        else
-        {
-            enemy_robot_states_map[robot.id()] =
-                boost::circular_buffer<TimestampedRobotState>(history_size);
-            enemy_robot_states_map[robot.id()].push_front(robot.currentState());
-        }
-    }
+    updateRobotStatesMap(friendly_team, friendly_robot_states_map);
+    updateRobotStatesMap(enemy_team, enemy_robot_states_map);
 }
 
 std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(

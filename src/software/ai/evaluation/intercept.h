@@ -35,6 +35,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(
  *
  * @throws std::invalid_argument if the ball is estimating the position with a time
  * from the past
+ *
  * @return the estimated position of the ball at the given number of milliseconds
  * in the future. Coordinates are in metres.
  */
