@@ -86,15 +86,6 @@ class SensorFusion
     RobotDetection invert(RobotDetection robot_detection);
     BallDetection invert(BallDetection ball_detection);
 
-    /**
-     * Given a detection, figures out if the camera is enabled
-     *
-     * @param detection SSL_DetectionFrame to consider
-     *
-     * @return whether the camera is enabled
-     */
-    bool isCameraEnabled(const SSL_DetectionFrame &detection);
-
     std::optional<Field> field;
     std::optional<Ball> ball;
     Team friendly_team;

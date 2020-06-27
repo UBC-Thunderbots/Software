@@ -12,14 +12,12 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                              std::string gamecontroller_multicast_address,
                              int gamecontroller_multicast_port,
                              std::function<void(World)> received_world_callback,
-                             std::shared_ptr<const RefboxConfig> refbox_config,
-                             std::shared_ptr<const CameraConfig> camera_config)
+                             std::shared_ptr<const RefboxConfig> refbox_config)
     : network_filter(refbox_config),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
       received_world_callback(received_world_callback),
-      refbox_config(refbox_config),
-      camera_config(camera_config)
+      refbox_config(refbox_config)
 {
     ssl_vision_client =
         std::make_unique<ThreadedProtoMulticastListener<SSL_WrapperPacket>>(
@@ -76,7 +74,6 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         if (packet.has_detection())
         {
             SSL_DetectionFrame detection = *packet.mutable_detection();
-            bool camera_disabled         = false;
 
             // We invert the field side if we explicitly choose to override the values
             // provided by refbox. The 'defending_positive_side' parameter dictates the
@@ -86,54 +83,28 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             {
                 invertFieldSide(detection);
             }
-            // TODO remove as part of
-            // https://github.com/UBC-Thunderbots/Software/issues/960
-            switch (detection.camera_id())
-            {
-                case 0:
-                    camera_disabled = camera_config->IgnoreCamera_0()->value();
-                    break;
-                case 1:
-                    camera_disabled = camera_config->IgnoreCamera_1()->value();
-                    break;
-                case 2:
-                    camera_disabled = camera_config->IgnoreCamera_2()->value();
-                    break;
-                case 3:
-                    camera_disabled = camera_config->IgnoreCamera_3()->value();
-                    break;
-                default:
-                    LOG(WARNING)
-                        << "An unknown camera id was detected, disabled by default "
-                        << "id: " << detection.camera_id() << std::endl;
-                    camera_disabled = true;
-                    break;
-            }
 
-            if (!camera_disabled)
+            std::optional<TimestampedBallState> ball_state =
+                network_filter.getFilteredBallData({detection});
+            if (ball_state)
             {
-                std::optional<TimestampedBallState> ball_state =
-                    network_filter.getFilteredBallData({detection});
-                if (ball_state)
+                if (ball)
                 {
-                    if (ball)
-                    {
-                        ball->updateState(*ball_state);
-                    }
-                    else
-                    {
-                        ball = Ball(*ball_state);
-                    }
+                    ball->updateState(*ball_state);
                 }
-
-                friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
-                int friendly_goalie_id = refbox_config->FriendlyGoalieId()->value();
-                friendly_team.assignGoalie(friendly_goalie_id);
-
-                enemy_team = network_filter.getFilteredEnemyTeamData({detection});
-                int enemy_goalie_id = refbox_config->EnemyGoalieId()->value();
-                enemy_team.assignGoalie(enemy_goalie_id);
+                else
+                {
+                    ball = Ball(*ball_state);
+                }
             }
+
+            friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
+            int friendly_goalie_id = refbox_config->FriendlyGoalieId()->value();
+            friendly_team.assignGoalie(friendly_goalie_id);
+
+            enemy_team = network_filter.getFilteredEnemyTeamData({detection});
+            int enemy_goalie_id = refbox_config->EnemyGoalieId()->value();
+            enemy_team.assignGoalie(enemy_goalie_id);
         }
     }
     if (field && ball)

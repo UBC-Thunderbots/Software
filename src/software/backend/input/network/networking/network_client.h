@@ -39,8 +39,7 @@ class NetworkClient
                            std::string gamecontroller_multicast_address,
                            int gamecontroller_multicast_port,
                            std::function<void(World)> received_world_callback,
-                           std::shared_ptr<const RefboxConfig> refbox_config,
-                           std::shared_ptr<const CameraConfig> camera_config);
+                           std::shared_ptr<const RefboxConfig> refbox_config);
 
     // Delete the copy and assignment operators because this class really shouldn't need
     // them and we don't want to risk doing anything nasty with the internal
@@ -118,5 +117,4 @@ class NetworkClient
     std::function<void(World)> received_world_callback;
 
     std::shared_ptr<const RefboxConfig> refbox_config;
-    std::shared_ptr<const CameraConfig> camera_config;
 };

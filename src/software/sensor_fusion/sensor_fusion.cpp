@@ -161,44 +161,41 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
                                        ->value();
 
     std::optional<TimestampedBallState> new_ball_state;
-    if (isCameraEnabled(ssl_detection_frame))
+    auto ball_detections = createBallDetections(
+        {ssl_detection_frame}, min_valid_x, max_valid_x, ignore_invalid_camera_data);
+    auto yellow_team =
+        createTeamDetection({ssl_detection_frame}, TeamColour::YELLOW, min_valid_x,
+                            max_valid_x, ignore_invalid_camera_data);
+    auto blue_team =
+        createTeamDetection({ssl_detection_frame}, TeamColour::BLUE, min_valid_x,
+                            max_valid_x, ignore_invalid_camera_data);
+
+    if (should_invert_field)
     {
-        auto ball_detections = createBallDetections(
-            {ssl_detection_frame}, min_valid_x, max_valid_x, ignore_invalid_camera_data);
-        auto yellow_team =
-            createTeamDetection({ssl_detection_frame}, TeamColour::YELLOW, min_valid_x,
-                                max_valid_x, ignore_invalid_camera_data);
-        auto blue_team =
-            createTeamDetection({ssl_detection_frame}, TeamColour::BLUE, min_valid_x,
-                                max_valid_x, ignore_invalid_camera_data);
+        for (auto &detection : ball_detections)
+        {
+            invert(detection);
+        }
+        for (auto &detection : yellow_team)
+        {
+            invert(detection);
+        }
+        for (auto &detection : blue_team)
+        {
+            invert(detection);
+        }
+    }
 
-        if (should_invert_field)
-        {
-            for (auto &detection : ball_detections)
-            {
-                invert(detection);
-            }
-            for (auto &detection : yellow_team)
-            {
-                invert(detection);
-            }
-            for (auto &detection : blue_team)
-            {
-                invert(detection);
-            }
-        }
-
-        new_ball_state = createTimestampedBallState(ball_detections);
-        if (friendly_team_is_yellow)
-        {
-            friendly_team = createFriendlyTeam(yellow_team);
-            enemy_team    = createEnemyTeam(blue_team);
-        }
-        else
-        {
-            friendly_team = createFriendlyTeam(blue_team);
-            enemy_team    = createEnemyTeam(yellow_team);
-        }
+    new_ball_state = createTimestampedBallState(ball_detections);
+    if (friendly_team_is_yellow)
+    {
+        friendly_team = createFriendlyTeam(yellow_team);
+        enemy_team    = createEnemyTeam(blue_team);
+    }
+    else
+    {
+        friendly_team = createFriendlyTeam(blue_team);
+        enemy_team    = createEnemyTeam(yellow_team);
     }
 
     if (new_ball_state)
@@ -247,38 +244,6 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
                                   ->value();
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
-}
-
-bool SensorFusion::isCameraEnabled(const SSL_DetectionFrame &detection)
-{
-    bool camera_disabled = false;
-    switch (detection.camera_id())
-    {
-        // TODO: create an array of dynamic params to index into with camera_id()
-        // may be resolved by https://github.com/UBC-Thunderbots/Software/issues/960
-        case 0:
-            camera_disabled =
-                DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
-            break;
-        case 1:
-            camera_disabled =
-                DynamicParameters->getCameraConfig()->IgnoreCamera_1()->value();
-            break;
-        case 2:
-            camera_disabled =
-                DynamicParameters->getCameraConfig()->IgnoreCamera_2()->value();
-            break;
-        case 3:
-            camera_disabled =
-                DynamicParameters->getCameraConfig()->IgnoreCamera_3()->value();
-            break;
-        default:
-            LOG(WARNING) << "An unknown camera id was detected, disabled by default "
-                         << "id: " << detection.camera_id() << std::endl;
-            camera_disabled = true;
-            break;
-    }
-    return !camera_disabled;
 }
 
 RobotDetection SensorFusion::invert(RobotDetection robot_detection)
