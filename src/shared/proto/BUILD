@@ -7,7 +7,7 @@ proto_library(
     name = "tbots_proto",
     srcs = [
         "geometry.proto",
-        "radio_primitive.proto",
+        "primitive.proto",
         "robot_component_status.proto",
         "tbots_robot_msg.proto",
         "tbots_software_msgs.proto",
@@ -23,7 +23,6 @@ cc_proto_library(
 )
 
 nanopb_proto_library(
-    name = "tbots_c_proto",
-    restricted_to = ["//cc_toolchain:stm32h7"],
+    name = "tbots_nanopb_proto",
     deps = [":tbots_proto"],
 )

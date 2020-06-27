@@ -72,7 +72,6 @@ int main(int argc, char* argv[])
     while (1)
     {
         // primitive and vision sender
-        test_primitive_msg.set_allocated_time_sent(createCurrentTimestampMsg().release());
         primitive_sender->sendProto(test_primitive_msg);
         test_vision_msg.set_allocated_time_sent(createCurrentTimestampMsg().release());
         vision_sender->sendProto(test_vision_msg);

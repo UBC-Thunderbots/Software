@@ -133,7 +133,7 @@ cc_library(
         "//firmware/app/world:firmware_world",
     ] + select({
         # TODO: this should not be dependent on freertos at all
-        "//cc_toolchain:cpu_stm32f4": ["//firmware/boards/legacy_robot_stm32f4:freertos"],
+        "//cc_toolchain:cpu_stm32f4": ["//firmware/boards/legacy_robot_stm32f4:legacy_shared_libs"],
         "//conditions:default": [],
     }),
 )

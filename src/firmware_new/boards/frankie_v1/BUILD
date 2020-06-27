@@ -56,6 +56,7 @@ cc_library(
     deps = [
         ":hal",
         ":lwip",
+        "@nanopb",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause

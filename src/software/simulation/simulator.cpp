@@ -1,6 +1,6 @@
 #include "software/simulation/simulator.h"
 
-#include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
@@ -210,33 +210,37 @@ Timestamp Simulator::getTimestamp() const
 primitive_params_t Simulator::getPrimitiveParams(
     const std::unique_ptr<Primitive>& primitive)
 {
-    // The MRFPrimitiveVisitor handles most of the encoding for us
-    MRFPrimitiveVisitor mrf_pv;
-    primitive->accept(mrf_pv);
-    RadioPrimitive_t radio_primitive = mrf_pv.getSerializedRadioPacket();
+    // The ProtoCreatorPrimitiveVisitor handles most of the encoding for us
+    ProtoCreatorPrimitiveVisitor mrf_pv;
+    PrimitiveMsg primitive_proto =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*primitive);
     primitive_params_t primitive_params;
-    std::array<double, 4> param_array = radio_primitive.param_array;
+    std::array<double, 4> param_array = {
+        primitive_proto.parameter1(),
+        primitive_proto.parameter2(),
+        primitive_proto.parameter3(),
+        primitive_proto.parameter4(),
+    };
     for (unsigned int i = 0; i < param_array.size(); i++)
     {
         // The data is already scaled appropriately for us from the
-        // getSerializedRadioPacket function. We just need to pack it
+        // getProto function. We just need to pack it
         // into an int16_t
         double data                = param_array[i];
         primitive_params.params[i] = static_cast<int16_t>(std::round(data));
     }
 
-    primitive_params.slow  = radio_primitive.slow;
-    primitive_params.extra = radio_primitive.extra_bits;
+    primitive_params.slow  = primitive_proto.slow();
+    primitive_params.extra = static_cast<uint8_t>(primitive_proto.extra_bits());
 
     return primitive_params;
 }
 
 unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive)
 {
-    MRFPrimitiveVisitor mrf_pv;
-    primitive->accept(mrf_pv);
-    RadioPrimitive_t radio_primitive = mrf_pv.getSerializedRadioPacket();
-    auto primitive_index = static_cast<unsigned int>(radio_primitive.prim_type);
+    PrimitiveMsg primitive_proto =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*primitive);
+    auto primitive_index = static_cast<unsigned int>(primitive_proto.prim_type());
 
     return primitive_index;
 }

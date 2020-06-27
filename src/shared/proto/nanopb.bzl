@@ -105,12 +105,12 @@ nanopb_proto_library = rule(
         ),
         "nanopb_libs": attr.label_list(
             providers = [CcInfo],
-            default = [Label("@com_github_nanopb_nanopb//:nanopb_header")],
+            default = [Label("@nanopb//:nanopb_header")],
         ),
         "nanopb_generator": attr.label(
             executable = True,
             cfg = "host",
-            default = Label("@com_github_nanopb_nanopb//:nanopb_generator"),
+            default = Label("@nanopb//:nanopb_generator"),
         ),
         "protoc": attr.label(
             executable = True,
