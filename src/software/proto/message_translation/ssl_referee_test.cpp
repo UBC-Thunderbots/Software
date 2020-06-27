@@ -6,9 +6,6 @@
 #include "software/sensor_fusion/refbox_data.h"
 #include "software/world/team_colour.h"
 
-// RefboxGameState createRefboxGameState(const SSL_Referee &packet, TeamColour
-// team_colour); RefboxStage createRefboxStage(const SSL_Referee &packet);
-// std::optional<Point> getBallPlacementPoint(const SSL_Referee &packet);
 class RefboxStageTest
     : public ::testing::TestWithParam<std::tuple<RefboxStage, SSL_Referee_Stage>>
 {
@@ -76,59 +73,86 @@ TEST_P(RefboxGameStateTest, test_refbox_game_state)
 INSTANTIATE_TEST_CASE_P(
     RefboxGameStateTests, RefboxGameStateTest,
     ::testing::Values(
+        // kickoff
         std::make_tuple(RefboxGameState::PREPARE_KICKOFF_US,
                         SSL_Referee_Command_PREPARE_KICKOFF_YELLOW, TeamColour::YELLOW),
-        std::make_tuple(RefboxGameState::PREPARE_KICKOFF_THEM,
-                        SSL_Referee_Command_PREPARE_KICKOFF_BLUE, TeamColour::YELLOW),
         std::make_tuple(RefboxGameState::PREPARE_KICKOFF_US,
                         SSL_Referee_Command_PREPARE_KICKOFF_BLUE, TeamColour::BLUE),
         std::make_tuple(RefboxGameState::PREPARE_KICKOFF_THEM,
+                        SSL_Referee_Command_PREPARE_KICKOFF_BLUE, TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::PREPARE_KICKOFF_THEM,
                         SSL_Referee_Command_PREPARE_KICKOFF_YELLOW, TeamColour::BLUE),
+
+        // penalty
         std::make_tuple(RefboxGameState::PREPARE_PENALTY_US,
                         SSL_Referee_Command_PREPARE_PENALTY_YELLOW, TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::PREPARE_PENALTY_US,
+                        SSL_Referee_Command_PREPARE_PENALTY_BLUE, TeamColour::BLUE),
         std::make_tuple(RefboxGameState::PREPARE_PENALTY_THEM,
                         SSL_Referee_Command_PREPARE_PENALTY_BLUE, TeamColour::YELLOW),
-        std::make_tuple(RefboxGameState::PREPARE_PENALTY_US,
-                        SSL_Referee_Command_PREPARE_PENALTY_YELLOW, TeamColour::BLUE),
         std::make_tuple(RefboxGameState::PREPARE_PENALTY_THEM,
-                        SSL_Referee_Command_PREPARE_PENALTY_BLUE, TeamColour::BLUE),
+                        SSL_Referee_Command_PREPARE_PENALTY_YELLOW, TeamColour::BLUE),
+
+        // direct free
         std::make_tuple(RefboxGameState::DIRECT_FREE_US,
                         SSL_Referee_Command_DIRECT_FREE_YELLOW, TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::DIRECT_FREE_US,
+                        SSL_Referee_Command_DIRECT_FREE_BLUE, TeamColour::BLUE),
         std::make_tuple(RefboxGameState::DIRECT_FREE_THEM,
                         SSL_Referee_Command_DIRECT_FREE_BLUE, TeamColour::YELLOW),
-        std::make_tuple(RefboxGameState::DIRECT_FREE_US,
-                        SSL_Referee_Command_DIRECT_FREE_YELLOW, TeamColour::BLUE),
         std::make_tuple(RefboxGameState::DIRECT_FREE_THEM,
-                        SSL_Referee_Command_DIRECT_FREE_BLUE, TeamColour::BLUE),
+                        SSL_Referee_Command_DIRECT_FREE_YELLOW, TeamColour::BLUE),
+
+        // indirect free
         std::make_tuple(RefboxGameState::INDIRECT_FREE_US,
                         SSL_Referee_Command_INDIRECT_FREE_YELLOW, TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::INDIRECT_FREE_US,
+                        SSL_Referee_Command_INDIRECT_FREE_BLUE, TeamColour::BLUE),
         std::make_tuple(RefboxGameState::INDIRECT_FREE_THEM,
                         SSL_Referee_Command_INDIRECT_FREE_BLUE, TeamColour::YELLOW),
-        std::make_tuple(RefboxGameState::INDIRECT_FREE_US,
-                        SSL_Referee_Command_INDIRECT_FREE_YELLOW, TeamColour::BLUE),
         std::make_tuple(RefboxGameState::INDIRECT_FREE_THEM,
-                        SSL_Referee_Command_INDIRECT_FREE_BLUE, TeamColour::BLUE),
+                        SSL_Referee_Command_INDIRECT_FREE_YELLOW, TeamColour::BLUE),
+
+        // timeout
         std::make_tuple(RefboxGameState::TIMEOUT_US, SSL_Referee_Command_TIMEOUT_YELLOW,
                         TeamColour::YELLOW),
-        std::make_tuple(RefboxGameState::TIMEOUT_THEM, SSL_Referee_Command_TIMEOUT_BLUE,
-                        TeamColour::YELLOW),
-        std::make_tuple(RefboxGameState::TIMEOUT_US, SSL_Referee_Command_TIMEOUT_YELLOW,
+        std::make_tuple(RefboxGameState::TIMEOUT_US, SSL_Referee_Command_TIMEOUT_BLUE,
                         TeamColour::BLUE),
         std::make_tuple(RefboxGameState::TIMEOUT_THEM, SSL_Referee_Command_TIMEOUT_BLUE,
+                        TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::TIMEOUT_THEM, SSL_Referee_Command_TIMEOUT_YELLOW,
                         TeamColour::BLUE),
+
+        // goal
         std::make_tuple(RefboxGameState::GOAL_US, SSL_Referee_Command_GOAL_YELLOW,
                         TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::GOAL_US, SSL_Referee_Command_GOAL_BLUE,
+                        TeamColour::BLUE),
         std::make_tuple(RefboxGameState::GOAL_THEM, SSL_Referee_Command_GOAL_BLUE,
                         TeamColour::YELLOW),
-        std::make_tuple(RefboxGameState::GOAL_US, SSL_Referee_Command_GOAL_YELLOW,
+        std::make_tuple(RefboxGameState::GOAL_THEM, SSL_Referee_Command_GOAL_YELLOW,
                         TeamColour::BLUE),
-        std::make_tuple(RefboxGameState::GOAL_THEM, SSL_Referee_Command_GOAL_BLUE,
-                        TeamColour::BLUE),
+
+        // ball placement
         std::make_tuple(RefboxGameState::BALL_PLACEMENT_US,
                         SSL_Referee_Command_BALL_PLACEMENT_YELLOW, TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::BALL_PLACEMENT_US,
+                        SSL_Referee_Command_BALL_PLACEMENT_BLUE, TeamColour::BLUE),
         std::make_tuple(RefboxGameState::BALL_PLACEMENT_THEM,
                         SSL_Referee_Command_BALL_PLACEMENT_BLUE, TeamColour::YELLOW),
-        std::make_tuple(RefboxGameState::BALL_PLACEMENT_US,
-                        SSL_Referee_Command_BALL_PLACEMENT_YELLOW, TeamColour::BLUE),
         std::make_tuple(RefboxGameState::BALL_PLACEMENT_THEM,
-                        SSL_Referee_Command_BALL_PLACEMENT_BLUE, TeamColour::BLUE)));
+                        SSL_Referee_Command_BALL_PLACEMENT_YELLOW, TeamColour::BLUE)));
+
+
+TEST(BallPlacementPointTest, test_ball_placement_point)
+{
+    SSL_Referee ref;
+    auto ref_point = std::make_unique<SSL_Referee_Point>();
+
+    ref_point->set_x(100);
+    ref_point->set_y(200);
+
+    ref.set_allocated_designated_position(ref_point.release());
+
+    ASSERT_EQ(Point(100, 200), getBallPlacementPoint(ref));
+}
