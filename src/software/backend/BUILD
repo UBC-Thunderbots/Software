@@ -68,24 +68,6 @@ cc_library(
     alwayslink = True,
 )
 
-cc_library(
-    name = "simulator_backend",
-    srcs = ["simulator_backend.cpp"],
-    hdrs = ["simulator_backend.h"],
-    deps = [
-        ":backend",
-        "//software/logger",
-        "//software/multithreading:thread_safe_buffer",
-        "//software/simulation:simulator",
-        "//software/util/design_patterns:generic_factory",
-        "//software/world",
-    ],
-    # We force linking so that the static variables required for the "factory"
-    # design pattern to work are linked in
-    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
-    alwayslink = True,
-)
-
 cc_test(
     name = "robot_status_test",
     srcs = ["robot_status_test.cpp"],
