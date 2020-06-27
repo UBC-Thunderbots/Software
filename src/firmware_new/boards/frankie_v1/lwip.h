@@ -40,8 +40,12 @@ extern "C"
 #include "lwip/tcpip.h"
 #endif /* WITH_RTOS */
 
-    /* USER CODE BEGIN 0 */
-
+/* USER CODE BEGIN 0 */
+// STM32CubeMX is supposed to generate this when we set the setting to Enabled
+// on the program. Unfortunately as of version 5.6.1 it doesn't do so. We enable
+// it ourselves here. This can be removed in the future if this flag shows up
+// in lwipopts.h
+#define SYS_LIGHTWEIGHT_PROT 1
     /* USER CODE END 0 */
 
     /* Global Variables ----------------------------------------------------------*/

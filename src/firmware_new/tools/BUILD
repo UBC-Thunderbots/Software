@@ -22,9 +22,13 @@ cc_binary(
     srcs = ["send_proto_over_udp.cpp"],
     restricted_to = ["//cc_toolchain:k8"],
     deps = [
-        "//firmware_new/boards/frankie_v1:constants",
-        "//firmware_new/proto:fw_cc_proto",
+        "//shared:constants",
+        "//shared/proto:tbots_cc_proto",
+        "//software/logger",
+        "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
+        "//software/proto/message_translation:tbots_protobuf",
+        "@boost//:asio",
         "@com_google_protobuf//:protobuf",
     ],
 )
