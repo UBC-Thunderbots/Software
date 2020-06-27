@@ -12,12 +12,12 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                              std::string gamecontroller_multicast_address,
                              int gamecontroller_multicast_port,
                              std::function<void(World)> received_world_callback,
-                             std::shared_ptr<const RefboxConfig> refbox_config)
-    : network_filter(refbox_config),
+                             std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
+    : network_filter(sensor_fusion_config),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
       received_world_callback(received_world_callback),
-      refbox_config(refbox_config)
+      sensor_fusion_config(sensor_fusion_config)
 {
     ssl_vision_client =
         std::make_unique<ThreadedProtoMulticastListener<SSL_WrapperPacket>>(
@@ -78,8 +78,8 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             // We invert the field side if we explicitly choose to override the values
             // provided by refbox. The 'defending_positive_side' parameter dictates the
             // side we are defending if we are overriding the value
-            if (refbox_config->OverrideRefboxDefendingSide()->value() &&
-                refbox_config->DefendingPositiveSide()->value())
+            if (sensor_fusion_config->OverrideRefboxDefendingSide()->value() &&
+                sensor_fusion_config->DefendingPositiveSide()->value())
             {
                 invertFieldSide(detection);
             }
@@ -99,11 +99,11 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             }
 
             friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
-            int friendly_goalie_id = refbox_config->FriendlyGoalieId()->value();
+            int friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
             friendly_team.assignGoalie(friendly_goalie_id);
 
             enemy_team = network_filter.getFilteredEnemyTeamData({detection});
-            int enemy_goalie_id = refbox_config->EnemyGoalieId()->value();
+            int enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
             enemy_team.assignGoalie(enemy_goalie_id);
         }
     }

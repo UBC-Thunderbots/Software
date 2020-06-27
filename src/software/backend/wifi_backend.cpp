@@ -16,7 +16,7 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
                   network_config->GamecontrollerIP()->value(),
                   network_config->GamecontrollerPort()->value(),
                   boost::bind(&WifiBackend::receiveWorld, this, _1),
-                  DynamicParameters->getAIControlConfig()->getRefboxConfig()),
+                  DynamicParameters->getSensorFusionConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->VisionIP()->value(),

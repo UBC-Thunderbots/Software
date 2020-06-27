@@ -14,9 +14,9 @@ GrSimBackend::GrSimBackend(std::shared_ptr<const NetworkConfig> network_config)
     network_config->GamecontrollerIP()->value(),
     network_config->GamecontrollerPort()->value(),
     boost::bind(&GrSimBackend::receiveWorld, this, _1),
-    DynamicParameters->getAIControlConfig()->getRefboxConfig()),
+    DynamicParameters->getSensorFusionConfig()),
       grsim_output(GRSIM_COMMAND_NETWORK_ADDRESS, GRSIM_COMMAND_NETWORK_PORT,
-                   DynamicParameters->getAIControlConfig()->getRefboxConfig())
+                   DynamicParameters->getSensorFusionConfig())
 {
 }
 

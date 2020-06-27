@@ -87,8 +87,7 @@ void SensorFusion::updateWorld(const Referee &packet)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    if (DynamicParameters->getAIControlConfig()
-            ->getRefboxConfig()
+    if (DynamicParameters->getSensorFusionConfig()
             ->FriendlyColorYellow()
             ->value())
     {
@@ -132,11 +131,10 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
     double min_valid_x =
-        DynamicParameters->getAIControlConfig()->getRefboxConfig()->MinValidX()->value();
+        DynamicParameters->getSensorFusionConfig()->MinValidX()->value();
     double max_valid_x =
-        DynamicParameters->getAIControlConfig()->getRefboxConfig()->MaxValidX()->value();
-    bool ignore_invalid_camera_data = DynamicParameters->getAIControlConfig()
-                                          ->getRefboxConfig()
+        DynamicParameters->getSensorFusionConfig()->MaxValidX()->value();
+    bool ignore_invalid_camera_data = DynamicParameters->getSensorFusionConfig()
                                           ->IgnoreInvalidCameraData()
                                           ->value();
 
@@ -144,19 +142,16 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    bool should_invert_field = DynamicParameters->getAIControlConfig()
-                                   ->getRefboxConfig()
+    bool should_invert_field = DynamicParameters->getSensorFusionConfig()
                                    ->OverrideRefboxDefendingSide()
                                    ->value() &&
-                               DynamicParameters->getAIControlConfig()
-                                   ->getRefboxConfig()
+                               DynamicParameters->getSensorFusionConfig()
                                    ->DefendingPositiveSide()
                                    ->value();
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    bool friendly_team_is_yellow = DynamicParameters->getAIControlConfig()
-                                       ->getRefboxConfig()
+    bool friendly_team_is_yellow = DynamicParameters->getSensorFusionConfig()
                                        ->FriendlyColorYellow()
                                        ->value();
 
@@ -227,8 +222,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-    RobotId friendly_goalie_id = DynamicParameters->getAIControlConfig()
-                                     ->getRefboxConfig()
+    RobotId friendly_goalie_id = DynamicParameters->getSensorFusionConfig()
                                      ->FriendlyGoalieId()
                                      ->value();
     new_friendly_team.assignGoalie(friendly_goalie_id);
@@ -238,8 +232,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
-    RobotId enemy_goalie_id = DynamicParameters->getAIControlConfig()
-                                  ->getRefboxConfig()
+    RobotId enemy_goalie_id = DynamicParameters->getSensorFusionConfig()
                                   ->EnemyGoalieId()
                                   ->value();
     new_enemy_team.assignGoalie(enemy_goalie_id);
