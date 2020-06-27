@@ -15,14 +15,6 @@ class GrSimBackend : public Backend
    private:
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
-    // TODO: ou are here setting up backends with Dynamic params. See if can move this function to
-    // generic backend so all can make use of it? Bind param change to re-init network config
-    static NetworkClient setupNetworkClient(std::shared_ptr<const NetworkConfig> network_config,
-            std::shared_ptr<const RefboxConfig> refbox_config,
-    std::shared_ptr<const CameraConfig> camera_config,
-                                            const std::function<void(World)>& received_world_callback
-    );
-
     /**
      * Set the most recently received world
      *

@@ -8,15 +8,23 @@
 
 const std::string WifiBackend::name = "wifi";
 
-WifiBackend::WifiBackend()
-    : network_input(SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT,
-                    SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-                    SSL_GAMECONTROLLER_MULTICAST_PORT,
-                    boost::bind(&WifiBackend::receiveWorld, this, _1),
-                    DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    DynamicParameters->getCameraConfig()),
+WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
+        : network_config(network_config),
+          network_input(
+                  network_config->VisionIP()->value(),
+                  network_config->VisionPort()->value(),
+                  network_config->GamecontrollerIP()->value(),
+                  network_config->GamecontrollerPort()->value(),
+                  boost::bind(&WifiBackend::receiveWorld, this, _1),
+                  DynamicParameters->getAIControlConfig()->getRefboxConfig(),
+                  DynamicParameters->getCameraConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
-                       boost::bind(&Backend::receiveSSLReferee, this, _1))
+                       boost::bind(&Backend::receiveSSLReferee, this, _1),
+                       network_config->VisionIP()->value(),
+                       network_config->VisionPort()->value(),
+                       network_config->GamecontrollerIP()->value(),
+                       network_config->GamecontrollerPort()->value()
+                       )
 {
     std::string network_interface =
         DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
