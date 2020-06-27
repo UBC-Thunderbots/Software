@@ -7,6 +7,7 @@
 std::unique_ptr<RadioPrimitiveMsg> ProtobufPrimitiveVisitor::getRadioPrimitiveMsg(
     const Primitive &primitive)
 {
+    prim_msg_ptr.reset(nullptr);
     primitive.accept(*this);
     return std::move(prim_msg_ptr);
 }
