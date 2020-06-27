@@ -30,15 +30,14 @@ AIControlConfig:
         - "ShootOrChip Play"
     description: >-
         Specifies the ai play that should be in use
-  RefboxConfig:
-    OverrideRefboxPlay:
-      type: "bool"
-      default: false
-      description: >-
-          Overrides the current refbox play with the play
-          specified by currentPlay parameter
-    CurrentRefboxPlay:
-      type: "std::string"
-      default: "Halt"
-      description: >- 
-          Specifies the refbox play that should be in use
+  OverrideRefboxPlay:
+    type: "bool"
+    default: false
+    description: >-
+        Overrides the current refbox play with the play
+        specified by currentPlay parameter
+  CurrentRefboxPlay:
+    type: "std::string"
+    default: "Halt"
+    description: >-
+        Specifies the refbox play that should be in use
