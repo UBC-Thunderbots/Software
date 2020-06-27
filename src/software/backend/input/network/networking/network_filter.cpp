@@ -10,7 +10,8 @@
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
 // get any field data which will update the state with the given protobuf data
-NetworkFilter::NetworkFilter(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
+NetworkFilter::NetworkFilter(
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : field_state(),
       ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
       friendly_team_state(
@@ -133,8 +134,9 @@ std::optional<TimestampedBallState> NetworkFilter::getFilteredBallData(
             ball_detection.timestamp = Timestamp::fromSeconds(detection.t_capture());
 
             bool ball_position_invalid =
-                    sensor_fusion_config->MinValidX()->value() > ball_detection.position.x() ||
-                    sensor_fusion_config->MaxValidX()->value() < ball_detection.position.x();
+                sensor_fusion_config->MinValidX()->value() >
+                    ball_detection.position.x() ||
+                sensor_fusion_config->MaxValidX()->value() < ball_detection.position.x();
             bool ignore_ball = sensor_fusion_config->IgnoreInvalidCameraData()->value() &&
                                ball_position_invalid;
             if (!ignore_ball)
@@ -186,10 +188,12 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
 
 
             bool robot_position_invalid =
-                    sensor_fusion_config->MinValidX()->value() > robot_detection.position.x() ||
-                    sensor_fusion_config->MaxValidX()->value() < robot_detection.position.x();
-            bool ignore_robot = sensor_fusion_config->IgnoreInvalidCameraData()->value() &&
-                                robot_position_invalid;
+                sensor_fusion_config->MinValidX()->value() >
+                    robot_detection.position.x() ||
+                sensor_fusion_config->MaxValidX()->value() < robot_detection.position.x();
+            bool ignore_robot =
+                sensor_fusion_config->IgnoreInvalidCameraData()->value() &&
+                robot_position_invalid;
             if (!ignore_robot)
             {
                 friendly_robot_detections.push_back(robot_detection);
@@ -232,10 +236,12 @@ Team NetworkFilter::getFilteredEnemyTeamData(
             robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
             bool robot_position_invalid =
-                    sensor_fusion_config->MinValidX()->value() > robot_detection.position.x() ||
-                    sensor_fusion_config->MaxValidX()->value() < robot_detection.position.x();
-            bool ignore_robot = sensor_fusion_config->IgnoreInvalidCameraData()->value() &&
-                                robot_position_invalid;
+                sensor_fusion_config->MinValidX()->value() >
+                    robot_detection.position.x() ||
+                sensor_fusion_config->MaxValidX()->value() < robot_detection.position.x();
+            bool ignore_robot =
+                sensor_fusion_config->IgnoreInvalidCameraData()->value() &&
+                robot_position_invalid;
             if (!ignore_robot)
             {
                 enemy_robot_detections.push_back(robot_detection);

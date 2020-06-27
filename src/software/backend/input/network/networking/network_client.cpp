@@ -7,12 +7,11 @@
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 
-NetworkClient::NetworkClient(std::string vision_multicast_address,
-                             int vision_multicast_port,
-                             std::string gamecontroller_multicast_address,
-                             int gamecontroller_multicast_port,
-                             std::function<void(World)> received_world_callback,
-                             std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
+NetworkClient::NetworkClient(
+    std::string vision_multicast_address, int vision_multicast_port,
+    std::string gamecontroller_multicast_address, int gamecontroller_multicast_port,
+    std::function<void(World)> received_world_callback,
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : network_filter(sensor_fusion_config),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
@@ -102,7 +101,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             int friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
             friendly_team.assignGoalie(friendly_goalie_id);
 
-            enemy_team = network_filter.getFilteredEnemyTeamData({detection});
+            enemy_team          = network_filter.getFilteredEnemyTeamData({detection});
             int enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
             enemy_team.assignGoalie(enemy_goalie_id);
         }

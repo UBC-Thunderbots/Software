@@ -87,9 +87,7 @@ void SensorFusion::updateWorld(const Referee &packet)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    if (DynamicParameters->getSensorFusionConfig()
-            ->FriendlyColorYellow()
-            ->value())
+    if (DynamicParameters->getSensorFusionConfig()->FriendlyColorYellow()->value())
     {
         refbox_game_state = createRefboxGameState(packet, TeamColour::YELLOW);
     }
@@ -130,34 +128,29 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    double min_valid_x =
-        DynamicParameters->getSensorFusionConfig()->MinValidX()->value();
-    double max_valid_x =
-        DynamicParameters->getSensorFusionConfig()->MaxValidX()->value();
-    bool ignore_invalid_camera_data = DynamicParameters->getSensorFusionConfig()
-                                          ->IgnoreInvalidCameraData()
-                                          ->value();
+    double min_valid_x = DynamicParameters->getSensorFusionConfig()->MinValidX()->value();
+    double max_valid_x = DynamicParameters->getSensorFusionConfig()->MaxValidX()->value();
+    bool ignore_invalid_camera_data =
+        DynamicParameters->getSensorFusionConfig()->IgnoreInvalidCameraData()->value();
 
     // We invert the field side if we explicitly choose to override the values
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    bool should_invert_field = DynamicParameters->getSensorFusionConfig()
-                                   ->OverrideRefboxDefendingSide()
-                                   ->value() &&
-                               DynamicParameters->getSensorFusionConfig()
-                                   ->DefendingPositiveSide()
-                                   ->value();
+    bool should_invert_field =
+        DynamicParameters->getSensorFusionConfig()
+            ->OverrideRefboxDefendingSide()
+            ->value() &&
+        DynamicParameters->getSensorFusionConfig()->DefendingPositiveSide()->value();
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    bool friendly_team_is_yellow = DynamicParameters->getSensorFusionConfig()
-                                       ->FriendlyColorYellow()
-                                       ->value();
+    bool friendly_team_is_yellow =
+        DynamicParameters->getSensorFusionConfig()->FriendlyColorYellow()->value();
 
     std::optional<TimestampedBallState> new_ball_state;
-    auto ball_detections = createBallDetections(
-        {ssl_detection_frame}, min_valid_x, max_valid_x, ignore_invalid_camera_data);
+    auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
+                                                max_valid_x, ignore_invalid_camera_data);
     auto yellow_team =
         createTeamDetection({ssl_detection_frame}, TeamColour::YELLOW, min_valid_x,
                             max_valid_x, ignore_invalid_camera_data);
@@ -222,9 +215,8 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-    RobotId friendly_goalie_id = DynamicParameters->getSensorFusionConfig()
-                                     ->FriendlyGoalieId()
-                                     ->value();
+    RobotId friendly_goalie_id =
+        DynamicParameters->getSensorFusionConfig()->FriendlyGoalieId()->value();
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
@@ -232,9 +224,8 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
-    RobotId enemy_goalie_id = DynamicParameters->getSensorFusionConfig()
-                                  ->EnemyGoalieId()
-                                  ->value();
+    RobotId enemy_goalie_id =
+        DynamicParameters->getSensorFusionConfig()->EnemyGoalieId()->value();
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }

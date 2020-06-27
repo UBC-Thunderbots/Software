@@ -12,7 +12,8 @@
 class WifiBackend : public Backend
 {
    public:
-    WifiBackend(std::shared_ptr<const NetworkConfig> network_config = DynamicParameters->getNetworkConfig());
+    WifiBackend(std::shared_ptr<const NetworkConfig> network_config =
+                    DynamicParameters->getNetworkConfig());
 
     static const std::string name;
 

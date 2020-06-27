@@ -23,7 +23,8 @@ class NetworkFilter
     /**
      * Creates a new NetworkFilter for data input and filtering
      */
-    explicit NetworkFilter(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
+    explicit NetworkFilter(
+        std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
 
 
     /**

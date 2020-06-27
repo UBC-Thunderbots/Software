@@ -3,14 +3,15 @@
 #include "software/backend/backend.h"
 #include "software/backend/input/network/networking/network_client.h"
 #include "software/backend/output/grsim/grsim_output.h"
-#include "software/world/world.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/world/world.h"
 
 class GrSimBackend : public Backend
 {
    public:
     static const std::string name;
-    GrSimBackend(std::shared_ptr<const NetworkConfig> network_config = DynamicParameters->getNetworkConfig());
+    GrSimBackend(std::shared_ptr<const NetworkConfig> network_config =
+                     DynamicParameters->getNetworkConfig());
 
    private:
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;

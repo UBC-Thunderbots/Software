@@ -8,21 +8,19 @@
 const std::string RadioBackend::name = "radio";
 
 RadioBackend::RadioBackend(std::shared_ptr<const NetworkConfig> network_config)
-        : network_config(network_config),
-          network_input(
-                  network_config->VisionIP()->value(),
-                  network_config->VisionPort()->value(),
-                  network_config->GamecontrollerIP()->value(),
-                  network_config->GamecontrollerPort()->value(),
-                  boost::bind(&RadioBackend::receiveWorld, this, _1),
-                  DynamicParameters->getSensorFusionConfig()),
+    : network_config(network_config),
+      network_input(network_config->VisionIP()->value(),
+                    network_config->VisionPort()->value(),
+                    network_config->GamecontrollerIP()->value(),
+                    network_config->GamecontrollerPort()->value(),
+                    boost::bind(&RadioBackend::receiveWorld, this, _1),
+                    DynamicParameters->getSensorFusionConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->VisionIP()->value(),
                        network_config->VisionPort()->value(),
                        network_config->GamecontrollerIP()->value(),
-                       network_config->GamecontrollerPort()->value()
-                       ),
+                       network_config->GamecontrollerPort()->value()),
       radio_output(DEFAULT_RADIO_CONFIG,
                    boost::bind(&RadioBackend::receiveRobotStatus, this, _1))
 {

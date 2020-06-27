@@ -11,7 +11,8 @@ class RadioBackend : public Backend
    public:
     static const std::string name;
 
-    RadioBackend(std::shared_ptr<const NetworkConfig> network_config = DynamicParameters->getNetworkConfig());
+    RadioBackend(std::shared_ptr<const NetworkConfig> network_config =
+                     DynamicParameters->getNetworkConfig());
 
    private:
     static const int DEFAULT_RADIO_CONFIG = 0;
