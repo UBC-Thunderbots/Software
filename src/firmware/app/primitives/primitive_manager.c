@@ -19,7 +19,6 @@
 #include "firmware/app/primitives/direct_velocity_primitive.h"
 #include "firmware/app/primitives/direct_wheels_primitive.h"
 #include "firmware/app/primitives/dribble_primitive.h"
-#include "firmware/app/primitives/imu_test_primitive.h"
 #include "firmware/app/primitives/move_primitive.h"
 #include "firmware/app/primitives/pivot_primitive.h"
 #include "firmware/app/primitives/primitive.h"
@@ -36,46 +35,12 @@ struct PrimitiveManager
     pthread_mutex_t primitive_mutex;
 #endif
 
-    // The primitive that is currently operating.
-    const primitive_t *current_primitive_functions;
-
-    // The index number of the current primitive.
-    unsigned int current_primitive_index;
+    // The primitive that is currently running. If NULL then there is no primitive running
+    const primitive_t *current_primitive;
 
     // A pointer to the state of the current primitive
     void *current_primitive_state;
-
-    // The most recent primitive params used to start a primitive
-    primitive_params_t *previous_primitive_params;
 };
-
-/**
- * \brief The available movement primitives.
- *
- * This array is indexed by movement primitive number. If movement primitives
- * are added or removed, they must be added or removed in this array and it
- * must be kept in the same order as the enumeration in @c
- * software/mrf/constants.h.
- *
- * Make sure stop is always the first primitive.
- */
-static const primitive_t *const PRIMITIVES[] = {
-    &STOP_PRIMITIVE,             // index 0, do not change the order of stuff in this one
-    &MOVE_PRIMITIVE,             // 1
-    &DRIBBLE_PRIMITIVE,          // 2
-    &SHOOT_PRIMITIVE,            // 3
-    &CATCH_PRIMITIVE,            // 4
-    &PIVOT_PRIMITIVE,            // 5
-    &SPIN_PRIMITIVE,             // 6
-    &DIRECT_WHEELS_PRIMITIVE,    // 7
-    &DIRECT_VELOCITY_PRIMITIVE,  // 8
-    &IMU_TEST_PRIMITIVE,         // 9
-};
-
-/**
- * \brief The number of primitives.
- */
-#define PRIMITIVE_COUNT (sizeof(PRIMITIVES) / sizeof(*PRIMITIVES))
 
 /**
  * Lock the primitive mutex
@@ -121,10 +86,8 @@ PrimitiveManager_t *app_primitive_manager_create(void)
 #error "Could not determine what CPU this is being compiled for."
 #endif
 
-    manager->current_primitive_functions = NULL;
-    manager->current_primitive_index     = 254;
-    manager->current_primitive_state     = NULL;
-    manager->previous_primitive_params   = NULL;
+    manager->current_primitive       = NULL;
+    manager->current_primitive_state = NULL;
 
     return manager;
 }
@@ -136,55 +99,106 @@ void app_primitive_manager_destroy(PrimitiveManager_t *manager)
 
 void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
-                                             unsigned int primitive_index,
-                                             const primitive_params_t *params)
+                                             PrimitiveMsg primitive_msg)
 {
-    // We have both an assert statement and an if statement because we want to easily
-    // be able to see this case while debugging, but don't want to accidentally
-    // run a totally random primitive if we're compiling in optimized mode with no
-    // assertions
-    if (primitive_index >= PRIMITIVE_COUNT)
-    {
-        assert(false);
-        return;
-    }
-
     app_primitive_manager_lockPrimitiveMutex(manager);
 
-    if (!primitive_params_are_equal(manager->previous_primitive_params, params) ||
-        manager->current_primitive_index != primitive_index ||
-        app_primitive_manager_primitiveIsDirect(primitive_index))
+    app_primitive_manager_endCurrentPrimitive(manager, world);
+
+    // Figure out which primitive we're running by parsing the `oneof` field in the proto,
+    // then start it
+    switch (primitive_msg.which_primitive)
     {
-        if (manager->current_primitive_functions)
-        {
-            manager->current_primitive_functions->end(manager->current_primitive_state,
-                                                      world);
-            manager->current_primitive_functions->destroy_state(
-                manager->current_primitive_state);
-        }
-
-        FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
-        Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
-        Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
-
-        app_chicker_disableAutochip(chicker);
-        app_chicker_disableAutokick(chicker);
-        app_dribbler_setSpeed(dribbler, 0);
-        manager->current_primitive_functions = PRIMITIVES[primitive_index];
-        manager->current_primitive_index     = primitive_index;
-        manager->current_primitive_state =
-            manager->current_primitive_functions->create_state();
-        if (!manager->previous_primitive_params)
-        {
-            manager->previous_primitive_params =
-                (primitive_params_t *)malloc(sizeof(primitive_params_t));
-        }
-        *(manager->previous_primitive_params) = *params;
-        manager->current_primitive_functions->start(
-            params, manager->current_primitive_state, world);
+        // TODO: consider changing this to arg parsing so that we don't have primitives
+        //       directly depending on proto
+        case PrimitiveMsg_move_tag:
+            manager->current_primitive = &MOVE_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_move_primitive_start(primitive_msg.primitive.move,
+                                     manager->current_primitive_state, world);
+            break;
+        case PrimitiveMsg_stop_tag:
+            manager->current_primitive = &STOP_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_stop_primitive_start(primitive_msg.primitive.stop,
+                                     manager->current_primitive_state, world);
+            break;
+        case PrimitiveMsg_dribble_tag:
+            manager->current_primitive = &DRIBBLE_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_dribble_primitive_start(primitive_msg.primitive.dribble,
+                                        manager->current_primitive_state, world);
+            break;
+        case PrimitiveMsg_shoot_tag:
+            manager->current_primitive = &SHOOT_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_shoot_primitive_start(primitive_msg.primitive.shoot,
+                                      manager->current_primitive_state, world);
+            break;
+        case PrimitiveMsg_catch_tag:
+            manager->current_primitive = &CATCH_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_catch_primitive_start(primitive_msg.primitive.catch,
+                                      manager->current_primitive_state, world);
+            break;
+        case PrimitiveMsg_pivot_tag:
+            manager->current_primitive = &PIVOT_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_pivot_primitive_start(primitive_msg.primitive.pivot,
+                                      manager->current_primitive_state, world);
+            break;
+        case PrimitiveMsg_spin_tag:
+            manager->current_primitive = &SPIN_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_spin_primitive_start(primitive_msg.primitive.spin,
+                                     manager->current_primitive_state, world);
+            break;
+        case PrimitiveMsg_direct_wheels_tag:
+            manager->current_primitive = &DIRECT_WHEELS_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state;
+            app_direct_wheels_primitive_start(primitive_msg.primitive.direct_wheels,
+                                              manager->current_primitive_state, world);
+            break;
+        case PrimitiveMsg_direct_velocity_tag:
+            manager->current_primitive = &DIRECT_VELOCITY_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_direct_velocity_primitive_start(primitive_msg.primitive.direct_velocity,
+                                                manager->current_primitive_state, world);
+            break;
+        default:
+            // We both assert and set a new primitive here because we want to
+            // easily be able to see this case while debugging, but don't want to
+            // accidentally run a totally random primitive if we're compiling in optimized
+            // mode with no assertions. We set the current primitive to a stop
+            // primitive for safety
+            manager->current_primitive = &STOP_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            PrimitiveParamsMsg params = PrimitiveParamsMsg_init_zero;
+            app_stop_primitive_start(params, manager->current_primitive_state, world);
+            assert(false);
     }
 
     app_primitive_manager_unlockPrimitiveMutex(manager);
+}
+
+void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
+                                               FirmwareWorld_t *world)
+{
+    if (manager->current_primitive)
+    {
+        manager->current_primitive->end(manager->current_primitive_state, world);
+        manager->current_primitive->destroy_state(manager->current_primitive_state);
+
+        manager->current_primitive = NULL;
+    }
+
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
+    Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
+
+    app_chicker_disableAutochip(chicker);
+    app_chicker_disableAutokick(chicker);
+    app_dribbler_setSpeed(dribbler, 0);
 }
 
 void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
@@ -192,21 +206,10 @@ void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
 {
     app_primitive_manager_lockPrimitiveMutex(manager);
 
-    if (manager->current_primitive_functions)
+    if (manager->current_primitive)
     {
-        manager->current_primitive_functions->tick(manager->current_primitive_state,
-                                                   world);
+        manager->current_primitive->tick(manager->current_primitive_state, world);
     }
 
     app_primitive_manager_unlockPrimitiveMutex(manager);
-}
-
-unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t *manager)
-{
-    return manager->current_primitive_index;
-}
-
-bool app_primitive_manager_primitiveIsDirect(unsigned int primitive)
-{
-    return PRIMITIVES[primitive]->direct;
 }

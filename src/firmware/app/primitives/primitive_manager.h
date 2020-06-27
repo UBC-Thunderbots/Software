@@ -2,6 +2,7 @@
 
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/world/firmware_world.h"
+#include "shared/proto/primitive.pb.h"
 
 typedef struct PrimitiveManager PrimitiveManager_t;
 
@@ -18,18 +19,20 @@ PrimitiveManager_t *app_primitive_manager_create(void);
  */
 void app_primitive_manager_destroy(PrimitiveManager_t *manager);
 
-/**
- * Sets the current primitive to a new one
- *
- * @param manager The primitive manager to set the current primitive on
- * @param world The world to run the primitive in
- * @param primitive_index The index of the primitive to run
- * @param params The parameters for the primitive
- */
+// TODO: jdoc
 void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
-                                             unsigned int primitive_index,
-                                             const primitive_params_t *params);
+                                             PrimitiveMsg primitive_msg);
+
+// TODO: jdoc
+void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
+                                               FirmwareWorld_t *world);
+
+// TODO: re-sort these functions
+
+// TODO: jdoc
+// TODO: make this private?
+primitive_t *app_primitive_manager_getPrimitiveFromMsg(PrimitiveMsg primitiveMsg);
 
 /**
  * Runs the current primitive
@@ -49,10 +52,3 @@ void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
  */
 unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t *manager);
 
-/**
- * Checks whether a particular primitive is direct.
- *
- * @param primitive the primitive to check
- * @return true if the primitive is direct primitive, false otherwise
- */
-bool app_primitive_manager_primitiveIsDirect(unsigned int primitive);

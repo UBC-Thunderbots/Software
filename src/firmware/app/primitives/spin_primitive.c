@@ -23,8 +23,8 @@ typedef struct SpinPrimitiveState
 } SpinPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(SpinPrimitiveState_t)
 
-static void spin_start(const primitive_params_t *p, void *void_state_ptr,
-                       FirmwareWorld_t *world)
+void app_spin_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+                              FirmwareWorld_t* world)
 {
     SpinPrimitiveState_t *state = (SpinPrimitiveState_t *)void_state_ptr;
 
@@ -34,11 +34,11 @@ static void spin_start(const primitive_params_t *p, void *void_state_ptr,
     //              param[3]: g_end_speed       [millimeter/s]
 
     // Parse the parameters with the standard units
-    state->x_final    = (float)p->params[0] / 1000.0f;
-    state->y_final    = (float)p->params[1] / 1000.0f;
-    state->avel_final = (float)p->params[2] / 100.0f;
-    state->end_speed  = (float)p->params[3] / 1000.0f;
-    state->slow       = p->slow;
+    state->x_final    = (float)params.parameter1 / 1000.0f;
+    state->y_final    = (float)params.parameter2 / 1000.0f;
+    state->avel_final = (float)params.parameter3 / 100.0f;
+    state->end_speed  = (float)params.parameter4     / 1000.0f;
+    state->slow       = params.slow;
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 
@@ -140,7 +140,6 @@ static void spin_tick(void *void_state_ptr, FirmwareWorld_t *world)
  * \brief The spin movement primitive.
  */
 const primitive_t SPIN_PRIMITIVE = {.direct        = false,
-                                    .start         = &spin_start,
                                     .end           = &spin_end,
                                     .tick          = &spin_tick,
                                     .create_state  = &createSpinPrimitiveState_t,

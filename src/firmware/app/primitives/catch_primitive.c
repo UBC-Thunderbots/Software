@@ -38,15 +38,15 @@ typedef struct CatchPrimitiveState
 } CatchPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(CatchPrimitiveState_t)
 
-static void catch_start(const primitive_params_t* params, void* void_state_ptr,
+void app_catch_primitive_start(const PrimitiveParamsMsg params, void* void_state_ptr,
                         FirmwareWorld_t* world)
 {
     CatchPrimitiveState_t* state = (CatchPrimitiveState_t*)void_state_ptr;
 
     // pass params in
-    state->catchvelocity  = (float)params->params[0];
-    state->catchmargin    = (float)params->params[2];
-    state->dribbler_speed = (float)params->params[1];
+    state->catchvelocity  = (float)params.parameter1;
+    state->catchmargin    = (float)params.parameter2;
+    state->dribbler_speed = (float)params.parameter3;
 
     Dribbler_t* dribbler =
         app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
@@ -241,7 +241,6 @@ static void catch_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * \brief The catch movement primitive.
  */
 const primitive_t CATCH_PRIMITIVE = {.direct        = false,
-                                     .start         = &catch_start,
                                      .end           = &catch_end,
                                      .tick          = &catch_tick,
                                      .create_state  = &createCatchPrimitiveState_t,

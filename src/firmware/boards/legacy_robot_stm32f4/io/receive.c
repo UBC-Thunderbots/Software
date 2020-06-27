@@ -184,10 +184,11 @@ void receive_tick(log_record_t *record)
         charger_enable(false);
         chicker_discharge(true);
 
-        primitive_params_t stop_params;
+        PrimitiveMsg primitive_msg    = PrimitiveMsg_init_zero;
+        primitive_msg.which_primitive = PrimitiveMsg_stop_tag;
+
         xSemaphoreTake(drive_mtx, portMAX_DELAY);
-        app_primitive_manager_startNewPrimitive(primitive_manager, world, 0,
-                                                &stop_params);
+        app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive_msg);
         xSemaphoreGive(drive_mtx);
     }
     else if (timeout_ticks > 1)
@@ -218,18 +219,12 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     timeout_ticks = 1000U / portTICK_PERIOD_MS;
 
     // Figure out what primitive to run
-    primitive_params_t pparams = {0};
-    unsigned int primitive     = 0;
+    PrimitiveMsg prim_msg = PrimitiveMsg_init_zero;
     if (estop_triggered)
     {
-        // Set the primitive to be a stop primitive
-        primitive         = 0;
-        pparams.params[0] = 0;
-        pparams.params[1] = 0;
-        pparams.params[2] = 0;
-        pparams.params[3] = 0;
-        pparams.slow      = true;
-        pparams.extra     = 0;
+        // Set the primitive to bring the robot to a stop
+        prim_msg.which_primitive     = PrimitiveMsg_stop_tag;
+        prim_msg.primitive.stop.slow = true;
 
         // Disable charging and discharge through chicker
         charger_enable(false);
@@ -239,22 +234,12 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     {
         // Decode the primitive
         pb_istream_t pb_in_stream = pb_istream_from_buffer(packet_data, packet_size - 3);
-        PrimitiveMsg prim_msg     = PrimitiveMsg_init_zero;
         if (!pb_decode(&pb_in_stream, PrimitiveMsg_fields, &prim_msg))
         {
             // If we failed to decode the message, it's likely malformed, so we should not
             // proceed
             return;
         }
-
-        pparams.slow      = prim_msg.slow;
-        pparams.extra     = prim_msg.extra_bits;
-        pparams.params[0] = prim_msg.parameter1;
-        pparams.params[1] = prim_msg.parameter2;
-        pparams.params[2] = prim_msg.parameter3;
-        pparams.params[3] = prim_msg.parameter3;
-
-        primitive = prim_msg.prim_type;
 
         // Enable charging
         charger_enable(true);
@@ -264,8 +249,7 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     // Take the drive mutex.
     xSemaphoreTake(drive_mtx, portMAX_DELAY);
 
-    app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
-                                            &pparams);
+    app_primitive_manager_startNewPrimitive(primitive_manager, world, prim_msg);
 
     // Release the drive mutex.
     xSemaphoreGive(drive_mtx);

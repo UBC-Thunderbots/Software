@@ -1,6 +1,19 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "primitive_from_proto",
+    srcs = ["primitive_from_proto.c"],
+    hdrs = ["primitive_from_proto.h"],
+    deps = [
+        "//firmware/app/primitives:move",
+        "//firmware/app/primitives:primitive",
+        "//firmware/app/primitives:stop",
+        "//shared/proto:tbots_nanopb_proto",
+        "@nanopb",
+    ],
+)
+
+cc_library(
     name = "accurate_shoot",
     srcs = ["accurate_shoot_primitive.c"],
     hdrs = ["accurate_shoot_primitive.h"],
@@ -23,6 +36,7 @@ cc_library(
         "//firmware/app/control:bangbang",
         "//firmware/shared:physics",
         "//firmware/shared:util",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -33,6 +47,7 @@ cc_library(
     deps = [
         ":primitive",
         "//firmware/app/control",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -42,6 +57,7 @@ cc_library(
     hdrs = ["direct_wheels_primitive.h"],
     deps = [
         ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -54,18 +70,7 @@ cc_library(
         "//firmware/app/control",
         "//firmware/app/control:bangbang",
         "//firmware/shared:physics",
-    ],
-)
-
-cc_library(
-    name = "imu_test",
-    srcs = ["imu_test_primitive.c"],
-    hdrs = ["imu_test_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -82,6 +87,7 @@ cc_library(
         "//firmware/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -94,12 +100,12 @@ cc_library(
         "//firmware/app/control",
         "//firmware/app/control:bangbang",
         "//firmware/shared:util",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
 cc_library(
     name = "primitive",
-    srcs = ["primitive.c"],
     hdrs = ["primitive.h"],
     deps = [
         "//firmware/app/world:firmware_world",
@@ -123,7 +129,6 @@ cc_library(
         ":direct_velocity",
         ":direct_wheels",
         ":dribble",
-        ":imu_test",
         ":move",
         ":pivot",
         ":primitive",
@@ -149,6 +154,7 @@ cc_library(
         "//firmware/app/control:physbot",
         "//firmware/shared:physics",
         "//firmware/shared:util",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -161,6 +167,7 @@ cc_library(
         "//firmware/app/control",
         "//firmware/app/control:bangbang",
         "//firmware/shared:physics",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -170,5 +177,6 @@ cc_library(
     hdrs = ["stop_primitive.h"],
     deps = [
         ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )

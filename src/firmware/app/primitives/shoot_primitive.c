@@ -59,8 +59,8 @@ void plan_shoot_rotation(PhysBot *pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-static void shoot_start(const primitive_params_t *params, void *void_state_ptr,
-                        FirmwareWorld_t *world)
+void app_shoot_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+                               FirmwareWorld_t* world)
 {
     ShootPrimitiveState_t *state = (ShootPrimitiveState_t *)void_state_ptr;
     /**
@@ -86,9 +86,9 @@ static void shoot_start(const primitive_params_t *params, void *void_state_ptr,
      */
 
     // Convert into m/s and rad/s because physics is in m and s
-    state->destination[0] = ((float)(params->params[0]) / 1000.0f);
-    state->destination[1] = ((float)(params->params[1]) / 1000.0f);
-    state->destination[2] = ((float)(params->params[2]) / 100.0f);
+    state->destination[0] = ((float)(params.parameter1) / 1000.0f);
+    state->destination[1] = ((float)(params.parameter2) / 1000.0f);
+    state->destination[2] = ((float)(params.parameter3) / 100.0f);
 
     // cosine and sine of orientation angle to global x axis
     state->major_vec[0] = cosf(state->destination[2]);
@@ -101,8 +101,8 @@ static void shoot_start(const primitive_params_t *params, void *void_state_ptr,
 
     state->total_rot =
         min_angle_delta(state->destination[2], app_firmware_robot_getOrientation(robot));
-    float shoot_power = (float)params->params[3] / 1000.0f;
-    bool chip         = params->extra & 1;
+    float shoot_power = (float)params.parameter4 / 1000.0f;
+    bool chip         = params.extra_bits & 1;
 
     Chicker_t *chicker =
         app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
@@ -155,7 +155,6 @@ static void shoot_tick(void *void_state_ptr, FirmwareWorld_t *world)
  * \brief The shoot movement primitive.
  */
 const primitive_t SHOOT_PRIMITIVE = {.direct        = false,
-                                     .start         = &shoot_start,
                                      .end           = &shoot_end,
                                      .tick          = &shoot_tick,
                                      .create_state  = &createShootPrimitiveState_t,

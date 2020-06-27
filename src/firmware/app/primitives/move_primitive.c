@@ -149,8 +149,8 @@ void plan_move_rotation(PhysBot* pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void move_start(const primitive_params_t* params, void* void_state_ptr,
-                FirmwareWorld_t* world)
+void app_move_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+                              FirmwareWorld_t* world)
 {
     MovePrimitiveState_t* state = (MovePrimitiveState_t*)void_state_ptr;
     // Parameters:     destination_x [mm]
@@ -159,11 +159,11 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
     //                end_speed [millimeter/s]
 
     // Convert into m/s and rad/s because physics is in m and s
-    state->destination[0] = (float)(params->params[0]) / 1000.0f;
-    state->destination[1] = (float)(params->params[1]) / 1000.0f;
-    state->destination[2] = (float)(params->params[2]) / 100.0f;
-    state->end_speed      = (float)(params->params[3]) / 1000.0f;
-    state->slow           = params->slow;
+    state->destination[0] = (float)(params.parameter1) / 1000.0f;
+    state->destination[1] = (float)(params.parameter2) / 1000.0f;
+    state->destination[2] = (float)(params.parameter3) / 100.0f;
+    state->end_speed      = (float)(params.parameter4) / 1000.0f;
+    state->slow           = params.slow;
 
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
@@ -184,11 +184,11 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
     Chicker_t* chicker   = app_firmware_robot_getChicker(robot);
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
 
-    if (params->extra & 0x01)
+    if (params.extra_bits & 0x01)
         app_chicker_enableAutokick(chicker, (float)BALL_MAX_SPEED_METERS_PER_SECOND - 1);
-    if (params->extra & 0x02)
+    if (params.extra_bits & 0x02)
         app_dribbler_setSpeed(dribbler, 16000);
-    if (params->extra & 0x04)
+    if (params.extra_bits & 0x04)
         app_chicker_enableAutochip(chicker, 2);
 }
 
@@ -251,7 +251,6 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * The move movement primitive.
  */
 const primitive_t MOVE_PRIMITIVE = {.direct        = false,
-                                    .start         = &move_start,
                                     .end           = &move_end,
                                     .tick          = &move_tick,
                                     .create_state  = &createMovePrimitiveState_t,
