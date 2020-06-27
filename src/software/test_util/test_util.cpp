@@ -183,7 +183,7 @@ namespace TestUtil
     {
         // subtracting one fixed epsilon to account for the error in fabs and one fixed
         // epsilon to account for the error in subtracting the two vals
-        double difference = fabs(val1 - val2) - ::FIXED_EPSILON * 2;
+        double difference = fabs(val1 - val2) -FIXED_EPSILON * 2;
         if (difference < tolerance)
         {
             return ::testing::AssertionSuccess();

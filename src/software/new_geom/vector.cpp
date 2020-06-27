@@ -163,7 +163,7 @@ std::ostream &operator<<(std::ostream &os, const Vector &v)
 
 bool operator==(const Vector &u, const Vector &v)
 {
-    return (u - v).lengthSquared() < ::FIXED_EPSILON;
+    return (u - v).lengthSquared() <FIXED_EPSILON;
 }
 
 bool operator!=(const Vector &u, const Vector &v)
