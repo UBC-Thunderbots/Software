@@ -5,6 +5,7 @@ cc_library(
     srcs = [],
     hdrs = ["constants.h"],
     deps = [],
+    alwayslink = True,
 )
 
 cc_library(

@@ -1,5 +1,5 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("//defs:nanopb.bzl", "nanopb_proto_library")
+load("//shared/proto:nanopb.bzl", "nanopb_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 

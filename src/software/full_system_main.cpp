@@ -10,8 +10,6 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-
-using namespace boost::program_options;
 // Member variables we need to maintain state
 // They are kept in an anonymous namespace so they are not accessible outside this
 // file and are not created as global static variables.
@@ -76,26 +74,27 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     std::string backend_help_str =
         "The backend that you would like to use, one of: " + all_backend_names;
 
-    options_description desc{"Options"};
+    boost::program_options::options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
-                       "Help screen")("backend",
-                                      value<std::string>(&args.backend_name)->required(),
-                                      backend_help_str.c_str())(
-        "headless", boost::program_options::bool_switch(&args.headless),
-        "Run without the Visualizer");
+                       "Help screen")(
+        "backend",
+        boost::program_options::value<std::string>(&args.backend_name)->required(),
+        backend_help_str.c_str())("headless",
+                                  boost::program_options::bool_switch(&args.headless),
+                                  "Run without the Visualizer");
 
-    variables_map vm;
+    boost::program_options::variables_map vm;
     try
     {
-        store(parse_command_line(argc, argv, desc), vm);
-        notify(vm);
+        boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+        boost::program_options::notify(vm);
 
         if (args.help)
         {
             std::cout << desc << std::endl;
         }
     }
-    catch (const error &ex)
+    catch (const boost::program_options::error &ex)
     {
         std::cerr << ex.what() << '\n';
         args.err = true;

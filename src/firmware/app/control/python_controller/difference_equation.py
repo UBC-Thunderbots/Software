@@ -56,7 +56,7 @@ class DifferenceEquation:
         aka self.__numerator_order
         """
 
-        # Calcualte the effect of the input history has on the output
+        # Calculate the effect of the input history has on the output
         input_response = 0
         history_index_shift = self.__system_order - self.__numerator_order
         for i in range(history_index_shift, self.__system_order):

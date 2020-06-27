@@ -108,3 +108,10 @@ const unsigned PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
 const unsigned ROBOT_STATUS_PORT = 42071;
+
+// the timeout to recv a network packet
+const unsigned NETWORK_TIMEOUT_MS = 1000;
+
+// maximum transfer unit of the network interface
+// this is an int to avoid Wconversion with lwip
+const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
