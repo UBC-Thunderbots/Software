@@ -13,7 +13,7 @@
 # - All 'name' attributes must be unique per-file
 # - All 'name' attribute values should be snake_case. Spaces are not allowed.
 # - All config file names must be unique
-
+ 
 #########################################################################################
 # The following are examples of how to include other configs
 #########################################################################################
@@ -42,7 +42,7 @@ include:
     description: >
       Can be true or false
 - int:
-    name: example_bool_param
+    name: example_int_param
     min: 0
     max: 5
     value: 3
