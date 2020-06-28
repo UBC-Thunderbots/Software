@@ -1,4 +1,6 @@
 #pragma once
+#include <stdbool.h>
+
 // Parameter for C
 //
 // Parameters for C will ALWAYS be immutable. We won't have a UI updating these
@@ -18,27 +20,29 @@
 // The compiler will NOT allow assignment to these structs without a struct initializer.
 // These struct initializers are auto generated from the yaml, OR can be created manually
 // when needed for testing.
-typedef struct BoolParameter
-{
-    const bool value;
-} BoolParameter_t;
+typedef struct BoolParameter BoolParameter_t;
+typedef struct StringParameter StringParameter_t;
+typedef struct FloatParameter FloatParameter_t;
+typedef struct IntegerParameter IntegerParameter_t;
+typedef struct UnsignedIntegerParameter UnsignedIntegerParameter_t;
 
-typedef struct IntegerParameter
-{
-    const int value;
-} IntegerParameter_t;
+float app_dynamic_parameters_getFloatValue(const FloatParameter_t* param);
+int app_dynamic_parameters_getIntegerValue(const IntegerParameter_t* param);
+unsigned app_dynamic_parameters_getUnsignedIntegerValue(
+    const UnsignedIntegerParameter_t* param);
+const char* app_dynamic_parameters_getStringValue(const StringParameter_t* param);
+bool app_dynamic_parameters_getBoolValue(const BoolParameter_t* param);
 
-typedef struct UnsignedIntegerParameter
-{
-    const unsigned value;
-} UnsignedIntegerParameter_t;
+const FloatParameter_t* app_dynamic_parameters_createFloatParameter(float value);
+const IntegerParameter_t* app_dynamic_parameters_createIntegerParameter(int value);
+const UnsignedIntegerParameter_t* app_dynamic_parameters_createUnsignedIntegerParameter(
+    unsigned value);
+const StringParameter_t* app_dynamic_parameters_createStringParameter(const char* value);
+const BoolParameter_t* app_dynamic_parameters_createBoolParameter(bool value);
 
-typedef struct FloatParameter
-{
-    const float value;
-} FloatParameter_t;
-
-typedef struct StringParameter
-{
-    const char* value;
-} StringParameter_t;
+void app_dynamic_parameters_destroyFloatParameter(const FloatParameter_t* param);
+void app_dynamic_parameters_destroyIntegerParameter(const IntegerParameter_t* param);
+void app_dynamic_parameters_destroyUnsignedIntegerParameter(
+    const UnsignedIntegerParameter_t* param);
+void app_dynamic_parameters_destroyStringParameter(const StringParameter_t* param);
+void app_dynamic_parameters_destroyBoolParameter(const BoolParameter_t* param);
