@@ -4,6 +4,8 @@ import sys
 import control as ct
 from control.matlab import *
 
+# {} required to format string
+# {{{}}} required to format string, initialize array, and 'escape' brackets
 CONTROLLER_DIFFERENCE_EQUATION_COEFFICIENTS = """
 #define WHEEL_SPEED_CONTROLLER_TICK_TIME 1e7
 #define GENERATED_NUM_WHEEL_SPEED_COEFFICIENTS {numerator_length};
