@@ -1,30 +1,22 @@
 #pragma once
 // Parameter for C
 //
-// NOTE: Parameters for C will ALWAYS be immutable.
-// We don't use an psuedo-class here to keep things simple
+// Parameters for C will ALWAYS be immutable. We won't have a UI updating these
+// values on the robot.
 //
-// - we don't want parameters to be a way of passing data between tasks, there are plenty
-// of rtos
-//   message passing techniques we can use (queues, notifications, binary-sempahores,
-//   etc...)
-// - keeps the api simpler, only allow create, access and destroy of parameters/configs in
-// c
+// In the future if we chose to support sending dynamic parameters over the
+// network, we can simply replace the existing param tree with the updated one.
 //
-// It is garunteed that don't change after `initAppDynamicParameters()` has been called
+// We don't use an psuedo-class here to keep things simple as we can make use of
+// compile time checks to provide immutability. (without hiding the contents of
+// the struct in the c file)
 //
-// legal usage:
-//      ExampleConfig->FooConfig->example_bool.value
-//      ExampleConfig->FooConfig->example_int.value
-//
-// illegal usage
-//      ExampleConfig->FooConfig->example_int.value = 100
+// It is garunteed that the values don't change after `app_dynamic_parameters_create()`
+// has been called
 //
 // The compiler will NOT allow assignment to these structs without a struct initializer.
-//
-// However: nothing is preventing someone from "re-initializing" the struct leading to
-// undefined behaviour. This can NOT be caught at compile time for obvious reasons.
-
+// These struct initializers are auto generated from the yaml, OR can be created manually
+// when needed for testing.
 typedef struct BoolParameter
 {
     const bool value;

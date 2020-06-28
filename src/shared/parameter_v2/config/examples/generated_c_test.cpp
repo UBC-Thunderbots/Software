@@ -42,13 +42,10 @@ TEST(BasicAccess, test_that_we_can_test_with_nested_configs)
     };
 
     ExampleConfig_t example_config_init = {
-        .FooConfig          = &foo_config,
-        .BarConfig          = &bar_config,
-        .example_bool_param = {.value = true},
-        .example_unsigned_int_param =
-            {
-                .value = 3,
-            },
+        .FooConfig            = &foo_config,
+        .BarConfig            = &bar_config,
+        .example_bool_param   = {.value = true},
+        .example_uint_param   = {.value = 3},
         .example_int_param    = {.value = 3},
         .example_float_param  = {.value = 4.0f},
         .example_string_param = {.value = "Hello World"}};
