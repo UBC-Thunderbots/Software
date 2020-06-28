@@ -12,9 +12,7 @@
  * value can be changed during runtime.
  *
  * In our codebase, we currently support bool, int, double, and strings
- *
  * */
-
 template <class T>
 class Parameter
 {
@@ -35,10 +33,6 @@ class Parameter
         this->min_     = parameter_min;
         this->max_     = parameter_max;
         this->options_ = parameter_options;
-
-        // TODO remove registry once Visuzlier uses new structure
-        // https://github.com/UBC-Thunderbots/Software/issues/960
-        Parameter<T>::registerParameter(this);
     }
 
     /**
@@ -122,50 +116,7 @@ class Parameter
         callback_functions.emplace_back(callback);
     }
 
-    /**
-     * Returns a reference to the Parameter registry. The registry is a list of
-     * pointers to all the existing Parameters.
-     *
-     * @return An immutable reference to the Parameter registry
-     */
-    static const std::vector<Parameter<T>*>& getRegistry()
-    {
-        return Parameter<T>::getMutableRegistry();
-    }
-
-    /**
-     * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
-     * into the registry, the pointer may not be accessed by the caller after this
-     * function has been called.
-     *
-     * Also registers params to the static configuration msg used to
-     * set parameters
-     *
-     * @param parameter A unique pointer to the Parameter to add. This pointer may not
-     * be accessed by the caller after this function has been called.
-     */
-    static void registerParameter(Parameter<T>* parameter)
-    {
-        Parameter<T>::getMutableRegistry().emplace_back(parameter);
-    }
-
    private:
-    /**
-     * Returns a mutable reference to the Parameter registry. This is the same as the
-     * above getRegistry() function, except that it returns a mutable reference. We need a
-     * mutable version so that member functions can modify the registry. The function is
-     * private so that external sources cannot modify the registry in unexpected ways.
-     *
-     * @return A mutable reference to the Parameter registry
-     */
-    static std::vector<Parameter<T>*>& getMutableRegistry()
-    {
-        // our registry needs to hold onto a unique mutex to access the parameters in the
-        // registry as mutexes cannot be moved or copied
-        static std::vector<Parameter<T>*> instance;
-        return instance;
-    }
-
     // the value mutex is marked mutable so it can be used when accessing the value
     // of this parameter in a const function.
     mutable std::mutex value_mutex_;

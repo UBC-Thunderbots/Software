@@ -6,7 +6,7 @@
 
 #include "software/backend/input/network/networking/network_filter.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
-#include "software/parameter/config.hpp"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/world/world.h"

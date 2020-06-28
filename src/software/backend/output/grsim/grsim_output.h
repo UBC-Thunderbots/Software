@@ -5,7 +5,7 @@
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
-#include "software/parameter/config.hpp"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/primitive/primitive.h"
 #include "software/proto/grSim_Packet.pb.h"
 #include "software/world/ball.h"
