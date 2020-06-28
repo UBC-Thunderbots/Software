@@ -50,7 +50,7 @@ py_test(
 )
 
 genrule(
-    name = "config_cc_generate",
+    name = "controller_coefficients_cc_generate",
     outs = [
         "generated_controller_coefficients.h",
     ],
