@@ -137,11 +137,11 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    bool should_invert_field =
-        DynamicParameters->getSensorFusionConfig()
+    const bool override_refbox_defending_side = DynamicParameters->getSensorFusionConfig()
             ->OverrideRefboxDefendingSide()
-            ->value() &&
-        DynamicParameters->getSensorFusionConfig()->DefendingPositiveSide()->value();
+            ->value();
+    const bool defending_positive_side =DynamicParameters->getSensorFusionConfig()->DefendingPositiveSide()->value(); 
+    const bool should_invert_field = override_refbox_defending_side && defending_positive_side;
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
