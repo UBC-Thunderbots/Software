@@ -28,14 +28,22 @@ cc_library(
 )
 
 cc_library(
+    name = "config",
+    hdrs = ["config.h"],
+    deps = [],
+)
+
+cc_library(
     name = "dynamic_parameters",
     srcs = ["dynamic_parameters.cpp"],
     hdrs = [
-        "generated_dynamic_parameters.hpp",
-        "config.h",
         "dynamic_parameters.h",
+        "generated_dynamic_parameters.hpp",
     ],
-    deps = [":parameter"],
+    deps = [
+        ":config",
+        ":parameter",
+    ],
 )
 
 cc_test(
