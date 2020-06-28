@@ -35,7 +35,7 @@ AIControlConfig:
     default: false
     description: >-
         Overrides the current refbox play with the play
-        specified by currentPlay parameter
+        specified by currentAIPlay parameter
   CurrentRefboxPlay:
     type: "std::string"
     default: "Halt"
