@@ -1,20 +1,12 @@
-//
-// Created by roark on 28/03/19.
-//
-
 #include "software/math/math_functions.h"
 
 #include <algorithm>
 
-namespace Util
+double linear(double value, double offset, double linear_width)
 {
-    double linear(double value, double offset, double linear_width)
-    {
-        double width_coef = 1 / linear_width;
-        return std::clamp((width_coef * (value - offset) + 0.5), 0.0, 1.0);
-    }
-
-}  // namespace Util
+    double width_coef = 1 / linear_width;
+    return std::clamp((width_coef * (value - offset) + 0.5), 0.0, 1.0);
+}
 
 double rectangleSigmoid(const Rectangle& rect, const Point& point,
                         const double& sig_width)

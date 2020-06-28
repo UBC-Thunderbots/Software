@@ -286,11 +286,11 @@ static void low_level_init(struct netif *netif)
     uint8_t MACAddr[6];
     heth.Instance            = ETH;
     MACAddr[0]               = 0x00;
-    MACAddr[1]               = 0xAA;
-    MACAddr[2]               = 0xAA;
-    MACAddr[3]               = 0xAA;
-    MACAddr[4]               = 0xAA;
-    MACAddr[5]               = 0x00;
+    MACAddr[1]               = 0xAF;
+    MACAddr[2]               = 0x3C;
+    MACAddr[3]               = 0xF6;
+    MACAddr[4]               = 0x99;
+    MACAddr[5]               = 0x9C;
     heth.Init.MACAddr        = &MACAddr[0];
     heth.Init.MediaInterface = HAL_ETH_RMII_MODE;
     heth.Init.TxDesc         = DMATxDscrTab;
@@ -298,7 +298,8 @@ static void low_level_init(struct netif *netif)
     heth.Init.RxBuffLen      = 1524;
 
     /* USER CODE BEGIN MACADDRESS */
-
+    // TODO configure MAC address based on ROBOT ID
+    // https://github.com/UBC-Thunderbots/Software/issues/1517
     /* USER CODE END MACADDRESS */
 
     hal_eth_init_status = HAL_ETH_Init(&heth);

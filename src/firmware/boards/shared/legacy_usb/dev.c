@@ -36,8 +36,6 @@
 
 #include "internal.h"
 
-
-
 /**
  * \cond INTERNAL
  */

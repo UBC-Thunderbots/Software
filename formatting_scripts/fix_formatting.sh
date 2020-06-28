@@ -65,7 +65,7 @@ function run_black_formatting () {
 }
 
 function run_code_spell(){
-    echo "Fixing spellings..."
+    echo "Fixing spelling..."
     cd $CURR_DIR/../src/software && codespell -w
     cd $CURR_DIR/../src/firmware_new && codespell -w
     cd $CURR_DIR/../src/firmware/app && codespell -w

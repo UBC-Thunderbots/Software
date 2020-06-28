@@ -2,26 +2,23 @@
 #include <algorithm>
 #include <set>
 
-namespace RobotCapabilities
+enum class RobotCapability
 {
-    enum class Capability
-    {
-        Dribble,
-        Kick,
-        Chip,
-        Move
-    };
+    Dribble,
+    Kick,
+    Chip,
+    Move
+};
 
-    /**
-     * Returns a set of all capabilities.
-     * @return a set of all capabilities
-     */
-    inline std::set<Capability> allCapabilities()
-    {
-        return {Capability::Dribble, Capability::Kick, Capability::Chip,
-                Capability::Move};
-    }
-};  // namespace RobotCapabilities
+/**
+ * Returns a set of all capabilities.
+ * @return a set of all capabilities
+ */
+inline std::set<RobotCapability> allRobotCapabilities()
+{
+    return {RobotCapability::Dribble, RobotCapability::Kick, RobotCapability::Chip,
+            RobotCapability::Move};
+}
 
 // utility operators below for comparing capabilities
 

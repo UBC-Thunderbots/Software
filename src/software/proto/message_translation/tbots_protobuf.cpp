@@ -5,7 +5,7 @@
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "shared/proto/vision.pb.h"
 #include "software/primitive/primitive.h"
-#include "software/proto/message_translation/tbots_protobuf_primitive_visitor.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/world/world.h"
 
 std::unique_ptr<VisionMsg> createVisionMsg(const World& world)
@@ -34,16 +34,16 @@ std::unique_ptr<VisionMsg> createVisionMsg(const World& world)
     return std::move(vision_msg);
 }
 
-std::unique_ptr<PrimitiveMsg> createPrimitiveMsg(
+std::unique_ptr<PrimitiveSetMsg> createPrimitiveSetMsg(
     const ConstPrimitiveVectorPtr& primitives)
 {
     // create msg and update timestamp
-    auto primitive_msg = std::make_unique<PrimitiveMsg>();
-    primitive_msg->set_allocated_time_sent(createCurrentTimestampMsg().release());
+    auto primitive_set_msg = std::make_unique<PrimitiveSetMsg>();
+    primitive_set_msg->set_allocated_time_sent(createCurrentTimestampMsg().release());
 
     // set robot primitives
-    auto& robot_primitives_map = *primitive_msg->mutable_robot_primitives();
-    auto primitive_visitor     = ProtobufPrimitiveVisitor();
+    auto& robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
+    auto primitive_visitor     = ProtoCreatorPrimitiveVisitor();
 
     // For every primitive that is converted, the unique_ptr is dereferenced,
     // and there is an implicit deep copy into the robot_primitives_map
@@ -52,10 +52,10 @@ std::unique_ptr<PrimitiveMsg> createPrimitiveMsg(
     // freed
     std::for_each(primitives->begin(), primitives->end(), [&](const auto& primitive) {
         robot_primitives_map[primitive->getRobotId()] =
-            *primitive_visitor.getRadioPrimitiveMsg(*primitive);
+            primitive_visitor.createPrimitiveMsg(*primitive);
     });
 
-    return std::move(primitive_msg);
+    return std::move(primitive_set_msg);
 }
 
 std::unique_ptr<RobotStateMsg> createRobotStateMsg(const Robot& robot)

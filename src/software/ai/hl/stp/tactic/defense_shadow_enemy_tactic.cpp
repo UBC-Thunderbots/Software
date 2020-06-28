@@ -98,7 +98,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         // received the pass
         if (*robotHasPossession(ball.getPreviousStates(),
                                 enemy_robot.getPreviousStates()) &&
-            ball.velocity().length() < Util::DynamicParameters->getAIConfig()
+            ball.velocity().length() < DynamicParameters->getAIConfig()
                                            ->getDefenseShadowEnemyTacticConfig()
                                            ->BallStealSpeed()
                                            ->value())

@@ -8,13 +8,12 @@
 const std::string RadioBackend::name = "radio";
 
 RadioBackend::RadioBackend()
-    : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_VISION_MULTICAST_PORT,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
+    : network_input(SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT,
+                    SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
+                    SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&RadioBackend::receiveWorld, this, _1),
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    Util::DynamicParameters->getCameraConfig()),
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig(),
+                    DynamicParameters->getCameraConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1)),
       radio_output(DEFAULT_RADIO_CONFIG,

@@ -5,6 +5,7 @@ cc_library(
     srcs = [],
     hdrs = ["constants.h"],
     deps = [],
+    alwayslink = True,
 )
 
 cc_library(
@@ -13,9 +14,4 @@ cc_library(
     deps = [
         "//firmware/shared/math:tbots_math",
     ],
-)
-
-cc_library(
-    name = "firmware_primitive_type",
-    hdrs = ["firmware_primitive_type.h"],
 )

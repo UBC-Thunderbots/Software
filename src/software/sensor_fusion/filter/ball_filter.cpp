@@ -207,8 +207,8 @@ std::optional<size_t> BallFilter::getAdjustedBufferSize(
     // buffer
     double linear_offset =
         MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE + (buffer_size_velocity_magnitude_diff / 2);
-    double linear_scaling_factor = Util::linear(min_max_magnitude_average, linear_offset,
-                                                buffer_size_velocity_magnitude_diff);
+    double linear_scaling_factor = linear(min_max_magnitude_average, linear_offset,
+                                          buffer_size_velocity_magnitude_diff);
     int buffer_size =
         max_buffer_size -
         static_cast<unsigned int>(std::floor(linear_scaling_factor * buffer_size_diff));
