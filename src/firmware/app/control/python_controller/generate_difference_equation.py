@@ -21,8 +21,8 @@ def generate(discrete_tf: ct.TransferFunction):
     numerator_coefficients = str(discrete_tf.num[0][0].tolist())[1:-1]
     denominator_coefficients = str(discrete_tf.den[0][0].tolist())[1:-1]
 
-    numerator_length = len(numerator_coefficients)
-    denominator_length = len(denominator_coefficients)
+    numerator_length = len(discrete_tf.num[0][0])
+    denominator_length = len(discrete_tf.den[0][0])
 
     return CONTROLLER_DIFFERENCE_EQUATION_COEFFICIENTS.format(
         numerator_coefficients=numerator_coefficients,
@@ -39,8 +39,8 @@ if __name__ == "__main__":
     with open(sys.argv[-1], "w") as controller_coefficient_generator:
         # TODO need to pass parameters from controller design file
         # https://github.com/UBC-Thunderbots/Software/issues/1520
-        numerator = [1, 1]
-        denominator = [1, 1, 1]
+        numerator = [1, 2]
+        denominator = [3, 4, 5]
         interpolation_period = 0.1
         input_value = 1
 

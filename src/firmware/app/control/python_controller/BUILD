@@ -36,6 +36,16 @@ py_binary(
         requirement("pyparsing"),
         requirement("cycler"),
         requirement("kiwisolver"),
+        requirement("python-dateutil"),
+    ],
+)
+
+py_test(
+    name = "generate_difference_equation_test",
+    srcs = [":generate_difference_equation_test.py"],
+    main = ":generate_difference_equation_test.py",
+    deps = [
+        ":generate_difference_equation",
     ],
 )
 
