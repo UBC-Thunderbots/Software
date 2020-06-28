@@ -18,13 +18,13 @@
 //
 typedef struct FooConfig_s
 {
-    const IntegerParameter_t* foo_int;
+    const IntParameter_t* foo_int;
     const BoolParameter_t* foo_bool;
 } FooConfig_t;
 
 typedef struct BarConfig_s
 {
-    const IntegerParameter_t* bar_int;
+    const IntParameter_t* bar_int;
     const BoolParameter_t* bar_bool;
 } BarConfig_t;
 
@@ -40,8 +40,8 @@ typedef struct ExampleConfig_s
 
     // the parameters defined in example.yaml
     const BoolParameter_t* example_bool_param;
-    const UnsignedIntegerParameter_t* example_uint_param;
-    const IntegerParameter_t* example_int_param;
+    const UIntParameter_t* example_uint_param;
+    const IntParameter_t* example_int_param;
     const FloatParameter_t* example_float_param;
     const StringParameter_t* example_string_param;
 } ExampleConfig_t;

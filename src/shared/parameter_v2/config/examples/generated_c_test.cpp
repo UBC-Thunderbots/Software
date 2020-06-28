@@ -17,13 +17,13 @@ TEST(BasicAccess, test_basic_parameter_access)
 {
     const ThunderbotsConfig_t* tbots_config = app_dynamic_parameters_create();
 
-    ASSERT_TRUE(app_dynamic_parameters_getBoolValue(
+    ASSERT_TRUE(app_dynamic_parameters_getBool(
                     tbots_config->ExampleConfig->FooConfig->foo_bool) == false);
-    ASSERT_TRUE(app_dynamic_parameters_getBoolValue(
+    ASSERT_TRUE(app_dynamic_parameters_getBool(
                     tbots_config->ExampleConfig->BarConfig->bar_bool) == false);
-    ASSERT_TRUE(app_dynamic_parameters_getIntegerValue(
+    ASSERT_TRUE(app_dynamic_parameters_getInt(
                     tbots_config->ExampleConfig->FooConfig->foo_int) == 3);
-    ASSERT_TRUE(app_dynamic_parameters_getIntegerValue(
+    ASSERT_TRUE(app_dynamic_parameters_getInt(
                     tbots_config->ExampleConfig->BarConfig->bar_int) == 3);
 
     app_dynamic_parameters_destroy(tbots_config);
@@ -33,7 +33,7 @@ TEST(BasicAccess, test_basic_parameter_access)
     // tbots_config->ExampleConfig->BarConfig->bar_bool->value = true;
     //
     // FooConfig_t foo_config = {
-    //     .foo_int  = app_dynamic_parameters_createIntegerParameter(420),
+    //     .foo_int  = app_dynamic_parameters_createIntParameter(420),
     //     .foo_bool = app_dynamic_parameters_createBoolParameter(false),
     // };
     //
@@ -43,24 +43,24 @@ TEST(BasicAccess, test_basic_parameter_access)
 TEST(BasicAccess, test_that_we_can_test_with_this_config)
 {
     FooConfig_t foo_config = {
-        .foo_int  = app_dynamic_parameters_createIntegerParameter(420),
+        .foo_int  = app_dynamic_parameters_createIntParameter(420),
         .foo_bool = app_dynamic_parameters_createBoolParameter(false),
     };
 
     // can pass foo_config into a test that needs it
-    ASSERT_TRUE(app_dynamic_parameters_getBoolValue(foo_config.foo_bool) == false);
-    ASSERT_TRUE(app_dynamic_parameters_getIntegerValue(foo_config.foo_int) == 420);
+    ASSERT_TRUE(app_dynamic_parameters_getBool(foo_config.foo_bool) == false);
+    ASSERT_TRUE(app_dynamic_parameters_getInt(foo_config.foo_int) == 420);
 }
 
 TEST(BasicAccess, test_that_we_can_test_with_nested_configs)
 {
     FooConfig_t foo_config = {
-        .foo_int  = app_dynamic_parameters_createIntegerParameter(420),
+        .foo_int  = app_dynamic_parameters_createIntParameter(420),
         .foo_bool = app_dynamic_parameters_createBoolParameter(false),
     };
 
     BarConfig_t bar_config = {
-        .bar_int  = app_dynamic_parameters_createIntegerParameter(24),
+        .bar_int  = app_dynamic_parameters_createIntParameter(24),
         .bar_bool = app_dynamic_parameters_createBoolParameter(true),
     };
 
@@ -68,21 +68,20 @@ TEST(BasicAccess, test_that_we_can_test_with_nested_configs)
         .FooConfig           = &foo_config,
         .BarConfig           = &bar_config,
         .example_bool_param  = app_dynamic_parameters_createBoolParameter(false),
-        .example_uint_param  = app_dynamic_parameters_createUnsignedIntegerParameter(3),
-        .example_int_param   = app_dynamic_parameters_createIntegerParameter(3),
+        .example_uint_param  = app_dynamic_parameters_createUIntParameter(3),
+        .example_int_param   = app_dynamic_parameters_createIntParameter(3),
         .example_float_param = app_dynamic_parameters_createFloatParameter(4.04f),
         .example_string_param =
             app_dynamic_parameters_createStringParameter("Hello World"),
     };
 
     // can pass foo_config into a test that needs it
-    ASSERT_TRUE(app_dynamic_parameters_getBoolValue(foo_config.foo_bool) == false);
-    ASSERT_TRUE(app_dynamic_parameters_getIntegerValue(foo_config.foo_int) == 420);
+    ASSERT_TRUE(app_dynamic_parameters_getBool(foo_config.foo_bool) == false);
+    ASSERT_TRUE(app_dynamic_parameters_getInt(foo_config.foo_int) == 420);
 
-    ASSERT_TRUE(app_dynamic_parameters_getBoolValue(example_config.example_bool_param) ==
+    ASSERT_TRUE(app_dynamic_parameters_getBool(example_config.example_bool_param) ==
                 false);
-    ASSERT_TRUE(
-        app_dynamic_parameters_getIntegerValue(example_config.example_int_param) == 3);
-    ASSERT_TRUE(app_dynamic_parameters_getFloatValue(
-                    example_config.example_float_param) == 4.04f);
+    ASSERT_TRUE(app_dynamic_parameters_getInt(example_config.example_int_param) == 3);
+    ASSERT_TRUE(app_dynamic_parameters_getFloat(example_config.example_float_param) ==
+                4.04f);
 }
