@@ -35,9 +35,6 @@ typedef struct ExampleConfig_s
     //      - "foo.yaml"
     //      - "bar.yaml"
     // It does NOT indicate hierarchy.
-    //
-    // If FooConfig is included in a bunch of other configs,
-    // it will still point to the same config.
     const FooConfig_t* FooConfig;
     const BarConfig_t* BarConfig;
 
@@ -54,7 +51,7 @@ typedef struct ThunderbotsConfig
     const ExampleConfig_t* ExampleConfig;
 } ThunderbotsConfig_t;
 
-// this function should get called in the initAppLayer() call in main.c
+// this function should get called in the main.c
 const ThunderbotsConfig_t* app_dynamic_parameters_create()
 {
     // Allocate memory for all configs

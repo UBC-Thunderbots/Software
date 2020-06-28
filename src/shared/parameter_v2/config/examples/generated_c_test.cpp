@@ -5,7 +5,7 @@
 
 TEST(BasicAccess, test_basic_parameter_access)
 {
-    const ThunderbotsConfig_t* tbots_config = initAppDynamicParameters();
+    const ThunderbotsConfig_t* tbots_config = app_dynamic_parameters_create();
 
     ASSERT_TRUE(tbots_config->ExampleConfig->FooConfig->foo_bool.value == true);
     ASSERT_TRUE(tbots_config->ExampleConfig->BarConfig->bar_bool.value == true);

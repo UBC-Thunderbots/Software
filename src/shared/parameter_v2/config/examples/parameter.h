@@ -5,7 +5,8 @@
 // values on the robot.
 //
 // In the future if we chose to support sending dynamic parameters over the
-// network, we can simply replace the existing param tree with the updated one.
+// network, we can simply replace the existing param tree on the robot
+// with the updated one.
 //
 // We don't use an psuedo-class here to keep things simple as we can make use of
 // compile time checks to provide immutability. (without hiding the contents of
