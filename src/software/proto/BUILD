@@ -23,7 +23,7 @@ proto_library(
         "grSim_Packet.proto",
         "grSim_Replacement.proto",
     ],
-    visibility = ["//visibility:private"],
+    #visibility = ["//visibility:private"],
     deps = [],
 )
 

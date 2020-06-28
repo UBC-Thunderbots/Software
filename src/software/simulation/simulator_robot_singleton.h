@@ -96,12 +96,10 @@ class SimulatorRobotSingleton
      * class
      *
      * @param firmware_world The world to run the primitive in
-     * @param primitive_index The index of the primitive to run
-     * @param params The parameters for the primitive
+     * @param primitive The primitive to run
      */
     static void startNewPrimitiveOnCurrentSimulatorRobot(
-        std::shared_ptr<FirmwareWorld_t> firmware_world, unsigned int primitive_index,
-        const primitive_params_t& primitive_params);
+        std::shared_ptr<FirmwareWorld_t> firmware_world, const PrimitiveMsg& primitive);
 
     /**
      * Runs the current primitive on the SimulatorRobot currently being controlled by this

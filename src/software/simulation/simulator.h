@@ -174,16 +174,6 @@ class Simulator
         const std::shared_ptr<SimulatorBall>& simulator_ball);
 
     /**
-     * Returns the encoded primitive parameters for the given Primitive
-     *
-     * @param primitive The Primitive to get the parameters for
-     *
-     * @return The encoded primitive parameters for the given Primitive
-     */
-    static primitive_params_t getPrimitiveParams(
-        const std::unique_ptr<Primitive>& primitive);
-
-    /**
      * Returns the primitive index for the given Primitive
      *
      * @param primitive The Primitive to get the index for

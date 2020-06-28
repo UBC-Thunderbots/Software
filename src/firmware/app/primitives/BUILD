@@ -1,32 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "primitive_from_proto",
-    srcs = ["primitive_from_proto.c"],
-    hdrs = ["primitive_from_proto.h"],
-    deps = [
-        "//firmware/app/primitives:move",
-        "//firmware/app/primitives:primitive",
-        "//firmware/app/primitives:stop",
-        "//shared/proto:tbots_nanopb_proto",
-        "@nanopb",
-    ],
-)
-
-cc_library(
-    name = "accurate_shoot",
-    srcs = ["accurate_shoot_primitive.c"],
-    hdrs = ["accurate_shoot_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
-        "//firmware/shared:util",
-    ],
-)
-
-cc_library(
     name = "catch",
     srcs = ["catch_primitive.c"],
     hdrs = ["catch_primitive.h"],

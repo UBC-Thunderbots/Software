@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "shared/proto/robot_component_status.proto";
 import "shared/proto/tbots_timestamp_msg.proto";
+import "software/proto/grSim_Packet.proto";
 
 message TbotsRobotMsg
 {

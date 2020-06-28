@@ -87,9 +87,6 @@ void Simulator::setRobotPrimitives(
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
     for (const auto& primitive_ptr : *primitives)
     {
-        primitive_params_t primitive_params = getPrimitiveParams(primitive_ptr);
-        unsigned int primitive_index        = getPrimitiveIndex(primitive_ptr);
-
         auto simulator_robots_iter =
             std::find_if(simulator_robots.begin(), simulator_robots.end(),
                          [&primitive_ptr](const auto& robot_world_pair) {
@@ -207,40 +204,3 @@ Timestamp Simulator::getTimestamp() const
     return physics_world.getTimestamp();
 }
 
-primitive_params_t Simulator::getPrimitiveParams(
-    const std::unique_ptr<Primitive>& primitive)
-{
-    // The ProtoCreatorPrimitiveVisitor handles most of the encoding for us
-    ProtoCreatorPrimitiveVisitor mrf_pv;
-    PrimitiveMsg primitive_proto =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*primitive);
-    primitive_params_t primitive_params;
-    std::array<double, 4> param_array = {
-        primitive_proto.parameter1(),
-        primitive_proto.parameter2(),
-        primitive_proto.parameter3(),
-        primitive_proto.parameter4(),
-    };
-    for (unsigned int i = 0; i < param_array.size(); i++)
-    {
-        // The data is already scaled appropriately for us from the
-        // getProto function. We just need to pack it
-        // into an int16_t
-        double data                = param_array[i];
-        primitive_params.params[i] = static_cast<int16_t>(std::round(data));
-    }
-
-    primitive_params.slow  = primitive_proto.slow();
-    primitive_params.extra = static_cast<uint8_t>(primitive_proto.extra_bits());
-
-    return primitive_params;
-}
-
-unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive)
-{
-    PrimitiveMsg primitive_proto =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*primitive);
-    auto primitive_index = static_cast<unsigned int>(primitive_proto.prim_type());
-
-    return primitive_index;
-}
