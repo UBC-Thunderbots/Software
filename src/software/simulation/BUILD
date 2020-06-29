@@ -170,8 +170,13 @@ cc_binary(
     srcs = ["standalone_simulator_main.cpp"],
     deps = [
         ":threaded_simulator",
+        "//shared/proto:tbots_cc_proto",
+        "//software:constants",
         "//software/gui/standalone_simulator:standalone_simulator_gui_wrapper",
         "//software/logger",
+        "//software/networking:threaded_proto_multicast_listener",
+        "//software/networking:threaded_proto_multicast_sender",
+        "//software/primitive",
         "//software/world:field",
     ],
 )
