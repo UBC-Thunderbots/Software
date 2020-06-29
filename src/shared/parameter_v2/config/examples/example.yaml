@@ -13,7 +13,7 @@
 # - All 'name' attributes must be unique per-file
 # - All 'name' attribute values should be snake_case. Spaces are not allowed.
 # - All config file names must be unique
- 
+
 #########################################################################################
 # The following are examples of how to include other configs
 #########################################################################################

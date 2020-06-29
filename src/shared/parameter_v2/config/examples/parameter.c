@@ -52,6 +52,8 @@ bool app_dynamic_parameters_getBool(const BoolParameter_t* param)
 
 const FloatParameter_t* app_dynamic_parameters_createFloatParameter(float value)
 {
+    // This is the safest way to initialize a const member after malloc
+    // https://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
     FloatParameter_t* param     = (FloatParameter_t*)malloc(sizeof(FloatParameter_t));
     FloatParameter_t param_init = {.value = value};
     memcpy(param, &param_init, sizeof(FloatParameter_t));
@@ -60,6 +62,8 @@ const FloatParameter_t* app_dynamic_parameters_createFloatParameter(float value)
 
 const IntParameter_t* app_dynamic_parameters_createIntParameter(int value)
 {
+    // This is the safest way to initialize a const member after malloc
+    // https://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
     IntParameter_t* param     = (IntParameter_t*)malloc(sizeof(IntParameter_t));
     IntParameter_t param_init = {.value = value};
     memcpy(param, &param_init, sizeof(IntParameter_t));
@@ -68,6 +72,8 @@ const IntParameter_t* app_dynamic_parameters_createIntParameter(int value)
 
 const UIntParameter_t* app_dynamic_parameters_createUIntParameter(unsigned value)
 {
+    // This is the safest way to initialize a const member after malloc
+    // https://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
     UIntParameter_t* param     = (UIntParameter_t*)malloc(sizeof(UIntParameter_t));
     UIntParameter_t param_init = {.value = value};
     memcpy(param, &param_init, sizeof(UIntParameter_t));
@@ -75,6 +81,8 @@ const UIntParameter_t* app_dynamic_parameters_createUIntParameter(unsigned value
 }
 const StringParameter_t* app_dynamic_parameters_createStringParameter(const char* value)
 {
+    // This is the safest way to initialize a const member after malloc
+    // https://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
     StringParameter_t* param     = (StringParameter_t*)malloc(sizeof(StringParameter_t));
     StringParameter_t param_init = {.value = value};
     memcpy(param, &param_init, sizeof(StringParameter_t));
@@ -83,6 +91,8 @@ const StringParameter_t* app_dynamic_parameters_createStringParameter(const char
 
 const BoolParameter_t* app_dynamic_parameters_createBoolParameter(bool value)
 {
+    // This is the safest way to initialize a const member after malloc
+    // https://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
     BoolParameter_t* param     = (BoolParameter_t*)malloc(sizeof(BoolParameter_t));
     BoolParameter_t param_init = {.value = value};
     memcpy(param, &param_init, sizeof(BoolParameter_t));
