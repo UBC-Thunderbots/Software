@@ -15,10 +15,6 @@
 #include "software/world/team.h"
 #include "software/world/world.h"
 
-using BallHistory    = boost::circular_buffer<TimestampedBallState>;
-using RobotHistory   = boost::circular_buffer<TimestampedRobotState>;
-using TeamHistoryMap = std::map<RobotId, RobotHistory>;
-
 /**
  * Sensor Fusion is an abstraction around all filtering operations that our system may
  * need to perform. It produces Worlds that may be used, and consumes vision detections,

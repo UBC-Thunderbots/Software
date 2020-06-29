@@ -402,12 +402,12 @@ class RobotEvaluationFindStateTest : public ::testing::Test
     TimestampedRobotState robot_state_current_time;
     TimestampedRobotState robot_state_half_second_future;
     TimestampedRobotState robot_state_one_second_future;
-    boost::circular_buffer<TimestampedRobotState> robot_states;
+    RobotHistory robot_states;
 
     TimestampedBallState ball_state_current_time;
     TimestampedBallState ball_state_half_second_future;
     TimestampedBallState ball_state_one_second_future;
-    boost::circular_buffer<TimestampedBallState> ball_states;
+    BallHistory ball_states;
 };
 
 TEST_F(RobotEvaluationFindStateTest, find_robot_state_fetches_one_second_future)

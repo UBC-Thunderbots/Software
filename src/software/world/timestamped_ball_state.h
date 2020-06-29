@@ -1,5 +1,8 @@
 #pragma once
 
+#include <boost/circular_buffer.hpp>
+#include <map>
+
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
 #include "software/time/timestamp.h"
@@ -69,3 +72,5 @@ class TimestampedBallState
     BallState ball_state_;
     Timestamp timestamp_;
 };
+
+using BallHistory = boost::circular_buffer<TimestampedBallState>;

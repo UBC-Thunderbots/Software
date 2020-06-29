@@ -16,10 +16,9 @@ bool robotOrientationWithinAngleThresholdOfTarget(const Point position,
     return diff_orientation < threshold;
 }
 
-std::optional<bool> robotHasPossession(
-    const boost::circular_buffer<TimestampedBallState>& ball_states,
-    const boost::circular_buffer<TimestampedRobotState>& robot_states,
-    std::optional<Timestamp> timestamp)
+std::optional<bool> robotHasPossession(const BallHistory& ball_states,
+                                       const RobotHistory& robot_states,
+                                       std::optional<Timestamp> timestamp)
 {
     Point robot_pos_at_time;
     Angle robot_ori_at_time;
@@ -82,10 +81,9 @@ std::optional<bool> robotHasPossession(
     }
 }
 
-std::optional<bool> robotBeingPassedTo(
-    const boost::circular_buffer<TimestampedBallState>& ball_states,
-    const boost::circular_buffer<TimestampedRobotState>& robot_states,
-    std::optional<Timestamp> timestamp)
+std::optional<bool> robotBeingPassedTo(const BallHistory& ball_states,
+                                       const RobotHistory& robot_states,
+                                       std::optional<Timestamp> timestamp)
 {
     Point robot_pos, ball_pos;
     Vector ball_velocity;

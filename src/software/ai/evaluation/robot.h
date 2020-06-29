@@ -35,10 +35,9 @@ bool robotOrientationWithinAngleThresholdOfTarget(Point position, Angle orientat
  *          and nullopt if we don't have information for the given timestamp. This
  * function is guaranteed to return non-nullopt if no timestamp is passed in.
  */
-std::optional<bool> robotHasPossession(
-    const boost::circular_buffer<TimestampedBallState>& ball_states,
-    const boost::circular_buffer<TimestampedRobotState>& robot_states,
-    std::optional<Timestamp> timestamp = std::nullopt);
+std::optional<bool> robotHasPossession(const BallHistory& ball_states,
+                                       const RobotHistory& robot_states,
+                                       std::optional<Timestamp> timestamp = std::nullopt);
 
 /**
  * Returns true if the robot is being passed to. A robot is considered to be being
@@ -52,10 +51,9 @@ std::optional<bool> robotHasPossession(
  * timestamp. This function is guaranteed to return non-nullopt if no timestamp is
  * passed in.
  */
-std::optional<bool> robotBeingPassedTo(
-    const boost::circular_buffer<TimestampedBallState>& ball_states,
-    const boost::circular_buffer<TimestampedRobotState>& robot_states,
-    std::optional<Timestamp> timestamp = std::nullopt);
+std::optional<bool> robotBeingPassedTo(const BallHistory& ball_states,
+                                       const RobotHistory& robot_states,
+                                       std::optional<Timestamp> timestamp = std::nullopt);
 
 /**
  * Finds an update timestamp that is close to the provided timestamp and returns the
@@ -67,6 +65,6 @@ std::optional<bool> robotBeingPassedTo(
  * @return STATE corresponding to timestamp or std::nullopt if no ball state found
  * matching timestamp.
  */
-template <typename STATE>
-std::optional<STATE> findState(boost::circular_buffer<STATE> states,
-                               Timestamp& timestamp);
+template <typename STATE_TYPE>
+std::optional<STATE_TYPE> findState(boost::circular_buffer<STATE_TYPE> states,
+                                    Timestamp& timestamp);

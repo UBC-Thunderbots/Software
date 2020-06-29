@@ -253,3 +253,48 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_too_fast_to_i
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_FALSE(best_intercept);
 }
+
+
+TEST(InterceptBallAtFutureTimeTest,
+     get_position_at_future_time_with_positive_ball_velocity)
+{
+    Ball ball = Ball(Point(), Vector(1, 2), Timestamp::fromSeconds(123));
+
+    EXPECT_EQ(Point(0.15, 0.3),
+              estimateBallPositionAtFutureTime(ball.position(), ball.velocity(),
+                                               Duration::fromMilliseconds(150)));
+    EXPECT_EQ(Point(1, 2),
+              estimateBallPositionAtFutureTime(ball.position(), ball.velocity(),
+                                               Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(Point(2, 4),
+              estimateBallPositionAtFutureTime(ball.position(), ball.velocity(),
+                                               Duration::fromMilliseconds(2000)));
+}
+
+TEST(InterceptBallAtFutureTimeTest,
+     get_position_at_future_time_with_negative_ball_velocity)
+{
+    Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), Timestamp::fromSeconds(123));
+
+    EXPECT_EQ(Point(2.325, 6.982),
+              estimateBallPositionAtFutureTime(ball.position(), ball.velocity(),
+                                               Duration::fromMilliseconds(150)));
+    EXPECT_EQ(Point(-1.5, 6.88),
+              estimateBallPositionAtFutureTime(ball.position(), ball.velocity(),
+                                               Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(Point(-6, 6.76),
+              estimateBallPositionAtFutureTime(ball.position(), ball.velocity(),
+                                               Duration::fromMilliseconds(2000)));
+}
+
+TEST(InterceptBallAtFutureTimeTest, get_position_at_past_time)
+{
+    Ball ball = Ball(Point(3, 7), Vector(1, 0.12), Timestamp::fromSeconds(123));
+
+    ASSERT_THROW(estimateBallPositionAtFutureTime(ball.position(), ball.velocity(),
+                                                  Duration::fromMilliseconds(-200)),
+                 std::invalid_argument);
+    ASSERT_THROW(estimateBallPositionAtFutureTime(ball.position(), ball.velocity(),
+                                                  Duration::fromMilliseconds(-2000)),
+                 std::invalid_argument);
+}
