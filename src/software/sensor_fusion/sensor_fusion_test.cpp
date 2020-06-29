@@ -1,6 +1,7 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
 #include <gtest/gtest.h>
+#include "software/parameter/dynamic_parameters.h"
 
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
@@ -10,7 +11,7 @@ class SensorFusionTest : public ::testing::Test
 {
    public:
     SensorFusionTest()
-        : sensor_fusion(),
+        : sensor_fusion(DynamicParameters->getSensorFusionConfig()),
           yellow_robot_states(initYellowRobotStates()),
           blue_robot_states(initBlueRobotStates()),
           ball_state(Point(-1.2, 0), Vector(0.0, 0.0), 0.2),

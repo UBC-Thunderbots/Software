@@ -6,6 +6,7 @@
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_referee.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
@@ -23,7 +24,7 @@
 class SensorFusion
 {
    public:
-    SensorFusion();
+    explicit SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
 
     virtual ~SensorFusion() = default;
 
@@ -85,6 +86,8 @@ class SensorFusion
      */
     RobotDetection invert(RobotDetection robot_detection);
     BallDetection invert(BallDetection ball_detection);
+
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
 
     std::optional<Field> field;
     std::optional<Ball> ball;

@@ -1,11 +1,10 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
-#include "software/constants.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
 
-SensorFusion::SensorFusion()
-    : field(std::nullopt),
+SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
+    : sensor_fusion_config(sensor_fusion_config),
+      field(std::nullopt),
       ball(std::nullopt),
       friendly_team(),
       enemy_team(),
@@ -17,6 +16,9 @@ SensorFusion::SensorFusion()
       friendly_team_filter(),
       enemy_team_filter()
 {
+    if(!sensor_fusion_config) {
+        throw std::invalid_argument("SensorFusion created with null SensorFusionConfig");
+    }
 }
 
 std::optional<World> SensorFusion::getWorld() const
@@ -87,7 +89,7 @@ void SensorFusion::updateWorld(const Referee &packet)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    if (DynamicParameters->getSensorFusionConfig()->FriendlyColorYellow()->value())
+    if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
         refbox_game_state = createRefboxGameState(packet, TeamColour::YELLOW);
     }
@@ -128,27 +130,27 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    double min_valid_x = DynamicParameters->getSensorFusionConfig()->MinValidX()->value();
-    double max_valid_x = DynamicParameters->getSensorFusionConfig()->MaxValidX()->value();
+    double min_valid_x = sensor_fusion_config->MinValidX()->value();
+    double max_valid_x = sensor_fusion_config->MaxValidX()->value();
     bool ignore_invalid_camera_data =
-        DynamicParameters->getSensorFusionConfig()->IgnoreInvalidCameraData()->value();
+        sensor_fusion_config->IgnoreInvalidCameraData()->value();
 
     // We invert the field side if we explicitly choose to override the values
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    const bool override_refbox_defending_side = DynamicParameters->getSensorFusionConfig()
+    const bool override_refbox_defending_side = sensor_fusion_config
                                                     ->OverrideRefboxDefendingSide()
                                                     ->value();
     const bool defending_positive_side =
-        DynamicParameters->getSensorFusionConfig()->DefendingPositiveSide()->value();
+        sensor_fusion_config->DefendingPositiveSide()->value();
     const bool should_invert_field =
         override_refbox_defending_side && defending_positive_side;
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
     bool friendly_team_is_yellow =
-        DynamicParameters->getSensorFusionConfig()->FriendlyColorYellow()->value();
+        sensor_fusion_config->FriendlyColorYellow()->value();
 
     std::optional<TimestampedBallState> new_ball_state;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
@@ -218,7 +220,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
     RobotId friendly_goalie_id =
-        DynamicParameters->getSensorFusionConfig()->FriendlyGoalieId()->value();
+        sensor_fusion_config->FriendlyGoalieId()->value();
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
@@ -227,7 +229,7 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
     RobotId enemy_goalie_id =
-        DynamicParameters->getSensorFusionConfig()->EnemyGoalieId()->value();
+        sensor_fusion_config->EnemyGoalieId()->value();
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }
