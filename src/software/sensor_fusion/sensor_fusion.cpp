@@ -17,9 +17,7 @@ SensorFusion::SensorFusion()
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
       enemy_team_filter(),
-      ball_states(history_size),
-      friendly_robot_states_map(),
-      enemy_robot_states_map()
+      ball_states(history_size)
 {
 }
 
@@ -203,7 +201,6 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
             friendly_team = createFriendlyTeam(blue_team);
             enemy_team    = createEnemyTeam(yellow_team);
         }
-        updateRobotStatesMap();
     }
 
     if (new_ball_state)
@@ -231,36 +228,6 @@ void SensorFusion::updateBall(TimestampedBallState new_ball_state)
     {
         ball = Ball(new_ball_state);
     }
-}
-
-void SensorFusion::updateRobotStatesMap(const Team &team, TeamHistoryMap &map_to_update)
-{
-    for (const auto &robot : team.getAllRobots())
-    {
-        auto it = map_to_update.find(robot.id());
-        if (it != map_to_update.end())
-        {
-            if (!it->second.empty() &&
-                robot.currentState().timestamp() < it->second.front().timestamp())
-            {
-                throw std::invalid_argument(
-                    "Error: Trying to update robot state using a state older then the current state");
-            }
-
-            it->second.push_front(robot.currentState());
-        }
-        else
-        {
-            map_to_update[robot.id()] = RobotHistory(history_size);
-            map_to_update[robot.id()].push_front(robot.currentState());
-        }
-    }
-}
-
-void SensorFusion::updateRobotStatesMap()
-{
-    updateRobotStatesMap(friendly_team, friendly_robot_states_map);
-    updateRobotStatesMap(enemy_team, enemy_robot_states_map);
 }
 
 std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(

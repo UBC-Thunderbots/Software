@@ -2,7 +2,6 @@
 
 #include <google/protobuf/repeated_field.h>
 
-#include "software/backend/robot_status.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_referee.h"
@@ -64,22 +63,6 @@ class SensorFusion
     void updateBall(TimestampedBallState new_ball_state);
 
     /**
-     * Updates friendly_robot_states_map and enemy_robot_states_map using friendly_team
-     * and enemy_team
-     */
-    void updateRobotStatesMap();
-
-    /**
-     * Updates team history map using team
-     *
-     * @param team The team state to use for updating
-     * @param map_to_update The TeamHistoryMap to update
-     *
-     * @modifies map_to_update with the new team
-     */
-    void updateRobotStatesMap(const Team &team, TeamHistoryMap &map_to_update);
-
-    /**
      * Create state of the ball from a list of ball detections
      *
      * @param ball_detections list of ball detections to filter
@@ -132,6 +115,4 @@ class SensorFusion
     RobotTeamFilter enemy_team_filter;
 
     BallHistory ball_states;
-    TeamHistoryMap friendly_robot_states_map;
-    TeamHistoryMap enemy_robot_states_map;
 };
