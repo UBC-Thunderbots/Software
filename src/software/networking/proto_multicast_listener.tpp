@@ -22,8 +22,8 @@ ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
                       "the listen_endpoint when trying to connect to the multicast "
                       "address. This may be due to another instance of the "
                       "ProtoMulicastListener running and using the port already. "
-                      "(ip = " << ip_address << ", port = " << port << ")"
-                << std::endl;
+                      "(ip = "
+                   << ip_address << ", port = " << port << ")" << std::endl;
     }
 
     // Join the multicast group.

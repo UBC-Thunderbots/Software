@@ -103,8 +103,10 @@ class ThreadedSimulator
      * @param primitive_type The primitive to set
      * @param params The parameters for the specified primitive
      */
-    void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index, const primitive_params_t& params);
-    void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index, const primitive_params_t& params);
+    void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
+                                 const primitive_params_t& params);
+    void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
+                               const primitive_params_t& params);
 
    private:
     /**

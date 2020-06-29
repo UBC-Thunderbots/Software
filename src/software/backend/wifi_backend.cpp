@@ -15,20 +15,23 @@ WifiBackend::WifiBackend()
                     boost::bind(&WifiBackend::receiveWorld, this, _1),
                     DynamicParameters->getAIControlConfig()->getRefboxConfig(),
                     DynamicParameters->getCameraConfig()),
-      ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
-                       boost::bind(&Backend::receiveSSLReferee, this, _1),
-                       SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT + 1,
-                       SSL_GAMECONTROLLER_MULTICAST_ADDRESS, SSL_GAMECONTROLLER_MULTICAST_PORT + 1)
+      ssl_proto_client(
+          boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
+          boost::bind(&Backend::receiveSSLReferee, this, _1),
+          SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT + 1,
+          SSL_GAMECONTROLLER_MULTICAST_ADDRESS, SSL_GAMECONTROLLER_MULTICAST_PORT + 1)
 {
     std::string network_interface =
         DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
     int channel = DynamicParameters->getNetworkConfig()->Channel()->value();
 
-    MutableDynamicParameters->getMutableNetworkConfig()->mutableChannel()->registerCallbackFunction([this](int new_channel) {
-        std::string new_network_interface =
+    MutableDynamicParameters->getMutableNetworkConfig()
+        ->mutableChannel()
+        ->registerCallbackFunction([this](int new_channel) {
+            std::string new_network_interface =
                 DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
-        joinMulticastChannel(new_channel, new_network_interface);
-    });
+            joinMulticastChannel(new_channel, new_network_interface);
+        });
 
     // connect to current channel
     joinMulticastChannel(channel, network_interface);

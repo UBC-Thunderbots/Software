@@ -117,8 +117,10 @@ class Simulator
      * @param primitive_index The index of the primitive to set
      * @param params The parameters for the specified primitive
      */
-    void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index, const primitive_params_t& params);
-    void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index, const primitive_params_t& params);
+    void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
+                                 const primitive_params_t& params);
+    void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
+                               const primitive_params_t& params);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -192,8 +194,11 @@ class Simulator
      * @param simulator_robots The robots to set the primitives on
      * @param simulator_ball The simulator ball to use in the primitives
      */
-    static void setRobotPrimitive(RobotId id, unsigned int primitive_index, primitive_params_t params, std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-    simulator_robots, const std::shared_ptr<SimulatorBall>& simulator_ball);
+    static void setRobotPrimitive(
+        RobotId id, unsigned int primitive_index, primitive_params_t params,
+        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+            simulator_robots,
+        const std::shared_ptr<SimulatorBall>& simulator_ball);
 
     /**
      * Returns the encoded primitive parameters for the given Primitive
