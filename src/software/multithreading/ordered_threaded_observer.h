@@ -50,8 +50,7 @@ class OrderedThreadedObserver : public Observer<T>
     std::mutex in_destructor_mutex;
     bool in_destructor;
 
-    // The period for checking whether or not the destructor for this class has
-    // been called
+    // The period for waiting for a message before it is destroyed
     const Duration IN_DESTRUCTOR_CHECK_PERIOD;
 
     // This is the thread that will continuously pull values from the buffer
@@ -79,21 +78,26 @@ void OrderedThreadedObserver<T>::continuouslyPullValuesFromBuffer()
 {
     do
     {
+        in_destructor_mutex.unlock();
+
         std::optional<T> new_val =
-            this->popLeastRecentlyReceivedValue(Duration::fromSeconds(5.0));
+                this->popLeastRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
 
         if (new_val)
         {
             onValueReceived(*new_val);
-        } else {
-            break;
         }
-    } while (true);
+
+        in_destructor_mutex.lock();
+    } while (!in_destructor);
 }
 
 template <typename T>
 OrderedThreadedObserver<T>::~OrderedThreadedObserver()
 {
     // TODO: possibly do something more intelligent here
+    in_destructor_mutex.lock();
+    in_destructor = true;
+    in_destructor_mutex.unlock();
     pull_from_buffer_thread.join();
 }

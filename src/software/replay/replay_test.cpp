@@ -19,11 +19,62 @@ class TestSubject : public Subject<SensorMsg>
     }
 };
 
-TEST(ReplayTest, test_spaghetti)
+TEST(ReplayTest, test_read_and_write_replay)
 {
+    // unfortunately due to the unavailablity of ordering tests and functions that
+    // generate test files that actually work, we have to read recorded replays back,
+    // write them, and then read them again in the same test
+    // TODO: record replay data with refbox running
+
+    std::vector<SensorMsg> read_replay_frames;
+
     ReplayReader reader(fs::current_path() / REPLAY_TEST_PATH_SUFFIX);
     while (reader.hasNextFrame()) {
         auto frame = reader.getNextFrame();
-        std::cout << frame.ssl_vision_msg().detection().t_sent() << std::endl;
+        read_replay_frames.emplace_back(frame);
+    }
+    // do a quick sanity check here to assert that the timestamps are monotonically increasing
+    double max_timestamp = 0.f;
+    for (const auto& msg : read_replay_frames) {
+        auto ts = msg.ssl_vision_msg().detection().t_sent();
+        if (ts < max_timestamp) {
+            FAIL() << "t_sent " << ts << " should have appeared after " << max_timestamp;
+        } else {
+            max_timestamp = ts;
+        }
+    }
+
+    // write the read frames to another replay directory
+    auto output_path = fs::current_path() / "replaytest";
+    std::shared_ptr<Observer<SensorMsg>> logger_ptr =
+            std::make_shared<ReplayLogger>(output_path);
+    TestSubject subject;
+    subject.registerObserver(logger_ptr);
+    for (const auto msg : read_replay_frames) {
+        subject.sendValue(msg);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    // unfortunately we have to do this
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    // TODO: actually test stuff
+    for (const auto& dir_entry : fs::directory_iterator(output_path)) {
+        std::cout << dir_entry << std::endl;
+    }
+
+    // compare against the messages that we read
+    std::vector<SensorMsg> written_read_replay_frames;
+    ReplayReader reader2(output_path);
+    while (reader2.hasNextFrame()) {
+        written_read_replay_frames.emplace_back(reader2.getNextFrame());
+    }
+
+    EXPECT_EQ(written_read_replay_frames.size(), read_replay_frames.size())
+        << "Replay written and read back does not have the same number of frames!";
+
+    for (size_t i = 0; i < written_read_replay_frames.size(); i++) {
+        bool eq = google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
+                read_replay_frames[i], written_read_replay_frames[i]
+                );
+        EXPECT_TRUE(eq);
     }
 }

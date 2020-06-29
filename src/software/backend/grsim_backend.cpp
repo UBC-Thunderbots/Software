@@ -19,7 +19,7 @@ GrSimBackend::GrSimBackend()
                    Util::Constants::GRSIM_COMMAND_NETWORK_PORT,
                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig())
 {
-    auto logger_ptr = std::make_shared<ReplayLogger>("/home/ubuntu/replayout");
+    auto logger_ptr = std::make_shared<ReplayLogger>("/home/ubuntu/replayout2");
     network_input.registerObserver(logger_ptr);
 }
 
