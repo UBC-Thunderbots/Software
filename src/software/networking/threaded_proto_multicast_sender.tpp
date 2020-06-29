@@ -3,10 +3,10 @@
 template <class SendProto>
 ThreadedProtoMulticastSender<SendProto>::ThreadedProtoMulticastSender(
     const std::string& ip_address, const unsigned short port)
-    : io_service(), multicast_sender(io_service, ip_address, port)
+    : io_service(), multicast_sender(io_service, ip_address, port), io_service_thread([this]() { io_service.run(); })
 {
     // start the thread to run the io_service in the background
-    io_service_thread = std::thread([this]() { io_service.run(); });
+//    io_service_thread = std::thread();
 }
 
 template <class SendProto>

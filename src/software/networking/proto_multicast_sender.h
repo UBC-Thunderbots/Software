@@ -9,15 +9,18 @@ class ProtoMulticastSender
 {
    public:
     /**
-     * Creates a ProtoMulticastSender that sends the SendProto over the network on the
+     * Creates a ProtoMulticastSender that sends the SendProto over the network to the
      * given address and port.
+     *
+     * The ProtoMulticastSender will be assigned a random available port on creation
+     * so it doesn't conflict with anything else on the system.
      *
      * @param io_service The io_service to use to service outgoing SendProto data
      * @param ip_address The ip address of the multicast group to send data on
      * (IPv4 in dotted decimal or IPv6 in hex string)
      *  example IPv4: 192.168.0.2
      *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
-     * @param port The port to send SendProto data on
+     * @param port The port to send SendProto data to
      */
     ProtoMulticastSender(boost::asio::io_service& io_service,
                          const std::string& ip_address, unsigned short port);
