@@ -1,8 +1,8 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
 #include <gtest/gtest.h>
-#include "software/parameter/dynamic_parameters.h"
 
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"

@@ -1,8 +1,13 @@
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 
-ThreadedSensorFusion::ThreadedSensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config) : sensor_fusion(sensor_fusion_config) {
-    if(!sensor_fusion_config) {
-        throw std::invalid_argument("ThreadedSensorFusion created with null SensorFusionConfig");
+ThreadedSensorFusion::ThreadedSensorFusion(
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
+    : sensor_fusion(sensor_fusion_config)
+{
+    if (!sensor_fusion_config)
+    {
+        throw std::invalid_argument(
+            "ThreadedSensorFusion created with null SensorFusionConfig");
     }
 }
 

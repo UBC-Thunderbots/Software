@@ -16,7 +16,8 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       friendly_team_filter(),
       enemy_team_filter()
 {
-    if(!sensor_fusion_config) {
+    if (!sensor_fusion_config)
+    {
         throw std::invalid_argument("SensorFusion created with null SensorFusionConfig");
     }
 }
@@ -139,9 +140,8 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    const bool override_refbox_defending_side = sensor_fusion_config
-                                                    ->OverrideRefboxDefendingSide()
-                                                    ->value();
+    const bool override_refbox_defending_side =
+        sensor_fusion_config->OverrideRefboxDefendingSide()->value();
     const bool defending_positive_side =
         sensor_fusion_config->DefendingPositiveSide()->value();
     const bool should_invert_field =
@@ -149,8 +149,7 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    bool friendly_team_is_yellow =
-        sensor_fusion_config->FriendlyColorYellow()->value();
+    bool friendly_team_is_yellow = sensor_fusion_config->FriendlyColorYellow()->value();
 
     std::optional<TimestampedBallState> new_ball_state;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
@@ -219,8 +218,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-    RobotId friendly_goalie_id =
-        sensor_fusion_config->FriendlyGoalieId()->value();
+    RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
@@ -228,8 +226,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
-    RobotId enemy_goalie_id =
-        sensor_fusion_config->EnemyGoalieId()->value();
+    RobotId enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }
