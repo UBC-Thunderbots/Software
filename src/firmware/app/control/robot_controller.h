@@ -1,26 +1,27 @@
 #pragma once
 
-#include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
 #include "firmware/app/control/trajectory_planner.h"
+#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
 
 typedef struct RobotController RobotController_t;
 
 /**
  * Initialize the IO layer for the Robot Controller
  *
- * NOTE: This does not take ownership of the given drive units. The driveunit's must
- *       remain valid until this function is called again.
+ * NOTE: This does not take ownership of the given drivetrain. The drivetrain must be
+ * destroyed separately.
  *
- * @param [in] front_left_drive_unit
- * @param [in] front_right_drive_unit
- * @param [in] back_left_drive_unit
- * @param [in] back_right_drive_unit
+ * @param drivetrain [in] The drivetrain of the robot.
  */
-RobotController_t* io_robot_controller_create(DrivetrainUnit_t* front_left_drive_unit,
-                                              DrivetrainUnit_t* front_right_drive_unit,
-                                              DrivetrainUnit_t* back_left_drive_unit,
-                                              DrivetrainUnit_t* back_right_drive_unit);
+RobotController_t* io_robot_controller_create(Drivetrain_t* drivetrain);
 
+/**
+ * Destroys the robot controller
+ *
+ * @param controller [in] Robot controller to destroy
+ */
+void app_robot_controller_destroy(RobotController_t* controller);
 
 /**
  * Updates the current trajectory followed by the robot.
@@ -29,37 +30,36 @@ RobotController_t* io_robot_controller_create(DrivetrainUnit_t* front_left_drive
  *
  * @param num_elements [in] The number of elements in the input velocity trajectory
  */
-void io_robot_controller_updateTrajectory(VelocityTrajectory_t* trajectory, size_t num_elements);
+void io_robot_controller_updateTrajectory(RobotController_t* robot_controller,
+                                          VelocityTrajectory_t* trajectory,
+                                          size_t num_elements);
 
 /**
- * Function transforms local robots speeds to robot wheel speeds.
+ * Function transforms global field coordinates to local robot coordinates
  *
- *                       X
+ *                     Local X
  *                       ^
  *                       |
- *          0  __________|___________  2
+ *             __________|___________
  *           ,           |           ,
  *          ,            |            ,
- *         ,             |             ,
+ * Local   ,             |             ,
  *   Y <-----------------|             ,
  *         ,                           ,
- *          ,                         ,
+ *          ,         Robot            ,
  *           ,                       ,
  *             ,                  , '
- *           1   ' - , _ _ _ ,  '   3
+ *               ' - , _ _ _ ,  '
  *
- * Where X and Y indicate the local speed axis and the numbers are the array index for each wheel
+ * @param controller [in] The robot controller
  *
- * @param x_speed [in] The local speed of the robot in the X, or 'forwards' direction [m/s]
+ * @param robot_orientation_rad [in] The robot orientation relative the the global X-axis
+ * in radians
  *
- * @param y_speed [in] The local speed of the robot in the Y, or 'sidewards' direction [m/s]
+ * @param global_speeds [in] The global X,Y,W speeds in the order X,Y,W
  *
- * @param angular_speed [in] The local angular speed of the robot [rad/s]
- *
- * @param wheel_speeds [out] The speed of each robot wheel in [rad/s]. Where:
- *                                                                          index 0 = front left wheel
- *                                                                          index 1 = back left wheel
- *                                                                          index 2 = front right wheel
- *                                                                          index 3 = back right wheel
+ * @return The local robot equivalent of the global speeds in the order X,Y,W
  */
-static void io_robot_controller_localRobotSpeed2WheelSpeeds(float x_speed, float y_speed, float wheel_speed[4]);
+static void io_robot_controller_sendGlobalSpeedToDrivetrain(RobotController_t* controller,
+                                                            float robot_orientation_rad,
+                                                            Matrix global_speeds);

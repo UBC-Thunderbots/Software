@@ -1,41 +1,73 @@
-#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
-#include "firmware/app/control/trajectory_planner.h"
+#include "firmware/app/control/robot_controller.h"
 
 #include <assert.h>
+#include <math.h>
 #include <stdbool.h>
 
-static DrivetrainUnit_t *_front_left_drive_unit;
-static DrivetrainUnit_t *_front_right_drive_unit;
-static DrivetrainUnit_t *_back_left_drive_unit;
-static DrivetrainUnit_t *_back_right_drive_unit;
-static VelocityTrajectory_t* _trajectory;
-static size_t _trajectory_index = 0;
-static size_t _num_trajectory_elements = 0;
+#include "firmware/app/control/trajectory_planner.h"
+#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 
-static bool initialized = false;
-
-void io_wheel_controller_init(DrivetrainUnit_t *front_left_drive_unit,
-                              DrivetrainUnit_t *front_right_drive_unit,
-                              DrivetrainUnit_t *back_left_drive_unit,
-                              DrivetrainUnit_t *back_right_drive_unit)
+struct RobotController
 {
-    _front_left_drive_unit  = front_left_drive_unit;
-    _front_right_drive_unit = front_right_drive_unit;
-    _back_left_drive_unit   = back_left_drive_unit;
-    _back_right_drive_unit  = back_right_drive_unit;
+    VelocityTrajectory_t* trajectory;
+    size_t num_trajectory_elements;
+    size_t current_trajectory_index;
+    Drivetrain_t* drivetrain;
+};
 
-    initialized = true;
+RobotController_t* app_robot_controller_create(Drivetrain_t* drivetrain)
+{
+    // Initialize members to zero and point to the drivetrain parameter
+    RobotController_t* controller = (RobotController_t*)malloc(sizeof(RobotController_t));
+    controller->current_trajectory_index = 0;
+    controller->num_trajectory_elements  = 0;
+    controller->trajectory               = NULL;
+    controller->drivetrain               = drivetrain;
+
+    return controller;
 }
 
-void io_robot_controller_updateTrajectory(VelocityTrajectory_t* trajectory, size_t num_elements){
+void app_robot_controller_destroy(RobotController_t* controller)
+{
+    free(controller);
+}
 
+void app_robot_controller_updateTrajectory(RobotController_t* controller,
+                                           VelocityTrajectory_t* trajectory,
+                                           size_t num_elements)
+{
     // Update the local values to the new ones
-    _num_trajectory_elements = num_elements;
-    _trajectory = trajectory;
+    controller->num_trajectory_elements = num_elements;
+    controller->trajectory              = trajectory;
 
     // Now that there is a new trajectory, reset the current tracking index
-    _trajectory_index = 0;
+    controller->current_trajectory_index = 0;
 }
 
+static void io_robot_controller_sendGlobalSpeedToDrivetrain(RobotController_t* controller,
+                                                            float robot_orientation_rad,
+                                                            Matrix global_speeds)
+{
+    const Matrix global_to_local_transform = create_matrix(3, 3);
 
+    /* Create the transformation matrix
+     *
+     * | cos(orientation) -sin(orientation)   0 |
+     * | sin(orientation)  cos(orientation)   0 |
+     * | 0                 0                  1 |
+     *
+     */
+    global_to_local_transform.rows[0][0] = cosf(robot_orientation_rad);
+    global_to_local_transform.rows[1][0] = sinf(robot_orientation_rad);
+    global_to_local_transform.rows[2][0] = 0;
+    global_to_local_transform.rows[0][1] = -sinf(robot_orientation_rad);
+    global_to_local_transform.rows[1][1] = cosf(robot_orientation_rad);
+    global_to_local_transform.rows[2][1] = 0;
+    global_to_local_transform.rows[0][2] = 0;
+    global_to_local_transform.rows[1][2] = 0;
+    global_to_local_transform.rows[2][2] = 1;
 
+    Matrix local_speeds = matmul(global_to_local_transform, global_speeds);
+
+    io_drivetrain_sendLocalSpeedsToDrivetrainUnits(controller->drivetrain, local_speeds);
+}

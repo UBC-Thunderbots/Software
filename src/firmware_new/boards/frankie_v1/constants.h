@@ -20,4 +20,4 @@ const unsigned AI_MULTICAST_SEND_PORT = ROBOT_MULTICAST_LISTEN_PORT;
 // the port to send unicast packets to for robot msgs (unicast)
 const unsigned AI_UNICAST_LISTEN_PORT = ROBOT_UNICAST_SEND_PORT;
 // The nominal max voltage that can be applied ot the motors
-const float MAX_MOTOR_VOLTAGE = 12.2f; // volts
+const float MAX_MOTOR_VOLTAGE = 12.2f;  // volts

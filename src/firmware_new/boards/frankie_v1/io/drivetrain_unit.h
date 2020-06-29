@@ -1,7 +1,7 @@
 #pragma once
 
-#include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
 #include "firmware/app/control/wheel_controller.h"
+#include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
 
 typedef struct DrivetrainUnit DrivetrainUnit_t;
 
@@ -14,25 +14,29 @@ typedef struct DrivetrainUnit DrivetrainUnit_t;
  *
  * @return The created DrivetrainUnit
  */
-DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_driver, WheelController_t* controller);
+DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_driver,
+                                            WheelController_t* controller);
 
 /**
  * Apply the given force to the given DrivetrainUnit
  *
  * @param [in] drive_train_unit The DrivetrainUnit to apply force to
  *
- * @param new_speed_command [in] The newly requested speed in rad/s. Positive values imply CLOCKWISE rotation and negative CCW.
+ * @param new_speed_command [in] The newly requested speed in rad/s. Positive values imply
+ * CLOCKWISE rotation and negative CCW.
  *
- * @param new_sampled_speed [in] The most recent data of the actual wheel speed from sensor data
+ * @param new_sampled_speed [in] The most recent data of the actual wheel speed from
+ * sensor data
  *
  */
-void io_drivetrain_unit_updateControl(DrivetrainUnit_t* drive_train_unit, float new_speed_command, float new_sampled_speed)
+void io_drivetrain_unit_updateControl(DrivetrainUnit_t* drive_train_unit,
+                                      float new_speed_command, float new_sampled_speed)
 
-/**
- * Returns the rotational speed of a drivetrain unit measured at the motor in rad/s.
- *
- * @param drive_train_unit [in] The drivetrain unit to get the speed for.
- *
- * @return The speed of the drivetrain at the motor in rad/s
- */
-float io_drivetrain_unit_getSpeed(DrivetrainUnit_t* drive_train_unit);
+    /**
+     * Returns the rotational speed of a drivetrain unit measured at the motor in rad/s.
+     *
+     * @param drive_train_unit [in] The drivetrain unit to get the speed for.
+     *
+     * @return The speed of the drivetrain at the motor in rad/s
+     */
+    float io_drivetrain_unit_getSpeed(DrivetrainUnit_t* drive_train_unit);
