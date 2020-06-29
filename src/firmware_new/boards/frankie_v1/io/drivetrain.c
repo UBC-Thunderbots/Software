@@ -1,10 +1,5 @@
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 
-#include <assert.h>
-#include <stdbool.h>
-
-#include "firmware/shared/math/matrix.h"
-
 struct Drivetrain
 {
     DrivetrainUnit_t* front_left_drive_unit;

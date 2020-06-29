@@ -41,6 +41,9 @@ const double ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0;
 // squared
 const double ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED = 10.0;
 
+// The nominal battery voltage
+const float ROBOT_NOMINAL_BATTERY_VOLTAGE = 12.0f;
+
 // The maximum speed attainable by enemy robots
 const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
 // The maximum acceleration achievable by enemy robots, in metres per seconds squared.

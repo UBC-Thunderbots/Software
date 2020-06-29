@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "firmware/app/control/wheel_controller.h"
-#include "firmware_new/boards/frankie_v1/constants.h"
+#include "shared/constants.h"
 
 typedef struct DrivetrainUnit
 {
@@ -36,7 +36,8 @@ void io_drivetrain_unit_updateControl(DrivetrainUnit_t* drive_train_unit,
     const float voltage_to_apply =
         app_wheel_controller_getWheelVoltageToApply(drive_train_unit->controller);
 
-    float pwm_percentage = fmin(1.0f, fabs(voltage_to_apply) / MAX_MOTOR_VOLTAGE);
+    float pwm_percentage =
+        fmin(1.0f, fabs(voltage_to_apply) / ROBOT_NOMINAL_BATTERY_VOLTAGE);
 
     if (voltage_to_apply >= 0)
     {
