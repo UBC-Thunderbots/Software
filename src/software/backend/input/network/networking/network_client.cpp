@@ -5,7 +5,6 @@
 
 #include "software/constants.h"
 #include "software/logger/logger.h"
-#include "software/parameter/config.hpp"
 #include "software/parameter/dynamic_parameters.h"
 
 NetworkClient::NetworkClient(std::string vision_multicast_address,
