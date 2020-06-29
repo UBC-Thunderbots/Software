@@ -1,0 +1,17 @@
+StandaloneSimulatorConfig:
+  YellowTeamChannel:
+    min: 0
+    max: 16
+    type: "int"
+    default: 0
+    description: >-
+      The multicast channel to use to communicate with the yellow robots
+      in the simulator
+  BlueTeamChannel:
+    min: 0
+    max: 16
+    type: "int"
+    default: 1
+    description: >-
+      The multicast channel to use to communicate with the yellow robots
+      in the simulator
