@@ -22,7 +22,7 @@
 
 bool isDegenerate(const Segment &segment)
 {
-    return distanceSquared(segment.getSegStart(), segment.getEnd()) < EPS2;
+    return distanceSquared(segment.getSegStart(), segment.getEnd()) < FIXED_EPSILON*FIXED_EPSILON;
 }
 
 double length(const Segment &segment)
@@ -52,7 +52,7 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
     std::vector<Point> ans;
 
     // take care of 0 length segments too much error here
-    if ((segB - segA).lengthSquared() < EPS)
+    if ((segB - segA).lengthSquared() < FIXED_EPSILON)
     {
         return ans;
     }
@@ -61,14 +61,14 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
     Point C       = segA + lenseg * (segB - segA).normalize();
 
     // if C outside circle no intersections
-    if ((C - centre).lengthSquared() > radius * radius + EPS)
+    if ((C - centre).lengthSquared() > radius * radius + FIXED_EPSILON)
     {
         return ans;
     }
 
     // if C on circle perimeter return the only intersection
-    if ((C - centre).lengthSquared() < radius * radius + EPS &&
-        (C - centre).lengthSquared() > radius * radius - EPS)
+    if ((C - centre).lengthSquared() < radius * radius + FIXED_EPSILON &&
+        (C - centre).lengthSquared() > radius * radius - FIXED_EPSILON)
     {
         ans.push_back(C);
         return ans;
@@ -91,18 +91,18 @@ Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &seg
 {
     // if one of the end-points is extremely close to the centre point
     // then return 0.0
-    if ((segB - centre).lengthSquared() < EPS2)
+    if ((segB - centre).lengthSquared() < FIXED_EPSILON*FIXED_EPSILON)
     {
         return segB;
     }
 
-    if ((segA - centre).lengthSquared() < EPS2)
+    if ((segA - centre).lengthSquared() < FIXED_EPSILON*FIXED_EPSILON)
     {
         return segA;
     }
 
     // take care of 0 length segments
-    if ((segB - segA).lengthSquared() < EPS2)
+    if ((segB - segA).lengthSquared() < FIXED_EPSILON*FIXED_EPSILON)
     {
         return segA;
     }
@@ -136,12 +136,12 @@ Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &seg
 
 bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const Point &d)
 {
-    return std::abs((d - c).cross(b - a)) > EPS;
+    return std::abs((d - c).cross(b - a)) > FIXED_EPSILON;
 }
 
 Point calcBlockCone(const Vector &a, const Vector &b, const double &radius)
 {
-    if (a.length() < EPS || b.length() < EPS)
+    if (a.length() < FIXED_EPSILON || b.length() < FIXED_EPSILON)
     {
     }
     // unit vector and bisector
@@ -507,7 +507,7 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
     for (std::vector<Segment>::const_iterator it = open_segs.begin();
          it != open_segs.end();)
     {
-        if (it->length() < EPS)
+        if (it->length() < FIXED_EPSILON)
         {
             open_segs.erase(it);
         }
@@ -565,7 +565,7 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
         Vector raw_projection = segment.toVector().project(direction);
 
         // Only count projections that have a non-zero magnitude
-        if (raw_projection.lengthSquared() > EPS)
+        if (raw_projection.lengthSquared() > FIXED_EPSILON)
         {
             projected_segments.push_back(
                 Segment(segment.getSegStart(), segment.getSegStart() + raw_projection));

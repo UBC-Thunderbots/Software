@@ -13,13 +13,9 @@
 #include "software/new_geom/segment.h"
 #include "software/new_geom/triangle.h"
 
-constexpr double EPS = 1e-9;
-
-constexpr double EPS2 = EPS * EPS;
-
 constexpr int sign(double n)
 {
-    return n > EPS ? 1 : (n < -EPS ? -1 : 0);
+    return n > FIXED_EPSILON ? 1 : (n < -FIXED_EPSILON ? -1 : 0);
 }
 
 double length(const Segment &segment);
@@ -33,9 +29,9 @@ double lengthSquared(const Segment &segment);
  *
  * @param segment2 : The second Segment
  *
- * @return true : If the Segment1 and Segment2 are collinear within EPS disance
+ * @return true : If the Segment1 and Segment2 are collinear within FIXED_EPSILON disance
  *
- * @return false : If Segment1 and Segment2 are NOT collinear within EPS distance
+ * @return false : If Segment1 and Segment2 are NOT collinear within FIXED_EPSILON distance
  */
 bool collinear(const Segment &segment1, const Segment &segment2);
 
