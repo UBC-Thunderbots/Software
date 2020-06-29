@@ -14,13 +14,19 @@ class Parameter
     /**
      * Constructs a new Parameter
      *
-     * @param name The name of the parameter
-     * @param value The value for this parameter
+     * @param parameter_name The name of the parameter used by dynamic_reconfigure
+     * dynamic_reconfigure
+     * @param default_value The default value for this parameter
      */
-    explicit Parameter<T>(const std::string& name, T value)
+    explicit Parameter<T>(const std::string& parameter_name, T default_value,
+                          std::vector<T> parameter_options,
+                          std::optional<T> parameter_min, std::optional<T> parameter_max)
     {
-        this->name_    = name;
-        this->value_   = value;
+        this->name_    = parameter_name;
+        this->value_   = default_value;
+        this->min_     = parameter_min;
+        this->max_     = parameter_max;
+        this->options_ = parameter_options;
     }
 
     /**
@@ -32,6 +38,36 @@ class Parameter
     {
         std::scoped_lock lock(this->value_mutex_);
         return this->value_;
+    }
+
+    /**
+     * Returns the options for this parameter
+     *
+     * @return the options of this parameter
+     */
+    const std::vector<T> getOptions() const
+    {
+        return this->options_;
+    }
+
+    /**
+     * Returns the min for this parameter
+     *
+     * @return the min of this parameter
+     */
+    const std::optional<T> getMin() const
+    {
+        return this->min_;
+    }
+
+    /**
+     * Returns the max for this parameter
+     *
+     * @return the max of this parameter
+     */
+    const std::optional<T> getMax() const
+    {
+        return this->max_;
     }
 
     /**
@@ -54,7 +90,6 @@ class Parameter
     {
         std::scoped_lock value_lock(this->value_mutex_);
         this->value_ = new_value;
-
         std::scoped_lock callback_lock(this->callback_mutex_);
         for (auto callback_func : callback_functions)
         {
@@ -75,13 +110,21 @@ class Parameter
     }
 
    private:
-
     // this mutex is marked as "mutable" so that it can be acquired in a const function
     mutable std::mutex value_mutex_;
     std::mutex callback_mutex_;
 
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
+
+    // Store the min/max
+    // Its up to the user how they want to interpret min/max for types other than
+    // int/double
+    std::optional<T> min_;
+    std::optional<T> max_;
+
+    // Store the options of this parameter
+    std::vector<T> options_;
 
     // Store the name of the parameter
     std::string name_;

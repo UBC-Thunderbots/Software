@@ -6,21 +6,28 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include "software/parameter/parameter.h"
 
 template <class T>
-class Parameter
+class ContinousParameter : public Parameter<T>
 {
    public:
     /**
-     * Constructs a new Parameter
+     * Constructs a new ContinousParameter, a Parameter that can take on any
+     * value between two ranges.
      *
-     * @param name The name of the parameter
-     * @param value The value for this parameter
+     * @param name The name of the ContinousParameter
+     * @param value The value for this ContinousParameter
+     * @param min The minimum value this ContinousParameter can take
+     * @param max The maximum value this ContinousParameter can take
      */
-    explicit Parameter<T>(const std::string& name, T value)
+    explicit ContinousParameter<T>(const std::string& name, T value,
+                          std::optional<T> parameter_min, std::optional<T> parameter_max)
     {
-        this->name_    = name;
-        this->value_   = value;
+        this->name_    = parameter_name;
+        this->value_   = default_value;
+        this->min_     = parameter_min;
+        this->max_     = parameter_max;
     }
 
     /**
@@ -32,6 +39,26 @@ class Parameter
     {
         std::scoped_lock lock(this->value_mutex_);
         return this->value_;
+    }
+
+    /**
+     * Returns the min for this parameter
+     *
+     * @return the min of this parameter
+     */
+    const std::optional<T> getMin() const
+    {
+        return this->min_;
+    }
+
+    /**
+     * Returns the max for this parameter
+     *
+     * @return the max of this parameter
+     */
+    const std::optional<T> getMax() const
+    {
+        return this->max_;
     }
 
     /**
@@ -54,7 +81,6 @@ class Parameter
     {
         std::scoped_lock value_lock(this->value_mutex_);
         this->value_ = new_value;
-
         std::scoped_lock callback_lock(this->callback_mutex_);
         for (auto callback_func : callback_functions)
         {
@@ -80,11 +106,14 @@ class Parameter
     mutable std::mutex value_mutex_;
     std::mutex callback_mutex_;
 
-    // Store the value so it can be retrieved without fetching from the server again
-    T value_;
+    // Its up to the implementor how they want to interpret min/max for types other
+    // than int/double
+    T min_;
+    T max_;
 
-    // Store the name of the parameter
+    // Stored name and value
     std::string name_;
+    T value_;
 
     // A list of functions to call when a new parameter value is set
     std::vector<std::function<void(T)>> callback_functions;
