@@ -42,6 +42,8 @@ const double ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0;
 const double ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED = 10.0;
 
 // The nominal battery voltage
+// TODO: Determine the actual nominal battery voltage. This number is a guess.
+// https://github.com/UBC-Thunderbots/Software/issues/1532
 const float ROBOT_NOMINAL_BATTERY_VOLTAGE = 12.0f;
 
 // The maximum speed attainable by enemy robots

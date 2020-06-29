@@ -54,4 +54,3 @@ static void io_drivetrain_sendLocalSpeedsToDrivetrainUnits(Drivetrain_t* drivetr
                                      io_drivetrain_unit_getSpeed(back_left));
     io_drivetrain_unit_updateControl(front_left, wheel_speeds.rows[3][0],
                                      io_drivetrain_unit_getSpeed(back_right));
-}
