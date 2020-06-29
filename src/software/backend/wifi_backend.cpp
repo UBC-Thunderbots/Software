@@ -10,12 +10,15 @@ const std::string WifiBackend::name = "wifi";
 
 WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
     : network_config(network_config),
-      network_input(network_config->getSSLCommunicationConfig()->VisionIPv4Address()->value(),
-                    network_config->getSSLCommunicationConfig()->VisionPort()->value(),
-                    network_config->getSSLCommunicationConfig()->GamecontrollerIPv4Address()->value(),
-                    network_config->getSSLCommunicationConfig()->GamecontrollerPort()->value(),
-                    boost::bind(&WifiBackend::receiveWorld, this, _1),
-                    DynamicParameters->getSensorFusionConfig()),
+      network_input(
+          network_config->getSSLCommunicationConfig()->VisionIPv4Address()->value(),
+          network_config->getSSLCommunicationConfig()->VisionPort()->value(),
+          network_config->getSSLCommunicationConfig()
+              ->GamecontrollerIPv4Address()
+              ->value(),
+          network_config->getSSLCommunicationConfig()->GamecontrollerPort()->value(),
+          boost::bind(&WifiBackend::receiveWorld, this, _1),
+          DynamicParameters->getSensorFusionConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->getSSLCommunicationConfig())

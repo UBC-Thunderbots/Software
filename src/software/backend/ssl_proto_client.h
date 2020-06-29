@@ -2,9 +2,9 @@
 
 #include "software/constants.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
-#include "software/parameter/dynamic_parameters.h"
 
 /**
  * This class encapsulates ProtoMulticastListener<SSL_WrapperPacket> and

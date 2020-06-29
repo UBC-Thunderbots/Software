@@ -7,7 +7,8 @@
 
 const std::string RadioBackend::name = "radio";
 
-RadioBackend::RadioBackend(std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config)
+RadioBackend::RadioBackend(
+    std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config)
     : ssl_communication_config(ssl_communication_config),
       network_input(ssl_communication_config->VisionIPv4Address()->value(),
                     ssl_communication_config->VisionPort()->value(),

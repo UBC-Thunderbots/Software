@@ -8,12 +8,15 @@ const std::string GrSimBackend::name = "grsim";
 
 GrSimBackend::GrSimBackend(std::shared_ptr<const NetworkConfig> network_config)
     : network_config(network_config),
-      network_input(network_config->getSSLCommunicationConfig()->VisionIPv4Address()->value(),
-                    network_config->getSSLCommunicationConfig()->VisionPort()->value(),
-                    network_config->getSSLCommunicationConfig()->GamecontrollerIPv4Address()->value(),
-                    network_config->getSSLCommunicationConfig()->GamecontrollerPort()->value(),
-                    boost::bind(&GrSimBackend::receiveWorld, this, _1),
-                    DynamicParameters->getSensorFusionConfig()),
+      network_input(
+          network_config->getSSLCommunicationConfig()->VisionIPv4Address()->value(),
+          network_config->getSSLCommunicationConfig()->VisionPort()->value(),
+          network_config->getSSLCommunicationConfig()
+              ->GamecontrollerIPv4Address()
+              ->value(),
+          network_config->getSSLCommunicationConfig()->GamecontrollerPort()->value(),
+          boost::bind(&GrSimBackend::receiveWorld, this, _1),
+          DynamicParameters->getSensorFusionConfig()),
       grsim_output(GRSIM_COMMAND_NETWORK_ADDRESS, GRSIM_COMMAND_NETWORK_PORT,
                    DynamicParameters->getSensorFusionConfig())
 {
