@@ -4,6 +4,7 @@
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * This class encapsulates ProtoMulticastListener<SSL_WrapperPacket> and
@@ -19,22 +20,17 @@ class SSLProtoClient
      * @param received_vision_callback Callback for when a new SSL_WrapperPacket is
      * received
      * @param received_referee_callback Callback for when a new Referee is received
-     * @param vision_multicast_address IP address the vision system is running on
-     * @param vision_multicast_port The port the vision system is running on
-     * @param gamecontroller_multicast_address IP address the gamecontroller system is
-     * running on
-     * @param gamecontroller_multicast_port The port the gamecontroller is running on
+     * @param ssl_communication_config The config defining the network parameters used
+     * to communicate with the SSL applications
      */
     explicit SSLProtoClient(
         std::function<void(SSL_WrapperPacket)> received_vision_callback,
         std::function<void(Referee)> received_referee_callback,
-        std::string vision_multicast_address, int vision_multicast_port,
-        std::string gamecontroller_multicast_address, int gamecontroller_multicast_port);
+        std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config);
 
    private:
-    // The client that handles data reception, filtering, and publishing for vision data
+    std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config;
     std::unique_ptr<ThreadedProtoMulticastListener<SSL_WrapperPacket>>
         ssl_vision_listener;
-    // The client that handles data reception, filtering , and publishing for referee data
     std::unique_ptr<ThreadedProtoMulticastListener<Referee>> ssl_referee_listener;
 };
