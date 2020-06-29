@@ -33,8 +33,8 @@ bool contains(const Polygon& container, const Point& contained)
     // located in one and only one polygon.
     auto& points            = container.getPoints();
     bool point_is_contained = false;
-    unsigned i              = 0;
-    unsigned j              = points.size() - 1;
+    size_t i                = 0;
+    size_t j                = points.size() - 1;
     double px               = contained.x();
     double py               = contained.y();
     while (i < points.size())
@@ -67,7 +67,7 @@ bool contains(const Ray& container, const Point& contained)
         collinear(contained, container.getStart(), point_in_ray_direction);
     bool point_is_in_ray_direction =
         ((contained - container.getStart()).normalize() - container.toUnitVector())
-            .length() < GeomConstants::FIXED_EPSILON;
+            .length() < FIXED_EPSILON;
     return point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
 }
 

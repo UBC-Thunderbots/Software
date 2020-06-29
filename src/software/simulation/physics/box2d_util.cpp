@@ -22,14 +22,14 @@ bool bodyExistsInWorld(b2Body* body, b2World* world)
 b2Vec2 createVec2(const Point& point)
 {
     b2Vec2 ret;
-    ret.Set(point.x(), point.y());
+    ret.Set(static_cast<float>(point.x()), static_cast<float>(point.y()));
     return ret;
 }
 
 b2Vec2 createVec2(const Vector& vector)
 {
     b2Vec2 ret;
-    ret.Set(vector.x(), vector.y());
+    ret.Set(static_cast<float>(vector.x()), static_cast<float>(vector.y()));
     return ret;
 }
 

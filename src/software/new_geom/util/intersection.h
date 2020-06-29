@@ -26,9 +26,8 @@
  * @return the point of intersection, if it exists
  */
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
-                                  const Point &d,
-                                  double fixed_epsilon = GeomConstants::FIXED_EPSILON,
-                                  int ulps_epsilon     = GeomConstants::ULPS_EPSILON_TEN);
+                                  const Point &d, double fixed_epsilon = FIXED_EPSILON,
+                                  int ulps_epsilon = ULPS_EPSILON_TEN);
 
 /**
  * Computes the intersection of two segments.

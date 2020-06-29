@@ -45,7 +45,7 @@ class Tactic
      * tactic will be restarted every time it completes and will never report done
      */
     explicit Tactic(bool loop_forever,
-                    const std::set<RobotCapabilities::Capability> &capability_reqs_ = {});
+                    const std::set<RobotCapability> &capability_reqs_ = {});
 
     /**
      * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed
@@ -74,12 +74,12 @@ class Tactic
     /**
      * robot hardware capability requirements of the tactic.
      */
-    const std::set<RobotCapabilities::Capability> &robotCapabilityRequirements() const;
+    const std::set<RobotCapability> &robotCapabilityRequirements() const;
 
     /**
      * Mutable robot hardware capability requirements of the tactic.
      */
-    std::set<RobotCapabilities::Capability> &mutableRobotCapabilityRequirements();
+    std::set<RobotCapability> &mutableRobotCapabilityRequirements();
 
 
     /**
@@ -192,5 +192,5 @@ class Tactic
     bool loop_forever;
 
     // robot capability requirements
-    std::set<RobotCapabilities::Capability> capability_reqs;
+    std::set<RobotCapability> capability_reqs;
 };

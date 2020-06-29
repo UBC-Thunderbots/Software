@@ -115,8 +115,8 @@ class BallFilterTest : public ::testing::Test
         // time step in order for the ball to reach the end of the given segment.
         Duration max_ball_travel_duration =
             Duration::fromSeconds(ball_path.length() / ball_velocity_magnitude);
-        int num_iterations =
-            std::round(max_ball_travel_duration.getSeconds() / time_step.getSeconds());
+        int num_iterations = static_cast<int>(
+            std::round(max_ball_travel_duration.getSeconds() / time_step.getSeconds()));
 
         testFilterHelper(start_time, ball_starting_position, ball_velocity,
                          ball_position_variance, time_step_variance,
@@ -545,5 +545,5 @@ TEST_F(BallFilterTest,
     // Check the lines are pointing in the same direction
     EXPECT_LT(x_vs_y_regression.regression_line.toNormalUnitVector().cross(
                   y_vs_x_regression.regression_line.toNormalUnitVector()),
-              GeomConstants::FIXED_EPSILON);
+              FIXED_EPSILON);
 }

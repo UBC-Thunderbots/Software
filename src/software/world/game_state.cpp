@@ -154,12 +154,11 @@ void GameState::setBallPlacementPoint(Point placementPoint)
 
 std::optional<Point> GameState::getBallPlacementPoint() const
 {
-    std::optional<Point> opt_ball_placement_point = std::nullopt;
     if (isSetupRestart())
     {
-        opt_ball_placement_point = ball_placement_point;
+        return ball_placement_point;
     }
-    return opt_ball_placement_point;
+    return std::nullopt;
 }
 
 // apologies for this monster switch statement
@@ -278,7 +277,7 @@ void GameState::updateBall(const Ball& ball)
     }
 }
 
-RefboxGameState GameState::getRefboxGameState() const
+const RefboxGameState& GameState::getRefboxGameState() const
 {
     return game_state;
 }

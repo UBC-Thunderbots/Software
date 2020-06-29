@@ -25,7 +25,7 @@ static void dribble_start(const primitive_params_t* params, void* void_state_ptr
 
     Dribbler_t* dribbler =
         app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
-    app_dribbler_setSpeed(dribbler, (unsigned int)(params->params[3]));
+    app_dribbler_setSpeed(dribbler, (uint32_t)(params->params[3]));
 }
 
 static void dribble_end(void* void_state_ptr, FirmwareWorld_t* world) {}

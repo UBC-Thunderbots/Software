@@ -7,16 +7,14 @@
 const std::string GrSimBackend::name = "grsim";
 
 GrSimBackend::GrSimBackend()
-    : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_VISION_MULTICAST_PORT,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
+    : network_input(SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT,
+                    SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
+                    SSL_GAMECONTROLLER_MULTICAST_PORT,
                     boost::bind(&GrSimBackend::receiveWorld, this, _1),
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    Util::DynamicParameters->getCameraConfig()),
-      grsim_output(Util::Constants::GRSIM_COMMAND_NETWORK_ADDRESS,
-                   Util::Constants::GRSIM_COMMAND_NETWORK_PORT,
-                   Util::DynamicParameters->getAIControlConfig()->getRefboxConfig())
+                    DynamicParameters->getAIControlConfig()->getRefboxConfig(),
+                    DynamicParameters->getCameraConfig()),
+      grsim_output(GRSIM_COMMAND_NETWORK_ADDRESS, GRSIM_COMMAND_NETWORK_PORT,
+                   DynamicParameters->getAIControlConfig()->getRefboxConfig())
 {
 }
 

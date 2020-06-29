@@ -57,7 +57,7 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(double total_chick
     }
 
     b2PolygonShape* shape = new b2PolygonShape();
-    shape->Set(vertices.data(), shape_points.size());
+    shape->Set(vertices.data(), static_cast<int>(shape_points.size()));
 
     return shape;
 }
@@ -85,7 +85,7 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(double total_chic
     }
 
     b2PolygonShape* shape = new b2PolygonShape();
-    shape->Set(vertices.data(), shape_points.size());
+    shape->Set(vertices.data(), static_cast<int>(shape_points.size()));
 
     return shape;
 }

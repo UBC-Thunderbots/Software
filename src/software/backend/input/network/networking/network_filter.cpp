@@ -13,10 +13,9 @@
 NetworkFilter::NetworkFilter(std::shared_ptr<const RefboxConfig> refbox_config)
     : field_state(),
       ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
-      friendly_team_state(Duration::fromMilliseconds(
-          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
-      enemy_team_state(Duration::fromMilliseconds(
-          Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
+      friendly_team_state(
+          Duration::fromMilliseconds(ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
+      enemy_team_state(Duration::fromMilliseconds(ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),

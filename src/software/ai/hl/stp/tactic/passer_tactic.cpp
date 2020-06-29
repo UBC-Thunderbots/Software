@@ -7,9 +7,7 @@
 #include "software/logger/logger.h"
 
 PasserTactic::PasserTactic(Pass pass, const Ball& ball, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapabilities::Capability::Kick}),
-      pass(std::move(pass)),
-      ball(ball)
+    : Tactic(loop_forever, {RobotCapability::Kick}), pass(std::move(pass)), ball(ball)
 {
 }
 

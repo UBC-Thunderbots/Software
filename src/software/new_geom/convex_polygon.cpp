@@ -50,25 +50,25 @@ bool ConvexPolygon::isConvex()
 
         // Calculate sign flips using the next edge vector ("next_to_curr"),
         // recording the first sign
-        if (next_to_curr.x() > GeomConstants::FIXED_EPSILON)
+        if (next_to_curr.x() > FIXED_EPSILON)
         {
             if (x_sign == 0)
             {
                 x_first_sign = 1;
             }
-            else if (x_sign < -GeomConstants::FIXED_EPSILON)
+            else if (x_sign < -FIXED_EPSILON)
             {
                 x_flips = x_flips + 1;
             }
             x_sign = 1;
         }
-        else if (next_to_curr.x() < -GeomConstants::FIXED_EPSILON)
+        else if (next_to_curr.x() < -FIXED_EPSILON)
         {
             if (x_sign == 0)
             {
                 x_first_sign = -1;
             }
-            else if (x_sign > GeomConstants::FIXED_EPSILON)
+            else if (x_sign > FIXED_EPSILON)
             {
                 x_flips = x_flips + 1;
             }
@@ -80,25 +80,25 @@ bool ConvexPolygon::isConvex()
             return false;
         }
 
-        if (next_to_curr.y() > GeomConstants::FIXED_EPSILON)
+        if (next_to_curr.y() > FIXED_EPSILON)
         {
             if (y_sign == 0)
             {
                 y_first_sign = 1;
             }
-            else if (y_sign < -GeomConstants::FIXED_EPSILON)
+            else if (y_sign < -FIXED_EPSILON)
             {
                 y_flips = y_flips + 1;
             }
             y_sign = 1;
         }
-        else if (next_to_curr.y() < -GeomConstants::FIXED_EPSILON)
+        else if (next_to_curr.y() < -FIXED_EPSILON)
         {
             if (y_sign == 0)
             {
                 y_first_sign = -1;
             }
-            else if (y_sign > GeomConstants::FIXED_EPSILON)
+            else if (y_sign > FIXED_EPSILON)
             {
                 y_flips = y_flips + 1;
             }
@@ -118,13 +118,11 @@ bool ConvexPolygon::isConvex()
         {
             w_sign = w;
         }
-        else if (w_sign > GeomConstants::FIXED_EPSILON &&
-                 w < -GeomConstants::FIXED_EPSILON)
+        else if (w_sign > FIXED_EPSILON && w < -FIXED_EPSILON)
         {
             return false;
         }
-        else if (w_sign < -GeomConstants::FIXED_EPSILON &&
-                 w > GeomConstants::FIXED_EPSILON)
+        else if (w_sign < -FIXED_EPSILON && w > FIXED_EPSILON)
         {
             return false;
         }
@@ -157,9 +155,9 @@ double ConvexPolygon::area() const
     double first_term  = 0;
     double second_term = 0;
 
-    unsigned num_points = reversePoints.size();
+    size_t num_points = reversePoints.size();
 
-    for (unsigned i = 0; i < num_points; i++)
+    for (size_t i = 0; i < num_points; i++)
     {
         first_term += reversePoints[i].x() * reversePoints[(i + 1) % num_points].y();
         second_term += reversePoints[i].y() * reversePoints[(i + 1) % num_points].x();

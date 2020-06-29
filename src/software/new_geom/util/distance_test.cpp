@@ -18,8 +18,8 @@ TEST(DistanceTest, point_on_line)
 TEST(DistanceTest, point_near_vertical_line)
 {
     Line l(Point(0, 1), Point(0, 0));
-    Point p(2, 0);
-    double expected = 2;
+    Point p(2.1, 0);
+    double expected = 2.1;
     EXPECT_DOUBLE_EQ(distance(l, p), expected);
     EXPECT_DOUBLE_EQ(distance(p, l), expected);
 }
@@ -57,46 +57,6 @@ TEST(DistanceTest, different_points)
     Point p2(4, 5);
     double expected = 13.0;
     EXPECT_DOUBLE_EQ(distance(p1, p2), expected);
-}
-
-TEST(DistanceTest, same_segments)
-{
-    Segment s1(Point(-4, 7), Point(4, 2));
-    Segment s2(Point(-4, 7), Point(4, 2));
-    double expected = 0;
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
-TEST(DistanceTest, different_parallel_segments)
-{
-    Segment s1(Point(-4, 7), Point(4, 2));
-    Segment s2(Point(-8, 6), Point(4, -1.5));
-    double expected = std::abs(4.5 - 1) / std::sqrt(std::pow((-5.0 / 8.0), 2) + 1);
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
-TEST(DistanceTest, intersecting_segments)
-{
-    Segment s1(Point(-4, 4), Point(4, 4));
-    Segment s2(Point(-5, 8), Point(2, 0));
-    double expected = 0;
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
-TEST(DistanceTest, non_intersecting_segments)
-{
-    Segment s1(Point(-4, 4), Point(4, 2));
-    Segment s2(Point(6, 8), Point(-2, 7));
-    double expected = std::abs(1.0 / 4.0 * -2 + 7 + -3) / std::hypot(1.0 / 4.0, 1);
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
-}
-
-TEST(DistanceTest, degenerate_segments)
-{
-    Segment s1(Point(-4, 4), Point(-4, 4));
-    Segment s2(Point(1, 9), Point(1, 9));
-    double expected = std::hypot(5, 5);
-    EXPECT_DOUBLE_EQ(distance(s1, s2), expected);
 }
 
 TEST(DistanceTest, point_on_segment_end)
@@ -194,8 +154,8 @@ TEST(DistanceTest, point_near_polygon_closest_to_edge)
     Polygon polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
     Point point(0.5, 1.1);
     double expected = 0.1;
-    EXPECT_NEAR(distance(point, polygon), expected, GeomConstants::FIXED_EPSILON);
-    EXPECT_NEAR(distance(polygon, point), expected, GeomConstants::FIXED_EPSILON);
+    EXPECT_NEAR(distance(point, polygon), expected, FIXED_EPSILON);
+    EXPECT_NEAR(distance(polygon, point), expected, FIXED_EPSILON);
 }
 
 TEST(DistanceTest, point_far_from_polygon)

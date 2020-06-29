@@ -4,8 +4,6 @@
 
 #include "software/optimization/gradient_descent_optimizer.h"
 
-using namespace Util;
-
 TEST(GradientDescentOptimizerTest, minimize_single_valued_function)
 {
     GradientDescentOptimizer<1> gradientDescentOptimizer({0.1});

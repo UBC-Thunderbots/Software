@@ -569,7 +569,7 @@ inline constexpr bool operator>=(const Angle &x, const Angle &y)
 inline bool operator==(const Angle &x, const Angle &y)
 {
     Angle diff = x.clamp().minDiff(y.clamp());
-    return diff.toRadians() <= GeomConstants::FIXED_EPSILON;
+    return diff.toRadians() <= FIXED_EPSILON;
 }
 
 inline constexpr bool operator!=(const Angle &x, const Angle &y)

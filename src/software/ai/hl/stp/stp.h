@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/motion_constraint/motion_constraint_manager.h"
-#include "software/parameter/config.hpp"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * The STP module is an implementation of the high-level logic Abstract class, that

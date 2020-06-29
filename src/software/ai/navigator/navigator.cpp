@@ -91,6 +91,8 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
     {
+        current_primitive.reset(nullptr);
+        current_robot_id.reset();
         intent->accept(*this);
         if (current_primitive)
         {

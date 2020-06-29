@@ -5,7 +5,6 @@
 
 #include "software/constants.h"
 #include "software/logger/logger.h"
-#include "software/parameter/config.hpp"
 #include "software/parameter/dynamic_parameters.h"
 
 NetworkClient::NetworkClient(std::string vision_multicast_address,
@@ -167,7 +166,7 @@ void NetworkClient::invertFieldSide(SSL_DetectionFrame& frame)
         {
             robot.set_x(-robot.x());
             robot.set_y(-robot.y());
-            robot.set_orientation(robot.orientation() + M_PI);
+            robot.set_orientation(robot.orientation() + static_cast<float>(M_PI));
         }
     }
 }

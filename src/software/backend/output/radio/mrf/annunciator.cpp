@@ -109,7 +109,8 @@ void Annunciator::handle_robot_message(int index, const void *data, std::size_t 
     RobotStatus robot_status;
 
     // Guard robot status state for this bot
-    std::lock_guard<std::mutex> lock(robot_status_states[index].bot_mutex);
+    std::lock_guard<std::mutex> lock(
+        robot_status_states[static_cast<unsigned char>(index)].bot_mutex);
 
     robot_status.link_quality = lqi / 255.0;
 
@@ -260,7 +261,8 @@ void Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_ET_MESSAGES[i])
                                         {
-                                            robot_status_states[index]
+                                            robot_status_states[static_cast<
+                                                                    unsigned char>(index)]
                                                 .et_messages[MRF::ERROR_ET_MESSAGES[i]] =
                                                 time(nullptr);
                                         }
@@ -357,7 +359,8 @@ void Annunciator::handle_robot_message(int index, const void *data, std::size_t 
     }
 
     // Edge-triggered messages: keep sending message for ET_MESSAGE_KEEPALIVE_TIME seconds
-    for (auto const &et_msg : robot_status_states[index].et_messages)
+    for (auto const &et_msg :
+         robot_status_states[static_cast<unsigned char>(index)].et_messages)
     {
         if (difftime(time(nullptr), et_msg.second) < ET_MESSAGE_KEEPALIVE_TIME)
         {
@@ -366,17 +369,19 @@ void Annunciator::handle_robot_message(int index, const void *data, std::size_t 
     }
 
     // Beep the dongle if there were new messages since the last update
-    checkNewMessages(new_msgs, robot_status_states[index].previous_status.robot_messages);
+    checkNewMessages(new_msgs, robot_status_states[static_cast<unsigned char>(index)]
+                                   .previous_status.robot_messages);
 
     // Add the latest robot and dongle status messages
     robot_status.robot_messages  = new_msgs;
     robot_status.dongle_messages = dongle_messages;
 
     // Update previous message state
-    robot_status_states[index].previous_status = robot_status;
+    robot_status_states[static_cast<unsigned char>(index)].previous_status = robot_status;
 
     // Update last communicated time
-    robot_status_states[index].last_status_update = time(nullptr);
+    robot_status_states[static_cast<unsigned char>(index)].last_status_update =
+        time(nullptr);
 
     // Send out robot status
     received_robot_status_callback(robot_status);
@@ -421,6 +426,10 @@ std::vector<std::string> Annunciator::handle_dongle_messages(uint8_t status)
     if (status & 32U)
     {
         dongle_messages.push_back(MRF::RECEIVE_QUEUE_FULL_MESSAGE);
+    }
+    if (status & 64U)
+    {
+        dongle_messages.push_back(MRF::PACKET_ABOVE_MAX_SIZE);
     }
 
     return dongle_messages;

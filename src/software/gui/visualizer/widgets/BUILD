@@ -49,6 +49,9 @@ qt_cc_library(
         "//software/gui/visualizer/ui:main_widget",
         "//software/logger",
         "//software/parameter",
+        "//software/parameter:config",
+        "//software/parameter:dynamic_parameters",
+        "//software/util/variant_visitor",
         "@qt//:qt_widgets",
     ],
 )
