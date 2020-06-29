@@ -7,9 +7,11 @@
 class ReplayReader {
    public:
     explicit ReplayReader(const std::string& _replay_dir);
-    std::optional<SensorMsg> getNextFrame();
+    SensorMsg getNextFrame();
+    bool hasNextFrame() const;
    private:
     void nextChunk();
+    size_t max_chunk_idx;
     size_t cur_chunk_idx;
     size_t cur_frame_idx;
     TbotsReplay cur_chunk;

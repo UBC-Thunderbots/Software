@@ -32,6 +32,7 @@ cc_library(
 cc_test(
     name = "replay_test",
     srcs = ["replay_test.cpp"],
+    data = [":test_replay"],
     deps = [
         "replay_logger",
         "replay_reader",

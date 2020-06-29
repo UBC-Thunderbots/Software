@@ -1,6 +1,8 @@
 #include "replay_reader.h"
 #include <fstream>
 #include <google/protobuf/util/delimited_message_util.h>
+
+// unfortunately protobuf forces me to write caveman code
 extern "C" {
 #include <unistd.h>
 #include <fcntl.h>
@@ -8,8 +10,25 @@ extern "C" {
 
 namespace fs = std::experimental::filesystem;
 
+namespace {
+    TbotsReplay readDelimitedReplayProtobufFile(const fs::path& file_path)
+    {
+        // imagine having to write caveman code to read protobuf msgs from files
+        TbotsReplay msg;
+        int fd = open(file_path.c_str(), O_RDONLY);
+        auto file_input = std::make_unique<google::protobuf::io::FileInputStream>(fd);
+        auto coded_input = std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
+        bool result = google::protobuf::util::ParseDelimitedFromCodedStream(&msg, coded_input.get(), nullptr);
+        if (!result) {
+            throw std::invalid_argument("Failed to parse protobuf from file " + file_path.string());
+        }
+        close(fd);
+        return msg;
+    }
+}
+
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const std::set<T>& set) {
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& set) {
     os << '{';
     for (const auto& val : set) {
         os << val << ' ';
@@ -34,16 +53,14 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
     // at 0; this is so that we can trivially 'crop' replays
     fs::directory_iterator dir_it(replay_dir);
     // filter the filenames in the replay out directory to only numeric filenames
-    std::set<size_t> chunk_indices;
+    std::vector<size_t> chunk_indices;
     std::for_each(fs::begin(dir_it), fs::end(dir_it),
         [&chunk_indices](const fs::directory_entry& dir_entry) {
             try {
                 auto fname_num = std::stoul(dir_entry.path().filename());
-                chunk_indices.emplace(fname_num);
+                chunk_indices.emplace_back(fname_num);
             } catch(std::invalid_argument&) {};
     });
-
-    std::cout << chunk_indices << std::endl;
 
     if (chunk_indices.size() == 0) {
         throw std::invalid_argument(replay_dir.string() +
@@ -52,34 +69,29 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
 
     // TODO: timestamp functionality, including seeking by timestamp
     // std::set::begin() is guaranteed to point to the smallest item
+    std::sort(chunk_indices.begin(), chunk_indices.end());
     cur_chunk_idx = *chunk_indices.begin();
+    max_chunk_idx = *chunk_indices.rbegin();
     auto chunk_path = replay_dir / std::to_string(cur_chunk_idx);
 
-    // imagine having to write caveman code to read protobuf msgs from files
-    int fd = open(chunk_path.c_str(), O_RDONLY);
-    auto file_input = std::make_unique<google::protobuf::io::FileInputStream>(fd);
-    auto coded_input = std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
-    bool result = google::protobuf::util::ParseDelimitedFromCodedStream(&cur_chunk, coded_input.get(), nullptr);
-    if (!result) {
-        throw std::invalid_argument("Failed to parse protobuf from file " + chunk_path.string());
-    }
-    close(fd);
+    cur_chunk.CopyFrom(::readDelimitedReplayProtobufFile(chunk_path));
 }
 
-std::optional<SensorMsg> ReplayReader::getNextFrame()
+SensorMsg ReplayReader::getNextFrame()
 {
     if (cur_frame_idx >= cur_chunk.replay_frames_size()) {
-        try {
-            nextChunk();
-        } catch (std::out_of_range& e) {
-            std::cout << "PEA BRAIN TIME " << e.what() << std::endl;
-            return std::nullopt;
-        }
+        nextChunk();
     }
 
     auto ret = cur_chunk.replay_frames(cur_frame_idx);
+    std::cout << "chunk_idx: " << cur_chunk_idx << ", frame idx: " << cur_frame_idx << std::endl;
     cur_frame_idx++;
     return ret;
+}
+
+bool ReplayReader::hasNextFrame() const {
+    return !(cur_chunk_idx == max_chunk_idx
+             && cur_frame_idx == cur_chunk.replay_frames_size());
 }
 
 void ReplayReader::nextChunk() {
@@ -90,15 +102,7 @@ void ReplayReader::nextChunk() {
         throw std::out_of_range("Reached end of replay!");
     }
 
-    // TODO: move this monstrosity into its own function
-    // imagine having to write caveman code to read protobuf msgs from files
-    int fd = open(chunk_path.c_str(), O_RDONLY);
-    auto file_input = std::make_unique<google::protobuf::io::FileInputStream>(fd);
-    auto coded_input = std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
-    bool result = google::protobuf::util::ParseDelimitedFromCodedStream(&cur_chunk, coded_input.get(), nullptr);
-    if (!result) {
-        throw std::invalid_argument("Failed to parse protobuf from file " + chunk_path.string());
-    }
-    close(fd);
+    cur_chunk = ::readDelimitedReplayProtobufFile(chunk_path);
     cur_frame_idx = 0;
 }
+
