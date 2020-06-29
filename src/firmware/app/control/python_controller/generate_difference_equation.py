@@ -44,7 +44,6 @@ if __name__ == "__main__":
         numerator = [1, 2]
         denominator = [3, 4, 5]
         interpolation_period = 0.1
-        input_value = 1
 
         transfer_function = tf(numerator, denominator, interpolation_period)
 

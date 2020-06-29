@@ -31,7 +31,6 @@ float GENERATED_PREVIOUS_WHEEL_SPEED_COMMAND_COEFFICIENTS[GENERATED_NUM_PREVIOUS
         numerator = [5, 4]
         denominator = [3, 2, 1]
         interpolation_period = 0.1
-        input_value = 1
 
         transfer_function = tf(numerator, denominator, interpolation_period)
         difference_equation_coefficients = gde.generate(transfer_function)
