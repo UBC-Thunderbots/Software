@@ -101,7 +101,7 @@ std::ostream &operator<<(std::ostream &os, const Point &p)
 
 bool operator==(const Point &p, const Point &q)
 {
-    return (p - q).lengthSquared() < GeomConstants::FIXED_EPSILON;
+    return (p - q).lengthSquared() < FIXED_EPSILON;
 }
 
 bool operator!=(const Point &p, const Point &q)

@@ -25,6 +25,7 @@
 #include <unused.h>
 
 #include "firmware/app/primitives/primitive.h"
+#include "firmware/app/primitives/stop_primitive.h"
 #include "firmware/shared/physics.h"
 #include "io/charger.h"
 #include "io/chicker.h"
@@ -35,7 +36,10 @@
 #include "io/motor.h"
 #include "io/mrf.h"
 #include "main.h"
+#include "pb_decode.h"
+#include "pb_encode.h"
 #include "priority.h"
+#include "shared/proto/primitive.pb.h"
 
 /**
  * \brief The number of robots in the drive packet.
@@ -65,16 +69,15 @@ static PrimitiveManager_t *primitive_manager;
 static uint8_t *dma_buffer;
 static SemaphoreHandle_t drive_mtx;
 static unsigned int timeout_ticks;
-static uint8_t last_serial        = 0xFF;
 static const size_t HEADER_LENGTH = 2U /* Frame control */ + 1U /* Seq# */ +
                                     2U /* Dest PAN */ + 2U /* Dest */ + 2U /* Src */;
-static const size_t FOOTER_LENGTH         = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
-static const int16_t MESSAGE_PURPOSE_ADDR = 2U /* Frame control */ + 1U /* Seq# */ +
-                                            2U /* Dest PAN */ + 2U /* Dest */ +
-                                            2U /* Src */;
-static const uint16_t MESSAGE_PAYLOAD_ADDR = 2U /* Frame control */ + 1U /* Seq# */ +
+static const size_t FOOTER_LENGTH          = 2U /* FCS */ + 1U /* RSSI */ + 1U /* LQI */;
+static const int16_t MESSAGE_PURPOSE_INDEX = 2U /* Frame control */ + 1U /* Seq# */ +
                                              2U /* Dest PAN */ + 2U /* Dest */ +
-                                             2U /* Src */ + 1U /* Msg Purpose*/;
+                                             2U /* Src */;
+static const uint16_t MESSAGE_PAYLOAD_INDEX = 2U /* Frame control */ + 1U /* Seq# */ +
+                                              2U /* Dest PAN */ + 2U /* Dest */ +
+                                              2U /* Src */ + 1U /* Msg Purpose*/;
 
 static void receive_task(void *UNUSED(param))
 {
@@ -105,13 +108,15 @@ static void receive_task(void *UNUSED(param))
                 {
                     // Broadcast frame must contain a camera packet or drive packet
                     // Note that camera packets have a variable length.
-                    if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x0FU)
+                    if (dma_buffer[MESSAGE_PURPOSE_INDEX] == 0x0FU)
                     {
-                        handle_drive_packet(dma_buffer);
+                        handle_drive_packet(
+                            &dma_buffer[MESSAGE_PAYLOAD_INDEX],
+                            frame_length - MESSAGE_PAYLOAD_INDEX - FOOTER_LENGTH);
                     }
-                    else if (dma_buffer[MESSAGE_PURPOSE_ADDR] == 0x10U)
+                    else if (dma_buffer[MESSAGE_PURPOSE_INDEX] == 0x10U)
                     {
-                        uint8_t buffer_position = MESSAGE_PAYLOAD_ADDR;
+                        uint8_t buffer_position = MESSAGE_PAYLOAD_INDEX;
                         handle_camera_packet(dma_buffer, buffer_position);
                     }
                 }
@@ -191,107 +196,79 @@ void receive_tick(log_record_t *record)
     }
 }
 
-
-/**
- * \brief Returns the serial number of the most recent drive packet.
- */
-uint8_t receive_last_serial(void)
+void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
 {
-    return __atomic_load_n(&last_serial, __ATOMIC_RELAXED);
-}
-
-void handle_drive_packet(uint8_t *dma_buffer)
-{
-    // Grab emergency stop status from the end of the frame.
-    bool estop_run =
-        !!dma_buffer[MESSAGE_PAYLOAD_ADDR + NUM_ROBOTS * RECEIVE_DRIVE_BYTES_PER_ROBOT];
-
-    // Grab a pointer to the robot’s own data block.
-    const uint8_t *robot_data =
-        dma_buffer + MESSAGE_PAYLOAD_ADDR + RECEIVE_DRIVE_BYTES_PER_ROBOT * robot_index;
+    bool estop_triggered                    = packet_data[0] != 1;
+    bool feedback_requested_from_this_robot = packet_data[1] == robot_index;
+    uint8_t packet_robot_id                 = packet_data[2];
 
     // Check if feedback should be sent.
-    if (robot_data[0] & 0x80)
+    if (feedback_requested_from_this_robot)
     {
         feedback_pend_normal();
     }
 
-    // Extract the serial number.
-    uint8_t serial = *robot_data++ & 0x0F;
-
-    // Construct the individual 16-bit words sent from the host.
-    uint16_t words[4U];
-    for (unsigned int i = 0U; i < 4U; ++i)
+    // Check if this drive packet was intended for us, if not we can stop here
+    if (packet_robot_id != robot_index)
     {
-        words[i] = *robot_data++;
-        words[i] |= (uint16_t)*robot_data++ << 8;
+        return;
     }
 
-    // In case of emergency stop, treat everything as zero
-    // except the chicker discharge bit (that can keep its
-    // status).
-    if (!estop_run)
+    // Reset timeout.
+    timeout_ticks = 1000U / portTICK_PERIOD_MS;
+
+    // Figure out what primitive to run
+    primitive_params_t pparams = {0};
+    unsigned int primitive     = 0;
+    if (estop_triggered)
     {
-        static const uint16_t MASK[4] = {0x0000, 0x4000, 0x0000, 0x0000};
-        for (unsigned int i = 0; i != 4; ++i)
+        // Set the primitive to be a stop primitive
+        primitive         = 0;
+        pparams.params[0] = 0;
+        pparams.params[1] = 0;
+        pparams.params[2] = 0;
+        pparams.params[3] = 0;
+        pparams.slow      = true;
+        pparams.extra     = 0;
+
+        // Disable charging and discharge through chicker
+        charger_enable(false);
+        chicker_discharge(true);
+    }
+    else
+    {
+        // Decode the primitive
+        pb_istream_t pb_in_stream = pb_istream_from_buffer(packet_data, packet_size - 3);
+        PrimitiveMsg prim_msg     = PrimitiveMsg_init_zero;
+        if (!pb_decode(&pb_in_stream, PrimitiveMsg_fields, &prim_msg))
         {
-            words[i] &= MASK[i];
+            // If we failed to decode the message, it's likely malformed, so we should not
+            // proceed
+            return;
         }
+
+        pparams.slow      = prim_msg.slow;
+        pparams.extra     = prim_msg.extra_bits;
+        pparams.params[0] = prim_msg.parameter1;
+        pparams.params[1] = prim_msg.parameter2;
+        pparams.params[2] = prim_msg.parameter3;
+        pparams.params[3] = prim_msg.parameter3;
+
+        primitive = prim_msg.prim_type;
+
+        // Enable charging
+        charger_enable(true);
+        chicker_discharge(false);
     }
 
     // Take the drive mutex.
     xSemaphoreTake(drive_mtx, portMAX_DELAY);
 
-    // Reset timeout.
-    timeout_ticks = 1000U / portTICK_PERIOD_MS;
-
-    // Apply the charge and discharge mode.
-    charger_enable(words[1] & 0x8000);
-    chicker_discharge(words[1] & 0x4000);
-
-    // If the serial number, the emergency stop has just
-    // been switched to stop, or the current primitive is
-    // direct, a new movement primitive needs to start. Do
-    // not start a movement primitive if the emergency stop
-    // has just been switched to run and the current
-    // primitive is not direct, because we can’t usefully
-    // restart the stopped prior primitive—instead, wait
-    // for the host to send new data. Strictly speaking, we
-    // only need to start direct primitives when the estop
-    // is switched from stop to run, but this is
-    // unnecessary as direct primitives shouldn’t care
-    // about being started more often than necessary.
-    unsigned int primitive;
-    primitive_params_t pparams;
-    for (unsigned int i = 0; i != 4; ++i)
-    {
-        int16_t value = words[i] & 0x3FF;
-        if (words[i] & 0x400)
-        {
-            value = -value;
-        }
-        if (words[i] & 0x800)
-        {
-            value *= 10;
-        }
-        pparams.params[i] = value;
-    }
-    primitive     = words[0] >> 12;
-    pparams.extra = (words[2] >> 12) | ((words[3] >> 12) << 4);
-    pparams.slow  = !!(pparams.extra & 0x80);
-    pparams.extra &= 0x7F;
-    if ((serial != last_serial /* Non-atomic because we are only writer */) ||
-        !estop_run || app_primitive_manager_primitiveIsDirect(primitive))
-    {
-        app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
-                                                &pparams);
-    }
+    app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
+                                            &pparams);
 
     // Release the drive mutex.
     xSemaphoreGive(drive_mtx);
-
-    // Update the last values.
-    __atomic_store_n(&last_serial, serial, __ATOMIC_RELAXED);
 }
 
 void handle_camera_packet(uint8_t *dma_buffer, uint8_t buffer_position)
@@ -367,28 +344,28 @@ void handle_camera_packet(uint8_t *dma_buffer, uint8_t buffer_position)
 
 void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
 {
-    // printf("got a message with purpose: %i", dma_buffer[MESSAGE_PURPOSE_ADDR]);
-    // printf("var index: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 1]);
-    // printf("value: %i", dma_buffer[MESSAGE_PURPOSE_ADDR + 2]);
-    switch (dma_buffer[MESSAGE_PURPOSE_ADDR])
+    // printf("got a message with purpose: %i", dma_buffer[MESSAGE_PURPOSE_INDEX]);
+    // printf("var index: %i", dma_buffer[MESSAGE_PURPOSE_INDEX + 1]);
+    // printf("value: %i", dma_buffer[MESSAGE_PURPOSE_INDEX + 2]);
+    switch (dma_buffer[MESSAGE_PURPOSE_INDEX])
     {
         case 0x00:
             if (frame_length == HEADER_LENGTH + 4U + FOOTER_LENGTH)
             {
-                uint8_t which  = dma_buffer[MESSAGE_PAYLOAD_ADDR];
-                uint16_t width = dma_buffer[MESSAGE_PAYLOAD_ADDR + 2U];
+                uint8_t which  = dma_buffer[MESSAGE_PAYLOAD_INDEX];
+                uint16_t width = dma_buffer[MESSAGE_PAYLOAD_INDEX + 2U];
                 width <<= 8U;
-                width |= dma_buffer[MESSAGE_PAYLOAD_ADDR + 1U];
+                width |= dma_buffer[MESSAGE_PAYLOAD_INDEX + 1U];
                 chicker_fire_with_pulsewidth(which ? CHICKER_CHIP : CHICKER_KICK, width);
             }
             break;
         case 0x01U:  // Arm autokick
             if (frame_length == HEADER_LENGTH + 4U + FOOTER_LENGTH)
             {
-                uint8_t which  = dma_buffer[MESSAGE_PAYLOAD_ADDR];
-                uint16_t width = dma_buffer[MESSAGE_PAYLOAD_ADDR + 2U];
+                uint8_t which  = dma_buffer[MESSAGE_PAYLOAD_INDEX];
+                uint16_t width = dma_buffer[MESSAGE_PAYLOAD_INDEX + 2U];
                 width <<= 8U;
-                width |= dma_buffer[MESSAGE_PAYLOAD_ADDR + 1U];
+                width |= dma_buffer[MESSAGE_PAYLOAD_INDEX + 1U];
                 chicker_auto_arm(which ? CHICKER_CHIP : CHICKER_KICK, width);
             }
             break;
@@ -402,7 +379,7 @@ void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
         case 0x03U:  // Set LED mode
             if (frame_length == HEADER_LENGTH + 2U + FOOTER_LENGTH)
             {
-                uint8_t mode = dma_buffer[MESSAGE_PAYLOAD_ADDR];
+                uint8_t mode = dma_buffer[MESSAGE_PAYLOAD_INDEX];
                 if (mode <= 4U)
                 {
                     leds_test_set_mode(LEDS_TEST_MODE_HALL, mode);
@@ -446,14 +423,14 @@ void handle_other_packet(uint8_t *dma_buffer, size_t frame_length)
 
         case 0x0EU:  // Set capacitor bits.
             xSemaphoreTake(drive_mtx, portMAX_DELAY);
-            char capacitor_flag = dma_buffer[MESSAGE_PAYLOAD_ADDR];
+            char capacitor_flag = dma_buffer[MESSAGE_PAYLOAD_INDEX];
             charger_enable(capacitor_flag & 0x02);
             chicker_discharge(capacitor_flag & 0x01);
             xSemaphoreGive(drive_mtx);
             break;
             // case 0x20U: // Update tunable variable
-            //    update_var(dma_buffer[MESSAGE_PAYLOAD_ADDR],
-            //    dma_buffer[MESSAGE_PAYLOAD_ADDR + 1]); uint8_t i =
-            //    get_var(dma_buffer[MESSAGE_PAYLOAD_ADDR]); break;
+            //    update_var(dma_buffer[MESSAGE_PAYLOAD_INDEX],
+            //    dma_buffer[MESSAGE_PAYLOAD_INDEX + 1]); uint8_t i =
+            //    get_var(dma_buffer[MESSAGE_PAYLOAD_INDEX]); break;
     }
 }

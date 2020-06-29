@@ -103,7 +103,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // set the requirement that Robot 1 must be able to kick and chip
         move_tactics.at(0)->mutableRobotCapabilityRequirements() = {
-            RobotCapabilities::Capability::Kick, RobotCapabilities::Capability::Chip};
+            RobotCapability::Kick, RobotCapability::Chip};
 
         // setup 5 kickoff positions in order of priority
         for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)

@@ -6,46 +6,30 @@
 #include <string_view>
 #include <vector>
 
-namespace
+/**
+ * Checks if a string representing enum values is valid.
+ *
+ * An enum string is valid if it does not contain any '=', meaning
+ * the enum is not being assigned any values manually
+ *
+ * @param str A string containing comma-separated enum value names
+ *
+ * @return True if the string is valid, and false otherwise
+ */
+constexpr bool isEnumArgsValid(const std::string_view& str)
 {
-    /**
-     * Checks if a string representing enum values is valid.
-     *
-     * An enum string is valid if it does not contain any '=', meaning
-     * the enum is not being assigned any values manually
-     *
-     * @param str A string containing comma-separated enum value names
-     *
-     * @return True if the string is valid, and false otherwise
-     */
-    constexpr bool isEnumArgsValid(const std::string_view& str)
-    {
-        size_t index = str.find('=');
-        return index == std::string_view::npos;
-    }
+    size_t index = str.find('=');
+    return index == std::string_view::npos;
+}
 
-    /**
-     * Separates a string of comma-separated values into a vector
-     *
-     * @param enum_string A string of comma-separated enum values
-     *
-     * @return A vector of strings, where each string is a value from the original string
-     */
-    std::vector<std::string> separateEnumStrings(std::string enum_string)
-    {
-        enum_string.erase(remove_if(enum_string.begin(), enum_string.end(), isspace),
-                          enum_string.end());
-        std::vector<std::string> separated_enum_strings;
-        std::string segment;
-        std::stringstream enum_string_stream(enum_string);
-        while (std::getline(enum_string_stream, segment, ','))
-        {
-            separated_enum_strings.emplace_back(segment);
-        }
-
-        return separated_enum_strings;
-    }
-}  // namespace
+/**
+ * Separates a string of comma-separated values into a vector
+ *
+ * @param enum_string A string of comma-separated enum values
+ *
+ * @return A vector of strings, where each string is a value from the original string
+ */
+std::vector<std::string> separateEnumStrings(std::string enum_string);
 
 /**
  * Creates an enum.

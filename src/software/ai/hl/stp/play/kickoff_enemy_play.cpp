@@ -39,21 +39,21 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            Util::DynamicParameters->getAIConfig()
+                                            DynamicParameters->getAIConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
                                                 ->BallStealSpeed()
                                                 ->value(),
                                             false, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            Util::DynamicParameters->getAIConfig()
+                                            DynamicParameters->getAIConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
                                                 ->BallStealSpeed()
                                                 ->value(),
                                             false, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            Util::DynamicParameters->getAIConfig()
+                                            DynamicParameters->getAIConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
                                                 ->BallStealSpeed()
                                                 ->value(),

@@ -21,7 +21,7 @@ std::unique_ptr<VisionMsg> createVisionMsg(const World& world);
  * @param primitives The primitives to include in the PrimitiveMsg
  * @returns The unique_ptr to a PrimitiveMsg proto containing the primitives
  */
-std::unique_ptr<PrimitiveMsg> createPrimitiveMsg(
+std::unique_ptr<PrimitiveSetMsg> createPrimitiveSetMsg(
     const ConstPrimitiveVectorPtr& primitives);
 
 /**

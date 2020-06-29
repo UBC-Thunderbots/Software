@@ -205,4 +205,6 @@ namespace MRF
         "Second dongle on this channel+PAN";
     static constexpr const char* TRANSMIT_QUEUE_FULL_MESSAGE = "Transmit Queue Full";
     static constexpr const char* RECEIVE_QUEUE_FULL_MESSAGE  = "Receive Queue Full";
+    static constexpr const char* PACKET_ABOVE_MAX_SIZE =
+        "Attempted to send packet over radio greater then the maximum size";
 }  // namespace MRF

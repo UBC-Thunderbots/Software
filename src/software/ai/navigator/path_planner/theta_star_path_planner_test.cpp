@@ -13,7 +13,7 @@ class TestThetaStarPathPlanner : public testing::Test
    public:
     TestThetaStarPathPlanner()
         : robot_navigation_obstacle_factory(
-              Util::DynamicParameters->getAIConfig()
+              DynamicParameters->getAIConfig()
                   ->getRobotNavigationObstacleFactoryConfig()),
           planner(std::make_unique<ThetaStarPathPlanner>())
     {
