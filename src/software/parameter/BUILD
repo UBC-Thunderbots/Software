@@ -13,7 +13,7 @@ genrule(
         "//software/parameter:yaml_config_descriptions",
     ],
     outs = [
-        "config.hpp",
+        "generated_dynamic_parameters.hpp",
     ],
     cmd = "python3 software/parameter/generate_parameters_v2.py \
            $(locations //software/parameter:yaml_config_descriptions) \
@@ -28,14 +28,22 @@ cc_library(
 )
 
 cc_library(
+    name = "config",
+    hdrs = ["config.h"],
+    deps = [],
+)
+
+cc_library(
     name = "dynamic_parameters",
     srcs = ["dynamic_parameters.cpp"],
     hdrs = [
-        "config.hpp",
-        "config_utils.hpp",
         "dynamic_parameters.h",
+        "generated_dynamic_parameters.hpp",
     ],
-    deps = [":parameter"],
+    deps = [
+        ":config",
+        ":parameter",
+    ],
 )
 
 cc_test(

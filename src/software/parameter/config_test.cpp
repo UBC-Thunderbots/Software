@@ -1,10 +1,9 @@
-#include "software/parameter/config.hpp"
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
 
+#include "software/parameter/dynamic_parameters.h"
 #include "software/parameter/parameter.h"
 #include "software/util/variant_visitor/variant_visitor.h"
 #include "yaml-cpp/yaml.h"

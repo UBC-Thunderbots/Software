@@ -115,7 +115,7 @@ AUTOGEN_WARNING = """
 H_HEADER = """{}
 #pragma once
 #include <iostream>
-#include \"software/parameter/config_utils.hpp\"
+#include \"software/parameter/config.h\"
 """.format(
     AUTOGEN_WARNING
 )

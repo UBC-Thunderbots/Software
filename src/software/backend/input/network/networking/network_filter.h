@@ -6,7 +6,7 @@
 #include "software/backend/input/network/filter/ball_filter.h"
 #include "software/backend/input/network/filter/robot_filter.h"
 #include "software/backend/input/network/filter/robot_team_filter.h"
-#include "software/parameter/config.hpp"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/sensor_fusion/refbox_data.h"
