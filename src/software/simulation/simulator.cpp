@@ -84,27 +84,38 @@ void Simulator::setRobotPrimitives(
         return;
     }
 
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
     for (const auto& primitive_ptr : *primitives)
     {
         primitive_params_t primitive_params = getPrimitiveParams(primitive_ptr);
         unsigned int primitive_index        = getPrimitiveIndex(primitive_ptr);
 
-        auto simulator_robots_iter =
+        setRobotPrimitive(primitive_ptr->getRobotId(), primitive_index, primitive_params, simulator_robots, simulator_ball);
+    }
+}
+
+void Simulator::setYellowRobotPrimitive(RobotId id, unsigned int primitive_index, const primitive_params_t& params) {
+    setRobotPrimitive(id, primitive_index, params, yellow_simulator_robots, simulator_ball);
+}
+
+void Simulator::setBlueRobotPrimitive(RobotId id, unsigned int primitive_index, const primitive_params_t& params) {
+    setRobotPrimitive(id, primitive_index, params, blue_simulator_robots, simulator_ball);
+}
+
+void Simulator::setRobotPrimitive(RobotId id, unsigned int primitive_index, primitive_params_t params, std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+simulator_robots, const std::shared_ptr<SimulatorBall>& simulator_ball) {
+    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
+    auto simulator_robots_iter =
             std::find_if(simulator_robots.begin(), simulator_robots.end(),
-                         [&primitive_ptr](const auto& robot_world_pair) {
-                             return robot_world_pair.first->getRobotId() ==
-                                    primitive_ptr->getRobotId();
+                         [id](const auto& robot_world_pair) {
+                             return robot_world_pair.first->getRobotId() == id;
                          });
 
-        if (simulator_robots_iter != simulator_robots.end())
-        {
-            auto simulator_robot = (*simulator_robots_iter).first;
-            auto firmware_world  = (*simulator_robots_iter).second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-                firmware_world, primitive_index, primitive_params);
-        }
+    if (simulator_robots_iter != simulator_robots.end()) {
+        auto simulator_robot = (*simulator_robots_iter).first;
+        auto firmware_world  = (*simulator_robots_iter).second;
+        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+        SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
+                firmware_world, primitive_index, params);
     }
 }
 
