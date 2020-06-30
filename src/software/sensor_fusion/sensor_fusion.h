@@ -93,8 +93,9 @@ class SensorFusion
     std::optional<Ball> ball;
     Team friendly_team;
     Team enemy_team;
-    GameState game_state;
+    RefboxGameState refbox_game_state;
     std::optional<RefboxStage> refbox_stage;
+    std::optional<Point> ball_placement_point;
 
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
