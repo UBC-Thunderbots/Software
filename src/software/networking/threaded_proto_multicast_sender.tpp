@@ -7,8 +7,6 @@ ThreadedProtoMulticastSender<SendProto>::ThreadedProtoMulticastSender(
       multicast_sender(io_service, ip_address, port),
       io_service_thread([this]() { io_service.run(); })
 {
-    // start the thread to run the io_service in the background
-    //    io_service_thread = std::thread();
 }
 
 template <class SendProto>

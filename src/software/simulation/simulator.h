@@ -111,7 +111,8 @@ class Simulator
     void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
 
     /**
-     * Sets the primitive being simulated by the robot in simulation
+     * Sets the primitive being simulated by the robot on the corresponding team
+     * in simulation
      *
      * @param id The id of the robot to set the primitive for
      * @param primitive_index The index of the primitive to set

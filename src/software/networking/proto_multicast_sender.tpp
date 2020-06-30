@@ -10,7 +10,7 @@ ProtoMulticastSender<SendProto>::ProtoMulticastSender(boost::asio::io_service& i
 {
     boost::asio::ip::address multicast_addr = boost::asio::ip::make_address(ip_address);
 
-    // Create the sender_enpoint. This is the endpoint that identifies the sender, and
+    // Create the sender_endpoint. This is the endpoint that identifies the sender, and
     // must be different than the receiver (otherwise multiple sockets will try bind to
     // the same port and cause errors). Port 0 is a special value that tells the operating
     // system to dynamically assign an available port.

@@ -18,6 +18,10 @@ WifiBackend::WifiBackend()
       ssl_proto_client(
           boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
           boost::bind(&Backend::receiveSSLReferee, this, _1),
+          // These ports are modified so they don't conflict with the NetworkClient.
+          // They can be reset to their original values once
+          // https://github.com/UBC-Thunderbots/Software/issues/1135 is complete, since
+          // this will remove the NetworkClient
           SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT + 1,
           SSL_GAMECONTROLLER_MULTICAST_ADDRESS, SSL_GAMECONTROLLER_MULTICAST_PORT + 1)
 {

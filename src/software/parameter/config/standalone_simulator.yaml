@@ -13,5 +13,5 @@ StandaloneSimulatorConfig:
     type: "int"
     default: 1
     description: >-
-      The multicast channel to use to communicate with the yellow robots
+      The multicast channel to use to communicate with the blue robots
       in the simulator
