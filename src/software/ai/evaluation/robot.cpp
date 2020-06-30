@@ -125,8 +125,9 @@ std::optional<bool> robotBeingPassedTo(const BallHistory& ball_states,
                                     pass_axis_speed > min_pass_speed_m_s);
 };
 
-template <typename STATE>
-std::optional<STATE> findState(boost::circular_buffer<STATE> states, Timestamp& timestamp)
+template <typename STATE_TYPE>
+std::optional<STATE_TYPE> findState(boost::circular_buffer<STATE_TYPE> states,
+                                    Timestamp& timestamp)
 {
     for (const auto& state : states)
     {
