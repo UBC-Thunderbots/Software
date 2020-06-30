@@ -4,7 +4,7 @@
 
 // clang-format off
 MAKE_ENUM(RefboxGameState,
-          // these enum items map to the constants in RefboxCommand.msg
+          // these enums map to the enums in ssl_referee.proto
           HALT,
           STOP,
           NORMAL_START,

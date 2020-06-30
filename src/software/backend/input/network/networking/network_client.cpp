@@ -23,9 +23,10 @@ NetworkClient::NetworkClient(
             vision_multicast_address, vision_multicast_port,
             boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
 
-    ssl_gamecontroller_client = std::make_unique<ThreadedProtoMulticastListener<Referee>>(
-        gamecontroller_multicast_address, gamecontroller_multicast_port,
-        boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
+    ssl_gamecontroller_client =
+        std::make_unique<ThreadedProtoMulticastListener<SSL_Referee>>(
+            gamecontroller_multicast_address, gamecontroller_multicast_port,
+            boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
 }
 
 void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
@@ -112,7 +113,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
     }
 }
 
-void NetworkClient::filterAndPublishGameControllerData(Referee packet)
+void NetworkClient::filterAndPublishGameControllerData(SSL_Referee packet)
 {
     if (field && ball)
     {
