@@ -10,7 +10,6 @@ proto_library(
         "messages_robocup_ssl_wrapper.proto",
         "ssl_game_controller_common.proto",
         "ssl_game_event.proto",
-        "ssl_game_event_2019.proto",
         "ssl_referee.proto",
     ],
     visibility = ["//visibility:private"],
