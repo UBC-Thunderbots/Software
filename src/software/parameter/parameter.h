@@ -68,16 +68,16 @@ class Parameter
      *
      * @param callback The function to call when this parameter's value is changed
      */
-    void registerCallbackFunction(std::function<void(T)> callback)
+    void registerCallbackFunction(std::function<void(T)> callback) const
     {
         std::scoped_lock callback_lock(this->callback_mutex_);
         callback_functions.emplace_back(callback);
     }
 
    protected:
-    // this mutex is marked as "mutable" so that it can be acquired in a const function
+    // mutexes are marked as mutable so that they can be acquired in a const function
     mutable std::mutex value_mutex_;
-    std::mutex callback_mutex_;
+    mutable std::mutex callback_mutex_;
 
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
@@ -86,5 +86,6 @@ class Parameter
     std::string name_;
 
     // A list of functions to call when a new parameter value is set
-    std::vector<std::function<void(T)>> callback_functions;
+    // marked as mutable to allow const parameters to also register callbacks
+    mutable std::vector<std::function<void(T)>> callback_functions;
 };

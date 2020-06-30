@@ -1,4 +1,3 @@
-
 #include "software/parameter/parameter.h"
 
 #include <gtest/gtest.h>
@@ -192,5 +191,24 @@ TEST(ParameterTest, register_duplicate_callbacks_test)
 
     EXPECT_EQ(test_value, 0);
     test_param.setValue(1);
+    EXPECT_EQ(test_value, 2);
+}
+
+TEST(ParameterTest, register_callback_on_const_parameter)
+{
+    std::shared_ptr<Parameter<int>> test_param =
+        std::make_shared<Parameter<int>>("test_param", 0);
+    std::shared_ptr<const Parameter<int>> test_const_param =
+        std::const_pointer_cast<const Parameter<int>>(test_param);
+
+    int test_value = 0;
+
+    // This callback will set the test_value (by reference) to the given value
+    auto callback = [&test_value](int new_value) { test_value += new_value; };
+    test_const_param->registerCallbackFunction(callback);
+    test_const_param->registerCallbackFunction(callback);
+
+    EXPECT_EQ(test_value, 0);
+    test_param->setValue(1);
     EXPECT_EQ(test_value, 2);
 }

@@ -69,9 +69,9 @@ class ContinousParameter : public Parameter<T>
     }
 
     /**
-     * Given the value, checks if the value between the min and max value, and if so sets
-     * the value of this parameter and calls all registered callback functions with the
-     * new value.
+     * Given the value, checks if the value is between the min and max value, and if so
+     * sets the value of this parameter and calls all registered callback functions with
+     * the new value.
      *
      * If the new_value is not allowed, it will be rejected, and the old value is
      * preserved.
