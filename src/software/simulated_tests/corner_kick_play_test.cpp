@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/kickoff_friendly_play.h"
+#include "software/ai/hl/stp/play/corner_kick_play.h"
 
 #include <gtest/gtest.h>
 
@@ -7,13 +7,13 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class KickoffFriendlyPlayTest : public SimulatedTestFixture
+class CornerKickPlayTest : public SimulatedTestFixture
 {
 };
 
-TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
+TEST_F(CornerKickPlayTest, test_corner_kick_play)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    setBallState(BallState(Point(4.5, -3), Vector(0, 0)));
     addFriendlyRobots({
         RobotStateWithId{
             .id          = 0,
@@ -37,7 +37,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
                                       AngularVelocity::zero())},
         RobotStateWithId{
             .id          = 5,
-            .robot_state = RobotState(Point(-3, -2.5), Vector(0, 0), Angle::zero(),
+            .robot_state = RobotState(Point(4.6, -3.1), Vector(0, 0), Angle::zero(),
                                       AngularVelocity::zero())},
     });
     setFriendlyGoalie(0);
@@ -67,10 +67,11 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
                              field().enemyDefenseArea().negXPosYCorner(), Vector(0, 0),
                              Angle::zero(), AngularVelocity::zero())},
     });
+
     setEnemyGoalie(0);
-    setAIPlay(KickoffFriendlyPlay::name);
+    setAIPlay(CornerKickPlay::name);
     setRefboxPlay(toString(RefboxGameState::NORMAL_START),
-                  toString(RefboxGameState::PREPARE_KICKOFF_US));
+                  toString(RefboxGameState::INDIRECT_FREE_US));
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

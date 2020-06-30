@@ -86,14 +86,28 @@ void SimulatedTestFixture::setEnemyGoalie(RobotId goalie_id)
         ->setValue(static_cast<int>(goalie_id));
 }
 
-void SimulatedTestFixture::setPlay(const std::string &play_name)
+void SimulatedTestFixture::setAIPlay(const std::string &ai_play)
 {
     MutableDynamicParameters->getMutableAIControlConfig()
         ->mutableOverrideAIPlay()
         ->setValue(true);
     MutableDynamicParameters->getMutableAIControlConfig()
         ->mutableCurrentAIPlay()
-        ->setValue(play_name);
+        ->setValue(ai_play);
+}
+
+void SimulatedTestFixture::setRefboxPlay(const std::string &current_refbox_play,
+                                         const std::string previous_refbox_play)
+{
+    MutableDynamicParameters->getMutableAIControlConfig()
+        ->mutableOverrideRefboxPlay()
+        ->setValue(true);
+    MutableDynamicParameters->getMutableAIControlConfig()
+        ->mutableCurrentRefboxPlay()
+        ->setValue(current_refbox_play);
+    MutableDynamicParameters->getMutableAIControlConfig()
+        ->mutablePreviousRefboxPlay()
+        ->setValue(previous_refbox_play);
 }
 
 void SimulatedTestFixture::enableVisualizer()

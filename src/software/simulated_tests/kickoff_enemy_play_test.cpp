@@ -68,7 +68,9 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                              Angle::zero(), AngularVelocity::zero())},
     });
     setEnemyGoalie(0);
-    setPlay(KickoffEnemyPlay::name);
+    setAIPlay(KickoffEnemyPlay::name);
+    setRefboxPlay(toString(RefboxGameState::NORMAL_START),
+                  toString(RefboxGameState::PREPARE_KICKOFF_THEM));
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

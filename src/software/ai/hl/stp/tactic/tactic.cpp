@@ -3,9 +3,9 @@
 #include "software/logger/logger.h"
 
 Tactic::Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_)
-    : action_sequence(boost::bind(&Tactic::calculateNextActionWrapper, this, _1)),
+    : loop_forever(loop_forever),
+      action_sequence(boost::bind(&Tactic::calculateNextActionWrapper, this, _1)),
       done_(false),
-      loop_forever(loop_forever),
       capability_reqs(capability_reqs_)
 {
     // require movement capability by default

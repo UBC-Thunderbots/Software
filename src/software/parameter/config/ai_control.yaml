@@ -41,3 +41,8 @@ AIControlConfig:
     default: "Halt"
     description: >-
         Specifies the refbox play that should be in use
+  PreviousRefboxPlay:
+    type: "std::string"
+    default: "Halt"
+    description: >-
+        Specifies the previous refbox play to correctly set up the game state state machine when overriding game state

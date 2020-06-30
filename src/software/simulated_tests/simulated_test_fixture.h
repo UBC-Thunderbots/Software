@@ -92,11 +92,20 @@ class SimulatedTestFixture : public ::testing::Test
     void setEnemyGoalie(RobotId goalie_id);
 
     /**
-     * Sets the play to run in the simulated test
+     * Sets the AI play to run in the simulated test
      *
-     * @param play_name The name of the play
+     * @param ai_play The name of the AI play
      */
-    void setPlay(const std::string& play_name);
+    void setAIPlay(const std::string& ai_play);
+
+    /**
+     * Sets the Refbox play to override for the simulated test
+     *
+     * @param current_refbox_play The name of the current play to set
+     * @param previous_refbox_play The name of the previous play to set
+     */
+    void setRefboxPlay(const std::string& current_refbox_play,
+                       const std::string previous_refbox_play);
 
     /**
      * Returns the field in the simulated test

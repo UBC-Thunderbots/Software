@@ -134,6 +134,9 @@ class Tactic
     // The robot performing this Tactic
     std::optional<Robot> robot;
 
+    // Whether or not this tactic should loop forever by restarting each time it is done
+    bool loop_forever;
+
    private:
     /**
      * A wrapper function for the calculateNextAction function.
@@ -187,9 +190,6 @@ class Tactic
 
     // Whether or not this Tactic is done
     bool done_;
-
-    // Whether or not this tactic should loop forever by restarting each time it is done
-    bool loop_forever;
 
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;
