@@ -1,6 +1,7 @@
 #pragma once
 #include <stdbool.h>
-// Parameter for C
+
+// Parameters for C
 //
 // Parameters for C will ALWAYS be immutable. We won't have a UI updating these
 // values on the robot.
