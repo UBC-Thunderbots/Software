@@ -7,11 +7,13 @@
 #include "software/backend/ssl_proto_client.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
+#include "software/parameter/dynamic_parameters.h"
 
 class WifiBackend : public Backend
 {
    public:
-    WifiBackend();
+    WifiBackend(std::shared_ptr<const NetworkConfig> network_config =
+                    DynamicParameters->getNetworkConfig());
 
     static const std::string name;
 
@@ -42,6 +44,7 @@ class WifiBackend : public Backend
      */
     void joinMulticastChannel(int channel, const std::string& interface);
 
+    const std::shared_ptr<const NetworkConfig> network_config;
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;

@@ -1,4 +1,4 @@
- HandheldControllerInputConfig:
+ HandheldControllerConfig:
   RobotId:
     min: 0
     max: 32

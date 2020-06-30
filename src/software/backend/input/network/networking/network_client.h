@@ -34,13 +34,11 @@ class NetworkClient
      * @param received_world_callback This function will be called with a new world
      *                                every time one is received
      */
-    explicit NetworkClient(std::string vision_multicast_address,
-                           int vision_multicast_port,
-                           std::string gamecontroller_multicast_address,
-                           int gamecontroller_multicast_port,
-                           std::function<void(World)> received_world_callback,
-                           std::shared_ptr<const RefboxConfig> refbox_config,
-                           std::shared_ptr<const CameraConfig> camera_config);
+    explicit NetworkClient(
+        std::string vision_multicast_address, int vision_multicast_port,
+        std::string gamecontroller_multicast_address, int gamecontroller_multicast_port,
+        std::function<void(World)> received_world_callback,
+        std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
 
     // Delete the copy and assignment operators because this class really shouldn't need
     // them and we don't want to risk doing anything nasty with the internal
@@ -118,6 +116,5 @@ class NetworkClient
     // The callback function that we pass newly received/filtered worlds to
     std::function<void(World)> received_world_callback;
 
-    std::shared_ptr<const RefboxConfig> refbox_config;
-    std::shared_ptr<const CameraConfig> camera_config;
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
 };

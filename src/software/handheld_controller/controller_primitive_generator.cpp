@@ -5,7 +5,7 @@
 #include "software/primitive/kick_primitive.h"
 
 ControllerPrimitiveGenerator::ControllerPrimitiveGenerator(
-    std::shared_ptr<const HandheldControllerInputConfig> controller_input_config)
+    std::shared_ptr<const HandheldControllerConfig> controller_input_config)
     : controller_input_config(controller_input_config)
 {
 }

@@ -3,13 +3,15 @@
 SSLProtoClient::SSLProtoClient(
     std::function<void(SSL_WrapperPacket)> received_vision_callback,
     std::function<void(SSL_Referee)> received_referee_callback,
-    std::string vision_multicast_address, int vision_multicast_port,
-    std::string gamecontroller_multicast_address, int gamecontroller_multicast_port)
-    : ssl_vision_listener(
+    std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config)
+    : ssl_communication_config(ssl_communication_config),
+      ssl_vision_listener(
           std::make_unique<ThreadedProtoMulticastListener<SSL_WrapperPacket>>(
-              vision_multicast_address, vision_multicast_port, received_vision_callback)),
+              ssl_communication_config->VisionIPv4Address()->value(),
+              ssl_communication_config->VisionPort()->value(), received_vision_callback)),
       ssl_referee_listener(std::make_unique<ThreadedProtoMulticastListener<SSL_Referee>>(
-          gamecontroller_multicast_address, gamecontroller_multicast_port,
+          ssl_communication_config->GamecontrollerIPv4Address()->value(),
+          ssl_communication_config->GamecontrollerPort()->value(),
           received_referee_callback))
 {
 }
