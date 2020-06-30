@@ -7,128 +7,56 @@
 #include <string>
 #include <vector>
 
+#include "software/parameter/parameter.h"
+
 template <class T>
-class Parameter
+class DiscreteParameter : Parameter<T>
 {
    public:
     /**
-     * Constructs a new Parameter
+     * Constructs a new DiscreteParameter, a Parameter that only take
+     * on a value from the allowed_values.
      *
-     * @param parameter_name The name of the parameter used by dynamic_reconfigure
-     * dynamic_reconfigure
-     * @param default_value The default value for this parameter
+     * @param name The name of the parameter
+     * @param value The value for this parameter
+     * @param allowed_values The values that this parameter is allowed to be
      */
-    explicit Parameter<T>(const std::string& parameter_name, T default_value,
-                          std::vector<T> parameter_options,
-                          std::optional<T> parameter_min, std::optional<T> parameter_max)
+    explicit Parameter<T>(const std::string& name, T value, std::vector<T> allowed_values)
     {
-        this->name_    = parameter_name;
-        this->value_   = default_value;
-        this->min_     = parameter_min;
-        this->max_     = parameter_max;
-        this->options_ = parameter_options;
+        this->name_           = name;
+        this->value_          = value;
+        this->allowed_values_ = allowed_values;
     }
 
     /**
-     * Returns the value of this parameter
+     * Returns the allowed values for this parameter
      *
-     * @return the value of this parameter
+     * @return the allowed values of this parameter
      */
-    const T value() const
+    const std::vector<T> getAllowedValues() const
     {
-        std::scoped_lock lock(this->value_mutex_);
-        return this->value_;
-    }
-
-    /**
-     * Returns the options for this parameter
-     *
-     * @return the options of this parameter
-     */
-    const std::vector<T> getOptions() const
-    {
-        return this->options_;
-    }
-
-    /**
-     * Returns the min for this parameter
-     *
-     * @return the min of this parameter
-     */
-    const std::optional<T> getMin() const
-    {
-        return this->min_;
-    }
-
-    /**
-     * Returns the max for this parameter
-     *
-     * @return the max of this parameter
-     */
-    const std::optional<T> getMax() const
-    {
-        return this->max_;
-    }
-
-    /**
-     * Returns the name of this parameter
-     *
-     * @return the name of this parameter
-     */
-    const std::string name() const
-    {
-        return name_;
+        return this->allowed_values_;
     }
 
     /**
      * Given the value, sets the value of this parameter and calls all registered
-     * callback functions with the new value
+     * callback functions with the new value.
      *
+     * @raises InvalidArgumentError if the new_value is not in allowed_values
      * @param new_value The new value to set
      */
     void setValue(const T new_value)
     {
-        std::scoped_lock value_lock(this->value_mutex_);
-        this->value_ = new_value;
-        std::scoped_lock callback_lock(this->callback_mutex_);
-        for (auto callback_func : callback_functions)
-        {
-            callback_func(new_value);
+        if (std::find(allowed_values_.begin(), allowed_values_.end(), new_value) {
+            Parameter<T>::setValue(new_value);
+        }
+        else {
+            LOG(WARNING) << "Rejected invalid parameter: " << parameter_name_;
+            << " value not allowed" << new_value;
         }
     }
 
-    /**
-     * Registers a callback function to be called when the value of this parameter is
-     * changed with setValue
-     *
-     * @param callback The function to call when this parameter's value is changed
-     */
-    void registerCallbackFunction(std::function<void(T)> callback)
-    {
-        std::scoped_lock callback_lock(this->callback_mutex_);
-        callback_functions.emplace_back(callback);
-    }
-
    private:
-    // this mutex is marked as "mutable" so that it can be acquired in a const function
-    mutable std::mutex value_mutex_;
-    std::mutex callback_mutex_;
-
-    // Store the value so it can be retrieved without fetching from the server again
-    T value_;
-
-    // Store the min/max
-    // Its up to the user how they want to interpret min/max for types other than
-    // int/double
-    std::optional<T> min_;
-    std::optional<T> max_;
-
     // Store the options of this parameter
-    std::vector<T> options_;
-
-    // Store the name of the parameter
-    std::string name_;
-
-    // A list of functions to call when a new parameter value is set
-    std::vector<std::function<void(T)>> callback_functions;
+    std::vector<T> allowed_values_;
 };

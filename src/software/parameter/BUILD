@@ -28,6 +28,18 @@ cc_library(
 )
 
 cc_library(
+    name = "continous_parameter",
+    hdrs = ["continous_parameter.h"],
+    deps = [],
+)
+
+cc_library(
+    name = "discrete_parameter",
+    hdrs = ["discrete_parameter.h"],
+    deps = [],
+)
+
+cc_library(
     name = "config",
     hdrs = ["config.h"],
     deps = [],

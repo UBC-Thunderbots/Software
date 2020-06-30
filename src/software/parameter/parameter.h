@@ -19,8 +19,8 @@ class Parameter
      */
     explicit Parameter<T>(const std::string& name, T value)
     {
-        this->name_    = name;
-        this->value_   = value;
+        this->name_  = name;
+        this->value_ = value;
     }
 
     /**
@@ -75,7 +75,6 @@ class Parameter
     }
 
    private:
-
     // this mutex is marked as "mutable" so that it can be acquired in a const function
     mutable std::mutex value_mutex_;
     std::mutex callback_mutex_;
