@@ -18,14 +18,25 @@ class DiscreteParameter : public Parameter<T>
      * Constructs a new DiscreteParameter, a Parameter that only take
      * on a value from the allowed_values.
      *
-     * @param name The name of the parameter
-     * @param value The value for this parameter
-     * @param allowed_values The values that this parameter is allowed to be
+     * A DiscreteParameter will never hold a value outside of allowed_values
+     *
+     * @param name The name of the DiscreteParameter
+     * @param value The value for this DiscreteParameter
+     * @param allowed_values The values that this DiscreteParameter is allowed to be
+     *
+     * @raises std::invalid_argument if the value is already invalid
      */
     explicit DiscreteParameter<T>(const std::string& name, T value,
                                   std::vector<T> allowed_values)
         : Parameter<T>(name, value)
     {
+        if (std::find(allowed_values.begin(), allowed_values.end(), value) ==
+            allowed_values.end())
+        {
+            throw std::invalid_argument(
+                "DiscreteParameter constructed with invalid value");
+        }
+
         allowed_values_ = allowed_values;
     }
 

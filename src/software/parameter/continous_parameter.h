@@ -26,14 +26,24 @@ class ContinousParameter : public Parameter<T>
      *
      * NOTE: The templated type must be numeric (i.e int, double, float, etc..)
      *
+     * A ContinousParameter will never violate min <= value <= max
+     *
      * @param name The name of the ContinousParameter
      * @param value The value for this ContinousParameter
      * @param min The minimum value this ContinousParameter can take
      * @param max The maximum value this ContinousParameter can take
+     *
+     * @raises std::invalid_argument if the value is already out of bounds
      */
     explicit ContinousParameter<T>(const std::string& name, T value, T min, T max)
         : Parameter<T>(name, value)
     {
+        if (value > max || min > value)
+        {
+            throw std::invalid_argument(
+                "ContinousParameter constructed with out of bounds value");
+        }
+
         min_ = min;
         max_ = max;
     }

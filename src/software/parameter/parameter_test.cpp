@@ -9,7 +9,6 @@
 #include "software/parameter/discrete_parameter.h"
 #include "software/util/make_enum/make_enum.h"
 
-// this is a TestEnum used by test_discrete_parameter_enum
 MAKE_ENUM(TestEnum, TEST1, TEST2, TEST3, TEST4, TEST5, )
 
 TEST(ParameterTest, test_discrete_parameter_enum)
@@ -47,6 +46,44 @@ TEST(ParameterTest, test_discrete_parameter_int)
         EXPECT_FALSE(test_discrete_param.setValue(invalid_option));
         EXPECT_FALSE(test_discrete_param.value() == invalid_option);
     }
+}
+
+TEST(ParameterTest, test_discrete_parameter_string)
+{
+    std::vector<std::string> options         = {"test1", "test2", "test3", "test4"};
+    std::vector<std::string> invalid_options = {" ", "test5", "test"};
+
+    DiscreteParameter<std::string> test_discrete_param =
+        DiscreteParameter<std::string>("test_param", "test2", options);
+
+    // test that valid options are stored
+    for (const auto& option : options)
+    {
+        EXPECT_TRUE(test_discrete_param.setValue(option));
+        EXPECT_TRUE(test_discrete_param.value() == option);
+    }
+
+    // test that invalid options are rejected
+    for (const auto& invalid_option : invalid_options)
+    {
+        EXPECT_FALSE(test_discrete_param.setValue(invalid_option));
+        EXPECT_FALSE(test_discrete_param.value() == invalid_option);
+    }
+}
+
+TEST(ParameterTest, test_discrete_invalid_constructor)
+{
+    std::vector<std::string> options = {"test1", "test2", "test3", "test4"};
+    EXPECT_THROW(DiscreteParameter<std::string>("test_param", "", options),
+                 std::invalid_argument);
+    EXPECT_THROW(DiscreteParameter<std::string>("test_param", "TEST", options),
+                 std::invalid_argument);
+
+    std::vector<int> int_options = {0, 1, 2, 3, 4, 5, 6, 7};
+    EXPECT_THROW(DiscreteParameter<int>("test_param", 100, int_options),
+                 std::invalid_argument);
+    EXPECT_THROW(DiscreteParameter<int>("test_param", -100, int_options),
+                 std::invalid_argument);
 }
 
 
@@ -88,6 +125,19 @@ TEST(ParameterTest, test_continous_parameter_float)
         EXPECT_FALSE(test_continous_parameter.setValue(k));
         EXPECT_FALSE(test_continous_parameter.value() == k);
     }
+}
+
+TEST(ParameterTest, test_continous_invalid_constructor)
+{
+    EXPECT_THROW(ContinousParameter<float>("test_param", 20.0f, -10.0f, 10.0f),
+                 std::invalid_argument);
+    EXPECT_THROW(ContinousParameter<float>("test_param", -20.0f, -10.0f, 10.0f),
+                 std::invalid_argument);
+
+    EXPECT_THROW(ContinousParameter<short>("test_param", 2, -1, 1),
+                 std::invalid_argument);
+    EXPECT_THROW(ContinousParameter<short>("test_param", -2, -1, 1),
+                 std::invalid_argument);
 }
 
 
