@@ -9,7 +9,7 @@
 // network, we can simply replace the existing param tree on the robot
 // with the updated one that was received over the network.
 //
-// It is garunteed that the values can NOT change after `app_dynamic_parameters_create()`
+// It is guaranteed that the values can NOT change after `app_dynamic_parameters_create()`
 // has been called
 typedef struct BoolParameter BoolParameter_t;
 typedef struct StringParameter StringParameter_t;
