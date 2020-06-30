@@ -7,7 +7,8 @@ NetworkConfig:
       description: >-
           The multicast channel to join to communicate with the robots
     NetworkInterface:
-      default: "eth0"
+#      default: "enp4s0f1"
+      default: "wlp3s0"
       type: "std::string"
       description: >-
           The network interface that is connected to the thunderbots router.
