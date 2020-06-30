@@ -7,10 +7,11 @@
 #include <string>
 #include <vector>
 
+#include "software/logger/logger.h"
 #include "software/parameter/parameter.h"
 
 template <class T>
-class DiscreteParameter : Parameter<T>
+class DiscreteParameter : public Parameter<T>
 {
    public:
     /**
@@ -21,11 +22,11 @@ class DiscreteParameter : Parameter<T>
      * @param value The value for this parameter
      * @param allowed_values The values that this parameter is allowed to be
      */
-    explicit Parameter<T>(const std::string& name, T value, std::vector<T> allowed_values)
+    explicit DiscreteParameter<T>(const std::string& name, T value,
+                                  std::vector<T> allowed_values)
+        : Parameter<T>(name, value)
     {
-        this->name_           = name;
-        this->value_          = value;
-        this->allowed_values_ = allowed_values;
+        allowed_values_ = allowed_values;
     }
 
     /**
@@ -35,24 +36,33 @@ class DiscreteParameter : Parameter<T>
      */
     const std::vector<T> getAllowedValues() const
     {
-        return this->allowed_values_;
+        return allowed_values_;
     }
 
     /**
-     * Given the value, sets the value of this parameter and calls all registered
-     * callback functions with the new value.
+     * Given the value, checks if the value is in the allowed_values, and if so, sets the
+     * value of this parameter and calls all registered callback functions with the new
+     * value.
      *
-     * @raises InvalidArgumentError if the new_value is not in allowed_values
+     * If the new_value is not allowed, it will be rejected, and the old value is
+     * preserved.
+     *
      * @param new_value The new value to set
+     * @returns true if the value was accepted, false if rejected
      */
-    void setValue(const T new_value)
+    bool setValue(const T new_value)
     {
-        if (std::find(allowed_values_.begin(), allowed_values_.end(), new_value) {
+        if (std::find(allowed_values_.begin(), allowed_values_.end(), new_value) !=
+            allowed_values_.end())
+        {
             Parameter<T>::setValue(new_value);
+            return true;
         }
-        else {
-            LOG(WARNING) << "Rejected invalid parameter: " << parameter_name_;
-            << " value not allowed" << new_value;
+        else
+        {
+            LOG(WARNING) << "Rejected new value " << new_value << " to DiscreteParameter "
+                         << Parameter<T>::name_ << std::endl;
+            return false;
         }
     }
 

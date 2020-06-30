@@ -74,7 +74,7 @@ class Parameter
         callback_functions.emplace_back(callback);
     }
 
-   private:
+   protected:
     // this mutex is marked as "mutable" so that it can be acquired in a const function
     mutable std::mutex value_mutex_;
     std::mutex callback_mutex_;

@@ -30,13 +30,13 @@ cc_library(
 cc_library(
     name = "continous_parameter",
     hdrs = ["continous_parameter.h"],
-    deps = [],
+    deps = ["//software/logger"],
 )
 
 cc_library(
     name = "discrete_parameter",
     hdrs = ["discrete_parameter.h"],
-    deps = [],
+    deps = ["//software/logger"],
 )
 
 cc_library(
@@ -62,7 +62,10 @@ cc_test(
     name = "parameter_test",
     srcs = ["parameter_test.cpp"],
     deps = [
+        ":continous_parameter",
+        ":discrete_parameter",
         ":parameter",
+        "//software/util/make_enum",
         "@gtest//:gtest_main",
     ],
 )
