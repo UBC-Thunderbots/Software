@@ -105,7 +105,7 @@ class SimulatedTestFixture : public ::testing::Test
      * @param previous_refbox_play The name of the previous play to set
      */
     void setRefboxPlay(const std::string& current_refbox_play,
-                       const std::string previous_refbox_play);
+                       const std::string& previous_refbox_play);
 
     /**
      * Returns the field in the simulated test

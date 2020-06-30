@@ -97,7 +97,7 @@ void SimulatedTestFixture::setAIPlay(const std::string &ai_play)
 }
 
 void SimulatedTestFixture::setRefboxPlay(const std::string &current_refbox_play,
-                                         const std::string previous_refbox_play)
+                                         const std::string &previous_refbox_play)
 {
     MutableDynamicParameters->getMutableAIControlConfig()
         ->mutableOverrideRefboxPlay()
