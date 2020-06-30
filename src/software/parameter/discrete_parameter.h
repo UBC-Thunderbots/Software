@@ -15,7 +15,7 @@ class DiscreteParameter : public Parameter<T>
 {
    public:
     /**
-     * Constructs a new DiscreteParameter, a Parameter that only take
+     * Constructs a new DiscreteParameter, a Parameter that will only take
      * on a value from the allowed_values.
      *
      * A DiscreteParameter will never hold a value outside of allowed_values
