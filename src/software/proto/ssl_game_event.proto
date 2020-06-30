@@ -1,7 +1,7 @@
 syntax = "proto2";
 
 // a game event that caused a referee command
-message Game_Event
+message SSL_Referee_Game_Event
 {
     enum GameEventType
     {
