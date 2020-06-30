@@ -11,7 +11,7 @@ class Xbox360Controller : public Controller
      * @param controller_input_config The config for this controller
      */
     explicit Xbox360Controller(
-        std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
+        std::shared_ptr<const HandheldControllerConfig> controller_input_config);
 
     ControllerInput handleButtonEvent(ControllerInput controller_input,
                                       const unsigned int button_id,

@@ -8,6 +8,7 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/primitive/primitive.h"
 #include "software/simulation/threaded_simulator.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/world/field.h"
 
 /**
@@ -51,7 +52,7 @@ int main(int argc, char* argv[])
     ThreadedSimulator simulator(Field::createSSLDivisionBField());
 
     ThreadedProtoMulticastSender<SSL_WrapperPacket> wrapper_packet_sender(
-        SSL_VISION_DEFAULT_MULTICAST_ADDRESS, SSL_VISION_MULTICAST_PORT);
+        DynamicParameters->getNetworkConfig()->getSSLCommunicationConfig()->VisionIPv4Address()->value(), static_cast<unsigned short>(DynamicParameters->getNetworkConfig()->getSSLCommunicationConfig()->VisionPort()->value()));
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [&standalone_simulator_gui_wrapper,
          &wrapper_packet_sender](SSL_WrapperPacket packet) {

@@ -3,13 +3,15 @@
 #include "software/backend/backend.h"
 #include "software/backend/input/network/networking/network_client.h"
 #include "software/backend/output/grsim/grsim_output.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
 class GrSimBackend : public Backend
 {
    public:
     static const std::string name;
-    GrSimBackend();
+    GrSimBackend(std::shared_ptr<const NetworkConfig> network_config =
+                     DynamicParameters->getNetworkConfig());
 
    private:
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
@@ -40,6 +42,8 @@ class GrSimBackend : public Backend
      * Send the current state of the world and the primitives for each robot to GrSim
      */
     void updateGrSim();
+
+    const std::shared_ptr<const NetworkConfig> network_config;
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
