@@ -1,14 +1,3 @@
-cc_test(
-    name = "generated_c_test",
-    srcs = ["generated_c_test.cpp"],
-    deps = [
-        ":example_config",
-        ":parameter",
-        "//software/proto/message_translation:tbots_protobuf",
-        "//software/test_util",
-    ],
-)
-
 cc_library(
     name = "parameter",
     srcs = ["parameter.c"],
