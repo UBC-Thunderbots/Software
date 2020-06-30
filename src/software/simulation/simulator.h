@@ -115,7 +115,7 @@ class Simulator
      * in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_index The index of the primitive to set
+     * @param primitive_index The index (type) of the primitive to set
      * @param params The parameters for the specified primitive
      */
     void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
