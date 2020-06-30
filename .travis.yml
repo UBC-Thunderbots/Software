@@ -13,6 +13,8 @@ jobs:
         # Run tests and collect coverage
         - >
           bazel coverage //...     \
+            --noshow_progress \
+            --noshow_loading_progress \
             --compilation_mode=fastbuild    \
             --verbose_test_summary          \
             --instrumentation_filter=//...  \
