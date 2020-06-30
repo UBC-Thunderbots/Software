@@ -50,7 +50,7 @@ class SensorFusion
      * @param new data
      */
     void updateWorld(const SSL_WrapperPacket &packet);
-    void updateWorld(const Referee &packet);
+    void updateWorld(const SSL_Referee &packet);
     void updateWorld(
         const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
     void updateWorld(const SSL_GeometryData &geometry_packet);
