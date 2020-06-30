@@ -216,19 +216,6 @@ AIConfig:
             The total length (in the direction the robot is facing) of the rectangle
             starting from the friendly robot inside which we think an enemy is about to
             steal the ball
-  RobotCapabilitiesConfig:
-    BrokenDribblers:
-      default: ""
-      type: "std::string"
-      description: Comma-separated list of numbers of robots with broken dribblers
-    BrokenChippers:
-      default: ""
-      type: "std::string"
-      description: Comma-separated list of numbers of robots with broken chippers
-    BrokenKickers:
-      default: ""
-      type: "std::string"
-      description: Comma-separated list of numbers of robots with broken kickers
   DefenseShadowEnemyTacticConfig:
     BallStealSpeed:
       default: 0.3
