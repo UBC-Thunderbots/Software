@@ -12,14 +12,16 @@
  * application on a computer or network and be interacted with by up to
  * 2 instances of an AI.
  */
-class StandaloneSimulator {
-public:
+class StandaloneSimulator
+{
+   public:
     /**
      * Creates a new StandaloneSimulator, and starts the simulation.
      *
      * @param standalone_simulator_config The config for the StandaloneSimulator
      */
-    explicit StandaloneSimulator(std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config);
+    explicit StandaloneSimulator(
+        std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config);
     StandaloneSimulator() = delete;
 
     /**
@@ -29,14 +31,15 @@ public:
      *
      * @param callback The callback function to register
      */
-    void registerOnSSLWrapperPacketReadyCallback(const std::function<void(SSL_WrapperPacket)>& callback);
+    void registerOnSSLWrapperPacketReadyCallback(
+        const std::function<void(SSL_WrapperPacket)>& callback);
 
     /**
      * Adds robots to predefined locations on the field
      */
     void setupInitialSimulationState();
 
-private:
+   private:
     /**
      * Sets the primitives being simulated by the robots on the respective team
      *
@@ -58,11 +61,15 @@ private:
      *
      * @return The primitive index and parameters for the given PrimitiveMsg
      */
-    static std::pair<unsigned int, primitive_params_t> decodePrimitiveMsg(const PrimitiveMsg& msg);
+    static std::pair<unsigned int, primitive_params_t> decodePrimitiveMsg(
+        const PrimitiveMsg& msg);
 
     std::shared_ptr<const StandaloneSimulatorConfig> standalone_simulator_config;
-    std::unique_ptr<ThreadedProtoMulticastSender<SSL_WrapperPacket>> wrapper_packet_sender;
-    std::unique_ptr<ThreadedProtoMulticastListener<PrimitiveSetMsg>> yellow_team_primitive_listener;
-    std::unique_ptr<ThreadedProtoMulticastListener<PrimitiveSetMsg>> blue_team_primitive_listener;
+    std::unique_ptr<ThreadedProtoMulticastSender<SSL_WrapperPacket>>
+        wrapper_packet_sender;
+    std::unique_ptr<ThreadedProtoMulticastListener<PrimitiveSetMsg>>
+        yellow_team_primitive_listener;
+    std::unique_ptr<ThreadedProtoMulticastListener<PrimitiveSetMsg>>
+        blue_team_primitive_listener;
     ThreadedSimulator simulator;
 };
