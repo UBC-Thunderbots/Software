@@ -14,9 +14,9 @@ qt_cc_library(
         "//software/geom",
         "//software/gui:geometry_conversion",
         "//software/gui/drawing:draw_functions",
+        "//software/gui/full_system/ui:main_widget",
         "//software/gui/generic_widgets/robot_status",
         "//software/gui/generic_widgets/world_view",
-        "//software/gui/visualizer/ui:main_widget",
         "//software/logger",
         "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",
@@ -24,9 +24,9 @@ qt_cc_library(
 )
 
 qt_cc_library(
-    name = "visualizer",
-    src = "visualizer.cpp",
-    hdr = "visualizer.h",
+    name = "full_system_gui",
+    src = "full_system_gui.cpp",
+    hdr = "full_system_gui.h",
     deps = [
         ":main_widget",
         "//software/ai/hl/stp:play_info",
@@ -44,9 +44,9 @@ qt_cc_library(
     src = "parameters.cpp",
     hdr = "parameters.h",
     deps = [
+        "//software/gui/full_system/ui:main_widget",
         "//software/gui/generic_widgets/robot_status:robot_status_table",
         "//software/gui/generic_widgets/world_view:zoomable_qgraphics_view",
-        "//software/gui/visualizer/ui:main_widget",
         "//software/logger",
         "//software/parameter",
         "//software/parameter:config",
@@ -62,9 +62,9 @@ qt_cc_library(
     hdr = "ai_control.h",
     deps = [
         "//software/ai/hl/stp/play",
+        "//software/gui/full_system/ui:main_widget",
         "//software/gui/generic_widgets/robot_status:robot_status_table",
         "//software/gui/generic_widgets/world_view:zoomable_qgraphics_view",
-        "//software/gui/visualizer/ui:main_widget",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
         "@qt//:qt_widgets",

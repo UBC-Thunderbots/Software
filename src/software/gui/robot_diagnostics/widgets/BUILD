@@ -3,9 +3,9 @@ load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
 package(default_visibility = ["//software/gui/robot_diagnostics:__subpackages__"])
 
 qt_cc_library(
-    name = "robot_diagnostics_widget",
-    src = "robot_diagnostics.cpp",
-    hdr = "robot_diagnostics.h",
+    name = "robot_diagnostics_gui",
+    src = "robot_diagnostics_gui.cpp",
+    hdr = "robot_diagnostics_gui.h",
     deps = [
         ":chicker",
         ":dribbler",

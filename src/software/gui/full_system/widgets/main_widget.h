@@ -9,11 +9,11 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
+#include "software/gui/full_system/ui/ui_main_widget.h"
+#include "software/gui/full_system/widgets/ai_control.h"
+#include "software/gui/full_system/widgets/parameters.h"
 #include "software/gui/generic_widgets/robot_status/robot_status.h"
 #include "software/gui/generic_widgets/world_view/world_view.h"
-#include "software/gui/visualizer/ui/ui_main_widget.h"
-#include "software/gui/visualizer/widgets/ai_control.h"
-#include "software/gui/visualizer/widgets/parameters.h"
 #include "software/new_geom/rectangle.h"
 #include "software/proto/sensor_msg.pb.h"
 
@@ -38,19 +38,19 @@ class MainWidget : public QWidget
    public slots:
 
     /**
-     * Draws all the AI information we want to display in the Visualizer. This includes
+     * Draws all the AI information we want to display in the FullSystemGUI. This includes
      * visualizing the state of the world as well as drawing the AI state we want to show,
      * like planned navigator paths.
      *
-     * @param world_draw_function The function that tells the Visualizer how to draw the
-     * World state
-     * @param ai_draw_function The function that tells the Visualizer how to draw the AI
-     * state
+     * @param world_draw_function The function that tells the FullSystemGUI how to draw
+     * the World state
+     * @param ai_draw_function The function that tells the FullSystemGUI how to draw the
+     * AI state
      */
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
 
     /**
-     * Sets the area of the World being drawn in the Visualizer to the given region
+     * Sets the area of the World being drawn in the FullSystemGUI to the given region
      *
      * @param new_view_area The new area to show in the view
      */
