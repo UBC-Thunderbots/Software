@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     LoggerSingleton::initializeLogger();
 
-    ThreadedStandaloneSimulatorGUI standalone_simulator_gui_wrapper(argc, argv);
+    ThreadedStandaloneSimulatorGUI standalone_simulator_gui_wrapper;
     ThreadedSimulator simulator = ThreadedSimulator(Field::createSSLDivisionBField());
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [&standalone_simulator_gui_wrapper](SSL_WrapperPacket packet) {

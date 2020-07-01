@@ -1,4 +1,4 @@
-#include "software/gui/generic_widgets/world_view/draw_function_visualizer.h"
+#include "software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h"
 #include "software/gui/geometry_conversion.h"
 #include "software/logger/logger.h"
 

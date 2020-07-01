@@ -3,7 +3,7 @@ load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
 package(default_visibility = ["//software/gui/standalone_simulator:__subpackages__"])
 
 qt_cc_library(
-    name = "simulator_gui",
+    name = "standalone_simulator_gui",
     src = "standalone_simulator_gui.cpp",
     hdr = "standalone_simulator_gui.h",
     deps = [

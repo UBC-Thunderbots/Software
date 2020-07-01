@@ -36,7 +36,7 @@
   <customwidget>
    <class>DrawFunctionVisualizer</class>
    <extends>QGraphicsView</extends>
-   <header>software/gui/generic_widgets/world_view/draw_function_visualizer.h</header>
+   <header>software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

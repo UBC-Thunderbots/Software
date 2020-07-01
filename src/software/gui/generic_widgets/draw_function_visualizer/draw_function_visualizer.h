@@ -3,7 +3,7 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QOpenGLWidget>
-#include "software/gui/generic_widgets/world_view/zoomable_qgraphics_view.h"
+#include "software/gui/generic_widgets/draw_function_visualizer/zoomable_qgraphics_view.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/new_geom/rectangle.h"
 
