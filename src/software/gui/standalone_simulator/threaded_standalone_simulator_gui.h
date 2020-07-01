@@ -12,24 +12,24 @@
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
 /**
- * This class wraps our SimulatorGUI object which is responsible for
+ * This class wraps our StandaloneSimulatorGUI object which is responsible for
  * visualizing simulation and allowing users to control it.
  */
-class StandaloneSimulatorGUIWrapper : public ThreadedObserver<SSL_WrapperPacket>
+class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket>
 {
    public:
-    StandaloneSimulatorGUIWrapper() = delete;
+    ThreadedStandaloneSimulatorGUI() = delete;
 
     /**
-     * Create a new Simulator GUI wrapper. The argc and argv arguments are required
+     * Create a new ThreadedStandaloneSimulatorGUI. The argc and argv arguments are required
      * to create a QApplication
      *
      * @param argc The number of arguments being passed
      * @param argv Keyword arguments
      */
-    explicit StandaloneSimulatorGUIWrapper(int argc, char** argv);
+    explicit ThreadedStandaloneSimulatorGUI(int argc, char** argv);
 
-    ~StandaloneSimulatorGUIWrapper() override;
+    ~ThreadedStandaloneSimulatorGUI() override;
 
     /**
      * Returns a shared_ptr to a promise that can be waited on, and that will
@@ -44,9 +44,9 @@ class StandaloneSimulatorGUIWrapper : public ThreadedObserver<SSL_WrapperPacket>
 
    private:
     /**
-     * Creates a new Simulator GUI in a new thread and starts running it. These
+     * Creates a new StandaloneSimulatorGUI in a new thread and starts running it. These
      * objects must be created in the new thread because the QApplication must be
-     * constructed in the thread is will run in, and the Simulator GUI must be
+     * constructed in the thread is will run in, and the StandaloneSimulatorGUI must be
      * created in the same context as the QApplication (which in this case is the new
      * thread).
      *
@@ -55,7 +55,7 @@ class StandaloneSimulatorGUIWrapper : public ThreadedObserver<SSL_WrapperPacket>
      */
     void createAndRunStandaloneSimulatorGUI(int argc, char** argv);
 
-    std::thread run_simulator_gui_thread;
+    std::thread run_standalone_simulator_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
 
     // Buffers that are shared with the instance of the Simulator GUI so that data can
