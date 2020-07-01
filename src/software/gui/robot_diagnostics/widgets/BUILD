@@ -64,6 +64,7 @@ qt_cc_library(
     hdr = "feedback.h",
     deps = [
         "//software/gui/robot_diagnostics/ui:main_widget",
+        "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",
     ],
 )

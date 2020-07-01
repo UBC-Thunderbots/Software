@@ -5,5 +5,9 @@ package(default_visibility = ["//software/gui/visualizer:__subpackages__"])
 qt_ui_library(
     name = "main_widget",
     ui = "main_widget.ui",
-    deps = ["@qt//:qt_widgets"],
+    deps = [
+        "//software/gui/generic_widgets/robot_status:robot_status_table",
+        "//software/gui/generic_widgets/world_view:zoomable_qgraphics_view",
+        "@qt//:qt_widgets",
+    ],
 )

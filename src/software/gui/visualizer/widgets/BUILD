@@ -44,8 +44,6 @@ qt_cc_library(
     src = "parameters.cpp",
     hdr = "parameters.h",
     deps = [
-        "//software/gui/generic_widgets/robot_status:robot_status_table",
-        "//software/gui/generic_widgets/world_view:zoomable_qgraphics_view",
         "//software/gui/visualizer/ui:main_widget",
         "//software/logger",
         "//software/parameter",
@@ -62,8 +60,6 @@ qt_cc_library(
     hdr = "ai_control.h",
     deps = [
         "//software/ai/hl/stp/play",
-        "//software/gui/generic_widgets/robot_status:robot_status_table",
-        "//software/gui/generic_widgets/world_view:zoomable_qgraphics_view",
         "//software/gui/visualizer/ui:main_widget",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
