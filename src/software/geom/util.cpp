@@ -22,7 +22,8 @@
 
 bool isDegenerate(const Segment &segment)
 {
-    return distanceSquared(segment.getSegStart(), segment.getEnd()) < FIXED_EPSILON*FIXED_EPSILON;
+    return distanceSquared(segment.getSegStart(), segment.getEnd()) <
+           FIXED_EPSILON * FIXED_EPSILON;
 }
 
 double length(const Segment &segment)
@@ -91,18 +92,18 @@ Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &seg
 {
     // if one of the end-points is extremely close to the centre point
     // then return 0.0
-    if ((segB - centre).lengthSquared() < FIXED_EPSILON*FIXED_EPSILON)
+    if ((segB - centre).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
     {
         return segB;
     }
 
-    if ((segA - centre).lengthSquared() < FIXED_EPSILON*FIXED_EPSILON)
+    if ((segA - centre).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
     {
         return segA;
     }
 
     // take care of 0 length segments
-    if ((segB - segA).lengthSquared() < FIXED_EPSILON*FIXED_EPSILON)
+    if ((segB - segA).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
     {
         return segA;
     }

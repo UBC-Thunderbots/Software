@@ -31,7 +31,8 @@ double lengthSquared(const Segment &segment);
  *
  * @return true : If the Segment1 and Segment2 are collinear within FIXED_EPSILON disance
  *
- * @return false : If Segment1 and Segment2 are NOT collinear within FIXED_EPSILON distance
+ * @return false : If Segment1 and Segment2 are NOT collinear within FIXED_EPSILON
+ * distance
  */
 bool collinear(const Segment &segment1, const Segment &segment2);
 

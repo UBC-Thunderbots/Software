@@ -198,7 +198,6 @@ std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
     std::vector<Segment> open_segs;
 
     open_segs = getEmptySpaceWithinParentSegment(obstacle_segment_projections, segment);
-
     Segment largest_segment;
 
     if (open_segs.size() >= 2)
