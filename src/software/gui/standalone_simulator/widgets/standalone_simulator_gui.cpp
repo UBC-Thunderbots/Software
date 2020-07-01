@@ -1,6 +1,8 @@
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 
 #include "software/gui/drawing/ssl_wrapper_packet.h"
+#include "software/gui/geometry_conversion.h"
+#include "software/world/field.h"
 
 StandaloneSimulatorGUI::StandaloneSimulatorGUI(
     std::shared_ptr<ThreadSafeBuffer<SSL_WrapperPacket>> ssl_wrapper_packet_buffer,

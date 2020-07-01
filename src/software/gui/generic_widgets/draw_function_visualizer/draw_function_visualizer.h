@@ -7,7 +7,11 @@
 #include "software/gui/drawing/draw_functions.h"
 #include "software/new_geom/rectangle.h"
 
-// TODO: protected inheritance to limit interface?
+/**
+ * This class is a QGraphicsView widget that allows the user to zoom
+ * and pan around the scene. It provides an interface for drawing arbitrary
+ * shapes and information in the scene through the use of DrawFunctions.
+ */
 class DrawFunctionVisualizer : public ZoomableQGraphicsView {
     Q_OBJECT
 
@@ -30,14 +34,3 @@ private:
     QGraphicsScene* graphics_scene;
     QOpenGLWidget* open_gl_widget;
 };
-
-
-/**
- * Sets up the SceneView which draws the AI's view of the world, such as robot
- * positions, ball velocity, etc.
- *
- * @param view The view to display the QGraphicsScene with
- * @param scene The QGraphicsScene that will be displayed by the view
- * @param gl_widget A QOpenGLWidget that can be used to help display items in the view
- */
-//void setupSceneView(QGraphicsView* view, QGraphicsScene* scene, QOpenGLWidget* gl_widget);

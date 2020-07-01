@@ -59,10 +59,12 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
     static constexpr std::size_t VIEW_AREA_BUFFER_SIZE = 1;
     // When the application starts up we want to set the initial view area
     // to show all the contents nicely. For some reason doing this only
-    // once at the start of the program isn't enough, we need to do it several
-    // times before it takes effect permanently.
-    // 50 is an arbitrary value that is small enough the user doesn't notice
-    // they don't have control on startup, but successfully sets the area.
+    // once at the start of the program isn't enough, the GUI seems to need
+    // a few iterations to fully render everything before the view area will
+    // be set correctly (otherwise the contents tend to be zoomed-out and
+    // offset). This is set to an arbitrary value that is small enough the
+    // user doesn't notice they don't have control on startup, but
+    // successfully sets the area.
     static constexpr int NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA = 50;
 
     std::atomic_bool application_shutting_down;

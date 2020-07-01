@@ -5,8 +5,6 @@
 DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent) : ZoomableQGraphicsView(parent), graphics_scene(new QGraphicsScene(this)), open_gl_widget(new QOpenGLWidget(this))
 {
     setScene(graphics_scene);
-    setDragMode(QGraphicsView::ScrollHandDrag);
-    setBackgroundBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
 
     // Performance optimizations
     // https://stackoverflow.com/questions/43826317/how-to-optimize-qgraphicsviews-performance
@@ -19,6 +17,10 @@ DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent) : ZoomableQGraph
     setViewport(open_gl_widget);
 
     setRenderHint(QPainter::Antialiasing);
+    setDragMode(QGraphicsView::ScrollHandDrag);
+    setBackgroundBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     // Invert the y-coordinates of the view.
     // We do this because Qt's default coordinate system for drawing is:
@@ -30,6 +32,16 @@ DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent) : ZoomableQGraph
     // (rotating from +x, to +y, to -x, to -y)
     QTransform view_transform(1, 0, 0, -1, 0, 0);
     setTransform(view_transform);
+
+    // The SceneRect defines the bounding rectangle of the scene, outside of which
+    // items cannot exist. The graphics_scene SceneRect also defines the scrollable
+    // area for the QGraphicsView. We want to give the user the freedom to scroll
+    // around the scene as much as they please, so we set this rectangle to be
+    // very large
+    Point bottom_left(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+    Point top_right(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    Rectangle max_scene_rect(bottom_left, top_right);
+    graphics_scene->setSceneRect(createQRectF(max_scene_rect));
 
     update();
 }
@@ -47,6 +59,6 @@ void DrawFunctionVisualizer::clearAndDraw(const std::vector<DrawFunction> &draw_
 }
 
 void DrawFunctionVisualizer::setViewArea(const Rectangle &view_area) {
-    graphics_scene->setSceneRect(createQRectF(view_area));
-    fitInView(graphics_scene->sceneRect(), Qt::KeepAspectRatio);
+    // Moves and scales the view to fit the view_area in the scene
+    fitInView(createQRectF(view_area), Qt::KeepAspectRatio);
 }
