@@ -5,5 +5,10 @@ package(default_visibility = ["//software/gui/full_system:__subpackages__"])
 qt_ui_library(
     name = "main_widget",
     ui = "main_widget.ui",
-    deps = ["@qt//:qt_widgets"],
+    deps = [
+        # Need to include targets used in promoted widgets
+        "//software/gui/generic_widgets/world_view:draw_function_visualizer",
+        "//software/gui/generic_widgets/robot_status:robot_status_table",
+        "@qt//:qt_widgets",
+    ],
 )

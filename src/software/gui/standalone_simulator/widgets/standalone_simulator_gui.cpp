@@ -36,6 +36,6 @@ void StandaloneSimulatorGUI::updateDrawViewArea()
     std::optional<Rectangle> view_area = view_area_buffer->popLeastRecentlyAddedValue();
     if (view_area)
     {
-        main_widget->setDrawViewArea(createQRectF(view_area.value()));
+        main_widget->setViewArea(view_area.value());
     }
 }

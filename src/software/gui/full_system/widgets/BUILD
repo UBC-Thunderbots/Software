@@ -16,7 +16,7 @@ qt_cc_library(
         "//software/gui/drawing:draw_functions",
         "//software/gui/full_system/ui:main_widget",
         "//software/gui/generic_widgets/robot_status",
-        "//software/gui/generic_widgets/world_view",
+        "//software/gui/generic_widgets/world_view:draw_function_visualizer",
         "//software/logger",
         "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",

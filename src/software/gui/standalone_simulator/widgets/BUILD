@@ -9,7 +9,7 @@ qt_cc_library(
     deps = [
         "//software/gui:geometry_conversion",
         "//software/gui/drawing:draw_functions",
-        "//software/gui/generic_widgets/world_view",
+        "//software/gui/generic_widgets/world_view:draw_function_visualizer",
         "//software/gui/standalone_simulator/ui:main_widget",
         "//software/logger",
         "//software/proto:ssl_cc_proto",

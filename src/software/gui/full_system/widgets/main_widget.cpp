@@ -8,8 +8,6 @@ MainWidget::MainWidget(std::shared_ptr<ThunderbotsConfig> config, QWidget* paren
     // Handles all the setup of the generated UI components and adds the components
     // to this widget
     main_widget->setupUi(this);
-    scene    = new QGraphicsScene(main_widget->ai_visualization_graphics_view);
-    glWidget = new QOpenGLWidget(this);
 
     // StrongFocus means that the MainWidget will more aggressively capture focus when
     // clicked. Specifically, we do this so that when the user clicks outside of the
@@ -30,11 +28,11 @@ MainWidget::MainWidget(std::shared_ptr<ThunderbotsConfig> config, QWidget* paren
     auto widget_sizes_qvector = QVector<int>::fromStdVector(widget_sizes_vector);
     auto widget_sizes_list    = QList<int>::fromVector(widget_sizes_qvector);
     main_widget->ai_control_and_view_splitter->setSizes(widget_sizes_list);
-    setupSceneView(main_widget->ai_visualization_graphics_view, scene, glWidget);
 
     setupRobotStatusTable(main_widget->robot_status_table_widget);
     setupAIControls(main_widget, config);
     setupParametersTab(main_widget);
+
     // Update to make sure all layout changes apply nicely
     update();
 }
@@ -42,16 +40,16 @@ MainWidget::MainWidget(std::shared_ptr<ThunderbotsConfig> config, QWidget* paren
 void MainWidget::draw(WorldDrawFunction world_draw_function,
                       AIDrawFunction ai_draw_function)
 {
-    scene->clear();
-    world_draw_function.execute(scene);
-    ai_draw_function.execute(scene);
+    auto df = static_cast<DrawFunctionWrapper&>(world_draw_function);
+//    main_widget->ai_visualization_graphics_view->clearAndDraw({})
+//    scene->clear();
+//    world_draw_function.execute(scene);
+//    ai_draw_function.execute(scene);
 }
 
-void MainWidget::setDrawViewArea(const QRectF& new_view_area)
+void MainWidget::setViewArea(const Rectangle& view_area)
 {
-    scene->setSceneRect(new_view_area);
-    main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(),
-                                                           Qt::KeepAspectRatio);
+    main_widget->ai_visualization_graphics_view->setViewArea(view_area);
 }
 
 void MainWidget::updatePlayInfo(const PlayInfo& play_info)

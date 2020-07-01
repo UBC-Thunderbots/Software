@@ -188,8 +188,8 @@ p, li { white-space: pre-wrap; }
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>225</width>
-              <height>509</height>
+              <width>234</width>
+              <height>505</height>
              </rect>
             </property>
            </widget>
@@ -198,7 +198,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="ZoomableQGraphicsView" name="ai_visualization_graphics_view">
+      <widget class="DrawFunctionVisualizer" name="ai_visualization_graphics_view">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
@@ -225,9 +225,9 @@ p, li { white-space: pre-wrap; }
    <header>software/gui/generic_widgets/robot_status/robot_status_table.h</header>
   </customwidget>
   <customwidget>
-   <class>ZoomableQGraphicsView</class>
+   <class>DrawFunctionVisualizer</class>
    <extends>QGraphicsView</extends>
-   <header>software/gui/generic_widgets/world_view/zoomable_qgraphics_view.h</header>
+   <header>software/gui/generic_widgets/world_view/draw_function_visualizer.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

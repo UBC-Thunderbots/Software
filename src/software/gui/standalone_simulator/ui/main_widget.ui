@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="ZoomableQGraphicsView" name="simulation_graphics_view">
+    <widget class="DrawFunctionVisualizer" name="simulation_graphics_view">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -34,9 +34,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ZoomableQGraphicsView</class>
+   <class>DrawFunctionVisualizer</class>
    <extends>QGraphicsView</extends>
-   <header>software/gui/generic_widgets/world_view/zoomable_qgraphics_view.h</header>
+   <header>software/gui/generic_widgets/world_view/draw_function_visualizer.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
