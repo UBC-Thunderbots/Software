@@ -8,7 +8,7 @@ cc_library(
     deps = [
         "//software/ai",
         "//software/gui/drawing:navigator",
-        "//software/gui/visualizer:visualizer_wrapper",
+        "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//software/sensor_fusion",
         "//software/simulated_tests/validation:non_terminating_function_validator",

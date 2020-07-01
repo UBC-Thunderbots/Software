@@ -1,4 +1,4 @@
-#include "software/gui/visualizer/visualizer_wrapper.h"
+#include "software/gui/full_system/threaded_full_system_gui.h"
 
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
@@ -6,7 +6,7 @@
 #include "software/gui/drawing/world.h"
 #include "software/parameter/dynamic_parameters.h"
 
-VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
+ThreadedFullSystemGUI::ThreadedFullSystemGUI(int argc, char** argv)
     : ThreadedObserver<World>(),
       ThreadedObserver<AIDrawFunction>(),
       ThreadedObserver<PlayInfo>(),
@@ -28,11 +28,11 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
       application_shutting_down(false),
       initial_view_area_set(false)
 {
-    run_visualizer_thread =
-        std::thread(&VisualizerWrapper::createAndRunVisualizer, this, argc, argv);
+    run_full_system_gui_thread =
+        std::thread(&ThreadedFullSystemGUI::createAndRunFullSystemGUI, this, argc, argv);
 }
 
-VisualizerWrapper::~VisualizerWrapper()
+ThreadedFullSystemGUI::~ThreadedFullSystemGUI()
 {
     QCoreApplication* application_ptr = QApplication::instance();
     if (!application_shutting_down.load() && application_ptr != nullptr)
@@ -43,39 +43,39 @@ VisualizerWrapper::~VisualizerWrapper()
                                   Qt::ConnectionType::QueuedConnection);
     }
 
-    run_visualizer_thread.join();
+    run_full_system_gui_thread.join();
 }
 
-void VisualizerWrapper::createAndRunVisualizer(int argc, char** argv)
+void ThreadedFullSystemGUI::createAndRunFullSystemGUI(int argc, char** argv)
 {
     // We use raw pointers to have explicit control over the order of destruction.
-    // For some reason, putting the QApplication and Visualizer on the stack does
+    // For some reason, putting the QApplication and FullSystemGUI on the stack does
     // not work, despite theoretically having the same order of destruction
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    Visualizer* visualizer =
-        new Visualizer(world_draw_functions_buffer, ai_draw_functions_buffer,
-                       play_info_buffer, sensor_msg_buffer, robot_status_buffer,
-                       view_area_buffer, MutableDynamicParameters);
-    visualizer->show();
+    FullSystemGUI* full_system_gui =
+        new FullSystemGUI(world_draw_functions_buffer, ai_draw_functions_buffer,
+                          play_info_buffer, sensor_msg_buffer, robot_status_buffer,
+                          view_area_buffer, MutableDynamicParameters);
+    full_system_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
     // until "quit" is called on the QApplication, either by closing all the
     // application windows or calling the destructor of this class
     application->exec();
 
-    // NOTE: The visualizer MUST be deleted before the QApplication. The QApplication
+    // NOTE: The full_system MUST be deleted before the QApplication. The QApplication
     // manages all the windows, widgets, and event loop so must be destroyed last
-    delete visualizer;
+    delete full_system_gui;
     delete application;
 
-    // Let the system know the visualizer has shut down once the application has
+    // Let the system know the full_system has shut down once the application has
     // stopped running
     termination_promise_ptr->set_value();
 }
 
-void VisualizerWrapper::onValueReceived(World world)
+void ThreadedFullSystemGUI::onValueReceived(World world)
 {
     auto world_draw_function = getDrawWorldFunction(world);
     world_draw_functions_buffer->push(world_draw_function);
@@ -87,27 +87,27 @@ void VisualizerWrapper::onValueReceived(World world)
     }
 }
 
-void VisualizerWrapper::onValueReceived(AIDrawFunction draw_function)
+void ThreadedFullSystemGUI::onValueReceived(AIDrawFunction draw_function)
 {
     ai_draw_functions_buffer->push(draw_function);
 }
 
-void VisualizerWrapper::onValueReceived(PlayInfo play_info)
+void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info)
 {
     play_info_buffer->push(play_info);
 }
 
-void VisualizerWrapper::onValueReceived(SensorMsg sensor_msg)
+void ThreadedFullSystemGUI::onValueReceived(SensorMsg sensor_msg)
 {
     sensor_msg_buffer->push(sensor_msg);
 }
 
-void VisualizerWrapper::onValueReceived(RobotStatus robot_status)
+void ThreadedFullSystemGUI::onValueReceived(RobotStatus robot_status)
 {
     robot_status_buffer->push(robot_status);
 }
 
-std::shared_ptr<std::promise<void>> VisualizerWrapper::getTerminationPromise()
+std::shared_ptr<std::promise<void>> ThreadedFullSystemGUI::getTerminationPromise()
 {
     return termination_promise_ptr;
 }

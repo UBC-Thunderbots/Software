@@ -1,6 +1,6 @@
-#include "software/gui/robot_diagnostics/widgets/robot_diagnostics.h"
+#include "software/gui/robot_diagnostics/widgets/robot_diagnostics_gui.h"
 
-RobotDiagnostics::RobotDiagnostics(
+RobotDiagnosticsGUI::RobotDiagnosticsGUI(
     std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer,
     std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<Primitive>>> primitive_buffer,
     QWidget* parent)
@@ -22,53 +22,54 @@ RobotDiagnostics::RobotDiagnostics(
     setFocusPolicy(Qt::StrongFocus);
 
     connect(update_timer, &QTimer::timeout, this,
-            &RobotDiagnostics::updateRobotDiagnostics);
+            &RobotDiagnosticsGUI::updateRobotDiagnostics);
     update_timer->start(static_cast<int>(update_timer_interval.getMilliseconds()));
 
     setupWidgets();
     update();
 }
 
-void RobotDiagnostics::onChickerStateChanged(double chicker_power, ChargeMode charge_mode,
-                                             ChickMode chick_mode)
+void RobotDiagnosticsGUI::onChickerStateChanged(double chicker_power,
+                                                ChargeMode charge_mode,
+                                                ChickMode chick_mode)
 {
     // TODO (Issue #1420): push primitive to buffer
 }
 
-void RobotDiagnostics::onDirectVelocityPowerChanged(
+void RobotDiagnosticsGUI::onDirectVelocityPowerChanged(
     double direct_per_wheel_power, DirectVelocityMode direct_velocity_mode)
 {
     // TODO (Issue #1420): push primitive to buffer
 }
 
-void RobotDiagnostics::onDirectPerWheelPowerChanged(
+void RobotDiagnosticsGUI::onDirectPerWheelPowerChanged(
     double direct_per_wheel_power, DirectPerWheelMode direct_per_wheel_mode)
 {
     // TODO (Issue #1420): push primitive to buffer
 }
 
-void RobotDiagnostics::onDribblerPowerChanged(double dribbler_power)
+void RobotDiagnosticsGUI::onDribblerPowerChanged(double dribbler_power)
 {
     // TODO (Issue #1420): push primitive to buffer
 }
 
-void RobotDiagnostics::setupWidgets()
+void RobotDiagnosticsGUI::setupWidgets()
 {
-    setupChicker(main_widget,
-                 boost::bind(&RobotDiagnostics::onChickerStateChanged, this, _1, _2, _3));
+    setupChicker(main_widget, boost::bind(&RobotDiagnosticsGUI::onChickerStateChanged,
+                                          this, _1, _2, _3));
     setupDribbler(main_widget,
-                  boost::bind(&RobotDiagnostics::onDribblerPowerChanged, this, _1));
+                  boost::bind(&RobotDiagnosticsGUI::onDribblerPowerChanged, this, _1));
     setupDrive(
         main_widget,
-        boost::bind(&RobotDiagnostics::onDirectPerWheelPowerChanged, this, _1, _2),
-        boost::bind(&RobotDiagnostics::onDirectVelocityPowerChanged, this, _1, _2));
+        boost::bind(&RobotDiagnosticsGUI::onDirectPerWheelPowerChanged, this, _1, _2),
+        boost::bind(&RobotDiagnosticsGUI::onDirectVelocityPowerChanged, this, _1, _2));
     setupFeedback(main_widget);
     setupLEDs(main_widget, led_mode);
     setupRobotSelection(main_widget, robot_selection);
     setupRobotStatusTable(main_widget->robot_status_table_widget);
 }
 
-void RobotDiagnostics::updateRobotDiagnostics()
+void RobotDiagnosticsGUI::updateRobotDiagnostics()
 {
     std::optional<SensorMsg> sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue();
     while (sensor_msg)
