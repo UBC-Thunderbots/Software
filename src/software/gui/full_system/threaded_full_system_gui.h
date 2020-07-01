@@ -9,7 +9,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
-#include "software/gui/full_system/widgets/visualizer.h"
+#include "software/gui/full_system/widgets/full_system_gui.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/new_geom/rectangle.h"
@@ -17,28 +17,28 @@
 #include "software/world/world.h"
 
 /**
- * This class wraps our Visualizer object which is responsible for
+ * This class wraps our FullSystemGUI object which is responsible for
  * visualizing information about our AI, and allowing users to control it.
  */
-class VisualizerWrapper : public ThreadedObserver<World>,
-                          public ThreadedObserver<AIDrawFunction>,
-                          public ThreadedObserver<PlayInfo>,
-                          public ThreadedObserver<SensorMsg>,
-                          public ThreadedObserver<RobotStatus>
+class ThreadedFullSystemGUI : public ThreadedObserver<World>,
+                              public ThreadedObserver<AIDrawFunction>,
+                              public ThreadedObserver<PlayInfo>,
+                              public ThreadedObserver<SensorMsg>,
+                              public ThreadedObserver<RobotStatus>
 {
    public:
-    VisualizerWrapper() = delete;
+    ThreadedFullSystemGUI() = delete;
 
     /**
-     * Create a new Visualizer wrapper. The argc and argv arguments are required
+     * Create a new ThreadedFullSystemGUI. The argc and argv arguments are required
      * to create a QApplication
      *
      * @param argc The number of arguments being passed
      * @param argv Keyword arguments
      */
-    explicit VisualizerWrapper(int argc, char** argv);
+    explicit ThreadedFullSystemGUI(int argc, char** argv);
 
-    ~VisualizerWrapper() override;
+    ~ThreadedFullSystemGUI() override;
 
     void onValueReceived(World world) override;
     void onValueReceived(AIDrawFunction draw_function) override;
@@ -48,30 +48,30 @@ class VisualizerWrapper : public ThreadedObserver<World>,
 
     /**
      * Returns a shared_ptr to a promise that can be waited on, and that will
-     * be notified once the Visualizer has shut down
+     * be notified once the FullSystemGUI has shut down
      *
      * @return a shared_ptr to a promise that can be waited on, and that will
-     * be notified once the Visualizer has been shut down
+     * be notified once the FullSystemGUI has been shut down
      */
     std::shared_ptr<std::promise<void>> getTerminationPromise();
 
    private:
     /**
-     * Creates a new Visualizer in a new thread and starts running it. These
+     * Creates a new FullSystemGUI in a new thread and starts running it. These
      * objects must be created in the new thread because the QApplication must be
-     * constructed in the thread is will run in, and the Visualizer must be
+     * constructed in the thread is will run in, and the FullSystemGUI must be
      * created in the same context as the QApplication (which in this case is the new
      * thread).
      *
      * @param argc The number of arguments being passed
-     * @param argv Keyword arguments for the Visualizer QApplication
+     * @param argv Keyword arguments for the FullSystemGUI QApplication
      */
-    void createAndRunVisualizer(int argc, char** argv);
+    void createAndRunFullSystemGUI(int argc, char** argv);
 
-    std::thread run_visualizer_thread;
+    std::thread run_full_system_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
 
-    // Buffers that are shared with the instance of the Visualizer so that data can
+    // Buffers that are shared with the instance of the FullSystemGUI so that data can
     // be passed safely
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;

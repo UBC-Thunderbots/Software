@@ -38,19 +38,19 @@ class MainWidget : public QWidget
    public slots:
 
     /**
-     * Draws all the AI information we want to display in the Visualizer. This includes
+     * Draws all the AI information we want to display in the FullSystemGUI. This includes
      * visualizing the state of the world as well as drawing the AI state we want to show,
      * like planned navigator paths.
      *
-     * @param world_draw_function The function that tells the Visualizer how to draw the
+     * @param world_draw_function The function that tells the FullSystemGUI how to draw the
      * World state
-     * @param ai_draw_function The function that tells the Visualizer how to draw the AI
+     * @param ai_draw_function The function that tells the FullSystemGUI how to draw the AI
      * state
      */
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
 
     /**
-     * Sets the area of the World being drawn in the Visualizer to the given region
+     * Sets the area of the World being drawn in the FullSystemGUI to the given region
      *
      * @param new_view_area The new area to show in the view
      */

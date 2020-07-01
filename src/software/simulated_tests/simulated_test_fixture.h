@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/ai.h"
-#include "software/gui/full_system/visualizer_wrapper.h"
+#include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
@@ -24,9 +24,9 @@ class SimulatedTestFixture : public ::testing::Test
     void SetUp() override;
 
     /**
-     * This function enables the Visualizer while a test is running, so that the test can
+     * This function enables the FullSystemGUI while a test is running, so that the test can
      * be debugged Visually. Simply call this function at the start of the test(s) you
-     * want to show in the Visualizer.
+     * want to show in the FullSystemGUI.
      */
     void enableVisualizer();
 
@@ -152,7 +152,7 @@ class SimulatedTestFixture : public ::testing::Test
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
 
-    std::shared_ptr<VisualizerWrapper> visualizer;
+    std::shared_ptr<ThreadedFullSystemGUI> visualizer;
     // If false, runs the simulation as fast as possible.
     // If true, introduces artificial delay so that simulation
     // time passes at the same speed a real life time

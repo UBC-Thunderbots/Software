@@ -41,7 +41,7 @@ class StandaloneSimulatorGUI : public QMainWindow
 
    private:
     /**
-     * Updates the area of the World being drawn in the Visualizer
+     * Updates the area of the World being drawn in the FullSystemGUI
      */
     void updateDrawViewArea();
 

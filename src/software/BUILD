@@ -9,7 +9,7 @@ cc_binary(
         "//software/ai/hl/stp:play_info",
         "//software/backend",
         "//software/backend:all_backends",
-        "//software/gui/visualizer:visualizer_wrapper",
+        "//software/gui/visualizer:threaded_full_system_gui",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",

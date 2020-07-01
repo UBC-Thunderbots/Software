@@ -51,7 +51,7 @@ class StandaloneSimulatorGUIWrapper : public ThreadedObserver<SSL_WrapperPacket>
      * thread).
      *
      * @param argc The number of arguments being passed
-     * @param argv Keyword arguments for the Visualizer QApplication
+     * @param argv Keyword arguments for the FullSystemGUI QApplication
      */
     void createAndRunStandaloneSimulatorGUI(int argc, char** argv);
 

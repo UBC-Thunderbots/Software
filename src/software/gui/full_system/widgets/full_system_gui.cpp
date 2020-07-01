@@ -1,8 +1,8 @@
-#include "software/gui/full_system/widgets/visualizer.h"
+#include "software/gui/full_system/widgets/full_system_gui.h"
 
 #include "software/gui/geometry_conversion.h"
 
-Visualizer::Visualizer(
+FullSystemGUI::FullSystemGUI(
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
@@ -23,11 +23,11 @@ Visualizer::Visualizer(
 {
     setCentralWidget(main_widget);
 
-    connect(update_timer, &QTimer::timeout, this, &Visualizer::updateVisualizer);
+    connect(update_timer, &QTimer::timeout, this, &FullSystemGUI::updateGUI);
     update_timer->start(static_cast<int>(update_timer_interval.getMilliseconds()));
 }
 
-void Visualizer::updateVisualizer()
+void FullSystemGUI::updateGUI()
 {
     draw();
     updatePlayInfo();
@@ -36,7 +36,7 @@ void Visualizer::updateVisualizer()
     updateDrawViewArea();
 }
 
-void Visualizer::draw()
+void FullSystemGUI::draw()
 {
     auto world_draw_function = world_draw_functions_buffer->popLeastRecentlyAddedValue();
     if (world_draw_function)
@@ -53,7 +53,7 @@ void Visualizer::draw()
     main_widget->draw(most_recent_world_draw_function, most_recent_ai_draw_function);
 }
 
-void Visualizer::updatePlayInfo()
+void FullSystemGUI::updatePlayInfo()
 {
     auto play_info = play_info_buffer->popLeastRecentlyAddedValue();
     if (play_info)
@@ -62,7 +62,7 @@ void Visualizer::updatePlayInfo()
     }
 }
 
-void Visualizer::updateSensorMsg()
+void FullSystemGUI::updateSensorMsg()
 {
     std::optional<SensorMsg> sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue();
     while (sensor_msg)
@@ -72,7 +72,7 @@ void Visualizer::updateSensorMsg()
     }
 }
 
-void Visualizer::updateRobotStatus()
+void FullSystemGUI::updateRobotStatus()
 {
     std::optional<RobotStatus> robot_status =
         robot_status_buffer->popLeastRecentlyAddedValue();
@@ -83,7 +83,7 @@ void Visualizer::updateRobotStatus()
     }
 }
 
-void Visualizer::updateDrawViewArea()
+void FullSystemGUI::updateDrawViewArea()
 {
     std::optional<Rectangle> view_area = view_area_buffer->popLeastRecentlyAddedValue();
     if (view_area)

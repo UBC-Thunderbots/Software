@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
-#include "software/gui/full_system/visualizer_wrapper.h"
+#include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -59,7 +59,7 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
         boost::program_options::value<std::string>(&args.backend_name)->required(),
         backend_help_str.c_str())("headless",
                                   boost::program_options::bool_switch(&args.headless),
-                                  "Run without the Visualizer");
+                                  "Run without the FullSystemGUI");
 
     boost::program_options::variables_map vm;
     try
@@ -103,14 +103,14 @@ int main(int argc, char **argv)
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend>::create(args.backend_name);
         auto ai = std::make_shared<AIWrapper>(ai_config, ai_control_config);
-        std::shared_ptr<VisualizerWrapper> visualizer;
+        std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers
         ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
         backend->Subject<World>::registerObserver(ai);
         if (!args.headless)
         {
-            visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
+            visualizer = std::make_shared<ThreadedFullSystemGUI>(argc, argv);
 
             backend->Subject<World>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
