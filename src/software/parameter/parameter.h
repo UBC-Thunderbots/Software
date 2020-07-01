@@ -75,10 +75,6 @@ class Parameter
     }
 
    protected:
-    // mutexes are marked as mutable so that they can be acquired in a const function
-    mutable std::mutex value_mutex_;
-    mutable std::mutex callback_mutex_;
-
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
 
@@ -88,4 +84,9 @@ class Parameter
     // A list of functions to call when a new parameter value is set
     // marked as mutable to allow const parameters to also register callbacks
     mutable std::vector<std::function<void(T)>> callback_functions;
+
+   private:
+    // mutexes are marked as mutable so that they can be acquired in a const function
+    mutable std::mutex value_mutex_;
+    mutable std::mutex callback_mutex_;
 };
