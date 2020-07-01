@@ -45,7 +45,7 @@ include:
     name: example_int_param
     min: 0
     max: 5
-    value: 3
+    value: 5
     description: >
       Can be any integer value in the range [min, max]
 - uint:
@@ -117,7 +117,7 @@ include:
 - bool:
     name: example_optional_parameter
     value: false
-    optional: true
+    optional: false
     description: >
       Optional parameters will generate with std::optional as their value return type.
       They can accept std::nullopt as a value. If optional is not specified, it is

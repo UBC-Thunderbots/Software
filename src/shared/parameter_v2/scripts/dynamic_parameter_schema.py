@@ -1,5 +1,19 @@
-DYNAMIC_PARAMETER_YAML_SCHEMA = {
+INCLUDE_DEF_SCHEMA = {
+    "type": "object",
+    "uniqueItems": True,
+    "minItems": 1,
+    "properties": {
+        "include": {
+            "type": "array",
+            "items": [{"type": "string"}, {"additionalProperties": False}],
+        }
+    },
+}
+
+PARAM_DEF_SCHEMA = {
     "type": "array",
+    "uniqueItems": True,
+    "minItems": 1,
     "items": [
         {
             "type": "object",
@@ -12,6 +26,7 @@ DYNAMIC_PARAMETER_YAML_SCHEMA = {
                         "description": {"type": "string"},
                     },
                     "required": ["name", "value", "description"],
+                    "additionalProperties": False,
                 }
             },
         },
@@ -28,6 +43,7 @@ DYNAMIC_PARAMETER_YAML_SCHEMA = {
                         "description": {"type": "string"},
                     },
                     "required": ["name", "min", "max", "value", "description"],
+                    "additionalProperties": False,
                 }
             },
         },
@@ -44,6 +60,7 @@ DYNAMIC_PARAMETER_YAML_SCHEMA = {
                         "description": {"type": "string"},
                     },
                     "required": ["name", "min", "max", "value", "description"],
+                    "additionalProperties": False,
                 }
             },
         },
@@ -60,6 +77,7 @@ DYNAMIC_PARAMETER_YAML_SCHEMA = {
                         "description": {"type": "string"},
                     },
                     "required": ["name", "min", "max", "value", "description"],
+                    "additionalProperties": False,
                 }
             },
         },
@@ -74,6 +92,7 @@ DYNAMIC_PARAMETER_YAML_SCHEMA = {
                         "description": {"type": "string"},
                     },
                     "required": ["name", "value", "description"],
+                    "additionalProperties": False,
                 }
             },
         },
@@ -89,6 +108,7 @@ DYNAMIC_PARAMETER_YAML_SCHEMA = {
                         "description": {"type": "string"},
                     },
                     "required": ["name", "enum", "value", "description"],
+                    "additionalProperties": False,
                 }
             },
         },
@@ -111,6 +131,7 @@ DYNAMIC_PARAMETER_YAML_SCHEMA = {
                         "value",
                         "description",
                     ],
+                    "additionalProperties": False,
                 }
             },
         },

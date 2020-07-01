@@ -4,7 +4,7 @@ import yaml
 from colorama import Fore, init
 from jsonschema import validate
 
-from dynamic_parameter_schema import DYNAMIC_PARAMETER_YAML_SCHEMA
+from dynamic_parameter_schema import PARAM_DEF_SCHEMA, INCLUDE_DEF_SCHEMA
 
 #######################################################################
 #                         Config Yaml Loader                          #
@@ -74,22 +74,28 @@ class ConfigYamlLoader(object):
         :rtype: dict
 
         """
-        param_info = {}
+        raw_configs = []
 
         for filename in self.__yaml_paths:
             with open(filename, "r") as param_yaml:
 
                 try:
-                    config_descriptions = yaml.safe_load_all(param_yaml)
-                    __import__("pprint").pprint(config_descriptions)
+                    raw_configs.append(list(yaml.safe_load_all(param_yaml)))
 
                 except yaml.YAMLError as ymle:
-
                     raise ConfigYamlMalformed(
                         "Check malformed {} \n {}".format(filename, ymle)
                     )
 
-        return param_info
+        for raw_config in raw_configs:
+
+            if len(raw_config) == 2:
+                validate(raw_config[0], INCLUDE_DEF_SCHEMA)
+                validate(raw_config[1], PARAM_DEF_SCHEMA)
+            else:
+                validate(raw_config[0], PARAM_DEF_SCHEMA)
+
+        return raw_configs
 
 
 #######################################################################
@@ -108,7 +114,7 @@ class ConfigYamlException(Exception):
     """
 
     def __init__(self, message):
-        init()  # init fore
+        init()  # init Fore to print w/ color
         super().__init__(Fore.RED + message + Fore.RESET)
 
 
