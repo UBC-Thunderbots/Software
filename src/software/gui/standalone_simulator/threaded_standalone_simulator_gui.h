@@ -21,8 +21,8 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
     ThreadedStandaloneSimulatorGUI() = delete;
 
     /**
-     * Create a new ThreadedStandaloneSimulatorGUI. The argc and argv arguments are required
-     * to create a QApplication
+     * Create a new ThreadedStandaloneSimulatorGUI. The argc and argv arguments are
+     * required to create a QApplication
      *
      * @param argc The number of arguments being passed
      * @param argv Keyword arguments

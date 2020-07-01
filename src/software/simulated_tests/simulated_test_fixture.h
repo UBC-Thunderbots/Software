@@ -24,8 +24,8 @@ class SimulatedTestFixture : public ::testing::Test
     void SetUp() override;
 
     /**
-     * This function enables the FullSystemGUI while a test is running, so that the test can
-     * be debugged Visually. Simply call this function at the start of the test(s) you
+     * This function enables the FullSystemGUI while a test is running, so that the test
+     * can be debugged Visually. Simply call this function at the start of the test(s) you
      * want to show in the FullSystemGUI.
      */
     void enableVisualizer();

@@ -3,7 +3,8 @@
 int main(int argc, char *argv[])
 {
     std::shared_ptr<ThreadedRobotDiagnosticsGUI> threaded_robot_diagnostics_gui;
-    threaded_robot_diagnostics_gui = std::make_shared<ThreadedRobotDiagnosticsGUI>(argc, argv);
+    threaded_robot_diagnostics_gui =
+        std::make_shared<ThreadedRobotDiagnosticsGUI>(argc, argv);
 
     // This blocks forever without using the CPU
     // Wait for the GUI to shut down before shutting

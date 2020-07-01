@@ -29,7 +29,8 @@ RobotDiagnosticsGUI::RobotDiagnosticsGUI(
     update();
 }
 
-void RobotDiagnosticsGUI::onChickerStateChanged(double chicker_power, ChargeMode charge_mode,
+void RobotDiagnosticsGUI::onChickerStateChanged(double chicker_power,
+                                                ChargeMode charge_mode,
                                                 ChickMode chick_mode)
 {
     // TODO (Issue #1420): push primitive to buffer
@@ -54,8 +55,8 @@ void RobotDiagnosticsGUI::onDribblerPowerChanged(double dribbler_power)
 
 void RobotDiagnosticsGUI::setupWidgets()
 {
-    setupChicker(main_widget,
-                 boost::bind(&RobotDiagnosticsGUI::onChickerStateChanged, this, _1, _2, _3));
+    setupChicker(main_widget, boost::bind(&RobotDiagnosticsGUI::onChickerStateChanged,
+                                          this, _1, _2, _3));
     setupDribbler(main_widget,
                   boost::bind(&RobotDiagnosticsGUI::onDribblerPowerChanged, this, _1));
     setupDrive(

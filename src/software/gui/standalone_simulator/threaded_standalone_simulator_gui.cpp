@@ -53,8 +53,9 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(int argc
     // application windows or calling the destructor of this class
     application->exec();
 
-    // NOTE: The standalone_simulator_gui MUST be deleted before the QApplication. The QApplication
-    // manages all the windows, widgets, and event loop so must be destroyed last
+    // NOTE: The standalone_simulator_gui MUST be deleted before the QApplication. The
+    // QApplication manages all the windows, widgets, and event loop so must be destroyed
+    // last
     delete standalone_simulator_gui;
     delete application;
 
@@ -81,7 +82,8 @@ void ThreadedStandaloneSimulatorGUI::onValueReceived(SSL_WrapperPacket wrapper_p
     }
 }
 
-std::shared_ptr<std::promise<void>> ThreadedStandaloneSimulatorGUI::getTerminationPromise()
+std::shared_ptr<std::promise<void>>
+ThreadedStandaloneSimulatorGUI::getTerminationPromise()
 {
     return termination_promise_ptr;
 }

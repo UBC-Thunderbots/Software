@@ -13,7 +13,7 @@ ThreadedRobotDiagnosticsGUI::ThreadedRobotDiagnosticsGUI(int argc, char** argv)
       application_shutting_down(false)
 {
     run_robot_diagnostics_thread = std::thread(
-            &ThreadedRobotDiagnosticsGUI::createAndRunRobotDiagnosticsGUI, this, argc, argv);
+        &ThreadedRobotDiagnosticsGUI::createAndRunRobotDiagnosticsGUI, this, argc, argv);
 }
 
 ThreadedRobotDiagnosticsGUI::~ThreadedRobotDiagnosticsGUI()

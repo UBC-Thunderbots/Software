@@ -15,8 +15,8 @@
 #include "software/world/world.h"
 
 /**
- * This class wraps our RobotDiagnosticsGUI object which is responsible for allowing users to
- * interact with and debug the robot
+ * This class wraps our RobotDiagnosticsGUI object which is responsible for allowing users
+ * to interact with and debug the robot
  */
 class ThreadedRobotDiagnosticsGUI : public ThreadedObserver<SensorMsg>
 {
@@ -61,8 +61,8 @@ class ThreadedRobotDiagnosticsGUI : public ThreadedObserver<SensorMsg>
     std::thread run_robot_diagnostics_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
 
-    // Buffers that are shared with the instance of the RobotDiagnosticsGUI so that data can
-    // be passed safely
+    // Buffers that are shared with the instance of the RobotDiagnosticsGUI so that data
+    // can be passed safely
     std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<Primitive>>> primitive_buffer;
 
