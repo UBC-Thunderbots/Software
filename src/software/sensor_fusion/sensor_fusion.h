@@ -3,6 +3,7 @@
 #include <google/protobuf/repeated_field.h>
 
 #include "software/backend/robot_status.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_referee.h"
@@ -23,7 +24,7 @@
 class SensorFusion
 {
    public:
-    SensorFusion();
+    explicit SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
 
     virtual ~SensorFusion() = default;
 
@@ -50,7 +51,7 @@ class SensorFusion
      * @param new data
      */
     void updateWorld(const SSL_WrapperPacket &packet);
-    void updateWorld(const Referee &packet);
+    void updateWorld(const SSL_Referee &packet);
     void updateWorld(
         const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
     void updateWorld(const SSL_GeometryData &geometry_packet);
@@ -86,14 +87,7 @@ class SensorFusion
     RobotDetection invert(RobotDetection robot_detection);
     BallDetection invert(BallDetection ball_detection);
 
-    /**
-     * Given a detection, figures out if the camera is enabled
-     *
-     * @param detection SSL_DetectionFrame to consider
-     *
-     * @return whether the camera is enabled
-     */
-    bool isCameraEnabled(const SSL_DetectionFrame &detection);
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
 
     std::optional<Field> field;
     std::optional<Ball> ball;
