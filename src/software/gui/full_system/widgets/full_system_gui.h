@@ -7,26 +7,26 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
-#include "software/gui/visualizer/widgets/main_widget.h"
+#include "software/gui/full_system/widgets/main_widget.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/time/duration.h"
 
 /**
- * This is the main window / application object for the visualizer.
+ * This is the main window / application object for the full_system.
  * Currently it wraps the "main_widget" which is what actually contains
  * all the content.
  *
  * This class uses ThreadSafeBuffers to receive new data, and updates the GUI with
  * the new data at a defined rate using a timer.
  */
-class Visualizer : public QMainWindow
+class FullSystemGUI : public QMainWindow
 {
     Q_OBJECT
 
    public:
     /**
-     * Creates a new Visualizer MainWindow
+     * Creates a new FullSystemGUI MainWindow
      *
      * @param world_draw_functions_buffer The buffer used to receive new
      * WorldDrawFunctions
@@ -37,7 +37,7 @@ class Visualizer : public QMainWindow
      * @param view_area_buffer The buffer used to receive Rectangles that specify the area
      * of the world to display in the view
      */
-    explicit Visualizer(
+    explicit FullSystemGUI(
         std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
@@ -48,14 +48,14 @@ class Visualizer : public QMainWindow
 
    public slots:
     /**
-     * Updates all components of the visualizer, including the World view,
+     * Updates all components of the full_system, including the World view,
      * PlayInfo, and RobotStatus
      */
-    void updateVisualizer();
+    void updateGUI();
 
    private:
     /**
-     * Draws all the AI information we want to display in the Visualizer. This includes
+     * Draws all the AI information we want to display in the FullSystemGUI. This includes
      * visualizing the state of the world as well as drawing the AI state we want to show,
      * like planned navigator paths.
      */
@@ -77,7 +77,7 @@ class Visualizer : public QMainWindow
     void updateRobotStatus();
 
     /**
-     * Updates the area of the World being drawn in the Visualizer
+     * Updates the area of the World being drawn in the FullSystemGUI
      */
     void updateDrawViewArea();
 

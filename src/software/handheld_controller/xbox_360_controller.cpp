@@ -1,7 +1,7 @@
 #include "software/handheld_controller/xbox_360_controller.h"
 
 Xbox360Controller::Xbox360Controller(
-    std::shared_ptr<const HandheldControllerInputConfig> controller_input_config)
+    std::shared_ptr<const HandheldControllerConfig> controller_input_config)
     : Controller(controller_input_config)
 {
 }

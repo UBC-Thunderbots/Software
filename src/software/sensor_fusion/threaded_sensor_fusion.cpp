@@ -1,6 +1,15 @@
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 
-ThreadedSensorFusion::ThreadedSensorFusion() : sensor_fusion() {}
+ThreadedSensorFusion::ThreadedSensorFusion(
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
+    : sensor_fusion(sensor_fusion_config)
+{
+    if (!sensor_fusion_config)
+    {
+        throw std::invalid_argument(
+            "ThreadedSensorFusion created with null SensorFusionConfig");
+    }
+}
 
 void ThreadedSensorFusion::onValueReceived(SensorMsg sensor_msg)
 {
