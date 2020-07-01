@@ -1,12 +1,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "robot_diagnostics_wrapper",
-    srcs = ["robot_diagnostics_wrapper.cpp"],
-    hdrs = ["robot_diagnostics_wrapper.h"],
+    name = "threaded_robot_diagnostics_gui",
+    srcs = ["threaded_robot_diagnostics_gui.cpp"],
+    hdrs = ["threaded_robot_diagnostics_gui.h"],
     deps = [
         "//software/geom",
-        "//software/gui/robot_diagnostics/widgets:robot_diagnostics_widget",
+        "//software/gui/robot_diagnostics/widgets:robot_diagnostics_gui",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",
         "//software/primitive",
@@ -20,7 +20,7 @@ cc_binary(
     name = "robot_diagnostics_main",
     srcs = ["robot_diagnostics_main.cpp"],
     deps = [
-        ":robot_diagnostics_wrapper",
+        ":threaded_robot_diagnostics_gui",
         "//software/logger",
         "@boost//:program_options",
     ],
