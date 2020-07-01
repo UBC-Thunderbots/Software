@@ -7,13 +7,13 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
-#include "software/gui/visualizer/widgets/main_widget.h"
+#include "software/gui/full_system/widgets/main_widget.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/time/duration.h"
 
 /**
- * This is the main window / application object for the visualizer.
+ * This is the main window / application object for the full_system.
  * Currently it wraps the "main_widget" which is what actually contains
  * all the content.
  *
@@ -48,7 +48,7 @@ class Visualizer : public QMainWindow
 
    public slots:
     /**
-     * Updates all components of the visualizer, including the World view,
+     * Updates all components of the full_system, including the World view,
      * PlayInfo, and RobotStatus
      */
     void updateVisualizer();

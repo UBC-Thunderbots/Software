@@ -1,4 +1,4 @@
-#include "software/gui/visualizer/visualizer_wrapper.h"
+#include "software/gui/full_system/visualizer_wrapper.h"
 
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
@@ -65,12 +65,12 @@ void VisualizerWrapper::createAndRunVisualizer(int argc, char** argv)
     // application windows or calling the destructor of this class
     application->exec();
 
-    // NOTE: The visualizer MUST be deleted before the QApplication. The QApplication
+    // NOTE: The full_system MUST be deleted before the QApplication. The QApplication
     // manages all the windows, widgets, and event loop so must be destroyed last
     delete visualizer;
     delete application;
 
-    // Let the system know the visualizer has shut down once the application has
+    // Let the system know the full_system has shut down once the application has
     // stopped running
     termination_promise_ptr->set_value();
 }

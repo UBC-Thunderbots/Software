@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
-#include "software/gui/visualizer/visualizer_wrapper.h"
+#include "software/gui/full_system/visualizer_wrapper.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -122,7 +122,7 @@ int main(int argc, char **argv)
         if (!args.headless)
         {
             // This blocks forever without using the CPU
-            // Wait for the visualizer to shut down before shutting
+            // Wait for the full_system to shut down before shutting
             // down the rest of the system
             visualizer->getTerminationPromise()->get_future().wait();
         }

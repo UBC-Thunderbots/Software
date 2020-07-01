@@ -58,7 +58,7 @@ void StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI(int argc,
     delete simulator_gui;
     delete application;
 
-    // Let the system know the visualizer has shut down once the application has
+    // Let the system know the full_system has shut down once the application has
     // stopped running
     termination_promise_ptr->set_value();
 }

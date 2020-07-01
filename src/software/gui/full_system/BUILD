@@ -12,7 +12,7 @@ cc_library(
         "//software/geom",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:world",
-        "//software/gui/visualizer/widgets:visualizer",
+        "//software/gui/full_system/widgets:visualizer",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",
         "//software/proto:sensor_msg_cc_proto",

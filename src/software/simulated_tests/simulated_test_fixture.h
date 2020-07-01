@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/ai.h"
-#include "software/gui/visualizer/visualizer_wrapper.h"
+#include "software/gui/full_system/visualizer_wrapper.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"

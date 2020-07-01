@@ -1,4 +1,4 @@
-#include "software/gui/visualizer/widgets/visualizer.h"
+#include "software/gui/full_system/widgets/visualizer.h"
 
 #include "software/gui/geometry_conversion.h"
 
