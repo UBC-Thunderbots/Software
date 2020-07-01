@@ -1,4 +1,4 @@
-#include "shared/parameter_v2/config/examples/example_config.h"
+#include "shared/parameter_v2/c_parameter/example_config.h"
 
 #include <memory.h>
 #include <stdlib.h>
