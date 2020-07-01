@@ -12,7 +12,7 @@ struct RobotStatus
     // The robot number.
     int32_t robot;
 
-    // Messages related to the robot that are to be displayed in the visualizer
+    // Messages related to the robot that are to be displayed in the full_system
     // (usually errors that need attention)
     std::vector<std::string> robot_messages;
 

@@ -185,7 +185,7 @@ cc_binary(
     srcs = ["standalone_simulator_main.cpp"],
     deps = [
         ":standalone_simulator",
-        "//software/gui/standalone_simulator:standalone_simulator_gui_wrapper",
+        "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
     ],
