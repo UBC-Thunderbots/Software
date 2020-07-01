@@ -85,6 +85,22 @@ TEST(ParameterTest, test_discrete_invalid_constructor)
                  std::invalid_argument);
 }
 
+TEST(ParameterTest, test_optional_value_int)
+{
+    Parameter<std::optional<int>> test_optional_int =
+        Parameter<std::optional<int>>("test_optional", std::nullopt);
+
+    EXPECT_FALSE(test_optional_int.value());
+
+    test_optional_int.setValue(100);
+
+    EXPECT_TRUE(test_optional_int.value());
+    EXPECT_TRUE(test_optional_int.value() == 100);
+
+    test_optional_int.setValue(std::nullopt);
+
+    EXPECT_FALSE(test_optional_int.value());
+}
 
 TEST(ParameterTest, test_continous_parameter_int)
 {
