@@ -30,19 +30,19 @@ namespace Ui
  * This class uses ThreadSafeBuffers to send/receive new data, and updates the GUI with
  * the new data at a defined rate using a timer.
  */
-class RobotDiagnostics : public QMainWindow
+class RobotDiagnosticsGUI : public QMainWindow
 {
     Q_OBJECT
 
    public:
     /**
-     * Creates a new RobotDiagnostics MainWindow
+     * Creates a new RobotDiagnosticsGUI MainWindow
      *
      * @param sensor_msg_buffer The buffer used to receive new SensorMsgs
      * @param primitive_buffer The buffer used to send new Primitives
      * @param parent parent widget
      */
-    explicit RobotDiagnostics(
+    explicit RobotDiagnosticsGUI(
         std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer,
         std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<Primitive>>> primitive_buffer,
         QWidget* parent = nullptr);
