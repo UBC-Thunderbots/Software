@@ -2,6 +2,13 @@ import yaml
 import os
 from pathlib import Path
 import argparse
+from config_yaml_loader import (
+    ConfigYamlLoader,
+    ConfigYamlException,
+    ConfigYamlCycleDetected,
+    ConfigYamlSchemaViolation,
+    ConfigYamlMalformed,
+)
 
 # Path relative to the bazel WORKSPACE root
 # This path is included in the data for the py_binary bazel target
@@ -12,11 +19,9 @@ def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
     # A temporary implementation used to show we can access the YAML files
     yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
 
-    for filename in yamls:
-        with open(filename, "r") as stream:
-            all_data = yaml.load_all(stream)
-            for data in all_data:
-                print(data)
+    print(yamls)
+    print(PARAMETER_CONFIG_PATH)
+    ConfigYamlLoader(yamls)
 
     with open(output_file, "w") as outfile:
         outfile.write("Hello world\n")
@@ -58,5 +63,12 @@ def main():
     )
 
 
+#######################################################################
+#                                Main                                 #
+#######################################################################
+
 if __name__ == "__main__":
+    print(ConfigYamlMalformed("TEST"))
+    print(ConfigYamlMalformed("TEST"))
+    print("MEETING IS ESTARTKING")
     main()
