@@ -216,7 +216,7 @@ p, li { white-space: pre-wrap; }
      </widget>
      <widget class="RobotStatusTable" name="robot_status_table_widget">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
