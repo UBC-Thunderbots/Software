@@ -6,7 +6,6 @@ from config_yaml_loader import (
     ConfigYamlLoader,
     ConfigYamlException,
     ConfigYamlCycleDetected,
-    ConfigYamlSchemaViolation,
     ConfigYamlMalformed,
 )
 
@@ -20,8 +19,7 @@ def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
     yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
 
     print(yamls)
-    print(PARAMETER_CONFIG_PATH)
-    ConfigYamlLoader(yamls)
+    ConfigYamlLoader.get_config_metadata(yamls)
 
     with open(output_file, "w") as outfile:
         outfile.write("Hello world\n")

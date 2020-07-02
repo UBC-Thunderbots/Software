@@ -48,7 +48,7 @@ include:
     value: 5
     description: >
       Can be any integer value in the range [min, max]
-- uint:
+- unsigned:
     name: example_unsigned_int_param
     min: 0 # Must be >= 0
     max: 5
@@ -56,7 +56,7 @@ include:
     description: >
       Can be any integer value in the range [min, max].
       The minimum value must be >= 0
-- float:
+- double:
     name: example_float_param
     min: 1.1
     max: 9.01
@@ -66,7 +66,7 @@ include:
 
       For C code, this will be generated as a float.
       For C++ code, this will be generated as a double.
-- string:
+- std::string:
     name: example_string_param
     value: "Hello World"
     description: >

@@ -1,3 +1,13 @@
+SUPPORTED_TYPES = [
+    "bool",
+    "int",
+    "unsigned",
+    "double",
+    "std::string",
+    "factory",
+    "enum",
+]
+
 INCLUDE_DEF_SCHEMA = {
     "type": "object",
     "uniqueItems": True,
@@ -84,7 +94,7 @@ PARAM_DEF_SCHEMA = {
         {
             "type": "object",
             "properties": {
-                "string": {
+                "std::string": {
                     "type": "object",
                     "properties": {
                         "name": {"type": "string"},

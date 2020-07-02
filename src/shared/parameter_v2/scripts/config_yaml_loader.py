@@ -1,10 +1,16 @@
 import sys
+import os
 
 import yaml
 from colorama import Fore, init
 from jsonschema import validate
 
-from dynamic_parameter_schema import PARAM_DEF_SCHEMA, INCLUDE_DEF_SCHEMA
+from dynamic_parameter_schema import (
+    PARAM_DEF_SCHEMA,
+    INCLUDE_DEF_SCHEMA,
+    SUPPORTED_TYPES,
+)
+
 
 #######################################################################
 #                         Config Yaml Loader                          #
@@ -12,71 +18,81 @@ from dynamic_parameter_schema import PARAM_DEF_SCHEMA, INCLUDE_DEF_SCHEMA
 
 
 class ConfigYamlLoader(object):
+    @staticmethod
+    def get_config_metadata(yaml_paths):
+        """Loads the yamls in the root config directory and verifies that the
+        requested configuration is valid. Then returns config_metadata dict
+        with a specific format captuing all the requested params and configs.
 
-    """Loads the yamls in the root config directory and verifies that the
-    requested configuration is valid.
+        Example config directory:
+        .
+        └── config
+            ├── ai
+            │   ├── ai.yaml
+            │   ├── passing
+            │   │   └── passing.yaml
+            │   └── plays
+            │       ├── plays.yaml
+            │       ├── defense.yaml
+            │       └── offense.yaml
+            ├── sensor_fusion
+            │   └── sensor_fusion.yaml
+            └── tbots_config.yaml
 
-    Example config directory:
-    .
-    └── config
-        ├── ai
-        │   ├── ai.yaml
-        │   ├── passing
-        │   │   └── passing.yaml
-        │   └── plays
-        │       ├── defense.yaml
-        │       └── offsense.yaml
-        ├── sensor_fusion
-        │   └── sensor_fusion.yaml
-        └── tbots_config.yaml
+        A valid config directory maintains the following properties:
 
-    A valid config directory maintains the following properties:
+        - All yamls are properly formed (i.e proper syntax, YAML Version 1.2)
+        - All parameter definitions abide by the dynamic parameter schema
+        - "include" statements do NOT cause cycles in configs
 
-    - All yamls are properly formed (i.e proper syntax, YAML Version 1.2)
-    - All parameter definitions abide by the dynamic parameter schema
-    - "include" statements do NOT cause cycles in configs
-
-    :param yaml_paths: the path to all the config yamls
-    :type yaml_paths: list of str
-
-    """
-
-    def __init__(self, yaml_paths: list):
-        self.__yaml_paths = yaml_paths
-        self.__yaml_dict = {}
-        self.__load_yaml_into_ordered_dict()
-
-    def __load_yaml_into_ordered_dict(self):
-        """Loads the yamls into an ordered dictionary, after validating with
-        schema. Any errors while validating will raise to the main thread.
-
-        Each file will be loaded into a new config entry as follows:
-
+        :param yaml_paths: the path to all the config yamls
+        :type yaml_paths: list of str
+        :returns config_metadata: the config name followed by a list of
+            included configs and a list of parameters.
         {
-            "config_name_1" :
-                    {
-                        "includes" : ["config_name_2", "config_name_3"],
-                        "int" : {
-                            "name" : "example_int", "value" : 10,
-                            "min" : 0, "max" : 20
-                        },
-                        ...
+            "ai": {
+                "includes": ["passing", "plays"],
+                "parameters" :
+                [
+                    "int": {
+                        "name": "example_int", "value": 10, "min": 0, "max": 20
                     },
-            "config_name_2" :
-                    {
-                        "includes" : ["config_name_7", "config_name_3"],
-                        ...
-                    }
+                    ...
+                ]
+            },
+
+            "plays": {
+                "includes": ["defense", "offense"],
+                ...
+            }
             ...
         }
 
+        :rtype config_metadata: dict
+
+        """
+        # load yaml into raw_configs
+        raw_configs = ConfigYamlLoader.__load_yaml_into_dict(yaml_paths)
+
+        # validate schema
+        ConfigYamlLoader.__validate_raw_loaded_config(raw_configs)
+
+    @staticmethod
+    def __load_yaml_into_dict(yaml_paths):
+        """Loads the yamls into an dictionary, after validating with a schema.
+        Any errors while validating will raise to the main thread.
+
+        Each file will be loaded into a new config entry as follows:
+
+        :param yaml_paths: the path to all the config yamls
+        :type yaml_paths: list of str
         :returns: Dictionary representing the data to generate
         :rtype: dict
 
         """
         raw_configs = []
 
-        for filename in self.__yaml_paths:
+        for filename in yaml_paths:
             with open(filename, "r") as param_yaml:
 
                 try:
@@ -87,15 +103,64 @@ class ConfigYamlLoader(object):
                         "Check malformed {} \n {}".format(filename, ymle)
                     )
 
+        return raw_configs
+
+    @staticmethod
+    def __validate_raw_loaded_config(raw_configs):
+        """Validates the "raw config" that was loaded with against
+        the INCLUDE_DEF_SCHEMA and PARAM_DEF_SCHEMA
+
+        :param raw_configs: The output of __load_yaml_into_dict 
+        :type raw_configs: list of dict
+        :returns: None
+
+        """
+        # validate schema
         for raw_config in raw_configs:
 
-            if len(raw_config) == 2:
+            if len(raw_config) == 1:
+
+                # includes only
+                if isinstance(raw_config[0], dict):
+                    validate(raw_config[0], INCLUDE_DEF_SCHEMA)
+
+                # parameter definitions only
+                if isinstance(raw_config[0], list):
+                    validate(raw_config[0], PARAM_DEF_SCHEMA)
+
+            elif len(raw_config) == 2:
+
+                # includes and parameter definitions only
                 validate(raw_config[0], INCLUDE_DEF_SCHEMA)
                 validate(raw_config[1], PARAM_DEF_SCHEMA)
-            else:
-                validate(raw_config[0], PARAM_DEF_SCHEMA)
 
-        return raw_configs
+                # This is an ugly artifact of how the yaml is loaded
+                # we are extracting all the requested types to check that
+                # they are all supported. This is the one thing the schema
+                # can't catch that we would like to check
+                requested_types = [
+                    key[0] for key in [list(entry.keys()) for entry in raw_config[1]]
+                ]
+
+                for requested_type in requested_types:
+                    if requested_type not in SUPPORTED_TYPES:
+
+                        raise ConfigYamlMalformed(
+                            "{} type unsupported".format(requested_type)
+                        )
+            else:
+                raise ConfigYamlMalformed(
+                    "More than 2 yaml documents found in one file, check format"
+                )
+
+    def __detect_cycles_in_config_medata(arg1):
+        """TODO: Docstring for __detect_cycles_in_config_medata.
+
+        :param arg1: TODO
+        :returns: TODO
+
+        """
+        pass
 
 
 #######################################################################
@@ -116,12 +181,6 @@ class ConfigYamlException(Exception):
     def __init__(self, message):
         init()  # init Fore to print w/ color
         super().__init__(Fore.RED + message + Fore.RESET)
-
-
-class ConfigYamlSchemaViolation(ConfigYamlException):
-    """Indicates when the schema defined in param_definition_schema.py
-    is violated.
-    """
 
 
 class ConfigYamlCycleDetected(ConfigYamlException):
