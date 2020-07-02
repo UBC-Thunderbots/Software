@@ -12,7 +12,7 @@ template <typename T>
 class Observer
 {
    public:
-    Observer();
+    Observer(size_t buffer_size = DEFAULT_BUFFER_SIZE);
 
     /**
      * Add the given value to the internal buffer
@@ -42,14 +42,14 @@ class Observer
 
     virtual std::optional<T> popLeastRecentlyReceivedValue(Duration max_wait_time) final;
 
-   private:
-    const size_t DEFAULT_BUFFER_SIZE = 2000;
+    static constexpr size_t DEFAULT_BUFFER_SIZE = 1;
 
+private:
     ThreadSafeBuffer<T> buffer;
 };
 
 template <typename T>
-Observer<T>::Observer() : buffer(DEFAULT_BUFFER_SIZE)
+Observer<T>::Observer(size_t buffer_size) : buffer(buffer_size)
 {
 }
 

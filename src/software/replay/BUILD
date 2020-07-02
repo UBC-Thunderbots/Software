@@ -8,7 +8,7 @@ cc_library(
     ],
     deps = [
         "//software/geom",
-        "//software/multithreading:ordered_threaded_observer",
+        "//software/multithreading:threaded_observer",
         "//software/proto:sensor_msg_cc_proto",
         "//software/time:timestamp",
         "//software/world",

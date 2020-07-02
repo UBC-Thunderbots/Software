@@ -52,11 +52,11 @@ TEST(ReplayTest, test_read_and_write_replay)
     subject.registerObserver(logger_ptr);
     for (const auto msg : read_replay_frames) {
         subject.sendValue(msg);
+        // we have 12000 frames of replay so we have to try to not fill the buffer
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     // unfortunately we have to do this
     std::this_thread::sleep_for(std::chrono::seconds(5));
-    // TODO: actually test stuff
     for (const auto& dir_entry : fs::directory_iterator(output_path)) {
         std::cout << dir_entry << std::endl;
     }

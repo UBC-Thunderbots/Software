@@ -1,6 +1,6 @@
 #pragma once
 #include <experimental/filesystem>
-#include "software/multithreading/ordered_threaded_observer.h"
+#include "software/multithreading/threaded_observer.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/proto/tbots_replay.pb.h"
 

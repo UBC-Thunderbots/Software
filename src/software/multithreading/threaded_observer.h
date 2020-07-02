@@ -12,13 +12,13 @@
  *
  * @tparam T The type of object this class is observing
  */
-template <typename T>
-class ThreadedObserver : public Observer<T>
+template <typename T, bool Ordered>
+class TThreadedObserver : public Observer<T>
 {
    public:
-    ThreadedObserver();
+    explicit TThreadedObserver(size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
 
-    ~ThreadedObserver() override;
+    ~TThreadedObserver() override;
 
    private:
     /**
@@ -59,30 +59,34 @@ class ThreadedObserver : public Observer<T>
     std::thread pull_from_buffer_thread;
 };
 
-template <typename T>
-ThreadedObserver<T>::ThreadedObserver()
-    : in_destructor(false), IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
+template <typename T, bool Ordered>
+TThreadedObserver<T, Ordered>::TThreadedObserver(size_t buffer_size)
+    : Observer<T>(buffer_size), in_destructor(false), IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {
     pull_from_buffer_thread = std::thread(
-        boost::bind(&ThreadedObserver::continuouslyPullValuesFromBuffer, this));
+        boost::bind(&TThreadedObserver::continuouslyPullValuesFromBuffer, this));
 }
 
-template <typename T>
-void ThreadedObserver<T>::onValueReceived(T val)
+template <typename T, bool Ordered>
+void TThreadedObserver<T, Ordered>::onValueReceived(T val)
 {
     // Do nothing, this function should be overriden to enable custom behavior on
     // message reception.
 }
 
-template <typename T>
-void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
+template <typename T, bool Ordered>
+void TThreadedObserver<T, Ordered>::continuouslyPullValuesFromBuffer()
 {
     do
     {
         in_destructor_mutex.unlock();
+        std::optional<T> new_val;
 
-        std::optional<T> new_val =
-            this->popMostRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
+        if constexpr (Ordered) {
+             new_val = this->popLeastRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
+        } else {
+            new_val = this->popMostRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
+        }
 
         if (new_val)
         {
@@ -93,8 +97,8 @@ void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
     } while (!in_destructor);
 }
 
-template <typename T>
-ThreadedObserver<T>::~ThreadedObserver()
+template <typename T, bool Ordered>
+TThreadedObserver<T, Ordered>::~TThreadedObserver()
 {
     in_destructor_mutex.lock();
     in_destructor = true;
@@ -104,3 +108,17 @@ ThreadedObserver<T>::~ThreadedObserver()
     // running we will segfault
     pull_from_buffer_thread.join();
 }
+
+template <typename T>
+class ThreadedObserver : public TThreadedObserver<T, false> {
+public:
+    ThreadedObserver<T>() : TThreadedObserver<T, false>() {};
+    explicit ThreadedObserver<T>(size_t buffer_size) : TThreadedObserver<T, false>(buffer_size) {};
+};
+
+template <typename T>
+class OrderedThreadedObserver : public TThreadedObserver<T, true> {
+public:
+    OrderedThreadedObserver<T>() : TThreadedObserver<T, true>() {};
+    explicit OrderedThreadedObserver<T>(size_t buffer_size) : TThreadedObserver<T, true>(buffer_size) {};
+};
