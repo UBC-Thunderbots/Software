@@ -61,7 +61,9 @@ class TThreadedObserver : public Observer<T>
 
 template <typename T, bool Ordered>
 TThreadedObserver<T, Ordered>::TThreadedObserver(size_t buffer_size)
-    : Observer<T>(buffer_size), in_destructor(false), IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
+    : Observer<T>(buffer_size),
+      in_destructor(false),
+      IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {
     pull_from_buffer_thread = std::thread(
         boost::bind(&TThreadedObserver::continuouslyPullValuesFromBuffer, this));
@@ -82,9 +84,12 @@ void TThreadedObserver<T, Ordered>::continuouslyPullValuesFromBuffer()
         in_destructor_mutex.unlock();
         std::optional<T> new_val;
 
-        if constexpr (Ordered) {
-             new_val = this->popLeastRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
-        } else {
+        if constexpr (Ordered)
+        {
+            new_val = this->popLeastRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
+        }
+        else
+        {
             new_val = this->popMostRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
         }
 
@@ -110,15 +115,19 @@ TThreadedObserver<T, Ordered>::~TThreadedObserver()
 }
 
 template <typename T>
-class ThreadedObserver : public TThreadedObserver<T, false> {
-public:
-    ThreadedObserver<T>() : TThreadedObserver<T, false>() {};
-    explicit ThreadedObserver<T>(size_t buffer_size) : TThreadedObserver<T, false>(buffer_size) {};
+class ThreadedObserver : public TThreadedObserver<T, false>
+{
+   public:
+    ThreadedObserver<T>() : TThreadedObserver<T, false>(){};
+    explicit ThreadedObserver<T>(size_t buffer_size)
+        : TThreadedObserver<T, false>(buffer_size){};
 };
 
 template <typename T>
-class OrderedThreadedObserver : public TThreadedObserver<T, true> {
-public:
-    OrderedThreadedObserver<T>() : TThreadedObserver<T, true>() {};
-    explicit OrderedThreadedObserver<T>(size_t buffer_size) : TThreadedObserver<T, true>(buffer_size) {};
+class OrderedThreadedObserver : public TThreadedObserver<T, true>
+{
+   public:
+    OrderedThreadedObserver<T>() : TThreadedObserver<T, true>(){};
+    explicit OrderedThreadedObserver<T>(size_t buffer_size)
+        : TThreadedObserver<T, true>(buffer_size){};
 };

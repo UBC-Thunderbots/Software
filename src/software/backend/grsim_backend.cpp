@@ -2,8 +2,8 @@
 
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/util/design_patterns/generic_factory.h"
 #include "software/replay/replay_logger.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 const std::string GrSimBackend::name = "grsim";
 

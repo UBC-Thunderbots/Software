@@ -81,7 +81,7 @@ void OrderedThreadedObserver<T>::continuouslyPullValuesFromBuffer()
         in_destructor_mutex.unlock();
 
         std::optional<T> new_val =
-                this->popLeastRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
+            this->popLeastRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
 
         if (new_val)
         {

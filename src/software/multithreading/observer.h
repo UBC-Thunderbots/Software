@@ -44,7 +44,7 @@ class Observer
 
     static constexpr size_t DEFAULT_BUFFER_SIZE = 1;
 
-private:
+   private:
     ThreadSafeBuffer<T> buffer;
 };
 
