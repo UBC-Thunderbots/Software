@@ -35,10 +35,10 @@ class ThreadedProtoMulticastSender
    private:
     // The io_service that will be used to serivce all network requests
     boost::asio::io_service io_service;
+    ProtoMulticastSender<SendProto> multicast_sender;
     // The thread running the io_service in the background. This thread will run for the
     // entire lifetime of the class
     std::thread io_service_thread;
-    ProtoMulticastSender<SendProto> multicast_sender;
 };
 
 #include "software/networking/threaded_proto_multicast_sender.tpp"
