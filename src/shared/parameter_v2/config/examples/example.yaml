@@ -36,11 +36,6 @@ include:
 #########################################################################################
 # The following are example of every type of parameter that can be used
 #########################################################################################
-- bool:
-    name: example_bool_param
-    value: true
-    description: >
-      Can be true or false
 - int:
     name: example_int_param
     min: 0
@@ -48,6 +43,11 @@ include:
     value: 5
     description: >
       Can be any integer value in the range [min, max]
+- bool:
+    name: example_bool_param
+    value: true
+    description: >
+      Can be true or false
 - unsigned:
     name: example_unsigned_int_param
     min: 0 # Must be >= 0

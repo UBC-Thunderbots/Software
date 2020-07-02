@@ -77,6 +77,12 @@ class ConfigYamlLoader(object):
         # validate schema
         ConfigYamlLoader.__validate_raw_loaded_config(raw_configs)
 
+        # strip yaml extensions from include statements
+        processed_configs = {}
+
+        for raw_config in raw_configs.values():
+            __import__('pprint').pprint(raw_config)
+
     @staticmethod
     def __load_yaml_into_dict(yaml_paths):
         """Loads the yamls into an dictionary, after validating with a schema.
@@ -90,13 +96,19 @@ class ConfigYamlLoader(object):
         :rtype: dict
 
         """
-        raw_configs = []
+        raw_configs = {}
 
         for filename in yaml_paths:
             with open(filename, "r") as param_yaml:
 
                 try:
-                    raw_configs.append(list(yaml.safe_load_all(param_yaml)))
+                    # extract config name from filename
+                    head, tail = os.path.split(filename)
+                    config_name = tail.split(".")[0]
+
+                    # safe load yaml into dictionary
+                    raw_configs[config_name] =\
+                        list(yaml.safe_load_all(param_yaml))
 
                 except yaml.YAMLError as ymle:
                     raise ConfigYamlMalformed(
@@ -111,12 +123,12 @@ class ConfigYamlLoader(object):
         the INCLUDE_DEF_SCHEMA and PARAM_DEF_SCHEMA
 
         :param raw_configs: The output of __load_yaml_into_dict 
-        :type raw_configs: list of dict
+        :type raw_configs: dict
         :returns: None
 
         """
         # validate schema
-        for raw_config in raw_configs:
+        for raw_config in raw_configs.values():
 
             if len(raw_config) == 1:
 
