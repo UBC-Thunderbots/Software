@@ -34,10 +34,12 @@ void STP::updateSTPState(const World& world)
 void STP::updateGameState(const World& world)
 {
     current_game_state = world.gameState();
-    if (control_config->OverrideRefboxPlay()->value())
+    if (control_config->OverrideRefboxGameState()->value())
     {
-        std::string previous_state_string = control_config->PreviousRefboxPlay()->value();
-        std::string current_state_string  = control_config->CurrentRefboxPlay()->value();
+        std::string previous_state_string =
+            control_config->PreviousRefboxGameState()->value();
+        std::string current_state_string =
+            control_config->CurrentRefboxGameState()->value();
         try
         {
             RefboxGameState previous_state =

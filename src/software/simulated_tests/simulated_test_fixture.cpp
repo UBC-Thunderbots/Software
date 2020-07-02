@@ -101,13 +101,13 @@ void SimulatedTestFixture::setRefboxGameState(
     const RefboxGameState &previous_refbox_game_state)
 {
     MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideRefboxPlay()
+        ->mutableOverrideRefboxGameState()
         ->setValue(true);
     MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentRefboxPlay()
+        ->mutableCurrentRefboxGameState()
         ->setValue(toString(current_refbox_game_state));
     MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutablePreviousRefboxPlay()
+        ->mutablePreviousRefboxGameState()
         ->setValue(toString(previous_refbox_game_state));
 }
 
