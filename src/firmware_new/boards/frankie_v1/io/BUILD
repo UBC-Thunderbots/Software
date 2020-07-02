@@ -32,6 +32,13 @@ cc_library(
 )
 
 cc_library(
+    name = "infineon_tle5009_e1000_sensor",
+    srcs = ["infineon_TLE5009_E1000.c"],
+    hdrs = ["infineon_TLE5009_E1000.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+cc_library(
     name = "drivetrain",
     srcs = ["drivetrain.c"],
     hdrs = ["drivetrain.h"],
