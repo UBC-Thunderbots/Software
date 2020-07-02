@@ -28,8 +28,11 @@ qt_cc_library(
     src = "full_system_gui.cpp",
     hdr = "full_system_gui.h",
     deps = [
+        ":ai_control",
+        #        ":parameters",
         "//software/ai/hl/stp:play_info",
         "//software/backend:robot_status",
+        "//software/gui/generic_widgets/robot_status",
         "//software/gui:geometry_conversion",
         "//software/gui/full_system/ui:main_widget",
         "//software/multithreading:thread_safe_buffer",

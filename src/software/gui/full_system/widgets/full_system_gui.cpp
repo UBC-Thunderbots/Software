@@ -1,4 +1,6 @@
 #include "software/gui/full_system/widgets/full_system_gui.h"
+#include "software/gui/full_system/widgets/ai_control.h"
+#include "software/gui/generic_widgets/robot_status/robot_status.h"
 
 FullSystemGUI::FullSystemGUI(
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
@@ -28,6 +30,33 @@ FullSystemGUI::FullSystemGUI(
     QWidget* central_widget = new QWidget(this);
     main_widget->setupUi(central_widget);
     setCentralWidget(central_widget);
+
+    // StrongFocus means that the MainWidget will more aggressively capture focus when
+    // clicked. Specifically, we do this so that when the user clicks outside of the
+    // QLineEdits used for Parameters, the QLineEdit will lose focus.
+    // https://www.qtcentre.org/threads/41128-Need-to-implement-in-place-line-edit-unable-to-get-lose-focus-of-QLineEdit
+    setFocusPolicy(Qt::StrongFocus);
+
+    // This is a trick to force the initial width of the ai control tabs to be small,
+    // and the initial width of the ai view to be large. This sets the sizes of the
+    // widgets in the splitter to be unrealistically small (1 pixel) so that the
+    // size policies defined for the widgets will take over and grow the widgets to
+    // their minimum size, and then distribute the rest of the space according to the
+    // policies.
+    // See https://doc.qt.io/archives/qt-4.8/qsplitter.html#setSizes
+//    int number_of_widgets_in_splitter =
+//            main_widget->ai_control_and_view_splitter->count();
+//    auto widget_sizes_vector  = std::vector<int>(number_of_widgets_in_splitter, 1);
+//    auto widget_sizes_qvector = QVector<int>::fromStdVector(widget_sizes_vector);
+//    auto widget_sizes_list    = QList<int>::fromVector(widget_sizes_qvector);
+//    main_widget->ai_control_and_view_splitter->setSizes(widget_sizes_list);
+
+    setupRobotStatusTable(main_widget->robot_status_table_widget);
+    setupAIControls(main_widget, config);
+//    setupParametersTab(main_widget);
+
+    // Update to make sure all layout changes apply nicely
+    update();
 
     connect(update_timer, &QTimer::timeout, this, &FullSystemGUI::handleUpdate);
     update_timer->start(static_cast<int>(Duration::fromMilliseconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));

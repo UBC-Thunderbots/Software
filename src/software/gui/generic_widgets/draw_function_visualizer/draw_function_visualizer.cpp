@@ -43,7 +43,11 @@ DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent) : ZoomableQGraph
     Rectangle max_scene_rect(bottom_left, top_right);
     graphics_scene->setSceneRect(createQRectF(max_scene_rect));
 
+    setMinimumHeight(0);
+    setMinimumWidth(0);
     update();
+
+    std::cout << "draw function visualizer sizehint " << sizeHint().width() << ", " << sizeHint().height() << std::endl;
 }
 
 void DrawFunctionVisualizer::clearAndDraw(const std::vector<DrawFunction> &draw_functions) {
