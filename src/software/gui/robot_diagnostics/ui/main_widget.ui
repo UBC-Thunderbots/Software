@@ -209,7 +209,7 @@
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v V</string>
+                   <string>%1 V</string>
                   </property>
                  </widget>
                 </item>
@@ -222,7 +222,7 @@
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v V</string>
+                   <string>%1 V</string>
                   </property>
                  </widget>
                 </item>
@@ -235,7 +235,7 @@
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v RPM</string>
+                   <string>%1 RPM</string>
                   </property>
                  </widget>
                 </item>
@@ -243,6 +243,9 @@
                  <widget class="QProgressBar" name="progressBar_break_beam">
                   <property name="value">
                    <number>24</number>
+                  </property>
+                  <property name="format">
+                   <string>%1%</string>
                   </property>
                  </widget>
                 </item>
@@ -339,7 +342,7 @@
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v °C</string>
+                   <string>%1 °C</string>
                   </property>
                  </widget>
                 </item>
@@ -349,7 +352,7 @@
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v °C</string>
+                   <string>%1 °C</string>
                   </property>
                  </widget>
                 </item>

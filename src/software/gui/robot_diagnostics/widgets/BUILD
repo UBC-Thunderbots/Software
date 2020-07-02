@@ -63,6 +63,7 @@ qt_cc_library(
     src = "feedback.cpp",
     hdr = "feedback.h",
     deps = [
+        ":progress_bar",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",
@@ -95,6 +96,16 @@ qt_cc_library(
     name = "slider",
     src = "slider.cpp",
     hdr = "slider.h",
+    deps = [
+        "//software/gui/robot_diagnostics/ui:main_widget",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "progress_bar",
+    src = "progress_bar.cpp",
+    hdr = "progress_bar.h",
     deps = [
         "//software/gui/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",

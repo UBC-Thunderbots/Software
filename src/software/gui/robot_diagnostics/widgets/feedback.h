@@ -6,6 +6,7 @@
 // The generated version will be names 'ui_<filename>.h'
 #include "software/gui/robot_diagnostics/ui/ui_main_widget.h"
 #include "software/proto/sensor_msg.pb.h"
+#include "software/gui/robot_diagnostics/widgets/progress_bar.h"
 
 /**
  * Set up feedback area of the widget
