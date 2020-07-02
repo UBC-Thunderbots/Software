@@ -1,4 +1,4 @@
-#include "software/gui/standalone_simulator/standalone_simulator_gui_wrapper.h"
+#include "software/gui/standalone_simulator/threaded_standalone_simulator_gui.h"
 
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
@@ -6,7 +6,7 @@
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 
-StandaloneSimulatorGUIWrapper::StandaloneSimulatorGUIWrapper(int argc, char** argv)
+ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(int argc, char** argv)
     : ThreadedObserver<SSL_WrapperPacket>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
@@ -16,12 +16,12 @@ StandaloneSimulatorGUIWrapper::StandaloneSimulatorGUIWrapper(int argc, char** ar
       application_shutting_down(false),
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
-    run_simulator_gui_thread =
-        std::thread(&StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI,
+    run_standalone_simulator_gui_thread =
+        std::thread(&ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI,
                     this, argc, argv);
 }
 
-StandaloneSimulatorGUIWrapper::~StandaloneSimulatorGUIWrapper()
+ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
 {
     QCoreApplication* application_ptr = QApplication::instance();
     if (!application_shutting_down.load() && application_ptr != nullptr)
@@ -32,11 +32,11 @@ StandaloneSimulatorGUIWrapper::~StandaloneSimulatorGUIWrapper()
                                   Qt::ConnectionType::QueuedConnection);
     }
 
-    run_simulator_gui_thread.join();
+    run_standalone_simulator_gui_thread.join();
 }
 
-void StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI(int argc,
-                                                                       char** argv)
+void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(int argc,
+                                                                        char** argv)
 {
     // We use raw pointers to have explicit control over the order of destruction.
     // For some reason, putting the QApplication and SimulatorGUI on the stack does
@@ -44,26 +44,27 @@ void StandaloneSimulatorGUIWrapper::createAndRunStandaloneSimulatorGUI(int argc,
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    StandaloneSimulatorGUI* simulator_gui =
+    StandaloneSimulatorGUI* standalone_simulator_gui =
         new StandaloneSimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer);
-    simulator_gui->show();
+    standalone_simulator_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
     // until "quit" is called on the QApplication, either by closing all the
     // application windows or calling the destructor of this class
     application->exec();
 
-    // NOTE: The simulator_gui MUST be deleted before the QApplication. The QApplication
-    // manages all the windows, widgets, and event loop so must be destroyed last
-    delete simulator_gui;
+    // NOTE: The standalone_simulator_gui MUST be deleted before the QApplication. The
+    // QApplication manages all the windows, widgets, and event loop so must be destroyed
+    // last
+    delete standalone_simulator_gui;
     delete application;
 
-    // Let the system know the visualizer has shut down once the application has
+    // Let the system know the gui has shut down once the application has
     // stopped running
     termination_promise_ptr->set_value();
 }
 
-void StandaloneSimulatorGUIWrapper::onValueReceived(SSL_WrapperPacket wrapper_packet)
+void ThreadedStandaloneSimulatorGUI::onValueReceived(SSL_WrapperPacket wrapper_packet)
 {
     ssl_wrapper_packet_buffer->push(wrapper_packet);
 
@@ -81,7 +82,8 @@ void StandaloneSimulatorGUIWrapper::onValueReceived(SSL_WrapperPacket wrapper_pa
     }
 }
 
-std::shared_ptr<std::promise<void>> StandaloneSimulatorGUIWrapper::getTerminationPromise()
+std::shared_ptr<std::promise<void>>
+ThreadedStandaloneSimulatorGUI::getTerminationPromise()
 {
     return termination_promise_ptr;
 }
