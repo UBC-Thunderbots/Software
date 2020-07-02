@@ -7,7 +7,7 @@ from control.matlab import *
 # {} required to format string
 # {{{}}} required to format string, initialize array, and 'escape' brackets
 CONTROLLER_DIFFERENCE_EQUATION_COEFFICIENTS = """
-#define WHEEL_SPEED_CONTROLLER_TICK_TIME 1e7
+#define WHEEL_SPEED_CONTROLLER_TICK_TIME {tick_time};
 #define GENERATED_NUM_WHEEL_SPEED_COEFFICIENTS {numerator_length};
 #define GENERATED_NUM_PREVIOUS_WHEEL_SPEED_COMMAND_COEFFICIENTS {denominator_length};
 float GENERATED_WHEEL_SPEED_COEFFICIENTS[GENERATED_NUM_WHEEL_SPEED_COEFFICIENTS] =
@@ -26,11 +26,14 @@ def generate(discrete_tf: ct.TransferFunction):
     numerator_length = len(discrete_tf.num[0][0])
     denominator_length = len(discrete_tf.den[0][0])
 
+    tick_time = discrete_tf.dt
+
     return CONTROLLER_DIFFERENCE_EQUATION_COEFFICIENTS.format(
         numerator_coefficients=numerator_coefficients,
         denominator_coefficients=denominator_coefficients,
         numerator_length=numerator_length,
         denominator_length=denominator_length,
+        tick_time=tick_time,
     )
 
 
