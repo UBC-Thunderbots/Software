@@ -508,9 +508,9 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
     for (std::vector<Segment>::const_iterator it = open_segs.begin();
          it != open_segs.end();)
     {
-        // If segment length is less than 2 * FIXED_EPSILON, remove the segment
-        // 2 * FIXED_EPSILON chosen as FIXED_EPSILON by itself is not a sufficient for all
-        // cases
+        // 2 * FIXED_EPSILON for error needed:
+        // - segment subtraction (end - start)
+        // - mathcalls `hypot` from `length` function call
         if (it->length() < 2 * FIXED_EPSILON)
         {
             open_segs.erase(it);
