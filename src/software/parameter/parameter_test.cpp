@@ -10,67 +10,67 @@
 
 MAKE_ENUM(TestEnum, TEST1, TEST2, TEST3, TEST4, TEST5, )
 
-TEST(ParameterTest, test_discrete_parameter_enum)
+TEST(ParameterTest, test_enumerated_parameter_enum)
 {
-    EnumeratedParameter<TestEnum> test_discrete_param =
+    EnumeratedParameter<TestEnum> test_enumerated_param =
         EnumeratedParameter<TestEnum>("test_param", TestEnum::TEST2, allValuesTestEnum());
 
     // test that valid options are stored
     for (TestEnum option : allValuesTestEnum())
     {
-        EXPECT_TRUE(test_discrete_param.setValue(option));
-        EXPECT_TRUE(test_discrete_param.value() == option);
+        EXPECT_TRUE(test_enumerated_param.setValue(option));
+        EXPECT_TRUE(test_enumerated_param.value() == option);
     }
 }
 
 
-TEST(ParameterTest, test_discrete_parameter_int)
+TEST(ParameterTest, test_enumerated_parameter_int)
 {
     std::vector<int> options         = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     std::vector<int> invalid_options = {-1, -2, -3, 40, 50, 60, -7, 90};
 
-    EnumeratedParameter<int> test_discrete_param =
+    EnumeratedParameter<int> test_enumerated_param =
         EnumeratedParameter<int>("test_param", 0, options);
 
     // test that valid options are stored
     for (int option : options)
     {
-        EXPECT_TRUE(test_discrete_param.setValue(option));
-        EXPECT_TRUE(test_discrete_param.value() == option);
+        EXPECT_TRUE(test_enumerated_param.setValue(option));
+        EXPECT_TRUE(test_enumerated_param.value() == option);
     }
 
     // test that invalid options are rejected
     for (int invalid_option : invalid_options)
     {
-        EXPECT_FALSE(test_discrete_param.setValue(invalid_option));
-        EXPECT_FALSE(test_discrete_param.value() == invalid_option);
+        EXPECT_FALSE(test_enumerated_param.setValue(invalid_option));
+        EXPECT_FALSE(test_enumerated_param.value() == invalid_option);
     }
 }
 
-TEST(ParameterTest, test_discrete_parameter_string)
+TEST(ParameterTest, test_enumerated_parameter_string)
 {
     std::vector<std::string> options         = {"test1", "test2", "test3", "test4"};
     std::vector<std::string> invalid_options = {" ", "test5", "test"};
 
-    EnumeratedParameter<std::string> test_discrete_param =
+    EnumeratedParameter<std::string> test_enumerated_param =
         EnumeratedParameter<std::string>("test_param", "test2", options);
 
     // test that valid options are stored
     for (const auto& option : options)
     {
-        EXPECT_TRUE(test_discrete_param.setValue(option));
-        EXPECT_TRUE(test_discrete_param.value() == option);
+        EXPECT_TRUE(test_enumerated_param.setValue(option));
+        EXPECT_TRUE(test_enumerated_param.value() == option);
     }
 
     // test that invalid options are rejected
     for (const auto& invalid_option : invalid_options)
     {
-        EXPECT_FALSE(test_discrete_param.setValue(invalid_option));
-        EXPECT_FALSE(test_discrete_param.value() == invalid_option);
+        EXPECT_FALSE(test_enumerated_param.setValue(invalid_option));
+        EXPECT_FALSE(test_enumerated_param.value() == invalid_option);
     }
 }
 
-TEST(ParameterTest, test_discrete_invalid_constructor)
+TEST(ParameterTest, test_enumerated_invalid_constructor)
 {
     std::vector<std::string> options = {"test1", "test2", "test3", "test4"};
     EXPECT_THROW(EnumeratedParameter<std::string>("test_param", "", options),
@@ -102,47 +102,47 @@ TEST(ParameterTest, test_optional_value_int)
     EXPECT_FALSE(test_optional_int.value());
 }
 
-TEST(ParameterTest, test_continous_parameter_int)
+TEST(ParameterTest, test_numeric_parameter_int)
 {
-    NumericParameter<int> test_continous_parameter =
+    NumericParameter<int> test_numeric_parameter =
         NumericParameter<int>("test_param", 0, -100, 100);
 
     // test that valid values are stored
     for (int k = -100; k <= 100; k++)
     {
-        EXPECT_TRUE(test_continous_parameter.setValue(k));
-        EXPECT_TRUE(test_continous_parameter.value() == k);
+        EXPECT_TRUE(test_numeric_parameter.setValue(k));
+        EXPECT_TRUE(test_numeric_parameter.value() == k);
     }
 
     // test that invalid values are rejected
     for (int k = 101; k <= 200; k++)
     {
-        EXPECT_FALSE(test_continous_parameter.setValue(k));
-        EXPECT_FALSE(test_continous_parameter.value() == k);
+        EXPECT_FALSE(test_numeric_parameter.setValue(k));
+        EXPECT_FALSE(test_numeric_parameter.value() == k);
     }
 }
 
-TEST(ParameterTest, test_continous_parameter_float)
+TEST(ParameterTest, test_numeric_parameter_float)
 {
-    NumericParameter<float> test_continous_parameter =
+    NumericParameter<float> test_numeric_parameter =
         NumericParameter<float>("test_param", 0.0f, -10.0f, 10.0f);
 
     // test that valid values are stored
     for (float k = -10.0f; k <= 10.0f; k += 0.1f)
     {
-        EXPECT_TRUE(test_continous_parameter.setValue(k));
-        EXPECT_TRUE(test_continous_parameter.value() == k);
+        EXPECT_TRUE(test_numeric_parameter.setValue(k));
+        EXPECT_TRUE(test_numeric_parameter.value() == k);
     }
 
     // test that invalid values are rejected
     for (float k = 11.0f; k <= 20.0f; k += 0.1f)
     {
-        EXPECT_FALSE(test_continous_parameter.setValue(k));
-        EXPECT_FALSE(test_continous_parameter.value() == k);
+        EXPECT_FALSE(test_numeric_parameter.setValue(k));
+        EXPECT_FALSE(test_numeric_parameter.value() == k);
     }
 }
 
-TEST(ParameterTest, test_continous_invalid_constructor)
+TEST(ParameterTest, test_numeric_invalid_constructor)
 {
     EXPECT_THROW(NumericParameter<float>("test_param", 20.0f, -10.0f, 10.0f),
                  std::invalid_argument);
