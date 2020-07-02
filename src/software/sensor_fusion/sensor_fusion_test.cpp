@@ -21,9 +21,9 @@ class SensorFusionTest : public ::testing::Test
           test_world(initWorld()),
           tbots_robot_msg_id_1(initTbotsRobotMsgId1()),
           tbots_robot_msg_id_2(initTbotsRobotMsgId2()),
-          ref_ind_yellow(initRefIndYellow()),
-          ref_ind_blue(initRefIndBlue()),
-          ref_ind_normal_start(initRefNormalStart())
+          referee_indirect_yellow(initRefereeIndirectYellow()),
+          referee_indirect_blue(initRefereeIndirectBlue()),
+          referee_normal_start(initRefereeNormalStart())
     {
     }
 
@@ -38,9 +38,9 @@ class SensorFusionTest : public ::testing::Test
     World test_world;
     std::unique_ptr<TbotsRobotMsg> tbots_robot_msg_id_1;
     std::unique_ptr<TbotsRobotMsg> tbots_robot_msg_id_2;
-    std::unique_ptr<SSL_Referee> ref_ind_yellow;
-    std::unique_ptr<SSL_Referee> ref_ind_blue;
-    std::unique_ptr<SSL_Referee> ref_ind_normal_start;
+    std::unique_ptr<SSL_Referee> referee_indirect_yellow;
+    std::unique_ptr<SSL_Referee> referee_indirect_blue;
+    std::unique_ptr<SSL_Referee> referee_normal_start;
 
    private:
     /**
@@ -151,21 +151,21 @@ class SensorFusionTest : public ::testing::Test
         return std::move(robot_msg);
     }
 
-    std::unique_ptr<SSL_Referee> initRefIndYellow()
+    std::unique_ptr<SSL_Referee> initRefereeIndirectYellow()
     {
         auto ref_msg = std::make_unique<SSL_Referee>();
         ref_msg->set_command(SSL_Referee_Command_INDIRECT_FREE_YELLOW);
         return ref_msg;
     }
 
-    std::unique_ptr<SSL_Referee> initRefIndBlue()
+    std::unique_ptr<SSL_Referee> initRefereeIndirectBlue()
     {
         auto ref_msg = std::make_unique<SSL_Referee>();
         ref_msg->set_command(SSL_Referee_Command_INDIRECT_FREE_BLUE);
         return ref_msg;
     }
 
-    std::unique_ptr<SSL_Referee> initRefNormalStart()
+    std::unique_ptr<SSL_Referee> initRefereeNormalStart()
     {
         auto ref_msg = std::make_unique<SSL_Referee>();
         ref_msg->set_command(SSL_Referee_Command_NORMAL_START);
@@ -269,13 +269,13 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
         createWrapperPacket(std::move(geom_data), std::move(detection_frame));
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *ref_ind_yellow;
+    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_yellow;
     sensor_fusion.updateWorld(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
     SensorMsg sensor_msg_2;
-    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *ref_ind_normal_start;
+    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_2, result_2.gameState());
@@ -296,13 +296,13 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
         createWrapperPacket(std::move(geom_data), std::move(detection_frame));
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *ref_ind_blue;
+    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_blue;
     sensor_fusion.updateWorld(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
     SensorMsg sensor_msg_2;
-    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *ref_ind_normal_start;
+    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_2, result_2.gameState());
