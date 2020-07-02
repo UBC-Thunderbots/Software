@@ -11,30 +11,30 @@
 #include "software/parameter/parameter.h"
 
 template <class T>
-class DiscreteParameter : public Parameter<T>
+class EnumeratedParameter : public Parameter<T>
 {
    public:
     /**
-     * Constructs a new DiscreteParameter, a Parameter that will only take
+     * Constructs a new EnumeratedParameter, a Parameter that will only take
      * on a value from the allowed_values.
      *
-     * A DiscreteParameter will never hold a value outside of allowed_values
+     * A EnumeratedParameter will never hold a value outside of allowed_values
      *
-     * @param name The name of the DiscreteParameter
-     * @param value The value for this DiscreteParameter
-     * @param allowed_values The values that this DiscreteParameter is allowed to be
+     * @param name The name of the EnumeratedParameter
+     * @param value The value for this EnumeratedParameter
+     * @param allowed_values The values that this EnumeratedParameter is allowed to be
      *
      * @raises std::invalid_argument if the value is already invalid
      */
-    explicit DiscreteParameter<T>(const std::string& name, T value,
-                                  std::vector<T> allowed_values)
+    explicit EnumeratedParameter<T>(const std::string& name, T value,
+                                    std::vector<T> allowed_values)
         : Parameter<T>(name, value)
     {
         if (std::find(allowed_values.begin(), allowed_values.end(), value) ==
             allowed_values.end())
         {
             throw std::invalid_argument(
-                "DiscreteParameter constructed with invalid value");
+                "EnumeratedParameter constructed with invalid value");
         }
 
         allowed_values_ = allowed_values;
@@ -71,8 +71,9 @@ class DiscreteParameter : public Parameter<T>
         }
         else
         {
-            LOG(WARNING) << "Rejected new value " << new_value << " to DiscreteParameter "
-                         << Parameter<T>::name_ << std::endl;
+            LOG(WARNING) << "Rejected new value " << new_value
+                         << " to EnumeratedParameter " << Parameter<T>::name_
+                         << std::endl;
             return false;
         }
     }

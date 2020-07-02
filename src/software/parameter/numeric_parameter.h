@@ -11,37 +11,37 @@
 #include "software/parameter/parameter.h"
 
 template <class T>
-class ContinousParameter : public Parameter<T>
+class NumericParameter : public Parameter<T>
 {
     /**
-     * ContinousParameters can only be templated with numeric types
+     * NumericParameters can only be templated with numeric types
      * we check using the is_arithmetic trait to disallow non-arithmetic types
      */
-    static_assert(std::is_arithmetic<T>::value, "ContinousParameter: T must be numeric");
+    static_assert(std::is_arithmetic<T>::value, "NumericParameter: T must be numeric");
 
    public:
     /**
-     * Constructs a new ContinousParameter, a Parameter that can take on any
+     * Constructs a new NumericParameter, a Parameter that can take on any
      * value between a min and a max.
      *
      * NOTE: The templated type must be numeric (i.e int, double, float, etc..)
      *
-     * A ContinousParameter will never violate min <= value <= max
+     * A NumericParameter will never violate min <= value <= max
      *
-     * @param name The name of the ContinousParameter
-     * @param value The value for this ContinousParameter
-     * @param min The minimum value this ContinousParameter can take
-     * @param max The maximum value this ContinousParameter can take
+     * @param name The name of the NumericParameter
+     * @param value The value for this NumericParameter
+     * @param min The minimum value this NumericParameter can take
+     * @param max The maximum value this NumericParameter can take
      *
      * @raises std::invalid_argument if the value is already out of bounds
      */
-    explicit ContinousParameter<T>(const std::string& name, T value, T min, T max)
+    explicit NumericParameter<T>(const std::string& name, T value, T min, T max)
         : Parameter<T>(name, value)
     {
         if (value > max || min > value)
         {
             throw std::invalid_argument(
-                "ContinousParameter constructed with out of bounds value");
+                "NumericParameter constructed with out of bounds value");
         }
 
         min_ = min;
@@ -89,7 +89,7 @@ class ContinousParameter : public Parameter<T>
         else
         {
             LOG(WARNING) << "Rejected out-of-range value " << new_value
-                         << " to ContinousParameter " << Parameter<T>::name_
+                         << " to NumericParameter " << Parameter<T>::name_
                          << " while min: " << min_ << " and max: " << max_ << std::endl;
             return false;
         }
