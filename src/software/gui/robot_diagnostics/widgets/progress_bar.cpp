@@ -6,4 +6,3 @@ void updateProgressBar(QProgressBar *progress_bar, float value)
     // we don't use this value its just for visuals
     progress_bar->setValue(static_cast<int>(value));
 }
-
