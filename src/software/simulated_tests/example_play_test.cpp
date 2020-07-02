@@ -4,6 +4,7 @@
 
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
+#include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
@@ -14,32 +15,9 @@ class ExamplePlayTest : public SimulatedTestFixture
 TEST_F(ExamplePlayTest, test_example_play)
 {
     setBallState(BallState(Point(-0.8, 0), Vector(0, 0)));
-    addFriendlyRobots({
-        RobotStateWithId{
-            .id          = 0,
-            .robot_state = RobotState(Point(4, 0), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 1,
-            .robot_state = RobotState(Point(0.5, 0), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 2,
-            .robot_state = RobotState(Point(-3, 1), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 3,
-            .robot_state = RobotState(Point(-1, -3), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 4,
-            .robot_state = RobotState(Point(2, 0), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 5,
-            .robot_state = RobotState(Point(3.5, 3), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-    });
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(4, 0), Point(0.5, 0), Point(-3, 1), Point(-1, -3), Point(2, 0),
+         Point(3.5, 3)}));
     // Set the goalie ID to that of a non-existent robot so that all robots
     // take on non-goalie roles
     setFriendlyGoalie(99);
