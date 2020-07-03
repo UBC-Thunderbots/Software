@@ -390,3 +390,16 @@ Some general guidelines when writing tests are:
 ### Protobuf
 
 Protobufs that we define should follow [Google's Protobuf Style Guide](https://developers.google.com/protocol-buffers/docs/style).
+
+* When initializing a protobuf from a unique pointer, avoid passing the `release()`'d pointer to set\_allocated and AddAllocated. Releasing unique pointers makes it too easy to cause memory leaks.
+  ```cpp
+  // Incorrect
+  vision_msg->set_allocated_ball_state(createBallStateMsg(world.ball()).release());
+  segments.AddAllocated(segment_1.release());
+  *(sensor_msg_1.add_tbots_robot_msgs())   = *tbots_robot_msg_id_1;
+
+  // Correct
+  *(vision_msg->mutable_ball_state()) = *createBallStateMsg(world.ball());
+  *(segments.Add()) = *segment_1;
+  *(sensor_msg_1.add_tbots_robot_msgs())   = *tbots_robot_msg_id_1;
+  ```
