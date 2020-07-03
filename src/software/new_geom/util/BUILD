@@ -4,6 +4,7 @@ cc_library(
     name = "algorithms",
     srcs = [
         "almost_equal.cpp",
+        "calculate_block_cone.cpp",
         "closest_point.cpp",
         "collinear.cpp",
         "contains.cpp",
@@ -12,10 +13,12 @@ cc_library(
         "furthest_point.cpp",
         "intersection.cpp",
         "intersects.cpp",
+        "projection.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
         "almost_equal.h",
+        "calculate_block_cone.h",
         "closest_point.h",
         "collinear.h",
         "contains.h",
@@ -24,6 +27,7 @@ cc_library(
         "furthest_point.h",
         "intersection.h",
         "intersects.h",
+        "projection.h",
         "voronoi_diagram.h",
     ],
     deps = [
@@ -150,6 +154,24 @@ cc_test(
 cc_test(
     name = "furthest_point_test",
     srcs = ["furthest_point_test.cpp"],
+    deps = [
+        ":algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "calculate_block_cone_test",
+    srcs = ["calculate_block_cone_test.cpp"],
+    deps = [
+        ":algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "projection_test",
+    srcs = ["projection_test.cpp"],
     deps = [
         ":algorithms",
         "@gtest//:gtest_main",

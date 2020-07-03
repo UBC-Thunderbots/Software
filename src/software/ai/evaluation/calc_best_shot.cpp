@@ -1,6 +1,7 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 
 #include "software/geom/util.h"
+#include "software/new_geom/util/projection.h"
 
 std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
                                        const Point &goal_post_pos, const Point &p,
@@ -179,7 +180,7 @@ std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
     if (obstacle_segment_projections.size() > 1)
     {
         obstacle_segment_projections =
-            combineToParallelSegments(obstacle_segment_projections,
+            projectSegmentsOntoVector(obstacle_segment_projections,
                                       obstacle_segment_projections.front().toVector());
     }
     else if (obstacle_segment_projections.size() == 0)
