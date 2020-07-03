@@ -63,7 +63,7 @@ void RobotDiagnosticsGUI::setupWidgets()
         main_widget,
         boost::bind(&RobotDiagnosticsGUI::onDirectPerWheelPowerChanged, this, _1, _2),
         boost::bind(&RobotDiagnosticsGUI::onDirectVelocityPowerChanged, this, _1, _2));
-    setupFeedback(main_widget);
+    setupSensorStatus(main_widget);
     setupLEDs(main_widget, led_mode);
     setupRobotSelection(main_widget, robot_selection);
     setupRobotStatusTable(main_widget->robot_status_table_widget);
@@ -74,7 +74,7 @@ void RobotDiagnosticsGUI::updateRobotDiagnostics()
     std::optional<SensorMsg> sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue();
     while (sensor_msg)
     {
-        updateFeedback(main_widget, sensor_msg.value());
+        updateSensorStatus(main_widget, sensor_msg.value());
 
         // update robot status table
         for (const auto& robot_msg : sensor_msg.value().tbots_robot_msgs())

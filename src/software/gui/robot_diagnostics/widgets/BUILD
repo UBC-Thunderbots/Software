@@ -10,9 +10,9 @@ qt_cc_library(
         ":chicker",
         ":dribbler",
         ":drive",
-        ":feedback",
         ":leds",
         ":robot_selection",
+        ":sensor_status",
         "//software/gui/generic_widgets/robot_status",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/multithreading:thread_safe_buffer",
@@ -59,9 +59,9 @@ qt_cc_library(
 )
 
 qt_cc_library(
-    name = "feedback",
-    src = "feedback.cpp",
-    hdr = "feedback.h",
+    name = "sensor_status",
+    src = "sensor_status.cpp",
+    hdr = "sensor_status.h",
     deps = [
         ":progress_bar",
         "//software/gui/robot_diagnostics/ui:main_widget",

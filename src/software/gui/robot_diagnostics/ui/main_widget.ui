@@ -72,10 +72,10 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QLabel" name="label_feedback">
+             <widget class="QLabel" name="label_sensor_status">
               <property name="maximumSize">
                <size>
-                <width>85</width>
+                <width>135</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -85,7 +85,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Feedback</string>
+               <string>Sensor Status</string>
               </property>
              </widget>
             </item>

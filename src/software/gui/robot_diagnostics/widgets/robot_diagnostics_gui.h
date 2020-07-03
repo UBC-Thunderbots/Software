@@ -11,7 +11,7 @@
 #include "software/gui/robot_diagnostics/widgets/chicker.h"
 #include "software/gui/robot_diagnostics/widgets/dribbler.h"
 #include "software/gui/robot_diagnostics/widgets/drive.h"
-#include "software/gui/robot_diagnostics/widgets/feedback.h"
+#include "software/gui/robot_diagnostics/widgets/sensor_status.h"
 #include "software/gui/robot_diagnostics/widgets/leds.h"
 #include "software/gui/robot_diagnostics/widgets/robot_selection.h"
 #include "software/multithreading/thread_safe_buffer.h"
