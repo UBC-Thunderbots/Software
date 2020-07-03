@@ -14,19 +14,19 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI(int argc, char** argv)
       ThreadedObserver<RobotStatus>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
-          world_draw_functions_buffer_size, false)),
+              WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
       ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(
-          ai_draw_functions_buffer_size, false)),
+              AI_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
       play_info_buffer(
-          std::make_shared<ThreadSafeBuffer<PlayInfo>>(play_info_buffer_size, false)),
+          std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_BUFFER_SIZE, false)),
       sensor_msg_buffer(
-          std::make_shared<ThreadSafeBuffer<SensorMsg>>(sensor_msg_buffer_size)),
+          std::make_shared<ThreadSafeBuffer<SensorMsg>>(SENSOR_MSG_BUFFER_SIZE)),
       robot_status_buffer(
-          std::make_shared<ThreadSafeBuffer<RobotStatus>>(robot_status_buffer_size)),
+          std::make_shared<ThreadSafeBuffer<RobotStatus>>(ROBOT_STATUS_BUFFER_SIZE)),
       view_area_buffer(
-          std::make_shared<ThreadSafeBuffer<Rectangle>>(view_area_buffer_size, false)),
+          std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
       application_shutting_down(false),
-      initial_view_area_set(false)
+      remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
     run_full_system_gui_thread =
         std::thread(&ThreadedFullSystemGUI::createAndRunFullSystemGUI, this, argc, argv);
@@ -80,9 +80,9 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
     auto world_draw_function = getDrawWorldFunction(world);
     world_draw_functions_buffer->push(world_draw_function);
 
-    if (!initial_view_area_set)
+    if (remaining_attempts_to_set_view_area > 0)
     {
-        initial_view_area_set = true;
+        remaining_attempts_to_set_view_area--;
         view_area_buffer->push(world.field().fieldBoundary());
     }
 }

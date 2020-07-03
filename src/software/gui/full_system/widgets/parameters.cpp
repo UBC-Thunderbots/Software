@@ -1,5 +1,6 @@
 #include "software/gui/full_system/widgets/parameters.h"
 
+#include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHBoxLayout>

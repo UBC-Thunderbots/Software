@@ -84,18 +84,27 @@ class ThreadedFullSystemGUI : public ThreadedObserver<World>,
     // smooth if the stream of data isn't perfectly consistent, so we use a very small
     // buffer of 2 values to be responsive while also giving a small buffer for
     // smoothness
-    static constexpr std::size_t world_draw_functions_buffer_size = 2;
-    static constexpr std::size_t ai_draw_functions_buffer_size    = 2;
+    static constexpr std::size_t WORLD_DRAW_FUNCTIONS_BUFFER_SIZE = 2;
+    static constexpr std::size_t AI_DRAW_FUNCTIONS_BUFFER_SIZE    = 2;
     // We only care about the most recent PlayInfo, so the buffer is of size 1
-    static constexpr std::size_t play_info_buffer_size = 1;
+    static constexpr std::size_t PLAY_INFO_BUFFER_SIZE = 1;
     // We don't want to miss any SensorMsg updates so we make the buffer larger
-    static constexpr std::size_t sensor_msg_buffer_size = 60;
+    static constexpr std::size_t SENSOR_MSG_BUFFER_SIZE = 60;
     // We don't want to miss any robot status updates so we make the buffer larger
-    static constexpr std::size_t robot_status_buffer_size = 60;
+    static constexpr std::size_t ROBOT_STATUS_BUFFER_SIZE = 60;
     // We only care about the most recent view area that was requested, so the
     // buffer is of size 1
-    static constexpr std::size_t view_area_buffer_size = 1;
+    static constexpr std::size_t VIEW_AREA_BUFFER_SIZE = 1;
+    // When the application starts up we want to set the initial view area
+    // to show all the contents nicely. For some reason doing this only
+    // once at the start of the program isn't enough, the GUI seems to need
+    // a few iterations to fully render everything before the view area will
+    // be set correctly (otherwise the contents tend to be zoomed-out and
+    // offset). This is set to an arbitrary value that is small enough the
+    // user doesn't notice they don't have control on startup, but
+    // successfully sets the area.
+    static constexpr int NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA = 50;
 
     std::atomic_bool application_shutting_down;
-    bool initial_view_area_set;
+    int remaining_attempts_to_set_view_area;
 };

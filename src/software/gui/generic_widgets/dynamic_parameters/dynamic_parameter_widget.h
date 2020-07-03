@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QScrollArea>
 #include <QtWidgets/QVBoxLayout>
 
 #include "software/parameter/dynamic_parameters.h"
@@ -9,7 +10,7 @@
 /**
  * TODO: comment
  */
-class DynamicParameterWidget : public QWidget {
+class DynamicParameterWidget : public QScrollArea {
     Q_OBJECT
 
 public:
@@ -19,7 +20,7 @@ public:
 
 private:
     // TODO: comment
-    void setupParametersHelper(QWidget* params_widget, QVBoxLayout* layout, MutableParameterVariant param_var);
+    void setupParametersHelper(QWidget* params_widget, QVBoxLayout* layout, std::shared_ptr<Config> config);
 
     /**
      * Creates a widget that contains the components necessary to display and control a

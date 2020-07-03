@@ -38,10 +38,10 @@ DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent) : ZoomableQGraph
     // area for the QGraphicsView. We want to give the user the freedom to scroll
     // around the scene as much as they please, so we set this rectangle to be
     // very large
-    Point bottom_left(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
-    Point top_right(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-    Rectangle max_scene_rect(bottom_left, top_right);
-    graphics_scene->setSceneRect(createQRectF(max_scene_rect));
+//    Point bottom_left(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+//    Point top_right(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+//    Rectangle max_scene_rect(bottom_left, top_right);
+//    graphics_scene->setSceneRect(createQRectF(max_scene_rect));
 
     update();
 }

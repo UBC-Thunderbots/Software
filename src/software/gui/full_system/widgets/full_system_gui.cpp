@@ -37,20 +37,6 @@ FullSystemGUI::FullSystemGUI(
     // https://www.qtcentre.org/threads/41128-Need-to-implement-in-place-line-edit-unable-to-get-lose-focus-of-QLineEdit
     setFocusPolicy(Qt::StrongFocus);
 
-    // This is a trick to force the initial width of the ai control tabs to be small,
-    // and the initial width of the ai view to be large. This sets the sizes of the
-    // widgets in the splitter to be unrealistically small (1 pixel) so that the
-    // size policies defined for the widgets will take over and grow the widgets to
-    // their minimum size, and then distribute the rest of the space according to the
-    // policies.
-    // See https://doc.qt.io/archives/qt-4.8/qsplitter.html#setSizes
-//    int number_of_widgets_in_splitter =
-//            main_widget->ai_control_and_view_splitter->count();
-//    auto widget_sizes_vector  = std::vector<int>(number_of_widgets_in_splitter, 1);
-//    auto widget_sizes_qvector = QVector<int>::fromStdVector(widget_sizes_vector);
-//    auto widget_sizes_list    = QList<int>::fromVector(widget_sizes_qvector);
-//    main_widget->ai_control_and_view_splitter->setSizes(widget_sizes_list);
-
     setupRobotStatusTable(main_widget->robot_status_table_widget);
     setupAIControls(main_widget, config);
 //    setupParametersTab(main_widget);
