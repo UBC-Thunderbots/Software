@@ -117,7 +117,7 @@ bool PhysicsBall::isInFlight()
     {
         double current_in_flight_distance_meters =
             (position() - in_flight_origin.value()).length();
-        // Once the ball is in flight, is can only stop being in flight once it has
+        // Once the ball is in flight, it can only stop being in flight once it has
         // travelled at least the current in_flight_distance and is simultaneously not
         // touching another object. This prevents the ball from "landing" in another
         // object, and instead pretends the ball hit the top and rolled off.

@@ -156,8 +156,7 @@ void SimulatorRobot::chip(float distance_m)
             // https://github.com/UBC-Thunderbots/Software/issues/1179
             Angle chip_angle = Angle::fromDegrees(45);
             // Use the formula for the Range of a parabolic projectile
-            // Rearrange to solve for the initial velocity
-            // See
+            // Rearrange to solve for the initial velocity.
             // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
             float range = distance_m;
             float numerator =
