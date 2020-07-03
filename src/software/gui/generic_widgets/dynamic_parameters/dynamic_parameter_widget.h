@@ -8,19 +8,27 @@
 #include "software/parameter/parameter.h"
 
 /**
- * TODO: comment
+ * This widget displays all our DynamicParameters and allows the user to
+ * change their values
  */
 class DynamicParameterWidget : public QScrollArea {
     Q_OBJECT
 
 public:
-    // TODO: comment
-    // TODO: take the params as a parameter
     explicit DynamicParameterWidget(QWidget* parent = 0);
 
 private:
-    // TODO: comment
-    void setupParametersHelper(QWidget* params_widget, QVBoxLayout* layout, std::shared_ptr<Config> config);
+    /**
+     * A helper function to recursively setup all parameters and sub-configs of the given
+     * config.
+     *
+     * @pre the params_widget must have an initialized layout (ie. the layout must
+     * not be null)
+     *
+     * @param params_widget The widget to add parameters to
+     * @param config The config to setup
+     */
+    void setupParametersHelper(QWidget* params_widget, std::shared_ptr<Config> config);
 
     /**
      * Creates a widget that contains the components necessary to display and control a

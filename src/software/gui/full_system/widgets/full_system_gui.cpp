@@ -39,7 +39,6 @@ FullSystemGUI::FullSystemGUI(
 
     setupRobotStatusTable(main_widget->robot_status_table_widget);
     setupAIControls(main_widget, config);
-//    setupParametersTab(main_widget);
 
     // Update to make sure all layout changes apply nicely
     update();
