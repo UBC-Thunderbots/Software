@@ -311,6 +311,6 @@ class SimulatorRobot
     // ball is kicked. Higher values will cause the ball to be kicked with an even greater
     // velocity if it had an initial non-zero velocity when being kicked.
     // This value is a very rough estimate of real-world behaviour, so that the ball
-    // will be kicked slightly faster it it's kicked with some initial velocity.
+    // will be kicked slightly faster it it entered the kicker with some initial velocity.
     static constexpr double MOMENTUM_CONSERVED_DURING_KICK = 0.1;
 };
