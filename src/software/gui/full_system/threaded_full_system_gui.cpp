@@ -6,7 +6,7 @@
 #include "software/gui/drawing/world.h"
 #include "software/parameter/dynamic_parameters.h"
 
-ThreadedFullSystemGUI::ThreadedFullSystemGUI(int argc, char** argv)
+ThreadedFullSystemGUI::ThreadedFullSystemGUI()
     : ThreadedObserver<World>(),
       ThreadedObserver<AIDrawFunction>(),
       ThreadedObserver<PlayInfo>(),
@@ -29,7 +29,7 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI(int argc, char** argv)
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
     run_full_system_gui_thread =
-        std::thread(&ThreadedFullSystemGUI::createAndRunFullSystemGUI, this, argc, argv);
+        std::thread(&ThreadedFullSystemGUI::createAndRunFullSystemGUI, this);
 }
 
 ThreadedFullSystemGUI::~ThreadedFullSystemGUI()
@@ -46,8 +46,14 @@ ThreadedFullSystemGUI::~ThreadedFullSystemGUI()
     run_full_system_gui_thread.join();
 }
 
-void ThreadedFullSystemGUI::createAndRunFullSystemGUI(int argc, char** argv)
+void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
 {
+    // We mock empty argc and argv since they don't affect the behaviour of the GUI.
+    // This way we don't need to pass them all the way down from the start of the
+    // program
+    char *argv[]               = {NULL};
+    int argc                   = sizeof(argv) / sizeof(char *) - 1;
+
     // We use raw pointers to have explicit control over the order of destruction.
     // For some reason, putting the QApplication and FullSystemGUI on the stack does
     // not work, despite theoretically having the same order of destruction

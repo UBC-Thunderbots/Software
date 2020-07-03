@@ -27,16 +27,7 @@ class ThreadedFullSystemGUI : public ThreadedObserver<World>,
                               public ThreadedObserver<RobotStatus>
 {
    public:
-    ThreadedFullSystemGUI() = delete;
-
-    /**
-     * Create a new ThreadedFullSystemGUI. The argc and argv arguments are required
-     * to create a QApplication
-     *
-     * @param argc The number of arguments being passed
-     * @param argv Keyword arguments
-     */
-    explicit ThreadedFullSystemGUI(int argc, char** argv);
+    explicit ThreadedFullSystemGUI();
 
     ~ThreadedFullSystemGUI() override;
 
@@ -62,11 +53,8 @@ class ThreadedFullSystemGUI : public ThreadedObserver<World>,
      * constructed in the thread is will run in, and the FullSystemGUI must be
      * created in the same context as the QApplication (which in this case is the new
      * thread).
-     *
-     * @param argc The number of arguments being passed
-     * @param argv Keyword arguments for the FullSystemGUI QApplication
      */
-    void createAndRunFullSystemGUI(int argc, char** argv);
+    void createAndRunFullSystemGUI();
 
     std::thread run_full_system_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;

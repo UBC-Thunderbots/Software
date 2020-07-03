@@ -17,6 +17,11 @@ class DrawFunctionVisualizer : public ZoomableQGraphicsView {
 public:
     explicit DrawFunctionVisualizer(QWidget* parent = 0);
 
+    /**
+     * Clears the scene and draws each of the provided DrawFunctions in order
+     *
+     * @param draw_functions The DrawFunctions to draw on the scene, in order
+     */
     void clearAndDraw(const std::vector<DrawFunction>& draw_functions);
 
     /**

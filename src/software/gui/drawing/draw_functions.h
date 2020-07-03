@@ -48,14 +48,8 @@ class DrawFunctionWrapper
         draw_function_ = draw_function;
     }
     DrawFunctionWrapper() = delete;
+    virtual ~DrawFunctionWrapper() = 0;
 
-//    inline void execute(QGraphicsScene* scene)
-//    {
-//        if (draw_function_)
-//        {
-//            draw_function_(scene);
-//        }
-//    }
     /**
      * Returns the internal draw_function
      *
@@ -64,7 +58,6 @@ class DrawFunctionWrapper
     inline std::function<void(QGraphicsScene* scene)> getDrawFunction() {
         return draw_function_;
     }
-    virtual ~DrawFunctionWrapper() = 0;
 
    private:
     DrawFunction draw_function_;
