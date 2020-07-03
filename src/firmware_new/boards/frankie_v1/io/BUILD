@@ -32,9 +32,9 @@ cc_library(
 )
 
 cc_library(
-    name = "infineon_tle5009_e1000_sensor",
-    srcs = ["infineon_TLE5009_E1000.c"],
-    hdrs = ["infineon_TLE5009_E1000.h"],
+    name = "infineon_TLE009_E1000_angle_sensor",
+    srcs = ["infineon_TLE5009_E1000_angle_sensor.c"],
+    hdrs = ["infineon_TLE5009_E1000_angle_sensor.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
 )
 

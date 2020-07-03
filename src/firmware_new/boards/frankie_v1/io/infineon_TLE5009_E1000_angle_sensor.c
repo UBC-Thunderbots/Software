@@ -1,23 +1,30 @@
-#include "infineon_TLE5009_E1000.h"
+#include "firmware_new/boards/frankie_v1/io/infineon_TLE5009_E1000_angle_sensor.h"
 
 #include <stdlib.h>
 
-struct InfineonTLE5009E1000
+struct InfineonTLE5009E1000AngleSensor
 {
+    // Gain/amplitude offset
     float A_x;
     float A_y;
+    // Mean value offset
     float O_x;
     float O_y;
+    // Phase offsets
     float phase_offset_x_rad;
     float phase_difference_offset_rad;
 };
 
-InfineonTLE5009E1000_t* io_infineon_TLE5009_E1000_create(
+InfineonTLE5009E1000AngleSensor_t* io_infineon_TLE5009_E1000_create(
     float x_max_value, float x_min_value, float y_max_value, float y_min_value,
     float x_magnitude_45_degrees, float y_magnitude_45_degrees,
     float x_magnitude_135_degrees, float y_magnitude_135_degrees)
 {
-    // This function intentionally uses variable names identical to the sensor data-sheet
+    /* This function intentionally uses variable names identical to the sensor data-sheet
+    * Datasheet:
+    * https://www.infineon.com/dgdl/Infineon-TLE5009_FDS-DataSheet-v01_01-en.pdf?fileId=db3a304330f686060131421d8ddd56b0
+    * Calibration on page 19.
+    */
 
     // Calculate the amplitudes
     const float A_x = (x_max_value - x_min_value) / 2;
@@ -35,8 +42,8 @@ InfineonTLE5009E1000_t* io_infineon_TLE5009_E1000_create(
     const float phase_offset_rad = 2 * atanf((M_135 - M_45) / (M_135 + M_45));
 
     // Create and initialize struct
-    InfineonTLE5009E1000_t* sensor =
-        (InfineonTLE5009E1000_t*)malloc(sizeof(InfineonTLE5009E1000_t));
+    InfineonTLE5009E1000AngleSensor_t* sensor =
+        (InfineonTLE5009E1000AngleSensor_t*)malloc(sizeof(InfineonTLE5009E1000AngleSensor_t));
     sensor->A_x                         = A_x;
     sensor->A_y                         = A_y;
     sensor->O_x                         = O_x;
@@ -46,12 +53,12 @@ InfineonTLE5009E1000_t* io_infineon_TLE5009_E1000_create(
     return sensor;
 }
 
-void io_infineon_TLE5009_E1000_destroy(InfineonTLE5009E1000_t* sensor)
+void io_infineon_TLE5009_E1000_destroy(InfineonTLE5009E1000AngleSensor_t* sensor)
 {
     free(sensor);
 }
 
-float io_infineon_TLE5009_E1000_calculateAngle(InfineonTLE5009E1000_t* sensor,
+float io_infineon_TLE5009_E1000_calculateAngle(InfineonTLE5009E1000AngleSensor_t* sensor,
                                                float x_value, float y_value)
 {
     // Remove the mean voltage offset
