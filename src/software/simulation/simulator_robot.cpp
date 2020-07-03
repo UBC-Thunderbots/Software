@@ -120,18 +120,23 @@ void SimulatorRobot::kick(float speed_m_per_s)
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
         for (auto ball : this->balls_in_dribbler_area)
         {
-            Vector robot_orientation_vector = Vector::createFromAngle(robot->getRobotState().orientation());
+            Vector robot_orientation_vector =
+                Vector::createFromAngle(robot->getRobotState().orientation());
 
             Vector head_on_momentum = ball->momentum().project(robot_orientation_vector);
-            double preserved_momentum = head_on_momentum.length() * MOMENTUM_CONSERVED_DURING_KICK;
+            double preserved_momentum =
+                head_on_momentum.length() * MOMENTUM_CONSERVED_DURING_KICK;
 
-            Vector kick_momentum = robot_orientation_vector.normalize(ball->massKg() * speed_m_per_s);
-            Vector kick_impulse = kick_momentum.normalize(kick_momentum.length() + preserved_momentum);
+            Vector kick_momentum =
+                robot_orientation_vector.normalize(ball->massKg() * speed_m_per_s);
+            Vector kick_impulse =
+                kick_momentum.normalize(kick_momentum.length() + preserved_momentum);
 
-            // Cancel head-on momentum, then kick. We must cancel the head-on momentum first
-            // so that the preserved momentum has an additive effect that results in a higher
-            // kick speed than requested.
-            ball->applyImpulse(robot_orientation_vector.normalize(head_on_momentum.length()));
+            // Cancel head-on momentum, then kick. We must cancel the head-on momentum
+            // first so that the preserved momentum has an additive effect that results in
+            // a higher kick speed than requested.
+            ball->applyImpulse(
+                robot_orientation_vector.normalize(head_on_momentum.length()));
             ball->applyImpulse(kick_impulse);
         }
     });
@@ -152,12 +157,17 @@ void SimulatorRobot::chip(float distance_m)
             Angle chip_angle = Angle::fromDegrees(45);
             // Use the formula for the Range of a parabolic projectile
             // Rearrange to solve for the initial velocity
-            // See https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
-            float range            = distance_m;
-            float numerator        = range * static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
-            float denominator      = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
-            float initial_velocity = static_cast<float>(std::sqrt(numerator / denominator));
-            float ground_velocity  = initial_velocity * static_cast<float>(chip_angle.cos());
+            // See
+            // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
+            float range = distance_m;
+            float numerator =
+                range *
+                static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
+            float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
+            float initial_velocity =
+                static_cast<float>(std::sqrt(numerator / denominator));
+            float ground_velocity =
+                initial_velocity * static_cast<float>(chip_angle.cos());
             kick(ground_velocity);
         }
     });
@@ -368,9 +378,9 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
     // Damp the ball when it collides with the dribbler. We damp each component
     // of the ball's momentum separately so we have the flexibility to tune this
     // behavior to match real life.
-    Vector ball_momentum = physics_ball->momentum();
+    Vector ball_momentum       = physics_ball->momentum();
     Vector robot_facing_vector = Vector::createFromAngle(physics_robot->orientation());
-    Vector robot_perp_vector = robot_facing_vector.perpendicular();
+    Vector robot_perp_vector   = robot_facing_vector.perpendicular();
 
     Vector dribbler_head_on_momentum = ball_momentum.project(robot_facing_vector);
     physics_ball->applyImpulse(-dribbler_head_on_momentum * DRIBBLER_HEAD_ON_DAMPING);

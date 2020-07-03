@@ -303,7 +303,8 @@ class SimulatorRobotSingletonAutochipTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonAutochipTest, test_autochip_ball_moving_towards_robot_with_no_obstacle)
+TEST_P(SimulatorRobotSingletonAutochipTest,
+       test_autochip_ball_moving_towards_robot_with_no_obstacle)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),

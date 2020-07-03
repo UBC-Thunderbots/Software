@@ -305,7 +305,7 @@ class SimulatorRobot
     // this behavior to match real life. These values have been manually tuned
     // such that the robots are able to hit one-time shots in simulation with
     // sufficient accuracy.
-    static constexpr double DRIBBLER_HEAD_ON_DAMPING = 0.7;
+    static constexpr double DRIBBLER_HEAD_ON_DAMPING       = 0.7;
     static constexpr double DRIBBLER_PERPENDICULAR_DAMPING = 0.61;
     // A value in the range [0, 1] that indicates how much momentum is conserved when the
     // ball is kicked. Higher values will cause the ball to be kicked with an even greater

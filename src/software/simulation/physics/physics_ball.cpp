@@ -67,12 +67,14 @@ Vector PhysicsBall::velocity() const
     return createVector(ball_body->GetLinearVelocity());
 }
 
-Vector PhysicsBall::momentum() const {
+Vector PhysicsBall::momentum() const
+{
     double momentum_magnitude = massKg() * velocity().length();
     return velocity().normalize(momentum_magnitude);
 }
 
-double PhysicsBall::massKg() const {
+double PhysicsBall::massKg() const
+{
     return ball_body->GetMass();
 }
 
@@ -102,7 +104,8 @@ bool PhysicsBall::isTouchingOtherObject() const
     return false;
 }
 
-void PhysicsBall::setInFlightForDistance(double in_flight_distance) {
+void PhysicsBall::setInFlightForDistance(double in_flight_distance)
+{
     in_flight_origin          = position();
     in_flight_distance_meters = in_flight_distance;
 }
@@ -115,13 +118,13 @@ bool PhysicsBall::isInFlight()
         double current_in_flight_distance_meters =
             (position() - in_flight_origin.value()).length();
         // Once the ball is in flight, is can only stop being in flight once it has
-        // travelled at least the current in_flight_distance and is simultaneously not touching
-        // another object. This prevents the ball from "landing" in another object, and
-        // instead pretends the ball hit the top and rolled off.
+        // travelled at least the current in_flight_distance and is simultaneously not
+        // touching another object. This prevents the ball from "landing" in another
+        // object, and instead pretends the ball hit the top and rolled off.
         //
         // We assume the ball does not collide while it is in flight, which gives us the
-        // "guarantee" the ball will travel far enough from the in_flight_origin in order to
-        // "land"
+        // "guarantee" the ball will travel far enough from the in_flight_origin in order
+        // to "land"
         if (current_in_flight_distance_meters >= in_flight_distance_meters &&
             !isTouchingOtherObject())
         {
