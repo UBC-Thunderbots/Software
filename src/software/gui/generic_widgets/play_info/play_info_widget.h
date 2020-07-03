@@ -1,16 +1,18 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QTextEdit>
+#include <QtWidgets/QWidget>
+
 #include "software/ai/hl/stp/play_info.h"
 
 /**
  * This class abstracts how we display PlayInfo in the GUI
  */
-class PlayInfoWidget : public QTextEdit {
+class PlayInfoWidget : public QTextEdit
+{
     Q_OBJECT
 
-public:
+   public:
     PlayInfoWidget(QWidget* parent = 0);
 
     /**

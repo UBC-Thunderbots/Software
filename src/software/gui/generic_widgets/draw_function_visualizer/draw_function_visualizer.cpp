@@ -1,8 +1,12 @@
 #include "software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h"
+
 #include "software/gui/geometry_conversion.h"
 #include "software/logger/logger.h"
 
-DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent) : ZoomableQGraphicsView(parent), graphics_scene(new QGraphicsScene(this)), open_gl_widget(new QOpenGLWidget(this))
+DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent)
+    : ZoomableQGraphicsView(parent),
+      graphics_scene(new QGraphicsScene(this)),
+      open_gl_widget(new QOpenGLWidget(this))
 {
     setScene(graphics_scene);
 
@@ -38,27 +42,33 @@ DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent) : ZoomableQGraph
     // area for the QGraphicsView. We want to give the user the freedom to scroll
     // around the scene as much as they please, so we set this rectangle to be
     // very large
-//    Point bottom_left(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
-//    Point top_right(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-//    Rectangle max_scene_rect(bottom_left, top_right);
-//    graphics_scene->setSceneRect(createQRectF(max_scene_rect));
+    //    Point bottom_left(std::numeric_limits<float>::lowest(),
+    //    std::numeric_limits<float>::lowest()); Point
+    //    top_right(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    //    Rectangle max_scene_rect(bottom_left, top_right);
+    //    graphics_scene->setSceneRect(createQRectF(max_scene_rect));
 
     update();
 }
 
-void DrawFunctionVisualizer::clearAndDraw(const std::vector<DrawFunction> &draw_functions) {
+void DrawFunctionVisualizer::clearAndDraw(const std::vector<DrawFunction> &draw_functions)
+{
     graphics_scene->clear();
     for (auto draw_function : draw_functions)
     {
-        if(draw_function) {
+        if (draw_function)
+        {
             draw_function(graphics_scene);
-        }else {
+        }
+        else
+        {
             LOG(WARNING) << "Attempted to draw a non-callable DrawFunction";
         }
     }
 }
 
-void DrawFunctionVisualizer::setViewArea(const Rectangle &view_area) {
+void DrawFunctionVisualizer::setViewArea(const Rectangle &view_area)
+{
     // Moves and scales the view to fit the view_area in the scene
     fitInView(createQRectF(view_area), Qt::KeepAspectRatio);
 }

@@ -2,8 +2,9 @@
 
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QOpenGLWidget>
-#include "software/gui/generic_widgets/draw_function_visualizer/zoomable_qgraphics_view.h"
+
 #include "software/gui/drawing/draw_functions.h"
+#include "software/gui/generic_widgets/draw_function_visualizer/zoomable_qgraphics_view.h"
 #include "software/new_geom/rectangle.h"
 
 /**
@@ -11,10 +12,11 @@
  * and pan around the scene. It provides an interface for drawing arbitrary
  * shapes and information in the scene through the use of DrawFunctions.
  */
-class DrawFunctionVisualizer : public ZoomableQGraphicsView {
+class DrawFunctionVisualizer : public ZoomableQGraphicsView
+{
     Q_OBJECT
 
-public:
+   public:
     explicit DrawFunctionVisualizer(QWidget* parent = 0);
 
     /**
@@ -31,7 +33,7 @@ public:
      */
     void setViewArea(const Rectangle& view_area);
 
-private:
+   private:
     // The "parent" of each of these widgets is set during construction, meaning that
     // the Qt system takes ownership of the pointer and is responsible for de-allocating
     // it, so we don't have to

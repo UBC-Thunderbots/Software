@@ -102,7 +102,7 @@ void SimulatedTestFixture::enableVisualizer()
     // tests and they don't affect the behaviour of the GUI
     char *argv[]               = {NULL};
     int argc                   = sizeof(argv) / sizeof(char *) - 1;
-    full_system_gui                 = std::make_shared<ThreadedFullSystemGUI>(argc, argv);
+    full_system_gui            = std::make_shared<ThreadedFullSystemGUI>(argc, argv);
     run_simulation_in_realtime = true;
 }
 

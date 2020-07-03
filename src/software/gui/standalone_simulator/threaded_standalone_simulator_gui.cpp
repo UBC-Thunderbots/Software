@@ -10,14 +10,14 @@ ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI()
     : ThreadedObserver<SSL_WrapperPacket>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
-              SSL_WRAPPER_PACKET_BUFFER_SIZE, false)),
+          SSL_WRAPPER_PACKET_BUFFER_SIZE, false)),
       view_area_buffer(
           std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
       application_shutting_down(false),
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
-    run_standalone_simulator_gui_thread =
-        std::thread(&ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI, this);
+    run_standalone_simulator_gui_thread = std::thread(
+        &ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI, this);
 }
 
 ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
@@ -39,8 +39,8 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI()
     // We mock empty argc and argv since they don't affect the behaviour of the GUI.
     // This way we don't need to pass them all the way down from the start of the
     // program
-    char *argv[]               = {NULL};
-    int argc                   = sizeof(argv) / sizeof(char *) - 1;
+    char* argv[] = {NULL};
+    int argc     = sizeof(argv) / sizeof(char*) - 1;
 
     // We use raw pointers to have explicit control over the order of destruction.
     // For some reason, putting the QApplication and SimulatorGUI on the stack does

@@ -41,13 +41,15 @@ class DrawFunctionWrapper
     inline explicit DrawFunctionWrapper(
         const std::function<void(QGraphicsScene* scene)>& draw_function)
     {
-        if(!draw_function) {
-            throw std::invalid_argument("Created a DrawFunctionWrapper with a non-callable function");
+        if (!draw_function)
+        {
+            throw std::invalid_argument(
+                "Created a DrawFunctionWrapper with a non-callable function");
         }
 
         draw_function_ = draw_function;
     }
-    DrawFunctionWrapper() = delete;
+    DrawFunctionWrapper()          = delete;
     virtual ~DrawFunctionWrapper() = 0;
 
     /**
@@ -55,7 +57,8 @@ class DrawFunctionWrapper
      *
      * @return the internal draw_function
      */
-    inline std::function<void(QGraphicsScene* scene)> getDrawFunction() {
+    inline std::function<void(QGraphicsScene* scene)> getDrawFunction()
+    {
         return draw_function_;
     }
 

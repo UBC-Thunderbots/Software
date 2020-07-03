@@ -12,7 +12,7 @@
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
 /**
- * This class wraps a StandaloneSimulatorGUI object so it can run independantly
+ * This class wraps a StandaloneSimulatorGUI object so it can run independently
  * in its own thread. This way the GUI can be rendered and handle events separately
  * without affecting the main application.
  */

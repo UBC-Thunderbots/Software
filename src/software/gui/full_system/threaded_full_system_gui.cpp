@@ -14,9 +14,9 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI()
       ThreadedObserver<RobotStatus>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
-              WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
+          WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
       ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(
-              AI_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
+          AI_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
       play_info_buffer(
           std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_BUFFER_SIZE, false)),
       sensor_msg_buffer(
@@ -51,8 +51,8 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
     // We mock empty argc and argv since they don't affect the behaviour of the GUI.
     // This way we don't need to pass them all the way down from the start of the
     // program
-    char *argv[]               = {NULL};
-    int argc                   = sizeof(argv) / sizeof(char *) - 1;
+    char* argv[] = {NULL};
+    int argc     = sizeof(argv) / sizeof(char*) - 1;
 
     // We use raw pointers to have explicit control over the order of destruction.
     // For some reason, putting the QApplication and FullSystemGUI on the stack does

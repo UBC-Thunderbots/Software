@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
 
 #include "software/parameter/dynamic_parameters.h"
 #include "software/parameter/parameter.h"
@@ -11,13 +11,14 @@
  * This widget displays all our DynamicParameters and allows the user to
  * change their values
  */
-class DynamicParameterWidget : public QScrollArea {
+class DynamicParameterWidget : public QScrollArea
+{
     Q_OBJECT
 
-public:
+   public:
     explicit DynamicParameterWidget(QWidget* parent = 0);
 
-private:
+   private:
     /**
      * A helper function to recursively setup all parameters and sub-configs of the given
      * config.
@@ -64,5 +65,6 @@ private:
      * @param parameter The string parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    static QWidget* createStringParameter(std::shared_ptr<Parameter<std::string>> parameter);
+    static QWidget* createStringParameter(
+        std::shared_ptr<Parameter<std::string>> parameter);
 };

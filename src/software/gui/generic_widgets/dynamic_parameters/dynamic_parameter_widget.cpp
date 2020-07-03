@@ -1,19 +1,20 @@
 #include "software/gui/generic_widgets/dynamic_parameters/dynamic_parameter_widget.h"
 
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
 
 #include "software/logger/logger.h"
 #include "software/util/variant_visitor/variant_visitor.h"
 
-DynamicParameterWidget::DynamicParameterWidget(QWidget* parent) : QScrollArea(parent){
-    QWidget* params_widget = new QWidget(this);
+DynamicParameterWidget::DynamicParameterWidget(QWidget* parent) : QScrollArea(parent)
+{
+    QWidget* params_widget            = new QWidget(this);
     QVBoxLayout* params_widget_layout = new QVBoxLayout(params_widget);
     params_widget->setLayout(params_widget_layout);
 
@@ -23,41 +24,46 @@ DynamicParameterWidget::DynamicParameterWidget(QWidget* parent) : QScrollArea(pa
     setWidgetResizable(true);
 }
 
-void DynamicParameterWidget::setupParametersHelper(QWidget* params_widget, std::shared_ptr<Config> config)
+void DynamicParameterWidget::setupParametersHelper(QWidget* params_widget,
+                                                   std::shared_ptr<Config> config)
 {
-    if(!params_widget->layout()) {
+    if (!params_widget->layout())
+    {
         throw std::invalid_argument("Cannot setup a parameter widget without a layout");
     }
 
-    for(auto mutable_parameter : config->getMutableParameterList()) {
-        std::visit(overload{[&](std::shared_ptr<Parameter<int>> param) {
-                       QWidget* int_param_widget = createIntegerParameter(param);
-                       int_param_widget->setParent(params_widget);
-                       params_widget->layout()->addWidget(int_param_widget);
-                   },
-                            [&](std::shared_ptr<Parameter<bool>> param) {
-                                QWidget* bool_param_widget = createBooleanParameter(param);
-                                bool_param_widget->setParent(params_widget);
-                                params_widget->layout()->addWidget(bool_param_widget);
-                            },
-                            [&](std::shared_ptr<Parameter<std::string>> param) {
-                                QWidget* string_param_widget = createStringParameter(param);
-                                string_param_widget->setParent(params_widget);
-                                params_widget->layout()->addWidget(string_param_widget);
-                            },
-                            [&](std::shared_ptr<Parameter<double>> param) {
-                                QWidget* double_param_widget = createDoubleParameter(param);
-                                double_param_widget->setParent(params_widget);
-                                params_widget->layout()->addWidget(double_param_widget);
-                            },
-                            [&](std::shared_ptr<Config> config_) {
-                                setupParametersHelper(params_widget, config_);
-                            }},
-                   mutable_parameter);
+    for (auto mutable_parameter : config->getMutableParameterList())
+    {
+        std::visit(
+            overload{[&](std::shared_ptr<Parameter<int>> param) {
+                         QWidget* int_param_widget = createIntegerParameter(param);
+                         int_param_widget->setParent(params_widget);
+                         params_widget->layout()->addWidget(int_param_widget);
+                     },
+                     [&](std::shared_ptr<Parameter<bool>> param) {
+                         QWidget* bool_param_widget = createBooleanParameter(param);
+                         bool_param_widget->setParent(params_widget);
+                         params_widget->layout()->addWidget(bool_param_widget);
+                     },
+                     [&](std::shared_ptr<Parameter<std::string>> param) {
+                         QWidget* string_param_widget = createStringParameter(param);
+                         string_param_widget->setParent(params_widget);
+                         params_widget->layout()->addWidget(string_param_widget);
+                     },
+                     [&](std::shared_ptr<Parameter<double>> param) {
+                         QWidget* double_param_widget = createDoubleParameter(param);
+                         double_param_widget->setParent(params_widget);
+                         params_widget->layout()->addWidget(double_param_widget);
+                     },
+                     [&](std::shared_ptr<Config> config_) {
+                         setupParametersHelper(params_widget, config_);
+                     }},
+            mutable_parameter);
     }
 }
 
-QWidget* DynamicParameterWidget::createBooleanParameter(std::shared_ptr<Parameter<bool>> parameter)
+QWidget* DynamicParameterWidget::createBooleanParameter(
+    std::shared_ptr<Parameter<bool>> parameter)
 {
     QWidget* widget     = new QWidget();
     QHBoxLayout* layout = new QHBoxLayout(widget);
@@ -92,7 +98,8 @@ QWidget* DynamicParameterWidget::createBooleanParameter(std::shared_ptr<Paramete
     return widget;
 }
 
-QWidget* DynamicParameterWidget::createIntegerParameter(std::shared_ptr<Parameter<int>> parameter)
+QWidget* DynamicParameterWidget::createIntegerParameter(
+    std::shared_ptr<Parameter<int>> parameter)
 {
     QWidget* widget     = new QWidget();
     QHBoxLayout* layout = new QHBoxLayout(widget);
@@ -133,7 +140,8 @@ QWidget* DynamicParameterWidget::createIntegerParameter(std::shared_ptr<Paramete
     return widget;
 }
 
-QWidget* DynamicParameterWidget::createDoubleParameter(std::shared_ptr<Parameter<double>> parameter)
+QWidget* DynamicParameterWidget::createDoubleParameter(
+    std::shared_ptr<Parameter<double>> parameter)
 {
     QWidget* widget     = new QWidget();
     QHBoxLayout* layout = new QHBoxLayout(widget);
@@ -176,7 +184,8 @@ QWidget* DynamicParameterWidget::createDoubleParameter(std::shared_ptr<Parameter
     return widget;
 }
 
-QWidget* DynamicParameterWidget::createStringParameter(std::shared_ptr<Parameter<std::string>> parameter)
+QWidget* DynamicParameterWidget::createStringParameter(
+    std::shared_ptr<Parameter<std::string>> parameter)
 {
     QWidget* widget     = new QWidget();
     QHBoxLayout* layout = new QHBoxLayout(widget);

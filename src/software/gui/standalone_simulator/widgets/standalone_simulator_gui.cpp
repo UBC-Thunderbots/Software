@@ -22,13 +22,13 @@ StandaloneSimulatorGUI::StandaloneSimulatorGUI(
     main_widget->setupUi(central_widget);
     setCentralWidget(central_widget);
 
-    connect(update_timer, &QTimer::timeout, this,
-            &StandaloneSimulatorGUI::handleUpdate);
+    connect(update_timer, &QTimer::timeout, this, &StandaloneSimulatorGUI::handleUpdate);
     update_timer->start(static_cast<int>(
         Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
 }
 
-void StandaloneSimulatorGUI::handleUpdate() {
+void StandaloneSimulatorGUI::handleUpdate()
+{
     draw();
     updateDrawViewArea();
 }
@@ -39,7 +39,8 @@ void StandaloneSimulatorGUI::draw()
     if (ssl_wrapper_packet)
     {
         auto draw_function = getDrawSSLWrapperPacketFunction(*ssl_wrapper_packet);
-        main_widget->simulation_graphics_view->clearAndDraw({draw_function.getDrawFunction()});
+        main_widget->simulation_graphics_view->clearAndDraw(
+            {draw_function.getDrawFunction()});
     }
 }
 
