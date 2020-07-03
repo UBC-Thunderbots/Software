@@ -9,7 +9,7 @@
 #include "software/proto/sensor_msg.pb.h"
 
 /**
- * Set up sensor status area of the widget
+ * Set up status and temperature area of the widget
  *
  * @param widget widget to setup
  */
