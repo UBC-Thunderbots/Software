@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"
+#include "software/geom/util.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),
@@ -123,9 +124,26 @@ void SimulatorRobot::kick(float speed_m_per_s)
             Vector robot_orientation_vector =
                 Vector::createFromAngle(robot->getRobotState().orientation());
 
+            double head_on_collision_momentum_magnitude = 0.0;
+
+            Angle a = acuteVertexAngle(ball->velocity(), -robot_orientation_vector).abs();
+            if(a < Angle::quarter()) {
+                // ball heading towards robot
+                head_on_collision_momentum_magnitude += ball->momentum().project(robot_orientation_vector).length();
+            }
+
+            Angle r = acuteVertexAngle(robot->velocity(), robot_orientation_vector).abs();
+            if(r < Angle::quarter()) {
+                // robot moving in direction facing
+                double r_speed = robot->velocity().project(robot_orientation_vector).length();
+                head_on_collision_momentum_magnitude += ball->massKg() * r_speed;
+            }
+
             Vector head_on_momentum = ball->momentum().project(robot_orientation_vector);
+//            double preserved_momentum =
+//                head_on_momentum.length() * MOMENTUM_CONSERVED_DURING_KICK;
             double preserved_momentum =
-                head_on_momentum.length() * MOMENTUM_CONSERVED_DURING_KICK;
+                head_on_collision_momentum_magnitude * MOMENTUM_CONSERVED_DURING_KICK;
 
             Vector kick_momentum =
                 robot_orientation_vector.normalize(ball->massKg() * speed_m_per_s);
