@@ -75,7 +75,7 @@
              <widget class="QLabel" name="label_feedback">
               <property name="maximumSize">
                <size>
-                <width>85</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -281,7 +281,7 @@
                <widget class="QLabel" name="label_temperature">
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>16777215</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -390,7 +390,7 @@
              <widget class="QLabel" name="label_leds">
               <property name="maximumSize">
                <size>
-                <width>45</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -455,7 +455,7 @@
              <widget class="QLabel" name="label_drive">
               <property name="maximumSize">
                <size>
-                <width>50</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -806,7 +806,7 @@
              <widget class="QLabel" name="label_chicker">
               <property name="maximumSize">
                <size>
-                <width>68</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -979,7 +979,7 @@
              <widget class="QLabel" name="label_dribbler_2">
               <property name="maximumSize">
                <size>
-                <width>80</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
