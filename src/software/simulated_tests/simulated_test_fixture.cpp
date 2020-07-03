@@ -98,11 +98,7 @@ void SimulatedTestFixture::setPlay(const std::string &play_name)
 
 void SimulatedTestFixture::enableVisualizer()
 {
-    // We mock empty argc and argv since we don't have access to them when running
-    // tests and they don't affect the behaviour of the GUI
-    char *argv[]               = {NULL};
-    int argc                   = sizeof(argv) / sizeof(char *) - 1;
-    full_system_gui            = std::make_shared<ThreadedFullSystemGUI>(argc, argv);
+    full_system_gui            = std::make_shared<ThreadedFullSystemGUI>();
     run_simulation_in_realtime = true;
 }
 
