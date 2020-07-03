@@ -165,13 +165,28 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "standalone_simulator",
+    srcs = ["standalone_simulator.cpp"],
+    hdrs = ["standalone_simulator.h"],
+    deps = [
+        ":threaded_simulator",
+        "//shared/proto:tbots_cc_proto",
+        "//software/logger",
+        "//software/networking:threaded_proto_multicast_listener",
+        "//software/networking:threaded_proto_multicast_sender",
+        "//software/parameter:dynamic_parameters",
+        "//software/world:field",
+    ],
+)
+
 cc_binary(
     name = "standalone_simulator_main",
     srcs = ["standalone_simulator_main.cpp"],
     deps = [
-        ":threaded_simulator",
+        ":standalone_simulator",
         "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
         "//software/logger",
-        "//software/world:field",
+        "//software/parameter:dynamic_parameters",
     ],
 )
