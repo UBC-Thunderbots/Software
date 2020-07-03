@@ -175,7 +175,7 @@ class SimulatorRobotSingletonKickTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonKickTest, test_kick_ball_at_angle)
+TEST_P(SimulatorRobotSingletonKickTest, test_kick_stationary_ball)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -221,7 +221,7 @@ class SimulatorRobotSingletonChipTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonChipTest, test_chip_ball_at_angle)
+TEST_P(SimulatorRobotSingletonChipTest, test_chip_stationary_ball)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -267,7 +267,7 @@ class SimulatorRobotSingletonAutokickTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonAutokickTest, test_autokick_ball_at_angle)
+TEST_P(SimulatorRobotSingletonAutokickTest, test_autokick_ball_moving_towards_robot)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -288,7 +288,7 @@ TEST_P(SimulatorRobotSingletonAutokickTest, test_autokick_ball_at_angle)
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    Vector expected_velocity = Vector::createFromAngle(robot_orientation).normalize(4.0);
+    Vector expected_velocity = Vector::createFromAngle(robot_orientation).normalize(5.03);
     EXPECT_LT((simulator_ball->velocity() - expected_velocity).length(), 0.001);
 }
 
@@ -303,7 +303,7 @@ class SimulatorRobotSingletonAutochipTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonAutochipTest, test_autochip_ball_at_angle_with_no_obstacle)
+TEST_P(SimulatorRobotSingletonAutochipTest, test_autochip_ball_moving_towards_robot_with_no_obstacle)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -326,8 +326,8 @@ TEST_P(SimulatorRobotSingletonAutochipTest, test_autochip_ball_at_angle_with_no_
 
     EXPECT_LT(simulator_ball->velocity().orientation().minDiff(robot_orientation),
               Angle::fromDegrees(1));
-    EXPECT_GT(simulator_ball->velocity().length(), 2);
-    EXPECT_LT(simulator_ball->velocity().length(), 3.5);
+    EXPECT_GT(simulator_ball->velocity().length(), 3);
+    EXPECT_LT(simulator_ball->velocity().length(), 4.5);
 }
 
 INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonAutochipTest,
