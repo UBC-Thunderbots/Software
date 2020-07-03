@@ -73,7 +73,7 @@ Vector PhysicsBall::momentum() const
     return velocity().normalize(momentum_magnitude);
 }
 
-double PhysicsBall::massKg() const
+float PhysicsBall::massKg() const
 {
     return ball_body->GetMass();
 }

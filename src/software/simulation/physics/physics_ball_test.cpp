@@ -40,6 +40,17 @@ TEST(PhysicsBallTest, test_get_momentum)
     EXPECT_LT((expected_momentum - physics_ball.momentum()).length(), 1e-6);
 }
 
+TEST(PhysicsBallTest, test_get_mass)
+{
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0);
+
+    EXPECT_FLOAT_EQ(1.0f, physics_ball.massKg());
+}
+
 TEST(PhysicsBallTest, test_get_ball_state)
 {
     b2Vec2 gravity(0, 0);

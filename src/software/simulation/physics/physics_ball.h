@@ -74,7 +74,7 @@ class PhysicsBall
      *
      * @return the mass of the ball in kg
      */
-    double massKg() const;
+    float massKg() const;
 
     /**
      * Marks the ball as "in flight" until it has travelled the given distance
