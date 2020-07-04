@@ -10,6 +10,7 @@ py_binary(
         "//shared/parameter_v2/config:example_configs",
     ],
     main = ":generate_dynamic_parameters.py",
+    visibility = ["//shared/parameter_v2:__subpackages__"],
     deps = [
         requirement("PyYAML"),
         requirement("jsonschema"),

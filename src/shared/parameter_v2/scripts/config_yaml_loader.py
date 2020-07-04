@@ -18,9 +18,6 @@ from dynamic_parameter_schema import (
 
 
 class ConfigYamlLoader(object):
-
-    """A collection of static methods to load and validate yaml"""
-
     @staticmethod
     def get_config_metadata(yaml_paths):
         """Loads the yamls in the root config directory and verifies that the
@@ -110,14 +107,16 @@ class ConfigYamlLoader(object):
                     _, tail = os.path.split(filename)
 
                     # safe load yaml into dictionary
-                    raw_config_metadata[tail] = list(yaml.safe_load_all(param_yaml))
+                    raw_config_metadata[tail] = list(
+                        yaml.safe_load_all(param_yaml))
 
                     if len(raw_config_metadata[tail]) == 1:
 
                         # include only in file
                         if isinstance(raw_config_metadata[tail][0], dict):
                             raw_config_metadata[tail] = {
-                                "include": raw_config_metadata[tail][0]["include"]
+                                "include":
+                                raw_config_metadata[tail][0]["include"]
                             }
 
                         # parameter definitions only in file
@@ -136,8 +135,7 @@ class ConfigYamlLoader(object):
 
                 except yaml.YAMLError as ymle:
                     raise ConfigYamlMalformed(
-                        "Check malformed {} \n {}".format(tail, ymle)
-                    )
+                        "Check malformed {} \n {}".format(tail, ymle))
 
         return raw_config_metadata
 
@@ -162,20 +160,15 @@ class ConfigYamlLoader(object):
 
                 # check duplicates
                 if len(metadata["include"]) > len(set(metadata["include"])):
-
                     raise ConfigYamlMalformed(
-                        "Duplicate include detected in {}".format(config_file)
-                    )
+                        "Duplicate include detected in {}".format(config_file))
 
                 # check that included yaml is defined elsewhere
                 for included_yaml in metadata["include"]:
                     if included_yaml not in config_metadata.keys():
-
                         raise ConfigYamlMalformed(
-                            "definition could not be found for {} in {}".format(
-                                included_yaml, config_file
-                            )
-                        )
+                            "definition could not be found for {} in {}".
+                            format(included_yaml, config_file))
 
             if "parameters" in metadata:
 
@@ -193,27 +186,24 @@ class ConfigYamlLoader(object):
 
                 # check duplicates
                 if len(param_names) > len(set(param_names)):
-
                     raise ConfigYamlMalformed(
-                        "Duplicate parameter detected in {}".format(config_file)
-                    )
+                        "Duplicate parameter detected in {}".format(
+                            config_file))
 
                 # This is an ugly artifact of how the yaml is defined and loaded
                 # We are extracting all the requested types to check that
                 # they are all supported. This is the one thing the schema
                 # can't validate that we would like to check
                 requested_types = [
-                    key[0]
-                    for key in [list(entry.keys()) for entry in metadata["parameters"]]
+                    key[0] for key in
+                    [list(entry.keys()) for entry in metadata["parameters"]]
                 ]
 
                 # check if type requested is supported
                 for requested_type in requested_types:
                     if requested_type not in SUPPORTED_TYPES:
-
                         raise ConfigYamlMalformed(
-                            "{} type unsupported".format(requested_type)
-                        )
+                            "{} type unsupported".format(requested_type))
 
     @staticmethod
     def __detect_cycles_in_config_metadata(config_metadata):
@@ -236,9 +226,8 @@ class ConfigYamlLoader(object):
 
         for cycle in networkx.simple_cycles(G):
             raise ConfigYamlCycleDetected(
-                "Cycle detected in the include statements: "
-                + " -> ".join(cycle + [cycle[0]])
-            )
+                "Cycle detected in the include statements: " +
+                " -> ".join(cycle + [cycle[0]]))
 
 
 #######################################################################
@@ -255,7 +244,6 @@ class ConfigYamlException(Exception):
     :type message: str
 
     """
-
     def __init__(self, message):
         init()  # init Fore to print w/ color
         super().__init__(Fore.RED + message + Fore.RESET)
