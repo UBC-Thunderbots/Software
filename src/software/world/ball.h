@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/circular_buffer.hpp>
 #include <optional>
 
 #include "software/new_geom/point.h"

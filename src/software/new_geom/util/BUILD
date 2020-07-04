@@ -12,6 +12,7 @@ cc_library(
         "furthest_point.cpp",
         "intersection.cpp",
         "intersects.cpp",
+        "physics.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
@@ -24,6 +25,7 @@ cc_library(
         "furthest_point.h",
         "intersection.h",
         "intersects.h",
+        "physics.h",
         "voronoi_diagram.h",
     ],
     deps = [
@@ -150,6 +152,15 @@ cc_test(
 cc_test(
     name = "furthest_point_test",
     srcs = ["furthest_point_test.cpp"],
+    deps = [
+        ":algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "physics_test",
+    srcs = ["physics_test.cpp"],
     deps = [
         ":algorithms",
         "@gtest//:gtest_main",

@@ -10,7 +10,6 @@ cc_library(
         "//software/new_geom:vector",
         "//software/time:timestamp",
         "//software/world:timestamped_ball_state",
-        "@boost//:circular_buffer",
     ],
 )
 
@@ -74,7 +73,6 @@ cc_library(
         "//software/geom",
         "//software/new_geom:rectangle",
         "//software/time:timestamp",
-        "@boost//:circular_buffer",
     ],
 )
 
@@ -125,7 +123,6 @@ cc_library(
         "//software/geom",
         "//software/time:duration",
         "//software/time:timestamp",
-        "@boost//:circular_buffer",
     ],
 )
 
