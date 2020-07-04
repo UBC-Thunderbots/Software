@@ -53,7 +53,7 @@ Vector Vector::normalize() const
 {
     // 2 * FIXED_EPSILON for error needed:
     // - mathcalls `hypot` from `length` function call
-    // TODO probably needed because input in test is already FIXED_EPSILON
+    // - where FIXED_EPSILON is used to initialize the vector
     return length() < 2 * FIXED_EPSILON ? Vector() : Vector(x_ / length(), y_ / length());
 }
 
