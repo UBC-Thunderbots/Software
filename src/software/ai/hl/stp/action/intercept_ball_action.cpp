@@ -73,9 +73,11 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         bool point_in_front_of_ball =
             pointInFrontVector(ball.position(), ball.velocity(), closest_point);
 
-        // We add FIXED_EPSILON to avoid division by 0 without affecting the result significantly
-        Duration ball_time_to_position = Duration::fromSeconds(
-            distance(closest_point, ball.position()) / (ball.velocity().length() + FIXED_EPSILON));
+        // We add FIXED_EPSILON to avoid division by 0 without affecting the result
+        // significantly
+        Duration ball_time_to_position =
+            Duration::fromSeconds(distance(closest_point, ball.position()) /
+                                  (ball.velocity().length() + FIXED_EPSILON));
         Duration robot_time_to_pos = getTimeToPositionForRobot(
             *robot, closest_point, ROBOT_MAX_SPEED_METERS_PER_SECOND,
             ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
