@@ -391,7 +391,7 @@ Some general guidelines when writing tests are:
 
 Protobufs that we define should follow [Google's Protobuf Style Guide](https://developers.google.com/protocol-buffers/docs/style).
 
-* When initializing a protobuf from a unique pointer, avoid passing the `release()`'d pointer to set\_allocated and AddAllocated. Releasing unique pointers makes it too easy to cause memory leaks.
+* When initializing a protobuf from a unique pointer, avoid passing the `release()`'d pointer to `set_allocated` and `AddAllocated`. Releasing unique pointers makes it too easy to cause memory leaks.
   ```cpp
   /** Context:
    * ball_state is field of vision_msg
