@@ -6,19 +6,18 @@
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 
-ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(int argc, char** argv)
+ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI()
     : ThreadedObserver<SSL_WrapperPacket>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
-          ssl_wrapper_packet_buffer_size, false)),
+          SSL_WRAPPER_PACKET_BUFFER_SIZE, false)),
       view_area_buffer(
-          std::make_shared<ThreadSafeBuffer<Rectangle>>(view_area_buffer_size, false)),
+          std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
       application_shutting_down(false),
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
-    run_standalone_simulator_gui_thread =
-        std::thread(&ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI,
-                    this, argc, argv);
+    run_standalone_simulator_gui_thread = std::thread(
+        &ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI, this);
 }
 
 ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
@@ -35,9 +34,14 @@ ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
     run_standalone_simulator_gui_thread.join();
 }
 
-void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(int argc,
-                                                                        char** argv)
+void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI()
 {
+    // We mock empty argc and argv since they don't affect the behaviour of the GUI.
+    // This way we don't need to pass them all the way down from the start of the
+    // program
+    char* argv[] = {NULL};
+    int argc     = sizeof(argv) / sizeof(char*) - 1;
+
     // We use raw pointers to have explicit control over the order of destruction.
     // For some reason, putting the QApplication and SimulatorGUI on the stack does
     // not work, despite theoretically having the same order of destruction
