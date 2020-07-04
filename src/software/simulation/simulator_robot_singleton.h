@@ -4,8 +4,10 @@
 #include <optional>
 
 #include "software/simulation/simulator_robot.h"
+
 extern "C"
 {
+#include "shared/proto/primitive.nanopb.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/firmware_robot.h"

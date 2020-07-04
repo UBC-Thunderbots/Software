@@ -9,9 +9,10 @@
 
 extern "C"
 {
-#include "shared/proto/primitive.pb.h"
+#include "shared/proto/primitive.nanopb.h"
 #include "firmware/app/primitives/primitive_manager.h"
 }
+
 
 /**
  * Because the PrimitiveManager_t struct is defined in the .c file (rather than the .h

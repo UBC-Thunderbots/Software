@@ -101,7 +101,7 @@ void SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
     )
 {
     checkValidAndExecuteVoid(
-        [firmware_world, primitive](auto robot) {
+        [firmware_world, &primitive](auto robot) {
             robot->startNewPrimitive(firmware_world, primitive);
         });
 }

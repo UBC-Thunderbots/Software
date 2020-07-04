@@ -3,6 +3,12 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 package(default_visibility = ["//visibility:public"])
 
 proto_library(
+    name = "deleteme_proto",
+    srcs = ["deleteme.proto"],
+    deps = [],
+)
+
+proto_library(
     name = "ssl_proto",
     srcs = [
         "messages_robocup_ssl_detection.proto",

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "primitive.h"
-#include "shared/proto/primitive.pb.h"
+#include "shared/proto/primitive.nanopb.h"
 
 extern const primitive_t SHOOT_PRIMITIVE;
 

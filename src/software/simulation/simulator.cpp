@@ -100,7 +100,7 @@ void Simulator::setRobotPrimitives(
             auto firmware_world  = (*simulator_robots_iter).second;
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
             SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-                firmware_world, primitive_index, primitive_params);
+                firmware_world, *primitive);
         }
     }
 }

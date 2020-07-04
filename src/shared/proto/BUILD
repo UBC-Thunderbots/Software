@@ -15,7 +15,7 @@ proto_library(
         "vision.proto",
     ],
     deps = [
-        "//software/proto:grsim_proto",
+        "//software/proto:deleteme_proto",
     ],
 )
 

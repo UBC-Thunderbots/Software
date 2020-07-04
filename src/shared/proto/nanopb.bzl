@@ -3,9 +3,10 @@ load("@rules_cc//cc:toolchain_utils.bzl", "find_cpp_toolchain")
 
 def _nanopb_proto_library_impl(ctx):
     # This is the folder we will place all our generation artifacts in
-    #generation_folder_name = ctx.attr.name + "_nanopb_gen/"
+    generation_folder_name = ctx.attr.name + "_nanopb_gen/"
 
-    # Gather all the proto files from dependencies
+    # Generate import flags for the protobuf compiler so it can find proto files we
+    # depend on, and a list of proto files to include
     all_proto_files = depset()
     for dep in ctx.attr.deps:
         all_proto_files = depset(
@@ -17,7 +18,7 @@ def _nanopb_proto_library_impl(ctx):
 
     for proto_file in all_proto_files.to_list():
         # Generate the `.pb` files using the protobuf compiler
-        pb_file_name = proto_file.path[:-len(".proto")] + ".pb"
+        pb_file_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb"
         pb_file = ctx.actions.declare_file(pb_file_name)
 
         ctx.actions.run(
@@ -30,20 +31,17 @@ def _nanopb_proto_library_impl(ctx):
         )
 
         # Generate the equivalent C code using Nanopb
-        print(proto_file)
-        print(proto_file.root.path)
-        h_out_name = proto_file.path[:-len(".proto")] + ".pb.h"
-        c_out_name = proto_file.path[:-len(".proto")] + ".pb.c"
+        h_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".nanopb.h"
+        c_out_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".nanopb.c"
         c_out = ctx.actions.declare_file(c_out_name)
         h_out = ctx.actions.declare_file(h_out_name)
-        print(h_out.path)
 
         ctx.actions.run_shell(
             tools = [ctx.executable.nanopb_generator],
             inputs = [pb_file],
             outputs = [c_out, h_out],
             mnemonic = "NanopbGeneration",
-            command = "%s %s" % (ctx.executable.nanopb_generator.path, pb_file.path),
+            command = "%s -e .nanopb %s" % (ctx.executable.nanopb_generator.path, pb_file.path),
         )
 
         all_proto_src_files.append(c_out)
@@ -75,7 +73,8 @@ def _nanopb_proto_library_impl(ctx):
         srcs = all_proto_src_files,
         public_hdrs = all_proto_hdr_files,
         includes = [
-            ctx.genfiles_dir.path,
+            ctx.genfiles_dir.path + "/" + ctx.build_file_path[:-len("BUILD")] +
+            generation_folder_name,
         ],
         compilation_contexts = nanopb_compilation_contexts,
     )

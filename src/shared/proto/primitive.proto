@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 // TODO: doc comments?
+import "software/proto/deleteme.proto";
 
 message PrimitiveParamsMsg {
     // The parameters for the primitive
@@ -22,7 +23,6 @@ message PrimitiveMsg {
         PrimitiveParamsMsg stop = 2;
         PrimitiveParamsMsg dribble = 3;
         PrimitiveParamsMsg shoot = 4;
-        PrimitiveParamsMsg catch = 5;
         PrimitiveParamsMsg pivot = 6;
         PrimitiveParamsMsg spin = 7;
         PrimitiveParamsMsg direct_wheels = 8;
