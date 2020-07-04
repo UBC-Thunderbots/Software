@@ -111,6 +111,19 @@ class Simulator
     void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
 
     /**
+     * Sets the primitive being simulated by the robot on the corresponding team
+     * in simulation
+     *
+     * @param id The id of the robot to set the primitive for
+     * @param primitive_index The index (type) of the primitive to set
+     * @param params The parameters for the specified primitive
+     */
+    void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
+                                 const primitive_params_t& params);
+    void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
+                               const primitive_params_t& params);
+
+    /**
      * Advances the simulation by the given time step. This will simulate
      * one "camera frame" of data and increase the camera_frame value by 1.
      *
@@ -172,6 +185,31 @@ class Simulator
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
         const std::shared_ptr<SimulatorBall>& simulator_ball);
+
+    /**
+     * Sets the primitive being simulated by the robot in simulation
+     *
+     * @param id The id of the robot to set the primitive for
+     * @param primitive_index The index of the primitive to set
+     * @param params The parameters for the specified primitive
+     * @param simulator_robots The robots to set the primitives on
+     * @param simulator_ball The simulator ball to use in the primitives
+     */
+    static void setRobotPrimitive(
+        RobotId id, unsigned int primitive_index, primitive_params_t params,
+        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+            simulator_robots,
+        const std::shared_ptr<SimulatorBall>& simulator_ball);
+
+    /**
+     * Returns the encoded primitive parameters for the given Primitive
+     *
+     * @param primitive The Primitive to get the parameters for
+     *
+     * @return The encoded primitive parameters for the given Primitive
+     */
+    static primitive_params_t getPrimitiveParams(
+        const std::unique_ptr<Primitive>& primitive);
 
     /**
      * Returns the primitive index for the given Primitive

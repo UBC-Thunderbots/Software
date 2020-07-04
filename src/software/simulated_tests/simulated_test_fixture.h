@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/ai.h"
-#include "software/gui/visualizer/visualizer_wrapper.h"
+#include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
@@ -24,9 +24,9 @@ class SimulatedTestFixture : public ::testing::Test
     void SetUp() override;
 
     /**
-     * This function enables the Visualizer while a test is running, so that the test can
-     * be debugged Visually. Simply call this function at the start of the test(s) you
-     * want to show in the Visualizer.
+     * This function enables the FullSystemGUI while a test is running, so that the test
+     * can be debugged Visually. Simply call this function at the start of the test(s) you
+     * want to show in the FullSystemGUI.
      */
     void enableVisualizer();
 
@@ -92,11 +92,20 @@ class SimulatedTestFixture : public ::testing::Test
     void setEnemyGoalie(RobotId goalie_id);
 
     /**
-     * Sets the play to run in the simulated test
+     * Sets the AI play to run in the simulated test
      *
-     * @param play_name The name of the play
+     * @param ai_play The name of the AI play
      */
-    void setPlay(const std::string& play_name);
+    void setAIPlay(const std::string& ai_play);
+
+    /**
+     * Sets the Refbox game state to override for the simulated test
+     *
+     * @param current_refbox_game_state The name of the current game state to set
+     * @param previous_refbox_game_state The name of the previous game state to set
+     */
+    void setRefboxGameState(const RefboxGameState& current_refbox_game_state,
+                            const RefboxGameState& previous_refbox_game_state);
 
     /**
      * Returns the field in the simulated test
@@ -152,7 +161,7 @@ class SimulatedTestFixture : public ::testing::Test
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
 
-    std::shared_ptr<VisualizerWrapper> visualizer;
+    std::shared_ptr<ThreadedFullSystemGUI> full_system_gui;
     // If false, runs the simulation as fast as possible.
     // If true, introduces artificial delay so that simulation
     // time passes at the same speed a real life time

@@ -9,10 +9,8 @@
 
 extern "C"
 {
-#include "shared/proto/primitive.nanopb.h"
 #include "firmware/app/primitives/primitive_manager.h"
 }
-
 
 /**
  * Because the PrimitiveManager_t struct is defined in the .c file (rather than the .h
@@ -224,10 +222,12 @@ class SimulatorRobot
      * Sets the current primitive this robot is running to a new one
      *
      * @param firmware_world The world to run the primitive in
-     * @param primitive_msg The message representing a primitive to run
+     * @param primitive_index The index of the primitive to run
+     * @param params The parameters for the primitive
      */
     void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                           const PrimitiveMsg& primitive_msg);
+                           unsigned int primitive_index,
+                           const primitive_params_t& params);
 
     /**
      * Runs the current primitive
@@ -297,5 +297,6 @@ class SimulatorRobot
     std::vector<PhysicsBall*> balls_in_dribbler_area;
 
     std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter> primitive_manager;
-    std::optional<PrimitiveMsg> current_primitive;
+    std::optional<unsigned int> current_primitive_index;
+    std::optional<primitive_params_t> current_primitive_params;
 };

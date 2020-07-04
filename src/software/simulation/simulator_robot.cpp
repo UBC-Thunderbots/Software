@@ -365,10 +365,11 @@ void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
 }
 
 void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                       const PrimitiveMsg& primitive_msg)
+                                       unsigned int primitive_index,
+                                       const primitive_params_t &params)
 {
-app_primitive_manager_startNewPrimitive(primitive_manager.get(), firmware_world.get(),
-                                            primitive_msg);
+    app_primitive_manager_startNewPrimitive(primitive_manager.get(), firmware_world.get(),
+                                            primitive_index, &params);
 }
 
 void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world)

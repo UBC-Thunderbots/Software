@@ -1,13 +1,13 @@
-#include "software/gui/standalone_simulator/standalone_simulator_gui_wrapper.h"
+#include "software/gui/standalone_simulator/threaded_standalone_simulator_gui.h"
 #include "software/logger/logger.h"
 #include "software/simulation/threaded_simulator.h"
 #include "software/world/field.h"
 
-int main(int argc, char *argv[])
+int main()
 {
     LoggerSingleton::initializeLogger();
 
-    StandaloneSimulatorGUIWrapper standalone_simulator_gui_wrapper(argc, argv);
+    ThreadedStandaloneSimulatorGUI standalone_simulator_gui_wrapper;
     ThreadedSimulator simulator = ThreadedSimulator(Field::createSSLDivisionBField());
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [&standalone_simulator_gui_wrapper](SSL_WrapperPacket packet) {
