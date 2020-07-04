@@ -19,7 +19,7 @@ from dynamic_parameter_schema import (
 
 class ConfigYamlLoader(object):
     @staticmethod
-    def get_config_metadata(yaml_paths):
+    def get_config_metadata(yaml_paths: list):
         """Loads the yamls in the root config directory and verifies that the
         requested configuration is valid. Then returns config_metadata dict
         with a specified format capturing all the requested params and configs.
@@ -85,7 +85,7 @@ class ConfigYamlLoader(object):
         return config_metadata
 
     @staticmethod
-    def __load_yaml_into_dict(yaml_paths):
+    def __load_yaml_into_dict(yaml_paths: list):
         """Loads the yamls into an dictionary. Any errors while in the yaml
         syntax will raise to the main thread. We also adjust how the dictionary
         is stored for easier access later.
@@ -139,7 +139,7 @@ class ConfigYamlLoader(object):
         return raw_config_metadata
 
     @staticmethod
-    def __validate_config_metadata(config_metadata):
+    def __validate_config_metadata(config_metadata: dict):
         """Validates the config_metadata that was loaded against the
         dynamic_parameter_schemas and then checks for duplicate includes
         and duplicate parameters in the same config.
@@ -222,7 +222,7 @@ class ConfigYamlLoader(object):
                         )
 
     @staticmethod
-    def __detect_cycles_in_config_metadata(config_metadata):
+    def __detect_cycles_in_config_metadata(config_metadata: dict):
         """Creates a DiGraph from all the included configs and checks if there
         are cycles. Raises to the main thread if a cycle is detected
 
