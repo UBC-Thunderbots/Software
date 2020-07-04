@@ -149,7 +149,6 @@ cc_library(
     deps = [
         ":shot",
         "//software/new_geom/util:algorithms",
-        "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
 )
@@ -188,7 +187,6 @@ cc_library(
         ":robot",
         ":shot",
         ":team",
-        "//software/parameter:dynamic_parameters",
         "//software/world:ball",
         "//software/world:field",
         "//software/world:robot",
@@ -213,7 +211,6 @@ cc_library(
     deps = [
         ":shot",
         "//shared:constants",
-        "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
 )
