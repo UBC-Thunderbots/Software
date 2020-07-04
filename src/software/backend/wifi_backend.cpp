@@ -27,6 +27,14 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
         DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
     int channel = DynamicParameters->getNetworkConfig()->Channel()->value();
 
+    MutableDynamicParameters->getMutableNetworkConfig()
+        ->mutableChannel()
+        ->registerCallbackFunction([this](int new_channel) {
+            std::string new_network_interface =
+                DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
+            joinMulticastChannel(new_channel, new_network_interface);
+        });
+
     // connect to current channel
     joinMulticastChannel(channel, network_interface);
 }
