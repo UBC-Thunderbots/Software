@@ -8,9 +8,8 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       ball(std::nullopt),
       friendly_team(),
       enemy_team(),
-      refbox_game_state(RefboxGameState::HALT),
+      game_state(),
       refbox_stage(std::nullopt),
-      ball_placement_point(std::nullopt),
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
@@ -27,17 +26,10 @@ std::optional<World> SensorFusion::getWorld() const
     if (field && ball)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
+        new_world.mutableGameState() = game_state;
         if (refbox_stage)
         {
             new_world.updateRefboxStage(*refbox_stage);
-        }
-        if (ball_placement_point)
-        {
-            new_world.updateGameState(refbox_game_state, *ball_placement_point);
-        }
-        else
-        {
-            new_world.updateGameState(refbox_game_state);
         }
         return new_world;
     }
@@ -92,19 +84,20 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
-        refbox_game_state = createRefboxGameState(packet, TeamColour::YELLOW);
+        game_state.updateRefboxGameState(
+            createRefboxGameState(packet, TeamColour::YELLOW));
     }
     else
     {
-        refbox_game_state = createRefboxGameState(packet, TeamColour::BLUE);
+        game_state.updateRefboxGameState(createRefboxGameState(packet, TeamColour::BLUE));
     }
 
-    if (refbox_game_state == RefboxGameState::BALL_PLACEMENT_US)
+    if (game_state.isOurBallPlacement())
     {
         auto pt = getBallPlacementPoint(packet);
         if (pt)
         {
-            ball_placement_point = pt;
+            game_state.setBallPlacementPoint(*pt);
         }
         else
         {
@@ -112,10 +105,6 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
                 << "In BALL_PLACEMENT_US game state, but no ball placement point found"
                 << std::endl;
         }
-    }
-    else
-    {
-        ball_placement_point = std::nullopt;
     }
 
     refbox_stage = createRefboxStage(packet);
