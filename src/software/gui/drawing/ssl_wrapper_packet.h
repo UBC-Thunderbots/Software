@@ -24,8 +24,9 @@ void drawSSLWrapperPacket(QGraphicsScene* scene,
  * Consumers may call this returned function to draw the provided wrapper
  * packet onto a QGraphicsScene.
  *
- * @param ssl_wrapper_packet The wrapper packet create a DrawFunction for
+ * @param ssl_wrapper_packet The wrapper packet create a DrawFunctionWrapper for
  *
  * @return A function that represents how to draw the provided world.
  */
-DrawFunction getDrawSSLWrapperPacketFunction(const SSL_WrapperPacket& ssl_wrapper_packet);
+WorldDrawFunction getDrawSSLWrapperPacketFunction(
+    const SSL_WrapperPacket& ssl_wrapper_packet);

@@ -42,7 +42,7 @@ include:
     description: >
       Can be true or false
 - int:
-    name: example_bool_param
+    name: example_int_param
     min: 0
     max: 5
     value: 3

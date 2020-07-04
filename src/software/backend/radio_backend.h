@@ -4,13 +4,15 @@
 #include "software/backend/input/network/networking/network_client.h"
 #include "software/backend/output/radio/radio_output.h"
 #include "software/backend/ssl_proto_client.h"
+#include "software/parameter/dynamic_parameters.h"
 
 class RadioBackend : public Backend
 {
    public:
     static const std::string name;
 
-    RadioBackend();
+    RadioBackend(std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config =
+                     DynamicParameters->getNetworkConfig()->getSSLCommunicationConfig());
 
    private:
     static const int DEFAULT_RADIO_CONFIG = 0;
@@ -32,6 +34,8 @@ class RadioBackend : public Backend
      * @param robot_status The RobotStatus
      */
     void receiveRobotStatus(RobotStatus robot_status);
+
+    const std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config;
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;

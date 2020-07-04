@@ -11,17 +11,19 @@ ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::make_address(ip_address), port);
     socket_.open(listen_endpoint.protocol());
+    socket_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
     try
     {
         socket_.bind(listen_endpoint);
     }
     catch (const boost::exception& ex)
     {
-        LOG(FATAL) << "There was an issue binding the socket to the endpoint when"
-                      "trying to connect to the multicast address. This may"
-                      "be due to another instance of the ProtoMulicastListener running"
-                      "and using the port already"
-                   << std::endl;
+        LOG(FATAL) << "ProtoMulticastListener: There was an issue binding the socket to "
+                      "the listen_endpoint when trying to connect to the multicast "
+                      "address. This may be due to another instance of the "
+                      "ProtoMulicastListener running and using the port already. "
+                      "(ip = "
+                   << ip_address << ", port = " << port << ")" << std::endl;
     }
 
     // Join the multicast group.

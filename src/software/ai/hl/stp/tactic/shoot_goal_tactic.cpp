@@ -11,7 +11,7 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
                                  Angle min_net_open_angle,
                                  std::optional<Point> chip_target, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapabilities::Capability::Kick}),
+    : Tactic(loop_forever, {RobotCapability::Kick}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -43,8 +43,8 @@ void ShootGoalTactic::updateControlParams(std::optional<Point> chip_target)
 
 double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
-    auto ball_intercept_opt =
-        findBestInterceptForBall(world.ball(), world.field(), robot);
+    auto ball_intercept_opt = findBestInterceptForBall(
+        world.ball().currentState(), world.field(), robot.currentState());
     double cost = 0;
     if (ball_intercept_opt)
     {
@@ -79,11 +79,11 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     Vector front_of_robot_dir =
         Vector(robot->orientation().cos(), robot->orientation().sin());
 
-    auto steal_ball_rect_width = Util::DynamicParameters->getAIConfig()
+    auto steal_ball_rect_width = DynamicParameters->getAIConfig()
                                      ->getShootGoalTacticConfig()
                                      ->EnemyAboutToStealBallRectangleWidth()
                                      ->value();
-    auto steal_ball_rect_length = Util::DynamicParameters->getAIConfig()
+    auto steal_ball_rect_length = DynamicParameters->getAIConfig()
                                       ->getShootGoalTacticConfig()
                                       ->EnemyAboutToStealBallRectangleExtensionLength()
                                       ->value();

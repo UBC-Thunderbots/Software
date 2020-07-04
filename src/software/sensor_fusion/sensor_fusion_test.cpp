@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
@@ -10,7 +11,7 @@ class SensorFusionTest : public ::testing::Test
 {
    public:
     SensorFusionTest()
-        : sensor_fusion(),
+        : sensor_fusion(DynamicParameters->getSensorFusionConfig()),
           yellow_robot_states(initYellowRobotStates()),
           blue_robot_states(initBlueRobotStates()),
           ball_state(Point(-1.2, 0), Vector(0.0, 0.0), 0.2),
@@ -19,7 +20,10 @@ class SensorFusionTest : public ::testing::Test
           detection_frame(initDetectionFrame()),
           test_world(initWorld()),
           tbots_robot_msg_id_1(initTbotsRobotMsgId1()),
-          tbots_robot_msg_id_2(initTbotsRobotMsgId2())
+          tbots_robot_msg_id_2(initTbotsRobotMsgId2()),
+          referee_indirect_yellow(initRefereeIndirectYellow()),
+          referee_indirect_blue(initRefereeIndirectBlue()),
+          referee_normal_start(initRefereeNormalStart())
     {
     }
 
@@ -34,6 +38,9 @@ class SensorFusionTest : public ::testing::Test
     World test_world;
     std::unique_ptr<TbotsRobotMsg> tbots_robot_msg_id_1;
     std::unique_ptr<TbotsRobotMsg> tbots_robot_msg_id_2;
+    std::unique_ptr<SSL_Referee> referee_indirect_yellow;
+    std::unique_ptr<SSL_Referee> referee_indirect_blue;
+    std::unique_ptr<SSL_Referee> referee_normal_start;
 
    private:
     /**
@@ -143,6 +150,27 @@ class SensorFusionTest : public ::testing::Test
 
         return std::move(robot_msg);
     }
+
+    std::unique_ptr<SSL_Referee> initRefereeIndirectYellow()
+    {
+        auto ref_msg = std::make_unique<SSL_Referee>();
+        ref_msg->set_command(SSL_Referee_Command_INDIRECT_FREE_YELLOW);
+        return ref_msg;
+    }
+
+    std::unique_ptr<SSL_Referee> initRefereeIndirectBlue()
+    {
+        auto ref_msg = std::make_unique<SSL_Referee>();
+        ref_msg->set_command(SSL_Referee_Command_INDIRECT_FREE_BLUE);
+        return ref_msg;
+    }
+
+    std::unique_ptr<SSL_Referee> initRefereeNormalStart()
+    {
+        auto ref_msg = std::make_unique<SSL_Referee>();
+        ref_msg->set_command(SSL_Referee_Command_NORMAL_START);
+        return ref_msg;
+    }
 };
 
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
@@ -150,7 +178,7 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
     SensorMsg sensor_msg;
     auto ssl_wrapper_packet =
         createWrapperPacket(std::move(geom_data), std::unique_ptr<SSL_DetectionFrame>());
-    *(sensor_msg.mutable_ssl_vision_msg()) = *(ssl_wrapper_packet.release());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
@@ -161,7 +189,7 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
     SensorMsg sensor_msg;
     auto ssl_wrapper_packet = createWrapperPacket(std::unique_ptr<SSL_GeometryData>(),
                                                   std::move(detection_frame));
-    *(sensor_msg.mutable_ssl_vision_msg()) = *(ssl_wrapper_packet.release());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
@@ -172,7 +200,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_packet)
     SensorMsg sensor_msg;
     auto ssl_wrapper_packet =
         createWrapperPacket(std::move(geom_data), std::move(detection_frame));
-    *(sensor_msg.mutable_ssl_vision_msg()) = *(ssl_wrapper_packet.release());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
     ASSERT_TRUE(sensor_fusion.getWorld());
@@ -183,7 +211,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_packet)
 TEST_F(SensorFusionTest, test_tbots_robot_msg_packet)
 {
     SensorMsg sensor_msg;
-    *(sensor_msg.add_tbots_robot_msgs()) = *(tbots_robot_msg_id_1.release());
+    *(sensor_msg.add_tbots_robot_msgs()) = *tbots_robot_msg_id_1;
     sensor_fusion.updateWorld(sensor_msg);
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
 }
@@ -193,18 +221,18 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_tbots_robot_msg_1_at_a_time)
     SensorMsg sensor_msg_1;
     auto ssl_wrapper_packet =
         createWrapperPacket(std::move(geom_data), std::move(detection_frame));
-    *(sensor_msg_1.mutable_ssl_vision_msg()) = *(ssl_wrapper_packet.release());
-    *(sensor_msg_1.add_tbots_robot_msgs())   = *(tbots_robot_msg_id_1.release());
+    *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg_1.add_tbots_robot_msgs())   = *tbots_robot_msg_id_1;
     sensor_fusion.updateWorld(sensor_msg_1);
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result_1 = *sensor_fusion.getWorld();
-    // TODO (issue #1149): Add checks on the state of World
+    // TODO (Issue #1276): Add checks on the state of World
     SensorMsg sensor_msg_2;
-    *(sensor_msg_2.add_tbots_robot_msgs()) = *(tbots_robot_msg_id_2.release());
+    *(sensor_msg_2.add_tbots_robot_msgs()) = *tbots_robot_msg_id_2;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
-    // TODO (issue #1149): Add checks on the state of World
+    // TODO (Issue #1276): Add checks on the state of World
 }
 
 TEST_F(SensorFusionTest, test_complete_wrapper_with_tbots_robot_msg_2_at_a_time)
@@ -212,16 +240,70 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_tbots_robot_msg_2_at_a_time)
     SensorMsg sensor_msg_1;
     auto ssl_wrapper_packet =
         createWrapperPacket(std::move(geom_data), std::move(detection_frame));
-    *(sensor_msg_1.mutable_ssl_vision_msg()) = *(ssl_wrapper_packet.release());
+    *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     sensor_fusion.updateWorld(sensor_msg_1);
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result_1 = *sensor_fusion.getWorld();
-    // TODO (issue #1149): Add checks on the state of World
+    // TODO (Issue #1276): Add checks on the state of World
     SensorMsg sensor_msg_2;
-    *(sensor_msg_2.add_tbots_robot_msgs()) = *(tbots_robot_msg_id_1.release());
-    *(sensor_msg_2.add_tbots_robot_msgs()) = *(tbots_robot_msg_id_2.release());
+    *(sensor_msg_2.add_tbots_robot_msgs()) = *tbots_robot_msg_id_1;
+    *(sensor_msg_2.add_tbots_robot_msgs()) = *tbots_robot_msg_id_2;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
-    // TODO (issue #1149): Add checks on the state of World
+    // TODO (Issue #1276): Add checks on the state of World
+}
+
+TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
+{
+    // TODO (Issue #960): Dependency inject config so that we don't have to implicitly
+    // assume that friendly is yellow
+    GameState expected_1;
+    expected_1.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_US);
+
+    GameState expected_2 = expected_1;
+    expected_2.updateRefboxGameState(RefboxGameState::NORMAL_START);
+
+    SensorMsg sensor_msg_1;
+    auto ssl_wrapper_packet =
+        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+    // set vision msg so that world is valid
+    *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_yellow;
+    sensor_fusion.updateWorld(sensor_msg_1);
+    World result_1 = *sensor_fusion.getWorld();
+    EXPECT_EQ(expected_1, result_1.gameState());
+
+    SensorMsg sensor_msg_2;
+    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
+    sensor_fusion.updateWorld(sensor_msg_2);
+    World result_2 = *sensor_fusion.getWorld();
+    EXPECT_EQ(expected_2, result_2.gameState());
+}
+
+TEST_F(SensorFusionTest, test_referee_blue_then_normal)
+{
+    // TODO (Issue #960): Dependency inject config so that we don't have to implicitly
+    // assume that friendly is yellow
+    GameState expected_1;
+    expected_1.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_THEM);
+
+    GameState expected_2 = expected_1;
+    expected_2.updateRefboxGameState(RefboxGameState::NORMAL_START);
+
+    SensorMsg sensor_msg_1;
+    auto ssl_wrapper_packet =
+        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+    // set vision msg so that world is valid
+    *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_blue;
+    sensor_fusion.updateWorld(sensor_msg_1);
+    World result_1 = *sensor_fusion.getWorld();
+    EXPECT_EQ(expected_1, result_1.gameState());
+
+    SensorMsg sensor_msg_2;
+    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
+    sensor_fusion.updateWorld(sensor_msg_2);
+    World result_2 = *sensor_fusion.getWorld();
+    EXPECT_EQ(expected_2, result_2.gameState());
 }

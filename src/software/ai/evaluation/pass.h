@@ -12,7 +12,7 @@
 /**
  * Calculate how long it would take the given robot to turn to the given orientation
  *
- * @param robot The robot to calculate the rotation time for
+ * @param current_orientation The current orientation of the robot
  * @param desired_orientation The orientation which we want the robot to be at
  * @param max_velocity The maximum angular velocity that robot can turn at (rad/s)
  * @param max_acceleration The maximum angular rate at which the robot can
@@ -20,7 +20,7 @@
  *
  * @return The time required for the given robot to rotate to the given orientation
  */
-Duration getTimeToOrientationForRobot(const Robot& robot,
+Duration getTimeToOrientationForRobot(const Angle& current_orientation,
                                       const Angle& desired_orientation,
                                       const double& max_velocity,
                                       const double& max_acceleration);
@@ -30,7 +30,7 @@ Duration getTimeToOrientationForRobot(const Robot& robot,
  *
  * This is only a rough calculation in order to be as performant as possible
  *
- * @param robot The robot to calculate the time for
+ * @param start The starting point of robot
  * @param dest The destination that the robot is going to
  * @param max_velocity The maximum linear velocity the robot can travel at (m/s)
  * @param max_acceleration The maximum acceleration of the robot (m/s^2)
@@ -40,7 +40,7 @@ Duration getTimeToOrientationForRobot(const Robot& robot,
  * @return The minimum theoretical time it would take the robot to reach the dest
  * point
  */
-Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
-                                   const double& max_velocity,
-                                   const double& max_acceleration,
-                                   const double& tolerance_meters = 0);
+Duration getTimeToPositionForRobot(const Point& start, const Point& dest,
+                                   const double max_velocity,
+                                   const double max_acceleration,
+                                   const double tolerance_meters = 0);

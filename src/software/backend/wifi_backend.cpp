@@ -8,20 +8,32 @@
 
 const std::string WifiBackend::name = "wifi";
 
-WifiBackend::WifiBackend()
-    : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_VISION_MULTICAST_PORT,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
-                    boost::bind(&WifiBackend::receiveWorld, this, _1),
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig(),
-                    Util::DynamicParameters->getCameraConfig()),
+WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
+    : network_config(network_config),
+      network_input(
+          network_config->getSSLCommunicationConfig()->VisionIPv4Address()->value(),
+          network_config->getSSLCommunicationConfig()->VisionPort()->value(),
+          network_config->getSSLCommunicationConfig()
+              ->GamecontrollerIPv4Address()
+              ->value(),
+          network_config->getSSLCommunicationConfig()->GamecontrollerPort()->value(),
+          boost::bind(&WifiBackend::receiveWorld, this, _1),
+          DynamicParameters->getSensorFusionConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
-                       boost::bind(&Backend::receiveSSLReferee, this, _1))
+                       boost::bind(&Backend::receiveSSLReferee, this, _1),
+                       network_config->getSSLCommunicationConfig())
 {
     std::string network_interface =
-        Util::DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
-    int channel = Util::DynamicParameters->getNetworkConfig()->Channel()->value();
+        DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
+    int channel = DynamicParameters->getNetworkConfig()->Channel()->value();
+
+    MutableDynamicParameters->getMutableNetworkConfig()
+        ->mutableChannel()
+        ->registerCallbackFunction([this](int new_channel) {
+            std::string new_network_interface =
+                DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
+            joinMulticastChannel(new_channel, new_network_interface);
+        });
 
     // connect to current channel
     joinMulticastChannel(channel, network_interface);

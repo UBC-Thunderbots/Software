@@ -5,5 +5,9 @@ package(default_visibility = ["//software/gui/standalone_simulator:__subpackages
 qt_ui_library(
     name = "main_widget",
     ui = "main_widget.ui",
-    deps = ["@qt//:qt_widgets"],
+    deps = [
+        # Need to include targets used in promoted widgets
+        "//software/gui/generic_widgets/draw_function_visualizer",
+        "@qt//:qt_widgets",
+    ],
 )

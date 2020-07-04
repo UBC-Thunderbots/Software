@@ -6,19 +6,9 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
-#include "software/gui/visualizer/visualizer_wrapper.h"
+#include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
-
-// Member variables we need to maintain state
-// They are kept in an anonymous namespace so they are not accessible outside this
-// file and are not created as global static variables.
-namespace
-{
-    std::shared_ptr<AIWrapper> ai;
-    std::shared_ptr<Backend> backend;
-    std::shared_ptr<VisualizerWrapper> visualizer;
-}  // namespace
 
 struct commandLineArgs
 {
@@ -40,18 +30,6 @@ std::string BANNER =
 "   /,'                                                                                                                    /,'       \n"
 "  /'                                                                                                                     /'          \n";
 // clang-format on
-
-void setBackendFromString(std::string backend_name)
-{
-    try
-    {
-        backend = GenericFactory<std::string, Backend>::create(backend_name);
-    }
-    catch (const std::invalid_argument &e)
-    {
-        LOG(FATAL) << e.what();
-    }
-}
 
 /**
  * Parses Arguments and Indicates which arguments were received
@@ -81,7 +59,7 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
         boost::program_options::value<std::string>(&args.backend_name)->required(),
         backend_help_str.c_str())("headless",
                                   boost::program_options::bool_switch(&args.headless),
-                                  "Run without the Visualizer");
+                                  "Run without the FullSystemGUI");
 
     boost::program_options::variables_map vm;
     try
@@ -104,25 +82,6 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     return args;
 }
 
-/**
- * Connects all the observers together
- *
- * @param headless - determines whether or not the visualizer is run (false to run
- * visualizer)
- */
-void connectObservers(bool headless)
-{
-    backend->Subject<World>::registerObserver(ai);
-    ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
-    if (!headless)
-    {
-        backend->Subject<World>::registerObserver(visualizer);
-        ai->Subject<AIDrawFunction>::registerObserver(visualizer);
-        ai->Subject<PlayInfo>::registerObserver(visualizer);
-        backend->Subject<RobotStatus>::registerObserver(visualizer);
-    }
-}
-
 int main(int argc, char **argv)
 {
     std::cout << BANNER << std::endl;
@@ -135,30 +94,35 @@ int main(int argc, char **argv)
     {
         // Setup dynamic parameters
         // TODO (Issue #960): Once we're using injected parameters everywhere (instead of
-        //                    just global accesses, `Util::DynamicParameters` should be
+        //                    just global accesses, `DynamicParameters` should be
         //                    deleted, and we should just create an instance here instead)
-        std::shared_ptr<const AIConfig> ai_config =
-            Util::DynamicParameters->getAIConfig();
+        std::shared_ptr<const AIConfig> ai_config = DynamicParameters->getAIConfig();
         std::shared_ptr<const AIControlConfig> ai_control_config =
-            Util::DynamicParameters->getAIControlConfig();
+            DynamicParameters->getAIControlConfig();
 
-        // The ai has to be initialized after the backend (which is started in
-        // parseCommandLineArgs) This is a bug. See #834
-        ai = std::make_shared<AIWrapper>(ai_config, ai_control_config);
+        std::shared_ptr<Backend> backend =
+            GenericFactory<std::string, Backend>::create(args.backend_name);
+        auto ai = std::make_shared<AIWrapper>(ai_config, ai_control_config);
+        std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
-        setBackendFromString(args.backend_name);
-
+        // Connect observers
+        ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
+        backend->Subject<World>::registerObserver(ai);
         if (!args.headless)
         {
-            visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
+            visualizer = std::make_shared<ThreadedFullSystemGUI>();
+
+            backend->Subject<World>::registerObserver(visualizer);
+            ai->Subject<AIDrawFunction>::registerObserver(visualizer);
+            ai->Subject<PlayInfo>::registerObserver(visualizer);
+            backend->Subject<RobotStatus>::registerObserver(visualizer);
         }
 
-        connectObservers(args.headless);
-
+        // Wait for termination
         if (!args.headless)
         {
             // This blocks forever without using the CPU
-            // Wait for the visualizer to shut down before shutting
+            // Wait for the full_system to shut down before shutting
             // down the rest of the system
             visualizer->getTerminationPromise()->get_future().wait();
         }

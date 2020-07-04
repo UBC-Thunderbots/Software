@@ -1,22 +1,26 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
-#include "software/constants.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
 
-SensorFusion::SensorFusion()
-    : field(std::nullopt),
+SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
+    : sensor_fusion_config(sensor_fusion_config),
+      history_size(20),
+      field(std::nullopt),
       ball(std::nullopt),
       friendly_team(),
       enemy_team(),
-      refbox_game_state(RefboxGameState::HALT),
+      game_state(),
       refbox_stage(std::nullopt),
-      ball_placement_point(std::nullopt),
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
-      enemy_team_filter()
+      enemy_team_filter(),
+      ball_states(history_size)
 {
+    if (!sensor_fusion_config)
+    {
+        throw std::invalid_argument("SensorFusion created with null SensorFusionConfig");
+    }
 }
 
 std::optional<World> SensorFusion::getWorld() const
@@ -24,17 +28,10 @@ std::optional<World> SensorFusion::getWorld() const
     if (field && ball)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
+        new_world.mutableGameState() = game_state;
         if (refbox_stage)
         {
             new_world.updateRefboxStage(*refbox_stage);
-        }
-        if (ball_placement_point)
-        {
-            new_world.updateGameState(refbox_game_state, *ball_placement_point);
-        }
-        else
-        {
-            new_world.updateGameState(refbox_game_state);
         }
         return new_world;
     }
@@ -83,28 +80,26 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
     }
 }
 
-void SensorFusion::updateWorld(const Referee &packet)
+void SensorFusion::updateWorld(const SSL_Referee &packet)
 {
-    // TODO remove Util::DynamicParameters as part of
+    // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    if (Util::DynamicParameters->getAIControlConfig()
-            ->getRefboxConfig()
-            ->FriendlyColorYellow()
-            ->value())
+    if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
-        refbox_game_state = createRefboxGameState(packet, TeamColour::YELLOW);
+        game_state.updateRefboxGameState(
+            createRefboxGameState(packet, TeamColour::YELLOW));
     }
     else
     {
-        refbox_game_state = createRefboxGameState(packet, TeamColour::BLUE);
+        game_state.updateRefboxGameState(createRefboxGameState(packet, TeamColour::BLUE));
     }
 
-    if (refbox_game_state == RefboxGameState::BALL_PLACEMENT_US)
+    if (game_state.isOurBallPlacement())
     {
         auto pt = getBallPlacementPoint(packet);
         if (pt)
         {
-            ball_placement_point = pt;
+            game_state.setBallPlacementPoint(*pt);
         }
         else
         {
@@ -112,10 +107,6 @@ void SensorFusion::updateWorld(const Referee &packet)
                 << "In BALL_PLACEMENT_US game state, but no ball placement point found"
                 << std::endl;
         }
-    }
-    else
-    {
-        ball_placement_point = std::nullopt;
     }
 
     refbox_stage = createRefboxStage(packet);
@@ -129,92 +120,90 @@ void SensorFusion::updateWorld(
 
 void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 {
-    // TODO remove Util::DynamicParameters as part of
+    // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    double min_valid_x = Util::DynamicParameters->getAIControlConfig()
-                             ->getRefboxConfig()
-                             ->MinValidX()
-                             ->value();
-    double max_valid_x = Util::DynamicParameters->getAIControlConfig()
-                             ->getRefboxConfig()
-                             ->MaxValidX()
-                             ->value();
-    bool ignore_invalid_camera_data = Util::DynamicParameters->getAIControlConfig()
-                                          ->getRefboxConfig()
-                                          ->IgnoreInvalidCameraData()
-                                          ->value();
+    double min_valid_x = sensor_fusion_config->MinValidX()->value();
+    double max_valid_x = sensor_fusion_config->MaxValidX()->value();
+    bool ignore_invalid_camera_data =
+        sensor_fusion_config->IgnoreInvalidCameraData()->value();
 
     // We invert the field side if we explicitly choose to override the values
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    bool should_invert_field = Util::DynamicParameters->getAIControlConfig()
-                                   ->getRefboxConfig()
-                                   ->OverrideRefboxDefendingSide()
-                                   ->value() &&
-                               Util::DynamicParameters->getAIControlConfig()
-                                   ->getRefboxConfig()
-                                   ->DefendingPositiveSide()
-                                   ->value();
+    const bool override_refbox_defending_side =
+        sensor_fusion_config->OverrideRefboxDefendingSide()->value();
+    const bool defending_positive_side =
+        sensor_fusion_config->DefendingPositiveSide()->value();
+    const bool should_invert_field =
+        override_refbox_defending_side && defending_positive_side;
 
-    // TODO remove Util::DynamicParameters as part of
+    // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    bool friendly_team_is_yellow = Util::DynamicParameters->getAIControlConfig()
-                                       ->getRefboxConfig()
-                                       ->FriendlyColorYellow()
-                                       ->value();
+    bool friendly_team_is_yellow = sensor_fusion_config->FriendlyColorYellow()->value();
 
     std::optional<TimestampedBallState> new_ball_state;
-    if (isCameraEnabled(ssl_detection_frame))
+    auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
+                                                max_valid_x, ignore_invalid_camera_data);
+    auto yellow_team =
+        createTeamDetection({ssl_detection_frame}, TeamColour::YELLOW, min_valid_x,
+                            max_valid_x, ignore_invalid_camera_data);
+    auto blue_team =
+        createTeamDetection({ssl_detection_frame}, TeamColour::BLUE, min_valid_x,
+                            max_valid_x, ignore_invalid_camera_data);
+
+    if (should_invert_field)
     {
-        auto ball_detections = createBallDetections(
-            {ssl_detection_frame}, min_valid_x, max_valid_x, ignore_invalid_camera_data);
-        auto yellow_team =
-            createTeamDetection({ssl_detection_frame}, TeamColour::YELLOW, min_valid_x,
-                                max_valid_x, ignore_invalid_camera_data);
-        auto blue_team =
-            createTeamDetection({ssl_detection_frame}, TeamColour::BLUE, min_valid_x,
-                                max_valid_x, ignore_invalid_camera_data);
+        for (auto &detection : ball_detections)
+        {
+            invert(detection);
+        }
+        for (auto &detection : yellow_team)
+        {
+            invert(detection);
+        }
+        for (auto &detection : blue_team)
+        {
+            invert(detection);
+        }
+    }
 
-        if (should_invert_field)
-        {
-            for (auto &detection : ball_detections)
-            {
-                invert(detection);
-            }
-            for (auto &detection : yellow_team)
-            {
-                invert(detection);
-            }
-            for (auto &detection : blue_team)
-            {
-                invert(detection);
-            }
-        }
-
-        new_ball_state = createTimestampedBallState(ball_detections);
-        if (friendly_team_is_yellow)
-        {
-            friendly_team = createFriendlyTeam(yellow_team);
-            enemy_team    = createEnemyTeam(blue_team);
-        }
-        else
-        {
-            friendly_team = createFriendlyTeam(blue_team);
-            enemy_team    = createEnemyTeam(yellow_team);
-        }
+    new_ball_state = createTimestampedBallState(ball_detections);
+    if (friendly_team_is_yellow)
+    {
+        friendly_team = createFriendlyTeam(yellow_team);
+        enemy_team    = createEnemyTeam(blue_team);
+    }
+    else
+    {
+        friendly_team = createFriendlyTeam(blue_team);
+        enemy_team    = createEnemyTeam(yellow_team);
     }
 
     if (new_ball_state)
     {
-        if (ball)
-        {
-            ball->updateState(*new_ball_state);
-        }
-        else
-        {
-            ball = Ball(*new_ball_state);
-        }
+        updateBall(*new_ball_state);
+    }
+}
+
+void SensorFusion::updateBall(TimestampedBallState new_ball_state)
+{
+    if (!ball_states.empty() &&
+        new_ball_state.timestamp() < ball_states.front().timestamp())
+    {
+        throw std::invalid_argument(
+            "Error: Trying to update ball state using a state older then the current state");
+    }
+
+    ball_states.push_front(new_ball_state);
+
+    if (ball)
+    {
+        ball->updateState(new_ball_state);
+    }
+    else
+    {
+        ball = Ball(new_ball_state);
     }
 }
 
@@ -234,10 +223,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-    RobotId friendly_goalie_id = Util::DynamicParameters->getAIControlConfig()
-                                     ->getRefboxConfig()
-                                     ->FriendlyGoalieId()
-                                     ->value();
+    RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
@@ -245,47 +231,12 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
-    RobotId enemy_goalie_id = Util::DynamicParameters->getAIControlConfig()
-                                  ->getRefboxConfig()
-                                  ->EnemyGoalieId()
-                                  ->value();
+    RobotId enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }
 
-bool SensorFusion::isCameraEnabled(const SSL_DetectionFrame &detection)
-{
-    bool camera_disabled = false;
-    switch (detection.camera_id())
-    {
-        // TODO: create an array of dynamic params to index into with camera_id()
-        // may be resolved by https://github.com/UBC-Thunderbots/Software/issues/960
-        case 0:
-            camera_disabled =
-                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
-            break;
-        case 1:
-            camera_disabled =
-                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_1()->value();
-            break;
-        case 2:
-            camera_disabled =
-                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_2()->value();
-            break;
-        case 3:
-            camera_disabled =
-                Util::DynamicParameters->getCameraConfig()->IgnoreCamera_3()->value();
-            break;
-        default:
-            LOG(WARNING) << "An unknown camera id was detected, disabled by default "
-                         << "id: " << detection.camera_id() << std::endl;
-            camera_disabled = true;
-            break;
-    }
-    return !camera_disabled;
-}
-
-RobotDetection SensorFusion::invert(RobotDetection robot_detection)
+RobotDetection SensorFusion::invert(RobotDetection robot_detection) const
 {
     robot_detection.position =
         Point(-robot_detection.position.x(), -robot_detection.position.y());
@@ -293,7 +244,7 @@ RobotDetection SensorFusion::invert(RobotDetection robot_detection)
     return robot_detection;
 }
 
-BallDetection SensorFusion::invert(BallDetection ball_detection)
+BallDetection SensorFusion::invert(BallDetection ball_detection) const
 {
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());

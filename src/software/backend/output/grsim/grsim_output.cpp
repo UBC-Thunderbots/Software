@@ -18,7 +18,7 @@
 using namespace boost::asio;
 
 GrSimOutput::GrSimOutput(std::string network_address, unsigned short port,
-                         std::shared_ptr<const RefboxConfig> config)
+                         std::shared_ptr<const SensorFusionConfig> config)
     : network_address(network_address), port(port), config(config), socket(io_service)
 {
     socket.open(ip::udp::v4());

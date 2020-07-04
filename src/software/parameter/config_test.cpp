@@ -1,10 +1,9 @@
-#include "software/parameter/config.hpp"
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
 
+#include "software/parameter/dynamic_parameters.h"
 #include "software/parameter/parameter.h"
 #include "software/util/variant_visitor/variant_visitor.h"
 #include "yaml-cpp/yaml.h"
@@ -98,27 +97,6 @@ class TestAutogenParameterList : public YamlLoadFixture
             // invalid key will fail the test by default
             ASSERT_EQ(param_description[param->name()]["default"].template as<T>(),
                       param->value());
-
-            // check to see if the options have been loaded correctly if they exist
-            if (param_description[param->name()]["options"])
-            {
-                std::vector<T> options = param_description[param->name()]["options"]
-                                             .template as<std::vector<T>>();
-                ASSERT_THAT(param->getOptions(),
-                            ::testing::ElementsAreArray(options.begin(), options.end()));
-            }
-
-            if (param_description[param->name()]["min"])
-            {
-                ASSERT_EQ(*param->getMin(),
-                          param_description[param->name()]["min"].template as<T>());
-            }
-
-            if (param_description[param->name()]["max"])
-            {
-                ASSERT_EQ(*param->getMax(),
-                          param_description[param->name()]["max"].template as<T>());
-            }
         }
         catch (...)
         {

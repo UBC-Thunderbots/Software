@@ -6,7 +6,7 @@
 
 #include "software/backend/input/network/networking/network_filter.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
-#include "software/parameter/config.hpp"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/world/world.h"
@@ -34,13 +34,11 @@ class NetworkClient
      * @param received_world_callback This function will be called with a new world
      *                                every time one is received
      */
-    explicit NetworkClient(std::string vision_multicast_address,
-                           int vision_multicast_port,
-                           std::string gamecontroller_multicast_address,
-                           int gamecontroller_multicast_port,
-                           std::function<void(World)> received_world_callback,
-                           std::shared_ptr<const RefboxConfig> refbox_config,
-                           std::shared_ptr<const CameraConfig> camera_config);
+    explicit NetworkClient(
+        std::string vision_multicast_address, int vision_multicast_port,
+        std::string gamecontroller_multicast_address, int gamecontroller_multicast_port,
+        std::function<void(World)> received_world_callback,
+        std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
 
     // Delete the copy and assignment operators because this class really shouldn't need
     // them and we don't want to risk doing anything nasty with the internal
@@ -82,7 +80,7 @@ class NetworkClient
      *
      * @param packet The newly received GameController packet
      */
-    void filterAndPublishGameControllerData(Referee packet);
+    void filterAndPublishGameControllerData(SSL_Referee packet);
 
     /**
      * Inverts all positions and orientations across the x and y axis of the field
@@ -98,7 +96,8 @@ class NetworkClient
     std::unique_ptr<ThreadedProtoMulticastListener<SSL_WrapperPacket>> ssl_vision_client;
     // The client that handles data reception, filtering , and publishing for
     // gamecontroller data
-    std::unique_ptr<ThreadedProtoMulticastListener<Referee>> ssl_gamecontroller_client;
+    std::unique_ptr<ThreadedProtoMulticastListener<SSL_Referee>>
+        ssl_gamecontroller_client;
 
     // The most up-to-date state of the world components
     std::optional<Field> field;
@@ -117,6 +116,5 @@ class NetworkClient
     // The callback function that we pass newly received/filtered worlds to
     std::function<void(World)> received_world_callback;
 
-    std::shared_ptr<const RefboxConfig> refbox_config;
-    std::shared_ptr<const CameraConfig> camera_config;
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
 };

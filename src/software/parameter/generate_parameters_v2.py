@@ -118,15 +118,6 @@ class Parameter(object):
             quote='"' if self.ptype == "std::string" else "",
             # the parameter name (different from variable name)
             param_name=self.param_name,
-            # min and max
-            param_min=self.min_value,
-            param_max=self.max_value,
-            # the parameter takes in a vector of options
-            # which is generated here
-            options=",".join(
-                ('"{0}"' if self.ptype == "std::string" else "{0}").format(option)
-                for option in self.options
-            ),
             # the default value of the parameter
             value=self.default_value,
         )
