@@ -3,7 +3,7 @@
 #include <memory.h>
 #include <stdlib.h>
 
-#include "shared/parameter_v2/config/examples/parameter.h"
+#include "shared/parameter_v2/c_parameter/parameter.h"
 
 // this function should get called in the main.c
 const ThunderbotsConfig_t* app_dynamic_parameters_create(void)
