@@ -29,9 +29,9 @@ class SimulatorRobotSingletonTest : public testing::Test
     {
         auto physics_world =
             std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField());
-        physics_world->setBallState(ball.currentState().ballState());
+        physics_world->setBallState(ball.currentState().state());
         RobotStateWithId robot_state{.id          = robot.id(),
-                                     .robot_state = robot.currentState().robotState()};
+                                     .robot_state = robot.currentState().state()};
         physics_world->addYellowRobots({robot_state});
 
         for (const auto& pos : enemy_robot_positions)

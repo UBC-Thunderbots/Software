@@ -19,9 +19,9 @@ class SimulatorRobotTest : public testing::Test
     {
         auto physics_world =
             std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField());
-        physics_world->setBallState(ball.currentState().ballState());
+        physics_world->setBallState(ball.currentState().state());
         physics_world->addYellowRobots({RobotStateWithId{
-            .id = robot.id(), .robot_state = robot.currentState().robotState()}});
+            .id = robot.id(), .robot_state = robot.currentState().state()}});
 
         std::shared_ptr<SimulatorRobot> simulator_robot;
         auto physics_robot = physics_world->getYellowPhysicsRobots().at(0);

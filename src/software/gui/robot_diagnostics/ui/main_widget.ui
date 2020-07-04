@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>480</height>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,10 +72,10 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
-             <widget class="QLabel" name="label_feedback">
+             <widget class="QLabel" name="label_sensor_status">
               <property name="maximumSize">
                <size>
-                <width>85</width>
+                <width>135</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -85,7 +85,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Feedback</string>
+               <string>Sensor Status</string>
               </property>
              </widget>
             </item>
@@ -209,7 +209,7 @@
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v V</string>
+                   <string>%1 V</string>
                   </property>
                  </widget>
                 </item>
@@ -222,7 +222,7 @@
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v V</string>
+                   <string>%1 V</string>
                   </property>
                  </widget>
                 </item>
@@ -235,7 +235,7 @@
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v RPM</string>
+                   <string>%1 RPM</string>
                   </property>
                  </widget>
                 </item>
@@ -243,6 +243,9 @@
                  <widget class="QProgressBar" name="progressBar_break_beam">
                   <property name="value">
                    <number>24</number>
+                  </property>
+                  <property name="format">
+                   <string>%1%</string>
                   </property>
                  </widget>
                 </item>
@@ -339,17 +342,17 @@
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v °C</string>
+                   <string>%1 °C</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_board">
+                 <widget class="QProgressBar" name="progressBar_board_temp">
                   <property name="value">
                    <number>0</number>
                   </property>
                   <property name="format">
-                   <string>%v °C</string>
+                   <string>%1 °C</string>
                   </property>
                  </widget>
                 </item>
@@ -630,7 +633,7 @@
             </widget>
             <widget class="QWidget" name="direct_velocity">
              <attribute name="title">
-              <string>DIrect Velocity Control</string>
+              <string>Direct Velocity Control</string>
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_25">
               <item>
@@ -1025,7 +1028,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_28">
       <item>
-       <widget class="QTableWidget" name="robot_status_table_widget">
+       <widget class="RobotStatusTable" name="robot_status_table_widget">
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>false</bool>
         </attribute>
@@ -1038,6 +1041,13 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>RobotStatusTable</class>
+   <extends>QTableWidget</extends>
+   <header>software/gui/generic_widgets/robot_status/robot_status_table.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <buttongroups>

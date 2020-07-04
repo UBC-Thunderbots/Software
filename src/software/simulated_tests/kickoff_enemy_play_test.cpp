@@ -4,6 +4,7 @@
 
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
+#include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
@@ -14,61 +15,18 @@ class KickoffEnemyPlayTest : public SimulatedTestFixture
 TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
-    addFriendlyRobots({
-        RobotStateWithId{
-            .id          = 0,
-            .robot_state = RobotState(Point(-3, 2.5), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 1,
-            .robot_state = RobotState(Point(-3, 1.5), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 2,
-            .robot_state = RobotState(Point(-3, 0.5), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 3,
-            .robot_state = RobotState(Point(-3, -0.5), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 4,
-            .robot_state = RobotState(Point(-3, -1.5), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 5,
-            .robot_state = RobotState(Point(-3, -2.5), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-    });
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
+         Point(-3, -2.5)}));
     setFriendlyGoalie(0);
-    addEnemyRobots({
-        RobotStateWithId{
-            .id          = 0,
-            .robot_state = RobotState(Point(1, 0), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 1,
-            .robot_state = RobotState(Point(1, 2.5), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 2,
-            .robot_state = RobotState(Point(1, -2.5), Vector(0, 0), Angle::zero(),
-                                      AngularVelocity::zero())},
-        RobotStateWithId{
-            .id          = 3,
-            .robot_state = RobotState(field().enemyGoalCenter(), Vector(0, 0),
-                                      Angle::zero(), AngularVelocity::zero())},
-        RobotStateWithId{.id          = 4,
-                         .robot_state = RobotState(
-                             field().enemyDefenseArea().negXNegYCorner(), Vector(0, 0),
-                             Angle::zero(), AngularVelocity::zero())},
-        RobotStateWithId{.id          = 5,
-                         .robot_state = RobotState(
-                             field().enemyDefenseArea().negXPosYCorner(), Vector(0, 0),
-                             Angle::zero(), AngularVelocity::zero())},
-    });
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
+         field().enemyDefenseArea().negXNegYCorner(),
+         field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setPlay(KickoffEnemyPlay::name);
+    setAIPlay(KickoffEnemyPlay::name);
+    setRefboxGameState(RefboxGameState::NORMAL_START,
+                       RefboxGameState::PREPARE_KICKOFF_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

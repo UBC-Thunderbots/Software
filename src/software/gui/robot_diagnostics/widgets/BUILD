@@ -10,9 +10,9 @@ qt_cc_library(
         ":chicker",
         ":dribbler",
         ":drive",
-        ":feedback",
         ":leds",
         ":robot_selection",
+        ":sensor_status",
         "//software/gui/generic_widgets/robot_status",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/multithreading:thread_safe_buffer",
@@ -59,11 +59,13 @@ qt_cc_library(
 )
 
 qt_cc_library(
-    name = "feedback",
-    src = "feedback.cpp",
-    hdr = "feedback.h",
+    name = "sensor_status",
+    src = "sensor_status.cpp",
+    hdr = "sensor_status.h",
     deps = [
+        ":progress_bar",
         "//software/gui/robot_diagnostics/ui:main_widget",
+        "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",
     ],
 )
@@ -94,6 +96,16 @@ qt_cc_library(
     name = "slider",
     src = "slider.cpp",
     hdr = "slider.h",
+    deps = [
+        "//software/gui/robot_diagnostics/ui:main_widget",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "progress_bar",
+    src = "progress_bar.cpp",
+    hdr = "progress_bar.h",
     deps = [
         "//software/gui/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",
