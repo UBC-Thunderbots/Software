@@ -4,6 +4,7 @@
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : sensor_fusion_config(sensor_fusion_config),
+      history_size(20),
       field(std::nullopt),
       ball(std::nullopt),
       friendly_team(),
@@ -13,7 +14,8 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
-      enemy_team_filter()
+      enemy_team_filter(),
+      ball_states(history_size)
 {
     if (!sensor_fusion_config)
     {
@@ -180,14 +182,28 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 
     if (new_ball_state)
     {
-        if (ball)
-        {
-            ball->updateState(*new_ball_state);
-        }
-        else
-        {
-            ball = Ball(*new_ball_state);
-        }
+        updateBall(*new_ball_state);
+    }
+}
+
+void SensorFusion::updateBall(TimestampedBallState new_ball_state)
+{
+    if (!ball_states.empty() &&
+        new_ball_state.timestamp() < ball_states.front().timestamp())
+    {
+        throw std::invalid_argument(
+            "Error: Trying to update ball state using a state older then the current state");
+    }
+
+    ball_states.push_front(new_ball_state);
+
+    if (ball)
+    {
+        ball->updateState(new_ball_state);
+    }
+    else
+    {
+        ball = Ball(new_ball_state);
     }
 }
 
@@ -220,7 +236,7 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
     return new_enemy_team;
 }
 
-RobotDetection SensorFusion::invert(RobotDetection robot_detection)
+RobotDetection SensorFusion::invert(RobotDetection robot_detection) const
 {
     robot_detection.position =
         Point(-robot_detection.position.x(), -robot_detection.position.y());
@@ -228,7 +244,7 @@ RobotDetection SensorFusion::invert(RobotDetection robot_detection)
     return robot_detection;
 }
 
-BallDetection SensorFusion::invert(BallDetection ball_detection)
+BallDetection SensorFusion::invert(BallDetection ball_detection) const
 {
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());

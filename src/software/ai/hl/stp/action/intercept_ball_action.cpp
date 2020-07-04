@@ -77,7 +77,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         Duration ball_time_to_position = Duration::fromSeconds(
             distance(closest_point, ball.position()) / (ball.velocity().length() + 1e-6));
         Duration robot_time_to_pos = getTimeToPositionForRobot(
-            *robot, closest_point, ROBOT_MAX_SPEED_METERS_PER_SECOND,
+            robot->position(), closest_point, ROBOT_MAX_SPEED_METERS_PER_SECOND,
             ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
         std::optional<Point> intercept_pos = std::nullopt;
@@ -121,7 +121,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                 DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
                 BallCollisionType::ALLOW));
         }
-    } while (!robotHasPossession(ball, *robot));
+    } while (!robotHasPossession(ball.getPreviousStates(), robot->getPreviousStates()));
 }
 
 void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yield,

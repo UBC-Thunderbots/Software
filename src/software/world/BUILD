@@ -33,6 +33,7 @@ cc_library(
         "//software/new_geom:point",
         "//software/new_geom:vector",
         "//software/time:timestamp",
+        "@boost//:circular_buffer",
     ],
 )
 
@@ -148,6 +149,7 @@ cc_library(
         "//software/new_geom:point",
         "//software/new_geom:vector",
         "//software/time:timestamp",
+        "@boost//:circular_buffer",
     ],
 )
 

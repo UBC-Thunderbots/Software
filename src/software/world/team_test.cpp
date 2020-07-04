@@ -125,63 +125,6 @@ TEST_F(TeamTest, update_with_new_team)
     EXPECT_EQ(team_update, team);
 }
 
-TEST_F(TeamTest, update_state_to_predicted_state_with_future_timestamp)
-{
-    Team team = Team(Duration::fromMilliseconds(1000));
-
-    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
-                          AngularVelocity::threeQuarter(), current_time);
-
-    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
-                          AngularVelocity::zero(), current_time);
-
-    std::vector<Robot> robot_list = {robot_0, robot_1};
-
-    team.updateRobots(robot_list);
-    team.assignGoalie(0);
-
-    team.updateStateToPredictedState(one_second_future);
-
-    Robot future_robot_0 = robot_0;
-    future_robot_0.updateStateToPredictedState(one_second_future);
-
-    Robot future_robot_1 = robot_1;
-    future_robot_1.updateStateToPredictedState(one_second_future);
-
-    EXPECT_EQ(2, team.numRobots());
-    EXPECT_EQ(future_robot_0, team.getRobotById(0));
-    EXPECT_EQ(future_robot_1, team.getRobotById(1));
-    // The goalie assignment should not be affected by the prediction
-    EXPECT_EQ(future_robot_0, team.goalie());
-}
-
-TEST_F(TeamTest, update_state_to_predicted_state_with_past_timestamp)
-{
-    Team team = Team(Duration::fromMilliseconds(1000));
-
-    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
-                          AngularVelocity::threeQuarter(), current_time);
-
-    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
-                          AngularVelocity::zero(), current_time);
-
-    std::vector<Robot> robot_list = {robot_0, robot_1};
-
-    team.updateRobots(robot_list);
-    team.assignGoalie(0);
-
-    ASSERT_THROW(team.updateStateToPredictedState(one_second_past),
-                 std::invalid_argument);
-
-    Robot future_robot_0 = robot_0;
-    ASSERT_THROW(future_robot_0.updateStateToPredictedState(one_second_past),
-                 std::invalid_argument);
-
-    Robot future_robot_1 = robot_1;
-    ASSERT_THROW(future_robot_1.updateStateToPredictedState(one_second_past),
-                 std::invalid_argument);
-}
-
 TEST_F(TeamTest, remove_expired_robots_at_current_time_so_no_robots_expire)
 {
     Team team = Team(Duration::fromMilliseconds(1000));

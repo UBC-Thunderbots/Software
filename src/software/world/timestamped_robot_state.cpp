@@ -21,14 +21,14 @@ Timestamp TimestampedRobotState::timestamp() const
     return timestamp_;
 }
 
-RobotState TimestampedRobotState::robotState() const
+RobotState TimestampedRobotState::state() const
 {
     return robot_state_;
 }
 
 bool TimestampedRobotState::operator==(const TimestampedRobotState &other) const
 {
-    return this->robotState() == other.robotState();
+    return this->state() == other.state();
 }
 
 bool TimestampedRobotState::operator!=(const TimestampedRobotState &other) const
