@@ -4,7 +4,7 @@ import sys
 import networkx
 import yaml
 from colorama import Fore, init
-from jsonschema import validate
+import jsonschema
 
 from dynamic_parameter_schema import (
     INCLUDE_DEF_SCHEMA,
@@ -107,16 +107,14 @@ class ConfigYamlLoader(object):
                     _, tail = os.path.split(filename)
 
                     # safe load yaml into dictionary
-                    raw_config_metadata[tail] = list(
-                        yaml.safe_load_all(param_yaml))
+                    raw_config_metadata[tail] = list(yaml.safe_load_all(param_yaml))
 
                     if len(raw_config_metadata[tail]) == 1:
 
                         # include only in file
                         if isinstance(raw_config_metadata[tail][0], dict):
                             raw_config_metadata[tail] = {
-                                "include":
-                                raw_config_metadata[tail][0]["include"]
+                                "include": raw_config_metadata[tail][0]["include"]
                             }
 
                         # parameter definitions only in file
@@ -135,7 +133,8 @@ class ConfigYamlLoader(object):
 
                 except yaml.YAMLError as ymle:
                     raise ConfigYamlMalformed(
-                        "Check malformed {} \n {}".format(tail, ymle))
+                        "Check malformed {} \n {}".format(tail, ymle)
+                    ) from None
 
         return raw_config_metadata
 
@@ -146,6 +145,7 @@ class ConfigYamlLoader(object):
         and duplicate parameters in the same config.
 
         :raises: ConfigYamlMalformed
+        :raises: ConfigSchemaViolation
         :param config_metadata: Metadata describing params and config includes
         :type config_metadata: dict
 
@@ -156,26 +156,39 @@ class ConfigYamlLoader(object):
             if "include" in metadata:
 
                 # check schema
-                validate(metadata["include"], INCLUDE_DEF_SCHEMA)
+                try:
+                    jsonschema.validate(metadata["include"], INCLUDE_DEF_SCHEMA)
+                except jsonschema.exceptions.ValidationError as jsval:
+                    raise ConfigYamlSchemaViolation(
+                        "Schema violation in {}: {}".format(config_file, jsval)
+                    ) from None
 
                 # check duplicates
                 if len(metadata["include"]) > len(set(metadata["include"])):
                     raise ConfigYamlMalformed(
-                        "Duplicate include detected in {}".format(config_file))
+                        "Duplicate include detected in {}".format(config_file)
+                    )
 
                 # check that included yaml is defined elsewhere
                 for included_yaml in metadata["include"]:
                     if included_yaml not in config_metadata.keys():
                         raise ConfigYamlMalformed(
-                            "definition could not be found for {} in {}".
-                            format(included_yaml, config_file))
+                            "definition could not be found for {} in {}".format(
+                                included_yaml, config_file
+                            )
+                        )
 
             if "parameters" in metadata:
 
                 # check schema
-                validate(metadata["parameters"], PARAM_DEF_SCHEMA)
+                try:
+                    jsonschema.validate(metadata["parameters"], PARAM_DEF_SCHEMA)
+                except jsonschema.exceptions.ValidationError as jsval:
+                    raise ConfigYamlSchemaViolation(
+                        "Schema violation in {}: {}".format(config_file, jsval)
+                    ) from None
 
-                # get all parameter names as a list, the parameter type comes
+                # Get all parameter names as a list, the parameter type comes
                 # first and the name follows in the dictionary. If the schema
                 # check above succeeded, its safe to assume the "name" key
                 # exists in the parameter dictionary
@@ -187,28 +200,31 @@ class ConfigYamlLoader(object):
                 # check duplicates
                 if len(param_names) > len(set(param_names)):
                     raise ConfigYamlMalformed(
-                        "Duplicate parameter detected in {}".format(
-                            config_file))
+                        "Duplicate parameter detected in {}".format(config_file)
+                    )
 
                 # This is an ugly artifact of how the yaml is defined and loaded
                 # We are extracting all the requested types to check that
                 # they are all supported. This is the one thing the schema
                 # can't validate that we would like to check
                 requested_types = [
-                    key[0] for key in
-                    [list(entry.keys()) for entry in metadata["parameters"]]
+                    key[0]
+                    for key in [list(entry.keys()) for entry in metadata["parameters"]]
                 ]
 
                 # check if type requested is supported
                 for requested_type in requested_types:
                     if requested_type not in SUPPORTED_TYPES:
                         raise ConfigYamlMalformed(
-                            "{} type unsupported".format(requested_type))
+                            "{} type unsupported in {}".format(
+                                requested_type, config_file
+                            )
+                        )
 
     @staticmethod
     def __detect_cycles_in_config_metadata(config_metadata):
-        """Creates a DiGraph from all the includes and checks if there are cycles.
-        Raises to the main thread if a cycle is detected
+        """Creates a DiGraph from all the included configs and checks if there
+        are cycles. Raises to the main thread if a cycle is detected
 
         :raises: ConfigYamlCycleDetected
         :param config_metadata: Metadata describing params and config includes
@@ -226,8 +242,9 @@ class ConfigYamlLoader(object):
 
         for cycle in networkx.simple_cycles(G):
             raise ConfigYamlCycleDetected(
-                "Cycle detected in the include statements: " +
-                " -> ".join(cycle + [cycle[0]]))
+                "Cycle detected in the include statements: "
+                + " -> ".join(cycle + [cycle[0]])
+            )
 
 
 #######################################################################
@@ -236,17 +253,24 @@ class ConfigYamlLoader(object):
 
 
 class ConfigYamlException(Exception):
-    """We have custom exceptions to facilitate terminating the genrule
-    using the ConfigYamlLoader class and to print the log in red, making
-    it more visible in the build log clutter.
+    """We use custom exceptions to facilitate terminating the genrule
+    using the ConfigYamlLoader class and to print the log in red and yellow,
+    making it more visible in the build log clutter.
 
     :param message: The exception msg to print in red
     :type message: str
 
     """
+
     def __init__(self, message):
-        init()  # init Fore to print w/ color
-        super().__init__(Fore.RED + message + Fore.RESET)
+        init()
+        super().__init__(
+            Fore.LIGHTRED_EX
+            + "Parameter generation error: "
+            + Fore.YELLOW
+            + message
+            + Fore.RESET
+        )
 
 
 class ConfigYamlCycleDetected(ConfigYamlException):
@@ -256,4 +280,9 @@ class ConfigYamlCycleDetected(ConfigYamlException):
 
 class ConfigYamlMalformed(ConfigYamlException):
     """Indicates when the yaml has a typo or doesn't follow proper syntax
+    """
+
+
+class ConfigYamlSchemaViolation(ConfigYamlException):
+    """Indicates when the yaml schema has been violated
     """
