@@ -17,5 +17,6 @@ py_binary(
         requirement("jsonschema"),
         requirement("colorama"),
         requirement("networkx"),
+        requirement("decorator"),
     ],
 )
