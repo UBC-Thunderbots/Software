@@ -39,6 +39,11 @@ class StandaloneSimulator
      */
     void setupInitialSimulationState();
 
+    void startSimulation();
+    void stopSimulation();
+    void setSlowMotionMultiplier(double multiplier);
+    void setBallState(const BallState& state);
+
    private:
     /**
      * Sets the primitives being simulated by the robots on the respective team
