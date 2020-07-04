@@ -4,8 +4,8 @@
 #include "software/new_geom/vector.h"
 
 /**
- * Given a cone shooting from the origin, determines the furthest location from
- * the origin, at which to place a circle to block the cone.
+ * Given a cone shooting from the origin, determines the furthest location from the
+ * origin, at which to place a circle to block the cone formed by the vectors a and b.
  *
  * @pre The cone must have nonzero area.
  *
