@@ -27,9 +27,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "shared/constants.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
+#include "shared/constants.h"
 #include "shared/proto/tbots_robot_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 /* USER CODE END Includes */
@@ -190,10 +190,26 @@ __weak void io_proto_multicast_startNetworkingTask(void *argument)
 void test_msg_update(void *argument)
 {
     /* USER CODE BEGIN test_msg_update */
+
+    // TODO https://github.com/UBC-Thunderbots/Software/issues/1519
+    // This is a placeholder task to test sending robot status NOT
+    // associated with a ticket because how the robot status msgs will be
+    // updated and sent is TBD
+    ProtoMulticastCommunicationProfile_t *comm_profile =
+        (ProtoMulticastCommunicationProfile_t *)argument;
+
     /* Infinite loop */
     for (;;)
     {
-        osDelay(1);
+        io_proto_multicast_communication_profile_acquireLock(comm_profile);
+        // TODO enable SNTP sys_now is currently only time since reset
+        // https://github.com/UBC-Thunderbots/Software/issues/1518
+        tbots_robot_msg.time_sent.epoch_timestamp_seconds = sys_now();
+        io_proto_multicast_communication_profile_releaseLock(comm_profile);
+        io_proto_multicast_communication_profile_notifyEvents(comm_profile,
+                                                              PROTO_UPDATED);
+        // run loop at 100hz
+        osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
     }
     /* USER CODE END test_msg_update */
 }
