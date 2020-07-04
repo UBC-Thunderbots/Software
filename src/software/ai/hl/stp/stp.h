@@ -85,11 +85,25 @@ class STP : public HL
 
    private:
     /**
-     * Updates the current play based on the state of the world
+     * Updates the current STP state based on the state of the world
      *
      * @param world
      */
-    void updateCurrentPlay(const World &world);
+    void updateSTPState(const World &world);
+
+    /**
+     * Updates the current game state based on the state of the world
+     *
+     * @param world
+     */
+    void updateGameState(const World &world);
+
+    /**
+     * Updates the current AI play based on the state of the world
+     *
+     * @param world
+     */
+    void updateAIPlay(const World &world);
 
     /**
      * Gets the intents the current play wants to run
@@ -111,6 +125,6 @@ class STP : public HL
     std::string previous_override_play_name;
     bool override_play;
     bool previous_override_play;
-    RefboxGameState current_game_state;
+    GameState current_game_state;
     MotionConstraintManager motion_constraint_manager;
 };

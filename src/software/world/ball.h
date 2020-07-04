@@ -50,16 +50,6 @@ class Ball final
     void updateState(const TimestampedBallState &new_state);
 
     /**
-     * Updates the ball's state to be its predicted state at the given timestamp.
-     * The timestamp must be >= the ball's last update timestamp
-     *
-     * @throws std::invalid_argument if the ball is updated with a time from the past
-     * @param timestamp The timestamp at which to update the ball's state to. Must
-     * be >= the ball's last update timestamp
-     */
-    void updateStateToPredictedState(const Timestamp &timestamp);
-
-    /**
      * Returns the timestamp for when this ball's data was last updated
      *
      * @return the timestamp for when this ball's data was last updated
@@ -87,6 +77,7 @@ class Ball final
      * @return the estimated position of the ball at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
+    // TODO (Issue #1416): Delete this when grsim get removed
     Point estimatePositionAtFutureTime(const Duration &duration_in_future) const;
 
     /**
@@ -97,38 +88,12 @@ class Ball final
     Vector velocity() const;
 
     /**
-     * Returns the estimated velocity of the ball at a future time, relative to when the
-     * ball was last updated
-     *
-     * @param duration_in_future The relative amount of time in the future
-     * at which to predict the ball's velocity. Value must be >= 0.
-     * For example, a value of 1.5 seconds would return the estimated velocity of the ball
-     * 1.5 seconds in the future.
-     *
-     * @throws std::invalid_argument if the ball is estimating the velocity with a time
-     * from the past
-     * @return the estimated velocity of the ball at the given number of milliseconds
-     * in the future. Coordinates are in metres.
-     */
-    Vector estimateVelocityAtFutureTime(const Duration &duration_in_future) const;
-
-    /**
      * Gets the previous states stored in states_
      *
      * @return The circular buffer containing the state history starting with the newest
      * available data at index 0
      */
-    boost::circular_buffer<TimestampedBallState> getPreviousStates() const;
-
-    /**
-     * Finds an update timestamp that is close to the provided timestamp and returns the
-     * index of the timestamp in the history buffer.
-     *
-     * @param timestamp timestamp of the update state index we wish to fetch
-     * @return Index of the ball's update timestamp closest to the desired time or a
-     * std::nullopt if there is not matching timestamp.
-     */
-    std::optional<int> getHistoryIndexFromTimestamp(const Timestamp &timestamp) const;
+    BallHistory getPreviousStates() const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
@@ -152,5 +117,5 @@ class Ball final
     // queue, This buffer will never be empty as it's initialized with a BallState on
     // creation
     // The buffer size (history_size) must be > 0
-    boost::circular_buffer<TimestampedBallState> states_;
+    BallHistory states_;
 };
