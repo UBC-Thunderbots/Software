@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:private"])
 py_binary(
     name = "generate_dynamic_parameters",
     srcs = [":generate_dynamic_parameters.py"],
+    python_version = "PY3",
     data = [
         "//shared/parameter_v2/config:example_configs",
     ],
