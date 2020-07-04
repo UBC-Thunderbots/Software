@@ -3,7 +3,7 @@
 #include "software/simulation/threaded_simulator.h"
 #include "software/world/field.h"
 
-int main(int argc, char *argv[])
+int main()
 {
     LoggerSingleton::initializeLogger();
 
