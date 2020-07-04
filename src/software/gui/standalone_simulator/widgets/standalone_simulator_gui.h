@@ -33,6 +33,8 @@ class StandaloneSimulatorGUI : public QMainWindow
         std::shared_ptr<ThreadSafeBuffer<SSL_WrapperPacket>> ssl_wrapper_packet_buffer,
         std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer);
 
+    void registerBallPlacementCallback(const std::function<void(Point)>& callback);
+
    private:
     /**
      * This function is called periodically by the update_timer to

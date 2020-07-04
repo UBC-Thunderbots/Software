@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="DrawFunctionVisualizer" name="simulation_graphics_view">
+    <widget class="StandaloneSimulatorDrawFunctionVisualizer" name="simulation_graphics_view">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -37,9 +37,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>DrawFunctionVisualizer</class>
+   <class>StandaloneSimulatorDrawFunctionVisualizer</class>
    <extends>QGraphicsView</extends>
-   <header>software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h</header>
+   <header>software/gui/standalone_simulator/widgets/standalone_simulator_draw_function_visualizer.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

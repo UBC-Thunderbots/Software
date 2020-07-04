@@ -7,8 +7,11 @@ int main(int argc, char *argv[])
 {
     LoggerSingleton::initializeLogger();
 
-    ThreadedStandaloneSimulatorGUI standalone_simulator_gui_wrapper;
     ThreadedSimulator simulator = ThreadedSimulator(Field::createSSLDivisionBField());
+    ThreadedStandaloneSimulatorGUI standalone_simulator_gui_wrapper([&simulator](Point ball_placement_point) {
+        BallState state(ball_placement_point, Vector(0, 0));
+        simulator.setBallState(state);
+    });
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [&standalone_simulator_gui_wrapper](SSL_WrapperPacket packet) {
             standalone_simulator_gui_wrapper.onValueReceived(packet);

@@ -27,6 +27,10 @@ StandaloneSimulatorGUI::StandaloneSimulatorGUI(
         Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
 }
 
+void StandaloneSimulatorGUI::registerBallPlacementCallback(const std::function<void (Point)> &callback) {
+    main_widget->simulation_graphics_view->registerBallPlacementCallback(callback);
+}
+
 void StandaloneSimulatorGUI::handleUpdate()
 {
     draw();

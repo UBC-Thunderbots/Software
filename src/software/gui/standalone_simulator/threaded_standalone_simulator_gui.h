@@ -19,7 +19,7 @@
 class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket>
 {
    public:
-    explicit ThreadedStandaloneSimulatorGUI();
+    explicit ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback);
 
     ~ThreadedStandaloneSimulatorGUI() override;
 
@@ -42,7 +42,7 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
      * created in the same context as the QApplication (which in this case is the new
      * thread).
      */
-    void createAndRunStandaloneSimulatorGUI();
+    void createAndRunStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback);
 
     std::thread run_standalone_simulator_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
