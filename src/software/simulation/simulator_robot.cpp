@@ -1,8 +1,8 @@
 #include "software/simulation/simulator_robot.h"
 
 #include "shared/constants.h"
-#include "software/logger/logger.h"
 #include "software/geom/util.h"
+#include "software/logger/logger.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),
@@ -126,21 +126,28 @@ void SimulatorRobot::kick(float speed_m_per_s)
 
             double total_head_on_collision_momentum_magnitude = 0.0;
 
-            if(acuteVertexAngle(ball->velocity(), -robot_orientation_vector).abs() < Angle::quarter()) {
+            if (acuteVertexAngle(ball->velocity(), -robot_orientation_vector).abs() <
+                Angle::quarter())
+            {
                 // The ball is heading towards the robot, and will have momentum that
                 // is preserved in the kicking collision
-                total_head_on_collision_momentum_magnitude += ball->momentum().project(robot_orientation_vector).length();
+                total_head_on_collision_momentum_magnitude +=
+                    ball->momentum().project(robot_orientation_vector).length();
             }
 
-            if(acuteVertexAngle(robot->velocity(), robot_orientation_vector).abs() < Angle::quarter()) {
+            if (acuteVertexAngle(robot->velocity(), robot_orientation_vector).abs() <
+                Angle::quarter())
+            {
                 // The robot is moving in direction it's facing, and will add momentum
                 // that is preserved in the kicking collision
-                double robot_speed_in_direction_of_orientation = robot->velocity().project(robot_orientation_vector).length();
-                total_head_on_collision_momentum_magnitude += ball->massKg() * robot_speed_in_direction_of_orientation;
+                double robot_speed_in_direction_of_orientation =
+                    robot->velocity().project(robot_orientation_vector).length();
+                total_head_on_collision_momentum_magnitude +=
+                    ball->massKg() * robot_speed_in_direction_of_orientation;
             }
 
-            double preserved_momentum =
-                    total_head_on_collision_momentum_magnitude * MOMENTUM_CONSERVED_DURING_KICK;
+            double preserved_momentum = total_head_on_collision_momentum_magnitude *
+                                        MOMENTUM_CONSERVED_DURING_KICK;
             Vector kick_momentum =
                 robot_orientation_vector.normalize(ball->massKg() * speed_m_per_s);
             Vector kick_impulse =
@@ -149,7 +156,8 @@ void SimulatorRobot::kick(float speed_m_per_s)
             // Cancel head-on momentum, then kick. We must cancel the head-on momentum
             // first so that the preserved momentum has an additive effect that results in
             // a higher kick speed than requested.
-            Vector ball_head_on_momentum = ball->momentum().project(robot_orientation_vector);
+            Vector ball_head_on_momentum =
+                ball->momentum().project(robot_orientation_vector);
             ball->applyImpulse(
                 robot_orientation_vector.normalize(ball_head_on_momentum.length()));
             ball->applyImpulse(kick_impulse);

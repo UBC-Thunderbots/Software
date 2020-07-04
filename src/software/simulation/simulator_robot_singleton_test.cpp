@@ -267,7 +267,8 @@ class SimulatorRobotSingletonAutokickTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonAutokickTest, test_autokick_ball_moving_towards_stationary_robot)
+TEST_P(SimulatorRobotSingletonAutokickTest,
+       test_autokick_ball_moving_towards_stationary_robot)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -292,16 +293,17 @@ TEST_P(SimulatorRobotSingletonAutokickTest, test_autokick_ball_moving_towards_st
     EXPECT_LT((simulator_ball->velocity() - expected_velocity).length(), 0.001);
 }
 
-TEST_P(SimulatorRobotSingletonAutokickTest, test_autokick_ball_moving_towards_moving_robot)
+TEST_P(SimulatorRobotSingletonAutokickTest,
+       test_autokick_ball_moving_towards_moving_robot)
 {
     Angle robot_orientation = GetParam();
-    Vector robot_velocity = Vector::createFromAngle(robot_orientation).normalize(1.5);
-    Robot robot(0, Point(0, 0), robot_velocity, robot_orientation, AngularVelocity::zero(),
-                Timestamp::fromSeconds(0));
+    Vector robot_velocity   = Vector::createFromAngle(robot_orientation).normalize(1.5);
+    Robot robot(0, Point(0, 0), robot_velocity, robot_orientation,
+                AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Point initial_ball_position =
-            robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
+        robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
     Vector initial_ball_velocity =
-            (robot.position() - initial_ball_position).normalize(1.0);
+        (robot.position() - initial_ball_position).normalize(1.0);
     Ball ball(initial_ball_position, initial_ball_velocity, Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
@@ -360,13 +362,13 @@ TEST_P(SimulatorRobotSingletonAutochipTest,
        test_autochip_ball_moving_towards_moving_robot_with_no_obstacle)
 {
     Angle robot_orientation = GetParam();
-    Vector robot_velocity = Vector::createFromAngle(robot_orientation).normalize(1.5);
-    Robot robot(0, Point(0, 0), robot_velocity, robot_orientation, AngularVelocity::zero(),
-                Timestamp::fromSeconds(0));
+    Vector robot_velocity   = Vector::createFromAngle(robot_orientation).normalize(1.5);
+    Robot robot(0, Point(0, 0), robot_velocity, robot_orientation,
+                AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Point initial_ball_position =
-            robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
+        robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
     Vector initial_ball_velocity =
-            (robot.position() - initial_ball_position).normalize(1.0);
+        (robot.position() - initial_ball_position).normalize(1.0);
     Ball ball(initial_ball_position, initial_ball_velocity, Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
