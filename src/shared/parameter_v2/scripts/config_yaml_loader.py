@@ -18,11 +18,14 @@ from dynamic_parameter_schema import (
 
 
 class ConfigYamlLoader(object):
+
+    """A collection of static methods to load and validate yaml"""
+
     @staticmethod
     def get_config_metadata(yaml_paths):
         """Loads the yamls in the root config directory and verifies that the
         requested configuration is valid. Then returns config_metadata dict
-        with a specified format captuing all the requested params and configs.
+        with a specified format capturing all the requested params and configs.
 
         Example config directory:
         .
@@ -87,7 +90,8 @@ class ConfigYamlLoader(object):
     @staticmethod
     def __load_yaml_into_dict(yaml_paths):
         """Loads the yamls into an dictionary. Any errors while in the yaml
-        syntax will raise to the main thread.
+        syntax will raise to the main thread. We also adjust how the dictionary
+        is stored for easier access later.
 
         :raises: ConfigYamlMalformed
         :param yaml_paths: the path to all the config yamls
@@ -110,13 +114,13 @@ class ConfigYamlLoader(object):
 
                     if len(raw_config_metadata[tail]) == 1:
 
-                        # include only
+                        # include only in file
                         if isinstance(raw_config_metadata[tail][0], dict):
                             raw_config_metadata[tail] = {
                                 "include": raw_config_metadata[tail][0]["include"]
                             }
 
-                        # parameter definitions only
+                        # parameter definitions only in file
                         if isinstance(raw_config_metadata[tail][0], list):
                             raw_config_metadata[tail] = {
                                 "parameters": raw_config_metadata[tail][0]
@@ -139,8 +143,9 @@ class ConfigYamlLoader(object):
 
     @staticmethod
     def __validate_config_metadata(config_metadata):
-        """Validates the config_metadata that was loaded with against
-        the INCLUDE_DEF_SCHEMA and PARAM_DEF_SCHEMA
+        """Validates the config_metadata that was loaded against the
+        dynamic_parameter_schemas and then checks for duplicate includes
+        and duplicate parameters in the same config.
 
         :raises: ConfigYamlMalformed
         :param config_metadata: Metadata describing params and config includes
@@ -157,6 +162,7 @@ class ConfigYamlLoader(object):
 
                 # check duplicates
                 if len(metadata["include"]) > len(set(metadata["include"])):
+
                     raise ConfigYamlMalformed(
                         "Duplicate include detected in {}".format(config_file)
                     )
@@ -166,7 +172,7 @@ class ConfigYamlLoader(object):
                     if included_yaml not in config_metadata.keys():
 
                         raise ConfigYamlMalformed(
-                            "{} in {}, definition could not be found".format(
+                            "definition could not be found for {} in {}".format(
                                 included_yaml, config_file
                             )
                         )
@@ -177,9 +183,9 @@ class ConfigYamlLoader(object):
                 validate(metadata["parameters"], PARAM_DEF_SCHEMA)
 
                 # get all parameter names as a list, the parameter type comes
-                # first, and the name follows in the dictionary. If the schema
-                # check above passed, its safe to assume the "name" key exists
-                # in the parameter dictionary
+                # first and the name follows in the dictionary. If the schema
+                # check above succeeded, its safe to assume the "name" key
+                # exists in the parameter dictionary
                 param_names = [
                     list(param_entry.values())[0]["name"]
                     for param_entry in metadata["parameters"]
@@ -187,14 +193,15 @@ class ConfigYamlLoader(object):
 
                 # check duplicates
                 if len(param_names) > len(set(param_names)):
+
                     raise ConfigYamlMalformed(
                         "Duplicate parameter detected in {}".format(config_file)
                     )
 
-                # This is an ugly artifact of how the yaml is loaded
-                # we are extracting all the requested types to check that
+                # This is an ugly artifact of how the yaml is defined and loaded
+                # We are extracting all the requested types to check that
                 # they are all supported. This is the one thing the schema
-                # can't catch that we would like to check
+                # can't validate that we would like to check
                 requested_types = [
                     key[0]
                     for key in [list(entry.keys()) for entry in metadata["parameters"]]
@@ -211,7 +218,7 @@ class ConfigYamlLoader(object):
     @staticmethod
     def __detect_cycles_in_config_metadata(config_metadata):
         """Creates a DiGraph from all the includes and checks if there are cycles.
-        Raises to the main thread if a cycle is detected 
+        Raises to the main thread if a cycle is detected
 
         :raises: ConfigYamlCycleDetected
         :param config_metadata: Metadata describing params and config includes
