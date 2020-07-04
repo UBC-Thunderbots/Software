@@ -207,6 +207,7 @@ cc_test(
     srcs = ["circle_tangent_test.cpp"],
     deps = [
         ":algorithms",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
