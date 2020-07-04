@@ -21,7 +21,7 @@ using DrawFunction = std::function<void(QGraphicsScene* scene)>;
  * draw its contents. This allows us to draw larger non-copyable objects
  * by creating a DrawFunctionWrapper from it's copyable components / members.
  *
- * This class is made abstract by making the desctructor pure virtual,
+ * This class is made abstract by making the destructor pure virtual,
  * but providing an implementation. The subclasses will have a default
  * destructor automatically generated which will implement the virtual
  * destructor. All together this lets the base class be pure virtual
