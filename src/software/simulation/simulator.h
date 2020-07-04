@@ -7,6 +7,11 @@
 #include "software/simulation/simulator_robot.h"
 #include "software/world/world.h"
 
+extern "C"
+{
+#include "shared/proto/primitive.nanopb.h"
+}
+
 /**
  * Because the FirmwareWorld_t struct is defined in the .c file (rather than the .h file),
  * C++ considers it an incomplete type and is unable to use it with smart pointers
@@ -115,13 +120,10 @@ class Simulator
      * in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_index The index (type) of the primitive to set
-     * @param params The parameters for the specified primitive
+     * TODO: jdoc here
      */
-    void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                 const primitive_params_t& params);
-    void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
-                               const primitive_params_t& params);
+    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -190,35 +192,15 @@ class Simulator
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_index The index of the primitive to set
-     * @param params The parameters for the specified primitive
+     * TODO: jdoc here
      * @param simulator_robots The robots to set the primitives on
      * @param simulator_ball The simulator ball to use in the primitives
      */
     static void setRobotPrimitive(
-        RobotId id, unsigned int primitive_index, primitive_params_t params,
+        RobotId id, const PrimitiveMsg& primitive_msg,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
         const std::shared_ptr<SimulatorBall>& simulator_ball);
-
-    /**
-     * Returns the encoded primitive parameters for the given Primitive
-     *
-     * @param primitive The Primitive to get the parameters for
-     *
-     * @return The encoded primitive parameters for the given Primitive
-     */
-    static primitive_params_t getPrimitiveParams(
-        const std::unique_ptr<Primitive>& primitive);
-
-    /**
-     * Returns the primitive index for the given Primitive
-     *
-     * @param primitive The Primitive to get the index for
-     *
-     * @return The index for the given Primitive
-     */
-    static unsigned int getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive);
 
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;

@@ -117,6 +117,7 @@ cc_library(
     srcs = ["simulator.cpp"],
     hdrs = ["simulator.h"],
     deps = [
+        ":convert_primitive_to_nanopb",
         ":simulator_ball",
         ":simulator_ball_singleton",
         ":simulator_robot",
@@ -188,5 +189,23 @@ cc_binary(
         "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
+    ],
+)
+
+# TODO: reorder this
+cc_library(
+    name = "convert_primitive_to_nanopb",
+    srcs = [
+        "convert_primitive_to_nanopb.cpp",
+        "serialize_primitive_to_proto.cpp",
+        "serialize_primitive_to_proto.h",
+    ],
+    hdrs = ["convert_primitive_to_nanopb.h"],
+    deps = [
+        "//shared/proto:tbots_cc_proto",
+        "//shared/proto:tbots_nanopb_proto",
+        "//software/primitive",
+        "//software/proto/message_translation:proto_creator_primitive_visitor",
+        "@nanopb",
     ],
 )
