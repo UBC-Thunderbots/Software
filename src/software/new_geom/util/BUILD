@@ -5,6 +5,7 @@ cc_library(
     srcs = [
         "almost_equal.cpp",
         "calculate_block_cone.cpp",
+        "circle_tangent.cpp",
         "closest_point.cpp",
         "collinear.cpp",
         "contains.cpp",
@@ -13,12 +14,15 @@ cc_library(
         "furthest_point.cpp",
         "intersection.cpp",
         "intersects.cpp",
+        "multiple_rays.cpp",
+        "multiple_segments.cpp",
         "projection.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
         "almost_equal.h",
         "calculate_block_cone.h",
+        "circle_tangent.h",
         "closest_point.h",
         "collinear.h",
         "contains.h",
@@ -27,6 +31,8 @@ cc_library(
         "furthest_point.h",
         "intersection.h",
         "intersects.h",
+        "multiple_rays.h",
+        "multiple_segments.h",
         "projection.h",
         "voronoi_diagram.h",
     ],
@@ -172,6 +178,33 @@ cc_test(
 cc_test(
     name = "projection_test",
     srcs = ["projection_test.cpp"],
+    deps = [
+        ":algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "multiple_segments_test",
+    srcs = ["multiple_segments_test.cpp"],
+    deps = [
+        ":algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "multiple_rays_test",
+    srcs = ["multiple_rays_test.cpp"],
+    deps = [
+        ":algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "circle_tangent_test",
+    srcs = ["circle_tangent_test.cpp"],
     deps = [
         ":algorithms",
         "@gtest//:gtest_main",
