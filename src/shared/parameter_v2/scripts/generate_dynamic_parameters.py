@@ -18,7 +18,6 @@ def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
     # A temporary implementation used to show we can access the YAML files
     yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
 
-    print(yamls)
     ConfigYamlLoader.get_config_metadata(yamls)
 
     with open(output_file, "w") as outfile:
@@ -66,7 +65,4 @@ def main():
 #######################################################################
 
 if __name__ == "__main__":
-    print(ConfigYamlMalformed("TEST"))
-    print(ConfigYamlMalformed("TEST"))
-    print("MEETING IS ESTARTKING")
     main()
