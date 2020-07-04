@@ -9,15 +9,10 @@ SUPPORTED_TYPES = [
 ]
 
 INCLUDE_DEF_SCHEMA = {
-    "type": "object",
+    "type": "array",
+    "items": [{"type": "string"}, {"additionalProperties": False}],
     "uniqueItems": True,
     "minItems": 1,
-    "properties": {
-        "include": {
-            "type": "array",
-            "items": [{"type": "string"}, {"additionalProperties": False}],
-        }
-    },
 }
 
 PARAM_DEF_SCHEMA = {

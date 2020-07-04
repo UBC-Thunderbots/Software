@@ -54,12 +54,12 @@ class ConfigYamlLoader(object):
             "ai.yaml": {
                 "includes": ["passing.yaml", "plays.yaml"],
                 "parameters" :
-                [
+                [{
                     "int": {
                         "name": "example_int", "value": 10, "min": 0, "max": 20
                     },
                     ...
-                ]
+                }]
             },
 
             "plays.yaml": {
@@ -106,8 +106,29 @@ class ConfigYamlLoader(object):
                     _, tail = os.path.split(filename)
 
                     # safe load yaml into dictionary
-                    raw_config_metadata[tail] = list(
-                        yaml.safe_load_all(param_yaml))
+                    raw_config_metadata[tail] = list(yaml.safe_load_all(param_yaml))
+
+                    if len(raw_config_metadata[tail]) == 1:
+
+                        # include only
+                        if isinstance(raw_config_metadata[tail][0], dict):
+                            raw_config_metadata[tail] = {
+                                "include": raw_config_metadata[tail][0]["include"]
+                            }
+
+                        # parameter definitions only
+                        if isinstance(raw_config_metadata[tail][0], list):
+                            raw_config_metadata[tail] = {
+                                "parameters": raw_config_metadata[tail][0]
+                            }
+
+                    elif len(raw_config_metadata[tail]) == 2:
+
+                        # include and param definition in file
+                        raw_config_metadata[tail] = {
+                            "include": raw_config_metadata[tail][0]["include"],
+                            "parameters": raw_config_metadata[tail][1],
+                        }
 
                 except yaml.YAMLError as ymle:
                     raise ConfigYamlMalformed(
@@ -127,78 +148,65 @@ class ConfigYamlLoader(object):
 
         """
 
-        def validate_include(config_metadata, config_file, include_dict):
-            # check schema
-            validate(include_dict, INCLUDE_DEF_SCHEMA)
-
-            # check duplicates
-            if len(include_dict["include"]) > len(set(include_dict["include"])):
-                raise ConfigYamlMalformed(
-                    "Duplicate include detected in {}".format(config_file)
-                )
-
-            # check that included yaml is defined elsewhere
-            for included_yaml in include_dict["include"]:
-                if included_yaml not in config_metadata.keys():
-                    raise ConfigYamlMalformed(
-                        "{} config definition could not be found".format(
-                            included_yaml)
-                    )
-
-        def validate_params(config_metadata, config_file, parameter_list):
-            # check schema
-            validate(parameter_list, PARAM_DEF_SCHEMA)
-
-            # get all parameter name list
-            param_names = [
-                list(param_entry.values())[0]["name"] for param_entry in parameter_list
-            ]
-
-            # check duplicates
-            if len(param_names) > len(set(param_names)):
-                raise ConfigYamlMalformed(
-                    "Duplicate parameter detected in {}".format(config_file)
-                )
-
-            # This is an ugly artifact of how the yaml is loaded
-            # we are extracting all the requested types to check that
-            # they are all supported. This is the one thing the schema
-            # can't catch that we would like to check
-            requested_types = [
-                key[0] for key in [list(entry.keys()) for entry in parameter_list]
-            ]
-
-            # check if type requested is supported
-            for requested_type in requested_types:
-                if requested_type not in SUPPORTED_TYPES:
-
-                    raise ConfigYamlMalformed(
-                        "{} type unsupported".format(requested_type)
-                    )
-
-        # validate schema
         for config_file, metadata in config_metadata.items():
 
-            if len(metadata) == 1:
+            if "include" in metadata:
 
-                # include only
-                if isinstance(metadata[0], dict):
-                    validate_include(config_metadata, config_file, metadata[0])
+                # check schema
+                validate(metadata["include"], INCLUDE_DEF_SCHEMA)
 
-                # parameter definitions only
-                if isinstance(metadata[0], list):
-                    validate_params(config_metadata, config_file, metadata[0])
+                # check duplicates
+                if len(metadata["include"]) > len(set(metadata["include"])):
+                    raise ConfigYamlMalformed(
+                        "Duplicate include detected in {}".format(config_file)
+                    )
 
-            elif len(metadata) == 2:
+                # check that included yaml is defined elsewhere
+                for included_yaml in metadata["include"]:
+                    if included_yaml not in config_metadata.keys():
 
-                # include and parameters
-                validate_include(config_metadata, config_file, metadata[0])
-                validate_params(config_metadata, config_file, metadata[1])
+                        raise ConfigYamlMalformed(
+                            "{} in {}, definition could not be found".format(
+                                included_yaml, config_file
+                            )
+                        )
 
-            else:
-                raise ConfigYamlMalformed(
-                    "More than 2 yaml documents found in a file, check format"
-                )
+            if "parameters" in metadata:
+
+                # check schema
+                validate(metadata["parameters"], PARAM_DEF_SCHEMA)
+
+                # get all parameter names as a list, the parameter type comes
+                # first, and the name follows in the dictionary. If the schema
+                # check above passed, its safe to assume the "name" key exists
+                # in the parameter dictionary
+                param_names = [
+                    list(param_entry.values())[0]["name"]
+                    for param_entry in metadata["parameters"]
+                ]
+
+                # check duplicates
+                if len(param_names) > len(set(param_names)):
+                    raise ConfigYamlMalformed(
+                        "Duplicate parameter detected in {}".format(config_file)
+                    )
+
+                # This is an ugly artifact of how the yaml is loaded
+                # we are extracting all the requested types to check that
+                # they are all supported. This is the one thing the schema
+                # can't catch that we would like to check
+                requested_types = [
+                    key[0]
+                    for key in [list(entry.keys()) for entry in metadata["parameters"]]
+                ]
+
+                # check if type requested is supported
+                for requested_type in requested_types:
+                    if requested_type not in SUPPORTED_TYPES:
+
+                        raise ConfigYamlMalformed(
+                            "{} type unsupported".format(requested_type)
+                        )
 
     @staticmethod
     def __detect_cycles_in_config_metadata(config_metadata):
@@ -213,8 +221,8 @@ class ConfigYamlLoader(object):
         edges = []
 
         for config, metadata in config_metadata.items():
-            if "include" in metadata[0]:
-                for included_config in metadata[0]["include"]:
+            if "include" in metadata:
+                for included_config in metadata["include"]:
                     edges.append((config, included_config))
 
         G = networkx.DiGraph(edges)
@@ -249,6 +257,7 @@ class ConfigYamlException(Exception):
 class ConfigYamlCycleDetected(ConfigYamlException):
     """Indicates when there is a cycle in the included configs
     """
+
 
 class ConfigYamlMalformed(ConfigYamlException):
     """Indicates when the yaml has a typo or doesn't follow proper syntax
