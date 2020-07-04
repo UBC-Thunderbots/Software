@@ -393,6 +393,12 @@ Protobufs that we define should follow [Google's Protobuf Style Guide](https://d
 
 * When initializing a protobuf from a unique pointer, avoid passing the `release()`'d pointer to set\_allocated and AddAllocated. Releasing unique pointers makes it too easy to cause memory leaks.
   ```cpp
+  /** Context:
+   * ball_state is field of vision_msg
+   * segments is google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>
+   * tbots_robot_msgs is a repeated field in sensor_msg_1
+   */
+
   // Incorrect
   vision_msg->set_allocated_ball_state(createBallStateMsg(world.ball()).release());
   segments.AddAllocated(segment_1.release());
