@@ -263,7 +263,7 @@ class ConfigYamlException(Exception):
     """
 
     def __init__(self, message):
-        init()
+        init()  # init Fore
         super().__init__(
             Fore.LIGHTRED_EX
             + "Parameter generation error: "
