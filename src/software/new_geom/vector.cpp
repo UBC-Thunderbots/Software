@@ -51,7 +51,10 @@ double Vector::length() const
 
 Vector Vector::normalize() const
 {
-    return length() < 1.0e-9 ? Vector() : Vector(x_ / length(), y_ / length());
+    // 2 * FIXED_EPSILON for error needed:
+    // - mathcalls `hypot` from `length` function call
+    // TODO probably needed because input in test is already FIXED_EPSILON
+    return length() < 2 * FIXED_EPSILON ? Vector() : Vector(x_ / length(), y_ / length());
 }
 
 Vector Vector::normalize(double length) const

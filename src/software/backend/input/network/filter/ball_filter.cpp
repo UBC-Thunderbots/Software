@@ -247,7 +247,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     // How to calculate the error is from
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
     double regression_error =
-        (A * regression_vector - b).norm() / (b.norm() + 1.0e-9);  // norm() is L2 norm
+        (A * regression_vector - b).norm() / (b.norm() + FIXED_EPSILON);  // norm() is L2 norm
 
     // Find 2 points on the regression line that we solved for, and use this to construct
     // our own Line class
