@@ -27,25 +27,33 @@ cc_binary(
         "//firmware_new/boards/frankie_v1/io:drivetrain",
         "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
         "//firmware_new/boards/frankie_v1/io:gpio_pin",
-        "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
         "//firmware_new/boards/frankie_v1/io:pwm_pin",
-        "//shared:constants",
     ],
 )
 
 cc_library(
     name = "frankie_v1_main_lib",
     srcs = [
-        "freertos.c",
         "startup_stm32h743xx.s",
         "stm32h7xx_hal_msp.c",
         "stm32h7xx_it.c",
         "system_stm32h7xx.c",
+        "crc.c",
+        "freertos.c",
+        "gpio.c",
+        "tim.c",
+        "usart.c",
+        "usb_otg.c",
     ],
     hdrs = [
         "FreeRTOSConfig.h",
         "stm32h7xx_hal_conf.h",
         "stm32h7xx_it.h",
+        "crc.h",
+        "gpio.h",
+        "tim.h",
+        "usart.h",
+        "usb_otg.h",
     ],
     copts = [
         "-DSTM32H743xx",
@@ -57,6 +65,9 @@ cc_library(
         ":hal",
         ":lwip",
         "@nanopb",
+        "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
+        "//shared/proto:tbots_nanopb_proto",
+        "//shared:constants",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause
