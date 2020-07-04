@@ -183,15 +183,6 @@ class Vector final
      */
     Vector &operator=(const Vector &other);
 
-    /**
-     * Calculate the angle between this and another Vector
-     *
-     * @param other the other Vector to calculate the angle with
-     *
-     * @return the Angle between this vector and the other vector
-     */
-    Angle angleWith(const Vector &other) const;
-
    private:
     /**
      * The magnitude in the X coordinate of the Vector. The variable name starts with an
