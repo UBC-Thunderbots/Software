@@ -10,7 +10,6 @@ py_binary(
         "//shared/parameter_v2/config:example_configs",
     ],
     main = ":generate_dynamic_parameters.py",
-    python_version = "PY3",
     visibility = ["//shared/parameter_v2:__subpackages__"],
     deps = [
         requirement("PyYAML"),
