@@ -31,3 +31,11 @@ StandaloneSimulatorConfig:
     description: >-
       The multicast channel to use to communicate with the blue robots
       in the simulator
+  SimulatorCommandsConfig:
+    SimulationSpeedMode:
+      min: 0
+      max: 2
+      type: "int"
+      default: 0
+      description: >-
+        The speed mode the simulation is running in

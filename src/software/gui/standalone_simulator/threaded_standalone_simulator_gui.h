@@ -10,6 +10,7 @@
 #include "software/multithreading/threaded_observer.h"
 #include "software/new_geom/rectangle.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * This class wraps a StandaloneSimulatorGUI object so it can run independently
@@ -19,7 +20,7 @@
 class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket>
 {
    public:
-    explicit ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback);
+    explicit ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, std::shared_ptr<SimulatorCommandsConfig> config);
 
     ~ThreadedStandaloneSimulatorGUI() override;
 
@@ -69,4 +70,6 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
 
     std::atomic_bool application_shutting_down;
     int remaining_attempts_to_set_view_area;
+
+    std::shared_ptr<SimulatorCommandsConfig> config;
 };

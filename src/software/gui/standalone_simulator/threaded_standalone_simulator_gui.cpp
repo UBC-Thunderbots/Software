@@ -6,7 +6,7 @@
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 
-ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback)
+ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, std::shared_ptr<SimulatorCommandsConfig> config)
     : ThreadedObserver<SSL_WrapperPacket>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
@@ -14,7 +14,8 @@ ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(const std::functi
       view_area_buffer(
           std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
       application_shutting_down(false),
-      remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
+      remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA),
+      config(config)
 {
     run_standalone_simulator_gui_thread = std::thread(
         &ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI, this, ball_placement_callback);
@@ -49,7 +50,7 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(const st
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
     StandaloneSimulatorGUI* standalone_simulator_gui =
-        new StandaloneSimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer);
+        new StandaloneSimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer, config);
     standalone_simulator_gui->registerBallPlacementCallback(ball_placement_callback);
     standalone_simulator_gui->show();
 

@@ -21,6 +21,7 @@ qt_cc_library(
         "//software/gui/drawing:ssl_wrapper_packet",
         "//software/gui/standalone_simulator/ui:main_widget",
         "//software/multithreading:thread_safe_buffer",
+        "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
         "@qt//:qt_widgets",
     ],

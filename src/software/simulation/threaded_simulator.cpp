@@ -1,7 +1,7 @@
 #include "software/simulation/threaded_simulator.h"
 
 ThreadedSimulator::ThreadedSimulator(const Field &field)
-    : simulator(field), simulation_thread_started(false), stopping_simulation(false)
+    : simulator(field), simulation_thread_started(false), stopping_simulation(false), slow_motion_multiplier(1.0)
 {
 }
 
@@ -43,6 +43,10 @@ void ThreadedSimulator::stopSimulation()
         // Reset the flag in case we want to re-start the simulation
         stopping_simulation = false;
     }
+}
+
+void ThreadedSimulator::setSlowMotionMultiplier(double multiplier) {
+    slow_motion_multiplier = multiplier;
 }
 
 void ThreadedSimulator::setBallState(const BallState &ball_state)
@@ -119,11 +123,10 @@ void ThreadedSimulator::runSimulationLoop()
             }
         }
 
-
         auto simulation_step_end_time =
             simulation_step_start_time +
             std::chrono::microseconds(
-                static_cast<unsigned int>(TIME_STEP_SECONDS * MICROSECONDS_PER_SECOND));
+                static_cast<unsigned int>(slow_motion_multiplier.load() * TIME_STEP_SECONDS * MICROSECONDS_PER_SECOND));
         // TODO: Warn or indicate if we are running slower than real-time
         // https://github.com/UBC-Thunderbots/Software/issues/1491
         std::this_thread::sleep_until(simulation_step_end_time);

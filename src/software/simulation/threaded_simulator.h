@@ -51,6 +51,12 @@ class ThreadedSimulator
     void stopSimulation();
 
     /**
+     * TODO
+     * @param multiplier
+     */
+    void setSlowMotionMultiplier(double multiplier);
+
+    /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
      * in the simulation at a time. If a ball does not already exist, a ball
      * is added with the given state. If a ball already exists, it's state is set to the
@@ -130,6 +136,8 @@ class ThreadedSimulator
     bool simulation_thread_started;
     std::mutex simulation_thread_started_mutex;
     std::atomic_bool stopping_simulation;
+
+    std::atomic<double> slow_motion_multiplier = 1.0;
 
     // 60HZ is approximately the framerate of the real-life cameras
     static constexpr double TIME_STEP_SECONDS = 1.0 / 60.0;
