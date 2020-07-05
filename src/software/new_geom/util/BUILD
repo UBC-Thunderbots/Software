@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "algorithms",
     srcs = [
+        "acute_angle.cpp",
         "almost_equal.cpp",
         "closest_point.cpp",
         "collinear.cpp",
@@ -15,6 +16,7 @@ cc_library(
         "voronoi_diagram.cpp",
     ],
     hdrs = [
+        "acute_angle.h",
         "almost_equal.h",
         "closest_point.h",
         "collinear.h",
@@ -150,6 +152,15 @@ cc_test(
 cc_test(
     name = "furthest_point_test",
     srcs = ["furthest_point_test.cpp"],
+    deps = [
+        ":algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "acute_angle_test",
+    srcs = ["acute_angle_test.cpp"],
     deps = [
         ":algorithms",
         "@gtest//:gtest_main",

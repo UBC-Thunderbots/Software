@@ -7,6 +7,7 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
+#include "software/new_geom/util/acute_angle.h"
 #include "software/parameter/dynamic_parameters.h"
 
 double ratePass(const World& world, const Pass& pass,
@@ -101,8 +102,8 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
-    Angle goal_angle = acuteVertexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
-                                        field.enemyGoalpostPos())
+    Angle goal_angle = acuteAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
+                                  field.enemyGoalpostPos())
                            .abs();
     double net_percent_open = 0;
     if (goal_angle > Angle::zero())
