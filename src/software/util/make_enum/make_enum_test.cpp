@@ -61,3 +61,11 @@ TEST(EnumMacroTest, test_macro_generated_functions)
     EXPECT_EQ(std::vector<TestEnum>({TestEnum::Var1, TestEnum::Var2}),
               allValuesTestEnum());
 }
+
+TEST(EnumMacroTest, test_macro_from_string)
+{
+    EXPECT_EQ(2, sizeTestEnum());
+    EXPECT_EQ(TestEnum::Var1, fromStringToTestEnum("Var1"));
+    EXPECT_EQ(TestEnum::Var2, fromStringToTestEnum("Var2"));
+    EXPECT_THROW(fromStringToTestEnum("Var3"), std::invalid_argument);
+}

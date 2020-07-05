@@ -80,6 +80,19 @@ std::vector<std::string> separateEnumStrings(std::string enum_string);
         std::vector<std::string> enum_strings = separateEnumStrings(str);                  \
         return enum_strings.size();                                                        \
     }                                                                                      \
+    static inline name fromStringTo##name(std::string str_in)                              \
+    {                                                                                      \
+        std::string str                       = #__VA_ARGS__;                              \
+        std::vector<std::string> enum_strings = separateEnumStrings(str);                  \
+        for (size_t i = 0; i < enum_strings.size(); i++)                                   \
+        {                                                                                  \
+            if (str_in == enum_strings[i])                                                 \
+            {                                                                              \
+                return static_cast<name>(i);                                               \
+            }                                                                              \
+        }                                                                                  \
+        throw std::invalid_argument(str_in + " cannot be converted to " + #name);          \
+    }                                                                                      \
     static inline std::vector<name> allValues##name()                                      \
     {                                                                                      \
         std::vector<name> values;                                                          \

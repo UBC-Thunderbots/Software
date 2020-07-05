@@ -112,7 +112,8 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 enemy_shot_vector.normalize(this->shadow_distance);
 
             // If the enemy robot already had the ball, try steal it and chip it away
-            if (*robotHasPossession(ball, enemy_robot) &&
+            if (*robotHasPossession(ball.getPreviousStates(),
+                                    enemy_robot.getPreviousStates()) &&
                 ball.velocity().length() <= ball_steal_speed)
             {
                 move_action->updateControlParams(

@@ -10,6 +10,7 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/util/calculate_block_cone.h"
 #include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
@@ -259,7 +260,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
             // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
             // either side
-            Point goalie_pos = calcBlockCone(
+            Point goalie_pos = calculateBlockCone(
                 field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
                 block_cone_radius * block_cone_angle.toRadians());
 

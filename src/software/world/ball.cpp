@@ -41,21 +41,6 @@ void Ball::updateState(const TimestampedBallState &new_state)
     states_.push_front(new_state);
 }
 
-void Ball::updateStateToPredictedState(const Timestamp &timestamp)
-{
-    if (timestamp < lastUpdateTimestamp())
-    {
-        throw std::invalid_argument(
-            "Error: Predicted state is updating times from the past");
-    }
-
-    auto duration_in_future = timestamp - lastUpdateTimestamp();
-    Point new_position      = estimatePositionAtFutureTime(duration_in_future);
-    Vector new_velocity     = estimateVelocityAtFutureTime(duration_in_future);
-
-    updateState(TimestampedBallState(new_position, new_velocity, timestamp));
-}
-
 Timestamp Ball::lastUpdateTimestamp() const
 {
     return states_.front().timestamp();
@@ -63,61 +48,17 @@ Timestamp Ball::lastUpdateTimestamp() const
 
 Point Ball::position() const
 {
-    return states_.front().ballState().position();
-}
-
-Point Ball::estimatePositionAtFutureTime(const Duration &duration_in_future) const
-{
-    if (duration_in_future < Duration::fromSeconds(0))
-    {
-        throw std::invalid_argument(
-            "Error: Position estimate is updating times from the past");
-    }
-
-    // TODO: This is a simple linear implementation that does not necessarily reflect
-    // real-world behavior. Position prediction should be improved as outlined in
-    // https://github.com/UBC-Thunderbots/Software/issues/47
-    double seconds_in_future = duration_in_future.getSeconds();
-    return position() + (velocity().normalize(seconds_in_future * velocity().length()));
+    return states_.front().state().position();
 }
 
 Vector Ball::velocity() const
 {
-    return states_.front().ballState().velocity();
+    return states_.front().state().velocity();
 }
 
-Vector Ball::estimateVelocityAtFutureTime(const Duration &duration_in_future) const
-{
-    if (duration_in_future < Duration::fromSeconds(0))
-    {
-        throw std::invalid_argument(
-            "Error: Velocity estimate is updating times from the past");
-    }
-
-    // TODO: This is a implementation with an empirically determined time constant that
-    // does not necessarily reflect real-world behavior. Velocity prediction should be
-    // improved as outlined in https://github.com/UBC-Thunderbots/Software/issues/47
-    double seconds_in_future = duration_in_future.getSeconds();
-    return velocity() * exp(-0.1 * seconds_in_future);
-}
-
-boost::circular_buffer<TimestampedBallState> Ball::getPreviousStates() const
+BallHistory Ball::getPreviousStates() const
 {
     return states_;
-}
-
-std::optional<int> Ball::getHistoryIndexFromTimestamp(const Timestamp &timestamp) const
-{
-    for (unsigned i = 0; i < states_.size(); i++)
-    {
-        double timestamp_diff =
-            fabs((timestamp - states_.at(i).timestamp()).getMilliseconds());
-
-        // If timestamp is close to desired timestamp, return the index.
-        if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
-            return i;
-    }
-    return std::nullopt;
 }
 
 bool Ball::operator==(const Ball &other) const

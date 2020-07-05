@@ -63,26 +63,6 @@ class Robot
     TimestampedRobotState currentState() const;
 
     /**
-     * Updates the robot's state to be its predicted state at the given timestamp.
-     * The timestamp must be >= the robot's last update timestamp
-     *
-     * @param timestamp The timestamp at which to update the robot's state to. Must
-     * be >= the robot's last update timestamp
-     * @throws std::invalid_argument if the robot is updated with a time from the past
-     */
-    void updateStateToPredictedState(const Timestamp &timestamp);
-
-    /**
-     * Updates the robot's state to be its predicted state at the given duration from the
-     * last time it was updated.
-     *
-     * @param duration_in_future A duration >= 0.0 that indicates how long in the future
-     * (from the last time this robot was updated) to update the robot state by
-     * @throws std::invalid_argument if the duration given is negative
-     */
-    void updateStateToPredictedState(const Duration &duration_in_future);
-
-    /**
      * Returns the timestamp for when this robot's data was last updated
      *
      * @return the timestamp for when this robot's data was last updated
@@ -104,43 +84,11 @@ class Robot
     Point position() const;
 
     /**
-     * Returns the estimated position of the robot at a future time, relative to when
-     * the robot was last updated
-     *
-     * @param duration_in_future The relative amount of time in the future
-     * at which to predict the robot's position. Value must be >= 0.
-     * For example, a value of 1.5 seconds would return the estimated position of the
-     * robot 1.5 seconds in the future.
-     *
-     * @throws std::invalid_argument if the robot is estimating the position with a time
-     * from the past
-     * @return the estimated position of the robot at the given number of milliseconds
-     * in the future. Coordinates are in metres.
-     */
-    Point estimatePositionAtFutureTime(const Duration &duration_in_future) const;
-
-    /**
      * Returns the current velocity of the robot
      *
      * @return the current velocity of the robot
      */
     Vector velocity() const;
-
-    /**
-     * Returns the estimated velocity of the robot at a future time, relative to when
-     * the robot was last updated
-     *
-     * @param duration_in_future The relative amount of time in the future
-     * at which to predict the robot's velocity. Value must be >= 0.
-     * For example, a value of 1.5 seconds would return the estimated velocity of the
-     * robot 1.5 seconds in the future.
-     *
-     * @throws std::invalid_argument if the robot is estimating the velocity with a time
-     * from the past
-     * @return the estimated velocity of the robot at the given number of milliseconds
-     * in the future, in metres per second
-     */
-    Vector estimateVelocityAtFutureTime(const Duration &duration_in_future) const;
 
     /**
      * Returns the current orientation of the robot
@@ -150,22 +98,6 @@ class Robot
     Angle orientation() const;
 
     /**
-     * Returns the estimated orientation of the robot at a future time, relative to when
-     * the robot was last updated
-     *
-     * @param duration_in_future The relative amount of time in the future
-     * at which to predict the robot's orientation. Value must be >= 0.
-     * For example, a value of 1.5 seconds would return the estimated orientation of the
-     * robot 1.5 seconds in the future.
-     *
-     * @throws std::invalid_argument if the robot is estimating the orientation with a
-     * time from the past
-     * @return the estimated orientation of the robot at the given number of milliseconds
-     * in the future. Coordinates are in metres.
-     */
-    Angle estimateOrientationAtFutureTime(const Duration &duration_in_future) const;
-
-    /**
      * Returns the current angular velocity of the robot
      *
      * @return the current angular velocity of the robot
@@ -173,39 +105,12 @@ class Robot
     AngularVelocity angularVelocity() const;
 
     /**
-     * Returns the estimated angular velocity of the robot at a future time, relative to
-     * when the robot was last updated
-     *
-     * @param duration_in_future The relative amount of time in the future
-     * at which to predict the robot's angular velocity. Value must be
-     * >= 0. For example, a value of 1.5 seconds would return the estimated angular
-     * velocity of the robot 1.5 seconds in the future.
-     *
-     * @throws std::invalid_argument if the robot is estimating the angular velocity with
-     * a time from the past
-     * @return the estimated angular velocity of the robot at the given number of
-     * milliseconds in the future. Coordinates are in metres. Coordinates are in metres.
-     */
-    AngularVelocity estimateAngularVelocityAtFutureTime(
-        const Duration &duration_in_future) const;
-
-    /**
      * Gets the buffer which holds all of the previous states
      *
      * @return circular_buffer containing all previous states up to the history_size field
      * cap
      */
-    boost::circular_buffer<TimestampedRobotState> getPreviousStates() const;
-
-    /**
-     * Finds an update timestamp that is close to the provided timestamp and returns the
-     * index of the timestamp in the history buffer.
-     *
-     * @param timestamp timestamp of the update state index we wish to fetch
-     * @return Index of the robot's update timestamp closest to the desired time or a
-     * std::nullopt if there is not matching timestamp.
-     */
-    std::optional<int> getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
+    RobotHistory getPreviousStates() const;
 
     /**
      * Returns the missing capabilities of the robot
@@ -273,7 +178,7 @@ class Robot
     // queue, This buffer will never be empty as it's initialized with a RobotState on
     // creation
     // The buffer size (history_size) must be > 0
-    boost::circular_buffer<TimestampedRobotState> states_;
+    RobotHistory states_;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapability> unavailable_capabilities_;

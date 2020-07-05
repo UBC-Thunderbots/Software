@@ -48,18 +48,6 @@ class NetworkClient
     NetworkClient()                                = delete;
 
    private:
-    // TODO: Remove this wrapper function once we move to a better simulator
-    // https://github.com/UBC-Thunderbots/Software/issues/609
-    /**
-     * A wrapper function for the filterAndPublishVisionData function. This wrapper is
-     * responsible for ignoring any bad packets we get from grSim, because grSim
-     * sends garbage packets from very far in the future that causes issues if they
-     * get through to our filters and logic.
-     *
-     * @param packet The vision packet
-     */
-    void filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet);
-
     /**
      * Filters and publishes the new vision data
      *

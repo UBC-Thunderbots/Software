@@ -15,22 +15,22 @@
  *                        opensource.org/licenses/BSD-3-Clause
  *
  ******************************************************************************
- */ /* USER CODE END Header */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
 #include "cmsis_os.h"
+#include "crc.h"
+#include "gpio.h"
 #include "lwip.h"
+#include "tim.h"
+#include "usart.h"
+#include "usb_otg.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
-#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
-#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
-#include "shared/constants.h"
-#include "shared/proto/tbots_robot_msg.pb.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 
 /* USER CODE END Includes */
 
@@ -51,72 +51,21 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-CRC_HandleTypeDef hcrc;
-
-TIM_HandleTypeDef htim4;
-
-UART_HandleTypeDef huart3;
-
-PCD_HandleTypeDef hpcd_USB_OTG_FS;
-
-/* Definitions for NetStartTask */
-osThreadId_t NetStartTaskHandle;
-const osThreadAttr_t NetStartTask_attributes = {.name     = "NetStartTask",
-                                                .priority = (osPriority_t)osPriorityHigh7,
-                                                .stack_size = 1024 * 4};
-/* Definitions for RobotStatusTask */
-osThreadId_t RobotStatusTaskHandle;
-const osThreadAttr_t RobotStatusTask_attributes = {
-    .name       = "RobotStatusTask",
-    .priority   = (osPriority_t)osPriorityHigh7,
-    .stack_size = 1024 * 4};
-/* Definitions for VisionMsgTask */
-osThreadId_t VisionMsgTaskHandle;
-const osThreadAttr_t VisionMsgTask_attributes = {
-    .name       = "VisionMsgTask",
-    .priority   = (osPriority_t)osPriorityHigh7,
-    .stack_size = 1024 * 4};
-/* Definitions for PrimMsgTask */
-osThreadId_t PrimMsgTaskHandle;
-const osThreadAttr_t PrimMsgTask_attributes = {.name     = "PrimMsgTask",
-                                               .priority = (osPriority_t)osPriorityHigh7,
-                                               .stack_size = 1024 * 4};
-/* Definitions for testMsgUpdate */
-osThreadId_t testMsgUpdateHandle;
-const osThreadAttr_t testMsgUpdate_attributes = {
-    .name       = "testMsgUpdate",
-    .priority   = (osPriority_t)osPriorityNormal1,
-    .stack_size = 1024 * 4};
 /* USER CODE BEGIN PV */
 
-ProtoMulticastCommunicationProfile_t *tbots_robot_msg_sender_profile;
-ProtoMulticastCommunicationProfile_t *vision_msg_listener_profile;
-ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
-
-static VisionMsg vision_msg;
-static TbotsRobotMsg tbots_robot_msg;
-static PrimitiveMsg primitive_msg;
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MPU_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_USART3_UART_Init(void);
-static void MX_USB_OTG_FS_PCD_Init(void);
-static void MX_CRC_Init(void);
-static void MX_TIM4_Init(void);
-void io_proto_multicast_startNetworkingTask(void *argument);
-extern void io_proto_multicast_sender_task(void *argument);
-extern void io_proto_multicast_listener_task(void *argument);
-void test_msg_update(void *argument);
-
+void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 static void initIoLayer(void);
 static void initIoDrivetrain(void);
 static void initIoNetworking(void);
+
 
 /* USER CODE END PFP */
 
@@ -174,28 +123,6 @@ void initIoDrivetrain(void)
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
 }
 
-void initIoNetworking()
-{
-    // TODO this needs to be hooked up to the channel dial on the robot, when available
-    // https://github.com/UBC-Thunderbots/Software/issues/1517
-    unsigned channel = 0;
-
-    io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
-
-    primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
-        "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
-        &primitive_msg, PrimitiveMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
-
-    vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
-        "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
-        &vision_msg, VisionMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
-
-    tbots_robot_msg_sender_profile = io_proto_multicast_communication_profile_create(
-        "tbots_robot_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
-        &tbots_robot_msg, TbotsRobotMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
-}
-
-
 /* USER CODE END 0 */
 
 /**
@@ -246,53 +173,8 @@ int main(void)
     /* USER CODE END 2 */
 
     /* Init scheduler */
-    osKernelInitialize();
-
-    /* USER CODE BEGIN RTOS_MUTEX */
-    /* add mutexes, ... */
-    /* USER CODE END RTOS_MUTEX */
-
-    /* USER CODE BEGIN RTOS_SEMAPHORES */
-    /* add semaphores, ... */
-    /* USER CODE END RTOS_SEMAPHORES */
-
-    /* USER CODE BEGIN RTOS_TIMERS */
-    /* start timers, add new ones, ... */
-    /* USER CODE END RTOS_TIMERS */
-
-    /* USER CODE BEGIN RTOS_QUEUES */
-    /* add queues, ... */
-    /* USER CODE END RTOS_QUEUES */
-
-    /* Create the thread(s) */
-    /* creation of NetStartTask */
-    NetStartTaskHandle = osThreadNew(io_proto_multicast_startNetworkingTask, NULL,
-                                     &NetStartTask_attributes);
-
-    /* creation of RobotStatusTask */
-    RobotStatusTaskHandle =
-        osThreadNew(io_proto_multicast_sender_task,
-                    (void *)tbots_robot_msg_sender_profile, &RobotStatusTask_attributes);
-
-    /* creation of VisionMsgTask */
-    VisionMsgTaskHandle =
-        osThreadNew(io_proto_multicast_listener_task, (void *)vision_msg_listener_profile,
-                    &VisionMsgTask_attributes);
-
-    /* creation of PrimMsgTask */
-    PrimMsgTaskHandle =
-        osThreadNew(io_proto_multicast_listener_task,
-                    (void *)primitive_msg_listener_profile, &PrimMsgTask_attributes);
-
-    /* creation of testMsgUpdate */
-    testMsgUpdateHandle =
-        osThreadNew(test_msg_update, (void *)tbots_robot_msg_sender_profile,
-                    &testMsgUpdate_attributes);
-
-    /* USER CODE BEGIN RTOS_THREADS */
-
-    /* USER CODE END RTOS_THREADS */
-
+    osKernelInitialize(); /* Call init function for freertos objects (in freertos.c) */
+    MX_FREERTOS_Init();
     /* Start scheduler */
     osKernelStart();
 
@@ -375,367 +257,9 @@ void SystemClock_Config(void)
     HAL_PWREx_EnableUSBVoltageDetector();
 }
 
-/**
- * @brief CRC Initialization Function
- * @param None
- * @retval None
- */
-static void MX_CRC_Init(void)
-{
-    /* USER CODE BEGIN CRC_Init 0 */
-
-    /* USER CODE END CRC_Init 0 */
-
-    /* USER CODE BEGIN CRC_Init 1 */
-
-    /* USER CODE END CRC_Init 1 */
-    hcrc.Instance                     = CRC;
-    hcrc.Init.DefaultPolynomialUse    = DEFAULT_POLYNOMIAL_ENABLE;
-    hcrc.Init.DefaultInitValueUse     = DEFAULT_INIT_VALUE_ENABLE;
-    hcrc.Init.InputDataInversionMode  = CRC_INPUTDATA_INVERSION_NONE;
-    hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE;
-    hcrc.InputDataFormat              = CRC_INPUTDATA_FORMAT_BYTES;
-    if (HAL_CRC_Init(&hcrc) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN CRC_Init 2 */
-
-    /* USER CODE END CRC_Init 2 */
-}
-
-/**
- * @brief TIM4 Initialization Function
- * @param None
- * @retval None
- */
-static void MX_TIM4_Init(void)
-{
-    /* USER CODE BEGIN TIM4_Init 0 */
-
-    /* USER CODE END TIM4_Init 0 */
-
-    TIM_MasterConfigTypeDef sMasterConfig = {0};
-    TIM_OC_InitTypeDef sConfigOC          = {0};
-
-    /* USER CODE BEGIN TIM4_Init 1 */
-
-    /* USER CODE END TIM4_Init 1 */
-    htim4.Instance               = TIM4;
-    htim4.Init.Prescaler         = 9 - 1;
-    htim4.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    htim4.Init.Period            = 400 - 1;
-    htim4.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
-    htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-    sMasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
-    if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    sConfigOC.OCMode     = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse      = 0;
-    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN TIM4_Init 2 */
-
-    /* USER CODE END TIM4_Init 2 */
-    HAL_TIM_MspPostInit(&htim4);
-}
-
-/**
- * @brief USART3 Initialization Function
- * @param None
- * @retval None
- */
-static void MX_USART3_UART_Init(void)
-{
-    /* USER CODE BEGIN USART3_Init 0 */
-
-    /* USER CODE END USART3_Init 0 */
-
-    /* USER CODE BEGIN USART3_Init 1 */
-
-    /* USER CODE END USART3_Init 1 */
-    huart3.Instance                    = USART3;
-    huart3.Init.BaudRate               = 115200;
-    huart3.Init.WordLength             = UART_WORDLENGTH_8B;
-    huart3.Init.StopBits               = UART_STOPBITS_1;
-    huart3.Init.Parity                 = UART_PARITY_NONE;
-    huart3.Init.Mode                   = UART_MODE_TX_RX;
-    huart3.Init.HwFlowCtl              = UART_HWCONTROL_NONE;
-    huart3.Init.OverSampling           = UART_OVERSAMPLING_16;
-    huart3.Init.OneBitSampling         = UART_ONE_BIT_SAMPLE_DISABLE;
-    huart3.Init.ClockPrescaler         = UART_PRESCALER_DIV1;
-    huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-    if (HAL_UART_Init(&huart3) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN USART3_Init 2 */
-
-    /* USER CODE END USART3_Init 2 */
-}
-
-/**
- * @brief USB_OTG_FS Initialization Function
- * @param None
- * @retval None
- */
-static void MX_USB_OTG_FS_PCD_Init(void)
-{
-    /* USER CODE BEGIN USB_OTG_FS_Init 0 */
-
-    /* USER CODE END USB_OTG_FS_Init 0 */
-
-    /* USER CODE BEGIN USB_OTG_FS_Init 1 */
-
-    /* USER CODE END USB_OTG_FS_Init 1 */
-    hpcd_USB_OTG_FS.Instance                     = USB_OTG_FS;
-    hpcd_USB_OTG_FS.Init.dev_endpoints           = 9;
-    hpcd_USB_OTG_FS.Init.speed                   = PCD_SPEED_FULL;
-    hpcd_USB_OTG_FS.Init.dma_enable              = DISABLE;
-    hpcd_USB_OTG_FS.Init.phy_itface              = PCD_PHY_EMBEDDED;
-    hpcd_USB_OTG_FS.Init.Sof_enable              = ENABLE;
-    hpcd_USB_OTG_FS.Init.low_power_enable        = DISABLE;
-    hpcd_USB_OTG_FS.Init.lpm_enable              = DISABLE;
-    hpcd_USB_OTG_FS.Init.battery_charging_enable = ENABLE;
-    hpcd_USB_OTG_FS.Init.vbus_sensing_enable     = ENABLE;
-    hpcd_USB_OTG_FS.Init.use_dedicated_ep1       = DISABLE;
-    if (HAL_PCD_Init(&hpcd_USB_OTG_FS) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN USB_OTG_FS_Init 2 */
-
-    /* USER CODE END USB_OTG_FS_Init 2 */
-}
-
-/**
- * @brief GPIO Initialization Function
- * @param None
- * @retval None
- */
-static void MX_GPIO_Init(void)
-{
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    /* GPIO Ports Clock Enable */
-    __HAL_RCC_GPIOC_CLK_ENABLE();
-    __HAL_RCC_GPIOF_CLK_ENABLE();
-    __HAL_RCC_GPIOH_CLK_ENABLE();
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    __HAL_RCC_GPIOD_CLK_ENABLE();
-    __HAL_RCC_GPIOG_CLK_ENABLE();
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(
-        GPIOF,
-        wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
-            wheel_motor_front_right_coast_Pin | wheel_motor_front_right_mode_Pin |
-            wheel_motor_front_right_direction_Pin | wheel_motor_front_right_brake_Pin |
-            wheel_motor_front_right_esf_Pin,
-        GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(
-        GPIOC, wheel_motor_back_right_coast_Pin | wheel_motor_back_left_direction_Pin,
-        GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOA,
-                      wheel_motor_back_right_brake_Pin |
-                          wheel_motor_back_right_reset_Pin |
-                          wheel_motor_back_right_direction_Pin,
-                      GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(
-        GPIOB,
-        wheel_motor_back_left_brake_Pin | wheel_motor_back_left_esf_Pin |
-            wheel_motor_front_left_esf_Pin | wheel_motor_back_left_reset_Pin |
-            wheel_motor_back_left_coast_Pin | LD3_Pin | wheel_motor_back_left_mode_Pin |
-            wheel_motor_front_left_reset_Pin | wheel_motor_front_left_coast_Pin |
-            wheel_motor_front_left_mode_Pin | LD2_Pin |
-            wheel_motor_front_left_direction_Pin | wheel_motor_front_left_brake_Pin,
-        GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(wheel_motor_back_right_mode_GPIO_Port,
-                      wheel_motor_back_right_mode_Pin, GPIO_PIN_RESET);
-
-    /*Configure GPIO pin : USER_Btn_Pin */
-    GPIO_InitStruct.Pin  = USER_Btn_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : wheel_motor_back_right_esf_Pin
-       wheel_motor_front_right_reset_Pin wheel_motor_front_right_coast_Pin
-       wheel_motor_front_right_mode_Pin wheel_motor_front_right_direction_Pin
-       wheel_motor_front_right_brake_Pin wheel_motor_front_right_esf_Pin */
-    GPIO_InitStruct.Pin =
-        wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
-        wheel_motor_front_right_coast_Pin | wheel_motor_front_right_mode_Pin |
-        wheel_motor_front_right_direction_Pin | wheel_motor_front_right_brake_Pin |
-        wheel_motor_front_right_esf_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : wheel_motor_back_right_coast_Pin
-     * wheel_motor_back_left_direction_Pin */
-    GPIO_InitStruct.Pin =
-        wheel_motor_back_right_coast_Pin | wheel_motor_back_left_direction_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : wheel_motor_back_right_brake_Pin
-     * wheel_motor_back_right_reset_Pin wheel_motor_back_right_direction_Pin */
-    GPIO_InitStruct.Pin = wheel_motor_back_right_brake_Pin |
-                          wheel_motor_back_right_reset_Pin |
-                          wheel_motor_back_right_direction_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : wheel_motor_back_left_brake_Pin wheel_motor_back_left_esf_Pin
-       wheel_motor_front_left_esf_Pin wheel_motor_back_left_reset_Pin
-                             wheel_motor_back_left_coast_Pin LD3_Pin
-       wheel_motor_back_left_mode_Pin wheel_motor_front_left_reset_Pin
-                             wheel_motor_front_left_coast_Pin
-       wheel_motor_front_left_mode_Pin LD2_Pin wheel_motor_front_left_direction_Pin
-                             wheel_motor_front_left_brake_Pin */
-    GPIO_InitStruct.Pin =
-        wheel_motor_back_left_brake_Pin | wheel_motor_back_left_esf_Pin |
-        wheel_motor_front_left_esf_Pin | wheel_motor_back_left_reset_Pin |
-        wheel_motor_back_left_coast_Pin | LD3_Pin | wheel_motor_back_left_mode_Pin |
-        wheel_motor_front_left_reset_Pin | wheel_motor_front_left_coast_Pin |
-        wheel_motor_front_left_mode_Pin | LD2_Pin | wheel_motor_front_left_direction_Pin |
-        wheel_motor_front_left_brake_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    /*Configure GPIO pin : USB_PowerSwitchOn_Pin */
-    GPIO_InitStruct.Pin   = USB_PowerSwitchOn_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(USB_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
-
-    /*Configure GPIO pin : USB_OverCurrent_Pin */
-    GPIO_InitStruct.Pin  = USB_OverCurrent_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
-
-    /*Configure GPIO pin : wheel_motor_back_right_mode_Pin */
-    GPIO_InitStruct.Pin   = wheel_motor_back_right_mode_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(wheel_motor_back_right_mode_GPIO_Port, &GPIO_InitStruct);
-}
-
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
-
-/* USER CODE BEGIN Header_io_proto_multicast_startNetworkingTask */
-/**
- * @brief  Function implementing the NetStartTask thread.
- * @param  argument: Not used
- * @retval None
- */
-/* USER CODE END Header_io_proto_multicast_startNetworkingTask */
-__weak void io_proto_multicast_startNetworkingTask(void *argument)
-{
-    /* init code for LWIP */
-    MX_LWIP_Init();
-    /* USER CODE BEGIN 5 */
-    /* Infinite loop */
-    for (;;)
-    {
-        osDelay(1);
-    }
-    /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_test_msg_update */
-/**
- * @brief Function implementing the testMsgUpdate thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_test_msg_update */
-void test_msg_update(void *argument)
-{
-    /* USER CODE BEGIN test_msg_update */
-
-    // TODO https://github.com/UBC-Thunderbots/Software/issues/1519
-    // This is a placeholder task to test sending robot status NOT
-    // associated with a ticket because how the robot status msgs will be
-    // updated and sent is TBD
-    ProtoMulticastCommunicationProfile_t *comm_profile =
-        (ProtoMulticastCommunicationProfile_t *)argument;
-
-    /* Infinite loop */
-    for (;;)
-    {
-        io_proto_multicast_communication_profile_acquireLock(comm_profile);
-        // TODO enable SNTP sys_now is currently only time since reset
-        // https://github.com/UBC-Thunderbots/Software/issues/1518
-        tbots_robot_msg.time_sent.epoch_timestamp_seconds = sys_now();
-        io_proto_multicast_communication_profile_releaseLock(comm_profile);
-        io_proto_multicast_communication_profile_notifyEvents(comm_profile,
-                                                              PROTO_UPDATED);
-        // run loop at 100hz
-        osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
-    }
-    /* USER CODE END test_msg_update */
-}
 
 /* MPU Configuration */
 

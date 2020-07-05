@@ -41,12 +41,9 @@ FullSystemGUI::FullSystemGUI(
     setupRobotStatusTable(main_widget->robot_status_table_widget);
     setupAIControls(main_widget, config);
 
-    // Update to make sure all layout changes apply nicely
-    update();
-
     connect(update_timer, &QTimer::timeout, this, &FullSystemGUI::handleUpdate);
     update_timer->start(static_cast<int>(
-        Duration::fromMilliseconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
+        Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
 }
 
 void FullSystemGUI::handleUpdate()

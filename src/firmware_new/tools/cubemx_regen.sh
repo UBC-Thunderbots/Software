@@ -59,8 +59,8 @@ CUBE_SCRIPT='''
 # Load the project-specific config file (.ioc)
 config load %s
 
-# Generate the peripheral initializations in main.c
-project couplefilesbyip 0
+# Generate the peripheral initializations in separated files
+project couplefilesbyip 1
 
 # Generate code in the project directory
 generate code %s
