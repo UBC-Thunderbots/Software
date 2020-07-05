@@ -58,10 +58,10 @@ PARAM_DEF_SCHEMA = {
                 "uint": {
                     "type": "object",
                     "properties": {
-                        "name": {"type": "string", "minimum": 0},
+                        "name": {"type": "string"},
                         "min": {"type": "integer", "minimum": 0},
                         "max": {"type": "integer", "minimum": 0},
-                        "value": {"type": "integer"},
+                        "value": {"type": "integer", "minimum": 0},
                         "description": {"type": "string"},
                     },
                     "required": ["name", "min", "max", "value", "description"],
