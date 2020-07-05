@@ -1,31 +1,31 @@
 #pragma once
 
 template <typename T, ThreadedObserverOrdering Ordering>
-TThreadedObserver<T, Ordering>::TThreadedObserver(size_t buffer_size)
+GenericThreadedObserver<T, Ordering>::GenericThreadedObserver(size_t buffer_size)
     : Observer<T>(buffer_size),
       in_destructor(false),
       IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {
     pull_from_buffer_thread = std::thread(
-        boost::bind(&TThreadedObserver::continuouslyPullValuesFromBuffer, this));
+        boost::bind(&GenericThreadedObserver::continuouslyPullValuesFromBuffer, this));
 }
 
 template <typename T, ThreadedObserverOrdering Ordering>
-void TThreadedObserver<T, Ordering>::onValueReceived(T val)
+void GenericThreadedObserver<T, Ordering>::onValueReceived(T val)
 {
     // Do nothing, this function should be overriden to enable custom behavior on
     // message reception.
 }
 
 template <typename T, ThreadedObserverOrdering Ordering>
-void TThreadedObserver<T, Ordering>::continuouslyPullValuesFromBuffer()
+void GenericThreadedObserver<T, Ordering>::continuouslyPullValuesFromBuffer()
 {
     do
     {
         in_destructor_mutex.unlock();
         std::optional<T> new_val;
 
-        if constexpr (Ordering == ThreadedObserverOrdering::Queue)
+        if constexpr (Ordering == ThreadedObserverOrdering::QUEUE)
         {
             new_val = this->popLeastRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
         }
@@ -44,7 +44,7 @@ void TThreadedObserver<T, Ordering>::continuouslyPullValuesFromBuffer()
 }
 
 template <typename T, ThreadedObserverOrdering Ordering>
-TThreadedObserver<T, Ordering>::~TThreadedObserver()
+GenericThreadedObserver<T, Ordering>::~GenericThreadedObserver()
 {
     in_destructor_mutex.lock();
     in_destructor = true;

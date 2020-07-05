@@ -1,11 +1,13 @@
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
+#include "software/backend/input/replay/replay_logger.h"
+#include "software/backend/input/replay/replay_reader.h"
 #include "software/multithreading/subject.h"
-#include "software/replay/replay_logger.h"
-#include "software/replay/replay_reader.h"
 
-constexpr const char* REPLAY_TEST_PATH_SUFFIX = "software/replay/test_replay";
+// the working directory of tests are the bazel WORKSPACE root (in this case, src)
+// this path is relative to the current working directory, i.e. the bazel root
+constexpr const char* REPLAY_TEST_PATH_SUFFIX = "software/backend/input/replay/test_replay";
 
 namespace fs = std::experimental::filesystem;
 
@@ -61,8 +63,11 @@ TEST(ReplayTest, test_read_and_write_replay)
         // we have 12000 frames of replay so we have to try to not fill the buffer
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    // unfortunately we have to do this
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    // unfortunately we have to do this because there is otherwise no way to 'guarantee'
+    // that the entire buffer of messages in the ThreadedObserver has been cleared and
+    // written to disk by the ReplayLogger
+    // This duration needs to be long enough to de facto make this a 'guarantee'
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     for (const auto& dir_entry : fs::directory_iterator(output_path))
     {
         std::cout << dir_entry << std::endl;

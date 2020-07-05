@@ -7,8 +7,8 @@
 
 enum class ThreadedObserverOrdering
 {
-    Queue,  // first in, first out
-    Stack   // last in, first out
+    QUEUE,  // first in, first out
+    STACK   // last in, first out
 };
 
 /**
@@ -19,18 +19,18 @@ enum class ThreadedObserverOrdering
  * @tparam T The type of object this class is observing
  */
 template <typename T, ThreadedObserverOrdering Ordering>
-class TThreadedObserver : public Observer<T>
+class GenericThreadedObserver : public Observer<T>
 {
    public:
-    explicit TThreadedObserver(size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
+    explicit GenericThreadedObserver(size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
 
-    ~TThreadedObserver() override;
+    ~GenericThreadedObserver() override;
 
     // Delete the copy and assignment operators because this class really shouldn't need
     // them and we don't want to risk doing anything nasty with the internal
     // multithreading this class uses
-    TThreadedObserver &operator=(const TThreadedObserver &) = delete;
-    TThreadedObserver(const TThreadedObserver &)            = delete;
+    GenericThreadedObserver &operator=(const GenericThreadedObserver &) = delete;
+    GenericThreadedObserver(const GenericThreadedObserver &)            = delete;
 
    private:
     /**
@@ -72,23 +72,23 @@ class TThreadedObserver : public Observer<T>
 };
 
 template <typename T>
-class ThreadedObserver : public TThreadedObserver<T, ThreadedObserverOrdering::Stack>
+class ThreadedObserver : public GenericThreadedObserver<T, ThreadedObserverOrdering::STACK>
 {
    public:
-    ThreadedObserver<T>() : TThreadedObserver<T, ThreadedObserverOrdering::Stack>(){};
+    ThreadedObserver<T>() : GenericThreadedObserver<T, ThreadedObserverOrdering::STACK>(){};
     explicit ThreadedObserver<T>(size_t buffer_size)
-        : TThreadedObserver<T, ThreadedObserverOrdering::Stack>(buffer_size){};
+        : GenericThreadedObserver<T, ThreadedObserverOrdering::STACK>(buffer_size){};
 };
 
 template <typename T>
 class OrderedThreadedObserver
-    : public TThreadedObserver<T, ThreadedObserverOrdering::Queue>
+    : public GenericThreadedObserver<T, ThreadedObserverOrdering::QUEUE>
 {
    public:
     OrderedThreadedObserver<T>()
-        : TThreadedObserver<T, ThreadedObserverOrdering::Queue>(){};
+        : GenericThreadedObserver<T, ThreadedObserverOrdering::QUEUE>(){};
     explicit OrderedThreadedObserver<T>(size_t buffer_size)
-        : TThreadedObserver<T, ThreadedObserverOrdering::Queue>(buffer_size){};
+        : GenericThreadedObserver<T, ThreadedObserverOrdering::QUEUE>(buffer_size){};
 };
 
 #include "threaded_observer.tpp"

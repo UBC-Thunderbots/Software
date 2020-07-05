@@ -22,7 +22,6 @@ cc_library(
         ":backend",
         "//software/backend/input/network/networking:network_client",
         "//software/backend/output/grsim:grsim_output",
-        "//software/replay:replay_logger",
         "//software/util/design_patterns:generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
