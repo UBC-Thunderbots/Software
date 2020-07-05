@@ -7,6 +7,7 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
+#include "software/new_geom/util/acute_angle.h"
 #include "software/parameter/dynamic_parameters.h"
 
 double ratePass(const World& world, const Pass& pass,
@@ -101,8 +102,8 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
-    Angle goal_angle = acuteVertexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
-                                        field.enemyGoalpostPos())
+    Angle goal_angle = acuteAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
+                                  field.enemyGoalpostPos())
                            .abs();
     double net_percent_open = 0;
     if (goal_angle > Angle::zero())
@@ -184,7 +185,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
     Point closest_point_on_pass_to_robot = closestPointOnSeg(
         enemy_robot.position(), pass.passerPoint(), pass.receiverPoint());
     Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(
-        enemy_robot, closest_point_on_pass_to_robot,
+        enemy_robot.position(), closest_point_on_pass_to_robot,
         ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
@@ -200,7 +201,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
     // Figure out how long the enemy robot and ball will take to reach the receive point
     // for the pass.
     Duration enemy_robot_time_to_pass_receive_position = getTimeToPositionForRobot(
-        enemy_robot, pass.receiverPoint(), ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        enemy_robot.position(), pass.receiverPoint(),
+        ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
@@ -272,7 +274,7 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Figure out how long it would take our robot to get there
     Duration min_robot_travel_time = getTimeToPositionForRobot(
-        best_receiver, pass.receiverPoint(), ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        best_receiver.position(), pass.receiverPoint(), ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Timestamp earliest_time_to_receive_point =
         best_receiver.lastUpdateTimestamp() + min_robot_travel_time;
@@ -280,7 +282,7 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
     // Figure out what angle the robot would have to be at to receive the ball
     Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
     Duration time_to_receive_angle = getTimeToOrientationForRobot(
-        best_receiver, receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+        best_receiver.orientation(), receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
         ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.lastUpdateTimestamp() + time_to_receive_angle;

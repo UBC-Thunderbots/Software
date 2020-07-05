@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "algorithms",
     srcs = [
+        "acute_angle.cpp",
         "almost_equal.cpp",
         "calculate_block_cone.cpp",
         "circle_tangent.cpp",
@@ -20,6 +21,7 @@ cc_library(
         "voronoi_diagram.cpp",
     ],
     hdrs = [
+        "acute_angle.h",
         "almost_equal.h",
         "calculate_block_cone.h",
         "circle_tangent.h",
@@ -169,6 +171,15 @@ cc_test(
 cc_test(
     name = "calculate_block_cone_test",
     srcs = ["calculate_block_cone_test.cpp"],
+    deps = [
+        ":algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "acute_angle_test",
+    srcs = ["acute_angle_test.cpp"],
     deps = [
         ":algorithms",
         "@gtest//:gtest_main",

@@ -73,8 +73,7 @@ const Timestamp PhysicsWorld::getTimestamp() const
 
 void PhysicsWorld::setBallState(const BallState& ball_state)
 {
-    physics_ball = std::make_shared<PhysicsBall>(b2_world, ball_state, BALL_MASS_KG,
-                                                 acceleration_due_to_gravity);
+    physics_ball = std::make_shared<PhysicsBall>(b2_world, ball_state, BALL_MASS_KG);
 }
 
 void PhysicsWorld::removeBall()

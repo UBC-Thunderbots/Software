@@ -132,7 +132,6 @@ cc_library(
 
 cc_library(
     name = "draw_functions",
-    srcs = [],
     hdrs = ["draw_functions.h"],
     deps = [
         "@qt//:qt_widgets",

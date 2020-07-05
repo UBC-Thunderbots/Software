@@ -101,25 +101,6 @@ double offsetToLine(Point x0, Point x1, Point p)
     return fabs(n.dot(p - x0));
 }
 
-Angle acuteVertexAngle(Vector v1, Vector v2)
-{
-    return v1.orientation().minDiff(v2.orientation());
-}
-
-Angle acuteVertexAngle(Point p1, Point p2, Point p3)
-{
-    return acuteVertexAngle(p1 - p2, p3 - p2);
-}
-
-bool pointInFrontVector(Point offset, Vector direction, Point p)
-{
-    // compare angle different
-    Angle a1   = direction.orientation();
-    Angle a2   = (p - offset).orientation();
-    Angle diff = (a1 - a2).clamp();
-    return diff < Angle::quarter() && diff > -Angle::quarter();
-}
-
 Point getPointsMean(const std::vector<Point> &points)
 {
     Point average = Point(0, 0);

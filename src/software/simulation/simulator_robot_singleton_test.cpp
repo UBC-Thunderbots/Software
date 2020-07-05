@@ -29,9 +29,9 @@ class SimulatorRobotSingletonTest : public testing::Test
     {
         auto physics_world =
             std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField());
-        physics_world->setBallState(ball.currentState().ballState());
+        physics_world->setBallState(ball.currentState().state());
         RobotStateWithId robot_state{.id          = robot.id(),
-                                     .robot_state = robot.currentState().robotState()};
+                                     .robot_state = robot.currentState().state()};
         physics_world->addYellowRobots({robot_state});
 
         for (const auto& pos : enemy_robot_positions)
@@ -175,7 +175,7 @@ class SimulatorRobotSingletonKickTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonKickTest, test_kick_ball_at_angle)
+TEST_P(SimulatorRobotSingletonKickTest, test_kick_stationary_ball_with_stationary_robot)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -221,7 +221,7 @@ class SimulatorRobotSingletonChipTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonChipTest, test_chip_ball_at_angle)
+TEST_P(SimulatorRobotSingletonChipTest, test_chip_stationary_ball_with_stationary_robot)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -267,7 +267,8 @@ class SimulatorRobotSingletonAutokickTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonAutokickTest, test_autokick_ball_at_angle)
+TEST_P(SimulatorRobotSingletonAutokickTest,
+       test_autokick_ball_moving_towards_stationary_robot)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -288,8 +289,35 @@ TEST_P(SimulatorRobotSingletonAutokickTest, test_autokick_ball_at_angle)
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    Vector expected_velocity = Vector::createFromAngle(robot_orientation).normalize(4.0);
+    Vector expected_velocity = Vector::createFromAngle(robot_orientation).normalize(5.03);
     EXPECT_LT((simulator_ball->velocity() - expected_velocity).length(), 0.001);
+}
+
+TEST_P(SimulatorRobotSingletonAutokickTest,
+       test_autokick_ball_moving_towards_moving_robot)
+{
+    Angle robot_orientation = GetParam();
+    Vector robot_velocity   = Vector::createFromAngle(robot_orientation).normalize(1.5);
+    Robot robot(0, Point(0, 0), robot_velocity, robot_orientation,
+                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Point initial_ball_position =
+        robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
+    Vector initial_ball_velocity =
+        (robot.position() - initial_ball_position).normalize(1.0);
+    Ball ball(initial_ball_position, initial_ball_velocity, Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_enableAutokick(chicker, 5.0);
+
+    // Simulate for 1/2 second
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    Vector expected_velocity = Vector::createFromAngle(robot_orientation).normalize(5.16);
+    EXPECT_LT((simulator_ball->velocity() - expected_velocity).length(), 0.01);
 }
 
 INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonAutokickTest,
@@ -303,7 +331,8 @@ class SimulatorRobotSingletonAutochipTest : public SimulatorRobotSingletonTest,
 {
 };
 
-TEST_P(SimulatorRobotSingletonAutochipTest, test_autochip_ball_at_angle_with_no_obstacle)
+TEST_P(SimulatorRobotSingletonAutochipTest,
+       test_autochip_ball_moving_towards_stationary_robot_with_no_obstacle)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -326,8 +355,35 @@ TEST_P(SimulatorRobotSingletonAutochipTest, test_autochip_ball_at_angle_with_no_
 
     EXPECT_LT(simulator_ball->velocity().orientation().minDiff(robot_orientation),
               Angle::fromDegrees(1));
-    EXPECT_GT(simulator_ball->velocity().length(), 2);
-    EXPECT_LT(simulator_ball->velocity().length(), 3.5);
+    EXPECT_NEAR(3.53, simulator_ball->velocity().length(), 0.05);
+}
+
+TEST_P(SimulatorRobotSingletonAutochipTest,
+       test_autochip_ball_moving_towards_moving_robot_with_no_obstacle)
+{
+    Angle robot_orientation = GetParam();
+    Vector robot_velocity   = Vector::createFromAngle(robot_orientation).normalize(1.5);
+    Robot robot(0, Point(0, 0), robot_velocity, robot_orientation,
+                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Point initial_ball_position =
+        robot.position() + Vector::createFromAngle(robot_orientation).normalize(0.25);
+    Vector initial_ball_velocity =
+        (robot.position() - initial_ball_position).normalize(1.0);
+    Ball ball(initial_ball_position, initial_ball_velocity, Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_enableAutochip(chicker, 5.0);
+
+    // Simulate for 1/2 second
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_LT(simulator_ball->velocity().orientation().minDiff(robot_orientation),
+              Angle::fromDegrees(1));
+    EXPECT_NEAR(3.65, simulator_ball->velocity().length(), 0.05);
 }
 
 INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonAutochipTest,

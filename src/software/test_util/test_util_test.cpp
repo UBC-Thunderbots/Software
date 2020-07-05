@@ -263,3 +263,37 @@ TEST(TestUtilsTest, test_milliseconds_since)
     const auto start_time = std::chrono::system_clock::now();
     EXPECT_TRUE(::TestUtil::millisecondsSince(start_time) > 0);
 }
+
+TEST(TestUtilsTest, test_create_stationary_robot_states_with_id)
+{
+    std::vector<RobotStateWithId> expected = {
+        RobotStateWithId{
+            .id          = 0,
+            .robot_state = RobotState(Point(-3, 2.5), Vector(0, 0), Angle::zero(),
+                                      AngularVelocity::zero())},
+        RobotStateWithId{
+            .id          = 1,
+            .robot_state = RobotState(Point(-3, 1.5), Vector(0, 0), Angle::zero(),
+                                      AngularVelocity::zero())},
+        RobotStateWithId{
+            .id          = 2,
+            .robot_state = RobotState(Point(-3, 0.5), Vector(0, 0), Angle::zero(),
+                                      AngularVelocity::zero())},
+        RobotStateWithId{
+            .id          = 3,
+            .robot_state = RobotState(Point(-3, -0.5), Vector(0, 0), Angle::zero(),
+                                      AngularVelocity::zero())},
+        RobotStateWithId{
+            .id          = 4,
+            .robot_state = RobotState(Point(-3, -1.5), Vector(0, 0), Angle::zero(),
+                                      AngularVelocity::zero())},
+        RobotStateWithId{
+            .id          = 5,
+            .robot_state = RobotState(Point(4.6, -3.1), Vector(0, 0), Angle::zero(),
+                                      AngularVelocity::zero())},
+    };
+
+    EXPECT_EQ(expected, TestUtil::createStationaryRobotStatesWithId(
+                            {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5),
+                             Point(-3, -0.5), Point(-3, -1.5), Point(4.6, -3.1)}));
+}

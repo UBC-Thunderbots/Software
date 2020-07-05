@@ -289,8 +289,8 @@ class SimulatorRobot
         std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
 
     std::weak_ptr<PhysicsRobot> physics_robot;
-    std::optional<double> autokick_speed_m_per_s;
-    std::optional<double> autochip_distance_m;
+    std::optional<float> autokick_speed_m_per_s;
+    std::optional<float> autochip_distance_m;
     uint32_t dribbler_rpm;
 
     // A pointer to all the balls currently being dribbled
@@ -299,4 +299,18 @@ class SimulatorRobot
     std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter> primitive_manager;
     std::optional<unsigned int> current_primitive_index;
     std::optional<primitive_params_t> current_primitive_params;
+
+    // How much the dribbler damps the ball when they collide. Each component
+    // of the damping can be changed separately so we have the flexibility to tune
+    // this behavior to match real life. These values have been manually tuned
+    // such that the robots are able to hit one-time shots in simulation with
+    // sufficient accuracy.
+    static constexpr double DRIBBLER_HEAD_ON_DAMPING       = 0.7;
+    static constexpr double DRIBBLER_PERPENDICULAR_DAMPING = 0.61;
+    // A value in the range [0, 1] that indicates how much momentum is conserved when the
+    // ball is kicked. Higher values will cause the ball to be kicked with an even greater
+    // velocity if it had an initial non-zero velocity when being kicked.
+    // This value is a very rough estimate of real-world behaviour, so that the ball
+    // will be kicked slightly faster it it entered the kicker with some initial velocity.
+    static constexpr double MOMENTUM_CONSERVED_DURING_KICK = 0.1;
 };

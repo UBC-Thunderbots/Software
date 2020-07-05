@@ -2,7 +2,6 @@
 
 #include <google/protobuf/repeated_field.h>
 
-#include "software/backend/robot_status.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
@@ -58,6 +57,13 @@ class SensorFusion
     void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
+     * Updates relevant components with a new ball state
+     *
+     * @param new_ball_state new TimestampedBallState
+     */
+    void updateBall(TimestampedBallState new_ball_state);
+
+    /**
      * Create state of the ball from a list of ball detections
      *
      * @param ball_detections list of ball detections to filter
@@ -84,20 +90,21 @@ class SensorFusion
      *
      *@return inverted Detection
      */
-    RobotDetection invert(RobotDetection robot_detection);
-    BallDetection invert(BallDetection ball_detection);
+    RobotDetection invert(RobotDetection robot_detection) const;
+    BallDetection invert(BallDetection ball_detection) const;
 
     std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
-
+    unsigned int history_size;
     std::optional<Field> field;
     std::optional<Ball> ball;
     Team friendly_team;
     Team enemy_team;
-    RefboxGameState refbox_game_state;
+    GameState game_state;
     std::optional<RefboxStage> refbox_stage;
-    std::optional<Point> ball_placement_point;
 
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+
+    BallHistory ball_states;
 };

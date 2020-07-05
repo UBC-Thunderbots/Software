@@ -3,6 +3,7 @@
 #include "software/geom/util.h"
 #include "software/new_geom/util/multiple_segments.h"
 #include "software/new_geom/util/projection.h"
+#include "software/new_geom/util/acute_angle.h"
 
 std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
                                        const Point &goal_post_pos, const Point &p,
@@ -128,9 +129,9 @@ std::optional<Shot> calcBestShotOnFriendlyGoal(const Field &field,
 double calcShotOpenFriendlyNetPercentage(const Field &field, const Point &shot_origin,
                                          const Shot &shot)
 {
-    Angle goal_angle = acuteVertexAngle(field.friendlyGoalpostPos(), shot_origin,
-                                        field.friendlyGoalpostNeg())
-                           .abs();
+    Angle goal_angle =
+        acuteAngle(field.friendlyGoalpostPos(), shot_origin, field.friendlyGoalpostNeg())
+            .abs();
     return shot.getOpenAngle().toDegrees() / goal_angle.toDegrees();
 }
 
@@ -138,8 +139,7 @@ double calcShotOpenEnemyNetPercentage(const Field &field, const Point &shot_orig
                                       const Shot &shot)
 {
     Angle goal_angle =
-        acuteVertexAngle(field.enemyGoalpostPos(), shot_origin, field.enemyGoalpostNeg())
-            .abs();
+        acuteAngle(field.enemyGoalpostPos(), shot_origin, field.enemyGoalpostNeg()).abs();
     return shot.getOpenAngle().toDegrees() / goal_angle.toDegrees();
 }
 
