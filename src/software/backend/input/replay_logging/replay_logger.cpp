@@ -1,8 +1,4 @@
-//
-// Created by jordan on 5/2/20.
-//
-
-#include "software/backend/input/replay/replay_logger.h"
+#include "software/backend/input/replay_logging/replay_logger.h"
 
 #include <google/protobuf/util/delimited_message_util.h>
 
@@ -30,7 +26,7 @@ ReplayLogger::ReplayLogger(const std::string& out_dir_path, int _msgs_per_chunk)
         {
             // this is better behavior than either adding more chunks to the same
             // directory (and having one directory end up with multiple replays) or
-            // silently overwriting and destroying a previous replay
+            // silently overwriting and destroying a previous replay_logging
             throw std::invalid_argument(out_dir_path +
                                         " is not empty! Find another directory!");
         }

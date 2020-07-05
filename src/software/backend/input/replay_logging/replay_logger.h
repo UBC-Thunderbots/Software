@@ -11,10 +11,10 @@ class ReplayLogger : public OrderedThreadedObserver<SensorMsg>
    public:
     /**
      * Constructs a Replay Logger. _msgs_per_chunk is a parameter that sets
-     * how many individual SensorMsg's go into one replay 'chunk' file.
+     * how many individual SensorMsg's go into one replay_logging 'chunk' file.
      * We separate replays into files of a certain number of messages to
      * reduce the amount of lost data in the case of a crash.
-     * @param output_directory The directory that we output replay chunk files to.
+     * @param output_directory The directory that we output replay_logging chunk files to.
      * @param _msgs_per_chunk number of messages per chunk
      */
     explicit ReplayLogger(const std::string& output_directory,

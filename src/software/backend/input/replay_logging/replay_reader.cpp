@@ -72,7 +72,7 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
     // we assume chunk indices are monotonically increasing, but not necessarily starting
     // at 0; this is so that we can trivially 'crop' replays
     fs::directory_iterator dir_it(replay_dir);
-    // filter the filenames in the replay out directory to only numeric filenames
+    // filter the filenames in the replay_logging out directory to only numeric filenames
     std::vector<size_t> chunk_indices;
     std::for_each(fs::begin(dir_it), fs::end(dir_it),
                   [&chunk_indices](const fs::directory_entry& dir_entry) {
@@ -90,7 +90,7 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
     {
         throw std::invalid_argument(
             replay_dir.string() +
-            " contains no files with numerical names! It is not a valid replay directory!");
+            " contains no files with numerical names! It is not a valid replay_logging directory!");
     }
 
     std::sort(chunk_indices.begin(), chunk_indices.end());
@@ -131,7 +131,7 @@ void ReplayReader::nextChunk()
 
     if (!fs::is_regular_file(chunk_path))
     {
-        throw std::out_of_range("Reached end of replay!");
+        throw std::out_of_range("Reached end of replay_logging!");
     }
 
     cur_chunk   = ::readDelimitedReplayProtobufFile(chunk_path);

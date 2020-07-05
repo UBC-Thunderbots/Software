@@ -22,7 +22,8 @@ template <typename T, ThreadedObserverOrdering Ordering>
 class GenericThreadedObserver : public Observer<T>
 {
    public:
-    explicit GenericThreadedObserver(size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
+    explicit GenericThreadedObserver(
+        size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
 
     ~GenericThreadedObserver() override;
 
@@ -72,10 +73,12 @@ class GenericThreadedObserver : public Observer<T>
 };
 
 template <typename T>
-class ThreadedObserver : public GenericThreadedObserver<T, ThreadedObserverOrdering::STACK>
+class ThreadedObserver
+    : public GenericThreadedObserver<T, ThreadedObserverOrdering::STACK>
 {
    public:
-    ThreadedObserver<T>() : GenericThreadedObserver<T, ThreadedObserverOrdering::STACK>(){};
+    ThreadedObserver<T>()
+        : GenericThreadedObserver<T, ThreadedObserverOrdering::STACK>(){};
     explicit ThreadedObserver<T>(size_t buffer_size)
         : GenericThreadedObserver<T, ThreadedObserverOrdering::STACK>(buffer_size){};
 };

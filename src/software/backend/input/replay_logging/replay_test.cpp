@@ -1,13 +1,14 @@
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
-#include "software/backend/input/replay/replay_logger.h"
-#include "software/backend/input/replay/replay_reader.h"
+#include "software/backend/input/replay_logging/replay_logger.h"
+#include "software/backend/input/replay_logging/replay_reader.h"
 #include "software/multithreading/subject.h"
 
 // the working directory of tests are the bazel WORKSPACE root (in this case, src)
 // this path is relative to the current working directory, i.e. the bazel root
-constexpr const char* REPLAY_TEST_PATH_SUFFIX = "software/backend/input/replay/test_replay";
+constexpr const char* REPLAY_TEST_PATH_SUFFIX =
+    "software/backend/input/replay_logging/test_replay";
 
 namespace fs = std::experimental::filesystem;
 
@@ -26,7 +27,7 @@ TEST(ReplayTest, test_read_and_write_replay)
     // unfortunately due to the unavailablity of ordering tests and functions that
     // generate test files that actually work, we have to read recorded replays back,
     // write them, and then read them again in the same test
-    // TODO: record replay data with refbox running
+    // TODO: record replay_logging data with refbox running
 
     std::vector<SensorMsg> read_replay_msgs;
 
@@ -51,7 +52,7 @@ TEST(ReplayTest, test_read_and_write_replay)
         }
     }
 
-    // write the read frames to another replay directory
+    // write the read frames to another replay_logging directory
     auto output_path = fs::current_path() / "replaytest";
     std::shared_ptr<Observer<SensorMsg>> logger_ptr =
         std::make_shared<ReplayLogger>(output_path);
@@ -60,7 +61,7 @@ TEST(ReplayTest, test_read_and_write_replay)
     for (const auto msg : read_replay_msgs)
     {
         subject.sendValue(msg);
-        // we have 12000 frames of replay so we have to try to not fill the buffer
+        // we have 12000 frames of replay_logging so we have to try to not fill the buffer
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     // unfortunately we have to do this because there is otherwise no way to 'guarantee'
