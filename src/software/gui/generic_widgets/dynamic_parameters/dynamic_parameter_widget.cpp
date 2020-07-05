@@ -107,8 +107,11 @@ QWidget* DynamicParameterWidget::createIntegerParameter(
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(parameter->name()));
     QSpinBox* spinbox = new QSpinBox(widget);
-    // TODO: Get range from parameter
-    spinbox->setRange(0, 100);
+    auto min = parameter->getMin();
+    auto max = parameter->getMax();
+    if(min && max) {
+        spinbox->setRange(min.value(), max.value());
+    }
     spinbox->setValue(parameter->value());
 
     layout->addWidget(label);
@@ -149,8 +152,11 @@ QWidget* DynamicParameterWidget::createDoubleParameter(
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(parameter->name()));
     QDoubleSpinBox* spinbox = new QDoubleSpinBox(widget);
-    // TODO: Get range from parameter
-    spinbox->setRange(0, 100);
+    auto min = parameter->getMin();
+    auto max = parameter->getMax();
+    if(min && max) {
+        spinbox->setRange(min.value(), max.value());
+    }
     spinbox->setValue(parameter->value());
     spinbox->setSingleStep(0.05);
 
