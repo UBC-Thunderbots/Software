@@ -14,9 +14,9 @@ namespace fs = std::experimental::filesystem;
 
 ReplayLogger::ReplayLogger(const std::string& out_dir_path, int _msgs_per_chunk)
     : OrderedThreadedObserver<SensorMsg>(2000),
-      output_dir_path(out_dir_path),
       current_chunk(),
       current_chunk_idx(0),
+      output_dir_path(out_dir_path),
       msgs_per_chunk(_msgs_per_chunk)
 {
     // check if directory exists, if not make a directory

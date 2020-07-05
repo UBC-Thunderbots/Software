@@ -15,7 +15,7 @@ class ReplayReader
     void nextChunk();
     size_t max_chunk_idx;
     size_t cur_chunk_idx;
-    size_t cur_msg_idx;
+    int cur_msg_idx;
     TbotsReplay cur_chunk;
     std::experimental::filesystem::path replay_dir;
 };

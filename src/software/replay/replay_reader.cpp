@@ -56,7 +56,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& set)
 }
 
 ReplayReader::ReplayReader(const std::string& _replay_dir)
-    : replay_dir(_replay_dir), cur_msg_idx(0)
+    : cur_msg_idx(0), replay_dir(_replay_dir)
 {
     if (!fs::exists(replay_dir) || !fs::is_directory(replay_dir))
     {
