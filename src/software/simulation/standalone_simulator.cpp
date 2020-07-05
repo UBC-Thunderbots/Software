@@ -89,23 +89,21 @@ void StandaloneSimulator::setupInitialSimulationState()
 }
 
 void StandaloneSimulator::setYellowRobotPrimitives(
-    std::map<RobotId, PrimitiveMsg> robot_id_to_primitive)
+    PrimitiveSetMsg primitive_set_msg)
 {
-    for (const auto& robot_id_and_primitive : robot_id_to_primitive)
-    {
-        RobotId id             = robot_id_and_primitive.first;
-        PrimitiveMsg primitive = robot_id_and_primitive.second;
-        simulator.setYellowRobotPrimitive(id, primitive);
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++){
+        RobotId id = primitive_set_msg.robot_primitives[i].key;
+        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
+        simulator.setYellowRobotPrimitive(id, primitive_msg);
     }
 }
 
 void StandaloneSimulator::setBlueRobotPrimitives(
-    std::map<RobotId, PrimitiveMsg> robot_id_to_primitive)
+    PrimitiveSetMsg primitive_set_msg)
 {
-    for (const auto& robot_id_and_primitive : robot_id_to_primitive)
-    {
-        RobotId id             = robot_id_and_primitive.first;
-        PrimitiveMsg primitive = robot_id_and_primitive.second;
-        simulator.setBlueRobotPrimitive(id, primitive);
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++){
+        RobotId id = primitive_set_msg.robot_primitives[i].key;
+        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
+        simulator.setBlueRobotPrimitive(id, primitive_msg);
     }
 }

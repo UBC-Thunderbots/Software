@@ -14,6 +14,9 @@ proto_library(
         "tbots_timestamp_msg.proto",
         "vision.proto",
     ],
+    deps = [
+        "@nanopb//:nanopb_proto",
+    ],
 )
 
 cc_proto_library(

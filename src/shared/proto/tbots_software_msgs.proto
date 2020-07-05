@@ -3,6 +3,7 @@ syntax = "proto3";
 import "shared/proto/vision.proto";
 import "shared/proto/primitive.proto";
 import "shared/proto/tbots_timestamp_msg.proto";
+import "nanopb.proto";
 
 message VisionMsg
 {
@@ -22,5 +23,5 @@ message PrimitiveSetMsg
     TimestampMsg time_sent = 1;
 
     // Robot ID to RadioPrimitive map
-    map<uint32, PrimitiveMsg> robot_primitives = 2;
+    map<uint32, PrimitiveMsg> robot_primitives = 2 [(nanopb).max_count = 20];
 }

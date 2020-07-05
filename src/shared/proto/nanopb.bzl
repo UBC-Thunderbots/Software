@@ -8,10 +8,24 @@ def _nanopb_proto_library_impl(ctx):
     # Generate import flags for the protobuf compiler so it can find proto files we
     # depend on, and a list of proto files to include
     all_proto_files = depset()
+    all_proto_include_dirs = depset()
     for dep in ctx.attr.deps:
         all_proto_files = depset(
             transitive = [all_proto_files, dep[ProtoInfo].transitive_sources],
         )
+        all_proto_include_dirs = depset(
+            transitive = [all_proto_include_dirs, dep[ProtoInfo].transitive_proto_path],
+        )
+
+    # TODO: delete print statements
+    #        print(dep[ProtoInfo].check_deps_sources)
+    #        print(dep[ProtoInfo].direct_descriptor_set)
+    #        print(dep[ProtoInfo].direct_sources)
+    #        print(dep[ProtoInfo].proto_source_root)
+    #        print(dep[ProtoInfo].transitive_descriptor_sets)
+    #        print(dep[ProtoInfo].transitive_imports)
+    #        print(dep[ProtoInfo].transitive_proto_path)
+    #        print(dep[ProtoInfo].transitive_sources)
 
     all_proto_hdr_files = []
     all_proto_src_files = []
@@ -21,10 +35,16 @@ def _nanopb_proto_library_impl(ctx):
         pb_file_name = generation_folder_name + proto_file.path[:-len(".proto")] + ".pb"
         pb_file = ctx.actions.declare_file(pb_file_name)
 
+        # Create the arguments for the proto compiler to compile the proto file,
+        # adding all the transitive include directories
+        proto_compile_args = ["-o", pb_file.path, proto_file.path]
+        for path in all_proto_include_dirs.to_list():
+            proto_compile_args += ["-I%s" % path]
+
         ctx.actions.run(
             inputs = all_proto_files,
             outputs = [pb_file],
-            arguments = ["-o", pb_file.path, proto_file.path],
+            arguments = proto_compile_args,
             executable = ctx.executable.protoc,
             mnemonic = "ProtoCompile",
             use_default_shell_env = True,

@@ -6,5 +6,5 @@
 // TODO: does it _really_ make sense to have these headers with just a typedef?
 
 using ThreadedNanoPbPrimitiveSetMulticastListener =
-    ThreadedNetworkListener<NanoPbPrimitiveSetMulticastListener, std::map<RobotId, PrimitiveMsg>>;
+    ThreadedNetworkListener<NanoPbPrimitiveSetMulticastListener, PrimitiveSetMsg>;
 

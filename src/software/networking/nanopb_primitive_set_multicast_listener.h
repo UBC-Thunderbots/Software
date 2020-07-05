@@ -31,7 +31,7 @@ class NanoPbPrimitiveSetMulticastListener
      */
     NanoPbPrimitiveSetMulticastListener(
         boost::asio::io_service& io_service, const std::string& ip_address,
-        unsigned short port, std::function<void(std::map<RobotId, PrimitiveMsg>&)> receive_callback);
+        unsigned short port, std::function<void(PrimitiveSetMsg&)> receive_callback);
 
    private:
     /**
@@ -46,6 +46,6 @@ class NanoPbPrimitiveSetMulticastListener
     MulticastListener multicast_listener;
 
     // The function to call on every received packet of ReceiveProtoT data
-    std::function<void(std::map<RobotId, PrimitiveMsg>&)> receive_callback;
+    std::function<void(PrimitiveSetMsg&)> receive_callback;
 };
 

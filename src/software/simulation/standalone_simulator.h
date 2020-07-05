@@ -51,8 +51,8 @@ class StandaloneSimulator
      * // TODO:  update jdoc
      * @param msg The primitives to set on the respective team
      */
-    void setYellowRobotPrimitives(std::map<RobotId, PrimitiveMsg> robot_id_to_primitive);
-    void setBlueRobotPrimitives(std::map<RobotId, PrimitiveMsg> robot_id_to_primitive);
+    void setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg);
+    void setBlueRobotPrimitives(PrimitiveSetMsg primitive_set_msg);
 
     /**
      * A helper function that sets up all networking functionality with
