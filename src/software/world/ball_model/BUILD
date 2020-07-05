@@ -2,7 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "ball_model",
-    srcs = ["ball_model.cpp"],
     hdrs = ["ball_model.h"],
     deps = [
         "//software/time:duration",
@@ -16,6 +15,7 @@ cc_library(
     hdrs = ["linear_ball_model.h"],
     deps = [
         ":ball_model",
+        "//software/new_geom/util:algorithms",
     ],
 )
 

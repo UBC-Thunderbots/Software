@@ -35,9 +35,28 @@ class LinearBallModel : public BallModel
         BallState initial_ball_state,
         std::optional<FrictionParameters> friction_parameters = std::nullopt);
 
-    BallState estimateFutureState(const Duration &time_in_future) override;
+    BallState estimateFutureState(double seconds_in_future) override;
 
    private:
-    BallState initial_ball_state;
-    std::optional<FrictionParameters> friction_parameters;
+    BallState initial_ball_state_;
+    std::optional<FrictionParameters> friction_parameters_;
+
+    static BallState applyLinearFrictionModel(
+        const BallState& initial_ball_state, double seconds_in_future,
+        const FrictionParameters& friction_parameters);
+
+    /**
+     * Calculates the future ball state assuming constant acceleration opposing the
+     * velocity of the ball
+     *
+     * @param initial_position initial_position of the ball
+     * @param initial_velocity initial_velocity of the ball
+     * @param friction_acceleration The magnitude of the acceleration due to friction
+     * @param seconds_in_future number of seconds into the future
+     *
+     * @return future ball state
+     */
+    static BallState calculateFutureBallState(BallState initial_ball_state,
+                                              double friction_acceleration,
+                                              double seconds_in_future);
 };
