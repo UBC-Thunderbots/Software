@@ -163,6 +163,7 @@ cc_test(
     srcs = ["physics_test.cpp"],
     deps = [
         ":algorithms",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
