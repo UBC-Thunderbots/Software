@@ -2,8 +2,8 @@
 
 #include "shared/constants.h"
 #include "software/geom/util.h"
-#include "software/new_geom/util/acute_angle.h"
 #include "software/logger/logger.h"
+#include "software/new_geom/util/acute_angle.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),

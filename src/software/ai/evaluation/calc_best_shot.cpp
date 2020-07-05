@@ -1,9 +1,9 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 
 #include "software/geom/util.h"
+#include "software/new_geom/util/acute_angle.h"
 #include "software/new_geom/util/multiple_segments.h"
 #include "software/new_geom/util/projection.h"
-#include "software/new_geom/util/acute_angle.h"
 
 std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
                                        const Point &goal_post_pos, const Point &p,

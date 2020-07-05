@@ -1,9 +1,8 @@
 #include "software/new_geom/util/projection.h"
 
-#include "software/new_geom/util/circle_tangent.h"
 #include "software/new_geom/util/contains.h"
-#include "software/new_geom/util/multiple_rays.h"
 #include "software/new_geom/util/multiple_segments.h"
+#include "software/new_geom/util/projection_impl.h"
 
 std::vector<Segment> projectCirclesOntoSegment(Segment segment,
                                                std::vector<Circle> circles, Point origin)
