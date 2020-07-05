@@ -79,7 +79,7 @@ class ConfigYamlLoader(object):
         # load yaml into config_metadata
         config_metadata = ConfigYamlLoader.__load_yaml_into_dict(yaml_paths)
 
-        # validate schema
+        # validate correct format with schema
         ConfigYamlLoader.__validate_config_metadata(config_metadata)
 
         # detect cycles
@@ -164,7 +164,7 @@ class ConfigYamlLoader(object):
 
             if INCLUDE_KEY in metadata:
 
-                # check schema
+                # validate correct format with schema
                 try:
                     jsonschema.validate(metadata[INCLUDE_KEY], INCLUDE_DEF_SCHEMA)
                 except jsonschema.exceptions.ValidationError as jsval:
@@ -189,7 +189,7 @@ class ConfigYamlLoader(object):
 
             if PARAMETER_KEY in metadata:
 
-                # check schema
+                # validate correct format with schema
                 try:
                     jsonschema.validate(metadata[PARAMETER_KEY], PARAM_DEF_SCHEMA)
                 except jsonschema.exceptions.ValidationError as jsval:
