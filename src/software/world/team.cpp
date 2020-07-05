@@ -63,17 +63,6 @@ void Team::updateState(const Team& new_team_data)
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
-void Team::updateStateToPredictedState(const Timestamp& timestamp)
-{
-    // Update the state of all robots to their predicted state
-    for (auto it = team_robots.begin(); it != team_robots.end(); it++)
-    {
-        it->updateStateToPredictedState(timestamp);
-    }
-
-    updateTimestamp(timestamp);
-}
-
 void Team::removeExpiredRobots(const Timestamp& timestamp)
 {
     // Check to see if any Robots have "expired". If it more time than the expiry_buffer

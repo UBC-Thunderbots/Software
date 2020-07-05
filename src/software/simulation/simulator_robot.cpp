@@ -1,7 +1,9 @@
 #include "software/simulation/simulator_robot.h"
 
 #include "shared/constants.h"
+#include "software/geom/util.h"
 #include "software/logger/logger.h"
+#include "software/new_geom/util/acute_angle.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),
@@ -120,10 +122,46 @@ void SimulatorRobot::kick(float speed_m_per_s)
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
         for (auto ball : this->balls_in_dribbler_area)
         {
-            Vector kick_vector =
+            Vector robot_orientation_vector =
                 Vector::createFromAngle(robot->getRobotState().orientation());
-            kick_vector = kick_vector.normalize(speed_m_per_s);
-            ball->kick(kick_vector);
+
+            double total_head_on_collision_momentum_magnitude = 0.0;
+
+            if (acuteAngle(ball->velocity(), -robot_orientation_vector).abs() <
+                Angle::quarter())
+            {
+                // The ball is heading towards the robot, and will have momentum that
+                // is preserved in the kicking collision
+                total_head_on_collision_momentum_magnitude +=
+                    ball->momentum().project(robot_orientation_vector).length();
+            }
+
+            if (acuteAngle(robot->velocity(), robot_orientation_vector).abs() <
+                Angle::quarter())
+            {
+                // The robot is moving in direction it's facing, and will add momentum
+                // that is preserved in the kicking collision
+                double robot_speed_in_direction_of_orientation =
+                    robot->velocity().project(robot_orientation_vector).length();
+                total_head_on_collision_momentum_magnitude +=
+                    ball->massKg() * robot_speed_in_direction_of_orientation;
+            }
+
+            double preserved_momentum = total_head_on_collision_momentum_magnitude *
+                                        MOMENTUM_CONSERVED_DURING_KICK;
+            Vector kick_momentum =
+                robot_orientation_vector.normalize(ball->massKg() * speed_m_per_s);
+            Vector kick_impulse =
+                kick_momentum.normalize(kick_momentum.length() + preserved_momentum);
+
+            // Cancel head-on momentum, then kick. We must cancel the head-on momentum
+            // first so that the preserved momentum has an additive effect that results in
+            // a higher kick speed than requested.
+            Vector ball_head_on_momentum =
+                ball->momentum().project(robot_orientation_vector);
+            ball->applyImpulse(
+                robot_orientation_vector.normalize(ball_head_on_momentum.length()));
+            ball->applyImpulse(kick_impulse);
         }
     });
 }
@@ -133,10 +171,27 @@ void SimulatorRobot::chip(float distance_m)
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         for (auto ball : this->balls_in_dribbler_area)
         {
-            Vector chip_vector =
-                Vector::createFromAngle(robot->getRobotState().orientation());
-            chip_vector = chip_vector.normalize(distance_m);
-            ball->chip(chip_vector);
+            // Mark the ball as "in flight" so collisions are turned off
+            // until it has travelled the desired chip distance.
+            ball->setInFlightForDistance(distance_m);
+
+            // Assume the ball is chipped at a 45 degree angle
+            // TODO: Use a robot-specific constant
+            // https://github.com/UBC-Thunderbots/Software/issues/1179
+            Angle chip_angle = Angle::fromDegrees(45);
+            // Use the formula for the Range of a parabolic projectile
+            // Rearrange to solve for the initial velocity.
+            // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
+            float range = distance_m;
+            float numerator =
+                range *
+                static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
+            float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
+            float initial_velocity =
+                static_cast<float>(std::sqrt(numerator / denominator));
+            float ground_velocity =
+                initial_velocity * static_cast<float>(chip_angle.cos());
+            kick(ground_velocity);
         }
     });
 }
@@ -287,17 +342,11 @@ void SimulatorRobot::onChickerBallContact(PhysicsRobot *physics_robot,
 {
     if (isAutokickEnabled())
     {
-        Vector kick_vector =
-            Vector::createFromAngle(physics_robot->getRobotState().orientation());
-        kick_vector = kick_vector.normalize(autokick_speed_m_per_s.value());
-        physics_ball->kick(kick_vector);
+        kick(autokick_speed_m_per_s.value());
     }
     else if (isAutochipEnabled())
     {
-        Vector chip_vector =
-            Vector::createFromAngle(physics_robot->getRobotState().orientation());
-        chip_vector = chip_vector.normalize(autochip_distance_m.value());
-        physics_ball->chip(chip_vector);
+        chip(autochip_distance_m.value());
     }
 }
 
@@ -349,6 +398,20 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
 void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
                                                 PhysicsBall *physics_ball)
 {
+    // Damp the ball when it collides with the dribbler. We damp each component
+    // of the ball's momentum separately so we have the flexibility to tune this
+    // behavior to match real life.
+    Vector ball_momentum       = physics_ball->momentum();
+    Vector robot_facing_vector = Vector::createFromAngle(physics_robot->orientation());
+    Vector robot_perp_vector   = robot_facing_vector.perpendicular();
+
+    Vector dribbler_head_on_momentum = ball_momentum.project(robot_facing_vector);
+    physics_ball->applyImpulse(-dribbler_head_on_momentum * DRIBBLER_HEAD_ON_DAMPING);
+
+    Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
+    physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
+
+    // Keep track of all balls in the dribbler
     balls_in_dribbler_area.emplace_back(physics_ball);
 }
 

@@ -60,15 +60,6 @@ class Team
     void updateState(const Team& new_team_data);
 
     /**
-     * Updates the Team's state to be its predicted state at the given timestamp.
-     * The timestamp must be >= the last update timestamp of the robots on the team
-     *
-     * @param timestamp The timestamp at which to update the team's state to. Must
-     * be >= the last update timestamp of the robots on the team
-     */
-    void updateStateToPredictedState(const Timestamp& timestamp);
-
-    /**
      * Removes expired robots from the team. Robots are expired if it has been more than
      * the expiry_buffer time has passed since they were last updated. This would happen
      * if a robot is removed from the field, so that it is no longer seen by the cameras.

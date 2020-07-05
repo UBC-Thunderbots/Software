@@ -256,4 +256,13 @@ namespace TestUtil
      */
     Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,
                                  const Timestamp &timestamp);
+
+    /**
+     * Creates a list of RobotStateWithId at given positions with 0 velocity, 0 angular
+     * velocity and 0 orientation The id is set as the index in the list of positions
+     *
+     * @param positions The positions to create robots at
+     */
+    std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
+        const std::vector<Point> &positions);
 };  // namespace TestUtil

@@ -4,17 +4,18 @@
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : sensor_fusion_config(sensor_fusion_config),
+      history_size(20),
       field(std::nullopt),
       ball(std::nullopt),
       friendly_team(),
       enemy_team(),
-      refbox_game_state(RefboxGameState::HALT),
+      game_state(),
       refbox_stage(std::nullopt),
-      ball_placement_point(std::nullopt),
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
-      enemy_team_filter()
+      enemy_team_filter(),
+      ball_states(history_size)
 {
     if (!sensor_fusion_config)
     {
@@ -27,17 +28,10 @@ std::optional<World> SensorFusion::getWorld() const
     if (field && ball)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
+        new_world.mutableGameState() = game_state;
         if (refbox_stage)
         {
             new_world.updateRefboxStage(*refbox_stage);
-        }
-        if (ball_placement_point)
-        {
-            new_world.updateGameState(refbox_game_state, *ball_placement_point);
-        }
-        else
-        {
-            new_world.updateGameState(refbox_game_state);
         }
         return new_world;
     }
@@ -92,19 +86,20 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
-        refbox_game_state = createRefboxGameState(packet, TeamColour::YELLOW);
+        game_state.updateRefboxGameState(
+            createRefboxGameState(packet, TeamColour::YELLOW));
     }
     else
     {
-        refbox_game_state = createRefboxGameState(packet, TeamColour::BLUE);
+        game_state.updateRefboxGameState(createRefboxGameState(packet, TeamColour::BLUE));
     }
 
-    if (refbox_game_state == RefboxGameState::BALL_PLACEMENT_US)
+    if (game_state.isOurBallPlacement())
     {
         auto pt = getBallPlacementPoint(packet);
         if (pt)
         {
-            ball_placement_point = pt;
+            game_state.setBallPlacementPoint(*pt);
         }
         else
         {
@@ -112,10 +107,6 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
                 << "In BALL_PLACEMENT_US game state, but no ball placement point found"
                 << std::endl;
         }
-    }
-    else
-    {
-        ball_placement_point = std::nullopt;
     }
 
     refbox_stage = createRefboxStage(packet);
@@ -191,14 +182,28 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 
     if (new_ball_state)
     {
-        if (ball)
-        {
-            ball->updateState(*new_ball_state);
-        }
-        else
-        {
-            ball = Ball(*new_ball_state);
-        }
+        updateBall(*new_ball_state);
+    }
+}
+
+void SensorFusion::updateBall(TimestampedBallState new_ball_state)
+{
+    if (!ball_states.empty() &&
+        new_ball_state.timestamp() < ball_states.front().timestamp())
+    {
+        throw std::invalid_argument(
+            "Error: Trying to update ball state using a state older then the current state");
+    }
+
+    ball_states.push_front(new_ball_state);
+
+    if (ball)
+    {
+        ball->updateState(new_ball_state);
+    }
+    else
+    {
+        ball = Ball(new_ball_state);
     }
 }
 
@@ -231,7 +236,7 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
     return new_enemy_team;
 }
 
-RobotDetection SensorFusion::invert(RobotDetection robot_detection)
+RobotDetection SensorFusion::invert(RobotDetection robot_detection) const
 {
     robot_detection.position =
         Point(-robot_detection.position.x(), -robot_detection.position.y());
@@ -239,7 +244,7 @@ RobotDetection SensorFusion::invert(RobotDetection robot_detection)
     return robot_detection;
 }
 
-BallDetection SensorFusion::invert(BallDetection ball_detection)
+BallDetection SensorFusion::invert(BallDetection ball_detection) const
 {
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());

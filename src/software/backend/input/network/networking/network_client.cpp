@@ -21,44 +21,12 @@ NetworkClient::NetworkClient(
     ssl_vision_client =
         std::make_unique<ThreadedProtoMulticastListener<SSL_WrapperPacket>>(
             vision_multicast_address, vision_multicast_port,
-            boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
+            boost::bind(&NetworkClient::filterAndPublishVisionData, this, _1));
 
     ssl_gamecontroller_client =
         std::make_unique<ThreadedProtoMulticastListener<SSL_Referee>>(
             gamecontroller_multicast_address, gamecontroller_multicast_port,
             boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
-}
-
-void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
-{
-    // We analyze the first 60 packets we receive to find the "real" starting time.
-    // The real starting time is the smaller value of the ones we receive
-    if (initial_packet_count < 60)
-    {
-        initial_packet_count++;
-        if (packet.has_detection() &&
-            packet.detection().t_capture() < last_valid_t_capture)
-        {
-            last_valid_t_capture = packet.detection().t_capture();
-        }
-    }
-    else
-    {
-        // We pass all packets without a detection to the logic (since they are likely
-        // geometry packet). Packets with detection timestamps are compared to the last
-        // valid timestamp to make sure they are close enough before the data is passed
-        // along. This ensures we ignore any of the garbage packets grsim sends that
-        // are thousands of seconds in the future.
-        if (!packet.has_detection())
-        {
-            filterAndPublishVisionData(packet);
-        }
-        else if (std::fabs(packet.detection().t_capture() - last_valid_t_capture) < 100)
-        {
-            last_valid_t_capture = packet.detection().t_capture();
-            filterAndPublishVisionData(packet);
-        }
-    }
 }
 
 void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)

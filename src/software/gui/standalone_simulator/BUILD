@@ -7,7 +7,7 @@ cc_library(
     srcs = ["threaded_standalone_simulator_gui.cpp"],
     hdrs = ["threaded_standalone_simulator_gui.h"],
     deps = [
-        "//software/gui/standalone_simulator/widgets:simulator_gui",
+        "//software/gui/standalone_simulator/widgets:standalone_simulator_gui",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",
         "//software/new_geom:rectangle",

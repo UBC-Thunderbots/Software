@@ -73,6 +73,24 @@ TEST_P(RefboxGameStateTest, test_refbox_game_state)
 INSTANTIATE_TEST_CASE_P(
     RefboxGameStateTests, RefboxGameStateTest,
     ::testing::Values(
+        // common to yellow and blue
+        std::make_tuple(RefboxGameState::HALT, SSL_Referee_Command_HALT,
+                        TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::STOP, SSL_Referee_Command_STOP,
+                        TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::NORMAL_START, SSL_Referee_Command_NORMAL_START,
+                        TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::FORCE_START, SSL_Referee_Command_FORCE_START,
+                        TeamColour::YELLOW),
+        std::make_tuple(RefboxGameState::HALT, SSL_Referee_Command_HALT,
+                        TeamColour::BLUE),
+        std::make_tuple(RefboxGameState::STOP, SSL_Referee_Command_STOP,
+                        TeamColour::BLUE),
+        std::make_tuple(RefboxGameState::NORMAL_START, SSL_Referee_Command_NORMAL_START,
+                        TeamColour::BLUE),
+        std::make_tuple(RefboxGameState::FORCE_START, SSL_Referee_Command_FORCE_START,
+                        TeamColour::BLUE),
+
         // kickoff
         std::make_tuple(RefboxGameState::PREPARE_KICKOFF_US,
                         SSL_Referee_Command_PREPARE_KICKOFF_YELLOW, TeamColour::YELLOW),

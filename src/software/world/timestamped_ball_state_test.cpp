@@ -13,7 +13,7 @@ TEST(BallStateWithTimestampTest, get_ball_state)
 {
     TimestampedBallState ball_state(Point(1, -2.3), Vector(0, 0.4),
                                     Timestamp::fromSeconds(0.65));
-    EXPECT_EQ(ball_state.ballState(), BallState(Point(1, -2.3), Vector(0, 0.4)));
+    EXPECT_EQ(ball_state.state(), BallState(Point(1, -2.3), Vector(0, 0.4)));
 }
 
 TEST(BallStateWithTimestampTest, compare_identical_states)

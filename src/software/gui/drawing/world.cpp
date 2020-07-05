@@ -9,7 +9,7 @@ void drawWorld(QGraphicsScene* scene, const World& world)
     drawField(scene, world.field());
     drawEnemyTeam(scene, world.enemyTeam());
     drawFriendlyTeam(scene, world.friendlyTeam());
-    drawBall(scene, world.ball().currentState().ballState());
+    drawBall(scene, world.ball().currentState().state());
     drawBallConeToFriendlyNet(scene, world.ball().position(), world.field());
 }
 

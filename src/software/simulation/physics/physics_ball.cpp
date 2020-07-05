@@ -5,8 +5,8 @@
 #include "software/simulation/physics/physics_object_user_data.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_state,
-                         const double mass_kg, const double gravity)
-    : gravity(gravity), chip_origin(std::nullopt), chip_distance_meters(0.0)
+                         const double mass_kg)
+    : in_flight_origin(std::nullopt), in_flight_distance_meters(0.0)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -33,8 +33,8 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
     float ball_area =
         static_cast<float>(M_PI * ball_shape.m_radius * ball_shape.m_radius);
     ball_fixture_def.density     = static_cast<float>(mass_kg / ball_area);
-    ball_fixture_def.restitution = static_cast<float>(ball_restitution);
-    ball_fixture_def.friction    = static_cast<float>(ball_friction);
+    ball_fixture_def.restitution = static_cast<float>(BALL_RESTITUTION);
+    ball_fixture_def.friction    = static_cast<float>(BALL_FRICTION);
     ball_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
 
@@ -67,32 +67,15 @@ Vector PhysicsBall::velocity() const
     return createVector(ball_body->GetLinearVelocity());
 }
 
-void PhysicsBall::kick(Vector kick_vector)
+Vector PhysicsBall::momentum() const
 {
-    // Figure out how much impulse to apply to change the speed of the ball by the
-    // magnitude of the kick_vector
-    double change_in_momentum = ball_body->GetMass() * kick_vector.length();
-    kick_vector               = kick_vector.normalize(change_in_momentum);
-    applyImpulse(kick_vector);
+    double momentum_magnitude = massKg() * velocity().length();
+    return velocity().normalize(momentum_magnitude);
 }
 
-void PhysicsBall::chip(const Vector &chip_vector)
+float PhysicsBall::massKg() const
 {
-    // Assume the ball is chipped at a 45 degree angle
-    // TODO: Use a robot-specific constant
-    // https://github.com/UBC-Thunderbots/Software/issues/1179
-    Angle chip_angle = Angle::fromDegrees(45);
-    // Use the formula for the Range of a parabolic projectile
-    // Rearrange to solve for the initial velocity
-    // See https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
-    double range            = chip_vector.length();
-    double numerator        = range * gravity;
-    double denominator      = 2 * (chip_angle * 2).sin();
-    double initial_velocity = std::sqrt(numerator / denominator);
-    double ground_velocity  = initial_velocity * chip_angle.cos();
-    kick(chip_vector.normalize(ground_velocity));
-    chip_origin          = getBallState().position();
-    chip_distance_meters = chip_vector.length();
+    return ball_body->GetMass();
 }
 
 void PhysicsBall::applyForce(const Vector &force)
@@ -121,25 +104,31 @@ bool PhysicsBall::isTouchingOtherObject() const
     return false;
 }
 
+void PhysicsBall::setInFlightForDistance(double in_flight_distance)
+{
+    in_flight_origin          = position();
+    in_flight_distance_meters = in_flight_distance;
+}
+
 bool PhysicsBall::isInFlight()
 {
-    bool chip_in_progress = chip_origin.has_value();
-    if (chip_in_progress)
+    bool ball_currently_in_flight = in_flight_origin.has_value();
+    if (ball_currently_in_flight)
     {
-        double current_chip_distance_meters =
-            (getBallState().position() - chip_origin.value()).length();
-        // Once the ball is in flight, is can only stop being in flight once it has
-        // travelled at least the current chip_distance and is simultaneously not touching
-        // another object. This prevents the ball from "landing" in another object, and
-        // instead pretends the ball hit the top and rolled off.
+        double current_in_flight_distance_meters =
+            (position() - in_flight_origin.value()).length();
+        // Once the ball is in flight, it can only stop being in flight once it has
+        // travelled at least the current in_flight_distance and is simultaneously not
+        // touching another object. This prevents the ball from "landing" in another
+        // object, and instead pretends the ball hit the top and rolled off.
         //
         // We assume the ball does not collide while it is in flight, which gives us the
-        // "guarantee" the ball will travel far enough from the chip_origin in order to
-        // "land"
-        if (current_chip_distance_meters >= chip_distance_meters &&
+        // "guarantee" the ball will travel far enough from the in_flight_origin in order
+        // to "land"
+        if (current_in_flight_distance_meters >= in_flight_distance_meters &&
             !isTouchingOtherObject())
         {
-            chip_origin = std::nullopt;
+            in_flight_origin = std::nullopt;
             return false;
         }
         else
