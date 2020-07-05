@@ -16,6 +16,9 @@ from dynamic_parameter_schema import (
 #                         Config Yaml Loader                          #
 #######################################################################
 
+INCLUDE_KEY = "include"
+PARAMETER_KEY = "parameters"
+
 
 class ConfigYamlLoader(object):
     @staticmethod
@@ -41,6 +44,7 @@ class ConfigYamlLoader(object):
 
         A valid config directory maintains the following properties:
 
+        - All yaml file names are unique
         - All yamls are properly formed (i.e proper syntax, YAML Version 1.2)
         - All parameter definitions abide by the dynamic parameter schema
         - All include statements do NOT cause cycles in configs
@@ -114,22 +118,27 @@ class ConfigYamlLoader(object):
                         # include only in file
                         if isinstance(raw_config_metadata[tail][0], dict):
                             raw_config_metadata[tail] = {
-                                "include": raw_config_metadata[tail][0]["include"]
+                                INCLUDE_KEY: raw_config_metadata[tail][0][INCLUDE_KEY]
                             }
 
                         # parameter definitions only in file
                         if isinstance(raw_config_metadata[tail][0], list):
                             raw_config_metadata[tail] = {
-                                "parameters": raw_config_metadata[tail][0]
+                                PARAMETER_KEY: raw_config_metadata[tail][0]
                             }
 
                     elif len(raw_config_metadata[tail]) == 2:
 
                         # include and param definition in file
                         raw_config_metadata[tail] = {
-                            "include": raw_config_metadata[tail][0]["include"],
-                            "parameters": raw_config_metadata[tail][1],
+                            INCLUDE_KEY: raw_config_metadata[tail][0][INCLUDE_KEY],
+                            PARAMETER_KEY: raw_config_metadata[tail][1],
                         }
+
+                    else:
+                        raise ConfigYamlMalformed(
+                            "More than two yaml documents in {}".format(tail)
+                        )
 
                 except yaml.YAMLError as ymle:
                     raise ConfigYamlMalformed(
@@ -153,24 +162,24 @@ class ConfigYamlLoader(object):
 
         for config_file, metadata in config_metadata.items():
 
-            if "include" in metadata:
+            if INCLUDE_KEY in metadata:
 
                 # check schema
                 try:
-                    jsonschema.validate(metadata["include"], INCLUDE_DEF_SCHEMA)
+                    jsonschema.validate(metadata[INCLUDE_KEY], INCLUDE_DEF_SCHEMA)
                 except jsonschema.exceptions.ValidationError as jsval:
                     raise ConfigYamlSchemaViolation(
                         "Schema violation in {}: {}".format(config_file, jsval)
                     ) from None
 
                 # check duplicates
-                if len(metadata["include"]) > len(set(metadata["include"])):
+                if len(metadata[INCLUDE_KEY]) > len(set(metadata[INCLUDE_KEY])):
                     raise ConfigYamlMalformed(
                         "Duplicate include detected in {}".format(config_file)
                     )
 
                 # check that included yaml is defined elsewhere
-                for included_yaml in metadata["include"]:
+                for included_yaml in metadata[INCLUDE_KEY]:
                     if included_yaml not in config_metadata.keys():
                         raise ConfigYamlMalformed(
                             "definition could not be found for {} in {}".format(
@@ -178,11 +187,11 @@ class ConfigYamlLoader(object):
                             )
                         )
 
-            if "parameters" in metadata:
+            if PARAMETER_KEY in metadata:
 
                 # check schema
                 try:
-                    jsonschema.validate(metadata["parameters"], PARAM_DEF_SCHEMA)
+                    jsonschema.validate(metadata[PARAMETER_KEY], PARAM_DEF_SCHEMA)
                 except jsonschema.exceptions.ValidationError as jsval:
                     raise ConfigYamlSchemaViolation(
                         "Schema violation in {}: {}".format(config_file, jsval)
@@ -194,7 +203,7 @@ class ConfigYamlLoader(object):
                 # exists in the parameter dictionary
                 param_names = [
                     list(param_entry.values())[0]["name"]
-                    for param_entry in metadata["parameters"]
+                    for param_entry in metadata[PARAMETER_KEY]
                 ]
 
                 # check duplicates
@@ -209,7 +218,7 @@ class ConfigYamlLoader(object):
                 # can't validate that we would like to check
                 requested_types = [
                     key[0]
-                    for key in [list(entry.keys()) for entry in metadata["parameters"]]
+                    for key in [list(entry.keys()) for entry in metadata[PARAMETER_KEY]]
                 ]
 
                 # check if type requested is supported
@@ -234,8 +243,8 @@ class ConfigYamlLoader(object):
         edges = []
 
         for config, metadata in config_metadata.items():
-            if "include" in metadata:
-                for included_config in metadata["include"]:
+            if INCLUDE_KEY in metadata:
+                for included_config in metadata[INCLUDE_KEY]:
                     edges.append((config, included_config))
 
         G = networkx.DiGraph(edges)

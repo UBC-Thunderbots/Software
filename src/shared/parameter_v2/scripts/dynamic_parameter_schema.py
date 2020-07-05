@@ -1,9 +1,9 @@
 SUPPORTED_TYPES = [
     "bool",
     "int",
-    "unsigned",
-    "double",
-    "std::string",
+    "uint",
+    "float",
+    "string",
     "factory",
     "enum",
 ]
@@ -58,9 +58,9 @@ PARAM_DEF_SCHEMA = {
                 "uint": {
                     "type": "object",
                     "properties": {
-                        "name": {"type": "string"},
-                        "min": {"type": "integer"},
-                        "max": {"type": "integer"},
+                        "name": {"type": "string", "minimum": 0},
+                        "min": {"type": "integer", "minimum": 0},
+                        "max": {"type": "integer", "minimum": 0},
                         "value": {"type": "integer"},
                         "description": {"type": "string"},
                     },

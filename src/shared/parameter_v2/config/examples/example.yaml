@@ -36,19 +36,19 @@ include:
 #########################################################################################
 # The following are example of every type of parameter that can be used
 #########################################################################################
-- int:
-    name: example_int_param
-    min: 0
-    max: 5
-    value: 5
-    description: >
-      Can be any integer value in the range [min, max]
 - bool:
     name: example_bool_param
     value: true
     description: >
       Can be true or false
-- unsigned:
+- int:
+    name: example_int_param
+    min: 0
+    max: 5
+    value: 3
+    description: >
+      Can be any integer value in the range [min, max]
+- uint:
     name: example_unsigned_int_param
     min: 0 # Must be >= 0
     max: 5
@@ -56,7 +56,7 @@ include:
     description: >
       Can be any integer value in the range [min, max].
       The minimum value must be >= 0
-- double:
+- float:
     name: example_float_param
     min: 1.1
     max: 9.01
@@ -66,7 +66,7 @@ include:
 
       For C code, this will be generated as a float.
       For C++ code, this will be generated as a double.
-- std::string:
+- string:
     name: example_string_param
     value: "Hello World"
     description: >
@@ -117,7 +117,7 @@ include:
 - bool:
     name: example_optional_parameter
     value: false
-    optional: false
+    optional: true
     description: >
       Optional parameters will generate with std::optional as their value return type.
       They can accept std::nullopt as a value. If optional is not specified, it is
