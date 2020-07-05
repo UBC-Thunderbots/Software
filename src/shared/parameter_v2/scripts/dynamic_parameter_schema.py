@@ -1,3 +1,6 @@
+INCLUDE_KEY = "include"
+PARAMETER_KEY = "parameters"
+
 SUPPORTED_TYPES = [
     "bool",
     "int",

@@ -10,19 +10,18 @@ from dynamic_parameter_schema import (
     INCLUDE_DEF_SCHEMA,
     PARAM_DEF_SCHEMA,
     SUPPORTED_TYPES,
+    INCLUDE_KEY,
+    PARAMETER_KEY,
 )
 
 #######################################################################
 #                         Config Yaml Loader                          #
 #######################################################################
 
-INCLUDE_KEY = "include"
-PARAMETER_KEY = "parameters"
-
 
 class ConfigYamlLoader(object):
     @staticmethod
-    def get_config_metadata(yaml_paths: list):
+    def get_config_metadata(yaml_paths: list) -> dict:
         """Loads the yamls in the root config directory and verifies that the
         requested configuration is valid. Then returns config_metadata dict
         with a specified format capturing all the requested params and configs.
@@ -48,6 +47,10 @@ class ConfigYamlLoader(object):
         - All yamls are properly formed (i.e proper syntax, YAML Version 1.2)
         - All parameter definitions abide by the dynamic parameter schema
         - All include statements do NOT cause cycles in configs
+
+        :raises ConfigYamlMalformed: when the yaml is malformed
+        :raises ConfigSchemaViolation: When the shema is violated
+        :raises ConfigYamlCycleDetected: When a cycle is detected in the incldues
 
         :param yaml_paths: the path to all the config yamls
         :type yaml_paths: list of str
@@ -89,12 +92,12 @@ class ConfigYamlLoader(object):
         return config_metadata
 
     @staticmethod
-    def __load_yaml_into_dict(yaml_paths: list):
+    def __load_yaml_into_dict(yaml_paths: list) -> dict:
         """Loads the yamls into an dictionary. Any errors while in the yaml
         syntax will raise to the main thread. We also adjust how the dictionary
         is stored for easier access later.
 
-        :raises: ConfigYamlMalformed
+        :raises ConfigYamlMalformed: when the yaml is malformed
         :param yaml_paths: the path to all the config yamls
         :type yaml_paths: list of str
         :returns: config_medata dict representing the data to generate
@@ -153,8 +156,8 @@ class ConfigYamlLoader(object):
         dynamic_parameter_schemas and then checks for duplicate includes
         and duplicate parameters in the same config.
 
-        :raises: ConfigYamlMalformed
-        :raises: ConfigSchemaViolation
+        :raises ConfigYamlMalformed: When the yaml is malformed
+        :raises ConfigSchemaViolation: When the shema is violated
         :param config_metadata: Metadata describing params and config includes
         :type config_metadata: dict
 
@@ -235,7 +238,7 @@ class ConfigYamlLoader(object):
         """Creates a DiGraph from all the included configs and checks if there
         are cycles. Raises to the main thread if a cycle is detected
 
-        :raises: ConfigYamlCycleDetected
+        :raises ConfigYamlCycleDetected: When a cycle is detected in the incldues
         :param config_metadata: Metadata describing params and config includes
         :type config_metadata: dict
 
