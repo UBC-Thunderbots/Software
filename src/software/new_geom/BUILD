@@ -351,6 +351,7 @@ cc_test(
     srcs = ["bezier_curve2d_test.cpp"],
     deps = [
         ":bezier_curve2d",
+        "//software/new_geom/util:algorithms",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

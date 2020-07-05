@@ -76,6 +76,7 @@ def _nanopb_proto_library_impl(ctx):
     ]
 
     # The absolute path to the root folder for all generated files
+
     generated_files_abs_root = ctx.genfiles_dir.path + "/" + \
                                ctx.build_file_path[:-len("BUILD")] + generation_folder_name
 

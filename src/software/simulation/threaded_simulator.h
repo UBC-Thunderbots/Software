@@ -11,8 +11,7 @@ extern "C" {
 }
 
 /**
- * A simulator that runs in a separate thread and publishes protobuf
- * data asynchronously.
+ * A wrapper for Simulator that runs in a separate thread with a callback registry
  */
 class ThreadedSimulator
 {
