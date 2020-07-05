@@ -1,9 +1,0 @@
-
-syntax = "proto3";
-
-message Deleteme {
-    float parameter1 = 1;
-    float parameter2 = 2;
-    float parameter3 = 3;
-    float parameter4 = 4;
-}

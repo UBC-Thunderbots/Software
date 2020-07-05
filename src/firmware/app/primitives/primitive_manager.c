@@ -15,7 +15,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "firmware/app/primitives/catch_primitive.h"
 #include "firmware/app/primitives/direct_velocity_primitive.h"
 #include "firmware/app/primitives/direct_wheels_primitive.h"
 #include "firmware/app/primitives/dribble_primitive.h"
@@ -175,6 +174,19 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     app_primitive_manager_unlockPrimitiveMutex(manager);
 }
 
+void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
+                                               FirmwareWorld_t *world)
+{
+    app_primitive_manager_lockPrimitiveMutex(manager);
+
+    if (manager->current_primitive)
+    {
+        manager->current_primitive->tick(manager->current_primitive_state, world);
+    }
+
+    app_primitive_manager_unlockPrimitiveMutex(manager);
+}
+
 void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
                                                FirmwareWorld_t *world)
 {
@@ -193,17 +205,4 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
     app_chicker_disableAutochip(chicker);
     app_chicker_disableAutokick(chicker);
     app_dribbler_setSpeed(dribbler, 0);
-}
-
-void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
-                                               FirmwareWorld_t *world)
-{
-    app_primitive_manager_lockPrimitiveMutex(manager);
-
-    if (manager->current_primitive)
-    {
-        manager->current_primitive->tick(manager->current_primitive_state, world);
-    }
-
-    app_primitive_manager_unlockPrimitiveMutex(manager);
 }

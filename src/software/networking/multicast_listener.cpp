@@ -2,7 +2,6 @@
 
 #include "software/logger/logger.h"
 
-// TODO: why do we need to inline this?
 MulticastListener::MulticastListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
     const unsigned short port, std::function<void(std::vector<uint8_t>&)> receive_callback)

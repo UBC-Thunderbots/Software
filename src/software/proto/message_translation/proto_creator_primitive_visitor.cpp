@@ -23,12 +23,6 @@ PrimitiveMsg ProtoCreatorPrimitiveVisitor::createPrimitiveMsg(const Primitive &p
     return getProto();
 }
 
-void ProtoCreatorPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
-{
-    // TODO: delete this
-    assert(false);
-}
-
 void ProtoCreatorPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
     PrimitiveParamsMsg* params = new PrimitiveParamsMsg();

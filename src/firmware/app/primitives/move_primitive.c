@@ -159,10 +159,10 @@ void app_move_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
     //                end_speed [millimeter/s]
 
     // Convert into m/s and rad/s because physics is in m and s
-    state->destination[0] = (float)(params.parameter1) / 1000.0f;
-    state->destination[1] = (float)(params.parameter2) / 1000.0f;
-    state->destination[2] = (float)(params.parameter3) / 100.0f;
-    state->end_speed      = (float)(params.parameter4) / 1000.0f;
+    state->destination[0] = params.parameter1 / 1000.0f;
+    state->destination[1] = params.parameter2 / 1000.0f;
+    state->destination[2] = params.parameter3 / 100.0f;
+    state->end_speed      = params.parameter4 / 1000.0f;
     state->slow           = params.slow;
 
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);

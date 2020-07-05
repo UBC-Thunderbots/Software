@@ -65,21 +65,21 @@ int main(int argc, char* argv[])
         std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]), PRIMITIVE_PORT);
 
     // TODO: fix this
-//    auto status_listener =
-//        std::make_unique<ThreadedProtoMulticastListener<TbotsRobotMsg>>(
-//            std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
-//            ROBOT_STATUS_PORT, std::function(callback));
+    auto status_listener =
+        std::make_unique<ThreadedProtoMulticastListener<TbotsRobotMsg>>(
+            std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+            ROBOT_STATUS_PORT, std::function(callback));
 
-//    while (1)
-//    {
-//        // primitive and vision sender
-//        primitive_sender->sendProto(test_primitive_msg);
-//        test_vision_msg.set_allocated_time_sent(createCurrentTimestampMsg().release());
-//        vision_sender->sendProto(test_vision_msg);
-//
-//        // 100 hz test
-//        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-//    }
+    while (1)
+    {
+        // primitive and vision sender
+        primitive_sender->sendProto(test_primitive_msg);
+        test_vision_msg.set_allocated_time_sent(createCurrentTimestampMsg().release());
+        vision_sender->sendProto(test_vision_msg);
+
+        // 100 hz test
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 
     google::protobuf::ShutdownProtobufLibrary();
 

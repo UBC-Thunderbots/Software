@@ -19,8 +19,8 @@ class ThreadedNetworkListener
      *  example IPv4: 192.168.0.2
      *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port on which to listen
-     * @param receive_callback The function to run for each new value received over the
-     *                         network
+     * @param receive_callback The function to call with each new value received over
+     *                         the network
      */
     ThreadedNetworkListener(const std::string& ip_address, unsigned short port,
                               std::function<void(CallBackFunctionArgT&)> receive_callback);

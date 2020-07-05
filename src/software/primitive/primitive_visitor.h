@@ -5,7 +5,6 @@
 // because primitive.h includes primitive_visitor.h, and each individual library includes
 // primitive.h. Note: every subclass of this visitor must include all of the classes
 // listed below
-class CatchPrimitive;
 class ChipPrimitive;
 class DirectVelocityPrimitive;
 class DirectWheelsPrimitive;
@@ -35,7 +34,6 @@ class PrimitiveVisitor
      * @param primitive The primitive to visit
      */
 
-    virtual void visit(const CatchPrimitive &catch_primitive)                    = 0;
     virtual void visit(const ChipPrimitive &chip_primitive)                      = 0;
     virtual void visit(const DirectVelocityPrimitive &direct_velocity_primitive) = 0;
     virtual void visit(const DirectWheelsPrimitive &direct_wheels_primitive)     = 0;

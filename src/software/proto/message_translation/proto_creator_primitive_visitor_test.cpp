@@ -5,23 +5,6 @@
 
 #include "software/primitive/all_primitives.h"
 
-TEST(ProtoCreatorPrimitiveVisitor, visit_catch_primitive)
-{
-    CatchPrimitive primitive(12, 33.456, 10000, 0.000038);
-    PrimitiveMsg expected_primitive;
-    expected_primitive.set_prim_type(PrimitiveMsg::CATCH);
-    expected_primitive.set_parameter1(static_cast<float>(33.456));
-    expected_primitive.set_parameter2(static_cast<float>(10000));
-    expected_primitive.set_parameter3(static_cast<float>(0.000038));
-    expected_primitive.set_extra_bits(0);
-
-    PrimitiveMsg actual_radio_primitive =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_radio_primitive));
-}
-
 TEST(ProtoCreatorPrimitiveVisitor, visit_chip_primitive)
 {
     ChipPrimitive primitive(11, Point(123.34, 32.22), Angle::half(), 0.000038);

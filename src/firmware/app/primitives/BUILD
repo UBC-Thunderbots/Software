@@ -1,20 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "catch",
-    srcs = ["catch_primitive.c"],
-    hdrs = ["catch_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
-        "//firmware/shared:util",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
     name = "direct_velocity",
     srcs = ["direct_velocity_primitive.c"],
     hdrs = ["direct_velocity_primitive.h"],
@@ -99,7 +85,6 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        ":catch",
         ":direct_velocity",
         ":direct_wheels",
         ":dribble",

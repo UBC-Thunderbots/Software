@@ -14,9 +14,6 @@ proto_library(
         "tbots_timestamp_msg.proto",
         "vision.proto",
     ],
-    deps = [
-        "//software/proto:deleteme_proto",
-    ],
 )
 
 cc_proto_library(

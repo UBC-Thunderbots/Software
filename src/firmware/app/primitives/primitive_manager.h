@@ -19,21 +19,15 @@ PrimitiveManager_t *app_primitive_manager_create(void);
  */
 void app_primitive_manager_destroy(PrimitiveManager_t *manager);
 
-// TODO: jdoc
+/**
+ * Start a new primitive with the given PrimitiveManager
+ * @param manager The PrimitiveManager to run the primitive
+ * @param world The world to run the primitive in
+ * @param primitive_msg The message representing the primitive to run
+ */
 void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
                                              PrimitiveMsg primitive_msg);
-
-// TODO: jdoc
-void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
-                                               FirmwareWorld_t *world);
-
-// TODO: re-sort these functions
-
-// TODO: jdoc
-// TODO: make this private?
-primitive_t *app_primitive_manager_getPrimitiveFromMsg(PrimitiveMsg primitiveMsg);
-
 /**
  * Runs the current primitive
  *
@@ -44,11 +38,9 @@ void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
                                                FirmwareWorld_t *world);
 
 /**
- * Gets the index of the currently running primitive
- * @param manager The primitive manager to get the index of the currently running
- *                primitive from
- * @return The index of the primitive this primitive manager is currently running, 254 if
- *         there is no primitive running
+ * End the primitive the manager is currently running (if there is one running)
+ * @param manager The manager (that could be) running a primitive
+ * @param world The world the primitive is to be ended in
  */
-unsigned int app_primitive_manager_getCurrentPrimitiveIndex(PrimitiveManager_t *manager);
-
+void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
+                                               FirmwareWorld_t *world);

@@ -1,12 +1,15 @@
 #pragma once
 
-#include "software/simulation/serialize_primitive_to_proto.h"
 #include "software/primitive/primitive.h"
 
 extern "C" {
 #include "shared/proto/primitive.nanopb.h"
 }
 
-// TODO: better name?
-// TODO: jdoc?
+/**
+ * Convert the given primitive to a NanoPb message
+ *
+ * @param primitive The primitive to convert to a NanoPb message
+ * @return The NanoPb message representing the given primitive
+ */
 PrimitiveMsg convertPrimitiveToNanoPb(const Primitive& primitive);

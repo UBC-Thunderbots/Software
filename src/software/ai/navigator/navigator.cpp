@@ -12,13 +12,6 @@ Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
 {
 }
 
-void Navigator::visit(const CatchIntent &intent)
-{
-    auto p            = std::make_unique<CatchPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
 void Navigator::visit(const ChipIntent &intent)
 {
     auto p            = std::make_unique<ChipPrimitive>(intent);

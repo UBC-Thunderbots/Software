@@ -19,9 +19,9 @@ DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DribblePrimitiveState_t)
                                  FirmwareWorld_t* world)
 {
     DribblePrimitiveState_t* state = (DribblePrimitiveState_t*)void_state_ptr;
-    state->destination[0]          = ((float)(params.parameter1) / 1000.0f);
-    state->destination[1]          = ((float)(params.parameter2) / 1000.0f);
-    state->destination[2]          = ((float)(params.parameter3) / 100.0f);
+    state->destination[0]          = params.parameter1 / 1000.0f;
+    state->destination[1]          = params.parameter2 / 1000.0f;
+    state->destination[2]          = params.parameter3 / 100.0f;
 
     Dribbler_t* dribbler =
         app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));

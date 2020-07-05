@@ -86,9 +86,9 @@ void app_shoot_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
      */
 
     // Convert into m/s and rad/s because physics is in m and s
-    state->destination[0] = ((float)(params.parameter1) / 1000.0f);
-    state->destination[1] = ((float)(params.parameter2) / 1000.0f);
-    state->destination[2] = ((float)(params.parameter3) / 100.0f);
+    state->destination[0] = params.parameter1 / 1000.0f;
+    state->destination[1] = params.parameter2 / 1000.0f;
+    state->destination[2] = params.parameter3 / 100.0f;
 
     // cosine and sine of orientation angle to global x axis
     state->major_vec[0] = cosf(state->destination[2]);
@@ -101,7 +101,7 @@ void app_shoot_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
 
     state->total_rot =
         min_angle_delta(state->destination[2], app_firmware_robot_getOrientation(robot));
-    float shoot_power = (float)params.parameter4 / 1000.0f;
+    float shoot_power = params.parameter4 / 1000.0f;
     bool chip         = params.extra_bits & 1;
 
     Chicker_t *chicker =

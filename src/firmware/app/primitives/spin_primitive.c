@@ -34,10 +34,10 @@ void app_spin_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
     //              param[3]: g_end_speed       [millimeter/s]
 
     // Parse the parameters with the standard units
-    state->x_final    = (float)params.parameter1 / 1000.0f;
-    state->y_final    = (float)params.parameter2 / 1000.0f;
-    state->avel_final = (float)params.parameter3 / 100.0f;
-    state->end_speed  = (float)params.parameter4     / 1000.0f;
+    state->x_final    = params.parameter1 / 1000.0f;
+    state->y_final    = params.parameter2 / 1000.0f;
+    state->avel_final = params.parameter3 / 100.0f;
+    state->end_speed  = params.parameter4     / 1000.0f;
     state->slow       = params.slow;
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);

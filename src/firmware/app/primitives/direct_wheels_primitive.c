@@ -11,13 +11,13 @@ DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DirectWheelsPrimitiveState_t
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
     app_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot),
-                         ((float)params.parameter1) / 100.0f);
+                         params.parameter1 / 100.0f);
     app_wheel_applyForce(app_firmware_robot_getBackLeftWheel(robot),
-                         ((float)params.parameter2) / 100.0f);
+                         params.parameter2 / 100.0f);
     app_wheel_applyForce(app_firmware_robot_getBackRightWheel(robot),
-                         ((float)params.parameter3) / 100.0f);
+                         params.parameter3 / 100.0f);
     app_wheel_applyForce(app_firmware_robot_getFrontRightWheel(robot),
-                         ((float)params.parameter4) / 100.0f);
+                         params.parameter4 / 100.0f);
 
     Dribbler_t* dribbler =
         app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
