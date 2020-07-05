@@ -51,21 +51,6 @@ Point Ball::position() const
     return states_.front().state().position();
 }
 
-Point Ball::estimatePositionAtFutureTime(const Duration &duration_in_future) const
-{
-    if (duration_in_future < Duration::fromSeconds(0))
-    {
-        throw std::invalid_argument(
-            "Error: Position estimate is updating times from the past");
-    }
-
-    // TODO: This is a simple linear implementation that does not necessarily reflect
-    // real-world behavior. Position prediction should be improved as outlined in
-    // https://github.com/UBC-Thunderbots/Software/issues/47
-    double seconds_in_future = duration_in_future.getSeconds();
-    return position() + (velocity().normalize(seconds_in_future * velocity().length()));
-}
-
 Vector Ball::velocity() const
 {
     return states_.front().state().velocity();
