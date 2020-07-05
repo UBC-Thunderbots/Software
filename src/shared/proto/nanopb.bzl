@@ -75,9 +75,9 @@ def _nanopb_proto_library_impl(ctx):
         if label[CcInfo].linking_context != None
     ]
 
-    # The root folder for all generated files
-    generated_files_root = ctx.genfiles_dir.path + "/" + \
-                           ctx.build_file_path[:-len("BUILD")] + generation_folder_name
+    # The absolute path to the root folder for all generated files
+    generated_files_abs_root = ctx.genfiles_dir.path + "/" + \
+                               ctx.build_file_path[:-len("BUILD")] + generation_folder_name
 
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = "compile_nanopb_outputs",
@@ -87,8 +87,8 @@ def _nanopb_proto_library_impl(ctx):
         srcs = all_proto_src_files,
         public_hdrs = all_proto_hdr_files,
         includes = [
-            generated_files_root,
-        ] + [generated_files_root + dir for dir in all_proto_include_dirs.to_list()],
+            generated_files_abs_root,
+        ] + [generated_files_abs_root + dir for dir in all_proto_include_dirs.to_list()],
         compilation_contexts = nanopb_compilation_contexts,
     )
 
