@@ -19,5 +19,5 @@ class ZoomableQGraphicsView : public QGraphicsView
    private:
     // The base of the exponential used to calculate how much to zoom
     // given a certain amount of mouse wheel movement
-    const double zoom_scaling_factor_exponential_base = 1.0005;
+    static constexpr double ZOOM_SCALING_FACTOR_EXPONENTIAL_BASE = 1.0005;
 };

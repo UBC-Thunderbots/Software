@@ -117,6 +117,15 @@ TEST(VectorLogicTests, vector_proj_test)
     EXPECT_EQ(1.76, proj.y());
 }
 
+TEST(VectorLogicTests, project_vector_onto_vector_in_opposite_direction)
+{
+    Vector u    = Vector(1, 2);
+    Vector v    = Vector(-3, 0);
+    Vector proj = u.project(v);
+    EXPECT_DOUBLE_EQ(1.0, proj.x());
+    EXPECT_DOUBLE_EQ(0.0, proj.y());
+}
+
 TEST(VectorLogicTests, vector_dot_test)
 {
     Vector u = Vector(-4, -9);

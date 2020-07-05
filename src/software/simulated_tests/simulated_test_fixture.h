@@ -161,7 +161,7 @@ class SimulatedTestFixture : public ::testing::Test
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
 
-    std::shared_ptr<ThreadedFullSystemGUI> visualizer;
+    std::shared_ptr<ThreadedFullSystemGUI> full_system_gui;
     // If false, runs the simulation as fast as possible.
     // If true, introduces artificial delay so that simulation
     // time passes at the same speed a real life time

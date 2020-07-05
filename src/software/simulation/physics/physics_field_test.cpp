@@ -76,7 +76,7 @@ TEST(PhysicsFieldTest, test_field_dimensions_do_not_change_during_simulation_ste
     EXPECT_EQ(field, field_parameter);
 }
 
-TEST(PhysicsBallTest, test_ball_bounces_off_field_boundary)
+TEST(PhysicsFieldTest, test_ball_bounces_off_field_boundary)
 {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
@@ -86,7 +86,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_field_boundary)
 
     BallState initial_ball_state(field_parameter.friendlyHalf().posXPosYCorner(),
                                  Vector(0, 2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1, 9.8);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -102,7 +102,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_field_boundary)
     EXPECT_LT((Vector(0, -2) - ball.velocity()).length(), 1e-5);
 }
 
-TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
+TEST(PhysicsFieldTest, test_ball_bounces_off_enemy_goal)
 {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
@@ -112,7 +112,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
 
     BallState initial_ball_state(field_parameter.enemyGoalCenter() + Vector(-1, 0),
                                  Vector(3.0, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1, 9.8);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
@@ -128,7 +128,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_enemy_goal)
     EXPECT_LT((Vector(-3.0, 0.0) - ball.velocity()).length(), 1e-3);
 }
 
-TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
+TEST(PhysicsFieldTest, test_ball_bounces_off_friendly_goal)
 {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
@@ -138,7 +138,7 @@ TEST(PhysicsBallTest, test_ball_bounces_off_friendly_goal)
 
     BallState initial_ball_state(field_parameter.friendlyGoalCenter() + Vector(1, 0),
                                  Vector(-3.0, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1, 9.8);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
