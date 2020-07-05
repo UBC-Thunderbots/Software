@@ -8,6 +8,8 @@
 /* Game Rules */
 // The max allowed speed of the ball, in metres per second
 const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
+// The max allowed height of the robots, in metres
+const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
 const double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
@@ -47,10 +49,14 @@ const double ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4.0;
 /* Unit Conversion */
 const double MILLIMETERS_PER_METER = 1000.0;
 const double METERS_PER_MILLIMETER = 1.0 / 1000.0;
+const double CENTIMETERS_PER_METER = 100.0;
+const double METERS_PER_CENTIMETER = 1.0 / 100.0;
 
 const double CENTIRADIANS_PER_RADIAN = 100.0;
 const double RADIANS_PER_CENTIRADIAN = 1.0 / 100.0;
 
+const double NANOSECONDS_PER_MILLISECOND  = 1000000.0;
+const double NANOSECONDS_PER_SECOND       = 1000000000.0;
 const double MICROSECONDS_PER_MILLISECOND = 1000.0;
 const double MICROSECONDS_PER_SECOND      = 1000000.0;
 const double MILLISECONDS_PER_SECOND      = 1000.0;
@@ -80,3 +86,32 @@ const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
  */
 const double ANGLE_TO_ROBOT_FRONT_WHEELS_DEG = 57.945;
 const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;
+
+
+// Networking
+// the IPv6 multicast address, only ff02 is important, the rest is random
+// see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
+#define MAX_MULTICAST_CHANNELS 16
+#define MULTICAST_CHANNEL_LENGTH 21
+const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] = {
+    "ff02::c3d0:42d2:bb01", "ff02::c3d0:42d2:bb02", "ff02::c3d0:42d2:bb03",
+    "ff02::c3d0:42d2:bb04", "ff02::c3d0:42d2:bb05", "ff02::c3d0:42d2:bb06",
+    "ff02::c3d0:42d2:bb07", "ff02::c3d0:42d2:bb08", "ff02::c3d0:42d2:bb09",
+    "ff02::c3d0:42d2:bb10", "ff02::c3d0:42d2:bb11", "ff02::c3d0:42d2:bb12",
+    "ff02::c3d0:42d2:bb13", "ff02::c3d0:42d2:bb14", "ff02::c3d0:42d2:bb15",
+    "ff02::c3d0:42d2:bb16",
+};
+
+// the port robots are listening to for vision and primitives
+const unsigned VISION_PORT    = 42069;
+const unsigned PRIMITIVE_PORT = 42070;
+
+// the port the AI receives msgs from the robot
+const unsigned ROBOT_STATUS_PORT = 42071;
+
+// the timeout to recv a network packet
+const unsigned NETWORK_TIMEOUT_MS = 1000;
+
+// maximum transfer unit of the network interface
+// this is an int to avoid Wconversion with lwip
+const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;

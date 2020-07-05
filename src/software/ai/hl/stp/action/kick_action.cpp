@@ -5,6 +5,7 @@
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/util.h"
 #include "software/new_geom/polygon.h"
+#include "software/new_geom/util/contains.h"
 #include "software/world/ball.h"
 
 KickAction::KickAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
@@ -105,7 +106,7 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
     Polygon behind_ball_region =
         Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
 
-    bool robot_behind_ball = behind_ball_region.contains(robot->position());
+    bool robot_behind_ball = contains(behind_ball_region, robot->position());
     // The point in the middle of the region behind the ball
     Point point_behind_ball =
         kick_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);

@@ -6,6 +6,6 @@
 
 // A custom level used to specify messages that contain robot statuses, including various
 // diagnostic information like battery voltage and wheel encoder errors. These messages
-// are separate because they are shown separately in the Visualizer.
+// are separate because they are shown separately in the FullSystemGUI.
 // over radio
 const LEVELS ROBOT_STATUS{INFO.value + 1, {"ROBOT_STATUS"}};

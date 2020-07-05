@@ -9,15 +9,15 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
 
 #include "shared/constants.h"
 #include "software/backend/output/radio/mrf/messages.h"
-#include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
 #include "software/logger/logger.h"
-
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 namespace
 {
     struct RadioConfig
@@ -119,8 +119,8 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     // Switch to configuration mode and configure the radio parameters.
     device.set_interface_alt_setting(radio_interface, configuration_altsetting);
     {
-        if (config < 0 || static_cast<std::size_t>(config) >=
-                              sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
+        if (static_cast<std::size_t>(config) >=
+            sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
         {
             throw std::out_of_range("Config index must be between 0 and " +
                                     std::to_string(NUM_DEFAULT_CONFIGS - 1));
@@ -415,145 +415,62 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
 
 void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
 {
-    // More than 1 prim.
-    if (!prims.empty())
+    for (auto &prim : prims)
     {
-        std::size_t num_prims = prims.size();
-        if (num_prims > MAX_ROBOTS_OVER_RADIO)
+        std::vector<uint8_t> encoded_primitive = encode_primitive(prim);
+        if (encoded_primitive.size() > MAX_RADIO_PACKET_SIZE)
         {
-            throw std::invalid_argument("Too many primitives in vector.");
+            LOG(WARNING) << "Failed to send " << prim->getPrimitiveName()
+                         << ", it had an encoded length of" << encoded_primitive.size()
+                         << ", max is  " << MAX_RADIO_PACKET_SIZE;
         }
-
-        if (num_prims == MAX_ROBOTS_OVER_RADIO)
+        else
         {
-            // All robots are present. Build a full-size packet with all the
-            // robots’ data in index order.
-            for (std::size_t i = 0; i != num_prims; ++i)
-            {
-                encode_primitive(prims[i], &drive_packet[i * 8]);
-            }
-            drive_packet_length = 64;
+            submit_drive_transfer(encoded_primitive);
         }
-        else if (num_prims < MAX_ROBOTS_OVER_RADIO)
-        {
-            // Only some robots are present. Build a reduced-size packet
-            // with robot indices prefixed.
-            drive_packet_length = 0;
-            for (std::size_t i = 0; i != num_prims; ++i)
-            {
-                drive_packet[drive_packet_length++] =
-                    static_cast<uint8_t>(prims[i]->getRobotId());
-                encode_primitive(prims[i], &drive_packet[drive_packet_length]);
-                drive_packet_length += 8;
-            }
-        }
-
-        submit_drive_transfer();
     }
 }
 
-bool MRFDongle::submit_drive_transfer()
+void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
 {
+    // Check the data is of valid size
+    if (data.size() > MAX_RADIO_PACKET_SIZE)
+    {
+        std::stringstream ss;
+        ss << "Tried to send packet with length " << data.size()
+           << " over radio, max size is " << MAX_RADIO_PACKET_SIZE;
+        throw std::runtime_error(ss.str());
+    }
+
     // Submit drive_packet when possible.
     if (!drive_transfer)
     {
-        drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet,
-                                                      drive_packet_length, 64, 0));
+        std::cout << "sending data of size: " << data.size() << std::endl;
+        drive_transfer.reset(new USB::BulkOutTransfer(device, 1, &data[0], data.size(),
+                                                      MAX_RADIO_PACKET_SIZE, 0));
         drive_transfer->signal_done.connect(
             boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
         drive_transfer->submit();
     }
-
-    return false;
 }
 
-void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *out)
+std::vector<uint8_t> MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
 {
-    uint16_t words[4];
-    MRFPrimitiveVisitor visitor = MRFPrimitiveVisitor();
+    // Get the proto representation of the primitive
+    PrimitiveMsg prim_proto = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*prim);
 
-    // Visit the primitive.
-    prim->accept(visitor);
-    RadioPrimitive r_prim = visitor.getSerializedRadioPacket();
+    // Serialize the proto representation
+    std::vector<uint8_t> serialized_proto(prim_proto.ByteSizeLong());
+    prim_proto.SerializeToArray(serialized_proto.data(),
+                                static_cast<int>(prim_proto.ByteSizeLong()));
+    // Prepend the robot id
+    // We place this outside the proto so that we can check on the robot if the message
+    // was intended for that robot with de-serializing the message
+    serialized_proto.insert(serialized_proto.begin(),
+                            static_cast<uint8_t>(prim->getRobotId()));
 
-    // Encode the parameter words.
-    for (std::size_t i = 0; i < r_prim.param_array.size(); ++i)
-    {
-        double value = r_prim.param_array[i];
-        switch (std::fpclassify(value))
-        {
-            case FP_NAN:
-                value = 0.0;
-                break;
-            case FP_INFINITE:
-                if (value > 0.0)
-                {
-                    value = 10000.0;
-                }
-                else
-                {
-                    value = -10000.0;
-                }
-                break;
-        }
-        words[i] = 0;
-        if (value < 0.0)
-        {
-            words[i] |= 1 << 10;
-            value = -value;
-        }
-        if (value > 1000.0)
-        {
-            words[i] |= 1 << 11;
-            value *= 0.1;
-        }
-        if (value > 1000.0)
-        {
-            value = 1000.0;
-        }
-        words[i] |= static_cast<uint16_t>(value);
-    }
 
-    // Encode the movement primitive number.
-    words[0] = static_cast<uint16_t>(words[0] |
-                                     static_cast<unsigned int>(r_prim.prim_type) << 12);
-
-    // Encode charge state
-    // Robots are always charged if the estop is in RUN state; otherwise discharge them.
-    switch (estop_state)
-    {
-        case EStopState::BROKEN:
-        case EStopState::STOP:
-            // Discharge`
-            words[1] |= 1 << 14;
-            break;
-        case EStopState::RUN:
-            // Charge
-            words[1] |= 2 << 14;
-            break;
-    }
-
-    // Encode extra data plus the slow flag.
-    uint8_t extra = r_prim.extra_bits;
-    bool slow     = r_prim.slow;
-    if (extra > 127)
-    {
-        throw std::invalid_argument("extra greater than 127");
-    }
-    uint8_t extra_encoded = static_cast<uint8_t>(extra | (slow ? 0x80 : 0x00));
-
-    words[2] = static_cast<uint16_t>(words[2] |
-                                     static_cast<uint16_t>((extra_encoded & 0xF) << 12));
-    words[3] = static_cast<uint16_t>(words[3] |
-                                     static_cast<uint16_t>((extra_encoded >> 4) << 12));
-
-    // Convert the words to bytes.
-    uint8_t *wptr = static_cast<uint8_t *>(out);
-    for (std::size_t i = 0; i != 4; ++i)
-    {
-        *wptr++ = static_cast<uint8_t>(words[i]);
-        *wptr++ = static_cast<uint8_t>(words[i] / 256);
-    }
+    return serialized_proto;
 }
 
 void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
@@ -584,9 +501,10 @@ void MRFDongle::send_unreliable(unsigned int robot, unsigned int tries, const vo
         throw std::out_of_range("Number of tries must be between 1 and 256 (inclusive)");
     }
 
-    uint8_t buffer[len + 2];
-    buffer[0] = static_cast<uint8_t>(robot);
-    buffer[1] = static_cast<uint8_t>(tries & 0xFF);
+    std::vector<uint8_t> buffer_vec(len + 2);
+    buffer_vec[0]   = static_cast<uint8_t>(robot);
+    buffer_vec[1]   = static_cast<uint8_t>(tries & 0xFF);
+    uint8_t *buffer = buffer_vec.data();
     std::memcpy(buffer + 2, data, len);
     std::unique_ptr<USB::BulkOutTransfer> elt(
         new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));

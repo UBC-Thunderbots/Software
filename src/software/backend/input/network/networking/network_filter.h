@@ -6,7 +6,7 @@
 #include "software/backend/input/network/filter/ball_filter.h"
 #include "software/backend/input/network/filter/robot_filter.h"
 #include "software/backend/input/network/filter/robot_team_filter.h"
-#include "software/parameter/config.hpp"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/sensor_fusion/refbox_data.h"
@@ -23,31 +23,32 @@ class NetworkFilter
     /**
      * Creates a new NetworkFilter for data input and filtering
      */
-    explicit NetworkFilter(std::shared_ptr<const RefboxConfig> refbox_config);
+    explicit NetworkFilter(
+        std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
 
 
     /**
      * Filters the ball data contained in the list of DetectionFrames and returns the most
-     * up to date state of the ball
+     * up to date state of the ball if available
      *
      * @param detections A list of new DetectionFrames containing ball data
      *
      * @return The most up to date state of the ball given the new DetectionFrame
      * information
      */
-    TimestampedBallState getFilteredBallData(
+    std::optional<TimestampedBallState> getFilteredBallData(
         const std::vector<SSL_DetectionFrame> &detections);
 
     /**
      * Returns a new Field object containing the most up to date state of the field given
-     * the new GeometryData information
+     * the new GeometryData information if available
      *
      * @param geometry_packet The SSL_GeometryData packet containing new field data
      *
      * @return a Field object containing the most up to date state of the field given the
      * new GeometryData information
      */
-    Field getFieldData(const SSL_GeometryData &geometry_packet);
+    std::optional<Field> getFieldData(const SSL_GeometryData &geometry_packet);
 
     /**
      * Filters the robot data for the friendly team contained in the list of
@@ -71,7 +72,7 @@ class NetworkFilter
      */
     Team getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &detections);
 
-    RefboxGameState getRefboxGameState(const Referee &packet);
+    RefboxGameState getRefboxGameState(const SSL_Referee &packet);
 
     virtual ~NetworkFilter() = default;
 
@@ -89,7 +90,7 @@ class NetworkFilter
     // Objects used to aggregate and store state. We use these to aggregate the state
     // so that we always publish "complete" data, not just data from a single frame/
     // part of the field
-    Field field_state;
+    std::optional<Field> field_state;
     TimestampedBallState ball_state;
     Team friendly_team_state;
     Team enemy_team_state;
@@ -98,7 +99,7 @@ class NetworkFilter
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
 
-    std::shared_ptr<const RefboxConfig> refbox_config;
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
 
     // backend *should* be the only part of the system that is aware of Refbox/Vision
     // global coordinates. To AI, +x will always be enemy and -x will always be friendly.
@@ -115,11 +116,11 @@ class NetworkFilter
     void setOurFieldSide(bool blue_team_on_positive_half);
 
     /**
-     * Converts a protobuf Referee::Command into a RefboxCommand constant for the
+     * Converts a protobuf SSL_Referee::Command into a RefboxCommand constant for the
      * corresponding Refbox command, based on which team we are (blue or yellow).
      *
      * @param command a referee command from the protobuf message
      * @return a RefboxCommand constant for the corresponding Refbox command
      */
-    RefboxGameState getTeamCommand(const Referee::Command &command);
+    RefboxGameState getTeamCommand(const SSL_Referee::Command &command);
 };

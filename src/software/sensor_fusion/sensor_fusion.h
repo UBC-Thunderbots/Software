@@ -1,12 +1,16 @@
 #pragma once
 
-#include "software/backend/robot_status.h"
-#include "software/multithreading/subject.h"
-#include "software/multithreading/threaded_observer.h"
+#include <google/protobuf/repeated_field.h>
+
+#include "software/parameter/dynamic_parameters.h"
+#include "software/proto/message_translation/ssl_detection.h"
+#include "software/proto/message_translation/ssl_geometry.h"
+#include "software/proto/message_translation/ssl_referee.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
+#include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/sensor_fusion/refbox_data.h"
-#include "software/sensor_fusion/vision_detection.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
@@ -15,90 +19,92 @@
  * Sensor Fusion is an abstraction around all filtering operations that our system may
  * need to perform. It produces Worlds that may be used, and consumes vision detections,
  * refbox data, and robot statuses
- *
- * This produce/consume pattern is performed by extending both "Observer" and
- * "Subject". Please see the implementation of those classes for details.
  */
-class SensorFusion : public Subject<World>,
-                     public ThreadedObserver<RefboxData>,
-                     public ThreadedObserver<RobotStatus>,
-                     public ThreadedObserver<VisionDetection>
+class SensorFusion
 {
    public:
-    SensorFusion();
+    explicit SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
 
     virtual ~SensorFusion() = default;
 
-    // Delete the copy and assignment operators because this class really shouldn't need
-    // them and we don't want to risk doing anything nasty with the internal
-    // multithreading this class potentially uses
-    SensorFusion &operator=(const SensorFusion &) = delete;
-    SensorFusion(const SensorFusion &)            = delete;
+    /**
+     * Updates components of world based on a new data
+     *
+     * @param new data
+     */
+    void updateWorld(const SensorMsg &sensor_msg);
+
+    /**
+     * Returns the most up-to-date world if enough data has been received
+     * to create one.
+     *
+     * @return the most up-to-date world if enough data has been received
+     * to create one.
+     */
+    std::optional<World> getWorld() const;
 
    private:
-    void onValueReceived(RefboxData refbox_data) override;
-    void onValueReceived(RobotStatus robot_status) override;
-    void onValueReceived(VisionDetection vision_detection) override;
+    /**
+     * Updates relevant components of world based on a new data
+     *
+     * @param new data
+     */
+    void updateWorld(const SSL_WrapperPacket &packet);
+    void updateWorld(const SSL_Referee &packet);
+    void updateWorld(
+        const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
+    void updateWorld(const SSL_GeometryData &geometry_packet);
+    void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
-     * Updates world based on new refbox data
+     * Updates relevant components with a new ball state
      *
-     * @param refbox_data new refbox data
+     * @param new_ball_state new TimestampedBallState
      */
-    void updateWorld(const RefboxData &refbox_data);
+    void updateBall(TimestampedBallState new_ball_state);
 
     /**
-     * Updates world based on a new robot status
+     * Create state of the ball from a list of ball detections
      *
-     * @param robot_status new robot status
+     * @param ball_detections list of ball detections to filter
+     *
+     * @return TimestampedBallState if filtered from ball detections
      */
-    void updateWorld(const RobotStatus &robot_status);
+    std::optional<TimestampedBallState> createTimestampedBallState(
+        const std::vector<BallDetection> &ball_detections);
 
     /**
-     * Updates world based on a new vision detection
+     * Create team from a list of robot detections
      *
-     * @param vision_detection new vision detection
+     * @param robot_detections The robot detections to filter
+     *
+     * @return team
      */
-    void updateWorld(const VisionDetection &vision_detection);
+    Team createFriendlyTeam(const std::vector<RobotDetection> &robot_detections);
+    Team createEnemyTeam(const std::vector<RobotDetection> &robot_detections);
 
     /**
-     * Get ball from a vision detection
+     *Inverts all positions and orientations across the x and y axis
      *
-     * @param vision_detection
+     * @param Detection to invert
      *
-     * @return ball if found in vision_detection
+     *@return inverted Detection
      */
-    std::optional<Ball> getBallFromvisionDetecion(
-        const VisionDetection &vision_detection);
+    RobotDetection invert(RobotDetection robot_detection) const;
+    BallDetection invert(BallDetection ball_detection) const;
 
-    /**
-     * Get friendly team from a vision detection
-     *
-     * @param vision_detection
-     *
-     * @return friendly team from vision_detection
-     */
-    Team getFriendlyTeamFromvisionDetecion(const VisionDetection &vision_detection);
-
-    /**
-     * Get enemy team from a vision detection
-     *
-     * @param vision_detection
-     *
-     * @return enemy team from vision_detection
-     */
-    Team getEnemyTeamFromvisionDetecion(const VisionDetection &vision_detection);
-
-    // Objects used to aggregate and store state. We use these to aggregate the state
-    // so that we always publish "complete" data, not just data from a single frame/
-    // part of the field
-    Field field_state;
-    TimestampedBallState ball_state;
-    Team friendly_team_state;
-    Team enemy_team_state;
-    World world;
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
+    unsigned int history_size;
+    std::optional<Field> field;
+    std::optional<Ball> ball;
+    Team friendly_team;
+    Team enemy_team;
+    GameState game_state;
+    std::optional<RefboxStage> refbox_stage;
 
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+
+    BallHistory ball_states;
 };

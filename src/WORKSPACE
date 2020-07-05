@@ -50,7 +50,7 @@ http_archive(
 )
 
 # nanopb: lightweight protobuf library used on the STM32. The build file in the
-# repo does not build the proto compiler (protoc) as a target, and is really compilicated
+# repo does not build the proto compiler (protoc) as a target, and is really complicated
 # to set it up as a protobuf plugin due to lack of bazel support. So we use the archive
 # which has both the headers and compiled protoc w/ the c support baked in.
 
@@ -97,7 +97,7 @@ git_repository(
 new_local_repository(
     name = "qt",
     build_file = "@bazel_rules_qt//:qt.BUILD",
-    path = "external/qt",  # This directory is symlinked in the setup script
+    path = "/usr/include/x86_64-linux-gnu/qt5/",
 )
 
 new_local_repository(
@@ -171,3 +171,38 @@ http_archive(
     strip_prefix = "buildtools-9e63c6f02e63adaab63e21a3a8feb75f4f7503cb",
     url = "https://github.com/bazelbuild/buildtools/archive/9e63c6f02e63adaab63e21a3a8feb75f4f7503cb.zip",
 )
+
+git_repository(
+    name = "rules_python",
+    commit = "a0fbf98d4e3a232144df4d0d80b577c7a693b570",
+    remote = "https://github.com/bazelbuild/rules_python.git",
+    shallow_since = "1586444447 +0200",
+)
+
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+load("@rules_python//python:pip.bzl", "pip_repositories")
+
+pip_repositories()
+
+load("@rules_python//python:pip.bzl", "pip3_import")
+
+pip3_import(
+    name = "python_control_deps",
+    requirements = "//firmware/app/control/python_controller:requirements.txt",
+)
+
+load("@python_control_deps//:requirements.bzl", "pip_install")
+
+pip_install()
+
+pip3_import(
+    name = "dynamic_parameter_deps",
+    requirements = "//shared/parameter_v2/scripts:requirements.txt",
+)
+
+load("@dynamic_parameter_deps//:requirements.bzl", "pip_install")
+
+pip_install()

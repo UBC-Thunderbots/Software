@@ -26,6 +26,12 @@ class TThreadedObserver : public Observer<T>
 
     ~TThreadedObserver() override;
 
+    // Delete the copy and assignment operators because this class really shouldn't need
+    // them and we don't want to risk doing anything nasty with the internal
+    // multithreading this class uses
+    TThreadedObserver &operator=(const TThreadedObserver &) = delete;
+    TThreadedObserver(const ThreadedObserver &)            = delete;
+
    private:
     /**
      * This function will be called with a new value as it is received.

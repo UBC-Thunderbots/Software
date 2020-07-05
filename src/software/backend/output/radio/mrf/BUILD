@@ -1,24 +1,4 @@
-cc_library(
-    name = "mrf_primitive_visitor",
-    srcs = ["mrf_primitive_visitor.cpp"],
-    hdrs = ["mrf_primitive_visitor.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//shared:constants",
-        "//shared:firmware_primitive_type",
-        "//software/primitive:all_primitives",
-        "//software/primitive:primitive_visitor",
-    ],
-)
-
-cc_test(
-    name = "mrf_primitive_visitor_test",
-    srcs = ["mrf_primitive_visitor_test.cpp"],
-    deps = [
-        ":mrf_primitive_visitor",
-        "@gtest//:gtest_main",
-    ],
-)
+package(default_visibility = ["//visibility:private"])
 
 cc_library(
     name = "messages",
@@ -41,12 +21,12 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":messages",
-        ":mrf_primitive_visitor",
         "//shared:constants",
         "//software:constants",
         "//software/backend:robot_status",
         "//software/backend/output/radio/mrf/usb:libusb",
         "//software/geom",
         "//software/primitive",
+        "//software/proto/message_translation:proto_creator_primitive_visitor",
     ],
 )

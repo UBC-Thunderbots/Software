@@ -6,7 +6,6 @@ cc_library(
     hdrs = ["catch_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:catch_primitive",
     ],
 )
@@ -26,7 +25,6 @@ cc_library(
     hdrs = ["chip_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:chip_primitive",
     ],
 )
@@ -46,7 +44,6 @@ cc_library(
     hdrs = ["direct_velocity_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:direct_velocity_primitive",
     ],
 )
@@ -66,7 +63,6 @@ cc_library(
     hdrs = ["direct_wheels_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:direct_wheels_primitive",
     ],
 )
@@ -86,7 +82,6 @@ cc_library(
     hdrs = ["dribble_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:dribble_primitive",
     ],
 )
@@ -106,7 +101,6 @@ cc_library(
     hdrs = ["kick_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:kick_primitive",
     ],
 )
@@ -126,7 +120,6 @@ cc_library(
     hdrs = ["move_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:move_primitive",
     ],
 )
@@ -146,7 +139,6 @@ cc_library(
     hdrs = ["movespin_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:movespin_primitive",
     ],
 )
@@ -166,7 +158,6 @@ cc_library(
     hdrs = ["pivot_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:pivot_primitive",
     ],
 )
@@ -186,7 +177,6 @@ cc_library(
     hdrs = ["stop_intent.h"],
     deps = [
         ":intent",
-        ":intent_visitor",
         "//software/primitive:stop_primitive",
     ],
 )
@@ -222,6 +212,7 @@ cc_library(
     srcs = ["intent.cpp"],
     hdrs = ["intent.h"],
     deps = [
+        "intent_visitor",
         "//software/ai/motion_constraint",
         "//software/logger",
     ],
@@ -240,5 +231,4 @@ cc_test(
 cc_library(
     name = "intent_visitor",
     hdrs = ["intent_visitor.h"],
-    deps = [":intent"],
 )

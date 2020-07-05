@@ -24,7 +24,7 @@ class PatrolTacticTest : public testing::Test
     void generateExpectedActions(Robot robot, std::vector<Point> patrol_points,
                                  Angle angle, double speed_at_patrol_points)
     {
-        for (int i = 0; i < patrol_points.size(); i++)
+        for (size_t i = 0; i < patrol_points.size(); i++)
         {
             auto expected_action = std::make_shared<MoveAction>(false);
             expected_action->updateControlParams(
@@ -44,11 +44,11 @@ class PatrolTacticTest : public testing::Test
     void generateRobotStatesToCompleteAction(std::vector<Point> patrol_points,
                                              Vector velocity)
     {
-        for (int i = 0; i < patrol_points.size(); i++)
+        for (size_t i = 0; i < patrol_points.size(); i++)
         {
             TimestampedRobotState robotState = TimestampedRobotState(
                 patrol_points[i], velocity, Angle::zero(), AngularVelocity::zero(),
-                Timestamp::fromSeconds(std::time(nullptr)));
+                Timestamp::fromSeconds(static_cast<double>(std::time(nullptr))));
             robot_state_to_complete_actions.push_back(robotState);
         }
     }
@@ -179,7 +179,7 @@ TEST_F(PatrolTacticTest, patrol_three_points)
 
     // Act and Assert
 
-    for (int i = 0; i < patrol_points.size(); i++)
+    for (size_t i = 0; i < patrol_points.size(); i++)
     {
         std::shared_ptr<Action> action_ptr = tactic.getNextAction();
         ASSERT_NE(nullptr, action_ptr);
@@ -222,7 +222,7 @@ TEST_F(PatrolTacticTest, patrol_two_points_and_restart)
 
     for (int j = 0; j < 2; j++)
     {
-        for (int i = 0; i < patrol_points.size(); i++)
+        for (size_t i = 0; i < patrol_points.size(); i++)
         {
             std::shared_ptr<Action> action_ptr = tactic.getNextAction();
             ASSERT_NE(nullptr, action_ptr);
@@ -251,7 +251,7 @@ TEST_F(PatrolTacticTest, cost_of_non_assigned_robot_when_tactic_is_assigned)
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     std::vector<Point> patrol_points{Point(2, 3), Point(4, 3)};
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     PatrolTactic tactic = PatrolTactic(patrol_points, 1.0, Angle::zero(), 2.0);
 
@@ -273,7 +273,7 @@ TEST_F(PatrolTacticTest, cost_of_non_assigned_robot_when_tactic_is_not_assigned)
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     std::vector<Point> patrol_points{Point(2, 2), Point(4, 3)};
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     PatrolTactic tactic = PatrolTactic(patrol_points, 1.0, Angle::zero(), 2.0);
 
@@ -294,7 +294,7 @@ TEST_F(PatrolTacticTest, cost_of_already_assigned_robot)
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     std::vector<Point> patrol_points{Point(2, 3), Point(4, 3)};
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     PatrolTactic tactic = PatrolTactic(patrol_points, 1.0, Angle::zero(), 2.0);
 

@@ -24,7 +24,7 @@ class ShootOrPassPlay : public Play
 
     bool invariantHolds(const World &world) const override;
 
-    void getNextTactics(TacticCoroutine::push_type &yield) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
    private:
     // How close each of our patrol tactics must be to each of the points in their
@@ -38,6 +38,7 @@ class ShootOrPassPlay : public Play
      * Updates the pass generator
      *
      * @param pass_generator
+     * @param world The current state of the world
      */
-    void updatePassGenerator(Passing::PassGenerator &pass_generator);
+    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
 };

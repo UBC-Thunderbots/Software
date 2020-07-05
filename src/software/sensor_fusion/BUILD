@@ -1,47 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "vision_detection",
-    srcs = ["vision_detection.cpp"],
-    hdrs = [
-        "ball_detection.h",
-        "robot_detection.h",
-        "vision_detection.h",
-    ],
-    deps = [
-        "//software/geom",
-        "//software/time:timestamp",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "vision_detection_test",
-    srcs = ["vision_detection_test.cpp"],
-    deps = [
-        ":vision_detection",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "refbox_data",
-    srcs = ["refbox_data.cpp"],
     hdrs = ["refbox_data.h"],
     deps = [
-        ":team_info",
-        "//software/geom",
-        "//software/proto:ssl_cc_proto",
-        "//software/time:timestamp",
         "//software/util/make_enum",
-    ],
-)
-
-cc_library(
-    name = "team_info",
-    srcs = ["team_info.cpp"],
-    hdrs = ["team_info.h"],
-    deps = [
     ],
 )
 
@@ -60,13 +23,39 @@ cc_library(
     hdrs = ["sensor_fusion.h"],
     deps = [
         ":refbox_data",
-        ":vision_detection",
         "//software/backend:robot_status",
-        "//software/multithreading:subject",
-        "//software/multithreading:threaded_observer",
+        "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/primitive",
+        "//software/proto:sensor_msg_cc_proto",
+        "//software/proto/message_translation:ssl_detection",
+        "//software/proto/message_translation:ssl_geometry",
+        "//software/proto/message_translation:ssl_referee",
         "//software/sensor_fusion/filter:sensor_fusion_filters",
+        "//software/sensor_fusion/filter:vision_detection",
         "//software/world",
+    ],
+)
+
+cc_test(
+    name = "sensor_fusion_test",
+    srcs = ["sensor_fusion_test.cpp"],
+    deps = [
+        ":sensor_fusion",
+        "//software/proto/message_translation:ssl_detection",
+        "//software/proto/message_translation:ssl_geometry",
+        "//software/proto/message_translation:ssl_wrapper",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "threaded_sensor_fusion",
+    srcs = ["threaded_sensor_fusion.cpp"],
+    hdrs = ["threaded_sensor_fusion.h"],
+    deps = [
+        ":sensor_fusion",
+        "//software/multithreading:subject",
+        "//software/multithreading:threaded_observer",
     ],
 )

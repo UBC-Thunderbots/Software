@@ -22,14 +22,14 @@ bool bodyExistsInWorld(b2Body* body, b2World* world)
 b2Vec2 createVec2(const Point& point)
 {
     b2Vec2 ret;
-    ret.Set(point.x(), point.y());
+    ret.Set(static_cast<float>(point.x()), static_cast<float>(point.y()));
     return ret;
 }
 
 b2Vec2 createVec2(const Vector& vector)
 {
     b2Vec2 ret;
-    ret.Set(vector.x(), vector.y());
+    ret.Set(static_cast<float>(vector.x()), static_cast<float>(vector.y()));
     return ret;
 }
 
@@ -54,7 +54,7 @@ float polygonArea(const b2PolygonShape& polygon)
     // counter-clockwise.
     double area    = 0.0;
     unsigned int j = polygon.m_count - 1;
-    for (unsigned int i = 0; i < polygon.m_count; i++)
+    for (int i = 0; i < polygon.m_count; i++)
     {
         double x_sum        = polygon.m_vertices[j].x + polygon.m_vertices[i].x;
         double y_difference = polygon.m_vertices[j].y - polygon.m_vertices[i].y;

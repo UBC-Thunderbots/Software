@@ -15,8 +15,8 @@ Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_siz
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
-Team::Team(const Duration& robot_expiry_buffer_duration,
-           const std::vector<Robot>& team_robots)
+Team::Team(const std::vector<Robot>& team_robots,
+           const Duration& robot_expiry_buffer_duration)
     : Team(robot_expiry_buffer_duration)
 {
     updateRobots(team_robots);
@@ -61,17 +61,6 @@ void Team::updateState(const Team& new_team_data)
     this->goalie_id = new_team_data.goalie_id;
 
     updateTimestamp(getMostRecentTimestampFromRobots());
-}
-
-void Team::updateStateToPredictedState(const Timestamp& timestamp)
-{
-    // Update the state of all robots to their predicted state
-    for (auto it = team_robots.begin(); it != team_robots.end(); it++)
-    {
-        it->updateStateToPredictedState(timestamp);
-    }
-
-    updateTimestamp(timestamp);
 }
 
 void Team::removeExpiredRobots(const Timestamp& timestamp)

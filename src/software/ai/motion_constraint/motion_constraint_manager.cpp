@@ -5,9 +5,9 @@
 std::set<MotionConstraint> MotionConstraintManager::getMotionConstraints(
     const GameState &game_state, Tactic &tactic)
 {
+    current_whitelisted_constraints.clear();
     std::set<MotionConstraint> current_motion_constraints =
         getMotionConstraintsFromGameState(game_state);
-
     try
     {
         // updates current_whitelisted_constraints

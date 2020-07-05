@@ -7,9 +7,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-
-
 /**
  * \cond INTERNAL
  */
@@ -279,7 +276,8 @@ typedef struct
      */
     unsigned int interface;
 
-    union {
+    union
+    {
         struct
         {
             /**

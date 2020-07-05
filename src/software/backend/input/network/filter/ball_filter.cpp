@@ -151,7 +151,7 @@ std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
         velocity_magnitude_sum += velocity_magnitude;
     }
     double average_velocity_magnitude =
-        velocity_magnitude_sum / ball_velocity_magnitudes.size();
+        velocity_magnitude_sum / static_cast<double>(ball_velocity_magnitudes.size());
     double velocity_magnitude_max = *std::max_element(ball_velocity_magnitudes.begin(),
                                                       ball_velocity_magnitudes.end());
     double velocity_magnitude_min = *std::min_element(ball_velocity_magnitudes.begin(),
@@ -208,8 +208,8 @@ std::optional<size_t> BallFilter::getAdjustedBufferSize(
     // buffer
     double linear_offset =
         MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE + (buffer_size_velocity_magnitude_diff / 2);
-    double linear_scaling_factor = Util::linear(min_max_magnitude_average, linear_offset,
-                                                buffer_size_velocity_magnitude_diff);
+    double linear_scaling_factor = linear(min_max_magnitude_average, linear_offset,
+                                          buffer_size_velocity_magnitude_diff);
     int buffer_size =
         max_buffer_size -
         static_cast<unsigned int>(std::floor(linear_scaling_factor * buffer_size_diff));
@@ -235,9 +235,9 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
         // This extra column of 1's is the bias variable, so that we can regress with a
         // y-intercept
         A(i, 0) = 1.0;
-        A(i, 1) = ball_detections.at(i).position.x();
+        A(i, 1) = static_cast<float>(ball_detections.at(i).position.x());
 
-        b(i) = ball_detections.at(i).position.y();
+        b(i) = static_cast<float>(ball_detections.at(i).position.y());
     }
 
     // Perform linear regression to find the line of best fit through the ball positions.

@@ -2,8 +2,6 @@
 
 #include <algorithm>
 
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-
 
 MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
 
@@ -33,7 +31,9 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
 
 void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>(false, 0, Angle());
+    auto move_action =
+        std::make_shared<MoveAction>(false, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
+                                     MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
     do
     {
         move_action->updateControlParams(

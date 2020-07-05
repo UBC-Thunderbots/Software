@@ -1,5 +1,8 @@
 #pragma once
 
+#include <boost/circular_buffer.hpp>
+#include <map>
+
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
@@ -50,7 +53,7 @@ class TimestampedRobotState
      *
      * @return the robot state without any timestamp information
      */
-    RobotState robotState() const;
+    RobotState state() const;
 
     /**
      * Defines the equality operator for a TimestampedRobotState.
@@ -73,6 +76,9 @@ class TimestampedRobotState
     bool operator!=(const TimestampedRobotState &other) const;
 
    private:
-    Timestamp timestamp_;
     RobotState robot_state_;
+    Timestamp timestamp_;
 };
+
+using RobotHistory   = boost::circular_buffer<TimestampedRobotState>;
+using TeamHistoryMap = std::map<RobotId, RobotHistory>;

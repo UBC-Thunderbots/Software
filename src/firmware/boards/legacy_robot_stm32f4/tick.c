@@ -129,7 +129,10 @@ static void normal_task(void *UNUSED(param))
                 current_primitive_index = 99;
             }
 
-            record->tick.drive_serial    = receive_last_serial();
+            // We no longer use message serials, but this is kept so that the message
+            // struct remains the same because our older tooling can be extremely brittle
+            // to changes
+            record->tick.drive_serial    = 0;
             record->tick.primitive       = (uint8_t)current_primitive_index;
             record->tick.idle_cpu_cycles = main_read_clear_idle_cycles();
             log_queue(record);

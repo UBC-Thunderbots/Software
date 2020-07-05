@@ -15,8 +15,7 @@
  *                        opensource.org/licenses/BSD-3-Clause
  *
  ******************************************************************************
- */
-/* USER CODE END Header */
+ */ /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -27,7 +26,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
-#include "udp_multicast.h"
+#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
+#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
+#include "shared/constants.h"
+#include "shared/proto/tbots_robot_msg.pb.h"
+#include "shared/proto/tbots_software_msgs.pb.h"
 
 /* USER CODE END Includes */
 
@@ -56,8 +59,43 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-osThreadId_t defaultTaskHandle;
+/* Definitions for NetStartTask */
+osThreadId_t NetStartTaskHandle;
+const osThreadAttr_t NetStartTask_attributes = {.name     = "NetStartTask",
+                                                .priority = (osPriority_t)osPriorityHigh7,
+                                                .stack_size = 1024 * 4};
+/* Definitions for RobotStatusTask */
+osThreadId_t RobotStatusTaskHandle;
+const osThreadAttr_t RobotStatusTask_attributes = {
+    .name       = "RobotStatusTask",
+    .priority   = (osPriority_t)osPriorityHigh7,
+    .stack_size = 1024 * 4};
+/* Definitions for VisionMsgTask */
+osThreadId_t VisionMsgTaskHandle;
+const osThreadAttr_t VisionMsgTask_attributes = {
+    .name       = "VisionMsgTask",
+    .priority   = (osPriority_t)osPriorityHigh7,
+    .stack_size = 1024 * 4};
+/* Definitions for PrimMsgTask */
+osThreadId_t PrimMsgTaskHandle;
+const osThreadAttr_t PrimMsgTask_attributes = {.name     = "PrimMsgTask",
+                                               .priority = (osPriority_t)osPriorityHigh7,
+                                               .stack_size = 1024 * 4};
+/* Definitions for testMsgUpdate */
+osThreadId_t testMsgUpdateHandle;
+const osThreadAttr_t testMsgUpdate_attributes = {
+    .name       = "testMsgUpdate",
+    .priority   = (osPriority_t)osPriorityNormal1,
+    .stack_size = 1024 * 4};
 /* USER CODE BEGIN PV */
+
+ProtoMulticastCommunicationProfile_t *tbots_robot_msg_sender_profile;
+ProtoMulticastCommunicationProfile_t *vision_msg_listener_profile;
+ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
+
+static VisionMsg vision_msg;
+static TbotsRobotMsg tbots_robot_msg;
+static PrimitiveMsg primitive_msg;
 
 /* USER CODE END PV */
 
@@ -69,12 +107,16 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM4_Init(void);
-void StartDefaultTask(void *argument);
+void io_proto_multicast_startNetworkingTask(void *argument);
+extern void io_proto_multicast_sender_task(void *argument);
+extern void io_proto_multicast_listener_task(void *argument);
+void test_msg_update(void *argument);
 
 /* USER CODE BEGIN PFP */
 
 static void initIoLayer(void);
 static void initIoDrivetrain(void);
+static void initIoNetworking(void);
 
 /* USER CODE END PFP */
 
@@ -84,6 +126,7 @@ static void initIoDrivetrain(void);
 static void initIoLayer(void)
 {
     initIoDrivetrain();
+    initIoNetworking();
 }
 
 void initIoDrivetrain(void)
@@ -130,6 +173,28 @@ void initIoDrivetrain(void)
     io_drivetrain_init(drivetrain_unit_front_left, drivetrain_unit_front_right,
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
 }
+
+void initIoNetworking()
+{
+    // TODO this needs to be hooked up to the channel dial on the robot, when available
+    // https://github.com/UBC-Thunderbots/Software/issues/1517
+    unsigned channel = 0;
+
+    io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
+
+    primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
+        "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
+        &primitive_msg, PrimitiveMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+
+    vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
+        "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
+        &vision_msg, VisionMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+
+    tbots_robot_msg_sender_profile = io_proto_multicast_communication_profile_create(
+        "tbots_robot_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
+        &tbots_robot_msg, TbotsRobotMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+}
+
 
 /* USER CODE END 0 */
 
@@ -180,6 +245,7 @@ int main(void)
 
     /* USER CODE END 2 */
 
+    /* Init scheduler */
     osKernelInitialize();
 
     /* USER CODE BEGIN RTOS_MUTEX */
@@ -199,22 +265,38 @@ int main(void)
     /* USER CODE END RTOS_QUEUES */
 
     /* Create the thread(s) */
-    /* definition and creation of defaultTask */
-    const osThreadAttr_t defaultTask_attributes = {
-        .name       = "defaultTask",
-        .priority   = (osPriority_t)osPriorityNormal,
-        .stack_size = 1024};
-    defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+    /* creation of NetStartTask */
+    NetStartTaskHandle = osThreadNew(io_proto_multicast_startNetworkingTask, NULL,
+                                     &NetStartTask_attributes);
+
+    /* creation of RobotStatusTask */
+    RobotStatusTaskHandle =
+        osThreadNew(io_proto_multicast_sender_task,
+                    (void *)tbots_robot_msg_sender_profile, &RobotStatusTask_attributes);
+
+    /* creation of VisionMsgTask */
+    VisionMsgTaskHandle =
+        osThreadNew(io_proto_multicast_listener_task, (void *)vision_msg_listener_profile,
+                    &VisionMsgTask_attributes);
+
+    /* creation of PrimMsgTask */
+    PrimMsgTaskHandle =
+        osThreadNew(io_proto_multicast_listener_task,
+                    (void *)primitive_msg_listener_profile, &PrimMsgTask_attributes);
+
+    /* creation of testMsgUpdate */
+    testMsgUpdateHandle =
+        osThreadNew(test_msg_update, (void *)tbots_robot_msg_sender_profile,
+                    &testMsgUpdate_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
-    /* add threads, ... */
+
     /* USER CODE END RTOS_THREADS */
 
     /* Start scheduler */
     osKernelStart();
 
     /* We should never get here as control is now taken by the scheduler */
-
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (1)
@@ -601,14 +683,14 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_io_proto_multicast_startNetworkingTask */
 /**
- * @brief  Function implementing the defaultTask thread.
+ * @brief  Function implementing the NetStartTask thread.
  * @param  argument: Not used
  * @retval None
  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_io_proto_multicast_startNetworkingTask */
+__weak void io_proto_multicast_startNetworkingTask(void *argument)
 {
     /* init code for LWIP */
     MX_LWIP_Init();
@@ -619,6 +701,40 @@ void StartDefaultTask(void *argument)
         osDelay(1);
     }
     /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_test_msg_update */
+/**
+ * @brief Function implementing the testMsgUpdate thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_test_msg_update */
+void test_msg_update(void *argument)
+{
+    /* USER CODE BEGIN test_msg_update */
+
+    // TODO https://github.com/UBC-Thunderbots/Software/issues/1519
+    // This is a placeholder task to test sending robot status NOT
+    // associated with a ticket because how the robot status msgs will be
+    // updated and sent is TBD
+    ProtoMulticastCommunicationProfile_t *comm_profile =
+        (ProtoMulticastCommunicationProfile_t *)argument;
+
+    /* Infinite loop */
+    for (;;)
+    {
+        io_proto_multicast_communication_profile_acquireLock(comm_profile);
+        // TODO enable SNTP sys_now is currently only time since reset
+        // https://github.com/UBC-Thunderbots/Software/issues/1518
+        tbots_robot_msg.time_sent.epoch_timestamp_seconds = sys_now();
+        io_proto_multicast_communication_profile_releaseLock(comm_profile);
+        io_proto_multicast_communication_profile_notifyEvents(comm_profile,
+                                                              PROTO_UPDATED);
+        // run loop at 100hz
+        osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
+    }
+    /* USER CODE END test_msg_update */
 }
 
 /* MPU Configuration */
@@ -702,7 +818,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
     /* USER CODE BEGIN 6 */
     /* User can add his own implementation to report the file name and line number,
-       tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
     /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

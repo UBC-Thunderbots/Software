@@ -8,7 +8,7 @@
 
 TEST(StopPlayTest, test_example_play_invariant_always_holds)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     HaltPlay halt_play;
     EXPECT_TRUE(halt_play.invariantHolds(world));
@@ -16,7 +16,7 @@ TEST(StopPlayTest, test_example_play_invariant_always_holds)
 
 TEST(StopPlayTest, test_stop_play_returns_correct_tactics)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     HaltPlay halt_play;
     auto tactics = halt_play.getTactics(world);
@@ -34,6 +34,7 @@ TEST(StopPlayTest, test_stop_play_returns_correct_tactics)
         {
             StopTactic *unused;
             unused = dynamic_cast<StopTactic *>(t.get());
+            UNUSED(unused);
         }
         catch (...)
         {

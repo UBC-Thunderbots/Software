@@ -36,9 +36,7 @@ PARAMETER_PUBLIC_ENTRY = """const std::shared_ptr<const Parameter<{type}>> {immu
 
 PARAMETER_PRIVATE_ENTRY = "std::shared_ptr<Parameter<{type}>> {param_variable_name};"
 
-PARAMETER_CONSTRUCTOR_ENTRY = """std::vector<{type}>{param_variable_name}_options = std::vector<{type}>{{{options}}};
-        {param_variable_name} = std::make_shared<Parameter<{type}>>(\"{param_name}\", {quote}{value}{quote},{param_variable_name}_options,
-                                {param_min}, {param_max});"""
+PARAMETER_CONSTRUCTOR_ENTRY = """{param_variable_name} = std::make_shared<Parameter<{type}>>(\"{param_name}\", {quote}{value}{quote});"""
 
 IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY = (
     "std::const_pointer_cast<const Parameter<{type}>>({param_variable_name})"
@@ -115,7 +113,7 @@ AUTOGEN_WARNING = """
 H_HEADER = """{}
 #pragma once
 #include <iostream>
-#include \"software/parameter/config_utils.hpp\"
+#include \"software/parameter/config.h\"
 """.format(
     AUTOGEN_WARNING
 )

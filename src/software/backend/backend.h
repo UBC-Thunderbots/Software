@@ -17,6 +17,7 @@
 class Backend : public Subject<SensorMsg>,
                 public Subject<World>,
                 public Subject<RobotStatus>,
+                public ThreadedObserver<World>,
                 public ThreadedObserver<ConstPrimitiveVectorPtr>
 {
    public:
@@ -24,9 +25,13 @@ class Backend : public Subject<SensorMsg>,
 
     virtual ~Backend() = default;
 
-    // Delete the copy and assignment operators because this class really shouldn't need
-    // them and we don't want to risk doing anything nasty with the internal
-    // multithreading this class potentially uses
-    Backend& operator=(const Backend&) = delete;
-    Backend(const Backend&)            = delete;
+    /**
+     * Callback function to send components of SensorMsg via Subject<SensorMsg>
+     * Immediately makes a SensorMsg from msg and sends it to Observers
+     *
+     * @param msg The component of SensorMsg
+     */
+    void receiveTbotsRobotMsg(TbotsRobotMsg msg);
+    void receiveSSLWrapperPacket(SSL_WrapperPacket msg);
+    void receiveSSLReferee(SSL_Referee msg);
 };

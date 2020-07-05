@@ -24,7 +24,7 @@ bool StopPlay::invariantHolds(const World &world) const
     return world.gameState().isStopped();
 }
 
-void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     // Robot assignments for the Stop Play
     //  - 1 robot will be the goalie
@@ -67,13 +67,14 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
     //
     // http://www.stumblingrobot.com/2015/10/06/
     // find-the-largest-rectangle-that-can-be-inscribed-in-a-semicircle/
-    float semicircle_radius = sqrt(2) * world.field().friendlyDefenseArea().yLength();
+    float semicircle_radius =
+        sqrtf(2) * static_cast<float>(world.field().friendlyDefenseArea().yLength());
 
     do
     {
         // goalie tactic
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
@@ -81,13 +82,13 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // for positioning all the robots (excluding the goalie). The positioning vector
         // will be used to position robots tangent to the goal_to_ball_unit_vector
         Vector goal_to_ball_unit_vector =
-            (world.field().friendlyGoal() - world.ball().position()).normalize();
+            (world.field().friendlyGoalCenter() - world.ball().position()).normalize();
         Vector robot_positioning_unit_vector = goal_to_ball_unit_vector.perpendicular();
 
         // goal_defense_point_center is a point on the semicircle around the friendly
         // defense area, that can block the direct path from the ball to the net.
-        Point goal_defense_point_center =
-            world.field().friendlyGoal() - semicircle_radius * goal_to_ball_unit_vector;
+        Point goal_defense_point_center = world.field().friendlyGoalCenter() -
+                                          semicircle_radius * goal_to_ball_unit_vector;
 
         // position robots on either side of the "goal defense point"
         Point goal_defense_point_left =

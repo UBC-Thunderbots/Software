@@ -11,25 +11,14 @@
 #include "software/primitive/primitive.h"
 #include "software/proto/grSim_Commands.pb.h"
 #include "software/proto/grSim_Replacement.pb.h"
+#include "software/util/variant_visitor/variant_visitor.h"
 #include "software/world/team.h"
 
 
 using namespace boost::asio;
 
-// Creates a struct which inherits all lambda function given to it and uses their
-// Ts::operator(). This can be passed to std::visit to easily write multiple different
-// lambdas for each type of motion controller commands below. See
-// https://en.cppreference.com/w/cpp/utility/variant/visit for more details.
-template <class... Ts>
-struct overload : Ts...
-{
-    using Ts::operator()...;
-};
-template <class... Ts>
-overload(Ts...)->overload<Ts...>;
-
 GrSimOutput::GrSimOutput(std::string network_address, unsigned short port,
-                         std::shared_ptr<const RefboxConfig> config)
+                         std::shared_ptr<const SensorFusionConfig> config)
     : network_address(network_address), port(port), config(config), socket(io_service)
 {
     socket.open(ip::udp::v4());

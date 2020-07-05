@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "shared/proto/robot_component_status.proto";
+import "shared/proto/tbots_timestamp_msg.proto";
 
 message TbotsRobotMsg
 {
@@ -14,4 +15,5 @@ message TbotsRobotMsg
     NetworkStatus network_status              = 8;
     PowerStatus power_status                  = 9;
     TemperatureStatus temperature_status      = 10;
+    TimestampMsg time_sent                    = 11;
 }

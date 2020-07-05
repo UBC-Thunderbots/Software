@@ -18,7 +18,7 @@ class ControllerPrimitiveGenerator : public ThreadedObserver<ControllerInput>,
      * @param controller_input_config The config for the PrimitiveGenerator
      */
     explicit ControllerPrimitiveGenerator(
-        std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
+        std::shared_ptr<const HandheldControllerConfig> controller_input_config);
 
     void onValueReceived(ControllerInput world) override;
 
@@ -33,5 +33,5 @@ class ControllerPrimitiveGenerator : public ThreadedObserver<ControllerInput>,
     std::unique_ptr<Primitive> createPrimitiveFromControllerInput(
         const ControllerInput& controller_input);
 
-    std::shared_ptr<const HandheldControllerInputConfig> controller_input_config;
+    std::shared_ptr<const HandheldControllerConfig> controller_input_config;
 };

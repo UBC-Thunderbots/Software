@@ -14,11 +14,11 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
     Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    Evaluation::EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
-                                         std::nullopt, 0,     std::nullopt};
-    Field field        = ::Test::TestUtil::createSSLDivBField();
-    Team enemy_team    = Team(Duration::fromSeconds(1), {enemy_robot});
-    Team friendly_team = Team(Duration::fromSeconds(1), {friendly_robot});
+    EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
+                             std::nullopt, 0,     std::nullopt};
+    Field field        = Field::createSSLDivisionBField();
+    Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
+    Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
 
     DefenseShadowEnemyTactic tactic =
@@ -33,7 +33,8 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(move_action->getDestination().isClose(Point(-0.5, 0), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
     EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
@@ -47,11 +48,11 @@ TEST(DefenseShadowEnemyTacticTest,
     Robot friendly_robot(0, Point(-1, -1), Vector(0, 0), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    Evaluation::EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
-                                         std::nullopt, 0,     std::nullopt};
-    Field field        = ::Test::TestUtil::createSSLDivBField();
-    Team enemy_team    = Team(Duration::fromSeconds(1), {enemy_robot});
-    Team friendly_team = Team(Duration::fromSeconds(1), {friendly_robot});
+    EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
+                             std::nullopt, 0,     std::nullopt};
+    Field field        = Field::createSSLDivisionBField();
+    Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
+    Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
               Timestamp::fromSeconds(0));
 
@@ -67,9 +68,10 @@ TEST(DefenseShadowEnemyTacticTest,
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(move_action->getDestination().isClose(ball.position(), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               ball.position(), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
-                  (enemy_robot.position() - field.friendlyGoal()).orientation()),
+                  (enemy_robot.position() - field.friendlyGoalCenter()).orientation()),
               Angle::fromDegrees(1));
     EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
 }
@@ -84,11 +86,11 @@ TEST(
     Robot friendly_robot(0, Point(-1, -1), Vector(0, 0), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    Evaluation::EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
-                                         std::nullopt, 0,     std::nullopt};
-    Field field        = ::Test::TestUtil::createSSLDivBField();
-    Team enemy_team    = Team(Duration::fromSeconds(1), {enemy_robot});
-    Team friendly_team = Team(Duration::fromSeconds(1), {friendly_robot});
+    EnemyThreat enemy_threat{enemy_robot,  false, Angle::zero(), std::nullopt,
+                             std::nullopt, 0,     std::nullopt};
+    Field field        = Field::createSSLDivisionBField();
+    Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
+    Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(4, 3),
               Timestamp::fromSeconds(0));
 
@@ -104,7 +106,8 @@ TEST(
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(move_action->getDestination().isClose(Point(-0.5, 0), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));

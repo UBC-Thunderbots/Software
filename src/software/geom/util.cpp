@@ -3,27 +3,27 @@
 #include <algorithm>
 #include <boost/geometry/algorithms/intersection.hpp>
 #include <boost/geometry/geometries/segment.hpp>
-#include <boost/polygon/voronoi.hpp>
 #include <cassert>
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <tuple>
 
-#include "software/geom/voronoi_diagram.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/rectangle.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/triangle.h"
 #include "software/new_geom/util/collinear.h"
+#include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
 #include "software/new_geom/util/intersects.h"
 
 bool isDegenerate(const Segment &segment)
 {
-    return distanceSquared(segment.getSegStart(), segment.getEnd()) < EPS2;
+    return distanceSquared(segment.getSegStart(), segment.getEnd()) <
+           FIXED_EPSILON * FIXED_EPSILON;
 }
 
 double length(const Segment &segment)
@@ -53,7 +53,7 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
     std::vector<Point> ans;
 
     // take care of 0 length segments too much error here
-    if ((segB - segA).lengthSquared() < EPS)
+    if ((segB - segA).lengthSquared() < FIXED_EPSILON)
     {
         return ans;
     }
@@ -62,14 +62,14 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
     Point C       = segA + lenseg * (segB - segA).normalize();
 
     // if C outside circle no intersections
-    if ((C - centre).lengthSquared() > radius * radius + EPS)
+    if ((C - centre).lengthSquared() > radius * radius + FIXED_EPSILON)
     {
         return ans;
     }
 
     // if C on circle perimeter return the only intersection
-    if ((C - centre).lengthSquared() < radius * radius + EPS &&
-        (C - centre).lengthSquared() > radius * radius - EPS)
+    if ((C - centre).lengthSquared() < radius * radius + FIXED_EPSILON &&
+        (C - centre).lengthSquared() > radius * radius - FIXED_EPSILON)
     {
         ans.push_back(C);
         return ans;
@@ -92,18 +92,18 @@ Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &seg
 {
     // if one of the end-points is extremely close to the centre point
     // then return 0.0
-    if ((segB - centre).lengthSquared() < EPS2)
+    if ((segB - centre).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
     {
         return segB;
     }
 
-    if ((segA - centre).lengthSquared() < EPS2)
+    if ((segA - centre).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
     {
         return segA;
     }
 
     // take care of 0 length segments
-    if ((segB - segA).lengthSquared() < EPS2)
+    if ((segB - segA).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
     {
         return segA;
     }
@@ -137,12 +137,12 @@ Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &seg
 
 bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const Point &d)
 {
-    return std::abs((d - c).cross(b - a)) > EPS;
+    return std::abs((d - c).cross(b - a)) > FIXED_EPSILON;
 }
 
 Point calcBlockCone(const Vector &a, const Vector &b, const double &radius)
 {
-    if (a.length() < EPS || b.length() < EPS)
+    if (a.length() < FIXED_EPSILON || b.length() < FIXED_EPSILON)
     {
     }
     // unit vector and bisector
@@ -191,7 +191,7 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
 {
     // If the point is already inside the circe arccos won't work so just return
     // the perp points
-    if (circle.contains(start))
+    if (contains(circle, start))
     {
         double perpDist = std::sqrt(circle.getRadius() * circle.getRadius() -
                                     (circle.getOrigin() - start).lengthSquared());
@@ -401,7 +401,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
         return redundant_segment;
     }
     // Check if the beginning of segment2 lays inside segment1
-    else if (segment1.contains(segment2.getSegStart()))
+    else if (contains(segment1, segment2.getSegStart()))
     {
         // If segment2.getSegStart() lays in segment1, then the combined segment is
         // segment2,getEnd() and the point furthest from segment2.getEnd()
@@ -411,7 +411,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                    : Segment(segment1.getEnd(), segment2.getEnd());
     }
     // Now check if the end of segment2 lays inside segment1
-    else if (segment1.contains(segment2.getEnd()))
+    else if (contains(segment1, segment2.getEnd()))
     {
         // If segment2.getSegStart() lays in segment1, then the combined segment is
         // segment2,getEnd() and the point furtherst from segmen2.getEnd()
@@ -447,8 +447,8 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 
     // The segment is redundant if both points of the smallest segment are contained in
     // the largest segment
-    if (largest_segment.contains(smallest_segment.getSegStart()) &&
-        largest_segment.contains(smallest_segment.getEnd()))
+    if (contains(largest_segment, smallest_segment.getSegStart()) &&
+        contains(largest_segment, smallest_segment.getEnd()))
     {
         return std::make_optional(largest_segment);
     }
@@ -508,7 +508,10 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
     for (std::vector<Segment>::const_iterator it = open_segs.begin();
          it != open_segs.end();)
     {
-        if (it->length() < EPS)
+        // 2 * FIXED_EPSILON for error needed:
+        // - segment subtraction (end - start)
+        // - mathcalls `hypot` from `length` function call
+        if (it->length() < 2 * FIXED_EPSILON)
         {
             open_segs.erase(it);
         }
@@ -531,7 +534,7 @@ std::vector<Segment> projectCirclesOntoSegment(Segment segment,
     for (Circle circle : circles)
     {
         // If the reference is inside an obstacle there is no open direction
-        if (circle.contains(origin))
+        if (contains(circle, origin))
         {
             obstacle_segment_projections.push_back(segment);
             return obstacle_segment_projections;
@@ -566,7 +569,7 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
         Vector raw_projection = segment.toVector().project(direction);
 
         // Only count projections that have a non-zero magnitude
-        if (raw_projection.lengthSquared() > EPS)
+        if (raw_projection.lengthSquared() > FIXED_EPSILON)
         {
             projected_segments.push_back(
                 Segment(segment.getSegStart(), segment.getSegStart() + raw_projection));
@@ -601,131 +604,4 @@ std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
     }
 
     return unique_segments;
-}
-
-std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points)
-{
-    // We use a Voronoi Diagram and it's Delaunay triangulation to find the largest
-    // open circles in the field
-    // Reference: https://www.cs.swarthmore.edu/~adanner/cs97/s08/papers/schuster.pdf
-    //
-    // You can think of the Delauney triangulation as a way to connect all the points
-    // (and the bounding_box corners) such that every point has three edges, and the
-    // triangles formed are setup to be as regular as possible (ie. we avoid things
-    // like super narrow triangles). The Voronoi diagram is the *dual* of this (scary
-    // math words, I know), which just means you can construct it by taking the center
-    // of each triangle and connecting it to the center of every adjacent triangle.
-    //
-    // So we can take each vertex on our voronoi diagram as the center of a open circle
-    // on the field, and the size of the circle is the distance to the closest vertex
-    // on the triangle that this vertex was created from
-
-    // Filters out points that are outside of the bounding box
-    points.erase(std::remove_if(points.begin(), points.end(),
-                                [&bounding_box](const Point &p) {
-                                    return !bounding_box.contains(p);
-                                }),
-                 points.end());
-
-    std::vector<Circle> empty_circles;
-
-    // Creating the Voronoi diagram with 2 or less points will produce no edges so we need
-    // to handle these cases manually
-    if (points.empty())
-    {
-        // If there are no points, return an empty vector since there are no constraints
-        // to the size of the circle.
-        return empty_circles;
-    }
-    if (points.size() == 1)
-    {
-        // If there is only 1 point, return circles centered at all four corners of the
-        // bounding bounding_box.
-        for (const Point &corner : bounding_box.getPoints())
-        {
-            empty_circles.emplace_back(Circle(corner, distance(points.front(), corner)));
-        }
-        return empty_circles;
-    }
-    if (points.size() == 2)
-    {
-        // If there are 2 point, split the points with a vector perpendicular to the
-        // vector connecting the two points. Return 2 circles that are centered at the
-        // points where the splitting vector intercepts the bounding_box. We should also
-        // include circles centered at each of the corners.
-        Vector connectedVec                     = points[1] - points[0];
-        Point halfPoint                         = points[0] + (connectedVec * 0.5);
-        Vector perpVec                          = connectedVec.perpendicular();
-        std::unordered_set<Point> intersections = intersection(
-            bounding_box,
-            Segment(
-                halfPoint + (perpVec *
-                             distance(bounding_box.furthestCorner(halfPoint), halfPoint)),
-                halfPoint - (perpVec * distance(bounding_box.furthestCorner(halfPoint),
-                                                halfPoint))));
-        std::vector<Point> corners = bounding_box.getPoints();
-        std::copy(corners.begin(), corners.end(),
-                  std::inserter(intersections, intersections.end()));
-        for (const Point &intersect : intersections)
-        {
-            double radius =
-                distance(findClosestPoint(intersect, points).value(), intersect);
-            empty_circles.emplace_back(intersect, radius);
-        }
-        return empty_circles;
-    }
-
-    // Construct the voronoi diagram
-    VoronoiDiagram vd(points);
-
-    // The corners of the rectangles are locations for the centre of circles with their
-    // radius being the distance to the corner's closest point.
-    for (const Point &corner : bounding_box.getPoints())
-    {
-        Point closest = findClosestPoint(corner, points).value();
-        empty_circles.emplace_back(Circle(corner, distance(corner, closest)));
-    }
-
-    std::vector<Point> intersects = vd.findVoronoiEdgeRecIntersects(bounding_box);
-
-    // Radius of the circle will be the distance from the interception point
-    // to the nearest input point.
-    for (const Point &p : intersects)
-    {
-        double radius = (points[0] - p).length();
-        for (const Point &inputP : points)
-        {
-            radius = std::min(radius, (inputP - p).length());
-        }
-        empty_circles.emplace_back(Circle(p, radius));
-    }
-
-    std::vector<Circle> calculatedEmptyCircles =
-        vd.voronoiVerticesToOpenCircles(bounding_box);
-    empty_circles.insert(empty_circles.end(), calculatedEmptyCircles.begin(),
-                         calculatedEmptyCircles.end());
-
-    // Sort the circles in descending order of radius
-    std::sort(empty_circles.begin(), empty_circles.end(),
-              [](auto c1, auto c2) { return c1.getRadius() > c2.getRadius(); });
-
-    return empty_circles;
-}
-
-std::optional<Point> findClosestPoint(const Point &origin_point,
-                                      std::vector<Point> test_points)
-{
-    std::optional<Point> closest_point = std::nullopt;
-
-    if (!test_points.empty())
-    {
-        closest_point =
-            *std::min_element(test_points.begin(), test_points.end(),
-                              [&](const Point &test_point1, const Point &test_point2) {
-                                  return distance(origin_point, test_point1) <
-                                         distance(origin_point, test_point2);
-                              });
-    }
-
-    return closest_point;
 }

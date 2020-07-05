@@ -75,15 +75,6 @@ class Ray final
      */
     Vector toUnitVector() const;
 
-    /**
-     * Returns true if this ray contains the given point, false otherwise.
-     *
-     * @param point
-     *
-     * @return true if this ray contains the given point, false otherwise
-     */
-    bool contains(const Point& point) const;
-
    private:
     /**
      * The start point of the Ray.

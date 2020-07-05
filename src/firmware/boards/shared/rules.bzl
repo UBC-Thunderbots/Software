@@ -1,6 +1,6 @@
-def legacy_freertos_and_stm32_lib(name, freertos_config_headers, **kwargs):
+def legacy_shared_libs(name, freertos_config_headers, **kwargs):
     """
-    Create a library containing freertos and stm32lib
+    Create a library containing all legacy shared libs
 
     name - The name for the library
     freertos_config_headers - Headers for the freertos config, must contain at least
@@ -11,10 +11,14 @@ def legacy_freertos_and_stm32_lib(name, freertos_config_headers, **kwargs):
         srcs = [
             "//firmware/boards/shared/legacy_freertos:sources",
             "//firmware/boards/shared/legacy_stm32lib:sources",
+            "//firmware/boards/shared/legacy_cdcacm:sources",
+            "//firmware/boards/shared/legacy_usb:sources",
         ],
         hdrs = [
             "//firmware/boards/shared/legacy_freertos:headers",
             "//firmware/boards/shared/legacy_stm32lib:headers",
+            "//firmware/boards/shared/legacy_cdcacm:headers",
+            "//firmware/boards/shared/legacy_usb:headers",
             freertos_config_headers,
         ],
         copts = [
@@ -28,6 +32,8 @@ def legacy_freertos_and_stm32_lib(name, freertos_config_headers, **kwargs):
             # https://docs.bazel.build/versions/master/be/c-cpp.html#cc_binary.includes
             "-isystem firmware/boards/shared/legacy_freertos/include",
             "-isystem firmware/boards/shared/legacy_stm32lib/include",
+            "-isystem firmware/boards/shared/legacy_cdcacm/include",
+            "-isystem firmware/boards/shared/legacy_usb/include",
         ],
         defines = [
             "STM32LIB_USE_FREERTOS",

@@ -5,7 +5,7 @@
 #
 
 # The version of the clang executable to use
-export CLANG_VERSION=7.0
+export CLANG_VERSION=10.0
 # The version of black to use
 export BLACK_VERSION=19-10b0
 
@@ -64,7 +64,16 @@ function run_black_formatting () {
     fi
 }
 
+function run_code_spell(){
+    echo "Fixing spelling..."
+    cd $CURR_DIR/../src/software && codespell -w
+    cd $CURR_DIR/../src/firmware_new && codespell -w
+    cd $CURR_DIR/../src/firmware/app && codespell -w
+    cd $CURR_DIR/../src/shared && codespell -w
+}
+
 # Run formatting
+run_code_spell
 run_clang_format
 run_bazel_formatting
 run_black_formatting

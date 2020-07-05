@@ -1,9 +1,11 @@
 #include "software/new_geom/util/distance.h"
 
+#include "software/new_geom/util/contains.h"
+
 double distance(const Line &first, const Point &second)
 {
     Line::Coeffs coeffs = first.getCoeffs();
-    return abs(coeffs.a * second.x() + coeffs.b * second.y() + coeffs.c) /
+    return std::abs(coeffs.a * second.x() + coeffs.b * second.y() + coeffs.c) /
            hypot(coeffs.a, coeffs.b);
 }
 
@@ -15,25 +17,6 @@ double distance(const Point &first, const Line &second)
 double distance(const Point &first, const Point &second)
 {
     return (first - second).length();
-}
-
-double distance(const Segment &first, const Segment &second)
-{
-    boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
-    boost::geometry::model::segment<Point> CD(second.getSegStart(),
-                                              second.getEnd());  // similar code
-    bool intersects = boost::geometry::intersects(AB, CD);
-    if (intersects)
-    {
-        return 0.0;
-    }
-    double first_to_second_start_distsq = distanceSquared(first, second.getSegStart());
-    double first_to_second_end_distsq   = distanceSquared(first, second.getEnd());
-    double second_to_first_start_distsq = distanceSquared(second, first.getSegStart());
-    double second_to_first_end_distsq   = distanceSquared(second, first.getEnd());
-    return std::sqrt(
-        std::min({first_to_second_start_distsq, first_to_second_end_distsq,
-                  second_to_first_start_distsq, second_to_first_end_distsq}));
 }
 
 double distance(const Point &first, const Segment &second)
@@ -48,7 +31,7 @@ double distance(const Segment &first, const Point &second)
 
 double distance(const Point &first, const Polygon &second)
 {
-    if (second.contains(first))
+    if (contains(second, first))
     {
         return 0;
     }
@@ -86,29 +69,24 @@ double distance(const Circle &first, const Point &second)
 
 double distanceSquared(const Point &first, const Segment &second)
 {
-    double seg_lensq          = distanceSquared(second.getSegStart(), second.getEnd());
+    Vector seg_vec            = second.toVector();
     Vector seg_start_to_point = first - second.getSegStart();
-    Vector seg_end_to_point   = first - second.getEnd();
 
-    Vector seg_vec = second.toVector();
-
-    if (seg_vec.dot(seg_start_to_point) > 0 &&
-        second.reverse().toVector().dot(seg_end_to_point) > 0)
+    if (seg_vec.dot(seg_start_to_point) <= 0)
     {
-        bool is_degenerate = distanceSquared(second.getSegStart(), second.getEnd()) <
-                             GeomConstants::FIXED_EPSILON;
-        if (is_degenerate)
-        {
-            return seg_start_to_point.length();
-        }
-        double cross = seg_start_to_point.cross(seg_vec);
-        return std::fabs(cross * cross / seg_lensq);
+        return seg_start_to_point.lengthSquared();
     }
 
-    double seg_start_to_point_distsq = distanceSquared(second.getSegStart(), first);
-    double seg_end_to_point_distsq   = distanceSquared(second.getEnd(), first);
+    // We delay this calculation until we actually need it for performance reasons
+    Vector seg_end_to_point = first - second.getEnd();
 
-    return std::min(seg_start_to_point_distsq, seg_end_to_point_distsq);
+    if (seg_vec.dot(seg_end_to_point) >= 0)
+    {
+        return seg_end_to_point.lengthSquared();
+    }
+
+    double cross = seg_start_to_point.cross(seg_vec);
+    return std::fabs(cross * cross / seg_vec.lengthSquared());
 }
 
 double distanceSquared(const Segment &first, const Point &second)

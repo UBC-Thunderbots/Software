@@ -33,11 +33,6 @@ double Circle::getRadius() const
     return radius_;
 }
 
-bool Circle::contains(const Point &p) const
-{
-    return p.distanceFromPoint(origin_) <= radius_;
-}
-
 double Circle::area() const
 {
     return M_PI * radius_ * radius_;
@@ -46,7 +41,7 @@ double Circle::area() const
 bool operator==(const Circle &c, const Circle &d)
 {
     return (c.getOrigin() == d.getOrigin()) &&
-           (std::abs(c.getRadius() - d.getRadius()) < GeomConstants::FIXED_EPSILON);
+           (std::abs(c.getRadius() - d.getRadius()) < FIXED_EPSILON);
 }
 
 bool operator!=(const Circle &c, const Circle &d)

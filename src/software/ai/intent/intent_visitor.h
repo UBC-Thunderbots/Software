@@ -1,9 +1,10 @@
 #pragma once
 
-// We forward-declare all the intents because if we include them we induce a
-// circular dependency between the Individual library for each intent and this
-// visitor. Ex: `CatchIntent` includes `IntentVisitor`, but `IntentVisitor`
-// also includes `CatchIntent`
+// We forward-declare all the intents because if we include them we induce a circular
+// dependency between the individual library for each intent and this visitor. This is
+// because intent.h includes intent_visitor.h, and each individual library includes
+// intent.h. Note: every subclass of this visitor must include all of the classes listed
+// below
 class CatchIntent;
 class ChipIntent;
 class DirectVelocityIntent;

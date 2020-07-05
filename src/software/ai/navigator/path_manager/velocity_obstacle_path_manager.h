@@ -1,6 +1,6 @@
 #pragma once
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/obstacle/obstacle_factory.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/parameter/dynamic_parameters.h"
 
@@ -18,9 +18,12 @@ class VelocityObstaclePathManager : public PathManager
     const std::map<RobotId, std::optional<Path>> getManagedPaths(
         const std::unordered_set<PathObjective>& objectives,
         const Rectangle& navigable_area) override;
+    const std::vector<ObstaclePtr> getObstacles(void) const override;
 
-    explicit VelocityObstaclePathManager(std::unique_ptr<PathPlanner> path_planner,
-                                         ObstacleFactory obstacle_factory);
+    explicit VelocityObstaclePathManager(
+        std::unique_ptr<PathPlanner> path_planner,
+        RobotNavigationObstacleFactory robot_navigation_obstacle_factory);
+
 
    private:
     /**
@@ -37,5 +40,6 @@ class VelocityObstaclePathManager : public PathManager
         const PathObjective& current_objective);
 
     std::unique_ptr<PathPlanner> path_planner;
-    ObstacleFactory obstacle_factory;
+    RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
+    std::vector<ObstaclePtr> path_planning_obstacles;
 };

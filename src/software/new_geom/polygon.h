@@ -27,17 +27,26 @@ class Polygon : public virtual Shape
     explicit Polygon(const std::initializer_list<Point>& points);
 
     /**
-     * Determines whether the given Point is contained within this Polygon.
+     * Returns the centroid of this polygon
      *
-     * @return whether the Point p is contained within this Polygon.
+     * @return The centroid of this polygon
      */
-    bool contains(const Point& p) const override;
+    Point centroid() const;
+
+    /**
+     * Returns the Polygon expanded in the direction of expansion_vector
+     * The Polygon is split in half perpendicular to expansion_vector and points on
+     * the half that expansion_vector is pointing are translated by expansion_vector
+     *
+     * @return a Polygon expanded in the direction of expansion_vector
+     */
+    Polygon expand(const Vector& expansion_vector) const;
 
     /**
      * Returns the line segments that form this polygon.
      * @return the line segments that form this polygon.
      */
-    const std::vector<Segment> getSegments() const;
+    const std::vector<Segment>& getSegments() const;
 
     /**
      * Returns the points that form the polygon.
@@ -46,7 +55,14 @@ class Polygon : public virtual Shape
     const std::vector<Point>& getPoints() const;
 
    protected:
+    /**
+     * Returns the line segments that connect a list of points.
+     * @return the line segments
+     */
+    static std::vector<Segment> initSegments(std::vector<Point> points);
+
     std::vector<Point> points_;
+    std::vector<Segment> segments_;
 };
 
 bool operator==(const Polygon& poly1, const Polygon& poly2);

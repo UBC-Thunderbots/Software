@@ -12,8 +12,7 @@
 TEST(GrSimOutputTest, create_grsim_packet_zero_vel)
 {
     GrSimOutput backend =
-        GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+        GrSimOutput("127.0.0.1", 20011, DynamicParameters->getSensorFusionConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         0, true, Vector(), Angle::zero(), 0.0, false, false);
@@ -46,8 +45,7 @@ TEST(GrSimOutputTest, create_grsim_packet_zero_vel)
 TEST(GrSimOutputTest, create_grsim_packet_positive_vel)
 {
     GrSimOutput backend =
-        GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+        GrSimOutput("127.0.0.1", 20011, DynamicParameters->getSensorFusionConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         6, false, Vector(89.6, 0.1589), Angle::fromRadians(1.23), 0.0, false, false);
@@ -62,9 +60,9 @@ TEST(GrSimOutputTest, create_grsim_packet_positive_vel)
 
     command->set_wheelsspeed(false);
 
-    command->set_veltangent(89.6);
-    command->set_velnormal(0.1589);
-    command->set_velangular(1.23);
+    command->set_veltangent(89.6f);
+    command->set_velnormal(0.1589f);
+    command->set_velangular(1.23f);
 
     command->set_kickspeedx(0.0);
     command->set_kickspeedz(0.0);
@@ -80,8 +78,7 @@ TEST(GrSimOutputTest, create_grsim_packet_positive_vel)
 TEST(GrSimOutputTest, create_grsim_packet_negative_vel)
 {
     GrSimOutput backend =
-        GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+        GrSimOutput("127.0.0.1", 20011, DynamicParameters->getSensorFusionConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         1, true, Vector(-0.001, 2.49), Angle::fromRadians(-0.04), 0.0, false, false);
@@ -96,9 +93,9 @@ TEST(GrSimOutputTest, create_grsim_packet_negative_vel)
 
     command->set_wheelsspeed(false);
 
-    command->set_veltangent(-0.001);
-    command->set_velnormal(2.49);
-    command->set_velangular(-0.04);
+    command->set_veltangent(-0.001f);
+    command->set_velnormal(2.49f);
+    command->set_velangular(-0.04f);
 
     command->set_kickspeedx(0.0);
     command->set_kickspeedz(0.0);
@@ -114,8 +111,7 @@ TEST(GrSimOutputTest, create_grsim_packet_negative_vel)
 TEST(GrSimOutputTest, create_grsim_packet_at_numeric_limits)
 {
     GrSimOutput backend =
-        GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+        GrSimOutput("127.0.0.1", 20011, DynamicParameters->getSensorFusionConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -150,8 +146,7 @@ TEST(GrSimOutputTest, create_grsim_packet_at_numeric_limits)
 TEST(GrSimOutputTest, create_grsim_packet_beyond_numeric_limits)
 {
     GrSimOutput backend =
-        GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+        GrSimOutput("127.0.0.1", 20011, DynamicParameters->getSensorFusionConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -168,9 +163,9 @@ TEST(GrSimOutputTest, create_grsim_packet_beyond_numeric_limits)
 
     command->set_wheelsspeed(false);
 
-    command->set_veltangent(std::numeric_limits<double>::min());
-    command->set_velnormal(std::numeric_limits<double>::min());
-    command->set_velangular(std::numeric_limits<double>::min());
+    command->set_veltangent(static_cast<float>(std::numeric_limits<double>::min()));
+    command->set_velnormal(static_cast<float>(std::numeric_limits<double>::min()));
+    command->set_velangular(static_cast<float>(std::numeric_limits<double>::min()));
 
     command->set_kickspeedx(0.0);
     command->set_kickspeedz(0.0);
@@ -186,8 +181,7 @@ TEST(GrSimOutputTest, create_grsim_packet_beyond_numeric_limits)
 TEST(GrSimOutputTest, create_grsim_packet_with_kick)
 {
     GrSimOutput backend =
-        GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+        GrSimOutput("127.0.0.1", 20011, DynamicParameters->getSensorFusionConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         0, true, Vector(), Angle::zero(), 4.0, false, false);
@@ -220,8 +214,7 @@ TEST(GrSimOutputTest, create_grsim_packet_with_kick)
 TEST(GrSimOutputTest, create_grsim_packet_with_chip)
 {
     GrSimOutput backend =
-        GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+        GrSimOutput("127.0.0.1", 20011, DynamicParameters->getSensorFusionConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -238,9 +231,9 @@ TEST(GrSimOutputTest, create_grsim_packet_with_chip)
 
     command->set_wheelsspeed(false);
 
-    command->set_veltangent(std::numeric_limits<double>::min());
-    command->set_velnormal(std::numeric_limits<double>::min());
-    command->set_velangular(std::numeric_limits<double>::min());
+    command->set_veltangent(static_cast<float>(std::numeric_limits<double>::min()));
+    command->set_velnormal(static_cast<float>(std::numeric_limits<double>::min()));
+    command->set_velangular(static_cast<float>(std::numeric_limits<double>::min()));
 
     command->set_kickspeedx(4.0);
     command->set_kickspeedz(4.0);
@@ -256,8 +249,7 @@ TEST(GrSimOutputTest, create_grsim_packet_with_chip)
 TEST(GrSimOutputTest, create_grsim_packet_with_dribbler_on)
 {
     GrSimOutput backend =
-        GrSimOutput("127.0.0.1", 20011,
-                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig());
+        GrSimOutput("127.0.0.1", 20011, DynamicParameters->getSensorFusionConfig());
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -274,9 +266,9 @@ TEST(GrSimOutputTest, create_grsim_packet_with_dribbler_on)
 
     command->set_wheelsspeed(false);
 
-    command->set_veltangent(std::numeric_limits<double>::min());
-    command->set_velnormal(std::numeric_limits<double>::min());
-    command->set_velangular(std::numeric_limits<double>::min());
+    command->set_veltangent(static_cast<float>(std::numeric_limits<double>::min()));
+    command->set_velnormal(static_cast<float>(std::numeric_limits<double>::min()));
+    command->set_velangular(static_cast<float>(std::numeric_limits<double>::min()));
 
     command->set_kickspeedx(0.0);
     command->set_kickspeedz(0.0);

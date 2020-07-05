@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstddef>
+#include <optional>
 #include <vector>
 
-#include "software/geom/shot.h"
 #include "software/new_geom/circle.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
@@ -13,13 +13,9 @@
 #include "software/new_geom/segment.h"
 #include "software/new_geom/triangle.h"
 
-constexpr double EPS = 1e-9;
-
-constexpr double EPS2 = EPS * EPS;
-
 constexpr int sign(double n)
 {
-    return n > EPS ? 1 : (n < -EPS ? -1 : 0);
+    return n > FIXED_EPSILON ? 1 : (n < -FIXED_EPSILON ? -1 : 0);
 }
 
 double length(const Segment &segment);
@@ -33,9 +29,10 @@ double lengthSquared(const Segment &segment);
  *
  * @param segment2 : The second Segment
  *
- * @return true : If the Segment1 and Segment2 are collinear within EPS disance
+ * @return true : If the Segment1 and Segment2 are collinear within FIXED_EPSILON disance
  *
- * @return false : If Segment1 and Segment2 are NOT collinear within EPS distance
+ * @return false : If Segment1 and Segment2 are NOT collinear within FIXED_EPSILON
+ * distance
  */
 bool collinear(const Segment &segment1, const Segment &segment2);
 
@@ -315,28 +312,3 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
  */
 std::vector<Segment> combineToParallelSegments(std::vector<Segment> segments,
                                                Vector direction);
-
-/**
- * Finds all circles which do not contain a point in them within the given rectangle.
- *
- * NOTE: this only guarantees that the center of each circle is within the
- *       rectangle, some portion of the circle may extend outside the rectangle
- *
- * @param bounding_box The rectangle in which to look for open circles
- * @param points The points that must not lie within the circles
- *
- * @return A list of circles, sorted in descending order of radius. If no points were
- * provided, returns an empty list. Any points outside the bounding_box are ommitted.
- */
-std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points);
-
-/**
- *
- * Finds the point in the testPoints vector that is closest to the originPoint.
- *
- * @param originPoint
- * @param testPoints
- * @return The point in testPoints closest to testPoints.
- */
-std::optional<Point> findClosestPoint(const Point &origin_point,
-                                      std::vector<Point> test_points);

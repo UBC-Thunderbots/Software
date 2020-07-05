@@ -47,7 +47,6 @@ static const struct __attribute__((packed))
                 },
             .bMaxPower = 150U,
         },
-
     .radio_off_intf =
         {
             .bLength            = sizeof(usb_interface_descriptor_t),

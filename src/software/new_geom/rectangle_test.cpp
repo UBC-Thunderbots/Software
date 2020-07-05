@@ -93,75 +93,13 @@ TEST(RectangleCornerTests, test_positive_and_negative_points)
     EXPECT_EQ(r.negXPosYCorner(), Point(-4, 2));
 }
 
-TEST(RectangleContainsPointTests, test_point_in_different_quadrant)
+TEST(RectangleCornerTests, test_min_max_values)
 {
-    EXPECT_FALSE(Rectangle(Point(0, 0), Point(-2, -2)).contains(Point(1, 1)));
-    EXPECT_TRUE(Rectangle(Point(0, 0), Point(-2, -2)).contains(Point(-1, -1)));
-}
-
-TEST(RectangleContainsPointTests, test_point_in_same_quadrant)
-{
-    EXPECT_TRUE(Rectangle(Point(0, 0), Point(3, 3)).contains(Point(1, 2)));
-    EXPECT_TRUE(Rectangle(Point(0, 0), Point(-4, 4)).contains(Point(-2, 3)));
-}
-
-TEST(RectangleContainsPointTests, test_point_on_rectangle_corner)
-{
-    EXPECT_TRUE(Rectangle(Point(0, 0), Point(2, 2)).contains(Point(0, 0)));
-}
-
-TEST(RectangleContainsPointTests, test_point_on_rectangle_edge)
-{
-    EXPECT_TRUE(Rectangle(Point(0, 0), Point(3, 3)).contains(Point(3, 3)));
-}
-
-TEST(RectangleContainsPointTests, test_point_off_left_of_rectangle)
-{
-    EXPECT_FALSE(Rectangle(Point(0, 0), Point(-4, 4)).contains(Point(-7, 2)));
-}
-
-TEST(RectangleContainsPointTests, test_point_off_right_of_rectangle)
-{
-    EXPECT_FALSE(Rectangle(Point(0, 0), Point(-4, 4)).contains(Point(1, 0)));
-}
-
-TEST(RectangleContainsPointTests, test_point_off_below_rectangle)
-{
-    EXPECT_FALSE(Rectangle(Point(0, 0), Point(-4, 4)).contains(Point(-2, -1)));
-}
-
-TEST(RectangleContainsPointTests, test_point_off_above_rectangle)
-{
-    EXPECT_FALSE(Rectangle(Point(0, 0), Point(-4, 4)).contains(Point(-2, 5)));
-}
-
-TEST(RectangleContainsPointTests, test_point_centre_of_rectangle)
-{
-    EXPECT_TRUE(Rectangle(Point(1, 1), Point(-1, -1)).contains(Point(0.5, 0.5)));
-}
-
-TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_top_right)
-{
-    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(0.5, 0.5)),
-              Point(8, 4));
-}
-
-TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_top_left)
-{
-    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(7, 0.5)),
-              Point(0, 4));
-}
-
-TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_bottom_right)
-{
-    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(0.5, 3)),
-              Point(8, 0));
-}
-
-TEST(RectangleFurthestCornerTests, test_rect_furthest_corner_bottom_left)
-{
-    EXPECT_EQ(Rectangle(Point(0, 0), Point(8, 4)).furthestCorner(Point(7, 3)),
-              Point(0, 0));
+    Rectangle r = Rectangle(Point(-4, -3), Point(1, 2));
+    EXPECT_EQ(r.xMin(), -4);
+    EXPECT_EQ(r.xMax(), 1);
+    EXPECT_EQ(r.yMin(), -3);
+    EXPECT_EQ(r.yMax(), 2);
 }
 
 TEST(RectangleExpandTests, test_expand_positive)

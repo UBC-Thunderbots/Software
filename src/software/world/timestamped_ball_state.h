@@ -1,5 +1,8 @@
 #pragma once
 
+#include <boost/circular_buffer.hpp>
+#include <map>
+
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
 #include "software/time/timestamp.h"
@@ -44,7 +47,7 @@ class TimestampedBallState
      *
      * @return the ball state without any timestamp information
      */
-    BallState ballState() const;
+    BallState state() const;
 
     /**
      * Defines the equality operator for a TimestampedBallState. TimestampedBallStates
@@ -66,6 +69,8 @@ class TimestampedBallState
     bool operator!=(const TimestampedBallState &other) const;
 
    private:
-    Timestamp timestamp_;
     BallState ball_state_;
+    Timestamp timestamp_;
 };
+
+using BallHistory = boost::circular_buffer<TimestampedBallState>;

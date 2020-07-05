@@ -115,7 +115,7 @@ AIConfig:
       default: 0.05
       type: "double"
       description: >-
-        The maximum allowed difference between the reciever and passer
+        The maximum allowed difference between the receiver and passer
         point of two passes for which they are considered equal
     PassEqualityMaxStartTimeDifferenceSeconds:
       min: 0
@@ -144,7 +144,7 @@ AIConfig:
       type: "double"
       description: "Distance to nearest robot when we stop slowing down to avoid collisions"
 
-  ObstacleFactoryConfig:
+  RobotNavigationObstacleFactoryConfig:
     SpeedScalingFactor:
       min: 0.0
       max: 1.0
@@ -159,13 +159,6 @@ AIConfig:
       default: 1.3
       type: "double"
       description: "Factor for robot obstacle size"
-
-  RobotExpiryBufferMilliseconds:
-    min: 0
-    max: 100
-    default: 50
-    type: "int"
-    description: "TODO: Add description as part of #149"
 
   GoalieTacticConfig:
     BlockConeBuffer:
@@ -223,19 +216,6 @@ AIConfig:
             The total length (in the direction the robot is facing) of the rectangle
             starting from the friendly robot inside which we think an enemy is about to
             steal the ball
-  RobotCapabilitiesConfig:
-    BrokenDribblers:
-      default: ""
-      type: "std::string"
-      description: Comma-separated list of numbers of robots with broken dribblers
-    BrokenChippers:
-      default: ""
-      type: "std::string"
-      description: Comma-separated list of numbers of robots with broken chippers
-    BrokenKickers:
-      default: ""
-      type: "std::string"
-      description: Comma-separated list of numbers of robots with broken kickers
   DefenseShadowEnemyTacticConfig:
     BallStealSpeed:
       default: 0.3

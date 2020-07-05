@@ -1,8 +1,5 @@
 #pragma once
 
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/register/point.hpp>
-#include <boost/polygon/point_concept.hpp>
 #include <cmath>
 #include <iostream>
 
@@ -86,13 +83,6 @@ class Point final
     double distanceFromOrigin() const;
 
     /**
-     * Returns the distance between this Point and the given point p
-     *
-     * @return the distance
-     */
-    double distanceFromPoint(const Point &p) const;
-
-    /**
      * Returns a new Vector from this Point
      *
      * @return A new vector from this Point
@@ -108,18 +98,6 @@ class Point final
      * @return the new Point rotated by rot
      */
     Point rotate(const Angle &rot) const;
-
-    /**
-     * Checks whether this Point is close to another Point
-     *
-     * @param other the other point to check against
-     *
-     * @param dist the distance to check against
-     *
-     * @return true if the other point is within the given distance (not inclusive) of
-     * this Point
-     */
-    bool isClose(const Point &other, double dist) const;
 
     /**
      * Assigns one Point to another
@@ -259,22 +237,3 @@ namespace std
         }
     };
 }  // namespace std
-
-// Make our Point class "compatible" with boost. This lets us pass our Points directly
-// into boost algorithms
-BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(Point, double, cs::cartesian, x, y, setX, setY)
-template <>
-struct boost::polygon::geometry_concept<Point>
-{
-    typedef point_concept type;
-};
-template <>
-struct boost::polygon::point_traits<Point>
-{
-    typedef int coordinate_type;
-
-    static coordinate_type get(const Point &point, orientation_2d orient)
-    {
-        return (orient == HORIZONTAL) ? point.x() : point.y();
-    }
-};

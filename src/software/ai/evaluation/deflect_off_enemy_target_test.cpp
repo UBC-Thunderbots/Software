@@ -16,14 +16,13 @@ TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)
     std::vector<Robot> enemy_robots;
     friendly_robots.emplace_back(friendly_robot);
     enemy_robots.emplace_back(enemy_robot);
-    using namespace Test;
 
     World test_world = TestUtil::createBlankTestingWorld();
-    test_world.mutableFriendlyTeam().updateRobots(friendly_robots);
-    test_world.mutableEnemyTeam().updateRobots(enemy_robots);
+    test_world.updateFriendlyTeamState(Team(friendly_robots));
+    test_world.updateEnemyTeamState(Team(enemy_robots));
     TestUtil::setBallPosition(test_world, Point(-1, 0), Timestamp::fromMilliseconds(0));
 
-    Point p = Evaluation::deflect_off_enemy_target(test_world);
+    Point p = deflect_off_enemy_target(test_world);
 
     EXPECT_EQ(p, Point(-3, -0.0675));
 }

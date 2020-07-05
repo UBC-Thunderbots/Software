@@ -23,7 +23,7 @@ typedef boost::coroutines2::coroutine<std::vector<std::shared_ptr<Tactic>>>
  * play a full game of soccer, as long a we provide a Play for any given scenario.
  *
  * Plays must define what conditions must be met for them to start (with the isApplicable
- * function), and what conditions must be continously met for the Play to continue
+ * function), and what conditions must be continuously met for the Play to continue
  * running (with the invariantHolds function). These are very important to get right,
  * so that we can always run at least 1 Play in every scenario, and that Plays don't
  * unexpectedly stop.
@@ -93,10 +93,6 @@ class Play
 
     virtual ~Play() = default;
 
-   protected:
-    // The Play's knowledge of the most up-to-date World
-    World world;
-
    private:
     /**
      * A wrapper function for the getNextTactics function.
@@ -121,16 +117,18 @@ class Play
     void getNextTacticsWrapper(TacticCoroutine::push_type& yield);
 
     /**
-     * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
-     * order of priority
-     *
      * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
      * this time, in order of priority. This yield happens in place of a return.
      *
      * @param yield The coroutine push_type for the Play
+     * @param world The current state of the world
      */
-    virtual void getNextTactics(TacticCoroutine::push_type& yield) = 0;
+    virtual void getNextTactics(TacticCoroutine::push_type& yield,
+                                const World& world) = 0;
 
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;
+
+    // The Play's knowledge of the most up-to-date World
+    std::optional<World> world;
 };

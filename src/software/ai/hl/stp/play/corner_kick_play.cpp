@@ -11,16 +11,13 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-using namespace Passing;
-
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
 CornerKickPlay::CornerKickPlay()
-    : MAX_TIME_TO_COMMIT_TO_PASS(
-          Duration::fromSeconds(Util::DynamicParameters->getAIConfig()
-                                    ->getCornerKickPlayConfig()
-                                    ->MaxTimeCommitToPassSeconds()
-                                    ->value()))
+    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(DynamicParameters->getAIConfig()
+                                                           ->getCornerKickPlayConfig()
+                                                           ->MaxTimeCommitToPassSeconds()
+                                                           ->value()))
 {
 }
 
@@ -42,11 +39,11 @@ bool CornerKickPlay::isApplicable(const World &world) const
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-           (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
-            Evaluation::teamPassInProgress(world, world.friendlyTeam()));
+           (!teamHasPossession(world, world.enemyTeam()) ||
+            teamPassInProgress(world, world.friendlyTeam()));
 }
 
-void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     /**
      * There are three main stages to this Play:
@@ -122,10 +119,10 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto bait_move_tactic_2 = std::make_shared<MoveTactic>(true);
     bait_move_tactic_1->updateControlParams(
         bait_move_tactic_1_pos,
-        (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
+        (world.field().enemyGoalCenter() - bait_move_tactic_1_pos).orientation(), 0.0);
     bait_move_tactic_2->updateControlParams(
         bait_move_tactic_2_pos,
-        (world.field().enemyGoal() - bait_move_tactic_2_pos).orientation(), 0.0);
+        (world.field().enemyGoalCenter() - bait_move_tactic_2_pos).orientation(), 0.0);
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::ONE_TOUCH_SHOT);
@@ -141,8 +138,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic);
-        updatePassGenerator(pass_generator);
+        updateAlignToBallTactic(align_to_ball_tactic, world);
+        updatePassGenerator(pass_generator, world);
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -158,8 +155,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Aligning to ball";
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        updatePassGenerator(pass_generator);
+        updateAlignToBallTactic(align_to_ball_tactic, world);
+        updatePassGenerator(pass_generator, world);
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -174,8 +171,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
     do
     {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        updatePassGenerator(pass_generator);
+        updateAlignToBallTactic(align_to_ball_tactic, world);
+        updatePassGenerator(pass_generator, world);
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -217,7 +214,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 void CornerKickPlay::updateAlignToBallTactic(
-    std::shared_ptr<MoveTactic> align_to_ball_tactic)
+    std::shared_ptr<MoveTactic> align_to_ball_tactic, const World &world)
 {
     Vector ball_to_center_vec = Vector(0, 0) - world.ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
@@ -228,7 +225,8 @@ void CornerKickPlay::updateAlignToBallTactic(
         ball_to_center_vec.orientation(), 0);
 }
 
-void CornerKickPlay::updatePassGenerator(PassGenerator &pass_generator)
+void CornerKickPlay::updatePassGenerator(PassGenerator &pass_generator,
+                                         const World &world)
 {
     pass_generator.setWorld(world);
     pass_generator.setPasserPoint(world.ball().position());

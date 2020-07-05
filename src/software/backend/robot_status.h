@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "shared/proto/tbots_robot_msg.pb.h"
+
 // This struct contains various robot diagnostics (e.g. voltages, link quality, etc.)
 // and messages related to robot and dongle condition.
 struct RobotStatus
@@ -10,7 +12,7 @@ struct RobotStatus
     // The robot number.
     int32_t robot;
 
-    // Messages related to the robot that are to be displayed in the visualizer
+    // Messages related to the robot that are to be displayed in the full_system
     // (usually errors that need attention)
     std::vector<std::string> robot_messages;
 
@@ -84,3 +86,13 @@ struct RobotStatus
     // The FPGA bitstream build ID.
     uint32_t fpga_build_id;
 };
+
+/**
+ * Converts RobotStatus to TbotsRobotMsg
+ * Does not convert ChipperKickerStatus,
+ * DriveUnits, and NetworkStatus due to insufficient info
+ *
+ * @param robot_status The RobotStatus
+ */
+std::unique_ptr<TbotsRobotMsg> convertRobotStatusToTbotsRobotMsg(
+    const RobotStatus &robot_status);

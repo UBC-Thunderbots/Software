@@ -28,7 +28,7 @@ class STPTacticAssignmentTest : public ::testing::Test
         };
         // Give an explicit seed to STP so that our tests are deterministic
         stp   = STP(default_play_constructor, 0);
-        world = ::Test::TestUtil::createBlankTestingWorld();
+        world = ::TestUtil::createBlankTestingWorld();
     }
 
     /**
@@ -54,7 +54,7 @@ class STPTacticAssignmentTest : public ::testing::Test
     }
 
     STP stp;
-    World world;
+    World world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_F(STPTacticAssignmentTest,
@@ -372,9 +372,8 @@ TEST_F(STPTacticAssignmentTest,
     // that doesn't even though the former has lower cost
     Team friendly_team(Duration::fromSeconds(0));
     // this robot has no capabilities
-    using RobotCapabilities::Capability;
     Robot robot_0(0, Point(0.1, 0.1), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0), 10, RobotCapabilities::allCapabilities());
+                  Timestamp::fromSeconds(0), 10, allRobotCapabilities());
     Robot robot_1(1, Point(-10, -10), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});

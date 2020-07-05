@@ -1,14 +1,8 @@
-/**
- * Tests for the `GradientDescentOptimizer`
- */
-
 #include <gtest/gtest.h>
 
 #include <cmath>
 
 #include "software/optimization/gradient_descent_optimizer.h"
-
-using namespace Util;
 
 TEST(GradientDescentOptimizerTest, minimize_single_valued_function)
 {

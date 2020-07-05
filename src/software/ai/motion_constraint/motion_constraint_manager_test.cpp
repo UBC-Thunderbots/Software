@@ -15,7 +15,7 @@
 // This namespace contains all the test parameters
 namespace
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Pass pass({1, 1}, {0.5, 0}, 2.29, Timestamp::fromSeconds(5));
 
 
@@ -25,7 +25,7 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new MoveTactic(false), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CherryPickTactic(World(), Rectangle({0, 0}, {1, 1})),
+                new CherryPickTactic(world, Rectangle({0, 0}, {1, 1})),
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new CreaseDefenderTactic(world.field(), world.ball(),

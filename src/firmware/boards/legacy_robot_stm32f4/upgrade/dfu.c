@@ -621,7 +621,8 @@ static struct
     /**
      * \brief Information used by an upload operation.
      */
-    union {
+    union
+    {
         /**
          * \brief The next byte to send, for a firmware upload.
          */

@@ -49,13 +49,15 @@ class GameState
 
     // The point at which the ball should be placed by robots before a restart. See
     // Robocup SSL Rules 9.2.
-    Point ball_placement_point;
+    std::optional<Point> ball_placement_point;
 
     GameState()
         : state(HALT),
           restart_reason(NONE),
           game_state(RefboxGameState::HALT),
-          our_restart(false)
+          ball_state(std::nullopt),
+          our_restart(false),
+          ball_placement_point(std::nullopt)
     {
     }
 
@@ -85,7 +87,7 @@ class GameState
      *
      * @return the current Refbox game state
      */
-    RefboxGameState getRefboxGameState() const;
+    const RefboxGameState& getRefboxGameState() const;
 
     /**
      * Returns the current restart reason
@@ -124,26 +126,26 @@ class GameState
     bool isPlaying() const;
 
     /**
-     * Returns true if a kickoff is occuring.
+     * Returns true if a kickoff is occurring.
      * See Robocup SSL Rules Law 8.2.
      *
-     * @return true if a kickoff is occuring.
+     * @return true if a kickoff is occurring.
      */
     bool isKickoff() const;
 
     /**
-     * Returns true if a penalty is occuring.
+     * Returns true if a penalty is occurring.
      * See Robocup SSL Rules Law 14.
      *
-     * @return true if a penalty is occuring.
+     * @return true if a penalty is occurring.
      */
     bool isPenalty() const;
 
     /**
-     * Returns true if ball placement is occuring.
+     * Returns true if ball placement is occurring.
      * See Robocup SSL Rules Law 9.2.
      *
-     * @return true if ball placement is occuring.
+     * @return true if ball placement is occurring.
      */
     bool isBallPlacement() const;
 
@@ -151,7 +153,7 @@ class GameState
      * Returns true if our team is doing the restart, e.g. when
      * we get an indirect kick
      * This function will have undefined behaviour if a restart is
-     * not being prepared for or occuring, such as after a transition to
+     * not being prepared for or occurring, such as after a transition to
      * HALT or STOP, because of how Refbox state transitions work.
      *
      * @return true if our team is doing the restart
@@ -159,20 +161,20 @@ class GameState
     bool isOurRestart() const;
 
     /**
-     * Returns true if a direct free kick is occuring.
+     * Returns true if a direct free kick is occurring.
      * See Robocup SSL Rules Law 13.
      *
      *
-     * @return true if a direct free kick is occuring
+     * @return true if a direct free kick is occurring
      */
     bool isDirectFree() const;
 
     /**
-     * Returns true if an indirect free kick is occuring.
+     * Returns true if an indirect free kick is occurring.
      * See Robocup SSL Rules Law 13.
      *
      *
-     * @return true if a direct free kick is occuring
+     * @return true if a direct free kick is occurring
      */
     bool isIndirectFree() const;
 

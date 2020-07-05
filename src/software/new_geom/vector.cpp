@@ -84,7 +84,7 @@ double Vector::cross(const Vector &other) const
     return x_ * other.y() - y_ * other.x();
 }
 
-Angle Vector::angleWith(const Vector &other)
+Angle Vector::angleWith(const Vector &other) const
 {
     return Angle::fromRadians(acos(dot(other) / (length() * other.length())));
 }
@@ -163,7 +163,7 @@ std::ostream &operator<<(std::ostream &os, const Vector &v)
 
 bool operator==(const Vector &u, const Vector &v)
 {
-    return (u - v).lengthSquared() < GeomConstants::FIXED_EPSILON;
+    return (u - v).lengthSquared() < FIXED_EPSILON;
 }
 
 bool operator!=(const Vector &u, const Vector &v)

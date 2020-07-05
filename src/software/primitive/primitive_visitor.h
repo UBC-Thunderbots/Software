@@ -1,7 +1,10 @@
 #pragma once
 
-// We pre-declare these here to avoid a circular dependency between the visitor and each
-// individual primitive
+// We forward-declare all the primitives because if we include them we induce a circular
+// dependency between the individual library for each primitive and this visitor. This is
+// because primitive.h includes primitive_visitor.h, and each individual library includes
+// primitive.h. Note: every subclass of this visitor must include all of the classes
+// listed below
 class CatchPrimitive;
 class ChipPrimitive;
 class DirectVelocityPrimitive;

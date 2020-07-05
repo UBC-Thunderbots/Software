@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "shared/proto/geometry.proto";
+
+message RobotStateMsg
+{
+    PointMsg global_position_meters                  = 1;
+    AngleMsg global_orientation_radians              = 2;
+    VectorMsg global_velocity_meters_per_sec         = 3;
+    AngleMsg global_angular_velocity_radians_per_sec = 4;
+}
+
+message BallStateMsg
+{
+    PointMsg global_position_meters          = 1;
+    VectorMsg global_velocity_meters_per_sec = 2;
+}

@@ -2,9 +2,9 @@
 
 #include "software/ai/ai.h"
 #include "software/ai/hl/stp/play_info.h"
+#include "software/gui/drawing/draw_functions.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
-#include "software/visualizer/drawing/draw_functions.h"
 #include "software/world/world.h"
 
 /**
@@ -40,5 +40,5 @@ class AIWrapper : public ThreadedObserver<World>,
 
     AI ai;
     std::shared_ptr<const AIControlConfig> control_config;
-    World most_recent_world;
+    std::optional<World> most_recent_world;
 };

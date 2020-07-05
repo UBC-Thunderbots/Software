@@ -23,7 +23,7 @@ float timeLimit(float *current, float limit)
     }
 }
 
-// perform a single step on a positon and acceleration given an acceleration and deltaT
+// perform a single step on a position and acceleration given an acceleration and deltaT
 void stepTime(float *dist, float *vel, float time, float accel)
 {
     *dist += accel / 2.0f * time * time + (*vel) * time;
@@ -46,7 +46,7 @@ void app_bangbang_prepareTrajectory(BBProfile *b, float d, float vi, float vf, f
 {
     if (vf * d < 0)
         vf = 0;  // not allowed- must be in same direction
-    b->Distance = d + vf * vf / (2.0 * MaxA);
+    b->Distance = d + vf * vf / (2.0f * MaxA);
     b->Vinitial = vi;
     b->MaxA     = MaxA;
     b->MaxV = INFINITY;  // no maxV therefore exceed the speed of light TO INFINITY AND
@@ -77,7 +77,7 @@ void app_bangbang_prepareTrajectoryMaxV(BBProfile *b, float d, float vi, float v
 {
     if (vf * d < 0)
         vf = 0;  // not allowed- must be in same direction
-    b->Distance = d + vf * vf / (2.0 * MaxA);
+    b->Distance = d + vf * vf / (2.0f * MaxA);
     b->Vinitial = vi;
     b->MaxA     = MaxA;
     b->MaxV     = MaxV;
@@ -116,7 +116,7 @@ void BBPositivePlan(BBProfile *b)
     {
         printf("Failed discrim test\n");  // perhaps we can log this with and error code
                                           // or something
-        return;                           // cannot acheive so give it a fail time;
+        return;                           // cannot achieve so give it a fail time;
     }
 
     // two possible solutons to the quadraic equations
@@ -170,7 +170,7 @@ void BBPositivePlan(BBProfile *b)
         }
     }
 
-    // compute the velocity at the t1,t3 boundry
+    // compute the velocity at the t1,t3 boundary
     float vm = b->a1 * b->t1 + b->Vinitial;
     b->Vmid  = vm;
     // if it is below the maximum we have our solution
@@ -241,7 +241,7 @@ void app_bangbang_planTrajectory(BBProfile *b)
     // are the target distance and current velocity in the same direction
     bool SameSign = !((b->Vinitial < 0.0f) ^ (b->Distance < 0.0f));
 
-    // would we overshoot if D and Vi had teh same sign
+    // would we overshoot if D and Vi had the same sign
     bool Overshoot = (b->Vinitial * b->Vinitial > 2.0f * b->MaxA * fabsf(b->Distance));
 
     // will we overshoot

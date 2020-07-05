@@ -2,30 +2,25 @@ package(default_visibility = ["//software/ai/navigator:__subpackages__"])
 
 cc_library(
     name = "obstacle",
-    srcs = [
-        "circle_obstacle.cpp",
-        "obstacle.cpp",
-        "polygon_obstacle.cpp",
-    ],
     hdrs = [
-        "circle_obstacle.h",
         "obstacle.h",
-        "polygon_obstacle.h",
+        "obstacle.tpp",
     ],
+    # We expose obstacle so that it can visualized
+    visibility = ["//visibility:public"],
     deps = [
+        "obstacle_visitor",
         "//shared:constants",
-        "//software/new_geom:circle",
         "//software/new_geom:point",
-        "//software/new_geom:polygon",
         "//software/new_geom:segment",
-        "//software/new_geom/util",
+        "//software/new_geom/util:algorithms",
     ],
 )
 
 cc_library(
-    name = "obstacle_factory",
-    srcs = ["obstacle_factory.cpp"],
-    hdrs = ["obstacle_factory.h"],
+    name = "robot_navigation_obstacle_factory",
+    srcs = ["robot_navigation_obstacle_factory.cpp"],
+    hdrs = ["robot_navigation_obstacle_factory.h"],
     deps = [
         ":obstacle",
         "//software/ai/motion_constraint",
@@ -49,14 +44,25 @@ cc_test(
 )
 
 cc_test(
-    name = "obstacle_factory_test",
-    srcs = ["obstacle_factory_test.cpp"],
+    name = "robot_navigation_obstacle_factory_test",
+    srcs = ["robot_navigation_obstacle_factory_test.cpp"],
     deps = [
-        ":obstacle_factory",
+        ":robot_navigation_obstacle_factory",
         "//software/new_geom:point",
         "//software/new_geom:rectangle",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "obstacle_visitor",
+    hdrs = ["obstacle_visitor.h"],
+    # We expose obstacle visitor so that it can visualized
+    visibility = ["//visibility:public"],
+    deps = [
+        "//software/new_geom:circle",
+        "//software/new_geom:polygon",
     ],
 )

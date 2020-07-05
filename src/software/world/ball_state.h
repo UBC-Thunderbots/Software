@@ -14,8 +14,12 @@ class BallState
      *
      * @param position The position of the ball, with coordinates in metres
      * @param velocity The velocity of the ball, in metres per second
+     * @param distance_from_ground The distance of the bottom of the ball from the ground
+     * in metres. For example, a ball rolling along the ground has a distance from ground
+     * of 0
      */
-    explicit BallState(const Point& position, const Vector& velocity);
+    explicit BallState(const Point& position, const Vector& velocity,
+                       double distance_from_ground = 0.0);
     BallState() = delete;
 
     /**
@@ -31,6 +35,13 @@ class BallState
      * @return the velocity of the ball represented by this state
      */
     Vector velocity() const;
+
+    /**
+     * Returns the distance of the bottom of the ball from the ground in metres
+     *
+     * @return the distance of the bottom of the ball from the ground in metres
+     */
+    double distanceFromGround() const;
 
     /**
      * Defines the equality operator for a BallState. BallStates are equal if their
@@ -54,4 +65,5 @@ class BallState
    private:
     Point position_;
     Vector velocity_;
+    double height_;
 };

@@ -5,7 +5,7 @@
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
-#include "software/parameter/config.hpp"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/primitive/primitive.h"
 #include "software/proto/grSim_Packet.pb.h"
 #include "software/world/ball.h"
@@ -22,7 +22,7 @@ class GrSimOutput
      * @param port The port to publish commands to
      */
     explicit GrSimOutput(std::string network_address, unsigned short port,
-                         std::shared_ptr<const RefboxConfig> config);
+                         std::shared_ptr<const SensorFusionConfig> config);
 
     ~GrSimOutput();
 
@@ -83,7 +83,7 @@ class GrSimOutput
     // Variables for networking
     std::string network_address;
     unsigned short port;
-    std::shared_ptr<const RefboxConfig> config;
+    std::shared_ptr<const SensorFusionConfig> config;
     boost::asio::io_service io_service;
     boost::asio::ip::udp::socket socket;
     boost::asio::ip::udp::endpoint remote_endpoint;

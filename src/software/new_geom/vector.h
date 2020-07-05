@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/geometry.hpp>
 #include <cmath>
 #include <iostream>
 
@@ -191,7 +190,7 @@ class Vector final
      *
      * @return the Angle between this vector and the other vector
      */
-    Angle angleWith(const Vector &other);
+    Angle angleWith(const Vector &other) const;
 
    private:
     /**

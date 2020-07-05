@@ -22,7 +22,7 @@ static void direct_velocity_start(const primitive_params_t* params, void* void_s
 
     Dribbler_t* dribbler =
         app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
-    app_dribbler_setSpeed(dribbler, (params->extra) * 300);
+    app_dribbler_setSpeed(dribbler, (unsigned int)(params->extra) * 300);
 }
 
 static void direct_velocity_end(void* void_state_ptr, FirmwareWorld_t* world) {}
