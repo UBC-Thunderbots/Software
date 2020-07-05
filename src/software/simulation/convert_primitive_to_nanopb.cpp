@@ -10,7 +10,7 @@ PrimitiveMsg convertPrimitiveToNanoPb(const Primitive& primitive)
     PrimitiveMsg primitive_msg = PrimitiveMsg_init_zero;
 
     pb_istream_t pb_in_stream =
-        pb_istream_from_buffer(static_cast<const unsigned char*>(serialized_proto.data()),
+        pb_istream_from_buffer(static_cast<uint8_t*>(serialized_proto.data()),
                                serialized_proto.size());
     if (!pb_decode(&pb_in_stream, PrimitiveMsg_fields, &primitive_msg))
     {

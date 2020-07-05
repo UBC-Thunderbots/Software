@@ -5,15 +5,20 @@
 #include <string>
 
 #include "software/networking/multicast_listener.h"
+#include "software/world/robot_state.h"
 
-template <class ReceiveProtoT>
-class ProtoMulticastListener
+extern "C" {
+#include "shared/proto/tbots_software_msgs.nanopb.h"
+}
+
+class NanoPbPrimitiveSetMulticastListener
 {
    public:
     /**
-     * Creates an ProtoMulticastListener that will listen for ReceiveProtoT packets from
-     * the network on the given address and port. For every ReceiveProtoT packet received,
-     * the receive_callback will be called to perform any operations desired by the caller
+     * Creates an NanoPbPrimitiveSetMulticastListener that will listen for primitive sets
+     * sent over the network on the given address and port. For every ReceiveProtoT packet
+     * received, the receive_callback will be called to perform any operations desired by
+     * the caller
      *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
      * @param ip_address The ip address of the multicast group on which to listen for
@@ -21,15 +26,14 @@ class ProtoMulticastListener
      *  example IPv4: 192.168.0.2
      *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port on which to listen for ReceiveProtoT packets
-     * @param receive_callback The function to run for every ReceiveProtoT packet received
-     * from the network
+     * @param receive_callback This function will be called with a map of
+     *                         RobotId -> PrimitiveMsg
      */
-    ProtoMulticastListener(boost::asio::io_service& io_service,
-                           const std::string& ip_address, unsigned short port,
-                           std::function<void(ReceiveProtoT&)> receive_callback);
+    NanoPbPrimitiveSetMulticastListener(
+        boost::asio::io_service& io_service, const std::string& ip_address,
+        unsigned short port, std::function<void(std::map<RobotId, PrimitiveMsg>&)> receive_callback);
 
    private:
-
     /**
      * This function is setup as the callback to handle packets received over the network.
      *
@@ -42,7 +46,6 @@ class ProtoMulticastListener
     MulticastListener multicast_listener;
 
     // The function to call on every received packet of ReceiveProtoT data
-    std::function<void(ReceiveProtoT&)> receive_callback;
+    std::function<void(std::map<RobotId, PrimitiveMsg>&)> receive_callback;
 };
 
-#include "software/networking/proto_multicast_listener.tpp"

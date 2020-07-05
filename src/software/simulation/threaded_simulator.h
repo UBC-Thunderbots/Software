@@ -6,6 +6,10 @@
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/simulator.h"
 
+extern "C" {
+#include "shared/proto/primitive.nanopb.h"
+}
+
 /**
  * A simulator that runs in a separate thread and publishes protobuf
  * data asynchronously.
@@ -100,13 +104,10 @@ class ThreadedSimulator
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_type The primitive to set
-     * @param params The parameters for the specified primitive
+     * TODO: jdoc
      */
-    void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                 const primitive_params_t& params);
-    void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
-                               const primitive_params_t& params);
+    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
 
    private:
     /**

@@ -1,10 +1,15 @@
 #pragma once
 
-#include "shared/proto/tbots_software_msgs.pb.h"
+#include "software/networking/threaded_nanopb_primitive_set_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/simulation/threaded_simulator.h"
+
+extern "C"
+{
+#include "shared/proto/tbots_software_msgs.nanopb.h"
+}
 
 /**
  * This class abstracts all simulation and networking operations for
@@ -43,10 +48,11 @@ class StandaloneSimulator
     /**
      * Sets the primitives being simulated by the robots on the respective team
      *
+     * // TODO:  update jdoc
      * @param msg The primitives to set on the respective team
      */
-    void setYellowRobotPrimitives(PrimitiveSetMsg msg);
-    void setBlueRobotPrimitives(PrimitiveSetMsg msg);
+    void setYellowRobotPrimitives(std::map<RobotId, PrimitiveMsg> robot_id_to_primitive);
+    void setBlueRobotPrimitives(std::map<RobotId, PrimitiveMsg> robot_id_to_primitive);
 
     /**
      * A helper function that sets up all networking functionality with
@@ -54,22 +60,10 @@ class StandaloneSimulator
      */
     void initNetworking();
 
-    /**
-     * Decodes a PrimitiveMsg into its primitive index and parameters
-     *
-     * @param msg The message to decode
-     *
-     * @return The primitive index and parameters for the given PrimitiveMsg
-     */
-    static std::pair<unsigned int, primitive_params_t> decodePrimitiveMsg(
-        const PrimitiveMsg& msg);
-
     std::shared_ptr<const StandaloneSimulatorConfig> standalone_simulator_config;
+    std::unique_ptr<ThreadedNanoPbPrimitiveSetMulticastListener>
+        yellow_team_primitive_listener, blue_team_primitive_listener;
     std::unique_ptr<ThreadedProtoMulticastSender<SSL_WrapperPacket>>
         wrapper_packet_sender;
-    std::unique_ptr<ThreadedProtoMulticastListener<PrimitiveSetMsg>>
-        yellow_team_primitive_listener;
-    std::unique_ptr<ThreadedProtoMulticastListener<PrimitiveSetMsg>>
-        blue_team_primitive_listener;
     ThreadedSimulator simulator;
 };

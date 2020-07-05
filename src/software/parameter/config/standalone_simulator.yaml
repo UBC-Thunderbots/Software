@@ -1,6 +1,6 @@
 StandaloneSimulatorConfig:
   NetworkInterface:
-    default: "wlp3s0"
+    default: "wlx000f60078cef"
     type: "std::string"
     description: >-
       The network interface to use for multicast network communication.

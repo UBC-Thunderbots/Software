@@ -106,16 +106,16 @@ int main(int argc, char **argv)
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers
-        ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
-        backend->Subject<World>::registerObserver(ai);
+//        ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
+//        backend->Subject<World>::registerObserver(ai);
         if (!args.headless)
         {
-            visualizer = std::make_shared<ThreadedFullSystemGUI>();
-
-            backend->Subject<World>::registerObserver(visualizer);
-            ai->Subject<AIDrawFunction>::registerObserver(visualizer);
-            ai->Subject<PlayInfo>::registerObserver(visualizer);
-            backend->Subject<RobotStatus>::registerObserver(visualizer);
+//            visualizer = std::make_shared<ThreadedFullSystemGUI>();
+//
+//            backend->Subject<World>::registerObserver(visualizer);
+//            ai->Subject<AIDrawFunction>::registerObserver(visualizer);
+//            ai->Subject<PlayInfo>::registerObserver(visualizer);
+//            backend->Subject<RobotStatus>::registerObserver(visualizer);
         }
 
         // Wait for termination
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
             // This blocks forever without using the CPU
             // Wait for the full_system to shut down before shutting
             // down the rest of the system
-            visualizer->getTerminationPromise()->get_future().wait();
+//            visualizer->getTerminationPromise()->get_future().wait();
         }
         else
         {
@@ -132,6 +132,7 @@ int main(int argc, char **argv)
             std::promise<void>().get_future().wait();
         }
     }
+    std::promise<void>().get_future().wait();
 
     return 0;
 }
