@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+
 #include "software/primitive/primitive.h"
 
 /**

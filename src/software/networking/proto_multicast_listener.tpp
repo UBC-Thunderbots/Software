@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/networking/proto_multicast_listener.h"
 #include "software/logger/logger.h"
+#include "software/networking/proto_multicast_listener.h"
 
 template <class ReceiveProtoT>
 ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
@@ -11,12 +11,13 @@ ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
           io_service, ip_address, port,
           boost::bind(&ProtoMulticastListener<ReceiveProtoT>::handleDataReception, this,
                       _1)),
-                      receive_callback(receive_callback)
+      receive_callback(receive_callback)
 {
 }
 
 template <class ReceiveProtoT>
-void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(std::vector<uint8_t>& data)
+void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
+    std::vector<uint8_t>& data)
 {
     ReceiveProtoT packet_data;
     const bool parsing_succeeded =

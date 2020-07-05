@@ -3,9 +3,9 @@
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
+#include "software/simulation/convert_primitive_to_nanopb.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/simulation/simulator_robot_singleton.h"
-#include "software/simulation/convert_primitive_to_nanopb.h"
 
 extern "C"
 {
@@ -89,15 +89,14 @@ void Simulator::setRobotPrimitives(
     {
         PrimitiveMsg primitive_msg = convertPrimitiveToNanoPb(*primitive_ptr);
 
-        setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg,
-                          simulator_robots, simulator_ball);
+        setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
+                          simulator_ball);
     }
 }
 
 void Simulator::setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots,
-                      simulator_ball);
+    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball);
 }
 
 void Simulator::setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
@@ -123,8 +122,8 @@ void Simulator::setRobotPrimitive(
         auto simulator_robot = (*simulator_robots_iter).first;
         auto firmware_world  = (*simulator_robots_iter).second;
         SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-            firmware_world, primitive_msg);
+        SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(firmware_world,
+                                                                          primitive_msg);
     }
 }
 
@@ -226,4 +225,3 @@ Timestamp Simulator::getTimestamp() const
 {
     return physics_world.getTimestamp();
 }
-

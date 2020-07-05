@@ -22,8 +22,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_chip_primitive)
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_direct_velocity_primitive)
@@ -41,8 +41,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_direct_velocity_primitive)
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_direct_wheels_primitive)
@@ -60,8 +60,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_direct_wheels_primitive)
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_dribble_primitive)
@@ -80,8 +80,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_dribble_primitive)
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_kick_primitive)
@@ -119,8 +119,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_and_dribble_off
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_enabled_dribble_off)
@@ -140,8 +140,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_enabled_dribble
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_dribble_enabled_autokick_off)
@@ -161,8 +161,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_dribble_enabled_autokick
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_and_dribble_enabled)
@@ -182,8 +182,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_and_dribble_ena
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_movespin_primitive)
@@ -202,8 +202,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_movespin_primitive)
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_pivot_primitive)
@@ -224,8 +224,8 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_pivot_primitive)
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }
 
 TEST(ProtoCreatorPrimitiveVisitor, visit_stop_primitive)
@@ -243,6 +243,6 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_stop_primitive)
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, actual_primitive_msg));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
+                                                                   actual_primitive_msg));
 }

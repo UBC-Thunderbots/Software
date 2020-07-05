@@ -77,4 +77,3 @@ typedef struct
     {                                                                                    \
         free((STATE_TYPE*)state);                                                        \
     }
-

@@ -59,4 +59,3 @@ class MulticastListener
     // The function to call on every received packet of ReceiveProto data
     std::function<void(std::vector<uint8_t>&)> receive_callback;
 };
-

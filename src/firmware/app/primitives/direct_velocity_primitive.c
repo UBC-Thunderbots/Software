@@ -10,8 +10,8 @@ typedef struct DirectVelocityPrimitiveState
 } DirectVelocityPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DirectVelocityPrimitiveState_t)
 
-void app_direct_velocity_primitive_start(PrimitiveParamsMsg params,
-                                         void* void_state_ptr, FirmwareWorld_t* world)
+void app_direct_velocity_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+                                         FirmwareWorld_t* world)
 {
     DirectVelocityPrimitiveState_t* state =
         (DirectVelocityPrimitiveState_t*)void_state_ptr;

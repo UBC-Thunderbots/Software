@@ -4,11 +4,15 @@
 
 MulticastListener::MulticastListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
-    const unsigned short port, std::function<void(std::vector<uint8_t>&)> receive_callback)
+    const unsigned short port,
+    std::function<void(std::vector<uint8_t>&)> receive_callback)
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
-        boost::asio::ip::make_address(ip_address), port); socket_.open(listen_endpoint.protocol()); socket_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true)); try
+        boost::asio::ip::make_address(ip_address), port);
+    socket_.open(listen_endpoint.protocol());
+    socket_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+    try
     {
         socket_.bind(listen_endpoint);
     }

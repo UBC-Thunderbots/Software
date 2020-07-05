@@ -109,49 +109,49 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     switch (primitive_msg.which_primitive)
     {
         case PrimitiveMsg_move_tag:
-            manager->current_primitive = &MOVE_PRIMITIVE;
+            manager->current_primitive       = &MOVE_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_move_primitive_start(primitive_msg.primitive.move,
                                      manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_stop_tag:
-            manager->current_primitive = &STOP_PRIMITIVE;
+            manager->current_primitive       = &STOP_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_stop_primitive_start(primitive_msg.primitive.stop,
                                      manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_dribble_tag:
-            manager->current_primitive = &DRIBBLE_PRIMITIVE;
+            manager->current_primitive       = &DRIBBLE_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_dribble_primitive_start(primitive_msg.primitive.dribble,
                                         manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_shoot_tag:
-            manager->current_primitive = &SHOOT_PRIMITIVE;
+            manager->current_primitive       = &SHOOT_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_shoot_primitive_start(primitive_msg.primitive.shoot,
                                       manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_pivot_tag:
-            manager->current_primitive = &PIVOT_PRIMITIVE;
+            manager->current_primitive       = &PIVOT_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_pivot_primitive_start(primitive_msg.primitive.pivot,
                                       manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_spin_tag:
-            manager->current_primitive = &SPIN_PRIMITIVE;
+            manager->current_primitive       = &SPIN_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_spin_primitive_start(primitive_msg.primitive.spin,
                                      manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_direct_wheels_tag:
-            manager->current_primitive = &DIRECT_WHEELS_PRIMITIVE;
+            manager->current_primitive       = &DIRECT_WHEELS_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state;
             app_direct_wheels_primitive_start(primitive_msg.primitive.direct_wheels,
                                               manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_direct_velocity_tag:
-            manager->current_primitive = &DIRECT_VELOCITY_PRIMITIVE;
+            manager->current_primitive       = &DIRECT_VELOCITY_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_direct_velocity_primitive_start(primitive_msg.primitive.direct_velocity,
                                                 manager->current_primitive_state, world);
@@ -162,9 +162,9 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
             // accidentally run a totally random primitive if we're compiling in optimized
             // mode with no assertions. We set the current primitive to a stop
             // primitive for safety
-            manager->current_primitive = &STOP_PRIMITIVE;
+            manager->current_primitive       = &STOP_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
-            PrimitiveParamsMsg params = PrimitiveParamsMsg_init_zero;
+            PrimitiveParamsMsg params        = PrimitiveParamsMsg_init_zero;
             app_stop_primitive_start(params, manager->current_primitive_state, world);
             assert(false);
     }

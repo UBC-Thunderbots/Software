@@ -6,12 +6,12 @@
 #include "software/simulation/simulator_robot.h"
 extern "C"
 {
-#include "shared/proto/primitive.nanopb.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/wheel.h"
 #include "firmware/shared/physics.h"
+#include "shared/proto/primitive.nanopb.h"
 }
 
 /**
@@ -100,7 +100,8 @@ class SimulatorRobotSingleton
      * @param primitive_msg The primitive to start
      */
     static void startNewPrimitiveOnCurrentSimulatorRobot(
-        std::shared_ptr<FirmwareWorld_t> firmware_world, const PrimitiveMsg& primitive_msg);
+        std::shared_ptr<FirmwareWorld_t> firmware_world,
+        const PrimitiveMsg& primitive_msg);
 
     /**
      * Runs the current primitive on the SimulatorRobot currently being controlled by this

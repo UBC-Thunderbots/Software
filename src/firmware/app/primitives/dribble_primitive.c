@@ -15,7 +15,7 @@ typedef struct DribblePrimitiveState
 } DribblePrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DribblePrimitiveState_t)
 
- void app_dribble_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+void app_dribble_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
                                  FirmwareWorld_t* world)
 {
     DribblePrimitiveState_t* state = (DribblePrimitiveState_t*)void_state_ptr;
@@ -28,7 +28,7 @@ DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DribblePrimitiveState_t)
     app_dribbler_setSpeed(dribbler, (uint32_t)(params.parameter4));
 }
 
-static  void dribble_end(void* void_state_ptr, FirmwareWorld_t* world) {}
+static void dribble_end(void* void_state_ptr, FirmwareWorld_t* world) {}
 
 static void dribble_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {

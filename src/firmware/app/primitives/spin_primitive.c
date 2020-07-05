@@ -23,8 +23,8 @@ typedef struct SpinPrimitiveState
 } SpinPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(SpinPrimitiveState_t)
 
-void app_spin_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
-                              FirmwareWorld_t* world)
+void app_spin_primitive_start(PrimitiveParamsMsg params, void *void_state_ptr,
+                              FirmwareWorld_t *world)
 {
     SpinPrimitiveState_t *state = (SpinPrimitiveState_t *)void_state_ptr;
 
@@ -37,7 +37,7 @@ void app_spin_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
     state->x_final    = params.parameter1 / 1000.0f;
     state->y_final    = params.parameter2 / 1000.0f;
     state->avel_final = params.parameter3 / 100.0f;
-    state->end_speed  = params.parameter4     / 1000.0f;
+    state->end_speed  = params.parameter4 / 1000.0f;
     state->slow       = params.slow;
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);

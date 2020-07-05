@@ -97,13 +97,11 @@ SimulatorRobotSingleton::createFirmwareRobot()
 }
 
 void SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-    std::shared_ptr<FirmwareWorld_t> firmware_world,
-    const PrimitiveMsg& primitive_msg)
+    std::shared_ptr<FirmwareWorld_t> firmware_world, const PrimitiveMsg& primitive_msg)
 {
-    checkValidAndExecuteVoid(
-        [firmware_world, primitive_msg](auto robot) {
-            robot->startNewPrimitive(firmware_world, primitive_msg);
-        });
+    checkValidAndExecuteVoid([firmware_world, primitive_msg](auto robot) {
+        robot->startNewPrimitive(firmware_world, primitive_msg);
+    });
 }
 
 void SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(

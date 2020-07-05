@@ -12,4 +12,4 @@ extern const primitive_t MOVE_PRIMITIVE;
  * @param world The world this primitive is running in.
  */
 void app_move_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
-                                 FirmwareWorld_t* world);
+                              FirmwareWorld_t* world);

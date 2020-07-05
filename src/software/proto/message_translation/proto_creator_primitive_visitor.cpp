@@ -25,7 +25,7 @@ PrimitiveMsg ProtoCreatorPrimitiveVisitor::createPrimitiveMsg(const Primitive &p
 
 void ProtoCreatorPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
-    PrimitiveParamsMsg* params = new PrimitiveParamsMsg();
+    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
     params->set_parameter1(
         static_cast<float>(chip_primitive.getChipOrigin().x() * MILLIMETERS_PER_METER));
     params->set_parameter2(
@@ -44,16 +44,17 @@ void ProtoCreatorPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 void ProtoCreatorPrimitiveVisitor::visit(
     const DirectVelocityPrimitive &direct_velocity_primitive)
 {
-    PrimitiveParamsMsg* params = new PrimitiveParamsMsg();
+    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
     params->set_parameter1(static_cast<float>(direct_velocity_primitive.getXVelocity() *
-                                            MILLIMETERS_PER_METER));
+                                              MILLIMETERS_PER_METER));
     params->set_parameter2(static_cast<float>(direct_velocity_primitive.getYVelocity() *
-                                            MILLIMETERS_PER_METER));
+                                              MILLIMETERS_PER_METER));
     params->set_parameter3(static_cast<float>(
         direct_velocity_primitive.getAngularVelocity() * CENTIRADIANS_PER_RADIAN));
     params->set_parameter4(static_cast<float>(0));
-    params->set_extra_bits(static_cast<uint8_t>(direct_velocity_primitive.getDribblerRpm() *
-                                              DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR));
+    params->set_extra_bits(
+        static_cast<uint8_t>(direct_velocity_primitive.getDribblerRpm() *
+                             DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR));
     params->set_slow(false);
 
     prim = PrimitiveMsg();
@@ -63,13 +64,13 @@ void ProtoCreatorPrimitiveVisitor::visit(
 void ProtoCreatorPrimitiveVisitor::visit(
     const DirectWheelsPrimitive &direct_wheels_primitive)
 {
-    PrimitiveParamsMsg* params = new PrimitiveParamsMsg();
+    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
     params->set_parameter1(static_cast<float>(direct_wheels_primitive.getWheel0Power()));
     params->set_parameter2(static_cast<float>(direct_wheels_primitive.getWheel1Power()));
     params->set_parameter3(static_cast<float>(direct_wheels_primitive.getWheel2Power()));
     params->set_parameter4(static_cast<float>(direct_wheels_primitive.getWheel3Power()));
     params->set_extra_bits(static_cast<uint8_t>(direct_wheels_primitive.getDribblerRPM() *
-                                              DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR));
+                                                DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR));
     params->set_slow(false);
 
     prim = PrimitiveMsg();
@@ -78,11 +79,11 @@ void ProtoCreatorPrimitiveVisitor::visit(
 
 void ProtoCreatorPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
 {
-    PrimitiveParamsMsg* params = new PrimitiveParamsMsg();
+    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
     params->set_parameter1(static_cast<float>(dribble_primitive.getDestination().x() *
-                                            MILLIMETERS_PER_METER));
+                                              MILLIMETERS_PER_METER));
     params->set_parameter2(static_cast<float>(dribble_primitive.getDestination().y() *
-                                            MILLIMETERS_PER_METER));
+                                              MILLIMETERS_PER_METER));
     params->set_parameter3(static_cast<float>(
         dribble_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN));
     // For this primitive, we don't divide the RPM
@@ -96,7 +97,7 @@ void ProtoCreatorPrimitiveVisitor::visit(const DribblePrimitive &dribble_primiti
 
 void ProtoCreatorPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
-    PrimitiveParamsMsg* params = new PrimitiveParamsMsg();
+    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
     params->set_parameter1(
         static_cast<float>(kick_primitive.getKickOrigin().x() * MILLIMETERS_PER_METER));
     params->set_parameter2(
@@ -114,13 +115,13 @@ void ProtoCreatorPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 
 void ProtoCreatorPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 {
-    PrimitiveParamsMsg* params = new PrimitiveParamsMsg();
+    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
     params->set_parameter1(
         static_cast<float>(move_primitive.getDestination().x() * MILLIMETERS_PER_METER));
     params->set_parameter2(
         static_cast<float>(move_primitive.getDestination().y() * MILLIMETERS_PER_METER));
     params->set_parameter3(static_cast<float>(move_primitive.getFinalAngle().toRadians() *
-                                            CENTIRADIANS_PER_RADIAN));
+                                              CENTIRADIANS_PER_RADIAN));
     params->set_parameter4(
         static_cast<float>(move_primitive.getFinalSpeed() * MILLIMETERS_PER_METER));
     uint32_t extra_bits = 0;
@@ -136,11 +137,11 @@ void ProtoCreatorPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 
 void ProtoCreatorPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive)
 {
-    PrimitiveParamsMsg* params = new PrimitiveParamsMsg();
+    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
     params->set_parameter1(static_cast<float>(movespin_primitive.getDestination().x() *
-                                            MILLIMETERS_PER_METER));
+                                              MILLIMETERS_PER_METER));
     params->set_parameter2(static_cast<float>(movespin_primitive.getDestination().y() *
-                                            MILLIMETERS_PER_METER));
+                                              MILLIMETERS_PER_METER));
     params->set_parameter3(static_cast<float>(
         movespin_primitive.getAngularVelocity().toRadians() * CENTIRADIANS_PER_RADIAN));
     params->set_parameter4(
@@ -154,15 +155,15 @@ void ProtoCreatorPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primi
 
 void ProtoCreatorPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
-    PrimitiveParamsMsg* params = new PrimitiveParamsMsg();
+    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
     params->set_parameter1(
         static_cast<float>(pivot_primitive.getPivotPoint().x() * MILLIMETERS_PER_METER));
     params->set_parameter2(
         static_cast<float>(pivot_primitive.getPivotPoint().y() * MILLIMETERS_PER_METER));
-    params->set_parameter3(static_cast<float>(pivot_primitive.getFinalAngle().toRadians() *
-                                            CENTIRADIANS_PER_RADIAN));
-    params->set_parameter4(static_cast<float>(pivot_primitive.getPivotSpeed().toRadians() *
-                                            CENTIRADIANS_PER_RADIAN));
+    params->set_parameter3(static_cast<float>(
+        pivot_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN));
+    params->set_parameter4(static_cast<float>(
+        pivot_primitive.getPivotSpeed().toRadians() * CENTIRADIANS_PER_RADIAN));
     params->set_extra_bits(pivot_primitive.isDribblerEnabled());
     params->set_slow(false);
 
@@ -172,7 +173,7 @@ void ProtoCreatorPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 
 void ProtoCreatorPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
-    PrimitiveParamsMsg* params = new PrimitiveParamsMsg();
+    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
     params->set_parameter1(static_cast<float>(0));
     params->set_parameter2(static_cast<float>(0));
     params->set_parameter3(static_cast<float>(0));

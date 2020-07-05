@@ -13,8 +13,7 @@ ThreadedNetworkListener<ListenerT, CallBackFunctionArgT>::ThreadedNetworkListene
 }
 
 template <class ListenerT, typename CallBackFunctionArgT>
-ThreadedNetworkListener<ListenerT,
-                        CallBackFunctionArgT>::~ThreadedNetworkListener()
+ThreadedNetworkListener<ListenerT, CallBackFunctionArgT>::~ThreadedNetworkListener()
 {
     // Stop the io_service. This is safe to call from another thread.
     // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service

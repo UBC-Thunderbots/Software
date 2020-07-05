@@ -1,8 +1,9 @@
 syntax = "proto3";
 
-// This message is used to ensure backwards compatability with our old format
+// This message is used to ensure backwards compatibility with our old format
 // for primitive parameters while we migrate to a new
-message PrimitiveParamsMsg {
+message PrimitiveParamsMsg
+{
     // The parameters for the primitive
     float parameter1 = 1;
     float parameter2 = 2;
@@ -16,17 +17,18 @@ message PrimitiveParamsMsg {
     bool slow = 6;
 }
 
-message PrimitiveMsg {
-    oneof primitive {
-        PrimitiveParamsMsg move = 1;
-        PrimitiveParamsMsg stop = 2;
-        PrimitiveParamsMsg dribble = 3;
-        PrimitiveParamsMsg shoot = 4;
-        PrimitiveParamsMsg pivot = 5;
-        PrimitiveParamsMsg spin = 6;
-        PrimitiveParamsMsg movespin = 7;
-        PrimitiveParamsMsg direct_wheels = 8;
+message PrimitiveMsg
+{
+    oneof primitive
+    {
+        PrimitiveParamsMsg move            = 1;
+        PrimitiveParamsMsg stop            = 2;
+        PrimitiveParamsMsg dribble         = 3;
+        PrimitiveParamsMsg shoot           = 4;
+        PrimitiveParamsMsg pivot           = 5;
+        PrimitiveParamsMsg spin            = 6;
+        PrimitiveParamsMsg movespin        = 7;
+        PrimitiveParamsMsg direct_wheels   = 8;
         PrimitiveParamsMsg direct_velocity = 9;
     }
 }
-

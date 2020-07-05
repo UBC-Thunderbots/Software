@@ -2,7 +2,8 @@
 
 #include "pb_decode.h"
 
-extern "C" {
+extern "C"
+{
 #include "shared/proto/tbots_software_msgs.nanopb.h"
 }
 
@@ -15,15 +16,15 @@ NanoPbPrimitiveSetMulticastListener::NanoPbPrimitiveSetMulticastListener(
           io_service, ip_address, port,
           boost::bind(&NanoPbPrimitiveSetMulticastListener::handleDataReception, this,
                       _1)),
-                      receive_callback(receive_callback)
+      receive_callback(receive_callback)
 {
 }
 
 void NanoPbPrimitiveSetMulticastListener::handleDataReception(std::vector<uint8_t>& data)
 {
     PrimitiveSetMsg primitive_set_msg;
-    pb_istream_t pb_in_stream = pb_istream_from_buffer(
-        static_cast<uint8_t*>(data.data()), data.size());
+    pb_istream_t pb_in_stream =
+        pb_istream_from_buffer(static_cast<uint8_t*>(data.data()), data.size());
     const bool parsing_succeeded =
         pb_decode(&pb_in_stream, PrimitiveSetMsg_fields, &primitive_set_msg);
     if (!parsing_succeeded)

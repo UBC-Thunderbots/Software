@@ -42,8 +42,8 @@ float compute_magnitude(float a[2])
     return sqrtf(a[0] * a[0] + a[1] * a[1]);
 }
 
-void app_pivot_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
-                               FirmwareWorld_t* world)
+void app_pivot_primitive_start(PrimitiveParamsMsg params, void *void_state_ptr,
+                               FirmwareWorld_t *world)
 {
     PivotPrimitiveState_t *state = (PivotPrimitiveState_t *)void_state_ptr;
     state->center[0]             = params.parameter1 / 1000.0f;

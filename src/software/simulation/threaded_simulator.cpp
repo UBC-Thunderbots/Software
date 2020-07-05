@@ -81,13 +81,15 @@ void ThreadedSimulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitive
     simulator.setBlueRobotPrimitives(primitives);
 }
 
-void ThreadedSimulator::setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
+void ThreadedSimulator::setYellowRobotPrimitive(RobotId id,
+                                                const PrimitiveMsg &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);
-    simulator.setYellowRobotPrimitive(id,primitive_msg);
+    simulator.setYellowRobotPrimitive(id, primitive_msg);
 }
 
-void ThreadedSimulator::setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
+void ThreadedSimulator::setBlueRobotPrimitive(RobotId id,
+                                              const PrimitiveMsg &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);
     simulator.setBlueRobotPrimitive(id, primitive_msg);

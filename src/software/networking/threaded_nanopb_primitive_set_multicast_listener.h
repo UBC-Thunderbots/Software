@@ -8,4 +8,3 @@
  */
 using ThreadedNanoPbPrimitiveSetMulticastListener =
     ThreadedNetworkListener<NanoPbPrimitiveSetMulticastListener, PrimitiveSetMsg>;
-

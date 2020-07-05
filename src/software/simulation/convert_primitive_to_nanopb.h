@@ -2,7 +2,8 @@
 
 #include "software/primitive/primitive.h"
 
-extern "C" {
+extern "C"
+{
 #include "shared/proto/primitive.nanopb.h"
 }
 

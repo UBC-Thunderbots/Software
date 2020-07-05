@@ -45,7 +45,6 @@ class StandaloneSimulator
     void setupInitialSimulationState();
 
    private:
-
     /**
      * Sets the primitives being simulated by the robots on the respective team
      *

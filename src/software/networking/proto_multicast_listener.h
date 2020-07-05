@@ -29,7 +29,6 @@ class ProtoMulticastListener
                            std::function<void(ReceiveProtoT&)> receive_callback);
 
    private:
-
     /**
      * This function is setup as the callback to handle packets received over the network.
      *

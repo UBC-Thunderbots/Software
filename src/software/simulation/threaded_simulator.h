@@ -6,7 +6,8 @@
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/simulator.h"
 
-extern "C" {
+extern "C"
+{
 #include "shared/proto/primitive.nanopb.h"
 }
 

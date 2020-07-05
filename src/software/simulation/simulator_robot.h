@@ -8,8 +8,8 @@
 
 extern "C"
 {
-#include "shared/proto/primitive.nanopb.h"
 #include "firmware/app/primitives/primitive_manager.h"
+#include "shared/proto/primitive.nanopb.h"
 }
 
 /**

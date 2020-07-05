@@ -23,12 +23,11 @@ class ThreadedNetworkListener
      *                         the network
      */
     ThreadedNetworkListener(const std::string& ip_address, unsigned short port,
-                              std::function<void(CallBackFunctionArgT&)> receive_callback);
+                            std::function<void(CallBackFunctionArgT&)> receive_callback);
 
     ~ThreadedNetworkListener();
 
    private:
-
     // The io_service that will be used to service all network requests
     boost::asio::io_service io_service;
     // The thread running the io_service in the background. This thread will run for the

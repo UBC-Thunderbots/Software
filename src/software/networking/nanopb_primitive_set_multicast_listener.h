@@ -7,7 +7,8 @@
 #include "software/networking/multicast_listener.h"
 #include "software/world/robot_state.h"
 
-extern "C" {
+extern "C"
+{
 #include "shared/proto/tbots_software_msgs.nanopb.h"
 }
 
@@ -48,4 +49,3 @@ class NanoPbPrimitiveSetMulticastListener
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(PrimitiveSetMsg&)> receive_callback;
 };
-
