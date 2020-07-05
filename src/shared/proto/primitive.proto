@@ -19,14 +19,13 @@ message PrimitiveParamsMsg {
 
 message PrimitiveMsg {
     oneof primitive {
+        // TODO: re-number these
         PrimitiveParamsMsg move = 1;
         PrimitiveParamsMsg stop = 2;
         PrimitiveParamsMsg dribble = 3;
         PrimitiveParamsMsg shoot = 4;
-        PrimitiveParamsMsg chip = 5;
         PrimitiveParamsMsg pivot = 6;
         PrimitiveParamsMsg spin = 7;
-        PrimitiveParamsMsg kick = 8;
         PrimitiveParamsMsg movespin = 9;
         PrimitiveParamsMsg direct_wheels = 10;
         PrimitiveParamsMsg direct_velocity = 11;
