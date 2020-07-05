@@ -1,10 +1,13 @@
 #include "software/world/ball.h"
 
 #include "shared/constants.h"
+#include "software/world/ball_model/linear_ball_model.h"
 
 Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp,
            unsigned int history_size)
-    : states_(history_size)
+    : states_(history_size),
+      ball_model_(std::make_shared<LinearBallModel>(
+          LinearBallModel(BallState(position, velocity))))
 {
     if (history_size <= 0)
     {
@@ -15,7 +18,9 @@ Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &times
 }
 
 Ball::Ball(const TimestampedBallState &initial_state, unsigned int history_size)
-    : states_(history_size)
+    : states_(history_size),
+      ball_model_(
+          std::make_shared<LinearBallModel>(LinearBallModel(initial_state.state())))
 {
     if (history_size <= 0)
     {
@@ -28,6 +33,11 @@ Ball::Ball(const TimestampedBallState &initial_state, unsigned int history_size)
 TimestampedBallState Ball::currentState() const
 {
     return states_.front();
+}
+
+const std::shared_ptr<BallModel> &Ball::getBallModel() const
+{
+    return ball_model_;
 }
 
 void Ball::updateState(const TimestampedBallState &new_state)
