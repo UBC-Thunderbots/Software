@@ -7,7 +7,6 @@
 #include <thread>
 
 #include "software/ai/hl/stp/play_info.h"
-#include "software/backend/radio/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/full_system/widgets/full_system_gui.h"
 #include "software/multithreading/thread_safe_buffer.h"
@@ -23,8 +22,7 @@
 class ThreadedFullSystemGUI : public ThreadedObserver<World>,
                               public ThreadedObserver<AIDrawFunction>,
                               public ThreadedObserver<PlayInfo>,
-                              public ThreadedObserver<SensorMsg>,
-                              public ThreadedObserver<RobotStatus>
+                              public ThreadedObserver<SensorMsg>
 {
    public:
     explicit ThreadedFullSystemGUI();
@@ -35,7 +33,6 @@ class ThreadedFullSystemGUI : public ThreadedObserver<World>,
     void onValueReceived(AIDrawFunction draw_function) override;
     void onValueReceived(PlayInfo play_info) override;
     void onValueReceived(SensorMsg sensor_msg) override;
-    void onValueReceived(RobotStatus robot_status) override;
 
     /**
      * Returns a shared_ptr to a promise that can be waited on, and that will
@@ -65,7 +62,6 @@ class ThreadedFullSystemGUI : public ThreadedObserver<World>,
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
     std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
-    std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
 
     // We want to show the most recent world and AI data, but also want things to look

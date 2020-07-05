@@ -23,7 +23,6 @@ cc_library(
     hdrs = ["sensor_fusion.h"],
     deps = [
         ":refbox_data",
-        "//software/backend:robot_status",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/primitive",
