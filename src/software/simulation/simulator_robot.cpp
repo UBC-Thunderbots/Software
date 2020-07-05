@@ -3,6 +3,7 @@
 #include "shared/constants.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
+#include "software/new_geom/util/acute_angle.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),
@@ -126,7 +127,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
 
             double total_head_on_collision_momentum_magnitude = 0.0;
 
-            if (acuteVertexAngle(ball->velocity(), -robot_orientation_vector).abs() <
+            if (acuteAngle(ball->velocity(), -robot_orientation_vector).abs() <
                 Angle::quarter())
             {
                 // The ball is heading towards the robot, and will have momentum that
@@ -135,7 +136,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
                     ball->momentum().project(robot_orientation_vector).length();
             }
 
-            if (acuteVertexAngle(robot->velocity(), robot_orientation_vector).abs() <
+            if (acuteAngle(robot->velocity(), robot_orientation_vector).abs() <
                 Angle::quarter())
             {
                 // The robot is moving in direction it's facing, and will add momentum
