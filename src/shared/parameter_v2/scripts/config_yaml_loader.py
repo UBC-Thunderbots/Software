@@ -6,6 +6,10 @@ import yaml
 from colorama import Fore, init
 import jsonschema
 
+from typing import List
+
+YamlPathList = List[str]
+
 from dynamic_parameter_schema import (
     INCLUDE_DEF_SCHEMA,
     PARAM_DEF_SCHEMA,
@@ -21,7 +25,7 @@ from dynamic_parameter_schema import (
 
 class ConfigYamlLoader(object):
     @staticmethod
-    def get_config_metadata(yaml_paths: list) -> dict:
+    def get_config_metadata(yaml_paths: YamlPathList) -> dict:
         """Loads the yamls in the root config directory and verifies that the
         requested configuration is valid. Then returns config_metadata dict
         with a specified format capturing all the requested params and configs.
@@ -92,7 +96,7 @@ class ConfigYamlLoader(object):
         return config_metadata
 
     @staticmethod
-    def __load_yaml_into_dict(yaml_paths: list) -> dict:
+    def __load_yaml_into_dict(yaml_paths: YamlPathList) -> dict:
         """Loads the yamls into an dictionary. Any errors while in the yaml
         syntax will raise to the main thread. We also adjust how the dictionary
         is stored for easier access later.
