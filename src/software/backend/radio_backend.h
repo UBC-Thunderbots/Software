@@ -1,8 +1,7 @@
 #pragma once
 
 #include "software/backend/backend.h"
-#include "software/backend/input/network/networking/network_client.h"
-#include "software/backend/output/radio/radio_output.h"
+#include "software/backend/radio/radio_output.h"
 #include "software/backend/ssl_proto_client.h"
 #include "software/parameter/dynamic_parameters.h"
 
@@ -21,14 +20,6 @@ class RadioBackend : public Backend
     void onValueReceived(World world) override;
 
     /**
-     * This is registered as an async callback function so that it is called
-     * with a new world every time one is available
-     *
-     * @param world The new world
-     */
-    void receiveWorld(World world);
-
-    /**
      * Convert robot_status to TbotsRobotMsg and send as a SensorMsg to observers
      *
      * @param robot_status The RobotStatus
@@ -36,9 +27,6 @@ class RadioBackend : public Backend
     void receiveRobotStatus(RobotStatus robot_status);
 
     const std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config;
-
-    // The interface with the network that lets us get new information about the world
-    NetworkClient network_input;
 
     // Client to listen for SSL protobufs
     SSLProtoClient ssl_proto_client;
