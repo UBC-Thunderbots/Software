@@ -26,7 +26,7 @@ from dynamic_parameter_schema import (
 class ConfigYamlLoader(object):
     @staticmethod
     def get_config_metadata(yaml_paths: YamlPathList) -> dict:
-        """Loads the yamls in the YamlPathList (which a list of absolute paths)
+        """Loads the yamls in the YamlPathList (a list of absolute paths to yamls)
         and verifies that the requested configuration is valid. Then returns
         config_metadata dict with a specified format capturing all the requested
         params and configs.
