@@ -4,7 +4,6 @@
 # DFU.
 #
 
-
 # --- begin runfiles.bash initialization ---
 # Copy-pasted from Bazel's Bash runfiles library (tools/bash/runfiles/runfiles.bash).
 # See here for why we need this:
