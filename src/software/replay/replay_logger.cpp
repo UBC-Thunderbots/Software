@@ -60,9 +60,9 @@ void ReplayLogger::onValueReceived(SensorMsg msg)
         LOG(INFO) << "Logging vision frame with t_sent="
                   << msg.ssl_vision_msg().detection().t_sent();
     }
-    current_chunk.mutable_replay_frames()->Add();
-    (current_chunk.mutable_replay_frames()->end() - 1)->CopyFrom(msg);
-    if (current_chunk.replay_frames_size() >= msgs_per_chunk)
+    current_chunk.mutable_replay_msgs()->Add();
+    (current_chunk.mutable_replay_msgs()->end() - 1)->CopyFrom(msg);
+    if (current_chunk.replay_msgs_size() >= msgs_per_chunk)
     {
         saveCurrentChunk();
         nextChunk();

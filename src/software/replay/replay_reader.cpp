@@ -108,12 +108,12 @@ std::optional<SensorMsg> ReplayReader::getNextMsg()
         return std::nullopt;
     }
 
-    if (cur_msg_idx >= cur_chunk.replay_frames_size())
+    if (cur_msg_idx >= cur_chunk.replay_msgs_size())
     {
         nextChunk();
     }
 
-    auto ret = cur_chunk.replay_frames(cur_msg_idx);
+    auto ret = cur_chunk.replay_msgs(cur_msg_idx);
     cur_msg_idx++;
     return ret;
 }
@@ -121,7 +121,7 @@ std::optional<SensorMsg> ReplayReader::getNextMsg()
 bool ReplayReader::hasNextMsg() const
 {
     return !(cur_chunk_idx == max_chunk_idx &&
-             cur_msg_idx == cur_chunk.replay_frames_size());
+             cur_msg_idx == cur_chunk.replay_msgs_size());
 }
 
 void ReplayReader::nextChunk()

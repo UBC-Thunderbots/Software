@@ -26,17 +26,17 @@ TEST(ReplayTest, test_read_and_write_replay)
     // write them, and then read them again in the same test
     // TODO: record replay data with refbox running
 
-    std::vector<SensorMsg> read_replay_frames;
+    std::vector<SensorMsg> read_replay_msgs;
 
     ReplayReader reader(fs::current_path() / REPLAY_TEST_PATH_SUFFIX);
     while (auto frame = reader.getNextMsg())
     {
-        read_replay_frames.emplace_back(*frame);
+        read_replay_msgs.emplace_back(*frame);
     }
     // do a quick sanity check here to assert that the timestamps are monotonically
     // increasing
     double max_timestamp = 0.f;
-    for (const auto& msg : read_replay_frames)
+    for (const auto& msg : read_replay_msgs)
     {
         auto ts = msg.ssl_vision_msg().detection().t_sent();
         if (ts < max_timestamp)
@@ -55,7 +55,7 @@ TEST(ReplayTest, test_read_and_write_replay)
         std::make_shared<ReplayLogger>(output_path);
     TestSubject subject;
     subject.registerObserver(logger_ptr);
-    for (const auto msg : read_replay_frames)
+    for (const auto msg : read_replay_msgs)
     {
         subject.sendValue(msg);
         // we have 12000 frames of replay so we have to try to not fill the buffer
@@ -69,20 +69,20 @@ TEST(ReplayTest, test_read_and_write_replay)
     }
 
     // compare against the messages that we read
-    std::vector<SensorMsg> written_read_replay_frames;
+    std::vector<SensorMsg> written_read_replay_msgs;
     ReplayReader reader2(output_path);
     while (auto frame = reader2.getNextMsg())
     {
-        written_read_replay_frames.emplace_back(*frame);
+        written_read_replay_msgs.emplace_back(*frame);
     }
 
-    EXPECT_EQ(written_read_replay_frames.size(), read_replay_frames.size())
+    EXPECT_EQ(written_read_replay_msgs.size(), read_replay_msgs.size())
         << "Replay written and read back does not have the same number of frames!";
 
-    for (size_t i = 0; i < written_read_replay_frames.size(); i++)
+    for (size_t i = 0; i < written_read_replay_msgs.size(); i++)
     {
         bool eq = google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
-            read_replay_frames[i], written_read_replay_frames[i]);
+            read_replay_msgs[i], written_read_replay_msgs[i]);
         EXPECT_TRUE(eq);
     }
 }

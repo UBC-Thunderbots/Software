@@ -6,10 +6,8 @@
 
 #include "software/backend/input/network/networking/network_filter.h"
 #include "software/backend/input/network/networking/proto_multicast_listener.h"
-#include "software/multithreading/subject.h"
 #include "software/parameter/config.hpp"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
-#include "software/proto/sensor_msg.pb.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/world/world.h"
 
@@ -20,7 +18,7 @@
  * member functions rather than large lambda functions. Overall, this helps keep our
  * main.cpp file shorter and more readable.
  */
-class NetworkClient : public Subject<SensorMsg>
+class NetworkClient
 {
    public:
     /**

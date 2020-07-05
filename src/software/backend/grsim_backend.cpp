@@ -2,7 +2,6 @@
 
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/replay/replay_logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 const std::string GrSimBackend::name = "grsim";
@@ -19,8 +18,6 @@ GrSimBackend::GrSimBackend()
                    Util::Constants::GRSIM_COMMAND_NETWORK_PORT,
                    Util::DynamicParameters->getAIControlConfig()->getRefboxConfig())
 {
-    auto logger_ptr = std::make_shared<ReplayLogger>("/home/ubuntu/replayout2");
-    network_input.registerObserver(logger_ptr);
 }
 
 void GrSimBackend::onValueReceived(ConstPrimitiveVectorPtr primitives)
