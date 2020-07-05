@@ -7,7 +7,7 @@ PrimitiveMsg convertPrimitiveToNanoPb(const Primitive& primitive)
 {
     std::vector<uint8_t> serialized_proto = serializePrimitiveToProto(primitive);
 
-    PrimitiveMsg primitive_msg = PrimitiveMsg_init_zero;
+    PrimitiveMsg primitive_msg;// = PrimitiveMsg_init_zero;
 
     pb_istream_t pb_in_stream =
         pb_istream_from_buffer(static_cast<uint8_t*>(serialized_proto.data()),

@@ -17,16 +17,6 @@ def _nanopb_proto_library_impl(ctx):
             transitive = [all_proto_include_dirs, dep[ProtoInfo].transitive_proto_path],
         )
 
-    # TODO: delete print statements
-    #        print(dep[ProtoInfo].check_deps_sources)
-    #        print(dep[ProtoInfo].direct_descriptor_set)
-    #        print(dep[ProtoInfo].direct_sources)
-    #        print(dep[ProtoInfo].proto_source_root)
-    #        print(dep[ProtoInfo].transitive_descriptor_sets)
-    #        print(dep[ProtoInfo].transitive_imports)
-    #        print(dep[ProtoInfo].transitive_proto_path)
-    #        print(dep[ProtoInfo].transitive_sources)
-
     all_proto_hdr_files = []
     all_proto_src_files = []
 
@@ -85,6 +75,10 @@ def _nanopb_proto_library_impl(ctx):
         if label[CcInfo].linking_context != None
     ]
 
+    # The root folder for all generated files
+    generated_files_root = ctx.genfiles_dir.path + "/" + \
+                           ctx.build_file_path[:-len("BUILD")] + generation_folder_name
+
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = "compile_nanopb_outputs",
         actions = ctx.actions,
@@ -93,9 +87,8 @@ def _nanopb_proto_library_impl(ctx):
         srcs = all_proto_src_files,
         public_hdrs = all_proto_hdr_files,
         includes = [
-            ctx.genfiles_dir.path + "/" + ctx.build_file_path[:-len("BUILD")] +
-            generation_folder_name,
-        ],
+            generated_files_root,
+        ] + [generated_files_root + dir for dir in all_proto_include_dirs.to_list()],
         compilation_contexts = nanopb_compilation_contexts,
     )
 

@@ -108,8 +108,6 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     // then start it
     switch (primitive_msg.which_primitive)
     {
-        // TODO: consider changing this to arg parsing so that we don't have primitives
-        //       directly depending on proto
         case PrimitiveMsg_move_tag:
             manager->current_primitive = &MOVE_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();

@@ -64,7 +64,6 @@ int main(int argc, char* argv[])
     auto primitive_sender = std::make_unique<ThreadedProtoMulticastSender<PrimitiveMsg>>(
         std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]), PRIMITIVE_PORT);
 
-    // TODO: fix this
     auto status_listener =
         std::make_unique<ThreadedProtoMulticastListener<TbotsRobotMsg>>(
             std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),

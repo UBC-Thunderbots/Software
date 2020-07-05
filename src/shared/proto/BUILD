@@ -15,7 +15,7 @@ proto_library(
         "vision.proto",
     ],
     deps = [
-        "@nanopb//:nanopb_proto",
+        "@nanopb//:nanopb_options_proto",
     ],
 )
 

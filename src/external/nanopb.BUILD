@@ -25,19 +25,17 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
-# TODO: what does this comment apply to?
-# this library is linked with all c_proto_libraries
-# the generated h and c files access pb.h relatively, so
-# we strip external/nanopb to comply
-
 cc_library(
     name = "nanopb_header",
     hdrs = [
         "pb.h",
     ],
     defines = common_defines,
-    # TODO: for some reason if we remove this line it breaks.... figure out why and
-    #       fix root cause or at least add a comment
+    # NOTE: Even an empty `strip_include_prefix` is prepended with the external project
+    # path (ex. "external/nanopb") so that other targets can include headers by a path
+    # relative to this project root. Note that if `strip_include_prefix` is not specified
+    # *at all*, then all other libraries may *only* access headers from this lib via the
+    # full project path (ex. `external/nanopb/pb.h`).
     strip_include_prefix = "",
     visibility = ["//visibility:public"],
 )
@@ -49,9 +47,9 @@ py_binary(
 )
 
 proto_library(
-    name = "nanopb_proto",
-    srcs = ["generator/proto/nanopb.proto"],
-    strip_import_prefix = "generator/proto",
+    name = "nanopb_options_proto",
+    srcs = ["generator/nanopb/options.proto"],
+    strip_import_prefix = "generator/",
     deps = [
         "@com_google_protobuf//:descriptor_proto",
     ],
