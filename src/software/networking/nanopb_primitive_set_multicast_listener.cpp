@@ -23,6 +23,7 @@ void NanoPbPrimitiveSetMulticastListener::handleDataReception(std::vector<uint8_
 {
     std::map<RobotId, PrimitiveMsg> primitive_map;
 
+    // TODO: comments throughout this function to explain what the _heck_ we're doing
     auto handle_field_callback = [](pb_istream_t *istream, const pb_field_t *field, void **arg){
         auto map = static_cast<std::map<RobotId, PrimitiveMsg>*>(*arg);
         if (field->tag == PrimitiveSetMsg_robot_primitives_tag){
@@ -33,7 +34,6 @@ void NanoPbPrimitiveSetMulticastListener::handleDataReception(std::vector<uint8_
                 return false;
             }
             (*map)[primitive_map_entry.key] = primitive_map_entry.value;
-//            map->insert(primitive_map_entry.key, primitive_map_entry.value);
         }
         // TODO: what the heck does this return value mean?
         return true;
