@@ -19,11 +19,12 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_test(
     name = "linear_ball_model_test",
     srcs = ["linear_ball_model_test.cpp"],
     deps = [
         ":linear_ball_model",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

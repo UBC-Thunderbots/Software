@@ -4,7 +4,8 @@
 
 LinearBallModel::LinearBallModel(BallState initial_ball_state,
                                  std::optional<FrictionParameters> friction_parameters)
-    : initial_ball_state_(initial_ball_state), friction_parameters_(friction_parameters)
+    : initial_ball_state_(initial_ball_state),
+      friction_parameters_(initFrictionParameters(friction_parameters))
 {
 }
 
@@ -37,7 +38,9 @@ BallState LinearBallModel::applyLinearFrictionModel(
     if (initial_velocity_length > friction_parameters.rolling_sliding_speed_threshold)
     {
         double seconds_until_rolling =
-            initial_velocity_length / friction_parameters.sliding_friction_acceleration;
+            (initial_velocity_length -
+             friction_parameters.rolling_sliding_speed_threshold) /
+            friction_parameters.sliding_friction_acceleration;
         if (seconds_in_future <= seconds_until_rolling)
         {
             return calculateFutureBallState(
@@ -49,9 +52,24 @@ BallState LinearBallModel::applyLinearFrictionModel(
             BallState initial_rolling_state = calculateFutureBallState(
                 initial_ball_state, friction_parameters.sliding_friction_acceleration,
                 seconds_until_rolling);
-            return calculateFutureBallState(
-                initial_rolling_state, friction_parameters.rolling_friction_acceleration,
-                seconds_in_future - seconds_until_rolling);
+            double seconds_to_spend_rolling = seconds_in_future - seconds_until_rolling;
+            double seconds_until_stopped =
+                initial_rolling_state.velocity().length() /
+                friction_parameters.rolling_friction_acceleration;
+            if (seconds_to_spend_rolling <= seconds_until_stopped)
+            {
+                return calculateFutureBallState(
+                    initial_rolling_state,
+                    friction_parameters.rolling_friction_acceleration,
+                    seconds_to_spend_rolling);
+            }
+            else
+            {
+                return calculateFutureBallState(
+                    initial_rolling_state,
+                    friction_parameters.rolling_friction_acceleration,
+                    seconds_until_stopped);
+            }
         }
     }
     else
@@ -75,4 +93,21 @@ BallState LinearBallModel::calculateFutureBallState(BallState initial_ball_state
         initial_ball_state.velocity(), acceleration_vector, seconds_in_future);
 
     return BallState(future_position, future_velocity);
+}
+
+std::optional<LinearBallModel::FrictionParameters>
+LinearBallModel::initFrictionParameters(std::optional<FrictionParameters> fp)
+{
+    if (fp)
+    {
+        return FrictionParameters{
+            .rolling_friction_acceleration = std::abs(fp->rolling_friction_acceleration),
+            .sliding_friction_acceleration = std::abs(fp->sliding_friction_acceleration),
+            .rolling_sliding_speed_threshold =
+                std::abs(fp->rolling_sliding_speed_threshold)};
+    }
+    else
+    {
+        return std::nullopt;
+    }
 }

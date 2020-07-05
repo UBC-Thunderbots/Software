@@ -23,5 +23,5 @@ class BallModel
      *
      * @return The future state of the ball
      */
-    virtual BallState estimateFutureState(double seconds_in_future);
+    virtual BallState estimateFutureState(double seconds_in_future) = 0;
 };
