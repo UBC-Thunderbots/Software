@@ -10,14 +10,15 @@ ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
     : multicast_listener(
           io_service, ip_address, port,
           boost::bind(&ProtoMulticastListener<ReceiveProtoT>::handleDataReception, this,
-                      _1))
+                      _1)),
+                      receive_callback(receive_callback)
 {
 }
 
 template <class ReceiveProtoT>
 void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(std::vector<uint8_t>& data)
 {
-    auto packet_data = ReceiveProtoT();
+    ReceiveProtoT packet_data;
     const bool parsing_succeeded =
         packet_data.ParseFromArray(data.data(), static_cast<int>(data.size()));
     if (!parsing_succeeded)
