@@ -58,8 +58,8 @@ class LinearBallModel : public BallModel
      * Calculates the future ball state assuming constant acceleration opposing the
      * velocity of the ball
      *
-     * @param initial_position initial_position of the ball
-     * @param initial_velocity initial_velocity of the ball
+     * @param initial_position The initial position of the ball
+     * @param initial_velocity The initial velocity of the ball
      * @param friction_acceleration The magnitude of the acceleration due to friction
      * @param seconds_in_future number of seconds into the future
      *
