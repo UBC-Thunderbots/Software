@@ -47,7 +47,7 @@ void Ball::updateState(const TimestampedBallState &new_state)
         throw std::invalid_argument(
             "Error: Trying to update ball state using a state older then the current state");
     }
-
+    ball_model_ = std::make_shared<LinearBallModel>(LinearBallModel(new_state.state()));
     states_.push_front(new_state);
 }
 
