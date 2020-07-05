@@ -113,11 +113,7 @@ void SimulatedTestFixture::setRefboxGameState(
 
 void SimulatedTestFixture::enableVisualizer()
 {
-    // We mock empty argc and argv since we don't have access to them when running
-    // tests These arguments do not matter for simply running the FullSystemGUI
-    char *argv[]               = {NULL};
-    int argc                   = sizeof(argv) / sizeof(char *) - 1;
-    visualizer                 = std::make_shared<ThreadedFullSystemGUI>(argc, argv);
+    full_system_gui            = std::make_shared<ThreadedFullSystemGUI>();
     run_simulation_in_realtime = true;
 }
 
@@ -224,11 +220,11 @@ void SimulatedTestFixture::runTest(
                     std::move(primitives));
             simulator->setYellowRobotPrimitives(primitives_ptr);
 
-            if (visualizer)
+            if (full_system_gui)
             {
-                visualizer->onValueReceived(*world);
-                visualizer->onValueReceived(ai.getPlayInfo());
-                visualizer->onValueReceived(drawNavigator(ai.getNavigator()));
+                full_system_gui->onValueReceived(*world);
+                full_system_gui->onValueReceived(ai.getPlayInfo());
+                full_system_gui->onValueReceived(drawNavigator(ai.getNavigator()));
             }
         }
         else

@@ -110,7 +110,7 @@ int main(int argc, char **argv)
         backend->Subject<World>::registerObserver(ai);
         if (!args.headless)
         {
-            visualizer = std::make_shared<ThreadedFullSystemGUI>(argc, argv);
+            visualizer = std::make_shared<ThreadedFullSystemGUI>();
 
             backend->Subject<World>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
