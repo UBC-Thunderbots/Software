@@ -120,8 +120,9 @@ class Simulator
      * in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * TODO: jdoc here
-     */ void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+     * @param primitive_msg The primitive to run on the robot
+     */
+    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
     void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
 
     /**
@@ -191,7 +192,7 @@ class Simulator
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * TODO: jdoc here
+     * @param primitive_msg The primitive to run on the robot
      * @param simulator_robots The robots to set the primitives on
      * @param simulator_ball The simulator ball to use in the primitives
      */

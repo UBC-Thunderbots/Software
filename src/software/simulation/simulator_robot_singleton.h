@@ -97,7 +97,7 @@ class SimulatorRobotSingleton
      * class
      *
      * @param firmware_world The world to run the primitive in
-     * TODO: jdoc here
+     * @param primitive_msg The primitive to start
      */
     static void startNewPrimitiveOnCurrentSimulatorRobot(
         std::shared_ptr<FirmwareWorld_t> firmware_world, const PrimitiveMsg& primitive_msg);

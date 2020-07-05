@@ -45,11 +45,11 @@ class StandaloneSimulator
     void setupInitialSimulationState();
 
    private:
+
     /**
      * Sets the primitives being simulated by the robots on the respective team
      *
-     * // TODO:  update jdoc
-     * @param msg The primitives to set on the respective team
+     * @param primitive_set_msg The set of primitives to run on the respective team
      */
     void setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg);
     void setBlueRobotPrimitives(PrimitiveSetMsg primitive_set_msg);

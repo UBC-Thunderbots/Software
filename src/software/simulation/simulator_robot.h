@@ -222,7 +222,7 @@ class SimulatorRobot
      * Sets the current primitive this robot is running to a new one
      *
      * @param firmware_world The world to run the primitive in
-     * TODO: jdoc here
+     * @param primitive_msg The primitive to start
      */
     void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
                            const PrimitiveMsg& primitive_msg);

@@ -37,8 +37,6 @@ void ProtoCreatorPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
     params->set_extra_bits(static_cast<uint8_t>(2 | 1));
     params->set_slow(false);
 
-    // TODO: file issue to unify chip and kick primitives if they're mapping to the same
-    //       underlying primitive
     prim = PrimitiveMsg();
     prim->set_allocated_shoot(params);
 }
