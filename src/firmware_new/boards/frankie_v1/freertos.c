@@ -30,8 +30,8 @@
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
 #include "shared/constants.h"
-#include "shared/proto/tbots_robot_msg.pb.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
+#include "shared/proto/tbots_robot_msg.nanopb.h"
+#include "shared/proto/tbots_software_msgs.nanopb.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
