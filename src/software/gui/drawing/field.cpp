@@ -3,6 +3,7 @@
 #include <QtWidgets/QGraphicsSimpleTextItem>
 
 #include "software/gui/drawing/geom.h"
+#include "external/qt/QtCore/Qt"
 
 void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)
 {
@@ -33,6 +34,11 @@ void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,
     QPen pen(Qt::transparent);
     pen.setWidth(0);
     pen.setCosmetic(true);
+
+    QBrush brush(Qt::white, Qt::BrushStyle::SolidPattern);
+
+    drawRectangle(scene, field.friendlyGoal(), pen, brush);
+    drawRectangle(scene, field.enemyGoal(), pen, brush);
 
     QBrush friendly_goal_brush(friendly_goal_colour, Qt::BrushStyle::SolidPattern);
     QBrush enemy_goal_brush(enemy_goal_colour, Qt::BrushStyle::SolidPattern);

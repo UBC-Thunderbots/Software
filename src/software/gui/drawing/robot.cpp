@@ -136,7 +136,7 @@ void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColo
     drawRobotAtPosition(scene, robot.robot_state.position(),
                         robot.robot_state.orientation(), color);
     drawRobotVelocity(scene, robot.robot_state.position(), robot.robot_state.velocity(),
-                      robot_speed_slow_color, robot_speed_fast_color);
+                      robot_speed_slow_color, color);
     drawRobotId(scene, robot.robot_state.position(), robot.id);
 
     // TODO: Show robot charge state
