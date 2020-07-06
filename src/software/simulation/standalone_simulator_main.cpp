@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     {
         // TODO remove this when we move to non-generic factories for backends
         // https://github.com/UBC-Thunderbots/Software/issues/1452
-        MutableDynamicParameters->getMutableNetworkConfig()
+        MutableDynamicParameters->getMutableStandaloneSimulatorConfig()
             ->mutableNetworkInterface()
             ->setValue(args.network_interface_name);
 
