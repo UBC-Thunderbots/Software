@@ -7,7 +7,7 @@ NetworkConfig:
       description: >-
           The multicast channel to join to communicate with the robots
     NetworkInterface:
-      default: "wlp3s0"
+      default: "eth0"
       type: "std::string"
       description: >-
           The network interface that is connected to the thunderbots router.
@@ -30,7 +30,7 @@ NetworkConfig:
       GamecontrollerPort:
         min: 1
         max: 65535
-        default: 10003
+        default: 10020
         type: "int"
         description: The port to listen on for gamecontroller data
 
