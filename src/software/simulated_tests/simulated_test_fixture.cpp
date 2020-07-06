@@ -154,10 +154,6 @@ void SimulatedTestFixture::sleep(
     auto wall_time_since_sim_start =
         std::chrono::duration_cast<std::chrono::milliseconds>(wall_time_now -
                                                               wall_start_time);
-
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
     auto ms_to_sleep =
         std::chrono::milliseconds(static_cast<int>(current_time.getMilliseconds())) -
         wall_time_since_sim_start;

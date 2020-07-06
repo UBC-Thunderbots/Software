@@ -21,7 +21,6 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
     // See the "Breakdown of a collision" section of:
     // https://www.iforce2d.net/b2dtut/collision-anatomy
     ball_body_def.bullet = true;
-    ball_body_def.linearDamping = 0.7f;
     ball_body            = world->CreateBody(&ball_body_def);
 
     b2CircleShape ball_shape;
