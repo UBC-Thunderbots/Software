@@ -6,7 +6,7 @@
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 
-ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, std::shared_ptr<SimulatorCommandsConfig> config)
+ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, const std::function<void(StandaloneSimulator::SimulationMode)>& simulation_mode_callback)
     : ThreadedObserver<SSL_WrapperPacket>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
@@ -14,11 +14,10 @@ ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(const std::functi
       view_area_buffer(
           std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
       application_shutting_down(false),
-      remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA),
-      config(config)
+      remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
     run_standalone_simulator_gui_thread = std::thread(
-        &ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI, this, ball_placement_callback);
+        &ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI, this, ball_placement_callback, simulation_mode_callback);
 }
 
 ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
@@ -35,7 +34,7 @@ ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
     run_standalone_simulator_gui_thread.join();
 }
 
-void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback)
+void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, const std::function<void(StandaloneSimulator::SimulationMode)>& simulation_mode_callback)
 {
     // We mock empty argc and argv since they don't affect the behaviour of the GUI.
     // This way we don't need to pass them all the way down from the start of the
@@ -50,8 +49,9 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(const st
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
     StandaloneSimulatorGUI* standalone_simulator_gui =
-        new StandaloneSimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer, config);
+        new StandaloneSimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer);
     standalone_simulator_gui->registerBallPlacementCallback(ball_placement_callback);
+    standalone_simulator_gui->registerSimulationModeCallback(simulation_mode_callback);
     standalone_simulator_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block

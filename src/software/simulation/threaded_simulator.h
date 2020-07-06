@@ -50,10 +50,23 @@ class ThreadedSimulator
     void stopSimulation();
 
     /**
-     * TODO
-     * @param multiplier
+     * Sets the slow motion multiplier for the simulation. Larger values
+     * cause the simulation to run in slow motion. For example, a value
+     * of 2.0 causes the simulation to run 2x slower.
+     *
+     * Note: This function is threadsafe
+     *
+     * @pre value is >= 1.0
+     *
+     * @param multiplier The slow motion multiplier
      */
     void setSlowMotionMultiplier(double multiplier);
+
+    /**
+     * Resets the slow motion multiplier value to let the simulation
+     * run in real-time speed.
+     */
+    void resetSlowMotionMultiplier();
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist

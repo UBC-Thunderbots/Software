@@ -14,6 +14,7 @@ cc_library(
         "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
         "//software/proto/message_translation:ssl_geometry",
+        "//software/simulation:standalone_simulator",
         "@qt//:qt_widgets",
     ],
 )

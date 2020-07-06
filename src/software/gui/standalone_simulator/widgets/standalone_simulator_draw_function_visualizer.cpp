@@ -10,8 +10,7 @@ void StandaloneSimulatorDrawFunctionVisualizer::registerBallPlacementCallback(co
 }
 
 void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* event) {
-
-    // If Ctrl is pressed, place the ball
+    // If Ctrl is pressed, place the ball where the user clicks
     if (event->modifiers() & Qt::ControlModifier) {
         Point point_in_scene = createPoint(mapToScene(event->pos()));
         for(const auto& callback : ball_placement_callbacks) {

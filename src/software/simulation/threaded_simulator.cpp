@@ -46,7 +46,15 @@ void ThreadedSimulator::stopSimulation()
 }
 
 void ThreadedSimulator::setSlowMotionMultiplier(double multiplier) {
+    if(multiplier < 1.0) {
+        throw std::invalid_argument("Slow motion multiplier must by >= 1.0");
+    }
+
     slow_motion_multiplier = multiplier;
+}
+
+void ThreadedSimulator::resetSlowMotionMultiplier() {
+    setSlowMotionMultiplier(1.0);
 }
 
 void ThreadedSimulator::setBallState(const BallState &ball_state)

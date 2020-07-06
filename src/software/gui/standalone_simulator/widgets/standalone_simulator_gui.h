@@ -8,7 +8,7 @@
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/new_geom/rectangle.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "software/simulation/standalone_simulator.h"
 
 /**
  * This class is the main application window for the StandaloneSimulatorGUI.
@@ -32,10 +32,23 @@ class StandaloneSimulatorGUI : public QMainWindow
      */
     explicit StandaloneSimulatorGUI(
         std::shared_ptr<ThreadSafeBuffer<SSL_WrapperPacket>> ssl_wrapper_packet_buffer,
-        std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
-        std::shared_ptr<SimulatorCommandsConfig> config);
+        std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer);
 
+    /**
+     * Register a callback that will be called when the user requests to place the ball
+     * in the GUI.
+     *
+     * @param callback The callback to register
+     */
     void registerBallPlacementCallback(const std::function<void(Point)>& callback);
+
+    /**
+     * Register a callback that will be called when the user changed the SimulationMode
+     * in the GUI
+     *
+     * @param callback The callback to register
+     */
+    void registerSimulationModeCallback(const std::function<void(StandaloneSimulator::SimulationMode)>& callback);
 
    private:
     /**
@@ -64,7 +77,7 @@ class StandaloneSimulatorGUI : public QMainWindow
     std::shared_ptr<ThreadSafeBuffer<SSL_WrapperPacket>> ssl_wrapper_packet_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
 
-    std::shared_ptr<SimulatorCommandsConfig> config;
+    std::vector<std::function<void(StandaloneSimulator::SimulationMode)>> simulation_mode_callbacks;
 
     static constexpr double UPDATE_INTERVAL_SECONDS = 1.0 / 60.0;
 };

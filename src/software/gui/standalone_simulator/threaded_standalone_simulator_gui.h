@@ -11,6 +11,7 @@
 #include "software/new_geom/rectangle.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/simulation/standalone_simulator.h"
 
 /**
  * This class wraps a StandaloneSimulatorGUI object so it can run independently
@@ -20,7 +21,15 @@
 class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket>
 {
    public:
-    explicit ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, std::shared_ptr<SimulatorCommandsConfig> config);
+    /**
+     * Creates a new ThreadedStandaloneSimulatorGUI
+     *
+     * @param ball_placement_callback A callback that will be called when the user places the ball
+     * in the GUI
+     * @param simulation_mode_callback A callback that will be called when the user sets the
+     * simulation mode in the GUI
+     */
+    explicit ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, const std::function<void(StandaloneSimulator::SimulationMode)>& simulation_mode_callback);
 
     ~ThreadedStandaloneSimulatorGUI() override;
 
@@ -43,7 +52,7 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
      * created in the same context as the QApplication (which in this case is the new
      * thread).
      */
-    void createAndRunStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback);
+    void createAndRunStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, const std::function<void(StandaloneSimulator::SimulationMode)>& simulation_mode_callback);
 
     std::thread run_standalone_simulator_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
@@ -70,6 +79,4 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
 
     std::atomic_bool application_shutting_down;
     int remaining_attempts_to_set_view_area;
-
-    std::shared_ptr<SimulatorCommandsConfig> config;
 };
