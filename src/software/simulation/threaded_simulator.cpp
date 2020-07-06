@@ -1,7 +1,10 @@
 #include "software/simulation/threaded_simulator.h"
 
 ThreadedSimulator::ThreadedSimulator(const Field &field)
-    : simulator(field), simulation_thread_started(false), stopping_simulation(false), slow_motion_multiplier(1.0)
+    : simulator(field),
+      simulation_thread_started(false),
+      stopping_simulation(false),
+      slow_motion_multiplier(1.0)
 {
 }
 
@@ -45,15 +48,18 @@ void ThreadedSimulator::stopSimulation()
     }
 }
 
-void ThreadedSimulator::setSlowMotionMultiplier(double multiplier) {
-    if(multiplier < 1.0) {
+void ThreadedSimulator::setSlowMotionMultiplier(double multiplier)
+{
+    if (multiplier < 1.0)
+    {
         throw std::invalid_argument("Slow motion multiplier must by >= 1.0");
     }
 
     slow_motion_multiplier = multiplier;
 }
 
-void ThreadedSimulator::resetSlowMotionMultiplier() {
+void ThreadedSimulator::resetSlowMotionMultiplier()
+{
     setSlowMotionMultiplier(1.0);
 }
 
@@ -132,14 +138,16 @@ void ThreadedSimulator::runSimulationLoop()
         auto simulation_step_end_time =
             simulation_step_start_time +
             std::chrono::microseconds(
-                static_cast<unsigned int>(slow_motion_multiplier.load() * TIME_STEP_SECONDS * MICROSECONDS_PER_SECOND));
+                static_cast<unsigned int>(slow_motion_multiplier.load() *
+                                          TIME_STEP_SECONDS * MICROSECONDS_PER_SECOND));
         // TODO: Warn or indicate if we are running slower than real-time
         // https://github.com/UBC-Thunderbots/Software/issues/1491
         std::this_thread::sleep_until(simulation_step_end_time);
     }
 }
 
-void ThreadedSimulator::updateCallbacks() {
+void ThreadedSimulator::updateCallbacks()
+{
     simulator_mutex.lock();
     auto ssl_wrapper_packet_ptr = simulator.getSSLWrapperPacket();
     simulator_mutex.unlock();

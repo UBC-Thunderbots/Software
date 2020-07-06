@@ -48,7 +48,8 @@ class StandaloneSimulatorGUI : public QMainWindow
      *
      * @param callback The callback to register
      */
-    void registerSimulationModeCallback(const std::function<void(StandaloneSimulator::SimulationMode)>& callback);
+    void registerSimulationModeCallback(
+        const std::function<void(StandaloneSimulator::SimulationMode)>& callback);
 
    private:
     /**
@@ -77,7 +78,8 @@ class StandaloneSimulatorGUI : public QMainWindow
     std::shared_ptr<ThreadSafeBuffer<SSL_WrapperPacket>> ssl_wrapper_packet_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
 
-    std::vector<std::function<void(StandaloneSimulator::SimulationMode)>> simulation_mode_callbacks;
+    std::vector<std::function<void(StandaloneSimulator::SimulationMode)>>
+        simulation_mode_callbacks;
 
     static constexpr double UPDATE_INTERVAL_SECONDS = 1.0 / 60.0;
 };

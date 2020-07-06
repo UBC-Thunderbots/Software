@@ -9,8 +9,8 @@
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/new_geom/rectangle.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/standalone_simulator.h"
 
 /**
@@ -24,12 +24,15 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
     /**
      * Creates a new ThreadedStandaloneSimulatorGUI
      *
-     * @param ball_placement_callback A callback that will be called when the user places the ball
-     * in the GUI
-     * @param simulation_mode_callback A callback that will be called when the user sets the
-     * simulation mode in the GUI
+     * @param ball_placement_callback A callback that will be called when the user places
+     * the ball in the GUI
+     * @param simulation_mode_callback A callback that will be called when the user sets
+     * the simulation mode in the GUI
      */
-    explicit ThreadedStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, const std::function<void(StandaloneSimulator::SimulationMode)>& simulation_mode_callback);
+    explicit ThreadedStandaloneSimulatorGUI(
+        const std::function<void(Point)>& ball_placement_callback,
+        const std::function<void(StandaloneSimulator::SimulationMode)>&
+            simulation_mode_callback);
 
     ~ThreadedStandaloneSimulatorGUI() override;
 
@@ -52,7 +55,10 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
      * created in the same context as the QApplication (which in this case is the new
      * thread).
      */
-    void createAndRunStandaloneSimulatorGUI(const std::function<void(Point)>& ball_placement_callback, const std::function<void(StandaloneSimulator::SimulationMode)>& simulation_mode_callback);
+    void createAndRunStandaloneSimulatorGUI(
+        const std::function<void(Point)>& ball_placement_callback,
+        const std::function<void(StandaloneSimulator::SimulationMode)>&
+            simulation_mode_callback);
 
     std::thread run_standalone_simulator_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;

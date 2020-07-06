@@ -8,10 +8,10 @@
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <limits>
 
 #include "software/logger/logger.h"
 #include "software/util/variant_visitor/variant_visitor.h"
-#include <limits>
 
 DynamicParameterWidget::DynamicParameterWidget(QWidget* parent) : QScrollArea(parent)
 {
@@ -110,7 +110,8 @@ QWidget* DynamicParameterWidget::createIntegerParameter(
     QSpinBox* spinbox = new QSpinBox(widget);
     // TODO: set range to the range of the parameter
     // https://github.com/UBC-Thunderbots/Software/issues/1581
-    spinbox->setRange(std::numeric_limits<int>::lowest(), std::numeric_limits<int>::max());
+    spinbox->setRange(std::numeric_limits<int>::lowest(),
+                      std::numeric_limits<int>::max());
     spinbox->setValue(parameter->value());
 
     layout->addWidget(label);
@@ -153,7 +154,8 @@ QWidget* DynamicParameterWidget::createDoubleParameter(
     QDoubleSpinBox* spinbox = new QDoubleSpinBox(widget);
     // TODO: set range to the range of the parameter
     // https://github.com/UBC-Thunderbots/Software/issues/1581
-    spinbox->setRange(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max());
+    spinbox->setRange(std::numeric_limits<double>::lowest(),
+                      std::numeric_limits<double>::max());
     spinbox->setValue(parameter->value());
     spinbox->setSingleStep(0.05);
 

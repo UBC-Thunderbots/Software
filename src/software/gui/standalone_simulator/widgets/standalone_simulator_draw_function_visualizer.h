@@ -8,10 +8,11 @@
  * A custom version of the DrawFunctionVisualizer widget that allows the user to
  * interact with the simulation, such as clicking to place the ball
  */
-class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer {
+class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
+{
     Q_OBJECT
 
-public:
+   public:
     StandaloneSimulatorDrawFunctionVisualizer(QWidget* parent = 0);
 
     /**
@@ -22,7 +23,7 @@ public:
      */
     void registerBallPlacementCallback(const std::function<void(Point)>& callback);
 
-private:
+   private:
     void mousePressEvent(QMouseEvent* event) override;
 
     std::vector<std::function<void(Point)>> ball_placement_callbacks;

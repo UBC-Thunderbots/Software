@@ -30,10 +30,12 @@ QLineF createQLineF(const Segment& segment)
     return QLineF(createQPointF(segment.getSegStart()), createQPointF(segment.getEnd()));
 }
 
-Point createPoint(const QPointF& point) {
+Point createPoint(const QPointF& point)
+{
     return Point(point.x(), point.y());
 }
 
-Point createPoint(const QPoint& point) {
+Point createPoint(const QPoint& point)
+{
     return Point(static_cast<double>(point.x()), static_cast<double>(point.y()));
 }

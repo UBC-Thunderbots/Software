@@ -15,11 +15,12 @@
 class StandaloneSimulator
 {
    public:
-     enum class SimulationMode {
-         PLAY,
-         PAUSE,
-         SLOW_MOTION
-     };
+    enum class SimulationMode
+    {
+        PLAY,
+        PAUSE,
+        SLOW_MOTION
+    };
 
     /**
      * Creates a new StandaloneSimulator, and starts the simulation.
