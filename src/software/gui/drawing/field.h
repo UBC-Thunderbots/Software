@@ -52,8 +52,8 @@ void drawGoals(QGraphicsScene* scene, const Field& field, QPen pen);
  *
  * @param scene The scene to draw on
  * @param field The field to draw
- * @param friendly_goal_colour The colour the highlight the friendly goal
- * @param enemy_goal_colour The colour the highlight the enemy goal
+ * @param friendly_goal_colour The colour to highlight the friendly goal
+ * @param enemy_goal_colour The colour to highlight the enemy goal
  */
 void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,
                           const QColor& friendly_goal_colour,
