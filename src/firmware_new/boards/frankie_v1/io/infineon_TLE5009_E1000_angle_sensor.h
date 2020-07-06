@@ -14,7 +14,9 @@ typedef struct InfineonTLE5009E1000AngleSensor InfineonTLE5009E1000AngleSensor_t
 /**
  * Creates an Infineon TLE5009 E1000 abstraction given the calibration parameters
  *
- * NOTE: The values here are the 'mean' values described in the data sheet. The mean is equal to the summed average of the clock-wise and counter clock-wise calibration values.
+ * NOTE: The values here are the 'mean' values described in the data sheet. The mean is
+ * equal to the summed average of the clock-wise and counter clock-wise calibration
+ * values.
  *
  * @param x_max_value [in] The maximum value observed over a full period of the X output
  * waveform
@@ -34,8 +36,8 @@ typedef struct InfineonTLE5009E1000AngleSensor InfineonTLE5009E1000AngleSensor_t
  * @param y_magnitude_45_degrees [in] The Y waveform magnitude at 45 degrees (as read by
  * the sensor)
  *
- * @param x_magnitude_135_degrees [in] The X waveform magnitude at 135 degrees (as read by the
- * sensor)
+ * @param x_magnitude_135_degrees [in] The X waveform magnitude at 135 degrees (as read by
+ * the sensor)
  *
  * @param y_magnitude_135_degrees [in] The Y waveform magnitude at 135 degrees (as read by
  * the sensor)

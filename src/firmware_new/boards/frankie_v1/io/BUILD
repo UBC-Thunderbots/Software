@@ -35,7 +35,15 @@ cc_library(
     name = "infineon_TLE009_E1000_angle_sensor",
     srcs = ["infineon_TLE5009_E1000_angle_sensor.c"],
     hdrs = ["infineon_TLE5009_E1000_angle_sensor.h"],
-    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+cc_test(
+    name = "infineon_TLE009_E1000_angle_sensor_test",
+    srcs = ["infineon_TLE5009_E1000_angle_sensor_test.cpp"],
+    deps = [
+        "//firmware_new/boards/frankie_v1/io:infineon_TLE009_E1000_angle_sensor",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_library(

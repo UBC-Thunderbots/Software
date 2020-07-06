@@ -10,8 +10,7 @@ struct InfineonTLE5009E1000AngleSensor
     // Mean value offset
     float O_x;
     float O_y;
-    // Phase offsets
-    float phase_offset_x_rad;
+    // Phase offset
     float phase_difference_offset_rad;
 };
 
@@ -20,11 +19,10 @@ InfineonTLE5009E1000AngleSensor_t* io_infineon_TLE5009_E1000_create(
     float x_magnitude_45_degrees, float y_magnitude_45_degrees,
     float x_magnitude_135_degrees, float y_magnitude_135_degrees)
 {
-    /* This function intentionally uses variable names identical to the sensor data-sheet
-    * Datasheet:
-    * https://www.infineon.com/dgdl/Infineon-TLE5009_FDS-DataSheet-v01_01-en.pdf?fileId=db3a304330f686060131421d8ddd56b0
-    * Calibration on page 19.
-    */
+    // This function intentionally uses variable names identical to the sensor data-sheet
+    // Datasheet:
+    // https://www.infineon.com/dgdl/Infineon-TLE5009_FDS-DataSheet-v01_01-en.pdf?fileId=db3a304330f686060131421d8ddd56b0
+    // Calibration on page 19
 
     // Calculate the amplitudes
     const float A_x = (x_max_value - x_min_value) / 2;
@@ -43,7 +41,8 @@ InfineonTLE5009E1000AngleSensor_t* io_infineon_TLE5009_E1000_create(
 
     // Create and initialize struct
     InfineonTLE5009E1000AngleSensor_t* sensor =
-        (InfineonTLE5009E1000AngleSensor_t*)malloc(sizeof(InfineonTLE5009E1000AngleSensor_t));
+        (InfineonTLE5009E1000AngleSensor_t*)malloc(
+            sizeof(InfineonTLE5009E1000AngleSensor_t));
     sensor->A_x                         = A_x;
     sensor->A_y                         = A_y;
     sensor->O_x                         = O_x;
