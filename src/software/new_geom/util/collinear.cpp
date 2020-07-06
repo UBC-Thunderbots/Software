@@ -27,3 +27,14 @@ bool collinear(const Point &a, const Point &b, const Point &c, double fixed_epsi
     Vector v2 = c - a;
     return almostEqual(v1.x() * v2.y(), v1.y() * v2.x(), fixed_epsilon, ulps_epsilon);
 }
+
+bool collinear(const Segment &segment1, const Segment &segment2)
+{
+    // Two segments are collinear if all Points are collinear
+    if (collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) &&
+        collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()))
+    {
+        return true;
+    }
+    return false;
+}
