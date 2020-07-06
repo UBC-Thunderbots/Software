@@ -63,7 +63,7 @@ class StandaloneSimulator
      * cause the simulation to run in slow motion. For example, a value
      * of 2.0 causes the simulation to run 2x slower.
      *
-     * @pre value is >= 1.0
+     * @pre multiplier is >= 1.0
      *
      * @param multiplier The slow motion multiplier
      */
@@ -81,7 +81,7 @@ class StandaloneSimulator
      * is added with the given state. If a ball already exists, it's state is set to the
      * given state.
      *
-     * @param ball_state The new ball state
+     * @param state The new ball state
      */
     void setBallState(const BallState& state);
 
