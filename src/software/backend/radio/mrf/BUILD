@@ -1,4 +1,4 @@
-package(default_visibility = ["//visibility:private"])
+package(default_visibility = ["//software/backend/radio:__subpackages__"])
 
 cc_library(
     name = "messages",

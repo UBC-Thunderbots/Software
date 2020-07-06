@@ -4,7 +4,16 @@
 #include <string>
 #include <vector>
 
+#include "software/backend/radio/mrf/messages.h"
 #include "software/logger/logger.h"
+
+static const std::map<const std::string, ErrorCode> dongle_message_error_codes = {
+    {MRF::ESTOP_BROKEN_MESSAGE, ErrorCode::ESTOP_BROKEN},
+    {MRF::RX_FCS_FAIL_MESSAGE, ErrorCode::RX_FCS_FAIL},
+    {MRF::SECOND_DONGLE_MESSAGE, ErrorCode::SECOND_DONGLE},
+    {MRF::TRANSMIT_QUEUE_FULL_MESSAGE, ErrorCode::TRANSMIT_QUEUE_FULL},
+    {MRF::RECEIVE_QUEUE_FULL_MESSAGE, ErrorCode::RECEIVE_QUEUE_FULL},
+    {MRF::PACKET_ABOVE_MAX_SIZE, ErrorCode::PACKET_ABOVE_MAX_SIZE}};
 
 std::unique_ptr<TbotsRobotMsg> convertRobotStatusToTbotsRobotMsg(
     const RobotStatus& robot_status)
@@ -15,7 +24,6 @@ std::unique_ptr<TbotsRobotMsg> convertRobotStatusToTbotsRobotMsg(
 
     robot_msg->set_robot_id(robot_status.robot);
 
-    ErrorCode error_code;
     for (auto& msg : robot_status.robot_messages)
     {
         // Parse error message into enum string representation
@@ -27,6 +35,7 @@ std::unique_ptr<TbotsRobotMsg> convertRobotStatusToTbotsRobotMsg(
         std::replace(enum_string.begin(), enum_string.end(), ' ', '_');
 
         // Map error message string to corresponding enum
+        ErrorCode error_code;
         bool errorCodeSuccess = ErrorCode_Parse(enum_string, &error_code);
         // If it is a valid error message, add to error_code
         if (errorCodeSuccess)
@@ -35,7 +44,20 @@ std::unique_ptr<TbotsRobotMsg> convertRobotStatusToTbotsRobotMsg(
         }
         else
         {
-            LOG(WARNING) << "'" << msg << "' is not a verified ErrorCode." << std::endl;
+            LOG(WARNING) << "'" << msg << "' is not a valid ErrorCode." << std::endl;
+        }
+    }
+
+    for (auto& msg : robot_status.dongle_messages)
+    {
+        auto error_code_it = dongle_message_error_codes.find(msg);
+        if (error_code_it != dongle_message_error_codes.end())
+        {
+            robot_msg->add_error_code(error_code_it->second);
+        }
+        else
+        {
+            LOG(WARNING) << "'" << msg << "' is not a valid ErrorCode." << std::endl;
         }
     }
 
