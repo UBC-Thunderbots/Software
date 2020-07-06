@@ -6,16 +6,27 @@
 #include "software/new_geom/segment.h"
 
 void drawBallVelocity(QGraphicsScene *scene, const Point &position,
-                      const Vector &velocity, const QColor &color)
+                      const Vector &velocity, const QColor& slow_colour, const QColor& fast_colour)
 {
-    QPen pen(color);
-    pen.setWidth(2);
+    double speed = velocity.length();
+
+    auto r = normalizeValueToRange<double>(speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, slow_colour.redF(), fast_colour.redF());
+    auto g = normalizeValueToRange<double>(speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, slow_colour.greenF(), fast_colour.greenF());
+    auto b = normalizeValueToRange<double>(speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, slow_colour.blueF(), fast_colour.blueF());
+    auto colour = QColor::fromRgbF(r, g, b);
+
+    QPen pen(colour);
+    pen.setWidth(3);
     // The cap style must be NOT be set to SquareCap. It can be set to anything else.
     // Drawing a line of length 0 with the SquareCap style causes a large line to be drawn
     pen.setCapStyle(Qt::PenCapStyle::RoundCap);
     pen.setCosmetic(true);
 
-    drawSegment(scene, Segment(position, position + velocity), pen);
+    // A somewhat arbitrary value that we've determined looks nice in the GUI
+    const double max_velocity_line_length = 1.0;
+    auto line_length = normalizeValueToRange<double>(speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, 0.0, max_velocity_line_length);
+
+    drawSegment(scene, Segment(position, position + velocity.normalize(line_length)), pen);
 }
 
 void drawBallPosition(QGraphicsScene *scene, const Point &position,
@@ -43,7 +54,7 @@ void drawBallPosition(QGraphicsScene *scene, const Point &position,
 void drawBall(QGraphicsScene *scene, const BallState &ball)
 {
     drawBallPosition(scene, ball.position(), ball.distanceFromGround(), ball_color);
-    drawBallVelocity(scene, ball.position(), ball.velocity(), ball_color);
+    drawBallVelocity(scene, ball.position(), ball.velocity(), ball_speed_slow_color, ball_speed_fast_color);
 }
 
 void drawBall(QGraphicsScene *scene, const BallDetection &ball)
