@@ -2,14 +2,16 @@
 
 #include <QtGui/QColor>
 
-const QColor ball_color(255, 100, 0, 255);
-const QColor friendly_team_color(50, 255, 50, 255);
-const QColor enemy_team_color(255, 50, 50, 255);
-const QColor yellow_robot_color(255, 255, 0, 255);
-const QColor blue_robot_color(0, 0, 255, 255);
+const QColor field_color = Qt::darkGreen;
 const QColor field_line_color     = Qt::white;
-const QColor navigator_path_color = Qt::darkBlue;
+const QColor ball_color(255, 100, 0, 255);
+const QColor ball_speed_slow_color(Qt::lightGray);
+const QColor ball_speed_fast_color(ball_color);
+const QColor yellow_robot_color(255, 255, 0, 255);
+const QColor blue_robot_color(0, 75, 255, 255);
+const QColor light_blue_robot_color(0, 200, 255, 255);
 const QColor robot_speed_slow_color(0, 255, 0, 255);
 const QColor robot_speed_fast_color(255, 0, 0, 255);
-const QColor ball_speed_slow_color(100, 100, 100, 255);
-const QColor ball_speed_fast_color(ball_color);
+const QColor navigator_path_color = Qt::darkBlue;
+
+

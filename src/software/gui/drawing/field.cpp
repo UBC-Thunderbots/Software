@@ -25,14 +25,17 @@ void drawGoals(QGraphicsScene* scene, const Field& field, QPen pen)
 }
 
 void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,
-                          QBrush friendly_team_brush, QBrush enemy_team_brush)
+                          const QColor& friendly_goal_colour, const QColor& enemy_goal_colour)
 {
     QPen pen(Qt::transparent);
     pen.setWidth(0);
     pen.setCosmetic(true);
 
-    drawRectangle(scene, field.friendlyGoal(), pen, friendly_team_brush);
-    drawRectangle(scene, field.enemyGoal(), pen, enemy_team_brush);
+    QBrush friendly_goal_brush(friendly_goal_colour, Qt::BrushStyle::SolidPattern);
+    QBrush enemy_goal_brush(enemy_goal_colour, Qt::BrushStyle::SolidPattern);
+
+    drawRectangle(scene, field.friendlyGoal(), pen, friendly_goal_brush);
+    drawRectangle(scene, field.enemyGoal(), pen, enemy_goal_brush);
 }
 
 void drawCenterLine(QGraphicsScene* scene, const Field& field, QPen pen)
@@ -57,14 +60,4 @@ void drawField(QGraphicsScene* scene, const Field& field)
     drawCenterCircle(scene, field, pen);
     drawDefenseAreas(scene, field, pen);
     drawGoals(scene, field, pen);
-
-    QColor friendly_team_color_transparent = friendly_team_color;
-    friendly_team_color_transparent.setAlpha(100);
-    QBrush friendly_team_goal_brush(friendly_team_color_transparent);
-
-    QColor enemy_team_color_transparent = enemy_team_color;
-    enemy_team_color_transparent.setAlpha(100);
-    QBrush enemy_team_goal_brush(enemy_team_color_transparent);
-
-    highlightGoalsByTeam(scene, field, friendly_team_goal_brush, enemy_team_goal_brush);
 }

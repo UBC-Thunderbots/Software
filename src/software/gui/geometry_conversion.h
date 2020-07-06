@@ -36,3 +36,14 @@ QPolygonF createQPolygonF(const Polygon& polygon);
  * @return The QLineF representation of the given Segment
  */
 QLineF createQLineF(const Segment& segment);
+
+/**
+ * Converts our Angle class to an angle value consumable by Qt.
+ * Qt uses integers to represent angles.
+ *
+ * @param angle The Angle to convert
+ *
+ * @return The Qt angle representation of the given Angle
+ */
+ // TODO: Test once https://github.com/UBC-Thunderbots/Software/pull/1583 is merged
+int createQAngle(const Angle& angle);

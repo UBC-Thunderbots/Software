@@ -29,3 +29,14 @@ QLineF createQLineF(const Segment& segment)
 {
     return QLineF(createQPointF(segment.getSegStart()), createQPointF(segment.getEnd()));
 }
+
+int createQAngle(const Angle& angle) {
+    // Qt uses integers to represent angles, in 16ths of a degree
+    // https://doc.qt.io/qt-5/qgraphicsellipseitem.html#spanAngle
+    // Qt's default coordinate convention also means that positive
+    // angles / rotation appear clockwise on the screen, as opposed
+    // to our convention of positive rotation being counter-clockwise.
+    // This is why we negate the value, to reverse the rotation to match
+    // our convention.
+    return -static_cast<int>(angle.toDegrees() * 16);
+}

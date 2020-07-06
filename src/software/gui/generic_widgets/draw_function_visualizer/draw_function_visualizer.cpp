@@ -2,6 +2,7 @@
 
 #include "software/gui/geometry_conversion.h"
 #include "software/logger/logger.h"
+#include "software/gui/drawing/colors.h"
 
 DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent)
     : ZoomableQGraphicsView(parent),
@@ -22,7 +23,7 @@ DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent)
 
     setRenderHint(QPainter::Antialiasing);
     setDragMode(QGraphicsView::ScrollHandDrag);
-    setBackgroundBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
+    setBackgroundBrush(QBrush(field_color, Qt::SolidPattern));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 

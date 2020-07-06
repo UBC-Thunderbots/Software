@@ -8,22 +8,21 @@
 void drawBallVelocity(QGraphicsScene *scene, const Point &position,
                       const Vector &velocity, const QColor& slow_colour, const QColor& fast_colour)
 {
-    double speed = velocity.length();
+    // A somewhat arbitrary value that we've determined looks nice in the GUI
+    const double max_velocity_line_length = 1.0;
 
-    auto r = normalizeValueToRange<double>(speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, slow_colour.redF(), fast_colour.redF());
-    auto g = normalizeValueToRange<double>(speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, slow_colour.greenF(), fast_colour.greenF());
-    auto b = normalizeValueToRange<double>(speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, slow_colour.blueF(), fast_colour.blueF());
-    auto colour = QColor::fromRgbF(r, g, b);
+    QGradient gradient = QLinearGradient(createQPointF(position), createQPointF(position + velocity.normalize(max_velocity_line_length)));
+    gradient.setColorAt(0, slow_colour);
+    gradient.setColorAt(1, fast_colour);
 
-    QPen pen(colour);
+    auto pen = QPen(gradient, 1);
     pen.setWidth(3);
     // The cap style must be NOT be set to SquareCap. It can be set to anything else.
     // Drawing a line of length 0 with the SquareCap style causes a large line to be drawn
     pen.setCapStyle(Qt::PenCapStyle::RoundCap);
     pen.setCosmetic(true);
 
-    // A somewhat arbitrary value that we've determined looks nice in the GUI
-    const double max_velocity_line_length = 1.0;
+    double speed = velocity.length();
     auto line_length = normalizeValueToRange<double>(speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, 0.0, max_velocity_line_length);
 
     drawSegment(scene, Segment(position, position + velocity.normalize(line_length)), pen);

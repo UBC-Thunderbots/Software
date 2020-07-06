@@ -52,11 +52,11 @@ void drawGoals(QGraphicsScene* scene, const Field& field, QPen pen);
  *
  * @param scene The scene to draw on
  * @param field The field to draw
- * @param friendly_team_brush The brush used to highlight the friendly team's goal
- * @param enemy_team_brush The brush used to highlight the enemy team's goal
+ * @param friendly_goal_colour The colour the highlight the friendly goal
+ * @param enemy_goal_colour The colour the highlight the enemy goal
  */
 void highlightGoalsByTeam(QGraphicsScene* scene, const Field& field,
-                          QBrush friendly_team_brush, QBrush enemy_team_brush);
+                          const QColor& friendly_goal_colour, const QColor& enemy_goal_colour);
 
 /**
  * Draws the center line of the field in the scene
