@@ -71,12 +71,12 @@ TEST(ReplayTest, test_read_and_write_replay)
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // test that 3 files named "0", "1", and "2" are created in the output directory
-    std::vector<std::string> created_filenames;
-    const std::vector<std::string> expected_filenames = {"0", "1", "2"};
+    std::unordered_set<std::string> created_filenames;
+    const std::unordered_set<std::string> expected_filenames = {"0", "1", "2"};
 
     for (const auto& dir_entry : fs::directory_iterator(output_path))
     {
-        created_filenames.emplace_back(dir_entry.path().filename());
+        created_filenames.emplace(dir_entry.path().filename());
     }
 
     EXPECT_EQ(created_filenames, expected_filenames);
