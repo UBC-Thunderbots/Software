@@ -1,9 +1,9 @@
-#include "shared/parameter_v2/config/examples/example_config.h"
+#include "shared/parameter_v2/c/example_config.h"
 
 #include <memory.h>
 #include <stdlib.h>
 
-#include "shared/parameter_v2/config/examples/parameter.h"
+#include "shared/parameter_v2/c/parameter.h"
 
 // this function should get called in the main.c
 const ThunderbotsConfig_t* app_dynamic_parameters_create(void)
