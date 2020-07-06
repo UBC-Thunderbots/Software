@@ -16,7 +16,7 @@ void drawBallVelocity(QGraphicsScene *scene, const Point &position,
     gradient.setColorAt(1, fast_colour);
 
     auto pen = QPen(gradient, 1);
-    pen.setWidth(3);
+    pen.setWidth(2);
     // The cap style must be NOT be set to SquareCap. It can be set to anything else.
     // Drawing a line of length 0 with the SquareCap style causes a large line to be drawn
     pen.setCapStyle(Qt::PenCapStyle::RoundCap);
