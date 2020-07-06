@@ -33,7 +33,7 @@ std::string BANNER =
 // clang-format on
 
 /**
- * Parses Arguments and Indicates which arguments were received
+ * Parses arguments and indicates which arguments were received
  *
  * @param argc
  * @param argv
