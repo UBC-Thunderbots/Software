@@ -59,26 +59,34 @@ void ThreadedSimulator::resetSlowMotionMultiplier() {
 
 void ThreadedSimulator::setBallState(const BallState &ball_state)
 {
-    std::scoped_lock lock(simulator_mutex);
+    simulator_mutex.lock();
     simulator.setBallState(ball_state);
+    simulator_mutex.unlock();
+    updateCallbacks();
 }
 
 void ThreadedSimulator::removeBall()
 {
-    std::scoped_lock lock(simulator_mutex);
+    simulator_mutex.lock();
     simulator.removeBall();
+    simulator_mutex.unlock();
+    updateCallbacks();
 }
 
 void ThreadedSimulator::addYellowRobots(const std::vector<RobotStateWithId> &robots)
 {
-    std::scoped_lock lock(simulator_mutex);
+    simulator_mutex.lock();
     simulator.addYellowRobots(robots);
+    simulator_mutex.unlock();
+    updateCallbacks();
 }
 
 void ThreadedSimulator::addBlueRobots(const std::vector<RobotStateWithId> &robots)
 {
-    std::scoped_lock lock(simulator_mutex);
+    simulator_mutex.lock();
     simulator.addBlueRobots(robots);
+    simulator_mutex.unlock();
+    updateCallbacks();
 }
 
 void ThreadedSimulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
@@ -117,19 +125,9 @@ void ThreadedSimulator::runSimulationLoop()
 
         simulator_mutex.lock();
         simulator.stepSimulation(time_step);
-        auto ssl_wrapper_packet_ptr = simulator.getSSLWrapperPacket();
         simulator_mutex.unlock();
 
-        assert(ssl_wrapper_packet_ptr);
-        SSL_WrapperPacket ssl_wrapper_packet = *(ssl_wrapper_packet_ptr.release());
-
-        {
-            std::scoped_lock lock(callback_mutex);
-            for (const auto &callback : ssl_wrapper_packet_callbacks)
-            {
-                callback(ssl_wrapper_packet);
-            }
-        }
+        updateCallbacks();
 
         auto simulation_step_end_time =
             simulation_step_start_time +
@@ -138,5 +136,20 @@ void ThreadedSimulator::runSimulationLoop()
         // TODO: Warn or indicate if we are running slower than real-time
         // https://github.com/UBC-Thunderbots/Software/issues/1491
         std::this_thread::sleep_until(simulation_step_end_time);
+    }
+}
+
+void ThreadedSimulator::updateCallbacks() {
+    simulator_mutex.lock();
+    auto ssl_wrapper_packet_ptr = simulator.getSSLWrapperPacket();
+    simulator_mutex.unlock();
+    assert(ssl_wrapper_packet_ptr);
+
+    {
+        std::scoped_lock lock(callback_mutex);
+        for (const auto &callback : ssl_wrapper_packet_callbacks)
+        {
+            callback(*ssl_wrapper_packet_ptr);
+        }
     }
 }

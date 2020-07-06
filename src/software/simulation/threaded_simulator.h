@@ -139,6 +139,12 @@ class ThreadedSimulator
      */
     void runSimulationLoop();
 
+    /**
+     * A helper function to update the callback functions with the latest
+     * data from the simulator
+     */
+    void updateCallbacks();
+
     std::vector<std::function<void(SSL_WrapperPacket)>> ssl_wrapper_packet_callbacks;
     std::mutex callback_mutex;
 
