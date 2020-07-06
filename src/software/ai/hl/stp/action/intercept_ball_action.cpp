@@ -80,6 +80,12 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             ball_time_to_position = Duration::fromSeconds(
                 distance(closest_point, ball.position()) / (ball.velocity().length()));
         }
+        else
+        {
+            // If velocity is 0, set ball_time_to_position to a high value
+            // This ensures `ball_time_to_position > robot_time_to_pos`
+            ball_time_to_position = Duration::fromSeconds(1e15);
+        }
 
         Duration robot_time_to_pos = getTimeToPositionForRobot(
             *robot, closest_point, ROBOT_MAX_SPEED_METERS_PER_SECOND,
