@@ -17,10 +17,11 @@
  * @param scene The scene to draw on
  * @param position The position of the robot
  * @param velocity The velocity of the robot
- * @param color The color to draw the robot's velocity
+ * @param slow_color The velocity line colour when the velocity is small
+ * @param fast_color The velocity line colour when the velocity is fast
  */
 void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
-                       const Vector& velocity, const QColor& color);
+                       const Vector& velocity, const QColor& slow_colour, const QColor& fast_colour);
 
 /**
  * Draws the robot's position on the given scene.

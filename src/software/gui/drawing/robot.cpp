@@ -6,18 +6,30 @@
 #include "software/gui/drawing/geom.h"
 #include "software/gui/geometry_conversion.h"
 #include "software/new_geom/segment.h"
+#include "software/math/math_functions.h"
 
 void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
-                       const Vector& velocity, const QColor& color)
+                       const Vector& velocity, const QColor& slow_colour, const QColor& fast_colour)
 {
-    QPen pen(color);
-    pen.setWidth(2);
+    double speed = velocity.length();
+
+    auto r = normalizeValueToRange<double>(speed, 0, ROBOT_MAX_SPEED_METERS_PER_SECOND, slow_colour.redF(), fast_colour.redF());
+    auto g = normalizeValueToRange<double>(speed, 0, ROBOT_MAX_SPEED_METERS_PER_SECOND, slow_colour.greenF(), fast_colour.greenF());
+    auto b = normalizeValueToRange<double>(speed, 0, ROBOT_MAX_SPEED_METERS_PER_SECOND, slow_colour.blueF(), fast_colour.blueF());
+    auto colour = QColor::fromRgbF(r, g, b);
+
+    QPen pen(colour);
+    pen.setWidth(4);
     // The cap style must be NOT be set to SquareCap. It can be set to anything else.
     // Drawing a line of length 0 with the SquareCap style causes a large line to be drawn
     pen.setCapStyle(Qt::PenCapStyle::RoundCap);
     pen.setCosmetic(true);
 
-    drawSegment(scene, Segment(position, position + velocity), pen);
+    // A somewhat arbitrary value that we've determined looks nice in the GUI
+    const double max_velocity_line_length = 0.5;
+    auto line_length = normalizeValueToRange<double>(speed, 0, ROBOT_MAX_SPEED_METERS_PER_SECOND, 0.0, max_velocity_line_length);
+
+    drawSegment(scene, Segment(position, position + velocity.normalize(line_length)), pen);
 }
 
 void drawRobotAtPosition(QGraphicsScene* scene, const Point& position,
@@ -104,7 +116,7 @@ void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColo
     drawRobotAtPosition(scene, robot.robot_state.position(),
                         robot.robot_state.orientation(), color);
     drawRobotVelocity(scene, robot.robot_state.position(), robot.robot_state.velocity(),
-                      color);
+                      robot_velocity_slow, robot_velocity_fast);
     drawRobotId(scene, robot.robot_state.position(), robot.id);
 
     // TODO: Show robot charge state
