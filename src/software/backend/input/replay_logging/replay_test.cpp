@@ -55,13 +55,13 @@ TEST(ReplayTest, test_read_and_write_replay)
     // write the read frames to another replay_logging directory
     auto output_path = fs::current_path() / "replaytest";
     std::shared_ptr<Observer<SensorMsg>> logger_ptr =
-        std::make_shared<ReplayLogger>(output_path);
+        std::make_shared<ReplayLogger>(output_path, 1000);
     TestSubject subject;
     subject.registerObserver(logger_ptr);
     for (const auto msg : read_replay_msgs)
     {
         subject.sendValue(msg);
-        // we have 12000 frames of replay_logging so we have to try to not fill the buffer
+        // we have 3000 frames of replay_logging so we have to try to not fill the buffer
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     // unfortunately we have to do this because there is otherwise no way to 'guarantee'
@@ -69,10 +69,17 @@ TEST(ReplayTest, test_read_and_write_replay)
     // written to disk by the ReplayLogger
     // This duration needs to be long enough to de facto make this a 'guarantee'
     std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // test that 3 files named "0", "1", and "2" are created in the output directory
+    std::vector<std::string> created_filenames;
+    const std::vector<std::string> expected_filenames = {"0", "1", "2"};
+
     for (const auto& dir_entry : fs::directory_iterator(output_path))
     {
-        std::cout << dir_entry << std::endl;
+        created_filenames.emplace_back(dir_entry.path().filename());
     }
+
+    EXPECT_EQ(created_filenames, expected_filenames);
 
     // compare against the messages that we read
     std::vector<SensorMsg> written_read_replay_msgs;
@@ -87,7 +94,7 @@ TEST(ReplayTest, test_read_and_write_replay)
 
     for (size_t i = 0; i < written_read_replay_msgs.size(); i++)
     {
-        bool eq = google::protobuf::util::MessageDifferencer::ApproximatelyEquivalent(
+        bool eq = google::protobuf::util::MessageDifferencer::Equivalent(
             read_replay_msgs[i], written_read_replay_msgs[i]);
         EXPECT_TRUE(eq);
     }
