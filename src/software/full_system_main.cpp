@@ -54,7 +54,7 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
         "The backend that you would like to use, one of: " + all_backend_names;
 
     std::string interface_help_str =
-        "The interface to send and receive packets over, ifconfig to get an idea";
+        "The interface to send and receive packets over (can be found through ifconfig)";
 
     boost::program_options::options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
