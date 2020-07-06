@@ -17,6 +17,8 @@ enum class ThreadedObserverOrdering
  * is received.
  *
  * @tparam T The type of object this class is observing
+ * @tparam Ordering the ordering of which objects in the internal buffer are iterated
+ *                  through when calling `onValueReceived`.
  */
 template <typename T, ThreadedObserverOrdering Ordering>
 class GenericThreadedObserver : public Observer<T>
@@ -94,4 +96,4 @@ class OrderedThreadedObserver
         : GenericThreadedObserver<T, ThreadedObserverOrdering::QUEUE>(buffer_size){};
 };
 
-#include "threaded_observer.tpp"
+#include "software/multithreading/threaded_observer.tpp"
