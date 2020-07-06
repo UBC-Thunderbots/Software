@@ -13,12 +13,12 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
     switch (friendly_team_colour)
     {
         case TeamColour::YELLOW:
-            friendly_team_colour_       = yellow_robot_color;
-            enemy_team_colour_          = blue_robot_color;
+            friendly_team_colour_ = yellow_robot_color;
+            enemy_team_colour_    = blue_robot_color;
             break;
         case TeamColour::BLUE:
-            friendly_team_colour_       = blue_robot_color;
-            enemy_team_colour_       = yellow_robot_color;
+            friendly_team_colour_ = blue_robot_color;
+            enemy_team_colour_    = yellow_robot_color;
             break;
     }
     QColor friendly_goal_colour = friendly_team_colour_;

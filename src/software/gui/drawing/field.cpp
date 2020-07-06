@@ -2,8 +2,8 @@
 
 #include <QtWidgets/QGraphicsSimpleTextItem>
 
-#include "software/gui/drawing/geom.h"
 #include "external/qt/QtCore/Qt"
+#include "software/gui/drawing/geom.h"
 
 void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)
 {
