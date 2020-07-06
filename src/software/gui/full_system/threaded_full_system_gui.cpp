@@ -83,7 +83,10 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
 
 void ThreadedFullSystemGUI::onValueReceived(World world)
 {
-    auto friendly_team_colour = DynamicParameters->getSensorFusionConfig()->FriendlyColorYellow()->value() ? TeamColour::YELLOW : TeamColour::BLUE;
+    auto friendly_team_colour =
+        DynamicParameters->getSensorFusionConfig()->FriendlyColorYellow()->value()
+            ? TeamColour::YELLOW
+            : TeamColour::BLUE;
     auto world_draw_function = getDrawWorldFunction(world, friendly_team_colour);
     world_draw_functions_buffer->push(world_draw_function);
 

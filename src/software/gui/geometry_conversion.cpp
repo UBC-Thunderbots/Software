@@ -30,7 +30,8 @@ QLineF createQLineF(const Segment& segment)
     return QLineF(createQPointF(segment.getSegStart()), createQPointF(segment.getEnd()));
 }
 
-int createQAngle(const Angle& angle) {
+int createQAngle(const Angle& angle)
+{
     // Qt uses integers to represent angles, in 16ths of a degree
     // https://doc.qt.io/qt-5/qgraphicsellipseitem.html#spanAngle
     // Qt's default coordinate convention also means that positive

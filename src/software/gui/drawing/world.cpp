@@ -1,4 +1,5 @@
 #include "software/gui/drawing/world.h"
+
 #include <QtWidgets/QGraphicsSimpleTextItem>
 
 #include "software/gui/drawing/ball.h"
@@ -11,19 +12,20 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
     QColor friendly_team_light_colour_;
     QColor enemy_team_colour_;
     QColor enemy_team_light_colour_;
-    switch(friendly_team_colour) {
+    switch (friendly_team_colour)
+    {
         case TeamColour::YELLOW:
             // Yellow is already light enough. We don't need another version
-            friendly_team_colour_ = yellow_robot_color;
+            friendly_team_colour_       = yellow_robot_color;
             friendly_team_light_colour_ = yellow_robot_color;
-            enemy_team_colour_ = blue_robot_color;
-            enemy_team_light_colour_ = light_blue_robot_color;
+            enemy_team_colour_          = blue_robot_color;
+            enemy_team_light_colour_    = light_blue_robot_color;
             break;
         case TeamColour::BLUE:
-            friendly_team_colour_ = blue_robot_color;
+            friendly_team_colour_       = blue_robot_color;
             friendly_team_light_colour_ = light_blue_robot_color;
             // Yellow is already light enough. We don't need another version
-            enemy_team_colour_ = yellow_robot_color;
+            enemy_team_colour_       = yellow_robot_color;
             enemy_team_light_colour_ = yellow_robot_color;
             break;
     }
@@ -41,8 +43,11 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
     drawBallConeToFriendlyNet(scene, world.ball().position(), world.field());
 }
 
-WorldDrawFunction getDrawWorldFunction(const World& world, TeamColour friendly_team_colour)
+WorldDrawFunction getDrawWorldFunction(const World& world,
+                                       TeamColour friendly_team_colour)
 {
-    auto draw_function = [world, friendly_team_colour](QGraphicsScene* scene) { drawWorld(scene, world, friendly_team_colour); };
+    auto draw_function = [world, friendly_team_colour](QGraphicsScene* scene) {
+        drawWorld(scene, world, friendly_team_colour);
+    };
     return WorldDrawFunction(draw_function);
 }

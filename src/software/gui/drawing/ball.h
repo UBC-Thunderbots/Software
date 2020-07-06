@@ -21,7 +21,8 @@
  * @param fast_colour The velocity line colour when the velocity is fast
  */
 void drawBallVelocity(QGraphicsScene *scene, const Point &position,
-                      const Vector &velocity, const QColor& slow_colour, const QColor& fast_colour);
+                      const Vector &velocity, const QColor &slow_colour,
+                      const QColor &fast_colour);
 
 /**
  * Draws the ball's position on the given scene.
