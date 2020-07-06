@@ -16,7 +16,8 @@ void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
     }
 
     QString play_info_string =
-        QString("%1\n%2\n%3").arg(refbox_gamestate_string, play_name_string, tactics_string);
+        QString("%1\n%2\n%3")
+            .arg(refbox_gamestate_string, play_name_string, tactics_string);
 
     setText(play_info_string);
 }
