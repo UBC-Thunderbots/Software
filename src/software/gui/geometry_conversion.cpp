@@ -7,8 +7,12 @@ QPointF createQPointF(const Point& point)
 
 QRectF createQRectF(const Rectangle& rectangle)
 {
-    return QRectF(createQPointF(rectangle.negXPosYCorner()),
-                  createQPointF(rectangle.posXNegYCorner()));
+    // In Qt's default coordinate system, (0, 0) is the "top-left" of the screen,
+    // y increases downwards, and x increases to the right. This means the "top-left"
+    // corner of a rectangle is the corner with the most negative x and y coordinate,
+    // and "bottom-right" is positive x and positive y
+    return QRectF(createQPointF(rectangle.negXNegYCorner()),
+                  createQPointF(rectangle.posXPosYCorner()));
 }
 
 QPolygonF createQPolygonF(const Polygon& polygon)

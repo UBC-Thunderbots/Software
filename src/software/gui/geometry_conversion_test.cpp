@@ -10,7 +10,9 @@ TEST(QtGeometryConversionTest, create_qpointf) {
 TEST(QtGeometryConversionTest, create_qrectf) {
     Rectangle rect(Point(-2.1, 5), Point(0, -1));
     auto result = createQRectF(rect);
-    EXPECT_EQ(QRectF(QPointF(-2.1, 5), QPointF(0, -1)), result);
+    // We need to check the QRectF got created properly in Qt's coordinate system
+    // (not our own). See implementation for details
+    EXPECT_EQ(QRectF(QPointF(-2.1, -1), QPointF(0, 5)), result);
 }
 
 TEST(QtGeometryConversionTest, create_qpolygonf) {
