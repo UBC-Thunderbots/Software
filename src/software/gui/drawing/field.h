@@ -83,3 +83,11 @@ void drawCenterCircle(QGraphicsScene* scene, const Field& field, QPen pen);
  * @param field The field to draw
  */
 void drawField(QGraphicsScene* scene, const Field& field);
+
+/**
+ * Marks the friendly and enemy goals on the field with text
+ *
+ * @param scene The scene to draw on
+ * @param field The field to draw
+ */
+void drawTeamGoalText(QGraphicsScene* scene, const Field& field);
