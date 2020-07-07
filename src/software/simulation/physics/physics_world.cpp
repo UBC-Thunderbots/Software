@@ -5,12 +5,15 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
-PhysicsWorld::PhysicsWorld(const Field& field)
+PhysicsWorld::PhysicsWorld(const Field& field, double ball_restitution,
+                           double ball_linear_damping)
     : b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
       current_timestamp(Timestamp::fromSeconds(0)),
       contact_listener(std::make_unique<SimulationContactListener>()),
       physics_field(b2_world, field),
-      physics_ball(nullptr)
+      physics_ball(nullptr),
+      ball_restitution(ball_restitution),
+      ball_linear_damping(ball_linear_damping)
 {
     b2_world->SetContactListener(contact_listener.get());
 }
@@ -73,7 +76,8 @@ const Timestamp PhysicsWorld::getTimestamp() const
 
 void PhysicsWorld::setBallState(const BallState& ball_state)
 {
-    physics_ball = std::make_shared<PhysicsBall>(b2_world, ball_state, BALL_MASS_KG);
+    physics_ball = std::make_shared<PhysicsBall>(b2_world, ball_state, BALL_MASS_KG,
+                                                 ball_restitution, ball_linear_damping);
 }
 
 void PhysicsWorld::removeBall()
