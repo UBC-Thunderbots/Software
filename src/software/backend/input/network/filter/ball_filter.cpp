@@ -246,17 +246,13 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
         A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
     // How to calculate the error is from
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
-    double regression_error;
+    double regression_error = std::numeric_limits<double>::max();
 
-    if ((A * regression_vector - b).norm() != 0 && b.norm() == 0)
-    {
-        regression_error = std::numeric_limits<double>::max();
-    }
-    else if ((A * regression_vector - b).norm() == 0 && b.norm() == 0)
+    if ((A * regression_vector - b).norm() == 0 && b.norm() == 0)
     {
         regression_error = 0;
     }
-    else
+    if (b.norm() != 0)
     {
         regression_error =
             (A * regression_vector - b).norm() / (b.norm());  // norm() is L2 norm
