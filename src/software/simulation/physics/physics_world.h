@@ -24,8 +24,10 @@ class PhysicsWorld
      * Creates a new PhysicsWorld that will contain no robots and no ball.
      *
      * @param field The initial state of the field
+     * @param ball_restitution The restitution for ball collisions
+     * @param ball_linear_damping The damping on the ball's linear motion
      */
-    explicit PhysicsWorld(const Field& field);
+    explicit PhysicsWorld(const Field& field, double ball_restitution = 1.0, double ball_linear_damping = 0.0);
     PhysicsWorld() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
@@ -206,6 +208,8 @@ class PhysicsWorld
 
     PhysicsField physics_field;
     std::shared_ptr<PhysicsBall> physics_ball;
+    const double ball_restitution;
+    const double ball_linear_damping;
     std::vector<std::shared_ptr<PhysicsRobot>> yellow_physics_robots;
     std::vector<std::shared_ptr<PhysicsRobot>> blue_physics_robots;
 };

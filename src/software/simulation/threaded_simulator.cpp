@@ -1,7 +1,7 @@
 #include "software/simulation/threaded_simulator.h"
 
-ThreadedSimulator::ThreadedSimulator(const Field &field)
-    : simulator(field), simulation_thread_started(false), stopping_simulation(false)
+ThreadedSimulator::ThreadedSimulator(const Field &field, double ball_restitution, double ball_linear_damping)
+    : simulator(field, ball_restitution, ball_linear_damping), simulation_thread_started(false), stopping_simulation(false)
 {
 }
 
