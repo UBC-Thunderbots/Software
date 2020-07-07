@@ -91,8 +91,8 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
         std::optional<Point> intercept_pos = std::nullopt;
-        if (ball_not_moving ||
-            (point_in_front_of_ball && (ball_time_to_position > robot_time_to_pos)))
+        if ((point_in_front_of_ball &&
+             (ball_not_moving || ball_time_to_position > robot_time_to_pos)))
         {
             intercept_pos = closest_point;
         }

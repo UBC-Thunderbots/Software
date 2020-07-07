@@ -254,7 +254,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     }
     else
     {
-        regression_error = std::numeric_limits<double>::max();
+        in
     }
 
     // Find 2 points on the regression line that we solved for, and use this to construct
