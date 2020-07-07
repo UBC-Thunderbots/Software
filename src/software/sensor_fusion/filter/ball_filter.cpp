@@ -251,6 +251,10 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     {
         regression_error = 0;
     }
+    else if ((A * regression_vector - b).norm() == 0 && b.norm() == 0)
+    {
+        regression_error = 0;
+    }
     else
     {
         regression_error =
