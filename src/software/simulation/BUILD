@@ -189,5 +189,6 @@ cc_binary(
         "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
+        "@boost//:program_options",
     ],
 )

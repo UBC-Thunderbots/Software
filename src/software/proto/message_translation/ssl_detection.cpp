@@ -68,20 +68,17 @@ std::unique_ptr<SSL_DetectionFrame> createSSLDetectionFrame(
 
     for (const auto& ball_state : balls)
     {
-        auto ball = detection_frame->add_balls();
-        *ball     = *(createSSLDetectionBall(ball_state).release());
+        *(detection_frame->add_balls()) = *createSSLDetectionBall(ball_state);
     }
 
     for (const auto& yellow_robot : yellow_robots)
     {
-        auto robot = detection_frame->add_robots_yellow();
-        *robot     = *(createSSLDetectionRobot(yellow_robot).release());
+        *(detection_frame->add_robots_yellow()) = *createSSLDetectionRobot(yellow_robot);
     }
 
     for (const auto& blue_robot : blue_robots)
     {
-        auto robot = detection_frame->add_robots_blue();
-        *robot     = *(createSSLDetectionRobot(blue_robot).release());
+        *(detection_frame->add_robots_blue()) = *createSSLDetectionRobot(blue_robot);
     }
 
     return std::move(detection_frame);

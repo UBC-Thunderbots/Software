@@ -1,7 +1,10 @@
 #include "software/simulation/threaded_simulator.h"
 
-ThreadedSimulator::ThreadedSimulator(const Field &field)
-    : simulator(field), simulation_thread_started(false), stopping_simulation(false)
+ThreadedSimulator::ThreadedSimulator(const Field &field, double ball_restitution,
+                                     double ball_linear_damping)
+    : simulator(field, ball_restitution, ball_linear_damping),
+      simulation_thread_started(false),
+      stopping_simulation(false)
 {
 }
 
@@ -109,7 +112,7 @@ void ThreadedSimulator::runSimulationLoop()
         simulator_mutex.unlock();
 
         assert(ssl_wrapper_packet_ptr);
-        SSL_WrapperPacket ssl_wrapper_packet = *(ssl_wrapper_packet_ptr.release());
+        SSL_WrapperPacket ssl_wrapper_packet = *ssl_wrapper_packet_ptr;
 
         {
             std::scoped_lock lock(callback_mutex);
