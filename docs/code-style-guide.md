@@ -390,3 +390,31 @@ Some general guidelines when writing tests are:
 ### Protobuf
 
 Protobufs that we define should follow [Google's Protobuf Style Guide](https://developers.google.com/protocol-buffers/docs/style).
+
+* When initializing a protobuf from a unique pointer, avoid passing the `release()`'d pointer to `set_allocated` and `AddAllocated`. Releasing unique pointers makes it too easy to cause memory leaks. This convention does result in an extra copy operation for the field being added to the proto, but we have decided that this is acceptable to reduce the risk of memory leaks.
+
+  ```cpp
+  message TbotsRobotMsg
+  {
+  ...
+      repeated ErrorCode error_code             = 2;
+  ...
+      TimestampMsg time_sent                    = 11;
+  }
+
+  TbotsRobotMsg tbots_robot_msg;
+  std::unique<TimestampMsg> timestamp_msg = // creator function
+  std::unique<ErrorCode> error_code = // creator function
+  google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+  std::unique<SSL_FieldLineSegment> field_segment = // creator function
+
+  // Incorrect
+  tbots_robot_msg.set_allocated_time_sent(timestamp_msg.release());
+  segments.AddAllocated(field_segment.release());
+  *(tbots_robot_msg.add_error_code()) = *error_code;
+
+  // Correct
+  *(tbots_robot_msg.mutable_time_sent()) = *timestamp_msg;
+  *(segments.Add()) = *field_segment;
+  *(tbots_robot_msg.add_error_code()) = *error_code;
+  ```

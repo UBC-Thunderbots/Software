@@ -7,11 +7,11 @@ std::unique_ptr<SSL_WrapperPacket> createWrapperPacket(
     auto wrapper_packet = std::make_unique<SSL_WrapperPacket>();
     if (geometry_data)
     {
-        wrapper_packet->set_allocated_geometry(geometry_data.release());
+        *(wrapper_packet->mutable_geometry()) = *geometry_data;
     }
     if (detection_frame)
     {
-        wrapper_packet->set_allocated_detection(detection_frame.release());
+        *(wrapper_packet->mutable_detection()) = *detection_frame;
     }
 
     return std::move(wrapper_packet);
