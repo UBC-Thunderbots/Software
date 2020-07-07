@@ -130,8 +130,8 @@ void setupGameStateOverrideComboBox(
     }
 
     auto on_game_state_changed = [gamestate_override_parameter,
-                                 previous_game_state_parameter,
-                                 current_game_state_parameter](const QString &text) {
+                                  previous_game_state_parameter,
+                                  current_game_state_parameter](const QString &text) {
         if (text == "Use Refbox")
         {
             gamestate_override_parameter->setValue(false);
@@ -139,7 +139,8 @@ void setupGameStateOverrideComboBox(
         else
         {
             gamestate_override_parameter->setValue(true);
-            previous_game_state_parameter->setValue(current_game_state_parameter->value());
+            previous_game_state_parameter->setValue(
+                current_game_state_parameter->value());
             current_game_state_parameter->setValue(text.toStdString());
         }
     };
