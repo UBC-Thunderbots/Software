@@ -56,7 +56,7 @@ class ThreadedSimulator
      *
      * Note: This function is threadsafe
      *
-     * @pre value is >= 1.0
+     * @pre multiplier is >= 1.0
      *
      * @param multiplier The slow motion multiplier
      */
