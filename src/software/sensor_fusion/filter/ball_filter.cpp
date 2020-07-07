@@ -247,7 +247,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
     double regression_error;
 
-    if ((A * regression_vector - b).norm() == 0 && b.norm() == 0)
+    if ((A * regression_vector - b).norm() == 0 || b.norm() == 0)
     {
         regression_error = 0;
     }
