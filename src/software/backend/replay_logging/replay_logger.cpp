@@ -1,12 +1,15 @@
-#include <google/protobuf/util/delimited_message_util.h>
-#include <fstream>
 #include "software/backend/replay_logging/replay_logger.h"
+
+#include <google/protobuf/util/delimited_message_util.h>
+
+#include <fstream>
+
 #include "software/logger/logger.h"
 
 namespace fs = std::experimental::filesystem;
 
 ReplayLogger::ReplayLogger(const std::string& out_dir_path, int _msgs_per_chunk)
-    : OrderedThreadedObserver<SensorMsg>(2000),
+    : FirstInFirstOutThreadedObserver<SensorMsg>(2000),
       current_chunk(),
       current_chunk_idx(0),
       output_dir_path(out_dir_path),
@@ -63,6 +66,8 @@ void ReplayLogger::nextChunk()
     current_chunk_idx++;
     current_chunk.Clear();
 }
+
+
 void ReplayLogger::saveCurrentChunk()
 {
     fs::path chunk_path = output_dir_path / std::to_string(current_chunk_idx);
@@ -71,6 +76,10 @@ void ReplayLogger::saveCurrentChunk()
                                                                       &chunk_ofstream);
     if (!result)
     {
-        LOG(WARNING) << "Failed to serialize chunk to output filestream of " << chunk_path;
+        LOG(WARNING) << "Failed to serialize chunk to output filestream of "
+                     << chunk_path;
+    }
+    else {
+        LOG(DEBUG) << "Successfully saved chunk " << current_chunk_idx << "to disk";
     }
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-template <typename T, ThreadedObserverOrdering Ordering>
-GenericThreadedObserver<T, Ordering>::GenericThreadedObserver(size_t buffer_size)
+template <typename T>
+GenericThreadedObserver<T>::GenericThreadedObserver(size_t buffer_size)
     : Observer<T>(buffer_size),
       in_destructor(false),
       IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
@@ -10,29 +10,22 @@ GenericThreadedObserver<T, Ordering>::GenericThreadedObserver(size_t buffer_size
         boost::bind(&GenericThreadedObserver::continuouslyPullValuesFromBuffer, this));
 }
 
-template <typename T, ThreadedObserverOrdering Ordering>
-void GenericThreadedObserver<T, Ordering>::onValueReceived(T val)
+template <typename T>
+void GenericThreadedObserver<T>::onValueReceived(T val)
 {
     // Do nothing, this function should be overriden to enable custom behavior on
     // message reception.
 }
 
-template <typename T, ThreadedObserverOrdering Ordering>
-void GenericThreadedObserver<T, Ordering>::continuouslyPullValuesFromBuffer()
+template <typename T>
+void GenericThreadedObserver<T>::continuouslyPullValuesFromBuffer()
 {
     do
     {
         in_destructor_mutex.unlock();
         std::optional<T> new_val;
 
-        if constexpr (Ordering == ThreadedObserverOrdering::QUEUE)
-        {
-            new_val = this->popLeastRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
-        }
-        else
-        {
-            new_val = this->popMostRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
-        }
+        new_val = this->getNextValue(IN_DESTRUCTOR_CHECK_PERIOD);
 
         if (new_val)
         {
@@ -43,8 +36,8 @@ void GenericThreadedObserver<T, Ordering>::continuouslyPullValuesFromBuffer()
     } while (!in_destructor);
 }
 
-template <typename T, ThreadedObserverOrdering Ordering>
-GenericThreadedObserver<T, Ordering>::~GenericThreadedObserver()
+template <typename T>
+GenericThreadedObserver<T>::~GenericThreadedObserver()
 {
     in_destructor_mutex.lock();
     in_destructor = true;
@@ -53,4 +46,18 @@ GenericThreadedObserver<T, Ordering>::~GenericThreadedObserver()
     // We must wait for the thread to stop, as if we destroy it while it's still
     // running we will segfault
     pull_from_buffer_thread.join();
+}
+
+template <typename T>
+std::optional<T> FirstInFirstOutThreadedObserver<T>::getNextValue(
+    const Duration& max_wait_time)
+{
+    return this->popLeastRecentlyReceivedValue(max_wait_time);
+}
+
+template <typename T>
+std::optional<T> LastInFirstOutThreadedObserver<T>::getNextValue(
+    const Duration& max_wait_time)
+{
+    return this->popLeastRecentlyReceivedValue(max_wait_time);
 }

@@ -1,8 +1,8 @@
 #pragma once
 #include <experimental/filesystem>
 
-#include "software/proto/sensor_msg.pb.h"
 #include "software/proto/replay_msg.pb.h"
+#include "software/proto/sensor_msg.pb.h"
 
 class ReplayReader
 {

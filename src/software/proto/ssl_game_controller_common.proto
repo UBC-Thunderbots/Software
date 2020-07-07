@@ -38,7 +38,7 @@ message ControllerReply
     // reason is an optional explanation of the status code
     optional string reason = 2;
     // next_token must be send with the next request, if secure communication is used
-    // the token is used to avoid replay_logging attacks
+    // the token is used to avoid replay attacks
     // the token is always present in the very first message before the registration
     // starts the token is not present, if secure communication is not used
     optional string next_token = 3;
