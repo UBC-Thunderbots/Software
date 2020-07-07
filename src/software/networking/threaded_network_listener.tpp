@@ -3,7 +3,7 @@
 #include "software/networking/threaded_network_listener.h"
 
 template <class ListenerT, typename CallBackFunctionArgT>
-ThreadedNetworkListener<ListenerT, CallBackFunctionArgT>::ThreadedNetworkListener(
+ThreadedMulticastListener<ListenerT, CallBackFunctionArgT>::ThreadedMulticastListener(
     const std::string& ip_address, const unsigned short port,
     std::function<void(CallBackFunctionArgT&)> receive_callback)
     : io_service(), listener(io_service, ip_address, port, receive_callback)
@@ -13,7 +13,7 @@ ThreadedNetworkListener<ListenerT, CallBackFunctionArgT>::ThreadedNetworkListene
 }
 
 template <class ListenerT, typename CallBackFunctionArgT>
-ThreadedNetworkListener<ListenerT, CallBackFunctionArgT>::~ThreadedNetworkListener()
+ThreadedMulticastListener<ListenerT, CallBackFunctionArgT>::~ThreadedMulticastListener()
 {
     // Stop the io_service. This is safe to call from another thread.
     // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service

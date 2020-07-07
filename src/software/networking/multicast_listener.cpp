@@ -11,7 +11,7 @@ MulticastListener::MulticastListener(
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::make_address(ip_address), port);
     socket_.open(listen_endpoint.protocol());
-    socket_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+    socket_.set_option(boost::asio::socket_base::reuse_address(true));
     try
     {
         socket_.bind(listen_endpoint);

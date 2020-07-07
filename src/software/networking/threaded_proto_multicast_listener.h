@@ -8,4 +8,4 @@
  */
 template <class ReceiveProtoT>
 using ThreadedProtoMulticastListener =
-    ThreadedNetworkListener<ProtoMulticastListener<ReceiveProtoT>, ReceiveProtoT>;
+    ThreadedMulticastListener<ProtoMulticastListener<ReceiveProtoT>, ReceiveProtoT>;

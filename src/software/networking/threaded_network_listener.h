@@ -7,11 +7,11 @@
 #include "software/networking/multicast_listener.h"
 
 template <class ListenerT, typename CallBackFunctionArgT>
-class ThreadedNetworkListener
+class ThreadedMulticastListener
 {
    public:
     /**
-     * Creates a ThreadedNetworkListener that asyncrhonously listens for data on the
+     * Creates a ThreadedMulticastListener that asyncrhonously listens for data on the
      * network using a given listener that passes data of a specified type back
      * in a given callback function
      *
@@ -22,10 +22,11 @@ class ThreadedNetworkListener
      * @param receive_callback The function to call with each new value received over
      *                         the network
      */
-    ThreadedNetworkListener(const std::string& ip_address, unsigned short port,
-                            std::function<void(CallBackFunctionArgT&)> receive_callback);
+    ThreadedMulticastListener(
+        const std::string& ip_address, unsigned short port,
+        std::function<void(CallBackFunctionArgT&)> receive_callback);
 
-    ~ThreadedNetworkListener();
+    ~ThreadedMulticastListener();
 
    private:
     // The io_service that will be used to service all network requests
