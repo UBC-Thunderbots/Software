@@ -117,7 +117,7 @@ void drawRobotId(QGraphicsScene* scene, const Point& position, const RobotId id)
     // care less about the height and just allow it to scale along with the width.
     double scaling_factor =
         1.0 / (robot_id->boundingRect().width() / robot_bounding_box.width());
-    // Flip the y-axis so the text show right-side-up. When we set up the GraphicsView
+    // Flip the y-axis so the text shows right-side-up. When we set up the GraphicsView
     // that contains the scene we apply a transformation to the y-axis so that Qt's
     // coordinate system matches ours and we can draw things without changing our
     // convention. Unfortunately this flips all text by default, so we need to flip it

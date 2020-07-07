@@ -88,7 +88,7 @@ void drawTeamGoalText(QGraphicsScene* scene, const Field& field)
     double enemy_text_scaling_factor =
         1.0 / (enemy_text->boundingRect().width() / field.goalYLength());
 
-    // Flip the y-axis so the text show right-side-up. When we set up the GraphicsView
+    // Flip the y-axis so the text shows right-side-up. When we set up the GraphicsView
     // that contains the scene we apply a transformation to the y-axis so that Qt's
     // coordinate system matches ours and we can draw things without changing our
     // convention. Unfortunately this flips all text by default, so we need to flip it
