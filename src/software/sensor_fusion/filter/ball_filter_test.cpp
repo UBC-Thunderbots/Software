@@ -210,7 +210,6 @@ class BallFilterTest : public ::testing::Test
             double ball_position_difference =
                 (filtered_ball->state().position() - current_ball_position).length();
             EXPECT_LT(ball_position_difference, expected_position_tolerance);
-
             // Only check the velocity once we have more than 1 data entry in the filter
             // since the filter can't return a realistic velocity with only a single
             // detection
