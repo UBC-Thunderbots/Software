@@ -86,8 +86,8 @@ void setupDefendingSideComboBox(
 {
     // See issue #811 for getting these value from an enum / factory
     widget->defending_side_combo_box->insertItem(0, "Use Refbox");
-    widget->defending_side_combo_box->insertItem(1, "East");
-    widget->defending_side_combo_box->insertItem(2, "West");
+    widget->defending_side_combo_box->insertItem(1, "Positive");
+    widget->defending_side_combo_box->insertItem(2, "Negative");
 
     auto on_defending_side_changed =
         [defending_side_override_parameter,

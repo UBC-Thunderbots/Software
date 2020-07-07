@@ -112,7 +112,7 @@ int main(int argc, char **argv)
         // This blocks forever without using the CPU.
         // Wait for the Simulator GUI to shut down before shutting
         // down the rest of the system
-        standalone_simulator_gui_wrapper.getTerminationPromise()->get_future().wait();
+        threaded_standalone_simulator_gui.getTerminationPromise()->get_future().wait();
     }
 
     return 0;
