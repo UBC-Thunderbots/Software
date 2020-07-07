@@ -65,8 +65,7 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
         backend_help_str.c_str());
     desc.add_options()(
         "interface",
-        boost::program_options::value<std::string>(&args.network_interface_name)
-            ->required(),
+        boost::program_options::value<std::string>(&args.network_interface_name),
         interface_help_str.c_str());
     desc.add_options()("headless", boost::program_options::bool_switch(&args.headless),
                        "Run without the FullSystemGUI");
@@ -112,9 +111,12 @@ int main(int argc, char **argv)
 
         // TODO remove this when we move to non-generic factories for backends
         // https://github.com/UBC-Thunderbots/Software/issues/1452
-        MutableDynamicParameters->getMutableNetworkConfig()
-            ->mutableNetworkInterface()
-            ->setValue(args.network_interface_name);
+        if (!args.network_interface_name.empty())
+        {
+            MutableDynamicParameters->getMutableNetworkConfig()
+                ->mutableNetworkInterface()
+                ->setValue(args.network_interface_name);
+        }
 
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend>::create(args.backend_name);

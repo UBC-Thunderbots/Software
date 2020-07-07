@@ -32,8 +32,7 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
                        "Help screen");
     desc.add_options()(
         "interface",
-        boost::program_options::value<std::string>(&args.network_interface_name)
-            ->required(),
+        boost::program_options::value<std::string>(&args.network_interface_name),
         interface_help_str.c_str());
 
     boost::program_options::variables_map vm;
@@ -68,9 +67,12 @@ int main(int argc, char **argv)
     {
         // TODO remove this when we move to non-generic factories for backends
         // https://github.com/UBC-Thunderbots/Software/issues/1452
-        MutableDynamicParameters->getMutableStandaloneSimulatorConfig()
-            ->mutableNetworkInterface()
-            ->setValue(args.network_interface_name);
+        if (!args.network_interface_name.empty())
+        {
+            MutableDynamicParameters->getMutableStandaloneSimulatorConfig()
+                ->mutableNetworkInterface()
+                ->setValue(args.network_interface_name);
+        }
 
         ThreadedStandaloneSimulatorGUI standalone_simulator_gui_wrapper;
         StandaloneSimulator standalone_simulator(
