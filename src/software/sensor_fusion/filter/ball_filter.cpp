@@ -254,7 +254,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     }
     else
     {
-        in
+        regression_error = 0;
     }
 
     // Find 2 points on the regression line that we solved for, and use this to construct
