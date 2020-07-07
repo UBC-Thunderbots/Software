@@ -1,6 +1,7 @@
 #include "software/simulation/convert_primitive_to_nanopb.h"
 
-#include "pb_decode.h"
+#include <pb_decode.h>
+
 #include "software/simulation/serialize_primitive_to_proto.h"
 
 PrimitiveMsg convertPrimitiveToNanoPb(const Primitive& primitive)

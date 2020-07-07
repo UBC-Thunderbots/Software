@@ -17,6 +17,7 @@
 
 #include <FreeRTOS.h>
 #include <assert.h>
+#include <pb_decode.h>
 #include <rtc.h>
 #include <semphr.h>
 #include <stack.h>
@@ -36,7 +37,6 @@
 #include "io/motor.h"
 #include "io/mrf.h"
 #include "main.h"
-#include "pb_decode.h"
 #include "pb_encode.h"
 #include "priority.h"
 #include "shared/proto/primitive.nanopb.h"

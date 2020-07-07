@@ -25,6 +25,12 @@ cc_library(
         "pb_encode.h",
     ],
     defines = common_defines,
+    # NOTE: Even an empty `strip_include_prefix` is prepended with the external project
+    # path (ex. "external/nanopb") so that other targets can include headers by a path
+    # relative to this project root. Note that if `strip_include_prefix` is not specified
+    # *at all*, then all other libraries may *only* access headers from this lib via the
+    # full project path (ex. `external/nanopb/pb.h`).
+    strip_include_prefix = "",
     visibility = ["//visibility:public"],
 )
 

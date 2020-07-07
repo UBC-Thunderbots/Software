@@ -3,7 +3,17 @@ load("@rules_cc//cc:toolchain_utils.bzl", "find_cpp_toolchain")
 
 def _nanopb_proto_library_impl(ctx):
     # This is the folder we will place all our generation artifacts in
+    #
+    # Because we need to generate the `.c` and `.h` files for all the proto files required
+    # for this library, including all the transitive dependencies, we would like to
+    # generate these in the same folder as each proto file. However bazel will not
+    # permit us to modify/produce files outside the folder that this rule is called from.
+    # We get around this be reproducing the folder structer under a generation folder
+    # and adding the root of this directory as an include path.
+    #
     generation_folder_name = ctx.attr.name + "_nanopb_gen/"
+    generated_folder_abs_path = ctx.genfiles_dir.path + "/" + \
+                                ctx.build_file_path[:-len("BUILD")] + generation_folder_name
 
     # Generate import flags for the protobuf compiler so it can find proto files we
     # depend on, and a list of proto files to include
@@ -75,11 +85,6 @@ def _nanopb_proto_library_impl(ctx):
         if label[CcInfo].linking_context != None
     ]
 
-    # The absolute path to the root folder for all generated files
-
-    generated_files_abs_root = ctx.genfiles_dir.path + "/" + \
-                               ctx.build_file_path[:-len("BUILD")] + generation_folder_name
-
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = "compile_nanopb_outputs",
         actions = ctx.actions,
@@ -88,8 +93,8 @@ def _nanopb_proto_library_impl(ctx):
         srcs = all_proto_src_files,
         public_hdrs = all_proto_hdr_files,
         includes = [
-            generated_files_abs_root,
-        ] + [generated_files_abs_root + dir for dir in all_proto_include_dirs.to_list()],
+            generated_folder_abs_path,
+        ] + [generated_folder_abs_path + dir for dir in all_proto_include_dirs.to_list()],
         compilation_contexts = nanopb_compilation_contexts,
     )
 

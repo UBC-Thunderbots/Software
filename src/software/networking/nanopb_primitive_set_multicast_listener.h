@@ -17,7 +17,7 @@ class NanoPbPrimitiveSetMulticastListener
    public:
     /**
      * Creates an NanoPbPrimitiveSetMulticastListener that will listen for primitive sets
-     * sent over the network on the given address and port. For every ReceiveProtoT packet
+     * sent over the network on the given address and port. For every PrimitiveMsgSet
      * received, the receive_callback will be called to perform any operations desired by
      * the caller
      *

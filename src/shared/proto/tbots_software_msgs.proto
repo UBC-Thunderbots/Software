@@ -23,5 +23,7 @@ message PrimitiveSetMsg
     TimestampMsg time_sent = 1;
 
     // Robot ID to RadioPrimitive map
+    // NOTE: The `max_count` for this field should be set to a number that is less then
+    //       or equal to the maximum number of robots we expect to run
     map<uint32, PrimitiveMsg> robot_primitives = 2 [(nanopb.fieldopt).max_count = 20];
 }

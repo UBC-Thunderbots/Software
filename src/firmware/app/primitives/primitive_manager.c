@@ -43,7 +43,7 @@ struct PrimitiveManager
 
 /**
  * Lock the primitive mutex
- * @param manager The primitive manager to lock the primitive mutex for
+ * @param manager [in/out] The primitive manager to lock the primitive mutex for
  */
 void app_primitive_manager_lockPrimitiveMutex(PrimitiveManager_t *manager)
 {
@@ -58,7 +58,7 @@ void app_primitive_manager_lockPrimitiveMutex(PrimitiveManager_t *manager)
 
 /**
  * Unlock the primitive mutex
- * @param manager The primitive manager to unlock the primitive mutex for
+ * @param manager [in/out] The primitive manager to unlock the primitive mutex for
  */
 void app_primitive_manager_unlockPrimitiveMutex(PrimitiveManager_t *manager)
 {
@@ -70,6 +70,16 @@ void app_primitive_manager_unlockPrimitiveMutex(PrimitiveManager_t *manager)
 #error "Could not determine what CPU this is being compiled for."
 #endif
 }
+
+/**
+ * Make the robot in the given world "safe" by disabling potentially dangerous
+ * functionality, including bringing it to a stop
+ *
+ * @param manager [in/out] The primitive manager controlling the robot
+ * @param world [in] The world containing the robot make safe
+ */
+void app_primitive_manager_makeRobotSafe(PrimitiveManager_t *manager,
+                                         FirmwareWorld_t *world);
 
 PrimitiveManager_t *app_primitive_manager_create(void)
 {
@@ -156,15 +166,7 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                                 manager->current_primitive_state, world);
             break;
         default:
-            // We both assert and set a new primitive here because we want to
-            // easily be able to see this case while debugging, but don't want to
-            // accidentally run a totally random primitive if we're compiling in optimized
-            // mode with no assertions. We set the current primitive to a stop
-            // primitive for safety
-            manager->current_primitive       = &STOP_PRIMITIVE;
-            manager->current_primitive_state = manager->current_primitive->create_state();
-            PrimitiveParamsMsg params        = PrimitiveParamsMsg_init_zero;
-            app_stop_primitive_start(params, manager->current_primitive_state, world);
+            app_primitive_manager_makeRobotSafe(manager, world);
             assert(false);
     }
 
@@ -195,6 +197,13 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
         manager->current_primitive = NULL;
     }
 
+    app_primitive_manager_makeRobotSafe(manager, world);
+}
+
+void app_primitive_manager_makeRobotSafe(PrimitiveManager_t *manager,
+                                         FirmwareWorld_t *world)
+{
+    // Disable chipper, kicker, dribbler
     FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
     Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
     Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
@@ -202,4 +211,10 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
     app_chicker_disableAutochip(chicker);
     app_chicker_disableAutokick(chicker);
     app_dribbler_setSpeed(dribbler, 0);
+
+    // Set the current primitive to STOP to stop the robot moving
+    manager->current_primitive       = &STOP_PRIMITIVE;
+    manager->current_primitive_state = manager->current_primitive->create_state();
+    PrimitiveParamsMsg params        = PrimitiveParamsMsg_init_zero;
+    app_stop_primitive_start(params, manager->current_primitive_state, world);
 }
