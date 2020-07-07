@@ -13,10 +13,11 @@
 
 struct commandLineArgs
 {
-    bool help                = false;
-    std::string backend_name = "";
-    bool headless            = false;
-    bool err                 = false;
+    bool help                          = false;
+    std::string backend_name           = "";
+    std::string network_interface_name = "";
+    bool headless                      = false;
+    bool err                           = false;
 };
 
 // clang-format off
@@ -33,7 +34,7 @@ std::string BANNER =
 // clang-format on
 
 /**
- * Parses Arguments and Indicates which arguments were received
+ * Parses arguments and indicates which arguments were received
  *
  * @param argc
  * @param argv
@@ -53,14 +54,22 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     std::string backend_help_str =
         "The backend that you would like to use, one of: " + all_backend_names;
 
+    std::string interface_help_str =
+        "The interface to send and receive packets over (can be found through ifconfig)";
+
     boost::program_options::options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
-                       "Help screen")(
+                       "Help screen");
+    desc.add_options()(
         "backend",
         boost::program_options::value<std::string>(&args.backend_name)->required(),
-        backend_help_str.c_str())("headless",
-                                  boost::program_options::bool_switch(&args.headless),
-                                  "Run without the FullSystemGUI");
+        backend_help_str.c_str());
+    desc.add_options()(
+        "interface",
+        boost::program_options::value<std::string>(&args.network_interface_name),
+        interface_help_str.c_str());
+    desc.add_options()("headless", boost::program_options::bool_switch(&args.headless),
+                       "Run without the FullSystemGUI");
 
     boost::program_options::variables_map vm;
     try
@@ -102,6 +111,15 @@ int main(int argc, char **argv)
             DynamicParameters->getAIControlConfig();
         std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
             DynamicParameters->getSensorFusionConfig();
+
+        // TODO remove this when we move to non-generic factories for backends
+        // https://github.com/UBC-Thunderbots/Software/issues/1452
+        if (!args.network_interface_name.empty())
+        {
+            MutableDynamicParameters->getMutableNetworkConfig()
+                ->mutableNetworkInterface()
+                ->setValue(args.network_interface_name);
+        }
 
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend>::create(args.backend_name);
