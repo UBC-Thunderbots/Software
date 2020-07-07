@@ -255,8 +255,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     }
     else
     {
-        regression_error = (A * regression_vector - b).norm() /
-                           (b.norm() + FIXED_EPSILON);  // norm() is L2 norm
+        regression_error = std::numeric_limits<double>::max();
     }
 
     // Find 2 points on the regression line that we solved for, and use this to construct

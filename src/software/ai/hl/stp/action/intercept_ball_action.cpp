@@ -74,6 +74,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             pointInFrontVector(ball.position(), ball.velocity(), closest_point);
 
         Duration ball_time_to_position;
+        bool ball_not_moving = false;
 
         if (ball.velocity().length() != 0)
         {
@@ -82,10 +83,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         }
         else
         {
-            // If velocity is 0, add FIXED_EPSILON to prevent division by zero
-            ball_time_to_position =
-                Duration::fromSeconds(distance(closest_point, ball.position()) /
-                                      (ball.velocity().length() + FIXED_EPSILON));
+            ball_not_moving = true;
         }
 
         Duration robot_time_to_pos = getTimeToPositionForRobot(
@@ -93,7 +91,8 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
         std::optional<Point> intercept_pos = std::nullopt;
-        if (point_in_front_of_ball && (ball_time_to_position > robot_time_to_pos))
+        if (ball_not_moving ||
+            (point_in_front_of_ball && (ball_time_to_position > robot_time_to_pos)))
         {
             intercept_pos = closest_point;
         }
