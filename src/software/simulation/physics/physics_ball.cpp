@@ -9,9 +9,9 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
                          const double mass_kg, double restitution, double linear_damping)
     : in_flight_origin(std::nullopt),
       in_flight_distance_meters(0.0),
+      flight_angle_of_departure(Angle::zero()),
       ball_restitution(restitution),
-      ball_linear_damping(linear_damping),
-      flight_angle_of_departure(Angle::zero())
+      ball_linear_damping(linear_damping)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
