@@ -112,7 +112,7 @@ void ThreadedSimulator::runSimulationLoop()
         simulator_mutex.unlock();
 
         assert(ssl_wrapper_packet_ptr);
-        SSL_WrapperPacket ssl_wrapper_packet = *(ssl_wrapper_packet_ptr.release());
+        SSL_WrapperPacket ssl_wrapper_packet = *ssl_wrapper_packet_ptr;
 
         {
             std::scoped_lock lock(callback_mutex);
