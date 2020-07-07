@@ -5,6 +5,9 @@ exports_files(["LICENSE.txt"])
 package(default_visibility = ["//visibility:public"])
 
 common_defines = [
+    # By default, NanoPb only supports 8-bit tags. This define changes the tag type to
+    # one that supports 16-bit tags.
+    # (https://jpa.kapsi.fi/nanopb/docs/reference.html)
     "PB_FIELD_16BIT",
 ]
 

@@ -15,15 +15,15 @@ PrimitiveManager_t *app_primitive_manager_create(void);
 /**
  * Destroy the given PrimitiveManager, freeing any memory allocated for it
  *
- * @param wheel The PrimitiveManager to destroy
+ * @param wheel [in] The PrimitiveManager to destroy
  */
 void app_primitive_manager_destroy(PrimitiveManager_t *manager);
 
 /**
  * Start a new primitive with the given PrimitiveManager
- * @param manager The PrimitiveManager to run the primitive
- * @param world The world to run the primitive in
- * @param primitive_msg The message representing the primitive to run
+ * @param manager [in/out] The PrimitiveManager to run the primitive
+ * @param world [in] The world to run the primitive in
+ * @param primitive_msg [in] The message representing the primitive to run
  */
 void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
@@ -31,16 +31,16 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
 /**
  * Runs the current primitive
  *
- * @param manager The primitive manager to set the current primitive on
- * @param world The world to run the primitive in
+ * @param manager [in/out] The primitive manager to set the current primitive on
+ * @param world [in] The world to run the primitive in
  */
 void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
                                                FirmwareWorld_t *world);
 
 /**
  * End the primitive the manager is currently running (if there is one running)
- * @param manager The manager (that could be) running a primitive
- * @param world The world the primitive is to be ended in
+ * @param manager [in/out] The manager (that could be) running a primitive
+ * @param world [in] The world the primitive is to be ended in
  */
 void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
                                                FirmwareWorld_t *world);

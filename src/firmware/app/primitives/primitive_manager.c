@@ -104,8 +104,7 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
 
     app_primitive_manager_endCurrentPrimitive(manager, world);
 
-    // Figure out which primitive we're running by parsing the `oneof` field in the proto,
-    // then start it
+    // Figure out which primitive we're running and start it
     switch (primitive_msg.which_primitive)
     {
         case PrimitiveMsg_move_tag:
