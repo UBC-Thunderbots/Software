@@ -15,8 +15,8 @@ TEST(RobotStateWithTimestampTest, get_robot_state)
     TimestampedRobotState state(RobotState(Point(1.1, -0.5), Vector(3, 0),
                                            Angle::quarter(), AngularVelocity::half()),
                                 Timestamp::fromSeconds(0.1));
-    EXPECT_EQ(state.robotState(), RobotState(Point(1.1, -0.5), Vector(3, 0),
-                                             Angle::quarter(), AngularVelocity::half()));
+    EXPECT_EQ(state.state(), RobotState(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
+                                        AngularVelocity::half()));
 }
 
 TEST(RobotStateWithTimestampTest, compare_identical_states)

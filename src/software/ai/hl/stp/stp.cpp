@@ -25,9 +25,39 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
 {
 }
 
-void STP::updateCurrentPlay(const World& world)
+void STP::updateSTPState(const World& world)
 {
-    current_game_state               = world.gameState().game_state;
+    updateGameState(world);
+    updateAIPlay(world);
+}
+
+void STP::updateGameState(const World& world)
+{
+    current_game_state = world.gameState();
+    if (control_config->OverrideRefboxGameState()->value())
+    {
+        std::string previous_state_string =
+            control_config->PreviousRefboxGameState()->value();
+        std::string current_state_string =
+            control_config->CurrentRefboxGameState()->value();
+        try
+        {
+            RefboxGameState previous_state =
+                fromStringToRefboxGameState(previous_state_string);
+            current_game_state.updateRefboxGameState(previous_state);
+            RefboxGameState current_state =
+                fromStringToRefboxGameState(current_state_string);
+            current_game_state.updateRefboxGameState(current_state);
+        }
+        catch (std::invalid_argument e)
+        {
+            LOG(WARNING) << e.what();
+        }
+    }
+}
+
+void STP::updateAIPlay(const World& world)
+{
     previous_override_play           = override_play;
     override_play                    = control_config->OverrideAIPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
@@ -109,7 +139,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
             if (intent)
             {
                 auto motion_constraints = motion_constraint_manager.getMotionConstraints(
-                    world.gameState(), *tactic);
+                    current_game_state, *tactic);
                 intent->setMotionConstraints(motion_constraints);
 
                 intents.emplace_back(std::move(intent));
@@ -123,7 +153,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
             }
             else
             {
-                LOG(WARNING) << "Tried to run a tactic that didn't yield an Intent"
+                LOG(WARNING) << "Tried to run a tactic that didn't yield an Intent "
                              << "and did not have a robot assigned!";
             }
         }
@@ -134,7 +164,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
-    updateCurrentPlay(world);
+    updateSTPState(world);
     return getIntentsFromCurrentPlay(world);
 }
 
@@ -300,10 +330,10 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    std::string info_play_type = toString(current_game_state);
+    std::string info_refbox_game_state = toString(current_game_state.game_state);
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
     std::unordered_set<std::string> info_robot_tactic_assignment = {};
-    info = PlayInfo(info_play_type, info_play_name, info_robot_tactic_assignment);
+    info = PlayInfo(info_refbox_game_state, info_play_name, info_robot_tactic_assignment);
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report
     // the tactics in order or robot id. This makes it much easier to read if tactics

@@ -17,14 +17,14 @@ Timestamp TimestampedBallState::timestamp() const
     return timestamp_;
 }
 
-BallState TimestampedBallState::ballState() const
+BallState TimestampedBallState::state() const
 {
     return ball_state_;
 }
 
 bool TimestampedBallState::operator==(const TimestampedBallState &other) const
 {
-    return this->ballState() == other.ballState();
+    return this->state() == other.state();
 }
 
 bool TimestampedBallState::operator!=(const TimestampedBallState &other) const

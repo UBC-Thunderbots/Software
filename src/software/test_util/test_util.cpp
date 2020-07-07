@@ -317,4 +317,18 @@ namespace TestUtil
                                        .count()) /
                NANOSECONDS_PER_MILLISECOND;
     }
+
+    std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
+        const std::vector<Point> &positions)
+    {
+        std::vector<RobotStateWithId> states;
+        for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
+        {
+            states.push_back(RobotStateWithId{
+                .id          = id,
+                .robot_state = RobotState(positions[id], Vector(0, 0), Angle::zero(),
+                                          AngularVelocity::zero())});
+        }
+        return states;
+    }
 };  // namespace TestUtil

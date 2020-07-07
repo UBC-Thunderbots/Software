@@ -1,6 +1,6 @@
 #include "software/ai/evaluation/pass.h"
 
-Duration getTimeToOrientationForRobot(const Robot& robot,
+Duration getTimeToOrientationForRobot(const Angle& current_orientation,
                                       const Angle& desired_orientation,
                                       const double& max_velocity,
                                       const double& max_acceleration)
@@ -18,7 +18,7 @@ Duration getTimeToOrientationForRobot(const Robot& robot,
     // We re-arrange (3) to get:
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    double dist = robot.orientation().minDiff(desired_orientation).toRadians();
+    double dist = current_orientation.minDiff(desired_orientation).toRadians();
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)
@@ -42,10 +42,10 @@ Duration getTimeToOrientationForRobot(const Robot& robot,
     return Duration::fromSeconds(travel_time);
 }
 
-Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
-                                   const double& max_velocity,
-                                   const double& max_acceleration,
-                                   const double& tolerance_meters)
+Duration getTimeToPositionForRobot(const Point& start, const Point& dest,
+                                   const double max_velocity,
+                                   const double max_acceleration,
+                                   const double tolerance_meters)
 {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
@@ -60,7 +60,7 @@ Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
     // We re-arrange (3) to get:
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    double dist = std::max(0.0, (robot.position() - dest).length() - tolerance_meters);
+    double dist = std::max(0.0, (start - dest).length() - tolerance_meters);
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)

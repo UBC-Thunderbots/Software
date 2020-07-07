@@ -91,4 +91,9 @@ struct RobotStateWithId
 {
     unsigned int id;
     RobotState robot_state;
+
+    bool operator==(const RobotStateWithId &other) const
+    {
+        return id == other.id && robot_state == other.robot_state;
+    }
 };

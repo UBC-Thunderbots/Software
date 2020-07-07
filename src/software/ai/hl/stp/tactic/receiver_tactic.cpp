@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
+#include "software/new_geom/util/acute_angle.h"
 #include "software/new_geom/util/closest_point.h"
 
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
@@ -192,10 +193,9 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
                 .clamp()
                 .abs();
 
-        Angle goal_angle =
-            acuteVertexAngle(field.friendlyGoalpostPos(), robot->position(),
-                             field.friendlyGoalpostNeg())
-                .abs();
+        Angle goal_angle = acuteAngle(field.friendlyGoalpostPos(), robot->position(),
+                                      field.friendlyGoalpostNeg())
+                               .abs();
         net_percent_open =
             best_shot_opt->getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }

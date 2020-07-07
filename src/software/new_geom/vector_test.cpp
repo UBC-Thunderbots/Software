@@ -117,6 +117,15 @@ TEST(VectorLogicTests, vector_proj_test)
     EXPECT_EQ(1.76, proj.y());
 }
 
+TEST(VectorLogicTests, project_vector_onto_vector_in_opposite_direction)
+{
+    Vector u    = Vector(1, 2);
+    Vector v    = Vector(-3, 0);
+    Vector proj = u.project(v);
+    EXPECT_DOUBLE_EQ(1.0, proj.x());
+    EXPECT_DOUBLE_EQ(0.0, proj.y());
+}
+
 TEST(VectorLogicTests, vector_dot_test)
 {
     Vector u = Vector(-4, -9);
@@ -234,28 +243,4 @@ TEST(VectorOperatorTests, vector_equality_inequality_test)
 
     EXPECT_FALSE(u == v);
     EXPECT_TRUE(u != v);
-}
-
-TEST(VectorAngleWithTests, vector_right_angle_with_other_test)
-{
-    Vector u = Vector(0, 5);
-    Vector v = Vector(4, 0);
-
-    EXPECT_EQ(v.angleWith(u), Angle::fromDegrees(90));
-}
-
-TEST(VectorAngleWithTests, vector_acute_angle_with_other_test)
-{
-    Vector u = Vector(0, -1);
-    Vector v = Vector(-1, -1);
-
-    EXPECT_EQ(v.angleWith(u), Angle::fromDegrees(45));
-}
-
-TEST(VectorAngleWithTests, vector_obtuse_angle_with_other_test)
-{
-    Vector u = Vector(1, 0);
-    Vector v = Vector(-1, -1);
-
-    EXPECT_EQ(v.angleWith(u), Angle::fromDegrees(135));
 }

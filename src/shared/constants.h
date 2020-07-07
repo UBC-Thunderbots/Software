@@ -46,6 +46,8 @@ const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
 // The maximum acceleration achievable by enemy robots, in metres per seconds squared.
 const double ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4.0;
 
+const double ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED = 9.81;
+
 /* Unit Conversion */
 const double MILLIMETERS_PER_METER = 1000.0;
 const double METERS_PER_MILLIMETER = 1.0 / 1000.0;
