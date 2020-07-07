@@ -23,9 +23,12 @@ class PhysicsBall
      * @param world A shared_ptr to a Box2D World
      * @param ball_state The initial state of the ball
      * @param mass_kg The mass of the ball in kg
+     * @param restitution The restitution of the ball
+     * @param linear_damping The linear damping of the ball
      */
     explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
-                         const double mass_kg);
+                         const double mass_kg, double restitution = 1.0,
+                         double linear_damping = 0.0);
 
     PhysicsBall() = delete;
 
@@ -134,11 +137,15 @@ class PhysicsBall
     double in_flight_distance_meters;
     Angle flight_angle_of_departure;
 
-    // These restitution and friction values are somewhat arbitrary. Because this is an
-    // "ideal" simulation, we can approximate the ball as having perfectly elastic
-    // collisions and no friction. Because we also do not generally depend on specific
-    // behaviour when the ball collides with something, getting these values to perfectly
-    // match reality isn't too important.
-    static constexpr double BALL_RESTITUTION = 1.0;
-    static constexpr double BALL_FRICTION    = 0.0;
+    // friction with other objects, such as robots/wall
+    static constexpr double BALL_FRICTION = 0.0;
+
+    // The restitution is the amount of energy retained when bouncing off walls and
+    // robots, 0.0 means perfectly inelastic and 1.0 means perfectly elastic collision.
+    // The linear damping determines how the linear motion of the ball decreases over
+    // time, 0.0 means no damping and the damping increases as linear_damping increases.
+    // Linear Damping link:
+    // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
+    const double ball_restitution;
+    const double ball_linear_damping;
 };

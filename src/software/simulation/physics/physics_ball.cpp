@@ -6,8 +6,12 @@
 #include "software/new_geom/util/distance.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_state,
-                         const double mass_kg)
-    : in_flight_origin(std::nullopt), in_flight_distance_meters(0.0), flight_angle_of_departure(Angle::zero())
+                         const double mass_kg, double restitution, double linear_damping)
+    : in_flight_origin(std::nullopt),
+      in_flight_distance_meters(0.0),
+      ball_restitution(restitution),
+      ball_linear_damping(linear_damping),
+      flight_angle_of_departure(Angle::zero())
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -21,8 +25,9 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
     // helps prevent tunneling and other collision problems
     // See the "Breakdown of a collision" section of:
     // https://www.iforce2d.net/b2dtut/collision-anatomy
-    ball_body_def.bullet = true;
-    ball_body            = world->CreateBody(&ball_body_def);
+    ball_body_def.bullet        = true;
+    ball_body_def.linearDamping = static_cast<float>(ball_linear_damping);
+    ball_body                   = world->CreateBody(&ball_body_def);
 
     b2CircleShape ball_shape;
     ball_shape.m_radius = static_cast<float>(BALL_MAX_RADIUS_METERS);
@@ -34,7 +39,7 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
     float ball_area =
         static_cast<float>(M_PI * ball_shape.m_radius * ball_shape.m_radius);
     ball_fixture_def.density     = static_cast<float>(mass_kg / ball_area);
-    ball_fixture_def.restitution = static_cast<float>(BALL_RESTITUTION);
+    ball_fixture_def.restitution = static_cast<float>(ball_restitution);
     ball_fixture_def.friction    = static_cast<float>(BALL_FRICTION);
     ball_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
@@ -144,7 +149,7 @@ void PhysicsBall::updateIsInFlight() {
     if (isInFlight())
     {
         double current_in_flight_distance_meters =
-                (position() - in_flight_origin.value()).length();
+            (position() - in_flight_origin.value()).length();
         // Once the ball is in flight, it can only stop being in flight once it has
         // travelled at least the current in_flight_distance and is simultaneously not
         // touching another object. This prevents the ball from "landing" in another

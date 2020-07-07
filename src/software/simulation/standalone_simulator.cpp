@@ -9,7 +9,7 @@ extern "C"
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField())
+      simulator(Field::createSSLDivisionBField(), 0.8, 0.2)
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(
         [this](int) { this->initNetworking(); });
@@ -29,7 +29,7 @@ StandaloneSimulator::StandaloneSimulator(
             this->wrapper_packet_sender->sendProto(wrapper_packet);
         });
 
-    simulator.setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    simulator.setBallState(BallState(Point(0, 0), Vector(5, 2)));
 
     simulator.startSimulation();
 }
