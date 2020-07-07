@@ -233,7 +233,8 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
 
     for (const auto &robot : enemy_team.getAllRobots())
     {
-        bool has_ball = *robotHasPossession(ball, robot);
+        bool has_ball =
+            *robotHasPossession(ball.getPreviousStates(), robot.getPreviousStates());
 
         // Get the angle from the robot to each friendly goalpost, then find the
         // difference between these angles to get the goal_angle for the robot

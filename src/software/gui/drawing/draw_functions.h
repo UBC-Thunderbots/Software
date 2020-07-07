@@ -3,6 +3,8 @@
 #include <QtWidgets/QGraphicsScene>
 #include <functional>
 
+using DrawFunction = std::function<void(QGraphicsScene* scene)>;
+
 /**
  * This class is used to represent a "draw function", which is a function
  * provided to various GUI components that tells them how to draw things.
@@ -14,54 +16,97 @@
  * solution to that.
  *
  * DrawFunctions can capture any data that supports copying and
- * "store" it for later. That way the entire DrawFunction can be copied
+ * "store" it for later. That way the entire DrawFunctionWrapper can be copied
  * and passed around the system, until some consumer calls it to
  * draw its contents. This allows us to draw larger non-copyable objects
- * by creating a DrawFunction from it's copyable components / members.
+ * by creating a DrawFunctionWrapper from it's copyable components / members.
+ *
+ * This class is made abstract by making the destructor pure virtual,
+ * but providing an implementation. The subclasses will have a default
+ * destructor automatically generated which will implement the virtual
+ * destructor. All together this lets the base class be pure virtual
+ * without needing an extra pure-virtual "dummy" function
+ * See https://stackoverflow.com/a/4641108
  */
-class DrawFunction
+class DrawFunctionWrapper
 {
    public:
-    DrawFunction() = default;
-    inline explicit DrawFunction(
+    /**
+     * Creates a DrawFunctionWrapper
+     *
+     * @pre draw_function must be callable (ie. operator bool(draw_function) == true)
+     *
+     * @param draw_function The function to use for drawing
+     */
+    inline explicit DrawFunctionWrapper(
         const std::function<void(QGraphicsScene* scene)>& draw_function)
     {
+        if (!draw_function)
+        {
+            throw std::invalid_argument(
+                "Created a DrawFunctionWrapper with a non-callable function");
+        }
+
         draw_function_ = draw_function;
     }
-    inline void execute(QGraphicsScene* scene)
+    DrawFunctionWrapper()          = delete;
+    virtual ~DrawFunctionWrapper() = 0;
+
+    /**
+     * Returns the internal draw_function
+     *
+     * @return the internal draw_function
+     */
+    inline std::function<void(QGraphicsScene* scene)> getDrawFunction()
     {
-        if (draw_function_)
-        {
-            draw_function_(scene);
-        }
+        return draw_function_;
     }
 
    private:
-    std::function<void(QGraphicsScene* scene)> draw_function_;
+    DrawFunction draw_function_;
 };
 
-// Note: Generally the top-level DrawFunction class can be used, but if we need
-// separate concrete types (for example so an Observer can explicitly observe
-// two different DrawFunctions), they can be defined here.
+inline DrawFunctionWrapper::~DrawFunctionWrapper() = default;
 
-class AIDrawFunction : public DrawFunction
+/**
+ * We inherit from the generic DrawFunctionWrapper to create "strong" types
+ * for different functions. This is required by the Observer system because
+ * it operates on types, and simply using a typedef would result in
+ * conflicting functions is an Observer tried to observe two different
+ * DrawFunctions at once.
+ *
+ * Additionally, it is useful to be able to distinguish different DrawFunctions
+ * because we can make more intelligent decisions about ordering when drawing.
+ * For example, we can make sure we always draw the Field before anything from
+ * the AI, so the AI drawings always show on top.
+ */
+
+/**
+ * This class identifies anything that we may want to show about
+ * the AI or its internal state. For example, navigation paths,
+ * highlighting threatening enemies, etc.
+ */
+class AIDrawFunction : public DrawFunctionWrapper
 {
    public:
-    AIDrawFunction() = default;
     inline explicit AIDrawFunction(
         const std::function<void(QGraphicsScene* scene)>& draw_function)
-        : DrawFunction(draw_function)
+        : DrawFunctionWrapper(draw_function)
     {
     }
 };
 
-class WorldDrawFunction : public DrawFunction
+/**
+ * This class identifies anything that we may want to show about
+ * the state of the World / things happening on the field. For example,
+ * robot positions, ball position, field lines, etc.
+ */
+class WorldDrawFunction : public DrawFunctionWrapper
 {
    public:
-    WorldDrawFunction() = default;
     inline explicit WorldDrawFunction(
         const std::function<void(QGraphicsScene* scene)>& draw_function)
-        : DrawFunction(draw_function)
+        : DrawFunctionWrapper(draw_function)
     {
     }
 };

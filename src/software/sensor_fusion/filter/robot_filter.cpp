@@ -20,14 +20,12 @@ std::optional<Robot> RobotFilter::getFilteredData(
 {
     int data_num               = 0;
     Timestamp latest_timestamp = Timestamp().fromSeconds(0);
-    FilteredRobotData filtered_data;
-
-    filtered_data.id               = this->getRobotId();
-    filtered_data.position         = Point(0, 0);
-    filtered_data.velocity         = Vector(0, 0);
-    filtered_data.orientation      = Angle::fromRadians(0);
-    filtered_data.angular_velocity = AngularVelocity::fromRadians(0);
-    filtered_data.timestamp        = Timestamp().fromSeconds(0);
+    FilteredRobotData filtered_data{.id               = this->getRobotId(),
+                                    .position         = Point(0, 0),
+                                    .velocity         = Vector(0, 0),
+                                    .orientation      = Angle::fromRadians(0),
+                                    .angular_velocity = AngularVelocity::fromRadians(0),
+                                    .timestamp        = Timestamp().fromSeconds(0)};
 
     for (const RobotDetection &robot_data : new_robot_data)
     {

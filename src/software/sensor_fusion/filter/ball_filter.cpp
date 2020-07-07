@@ -247,14 +247,14 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     // https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
     double regression_error;
 
-    if (b.norm() != 0)
+    if ((A * regression_vector - b).norm() == 0 && b.norm() == 0)
     {
-        regression_error =
-            (A * regression_vector - b).norm() / (b.norm());  // norm() is L2 norm
+        regression_error = 0;
     }
     else
     {
-        regression_error = 0;
+        regression_error =
+            (A * regression_vector - b).norm() / (b.norm());  // norm() is L2 norm
     }
 
     // Find 2 points on the regression line that we solved for, and use this to construct

@@ -26,7 +26,6 @@ RobotDiagnosticsGUI::RobotDiagnosticsGUI(
     update_timer->start(static_cast<int>(update_timer_interval.getMilliseconds()));
 
     setupWidgets();
-    update();
 }
 
 void RobotDiagnosticsGUI::onChickerStateChanged(double chicker_power,

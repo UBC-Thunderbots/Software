@@ -5,9 +5,8 @@
 #include <vector>
 
 /**
- * A description of the play.  Contains the type of play being
- * run, its name, and the tactic assignments for all the robots
- * on the field.
+ * A description of the play.  Contains the refbox game state, the name of the current
+ * play being run by AI, and the tactic assignments for all the robots on the field.
  */
 class PlayInfo
 {
@@ -20,15 +19,15 @@ class PlayInfo
     /**
      * Constructs a PlayInfo object with given arguments for fields
      */
-    explicit PlayInfo(std::string play_type, std::string play_name,
+    explicit PlayInfo(std::string refbox_game_state_name, std::string play_name,
                       std::unordered_set<std::string> robots_tactic_assignment);
 
     /**
-     * Get play type
+     * Get refbox game state name
      *
-     * @return play_type field
+     * @return refbox game state name
      */
-    std::string getPlayType() const;
+    std::string getRefboxGameStateName() const;
 
     /**
      * Get play name
@@ -59,7 +58,7 @@ class PlayInfo
     bool operator==(const PlayInfo &other) const;
 
    private:
-    std::string play_type;
+    std::string refbox_game_state_name;
     std::string play_name;
     std::unordered_set<std::string> robot_tactic_assignment;
 };

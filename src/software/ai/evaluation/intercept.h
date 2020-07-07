@@ -19,5 +19,25 @@
  *         relative to the timestamp of the robot. If no possible intercept could be
  * found within the field bounds, returns std::nullopt
  */
-std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Field field,
-                                                                   Robot robot);
+std::optional<std::pair<Point, Duration>> findBestInterceptForBall(
+    TimestampedBallState ball, Field field, TimestampedRobotState robot);
+
+/**
+ * Returns the estimated position of the ball at a future time, relative to when the
+ * ball was last updated.
+ *
+ * @param position current position of the ball
+ * @param velocity current velocity of the ball
+ * @param duration_in_future The relative amount of time in the future
+ * at which to predict the ball's position. Value must be >= 0.
+ * For example, a value of 1.5 seconds would return the estimated position of the ball
+ * 1.5 seconds in the future.
+ *
+ * @throws std::invalid_argument if the ball is estimating the position with a time
+ * from the past
+ *
+ * @return the estimated position of the ball at the given number of milliseconds
+ * in the future. Coordinates are in metres.
+ */
+Point estimateBallPositionAtFutureTime(Point position, Vector velocity,
+                                       const Duration &duration_in_future);

@@ -15,7 +15,15 @@ extern "C"
 }
 
 Simulator::Simulator(const Field& field, const Duration& physics_time_step)
-    : physics_world(field), frame_number(0), physics_time_step(physics_time_step)
+    : Simulator(field, 1.0, 0.0, physics_time_step)
+{
+}
+
+Simulator::Simulator(const Field& field, double ball_restitution,
+                     double ball_linear_damping, const Duration& physics_time_step)
+    : physics_world(field, ball_restitution, ball_linear_damping),
+      frame_number(0),
+      physics_time_step(physics_time_step)
 {
 }
 
