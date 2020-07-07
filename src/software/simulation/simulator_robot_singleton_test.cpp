@@ -439,7 +439,7 @@ TEST_F(SimulatorRobotSingletonTest,
     // the ball will land, and an enemy past where the ball will land
     std::vector<Point> enemy_robot_positions = {Point(1, 0), Point(2, 0), Point(3, 0)};
     auto [world, firmware_robot, simulator_ball] =
-    createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
+        createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
 
     // Simulate for 1/2 second without chipping
     for (unsigned int i = 0; i < 30; i++)
@@ -459,13 +459,13 @@ TEST_F(SimulatorRobotSingletonTest,
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    // The ball should have made it past the first and second robots, but been stopped by the third
+    // The ball should have made it past the first and second robots, but been stopped by
+    // the third
     EXPECT_GT(simulator_ball->position().x(), 2.0);
     EXPECT_LT(simulator_ball->position().x(), 3.0);
 }
 
-TEST_F(SimulatorRobotSingletonTest,
-       test_ball_maintains_speed_throughout_chipping)
+TEST_F(SimulatorRobotSingletonTest, test_ball_maintains_speed_throughout_chipping)
 {
     // This is a regression test to help catch future issues with chipping speed.
     // The original bug was that not all collisions were properly disabled while
@@ -481,7 +481,7 @@ TEST_F(SimulatorRobotSingletonTest,
     // Add an enemy close to the chipping robot
     std::vector<Point> enemy_robot_positions = {Point(1, 0)};
     auto [world, firmware_robot, simulator_ball] =
-    createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
+        createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
 
     // Simulate for 1/2 second without chipping
     for (unsigned int i = 0; i < 30; i++)
@@ -500,12 +500,14 @@ TEST_F(SimulatorRobotSingletonTest,
     for (unsigned int i = 0; i < 200; i++)
     {
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-        if(i == 0) {
+        if (i == 0)
+        {
             initial_chip_speed = simulator_ball->velocity().length();
         }
-        if(i >= 5) {
-            // Once the ball is chipped its speed should not change until it hits the obstacle
-            // after it lands
+        if (i >= 5)
+        {
+            // Once the ball is chipped its speed should not change until it hits the
+            // obstacle after it lands
             EXPECT_NEAR(initial_chip_speed, simulator_ball->velocity().length(), 1e-6);
         }
     }

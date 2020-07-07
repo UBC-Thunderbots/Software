@@ -435,7 +435,8 @@ TEST(PhysicsBallTest, test_set_ball_in_flight_with_collisions)
     EXPECT_FALSE(physics_ball.isInFlight());
 }
 
-TEST(PhysicsBall, get_height_when_ball_not_in_flight) {
+TEST(PhysicsBall, get_height_when_ball_not_in_flight)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
@@ -445,7 +446,8 @@ TEST(PhysicsBall, get_height_when_ball_not_in_flight) {
     EXPECT_DOUBLE_EQ(0.0, physics_ball.getBallState().distanceFromGround());
 }
 
-TEST(PhysicsBall, get_height_when_ball_in_flight) {
+TEST(PhysicsBall, get_height_when_ball_in_flight)
+{
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
     BallState initial_ball_state(Point(0, 0), Vector(1, 0));
@@ -463,17 +465,25 @@ TEST(PhysicsBall, get_height_when_ball_in_flight) {
         // https://www.iforce2d.net/b2dtut/worlds
         world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
         physics_ball.updateIsInFlight();
-        auto ball = physics_ball.getBallState();
+        auto ball                                = physics_ball.getBallState();
         double expected_max_distance_grom_ground = 0.5;
-        if(ball.position().x() < 0.95) {
+        if (ball.position().x() < 0.95)
+        {
             EXPECT_GT(ball.distanceFromGround(), 0.0);
             EXPECT_LT(ball.distanceFromGround(), expected_max_distance_grom_ground);
-        }else if(ball.position().x() < 1.05) {
-            EXPECT_NEAR(expected_max_distance_grom_ground, ball.distanceFromGround(), 0.05);
-        }else if(ball.position().x() <= 2.0) {
+        }
+        else if (ball.position().x() < 1.05)
+        {
+            EXPECT_NEAR(expected_max_distance_grom_ground, ball.distanceFromGround(),
+                        0.05);
+        }
+        else if (ball.position().x() <= 2.0)
+        {
             EXPECT_GT(ball.distanceFromGround(), 0.0);
             EXPECT_LT(ball.distanceFromGround(), expected_max_distance_grom_ground);
-        }else {
+        }
+        else
+        {
             EXPECT_DOUBLE_EQ(0.0, ball.distanceFromGround());
         }
     }

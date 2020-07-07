@@ -12,11 +12,13 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
         PhysicsObjectUserData *user_data_b =
             static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
 
-        if (auto ball = isBallContact(user_data_a, user_data_b)) {
+        if (auto ball = isBallContact(user_data_a, user_data_b))
+        {
             // Disable collisions with the ball if it is in flight. This is how we
             // simulate the ball being chipped any flying over other objects
             // in a 2D simulation
-            if (ball->isInFlight()) {
+            if (ball->isInFlight())
+            {
                 contact->SetEnabled(false);
                 return;
             }
@@ -56,11 +58,13 @@ void SimulationContactListener::PreSolve(b2Contact *contact,
         PhysicsObjectUserData *user_data_b =
             static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
 
-        if (auto ball = isBallContact(user_data_a, user_data_b)) {
+        if (auto ball = isBallContact(user_data_a, user_data_b))
+        {
             // Disable collisions with the ball if it is in flight. This is how we
             // simulate the ball being chipped any flying over other objects
             // in a 2D simulation
-            if (ball->isInFlight()) {
+            if (ball->isInFlight())
+            {
                 contact->SetEnabled(false);
                 return;
             }
@@ -99,11 +103,13 @@ void SimulationContactListener::EndContact(b2Contact *contact)
     PhysicsObjectUserData *user_data_b =
         static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
 
-    if (auto ball = isBallContact(user_data_a, user_data_b)) {
+    if (auto ball = isBallContact(user_data_a, user_data_b))
+    {
         // Disable collisions with the ball if it is in flight. This is how we
         // simulate the ball being chipped any flying over other objects
         // in a 2D simulation
-        if (ball->isInFlight()) {
+        if (ball->isInFlight())
+        {
             contact->SetEnabled(false);
             return;
         }

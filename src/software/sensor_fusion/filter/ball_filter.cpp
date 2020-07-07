@@ -324,7 +324,8 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
         Vector filtered_velocity = velocity_direction_along_regression_line.normalize(
             velocity_estimate->average_velocity_magnitude);
 
-        BallState ball_state(filtered_ball_position, filtered_velocity, latest_ball_detection.distance_from_ground);
+        BallState ball_state(filtered_ball_position, filtered_velocity,
+                             latest_ball_detection.distance_from_ground);
         return TimestampedBallState(ball_state, latest_ball_detection.timestamp);
     }
 }
@@ -344,8 +345,10 @@ std::optional<TimestampedBallState> BallFilter::getFilteredData(
         }
         else
         {
-            BallState ball_state(ball_detection_buffer.front().position, Vector(0, 0), ball_detection_buffer.front().distance_from_ground);
-            TimestampedBallState timestamped_ball_state(ball_state, ball_detection_buffer.front().timestamp);
+            BallState ball_state(ball_detection_buffer.front().position, Vector(0, 0),
+                                 ball_detection_buffer.front().distance_from_ground);
+            TimestampedBallState timestamped_ball_state(
+                ball_state, ball_detection_buffer.front().timestamp);
             return timestamped_ball_state;
         }
     }
@@ -353,8 +356,10 @@ std::optional<TimestampedBallState> BallFilter::getFilteredData(
     {
         // If there is only 1 entry in the buffer, we can't calculate a velocity so
         // just set it to 0
-        BallState ball_state(ball_detection_buffer.front().position, Vector(0, 0), ball_detection_buffer.front().distance_from_ground);
-        TimestampedBallState timestamped_ball_state(ball_state, ball_detection_buffer.front().timestamp);
+        BallState ball_state(ball_detection_buffer.front().position, Vector(0, 0),
+                             ball_detection_buffer.front().distance_from_ground);
+        TimestampedBallState timestamped_ball_state(
+            ball_state, ball_detection_buffer.front().timestamp);
         return timestamped_ball_state;
     }
     else
