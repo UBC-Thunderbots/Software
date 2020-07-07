@@ -102,15 +102,17 @@ TEST(RobotStatusTest, test_dongle_message_to_error_code)
 {
     // Mock dongle_messages with valid ErrorCode messages
     std::vector<std::string> dongle_messages = {
-        MRF::ESTOP_BROKEN_MESSAGE,       MRF::RX_FCS_FAIL_MESSAGE,
-        MRF::SECOND_DONGLE_MESSAGE,      MRF::TRANSMIT_QUEUE_FULL_MESSAGE,
-        MRF::RECEIVE_QUEUE_FULL_MESSAGE, MRF::PACKET_ABOVE_MAX_SIZE};
+        MRF::ROBOT_DEAD_MESSAGE,          MRF::ESTOP_BROKEN_MESSAGE,
+        MRF::RX_FCS_FAIL_MESSAGE,         MRF::SECOND_DONGLE_MESSAGE,
+        MRF::TRANSMIT_QUEUE_FULL_MESSAGE, MRF::RECEIVE_QUEUE_FULL_MESSAGE,
+        MRF::PACKET_ABOVE_MAX_SIZE};
 
     // Mock expected return ErrorCode enums from dongle_messages
     std::vector<ErrorCode> expected_error_code = {
-        ErrorCode::ESTOP_BROKEN,       ErrorCode::RX_FCS_FAIL,
-        ErrorCode::SECOND_DONGLE,      ErrorCode::TRANSMIT_QUEUE_FULL,
-        ErrorCode::RECEIVE_QUEUE_FULL, ErrorCode::PACKET_ABOVE_MAX_SIZE};
+        ErrorCode::ROBOT_DEAD,           ErrorCode::ESTOP_BROKEN,
+        ErrorCode::RX_FCS_FAIL,          ErrorCode::SECOND_DONGLE,
+        ErrorCode::TRANSMIT_QUEUE_FULL,  ErrorCode::RECEIVE_QUEUE_FULL,
+        ErrorCode::PACKET_ABOVE_MAX_SIZE};
 
     // Mock robot_status
     RobotStatus robot_status = {.robot = 1,

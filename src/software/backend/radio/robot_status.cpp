@@ -8,6 +8,7 @@
 #include "software/logger/logger.h"
 
 static const std::map<const std::string, ErrorCode> dongle_message_error_codes = {
+    {MRF::ROBOT_DEAD_MESSAGE, ErrorCode::ROBOT_DEAD},
     {MRF::ESTOP_BROKEN_MESSAGE, ErrorCode::ESTOP_BROKEN},
     {MRF::RX_FCS_FAIL_MESSAGE, ErrorCode::RX_FCS_FAIL},
     {MRF::SECOND_DONGLE_MESSAGE, ErrorCode::SECOND_DONGLE},
