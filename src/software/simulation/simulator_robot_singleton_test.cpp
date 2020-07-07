@@ -465,6 +465,53 @@ TEST_F(SimulatorRobotSingletonTest,
 }
 
 TEST_F(SimulatorRobotSingletonTest,
+       test_ball_maintains_speed_throughout_chipping)
+{
+    // This is a regression test to help catch future issues with chipping speed.
+    // The original bug was that not all collisions were properly disabled while
+    // the ball was "in flight", so when it passed over a robot it would still
+    // be damped by the dribbler and slow down the chip. This test verifies
+    // the speed of the ball does not change for the duration of a chip as the
+    // ball passes over obstacles
+
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
+    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
+    // Add an enemy close to the chipping robot
+    std::vector<Point> enemy_robot_positions = {Point(1, 0)};
+    auto [world, firmware_robot, simulator_ball] =
+    createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
+
+    // Simulate for 1/2 second without chipping
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    // Make sure we didn't chip
+    EXPECT_LT(simulator_ball->velocity().length(), 0.001);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_chip(chicker, 2.0);
+
+    double initial_chip_speed = 0.0;
+    for (unsigned int i = 0; i < 200; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+        if(i == 0) {
+            initial_chip_speed = simulator_ball->velocity().length();
+        }
+        if(i >= 5) {
+            // Once the ball is chipped its speed should not change until it hits the obstacle
+            // after it lands
+            EXPECT_NEAR(initial_chip_speed, simulator_ball->velocity().length(), 1e-6);
+        }
+    }
+}
+
+TEST_F(SimulatorRobotSingletonTest,
        test_robot_does_not_kick_or_chip_ball_when_autokick_and_autochip_disabled)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
