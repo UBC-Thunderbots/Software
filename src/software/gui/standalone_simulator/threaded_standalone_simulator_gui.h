@@ -24,8 +24,8 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
     /**
      * Creates a new ThreadedStandaloneSimulatorGUI
      *
-     * @param ball_placement_callback A callback that will be called when the user places
-     * the ball in the GUI
+     * @param ball_placement_callback A callback that will be called with the new ball location when
+     * the user places the ball in the GUI.
      * @param simulation_mode_callback A callback that will be called when the user sets
      * the simulation mode in the GUI
      */
