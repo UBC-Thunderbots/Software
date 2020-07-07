@@ -10,9 +10,9 @@ std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray
     // Create rays located at the extremes of the segment, that point in the direction
     // outwards are parallel to the segment
     const Ray extremes1 =
-        Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
+        Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getStart()));
     const Ray extremes2 =
-        Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
+        Ray(segment.getStart(), Vector(segment.getStart() - segment.getEnd()));
 
     const std::optional<Point> extreme_intersect11 = intersection(extremes1, ray1);
     const std::optional<Point> extreme_intersect12 = intersection(extremes2, ray1);
@@ -104,9 +104,9 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
     else if (intersect11.has_value() && !intersect21.has_value())
     {
         const Ray extremes1 =
-            Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
+            Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getStart()));
         const Ray extremes2 =
-            Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
+            Ray(segment.getStart(), Vector(segment.getStart() - segment.getEnd()));
         ;
 
         std::optional<Point> extreme_intersect1 = intersection(extremes1, ray2);
@@ -119,7 +119,7 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
         else if (extreme_intersect2.has_value())
         {
             return std::make_optional(
-                Segment(intersect11.value(), segment.getSegStart()));
+                Segment(intersect11.value(), segment.getStart()));
         }
     }
     // If only one ray intersects the segment return the segment between the intersection
@@ -127,9 +127,9 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
     else if (intersect21.has_value() && !intersect11.has_value())
     {
         const Ray extremes1 =
-            Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
+            Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getStart()));
         const Ray extremes2 =
-            Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
+            Ray(segment.getStart(), Vector(segment.getStart() - segment.getEnd()));
         ;
 
         std::optional<Point> extreme_intersect1 = intersection(extremes1, ray1);
@@ -142,7 +142,7 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
         else if (extreme_intersect2.has_value())
         {
             return std::make_optional(
-                Segment(intersect21.value(), segment.getSegStart()));
+                Segment(intersect21.value(), segment.getStart()));
         }
     }
     // All cases have been checked, return std::nullopt

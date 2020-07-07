@@ -21,23 +21,23 @@
 
 bool isDegenerate(const Segment &segment)
 {
-    return distanceSquared(segment.getSegStart(), segment.getEnd()) <
+    return distanceSquared(segment.getStart(), segment.getEnd()) <
            FIXED_EPSILON * FIXED_EPSILON;
 }
 
 double length(const Segment &segment)
 {
-    return distance(segment.getSegStart(), segment.getEnd());
+    return distance(segment.getStart(), segment.getEnd());
 }
 
 double lengthSquared(const Segment &segment)
 {
-    return distanceSquared(segment.getSegStart(), segment.getEnd());
+    return distanceSquared(segment.getStart(), segment.getEnd());
 }
 
 Point closestPointOnSeg(const Point &p, const Segment &segment)
 {
-    return closestPointOnSeg(p, segment.getSegStart(), segment.getEnd());
+    return closestPointOnSeg(p, segment.getStart(), segment.getEnd());
 }
 Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB)
 {

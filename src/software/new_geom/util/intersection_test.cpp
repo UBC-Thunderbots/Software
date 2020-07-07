@@ -134,7 +134,7 @@ TEST(RaySegmentIntersectionsTest, test_ray_overlapping_single_point_at_seg_start
     auto intersections = intersection(ray, segment);
 
     EXPECT_EQ(intersections[0], ray.getStart());
-    EXPECT_EQ(intersections[1], segment.getSegStart());
+    EXPECT_EQ(intersections[1], segment.getStart());
 }
 
 TEST(RaySegmentIntersectionsTest, test_ray_passes_through_seg_start_and_end)
@@ -144,7 +144,7 @@ TEST(RaySegmentIntersectionsTest, test_ray_passes_through_seg_start_and_end)
 
     auto intersections = intersection(ray, segment);
 
-    EXPECT_EQ(intersections[0], segment.getSegStart());
+    EXPECT_EQ(intersections[0], segment.getStart());
     EXPECT_EQ(intersections[1], segment.getEnd());
 }
 

@@ -7,7 +7,7 @@
 
 bool contains(const Circle& container, const Segment& contained)
 {
-    return contains(container, contained.getSegStart()) &&
+    return contains(container, contained.getStart()) &&
            contains(container, contained.getEnd());
 }
 
@@ -74,29 +74,29 @@ bool contains(const Ray& container, const Point& contained)
 bool contains(const Segment& container, const Point& contained, double fixed_epsilon,
               int ulps_distance)
 {
-    if (collinear(contained, container.getSegStart(), container.getEnd()))
+    if (collinear(contained, container.getStart(), container.getEnd()))
     {
         // If the segment and contained are in a perfect vertical line, we must use Y
         // coordinate centric logic
         if (almostEqual(contained.x(), container.getEnd().x(), fixed_epsilon,
                         ulps_distance) &&
-            almostEqual(container.getEnd().x(), container.getSegStart().x(),
+            almostEqual(container.getEnd().x(), container.getStart().x(),
                         fixed_epsilon, ulps_distance))
         {
             // Since segment and contained are collinear we only need to check one of the
             // coordinates, in this case we select Y because all X values are equal
-            return (contained.y() <= container.getSegStart().y() &&
+            return (contained.y() <= container.getStart().y() &&
                     contained.y() >= container.getEnd().y()) ||
                    (contained.y() <= container.getEnd().y() &&
-                    contained.y() >= container.getSegStart().y());
+                    contained.y() >= container.getStart().y());
         }
 
         // Since segment and contained are collinear we only need to check one of the
         // coordinates, choose x because we know there is variance in these values
-        return (contained.x() <= container.getSegStart().x() &&
+        return (contained.x() <= container.getStart().x() &&
                 contained.x() >= container.getEnd().x()) ||
                (contained.x() <= container.getEnd().x() &&
-                contained.x() >= container.getSegStart().x());
+                contained.x() >= container.getStart().x());
     }
 
     return false;
