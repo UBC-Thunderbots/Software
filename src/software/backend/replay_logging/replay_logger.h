@@ -3,7 +3,7 @@
 
 #include "software/multithreading/threaded_observer.h"
 #include "software/proto/sensor_msg.pb.h"
-#include "software/proto/tbots_replay.pb.h"
+#include "software/proto/replay_msg.pb.h"
 
 
 class ReplayLogger : public OrderedThreadedObserver<SensorMsg>
@@ -34,7 +34,7 @@ class ReplayLogger : public OrderedThreadedObserver<SensorMsg>
 
     static constexpr int DEFAULT_MSGS_PER_CHUNK = 1000;
 
-    TbotsReplay current_chunk;
+    ReplayMsg current_chunk;
     size_t current_chunk_idx;
     std::experimental::filesystem::path output_dir_path;
     const int msgs_per_chunk;

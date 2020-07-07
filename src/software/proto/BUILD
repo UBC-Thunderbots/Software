@@ -30,10 +30,22 @@ proto_library(
     name = "sensor_msg_proto",
     srcs = [
         "sensor_msg.proto",
-        "tbots_replay.proto",
     ],
     visibility = ["//visibility:private"],
     deps = [
+        ":ssl_proto",
+        "//shared/proto:tbots_proto",
+    ],
+)
+
+proto_library(
+    name = "replay_msg_proto",
+    srcs = [
+        "replay_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":sensor_msg_proto",
         ":ssl_proto",
         "//shared/proto:tbots_proto",
     ],
@@ -52,4 +64,9 @@ cc_proto_library(
 cc_proto_library(
     name = "sensor_msg_cc_proto",
     deps = [":sensor_msg_proto"],
+)
+
+cc_proto_library(
+    name = "replay_msg_cc_proto",
+    deps = [":replay_msg_proto"],
 )

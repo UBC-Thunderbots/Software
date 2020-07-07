@@ -1,14 +1,14 @@
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
-#include "software/backend/input/replay_logging/replay_logger.h"
-#include "software/backend/input/replay_logging/replay_reader.h"
+#include "software/backend/replay_logging/replay_logger.h"
+#include "software/backend/replay_logging/replay_reader.h"
 #include "software/multithreading/subject.h"
 
 // the working directory of tests are the bazel WORKSPACE root (in this case, src)
 // this path is relative to the current working directory, i.e. the bazel root
 constexpr const char* REPLAY_TEST_PATH_SUFFIX =
-    "software/backend/input/replay_logging/test_replay";
+    "software/backend/replay_logging/test_replay";
 
 namespace fs = std::experimental::filesystem;
 

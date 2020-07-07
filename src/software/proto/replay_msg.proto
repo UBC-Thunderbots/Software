@@ -2,7 +2,7 @@ syntax = 'proto3';
 
 import "software/proto/sensor_msg.proto";
 
-message TbotsReplay
+message ReplayMsg
 {
     repeated SensorMsg replay_msgs = 1;
 }

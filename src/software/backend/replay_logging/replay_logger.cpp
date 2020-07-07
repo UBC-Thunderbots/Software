@@ -1,9 +1,6 @@
-#include "software/backend/input/replay_logging/replay_logger.h"
-
 #include <google/protobuf/util/delimited_message_util.h>
-
 #include <fstream>
-
+#include "software/backend/replay_logging/replay_logger.h"
 #include "software/logger/logger.h"
 
 namespace fs = std::experimental::filesystem;
@@ -51,11 +48,6 @@ ReplayLogger::~ReplayLogger()
 
 void ReplayLogger::onValueReceived(SensorMsg msg)
 {
-    if (msg.has_ssl_vision_msg())
-    {
-        LOG(INFO) << "Logging vision frame with t_sent="
-                  << msg.ssl_vision_msg().detection().t_sent();
-    }
     current_chunk.mutable_replay_msgs()->Add();
     (current_chunk.mutable_replay_msgs()->end() - 1)->CopyFrom(msg);
     if (current_chunk.replay_msgs_size() >= msgs_per_chunk)
@@ -79,6 +71,6 @@ void ReplayLogger::saveCurrentChunk()
                                                                       &chunk_ofstream);
     if (!result)
     {
-        LOG(WARNING) << "Failed to log chunk!";
+        LOG(WARNING) << "Failed to serialize chunk to output filestream of " << chunk_path;
     }
 }

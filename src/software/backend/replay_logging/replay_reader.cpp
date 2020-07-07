@@ -15,10 +15,10 @@ namespace fs = std::experimental::filesystem;
 
 namespace
 {
-    TbotsReplay readDelimitedReplayProtobufFile(const fs::path& file_path)
+    ReplayMsg readDelimitedReplayProtobufFile(const fs::path& file_path)
     {
         // imagine having to write caveman code to read protobuf msgs from files
-        TbotsReplay msg;
+        ReplayMsg msg;
         int fd = open(file_path.c_str(), O_RDONLY);
 
         if (fd < 0)

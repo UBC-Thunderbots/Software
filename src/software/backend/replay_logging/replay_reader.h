@@ -2,7 +2,7 @@
 #include <experimental/filesystem>
 
 #include "software/proto/sensor_msg.pb.h"
-#include "software/proto/tbots_replay.pb.h"
+#include "software/proto/replay_msg.pb.h"
 
 class ReplayReader
 {
@@ -16,6 +16,6 @@ class ReplayReader
     size_t max_chunk_idx;
     size_t cur_chunk_idx;
     int cur_msg_idx;
-    TbotsReplay cur_chunk;
+    ReplayMsg cur_chunk;
     std::experimental::filesystem::path replay_dir;
 };
