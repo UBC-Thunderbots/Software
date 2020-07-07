@@ -61,7 +61,7 @@ void RobotStatusTable::removeOldStatusMessages()
         auto age = iter->second;
         if (age > message_expiry_age)
         {
-            status_messages.erase(iter);
+            status_messages.erase(iter++);
         }
         else
         {
