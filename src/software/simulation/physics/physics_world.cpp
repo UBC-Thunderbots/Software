@@ -186,6 +186,9 @@ bool PhysicsWorld::isRobotIdAvailable(RobotId id, TeamColour colour) const
 
 void PhysicsWorld::stepSimulation(const Duration& time_step)
 {
+    if(physics_ball)  {
+        physics_ball->updateIsInFlight();
+    }
     b2_world->Step(static_cast<float>(time_step.getSeconds()), velocity_iterations,
                    position_iterations);
     current_timestamp = current_timestamp + time_step;

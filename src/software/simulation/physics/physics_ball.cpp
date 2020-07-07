@@ -3,10 +3,11 @@
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_object_user_data.h"
+#include "software/new_geom/util/distance.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_state,
                          const double mass_kg)
-    : in_flight_origin(std::nullopt), in_flight_distance_meters(0.0)
+    : in_flight_origin(std::nullopt), in_flight_distance_meters(0.0), flight_angle_of_departure(Angle::zero())
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -54,7 +55,7 @@ PhysicsBall::~PhysicsBall()
 
 BallState PhysicsBall::getBallState() const
 {
-    return BallState(position(), velocity());
+    return BallState(position(), velocity(), calculateDistanceFromGround());
 }
 
 Point PhysicsBall::position() const
@@ -104,19 +105,46 @@ bool PhysicsBall::isTouchingOtherObject() const
     return false;
 }
 
-void PhysicsBall::setInFlightForDistance(double in_flight_distance)
+void PhysicsBall::setInFlightForDistance(double in_flight_distance, Angle angle_of_departure)
 {
     in_flight_origin          = position();
     in_flight_distance_meters = in_flight_distance;
+    flight_angle_of_departure = angle_of_departure;
 }
 
-bool PhysicsBall::isInFlight()
-{
-    bool ball_currently_in_flight = in_flight_origin.has_value();
-    if (ball_currently_in_flight)
+double PhysicsBall::calculateDistanceFromGround() const {
+    double distance_from_ground = 0.0;
+    if(isInFlight()) {
+        // We already know the range and angle of departure, so we can re-arrange
+        // to solve for the theoretical initial speed of the ball. This then lets us
+        // calculate the parabolic trajectory.
+        // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
+        double x = distance(position(), in_flight_origin.value());
+        double initial_speed_numerator = in_flight_distance_meters * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+        double initial_speed_denominator = (flight_angle_of_departure * 2).sin();
+        double initial_speed = std::sqrt(initial_speed_numerator / initial_speed_denominator);
+        double y_numerator = ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED * x * x;
+        double y_denominator = 2 * initial_speed * initial_speed * std::pow(flight_angle_of_departure.cos(), 2);
+        double y = std::tan(flight_angle_of_departure.toRadians()) * x - (y_numerator / y_denominator);
+
+        if(isTouchingOtherObject()) {
+            // If the ball is still in flight and touching another object,
+            // it must be on top of another robot/object and so cannot be
+            // lower than that
+            distance_from_ground = std::max(y, ROBOT_MAX_HEIGHT_METERS);
+        }else {
+            distance_from_ground = std::max(y, 0.0);
+        }
+    }
+
+    return distance_from_ground;
+}
+
+void PhysicsBall::updateIsInFlight() {
+    if (isInFlight())
     {
         double current_in_flight_distance_meters =
-            (position() - in_flight_origin.value()).length();
+                (position() - in_flight_origin.value()).length();
         // Once the ball is in flight, it can only stop being in flight once it has
         // travelled at least the current in_flight_distance and is simultaneously not
         // touching another object. This prevents the ball from "landing" in another
@@ -129,13 +157,11 @@ bool PhysicsBall::isInFlight()
             !isTouchingOtherObject())
         {
             in_flight_origin = std::nullopt;
-            return false;
-        }
-        else
-        {
-            return true;
         }
     }
+}
 
-    return false;
+bool PhysicsBall::isInFlight() const
+{
+    return in_flight_origin.has_value();
 }

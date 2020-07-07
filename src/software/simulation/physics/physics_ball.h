@@ -81,15 +81,18 @@ class PhysicsBall
      * from its current location.
      *
      * @param in_flight_distance The distance for which the ball will be in flight
+     * @param angle_of_departure The angle of departure for the ball as it enters flight
      */
-    void setInFlightForDistance(double in_flight_distance);
+    void setInFlightForDistance(double in_flight_distance, Angle angle_of_departure);
 
     /**
      * Returns true if the ball is currently in flight, and false otherwise
      *
      * @return true if the ball is currently in flight, and false otherwise
      */
-    bool isInFlight();
+    bool isInFlight() const;
+
+    void updateIsInFlight();
 
     /**
      * Applies the given force vector to the ball at its center of mass
@@ -114,6 +117,13 @@ class PhysicsBall
      */
     bool isTouchingOtherObject() const;
 
+    /**
+     * Calculates and returns the ball's distance from the ground, in metres
+     *
+     * @return the ball's distance from the ground, in metres
+     */
+    double calculateDistanceFromGround() const;
+
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
     b2Body* ball_body;
@@ -122,6 +132,7 @@ class PhysicsBall
     // where the ball initially became in flight
     std::optional<Point> in_flight_origin;
     double in_flight_distance_meters;
+    Angle flight_angle_of_departure;
 
     // These restitution and friction values are somewhat arbitrary. Because this is an
     // "ideal" simulation, we can approximate the ball as having perfectly elastic
