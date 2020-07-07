@@ -27,7 +27,8 @@ class PhysicsWorld
      * @param ball_restitution The restitution for ball collisions
      * @param ball_linear_damping The damping on the ball's linear motion
      */
-    explicit PhysicsWorld(const Field& field, double ball_restitution = 1.0, double ball_linear_damping = 0.0);
+    explicit PhysicsWorld(const Field& field, double ball_restitution = 1.0,
+                          double ball_linear_damping = 0.0);
     PhysicsWorld() = delete;
 
     // Delete the copy and assignment operators because copying this class causes

@@ -131,7 +131,8 @@ class PhysicsBall
     // The restitution is the amount of energy retained when bouncing off walls and
     // robots, 0.0 means perfectly inelastic and 1.0 means perfectly elastic collision.
     // The linear damping determines how the linear motion of the ball decreases over
-    // time, 0.0 means no damping and the damping increases as linear_damping increases. Linear Damping link:
+    // time, 0.0 means no damping and the damping increases as linear_damping increases.
+    // Linear Damping link:
     // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
     const double ball_restitution;
     const double ball_linear_damping;

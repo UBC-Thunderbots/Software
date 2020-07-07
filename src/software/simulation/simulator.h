@@ -81,7 +81,9 @@ class Simulator
      * @param physics_time_step The time step used to simulated physics
      * and robot primitives.
      */
-    explicit Simulator(const Field& field, double ball_restitution , double ball_linear_damping, const Duration& physics_time_step =
+    explicit Simulator(const Field& field, double ball_restitution,
+                       double ball_linear_damping,
+                       const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;
 
