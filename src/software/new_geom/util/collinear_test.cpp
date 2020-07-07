@@ -46,3 +46,17 @@ TEST(CollinearPointsTest, vertically_collinear_points)
     Point r(202.00000000000003, -0.5);
     EXPECT_TRUE(collinear(p, q, r));
 }
+
+TEST(CollinearPointsTest, test_collinear_segments)
+{
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+        Vector v = Vector::createFromAngle(
+            Angle::fromDegrees((std::rand() % 360)));  // should be random number here
+        Point pointA((std::rand() % 100) / 100.0, (std::rand() % 100) / 100.0);
+        Point pointB = pointA + v * (std::rand() % 100) / 100.0;
+        Point pointC = pointA - v * (std::rand() % 100) / 100.0;
+        bool val     = collinear(pointA, pointB, pointC);
+        EXPECT_TRUE(val);
+    }
+}

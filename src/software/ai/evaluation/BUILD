@@ -49,6 +49,7 @@ cc_library(
         "//shared:constants",
         "//software/geom",
         "//software/new_geom:segment",
+        "//software/new_geom/util:algorithms",
         "//software/world",
     ],
 )

@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/new_geom/bezier_curve2d.h"
+#include "software/new_geom/util/acute_angle.h"
 #include "software/test_util/test_util.h"
 
 class CubicBezierSplineTest : public ::testing::Test
@@ -65,7 +66,7 @@ TEST_F(CubicBezierSplineTest, getValueAt__start_point)
     // as well.
     const Point just_after_start_point   = test_spline_1.getValueAt(1e-9);
     const Vector approx_tangent_at_start = just_after_start_point - start_point;
-    const Angle tangent_error_angle = approx_tangent_at_start.angleWith(Vector(-3, -4));
+    const Angle tangent_error_angle = acuteAngle(approx_tangent_at_start, Vector(-3, -4));
 
     EXPECT_NEAR(0, tangent_error_angle.toRadians(), 1e-9);
 }
@@ -81,9 +82,10 @@ TEST_F(CubicBezierSplineTest, getValueAt__end_point)
     // as well.
     const Point just_before_end_point  = test_spline_1.getValueAt(1 - 1e-9);
     const Vector approx_tangent_at_end = just_before_end_point - end_point;
-    const Angle tangent_error_angle    = approx_tangent_at_end.angleWith(Vector(-2, -5));
+    const Angle tangent_error_angle = acuteAngle(approx_tangent_at_end, Vector(-2, -5));
 
-    EXPECT_NEAR(0, tangent_error_angle.toRadians(), 1e-9);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Angle::zero(), tangent_error_angle,
+                                               Angle::fromRadians(1e-6)));
 }
 
 TEST_F(CubicBezierSplineTest, getStartPoint)

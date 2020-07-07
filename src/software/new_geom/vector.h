@@ -127,12 +127,11 @@ class Vector final
     Vector rotate(const Angle &rot) const;
 
     /**
-     * Projects this vector onto another vector
+     * Projects this vector onto the line formed by another vector
      *
      * @param the vector to project onto
      *
-     * @return the component of this Vector that is in the same direction as the given
-     * Vector
+     * @return the projection of this vector onto the line formed by the given Vector
      */
     Vector project(const Vector &other) const;
 
@@ -182,15 +181,6 @@ class Vector final
      * @return this Vector
      */
     Vector &operator=(const Vector &other);
-
-    /**
-     * Calculate the angle between this and another Vector
-     *
-     * @param other the other Vector to calculate the angle with
-     *
-     * @return the Angle between this vector and the other vector
-     */
-    Angle angleWith(const Vector &other) const;
 
    private:
     /**
