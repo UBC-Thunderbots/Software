@@ -391,21 +391,30 @@ Some general guidelines when writing tests are:
 
 Protobufs that we define should follow [Google's Protobuf Style Guide](https://developers.google.com/protocol-buffers/docs/style).
 
-* When initializing a protobuf from a unique pointer, avoid passing the `release()`'d pointer to `set_allocated` and `AddAllocated`. Releasing unique pointers makes it too easy to cause memory leaks.
+* When initializing a protobuf from a unique pointer, avoid passing the `release()`'d pointer to `set_allocated` and `AddAllocated`. Releasing unique pointers makes it too easy to cause memory leaks. This convention does result in an extra copy operation for the field being added to the proto, but we have decided that this is acceptable to reduce the risk of memory leaks.
+
   ```cpp
-  /** Context:
-   * ball_state is field of vision_msg
-   * segments is google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>
-   * tbots_robot_msgs is a repeated field in sensor_msg_1
-   */
+  message TbotsRobotMsg
+  {
+  ...
+      repeated ErrorCode error_code             = 2;
+  ...
+      TimestampMsg time_sent                    = 11;
+  }
+
+  TbotsRobotMsg tbots_robot_msg;
+  std::unique<TimestampMsg> timestamp_msg = // creator function
+  std::unique<ErrorCode> error_code = // creator function
+  google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+  std::unique<SSL_FieldLineSegment> field_segment = // creator function
 
   // Incorrect
-  vision_msg->set_allocated_ball_state(createBallStateMsg(world.ball()).release());
-  segments.AddAllocated(segment_1.release());
-  *(sensor_msg_1.add_tbots_robot_msgs())   = *tbots_robot_msg_id_1;
+  tbots_robot_msg.set_allocated_time_sent(timestamp_msg.release());
+  segments.AddAllocated(field_segment.release());
+  *(tbots_robot_msg.add_error_code()) = *error_code;
 
   // Correct
-  *(vision_msg->mutable_ball_state()) = *createBallStateMsg(world.ball());
-  *(segments.Add()) = *segment_1;
-  *(sensor_msg_1.add_tbots_robot_msgs())   = *tbots_robot_msg_id_1;
+  *(tbots_robot_msg.mutable_time_sent()) = *timestamp_msg;
+  *(segments.Add()) = *field_segment;
+  *(tbots_robot_msg.add_error_code()) = *error_code;
   ```
