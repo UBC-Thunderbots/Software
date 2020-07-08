@@ -4,9 +4,9 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "firmware/app/control/bangbang.h"
 #include "firmware/app/control/control.h"
 #include "firmware/app/control/physbot.h"
+#include "firmware/app/control/trajectory_planner.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
 #include "shared/constants.h"
@@ -28,11 +28,18 @@ const float PI_2 = P_PI / 2.0f;
 
 typedef struct MovePrimitiveState
 {
-    float destination[3], end_speed, major_vec[2], minor_vec[2];
-    // We store a wheel index here so we only have to calculate the axis
-    // we want to use when move start is called
-    unsigned optimal_wheel_axes_index;
-    bool slow;
+    // The trajectory we're tracking
+    PositionTrajectory_t position_trajectory;
+
+    // The number of elements in the trajectory we're tracking
+    size_t num_trajectory_elems;
+
+    // The start time of this primitive, in seconds
+    float primitive_start_time_seconds;
+
+    // Whether or not we're trying to move slowly
+    // TODO: we should probably just plan for this in the trajectory planner....
+    bool move_slow;
 } MovePrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MovePrimitiveState_t);
 
@@ -48,7 +55,8 @@ DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MovePrimitiveState_t);
  * @param final_angle the final destination angle
  * @return the index of the wheel axis to use
  */
-unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_angle);
+unsigned int choose_wheel_axis(float dx, float dy, float current_angle,
+                               float final_angle);
 
 /**
  * Calculates the rotation time, velocity, and acceleration to be stored
@@ -79,7 +87,7 @@ void build_wheel_axes(float (*wheel_axes)[8], float angle)
     (*wheel_axes)[7] = angle - ANGLE_TO_BACK_WHEELS + (3 * PI_2);
 }
 
-unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_angle)
+unsigned int choose_wheel_axis(float dx, float dy, float current_angle, float final_angle)
 {
     float wheel_axes[8];
     build_wheel_axes(&wheel_axes, current_angle);
@@ -158,28 +166,69 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
     //                destination_ang [centi-rad]
     //                end_speed [millimeter/s]
 
+    // TODO: units on variables!
+
     // Convert into m/s and rad/s because physics is in m and s
-    state->destination[0] = (float)(params->params[0]) / 1000.0f;
-    state->destination[1] = (float)(params->params[1]) / 1000.0f;
-    state->destination[2] = (float)(params->params[2]) / 100.0f;
-    state->end_speed      = (float)(params->params[3]) / 1000.0f;
-    state->slow           = params->slow;
+    const float destination_x           = (float)(params->params[0]) / 1000.0f;
+    const float destination_y           = (float)(params->params[1]) / 1000.0f;
+    const float destination_orientation = (float)(params->params[2]) / 100.0f;
+    const float speed_at_dest_m_per_s   = (float)(params->params[3]) / 1000.0f;
+    state->move_slow                    = params->slow;
 
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    float dx = state->destination[0] - app_firmware_robot_getPositionX(robot);
-    float dy = state->destination[1] - app_firmware_robot_getPositionY(robot);
-    // Add a small number to avoid division by zero
-    float total_disp    = sqrtf(dx * dx + dy * dy) + 1e-6f;
-    state->major_vec[0] = dx / total_disp;
-    state->major_vec[1] = dy / total_disp;
-    state->minor_vec[0] = state->major_vec[0];
-    state->minor_vec[1] = state->major_vec[1];
-    rotate(state->minor_vec, P_PI / 2);
+    const float current_x           = app_firmware_robot_getPositionX(robot);
+    const float current_y           = app_firmware_robot_getPositionY(robot);
+    const float current_orientation = app_firmware_robot_getOrientation(robot);
+    // TODO: make this a function in the `FirmwareRobot` class?
+    const float current_speed = sqrtf(powf(app_firmware_robot_getVelocityX(robot), 2) +
+                                      powf(app_firmware_robot_getVelocityY(robot), 2));
 
-    // pick the wheel axis that will be used for faster movement
-    state->optimal_wheel_axes_index = choose_wheel_axis(
-        dx, dy, app_firmware_robot_getOrientation(robot), state->destination[2]);
+    // Plan a trajectory to track
+    FirmwareRobotPathParameters_t path_parameters = {
+        .path = {.x = {.coefficients = {0, 0, destination_x - current_x, current_x}},
+                 .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
+        .orientation_profile = {.coefficients = {0, 0, current_orientation,
+                                                 destination_orientation -
+                                                     current_orientation}},
+        .t_start             = 0,
+        .t_end               = 1,
+        .num_elements        = 100,
+        .max_allowable_linear_acceleration =
+            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+        .max_allowable_linear_speed = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        .max_allowable_angular_acceleration =
+            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
+        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+        .initial_linear_speed        = current_speed,
+        .final_linear_speed          = speed_at_dest_m_per_s};
+    //    TrajectoryPlannerGenerationStatus_t status =
+    state->num_trajectory_elems = path_parameters.num_elements;
+    app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
+        path_parameters, &(state->position_trajectory));
+
+    // TODO: act
+    // assert(status == OK);
+
+    // NOTE: We set this after doing the trajectory generation in case the generation
+    //       took a while, since we're going to use this as our reference time when
+    //       tracking the trajectory, and so what it to be as close as possible to
+    //       the time that we actually start _executing_ the trajectory
+    state->primitive_start_time_seconds = app_firmware_world_getCurrentTime(world);
+
+    //    float dx = state->destination[0] - app_firmware_robot_getPositionX(robot);
+    //    float dy = state->destination[1] - app_firmware_robot_getPositionY(robot);
+    //    // Add a small number to avoid division by zero
+    //    float total_disp    = sqrtf(dx * dx + dy * dy) + 1e-6f;
+    //    state->major_vec[0] = dx / total_disp;
+    //    state->major_vec[1] = dy / total_disp;
+    //    state->minor_vec[0] = state->major_vec[0];
+    //    state->minor_vec[1] = state->major_vec[1];
+    //    rotate(state->minor_vec, P_PI / 2);
+    //
+    //    // pick the wheel axis that will be used for faster movement
+    //    state->optimal_wheel_axes_index = choose_wheel_axis(
+    //        dx, dy, app_firmware_robot_getOrientation(robot), state->destination[2]);
 
     Chicker_t* chicker   = app_firmware_robot_getChicker(robot);
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
@@ -207,25 +256,51 @@ void move_end(void* void_state_ptr, FirmwareWorld_t* world)
 
 void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
-    MovePrimitiveState_t* state = (MovePrimitiveState_t*)(void_state_ptr);
-    assert(!isnan(state->major_vec[0]));
-    assert(!isnan(state->major_vec[1]));
-    assert(!isnan(state->minor_vec[0]));
-    assert(!isnan(state->minor_vec[1]));
+    MovePrimitiveState_t* state  = (MovePrimitiveState_t*)(void_state_ptr);
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
-    PhysBot pb =
-        app_physbot_create(robot, state->destination, state->major_vec, state->minor_vec);
+    // Figure out the index of the trajectory element we should be executing
+    size_t trajectory_index  = 0;
+    const float current_time = app_firmware_world_getCurrentTime(world);
+    while (trajectory_index < state->num_trajectory_elems - 1 &&
+           state->position_trajectory.time_profile[trajectory_index] < current_time)
+    {
+        trajectory_index++;
+    }
 
-    // choose a wheel axis to rotate onto
-    // TODO: try to make this less jittery
-    //    choose_rotation_destination(state->optimial_wheel_axes_index, &pb,
-    //    current_states.angle);
+    const float dest_x = state->position_trajectory.x_position[trajectory_index];
+    const float dest_y = state->position_trajectory.y_position[trajectory_index];
+    float dest[2]      = {dest_x, dest_y};
+    //    const float dest_orientation =
+    //        state->position_trajectory.orientation[trajectory_index];
+
+    const float curr_x = app_firmware_robot_getPositionX(robot);
+    const float curr_y = app_firmware_robot_getPositionY(robot);
+    //    const float curr_orientation = app_firmware_robot_getOrientation(robot);
+
+    // TODO: comment here
+    const float dx = dest_x - curr_x;
+    const float dy = dest_y - curr_y;
+
+    // Add a small number to avoid division by zero
+    float total_disp   = sqrtf(dx * dx + dy * dy) + 1e-6f;
+    float major_vec[2] = {dx / total_disp, dy / total_disp};
+    float minor_vec[2] = {major_vec[0], major_vec[1]};
+    rotate(minor_vec, P_PI / 2);
+
+    // TODO: should we be using this? If not we can nuke all the wheel axis stuff
+    //    // pick the wheel axis that will be used for faster movement
+    //    unsigned int optimal_wheel_axes_index =
+    //        choose_wheel_axis(dx, dy, curr_orientation, dest_orientation);
+
+    PhysBot pb = app_physbot_create(robot, dest, major_vec, minor_vec);
+
+    const float dest_speed = state->position_trajectory.linear_speed[trajectory_index];
 
     // plan major axis movement
     float max_major_a     = 3.5;
-    float max_major_v     = state->slow ? 1.25 : 3.0;
-    float major_params[3] = {state->end_speed, max_major_a, max_major_v};
+    float max_major_v     = state->move_slow ? 1.25 : 3.0;
+    float major_params[3] = {dest_speed, max_major_a, max_major_v};
     app_physbot_planMove(&pb.maj, major_params);
 
     // plan minor axis movement
@@ -240,9 +315,8 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
     float accel[3] = {0, 0, pb.rot.accel};
 
     // rotate the accel and apply it
-    app_physbot_computeAccelInLocalCoordinates(accel, pb,
-                                               app_firmware_robot_getOrientation(robot),
-                                               state->major_vec, state->minor_vec);
+    app_physbot_computeAccelInLocalCoordinates(
+        accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
 
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }

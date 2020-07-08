@@ -154,7 +154,6 @@ unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(
     return 0;
 }
 
-
 float SimulatorRobotSingleton::getPositionX()
 {
     return checkValidAndReturnFloat([](auto robot) { return robot->getPositionX(); });

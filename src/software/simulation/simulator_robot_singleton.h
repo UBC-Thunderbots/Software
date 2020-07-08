@@ -113,7 +113,8 @@ class SimulatorRobotSingleton
         std::shared_ptr<FirmwareWorld_t> firmware_world);
 
    private:
-    /** * Returns the x-position of the robot, in global field coordinates, in meters
+    /**
+     * Returns the x-position of the robot, in global field coordinates, in meters
      *
      * @return the x-position of the robot, in global field coordinates, in meters
      */

@@ -14,6 +14,12 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
+// TODO: implement this properly
+static float current_time = 0;
+static float getCurrentTime() {
+    return current_time;
+}
+
 Simulator::Simulator(const Field& field, const Duration& physics_time_step)
     : Simulator(field, 1.0, 0.0, physics_time_step)
 {
@@ -63,7 +69,7 @@ void Simulator::updateSimulatorRobots(
         auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
         auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
         FirmwareWorld_t* firmware_world_raw =
-            app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
+            app_firmware_world_create(firmware_robot.release(), firmware_ball.release(), &getCurrentTime);
         auto firmware_world =
             std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 
@@ -73,11 +79,13 @@ void Simulator::updateSimulatorRobots(
 
 void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
+    current_time = static_cast<float>(getTimestamp().getSeconds());
     setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball);
 }
 
 void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
+    current_time = static_cast<float>(getTimestamp().getSeconds());
     setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball);
 }
 
@@ -144,6 +152,8 @@ void Simulator::stepSimulation(const Duration& time_step)
     // We only need to do this a single time since all robots
     // can see and interact with the same ball
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
+
+    current_time = static_cast<float>(getTimestamp().getSeconds());
 
     Duration remaining_time = time_step;
     while (remaining_time > Duration::fromSeconds(0))
