@@ -146,23 +146,21 @@ void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
         {
             const float current_speed    = speeds2[i];
             const float desired_duration = durations1[i];
-            float *final_speed_to_change = &speeds2[i + 1];
+            float *next_speed            = &speeds2[i + 1];
             const float displacement     = displacement2[i];
 
-            *final_speed_to_change =
-                app_trajectory_planner_impl_calculateSpeedToMatchDuration(
-                    current_speed, desired_duration, displacement);
+            *next_speed = app_trajectory_planner_impl_calculateSpeedToMatchDuration(
+                current_speed, desired_duration, displacement);
         }
         else if (durations2[i] > durations1[i] && displacement2[i] != 0)
         {
             const float current_speed    = speeds1[i];
             const float desired_duration = durations2[i];
-            float *final_speed_to_change = &speeds1[i + 1];
+            float *next_speed            = &speeds1[i + 1];
             const float displacement     = displacement1[i];
 
-            *final_speed_to_change =
-                app_trajectory_planner_impl_calculateSpeedToMatchDuration(
-                    current_speed, desired_duration, displacement);
+            *next_speed = app_trajectory_planner_impl_calculateSpeedToMatchDuration(
+                current_speed, desired_duration, displacement);
 
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
