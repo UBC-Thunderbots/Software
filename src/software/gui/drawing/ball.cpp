@@ -33,7 +33,7 @@ void drawBallPosition(QGraphicsScene *scene, const Point &position,
     // Increase the radius of the ball the further from the ground it is.
     double ball_radius = normalizeValueToRange<double>(
         distance_from_ground, 0, ball_max_distance_from_ground, BALL_MAX_RADIUS_METERS,
-        6 * BALL_MAX_RADIUS_METERS);
+        4 * BALL_MAX_RADIUS_METERS);
 
     QPen pen(color);
     pen.setWidth(2);
