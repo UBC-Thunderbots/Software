@@ -61,5 +61,4 @@ TEST(QtGeometryConversionTest, create_qangle_from_negative_angle)
     // clockwise rotation
     int expected = -(-204 * 16);
     EXPECT_EQ(expected, result);
-
 }
