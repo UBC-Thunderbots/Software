@@ -233,7 +233,8 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     else
     {
         // Decode the primitive
-        pb_istream_t pb_in_stream = pb_istream_from_buffer(packet_data, packet_size - 3);
+        pb_istream_t pb_in_stream =
+            pb_istream_from_buffer(packet_data + 3, packet_size - 3);
         if (!pb_decode(&pb_in_stream, PrimitiveMsg_fields, &prim_msg))
         {
             // If we failed to decode the message, it's likely malformed, so we should not
