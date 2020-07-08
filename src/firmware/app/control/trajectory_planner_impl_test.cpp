@@ -734,6 +734,28 @@ TEST(TrajectoryPlannerImplTest, test_rebalance_trajectory_segment_to_mach_durati
 
     speeds[1] = app_trajectory_planner_impl_modifySpeedToMatchDuration(
         speeds[0], desired_time_seconds, segment_lengths_meters[0]);
-    EXPECT_FLOAT_EQ(speeds[1], 201);
+    EXPECT_FLOAT_EQ(speeds[1], 199);
     EXPECT_FLOAT_EQ(speeds[0], 1);
+}
+
+TEST(TrajectoryPlannerImplTest,
+     test_rebalance_trajectory_segment_to_mach_duration_decreasing_speed)
+{
+    // This test was added to address a bug where the trajectory rebalancing could not
+    // account for decreasing speeds this led to the accumulation of speed where it was
+    // supposed to be decreasing
+    float segment_lengths_meters[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+    float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
+
+    // Create an artificial trajectory here for testing
+    speeds[0]                  = 4;
+    speeds[1]                  = 3;
+    float desired_time_seconds = 0.15f;
+
+    segment_lengths_meters[0] = 0.35f;
+
+    speeds[1] = app_trajectory_planner_impl_modifySpeedToMatchDuration(
+        speeds[0], desired_time_seconds, segment_lengths_meters[0]);
+    EXPECT_NEAR(speeds[1], 0.666666f, 0.0001f);
+    EXPECT_FLOAT_EQ(speeds[0], 4.0f);
 }

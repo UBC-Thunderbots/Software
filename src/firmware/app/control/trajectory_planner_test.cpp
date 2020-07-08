@@ -1210,3 +1210,39 @@ TEST_F(
     EXPECT_FLOAT_EQ(
         velocity_trajectory.angular_velocity[path_parameters.num_elements - 1], 0);
 }
+
+// A robot with very little linear motion required, rotates just under 180 deg.
+TEST_F(TrajectoryPlannerTest,
+       test_angular_limiting_the_trajectory_with_large_linear_slowdown)
+{
+    // This test was created to address a bug that was found where the corrected linear
+    // speeds where too great it was caused by the speed correction only adding speed vs
+    // taking it away when the speed is decreasing.
+    FirmwareRobotPathParameters_t path_parameters = {
+        .path                = {.x = {.coefficients = {0.0f, 0.0f, 0.05f, 4.6f}},
+                 .y = {.coefficients = {0.0f, 0.0f, 0.0f, -3.09f}}},
+        .orientation_profile = {.coefficients = {0.0f, 0.0f, 2.55f, 0.0f}},
+        .t_start             = 0.0f,
+        .t_end               = 1.0f,
+        .num_elements        = 10,
+        .max_allowable_linear_acceleration  = 1.5f,
+        .max_allowable_linear_speed         = 1.0f,
+        .max_allowable_angular_acceleration = 5.0f,
+        .max_allowable_angular_speed        = 6.28f,
+        .initial_linear_speed               = 0.0f,
+        .final_linear_speed                 = 0.0f};
+
+    PositionTrajectory_t position_trajectory;
+    auto status =
+        app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
+            path_parameters, &position_trajectory);
+    EXPECT_EQ(status, OK);
+
+    // Check that the speeds meet the start and end conditions and did not accumulate
+    EXPECT_NEAR(position_trajectory.linear_speed[0], path_parameters.initial_linear_speed,
+                0.0001f);
+    EXPECT_NEAR(position_trajectory.linear_speed[9], path_parameters.final_linear_speed,
+                0.0001f);
+    EXPECT_NEAR(position_trajectory.angular_speed[0], 0.0f, 0.0001f);
+    EXPECT_NEAR(position_trajectory.angular_speed[9], 0.0f, 0.0001f);
+}

@@ -112,7 +112,7 @@ float app_trajectory_planner_impl_modifySpeedToMatchDuration(float initial_speed
 {
     // Calculate the new final speed based on the initial speed, displacement, and
     // the desired duration in time
-    return (2 * displacement / duration) + initial_speed;
+    return (2 * displacement - initial_speed * duration) / duration;
 }
 
 
@@ -131,29 +131,37 @@ void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
     for (unsigned int i = 0; i < num_elements - 1; i++)
     {
         // Check for the case that each segment duration isn't equal, so that they can be
-        // modifed to have the same duration
+        // modified to have the same duration
         if (durations1[i] > durations2[i] && displacement1[i] != 0)
         {
             const float current_speed    = speeds2[i];
-            const float displacement     = displacement2[i];
             const float desired_duration = durations1[i];
             float *final_speed_to_change = &speeds2[i + 1];
+            const float displacement     = displacement2[i];
 
             *final_speed_to_change =
                 app_trajectory_planner_impl_modifySpeedToMatchDuration(
                     current_speed, desired_duration, displacement);
+            if (*final_speed_to_change < 0)
+            {
+                *final_speed_to_change = 0;
+            }
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else if (durations2[i] > durations1[i] && displacement2[i] != 0)
         {
             const float current_speed    = speeds1[i];
-            const float displacement     = displacement1[i];
             const float desired_duration = durations2[i];
             float *final_speed_to_change = &speeds1[i + 1];
+            const float displacement     = displacement1[i];
 
             *final_speed_to_change =
                 app_trajectory_planner_impl_modifySpeedToMatchDuration(
                     current_speed, desired_duration, displacement);
+            if (*final_speed_to_change < 0)
+            {
+                *final_speed_to_change = 0;
+            }
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else
