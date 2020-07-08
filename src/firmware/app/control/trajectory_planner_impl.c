@@ -112,7 +112,17 @@ float app_trajectory_planner_impl_modifySpeedToMatchDuration(float initial_speed
 {
     // Calculate the new final speed based on the initial speed, displacement, and
     // the desired duration in time
-    return (2 * displacement - initial_speed * duration) / duration;
+    float next_speed = (2.0f * displacement - initial_speed * duration) / duration;
+
+    // Since speed is absolute here, we want to prevent returning negative speed that
+    // would make us go backwards along the path The case where next_speed < 0 shouldn't
+    // happen under normal circumstances, but this check exists just in case.
+    if (next_speed < 0.0f)
+    {
+        next_speed = 0.0f;
+    }
+
+    return next_speed;
 }
 
 
@@ -142,10 +152,7 @@ void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
             *final_speed_to_change =
                 app_trajectory_planner_impl_modifySpeedToMatchDuration(
                     current_speed, desired_duration, displacement);
-            if (*final_speed_to_change < 0)
-            {
-                *final_speed_to_change = 0;
-            }
+
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else if (durations2[i] > durations1[i] && displacement2[i] != 0)
@@ -158,10 +165,7 @@ void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
             *final_speed_to_change =
                 app_trajectory_planner_impl_modifySpeedToMatchDuration(
                     current_speed, desired_duration, displacement);
-            if (*final_speed_to_change < 0)
-            {
-                *final_speed_to_change = 0;
-            }
+
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else
