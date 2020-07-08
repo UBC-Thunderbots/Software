@@ -1210,3 +1210,29 @@ TEST_F(
     EXPECT_FLOAT_EQ(
         velocity_trajectory.angular_velocity[path_parameters.num_elements - 1], 0);
 }
+
+// A robot with very little linear motion required, rotates just under 180 deg.
+TEST_F(TrajectoryPlannerTest, please_rename_me)
+{
+    // TODO; formatting what the heck here
+    FirmwareRobotPathParameters_t path_parameters = {
+        .path                               = {.x = {.coefficients = {0.0f, 0.0f, 0.05f, 4.6f}},
+                 .y = {.coefficients = {0.0f, 0.0f, 0.0f, -3.09f}}},
+        .orientation_profile                = {.coefficients = {0.0f, 0.0f, 2.55f, 0.0f}},
+        .t_start                            = 0.0f,
+        .t_end                              = 1.0f,
+        .num_elements                       = 10,
+        .max_allowable_linear_acceleration  = 1.5f,
+        .max_allowable_linear_speed         = 1.0f,
+        .max_allowable_angular_acceleration = 5.0f,
+        .max_allowable_angular_speed        = 6.28f,
+        .initial_linear_speed               = 0.0f,
+        .final_linear_speed                 = 0.0f};
+
+    PositionTrajectory_t position_trajectory;
+
+    auto status = app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
+        path_parameters, &position_trajectory);
+
+    ASSERT_EQ(status, OK);
+}
