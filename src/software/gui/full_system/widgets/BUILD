@@ -9,7 +9,6 @@ qt_cc_library(
     deps = [
         ":ai_control",
         "//software/ai/hl/stp:play_info",
-        "//software/backend:robot_status",
         "//software/gui:geometry_conversion",
         "//software/gui/full_system/ui:main_widget",
         "//software/gui/generic_widgets/robot_status",
