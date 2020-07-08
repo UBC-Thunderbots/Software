@@ -1,4 +1,3 @@
-
 #######################################################################
 #                             C Parameter                             #
 #######################################################################
@@ -11,8 +10,9 @@ class CParameter(object):
     INITIALIZATION = ".{name} = {constructor},"
     DESTRUCTOR = "app_dynamic_parameters_destroy{type}({ptr})"
 
-    def __init__(self, param_name: str, param_type: str,
-                 param_value: str, ptr_to_instance: str):
+    def __init__(
+        self, param_name: str, param_type: str, param_value: str, ptr_to_instance: str
+    ):
         """Initializes a CParameter with the given type and value. The
         corresponding generation strings (definition, constructor, destructor)
         are available through read-only properties.
@@ -34,14 +34,12 @@ class CParameter(object):
         self.param_value = param_value
         self.ptr_to_instance = ptr_to_instance
 
-        self.definition =\
-            CParameter.DEFINITION.format(param_type, param_name)
-        self.constructor =\
-            CParameter.CONSTRUCTOR.format(param_type, param_value)
-        self.destructor =\
-            CParameter.DESTRUCTOR.format(param_type, ptr_to_instance)
-        self.initialization =\
-            CParameter.INITIALIZATION.format(param_name, self.constructor)
+        self.definition = CParameter.DEFINITION.format(param_type, param_name)
+        self.constructor = CParameter.CONSTRUCTOR.format(param_type, param_value)
+        self.destructor = CParameter.DESTRUCTOR.format(param_type, ptr_to_instance)
+        self.initialization = CParameter.INITIALIZATION.format(
+            param_name, self.constructor
+        )
 
     @property
     def definition(self):

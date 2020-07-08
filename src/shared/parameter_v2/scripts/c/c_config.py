@@ -60,13 +60,12 @@ class CConfig(object):
         :rtype: str
 
         """
-        definition_contents =\
-            "\n".join([config.definition for config in self.configs]) +\
-            "\n".join([parameter.definition for parameter in self.configs])
+        definition_contents = "\n".join(
+            [config.definition for config in self.configs]
+        ) + "\n".join([parameter.definition for parameter in self.configs])
 
         return CConfig.DEFINITION.format(
-            name=self.config_name,
-            contents=definition_contents
+            name=self.config_name, contents=definition_contents
         )
 
     @property
@@ -80,13 +79,12 @@ class CConfig(object):
 
         """
 
-        initialization_contents =\
-            "\n".join([config.initialization for config in self.configs]) +\
-            "\n".join([parameter.initialization for parameter in self.configs])
+        initialization_contents = "\n".join(
+            [config.initialization for config in self.configs]
+        ) + "\n".join([parameter.initialization for parameter in self.configs])
 
         return CConfig.INITIALIZATION.format(
-            name=self.config_name,
-            contents=initialization_contents
+            name=self.config_name, contents=initialization_contents
         )
 
     @property
