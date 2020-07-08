@@ -7,7 +7,7 @@ qt_ui_library(
     ui = "main_widget.ui",
     deps = [
         # Need to include targets used in promoted widgets
-        "//software/gui/generic_widgets/draw_function_visualizer",
+        "//software/gui/standalone_simulator/widgets:standalone_simulator_draw_function_visualizer",
         "@qt//:qt_widgets",
     ],
 )
