@@ -46,3 +46,13 @@ QLineF createQLineF(const Segment& segment);
  */
 Point createPoint(const QPointF& point);
 Point createPoint(const QPoint& point);
+
+/**
+ * Converts our Angle class to an angle value consumable by Qt.
+ * Qt uses integers to represent angles.
+ *
+ * @param angle The Angle to convert
+ *
+ * @return The Qt angle representation of the given Angle
+ */
+int createQAngle(const Angle& angle);

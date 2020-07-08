@@ -44,3 +44,21 @@ TEST(QtGeometryConversionTest, create_point_from_qpoint)
     auto result = createPoint(QPoint(3, 0));
     EXPECT_EQ(Point(3, 0), result);
 }
+
+TEST(QtGeometryConversionTest, create_qangle_from_positive_angle)
+{
+    auto result = createQAngle(Angle::quarter());
+    // Qt uses 16-ths of a degree, and defines positive angles as "negative"
+    // clockwise rotation
+    int expected = -(90 * 16);
+    EXPECT_EQ(expected, result);
+}
+
+TEST(QtGeometryConversionTest, create_qangle_from_negative_angle)
+{
+    auto result = createQAngle(Angle::fromDegrees(-204));
+    // Qt uses 16-ths of a degree, and defines positive angles as "negative"
+    // clockwise rotation
+    int expected = -(-204 * 16);
+    EXPECT_EQ(expected, result);
+}
