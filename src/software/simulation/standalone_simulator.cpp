@@ -67,23 +67,47 @@ void StandaloneSimulator::initNetworking()
 
 void StandaloneSimulator::setupInitialSimulationState()
 {
-    RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0), Angle::zero(),
+    RobotState blue_robot_state1(Point(3, 2.5), Vector(0, 0), Angle::half(),
                                  AngularVelocity::zero());
-    RobotState blue_robot_state2(Point(-2, 1), Vector(0, 0), Angle::quarter(),
+    RobotState blue_robot_state2(Point(3, 1.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state3(Point(3, 0.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state4(Point(3, -0.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state5(Point(3, -1.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state6(Point(3, -2.5), Vector(0, 0), Angle::half(),
                                  AngularVelocity::zero());
     std::vector<RobotStateWithId> blue_robot_states = {
-        RobotStateWithId{.id = 1, .robot_state = blue_robot_state1},
-        RobotStateWithId{.id = 2, .robot_state = blue_robot_state2},
+        RobotStateWithId{.id = 0, .robot_state = blue_robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = blue_robot_state2},
+        RobotStateWithId{.id = 2, .robot_state = blue_robot_state3},
+        RobotStateWithId{.id = 3, .robot_state = blue_robot_state4},
+        RobotStateWithId{.id = 4, .robot_state = blue_robot_state5},
+        RobotStateWithId{.id = 5, .robot_state = blue_robot_state6},
     };
     simulator.addBlueRobots(blue_robot_states);
 
-    RobotState yellow_robot_state1(Point(1, 1.5), Vector(0, 0), Angle::half(),
+    RobotState yellow_robot_state1(Point(-3, 2.5), Vector(0, 0), Angle::zero(),
                                    AngularVelocity::zero());
-    RobotState yellow_robot_state2(Point(2.5, -1), Vector(0, 0), Angle::threeQuarter(),
+    RobotState yellow_robot_state2(Point(-3, 1.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state3(Point(-3, 0.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state4(Point(-3, -0.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state5(Point(-3, -1.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state6(Point(-3, -2.5), Vector(0, 0), Angle::zero(),
                                    AngularVelocity::zero());
     std::vector<RobotStateWithId> yellow_robot_states = {
-        RobotStateWithId{.id = 1, .robot_state = yellow_robot_state1},
-        RobotStateWithId{.id = 2, .robot_state = yellow_robot_state2},
+        RobotStateWithId{.id = 0, .robot_state = yellow_robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = yellow_robot_state2},
+        RobotStateWithId{.id = 2, .robot_state = yellow_robot_state3},
+        RobotStateWithId{.id = 3, .robot_state = yellow_robot_state4},
+        RobotStateWithId{.id = 4, .robot_state = yellow_robot_state5},
+        RobotStateWithId{.id = 5, .robot_state = yellow_robot_state6},
     };
     simulator.addYellowRobots(yellow_robot_states);
 }
@@ -122,4 +146,29 @@ std::pair<unsigned int, primitive_params_t> StandaloneSimulator::decodePrimitive
     params.slow      = msg.slow();
 
     return std::make_pair(primitive_index, params);
+}
+
+void StandaloneSimulator::startSimulation()
+{
+    simulator.startSimulation();
+}
+
+void StandaloneSimulator::stopSimulation()
+{
+    simulator.stopSimulation();
+}
+
+void StandaloneSimulator::setSlowMotionMultiplier(double multiplier)
+{
+    simulator.setSlowMotionMultiplier(multiplier);
+}
+
+void StandaloneSimulator::resetSlowMotionMultiplier()
+{
+    simulator.resetSlowMotionMultiplier();
+}
+
+void StandaloneSimulator::setBallState(const BallState& state)
+{
+    simulator.setBallState(state);
 }

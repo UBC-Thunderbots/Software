@@ -15,6 +15,13 @@
 class StandaloneSimulator
 {
    public:
+    enum class SimulationMode
+    {
+        PLAY,
+        PAUSE,
+        SLOW_MOTION
+    };
+
     /**
      * Creates a new StandaloneSimulator, and starts the simulation.
      *
@@ -38,6 +45,49 @@ class StandaloneSimulator
      * Adds robots to predefined locations on the field
      */
     void setupInitialSimulationState();
+
+    /**
+     * Starts the simulation. If the simulator is already running, this
+     * function does nothing.
+     */
+    void startSimulation();
+
+    /**
+     * Stops the simulation. If the simulator is already stopped, this
+     * function does nothing.
+     */
+    void stopSimulation();
+
+    /**
+     * Sets the slow motion multiplier for the simulation. Larger values
+     * cause the simulation to run in slow motion. For example, a value
+     * of 2.0 causes the simulation to run 2x slower.
+     *
+     * @pre multiplier is >= 1.0
+     *
+     * @param multiplier The slow motion multiplier
+     */
+    void setSlowMotionMultiplier(double multiplier);
+
+    /**
+     * Resets the slow motion multiplier value to let the simulation
+     * run in real-time speed.
+     */
+    void resetSlowMotionMultiplier();
+
+    /**
+     * Sets the state of the ball in the simulation. No more than 1 ball may exist
+     * in the simulation at a time. If a ball does not already exist, a ball
+     * is added with the given state. If a ball already exists, it's state is set to the
+     * given state.
+     *
+     * @param state The new ball state
+     */
+    void setBallState(const BallState& state);
+
+    // This is a somewhat arbitrary value that results in slow motion
+    // simulation looking appropriately / usefully slow
+    static constexpr double DEFAULT_SLOW_MOTION_MULTIPLIER = 8.0;
 
    private:
     /**

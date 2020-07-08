@@ -10,3 +10,13 @@ cc_library(
         "@qt//:qt_gui",
     ],
 )
+
+cc_test(
+    name = "geometry_conversion_test",
+    srcs = ["geometry_conversion_test.cpp"],
+    deps = [
+        ":geometry_conversion",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
