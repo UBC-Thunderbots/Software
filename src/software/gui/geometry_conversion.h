@@ -55,5 +55,4 @@ Point createPoint(const QPoint& point);
  *
  * @return The Qt angle representation of the given Angle
  */
-// TODO: Test once https://github.com/UBC-Thunderbots/Software/pull/1583 is merged
 int createQAngle(const Angle& angle);
