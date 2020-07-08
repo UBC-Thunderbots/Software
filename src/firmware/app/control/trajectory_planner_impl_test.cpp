@@ -742,7 +742,7 @@ TEST(TrajectoryPlannerImplTest,
      test_rebalance_trajectory_segment_to_mach_duration_decreasing_speed)
 {
     // This test was added to address a bug where the trajectory rebalancing could not
-    // account for decreasing speeds this led to the accumulation of speed where it was
+    // account for decreasing speeds. This led to the accumulation of speed when it was
     // supposed to be decreasing
     float segment_lengths_meters[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];
     float speeds[TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS];

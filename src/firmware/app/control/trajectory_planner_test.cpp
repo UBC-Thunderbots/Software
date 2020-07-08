@@ -1216,8 +1216,8 @@ TEST_F(TrajectoryPlannerTest,
        test_angular_limiting_the_trajectory_with_large_linear_slowdown)
 {
     // This test was created to address a bug that was found where the corrected linear
-    // speeds where too great it was caused by the speed correction only adding speed vs
-    // taking it away when the speed is decreasing.
+    // speeds accumulated instead of decreasing to the final value. It was caused by the
+    // speed correction only adding speed vs taking it away when the speed is decreasing.
     FirmwareRobotPathParameters_t path_parameters = {
         .path                = {.x = {.coefficients = {0.0f, 0.0f, 0.05f, 4.6f}},
                  .y = {.coefficients = {0.0f, 0.0f, 0.0f, -3.09f}}},
