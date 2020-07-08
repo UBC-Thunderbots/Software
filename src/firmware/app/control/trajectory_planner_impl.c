@@ -151,6 +151,8 @@ void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
 
             *next_speed = app_trajectory_planner_impl_calculateSpeedToMatchDuration(
                 current_speed, desired_duration, displacement);
+
+            complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else if (durations2[i] > durations1[i] && displacement2[i] != 0)
         {
@@ -168,7 +170,6 @@ void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
         {
             // This means that the durations are equal and nothing needs to be changed
             complete_time_profile[i + 1] = complete_time_profile[i] + durations1[i];
-            continue;
         }
     }
 }
