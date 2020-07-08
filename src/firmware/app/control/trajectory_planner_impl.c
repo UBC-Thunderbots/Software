@@ -115,7 +115,7 @@ float app_trajectory_planner_impl_calculateSpeedToMatchDuration(float initial_sp
     float next_speed = (2.0f * displacement - initial_speed * duration) / duration;
 
     // Since speed is absolute here, we want to prevent returning negative speed that
-    // would make us go backwards along the path The case where next_speed < 0 shouldn't
+    // would make us go backwards along the path. The case where next_speed < 0 shouldn't
     // happen under normal circumstances, but this check exists just in case.
     if (next_speed < 0.0f)
     {
