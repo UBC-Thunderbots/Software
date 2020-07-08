@@ -13,4 +13,4 @@ extern "C"
  * @param primitive The primitive to convert to a NanoPb message
  * @return The NanoPb message representing the given primitive
  */
-PrimitiveMsg convertPrimitiveToNanoPb(const Primitive& primitive);
+PrimitiveMsg createNanoPbPrimitiveMsg(const Primitive& primitive);

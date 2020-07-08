@@ -4,7 +4,7 @@
 
 #include "software/simulation/serialize_primitive_to_proto.h"
 
-PrimitiveMsg convertPrimitiveToNanoPb(const Primitive& primitive)
+PrimitiveMsg createNanoPbPrimitiveMsg(const Primitive& primitive)
 {
     std::vector<uint8_t> serialized_proto = serializePrimitiveToProto(primitive);
 

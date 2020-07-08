@@ -17,7 +17,7 @@ TEST(ConvertPrimitiveToNanoPbTest, convert_move_primitive)
     MovePrimitive move_primitive(0, Point(1, 2), Angle::half(), 100, DribblerEnable::ON,
                                  MoveType::SLOW, AutokickType::AUTOCHIP);
 
-    PrimitiveMsg move_primitive_msg = convertPrimitiveToNanoPb(move_primitive);
+    PrimitiveMsg move_primitive_msg = createNanoPbPrimitiveMsg(move_primitive);
 
     ASSERT_EQ(move_primitive_msg.which_primitive, PrimitiveMsg_move_tag);
     EXPECT_EQ(move_primitive_msg.primitive.move.parameter1, 1000.0f);

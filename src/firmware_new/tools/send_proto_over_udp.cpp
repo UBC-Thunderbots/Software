@@ -28,7 +28,7 @@ using google::protobuf::Message;
  * bazel run //firmware_new/tools:send_proto_over_udp -- your_interface_here
  *
  */
-void callback(TbotsRobotMsg& test)
+void callback(TbotsRobotMsg test)
 {
     if (test.has_time_sent())
     {

@@ -73,7 +73,7 @@ void app_primitive_manager_unlockPrimitiveMutex(PrimitiveManager_t *manager)
 
 /**
  * Make the robot in the given world "safe" by disabling potentially dangerous
- * functionality, including bringing it to a stop
+ * functionality and bringing the robot to a stop
  *
  * @param manager [in/out] The primitive manager controlling the robot
  * @param world [in] The world containing the robot make safe
