@@ -53,6 +53,25 @@ class ThreadedSimulator
     void stopSimulation();
 
     /**
+     * Sets the slow motion multiplier for the simulation. Larger values
+     * cause the simulation to run in slow motion. For example, a value
+     * of 2.0 causes the simulation to run 2x slower.
+     *
+     * Note: This function is threadsafe
+     *
+     * @pre multiplier is >= 1.0
+     *
+     * @param multiplier The slow motion multiplier
+     */
+    void setSlowMotionMultiplier(double multiplier);
+
+    /**
+     * Resets the slow motion multiplier value to let the simulation
+     * run in real-time speed.
+     */
+    void resetSlowMotionMultiplier();
+
+    /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
      * in the simulation at a time. If a ball does not already exist, a ball
      * is added with the given state. If a ball already exists, it's state is set to the
@@ -123,6 +142,12 @@ class ThreadedSimulator
      */
     void runSimulationLoop();
 
+    /**
+     * A helper function to update the callback functions with the latest
+     * data from the simulator
+     */
+    void updateCallbacks();
+
     std::vector<std::function<void(SSL_WrapperPacket)>> ssl_wrapper_packet_callbacks;
     std::mutex callback_mutex;
 
@@ -132,6 +157,8 @@ class ThreadedSimulator
     bool simulation_thread_started;
     std::mutex simulation_thread_started_mutex;
     std::atomic_bool stopping_simulation;
+
+    std::atomic<double> slow_motion_multiplier = 1.0;
 
     // 60HZ is approximately the framerate of the real-life cameras
     static constexpr double TIME_STEP_SECONDS = 1.0 / 60.0;
