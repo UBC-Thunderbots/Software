@@ -18,13 +18,53 @@ StandaloneSimulatorGUI::StandaloneSimulatorGUI(
     // setCentralWidget call will cause this class (the Qt QMainWindow)
     // to take ownership of the widget and handle its deletion, we
     // do not need to make this a class member and delete it ourself.
-    QWidget* central_widget = new QWidget(this);
+    QWidget *central_widget = new QWidget(this);
     main_widget->setupUi(central_widget);
     setCentralWidget(central_widget);
+
+    connect(main_widget->play_button, &QRadioButton::toggled, [&](bool checked) {
+        if (checked)
+        {
+            for (auto callback : simulation_mode_callbacks)
+            {
+                callback(StandaloneSimulator::SimulationMode::PLAY);
+            }
+        }
+    });
+    connect(main_widget->pause_button, &QRadioButton::toggled, [&](bool checked) {
+        if (checked)
+        {
+            for (auto callback : simulation_mode_callbacks)
+            {
+                callback(StandaloneSimulator::SimulationMode::PAUSE);
+            }
+        }
+    });
+    connect(main_widget->slow_motion_button, &QRadioButton::toggled, [&](bool checked) {
+        if (checked)
+        {
+            for (auto callback : simulation_mode_callbacks)
+            {
+                callback(StandaloneSimulator::SimulationMode::SLOW_MOTION);
+            }
+        }
+    });
 
     connect(update_timer, &QTimer::timeout, this, &StandaloneSimulatorGUI::handleUpdate);
     update_timer->start(static_cast<int>(
         Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
+}
+
+void StandaloneSimulatorGUI::registerBallPlacementCallback(
+    const std::function<void(Point)> &callback)
+{
+    main_widget->simulation_graphics_view->registerBallPlacementCallback(callback);
+}
+
+void StandaloneSimulatorGUI::registerSimulationModeCallback(
+    const std::function<void(StandaloneSimulator::SimulationMode)> &callback)
+{
+    simulation_mode_callbacks.emplace_back(callback);
 }
 
 void StandaloneSimulatorGUI::handleUpdate()
