@@ -4,6 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"
+#include "software/new_geom/util/distance.h"
 
 PhysicsWorld::PhysicsWorld(const Field& field, double ball_restitution,
                            double ball_linear_damping)
@@ -13,7 +14,8 @@ PhysicsWorld::PhysicsWorld(const Field& field, double ball_restitution,
       physics_field(b2_world, field),
       physics_ball(nullptr),
       ball_restitution(ball_restitution),
-      ball_linear_damping(ball_linear_damping)
+      ball_linear_damping(ball_linear_damping),
+      post_world_update_functions(std::make_shared<ThreadSafeBuffer<std::function<void()>>>(POST_WORLD_UPDATE_FUNCTIONS_BUFFER_SIZE))
 {
     b2_world->SetContactListener(contact_listener.get());
 }
@@ -92,8 +94,8 @@ void PhysicsWorld::addYellowRobots(const std::vector<RobotStateWithId>& robots)
         if (isRobotIdAvailable(state_with_id.id, TeamColour::YELLOW))
         {
             yellow_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
-                state_with_id.id, b2_world, state_with_id.robot_state,
-                ROBOT_WITH_BATTERY_MASS_KG));
+                    state_with_id.id, b2_world, state_with_id.robot_state,
+                    ROBOT_WITH_BATTERY_MASS_KG, post_world_update_functions));
         }
         else
         {
@@ -112,8 +114,8 @@ void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots)
         if (isRobotIdAvailable(state_with_id.id, TeamColour::BLUE))
         {
             blue_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
-                state_with_id.id, b2_world, state_with_id.robot_state,
-                ROBOT_WITH_BATTERY_MASS_KG));
+                    state_with_id.id, b2_world, state_with_id.robot_state,
+                    ROBOT_WITH_BATTERY_MASS_KG, post_world_update_functions));
         }
         else
         {
@@ -192,6 +194,9 @@ void PhysicsWorld::stepSimulation(const Duration& time_step)
 {
     b2_world->Step(static_cast<float>(time_step.getSeconds()), velocity_iterations,
                    position_iterations);
+    while(auto post_world_update_function = post_world_update_functions->popLeastRecentlyAddedValue()) {
+        (post_world_update_function.value())();
+    }
     current_timestamp = current_timestamp + time_step;
 }
 
@@ -230,4 +235,22 @@ std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getBluePhysicsRobots() co
 std::weak_ptr<PhysicsBall> PhysicsWorld::getPhysicsBall() const
 {
     return std::weak_ptr<PhysicsBall>(physics_ball);
+}
+
+std::weak_ptr<PhysicsRobot> PhysicsWorld::getRobotAtPosition(const Point &position) {
+    std::weak_ptr<PhysicsRobot> result;
+
+    for(const auto& robot : yellow_physics_robots) {
+        if(distance(position, robot->position()) < ROBOT_MAX_RADIUS_METERS) {
+            result = robot;
+        }
+    }
+
+    for(const auto& robot : blue_physics_robots) {
+        if(distance(position, robot->position()) < ROBOT_MAX_RADIUS_METERS) {
+            result = robot;
+        }
+    }
+
+    return result;
 }

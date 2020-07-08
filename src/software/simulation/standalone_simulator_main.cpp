@@ -79,6 +79,7 @@ int main(int argc, char **argv)
 
         auto ball_placement_callback =
             [&standalone_simulator](Point ball_placement_point) {
+//                standalone_simulator.setRobotPosition(std::make_pair(0, TeamColour::YELLOW), ball_placement_point);
                 BallState state(ball_placement_point, Vector(0, 0));
                 standalone_simulator.setBallState(state);
             };
@@ -103,8 +104,12 @@ int main(int argc, char **argv)
                 }
             };
 
+        auto get_robot_callback = [&standalone_simulator](Point pos) {
+            return standalone_simulator.getRobotAtPosition(pos);
+        };
+
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(
-            ball_placement_callback, simulation_mode_callback);
+                ball_placement_callback, simulation_mode_callback, get_robot_callback);
 
         standalone_simulator.registerOnSSLWrapperPacketReadyCallback(
             [&threaded_standalone_simulator_gui](SSL_WrapperPacket wrapper_packet) {

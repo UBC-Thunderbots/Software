@@ -9,6 +9,10 @@ qt_cc_library(
     deps = [
         "//software/gui:geometry_conversion",
         "//software/gui/generic_widgets/draw_function_visualizer",
+        "//software/new_geom:point",
+        "//software/simulation/physics:physics_robot",
+        "//software/world:robot_state",
+        "//software/world:team_colour",
         "@qt//:qt_widgets",
     ],
 )

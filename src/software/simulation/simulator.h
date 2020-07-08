@@ -176,6 +176,18 @@ class Simulator
      */
     Timestamp getTimestamp() const;
 
+    /**
+     * Returns the PhysicsRobot at the given position. This function accounts
+     * for robot radius, so a robot will be returned if the given position is
+     * within the robot's radius from its position.
+     *
+     * @param position The position at which to check for a robot
+     *
+     * @return a weak_ptr to the PhysicsRobot at the given position if one exists,
+     * otherwise returns an empty pointer
+     */
+    std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point &position);
+
    private:
     /**
      * Updates the given simulator_robots to contain and control the given physics_robots

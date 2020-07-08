@@ -24,8 +24,8 @@ const double PhysicsRobot::total_chicker_depth =
     PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
 
 PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
-                           const RobotState& robot_state, const double mass_kg)
-    : robot_id(id)
+                           const RobotState& robot_state, const double mass_kg, std::shared_ptr<ThreadSafeBuffer<std::function<void()>>> post_world_update_functions)
+: robot_id(id), post_world_update_functions(post_world_update_functions)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
@@ -349,4 +349,18 @@ float PhysicsRobot::getMotorBrakeForce(float motor_speed) const
     // The scaling factor has been tuned to stop the robot in a reasonable
     // amount of time via the unit tests
     return -0.5f * robot_body->GetMass() * motor_speed;
+}
+
+void PhysicsRobot::setPosition(const Point &position) {
+    auto func = [=]() {
+        b2World *world = robot_body->GetWorld();
+        if (bodyExistsInWorld(robot_body, world))
+        {
+            robot_body->SetLinearVelocity(createVec2(Vector(0, 0)));
+            robot_body->SetAngularVelocity(0.0);
+            robot_body->SetTransform(createVec2(position), robot_body->GetAngle());
+        }
+    };
+
+    post_world_update_functions->push(func);
 }

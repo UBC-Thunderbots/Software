@@ -85,6 +85,18 @@ class StandaloneSimulator
      */
     void setBallState(const BallState& state);
 
+    /**
+     * Returns the PhysicsRobot at the given position. This function accounts
+     * for robot radius, so a robot will be returned if the given position is
+     * within the robot's radius from its position.
+     *
+     * @param position The position at which to check for a robot
+     *
+     * @return a weak_ptr to the PhysicsRobot at the given position if one exists,
+     * otherwise returns an empty pointer
+     */
+    std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point &position);
+
     // This is a somewhat arbitrary value that results in slow motion
     // simulation looking appropriately / usefully slow
     static constexpr double DEFAULT_SLOW_MOTION_MULTIPLIER = 8.0;

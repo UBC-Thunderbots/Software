@@ -2,6 +2,7 @@
 
 #include <Box2D/Box2D.h>
 
+#include "software/multithreading/thread_safe_buffer.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_field.h"
 #include "software/simulation/physics/physics_robot.h"
@@ -159,6 +160,18 @@ class PhysicsWorld
      */
     std::weak_ptr<PhysicsBall> getPhysicsBall() const;
 
+    /**
+     * Returns the PhysicsRobot at the given position. This function accounts
+     * for robot radius, so a robot will be returned if the given position is
+     * within the robot's radius from its position.
+     *
+     * @param position The position at which to check for a robot
+     *
+     * @return a weak_ptr to the PhysicsRobot at the given position if one exists,
+     * otherwise returns an empty pointer
+     */
+    std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point &position);
+
    private:
     /**
      * Returns the states and IDs of all robots of the specified colour.
@@ -213,4 +226,9 @@ class PhysicsWorld
     const double ball_linear_damping;
     std::vector<std::shared_ptr<PhysicsRobot>> yellow_physics_robots;
     std::vector<std::shared_ptr<PhysicsRobot>> blue_physics_robots;
+
+    // A buffer of functions that will be called after each world time step
+    std::shared_ptr<ThreadSafeBuffer<std::function<void()>>> post_world_update_functions;
+    // We make this buffer relatively large because we do not want to drop any functions.
+    static constexpr size_t POST_WORLD_UPDATE_FUNCTIONS_BUFFER_SIZE = 100;
 };

@@ -129,6 +129,18 @@ class ThreadedSimulator
     void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
                                const primitive_params_t& params);
 
+    /**
+     * Returns the PhysicsRobot at the given position. This function accounts
+     * for robot radius, so a robot will be returned if the given position is
+     * within the robot's radius from its position.
+     *
+     * @param position The position at which to check for a robot
+     *
+     * @return a weak_ptr to the PhysicsRobot at the given position if one exists,
+     * otherwise returns an empty pointer
+     */
+    std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point &position);
+
    private:
     /**
      * The function that runs inside the simulation thread, handling

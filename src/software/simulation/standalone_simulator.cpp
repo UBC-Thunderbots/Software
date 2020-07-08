@@ -172,3 +172,7 @@ void StandaloneSimulator::setBallState(const BallState& state)
 {
     simulator.setBallState(state);
 }
+
+std::weak_ptr<PhysicsRobot> StandaloneSimulator::getRobotAtPosition(const Point &position) {
+    return simulator.getRobotAtPosition(position);
+}

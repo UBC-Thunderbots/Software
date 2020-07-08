@@ -4,6 +4,7 @@
 
 #include <functional>
 
+#include "software/multithreading/thread_safe_buffer.h"
 #include "software/new_geom/angle.h"
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
@@ -39,9 +40,11 @@ class PhysicsRobot
      * @param world A shared_ptr to a Box2D World
      * @param robot_state The initial robot state
      * @param mass_kg The mass of the robot in kg
+     * @param post_world_update_functions A buffer of functions to be executed
+     * after each world time step
      */
     explicit PhysicsRobot(const RobotId id, std::shared_ptr<b2World> world,
-                          const RobotState &robot_state, const double mass_kg);
+                          const RobotState &robot_state, const double mass_kg, std::shared_ptr<ThreadSafeBuffer<std::function<void()>>> post_world_update_functions);
 
     PhysicsRobot() = delete;
 
@@ -179,6 +182,15 @@ class PhysicsRobot
     void brakeMotorFrontLeft();
     void brakeMotorFrontRight();
 
+    /**
+     * Sets the position of the PhysicsRobot to the given position. The robot
+     * will maintain its orientation, but will have its linear and angular
+     * velocity set to zero.
+     *
+     * @param position The new position of the robot
+     */
+    void setPosition(const Point& position);
+
    private:
     /**
      * Creates as many fixtures as necessary to represent the body shape of the given
@@ -256,6 +268,8 @@ class PhysicsRobot
         dribbler_ball_end_contact_callbacks;
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
         chicker_ball_contact_callbacks;
+
+    std::shared_ptr<ThreadSafeBuffer<std::function<void()>>> post_world_update_functions;
 
     // This is a somewhat arbitrary value for damping. We keep it relatively low
     // so that robots still coast a ways before stopping, but non-zero so that robots

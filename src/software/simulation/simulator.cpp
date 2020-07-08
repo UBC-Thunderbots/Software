@@ -274,3 +274,7 @@ unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& prim
 
     return primitive_index;
 }
+
+std::weak_ptr<PhysicsRobot> Simulator::getRobotAtPosition(const Point &position) {
+    return physics_world.getRobotAtPosition(position);
+}

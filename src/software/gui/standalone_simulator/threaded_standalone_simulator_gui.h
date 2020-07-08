@@ -28,11 +28,13 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
      * location when the user places the ball in the GUI.
      * @param simulation_mode_callback A callback that will be called with the new
      * simulation mode when the user sets the simulation mode in the GUI.
+     * @param get_robot_at_position_func A function that can be called to get the robot
+     * as the given position
      */
     explicit ThreadedStandaloneSimulatorGUI(
         const std::function<void(Point)>& ball_placement_callback,
         const std::function<void(StandaloneSimulator::SimulationMode)>&
-            simulation_mode_callback);
+            simulation_mode_callback, const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func);
 
     ~ThreadedStandaloneSimulatorGUI() override;
 
@@ -54,11 +56,20 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
      * constructed in the thread it will run in, and the StandaloneSimulatorGUI must be
      * created in the same context as the QApplication (which in this case is the new
      * thread).
+     *
+     * @param ball_placement_callback A callback that will be called with the new ball
+     * location when the user places the ball in the GUI.
+     * @param simulation_mode_callback A callback that will be called with the new
+     * simulation mode when the user sets the simulation mode in the GUI.
+     * @param get_robot_at_position_func A function that can be called to get the robot
+     * as the given position
      */
     void createAndRunStandaloneSimulatorGUI(
         const std::function<void(Point)>& ball_placement_callback,
         const std::function<void(StandaloneSimulator::SimulationMode)>&
-            simulation_mode_callback);
+            simulation_mode_callback,
+        const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func
+            );
 
     std::thread run_standalone_simulator_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
