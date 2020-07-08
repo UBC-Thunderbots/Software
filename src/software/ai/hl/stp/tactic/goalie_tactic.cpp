@@ -11,10 +11,10 @@
 #include "software/new_geom/ray.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/util/calculate_block_cone.h"
+#include "software/new_geom/util/closest_point.h"
 #include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
-
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team)

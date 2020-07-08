@@ -9,7 +9,9 @@ cc_library(
 cc_library(
     name = "segment",
     srcs = ["segment.cpp"],
-    hdrs = ["segment.h"],
+    hdrs = [
+        "segment.h",
+    ],
     deps = [
         ":point",
     ],

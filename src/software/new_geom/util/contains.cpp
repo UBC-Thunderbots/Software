@@ -80,8 +80,8 @@ bool contains(const Segment& container, const Point& contained, double fixed_eps
         // coordinate centric logic
         if (almostEqual(contained.x(), container.getEnd().x(), fixed_epsilon,
                         ulps_distance) &&
-            almostEqual(container.getEnd().x(), container.getStart().x(),
-                        fixed_epsilon, ulps_distance))
+            almostEqual(container.getEnd().x(), container.getStart().x(), fixed_epsilon,
+                        ulps_distance))
         {
             // Since segment and contained are collinear we only need to check one of the
             // coordinates, in this case we select Y because all X values are equal

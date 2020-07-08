@@ -162,8 +162,7 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
     // The first Angle is between the reference Segment and the first obstacle Segment
     // After this one, ever open angle is between segment(i).end and
     // segment(i+1).start
-    open_segs.push_back(
-        Segment(parent_segment.getStart(), segments.front().getStart()));
+    open_segs.push_back(Segment(parent_segment.getStart(), segments.front().getStart()));
 
     // The 'open' Segment in the space between consecutive 'blocking' Segments
     for (std::vector<Segment>::const_iterator it = segments.begin();

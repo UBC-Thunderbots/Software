@@ -2,6 +2,7 @@
 
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
+#include "software/new_geom/segment.h"
 
 /**
  * Finds the closest Point on a Line to a Point
@@ -12,3 +13,17 @@
  */
 Point closestPointOnLine(const Point &p, const Line &l);
 Point closestPointOnLine(const Line &l, const Point &p);
+
+/**
+ * Finds the Point on line segment closest to point.
+ *
+ * @param centre the point.
+ *
+ * @param segA one end of the line segment.
+ *
+ * @param segB the other end of the line segment.
+ *
+ * @return the Point on line segment closest to centre point.
+ */
+Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB);
+Point closestPointOnSeg(const Point &p, const Segment &segment);

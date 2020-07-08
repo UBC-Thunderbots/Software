@@ -8,6 +8,7 @@
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/util/acute_angle.h"
+#include "software/new_geom/util/closest_point.h"
 #include "software/parameter/dynamic_parameters.h"
 
 double ratePass(const World& world, const Pass& pass,

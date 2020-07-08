@@ -18,24 +18,6 @@ constexpr int sign(double n)
     return n > FIXED_EPSILON ? 1 : (n < -FIXED_EPSILON ? -1 : 0);
 }
 
-double length(const Segment &segment);
-
-double lengthSquared(const Segment &segment);
-
-/**
- * Finds the Point on line segment closest to point.
- *
- * @param centre the point.
- *
- * @param segA one end of the line segment.
- *
- * @param segB the other end of the line segment.
- *
- * @return the Point on line segment closest to centre point.
- */
-Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB);
-Point closestPointOnSeg(const Point &p, const Segment &segment);
-
 /**
  * returns perpendicular offset from line x0-x1 to point p
  */

@@ -110,8 +110,7 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
         else
         {
             Point overlapping_segment_end =
-                ray.toUnitVector() ==
-                        (segment.getEnd() - segment.getStart()).normalize()
+                ray.toUnitVector() == (segment.getEnd() - segment.getStart()).normalize()
                     ? segment.getEnd()
                     : segment.getStart();
             intersections = {ray.getStart(), overlapping_segment_end};
