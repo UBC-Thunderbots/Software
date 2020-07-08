@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/primitive/primitive.h"
@@ -15,8 +14,6 @@
  * "Subject". Please see the implementation of those classes for details.
  */
 class Backend : public Subject<SensorMsg>,
-                public Subject<World>,
-                public Subject<RobotStatus>,
                 public ThreadedObserver<World>,
                 public ThreadedObserver<ConstPrimitiveVectorPtr>
 {

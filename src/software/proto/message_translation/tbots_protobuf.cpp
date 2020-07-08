@@ -11,8 +11,8 @@
 std::unique_ptr<VisionMsg> createVisionMsg(const World& world)
 {
     // create msg and set timestamp
-    auto vision_msg = std::make_unique<VisionMsg>();
-    vision_msg->set_allocated_time_sent(createCurrentTimestampMsg().release());
+    auto vision_msg                    = std::make_unique<VisionMsg>();
+    *(vision_msg->mutable_time_sent()) = *createCurrentTimestampMsg();
 
     // set robot_states map
     auto& robot_states_map = *vision_msg->mutable_robot_states();
@@ -29,7 +29,7 @@ std::unique_ptr<VisionMsg> createVisionMsg(const World& world)
                   });
 
     // set ball state
-    vision_msg->set_allocated_ball_state(createBallStateMsg(world.ball()).release());
+    *(vision_msg->mutable_ball_state()) = *createBallStateMsg(world.ball());
 
     return std::move(vision_msg);
 }
@@ -38,8 +38,8 @@ std::unique_ptr<PrimitiveSetMsg> createPrimitiveSetMsg(
     const ConstPrimitiveVectorPtr& primitives)
 {
     // create msg and update timestamp
-    auto primitive_set_msg = std::make_unique<PrimitiveSetMsg>();
-    primitive_set_msg->set_allocated_time_sent(createCurrentTimestampMsg().release());
+    auto primitive_set_msg                    = std::make_unique<PrimitiveSetMsg>();
+    *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestampMsg();
 
     // set robot primitives
     auto& robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
@@ -67,11 +67,11 @@ std::unique_ptr<RobotStateMsg> createRobotStateMsg(const Robot& robot)
 
     auto robot_state_msg = std::make_unique<RobotStateMsg>();
 
-    robot_state_msg->set_allocated_global_position_meters(position.release());
-    robot_state_msg->set_allocated_global_orientation_radians(orientation.release());
-    robot_state_msg->set_allocated_global_velocity_meters_per_sec(velocity.release());
-    robot_state_msg->set_allocated_global_angular_velocity_radians_per_sec(
-        angular_velocity.release());
+    *(robot_state_msg->mutable_global_position_meters())         = *position;
+    *(robot_state_msg->mutable_global_orientation_radians())     = *orientation;
+    *(robot_state_msg->mutable_global_velocity_meters_per_sec()) = *velocity;
+    *(robot_state_msg->mutable_global_angular_velocity_radians_per_sec()) =
+        *angular_velocity;
 
     return std::move(robot_state_msg);
 }
@@ -82,8 +82,8 @@ std::unique_ptr<BallStateMsg> createBallStateMsg(const Ball& ball)
     auto velocity       = createVectorMsg(ball.velocity());
     auto ball_state_msg = std::make_unique<BallStateMsg>();
 
-    ball_state_msg->set_allocated_global_position_meters(position.release());
-    ball_state_msg->set_allocated_global_velocity_meters_per_sec(velocity.release());
+    *(ball_state_msg->mutable_global_position_meters())         = *position;
+    *(ball_state_msg->mutable_global_velocity_meters_per_sec()) = *velocity;
 
     return std::move(ball_state_msg);
 }
