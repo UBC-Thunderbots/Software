@@ -38,6 +38,16 @@ QPolygonF createQPolygonF(const Polygon& polygon);
 QLineF createQLineF(const Segment& segment);
 
 /**
+ * Converts Qt's Point class to our Point class
+ *
+ * @param point The Point to convert
+ *
+ * @return The Point representation of the given QPoint
+ */
+Point createPoint(const QPointF& point);
+Point createPoint(const QPoint& point);
+
+/**
  * Converts our Angle class to an angle value consumable by Qt.
  * Qt uses integers to represent angles.
  *
