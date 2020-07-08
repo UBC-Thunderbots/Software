@@ -95,6 +95,9 @@ class PhysicsBall
      */
     bool isInFlight() const;
 
+    /**
+     * Updates whether or not the ball is "in flight" based on its current state.
+     */
     void updateIsInFlight();
 
     /**
