@@ -29,3 +29,5 @@ build --disk_cache=~/.cache/thunderbots_bazel_disk_cache
 # to find the X-Window system and create windows
 build --test_env=XDG_RUNTIME_DIR
 build --test_env=DISPLAY
+
+test --cache_test_results=no
