@@ -46,7 +46,8 @@ class Segment final
     /**
      * Creates a Segment that starts and ends at the given points
      */
-    inline explicit Segment(const Point& start, const Point& end) : start(start), end(end){};
+    inline explicit Segment(const Point& start, const Point& end)
+        : start(start), end(end){};
 
     /**
      * Creates a Segment that is reversed
