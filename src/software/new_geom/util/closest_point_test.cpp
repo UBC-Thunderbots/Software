@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "software/test_util/test_util.h"
+
 TEST(ClosestPointTest, point_on_line)
 {
     Point p(4, 4);
@@ -57,8 +59,8 @@ TEST(GeomUtilTest, test_closest_lineseg_point)
 
     seg = Segment(Point{-2, 1}, Point{1, 2});
 
-    EXPECT_TRUE((closestPointOnSeg(Point(1, 0), seg) - Point(0.4, 1.8)).length() <
-                0.00001);
-    EXPECT_TRUE((closestPointOnSeg(Point(-1.4, 1.2), seg) - Point(-1.4, 1.2)).length() <
-                0.00001);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(1, 0), seg),
+                                               Point(0.4, 1.8), 0.00001));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(-1.4, 1.2), seg),
+                                               Point(-1.4, 1.2), 0.00001));
 }

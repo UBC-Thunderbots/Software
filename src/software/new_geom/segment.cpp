@@ -1,5 +1,13 @@
 #include "software/new_geom/segment.h"
 
+Segment::Segment(const Point& start, const Point& end) : start(start), end(end)
+{
+    if (start == end)
+    {
+        throw std::invalid_argument("Attempting to construct a degenerate segment");
+    }
+}
+
 void Segment::setStart(Point o)
 {
     start = o;
@@ -38,11 +46,6 @@ Segment Segment::reverse() const
 Vector Segment::toVector() const
 {
     return end - start;
-};
-
-double Segment::slope() const
-{
-    return (end.y() - start.y()) / (end.x() - start.x());
 };
 
 bool Segment::operator==(const Segment& other) const

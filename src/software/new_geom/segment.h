@@ -6,6 +6,11 @@ class Segment final
 {
    public:
     /**
+     * Creates a Segment that starts and ends at the given points
+     */
+    Segment(const Point& start, const Point& end);
+
+    /**
      * Sets the start point of the segment to o
      *
      * @param o new start point of segment
@@ -48,17 +53,6 @@ class Segment final
     double lengthSquared() const;
 
     /**
-     * Creates a Segment that starts and ends at the given points
-     */
-    inline explicit Segment(const Point& start, const Point& end) : start(start), end(end)
-    {
-        if (start == end)
-        {
-            throw std::invalid_argument("Attempting to construct a degenerate segment");
-        }
-    };
-
-    /**
      * Creates a Segment that is reversed
      */
     Segment reverse() const;
@@ -67,8 +61,6 @@ class Segment final
      * Makes a Vector out of this Segment.
      */
     Vector toVector() const;
-
-    double slope() const;
 
     bool operator==(const Segment& other) const;
 
