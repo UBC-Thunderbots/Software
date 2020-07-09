@@ -186,3 +186,31 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "penalty_kick_play_test",
+    srcs = ["penalty_kick_play_test.cpp"],
+    deps = [
+        ":simulated_test_fixture",
+        "//software/ai/hl/stp/play:penalty_kick_play",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "penalty_kick_enemy_play_test",
+    srcs = ["penalty_kick_enemy_play_test.cpp"],
+    deps = [
+        ":simulated_test_fixture",
+        "//software/ai/hl/stp/play:penalty_kick_enemy_play",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
