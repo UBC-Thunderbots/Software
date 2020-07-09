@@ -144,14 +144,18 @@ void SimulatedTestFixture::updateSensorFusion()
     sensor_fusion.updateWorld(sensor_msg);
 }
 
-void SimulatedTestFixture::sleep(const std::chrono::steady_clock::time_point &tick_wall_start_time,
-                                 const Duration &desired_wall_tick_time) {
+void SimulatedTestFixture::sleep(
+    const std::chrono::steady_clock::time_point &tick_wall_start_time,
+    const Duration &desired_wall_tick_time)
+{
     auto wall_time_now = std::chrono::steady_clock::now();
     auto wall_time_since_tick_start =
         std::chrono::duration_cast<std::chrono::milliseconds>(wall_time_now -
                                                               tick_wall_start_time);
 
-    auto ms_to_sleep = std::chrono::milliseconds(static_cast<int>(desired_wall_tick_time.getMilliseconds())) - wall_time_since_tick_start;
+    auto ms_to_sleep = std::chrono::milliseconds(
+                           static_cast<int>(desired_wall_tick_time.getMilliseconds())) -
+                       wall_time_since_tick_start;
     if (ms_to_sleep > std::chrono::milliseconds(0))
     {
         std::this_thread::sleep_for(ms_to_sleep);
@@ -191,7 +195,7 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {
-        auto wall_start_time           = std::chrono::steady_clock::now();
+        auto wall_start_time = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {
             simulator->stepSimulation(time_step);

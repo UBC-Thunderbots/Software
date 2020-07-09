@@ -15,29 +15,27 @@ class ShootOrChipPlayTest : public SimulatedTestFixture
 TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
 {
     setBallState(BallState(Point(-1.4, 2), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {
-            field().friendlyGoalCenter(),
-            Point(-1.5, 2),
-            Point(-2, 1.5),
-            Point(-2, 0.5),
-            Point(-2, -0.5),
-            Point(-2, -1.5),
-        }));
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({
+        field().friendlyGoalCenter(),
+        Point(-1.5, 2),
+        Point(-2, 1.5),
+        Point(-2, 0.5),
+        Point(-2, -0.5),
+        Point(-2, -1.5),
+    }));
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {
-                field().enemyGoalCenter(),
-                field().enemyDefenseArea().negXNegYCorner(),
-                field().enemyDefenseArea().negXPosYCorner(),
-            Point(-1, 0),
-            Point(1, -2.5),
-        }));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({
+        field().enemyGoalCenter(),
+        field().enemyDefenseArea().negXNegYCorner(),
+        field().enemyDefenseArea().negXPosYCorner(),
+        Point(-1, 0),
+        Point(1, -2.5),
+    }));
     addEnemyRobots({
         RobotStateWithId{
-            .id = 5,
-            .robot_state = RobotState(Point(1, 2), Vector(-4.6, 0), Angle::half(), AngularVelocity::zero())
-        },
+            .id          = 5,
+            .robot_state = RobotState(Point(1, 2), Vector(-4.6, 0), Angle::half(),
+                                      AngularVelocity::zero())},
     });
     setEnemyGoalie(0);
     setAIPlay(ShootOrChipPlay::name);

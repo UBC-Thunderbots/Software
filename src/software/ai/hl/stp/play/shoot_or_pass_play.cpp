@@ -72,12 +72,12 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     if (world.ball().position().x() > -1)
     {
         double y_offset =
-                -std::copysign(world.field().yLength() / 2, world.ball().position().y());
+            -std::copysign(world.field().yLength() / 2, world.ball().position().y());
         cherry_pick_1_target_region =
-                Rectangle(Point(0, 0),
-                          Point(world.field().xLength() / 4, y_offset));
+            Rectangle(Point(0, 0), Point(world.field().xLength() / 4, y_offset));
         cherry_pick_2_target_region =
-                Rectangle(Point(world.field().xLength() / 4, 0), Point(world.field().xLength() / 2, y_offset));
+            Rectangle(Point(world.field().xLength() / 4, 0),
+                      Point(world.field().xLength() / 2, y_offset));
     }
 
     std::array<std::shared_ptr<CherryPickTactic>, 2> cherry_pick_tactics = {

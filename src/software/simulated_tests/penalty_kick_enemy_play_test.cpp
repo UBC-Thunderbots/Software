@@ -19,13 +19,18 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(4.6, -3.1)}));
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {field().enemyGoalCenter(),
-         Point(3, 2.5), Point(3.2, 2.5), Point(3.4, 2.5), Point(3, -2.5), Point(3.2, -2.5),
-         }));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({
+        field().enemyGoalCenter(),
+        Point(3, 2.5),
+        Point(3.2, 2.5),
+        Point(3.4, 2.5),
+        Point(3, -2.5),
+        Point(3.2, -2.5),
+    }));
     setEnemyGoalie(0);
     setAIPlay(PenaltyKickEnemyPlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START, RefboxGameState::PREPARE_PENALTY_THEM);
+    setRefboxGameState(RefboxGameState::NORMAL_START,
+                       RefboxGameState::PREPARE_PENALTY_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

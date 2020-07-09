@@ -141,7 +141,8 @@ class SimulatedTestFixture : public ::testing::Test
      * Puts the current thread to sleep so that a single simulation tick will take
      * the desired amount of real-world "wall" time.
      *
-     * @param tick_wall_start_time The time at which the simulation tick started, in wall time
+     * @param tick_wall_start_time The time at which the simulation tick started, in wall
+     * time
      * @param desired_wall_tick_time How long the tick should take, in wall time
      */
     static void sleep(const std::chrono::steady_clock::time_point& tick_wall_start_time,

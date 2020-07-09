@@ -16,24 +16,17 @@ TEST_F(DefensePlayTest, test_defense_play)
 {
     setBallState(BallState(Point(0.9, 2.85), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {
-            Point(-3, 2.5),
-            Point(-3, 1.5),
-            Point(-3, 0.5),
-            Point(-3, -0.5),
-            Point(-3, -1.5),
-            Point(-3, -3.0)
-        }));
+        {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
+         Point(-3, -3.0)}));
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {
-                field().enemyGoalCenter(),
-                field().enemyDefenseArea().negXNegYCorner(),
-                field().enemyDefenseArea().negXPosYCorner(),
-            Point(1, 3),
-            Point(-1, -0.25),
-            Point(-2, -1.25),
-        }));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({
+        field().enemyGoalCenter(),
+        field().enemyDefenseArea().negXNegYCorner(),
+        field().enemyDefenseArea().negXPosYCorner(),
+        Point(1, 3),
+        Point(-1, -0.25),
+        Point(-2, -1.25),
+    }));
     setEnemyGoalie(0);
     setAIPlay(DefensePlay::name);
     setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::NORMAL_START);
@@ -41,11 +34,9 @@ TEST_F(DefensePlayTest, test_defense_play)
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-            // TODO: Implement proper validation
-            // https://github.com/UBC-Thunderbots/Software/issues/1396
-            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            }
-    };
+        // TODO: Implement proper validation
+        // https://github.com/UBC-Thunderbots/Software/issues/1396
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {}};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
