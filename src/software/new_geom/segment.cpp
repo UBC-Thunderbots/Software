@@ -45,7 +45,7 @@ double Segment::slope() const
     return (end.y() - start.y()) / (end.x() - start.x());
 };
 
-inline bool Segment::operator==(const Segment& other) const
+bool Segment::operator==(const Segment& other) const
 {
     return start == other.start && end == other.end;
 }
