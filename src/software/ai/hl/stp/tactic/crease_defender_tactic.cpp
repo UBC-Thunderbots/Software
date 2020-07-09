@@ -77,16 +77,14 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {
-                //                LOG(WARNING)
-                //                    << "min_defender_seperation_deg >
-                //                    max_defender_seperation_deg";
+                LOG(WARNING)
+                    << "min_defender_seperation_deg > max_defender_seperation_deg";
                 return std::nullopt;
             }
             if (min_ball_dist > max_ball_dist)
             {
-                //                LOG(WARNING)
-                //                    << "min_defender_seperation_deg >
-                //                    max_defender_seperation_deg";
+                LOG(WARNING)
+                    << "min_defender_seperation_deg > max_defender_seperation_deg";
                 return std::nullopt;
             }
 
@@ -112,17 +110,15 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
             }
             else
             {
-                //                LOG(WARNING)
-                //                    << "Could not draw a line from the goalie to the
-                //                    ball through the defender crease";
+                LOG(WARNING)
+                    << "Could not draw a line from the goalie to the ball through the defender crease";
                 return std::nullopt;
             }
         }
         else
         {
-            //            LOG(WARNING)
-            //                << "Could not draw a line from the goalie to the ball
-            //                through the defender crease";
+            LOG(WARNING)
+                << "Could not draw a line from the goalie to the ball through the defender crease";
             return std::nullopt;
         }
     }
@@ -187,7 +183,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
         }
         else
         {
-            //            LOG(WARNING) << "Error updating robot state, stopping";
+            LOG(WARNING) << "Error updating robot state, stopping";
 
             stop_action->updateControlParams(*robot, false);
             yield(stop_action);

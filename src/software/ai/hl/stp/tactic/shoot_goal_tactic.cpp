@@ -188,9 +188,6 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             yield(move_action);
         }
     } while (!(kick_action->done() || chip_action->done()));
-
-    volatile int a;
-    (void)a;
 }
 
 void ShootGoalTactic::accept(MutableTacticVisitor &visitor)
