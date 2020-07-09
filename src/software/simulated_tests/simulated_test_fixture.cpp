@@ -144,19 +144,16 @@ void SimulatedTestFixture::updateSensorFusion()
     sensor_fusion.updateWorld(sensor_msg);
 }
 
-void SimulatedTestFixture::sleep(
-    const std::chrono::steady_clock::time_point &wall_start_time,
-    const Timestamp &current_time)
-{
-    // How long to wait for the wall-clock time to match the
-    // current simulation time
+void SimulatedTestFixture::sleep(const std::chrono::steady_clock::time_point &wall_start_time,
+                                 const Duration &desired_wall_tick_time) {
     auto wall_time_now = std::chrono::steady_clock::now();
-    auto wall_time_since_sim_start =
+    auto current_tick_wall_time_duration =
         std::chrono::duration_cast<std::chrono::milliseconds>(wall_time_now -
                                                               wall_start_time);
     auto ms_to_sleep =
-        std::chrono::milliseconds(static_cast<int>(current_time.getMilliseconds())) -
-        wall_time_since_sim_start;
+            std::chrono::milliseconds(static_cast<int>(desired_wall_tick_time.getMilliseconds())) -
+            current_tick_wall_time_duration;
+    std::cout << "sleeping for " << ms_to_sleep.count() << std::endl;
     if (ms_to_sleep > std::chrono::milliseconds(0))
     {
         std::this_thread::sleep_for(ms_to_sleep);
@@ -191,15 +188,16 @@ void SimulatedTestFixture::runTest(
             NonTerminatingFunctionValidator(validation_function, world));
     }
 
-    Timestamp timeout_time         = simulator->getTimestamp() + timeout;
-    Duration time_step             = Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
-    auto wall_start_time           = std::chrono::steady_clock::now();
+    const Timestamp timeout_time         = simulator->getTimestamp() + timeout;
+    const Duration simulation_time_step             = Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
+    const Duration ai_time_step             = Duration::fromSeconds(simulation_time_step.getSeconds() * CAMERA_FRAMES_PER_AI_TICK);
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {
+        auto wall_start_time           = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {
-            simulator->stepSimulation(time_step);
+            simulator->stepSimulation(simulation_time_step);
             updateSensorFusion();
         }
 
@@ -220,6 +218,11 @@ void SimulatedTestFixture::runTest(
                     std::move(primitives));
             simulator->setYellowRobotPrimitives(primitives_ptr);
 
+            if (run_simulation_in_realtime)
+            {
+                sleep(wall_start_time, ai_time_step);
+            }
+
             if (full_system_gui)
             {
                 full_system_gui->onValueReceived(*world);
@@ -230,11 +233,6 @@ void SimulatedTestFixture::runTest(
         else
         {
             LOG(WARNING) << "SensorFusion did not output a valid World";
-        }
-
-        if (run_simulation_in_realtime)
-        {
-            sleep(wall_start_time, simulator->getTimestamp());
         }
     }
 
