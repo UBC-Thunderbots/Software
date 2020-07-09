@@ -48,8 +48,6 @@ void STP::updateGameState(const World& world)
             RefboxGameState current_state =
                 fromStringToRefboxGameState(current_state_string);
             current_game_state.updateRefboxGameState(current_state);
-            volatile int a;
-            (void)a;
         }
         catch (std::invalid_argument e)
         {
