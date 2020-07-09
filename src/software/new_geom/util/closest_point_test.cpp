@@ -49,7 +49,23 @@ TEST(ClosestPointTest, point_far_from_line)
     EXPECT_EQ(closestPointOnLine(l, p), expected);
 }
 
-TEST(GeomUtilTest, test_closest_one_dimension_lineseg_middle_point)
+TEST(GeomUtilTest, test_closest_lineseg_intermediate_point)
+{
+    Segment seg(Point{-2, 1}, Point{1, 2});
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(1, 0), seg),
+                                               Point(0.4, 1.8), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_lineseg_point_on_seg)
+{
+    Segment seg(Point{-2, 1}, Point{1, 2});
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(-1.4, 1.2), seg),
+                                               Point(-1.4, 1.2), 0.00001));
+}
+
+TEST(GeomUtilTest, test_closest_lineseg_middle_point)
 {
     Segment seg(Point{-1, 1}, Point{1, 1});
 
@@ -57,7 +73,7 @@ TEST(GeomUtilTest, test_closest_one_dimension_lineseg_middle_point)
                                                Point(0, 1), 0.00001));
 }
 
-TEST(GeomUtilTest, test_closest_one_dimension_lineseg_start_point)
+TEST(GeomUtilTest, test_closest_lineseg_start_point)
 {
     Segment seg(Point{-1, 1}, Point{1, 1});
 
@@ -65,50 +81,10 @@ TEST(GeomUtilTest, test_closest_one_dimension_lineseg_start_point)
                                                Point(-1, 1), 0.00001));
 }
 
-TEST(GeomUtilTest, test_closest_one_dimension_lineseg_end_point)
+TEST(GeomUtilTest, test_closest_lineseg_end_point)
 {
     Segment seg(Point{-1, 1}, Point{1, 1});
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(2, 1.5), seg),
-                                               Point(1, 1), 0.00001));
-}
-
-TEST(GeomUtilTest, test_closest_one_dimension_lineseg_intermediate_point)
-{
-    Segment seg(Point{-1, 1}, Point{1, 1});
-
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(0.5, 2), seg),
-                                               Point(0.5, 1), 0.00001));
-}
-
-TEST(GeomUtilTest, test_closest_two_dimension_lineseg_middle_point)
-{
-    Segment seg = Segment(Point{-2, -2}, Point{2, 2});
-
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(1, -1), seg),
-                                               Point(0, 0), 0.00001));
-}
-
-TEST(GeomUtilTest, test_closest_two_dimension_lineseg_start_point)
-{
-    Segment seg = Segment(Point{-2, -2}, Point{2, 2});
-
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(-3, -4), seg),
-                                               Point(-2, -2), 0.00001));
-}
-
-TEST(GeomUtilTest, test_closest_two_dimension_lineseg_end_point)
-{
-    Segment seg = Segment(Point{-2, -2}, Point{2, 2});
-
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(5, 2), seg),
-                                               Point(2, 2), 0.00001));
-}
-
-TEST(GeomUtilTest, test_closest_two_dimension_lineseg_intermediate_point)
-{
-    Segment seg = Segment(Point{-2, -2}, Point{2, 2});
-
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSeg(Point(2, 0), seg),
                                                Point(1, 1), 0.00001));
 }
