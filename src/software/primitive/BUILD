@@ -1,25 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "catch_primitive",
-    srcs = ["catch_primitive.cpp"],
-    hdrs = ["catch_primitive.h"],
-    deps = [
-        ":primitive",
-        "//software/geom",
-    ],
-)
-
-cc_test(
-    name = "catch_primitive_test",
-    srcs = ["catch_primitive_test.cpp"],
-    deps = [
-        ":catch_primitive",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "chip_primitive",
     srcs = ["chip_primitive.cpp"],
     hdrs = ["chip_primitive.h"],
@@ -196,7 +177,6 @@ cc_library(
     name = "all_primitives",
     hdrs = ["all_primitives.h"],
     deps = [
-        ":catch_primitive",
         ":chip_primitive",
         ":direct_velocity_primitive",
         ":direct_wheels_primitive",

@@ -15,17 +15,17 @@ typedef struct DribblePrimitiveState
 } DribblePrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DribblePrimitiveState_t)
 
-static void dribble_start(const primitive_params_t* params, void* void_state_ptr,
-                          FirmwareWorld_t* world)
+void app_dribble_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+                                 FirmwareWorld_t* world)
 {
     DribblePrimitiveState_t* state = (DribblePrimitiveState_t*)void_state_ptr;
-    state->destination[0]          = ((float)(params->params[0]) / 1000.0f);
-    state->destination[1]          = ((float)(params->params[1]) / 1000.0f);
-    state->destination[2]          = ((float)(params->params[2]) / 100.0f);
+    state->destination[0]          = params.parameter1 / 1000.0f;
+    state->destination[1]          = params.parameter2 / 1000.0f;
+    state->destination[2]          = params.parameter3 / 100.0f;
 
     Dribbler_t* dribbler =
         app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
-    app_dribbler_setSpeed(dribbler, (uint32_t)(params->params[3]));
+    app_dribbler_setSpeed(dribbler, (uint32_t)(params.parameter4));
 }
 
 static void dribble_end(void* void_state_ptr, FirmwareWorld_t* world) {}
@@ -81,7 +81,6 @@ static void dribble_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * \brief The dribble movement primitive.
  */
 const primitive_t DRIBBLE_PRIMITIVE = {.direct        = false,
-                                       .start         = &dribble_start,
                                        .end           = &dribble_end,
                                        .tick          = &dribble_tick,
                                        .create_state  = &createDribblePrimitiveState_t,
