@@ -144,15 +144,17 @@ void SimulatedTestFixture::updateSensorFusion()
     sensor_fusion.updateWorld(sensor_msg);
 }
 
-void SimulatedTestFixture::sleep(const std::chrono::steady_clock::time_point &wall_start_time,
-                                 const Duration &desired_wall_tick_time) {
+void SimulatedTestFixture::sleep(
+    const std::chrono::steady_clock::time_point &wall_start_time,
+    const Duration &desired_wall_tick_time)
+{
     auto wall_time_now = std::chrono::steady_clock::now();
     auto current_tick_wall_time_duration =
         std::chrono::duration_cast<std::chrono::milliseconds>(wall_time_now -
                                                               wall_start_time);
-    auto ms_to_sleep =
-            std::chrono::milliseconds(static_cast<int>(desired_wall_tick_time.getMilliseconds())) -
-            current_tick_wall_time_duration;
+    auto ms_to_sleep = std::chrono::milliseconds(
+                           static_cast<int>(desired_wall_tick_time.getMilliseconds())) -
+                       current_tick_wall_time_duration;
     std::cout << "sleeping for " << ms_to_sleep.count() << std::endl;
     if (ms_to_sleep > std::chrono::milliseconds(0))
     {
@@ -188,13 +190,15 @@ void SimulatedTestFixture::runTest(
             NonTerminatingFunctionValidator(validation_function, world));
     }
 
-    const Timestamp timeout_time         = simulator->getTimestamp() + timeout;
-    const Duration simulation_time_step             = Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
-    const Duration ai_time_step             = Duration::fromSeconds(simulation_time_step.getSeconds() * CAMERA_FRAMES_PER_AI_TICK);
+    const Timestamp timeout_time = simulator->getTimestamp() + timeout;
+    const Duration simulation_time_step =
+        Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
+    const Duration ai_time_step = Duration::fromSeconds(
+        simulation_time_step.getSeconds() * CAMERA_FRAMES_PER_AI_TICK);
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {
-        auto wall_start_time           = std::chrono::steady_clock::now();
+        auto wall_start_time = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {
             simulator->stepSimulation(simulation_time_step);
