@@ -322,6 +322,17 @@ cc_test(
 )
 
 cc_test(
+    name = "segment_test",
+    srcs = [
+        "segment_test.cpp",
+    ],
+    deps = [
+        ":segment",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "triangle_test",
     srcs = [
         "triangle_test.cpp",
