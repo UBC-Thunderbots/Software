@@ -79,7 +79,6 @@ int main(int argc, char **argv)
 
         auto ball_placement_callback =
             [&standalone_simulator](Point ball_placement_point) {
-//                standalone_simulator.setRobotPosition(std::make_pair(0, TeamColour::YELLOW), ball_placement_point);
                 BallState state(ball_placement_point, Vector(0, 0));
                 standalone_simulator.setBallState(state);
             };
