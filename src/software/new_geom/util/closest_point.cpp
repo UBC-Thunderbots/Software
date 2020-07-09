@@ -22,6 +22,11 @@ Point closestPointOnSeg(const Point &p, const Segment &segment)
     return closestPointOnSeg(p, segment.getStart(), segment.getEnd());
 }
 
+Point closestPointOnSeg(const Segment &segment, const Point &p)
+{
+    return closestPointOnSeg(p, segment.getStart(), segment.getEnd());
+}
+
 Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB)
 {
     // if one of the end-points is extremely close to the centre point
