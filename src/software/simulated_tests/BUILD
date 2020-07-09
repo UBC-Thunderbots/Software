@@ -130,3 +130,17 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "halt_play_test",
+    srcs = ["halt_play_test.cpp"],
+    deps = [
+        ":simulated_test_fixture",
+        "//software/ai/hl/stp/play:halt_play",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
