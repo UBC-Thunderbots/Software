@@ -389,39 +389,45 @@ TEST(PhysicsSimulatorTest, test_single_small_time_step)
     EXPECT_EQ(physics_world.getField(), Field::createSSLDivisionBField());
 }
 
-TEST(PhysicsWorldTest, test_get_robot_at_position_without_robot) {
+TEST(PhysicsWorldTest, test_get_robot_at_position_without_robot)
+{
     PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     auto result = physics_world.getRobotAtPosition(Point(1, 1));
     EXPECT_FALSE(result.lock());
 }
 
-TEST(PhysicsWorldTest, test_get_robot_at_position_with_exact_robot_position) {
+TEST(PhysicsWorldTest, test_get_robot_at_position_with_exact_robot_position)
+{
     PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::quarter(),
                            AngularVelocity::zero());
     std::vector<RobotStateWithId> states = {
-            RobotStateWithId{.id = 0, .robot_state = robot_state}};
+        RobotStateWithId{.id = 0, .robot_state = robot_state}};
     physics_world.addYellowRobots(states);
 
     auto result = physics_world.getRobotAtPosition(Point(1, 0));
     ASSERT_TRUE(result.lock());
     auto physics_robot = result.lock();
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(physics_robot->position(), Point(1, 0), 1e-3));
+    EXPECT_TRUE(
+        ::TestUtil::equalWithinTolerance(physics_robot->position(), Point(1, 0), 1e-3));
 }
 
-TEST(PhysicsWorldTest, test_get_robot_at_position_near_edge_of_robot) {
+TEST(PhysicsWorldTest, test_get_robot_at_position_near_edge_of_robot)
+{
     PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
     RobotState robot_state(Point(1, 2), Vector(0, 0), Angle::zero(),
                            AngularVelocity::zero());
     std::vector<RobotStateWithId> states = {
-            RobotStateWithId{.id = 0, .robot_state = robot_state}};
+        RobotStateWithId{.id = 0, .robot_state = robot_state}};
     physics_world.addBlueRobots(states);
 
-    auto result = physics_world.getRobotAtPosition(Point(1, 2 + ROBOT_MAX_RADIUS_METERS * 0.9));
+    auto result =
+        physics_world.getRobotAtPosition(Point(1, 2 + ROBOT_MAX_RADIUS_METERS * 0.9));
     ASSERT_TRUE(result.lock());
     auto physics_robot = result.lock();
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(physics_robot->position(), Point(1, 2), 1e-3));
+    EXPECT_TRUE(
+        ::TestUtil::equalWithinTolerance(physics_robot->position(), Point(1, 2), 1e-3));
 }

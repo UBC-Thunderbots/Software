@@ -163,7 +163,8 @@ void ThreadedSimulator::updateCallbacks()
     }
 }
 
-std::weak_ptr<PhysicsRobot> ThreadedSimulator::getRobotAtPosition(const Point &position) {
+std::weak_ptr<PhysicsRobot> ThreadedSimulator::getRobotAtPosition(const Point &position)
+{
     std::scoped_lock lock(simulator_mutex);
     return simulator.getRobotAtPosition(position);
 }

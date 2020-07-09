@@ -10,8 +10,7 @@ ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(
     const std::function<void(Point)>& ball_placement_callback,
     const std::function<void(StandaloneSimulator::SimulationMode)>&
         simulation_mode_callback,
-    const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func
-        )
+    const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func)
     : ThreadedObserver<SSL_WrapperPacket>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
@@ -21,9 +20,9 @@ ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(
       application_shutting_down(false),
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
-    run_standalone_simulator_gui_thread =
-        std::thread(&ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI,
-                    this, ball_placement_callback, simulation_mode_callback, get_robot_at_position_func);
+    run_standalone_simulator_gui_thread = std::thread(
+        &ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI, this,
+        ball_placement_callback, simulation_mode_callback, get_robot_at_position_func);
 }
 
 ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
@@ -44,8 +43,7 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(
     const std::function<void(Point)>& ball_placement_callback,
     const std::function<void(StandaloneSimulator::SimulationMode)>&
         simulation_mode_callback,
-    const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func
-        )
+    const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func)
 {
     // We mock empty argc and argv since they don't affect the behaviour of the GUI.
     // This way we don't need to pass them all the way down from the start of the
@@ -59,8 +57,8 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    StandaloneSimulatorGUI* standalone_simulator_gui =
-        new StandaloneSimulatorGUI(ssl_wrapper_packet_buffer, view_area_buffer, get_robot_at_position_func);
+    StandaloneSimulatorGUI* standalone_simulator_gui = new StandaloneSimulatorGUI(
+        ssl_wrapper_packet_buffer, view_area_buffer, get_robot_at_position_func);
     standalone_simulator_gui->registerBallPlacementCallback(ball_placement_callback);
     standalone_simulator_gui->registerSimulationModeCallback(simulation_mode_callback);
     standalone_simulator_gui->show();

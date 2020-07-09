@@ -191,9 +191,9 @@ class PhysicsRobot
      *
      * @param position The new position of the robot
      */
-    void setPosition(const Point& position);
+    void setPosition(const Point &position);
 
-protected:
+   protected:
     void runPostPhysicsStep();
 
    private:

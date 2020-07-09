@@ -34,7 +34,9 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
     explicit ThreadedStandaloneSimulatorGUI(
         const std::function<void(Point)>& ball_placement_callback,
         const std::function<void(StandaloneSimulator::SimulationMode)>&
-            simulation_mode_callback, const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func);
+            simulation_mode_callback,
+        const std::function<std::weak_ptr<PhysicsRobot>(Point)>&
+            get_robot_at_position_func);
 
     ~ThreadedStandaloneSimulatorGUI() override;
 
@@ -68,8 +70,8 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
         const std::function<void(Point)>& ball_placement_callback,
         const std::function<void(StandaloneSimulator::SimulationMode)>&
             simulation_mode_callback,
-        const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func
-            );
+        const std::function<std::weak_ptr<PhysicsRobot>(Point)>&
+            get_robot_at_position_func);
 
     std::thread run_standalone_simulator_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;

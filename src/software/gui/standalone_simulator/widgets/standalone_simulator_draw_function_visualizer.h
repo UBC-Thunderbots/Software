@@ -1,13 +1,13 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+#include <memory>
 
 #include "software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h"
-#include "software/world/robot_state.h"
-#include "software/world/team_colour.h"
 #include "software/new_geom/point.h"
 #include "software/simulation/physics/physics_robot.h"
-#include <memory>
+#include "software/world/robot_state.h"
+#include "software/world/team_colour.h"
 
 /**
  * A custom version of the DrawFunctionVisualizer widget that allows the user to
@@ -34,7 +34,8 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
      *
      * @param func The new function to set
      */
-    void setGetRobotAtPositionFunc(const std::function<std::weak_ptr<PhysicsRobot>(Point)>& func);
+    void setGetRobotAtPositionFunc(
+        const std::function<std::weak_ptr<PhysicsRobot>(Point)>& func);
 
    private:
     void mousePressEvent(QMouseEvent* event) override;

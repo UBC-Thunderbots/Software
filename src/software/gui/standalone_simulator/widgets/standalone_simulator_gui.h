@@ -29,14 +29,14 @@ class StandaloneSimulatorGUI : public QMainWindow
      * @param ssl_wrapper_packet_buffer Thye buffer use to receive SSL_WrapperPackets
      * @param view_area_buffer The buffer used to receive Rectangles that specify the area
      * of the world to display in the view
-     * @param get_robot_at_position_function A function that can be called to get the robot
-     * at the given position
+     * @param get_robot_at_position_function A function that can be called to get the
+     * robot at the given position
      */
     explicit StandaloneSimulatorGUI(
         std::shared_ptr<ThreadSafeBuffer<SSL_WrapperPacket>> ssl_wrapper_packet_buffer,
         std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
-        const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_function
-        );
+        const std::function<std::weak_ptr<PhysicsRobot>(Point)>&
+            get_robot_at_position_function);
 
     /**
      * Register a callback that will be called when the user requests to place the ball

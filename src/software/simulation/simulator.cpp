@@ -233,6 +233,7 @@ Timestamp Simulator::getTimestamp() const
     return physics_world.getTimestamp();
 }
 
-std::weak_ptr<PhysicsRobot> Simulator::getRobotAtPosition(const Point &position) {
+std::weak_ptr<PhysicsRobot> Simulator::getRobotAtPosition(const Point& position)
+{
     return physics_world.getRobotAtPosition(position);
 }

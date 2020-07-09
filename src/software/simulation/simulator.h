@@ -188,7 +188,7 @@ class Simulator
      * @return a weak_ptr to the PhysicsRobot at the given position if one exists,
      * otherwise returns an empty pointer
      */
-    std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point &position);
+    std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
 
    private:
     /**

@@ -25,7 +25,7 @@ const double PhysicsRobot::total_chicker_depth =
 
 PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
                            const RobotState& robot_state, const double mass_kg)
-: robot_id(id)
+    : robot_id(id)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
@@ -351,9 +351,10 @@ float PhysicsRobot::getMotorBrakeForce(float motor_speed) const
     return -0.5f * robot_body->GetMass() * motor_speed;
 }
 
-void PhysicsRobot::setPosition(const Point &position) {
+void PhysicsRobot::setPosition(const Point& position)
+{
     auto func = [=]() {
-        b2World *world = robot_body->GetWorld();
+        b2World* world = robot_body->GetWorld();
         if (bodyExistsInWorld(robot_body, world))
         {
             robot_body->SetLinearVelocity(createVec2(Vector(0, 0)));
@@ -363,12 +364,15 @@ void PhysicsRobot::setPosition(const Point &position) {
     };
 
     // We can't set the robot body's position immediately because we may be in the middle
-    // of a Box2D world update, so we defer calling this function until after a physics step
+    // of a Box2D world update, so we defer calling this function until after a physics
+    // step
     post_physics_step_functions.emplace(func);
 }
 
-void PhysicsRobot::runPostPhysicsStep() {
-    while(!post_physics_step_functions.empty()) {
+void PhysicsRobot::runPostPhysicsStep()
+{
+    while (!post_physics_step_functions.empty())
+    {
         auto post_physics_step_function = post_physics_step_functions.front();
         post_physics_step_function();
         post_physics_step_functions.pop();

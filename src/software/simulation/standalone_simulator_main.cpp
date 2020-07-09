@@ -108,7 +108,7 @@ int main(int argc, char **argv)
         };
 
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(
-                ball_placement_callback, simulation_mode_callback, get_robot_callback);
+            ball_placement_callback, simulation_mode_callback, get_robot_callback);
 
         standalone_simulator.registerOnSSLWrapperPacketReadyCallback(
             [&threaded_standalone_simulator_gui](SSL_WrapperPacket wrapper_packet) {
