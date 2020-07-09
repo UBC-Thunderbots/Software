@@ -230,9 +230,6 @@ TEST_P(PlannerTest, test_path_planner)
 {
     std::unique_ptr<PathPlanner> planner = std::get<0>(GetParam()).second();
     auto planner_test_case               = std::get<1>(GetParam());
-    // TODO findPath is throwing me the following error
-    // All/PlannerTest.test_path_planner/0, where GetParam() = (("20ThetaStarPathPlanner",
-    // 32-byte object <00...
     std::optional<Path> path =
         planner->findPath(planner_test_case.start, planner_test_case.end,
                           planner_test_case.navigable_area, planner_test_case.obstacles);
