@@ -39,15 +39,15 @@ class Segment final
     double lengthSquared() const;
 
     /**
-     * Creates a degenerate Segment at (0, 0)
-     */
-    inline explicit Segment(){};
-
-    /**
      * Creates a Segment that starts and ends at the given points
      */
-    inline explicit Segment(const Point& start, const Point& end)
-        : start(start), end(end){};
+    inline explicit Segment(const Point& start, const Point& end) : start(start), end(end)
+    {
+        if (start == end)
+        {
+            throw std::invalid_argument("Attempting to construct a degenerate segment");
+        }
+    };
 
     /**
      * Creates a Segment that is reversed

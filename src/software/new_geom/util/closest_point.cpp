@@ -16,46 +16,38 @@ Point closestPointOnLine(const Line &l, const Point &p)
     return closestPointOnLine(p, l);
 }
 
-
 Point closestPointOnSeg(const Point &p, const Segment &segment)
-{
-    return closestPointOnSeg(p, segment.getStart(), segment.getEnd());
-}
-
-Point closestPointOnSeg(const Segment &segment, const Point &p)
-{
-    return closestPointOnSeg(p, segment.getStart(), segment.getEnd());
-}
-
-Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB)
 {
     // if one of the end-points is extremely close to the centre point
     // then return 0.0
-    if ((segB - centre).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
+    if ((segment.getEnd() - p).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
     {
-        return segB;
+        return segment.getEnd();
     }
 
-    if ((segA - centre).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
+    if ((segment.getStart() - p).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
     {
-        return segA;
+        return segment.getStart();
     }
 
     // take care of 0 length segments
-    if ((segB - segA).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
+    if ((segment.getEnd() - segment.getStart()).lengthSquared() <
+        FIXED_EPSILON * FIXED_EPSILON)
     {
-        return segA;
+        return segment.getStart();
     }
 
     // find point C
     // which is the projection onto the line
-    double lenseg = (segB - segA).dot(centre - segA) / (segB - segA).length();
-    Point C       = segA + lenseg * (segB - segA).normalize();
+    double lenseg = (segment.getEnd() - segment.getStart()).dot(p - segment.getStart()) /
+                    (segment.getEnd() - segment.getStart()).length();
+    Point C =
+        segment.getStart() + lenseg * (segment.getEnd() - segment.getStart()).normalize();
 
     // check if C is in the line seg range
-    double AC     = (segA - C).lengthSquared();
-    double BC     = (segB - C).lengthSquared();
-    double AB     = (segA - segB).lengthSquared();
+    double AC     = (segment.getStart() - C).lengthSquared();
+    double BC     = (segment.getEnd() - C).lengthSquared();
+    double AB     = (segment.getStart() - segment.getEnd()).lengthSquared();
     bool in_range = AC <= AB && BC <= AB;
 
     // if so return C
@@ -63,13 +55,63 @@ Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &seg
     {
         return C;
     }
-    double lenA = (centre - segA).length();
-    double lenB = (centre - segB).length();
+    double lenA = (p - segment.getStart()).length();
+    double lenB = (p - segment.getEnd()).length();
 
     // otherwise return closest end of line-seg
     if (lenA < lenB)
     {
-        return segA;
+        return segment.getStart();
     }
-    return segB;
+    return segment.getEnd();
+}
+
+Point closestPointOnSeg(const Segment &segment, const Point &p)
+{
+    // if one of the end-points is extremely close to the centre point
+    // then return 0.0
+    if ((segment.getEnd() - p).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
+    {
+        return segment.getEnd();
+    }
+
+    if ((segment.getStart() - p).lengthSquared() < FIXED_EPSILON * FIXED_EPSILON)
+    {
+        return segment.getStart();
+    }
+
+    // take care of 0 length segments
+    if ((segment.getEnd() - segment.getStart()).lengthSquared() <
+        FIXED_EPSILON * FIXED_EPSILON)
+    {
+        return segment.getStart();
+    }
+
+    // find point C
+    // which is the projection onto the line
+    double lenseg = (segment.getEnd() - segment.getStart()).dot(p - segment.getStart()) /
+                    (segment.getEnd() - segment.getStart()).length();
+    Point C =
+        segment.getStart() + lenseg * (segment.getEnd() - segment.getStart()).normalize();
+
+    // check if C is in the line seg range
+    double AC     = (segment.getStart() - C).lengthSquared();
+    double BC     = (segment.getEnd() - C).lengthSquared();
+    double AB     = (segment.getStart() - segment.getEnd()).lengthSquared();
+    bool in_range = AC <= AB && BC <= AB;
+
+    // if so return C
+    if (in_range)
+    {
+        return C;
+    }
+    double lenA = (p - segment.getStart()).length();
+    double lenB = (p - segment.getEnd()).length();
+
+    // otherwise return closest end of line-seg
+    if (lenA < lenB)
+    {
+        return segment.getStart();
+    }
+    return segment.getEnd();
 }

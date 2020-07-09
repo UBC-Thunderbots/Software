@@ -104,7 +104,8 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
         return std::nullopt;
     }
 
-    Segment largest_segment, smallest_segment;
+    Segment largest_segment(Point{0, 0}, Point{1, 0});
+    Segment smallest_segment(Point{0, 0}, Point{1, 0});
     // Grab the largest segment
     if (segment1.toVector().lengthSquared() > segment2.toVector().lengthSquared())
     {
@@ -162,7 +163,11 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
     // The first Angle is between the reference Segment and the first obstacle Segment
     // After this one, ever open angle is between segment(i).end and
     // segment(i+1).start
-    open_segs.push_back(Segment(parent_segment.getStart(), segments.front().getStart()));
+    if (parent_segment.getStart() != segments.front().getStart())
+    {
+        open_segs.push_back(
+            Segment(parent_segment.getStart(), segments.front().getStart()));
+    }
 
     // The 'open' Segment in the space between consecutive 'blocking' Segments
     for (std::vector<Segment>::const_iterator it = segments.begin();
@@ -173,8 +178,10 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
 
     // Lastly, the final open angle is between obstacles.end().getEnd() and
     // reference_segment.getEnd()
-    open_segs.push_back(Segment(segments.back().getEnd(), parent_segment.getEnd()));
-
+    if (segments.back().getEnd() != parent_segment.getEnd())
+    {
+        open_segs.push_back(Segment(segments.back().getEnd(), parent_segment.getEnd()));
+    }
     // Remove all zero length open Segments
     for (std::vector<Segment>::const_iterator it = open_segs.begin();
          it != open_segs.end();)

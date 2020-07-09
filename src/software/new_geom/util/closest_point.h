@@ -17,19 +17,6 @@ Point closestPointOnLine(const Line &l, const Point &p);
 /**
  * Finds the Point on line segment closest to point.
  *
- * @param centre the point.
- *
- * @param segA one end of the line segment.
- *
- * @param segB the other end of the line segment.
- *
- * @return the Point on line segment closest to centre point.
- */
-Point closestPointOnSeg(const Point &centre, const Point &segA, const Point &segB);
-
-/**
- * Finds the Point on line segment closest to point.
- *
  * @param p the point.
  *
  * @param segment the line segment.
