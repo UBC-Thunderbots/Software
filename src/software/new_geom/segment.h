@@ -34,9 +34,9 @@ class Segment final
     const Point& getEnd() const;
 
     // TODO function headers
-    double length();
+    double length() const;
 
-    double lengthSquared();
+    double lengthSquared() const;
 
     /**
      * Creates a degenerate Segment at (0, 0)
@@ -46,40 +46,21 @@ class Segment final
     /**
      * Creates a Segment that starts and ends at the given points
      */
-    inline explicit Segment(const Point& start, const Point& end){};
+    inline explicit Segment(const Point& start, const Point& end) : start(start), end(end){};
 
     /**
      * Creates a Segment that is reversed
      */
-    inline Segment reverse() const
-    {
-        return Segment(end, start);
-    };
+    Segment reverse() const;
 
     /**
      * Makes a Vector out of this Segment.
      */
-    inline Vector toVector() const
-    {
-        return end - start;
-    };
+    Vector toVector() const;
 
-    inline double length() const
-    {
-        return (end - start).length();
-    };
+    double slope() const;
 
-    inline double slope() const
-    {
-        return (end.y() - start.y()) / (end.x() - start.x());
-    };
-
-    inline bool operator==(const Segment& other) const
-    {
-        {
-            return start == other.start && end == other.end;
-        }
-    };
+    bool operator==(const Segment& other) const;
 
    private:
     Point start;
