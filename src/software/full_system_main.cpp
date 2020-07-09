@@ -8,6 +8,7 @@
 #include "software/constants.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
+#include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 struct commandLineArgs
@@ -108,6 +109,8 @@ int main(int argc, char **argv)
         std::shared_ptr<const AIConfig> ai_config = DynamicParameters->getAIConfig();
         std::shared_ptr<const AIControlConfig> ai_control_config =
             DynamicParameters->getAIControlConfig();
+        std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
+            DynamicParameters->getSensorFusionConfig();
 
         // TODO remove this when we move to non-generic factories for backends
         // https://github.com/UBC-Thunderbots/Software/issues/1452
@@ -120,21 +123,22 @@ int main(int argc, char **argv)
 
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend>::create(args.backend_name);
-
-        auto ai = std::make_shared<AIWrapper>(ai_config, ai_control_config);
+        auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(sensor_fusion_config);
+        auto ai            = std::make_shared<AIWrapper>(ai_config, ai_control_config);
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers
         ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
-        backend->Subject<World>::registerObserver(ai);
+        sensor_fusion->Subject<World>::registerObserver(ai);
+        backend->Subject<SensorMsg>::registerObserver(sensor_fusion);
         if (!args.headless)
         {
             visualizer = std::make_shared<ThreadedFullSystemGUI>();
 
-            backend->Subject<World>::registerObserver(visualizer);
+            sensor_fusion->Subject<World>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
             ai->Subject<PlayInfo>::registerObserver(visualizer);
-            backend->Subject<RobotStatus>::registerObserver(visualizer);
+            backend->Subject<SensorMsg>::registerObserver(visualizer);
         }
 
         // Wait for termination

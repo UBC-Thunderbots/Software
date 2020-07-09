@@ -66,6 +66,7 @@ cc_library(
         "//shared:constants",
         "//software/geom",
         "//software/gui:geometry_conversion",
+        "//software/math:math_functions",
         "//software/sensor_fusion/filter:vision_detection",
         "//software/world:robot_state",
         "@qt//:qt_widgets",

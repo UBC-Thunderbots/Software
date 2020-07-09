@@ -11,7 +11,6 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI()
       ThreadedObserver<AIDrawFunction>(),
       ThreadedObserver<PlayInfo>(),
       ThreadedObserver<SensorMsg>(),
-      ThreadedObserver<RobotStatus>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
           WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
@@ -21,8 +20,6 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI()
           std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_BUFFER_SIZE, false)),
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorMsg>>(SENSOR_MSG_BUFFER_SIZE)),
-      robot_status_buffer(
-          std::make_shared<ThreadSafeBuffer<RobotStatus>>(ROBOT_STATUS_BUFFER_SIZE)),
       view_area_buffer(
           std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
       application_shutting_down(false),
@@ -60,10 +57,9 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    FullSystemGUI* full_system_gui =
-        new FullSystemGUI(world_draw_functions_buffer, ai_draw_functions_buffer,
-                          play_info_buffer, sensor_msg_buffer, robot_status_buffer,
-                          view_area_buffer, MutableDynamicParameters);
+    FullSystemGUI* full_system_gui = new FullSystemGUI(
+        world_draw_functions_buffer, ai_draw_functions_buffer, play_info_buffer,
+        sensor_msg_buffer, view_area_buffer, MutableDynamicParameters);
     full_system_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -83,7 +79,11 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
 
 void ThreadedFullSystemGUI::onValueReceived(World world)
 {
-    auto world_draw_function = getDrawWorldFunction(world);
+    auto friendly_team_colour =
+        DynamicParameters->getSensorFusionConfig()->FriendlyColorYellow()->value()
+            ? TeamColour::YELLOW
+            : TeamColour::BLUE;
+    auto world_draw_function = getDrawWorldFunction(world, friendly_team_colour);
     world_draw_functions_buffer->push(world_draw_function);
 
     if (remaining_attempts_to_set_view_area > 0)
@@ -106,11 +106,6 @@ void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info)
 void ThreadedFullSystemGUI::onValueReceived(SensorMsg sensor_msg)
 {
     sensor_msg_buffer->push(sensor_msg);
-}
-
-void ThreadedFullSystemGUI::onValueReceived(RobotStatus robot_status)
-{
-    robot_status_buffer->push(robot_status);
 }
 
 std::shared_ptr<std::promise<void>> ThreadedFullSystemGUI::getTerminationPromise()

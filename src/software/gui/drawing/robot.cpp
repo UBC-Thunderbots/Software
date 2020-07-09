@@ -1,67 +1,99 @@
 #include "software/gui/drawing/robot.h"
 
 #include <QtWidgets/QGraphicsEllipseItem>
+#include <QtWidgets/QGraphicsSimpleTextItem>
 
 #include "shared/constants.h"
 #include "software/gui/drawing/geom.h"
 #include "software/gui/geometry_conversion.h"
+#include "software/math/math_functions.h"
 #include "software/new_geom/segment.h"
+#include "software/new_geom/util/acute_angle.h"
 
 void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
-                       const Vector& velocity, const QColor& color)
+                       const Vector& velocity, const QColor& slow_colour,
+                       const QColor& fast_colour)
 {
-    QPen pen(color);
-    pen.setWidth(2);
+    // A somewhat arbitrary value that we've determined looks nice in the GUI
+    const double max_velocity_line_length = 0.5;
+
+    QGradient gradient = QLinearGradient(
+        createQPointF(position),
+        createQPointF(position + velocity.normalize(max_velocity_line_length)));
+    gradient.setColorAt(0, slow_colour);
+    gradient.setColorAt(1, fast_colour);
+
+    auto pen = QPen(gradient, 1);
+    pen.setWidth(4);
     // The cap style must be NOT be set to SquareCap. It can be set to anything else.
     // Drawing a line of length 0 with the SquareCap style causes a large line to be drawn
     pen.setCapStyle(Qt::PenCapStyle::RoundCap);
     pen.setCosmetic(true);
 
-    drawSegment(scene, Segment(position, position + velocity), pen);
+    double speed     = velocity.length();
+    auto line_length = normalizeValueToRange<double>(
+        speed, 0, ROBOT_MAX_SPEED_METERS_PER_SECOND, 0.0, max_velocity_line_length);
+
+    drawSegment(scene, Segment(position, position + velocity.normalize(line_length)),
+                pen);
 }
 
 void drawRobotAtPosition(QGraphicsScene* scene, const Point& position,
                          const Angle& orientation, const QColor& color)
 {
-    QPen pen(Qt::black);
-    pen.setWidth(1);
-    pen.setCosmetic(true);
-
-    QBrush brush(color);
-    brush.setStyle(Qt::BrushStyle::SolidPattern);
-
-    // This defines the rectangle that will "clip" or cover part of the robot ellipse.
-    // This is what allows us to easily draw the flat front of the robot. We create an
-    // invisible smaller "window" rectangle that the robot ellipse is shown through
-    Point robot_clipping_bounding_box_top_left =
-        position + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
-    Point robot_clipping_bounding_box_bottom_right =
-        position + Vector(DIST_TO_FRONT_OF_ROBOT_METERS, -ROBOT_MAX_RADIUS_METERS);
-    QRectF robot_clipping_bounding_box(
-        createQPointF(robot_clipping_bounding_box_top_left),
-        createQPointF(robot_clipping_bounding_box_bottom_right));
-    QGraphicsRectItem* robot_clipping_rect =
-        new QGraphicsRectItem(robot_clipping_bounding_box);
-    robot_clipping_rect->setTransformOriginPoint(createQPointF(position));
-    robot_clipping_rect->setRotation(orientation.toDegrees());
-    robot_clipping_rect->setFlag(QGraphicsItem::ItemClipsChildrenToShape, true);
-    robot_clipping_rect->setPen(Qt::NoPen);
-    robot_clipping_rect->setBrush(Qt::NoBrush);
-
+    // The bounding box that defines the ellipse used for the main robot body
     Point robot_bounding_box_top_left =
         position + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
     Point robot_bounding_box_bottom_right =
         position + Vector(ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS);
-    // This robot ellipse graphics item is a child of the robot_clipping_rect above so
-    // that is can be covered / clipped by the clipping rect
-    QGraphicsEllipseItem* robot_ellipse =
-        new QGraphicsEllipseItem(QRectF(createQPointF(robot_bounding_box_top_left),
-                                        createQPointF(robot_bounding_box_bottom_right)),
-                                 robot_clipping_rect);
-    robot_ellipse->setPen(pen);
-    robot_ellipse->setBrush(brush);
 
-    scene->addItem(robot_clipping_rect);
+    // The front-left and right edges of the robot face (the front of the robot)
+    Vector robot_face_front_left =
+        Vector(DIST_TO_FRONT_OF_ROBOT_METERS, FRONT_OF_ROBOT_WIDTH_METERS / 2.0)
+            .rotate(orientation);
+    Vector robot_face_front_right =
+        Vector(DIST_TO_FRONT_OF_ROBOT_METERS, -FRONT_OF_ROBOT_WIDTH_METERS / 2.0)
+            .rotate(orientation);
+
+    // The front face of the robot
+    Segment front_face =
+        Segment(position + robot_face_front_left, position + robot_face_front_right);
+
+    // A rectangle that extends from the front face of the robot to the back of the robot.
+    // This will be usd to fill in the area in the front and middle of the robot that is
+    // missed by the ellipse arc.
+    Polygon robot_body_fill_polygon{
+        position + robot_face_front_left, position - robot_face_front_right,
+        position - robot_face_front_left, position + robot_face_front_right};
+
+    QPen robot_body_pen(Qt::black);
+    robot_body_pen.setWidth(1);
+    robot_body_pen.setCosmetic(true);
+
+    QBrush brush(color);
+    brush.setStyle(Qt::BrushStyle::SolidPattern);
+
+    // This ellipse will draw the majority of the Robot body in an arc from the
+    // front-left of the robot all the way around the back to the front-right
+    QGraphicsEllipseItem* robot_body_ellipse =
+        new QGraphicsEllipseItem(QRectF(createQPointF(robot_bounding_box_top_left),
+                                        createQPointF(robot_bounding_box_bottom_right)));
+    robot_body_ellipse->setPen(robot_body_pen);
+    robot_body_ellipse->setBrush(brush);
+    robot_body_ellipse->setStartAngle(createQAngle(robot_face_front_left.orientation()));
+    Angle robot_body_ellipse_span =
+        Angle::full() - acuteAngle(robot_face_front_left, robot_face_front_right);
+    robot_body_ellipse->setSpanAngle(createQAngle(robot_body_ellipse_span));
+    scene->addItem(robot_body_ellipse);
+
+    drawPolygon(scene, robot_body_fill_polygon, Qt::NoPen, brush);
+
+    // Draw a slightly thicker line for the front face of the robot to make
+    // it more visible
+    QPen robot_front_face_pen(Qt::black);
+    robot_front_face_pen.setWidth(2);
+    robot_front_face_pen.setCosmetic(true);
+    drawSegment(scene, front_face, robot_front_face_pen);
 }
 
 void drawRobotId(QGraphicsScene* scene, const Point& position, const RobotId id)
@@ -85,7 +117,7 @@ void drawRobotId(QGraphicsScene* scene, const Point& position, const RobotId id)
     // care less about the height and just allow it to scale along with the width.
     double scaling_factor =
         1.0 / (robot_id->boundingRect().width() / robot_bounding_box.width());
-    // Flip the y-axis so the text show right-side-up. When we set up the GraphicsView
+    // Flip the y-axis so the text shows right-side-up. When we set up the GraphicsView
     // that contains the scene we apply a transformation to the y-axis so that Qt's
     // coordinate system matches ours and we can draw things without changing our
     // convention. Unfortunately this flips all text by default, so we need to flip it
@@ -104,7 +136,7 @@ void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColo
     drawRobotAtPosition(scene, robot.robot_state.position(),
                         robot.robot_state.orientation(), color);
     drawRobotVelocity(scene, robot.robot_state.position(), robot.robot_state.velocity(),
-                      color);
+                      robot_speed_slow_color, color);
     drawRobotId(scene, robot.robot_state.position(), robot.id);
 
     // TODO: Show robot charge state

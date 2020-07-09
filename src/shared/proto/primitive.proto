@@ -1,118 +1,37 @@
 syntax = "proto3";
 
-message PrimitiveMsg
+// This message is used to ensure backwards compatibility with our old format
+// for primitive parameters while we migrate to a new format where each primitive
+// has it's own unique proto message
+// TODO: Remove this once it's no longer needed
+//       (https://github.com/UBC-Thunderbots/Software/issues/1578)
+message PrimitiveParamsMsg
 {
-    /*
-     * This enum represents the IDs of the primitives
-     */
-    enum PrimitiveType
-    {
-        /**
-         * Stop Primitive
-         *
-         * The parameters are unused.
-         *
-         * The extra field is 0 for coasting or 1 for braking.
-         */
-        STOP = 0;
-
-        /**
-         * Move Primitive
-         *
-         * The parameters are:
-         * - relative position (x, y)(mm, mm)
-         * - relative orientation (centiradians)
-         * - final speed (mm/s)
-         *
-         * The extra field is 0 if the caller doesn’t care about orientation,
-         * or 1 if it does.
-         */
-        MOVE = 1;
-
-        /**
-         * Dribble Primitive
-         *
-         * The parameters are:
-         * - relative position (x, y)(mm, mm)
-         * - relative orientation (centiradians)
-         *
-         * The extra field is 0 if small kicks are prohibited or 1 if they are
-         * allowed.
-         */
-        DRIBBLE = 2;
-
-        /**
-         * Shoot Primitive
-         *
-         * Note that in HL, this is split into kick and chip.
-         *
-         * The parameters are:
-         * - relative position (x, y)(mm, mm)
-         * - relative orientation (centiradians)
-         * - power (either m/s or m).
-         *
-         * The extra field has bit 0 clear to kick or set to chip, and bit 1
-         * set if the caller cares about orientation.
-         */
-        SHOOT = 3;
-
-        /**
-         * Catch Primitive
-         *
-         * The parameters are:
-         * - The velocity (mm/s)
-         * - dribble speed (rpm)
-         * - margin (no unit)
-         */
-        CATCH = 4;
-
-        /**
-         * Pivot Primitive
-         *
-         * The parameters are:
-         * - The relative centre point (x, y)(mm, mm)
-         * - The radius to pivot around (mm)
-         * - The angle to pivot to (centiradians)
-         * orientation.
-         */
-        PIVOT = 5;
-
-        /**
-         * Spin Primitive
-         *
-         * The parameters are
-         * - relative x position (mm)
-         * - relative y position (mm)
-         * - angular velocity (centiradians/s)
-         * - final speed (mm/s)
-         */
-        SPIN = 6;
-
-        /**
-         * Specifies that direct control is in use and wheels are being
-         * driven with individual power levels.
-         */
-        DIRECT_WHEELS = 7;
-
-        /**
-         * Specifies that direct control is in use and robot-relative
-         * linear and angular velocities are being sent.
-         */
-        DIRECT_VELOCITY = 8;
-    };
-
-    // The primitive type to run
-    PrimitiveType prim_type = 1;
-
     // The parameters for the primitive
-    float parameter1 = 2;
-    float parameter2 = 3;
-    float parameter3 = 4;
-    float parameter4 = 5;
+    float parameter1 = 1;
+    float parameter2 = 2;
+    float parameter3 = 3;
+    float parameter4 = 4;
 
     // Extra bits used for flags and/or additional information
-    uint32 extra_bits = 6;
+    uint32 extra_bits = 5;
 
     // Indicates whether the robot should move slowly (<1.5 m/s)
-    bool slow = 7;
+    bool slow = 6;
+}
+
+message PrimitiveMsg
+{
+    oneof primitive
+    {
+        PrimitiveParamsMsg move            = 1;
+        PrimitiveParamsMsg stop            = 2;
+        PrimitiveParamsMsg dribble         = 3;
+        PrimitiveParamsMsg shoot           = 4;
+        PrimitiveParamsMsg pivot           = 5;
+        PrimitiveParamsMsg spin            = 6;
+        PrimitiveParamsMsg movespin        = 7;
+        PrimitiveParamsMsg direct_wheels   = 8;
+        PrimitiveParamsMsg direct_velocity = 9;
+    }
 }

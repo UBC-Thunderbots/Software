@@ -17,10 +17,12 @@
  *
  * @param scene The scene to draw on
  * @param ball The ball to draw
- * @param color The color to draw the ball's velocity
+ * @param slow_colour The velocity line colour when the velocity is slow
+ * @param fast_colour The velocity line colour when the velocity is fast
  */
 void drawBallVelocity(QGraphicsScene *scene, const Point &position,
-                      const Vector &velocity, const QColor &color);
+                      const Vector &velocity, const QColor &slow_colour,
+                      const QColor &fast_colour);
 
 /**
  * Draws the ball's position on the given scene.
