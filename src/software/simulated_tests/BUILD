@@ -102,3 +102,17 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "enemy_free_kick_play_test",
+    srcs = ["enemy_free_kick_play_test.cpp"],
+    deps = [
+        ":simulated_test_fixture",
+        "//software/ai/hl/stp/play:enemy_freekick_play",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
