@@ -226,9 +226,4 @@ class PhysicsWorld
     const double ball_linear_damping;
     std::vector<std::shared_ptr<PhysicsRobot>> yellow_physics_robots;
     std::vector<std::shared_ptr<PhysicsRobot>> blue_physics_robots;
-
-    // A buffer of functions that will be called after each world time step
-    std::shared_ptr<ThreadSafeBuffer<std::function<void()>>> post_world_update_functions;
-    // We make this buffer relatively large because we do not want to drop any functions.
-    static constexpr size_t POST_WORLD_UPDATE_FUNCTIONS_BUFFER_SIZE = 100;
 };

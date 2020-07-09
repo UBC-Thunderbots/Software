@@ -24,8 +24,8 @@ const double PhysicsRobot::total_chicker_depth =
     PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
 
 PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
-                           const RobotState& robot_state, const double mass_kg, std::shared_ptr<ThreadSafeBuffer<std::function<void()>>> post_world_update_functions)
-: robot_id(id), post_world_update_functions(post_world_update_functions)
+                           const RobotState& robot_state, const double mass_kg)
+: robot_id(id)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
@@ -362,5 +362,15 @@ void PhysicsRobot::setPosition(const Point &position) {
         }
     };
 
-    post_world_update_functions->push(func);
+    // We can't set the robot body's position immediately because we may be in the middle
+    // of a Box2D world update, so we defer calling this function until after a physics step
+    post_physics_step_functions.emplace(func);
+}
+
+void PhysicsRobot::runPostPhysicsStep() {
+    while(!post_physics_step_functions.empty()) {
+        auto post_physics_step_function = post_physics_step_functions.front();
+        post_physics_step_function();
+        post_physics_step_functions.pop();
+    }
 }

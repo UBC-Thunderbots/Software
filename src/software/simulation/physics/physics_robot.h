@@ -12,6 +12,8 @@
 #include "software/simulation/physics/physics_ball.h"
 #include "software/world/robot_state.h"
 
+class PhysicsWorld;
+
 /**
  * This class represent a Robot in a Box2D physics simulation. It provides a convenient
  * way for us to abstract the robot and convert to our own Robot alss when data is needed.
@@ -31,6 +33,8 @@ class PhysicsRobot
     static double const chicker_thickness;
     static double const total_chicker_depth;
 
+    friend class PhysicsWorld;
+
     /**
      * Creates a new PhysicsRobot given a Box2D world and a Robot object. A Box2D body
      * will be automatically added to the Box2D world and updated during world update
@@ -40,11 +44,9 @@ class PhysicsRobot
      * @param world A shared_ptr to a Box2D World
      * @param robot_state The initial robot state
      * @param mass_kg The mass of the robot in kg
-     * @param post_world_update_functions A buffer of functions to be executed
-     * after each world time step
      */
     explicit PhysicsRobot(const RobotId id, std::shared_ptr<b2World> world,
-                          const RobotState &robot_state, const double mass_kg, std::shared_ptr<ThreadSafeBuffer<std::function<void()>>> post_world_update_functions);
+                          const RobotState &robot_state, const double mass_kg);
 
     PhysicsRobot() = delete;
 
@@ -191,6 +193,9 @@ class PhysicsRobot
      */
     void setPosition(const Point& position);
 
+protected:
+    void runPostPhysicsStep();
+
    private:
     /**
      * Creates as many fixtures as necessary to represent the body shape of the given
@@ -269,7 +274,7 @@ class PhysicsRobot
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
         chicker_ball_contact_callbacks;
 
-    std::shared_ptr<ThreadSafeBuffer<std::function<void()>>> post_world_update_functions;
+    std::queue<std::function<void()>> post_physics_step_functions;
 
     // This is a somewhat arbitrary value for damping. We keep it relatively low
     // so that robots still coast a ways before stopping, but non-zero so that robots
