@@ -1,25 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "catch_intent",
-    srcs = ["catch_intent.cpp"],
-    hdrs = ["catch_intent.h"],
-    deps = [
-        ":intent",
-        "//software/primitive:catch_primitive",
-    ],
-)
-
-cc_test(
-    name = "catch_intent_test",
-    srcs = ["catch_intent_test.cpp"],
-    deps = [
-        ":catch_intent",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "chip_intent",
     srcs = ["chip_intent.cpp"],
     hdrs = ["chip_intent.h"],
@@ -194,7 +175,6 @@ cc_library(
     name = "all_intents",
     hdrs = ["all_intents.h"],
     deps = [
-        ":catch_intent",
         ":chip_intent",
         ":direct_velocity_intent",
         ":direct_wheels_intent",

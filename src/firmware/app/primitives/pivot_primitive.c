@@ -42,16 +42,16 @@ float compute_magnitude(float a[2])
     return sqrtf(a[0] * a[0] + a[1] * a[1]);
 }
 
-static void pivot_start(const primitive_params_t *params, void *void_state_ptr,
-                        FirmwareWorld_t *world)
+void app_pivot_primitive_start(PrimitiveParamsMsg params, void *void_state_ptr,
+                               FirmwareWorld_t *world)
 {
     PivotPrimitiveState_t *state = (PivotPrimitiveState_t *)void_state_ptr;
-    state->center[0]             = params->params[0] / 1000.0f;
-    state->center[1]             = params->params[1] / 1000.0f;
-    state->angle                 = params->params[2] / 100.0f;
-    state->speed                 = params->params[3] / 100.0f;
+    state->center[0]             = params.parameter1 / 1000.0f;
+    state->center[1]             = params.parameter2 / 1000.0f;
+    state->angle                 = params.parameter3 / 100.0f;
+    state->speed                 = params.parameter4 / 100.0f;
 
-    if (params->extra & 0x01)
+    if (params.extra_bits & 0x01)
     {
         Dribbler_t *dribbler =
             app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
@@ -154,7 +154,6 @@ static void pivot_tick(void *void_state_ptr, FirmwareWorld_t *world)
  * \brief The pivot movement primitive.
  */
 const primitive_t PIVOT_PRIMITIVE = {.direct        = false,
-                                     .start         = &pivot_start,
                                      .end           = &pivot_end,
                                      .tick          = &pivot_tick,
                                      .create_state  = &createPivotPrimitiveState_t,

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/primitive/catch_primitive.h"
 #include "software/primitive/chip_primitive.h"
 #include "software/primitive/direct_velocity_primitive.h"
 #include "software/primitive/direct_wheels_primitive.h"
