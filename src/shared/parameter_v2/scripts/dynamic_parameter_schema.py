@@ -1,5 +1,7 @@
 INCLUDE_KEY = "include"
 PARAMETER_KEY = "parameters"
+CONSTANT_KEY = "constant"
+OPTIONAL_KEY = "optional"
 
 SUPPORTED_TYPES = [
     "bool",

@@ -1,3 +1,5 @@
+from type_map import C_TYPE_MAP
+
 #######################################################################
 #                             C Parameter                             #
 #######################################################################
@@ -5,10 +7,10 @@
 
 class CParameter(object):
 
-    DEFINITION = "{{const {type}_t* {name}}};"
+    DEFINITION = "const {type}_t* {name};"
     CONSTRUCTOR = "app_dynamic_parameters_create{type}({value});"
     INITIALIZATION = ".{name} = {constructor},"
-    DESTRUCTOR = "app_dynamic_parameters_destroy{type}({ptr})"
+    DESTRUCTOR = "app_dynamic_parameters_destroy{type}({ptr});"
 
     def __init__(
         self, param_name: str, param_type: str, param_value: str, ptr_to_instance: str
@@ -29,30 +31,34 @@ class CParameter(object):
 
         """
 
-        self.param_name = param_name
         self.param_type = param_type
         self.param_value = param_value
         self.ptr_to_instance = ptr_to_instance
 
-        self.definition = CParameter.DEFINITION.format(param_type, param_name)
-        self.constructor = CParameter.CONSTRUCTOR.format(param_type, param_value)
-        self.destructor = CParameter.DESTRUCTOR.format(param_type, ptr_to_instance)
-        self.initialization = CParameter.INITIALIZATION.format(
-            param_name, self.constructor
+        self.__definition = CParameter.DEFINITION.format(
+            type=param_type, name=param_name
         )
 
-    @property
+        self.__constructor = CParameter.CONSTRUCTOR.format(
+            type=param_type, value=param_value
+        )
+
+        self.__destructor = CParameter.DESTRUCTOR.format(
+            type=param_type, ptr=ptr_to_instance
+        )
+
+        self.__initialization = CParameter.INITIALIZATION.format(
+            name=param_name, constructor=self.constructor()
+        )
+
     def definition(self):
-        return self.definition
+        return self.__definition
 
-    @property
     def constructor(self):
-        return self.constructor
+        return self.__constructor
 
-    @property
     def destructor(self):
-        return self.destructor
+        return self.__destructor
 
-    @property
     def initialization(self):
-        return self.initialization
+        return self.__initialization

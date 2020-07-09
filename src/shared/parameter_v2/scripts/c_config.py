@@ -30,7 +30,7 @@ class CConfig(object):
         self.ptr_to_instance = ptr_to_instance
 
         self.parameters: Set[CParameter] = set()
-        self.configs: Set[CConfig] = set()
+        self.configs: Set[str] = set()
 
     def add_parameter(self, parameter: CParameter):
         """Add a parameter to this config to generate.
@@ -41,7 +41,7 @@ class CConfig(object):
         """
         self.parameters.add(parameter)
 
-    def add_config(self, config: CConfig):
+    def include_config(self, config: str):
         """Add a config to this config to generate.
 
         :param config: The CConfig to add to this CConfig
