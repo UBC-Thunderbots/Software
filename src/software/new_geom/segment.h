@@ -33,9 +33,18 @@ class Segment final
      */
     const Point& getEnd() const;
 
-    // TODO function headers
+    /**
+     * Gets the length of the segment
+     *
+     * @return length of segment
+     */
     double length() const;
 
+    /**
+     * Gets the squared length of the segment
+     *
+     * @return squared length of segment
+     */
     double lengthSquared() const;
 
     /**
