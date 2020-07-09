@@ -139,7 +139,7 @@ class SimulatedTestFixture : public ::testing::Test
 
     /**
      * Puts the current thread to sleep such that each simulation step will take
-     * the desired about of real-world "wall" time.
+     * the desired amount of real-world "wall" time.
      *
      * @param wall_start_time The time at which the most recent simulation step started,
      * in wall time
