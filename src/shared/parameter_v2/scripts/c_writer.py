@@ -28,7 +28,8 @@ class CWriter(object):
             config_name = CWriter.to_camel_case(config.split(".")[0])
 
             config = CConfig(
-                config_name, ptr_format_str.format(top_level_config_name, config_name)
+                config_name, ptr_format_str.format(
+                    top_level_config_name, config_name)
             )
 
             # add all the valid CParameters to the CConfig
@@ -65,6 +66,13 @@ class CWriter(object):
                         print(c_param.destructor())
                         print(c_param.initialization())
                         print(c_param.definition())
+
+            if INCLUDE_KEY in metadata:
+
+                for included_yaml in metadata["include"]:
+                    config.include_config(CWriter.to_camel_case(
+                        included_yaml.split(".")[0]))
+
 
     @staticmethod
     def to_camel_case(snake_str):

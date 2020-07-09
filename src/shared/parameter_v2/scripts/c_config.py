@@ -11,7 +11,7 @@ class CConfig(object):
     DEFINITION = "typedef struct {name}_s {{{contents}}} {name}_t;"
     MALLOC = "{name}_t* {name}_config = ({name}_t*)malloc(sizeof({name}_t}));"
     INITIALIZATION = "{name}_t {name}_init = {{{contents}}};"
-    MEMCPY = "memcpy({name}_config, &{name}_init, sizeof({name_t}));"
+    MEMCPY = "memcpy({name}_config, &{name}_init, sizeof({name}_t));"
     FREE = "free((void*){ptr_to_instance})"
 
     def __init__(self, config_name: str, ptr_to_instance: str):
@@ -93,7 +93,7 @@ class CConfig(object):
 
     @property
     def memcpy(self):
-        return CConfig.MALLOC.format(name=self.config_name)
+        return CConfig.MEMCPY.format(name=self.config_name)
 
     @property
     def free(self):
