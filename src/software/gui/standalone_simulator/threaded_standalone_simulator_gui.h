@@ -62,7 +62,7 @@ class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket
      * @param simulation_mode_callback A callback that will be called with the new
      * simulation mode when the user sets the simulation mode in the GUI.
      * @param get_robot_at_position_func A function that can be called to get the robot
-     * as the given position
+     * at the given position
      */
     void createAndRunStandaloneSimulatorGUI(
         const std::function<void(Point)>& ball_placement_callback,
