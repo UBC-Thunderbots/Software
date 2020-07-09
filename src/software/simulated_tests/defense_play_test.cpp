@@ -14,7 +14,6 @@ class DefensePlayTest : public SimulatedTestFixture
 
 TEST_F(DefensePlayTest, test_defense_play)
 {
-    enableVisualizer();
     setBallState(BallState(Point(0.9, 2.85), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {

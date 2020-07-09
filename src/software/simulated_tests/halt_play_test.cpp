@@ -14,7 +14,6 @@ class HaltPlayTest : public SimulatedTestFixture
 
 TEST_F(HaltPlayTest, test_halt_play)
 {
-    enableVisualizer();
     setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),

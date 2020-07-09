@@ -14,7 +14,6 @@ class ShootOrChipPlayTest : public SimulatedTestFixture
 
 TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
 {
-    enableVisualizer();
     setBallState(BallState(Point(-1.4, 2), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {

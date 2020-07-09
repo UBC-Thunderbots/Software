@@ -14,7 +14,6 @@ class PenaltyKickEnemyPlayTest : public SimulatedTestFixture
 
 TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
 {
-    enableVisualizer();
     setBallState(BallState(field().penaltyEnemy(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
