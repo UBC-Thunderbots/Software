@@ -6,16 +6,31 @@
 #include "software/new_geom/segment.h"
 
 void drawBallVelocity(QGraphicsScene *scene, const Point &position,
-                      const Vector &velocity, const QColor &color)
+                      const Vector &velocity, const QColor &slow_colour,
+                      const QColor &fast_colour)
 {
-    QPen pen(color);
+    // A somewhat arbitrary value that we've determined looks nice in the GUI
+    const double max_velocity_line_length = 1.0;
+
+    QGradient gradient = QLinearGradient(
+        createQPointF(position),
+        createQPointF(position + velocity.normalize(max_velocity_line_length)));
+    gradient.setColorAt(0, slow_colour);
+    gradient.setColorAt(1, fast_colour);
+
+    auto pen = QPen(gradient, 1);
     pen.setWidth(2);
     // The cap style must be NOT be set to SquareCap. It can be set to anything else.
     // Drawing a line of length 0 with the SquareCap style causes a large line to be drawn
     pen.setCapStyle(Qt::PenCapStyle::RoundCap);
     pen.setCosmetic(true);
 
-    drawSegment(scene, Segment(position, position + velocity), pen);
+    double speed     = velocity.length();
+    auto line_length = normalizeValueToRange<double>(
+        speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, 0.0, max_velocity_line_length);
+
+    drawSegment(scene, Segment(position, position + velocity.normalize(line_length)),
+                pen);
 }
 
 void drawBallPosition(QGraphicsScene *scene, const Point &position,
@@ -43,7 +58,8 @@ void drawBallPosition(QGraphicsScene *scene, const Point &position,
 void drawBall(QGraphicsScene *scene, const BallState &ball)
 {
     drawBallPosition(scene, ball.position(), ball.distanceFromGround(), ball_color);
-    drawBallVelocity(scene, ball.position(), ball.velocity(), ball_color);
+    drawBallVelocity(scene, ball.position(), ball.velocity(), ball_speed_slow_color,
+                     ball_speed_fast_color);
 }
 
 void drawBall(QGraphicsScene *scene, const BallDetection &ball)
