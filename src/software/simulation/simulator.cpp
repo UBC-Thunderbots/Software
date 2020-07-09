@@ -1,9 +1,9 @@
 #include "software/simulation/simulator.h"
 
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
+#include "software/simulation/convert_primitive_to_nanopb.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/simulation/simulator_robot_singleton.h"
 
@@ -94,29 +94,25 @@ void Simulator::setRobotPrimitives(
 
     for (const auto& primitive_ptr : *primitives)
     {
-        primitive_params_t primitive_params = getPrimitiveParams(primitive_ptr);
-        unsigned int primitive_index        = getPrimitiveIndex(primitive_ptr);
+        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
 
-        setRobotPrimitive(primitive_ptr->getRobotId(), primitive_index, primitive_params,
-                          simulator_robots, simulator_ball);
+        setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
+                          simulator_ball);
     }
 }
 
-void Simulator::setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                        const primitive_params_t& params)
+void Simulator::setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_index, params, yellow_simulator_robots,
-                      simulator_ball);
+    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball);
 }
 
-void Simulator::setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                      const primitive_params_t& params)
+void Simulator::setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_index, params, blue_simulator_robots, simulator_ball);
+    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball);
 }
 
 void Simulator::setRobotPrimitive(
-    RobotId id, unsigned int primitive_index, primitive_params_t params,
+    RobotId id, const PrimitiveMsg& primitive_msg,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
     const std::shared_ptr<SimulatorBall>& simulator_ball)
@@ -133,8 +129,8 @@ void Simulator::setRobotPrimitive(
         auto simulator_robot = (*simulator_robots_iter).first;
         auto firmware_world  = (*simulator_robots_iter).second;
         SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-            firmware_world, primitive_index, params);
+        SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(firmware_world,
+                                                                          primitive_msg);
     }
 }
 
@@ -235,46 +231,4 @@ Field Simulator::getField() const
 Timestamp Simulator::getTimestamp() const
 {
     return physics_world.getTimestamp();
-}
-
-primitive_params_t Simulator::getPrimitiveParams(
-    const std::unique_ptr<Primitive>& primitive)
-{
-    // The ProtoCreatorPrimitiveVisitor handles most of the encoding for us
-    ProtoCreatorPrimitiveVisitor mrf_pv;
-    PrimitiveMsg primitive_proto =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*primitive);
-    primitive_params_t primitive_params;
-    std::array<double, 4> param_array = {
-        primitive_proto.parameter1(),
-        primitive_proto.parameter2(),
-        primitive_proto.parameter3(),
-        primitive_proto.parameter4(),
-    };
-    for (unsigned int i = 0; i < param_array.size(); i++)
-    {
-        // The data is already scaled appropriately for us from the
-        // getProto function. We just need to pack it
-        // into an int16_t
-        double data                = param_array[i];
-        primitive_params.params[i] = static_cast<int16_t>(std::round(data));
-    }
-
-    primitive_params.slow  = primitive_proto.slow();
-    primitive_params.extra = static_cast<uint8_t>(primitive_proto.extra_bits());
-
-    return primitive_params;
-}
-
-unsigned int Simulator::getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive)
-{
-    PrimitiveMsg primitive_proto =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*primitive);
-    auto primitive_index = static_cast<unsigned int>(primitive_proto.prim_type());
-
-    return primitive_index;
-}
-
-std::weak_ptr<PhysicsRobot> Simulator::getRobotAtPosition(const Point &position) {
-    return physics_world.getRobotAtPosition(position);
 }

@@ -56,11 +56,11 @@ void StandaloneSimulator::initNetworking()
             static_cast<unsigned short>(
                 standalone_simulator_config->VisionPort()->value()));
     yellow_team_primitive_listener =
-        std::make_unique<ThreadedProtoMulticastListener<PrimitiveSetMsg>>(
+        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             yellow_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1));
     blue_team_primitive_listener =
-        std::make_unique<ThreadedProtoMulticastListener<PrimitiveSetMsg>>(
+        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             blue_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
 }
@@ -112,40 +112,24 @@ void StandaloneSimulator::setupInitialSimulationState()
     simulator.addYellowRobots(yellow_robot_states);
 }
 
-void StandaloneSimulator::setYellowRobotPrimitives(PrimitiveSetMsg msg)
+void StandaloneSimulator::setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg)
 {
-    for (const auto& primitive : msg.robot_primitives())
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        RobotId id                               = primitive.first;
-        auto [primitive_index, primitive_params] = decodePrimitiveMsg(primitive.second);
-        simulator.setYellowRobotPrimitive(id, primitive_index, primitive_params);
+        RobotId id                 = primitive_set_msg.robot_primitives[i].key;
+        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
+        simulator.setYellowRobotPrimitive(id, primitive_msg);
     }
 }
 
-void StandaloneSimulator::setBlueRobotPrimitives(PrimitiveSetMsg msg)
+void StandaloneSimulator::setBlueRobotPrimitives(PrimitiveSetMsg primitive_set_msg)
 {
-    for (const auto& primitive : msg.robot_primitives())
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        RobotId id                               = primitive.first;
-        auto [primitive_index, primitive_params] = decodePrimitiveMsg(primitive.second);
-        simulator.setBlueRobotPrimitive(id, primitive_index, primitive_params);
+        RobotId id                 = primitive_set_msg.robot_primitives[i].key;
+        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
+        simulator.setBlueRobotPrimitive(id, primitive_msg);
     }
-}
-
-std::pair<unsigned int, primitive_params_t> StandaloneSimulator::decodePrimitiveMsg(
-    const PrimitiveMsg& msg)
-{
-    auto primitive_index = static_cast<unsigned int>(msg.prim_type());
-
-    primitive_params_t params;
-    params.params[0] = static_cast<uint16_t>(msg.parameter1());
-    params.params[1] = static_cast<uint16_t>(msg.parameter2());
-    params.params[2] = static_cast<uint16_t>(msg.parameter3());
-    params.params[3] = static_cast<uint16_t>(msg.parameter4());
-    params.extra     = static_cast<uint8_t>(msg.extra_bits());
-    params.slow      = msg.slow();
-
-    return std::make_pair(primitive_index, params);
 }
 
 void StandaloneSimulator::startSimulation()

@@ -5,7 +5,6 @@ cc_library(
     srcs = ["backend.cpp"],
     hdrs = ["backend.h"],
     deps = [
-        ":robot_status",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/primitive",
@@ -21,8 +20,7 @@ cc_library(
     deps = [
         ":backend",
         ":ssl_proto_client",
-        "//software/backend/input/network/networking:network_client",
-        "//software/backend/output/radio:radio_output",
+        "//software/backend/radio:radio_output",
         "//software/util/design_patterns:generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
@@ -40,7 +38,6 @@ cc_library(
         ":ssl_proto_client",
         "//shared:constants",
         "//software:constants",
-        "//software/backend/input/network/networking:network_client",
         "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
         "//software/proto/message_translation:tbots_protobuf",
@@ -50,15 +47,6 @@ cc_library(
     # design pattern to work are linked in
     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
     alwayslink = True,
-)
-
-cc_test(
-    name = "robot_status_test",
-    srcs = ["robot_status_test.cpp"],
-    deps = [
-        ":robot_status",
-        "@gtest//:gtest_main",
-    ],
 )
 
 cc_library(
@@ -78,15 +66,5 @@ cc_library(
         "//software/networking:threaded_proto_multicast_listener",
         "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
-    ],
-)
-
-cc_library(
-    name = "robot_status",
-    srcs = ["robot_status.cpp"],
-    hdrs = ["robot_status.h"],
-    deps = [
-        "//shared/proto:tbots_cc_proto",
-        "//software/logger",
     ],
 )

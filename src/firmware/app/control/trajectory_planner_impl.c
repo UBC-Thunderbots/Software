@@ -106,13 +106,23 @@ void app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
     }
 }
 
-float app_trajectory_planner_impl_modifySpeedToMatchDuration(float initial_speed,
-                                                             float duration,
-                                                             float displacement)
+float app_trajectory_planner_impl_calculateSpeedToMatchDuration(float initial_speed,
+                                                                float duration,
+                                                                float displacement)
 {
     // Calculate the new final speed based on the initial speed, displacement, and
     // the desired duration in time
-    return (2 * displacement / duration) + initial_speed;
+    float next_speed = (2.0f * displacement - initial_speed * duration) / duration;
+
+    // Since speed is absolute here, we want to prevent returning negative speed that
+    // would make us go backwards along the path. The case where next_speed < 0 shouldn't
+    // happen under normal circumstances, but this check exists just in case.
+    if (next_speed < 0.0f)
+    {
+        next_speed = 0.0f;
+    }
+
+    return next_speed;
 }
 
 
@@ -131,36 +141,35 @@ void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
     for (unsigned int i = 0; i < num_elements - 1; i++)
     {
         // Check for the case that each segment duration isn't equal, so that they can be
-        // modifed to have the same duration
+        // modified to have the same duration
         if (durations1[i] > durations2[i] && displacement1[i] != 0)
         {
             const float current_speed    = speeds2[i];
-            const float displacement     = displacement2[i];
             const float desired_duration = durations1[i];
-            float *final_speed_to_change = &speeds2[i + 1];
+            float *next_speed            = &speeds2[i + 1];
+            const float displacement     = displacement2[i];
 
-            *final_speed_to_change =
-                app_trajectory_planner_impl_modifySpeedToMatchDuration(
-                    current_speed, desired_duration, displacement);
+            *next_speed = app_trajectory_planner_impl_calculateSpeedToMatchDuration(
+                current_speed, desired_duration, displacement);
+
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else if (durations2[i] > durations1[i] && displacement2[i] != 0)
         {
             const float current_speed    = speeds1[i];
-            const float displacement     = displacement1[i];
             const float desired_duration = durations2[i];
-            float *final_speed_to_change = &speeds1[i + 1];
+            float *next_speed            = &speeds1[i + 1];
+            const float displacement     = displacement1[i];
 
-            *final_speed_to_change =
-                app_trajectory_planner_impl_modifySpeedToMatchDuration(
-                    current_speed, desired_duration, displacement);
+            *next_speed = app_trajectory_planner_impl_calculateSpeedToMatchDuration(
+                current_speed, desired_duration, displacement);
+
             complete_time_profile[i + 1] = complete_time_profile[i] + desired_duration;
         }
         else
         {
             // This means that the durations are equal and nothing needs to be changed
             complete_time_profile[i + 1] = complete_time_profile[i] + durations1[i];
-            continue;
         }
     }
 }

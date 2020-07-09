@@ -69,12 +69,13 @@ enum ErrorCode
     CRASHED_NO_CORE_DUMP                 = 27;
 
     // Radio Dongle Errors
-    ROBOT_DEAD          = 28;
-    ESTOP_BROKEN        = 29;
-    RX_FCS_FAIL         = 30;
-    SECOND_DONGLE       = 31;
-    TRANSMIT_QUEUE_FULL = 32;
-    RECEIVE_QUEUE_FULL  = 33;
+    ROBOT_DEAD            = 28;
+    ESTOP_BROKEN          = 29;
+    RX_FCS_FAIL           = 30;
+    SECOND_DONGLE         = 31;
+    TRANSMIT_QUEUE_FULL   = 32;
+    RECEIVE_QUEUE_FULL    = 33;
+    PACKET_ABOVE_MAX_SIZE = 34;
 }
 
 /* Firmware build information  */

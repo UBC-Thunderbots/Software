@@ -22,7 +22,6 @@ class ProtoCreatorPrimitiveVisitor : public PrimitiveVisitor
     /**
      * Visits a given primitive
      */
-    void visit(const CatchPrimitive &catch_primitive) override;
     void visit(const ChipPrimitive &chip_primitive) override;
     void visit(const DirectVelocityPrimitive &direct_velocity_primitive) override;
     void visit(const DirectWheelsPrimitive &direct_wheels_primitive) override;

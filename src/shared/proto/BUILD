@@ -14,7 +14,9 @@ proto_library(
         "tbots_timestamp_msg.proto",
         "vision.proto",
     ],
-    # Note: this library is public so that proto libraries in firmware or software can build from it
+    deps = [
+        "@nanopb//:nanopb_options_proto",
+    ],
 )
 
 cc_proto_library(
