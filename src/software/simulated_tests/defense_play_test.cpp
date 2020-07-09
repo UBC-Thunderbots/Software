@@ -37,7 +37,7 @@ TEST_F(DefensePlayTest, test_defense_play)
         }));
     setEnemyGoalie(0);
     setAIPlay(DefensePlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START, RefboxGameState::FORCE_START);
+    setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::NORMAL_START);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 

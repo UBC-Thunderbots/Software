@@ -258,6 +258,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:receiver_tactic",
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:shoot_goal_tactic",
+        "//software/ai/hl/stp/tactic:stop_tactic",
         "//software/ai/passing:pass_generator",
         "//software/logger",
         "//software/parameter:dynamic_parameters",

@@ -138,15 +138,14 @@ class SimulatedTestFixture : public ::testing::Test
             non_terminating_function_validators);
 
     /**
-     * Puts the current thread to sleep until the difference between the current wall time
-     * and the wall_start_time is >= the difference between current_time and zero. This
-     * "synchronizes" wall time with simulation time by slowing down execution if needed.
+     * Puts the current thread to sleep so that a single simulation tick will take
+     * the desired amount of real-world "wall" time.
      *
-     * @param wall_start_time The time at which the simulated test started, in wall time
-     * @param current_time The current time in the simulated test
+     * @param tick_wall_start_time The time at which the simulation tick started, in wall time
+     * @param desired_wall_tick_time How long the tick should take, in wall time
      */
-    static void sleep(const std::chrono::steady_clock::time_point& wall_start_time,
-                      const Timestamp& current_time);
+    static void sleep(const std::chrono::steady_clock::time_point& tick_wall_start_time,
+                      const Duration& desired_wall_tick_time);
 
     // The simulator needs to be a pointer so that we can destroy and re-create
     // the object in the SetUp function. Because the simulator has no

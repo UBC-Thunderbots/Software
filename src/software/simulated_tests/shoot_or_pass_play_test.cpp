@@ -24,21 +24,20 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
             Point(-2, 0.5),
             Point(-2, -0.5),
             Point(-2, -1.5),
-//         Point(4.6, -3.1)
         }));
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
         {
-//            Point(1, 0),
-//            Point(1, 2.5),
-//            Point(1, -2.5),
+            Point(1, 0),
+            Point(1, 2.5),
+            Point(1, -2.5),
             field().enemyGoalCenter(),
-//         field().enemyDefenseArea().negXNegYCorner(),
-//         field().enemyDefenseArea().negXPosYCorner()
+         field().enemyDefenseArea().negXNegYCorner(),
+         field().enemyDefenseArea().negXPosYCorner()
         }));
     setEnemyGoalie(0);
     setAIPlay(ShootOrPassPlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START, RefboxGameState::FORCE_START);
+    setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

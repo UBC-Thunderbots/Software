@@ -234,7 +234,7 @@ AIConfig:
     AbsMinPassScore:
       min: 0.0
       max: 1.0
-      default: 0.05
+      default: 0.00
       type: double
       description: The absolute minimum pass quality we're willing to attempt
     PassScoreRampDownDuration:

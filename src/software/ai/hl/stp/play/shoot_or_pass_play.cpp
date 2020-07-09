@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
+#include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
@@ -72,13 +73,15 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // on the opposite side of the x-axis to wherever the pass is coming from
     if (world.ball().position().x() > -1)
     {
-        double y_offset =
-                -std::copysign(world.field().yLength() / 2, world.ball().position().y());
-        cherry_pick_1_target_region =
-                Rectangle(Point(0, 0),
-                          Point(world.field().xLength() / 4, y_offset));
-        cherry_pick_2_target_region =
-                Rectangle(Point(world.field().xLength() / 4, 0), Point(world.field().xLength() / 2, y_offset));
+//        double y_offset =
+//                -std::copysign(world.field().yLength() / 2, world.ball().position().y());
+//        cherry_pick_1_target_region =
+//                Rectangle(Point(0, 0),
+//                          Point(world.field().xLength() / 4, y_offset));
+//        cherry_pick_2_target_region =
+//                Rectangle(Point(world.field().xLength() / 4, 0), Point(world.field().xLength() / 2, y_offset));
+        cherry_pick_1_target_region = world.field().enemyPositiveYQuadrant();
+        cherry_pick_2_target_region = world.field().enemyNegativeYQuadrant();
     }
 
     std::array<std::shared_ptr<CherryPickTactic>, 2> cherry_pick_tactics = {
@@ -180,12 +183,13 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto receiver = std::make_shared<ReceiverTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
             false);
+        auto temp_stop = std::make_shared<StopTactic>(false);
         do
         {
             passer->updateControlParams(pass);
             receiver->updateControlParams(pass);
             yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
-                   std::get<1>(crease_defender_tactics)});
+                   std::get<1>(crease_defender_tactics), temp_stop});
         } while (!receiver->done());
     }
     else
