@@ -9,6 +9,7 @@ qt_cc_library(
     deps = [
         ":zoomable_qgraphics_view",
         "//software/gui:geometry_conversion",
+        "//software/gui/drawing:colors",
         "//software/gui/drawing:draw_functions",
         "//software/new_geom:rectangle",
         "@qt//:qt_core",

@@ -123,12 +123,12 @@ class SensorFusionTest : public ::testing::Test
 
         auto break_beam_msg = std::make_unique<BreakBeamStatus>();
         break_beam_msg->set_ball_in_beam(false);
-        robot_msg->set_allocated_break_beam_status(break_beam_msg.release());
+        *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
 
         auto chipper_kicker_status = std::make_unique<ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(13);
         chipper_kicker_status->set_ms_since_kicker_fired(9);
-        robot_msg->set_allocated_chipper_kicker_status(chipper_kicker_status.release());
+        *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
 
         return std::move(robot_msg);
     }
@@ -141,12 +141,12 @@ class SensorFusionTest : public ::testing::Test
 
         auto break_beam_msg = std::make_unique<BreakBeamStatus>();
         break_beam_msg->set_ball_in_beam(true);
-        robot_msg->set_allocated_break_beam_status(break_beam_msg.release());
+        *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
 
         auto chipper_kicker_status = std::make_unique<ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(11);
         chipper_kicker_status->set_ms_since_kicker_fired(6);
-        robot_msg->set_allocated_chipper_kicker_status(chipper_kicker_status.release());
+        *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
 
         return std::move(robot_msg);
     }

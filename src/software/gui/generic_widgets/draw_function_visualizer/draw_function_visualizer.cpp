@@ -1,5 +1,6 @@
 #include "software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h"
 
+#include "software/gui/drawing/colors.h"
 #include "software/gui/geometry_conversion.h"
 #include "software/logger/logger.h"
 
@@ -22,7 +23,7 @@ DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent)
 
     setRenderHint(QPainter::Antialiasing);
     setDragMode(QGraphicsView::ScrollHandDrag);
-    setBackgroundBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
+    setBackgroundBrush(QBrush(field_color, Qt::SolidPattern));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 

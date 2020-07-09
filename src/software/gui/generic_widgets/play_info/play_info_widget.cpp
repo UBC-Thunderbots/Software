@@ -5,7 +5,7 @@ PlayInfoWidget::PlayInfoWidget(QWidget* parent) : QTextEdit(parent) {}
 void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
 {
     QString refbox_game_state_string =
-        QString("Refbox Game State: %1\n")
+        QString("Refbox Gamestate: %1\n")
             .arg(QString::fromStdString(play_info.getRefboxGameStateName()));
     QString play_name_string =
         QString("Play Name: %1\n").arg(QString::fromStdString(play_info.getPlayName()));
