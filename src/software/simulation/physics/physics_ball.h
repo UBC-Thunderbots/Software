@@ -98,7 +98,7 @@ class PhysicsBall
     /**
      * Updates whether or not the ball is "in flight" based on its current state.
      */
-    void updateIsInFlight();
+    void updateIsInFlight() const;
 
     /**
      * Applies the given force vector to the ball at its center of mass
@@ -136,7 +136,7 @@ class PhysicsBall
 
     // If the ball is currently in flight, the in_flight_origin holds the point
     // where the ball initially became in flight
-    std::optional<Point> in_flight_origin;
+    mutable std::optional<Point> in_flight_origin;
     double in_flight_distance_meters;
     Angle flight_angle_of_departure;
 

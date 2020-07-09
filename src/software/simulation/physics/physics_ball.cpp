@@ -157,9 +157,9 @@ double PhysicsBall::calculateDistanceFromGround() const
     return distance_from_ground;
 }
 
-void PhysicsBall::updateIsInFlight()
+void PhysicsBall::updateIsInFlight() const
 {
-    if (isInFlight())
+    if (in_flight_origin.has_value())
     {
         double current_in_flight_distance_meters =
             (position() - in_flight_origin.value()).length();
@@ -181,5 +181,6 @@ void PhysicsBall::updateIsInFlight()
 
 bool PhysicsBall::isInFlight() const
 {
+    updateIsInFlight();
     return in_flight_origin.has_value();
 }
