@@ -22,11 +22,3 @@ constexpr int sign(double n)
  * returns perpendicular offset from line x0-x1 to point p
  */
 double offsetToLine(Point x0, Point x1, Point p);
-
-/**
- * Returns the mean of a list of points
- *
- * @param points the vector of points
- * @return the mean point of points
- */
-Point getPointsMean(const std::vector<Point> &points);

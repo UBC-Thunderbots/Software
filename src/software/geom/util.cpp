@@ -32,17 +32,3 @@ double offsetToLine(Point x0, Point x1, Point p)
 
     return fabs(n.dot(p - x0));
 }
-
-Point getPointsMean(const std::vector<Point> &points)
-{
-    Point average = Point(0, 0);
-    for (unsigned int i = 0; i < points.size(); i++)
-    {
-        average += points[i].toVector();
-    }
-
-    Vector averageVector = average.toVector();
-
-    averageVector /= static_cast<double>(points.size());
-    return Point(averageVector);
-}

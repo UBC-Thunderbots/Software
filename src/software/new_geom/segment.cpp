@@ -48,6 +48,11 @@ Vector Segment::toVector() const
     return end - start;
 };
 
+Point Segment::midPoint() const
+{
+    return Point(toVector() / 2 + start);
+}
+
 bool Segment::operator==(const Segment& other) const
 {
     return start == other.start && end == other.end;

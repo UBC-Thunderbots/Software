@@ -163,8 +163,7 @@ std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
     // If there are no obstacles, return the center of the Segment and the shot angle
     if (obstacles.size() == 0)
     {
-        const Point center_of_segment =
-            getPointsMean({segment.getStart(), segment.getEnd()});
+        const Point center_of_segment = segment.midPoint();
         const Angle angle_of_entire_segment =
             ((segment.getStart() - origin)
                  .orientation()
@@ -187,8 +186,7 @@ std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
     else if (obstacle_segment_projections.size() == 0)
     {
         // If there are no blocking Segments, just shoot at the center of the goal
-        const Point center_of_segment =
-            getPointsMean({segment.getStart(), segment.getEnd()});
+        const Point center_of_segment = segment.midPoint();
         const Angle angle_of_entire_segment =
             ((segment.getStart() - origin)
                  .orientation()

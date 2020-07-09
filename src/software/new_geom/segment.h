@@ -62,6 +62,13 @@ class Segment final
      */
     Vector toVector() const;
 
+    /**
+     * Gets mid point of the Segment, halfway between the start and end points
+     *
+     * @return mid point
+     */
+    Point midPoint() const;
+
     bool operator==(const Segment& other) const;
 
    private:
