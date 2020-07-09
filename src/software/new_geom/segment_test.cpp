@@ -87,3 +87,15 @@ TEST(SegmentOperatorTests, segment_operator_unequal_start_end)
     Segment s2 = Segment(Point(7, 6), Point(1, 3));
     EXPECT_FALSE(s1.operator==(s2));
 }
+
+TEST(SegmentMidPointTest, test_mid_point_1)
+{
+    Segment segment(Point(202, 15), Point(202, -15));
+    EXPECT_EQ(Point(202, 0), segment.midPoint());
+}
+
+TEST(SegmentMidPointTest, test_mid_point_2)
+{
+    Segment segment(Point(-2, 4), Point(5, 3));
+    EXPECT_EQ(Point(1.5, 3.5), segment.midPoint());
+}
