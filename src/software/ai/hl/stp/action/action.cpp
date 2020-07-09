@@ -44,13 +44,27 @@ std::unique_ptr<Intent> Action::getNextIntent()
             // Extract the result from the coroutine. This will be whatever value was
             // yielded by the calculateNextIntent function
             next_intent = intent_sequence.get();
+
+            // TODO: clean this up
+            if (next_intent == nullptr && loop_forever){
+                restart();
+                intent_sequence();
+                next_intent = intent_sequence.get();
+            }
         }
         else if (loop_forever)
         {
             restart();
             intent_sequence();
             next_intent = intent_sequence.get();
+            if (next_intent == nullptr){
+                volatile  int a;
+                (void)a;
+            }
         }
+    } else {
+        volatile  int a;
+        (void)a;
     }
 
     return next_intent;

@@ -21,6 +21,7 @@ struct FirmwareRobot
     Wheel_t* back_right_wheel;
     Wheel_t* back_left_wheel;
     RobotConstants_t robot_constants;
+    unsigned int id;
 };
 
 FirmwareRobot_t* app_firmware_robot_create(
@@ -30,7 +31,9 @@ FirmwareRobot_t* app_firmware_robot_create(
     float (*get_robot_velocity_angular)(void), float (*get_battery_voltage)(void),
     Wheel_t* front_right_wheel, Wheel_t* front_left_wheel, Wheel_t* back_right_wheel,
     Wheel_t* back_left_wheel, ControllerState_t* controller_state,
-    RobotConstants_t robot_constants)
+    RobotConstants_t robot_constants,
+    unsigned int id
+    )
 {
     FirmwareRobot_t* new_robot = malloc(sizeof(FirmwareRobot_t));
 
@@ -49,6 +52,7 @@ FirmwareRobot_t* app_firmware_robot_create(
     new_robot->back_left_wheel            = back_left_wheel;
     new_robot->robot_constants            = robot_constants;
     new_robot->controller_state           = controller_state;
+    new_robot->id           = id;
 
     return new_robot;
 }
@@ -131,4 +135,8 @@ RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* rob
 ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* robot)
 {
     return robot->controller_state;
+}
+
+unsigned int app_firmware_robot_getId(const FirmwareRobot_t* robot){
+    return robot->id;
 }

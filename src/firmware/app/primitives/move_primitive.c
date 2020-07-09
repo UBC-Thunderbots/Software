@@ -183,12 +183,9 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
     const float dest_y = state->position_trajectory.y_position[trajectory_index];
     const float dest_orientation = state->position_trajectory.orientation[trajectory_index];
     float dest[3]      = {dest_x, dest_y, dest_orientation};
-    //    const float dest_orientation =
-    //        state->position_trajectory.orientation[trajectory_index];
 
     const float curr_x = app_firmware_robot_getPositionX(robot);
     const float curr_y = app_firmware_robot_getPositionY(robot);
-    //    const float curr_orientation = app_firmware_robot_getOrientation(robot);
 
     // TODO: comment here
     const float dx = dest_x - curr_x;

@@ -437,6 +437,11 @@ void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware
 
 void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world)
 {
+    // TODO: delete this
+    if (getRobotId() == 5){
+        volatile int a;
+        (void)a;
+    }
     app_primitive_manager_runCurrentPrimitive(primitive_manager.get(),
                                               firmware_world.get());
 }

@@ -66,7 +66,7 @@ void Simulator::updateSimulatorRobots(
     for (const auto& physics_robot : physics_robots)
     {
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
-        auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
+        auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot(physics_robot.lock()->getRobotId());
         auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
         FirmwareWorld_t* firmware_world_raw =
             app_firmware_world_create(firmware_robot.release(), firmware_ball.release(), &getCurrentTime);

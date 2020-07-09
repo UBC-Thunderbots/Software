@@ -149,6 +149,10 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
         return;
     }
 
+    if (app_firmware_robot_getId(app_firmware_world_getRobot(world)) == 5){
+        printf("running %d\n", primitive_index);
+    }
+
     app_primitive_manager_lockPrimitiveMutex(manager);
 
     if (!primitive_params_are_equal(manager->previous_primitive_params, params) ||

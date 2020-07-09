@@ -25,8 +25,9 @@ void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> 
     simulator_robot = robot;
 }
 
+// TODO: jdoc for arg
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
-SimulatorRobotSingleton::createFirmwareRobot()
+SimulatorRobotSingleton::createFirmwareRobot(RobotId robot_id)
 {
     // TODO: Make sure all objects de-allocated properly
     // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
@@ -90,7 +91,8 @@ SimulatorRobotSingleton::createFirmwareRobot()
         &(SimulatorRobotSingleton::getVelocityAngular),
         &(SimulatorRobotSingleton::getBatteryVoltage), front_right_wheel,
         front_left_wheel, back_right_wheel, back_left_wheel, controller_state,
-        robot_constants);
+        robot_constants,
+        robot_id);
 
     return std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>(firmware_robot,
                                                                   FirmwareRobotDeleter());

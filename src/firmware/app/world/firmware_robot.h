@@ -75,7 +75,10 @@ FirmwareRobot_t* app_firmware_robot_create(
     float (*get_robot_velocity_angular)(void), float (*get_battery_voltage)(void),
     Wheel_t* front_right_wheel, Wheel_t* front_left_wheel, Wheel_t* back_right_wheel,
     Wheel_t* back_left_wheel, ControllerState_t* controller_state,
-    RobotConstants_t robot_constants);
+    RobotConstants_t robot_constants,
+    // TODO: jdoc for this
+    unsigned int id
+    );
 
 /**
  * Destroy the given robot, freeing any memory allocated for it
@@ -193,3 +196,6 @@ RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* rob
  * @return A pointer to the controller state for the given robot
  */
 ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* robot);
+
+// TODO: jdoc
+unsigned int app_firmware_robot_getId(const FirmwareRobot_t* robot);
