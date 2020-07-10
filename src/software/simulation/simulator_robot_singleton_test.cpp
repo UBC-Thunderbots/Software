@@ -683,6 +683,60 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.015);
 }
 
+TEST_F(SimulatorRobotSingletonTest, test_kick_ball_while_dribbling)
+{
+    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    auto dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
+    Ball ball(dribbling_point, Vector(0, 0.3), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
+    // We use an arbitrarily large number here for speed
+    app_dribbler_setSpeed(dribbler, 10000);
+
+    // Simulate for 0.5 second so the ball makes contact with the dribbler
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+        std::cout << simulator_ball->position() << "             " << simulator_ball->velocity() << std::endl;
+    }
+    std::cout << "DONE DRIBBLER STARTUP\n\n" << std::endl;
+
+    // Check the ball has stuck to the dribbler
+    EXPECT_LT((simulator_ball->velocity() - Vector(0.0, 0)).length(), 0.005);
+//    Point dribbling_point = getDribblingPoint(firmware_robot);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_kick(chicker, 2.0);
+
+
+    // Accelerate the robot up to an angular velocity of 4*pi rad/s (ie. 2 rpm)
+    // The iteration limit is a safety so we don't loop forever if applyForce is broken
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+        std::cout << simulator_ball->position() << "             " << simulator_ball->velocity() << std::endl;
+    }
+
+    EXPECT_LT(simulator_ball->velocity().orientation().minDiff(robot.orientation()), Angle::fromDegrees(2));
+
+//    // Check the ball has stuck to the dribbler
+//    dribbling_point = getDribblingPoint(firmware_robot);
+//    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+//
+//    // Simulate a bit long to check the ball remains stuck to the dribbler
+//    for (unsigned int i = 0; i < 120; i++)
+//    {
+//        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+//    }
+//
+//    dribbling_point = getDribblingPoint(firmware_robot);
+//    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.015);
+}
+
+
 TEST_F(SimulatorRobotSingletonTest, test_dribbler_coast)
 {
     Point robot_position    = Point(0, 0);

@@ -50,6 +50,7 @@ class StandaloneSimulator
      * Adds robots to predefined locations on the field
      */
     void setupInitialSimulationState();
+    void setupShortPassState();
 
     SSL_WrapperPacket getSSLWrapperPacket() const;
 
