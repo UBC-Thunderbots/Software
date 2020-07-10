@@ -155,7 +155,6 @@ void SimulatedTestFixture::sleep(
     auto ms_to_sleep = std::chrono::milliseconds(
                            static_cast<int>(desired_wall_tick_time.getMilliseconds())) -
                        current_tick_wall_time_duration;
-    std::cout << "sleeping for " << ms_to_sleep.count() << std::endl;
     if (ms_to_sleep > std::chrono::milliseconds(0))
     {
         std::this_thread::sleep_for(ms_to_sleep);
