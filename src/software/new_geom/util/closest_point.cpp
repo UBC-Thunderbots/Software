@@ -16,7 +16,7 @@ Point closestPointOnLine(const Line &l, const Point &p)
     return closestPointOnLine(p, l);
 }
 
-Point closestPointOnSeg(const Point &p, const Segment &segment)
+Point closestPointOnSegment(const Point &p, const Segment &segment)
 {
     // if one of the end-points is extremely close to the centre point
     // then return 0.0
@@ -66,7 +66,7 @@ Point closestPointOnSeg(const Point &p, const Segment &segment)
     return segment.getEnd();
 }
 
-Point closestPointOnSeg(const Segment &segment, const Point &p)
+Point closestPointOnSegment(const Segment &segment, const Point &p)
 {
     // if one of the end-points is extremely close to the centre point
     // then return 0.0

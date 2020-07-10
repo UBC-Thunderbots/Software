@@ -104,6 +104,15 @@ TEST(DistanceTest, point_off_segment_closest_to_segment_end)
     EXPECT_DOUBLE_EQ(distance(s, p), expected);
 }
 
+TEST(DistanceTest, point_off_almost_degenerate_segment)
+{
+    Point p(5, 3);
+    Segment s(Point(-2.01, 2), Point(-2, 2));
+    double expected = std::hypot(7, 1);
+    EXPECT_DOUBLE_EQ(distance(p, s), expected);
+    EXPECT_DOUBLE_EQ(distance(s, p), expected);
+}
+
 TEST(DistanceTest, point_in_polygon)
 {
     Polygon polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});

@@ -31,7 +31,7 @@ const Point& Segment::getEnd() const
 double Segment::length() const
 {
     return (end - start).length();
-};
+}
 
 double Segment::lengthSquared() const
 {
@@ -41,12 +41,12 @@ double Segment::lengthSquared() const
 Segment Segment::reverse() const
 {
     return Segment(end, start);
-};
+}
 
 Vector Segment::toVector() const
 {
     return end - start;
-};
+}
 
 Point Segment::midPoint() const
 {

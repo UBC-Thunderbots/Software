@@ -54,11 +54,15 @@ class Segment final
 
     /**
      * Creates a Segment that is reversed
+     *
+     * @return reversed segment
      */
     Segment reverse() const;
 
     /**
-     * Makes a Vector out of this Segment.
+     * Makes a Vector out of this Segment
+     *
+     * @return vector of segment
      */
     Vector toVector() const;
 
@@ -69,6 +73,13 @@ class Segment final
      */
     Point midPoint() const;
 
+    /**
+     * Compares with another segment for equality
+     *
+     * @param other the other segment
+     *
+     * @return true if segment is equal to other, and false otherwise.
+     */
     bool operator==(const Segment& other) const;
 
    private:
