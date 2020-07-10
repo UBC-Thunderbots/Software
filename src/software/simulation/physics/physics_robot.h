@@ -194,6 +194,13 @@ class PhysicsRobot
     void setPosition(const Point &position);
 
    protected:
+    /**
+     * This functions runs any operations this PhysicsRobot wants to perform
+     * after a physics step has happened. We assume this function will be called
+     * by the PhysicsWorld at the correct time. This exists so that this class
+     * doesn't accidentally make a change to the Box2D world in the middle of
+     * a physics step, which causes the system to crash.
+     */
     void runPostPhysicsStep();
 
    private:
