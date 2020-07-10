@@ -1,21 +1,24 @@
 #include "software/gui/standalone_simulator/threaded_standalone_simulator_gui.h"
 
-#include <QtWidgets/QApplication>
 #include <QtCore/QGenericArgument>
+#include <QtWidgets/QApplication>
 
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 
-ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(std::shared_ptr<StandaloneSimulator> simulator)
+ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(
+    std::shared_ptr<StandaloneSimulator> simulator)
     : termination_promise_ptr(std::make_shared<std::promise<void>>()),
       application_shutting_down(false)
 {
-    if(!simulator) {
-        throw std::invalid_argument("Cannot create ThreadedStandaloneSimulatorGUI without a valid StandaloneSimulator");
+    if (!simulator)
+    {
+        throw std::invalid_argument(
+            "Cannot create ThreadedStandaloneSimulatorGUI without a valid StandaloneSimulator");
     }
 
-    run_standalone_simulator_gui_thread = std::thread(
-        &ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI, this,
-        simulator);
+    run_standalone_simulator_gui_thread =
+        std::thread(&ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI,
+                    this, simulator);
 }
 
 ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
@@ -32,10 +35,13 @@ ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
     run_standalone_simulator_gui_thread.join();
 }
 
-void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(std::shared_ptr<StandaloneSimulator> simulator)
+void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(
+    std::shared_ptr<StandaloneSimulator> simulator)
 {
-    if(!simulator) {
-        throw std::invalid_argument("Cannot start a new StandaloneSimulatorGUI thread without a valid StandaloneSimulator");
+    if (!simulator)
+    {
+        throw std::invalid_argument(
+            "Cannot start a new StandaloneSimulatorGUI thread without a valid StandaloneSimulator");
     }
 
     // We mock empty argc and argv since they don't affect the behaviour of the GUI.
@@ -50,8 +56,8 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(std::sha
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    StandaloneSimulatorGUI* standalone_simulator_gui = new StandaloneSimulatorGUI(
-        simulator);
+    StandaloneSimulatorGUI* standalone_simulator_gui =
+        new StandaloneSimulatorGUI(simulator);
     standalone_simulator_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block

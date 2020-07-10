@@ -8,7 +8,9 @@ StandaloneSimulatorDrawFunctionVisualizer::StandaloneSimulatorDrawFunctionVisual
 {
 }
 
-void StandaloneSimulatorDrawFunctionVisualizer::setStandaloneSimulator(std::shared_ptr<StandaloneSimulator> simulator) {
+void StandaloneSimulatorDrawFunctionVisualizer::setStandaloneSimulator(
+    std::shared_ptr<StandaloneSimulator> simulator)
+{
     standalone_simulator = simulator;
 }
 

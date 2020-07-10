@@ -21,7 +21,8 @@ class ThreadedStandaloneSimulatorGUI
      *
      * @param simulator The StandaloneSimulator this GUI will control
      */
-    explicit ThreadedStandaloneSimulatorGUI(std::shared_ptr<StandaloneSimulator> simulator);
+    explicit ThreadedStandaloneSimulatorGUI(
+        std::shared_ptr<StandaloneSimulator> simulator);
 
     ~ThreadedStandaloneSimulatorGUI();
 
@@ -46,7 +47,8 @@ class ThreadedStandaloneSimulatorGUI
      *
      * @param simulator The StandaloneSimulator this GUI will control
      */
-    void createAndRunStandaloneSimulatorGUI(std::shared_ptr<StandaloneSimulator> simulator);
+    void createAndRunStandaloneSimulatorGUI(
+        std::shared_ptr<StandaloneSimulator> simulator);
 
     std::thread run_standalone_simulator_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;

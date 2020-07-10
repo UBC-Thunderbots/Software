@@ -77,7 +77,8 @@ int main(int argc, char **argv)
             MutableDynamicParameters->getMutableStandaloneSimulatorConfig());
         standalone_simulator->setupInitialSimulationState();
 
-        ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(standalone_simulator);
+        ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(
+            standalone_simulator);
 
         // This blocks forever without using the CPU.
         // Wait for the Simulator GUI to shut down before shutting

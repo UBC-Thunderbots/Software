@@ -6,8 +6,8 @@
 #include "software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h"
 #include "software/new_geom/point.h"
 #include "software/simulation/physics/physics_robot.h"
-#include "software/world/robot_state.h"
 #include "software/simulation/standalone_simulator.h"
+#include "software/world/robot_state.h"
 #include "software/world/team_colour.h"
 
 /**

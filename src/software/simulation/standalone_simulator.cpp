@@ -114,7 +114,8 @@ void StandaloneSimulator::setupInitialSimulationState()
     simulator.addYellowRobots(yellow_robot_states);
 }
 
-const SSL_WrapperPacket & StandaloneSimulator::getSSLWrapperPacket() const {
+const SSL_WrapperPacket& StandaloneSimulator::getSSLWrapperPacket() const
+{
     return most_recent_ssl_wrapper_packet;
 }
 
