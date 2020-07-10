@@ -27,6 +27,7 @@ StandaloneSimulator::StandaloneSimulator(
 
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [this](SSL_WrapperPacket wrapper_packet) {
+            std::scoped_lock ssl_wrapper_packet_lock(most_recent_ssl_wrapper_packet_mutex);
             this->most_recent_ssl_wrapper_packet = wrapper_packet;
             this->wrapper_packet_sender->sendProto(wrapper_packet);
         });
@@ -116,6 +117,7 @@ void StandaloneSimulator::setupInitialSimulationState()
 
 const SSL_WrapperPacket& StandaloneSimulator::getSSLWrapperPacket() const
 {
+    std::scoped_lock ssl_wrapper_packet_lock(most_recent_ssl_wrapper_packet_mutex);
     return most_recent_ssl_wrapper_packet;
 }
 

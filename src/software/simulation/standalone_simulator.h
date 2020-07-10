@@ -130,5 +130,6 @@ class StandaloneSimulator
         wrapper_packet_sender;
     ThreadedSimulator simulator;
 
+    mutable std::mutex most_recent_ssl_wrapper_packet_mutex;
     SSL_WrapperPacket most_recent_ssl_wrapper_packet;
 };
