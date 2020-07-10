@@ -61,7 +61,7 @@ void TacticWorldParamsUpdateVisitor::visit(ShootGoalTactic &tactic)
 
 void TacticWorldParamsUpdateVisitor::visit(PasserTactic &tactic)
 {
-    tactic.updateWorldParams(world.ball());
+    tactic.updateWorldParams(world.ball(), world.field());
 }
 
 void TacticWorldParamsUpdateVisitor::visit(DefenseShadowEnemyTactic &tactic)

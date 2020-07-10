@@ -50,7 +50,7 @@ void PhysicsField::setupFieldBoundary(const Field &field)
     field_boundary_fixture_def.shape = &field_boundary_shape;
     // Collisions with the field boundary are perfectly elastic and have
     // no friction
-    field_boundary_fixture_def.restitution = 1.0;
+    field_boundary_fixture_def.restitution = field_restitution;
     field_boundary_fixture_def.friction    = 0.0;
     field_body->CreateFixture(&field_boundary_fixture_def);
 }
@@ -66,7 +66,7 @@ void PhysicsField::setupEnemyGoal(const Field &field)
     enemy_goal_shape.CreateChain(enemy_goal_vertices, num_enemy_goal_vertices);
     enemy_goal_fixture_def.shape = &enemy_goal_shape;
     // Collisions with the enemy goal are perfectly elastic and have no friction
-    enemy_goal_fixture_def.restitution = 1.0;
+    enemy_goal_fixture_def.restitution = field_restitution;
     enemy_goal_fixture_def.friction    = 1.0;
     field_body->CreateFixture(&enemy_goal_fixture_def);
 }
@@ -82,7 +82,7 @@ void PhysicsField::setupFriendlyGoal(const Field &field)
     friendly_goal_shape.CreateChain(friendly_goal_vertices, num_friendly_goal_vertices);
     friendly_goal_fixture_def.shape = &friendly_goal_shape;
     // Collisions with the friendly goal are perfectly elastic and have no friction
-    friendly_goal_fixture_def.restitution = 1.0;
+    friendly_goal_fixture_def.restitution = field_restitution;
     friendly_goal_fixture_def.friction    = 1.0;
     field_body->CreateFixture(&friendly_goal_fixture_def);
 }

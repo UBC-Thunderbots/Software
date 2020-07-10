@@ -9,7 +9,7 @@ extern "C"
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField(), 0.8, 0.2),
+      simulator(Field::createSSLDivisionBField(), 0.1, 0.8),
       most_recent_ssl_wrapper_packet(SSL_WrapperPacket())
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(
@@ -115,7 +115,7 @@ void StandaloneSimulator::setupInitialSimulationState()
     simulator.addYellowRobots(yellow_robot_states);
 }
 
-const SSL_WrapperPacket& StandaloneSimulator::getSSLWrapperPacket() const
+SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
 {
     std::scoped_lock ssl_wrapper_packet_lock(most_recent_ssl_wrapper_packet_mutex);
     return most_recent_ssl_wrapper_packet;

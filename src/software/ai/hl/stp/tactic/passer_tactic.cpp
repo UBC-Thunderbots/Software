@@ -2,12 +2,13 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 
-PasserTactic::PasserTactic(Pass pass, const Ball& ball, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick}), pass(std::move(pass)), ball(ball)
+PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field, bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Kick}), pass(std::move(pass)), ball(ball), field(field)
 {
 }
 
@@ -16,9 +17,10 @@ std::string PasserTactic::getName() const
     return "Passer Tactic";
 }
 
-void PasserTactic::updateWorldParams(const Ball& updated_ball)
+void PasserTactic::updateWorldParams(const Ball& updated_ball, const Field& updated_field)
 {
     this->ball = updated_ball;
+    this->field = updated_field;
 }
 
 void PasserTactic::updateControlParams(const Pass& updated_pass)
@@ -38,10 +40,17 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
 
 void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    auto move_action = std::make_shared<MoveAction>(
-        true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
+    // Collect the ball
+    auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, false);
+    do {
+        intercept_action->updateControlParams(*robot);
+        yield(intercept_action);
+    } while(!intercept_action->done());
+
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass
+    auto move_action = std::make_shared<MoveAction>(
+        true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
     while (ball.lastUpdateTimestamp() < pass.startTime())
     {
         // We want to wait just behind where the pass is supposed to start, so that the

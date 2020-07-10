@@ -82,6 +82,7 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
 
 void SensorFusion::updateWorld(const SSL_Referee &packet)
 {
+    std::scoped_lock game_state_lock(game_state_mutex);
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())
@@ -131,12 +132,12 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    const bool override_refbox_defending_side =
-        sensor_fusion_config->OverrideRefboxDefendingSide()->value();
-    const bool defending_positive_side =
-        sensor_fusion_config->DefendingPositiveSide()->value();
-    const bool should_invert_field =
-        override_refbox_defending_side && defending_positive_side;
+//    const bool override_refbox_defending_side =
+//        sensor_fusion_config->OverrideRefboxDefendingSide()->value();
+//    const bool defending_positive_side =
+//        sensor_fusion_config->DefendingPositiveSide()->value();
+//    const bool should_invert_field =
+//        override_refbox_defending_side && defending_positive_side;
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
@@ -152,21 +153,21 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
         createTeamDetection({ssl_detection_frame}, TeamColour::BLUE, min_valid_x,
                             max_valid_x, ignore_invalid_camera_data);
 
-    if (should_invert_field)
-    {
-        for (auto &detection : ball_detections)
-        {
-            invert(detection);
-        }
-        for (auto &detection : yellow_team)
-        {
-            invert(detection);
-        }
-        for (auto &detection : blue_team)
-        {
-            invert(detection);
-        }
-    }
+//    if (should_invert_field)
+//    {
+//        for (auto &detection : ball_detections)
+//        {
+//            detection = invert(detection);
+//        }
+//        for (auto &detection : yellow_team)
+//        {
+//            detection = invert(detection);
+//        }
+//        for (auto &detection : blue_team)
+//        {
+//            detection = invert(detection);
+//        }
+//    }
 
     new_ball_state = createTimestampedBallState(ball_detections);
     if (friendly_team_is_yellow)
@@ -188,6 +189,7 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 
 void SensorFusion::updateBall(TimestampedBallState new_ball_state)
 {
+    std::scoped_lock game_state_lock(game_state_mutex);
     if (!ball_states.empty() &&
         new_ball_state.timestamp() < ball_states.front().timestamp())
     {

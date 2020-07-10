@@ -38,8 +38,13 @@ void InterceptBallAction::accept(MutableActionVisitor& visitor)
 std::optional<Point> InterceptBallAction::getPointBallLeavesField(const Field& field,
                                                                   const Ball& ball)
 {
+    const bool ball_in_field = field.pointInFieldLines(ball.position());
+    if (ball.velocity().length() == 0 && ball_in_field)
+    {
+        return std::nullopt;
+    }
     Ray ball_ray(ball.position(), ball.velocity());
-    if (field.pointInFieldLines(ball.position()))
+    if (ball_in_field)
     {
         std::unordered_set<Point> intersections =
             intersection(field.fieldLines(), ball_ray);
@@ -100,9 +105,12 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             {
                 moveToInterceptPosition(yield, closest_point);
 
-                closest_point = closestPointOnLine(
-                    robot->position(),
-                    Line(ball.position(), ball.position() + ball.velocity()));
+                closest_point = ball.position();
+                if (ball.velocity().length() != 0){
+                    closest_point = closestPointOnLine(
+                        robot->position(),
+                        Line(ball.position(), ball.position() + ball.velocity()));
+                }
                 point_in_front_of_ball =
                     acuteAngle(ball.velocity(), closest_point - ball.position()) <
                     Angle::quarter();
@@ -144,15 +152,56 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
 
     if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
     {
-        LOG(DEBUG) << "moving to ball slow" << std::endl;
-        yield(std::make_unique<MoveIntent>(
-            robot->id(), ball.position(),
-            (ball.position() - robot->position()).orientation(), FINAL_SPEED_AT_SLOW_BALL,
-            0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
-            BallCollisionType::ALLOW));
+        // Move to a point near the ball
+        while (distance(ball.position(), getRobot()->position()) >
+                   ROBOT_MAX_RADIUS_METERS * 1.2 ||
+               (ball.position() - robot->position())
+                       .orientation()
+                       .minDiff(getRobot()->orientation())
+                       .abs() > Angle::fromDegrees(3))
+        {
+            Point target_position =
+                ball.position() + (robot->position() - ball.position()).normalize() *
+                                      ROBOT_MAX_RADIUS_METERS * 1.1;
+            yield(std::make_unique<MoveIntent>(
+                robot->id(), target_position,
+                (ball.position() - robot->position()).orientation(),
+                FINAL_SPEED_AT_SLOW_BALL, 0, DribblerEnable::ON, MoveType::NORMAL,
+                AutokickType::NONE, BallCollisionType::ALLOW));
+        }
+
+        // Slowly approach the ball with the dribbler on
+        while(ball.velocity().length() < 0.05){
+            yield(std::make_unique<MoveIntent>(
+                robot->id(), ball.position(),
+                (ball.position() - robot->position()).orientation(),
+                ball.velocity().length(), 0, DribblerEnable::ON, MoveType::NORMAL,
+                AutokickType::NONE, BallCollisionType::ALLOW));
+        }
+
+
+        // TODO: comment here
+        if (ball.velocity().length() < 0.1){
+            // Once ball speed increases, bring the robot to a stop with the dribbler on
+            while(ball.velocity().length() > 0.01){
+                yield(std::make_unique<MoveIntent>(
+                    robot->id(), getRobot()->position(),
+                    robot->orientation(),
+                    0, 0, DribblerEnable::ON, MoveType::NORMAL,
+                    AutokickType::NONE, BallCollisionType::ALLOW));
+            }
+        }
+
+        // Run through the ball
+//        yield(std::make_unique<MoveIntent>(
+//            robot->id(), ball.position(),
+//            (ball.position() - robot->position()).orientation(), FINAL_SPEED_AT_SLOW_BALL,
+//            0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+//            BallCollisionType::ALLOW));
     }
     else if (robot_on_ball_line)
     {
+        // Move to a point on the line such that the ball runs into the front of the robot
         Vector ball_to_robot = robot->position() - ball.position();
         double dist_to_ball  = distance(robot->position(), ball.position());
         double dist_in_front_of_ball_to_intercept =

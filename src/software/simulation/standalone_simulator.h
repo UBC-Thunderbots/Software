@@ -51,7 +51,7 @@ class StandaloneSimulator
      */
     void setupInitialSimulationState();
 
-    const SSL_WrapperPacket& getSSLWrapperPacket() const;
+    SSL_WrapperPacket getSSLWrapperPacket() const;
 
     /**
      * Starts the simulation. If the simulator is already running, this
