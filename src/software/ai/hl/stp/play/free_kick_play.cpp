@@ -75,8 +75,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     {
         double cherry_pick_region_y_length =
             -std::copysign(world.field().yLength() / 2, world.ball().position().y());
-        cherry_pick_1_target_region =
-            Rectangle(Point(0, 0), Point(world.field().xLength() / 4, cherry_pick_region_y_length));
+        cherry_pick_1_target_region = Rectangle(
+            Point(0, 0), Point(world.field().xLength() / 4, cherry_pick_region_y_length));
         cherry_pick_2_target_region =
             Rectangle(Point(world.field().xLength() / 4, 0),
                       Point(world.field().xLength() / 2, cherry_pick_region_y_length));
