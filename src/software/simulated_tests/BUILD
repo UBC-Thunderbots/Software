@@ -38,6 +38,8 @@ cc_test(
     srcs = ["example_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        "//software/ai/hl/stp/play:all_plays",
+        "//software/ai/hl/stp/play:defense_play",
         "//software/ai/hl/stp/play:example_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

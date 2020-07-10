@@ -27,7 +27,7 @@ void SimulatedTestFixture::SetUp()
     // guarantee the pointer will never be null / empty
     simulator = std::make_unique<Simulator>(Field::createSSLDivisionBField());
     ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
-    sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
+//    sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
 
     MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
 

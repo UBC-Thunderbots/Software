@@ -38,6 +38,8 @@ class InterceptBallAction : public Action
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
+    void interceptSlowBall(IntentCoroutine::push_type& yield);
+
     /**
      * Determines the best place to intercept the ball and move the robot to that
      * position.
@@ -68,4 +70,5 @@ class InterceptBallAction : public Action
     // Action parameters
     Field field;
     Ball ball;
+
 };

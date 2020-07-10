@@ -149,7 +149,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromTeam(
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(
     const Point &ball_position) const
 {
-    return createFromShape(Circle(ball_position, BALL_MAX_RADIUS_METERS));
+    return createFromShape(Circle(ball_position, BALL_MAX_RADIUS_METERS * 5));
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(
