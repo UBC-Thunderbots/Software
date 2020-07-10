@@ -73,13 +73,13 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     // on the opposite side of the x-axis to wherever the pass is coming from
     if (world.ball().position().x() > -1)
     {
-        double y_offset =
+        double cherry_pick_region_y_length =
             -std::copysign(world.field().yLength() / 2, world.ball().position().y());
         cherry_pick_1_target_region =
-            Rectangle(Point(0, 0), Point(world.field().xLength() / 4, y_offset));
+            Rectangle(Point(0, 0), Point(world.field().xLength() / 4, cherry_pick_region_y_length));
         cherry_pick_2_target_region =
             Rectangle(Point(world.field().xLength() / 4, 0),
-                      Point(world.field().xLength() / 2, y_offset));
+                      Point(world.field().xLength() / 2, cherry_pick_region_y_length));
     }
 
     // These two tactics will set robots to roam around the field, trying to put
