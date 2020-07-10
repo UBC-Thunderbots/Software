@@ -107,7 +107,7 @@ class StandaloneSimulator
 
     // This is a somewhat arbitrary value that results in slow motion
     // simulation looking appropriately / usefully slow
-    static constexpr double DEFAULT_SLOW_MOTION_MULTIPLIER = 8.0;
+    static constexpr double DEFAULT_SLOW_MOTION_MULTIPLIER = 14.0;
 
    private:
     /**

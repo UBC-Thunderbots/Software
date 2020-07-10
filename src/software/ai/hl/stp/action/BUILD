@@ -51,6 +51,7 @@ cc_library(
         "//software/ai/evaluation:intercept",
         "//software/ai/evaluation:robot",
         "//software/ai/intent:move_intent",
+        "//software/ai/intent:stop_intent",
         "//software/geom",
         "//software/logger",
         "//software/new_geom/util:algorithms",

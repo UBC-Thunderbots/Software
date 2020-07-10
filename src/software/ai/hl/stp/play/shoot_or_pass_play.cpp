@@ -125,8 +125,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     {
         updatePassGenerator(pass_generator, world);
 
-//        LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
-//        LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
+        LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
+        LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
         yield({goalie_tactic, shoot_tactic, std::get<0>(cherry_pick_tactics),
                std::get<0>(crease_defender_tactics), std::get<1>(cherry_pick_tactics),
@@ -161,7 +161,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         }
     } while (!ready_to_pass || shoot_tactic->hasShotAvailable());
 
-    return;
     // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
     //                    to save CPU cycles
 

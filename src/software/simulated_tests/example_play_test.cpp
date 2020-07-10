@@ -58,9 +58,9 @@ TEST_F(ExamplePlayTest, test_example_play)
 TEST_F(ExamplePlayTest, test_ball_interception)
 {
     enableVisualizer();
-    setBallState(BallState(Point(3, 0.2), Vector(-0.2, 0)));
+    setBallState(BallState(Point(2, 0.2), Vector(-0.0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-            {Point(-4.5, 0), Point(3.5, -2)}));
+            {Point(-4.5, 0), Point(-2.5, -2)}));
     // Set the goalie ID to that of a non-existent robot so that all robots
     // take on non-goalie roles
     setFriendlyGoalie(0);
