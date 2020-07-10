@@ -213,7 +213,7 @@ class Simulator
         ConstPrimitiveVectorPtr primitives,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
-        const std::shared_ptr<SimulatorBall>& simulator_ball);
+        const std::shared_ptr<SimulatorBall>& simulator_ball, bool invert);
 
     /**
      * Sets the primitive being simulated by the robot in simulation
@@ -227,7 +227,7 @@ class Simulator
         RobotId id, const PrimitiveMsg& primitive_msg,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
-        const std::shared_ptr<SimulatorBall>& simulator_ball);
+        const std::shared_ptr<SimulatorBall>& simulator_ball, bool invert);
 
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;

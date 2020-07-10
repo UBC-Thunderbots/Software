@@ -12,13 +12,16 @@ void app_stop_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
 
     void (*wheel_op)(const Wheel_t* wheel);
 
-    if (params.extra_bits)
+    if (!params.extra_bits)
     {
         wheel_op = app_wheel_brake;
     }
     else
     {
         wheel_op = app_wheel_coast;
+        Dribbler_t* dribbler =
+            app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
+        app_dribbler_coast(dribbler);
     }
 
     wheel_op(app_firmware_robot_getFrontLeftWheel(robot));
@@ -26,12 +29,9 @@ void app_stop_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
     wheel_op(app_firmware_robot_getBackLeftWheel(robot));
     wheel_op(app_firmware_robot_getBackRightWheel(robot));
 
-    if (!params.extra_bits)
-    {
-        Dribbler_t* dribbler =
+    Dribbler_t* dribbler =
             app_firmware_robot_getDribbler(app_firmware_world_getRobot(world));
-        app_dribbler_coast(dribbler);
-    }
+    app_dribbler_setSpeed(dribbler, 10000);
 }
 
 static void stop_end(void* void_state_ptr, FirmwareWorld_t* world) {}

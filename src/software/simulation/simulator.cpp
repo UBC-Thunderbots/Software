@@ -73,19 +73,19 @@ void Simulator::updateSimulatorRobots(
 
 void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball);
+    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball, false);
 }
 
 void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball);
+    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball, true);
 }
 
 void Simulator::setRobotPrimitives(
     ConstPrimitiveVectorPtr primitives,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball)
+    const std::shared_ptr<SimulatorBall>& simulator_ball, bool invert)
 {
     if (!primitives)
     {
@@ -97,25 +97,25 @@ void Simulator::setRobotPrimitives(
         PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
 
         setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
-                          simulator_ball);
+                          simulator_ball, invert);
     }
 }
 
 void Simulator::setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball);
+    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball, false);
 }
 
 void Simulator::setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball);
+    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball, true);
 }
 
 void Simulator::setRobotPrimitive(
     RobotId id, const PrimitiveMsg& primitive_msg,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball)
+    const std::shared_ptr<SimulatorBall>& simulator_ball, bool invert)
 {
     SimulatorBallSingleton::setSimulatorBall(simulator_ball);
     auto simulator_robots_iter =
@@ -128,7 +128,7 @@ void Simulator::setRobotPrimitive(
     {
         auto simulator_robot = (*simulator_robots_iter).first;
         auto firmware_world  = (*simulator_robots_iter).second;
-        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, invert);
         SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(firmware_world,
                                                                           primitive_msg);
     }

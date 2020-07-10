@@ -19,10 +19,12 @@ extern "C"
 #define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
 
 std::shared_ptr<SimulatorRobot> SimulatorRobotSingleton::simulator_robot = nullptr;
+bool SimulatorRobotSingleton::invert_ = false;
 
-void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot)
+void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot, bool invert)
 {
     simulator_robot = robot;
+    invert_ = invert;
 }
 
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
@@ -155,31 +157,48 @@ unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(
 
 float SimulatorRobotSingleton::getPositionX()
 {
+    if(invert_) {
+        return checkValidAndReturnFloat([](auto robot) { return -robot->getPositionX(); });
+    }
     return checkValidAndReturnFloat([](auto robot) { return robot->getPositionX(); });
 }
 
 float SimulatorRobotSingleton::getPositionY()
 {
+    if(invert_) {
+        return checkValidAndReturnFloat([](auto robot) { return -robot->getPositionY(); });
+    }
     return checkValidAndReturnFloat([](auto robot) { return robot->getPositionY(); });
 }
 
 float SimulatorRobotSingleton::getOrientation()
 {
+    if(invert_) {
+        return checkValidAndReturnFloat([](auto robot) { return robot->getOrientation() + M_PI; });
+    }
     return checkValidAndReturnFloat([](auto robot) { return robot->getOrientation(); });
 }
 
 float SimulatorRobotSingleton::getVelocityX()
 {
+    if(invert_) {
+        return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityX(); });
+    }
     return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityX(); });
 }
 
 float SimulatorRobotSingleton::getVelocityY()
 {
+    if(invert_) {
+        return checkValidAndReturnFloat([](auto robot) { return -robot->getVelocityY(); });
+    }
     return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityY(); });
 }
 
 float SimulatorRobotSingleton::getVelocityAngular()
 {
+//    if(invert_) {
+//    }
     return checkValidAndReturnFloat(
         [](auto robot) { return robot->getVelocityAngular(); });
 }

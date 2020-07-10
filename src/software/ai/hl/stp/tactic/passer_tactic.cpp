@@ -76,7 +76,6 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     auto kick_action = std::make_shared<KickAction>();
     do
     {
-
         LOG(INFO) << "Passer passing";
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot

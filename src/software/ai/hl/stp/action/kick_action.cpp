@@ -116,7 +116,7 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, kick_direction,
                                            0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-                                           AutokickType::NONE, BallCollisionType::ALLOW));
+                                           AutokickType::NONE, BallCollisionType::AVOID));
     }
     else
     {
