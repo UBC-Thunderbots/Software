@@ -64,7 +64,7 @@ class Segment final
     /**
      * Makes a Vector out of this Segment
      *
-     * @return vector of segment
+     * @return vector representation of the segment
      */
     Vector toVector() const;
 
