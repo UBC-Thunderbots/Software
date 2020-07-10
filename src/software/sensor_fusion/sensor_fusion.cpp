@@ -205,6 +205,8 @@ void SensorFusion::updateBall(TimestampedBallState new_ball_state)
     {
         ball = Ball(new_ball_state);
     }
+
+    game_state.updateBall(*ball);
 }
 
 std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(
