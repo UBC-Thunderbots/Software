@@ -77,7 +77,7 @@ TEST(GeomUtilTest, test_closest_lineseg_start_point)
 {
     Segment seg(Point{-1, 1}, Point{1, 1});
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSegment(Point(-2, 1.5), seg),
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPointOnSegment(seg, Point(-2, 1.5)),
                                                Point(-1, 1), 0.00001));
 }
 

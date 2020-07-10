@@ -7,6 +7,8 @@ class Segment final
    public:
     /**
      * Creates a Segment that starts and ends at the given points
+     *
+     * @throws std::invalid_argument if the start and end points are equal
      */
     Segment(const Point& start, const Point& end);
 
