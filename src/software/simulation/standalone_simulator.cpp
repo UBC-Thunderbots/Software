@@ -31,7 +31,7 @@ StandaloneSimulator::StandaloneSimulator(
             this->wrapper_packet_sender->sendProto(wrapper_packet);
         });
 
-    simulator.setBallState(BallState(Point(0, 0), Vector(5, 2)));
+    simulator.setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
     simulator.startSimulation();
 }
