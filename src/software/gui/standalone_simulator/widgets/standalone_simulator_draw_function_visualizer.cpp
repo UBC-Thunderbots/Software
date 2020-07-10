@@ -8,27 +8,22 @@ StandaloneSimulatorDrawFunctionVisualizer::StandaloneSimulatorDrawFunctionVisual
 {
 }
 
-void StandaloneSimulatorDrawFunctionVisualizer::registerBallPlacementCallback(
-    const std::function<void(Point)>& callback)
-{
-    ball_placement_callbacks.emplace_back(callback);
+void StandaloneSimulatorDrawFunctionVisualizer::setStandaloneSimulator(std::shared_ptr<StandaloneSimulator> simulator) {
+    standalone_simulator = simulator;
 }
 
 void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* event)
 {
     // If Ctrl is pressed, place the ball where the user clicks
-    if (event->modifiers() & Qt::ControlModifier)
+    if (event->modifiers() & Qt::ControlModifier && standalone_simulator)
     {
         Point point_in_scene = createPoint(mapToScene(event->pos()));
-        for (const auto& callback : ball_placement_callbacks)
-        {
-            callback(point_in_scene);
-        }
+        standalone_simulator->setBallState(BallState(point_in_scene, Vector(0, 0)));
     }
-    else if (event->modifiers() & Qt::ShiftModifier && get_robot_at_position_func)
+    else if (event->modifiers() & Qt::ShiftModifier && standalone_simulator)
     {
         Point point_in_scene = createPoint(mapToScene(event->pos()));
-        robot                = get_robot_at_position_func(point_in_scene);
+        robot                = standalone_simulator->getRobotAtPosition(point_in_scene);
     }
     else
     {
@@ -44,16 +39,11 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseReleaseEvent(QMouseEvent* e
 
 void StandaloneSimulatorDrawFunctionVisualizer::mouseMoveEvent(QMouseEvent* event)
 {
-    if (auto physics_robot = robot.lock())
+    auto physics_robot = robot.lock();
+    if (physics_robot && standalone_simulator)
     {
         Point point_in_scene = createPoint(mapToScene(event->pos()));
         physics_robot->setPosition(point_in_scene);
     }
     DrawFunctionVisualizer::mouseMoveEvent(event);
-}
-
-void StandaloneSimulatorDrawFunctionVisualizer::setGetRobotAtPositionFunc(
-    const std::function<std::weak_ptr<PhysicsRobot>(Point)>& func)
-{
-    this->get_robot_at_position_func = func;
 }

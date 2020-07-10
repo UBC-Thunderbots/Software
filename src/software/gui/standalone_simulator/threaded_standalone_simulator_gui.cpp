@@ -1,28 +1,21 @@
 #include "software/gui/standalone_simulator/threaded_standalone_simulator_gui.h"
 
-#include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
+#include <QtCore/QGenericArgument>
 
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
-#include "software/proto/message_translation/ssl_geometry.h"
 
-ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(
-    const std::function<void(Point)>& ball_placement_callback,
-    const std::function<void(StandaloneSimulator::SimulationMode)>&
-        simulation_mode_callback,
-    const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func)
-    : ThreadedObserver<SSL_WrapperPacket>(),
-      termination_promise_ptr(std::make_shared<std::promise<void>>()),
-      ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
-          SSL_WRAPPER_PACKET_BUFFER_SIZE, false)),
-      view_area_buffer(
-          std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
-      application_shutting_down(false),
-      remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
+ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(std::shared_ptr<StandaloneSimulator> simulator)
+    : termination_promise_ptr(std::make_shared<std::promise<void>>()),
+      application_shutting_down(false)
 {
+    if(!simulator) {
+        throw std::invalid_argument("Cannot create ThreadedStandaloneSimulatorGUI without a valid StandaloneSimulator");
+    }
+
     run_standalone_simulator_gui_thread = std::thread(
         &ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI, this,
-        ball_placement_callback, simulation_mode_callback, get_robot_at_position_func);
+        simulator);
 }
 
 ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
@@ -39,12 +32,12 @@ ThreadedStandaloneSimulatorGUI::~ThreadedStandaloneSimulatorGUI()
     run_standalone_simulator_gui_thread.join();
 }
 
-void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(
-    const std::function<void(Point)>& ball_placement_callback,
-    const std::function<void(StandaloneSimulator::SimulationMode)>&
-        simulation_mode_callback,
-    const std::function<std::weak_ptr<PhysicsRobot>(Point)>& get_robot_at_position_func)
+void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(std::shared_ptr<StandaloneSimulator> simulator)
 {
+    if(!simulator) {
+        throw std::invalid_argument("Cannot start a new StandaloneSimulatorGUI thread without a valid StandaloneSimulator");
+    }
+
     // We mock empty argc and argv since they don't affect the behaviour of the GUI.
     // This way we don't need to pass them all the way down from the start of the
     // program
@@ -58,9 +51,7 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
     StandaloneSimulatorGUI* standalone_simulator_gui = new StandaloneSimulatorGUI(
-        ssl_wrapper_packet_buffer, view_area_buffer, get_robot_at_position_func);
-    standalone_simulator_gui->registerBallPlacementCallback(ball_placement_callback);
-    standalone_simulator_gui->registerSimulationModeCallback(simulation_mode_callback);
+        simulator);
     standalone_simulator_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -77,24 +68,6 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(
     // Let the system know the gui has shut down once the application has
     // stopped running
     termination_promise_ptr->set_value();
-}
-
-void ThreadedStandaloneSimulatorGUI::onValueReceived(SSL_WrapperPacket wrapper_packet)
-{
-    ssl_wrapper_packet_buffer->push(wrapper_packet);
-
-    if (remaining_attempts_to_set_view_area > 0)
-    {
-        if (wrapper_packet.has_geometry())
-        {
-            auto field = createField(wrapper_packet.geometry());
-            if (field)
-            {
-                remaining_attempts_to_set_view_area--;
-                view_area_buffer->push(field->fieldBoundary());
-            }
-        }
-    }
 }
 
 std::shared_ptr<std::promise<void>>

@@ -51,6 +51,8 @@ class StandaloneSimulator
      */
     void setupInitialSimulationState();
 
+    const SSL_WrapperPacket& getSSLWrapperPacket() const;
+
     /**
      * Starts the simulation. If the simulator is already running, this
      * function does nothing.
@@ -127,4 +129,6 @@ class StandaloneSimulator
     std::unique_ptr<ThreadedProtoMulticastSender<SSL_WrapperPacket>>
         wrapper_packet_sender;
     ThreadedSimulator simulator;
+
+    SSL_WrapperPacket most_recent_ssl_wrapper_packet;
 };
