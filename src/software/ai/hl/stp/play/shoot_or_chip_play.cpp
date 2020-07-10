@@ -28,8 +28,11 @@ std::string ShootOrChipPlay::getName() const
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isPlaying() &&
-           teamHasPossession(world, world.friendlyTeam());
+    // TODO: figure out whether or not ShootOrChip and ShootOrPass should be seperate
+    //       plays, or if we should combine them
+    return false;
+//    return world.gameState().isPlaying() &&
+//           teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
