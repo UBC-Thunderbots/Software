@@ -96,7 +96,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
         world.field().enemyCornerNeg() - neg_y_goalline_x_offset);
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>(true);
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -163,6 +163,11 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
+
+    // Restart the align to ball tactic, but now loop forever so that
+    // the robot holds position until it's ready to kick
+    align_to_ball_tactic =
+         std::make_shared<MoveTactic>(true);
 
     // Align the kicker to take the corner kick and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
