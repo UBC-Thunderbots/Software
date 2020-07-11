@@ -182,7 +182,7 @@ float SimulatorRobotSingleton::getOrientation()
 float SimulatorRobotSingleton::getVelocityX()
 {
     if(invert_) {
-        return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityX(); });
+        return checkValidAndReturnFloat([](auto robot) { return -robot->getVelocityX(); });
     }
     return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityX(); });
 }

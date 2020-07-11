@@ -117,7 +117,7 @@ void Simulator::setRobotPrimitive(
         simulator_robots,
     const std::shared_ptr<SimulatorBall>& simulator_ball, bool invert)
 {
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
+    SimulatorBallSingleton::setSimulatorBall(simulator_ball, invert);
     auto simulator_robots_iter =
         std::find_if(simulator_robots.begin(), simulator_robots.end(),
                      [id](const auto& robot_world_pair) {
@@ -139,24 +139,26 @@ void Simulator::stepSimulation(const Duration& time_step)
     // Set the ball being referenced in each firmware_world.
     // We only need to do this a single time since all robots
     // can see and interact with the same ball
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
+
 
     Duration remaining_time = time_step;
     while (remaining_time > Duration::fromSeconds(0))
     {
-        for (auto& iter : yellow_simulator_robots)
-        {
-            auto simulator_robot = iter.first;
-            auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
-        }
-
         for (auto& iter : blue_simulator_robots)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, true);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball, true);
+            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
+        }
+
+        for (auto& iter : yellow_simulator_robots)
+        {
+            auto simulator_robot = iter.first;
+            auto firmware_world  = iter.second;
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, false);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball, false);
             SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
         }
 

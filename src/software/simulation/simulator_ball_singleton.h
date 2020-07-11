@@ -47,7 +47,7 @@ class SimulatorBallSingleton
      *
      * @param ball The SimulatorBall to control with this class. Must not be null
      */
-    static void setSimulatorBall(std::shared_ptr<SimulatorBall> ball);
+    static void setSimulatorBall(std::shared_ptr<SimulatorBall> ball, bool invert);
 
     /**
      * Creates a FirmwareBall_t with functions bound to the static functions in this
@@ -101,4 +101,5 @@ class SimulatorBallSingleton
 
     // The simulator ball being controlled by this class
     static std::shared_ptr<SimulatorBall> simulator_ball;
+    static bool invert_;
 };

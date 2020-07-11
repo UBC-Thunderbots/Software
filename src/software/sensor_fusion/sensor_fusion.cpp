@@ -143,6 +143,8 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     // https://github.com/UBC-Thunderbots/Software/issues/960
     bool friendly_team_is_yellow = sensor_fusion_config->FriendlyColorYellow()->value();
 
+    const bool should_invert_field = !friendly_team_is_yellow;
+
     std::optional<TimestampedBallState> new_ball_state;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
                                                 max_valid_x, ignore_invalid_camera_data);
@@ -153,21 +155,21 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
         createTeamDetection({ssl_detection_frame}, TeamColour::BLUE, min_valid_x,
                             max_valid_x, ignore_invalid_camera_data);
 
-//    if (should_invert_field)
-//    {
-//        for (auto &detection : ball_detections)
-//        {
-//            detection = invert(detection);
-//        }
-//        for (auto &detection : yellow_team)
-//        {
-//            detection = invert(detection);
-//        }
-//        for (auto &detection : blue_team)
-//        {
-//            detection = invert(detection);
-//        }
-//    }
+    if (should_invert_field)
+    {
+        for (auto &detection : ball_detections)
+        {
+            detection = invert(detection);
+        }
+        for (auto &detection : yellow_team)
+        {
+            detection = invert(detection);
+        }
+        for (auto &detection : blue_team)
+        {
+            detection = invert(detection);
+        }
+    }
 
     new_ball_state = createTimestampedBallState(ball_detections);
     if (friendly_team_is_yellow)
