@@ -59,6 +59,7 @@ cc_library(
         "//software/time:timestamp",
         "//software/world:ball_state",
         "//software/world:robot_state",
+        "//software/world:team_types",
     ],
 )
 
@@ -100,7 +101,7 @@ cc_library(
         "//software/new_geom:point",
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion:refbox_data",
-        "//software/world:team_colour",
+        "//software/world:team_types",
     ],
 )
 

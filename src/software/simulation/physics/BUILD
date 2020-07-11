@@ -149,6 +149,7 @@ cc_library(
         "//software/world",
         "//software/world:ball_state",
         "//software/world:robot_state",
+        "//software/world:team_types",
         "@box2d",
     ],
 )

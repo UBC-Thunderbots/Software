@@ -110,8 +110,8 @@ cc_test(
 )
 
 cc_library(
-    name = "team_colour",
-    hdrs = ["team_colour.h"],
+    name = "team_types",
+    hdrs = ["team_types.h"],
     deps = ["//software/util/make_enum"],
 )
 
@@ -167,7 +167,7 @@ cc_library(
     srcs = ["robot_state.cpp"],
     hdrs = ["robot_state.h"],
     deps = [
-        "team_colour",
+        "team_types",
         "//shared:constants",
         "//software/new_geom:angle",
         "//software/new_geom:angular_velocity",

@@ -3,7 +3,7 @@
 #include "software/new_geom/point.h"
 #include "software/proto/ssl_referee.pb.h"
 #include "software/sensor_fusion/refbox_data.h"
-#include "software/world/team_colour.h"
+#include "software/world/team_types.h"
 
 /**
  * Converts a SSL_Referee packet into a RefboxGameState for the Refbox command contained

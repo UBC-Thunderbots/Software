@@ -15,6 +15,7 @@
 std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
                                                          const Ball &ball,
                                                          const Field &field);
+
 /**
  * Return true if the provided team has possession of the ball. A team is considered
  * to have possession if any robot on the team has had possession within the last
@@ -26,6 +27,7 @@ std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
  * @return True if the team has possession, false otherwise
  */
 bool teamHasPossession(const World &world, const Team &team);
+
 /**
  * Returns true if the provided team has a robot that is being passed to or has been
  * passed to within the past `possession_buffer_time` seconds.

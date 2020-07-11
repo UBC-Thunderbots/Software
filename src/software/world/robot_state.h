@@ -5,7 +5,6 @@
 #include "software/new_geom/angular_velocity.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
-#include "software/world/team_colour.h"
 
 using RobotId = unsigned int;
 

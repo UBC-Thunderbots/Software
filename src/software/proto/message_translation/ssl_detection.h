@@ -8,6 +8,7 @@
 #include "software/time/timestamp.h"
 #include "software/world/ball_state.h"
 #include "software/world/robot_state.h"
+#include "software/world/team_types.h"
 
 /**
  * Creates a DetectionBall from the given BallState.
