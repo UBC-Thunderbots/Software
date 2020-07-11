@@ -34,7 +34,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play)
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(30))
             {
                 yield();
             }
@@ -43,5 +43,5 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play)
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(30));
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/intent/catch_intent.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/direct_velocity_intent.h"
 #include "software/ai/intent/direct_wheels_intent.h"

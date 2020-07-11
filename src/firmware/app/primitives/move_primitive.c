@@ -66,8 +66,8 @@ void plan_move_rotation(PhysBot* pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void move_start(const primitive_params_t* params, void* void_state_ptr,
-                FirmwareWorld_t* world)
+void app_move_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+                              FirmwareWorld_t* world)
 {
     MovePrimitiveState_t* state = (MovePrimitiveState_t*)void_state_ptr;
     // Parameters:     destination_x [mm]
@@ -78,11 +78,11 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
     // TODO: units on variables!
 
     // Convert into m/s and rad/s because physics is in m and s
-    const float destination_x           = (float)(params->params[0]) / 1000.0f;
-    const float destination_y           = (float)(params->params[1]) / 1000.0f;
-    const float destination_orientation = (float)(params->params[2]) / 100.0f;
-    const float speed_at_dest_m_per_s   = (float)(params->params[3]) / 1000.0f;
-    state->move_slow                    = params->slow;
+    const float destination_x           = params.parameter1 / 1000.0f;
+    const float destination_y           = params.parameter2 / 1000.0f;
+    const float destination_orientation = params.parameter3 / 100.0f;
+    const float speed_at_dest_m_per_s   = params.parameter4 / 1000.0f;
+    state->move_slow                    = params.slow;
 
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
@@ -98,18 +98,19 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
         .path = {.x = {.coefficients = {0, 0, destination_x - current_x, current_x}},
                  .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
         .orientation_profile = {.coefficients = {0, 0,
-                                                 fmodf( destination_orientation -
-                                                     current_orientation, (float)M_PI),
-                                                     current_orientation}},
+                                                 fmodf(destination_orientation -
+                                                           current_orientation,
+                                                       (float)M_PI),
+                                                 current_orientation}},
         .t_start             = 0,
         .t_end               = 1,
         .num_elements        = 10,
         .max_allowable_linear_acceleration =
-            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED/2.0f,
-        .max_allowable_linear_speed = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND/2.0f,
+            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f,
+        .max_allowable_linear_speed = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND / 2.0f,
         .max_allowable_angular_acceleration =
-            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED/2.0f,
-        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND/2.0f,
+            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED / 2.0f,
+        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND / 2.0f,
         .initial_linear_speed        = current_speed,
         .final_linear_speed          = speed_at_dest_m_per_s};
     //    TrajectoryPlannerGenerationStatus_t status =
@@ -144,11 +145,11 @@ void move_start(const primitive_params_t* params, void* void_state_ptr,
     Chicker_t* chicker   = app_firmware_robot_getChicker(robot);
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
 
-    if (params->extra & 0x01)
+    if (params.extra_bits & 0x01)
         app_chicker_enableAutokick(chicker, (float)BALL_MAX_SPEED_METERS_PER_SECOND - 1);
-    if (params->extra & 0x02)
+    if (params.extra_bits & 0x02)
         app_dribbler_setSpeed(dribbler, 16000);
-    if (params->extra & 0x04)
+    if (params.extra_bits & 0x04)
         app_chicker_enableAutochip(chicker, 2);
 }
 
@@ -174,15 +175,16 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
     size_t trajectory_index  = 1;
     const float current_time = app_firmware_world_getCurrentTime(world);
     while (trajectory_index < state->num_trajectory_elems - 1 &&
-           state->position_trajectory.time_profile[trajectory_index-1] < current_time)
+           state->position_trajectory.time_profile[trajectory_index - 1] < current_time)
     {
         trajectory_index++;
     }
 
     const float dest_x = state->position_trajectory.x_position[trajectory_index];
     const float dest_y = state->position_trajectory.y_position[trajectory_index];
-    const float dest_orientation = state->position_trajectory.orientation[trajectory_index];
-    float dest[3]      = {dest_x, dest_y, dest_orientation};
+    const float dest_orientation =
+        state->position_trajectory.orientation[trajectory_index];
+    float dest[3] = {dest_x, dest_y, dest_orientation};
 
     const float curr_x = app_firmware_robot_getPositionX(robot);
     const float curr_y = app_firmware_robot_getPositionY(robot);
@@ -236,7 +238,6 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * The move movement primitive.
  */
 const primitive_t MOVE_PRIMITIVE = {.direct        = false,
-                                    .start         = &move_start,
                                     .end           = &move_end,
                                     .tick          = &move_tick,
                                     .create_state  = &createMovePrimitiveState_t,

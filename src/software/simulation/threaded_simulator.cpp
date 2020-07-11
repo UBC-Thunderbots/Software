@@ -108,18 +108,18 @@ void ThreadedSimulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitive
     simulator.setBlueRobotPrimitives(primitives);
 }
 
-void ThreadedSimulator::setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                                const primitive_params_t &params)
+void ThreadedSimulator::setYellowRobotPrimitive(RobotId id,
+                                                const PrimitiveMsg &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);
-    simulator.setYellowRobotPrimitive(id, primitive_index, params);
+    simulator.setYellowRobotPrimitive(id, primitive_msg);
 }
 
-void ThreadedSimulator::setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                              const primitive_params_t &params)
+void ThreadedSimulator::setBlueRobotPrimitive(RobotId id,
+                                              const PrimitiveMsg &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);
-    simulator.setBlueRobotPrimitive(id, primitive_index, params);
+    simulator.setBlueRobotPrimitive(id, primitive_msg);
 }
 
 void ThreadedSimulator::runSimulationLoop()
