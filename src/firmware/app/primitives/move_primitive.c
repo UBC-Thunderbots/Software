@@ -128,20 +128,6 @@ void app_move_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
     //       the time that we actually start _executing_ the trajectory
     state->primitive_start_time_seconds = app_firmware_world_getCurrentTime(world);
 
-    //    float dx = state->destination[0] - app_firmware_robot_getPositionX(robot);
-    //    float dy = state->destination[1] - app_firmware_robot_getPositionY(robot);
-    //    // Add a small number to avoid division by zero
-    //    float total_disp    = sqrtf(dx * dx + dy * dy) + 1e-6f;
-    //    state->major_vec[0] = dx / total_disp;
-    //    state->major_vec[1] = dy / total_disp;
-    //    state->minor_vec[0] = state->major_vec[0];
-    //    state->minor_vec[1] = state->major_vec[1];
-    //    rotate(state->minor_vec, P_PI / 2);
-    //
-    //    // pick the wheel axis that will be used for faster movement
-    //    state->optimal_wheel_axes_index = choose_wheel_axis(
-    //        dx, dy, app_firmware_robot_getOrientation(robot), state->destination[2]);
-
     Chicker_t* chicker   = app_firmware_robot_getChicker(robot);
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
 
@@ -198,11 +184,6 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
     float major_vec[2] = {dx / total_disp, dy / total_disp};
     float minor_vec[2] = {major_vec[0], major_vec[1]};
     rotate(minor_vec, P_PI / 2);
-
-    // TODO: should we be using this? If not we can nuke all the wheel axis stuff
-    //    // pick the wheel axis that will be used for faster movement
-    //    unsigned int optimal_wheel_axes_index =
-    //        choose_wheel_axis(dx, dy, curr_orientation, dest_orientation);
 
     PhysBot pb = app_physbot_create(robot, dest, major_vec, minor_vec);
 
