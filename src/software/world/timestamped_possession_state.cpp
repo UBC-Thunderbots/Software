@@ -2,15 +2,18 @@
 
 
 TimestampedPossessionState::TimestampedPossessionState()
-    : last_possession_map_(std::map<RobotIdWithTeamSide, Timestamp>()),
-      timestamp_(Timestamp::fromSeconds(0.0))
+    : timestamp_(Timestamp::fromSeconds(0.0))
 {
 }
 
 void TimestampedPossessionState::updatePossessionState(
-    const std::vector<RobotIdWithTeamSide> &possessions, Timestamp update_time)
+    const std::set<RobotIdWithTeamSide> &possessions, Timestamp update_time)
 {
-    // TODO: update this properly
+    timestamp_ = update_time;
+    for (const auto &poss : possessions)
+    {
+        last_possession_map_[poss] = update_time;
+    }
 }
 
 Timestamp TimestampedPossessionState::timestamp() const
@@ -18,27 +21,30 @@ Timestamp TimestampedPossessionState::timestamp() const
     return timestamp_;
 }
 
-std::optional<RobotIdWithTeamSide>
-TimestampedPossessionState::getRobotWithMostRecentPossession() const
+std::set<RobotIdWithTeamSide> TimestampedPossessionState::getRobotsWithCurrentPossession()
+    const
 {
-    // TODO: calculate this properly
-    return std::nullopt;
+    return current_possessions_;
 }
 
 std::optional<TeamSide> TimestampedPossessionState::getTeamWithMostRecentPossession()
     const
 {
-    auto possession_robot = getRobotWithMostRecentPossession();
-    if (possession_robot)
+    auto possession_robots = getRobotsWithCurrentPossession();
+    if (possession_robots.size() == 1)
     {
-        return possession_robot->team_side;
+        return possession_robots.begin()->team_side;
     }
-    return std::nullopt;
+    else
+    {
+        return std::nullopt;
+    }
 }
 
 bool TimestampedPossessionState::operator==(const TimestampedPossessionState &other) const
 {
     return this->last_possession_map_ == other.last_possession_map_ &&
+           this->current_possessions_ == other.current_possessions_ &&
            this->timestamp_ == other.timestamp_;
 }
 

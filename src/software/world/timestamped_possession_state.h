@@ -2,6 +2,7 @@
 
 #include <map>
 #include <optional>
+#include <set>
 
 #include "software/time/timestamp.h"
 #include "software/world/robot_state.h"
@@ -19,6 +20,11 @@ struct RobotIdWithTeamSide
     {
         return id == other.id && team_side == other.team_side;
     }
+
+    bool operator<(const RobotIdWithTeamSide &other) const
+    {
+        return id < other.id && team_side < other.team_side;
+    }
 };
 
 class TimestampedPossessionState
@@ -35,7 +41,7 @@ class TimestampedPossessionState
      * @param possessions The robots that have possession of the ball at update_time
      * @param update_time The timestamp to update possession state
      */
-    void updatePossessionState(const std::vector<RobotIdWithTeamSide> &possessions,
+    void updatePossessionState(const std::set<RobotIdWithTeamSide> &possessions,
                                Timestamp update_time);
 
     /**
@@ -46,15 +52,17 @@ class TimestampedPossessionState
     Timestamp timestamp() const;
 
     /**
-     * Returns the Robot that most recently or currently has possession of the ball
+     * Returns the robots that currently have possession of the ball. Usually, this will
+     * be only one robot, but multiple robots could be fighting over the ball. If there
+     * isn't enough data or if no robots have possession, then returns an empty set
      *
-     * @return RobotIdWithTeamSide with possession or std::nullopt if it can't be
-     * determined
+     * @return RobotIdWithTeamSides with possession of the ball
      */
-    std::optional<RobotIdWithTeamSide> getRobotWithMostRecentPossession() const;
+    std::set<RobotIdWithTeamSide> getRobotsWithCurrentPossession() const;
 
     /**
-     * Returns the Team Side that most recently or currently has possession of the ball
+     * Returns the Team Side that most recently or currently has possession of the
+     * ball
      *
      * @return TeamSide with possession or std::nullopt if it can't be determined
      */
@@ -66,6 +74,7 @@ class TimestampedPossessionState
      * equal
      *
      * @param other The TimestampedPossessionState to compare against for equality
+     *
      * @return True if the other possession state is equal to this possession state, and
      * false otherwise
      */
@@ -75,6 +84,7 @@ class TimestampedPossessionState
      * The inequality operator for a TimestampedPossessionState.
      *
      * @param other The possession state to compare against for inequality
+     *
      * @return True if the other possession state is not equal to this possession state,
      * and false otherwise
      */
@@ -82,5 +92,6 @@ class TimestampedPossessionState
 
    private:
     std::map<RobotIdWithTeamSide, Timestamp> last_possession_map_;
+    std::set<RobotIdWithTeamSide> current_possessions_;
     Timestamp timestamp_;
 };
