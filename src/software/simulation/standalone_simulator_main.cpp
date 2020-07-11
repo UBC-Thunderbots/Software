@@ -75,8 +75,8 @@ int main(int argc, char **argv)
 
         auto standalone_simulator = std::make_shared<StandaloneSimulator>(
             MutableDynamicParameters->getMutableStandaloneSimulatorConfig());
-//        standalone_simulator->setupInitialSimulationState();
-        standalone_simulator->setupShortPassState();
+        standalone_simulator->setupInitialSimulationState();
+//        standalone_simulator->setupShortPassState();
 
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(
             standalone_simulator);
