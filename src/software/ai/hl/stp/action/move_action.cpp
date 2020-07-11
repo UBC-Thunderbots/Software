@@ -11,8 +11,7 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
       autokick_type(AutokickType::NONE),
       ball_collision_type(BallCollisionType::AVOID),
       close_to_dest_threshold(close_to_dest_threshold),
-      close_to_orientation_threshold(close_to_orientation_threshold),
-      loop_forever(loop_forever)
+      close_to_orientation_threshold(close_to_orientation_threshold)
 {
 }
 

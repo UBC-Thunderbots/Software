@@ -99,6 +99,4 @@ class MoveAction : public Action
 
     double close_to_dest_threshold;
     Angle close_to_orientation_threshold;
-
-    bool loop_forever;
 };
