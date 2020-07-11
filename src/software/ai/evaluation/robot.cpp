@@ -4,18 +4,6 @@
 #include "software/parameter/dynamic_parameters.h"
 
 
-bool robotOrientationWithinAngleThresholdOfTarget(const Point position,
-                                                  const Angle orientation,
-                                                  const Point target, Angle threshold)
-{
-    // Calculate the target orientation, then calculate the difference between facing
-    // orientation and target orientation. The difference in angle will be in the range of
-    // [0, pi]. Return true if the difference is smaller than threshold, false otherwise
-    Angle target_orientation = (target - position).orientation();
-    Angle diff_orientation   = orientation.minDiff(target_orientation);
-    return diff_orientation < threshold;
-}
-
 std::optional<bool> robotHasPossession(const BallHistory& ball_states,
                                        const RobotHistory& robot_states,
                                        std::optional<Timestamp> timestamp)

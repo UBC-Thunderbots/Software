@@ -88,7 +88,7 @@ class RobotState
  */
 struct RobotStateWithId
 {
-    unsigned int id;
+    RobotId id;
     RobotState robot_state;
 
     bool operator==(const RobotStateWithId &other) const

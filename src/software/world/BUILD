@@ -163,6 +163,26 @@ cc_test(
 )
 
 cc_library(
+    name = "timestamped_possession_state",
+    srcs = ["timestamped_possession_state.cpp"],
+    hdrs = ["timestamped_possession_state.h"],
+    deps = [
+        ":robot_state",
+        ":team_types",
+        "//software/time:timestamp",
+    ],
+)
+
+cc_test(
+    name = "timestamped_possession_state_test",
+    srcs = ["timestamped_possession_state_test.cpp"],
+    deps = [
+        ":timestamped_possession_state",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "robot_state",
     srcs = ["robot_state.cpp"],
     hdrs = ["robot_state.h"],
