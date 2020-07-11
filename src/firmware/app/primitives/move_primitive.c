@@ -106,11 +106,11 @@ void app_move_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
         .t_end               = 1,
         .num_elements        = 10,
         .max_allowable_linear_acceleration =
-            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f,
-        .max_allowable_linear_speed = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND / 2.0f,
+            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+        .max_allowable_linear_speed = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND,
         .max_allowable_angular_acceleration =
-            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED / 2.0f,
-        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND / 2.0f,
+            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
+        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
         .initial_linear_speed        = current_speed,
         .final_linear_speed          = speed_at_dest_m_per_s};
     //    TrajectoryPlannerGenerationStatus_t status =
