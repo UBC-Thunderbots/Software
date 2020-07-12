@@ -22,7 +22,7 @@ struct RobotIdWithTeamSide
 
     bool operator<(const RobotIdWithTeamSide &other) const
     {
-        return id < other.id && team_side < other.team_side;
+        return id < other.id || team_side < other.team_side;
     }
 };
 
@@ -67,6 +67,16 @@ class TimestampedPossessionState
      * @return TeamSide with possession or std::nullopt if it can't be determined
      */
     std::optional<TeamSide> getTeamWithPossession() const;
+
+    /**
+     * Returns the last time a robot had possession of the ball
+     *
+     * @param robot the robot to check
+     *
+     * @return last update time
+     */
+    std::optional<Timestamp> getLastPossessionTime(
+        const RobotIdWithTeamSide &robot) const;
 
     /**
      * The equality operator for a TimestampedPossessionState. TimestampedPossessionState

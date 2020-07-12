@@ -32,6 +32,7 @@ TEST(TimestampedPossessionStateTest, test_get_robots_with_possession_one_robot)
     EXPECT_EQ(std::vector<RobotIdWithTeamSide>(
                   {RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::FRIENDLY}}),
               timestamped_possession_state.getRobotsWithPossession());
+
     timestamped_possession_state.updateState(
         {RobotIdWithTeamSide{.id = 1, .team_side = TeamSide::ENEMY}},
         Timestamp::fromSeconds(1.2));
@@ -49,6 +50,7 @@ TEST(TimestampedPossessionStateTest, test_get_robots_with_possession_multiple_ro
     EXPECT_EQ(std::vector<RobotIdWithTeamSide>(
                   {RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::FRIENDLY}}),
               timestamped_possession_state.getRobotsWithPossession());
+
     timestamped_possession_state.updateState(
         {RobotIdWithTeamSide{.id = 1, .team_side = TeamSide::ENEMY},
          RobotIdWithTeamSide{.id = 2, .team_side = TeamSide::FRIENDLY}},
@@ -68,6 +70,7 @@ TEST(TimestampedPossessionStateTest, test_get_robots_with_possession_no_robots)
     EXPECT_EQ(std::vector<RobotIdWithTeamSide>(
                   {RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::FRIENDLY}}),
               timestamped_possession_state.getRobotsWithPossession());
+
     timestamped_possession_state.updateState({}, Timestamp::fromSeconds(1.2));
     EXPECT_EQ(std::vector<RobotIdWithTeamSide>({}),
               timestamped_possession_state.getRobotsWithPossession());
@@ -80,6 +83,7 @@ TEST(TimestampedPossessionStateTest, test_get_team_with_possession)
         {RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::FRIENDLY}},
         Timestamp::fromSeconds(1.0));
     EXPECT_EQ(TeamSide::FRIENDLY, timestamped_possession_state.getTeamWithPossession());
+
     timestamped_possession_state.updateState({}, Timestamp::fromSeconds(1.2));
     EXPECT_EQ(std::nullopt, timestamped_possession_state.getTeamWithPossession());
     timestamped_possession_state.updateState(
@@ -87,4 +91,29 @@ TEST(TimestampedPossessionStateTest, test_get_team_with_possession)
          RobotIdWithTeamSide{.id = 2, .team_side = TeamSide::FRIENDLY}},
         Timestamp::fromSeconds(3.2));
     EXPECT_EQ(std::nullopt, timestamped_possession_state.getTeamWithPossession());
+}
+
+TEST(TimestampedPossessionStateTest, test_get_last_possession_time)
+{
+    TimestampedPossessionState timestamped_possession_state;
+    timestamped_possession_state.updateState(
+        {RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::FRIENDLY}},
+        Timestamp::fromSeconds(1.0));
+    EXPECT_EQ(Timestamp::fromSeconds(1.0),
+              timestamped_possession_state.getLastPossessionTime(
+                  RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::FRIENDLY}));
+
+    timestamped_possession_state.updateState(
+        {RobotIdWithTeamSide{.id = 1, .team_side = TeamSide::ENEMY},
+         RobotIdWithTeamSide{.id = 2, .team_side = TeamSide::FRIENDLY}},
+        Timestamp::fromSeconds(3.2));
+    EXPECT_EQ(Timestamp::fromSeconds(1.0),
+              timestamped_possession_state.getLastPossessionTime(
+                  RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::FRIENDLY}));
+    EXPECT_EQ(Timestamp::fromSeconds(3.2),
+              timestamped_possession_state.getLastPossessionTime(
+                  RobotIdWithTeamSide{.id = 1, .team_side = TeamSide::ENEMY}));
+    EXPECT_EQ(Timestamp::fromSeconds(3.2),
+              timestamped_possession_state.getLastPossessionTime(
+                  RobotIdWithTeamSide{.id = 2, .team_side = TeamSide::FRIENDLY}));
 }

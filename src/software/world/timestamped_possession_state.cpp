@@ -44,6 +44,20 @@ std::optional<TeamSide> TimestampedPossessionState::getTeamWithPossession() cons
     }
 }
 
+std::optional<Timestamp> TimestampedPossessionState::getLastPossessionTime(
+    const RobotIdWithTeamSide &robot) const
+{
+    auto last_possession_it = last_possession_map_.find(robot);
+    if (last_possession_it == last_possession_map_.end())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return last_possession_it->second;
+    }
+}
+
 bool TimestampedPossessionState::operator==(const TimestampedPossessionState &other) const
 {
     return this->last_possession_map_ == other.last_possession_map_ &&
