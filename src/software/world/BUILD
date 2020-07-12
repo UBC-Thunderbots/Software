@@ -247,6 +247,7 @@ cc_library(
         ":game_state",
         ":robot",
         ":team",
+        ":timestamped_possession_state",
         "//software/parameter:dynamic_parameters",
     ],
 )

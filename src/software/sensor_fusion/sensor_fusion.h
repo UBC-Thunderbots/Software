@@ -11,8 +11,6 @@
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/sensor_fusion/refbox_data.h"
-#include "software/world/ball.h"
-#include "software/world/team.h"
 #include "software/world/world.h"
 
 /**
@@ -50,16 +48,35 @@ class SensorFusion
 
    private:
     /**
-     * Updates relevant components of world based on a new data
+     * Updates refbox_stage and game_state based on new data
      *
-     * @param new data
+     * @param packet new SSL_Referee proto
      */
-    void updateWorld(const SSL_WrapperPacket &packet);
-    void updateWorld(const SSL_Referee &packet);
-    void updateWorld(
+    void updateRefboxStageAndGameState(const SSL_Referee &packet);
+
+    /**
+     * Updates timestamped_possession_state based on new data
+     *
+     * @pre ball, friendly_team, and enemy_team was updated
+     *
+     * @param tbots_robot_msgs New list of TbotsRobotMsg
+     */
+    void updatePossessionState(
         const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
-    void updateWorld(const SSL_GeometryData &geometry_packet);
-    void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
+
+    /**
+     * Updates field based on new data
+     *
+     * @param geometry_packet The new SSL_GeometryData
+     */
+    void updateField(const SSL_GeometryData &geometry_packet);
+
+    /**
+     * Updates ball, friendly_team, and enemy_team based on new data
+     *
+     * @param ssl_detection_frame The new SSL_DetectionFrame
+     */
+    void updateBallAndTeams(const SSL_DetectionFrame &ssl_detection_frame);
 
     /**
      * Updates relevant components with a new ball state
@@ -104,6 +121,7 @@ class SensorFusion
     std::optional<Ball> ball;
     Team friendly_team;
     Team enemy_team;
+    TimestampedPossessionState timestamped_possession_state;
     GameState game_state;
     std::optional<RefboxStage> refbox_stage;
 

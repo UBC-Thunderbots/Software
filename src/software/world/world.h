@@ -8,7 +8,7 @@
 #include "software/world/field.h"
 #include "software/world/game_state.h"
 #include "software/world/team.h"
-#include "software/world/timestamped_ball_state.h"
+#include "software/world/timestamped_possession_state.h"
 
 /**
  * The world object describes the entire state of the world, which for us is all the

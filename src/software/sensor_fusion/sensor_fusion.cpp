@@ -1,5 +1,7 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include <algorithm>
+
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
@@ -9,6 +11,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       ball(std::nullopt),
       friendly_team(),
       enemy_team(),
+      timestamped_possession_state(),
       game_state(),
       refbox_stage(std::nullopt),
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
@@ -45,31 +48,26 @@ void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {
-        updateWorld(sensor_msg.ssl_vision_msg());
+        auto packet = sensor_msg.ssl_vision_msg();
+        if (packet.has_geometry())
+        {
+            updateField(packet.geometry());
+        }
+        if (packet.has_detection())
+        {
+            updateBallAndTeams(packet.detection());
+        }
     }
 
     if (sensor_msg.has_ssl_refbox_msg())
     {
-        updateWorld(sensor_msg.ssl_refbox_msg());
+        updateRefboxStageAndGameState(sensor_msg.ssl_refbox_msg());
     }
 
-    updateWorld(sensor_msg.tbots_robot_msgs());
+    updatePossessionState(sensor_msg.tbots_robot_msgs());
 }
 
-void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
-{
-    if (packet.has_geometry())
-    {
-        updateWorld(packet.geometry());
-    }
-
-    if (packet.has_detection())
-    {
-        updateWorld(packet.detection());
-    }
-}
-
-void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
+void SensorFusion::updateField(const SSL_GeometryData &geometry_packet)
 {
     field = createField(geometry_packet);
     if (!field)
@@ -80,7 +78,7 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
     }
 }
 
-void SensorFusion::updateWorld(const SSL_Referee &packet)
+void SensorFusion::updateRefboxStageAndGameState(const SSL_Referee &packet)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
@@ -112,13 +110,27 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
     refbox_stage = createRefboxStage(packet);
 }
 
-void SensorFusion::updateWorld(
+void SensorFusion::updatePossessionState(
     const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs)
 {
-    // TODO (issue #1149): incorporate TbotsRobotMsg into world and update world
+    std::vector<RobotId> friendly_robots_with_breakbeam_triggered;
+    for (const auto &tbots_robot_msg : tbots_robot_msgs)
+    {
+        if (tbots_robot_msg.has_break_beam_status())
+        {
+            friendly_robots_with_breakbeam_triggered.push_back(
+                tbots_robot_msg.robot_id());
+        }
+    }
+
+    Timestamp most_recent_timestamp = std::max<Timestamp>(
+        {friendly_team.getMostRecentTimestamp(), enemy_team.getMostRecentTimestamp()});
+    // TODO: uncomment this
+    // timestamped_possession_state.updateState(possession_filter.getFilteredData(friendly_robots_with_breakbeam_triggered,
+    // ) , most_recent_timestamp);
 }
 
-void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
+void SensorFusion::updateBallAndTeams(const SSL_DetectionFrame &ssl_detection_frame)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
