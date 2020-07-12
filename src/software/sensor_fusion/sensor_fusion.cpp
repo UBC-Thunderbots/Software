@@ -5,22 +5,22 @@
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
-    : sensor_fusion_config(sensor_fusion_config),
-      history_size(20),
-      field(std::nullopt),
-      ball(std::nullopt),
-      friendly_team(),
-      enemy_team(),
-      timestamped_possession_state(),
-      game_state(),
-      refbox_stage(std::nullopt),
-      ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
-                  BallFilter::DEFAULT_MAX_BUFFER_SIZE),
-      friendly_team_filter(),
-      enemy_team_filter(),
-      ball_states(history_size)
+    : sensor_fusion_config_(sensor_fusion_config),
+      history_size_(20),
+      field_(std::nullopt),
+      ball_(std::nullopt),
+      friendly_team_(),
+      enemy_team_(),
+      timestamped_possession_state_(),
+      game_state_(),
+      refbox_stage_(std::nullopt),
+      ball_filter_(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
+                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
+      friendly_team_filter_(),
+      enemy_team_filter_(),
+      ball_states_(history_size_)
 {
-    if (!sensor_fusion_config)
+    if (!sensor_fusion_config_)
     {
         throw std::invalid_argument("SensorFusion created with null SensorFusionConfig");
     }
@@ -28,13 +28,13 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
 
 std::optional<World> SensorFusion::getWorld() const
 {
-    if (field && ball)
+    if (field_ && ball_)
     {
-        World new_world(*field, *ball, friendly_team, enemy_team);
-        new_world.mutableGameState() = game_state;
-        if (refbox_stage)
+        World new_world(*field_, *ball_, friendly_team_, enemy_team_);
+        new_world.mutableGameState() = game_state_;
+        if (refbox_stage_)
         {
-            new_world.updateRefboxStage(*refbox_stage);
+            new_world.updateRefboxStage(*refbox_stage_);
         }
         return new_world;
     }
@@ -64,13 +64,16 @@ void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
         updateRefboxStageAndGameState(sensor_msg.ssl_refbox_msg());
     }
 
-    updatePossessionState(sensor_msg.tbots_robot_msgs());
+    if (ball_)
+    {
+        updatePossessionState(sensor_msg.tbots_robot_msgs());
+    }
 }
 
 void SensorFusion::updateField(const SSL_GeometryData &geometry_packet)
 {
-    field = createField(geometry_packet);
-    if (!field)
+    field_ = createField(geometry_packet);
+    if (!field_)
     {
         LOG(WARNING)
             << "Invalid field packet has been detected, which means field may be unreliable "
@@ -82,22 +85,23 @@ void SensorFusion::updateRefboxStageAndGameState(const SSL_Referee &packet)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    if (sensor_fusion_config->FriendlyColorYellow()->value())
+    if (sensor_fusion_config_->FriendlyColorYellow()->value())
     {
-        game_state.updateRefboxGameState(
+        game_state_.updateRefboxGameState(
             createRefboxGameState(packet, TeamColour::YELLOW));
     }
     else
     {
-        game_state.updateRefboxGameState(createRefboxGameState(packet, TeamColour::BLUE));
+        game_state_.updateRefboxGameState(
+            createRefboxGameState(packet, TeamColour::BLUE));
     }
 
-    if (game_state.isOurBallPlacement())
+    if (game_state_.isOurBallPlacement())
     {
         auto pt = getBallPlacementPoint(packet);
         if (pt)
         {
-            game_state.setBallPlacementPoint(*pt);
+            game_state_.setBallPlacementPoint(*pt);
         }
         else
         {
@@ -107,52 +111,57 @@ void SensorFusion::updateRefboxStageAndGameState(const SSL_Referee &packet)
         }
     }
 
-    refbox_stage = createRefboxStage(packet);
+    refbox_stage_ = createRefboxStage(packet);
 }
 
 void SensorFusion::updatePossessionState(
     const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs)
 {
-    std::vector<RobotId> friendly_robots_with_breakbeam_triggered;
-    for (const auto &tbots_robot_msg : tbots_robot_msgs)
+    if (ball_)
     {
-        if (tbots_robot_msg.has_break_beam_status())
+        std::vector<RobotId> friendly_robots_with_breakbeam_triggered;
+        for (const auto &tbots_robot_msg : tbots_robot_msgs)
         {
-            friendly_robots_with_breakbeam_triggered.push_back(
-                tbots_robot_msg.robot_id());
+            if (tbots_robot_msg.has_break_beam_status())
+            {
+                friendly_robots_with_breakbeam_triggered.push_back(
+                    tbots_robot_msg.robot_id());
+            }
         }
-    }
 
-    Timestamp most_recent_timestamp = std::max<Timestamp>(
-        {friendly_team.getMostRecentTimestamp(), enemy_team.getMostRecentTimestamp()});
-    // TODO: uncomment this
-    // timestamped_possession_state.updateState(possession_filter.getFilteredData(friendly_robots_with_breakbeam_triggered,
-    // ) , most_recent_timestamp);
+        Timestamp most_recent_timestamp =
+            std::max<Timestamp>({friendly_team_.getMostRecentTimestamp(),
+                                 enemy_team_.getMostRecentTimestamp()});
+        timestamped_possession_state_.updateState(
+            getRobotsWithPossession(friendly_robots_with_breakbeam_triggered,
+                                    friendly_team_, enemy_team_, *ball_),
+            most_recent_timestamp);
+    }
 }
 
 void SensorFusion::updateBallAndTeams(const SSL_DetectionFrame &ssl_detection_frame)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    double min_valid_x = sensor_fusion_config->MinValidX()->value();
-    double max_valid_x = sensor_fusion_config->MaxValidX()->value();
+    double min_valid_x = sensor_fusion_config_->MinValidX()->value();
+    double max_valid_x = sensor_fusion_config_->MaxValidX()->value();
     bool ignore_invalid_camera_data =
-        sensor_fusion_config->IgnoreInvalidCameraData()->value();
+        sensor_fusion_config_->IgnoreInvalidCameraData()->value();
 
     // We invert the field side if we explicitly choose to override the values
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
     const bool override_refbox_defending_side =
-        sensor_fusion_config->OverrideRefboxDefendingSide()->value();
+        sensor_fusion_config_->OverrideRefboxDefendingSide()->value();
     const bool defending_positive_side =
-        sensor_fusion_config->DefendingPositiveSide()->value();
+        sensor_fusion_config_->DefendingPositiveSide()->value();
     const bool should_invert_field =
         override_refbox_defending_side && defending_positive_side;
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    bool friendly_team_is_yellow = sensor_fusion_config->FriendlyColorYellow()->value();
+    bool friendly_team_is_yellow = sensor_fusion_config_->FriendlyColorYellow()->value();
 
     std::optional<TimestampedBallState> new_ball_state;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
@@ -183,13 +192,13 @@ void SensorFusion::updateBallAndTeams(const SSL_DetectionFrame &ssl_detection_fr
     new_ball_state = createTimestampedBallState(ball_detections);
     if (friendly_team_is_yellow)
     {
-        friendly_team = createFriendlyTeam(yellow_team);
-        enemy_team    = createEnemyTeam(blue_team);
+        friendly_team_ = createFriendlyTeam(yellow_team);
+        enemy_team_    = createEnemyTeam(blue_team);
     }
     else
     {
-        friendly_team = createFriendlyTeam(blue_team);
-        enemy_team    = createEnemyTeam(yellow_team);
+        friendly_team_ = createFriendlyTeam(blue_team);
+        enemy_team_    = createEnemyTeam(yellow_team);
     }
 
     if (new_ball_state)
@@ -200,32 +209,83 @@ void SensorFusion::updateBallAndTeams(const SSL_DetectionFrame &ssl_detection_fr
 
 void SensorFusion::updateBall(TimestampedBallState new_ball_state)
 {
-    if (!ball_states.empty() &&
-        new_ball_state.timestamp() < ball_states.front().timestamp())
+    if (!ball_states_.empty() &&
+        new_ball_state.timestamp() < ball_states_.front().timestamp())
     {
         throw std::invalid_argument(
             "Error: Trying to update ball state using a state older then the current state");
     }
 
-    ball_states.push_front(new_ball_state);
+    ball_states_.push_front(new_ball_state);
 
-    if (ball)
+    if (ball_)
     {
-        ball->updateState(new_ball_state);
+        ball_->updateState(new_ball_state);
     }
     else
     {
-        ball = Ball(new_ball_state);
+        ball_ = Ball(new_ball_state);
+    }
+}
+
+std::vector<RobotIdWithTeamSide> SensorFusion::getRobotsWithPossession(
+    std::vector<RobotId> friendly_robots_with_breakbeam_triggered, Team friendly_team,
+    Team enemy_team, Ball ball) const
+{
+    std::vector<RobotIdWithTeamSide> possessions;
+    for (const auto &robot_id : friendly_robots_with_breakbeam_triggered)
+    {
+        possessions.push_back(
+            RobotIdWithTeamSide{.id = robot_id, .team_side = TeamSide::FRIENDLY});
+    }
+
+    for (const auto &robot : friendly_team.getAllRobots())
+    {
+        if (ballNearDribbler(ball.position(), robot.position(), robot.orientation()))
+        {
+            possessions.push_back(
+                RobotIdWithTeamSide{.id = robot.id(), .team_side = TeamSide::FRIENDLY});
+        }
+    }
+
+    for (const auto &robot : enemy_team.getAllRobots())
+    {
+        if (ballNearDribbler(ball.position(), robot.position(), robot.orientation()))
+        {
+            possessions.push_back(
+                RobotIdWithTeamSide{.id = robot.id(), .team_side = TeamSide::ENEMY});
+        }
+    }
+
+    return possessions;
+}
+
+bool SensorFusion::ballNearDribbler(Point ball_position, Point robot_position,
+                                    Angle robot_orientation) const
+{
+    // check if the ball is within a certain distance of the robot
+    // this is experimentally determined to be a reasonable value
+    static const double max_dist_to_robot = ROBOT_MAX_RADIUS_METERS + 0.2;
+    if ((ball_position - robot_position).length() > max_dist_to_robot)
+    {
+        return false;
+    }
+    else
+    {
+        // check that ball is in a 90-degree cone in front of the robot
+        auto ball_to_robot_angle =
+            robot_orientation.minDiff((ball_position - robot_position).orientation());
+        return (ball_to_robot_angle < Angle::fromDegrees(45.0));
     }
 }
 
 std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(
     const std::vector<BallDetection> &ball_detections)
 {
-    if (field)
+    if (field_)
     {
         std::optional<TimestampedBallState> new_ball =
-            ball_filter.getFilteredData(ball_detections, *field);
+            ball_filter_.getFilteredData(ball_detections, *field_);
         return new_ball;
     }
     return std::nullopt;
@@ -234,16 +294,17 @@ std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(
 Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_friendly_team =
-        friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-    RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
+        friendly_team_filter_.getFilteredData(friendly_team_, robot_detections);
+    RobotId friendly_goalie_id = sensor_fusion_config_->FriendlyGoalieId()->value();
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
 
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
-    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
-    RobotId enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
+    Team new_enemy_team =
+        enemy_team_filter_.getFilteredData(enemy_team_, robot_detections);
+    RobotId enemy_goalie_id = sensor_fusion_config_->EnemyGoalieId()->value();
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }

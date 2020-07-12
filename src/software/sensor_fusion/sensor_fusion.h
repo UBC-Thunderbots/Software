@@ -86,6 +86,33 @@ class SensorFusion
     void updateBall(TimestampedBallState new_ball_state);
 
     /**
+     * Compiles the list of robots that have possession of the ball
+     *
+     * @param friendly_robots_with_breakbeam_triggered The friendly robots that have their
+     * breakbeam triggered
+     * @param friendly_team The friendly_team of robots
+     * @param enemy_team The enemy_team of robots
+     * @param ball The ball
+     *
+     * @return the list of robots that possession of the ball
+     */
+    std::vector<RobotIdWithTeamSide> getRobotsWithPossession(
+        std::vector<RobotId> friendly_robots_with_breakbeam_triggered, Team friendly_team,
+        Team enemy_team, Ball ball) const;
+
+    /**
+     * Decides if the ball is near the dribbler of the robot
+     *
+     * @param ball_position The position of the ball
+     * @param robot_position The position of the robot
+     * @param robot_orientation The orientation the robot
+     *
+     * @return whether the ball is near the dribbler of the robot
+     */
+    bool ballNearDribbler(Point ball_position, Point robot_position,
+                          Angle robot_orientation) const;
+
+    /**
      * Create state of the ball from a list of ball detections
      *
      * @param ball_detections list of ball detections to filter
@@ -115,19 +142,19 @@ class SensorFusion
     RobotDetection invert(RobotDetection robot_detection) const;
     BallDetection invert(BallDetection ball_detection) const;
 
-    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
-    unsigned int history_size;
-    std::optional<Field> field;
-    std::optional<Ball> ball;
-    Team friendly_team;
-    Team enemy_team;
-    TimestampedPossessionState timestamped_possession_state;
-    GameState game_state;
-    std::optional<RefboxStage> refbox_stage;
+    std::shared_ptr<const SensorFusionConfig> sensor_fusion_config_;
+    unsigned int history_size_;
+    std::optional<Field> field_;
+    std::optional<Ball> ball_;
+    Team friendly_team_;
+    Team enemy_team_;
+    TimestampedPossessionState timestamped_possession_state_;
+    GameState game_state_;
+    std::optional<RefboxStage> refbox_stage_;
 
-    BallFilter ball_filter;
-    RobotTeamFilter friendly_team_filter;
-    RobotTeamFilter enemy_team_filter;
+    BallFilter ball_filter_;
+    RobotTeamFilter friendly_team_filter_;
+    RobotTeamFilter enemy_team_filter_;
 
-    BallHistory ball_states;
+    BallHistory ball_states_;
 };
