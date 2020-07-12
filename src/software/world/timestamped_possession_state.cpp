@@ -6,10 +6,15 @@ TimestampedPossessionState::TimestampedPossessionState()
 {
 }
 
-void TimestampedPossessionState::updatePossessionState(
-    const std::set<RobotIdWithTeamSide> &possessions, Timestamp update_time)
+void TimestampedPossessionState::updateState(std::vector<RobotIdWithTeamSide> possessions,
+                                             Timestamp update_time)
 {
-    timestamp_ = update_time;
+    if (update_time < timestamp_)
+    {
+        throw std::invalid_argument("Update time is older than the last update time");
+    }
+    timestamp_           = update_time;
+    current_possessions_ = possessions;
     for (const auto &poss : possessions)
     {
         last_possession_map_[poss] = update_time;
@@ -21,19 +26,17 @@ Timestamp TimestampedPossessionState::timestamp() const
     return timestamp_;
 }
 
-std::set<RobotIdWithTeamSide> TimestampedPossessionState::getRobotsWithCurrentPossession()
-    const
+const std::vector<RobotIdWithTeamSide>
+    &TimestampedPossessionState::getRobotsWithPossession() const
 {
     return current_possessions_;
 }
 
-std::optional<TeamSide> TimestampedPossessionState::getTeamWithMostRecentPossession()
-    const
+std::optional<TeamSide> TimestampedPossessionState::getTeamWithPossession() const
 {
-    auto possession_robots = getRobotsWithCurrentPossession();
-    if (possession_robots.size() == 1)
+    if (current_possessions_.size() == 1)
     {
-        return possession_robots.begin()->team_side;
+        return current_possessions_.begin()->team_side;
     }
     else
     {
