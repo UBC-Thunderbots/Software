@@ -1,4 +1,4 @@
-
+#pragma once
 
 /**
  * A representation of a matrix that has an arbitrary number of rows and columns specified
@@ -8,12 +8,12 @@
  * n_rows for the matrix. Then when you are done with the matrix, you will need to call
  * free_matrix.
  */
-typedef struct
+typedef struct Matrix
 {
     float **rows;
     int n_cols;
     int n_rows;
-} Matrix;
+} Matrix_t;
 
 /**
  * Gets a matrix of the given size. This uses dynamic memory allocation so make sure to
@@ -23,14 +23,14 @@ typedef struct
  * @param n_cols the number of columns in the matrix
  * @return a Matrix object
  */
-Matrix create_matrix(int n_rows, int n_cols);
+Matrix_t create_matrix(int n_rows, int n_cols);
 
 /**
  * Frees the memory used up by a matrix.
  *
  * @param matrix the matrix to free
  */
-void free_matrix(Matrix matrix);
+void free_matrix(Matrix_t matrix);
 
 /**
  * Multiplies two matrices together and returns the resulting matrix, which is of size
@@ -40,7 +40,7 @@ void free_matrix(Matrix matrix);
  * @param B the right matrix
  * @return the resulting Matrix from the matrix multiplication
  */
-Matrix matmul(Matrix A, Matrix B);
+Matrix_t matmul(Matrix_t A, Matrix_t B);
 
 /**
  * Rotates the coordinate axis through the angle represented by the given
@@ -70,4 +70,4 @@ void rotate_vector_2D(float vector[2], const float unit_vector[2]);
  * @param in_matrix the matrix to transpose
  * @return the transpose of the given matrix
  */
-Matrix transpose(Matrix in_matrix);
+Matrix_t transpose(Matrix_t in_matrix);
