@@ -5,7 +5,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
 TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)

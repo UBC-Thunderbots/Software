@@ -8,7 +8,6 @@
 #include "software/new_geom/point.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/rectangle.h"
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
 

@@ -142,4 +142,4 @@ namespace TestUtil
     ::testing::AssertionResult equalWithinTolerance(const BallState &state1,
                                                     const BallState &state2,
                                                     double tolerance);
-}  // namespace TestUtil
+};  // namespace TestUtil

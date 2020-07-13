@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
 TEST(BezierCurve2dTest, contstruct_with_less_then_two_control_points)

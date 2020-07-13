@@ -4,7 +4,6 @@
 
 #include "software/primitive/move_primitive.h"
 #include "software/primitive/primitive.h"
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
 class ThreadedSimulatorTest : public ::testing::Test

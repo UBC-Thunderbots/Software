@@ -4,7 +4,6 @@
 
 #include "software/new_geom/bezier_curve2d.h"
 #include "software/new_geom/util/acute_angle.h"
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
 class CubicBezierSplineTest : public ::testing::Test

@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
 TEST(LinearSpline2dTest, test_constructor_three_knot)

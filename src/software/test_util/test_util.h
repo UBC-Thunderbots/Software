@@ -14,6 +14,7 @@
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
+#include "software/test_util/equal_within_tolerance.h"
 
 #define UNUSED(x) (void)(x)
 

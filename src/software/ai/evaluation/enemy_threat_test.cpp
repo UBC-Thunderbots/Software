@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
 TEST(FindAllPasserReceiverPairsTest, robot_passing_to_itself)

@@ -11,7 +11,6 @@
 #include "software/new_geom/line.h"
 #include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/intersection.h"
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
 // The following tests will make sure the goalie stays in the requested

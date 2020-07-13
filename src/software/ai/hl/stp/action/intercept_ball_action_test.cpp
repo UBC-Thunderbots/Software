@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/move_intent.h"
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 #include "software/world/ball.h"
 

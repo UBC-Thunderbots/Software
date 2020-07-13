@@ -4,7 +4,6 @@
 
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
 TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)

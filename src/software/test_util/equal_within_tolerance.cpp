@@ -214,4 +214,4 @@ namespace TestUtil
 
         return assertion_result;
     }
-}  // namespace TestUtil
+};  // namespace TestUtil
