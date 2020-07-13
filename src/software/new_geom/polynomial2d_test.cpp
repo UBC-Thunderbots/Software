@@ -59,11 +59,11 @@ TEST(Polynomial2dTest, constructor_from_list_of_points_valid)
     EXPECT_EQ(2, p.getPolyY().getOrder());
 
     // Check that we interpolate the start and end points at the expected t-values
-    EXPECT_TRUE(equalWithinTolerance(Point(-1, 1), p.getValueAt(0), 1e-9));
-    EXPECT_TRUE(equalWithinTolerance(Point(3.3, 7.8), p.getValueAt(1), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(-1, 1), p.getValueAt(0), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(3.3, 7.8), p.getValueAt(1), 1e-9));
 
     // Check that the intermediate point was interpolated correctly
-    EXPECT_TRUE(equalWithinTolerance(Point(0, 0), p.getValueAt(0.5), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Point(0, 0), p.getValueAt(0.5), 1e-9));
 
     // Check the coefficients are as expected
     // These were calculated using an online math tool

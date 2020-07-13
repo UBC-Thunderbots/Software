@@ -28,8 +28,8 @@ TEST(BezierCurve2dTest, get_value_two_points)
     for (int i = 0; i <= 1000; i++)
     {
         const double t = static_cast<double>(i) / 1000.0;
-        EXPECT_TRUE(equalWithinTolerance(expected_polynomial2d.getValueAt(t),
-                                         curve.getValueAt(t), 1e-9));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.getValueAt(t),
+                                                   curve.getValueAt(t), 1e-9));
     }
 }
 
@@ -52,8 +52,8 @@ TEST(BezierCurve2dTest, get_value_two_points_x_unchanged)
     for (int i = 0; i <= 1000; i++)
     {
         const double t = static_cast<double>(i) / 1000.0;
-        EXPECT_TRUE(equalWithinTolerance(expected_polynomial2d.getValueAt(t),
-                                         curve.getValueAt(t), 1e-9));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.getValueAt(t),
+                                                   curve.getValueAt(t), 1e-9));
     }
 }
 
@@ -115,8 +115,8 @@ TEST(BezierCurveTest, get_value_four_points)
     for (int i = 0; i <= 1000; i++)
     {
         const double t = static_cast<double>(i) / 1000.0;
-        EXPECT_TRUE(equalWithinTolerance(expected_polynomial2d.getValueAt(t),
-                                         curve.getValueAt(t), 1e-9));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.getValueAt(t),
+                                                   curve.getValueAt(t), 1e-9));
     }
 }
 

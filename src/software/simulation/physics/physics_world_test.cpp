@@ -12,8 +12,8 @@
 // physics library
 MATCHER(RobotStateWithIdEq, "Robot State with Id Equal")
 {
-    return equalWithinTolerance(::std::get<0>(arg), ::std::get<1>(arg), 1e-6,
-                                Angle::fromDegrees(0.1));
+    return TestUtil::equalWithinTolerance(::std::get<0>(arg), ::std::get<1>(arg), 1e-6,
+                                          Angle::fromDegrees(0.1));
 }
 
 TEST(PhysicsWorldTest, default_construct_physics_world)
@@ -322,7 +322,8 @@ TEST(PhysicsSimulatorTest, test_world_does_not_change_if_time_step_is_zero)
 
     ASSERT_TRUE(updated_ball_state);
 
-    EXPECT_TRUE(equalWithinTolerance(ball_state, updated_ball_state.value(), 1e-6));
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(ball_state, updated_ball_state.value(), 1e-6));
     EXPECT_THAT(
         yellow_robot_states,
         ::testing::UnorderedPointwise(RobotStateWithIdEq(), updated_yellow_robot_states));
@@ -378,8 +379,8 @@ TEST(PhysicsSimulatorTest, test_single_small_time_step)
         RobotStateWithId{.id = 0, .robot_state = expected_blue_robot_state},
     };
 
-    EXPECT_TRUE(
-        equalWithinTolerance(expected_ball_state, updated_ball_state.value(), 1e-4));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_ball_state,
+                                               updated_ball_state.value(), 1e-4));
     EXPECT_THAT(expected_yellow_robot_states,
                 ::testing::Not(::testing::UnorderedPointwise(
                     RobotStateWithIdEq(), updated_yellow_robot_states)));

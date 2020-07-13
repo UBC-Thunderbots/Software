@@ -107,8 +107,8 @@ class GoalieTacticTest : public testing::Test
 
         auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
         ASSERT_NE(move_action, nullptr);
-        EXPECT_TRUE(
-            equalWithinTolerance(move_action->getDestination(), destination, 0.03));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                                   destination, 0.03));
         EXPECT_NEAR(move_action->getFinalSpeed(), 0, 0.001);
     }
 
@@ -154,8 +154,8 @@ class GoalieTacticTest : public testing::Test
 
         auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
         ASSERT_NE(chip_action, nullptr);
-        EXPECT_TRUE(equalWithinTolerance(chip_action->getChipOrigin(),
-                                         world.ball().position(), 0.001));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(chip_action->getChipOrigin(),
+                                                   world.ball().position(), 0.001));
         EXPECT_EQ(
             chip_action->getChipDirection(),
             (world.ball().position() - world.field().friendlyGoalCenter()).orientation());

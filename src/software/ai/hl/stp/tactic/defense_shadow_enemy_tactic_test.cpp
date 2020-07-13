@@ -34,8 +34,8 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(
-        equalWithinTolerance(move_action->getDestination(), Point(-0.5, 0), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
     EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
@@ -69,8 +69,8 @@ TEST(DefenseShadowEnemyTacticTest,
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(
-        equalWithinTolerance(move_action->getDestination(), ball.position(), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               ball.position(), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - field.friendlyGoalCenter()).orientation()),
               Angle::fromDegrees(1));
@@ -107,8 +107,8 @@ TEST(
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(
-        equalWithinTolerance(move_action->getDestination(), Point(-0.5, 0), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));

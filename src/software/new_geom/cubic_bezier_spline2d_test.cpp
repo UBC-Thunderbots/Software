@@ -60,7 +60,7 @@ TEST_F(CubicBezierSplineTest, getValueAt__start_point)
 {
     // Check that the start point is at the correct position
     const Point start_point = test_spline_1.getValueAt(0);
-    EXPECT_TRUE(equalWithinTolerance(start_point, Point(1, -1), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(start_point, Point(1, -1), 1e-9));
 
     // Check that the tangent at the start is (approximately) what we expected. This
     // serves to check that we're getting the value for intermediate points correctly
@@ -76,7 +76,7 @@ TEST_F(CubicBezierSplineTest, getValueAt__end_point)
 {
     // Check that the end point is at the correct position
     const Point end_point = test_spline_1.getValueAt(1);
-    EXPECT_TRUE(equalWithinTolerance(end_point, Point(1, -2), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(end_point, Point(1, -2), 1e-9));
 
     // Check that the tangent at the end is (approximately) what we expected. This
     // serves to check that we're getting the value for intermediate points correctly
@@ -85,18 +85,20 @@ TEST_F(CubicBezierSplineTest, getValueAt__end_point)
     const Vector approx_tangent_at_end = just_before_end_point - end_point;
     const Angle tangent_error_angle = acuteAngle(approx_tangent_at_end, Vector(-2, -5));
 
-    EXPECT_TRUE(equalWithinTolerance(Angle::zero(), tangent_error_angle,
-                                     Angle::fromRadians(1e-6)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Angle::zero(), tangent_error_angle,
+                                               Angle::fromRadians(1e-6)));
 }
 
 TEST_F(CubicBezierSplineTest, getStartPoint)
 {
-    EXPECT_TRUE(equalWithinTolerance(test_spline_1.getStartPoint(), Point(1, -1), 1e-9));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(test_spline_1.getStartPoint(),
+                                               Point(1, -1), 1e-9));
 }
 
 TEST_F(CubicBezierSplineTest, getEndPoint)
 {
-    EXPECT_TRUE(equalWithinTolerance(test_spline_1.getEndPoint(), Point(1, -2), 1e-9));
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(test_spline_1.getEndPoint(), Point(1, -2), 1e-9));
 }
 
 TEST_F(CubicBezierSplineTest, getValue__check_c2_continuous_at_knots)

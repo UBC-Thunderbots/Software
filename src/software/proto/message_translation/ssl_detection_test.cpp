@@ -182,11 +182,11 @@ TEST(SSLDetectionTest, test_convert_robot_states_to_proto_and_back)
     ASSERT_EQ(1.0, yellow_team_detections[1].confidence);
     ASSERT_EQ(Point(1, 0), yellow_team_detections[0].position);
     ASSERT_EQ(Point(0, 0), yellow_team_detections[1].position);
-    ASSERT_TRUE(equalWithinTolerance(Angle::quarter(),
-                                     yellow_team_detections[0].orientation,
-                                     Angle::fromDegrees(0.5)));
-    ASSERT_TRUE(equalWithinTolerance(Angle::half(), yellow_team_detections[1].orientation,
-                                     Angle::fromDegrees(0.5)));
+    ASSERT_TRUE(TestUtil::equalWithinTolerance(Angle::quarter(),
+                                               yellow_team_detections[0].orientation,
+                                               Angle::fromDegrees(0.5)));
+    ASSERT_TRUE(TestUtil::equalWithinTolerance(
+        Angle::half(), yellow_team_detections[1].orientation, Angle::fromDegrees(0.5)));
     ASSERT_EQ(t_capture, yellow_team_detections[0].timestamp);
     ASSERT_EQ(t_capture, yellow_team_detections[1].timestamp);
     ASSERT_EQ(1, yellow_team_detections[0].id);
@@ -200,12 +200,12 @@ TEST(SSLDetectionTest, test_convert_robot_states_to_proto_and_back)
     ASSERT_EQ(Point(1, 0), blue_team_detections[0].position);
     ASSERT_EQ(Point(0, 0), blue_team_detections[1].position);
     ASSERT_EQ(Point(-1, -1), blue_team_detections[2].position);
-    ASSERT_TRUE(equalWithinTolerance(
+    ASSERT_TRUE(TestUtil::equalWithinTolerance(
         Angle::quarter(), blue_team_detections[0].orientation, Angle::fromDegrees(0.5)));
-    ASSERT_TRUE(equalWithinTolerance(Angle::half(), blue_team_detections[1].orientation,
-                                     Angle::fromDegrees(0.5)));
-    ASSERT_TRUE(equalWithinTolerance(Angle::half(), blue_team_detections[2].orientation,
-                                     Angle::fromDegrees(0.5)));
+    ASSERT_TRUE(TestUtil::equalWithinTolerance(
+        Angle::half(), blue_team_detections[1].orientation, Angle::fromDegrees(0.5)));
+    ASSERT_TRUE(TestUtil::equalWithinTolerance(
+        Angle::half(), blue_team_detections[2].orientation, Angle::fromDegrees(0.5)));
     ASSERT_EQ(t_capture, blue_team_detections[0].timestamp);
     ASSERT_EQ(t_capture, blue_team_detections[1].timestamp);
     ASSERT_EQ(t_capture, blue_team_detections[2].timestamp);

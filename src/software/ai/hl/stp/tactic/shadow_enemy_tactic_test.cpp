@@ -34,8 +34,8 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(nullptr, move_action);
-    EXPECT_TRUE(
-        equalWithinTolerance(move_action->getDestination(), Point(-0.5, 0), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
     EXPECT_TRUE(move_action->getAutoKickType() == NONE);
@@ -74,7 +74,8 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(nullptr, move_action);
-    EXPECT_TRUE(equalWithinTolerance(move_action->getDestination(), Point(0, 0.2), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               Point(0, 0.2), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::quarter()),
               Angle::fromDegrees(1));
     EXPECT_TRUE(move_action->getAutoKickType() == NONE);
@@ -109,8 +110,8 @@ TEST(ShadowEnemyTacticTest,
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(nullptr, move_action);
-    EXPECT_TRUE(
-        equalWithinTolerance(move_action->getDestination(), ball.position(), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               ball.position(), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (ball.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
@@ -146,8 +147,8 @@ TEST(
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(nullptr, move_action);
-    EXPECT_TRUE(
-        equalWithinTolerance(move_action->getDestination(), Point(-0.5, 0), 0.01));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+                                               Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
     EXPECT_TRUE(move_action->getAutoKickType() == NONE);
