@@ -5,8 +5,8 @@
 #include <unordered_set>
 
 #include "software/new_geom/point.h"
-#include "software/test_util/test_util.h"
 #include "software/test_util/equal_within_tolerance.h"
+#include "software/test_util/test_util.h"
 
 TEST(PolygonTest, test_construct_from_vector)
 {

@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "software/new_geom/util/projection_impl.h"
-#include "software/test_util/test_util.h"
 #include "software/test_util/equal_within_tolerance.h"
+#include "software/test_util/test_util.h"
 
 TEST(ProjectionTest, test_project_circles_origin_inside_circle)
 {
@@ -112,11 +112,11 @@ TEST(ProjectionImplTest, test_circle_tangent_rays)
     EXPECT_TRUE(equalWithinTolerance(r1.getStart(), p, 0.01));
     EXPECT_TRUE(equalWithinTolerance(r2.getStart(), p, 0.01));
     EXPECT_TRUE(equalWithinTolerance(r1.getDirection(),
-                                               (Point(-1.58, 1.91) - p).orientation(),
-                                               Angle::fromRadians(0.01)));
+                                     (Point(-1.58, 1.91) - p).orientation(),
+                                     Angle::fromRadians(0.01)));
     EXPECT_TRUE(equalWithinTolerance(r2.getDirection(),
-                                               (Point(0.91, -0.58) - p).orientation(),
-                                               Angle::fromRadians(0.01)));
+                                     (Point(0.91, -0.58) - p).orientation(),
+                                     Angle::fromRadians(0.01)));
 }
 
 // Check the case where both rays intersect the segment only once (forming an intersection

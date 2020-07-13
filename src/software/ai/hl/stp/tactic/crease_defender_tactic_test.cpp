@@ -4,8 +4,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/test_util/test_util.h"
 #include "software/test_util/equal_within_tolerance.h"
+#include "software/test_util/test_util.h"
 
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
 {

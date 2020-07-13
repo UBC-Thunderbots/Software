@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "software/test_util/test_util.h"
 #include "software/test_util/equal_within_tolerance.h"
+#include "software/test_util/test_util.h"
 
 TEST(BezierCurve2dTest, contstruct_with_less_then_two_control_points)
 {
@@ -29,7 +29,7 @@ TEST(BezierCurve2dTest, get_value_two_points)
     {
         const double t = static_cast<double>(i) / 1000.0;
         EXPECT_TRUE(equalWithinTolerance(expected_polynomial2d.getValueAt(t),
-                                                   curve.getValueAt(t), 1e-9));
+                                         curve.getValueAt(t), 1e-9));
     }
 }
 
@@ -53,7 +53,7 @@ TEST(BezierCurve2dTest, get_value_two_points_x_unchanged)
     {
         const double t = static_cast<double>(i) / 1000.0;
         EXPECT_TRUE(equalWithinTolerance(expected_polynomial2d.getValueAt(t),
-                                                   curve.getValueAt(t), 1e-9));
+                                         curve.getValueAt(t), 1e-9));
     }
 }
 
@@ -116,7 +116,7 @@ TEST(BezierCurveTest, get_value_four_points)
     {
         const double t = static_cast<double>(i) / 1000.0;
         EXPECT_TRUE(equalWithinTolerance(expected_polynomial2d.getValueAt(t),
-                                                   curve.getValueAt(t), 1e-9));
+                                         curve.getValueAt(t), 1e-9));
     }
 }
 

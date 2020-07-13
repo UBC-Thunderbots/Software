@@ -14,19 +14,18 @@
 #include "software/world/world.h"
 
 /**
-     * Checks if two polygons are within tolerance of each other
-     * Two polygons are within tolerance of each other if the corresponding points are
-     * within tolerance of each other
-     *
-     * @param poly1, poly2 Polygons to compare
-     * @param tolerance tolerance to check equality with, default is
-     * METERS_PER_MILLIMETER
-     *
-     * @return AssertionSuccess if the two polygons are within tolerance of each other
-     */
-::testing::AssertionResult equalWithinTolerance(
-        const Polygon &poly1, const Polygon &poly2,
-        double tolerance);
+ * Checks if two polygons are within tolerance of each other
+ * Two polygons are within tolerance of each other if the corresponding points are
+ * within tolerance of each other
+ *
+ * @param poly1, poly2 Polygons to compare
+ * @param tolerance tolerance to check equality with, default is
+ * METERS_PER_MILLIMETER
+ *
+ * @return AssertionSuccess if the two polygons are within tolerance of each other
+ */
+::testing::AssertionResult equalWithinTolerance(const Polygon &poly1,
+                                                const Polygon &poly2, double tolerance);
 
 /**
  * Checks if two circles are within tolerance of each other
@@ -39,8 +38,8 @@
  *
  * @return AssertionSuccess if the two circles are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(
-        const Circle &c1, const Circle &c2, double tolerance);
+::testing::AssertionResult equalWithinTolerance(const Circle &c1, const Circle &c2,
+                                                double tolerance);
 
 /**
  * Checks if two Angles are within tolerance of each other
@@ -64,8 +63,8 @@
  *
  * @return AssertionSuccess if the two points are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(
-        const Vector &v1, const Vector &v2, double tolerance);
+::testing::AssertionResult equalWithinTolerance(const Vector &v1, const Vector &v2,
+                                                double tolerance);
 
 /**
  * Checks if two points are within tolerance of each other
@@ -78,8 +77,8 @@
  *
  * @return AssertionSuccess if the two points are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(
-        const Point &pt1, const Point &pt2, double tolerance);
+::testing::AssertionResult equalWithinTolerance(const Point &pt1, const Point &pt2,
+                                                double tolerance);
 
 /**
  * Checks if two values are within tolerance of each other
@@ -90,8 +89,8 @@
  *
  * @return AssertionSuccess if the two values are within tolerance of each other
  */
-::testing::AssertionResult equalWithinTolerance(
-        double val1, double val2, double tolerance);
+::testing::AssertionResult equalWithinTolerance(double val1, double val2,
+                                                double tolerance);
 
 /**
  * Checks if two RobotStates are within tolerance of each other.

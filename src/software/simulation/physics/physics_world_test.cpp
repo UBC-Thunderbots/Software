@@ -3,8 +3,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "software/test_util/test_util.h"
 #include "software/test_util/equal_within_tolerance.h"
+#include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
 // A matcher used to compare RobotStateWitId_t structs with enough tolerance
@@ -13,7 +13,7 @@
 MATCHER(RobotStateWithIdEq, "Robot State with Id Equal")
 {
     return equalWithinTolerance(::std::get<0>(arg), ::std::get<1>(arg), 1e-6,
-                                            Angle::fromDegrees(0.1));
+                                Angle::fromDegrees(0.1));
 }
 
 TEST(PhysicsWorldTest, default_construct_physics_world)
@@ -322,8 +322,7 @@ TEST(PhysicsSimulatorTest, test_world_does_not_change_if_time_step_is_zero)
 
     ASSERT_TRUE(updated_ball_state);
 
-    EXPECT_TRUE(
-        equalWithinTolerance(ball_state, updated_ball_state.value(), 1e-6));
+    EXPECT_TRUE(equalWithinTolerance(ball_state, updated_ball_state.value(), 1e-6));
     EXPECT_THAT(
         yellow_robot_states,
         ::testing::UnorderedPointwise(RobotStateWithIdEq(), updated_yellow_robot_states));
@@ -380,8 +379,7 @@ TEST(PhysicsSimulatorTest, test_single_small_time_step)
     };
 
     EXPECT_TRUE(
-            equalWithinTolerance(expected_ball_state,
-                                                 updated_ball_state.value(), 1e-4));
+        equalWithinTolerance(expected_ball_state, updated_ball_state.value(), 1e-4));
     EXPECT_THAT(expected_yellow_robot_states,
                 ::testing::Not(::testing::UnorderedPointwise(
                     RobotStateWithIdEq(), updated_yellow_robot_states)));

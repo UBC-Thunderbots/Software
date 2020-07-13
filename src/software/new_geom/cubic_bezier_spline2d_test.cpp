@@ -4,8 +4,8 @@
 
 #include "software/new_geom/bezier_curve2d.h"
 #include "software/new_geom/util/acute_angle.h"
-#include "software/test_util/test_util.h"
 #include "software/test_util/equal_within_tolerance.h"
+#include "software/test_util/test_util.h"
 
 class CubicBezierSplineTest : public ::testing::Test
 {
@@ -86,19 +86,17 @@ TEST_F(CubicBezierSplineTest, getValueAt__end_point)
     const Angle tangent_error_angle = acuteAngle(approx_tangent_at_end, Vector(-2, -5));
 
     EXPECT_TRUE(equalWithinTolerance(Angle::zero(), tangent_error_angle,
-                                               Angle::fromRadians(1e-6)));
+                                     Angle::fromRadians(1e-6)));
 }
 
 TEST_F(CubicBezierSplineTest, getStartPoint)
 {
-    EXPECT_TRUE(equalWithinTolerance(test_spline_1.getStartPoint(),
-                                               Point(1, -1), 1e-9));
+    EXPECT_TRUE(equalWithinTolerance(test_spline_1.getStartPoint(), Point(1, -1), 1e-9));
 }
 
 TEST_F(CubicBezierSplineTest, getEndPoint)
 {
-    EXPECT_TRUE(
-        equalWithinTolerance(test_spline_1.getEndPoint(), Point(1, -2), 1e-9));
+    EXPECT_TRUE(equalWithinTolerance(test_spline_1.getEndPoint(), Point(1, -2), 1e-9));
 }
 
 TEST_F(CubicBezierSplineTest, getValue__check_c2_continuous_at_knots)
