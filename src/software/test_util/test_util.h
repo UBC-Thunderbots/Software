@@ -10,11 +10,11 @@
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/util/almost_equal.h"
 #include "software/simulation/physics/physics_world.h"
+#include "software/test_util/equal_within_tolerance.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
-#include "software/test_util/equal_within_tolerance.h"
 
 #define UNUSED(x) (void)(x)
 
