@@ -12,6 +12,7 @@
 #include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/intersection.h"
 #include "software/test_util/test_util.h"
+#include "software/test_util/equal_within_tolerance.h"
 
 // The following tests will make sure the goalie stays in the requested
 // deflated defense area when best positioning to defend the ball.
@@ -106,7 +107,7 @@ class GoalieTacticTest : public testing::Test
 
         auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
         ASSERT_NE(move_action, nullptr);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+        EXPECT_TRUE(equalWithinTolerance(move_action->getDestination(),
                                                    destination, 0.03));
         EXPECT_NEAR(move_action->getFinalSpeed(), 0, 0.001);
     }
@@ -153,7 +154,7 @@ class GoalieTacticTest : public testing::Test
 
         auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
         ASSERT_NE(chip_action, nullptr);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(chip_action->getChipOrigin(),
+        EXPECT_TRUE(equalWithinTolerance(chip_action->getChipOrigin(),
                                                    world.ball().position(), 0.001));
         EXPECT_EQ(
             chip_action->getChipDirection(),

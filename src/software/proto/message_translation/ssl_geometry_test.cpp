@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/test_util/test_util.h"
+#include "software/test_util/equal_within_tolerance.h"
 
 class SSLGeometryTest : public ::testing::Test
 {

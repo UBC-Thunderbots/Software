@@ -167,6 +167,7 @@ cc_test(
     deps = [
         ":simulator",
         "//software/test_util",
+        "//software/test_util:equal_within_tolerance",
         "//software/world",
         "@gtest//:gtest_main",
     ],
@@ -188,6 +189,7 @@ cc_test(
     deps = [
         ":threaded_simulator",
         "//software/test_util",
+        "//software/test_util:equal_within_tolerance",
         "//software/world",
         "@gtest//:gtest_main",
     ],

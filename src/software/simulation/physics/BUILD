@@ -159,6 +159,7 @@ cc_test(
     deps = [
         ":physics_world",
         "//software/test_util",
+        "//software/test_util:equal_within_tolerance",
         "//software/world",
         "@gtest//:gtest_main",
     ],

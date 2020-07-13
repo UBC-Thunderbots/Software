@@ -18,6 +18,7 @@ cc_test(
     deps = [
         ":chip_action",
         "//software/test_util",
+        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )
@@ -66,6 +67,7 @@ cc_test(
         ":intercept_ball_action",
         "//software/ai/intent:move_intent",
         "//software/test_util",
+        "//software/test_util:equal_within_tolerance",
         "//software/world:ball",
         "@gtest//:gtest_main",
     ],
@@ -90,6 +92,7 @@ cc_test(
     deps = [
         ":kick_action",
         "//software/test_util",
+        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )

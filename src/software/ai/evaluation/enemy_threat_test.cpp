@@ -4,6 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/test_util/test_util.h"
+#include "software/test_util/equal_within_tolerance.h"
 
 TEST(FindAllPasserReceiverPairsTest, robot_passing_to_itself)
 {
@@ -447,7 +448,7 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     ASSERT_TRUE(threat.best_shot_angle);
     EXPECT_NEAR(threat.best_shot_angle->toDegrees(), 30, 5);
     ASSERT_TRUE(threat.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat.best_shot_target,
+    EXPECT_TRUE(equalWithinTolerance(*threat.best_shot_target,
                                                world.field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat.passer);
@@ -523,7 +524,7 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_0.best_shot_angle);
     EXPECT_NEAR(threat_0.best_shot_angle->toDegrees(), 15, 5);
     ASSERT_TRUE(threat_0.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat_0.best_shot_target,
+    EXPECT_TRUE(equalWithinTolerance(*threat_0.best_shot_target,
                                                world.field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_0.num_passes_to_get_possession, 0);
     ASSERT_FALSE(threat_0.passer);
@@ -535,7 +536,7 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_1.best_shot_angle);
     EXPECT_NEAR(threat_1.best_shot_angle->toDegrees(), 20, 5);
     ASSERT_TRUE(threat_1.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat_1.best_shot_target,
+    EXPECT_TRUE(equalWithinTolerance(*threat_1.best_shot_target,
                                                world.field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_1.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_1.passer);
@@ -548,7 +549,7 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     ASSERT_TRUE(threat_2.best_shot_angle);
     EXPECT_NEAR(threat_2.best_shot_angle->toDegrees(), 5, 5);
     ASSERT_TRUE(threat_2.best_shot_target);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(*threat_2.best_shot_target,
+    EXPECT_TRUE(equalWithinTolerance(*threat_2.best_shot_target,
                                                world.field().friendlyGoalCenter(), 0.05));
     EXPECT_EQ(threat_2.num_passes_to_get_possession, 1);
     ASSERT_TRUE(threat_2.passer);

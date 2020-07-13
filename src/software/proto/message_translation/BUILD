@@ -68,6 +68,7 @@ cc_test(
     deps = [
         ":ssl_detection",
         "//software/test_util",
+        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )

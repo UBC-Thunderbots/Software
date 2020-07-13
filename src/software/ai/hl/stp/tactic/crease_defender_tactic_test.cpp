@@ -5,6 +5,7 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
+#include "software/test_util/equal_within_tolerance.h"
 
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
 {
@@ -29,7 +30,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
 
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(equalWithinTolerance(
         move_action->getDestination(),
         Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
                   ROBOT_MAX_RADIUS_METERS,
@@ -68,7 +69,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
     // shot in the middle and the crease defender isn't overlapping with the goalie
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(equalWithinTolerance(
         move_action->getDestination(),
         Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
                   ROBOT_MAX_RADIUS_METERS,
@@ -108,7 +109,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_sid
     // shot in the middle and the crease defender isn't overlapping with the goalie
     auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
     ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(equalWithinTolerance(
         move_action->getDestination(),
         Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
                   ROBOT_MAX_RADIUS_METERS,

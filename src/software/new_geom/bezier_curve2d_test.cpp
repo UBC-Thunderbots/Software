@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/test_util/test_util.h"
+#include "software/test_util/equal_within_tolerance.h"
 
 TEST(BezierCurve2dTest, contstruct_with_less_then_two_control_points)
 {
@@ -27,7 +28,7 @@ TEST(BezierCurve2dTest, get_value_two_points)
     for (int i = 0; i <= 1000; i++)
     {
         const double t = static_cast<double>(i) / 1000.0;
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.getValueAt(t),
+        EXPECT_TRUE(equalWithinTolerance(expected_polynomial2d.getValueAt(t),
                                                    curve.getValueAt(t), 1e-9));
     }
 }
@@ -51,7 +52,7 @@ TEST(BezierCurve2dTest, get_value_two_points_x_unchanged)
     for (int i = 0; i <= 1000; i++)
     {
         const double t = static_cast<double>(i) / 1000.0;
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.getValueAt(t),
+        EXPECT_TRUE(equalWithinTolerance(expected_polynomial2d.getValueAt(t),
                                                    curve.getValueAt(t), 1e-9));
     }
 }
@@ -114,7 +115,7 @@ TEST(BezierCurveTest, get_value_four_points)
     for (int i = 0; i <= 1000; i++)
     {
         const double t = static_cast<double>(i) / 1000.0;
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_polynomial2d.getValueAt(t),
+        EXPECT_TRUE(equalWithinTolerance(expected_polynomial2d.getValueAt(t),
                                                    curve.getValueAt(t), 1e-9));
     }
 }

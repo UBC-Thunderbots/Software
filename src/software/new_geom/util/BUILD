@@ -193,6 +193,7 @@ cc_test(
     deps = [
         ":algorithms",
         "//software/test_util",
+        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )

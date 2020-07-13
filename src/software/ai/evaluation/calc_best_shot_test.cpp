@@ -5,6 +5,7 @@
 #include "shared/constants.h"
 #include "software/geom/util.h"
 #include "software/test_util/test_util.h"
+#include "software/test_util/equal_within_tolerance.h"
 
 TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
 {
@@ -21,7 +22,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(result->getPointToShootAt(),
+    EXPECT_TRUE(equalWithinTolerance(result->getPointToShootAt(),
                                                world.field().enemyGoalCenter(), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 12, 5);
 }
@@ -41,7 +42,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(result->getPointToShootAt(),
+    EXPECT_TRUE(equalWithinTolerance(result->getPointToShootAt(),
                                                world.field().friendlyGoalCenter(), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 12, 5);
 }
@@ -67,7 +68,7 @@ TEST(CalcBestShotTest,
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(equalWithinTolerance(
         result->getPointToShootAt(), Point(world.field().enemyGoalCenter().x(), -0.3),
         0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
@@ -94,7 +95,7 @@ TEST(CalcBestShotTest,
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(equalWithinTolerance(
         result->getPointToShootAt(), Point(world.field().friendlyGoalCenter().x(), -0.3),
         0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
@@ -124,7 +125,7 @@ TEST(CalcBestShotTest,
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(equalWithinTolerance(
         result->getPointToShootAt(), Point(world.field().enemyGoalCenter().x(), -0.3),
         0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
@@ -154,7 +155,7 @@ TEST(CalcBestShotTest,
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(equalWithinTolerance(
         result->getPointToShootAt(), Point(world.field().friendlyGoalCenter().x(), -0.3),
         0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
