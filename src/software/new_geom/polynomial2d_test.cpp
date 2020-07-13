@@ -154,6 +154,17 @@ TEST(Polynomial2dTest, addition_operator)
     EXPECT_EQ(expected, p1 + p2);
 }
 
+TEST(Polynomial2dTest, subtraction_operator)
+{
+    const Polynomial2d p1(Polynomial1d({5, 6, 7}), Polynomial1d({7, 5, 9}));
+
+    const Polynomial2d p2(Polynomial1d({2, 4, 6}), Polynomial1d({1, 2, 4}));
+
+    const Polynomial2d expected(Polynomial1d({3, 2, 1}), Polynomial1d({6, 3, 5}));
+
+    EXPECT_EQ(expected, p1 - p2);
+}
+
 TEST(Polynomial2dTest, addition_assignment_operator)
 {
     const Polynomial2d p1(Polynomial1d({1, 2, 3}), Polynomial1d({1, 1, 1}));
@@ -163,6 +174,19 @@ TEST(Polynomial2dTest, addition_assignment_operator)
     const Polynomial2d expected(Polynomial1d({3, 6, 9}), Polynomial1d({2, 3, 5}));
 
     p2 += p1;
+
+    EXPECT_EQ(expected, p2);
+}
+
+TEST(Polynomial2dTest, subtraction_assignment_operator)
+{
+    const Polynomial2d p1(Polynomial1d({1, 2, 3}), Polynomial1d({1, 1, 1}));
+
+    Polynomial2d p2(Polynomial1d({6, 8, 10}), Polynomial1d({5, 2, 3}));
+
+    const Polynomial2d expected(Polynomial1d({5, 6, 7}), Polynomial1d({4, 1, 2}));
+
+    p2 -= p1;
 
     EXPECT_EQ(expected, p2);
 }
