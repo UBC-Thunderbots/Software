@@ -3,8 +3,14 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "test_util",
     testonly = True,
-    srcs = ["test_util.cpp"],
-    hdrs = ["test_util.h"],
+    srcs = [
+        "equal_within_tolerance.cpp",
+        "test_util.cpp",
+    ],
+    hdrs = [
+        "equal_within_tolerance.h",
+        "test_util.h",
+    ],
     deps = [
         "//shared:constants",
         "//software/new_geom:angle",
@@ -30,31 +36,11 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "equal_within_tolerance",
-    srcs = ["equal_within_tolerance.cpp"],
-    hdrs = ["equal_within_tolerance.h"],
-    deps = [
-        "//shared:constants",
-        "//software/new_geom:angle",
-        "//software/new_geom:angular_velocity",
-        "//software/new_geom:geom_constants",
-        "//software/new_geom:point",
-        "//software/new_geom:polygon",
-        "//software/new_geom:vector",
-        "//software/new_geom/util:algorithms",
-        "//software/simulation/physics:physics_world",
-        "//software/world",
-        "//software/world:robot_state",
-        "@gtest//:gtest_main",
-    ],
-)
-
 cc_test(
     name = "equal_within_tolerance_test",
     srcs = ["equal_within_tolerance_test.cpp"],
     deps = [
-        ":equal_within_tolerance",
+        ":test_util",
         "@gtest//:gtest_main",
     ],
 )

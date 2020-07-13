@@ -51,7 +51,6 @@ cc_test(
         "//software/new_geom:point",
         "//software/new_geom:rectangle",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "//software/world",
         "@gtest//:gtest_main",
     ],

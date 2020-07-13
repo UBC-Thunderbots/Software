@@ -106,7 +106,6 @@ cc_test(
         "//shared:constants",
         "//software/ai/intent:move_intent",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )
@@ -134,7 +133,6 @@ cc_test(
     deps = [
         ":defense_shadow_enemy_tactic",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )
@@ -167,7 +165,6 @@ cc_test(
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )
@@ -325,7 +322,6 @@ cc_test(
     deps = [
         ":shadow_enemy_tactic",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )

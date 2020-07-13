@@ -248,7 +248,6 @@ cc_test(
     deps = [
         ":polynomial2d",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )
@@ -296,7 +295,6 @@ cc_test(
     deps = [
         ":polygon",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )
@@ -344,7 +342,6 @@ cc_test(
         ":linear_spline2d",
         "//software/new_geom/util:algorithms",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )
@@ -356,7 +353,6 @@ cc_test(
         ":bezier_curve2d",
         "//software/new_geom/util:algorithms",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )
@@ -367,7 +363,6 @@ cc_test(
     deps = [
         ":cubic_bezier_spline2d",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )

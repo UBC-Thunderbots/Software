@@ -62,7 +62,6 @@ cc_test(
         ":shot",
         "//shared:constants",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "@gtest//:gtest_main",
     ],
 )
@@ -139,7 +138,6 @@ cc_test(
     deps = [
         ":enemy_threat",
         "//software/test_util",
-        "//software/test_util:equal_within_tolerance",
         "//software/world:ball",
         "@gtest//:gtest_main",
     ],
