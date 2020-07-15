@@ -170,7 +170,7 @@ TEST(BallPlacementPointTest, test_ball_placement_point)
     ref_point->set_x(100);
     ref_point->set_y(200);
 
-    ref.set_allocated_designated_position(ref_point.release());
+    *(ref.mutable_designated_position()) = *ref_point;
 
     ASSERT_EQ(Point(100, 200), getBallPlacementPoint(ref));
 }

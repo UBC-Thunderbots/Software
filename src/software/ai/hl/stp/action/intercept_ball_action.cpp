@@ -8,6 +8,7 @@
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/ray.h"
+#include "software/new_geom/util/acute_angle.h"
 #include "software/new_geom/util/closest_point.h"
 #include "software/new_geom/util/distance.h"
 #include "software/new_geom/util/intersection.h"
@@ -71,17 +72,29 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         Point closest_point = closestPointOnLine(
             robot->position(), Line(ball.position(), ball.position() + ball.velocity()));
         bool point_in_front_of_ball =
-            pointInFrontVector(ball.position(), ball.velocity(), closest_point);
+            acuteAngle(ball.velocity(), closest_point - ball.position()) <
+            Angle::quarter();
 
-        // We add 1e-6 to avoid division by 0 without affecting the result significantly
-        Duration ball_time_to_position = Duration::fromSeconds(
-            distance(closest_point, ball.position()) / (ball.velocity().length() + 1e-6));
+        Duration ball_time_to_position;
+        bool ball_not_moving = false;
+
+        if (ball.velocity().length() != 0)
+        {
+            ball_time_to_position = Duration::fromSeconds(
+                distance(closest_point, ball.position()) / (ball.velocity().length()));
+        }
+        else
+        {
+            ball_not_moving = true;
+        }
+
         Duration robot_time_to_pos = getTimeToPositionForRobot(
             robot->position(), closest_point, ROBOT_MAX_SPEED_METERS_PER_SECOND,
             ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
         std::optional<Point> intercept_pos = std::nullopt;
-        if (point_in_front_of_ball && (ball_time_to_position > robot_time_to_pos))
+        if ((point_in_front_of_ball &&
+             (ball_not_moving || ball_time_to_position > robot_time_to_pos)))
         {
             intercept_pos = closest_point;
         }
@@ -97,7 +110,8 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                     robot->position(),
                     Line(ball.position(), ball.position() + ball.velocity()));
                 point_in_front_of_ball =
-                    pointInFrontVector(ball.position(), ball.velocity(), closest_point);
+                    acuteAngle(ball.velocity(), closest_point - ball.position()) <
+                    Angle::quarter();
             }
         }
         else if (point_ball_leaves_field)
@@ -128,7 +142,8 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
                                                   Point closest_point_on_ball_trajectory)
 {
     bool robot_on_ball_line =
-        pointInFrontVector(ball.position(), ball.velocity(), robot->position()) &&
+        acuteAngle(ball.velocity(), robot->position() - ball.position()) <
+            Angle::quarter() &&
         distance(robot->position(),
                  Line(ball.position(), ball.position() + ball.velocity())) <
             ROBOT_CLOSE_TO_BALL_TRAJECTORY_LINE_THRESHOLD;

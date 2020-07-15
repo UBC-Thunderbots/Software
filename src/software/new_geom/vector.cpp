@@ -51,7 +51,10 @@ double Vector::length() const
 
 Vector Vector::normalize() const
 {
-    return length() < 1.0e-9 ? Vector() : Vector(x_ / length(), y_ / length());
+    // 2 * FIXED_EPSILON for error needed:
+    // - mathcalls `hypot` from `length` function call
+    // - cases where FIXED_EPSILON is used to initialize the vector
+    return length() < 2 * FIXED_EPSILON ? Vector() : Vector(x_ / length(), y_ / length());
 }
 
 Vector Vector::normalize(double length) const
@@ -82,11 +85,6 @@ double Vector::dot(const Vector &other) const
 double Vector::cross(const Vector &other) const
 {
     return x_ * other.y() - y_ * other.x();
-}
-
-Angle Vector::angleWith(const Vector &other) const
-{
-    return Angle::fromRadians(acos(dot(other) / (length() * other.length())));
 }
 
 Vector &Vector::operator=(const Vector &q)

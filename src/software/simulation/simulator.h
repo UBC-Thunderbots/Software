@@ -7,6 +7,11 @@
 #include "software/simulation/simulator_robot.h"
 #include "software/world/world.h"
 
+extern "C"
+{
+#include "shared/proto/primitive.nanopb.h"
+}
+
 /**
  * Because the FirmwareWorld_t struct is defined in the .c file (rather than the .h file),
  * C++ considers it an incomplete type and is unable to use it with smart pointers
@@ -70,6 +75,21 @@ class Simulator
     explicit Simulator(const Field& field,
                        const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
+
+    /**
+     * Creates a new Simulator. The starting state of the simulation
+     * will have the given field, with no robots or ball.
+     *
+     * @param field The field to initialize the simulation with
+     * @param ball_restitution The restitution for ball collisions
+     * @param ball_linear_damping The damping on the ball's linear motion
+     * @param physics_time_step The time step used to simulated physics
+     * and robot primitives.
+     */
+    explicit Simulator(const Field& field, double ball_restitution,
+                       double ball_linear_damping,
+                       const Duration& physics_time_step =
+                           Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;
 
     /**
@@ -115,13 +135,10 @@ class Simulator
      * in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_index The index (type) of the primitive to set
-     * @param params The parameters for the specified primitive
+     * @param primitive_msg The primitive to run on the robot
      */
-    void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                 const primitive_params_t& params);
-    void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
-                               const primitive_params_t& params);
+    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -190,35 +207,15 @@ class Simulator
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_index The index of the primitive to set
-     * @param params The parameters for the specified primitive
+     * @param primitive_msg The primitive to run on the robot
      * @param simulator_robots The robots to set the primitives on
      * @param simulator_ball The simulator ball to use in the primitives
      */
     static void setRobotPrimitive(
-        RobotId id, unsigned int primitive_index, primitive_params_t params,
+        RobotId id, const PrimitiveMsg& primitive_msg,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
         const std::shared_ptr<SimulatorBall>& simulator_ball);
-
-    /**
-     * Returns the encoded primitive parameters for the given Primitive
-     *
-     * @param primitive The Primitive to get the parameters for
-     *
-     * @return The encoded primitive parameters for the given Primitive
-     */
-    static primitive_params_t getPrimitiveParams(
-        const std::unique_ptr<Primitive>& primitive);
-
-    /**
-     * Returns the primitive index for the given Primitive
-     *
-     * @param primitive The Primitive to get the index for
-     *
-     * @return The index for the given Primitive
-     */
-    static unsigned int getPrimitiveIndex(const std::unique_ptr<Primitive>& primitive);
 
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;

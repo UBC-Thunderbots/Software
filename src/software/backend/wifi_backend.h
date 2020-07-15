@@ -3,7 +3,6 @@
 #include "shared/proto/tbots_robot_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
-#include "software/backend/input/network/networking/network_client.h"
 #include "software/backend/ssl_proto_client.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
@@ -18,14 +17,6 @@ class WifiBackend : public Backend
     static const std::string name;
 
    private:
-    /**
-     * This is registered as an async callback function so that it is called
-     * with a new world every time one is available
-     *
-     * @param world The new world
-     */
-    void receiveWorld(World world);
-
     void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
     void onValueReceived(World world) override;
 
@@ -45,9 +36,6 @@ class WifiBackend : public Backend
     void joinMulticastChannel(int channel, const std::string& interface);
 
     const std::shared_ptr<const NetworkConfig> network_config;
-
-    // The interface with the network that lets us get new information about the world
-    NetworkClient network_input;
 
     // Client to listen for SSL protobufs
     SSLProtoClient ssl_proto_client;

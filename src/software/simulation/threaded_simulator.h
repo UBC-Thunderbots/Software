@@ -6,9 +6,13 @@
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/simulator.h"
 
+extern "C"
+{
+#include "shared/proto/primitive.nanopb.h"
+}
+
 /**
- * A simulator that runs in a separate thread and publishes protobuf
- * data asynchronously.
+ * A wrapper for Simulator that runs in a separate thread with a callback registry
  */
 class ThreadedSimulator
 {
@@ -18,8 +22,11 @@ class ThreadedSimulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param ball_restitution The restitution for ball collisions
+     * @param ball_linear_damping The damping on the ball's linear motion
      */
-    explicit ThreadedSimulator(const Field& field);
+    explicit ThreadedSimulator(const Field& field, double ball_restitution = 1.0,
+                               double ball_linear_damping = 0.0);
     ~ThreadedSimulator();
 
     /**
@@ -49,6 +56,25 @@ class ThreadedSimulator
      * Note: This function is threadsafe
      */
     void stopSimulation();
+
+    /**
+     * Sets the slow motion multiplier for the simulation. Larger values
+     * cause the simulation to run in slow motion. For example, a value
+     * of 2.0 causes the simulation to run 2x slower.
+     *
+     * Note: This function is threadsafe
+     *
+     * @pre multiplier is >= 1.0
+     *
+     * @param multiplier The slow motion multiplier
+     */
+    void setSlowMotionMultiplier(double multiplier);
+
+    /**
+     * Resets the slow motion multiplier value to let the simulation
+     * run in real-time speed.
+     */
+    void resetSlowMotionMultiplier();
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
@@ -100,13 +126,10 @@ class ThreadedSimulator
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_type The primitive to set
-     * @param params The parameters for the specified primitive
+     * @param primitive_msg The primitive to run on the robot
      */
-    void setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                 const primitive_params_t& params);
-    void setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
-                               const primitive_params_t& params);
+    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
 
    private:
     /**
@@ -121,6 +144,12 @@ class ThreadedSimulator
      */
     void runSimulationLoop();
 
+    /**
+     * A helper function to update the callback functions with the latest
+     * data from the simulator
+     */
+    void updateCallbacks();
+
     std::vector<std::function<void(SSL_WrapperPacket)>> ssl_wrapper_packet_callbacks;
     std::mutex callback_mutex;
 
@@ -130,6 +159,8 @@ class ThreadedSimulator
     bool simulation_thread_started;
     std::mutex simulation_thread_started_mutex;
     std::atomic_bool stopping_simulation;
+
+    std::atomic<double> slow_motion_multiplier = 1.0;
 
     // 60HZ is approximately the framerate of the real-life cameras
     static constexpr double TIME_STEP_SECONDS = 1.0 / 60.0;

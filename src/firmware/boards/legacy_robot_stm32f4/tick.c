@@ -119,15 +119,9 @@ static void normal_task(void *UNUSED(param))
         // Submit the log record, if we filled one.
         if (record)
         {
-            unsigned int current_primitive_index =
-                app_primitive_manager_getCurrentPrimitiveIndex(primitive_manager);
-
-            // We can only send integer, so set to a really large value if less then zero,
-            // so we can at least indicate that _something_ is wrong
-            if (current_primitive_index < 0)
-            {
-                current_primitive_index = 99;
-            }
+            // We no longer have the concept of a primitive index, but we set it to
+            // a default value here for backwards compatability
+            uint8_t current_primitive_index = 99;
 
             // We no longer use message serials, but this is kept so that the message
             // struct remains the same because our older tooling can be extremely brittle

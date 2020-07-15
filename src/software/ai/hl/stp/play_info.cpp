@@ -1,18 +1,21 @@
 #include "software/ai/hl/stp/play_info.h"
 
-PlayInfo::PlayInfo() : play_type(""), play_name(""), robot_tactic_assignment({}) {}
+PlayInfo::PlayInfo()
+    : refbox_game_state_name(""), play_name(""), robot_tactic_assignment({})
+{
+}
 
-PlayInfo::PlayInfo(std::string play_type, std::string play_name,
+PlayInfo::PlayInfo(std::string refbox_game_state_name, std::string play_name,
                    std::unordered_set<std::string> robot_tactic_assignment)
-    : play_type(play_type),
+    : refbox_game_state_name(refbox_game_state_name),
       play_name(play_name),
       robot_tactic_assignment(robot_tactic_assignment)
 {
 }
 
-std::string PlayInfo::getPlayType() const
+std::string PlayInfo::getRefboxGameStateName() const
 {
-    return play_type;
+    return refbox_game_state_name;
 }
 
 std::string PlayInfo::getPlayName() const
@@ -32,6 +35,7 @@ void PlayInfo::addRobotTacticAssignment(std::string new_assignment)
 
 bool PlayInfo::operator==(const PlayInfo &other) const
 {
-    return this->play_type == other.play_type && this->play_name == other.play_name &&
+    return this->refbox_game_state_name == other.refbox_game_state_name &&
+           this->play_name == other.play_name &&
            this->robot_tactic_assignment == other.robot_tactic_assignment;
 }

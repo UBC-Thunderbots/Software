@@ -5,7 +5,6 @@
 // because intent.h includes intent_visitor.h, and each individual library includes
 // intent.h. Note: every subclass of this visitor must include all of the classes listed
 // below
-class CatchIntent;
 class ChipIntent;
 class DirectVelocityIntent;
 class DirectWheelsIntent;
@@ -33,7 +32,6 @@ class IntentVisitor
      *
      * @param The Intent to visit
      */
-    virtual void visit(const CatchIntent &catch_intent)                    = 0;
     virtual void visit(const ChipIntent &chip_intent)                      = 0;
     virtual void visit(const DirectVelocityIntent &direct_velocity_intent) = 0;
     virtual void visit(const DirectWheelsIntent &direct_wheels_intent)     = 0;

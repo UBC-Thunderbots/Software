@@ -62,23 +62,6 @@ class ThetaStarNavigatorTest : public testing::Test
     Navigator navigator;
 };
 
-TEST_F(ThetaStarNavigatorTest, convert_catch_intent_to_catch_primitive)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(std::make_unique<CatchIntent>(1, 0, 10, 0.3, 0));
-
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
-
-    // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
-
-    auto expected_primitive = CatchPrimitive(1, 0, 10, 0.3);
-    auto primitive          = dynamic_cast<CatchPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
-}
-
 TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
 {
     World world = ::TestUtil::createBlankTestingWorld();
