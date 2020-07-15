@@ -22,7 +22,7 @@ typedef struct FilteredRobotData_t
     Timestamp timestamp;
 } FilteredRobotData;
 
-class RobotFilter
+class RobotFilter final
 {
    public:
     /**

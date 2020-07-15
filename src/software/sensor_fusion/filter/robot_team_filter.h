@@ -6,7 +6,7 @@
 #include "software/sensor_fusion/filter/robot_filter.h"
 #include "software/world/team.h"
 
-class RobotTeamFilter
+class RobotTeamFilter final
 {
    public:
     /**

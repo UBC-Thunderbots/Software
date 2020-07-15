@@ -35,7 +35,7 @@ struct LinearRegressionResults
  * Given ball data from SSL Vision, filters for and returns the position/velocity of the
  * "real" ball
  */
-class BallFilter
+class BallFilter final
 {
    public:
     // The default min and max sizes of the ball detection buffer

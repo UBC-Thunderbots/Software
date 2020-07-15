@@ -1,7 +1,5 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
-#include <algorithm>
-
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)

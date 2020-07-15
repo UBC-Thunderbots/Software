@@ -19,7 +19,7 @@
  * need to perform. It produces Worlds that may be used, and consumes vision detections,
  * refbox data, and robot statuses
  */
-class SensorFusion
+class SensorFusion final
 {
    public:
     /**
