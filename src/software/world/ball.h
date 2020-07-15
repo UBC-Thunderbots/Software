@@ -48,7 +48,7 @@ class Ball final
      *
      * @return ball model
      */
-    const std::shared_ptr<BallModel> &getBallModel() const;
+    const std::shared_ptr<BallModel> &ballModel() const;
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive

@@ -9,7 +9,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
                                                                    const Robot &robot)
 {
     TimestampedBallState ball_state               = ball.currentState();
-    auto ball_model                               = ball.getBallModel();
+    auto ball_model                               = ball.ballModel();
     static const double gradient_approx_step_size = 0.000001;
 
     // We use this to take a smooth absolute value in our objective function
@@ -49,7 +49,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
         return std::sqrt(std::pow(ball_robot_time_diff, 2) + smooth_abs_eps);
     };
 
-    // Figure out when/where to intercept the ball_state. We do this by optimizing over
+    // Figure out when/where to intercept the ball. We do this by optimizing over
     // the ball position as a function of it's travel time
     // We make the weight here an inverse of the ball speed, so that the gradient
     // descent takes smaller steps when the ball is moving faster

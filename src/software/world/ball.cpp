@@ -35,7 +35,7 @@ TimestampedBallState Ball::currentState() const
     return states_.front();
 }
 
-const std::shared_ptr<BallModel> &Ball::getBallModel() const
+const std::shared_ptr<BallModel> &Ball::ballModel() const
 {
     return ball_model_;
 }

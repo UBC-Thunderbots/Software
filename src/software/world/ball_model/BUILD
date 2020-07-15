@@ -15,7 +15,7 @@ cc_library(
     hdrs = ["linear_ball_model.h"],
     deps = [
         ":ball_model",
-        "//software/new_geom/util:algorithms",
+        "//software/physics",
     ],
 )
 

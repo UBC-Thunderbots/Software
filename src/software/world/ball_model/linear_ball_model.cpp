@@ -1,6 +1,6 @@
 #include "software/world/ball_model/linear_ball_model.h"
 
-#include "software/new_geom/util/physics.h"
+#include "software/physics/physics.h"
 
 LinearBallModel::LinearBallModel(BallState initial_ball_state,
                                  std::optional<FrictionParameters> friction_parameters)

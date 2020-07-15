@@ -15,7 +15,6 @@ cc_library(
         "intersection.cpp",
         "intersects.cpp",
         "multiple_segments.cpp",
-        "physics.cpp",
         "projection.cpp",
         "projection_impl.cpp",
         "projection_impl.h",  # Hiding implementation functions of projection
@@ -34,7 +33,6 @@ cc_library(
         "intersection.h",
         "intersects.h",
         "multiple_segments.h",
-        "physics.h",
         "projection.h",
         "voronoi_diagram.h",
     ],
@@ -192,16 +190,6 @@ cc_test(
         "projection_impl.h",
         "projection_test.cpp",
     ],
-    deps = [
-        ":algorithms",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "physics_test",
-    srcs = ["physics_test.cpp"],
     deps = [
         ":algorithms",
         "//software/test_util",
