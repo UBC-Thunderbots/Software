@@ -12,13 +12,17 @@ TEST(LinearBallModelTest, test_no_friction)
     BallState expected_1(Point(4, 4), velocity);
     BallState expected_2(Point(5.5, 2.5), velocity);
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_1.position(), model.estimateFutureState(1.0).position(), 0.01));
+        expected_1.position(),
+        model.estimateFutureState(Duration::fromSeconds(1.0)).position(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_1.velocity(), model.estimateFutureState(1.0).velocity(), 0.01));
+        expected_1.velocity(),
+        model.estimateFutureState(Duration::fromSeconds(1.0)).velocity(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_2.position(), model.estimateFutureState(2.5).position(), 0.01));
+        expected_2.position(),
+        model.estimateFutureState(Duration::fromSeconds(2.5)).position(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_2.velocity(), model.estimateFutureState(2.5).velocity(), 0.01));
+        expected_2.velocity(),
+        model.estimateFutureState(Duration::fromSeconds(2.5)).velocity(), 0.01));
 }
 
 TEST(LinearBallModelTest, test_rolling_friction)
@@ -32,13 +36,17 @@ TEST(LinearBallModelTest, test_rolling_friction)
     BallState expected_1(Point(5.46, 3.36), Vector(1.92, -1.28));
     BallState expected_2(Point(7.12, 2.25), Vector(0.30, -0.20));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_1.position(), model.estimateFutureState(1.0).position(), 0.01));
+        expected_1.position(),
+        model.estimateFutureState(Duration::fromSeconds(1.0)).position(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_1.velocity(), model.estimateFutureState(1.0).velocity(), 0.01));
+        expected_1.velocity(),
+        model.estimateFutureState(Duration::fromSeconds(1.0)).velocity(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_2.position(), model.estimateFutureState(2.5).position(), 0.01));
+        expected_2.position(),
+        model.estimateFutureState(Duration::fromSeconds(2.5)).position(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_2.velocity(), model.estimateFutureState(2.5).velocity(), 0.01));
+        expected_2.velocity(),
+        model.estimateFutureState(Duration::fromSeconds(2.5)).velocity(), 0.01));
 }
 
 TEST(LinearBallModelTest, test_sliding_friction)
@@ -53,15 +61,21 @@ TEST(LinearBallModelTest, test_sliding_friction)
     BallState expected_2(Point(5.59, 3.27), Vector(0.0, 0.0));
     BallState expected_3(Point(5.59, 3.27), Vector(0.0, 0.0));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_1.position(), model.estimateFutureState(1.0).position(), 0.01));
+        expected_1.position(),
+        model.estimateFutureState(Duration::fromSeconds(1.0)).position(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_1.velocity(), model.estimateFutureState(1.0).velocity(), 0.01));
+        expected_1.velocity(),
+        model.estimateFutureState(Duration::fromSeconds(1.0)).velocity(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_2.position(), model.estimateFutureState(2.5).position(), 0.01));
+        expected_2.position(),
+        model.estimateFutureState(Duration::fromSeconds(2.5)).position(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_2.velocity(), model.estimateFutureState(2.5).velocity(), 0.01));
+        expected_2.velocity(),
+        model.estimateFutureState(Duration::fromSeconds(2.5)).velocity(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_3.position(), model.estimateFutureState(5.1).position(), 0.01));
+        expected_3.position(),
+        model.estimateFutureState(Duration::fromSeconds(5.1)).position(), 0.01));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_3.velocity(), model.estimateFutureState(5.1).velocity(), 0.01));
+        expected_3.velocity(),
+        model.estimateFutureState(Duration::fromSeconds(5.1)).velocity(), 0.01));
 }

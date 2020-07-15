@@ -32,7 +32,8 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
         }
 
         // Estimate the ball position
-        Point new_ball_pos = ball_model->estimateFutureState(duration).position();
+        Point new_ball_pos =
+            ball_model->estimateFutureState(Duration::fromSeconds(duration)).position();
 
         // Figure out how long it will take the robot to get to the new ball position
         Duration time_to_ball_pos = getTimeToPositionForRobot(
@@ -69,8 +70,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     }
 
     Point best_ball_intercept_pos =
-        ball_model->estimateFutureState(best_ball_travel_duration.getSeconds())
-            .position();
+        ball_model->estimateFutureState(best_ball_travel_duration).position();
 
     // Check that we can get to the best position in time
     Duration time_to_ball_pos = getTimeToPositionForRobot(

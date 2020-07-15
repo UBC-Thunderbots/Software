@@ -15,7 +15,7 @@ class BallModel
      * Returns the estimated state of the ball at the specified amount of time in the
      * future
      *
-     * @param second_in_future The Duration into the future at which to predict the
+     * @param duration_in_future The Duration into the future at which to predict the
      * ball's position from when the BallModel was initialized
      *
      * @throws std::invalid_argument if the ball is estimating state at a time from the
@@ -23,7 +23,7 @@ class BallModel
      *
      * @return The future state of the ball
      */
-    virtual BallState estimateFutureState(double seconds_in_future) = 0;
+    virtual BallState estimateFutureState(Duration duration_in_future) = 0;
 
     virtual ~BallModel() = default;
 };

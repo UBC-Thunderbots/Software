@@ -5,16 +5,8 @@
 
 Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp,
            unsigned int history_size)
-    : states_(history_size),
-      ball_model_(std::make_shared<LinearBallModel>(
-          LinearBallModel(BallState(position, velocity))))
+    : Ball(TimestampedBallState(position, velocity, timestamp), history_size)
 {
-    if (history_size <= 0)
-    {
-        throw std::invalid_argument("Error: history_size must be greater than 0");
-    }
-
-    updateState(TimestampedBallState(position, velocity, timestamp));
 }
 
 Ball::Ball(const TimestampedBallState &initial_state, unsigned int history_size)
