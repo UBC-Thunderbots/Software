@@ -18,6 +18,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
                    BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter_(),
       enemy_team_filter_(),
+      possession_filter_(),
       ball_states_(history_size_)
 {
     if (!sensor_fusion_config_)
@@ -133,8 +134,9 @@ void SensorFusion::updatePossessionState(
             std::max<Timestamp>({friendly_team_.getMostRecentTimestamp(),
                                  enemy_team_.getMostRecentTimestamp()});
         timestamped_possession_state_.updateState(
-            getRobotsWithPossession(friendly_robots_with_breakbeam_triggered,
-                                    friendly_team_, enemy_team_, *ball_),
+            possession_filter_.getRobotsWithPossession(
+                friendly_robots_with_breakbeam_triggered, friendly_team_, enemy_team_,
+                *ball_),
             most_recent_timestamp);
     }
 }
@@ -225,57 +227,6 @@ void SensorFusion::updateBall(TimestampedBallState new_ball_state)
     else
     {
         ball_ = Ball(new_ball_state);
-    }
-}
-
-std::vector<RobotIdWithTeamSide> SensorFusion::getRobotsWithPossession(
-    std::vector<RobotId> friendly_robots_with_breakbeam_triggered, Team friendly_team,
-    Team enemy_team, Ball ball) const
-{
-    std::vector<RobotIdWithTeamSide> possessions;
-    for (const auto &robot_id : friendly_robots_with_breakbeam_triggered)
-    {
-        possessions.push_back(
-            RobotIdWithTeamSide{.id = robot_id, .team_side = TeamSide::FRIENDLY});
-    }
-
-    for (const auto &robot : friendly_team.getAllRobots())
-    {
-        if (ballNearDribbler(ball.position(), robot.position(), robot.orientation()))
-        {
-            possessions.push_back(
-                RobotIdWithTeamSide{.id = robot.id(), .team_side = TeamSide::FRIENDLY});
-        }
-    }
-
-    for (const auto &robot : enemy_team.getAllRobots())
-    {
-        if (ballNearDribbler(ball.position(), robot.position(), robot.orientation()))
-        {
-            possessions.push_back(
-                RobotIdWithTeamSide{.id = robot.id(), .team_side = TeamSide::ENEMY});
-        }
-    }
-
-    return possessions;
-}
-
-bool SensorFusion::ballNearDribbler(Point ball_position, Point robot_position,
-                                    Angle robot_orientation) const
-{
-    // check if the ball is within a certain distance of the robot
-    // this is experimentally determined to be a reasonable value
-    static const double max_dist_to_robot = ROBOT_MAX_RADIUS_METERS + 0.2;
-    if ((ball_position - robot_position).length() > max_dist_to_robot)
-    {
-        return false;
-    }
-    else
-    {
-        // check that ball is in a 90-degree cone in front of the robot
-        auto ball_to_robot_angle =
-            robot_orientation.minDiff((ball_position - robot_position).orientation());
-        return (ball_to_robot_angle < Angle::fromDegrees(45.0));
     }
 }
 

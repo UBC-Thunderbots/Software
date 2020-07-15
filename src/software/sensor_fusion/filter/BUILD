@@ -78,9 +78,32 @@ cc_test(
 )
 
 cc_library(
+    name = "possession_filter",
+    srcs = ["possession_filter.cpp"],
+    hdrs = ["possession_filter.h"],
+    deps = [
+        "//software:constants",
+        "//software/world:ball",
+        "//software/world:robot_state",
+        "//software/world:team",
+        "//software/world:timestamped_possession_state",
+    ],
+)
+
+cc_test(
+    name = "possession_filter_test",
+    srcs = ["possession_filter_test.cpp"],
+    deps = [
+        ":possession_filter",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "sensor_fusion_filters",
     deps = [
         ":ball_filter",
+        ":possession_filter",
         ":robot_team_filter",
     ],
 )

@@ -8,6 +8,7 @@
 #include "software/proto/message_translation/ssl_referee.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
+#include "software/sensor_fusion/filter/possession_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/sensor_fusion/refbox_data.h"
@@ -86,33 +87,6 @@ class SensorFusion
     void updateBall(TimestampedBallState new_ball_state);
 
     /**
-     * Compiles the list of robots that have possession of the ball
-     *
-     * @param friendly_robots_with_breakbeam_triggered The friendly robots that have their
-     * breakbeam triggered
-     * @param friendly_team The friendly_team of robots
-     * @param enemy_team The enemy_team of robots
-     * @param ball The ball
-     *
-     * @return the list of robots that possession of the ball
-     */
-    std::vector<RobotIdWithTeamSide> getRobotsWithPossession(
-        std::vector<RobotId> friendly_robots_with_breakbeam_triggered, Team friendly_team,
-        Team enemy_team, Ball ball) const;
-
-    /**
-     * Decides if the ball is near the dribbler of the robot
-     *
-     * @param ball_position The position of the ball
-     * @param robot_position The position of the robot
-     * @param robot_orientation The orientation the robot
-     *
-     * @return whether the ball is near the dribbler of the robot
-     */
-    bool ballNearDribbler(Point ball_position, Point robot_position,
-                          Angle robot_orientation) const;
-
-    /**
      * Create state of the ball from a list of ball detections
      *
      * @param ball_detections list of ball detections to filter
@@ -155,6 +129,7 @@ class SensorFusion
     BallFilter ball_filter_;
     RobotTeamFilter friendly_team_filter_;
     RobotTeamFilter enemy_team_filter_;
+    PossessionFilter possession_filter_;
 
     BallHistory ball_states_;
 };
