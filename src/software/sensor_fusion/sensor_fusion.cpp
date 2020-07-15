@@ -18,7 +18,6 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
                    BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter_(),
       enemy_team_filter_(),
-      possession_filter_(),
       ball_states_(history_size_)
 {
     if (!sensor_fusion_config_)
@@ -134,9 +133,8 @@ void SensorFusion::updatePossessionState(
             std::max<Timestamp>({friendly_team_.getMostRecentTimestamp(),
                                  enemy_team_.getMostRecentTimestamp()});
         timestamped_possession_state_.updateState(
-            possession_filter_.getRobotsWithPossession(
-                friendly_robots_with_breakbeam_triggered, friendly_team_, enemy_team_,
-                *ball_),
+            getRobotsWithPossession(friendly_robots_with_breakbeam_triggered,
+                                    friendly_team_, enemy_team_, *ball_),
             most_recent_timestamp);
     }
 }

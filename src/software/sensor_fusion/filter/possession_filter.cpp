@@ -1,13 +1,8 @@
 #include "software/sensor_fusion/filter/possession_filter.h"
 
-PossessionFilter::PossessionFilter(double possession_threshold_meters)
-    : possession_threshold_meters(possession_threshold_meters)
-{
-}
-
-std::vector<RobotIdWithTeamSide> PossessionFilter::getRobotsWithPossession(
+std::vector<RobotIdWithTeamSide> getRobotsWithPossession(
     std::vector<RobotId> friendly_robots_with_breakbeam_triggered, Team friendly_team,
-    Team enemy_team, Ball ball) const
+    Team enemy_team, Ball ball)
 {
     std::vector<RobotIdWithTeamSide> possessions;
     for (const auto &robot_id : friendly_robots_with_breakbeam_triggered)
@@ -37,10 +32,10 @@ std::vector<RobotIdWithTeamSide> PossessionFilter::getRobotsWithPossession(
     return possessions;
 }
 
-bool PossessionFilter::ballNearDribbler(Point ball_position, Point robot_position,
-                                        Angle robot_orientation) const
+bool ballNearDribbler(Point ball_position, Point robot_position, Angle robot_orientation)
 {
-    if ((ball_position - robot_position).length() > possession_threshold_meters)
+    static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + 0.2;
+    if ((ball_position - robot_position).length() > POSSESSION_THRESHOLD_METERS)
     {
         return false;
     }

@@ -129,7 +129,6 @@ class SensorFusion
     BallFilter ball_filter_;
     RobotTeamFilter friendly_team_filter_;
     RobotTeamFilter enemy_team_filter_;
-    PossessionFilter possession_filter_;
 
     BallHistory ball_states_;
 };
