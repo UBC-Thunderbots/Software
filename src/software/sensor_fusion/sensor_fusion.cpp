@@ -28,7 +28,8 @@ std::optional<World> SensorFusion::getWorld() const
 {
     if (field_ && ball_)
     {
-        World new_world(*field_, *ball_, friendly_team_, enemy_team_);
+        World new_world(*field_, *ball_, friendly_team_, enemy_team_,
+                        timestamped_possession_state_);
         new_world.mutableGameState() = game_state_;
         if (refbox_stage_)
         {
@@ -120,7 +121,8 @@ void SensorFusion::updatePossessionState(
         std::vector<RobotId> friendly_robots_with_breakbeam_triggered;
         for (const auto &tbots_robot_msg : tbots_robot_msgs)
         {
-            if (tbots_robot_msg.has_break_beam_status())
+            if (tbots_robot_msg.has_break_beam_status() &&
+                tbots_robot_msg.break_beam_status().ball_in_beam())
             {
                 friendly_robots_with_breakbeam_triggered.push_back(
                     tbots_robot_msg.robot_id());

@@ -14,7 +14,7 @@ class SensorFusionTest : public ::testing::Test
         : sensor_fusion(DynamicParameters->getSensorFusionConfig()),
           yellow_robot_states(initYellowRobotStates()),
           blue_robot_states(initBlueRobotStates()),
-          ball_state(Point(-1.2, 0), Vector(0.0, 0.0), 0.2),
+          ball_state(Point(-4.3, 3), Vector(0.0, 0.0), 0.2),
           current_time(Timestamp::fromSeconds(8.03)),
           geom_data(initSSLDivBGeomData()),
           detection_frame(initDetectionFrame()),
@@ -227,12 +227,18 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_tbots_robot_msg_1_at_a_time)
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result_1 = *sensor_fusion.getWorld();
-    // TODO (Issue #1276): Add checks on the state of World
+    EXPECT_EQ(test_world, result_1);
     SensorMsg sensor_msg_2;
     *(sensor_msg_2.add_tbots_robot_msgs()) = *tbots_robot_msg_id_2;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
-    // TODO (Issue #1276): Add checks on the state of World
+    EXPECT_NE(test_world, result_2);
+    TimestampedPossessionState expected_possession_state;
+    expected_possession_state.updateState(
+        std::vector<RobotIdWithTeamSide>(
+            {RobotIdWithTeamSide{.id = 2, .team_side = TeamSide::FRIENDLY}}),
+        Timestamp::fromSeconds(8.03));
+    EXPECT_EQ(expected_possession_state, result_2.timestampedPossessionState());
 }
 
 TEST_F(SensorFusionTest, test_complete_wrapper_with_tbots_robot_msg_2_at_a_time)
@@ -245,13 +251,19 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_tbots_robot_msg_2_at_a_time)
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result_1 = *sensor_fusion.getWorld();
-    // TODO (Issue #1276): Add checks on the state of World
+    EXPECT_EQ(test_world, result_1);
     SensorMsg sensor_msg_2;
     *(sensor_msg_2.add_tbots_robot_msgs()) = *tbots_robot_msg_id_1;
     *(sensor_msg_2.add_tbots_robot_msgs()) = *tbots_robot_msg_id_2;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
-    // TODO (Issue #1276): Add checks on the state of World
+    EXPECT_NE(test_world, result_2);
+    TimestampedPossessionState expected_possession_state;
+    expected_possession_state.updateState(
+        std::vector<RobotIdWithTeamSide>(
+            {RobotIdWithTeamSide{.id = 2, .team_side = TeamSide::FRIENDLY}}),
+        Timestamp::fromSeconds(8.03));
+    EXPECT_EQ(expected_possession_state, result_2.timestampedPossessionState());
 }
 
 TEST_F(SensorFusionTest, test_referee_yellow_then_normal)

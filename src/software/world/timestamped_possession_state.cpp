@@ -61,8 +61,7 @@ std::optional<Timestamp> TimestampedPossessionState::getLastPossessionTime(
 bool TimestampedPossessionState::operator==(const TimestampedPossessionState &other) const
 {
     return this->last_possession_map_ == other.last_possession_map_ &&
-           this->current_possessions_ == other.current_possessions_ &&
-           this->timestamp_ == other.timestamp_;
+           this->current_possessions_ == other.current_possessions_;
 }
 
 bool TimestampedPossessionState::operator!=(const TimestampedPossessionState &other) const
