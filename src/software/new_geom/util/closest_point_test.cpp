@@ -88,3 +88,11 @@ TEST(GeomUtilTest, test_closest_lineseg_end_point)
     EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(2, 1.5), seg),
                                                Point(1, 1), 0.00001));
 }
+
+TEST(GeomUtilTest, test_closest_lineseg_degenerate)
+{
+    Segment seg(Point{1, 1}, Point{1, 1});
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(closestPoint(Point(1, 0), seg),
+                                               Point(1, 1), 0.00001));
+}

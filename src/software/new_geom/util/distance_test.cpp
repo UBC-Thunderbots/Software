@@ -107,7 +107,7 @@ TEST(DistanceTest, point_off_segment_closest_to_segment_end)
 TEST(DistanceTest, point_off_almost_degenerate_segment)
 {
     Point p(5, 3);
-    Segment s(Point(-2.01, 2), Point(-2, 2));
+    Segment s(Point(-2, 2), Point(-2, 2));
     double expected = std::hypot(7, 1);
     EXPECT_DOUBLE_EQ(distance(p, s), expected);
     EXPECT_DOUBLE_EQ(distance(s, p), expected);

@@ -104,8 +104,7 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
         return std::nullopt;
     }
 
-    Segment largest_segment(Point{0, 0}, Point{1, 0});
-    Segment smallest_segment(Point{0, 0}, Point{1, 0});
+    Segment largest_segment, smallest_segment;
     // Grab the largest segment
     if (segment1.toVector().lengthSquared() > segment2.toVector().lengthSquared())
     {
