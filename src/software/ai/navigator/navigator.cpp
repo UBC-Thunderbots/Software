@@ -33,13 +33,6 @@ void Navigator::visit(const DirectWheelsIntent &intent)
     current_robot_id  = intent.getRobotId();
 }
 
-void Navigator::visit(const DribbleIntent &intent)
-{
-    auto p            = std::make_unique<DribblePrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
 void Navigator::visit(const KickIntent &intent)
 {
     auto p            = std::make_unique<KickPrimitive>(intent);
@@ -56,13 +49,6 @@ void Navigator::visit(const MoveIntent &intent)
 void Navigator::visit(const MoveSpinIntent &intent)
 {
     auto p            = std::make_unique<MoveSpinPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
-void Navigator::visit(const PivotIntent &intent)
-{
-    auto p            = std::make_unique<PivotPrimitive>(intent);
     current_primitive = std::move(p);
     current_robot_id  = intent.getRobotId();
 }

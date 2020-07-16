@@ -116,24 +116,6 @@ TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_pri
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorTest, convert_dribble_intent_to_dribble_primitive)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<DribbleIntent>(0, Point(), Angle::quarter(), 8888, true, 50));
-
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
-
-    // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
-
-    auto expected_primitive = DribblePrimitive(0, Point(), Angle::quarter(), 8888, true);
-    auto primitive          = dynamic_cast<DribblePrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
-}
-
 TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
 {
     World world = ::TestUtil::createBlankTestingWorld();
@@ -170,25 +152,6 @@ TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorTest, convert_pivot_intent_to_pivot_primitive)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
-                                                       Angle::fromRadians(3.2), true, 1));
-
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
-
-    // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
-
-    auto expected_primitive =
-        PivotPrimitive(0, Point(1, 0.4), Angle::half(), Angle::fromRadians(3.2), true);
-    auto primitive = dynamic_cast<PivotPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
-}
-
 TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
 {
     World world = ::TestUtil::createBlankTestingWorld();
@@ -212,21 +175,19 @@ TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
-    intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
-                                                       Angle::fromRadians(2.2), true, 1));
+    intents.emplace_back(std::make_unique<StopIntent>(1, false, 1));
 
     auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 3 primitives back
     EXPECT_EQ(primitive_ptrs.size(), 2);
 
-    auto expected_stop_primitive = StopPrimitive(0, false);
-    auto stop_primitive          = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_stop_primitive, stop_primitive);
-    auto expected_pivot_primitive =
-        PivotPrimitive(0, Point(1, 0.4), Angle::half(), Angle::fromRadians(2.2), true);
-    auto pivot_primitive = dynamic_cast<PivotPrimitive &>(*(primitive_ptrs.at(1)));
-    EXPECT_EQ(expected_pivot_primitive, pivot_primitive);
+    auto expected_stop_primitive_1 = StopPrimitive(0, false);
+    auto stop_primitive_1          = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(0)));
+    EXPECT_EQ(expected_stop_primitive_1, stop_primitive_1);
+    auto expected_stop_primitive_2 = StopPrimitive(1, false);
+    auto stop_primitive_2          = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(1)));
+    EXPECT_EQ(expected_stop_primitive_2, stop_primitive_2);
 }
 
 TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
