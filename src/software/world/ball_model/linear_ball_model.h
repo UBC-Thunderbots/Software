@@ -11,7 +11,7 @@
  * 3. rolls with a constant rolling friction below a certain speed threshold
  * 4. the transition between sliding and rolling is instantaneous
  */
-class LinearBallModel : public BallModel
+class LinearBallModel final : public BallModel
 {
    public:
     LinearBallModel() = delete;
@@ -20,18 +20,17 @@ class LinearBallModel : public BallModel
      * Creates a new LinearBallModel with the given friction
      *
      * @param initial_ball_state The initial state of the ball
-     * @param rolling_friction_acceleration_m_per_s_squared acceleration opposing the
+     * @param rolling_friction_acceleration_m_per_s_squared The acceleration opposing the
      * direction of travel of a rolling ball
-     * @param sliding_friction_acceleration_m_per_s_squared acceleration opposing the
+     * @param sliding_friction_acceleration_m_per_s_squared The acceleration opposing the
      * direction of travel of a sliding ball
-     * @param    sliding_to_rolling_transition_speed_threshold_m_per_s threshold above
-     * which the ball slides and below which the ball rolls
+     * @param sliding_to_rolling_speed_threshold_m_per_s The threshold above which the
+     * ball slides and below which the ball rolls
      */
-    explicit LinearBallModel(
-        BallState initial_ball_state,
-        double rolling_friction_acceleration_m_per_s_squared         = 0,
-        double sliding_friction_acceleration_m_per_s_squared         = 0,
-        double sliding_to_rolling_transition_speed_threshold_m_per_s = 0);
+    explicit LinearBallModel(BallState initial_ball_state,
+                             double rolling_friction_acceleration_m_per_s_squared = 0,
+                             double sliding_friction_acceleration_m_per_s_squared = 0,
+                             double sliding_to_rolling_speed_threshold_m_per_s    = 0);
 
     BallState estimateFutureState(const Duration &duration_in_future) override;
 
@@ -42,30 +41,31 @@ class LinearBallModel : public BallModel
     // acceleration opposing the direction of travel of a sliding ball
     double sliding_friction_acceleration_m_per_s_squared_;
     // threshold above which the ball slides and below which the ball rolls
-    double sliding_to_rolling_transition_speed_threshold_m_per_s_;
+    double sliding_to_rolling_speed_threshold_m_per_s_;
 
 
     /**
      * Applies linear friction model
      *
-     * @param duration_in_future Duration into the future
+     * @param seconds_in_future Seconds into the future
      *
      * @return future ball state
      */
-    BallState applyLinearFrictionModel(const Duration &duration_in_future) const;
+    BallState applyLinearFrictionModel(const double seconds_in_future) const;
 
     /**
      * Calculates the future ball state assuming constant acceleration opposing the
      * velocity of the ball
      *
-     * @param initial_position The initial position of the ball
-     * @param initial_velocity The initial velocity of the ball
-     * @param friction_acceleration The magnitude of the acceleration due to friction
-     * @param duration_in_future Duration into the future
+     * @param initial_ball_state The initial ball state
+     * @param constant_friction_acceleration_m_per_s The magnitude of the acceleration due
+     * to friction
+     * @param seconds_in_future Seconds into the future
      *
      * @return future ball state
      */
-    BallState calculateFutureBallState(BallState initial_ball_state,
-                                       double friction_acceleration,
-                                       Duration duration_in_future) const;
+    BallState calculateFutureBallState(
+        const BallState &initial_ball_state,
+        const double constant_friction_acceleration_m_per_s,
+        const double seconds_in_future) const;
 };
