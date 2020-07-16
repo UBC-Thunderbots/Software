@@ -13,46 +13,56 @@
 class LinearBallModel : public BallModel
 {
    public:
-    struct FrictionParameters
-    {
-        // acceleration opposing the direction of travel of a rolling ball
-        double rolling_friction_acceleration;
-        // acceleration opposing the direction of travel of a sliding ball
-        double sliding_friction_acceleration;
-        // threshold above which the ball slides and below which the ball rolls
-        double rolling_sliding_speed_threshold;
-    };
-
     LinearBallModel() = delete;
 
     /**
      * Creates a new LinearBallModel with the given friction
      *
      * @param initial_ball_state The initial state of the ball
-     * @param friction_parameters The FrictionParameters for prediction
+     * @param rolling_friction_acceleration_m_per_s_squared acceleration opposing the
+     * direction of travel of a rolling ball
+     * @param sliding_friction_acceleration_m_per_s_squared acceleration opposing the
+     * direction of travel of a sliding ball
+     * @param    sliding_to_rolling_transition_speed_threshold_m_per_s threshold above
+     * which the ball slides and below which the ball rolls
      */
     explicit LinearBallModel(
         BallState initial_ball_state,
-        std::optional<FrictionParameters> friction_parameters = std::nullopt);
+        double rolling_friction_acceleration_m_per_s_squared         = 0,
+        double sliding_friction_acceleration_m_per_s_squared         = 0,
+        double sliding_to_rolling_transition_speed_threshold_m_per_s = 0);
 
     BallState estimateFutureState(Duration duration_in_future) override;
 
    private:
     const BallState initial_ball_state_;
-    const std::optional<FrictionParameters> friction_parameters_;
+    // acceleration opposing the direction of travel of a rolling ball
+    double rolling_friction_acceleration_m_per_s_squared_;
+    // acceleration opposing the direction of travel of a sliding ball
+    double sliding_friction_acceleration_m_per_s_squared_;
+    // threshold above which the ball slides and below which the ball rolls
+    double sliding_to_rolling_transition_speed_threshold_m_per_s_;
+
 
     /**
      * Applies linear friction model
      *
      * @param initial_ball_state initial ball state
      * @param duration_in_future Duration into the future
-     * @param friction_parameters defines friction for model
+     * @param rolling_friction_acceleration_m_per_s_squared acceleration opposing the
+     * direction of travel of a rolling ball
+     * @param sliding_friction_acceleration_m_per_s_squared acceleration opposing the
+     * direction of travel of a sliding ball
+     * @param    sliding_to_rolling_transition_speed_threshold_m_per_s threshold above
+     * which the ball slides and below which the ball rolls
      *
      * @return future ball state
      */
     static BallState applyLinearFrictionModel(
         const BallState& initial_ball_state, Duration duration_in_future,
-        const FrictionParameters& friction_parameters);
+        double rolling_friction_acceleration_m_per_s_squared,
+        double sliding_friction_acceleration_m_per_s_squared,
+        double sliding_to_rolling_transition_speed_threshold_m_per_s);
 
     /**
      * Calculates the future ball state assuming constant acceleration opposing the
@@ -68,14 +78,4 @@ class LinearBallModel : public BallModel
     static BallState calculateFutureBallState(BallState initial_ball_state,
                                               double friction_acceleration,
                                               Duration duration_in_future);
-
-    /**
-     * Returns absolute value of input friction parameter
-     *
-     * @param friction_parameters FrictionParameters to initialize
-     *
-     * @return friction parameter with no negative values
-     */
-    std::optional<FrictionParameters> initFrictionParameters(
-        std::optional<FrictionParameters> fp);
 };
