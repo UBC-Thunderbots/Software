@@ -1,32 +1,15 @@
-/**
- * This file includes the definition of the MovePrimitive class and it's member functions
- * and data
- */
-
 #pragma once
 
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/primitive/primitive.h"
+#include "software/util/make_enum/make_enum.h"
 
-enum AutokickType
-{
-    NONE,
-    AUTOKICK,
-    AUTOCHIP
-};
+MAKE_ENUM(AutokickType, NONE, AUTOKICK, AUTOCHIP);
 
-enum MoveType
-{
-    NORMAL,
-    SLOW,
-};
+MAKE_ENUM(MoveType, NORMAL, SLOW);
 
-enum DribblerEnable
-{
-    OFF = false,
-    ON  = true,
-};
+MAKE_ENUM(DribblerEnable, OFF, ON);
 
 class MovePrimitive : public Primitive
 {

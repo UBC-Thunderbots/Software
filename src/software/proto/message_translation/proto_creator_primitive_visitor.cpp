@@ -125,9 +125,9 @@ void ProtoCreatorPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
     params->set_parameter4(
         static_cast<float>(move_primitive.getFinalSpeed() * MILLIMETERS_PER_METER));
     uint32_t extra_bits = 0;
-    extra_bits |= (move_primitive.getAutoKickType() == AUTOKICK) * 0x01;
+    extra_bits |= (move_primitive.getAutoKickType() == AutokickType::AUTOKICK) * 0x01;
     extra_bits |= (move_primitive.getDribblerEnable() == DribblerEnable::ON) * 0x02;
-    extra_bits |= (move_primitive.getAutoKickType() == AUTOCHIP) * 0x04;
+    extra_bits |= (move_primitive.getAutoKickType() == AutokickType::AUTOCHIP) * 0x04;
     params->set_extra_bits(extra_bits);
     params->set_slow(move_primitive.getMoveType() == MoveType::SLOW);
 

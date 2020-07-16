@@ -30,7 +30,7 @@ TEST(MovePrimTest, autokick_and_dribble_disabled_by_default)
 {
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, DribblerEnable::OFF,
                                             MoveType::NORMAL, AutokickType::NONE);
-    EXPECT_FALSE(move_prim.getAutoKickType());
+    EXPECT_EQ(move_prim.getAutoKickType(), AutokickType::NONE);
     EXPECT_FALSE(move_prim.getDribblerEnable() == DribblerEnable::ON);
 }
 
@@ -39,7 +39,7 @@ TEST(MovePrimTest, get_dribble_enabled)
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, DribblerEnable::ON,
                                             MoveType::NORMAL, AutokickType::NONE);
     EXPECT_TRUE(move_prim.getDribblerEnable() == DribblerEnable::ON);
-    EXPECT_EQ(move_prim.getAutoKickType(), NONE);
+    EXPECT_EQ(move_prim.getAutoKickType(), AutokickType::NONE);
 }
 
 TEST(MovePrimTest, get_slow_enabled)
@@ -54,7 +54,7 @@ TEST(MovePrimTest, get_autokick_enabled)
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, DribblerEnable::OFF,
                                             MoveType::NORMAL, AutokickType::AUTOKICK);
     EXPECT_FALSE(move_prim.getDribblerEnable() == DribblerEnable::ON);
-    EXPECT_EQ(move_prim.getAutoKickType(), AUTOKICK);
+    EXPECT_EQ(move_prim.getAutoKickType(), AutokickType::AUTOKICK);
 }
 
 TEST(MovePrimTest, get_autochip_enabled)
@@ -62,7 +62,7 @@ TEST(MovePrimTest, get_autochip_enabled)
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, DribblerEnable::OFF,
                                             MoveType::NORMAL, AutokickType::AUTOCHIP);
     EXPECT_FALSE(move_prim.getDribblerEnable() == DribblerEnable::ON);
-    EXPECT_EQ(move_prim.getAutoKickType(), AUTOCHIP);
+    EXPECT_EQ(move_prim.getAutoKickType(), AutokickType::AUTOCHIP);
 }
 
 TEST(MovePrimTest, get_final_speed_test)

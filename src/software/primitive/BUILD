@@ -102,6 +102,7 @@ cc_library(
     deps = [
         ":primitive",
         "//software/geom",
+        "//software/util/make_enum",
     ],
 )
 

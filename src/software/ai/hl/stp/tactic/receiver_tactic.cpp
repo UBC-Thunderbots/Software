@@ -109,9 +109,9 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             Point ideal_position    = shot.getPointToShootAt();
             Angle ideal_orientation = shot.getOpenAngle();
 
-            move_action->updateControlParams(*robot, ideal_position, ideal_orientation, 0,
-                                             DribblerEnable::OFF, MoveType::NORMAL,
-                                             AUTOKICK, BallCollisionType::ALLOW);
+            move_action->updateControlParams(
+                *robot, ideal_position, ideal_orientation, 0, DribblerEnable::OFF,
+                MoveType::NORMAL, AutokickType::AUTOKICK, BallCollisionType::ALLOW);
             yield(move_action);
 
             // Calculations to check for termination conditions

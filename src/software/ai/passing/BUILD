@@ -10,6 +10,7 @@ cc_library(
         "//software/geom",
         "//software/logger",
         "//software/math:math_functions",
+        "//software/util/make_enum",
         "//software/world",
     ],
 )

@@ -73,7 +73,7 @@ TEST(DefenseShadowEnemyTacticTest,
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - field.friendlyGoalCenter()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
 }
 
 
@@ -111,5 +111,5 @@ TEST(
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
 }

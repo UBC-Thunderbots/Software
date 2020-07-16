@@ -102,6 +102,7 @@ cc_library(
     deps = [
         ":intent",
         "//software/primitive:move_primitive",
+        "//software/util/make_enum",
     ],
 )
 

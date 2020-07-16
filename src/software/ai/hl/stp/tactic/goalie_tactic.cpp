@@ -300,7 +300,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
             move_action->updateControlParams(*robot, goalie_pos, goalie_orientation,
                                              goalie_final_speed, DribblerEnable::OFF,
-                                             MoveType::NORMAL, AUTOCHIP,
+                                             MoveType::NORMAL, AutokickType::AUTOCHIP,
                                              BallCollisionType::ALLOW);
             next_action = move_action;
         }

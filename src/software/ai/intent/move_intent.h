@@ -4,12 +4,9 @@
 #include "software/new_geom/angle.h"
 #include "software/new_geom/point.h"
 #include "software/primitive/move_primitive.h"
+#include "software/util/make_enum/make_enum.h"
 
-enum BallCollisionType
-{
-    AVOID,
-    ALLOW
-};
+MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 
 class MoveIntent : public MovePrimitive, public Intent
 {

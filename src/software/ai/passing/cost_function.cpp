@@ -64,12 +64,12 @@ double ratePass(const World& world, const Pass& pass,
     double pass_quality = 0;
     switch (pass_type)
     {
-        case RECEIVE_AND_DRIBBLE:
+        case PassType::RECEIVE_AND_DRIBBLE:
             pass_quality = static_pass_quality * friendly_pass_rating *
                            enemy_pass_rating * in_region_quality *
                            pass_time_offset_quality * pass_speed_quality;
             break;
-        case ONE_TOUCH_SHOT:
+        case PassType::ONE_TOUCH_SHOT:
             pass_quality = static_pass_quality * friendly_pass_rating *
                            enemy_pass_rating * shoot_pass_rating * in_region_quality *
                            pass_time_offset_quality * pass_speed_quality;
