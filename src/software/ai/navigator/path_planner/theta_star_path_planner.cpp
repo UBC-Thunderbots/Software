@@ -67,16 +67,13 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinat
         Point p2               = convertCoordToPoint(coord2);
         bool has_line_of_sight = true;
 
-        if (p1 != p2)
+        Segment seg(p1, p2);
+        for (const auto &obstacle : obstacles)
         {
-            Segment seg(p1, p2);
-            for (const auto &obstacle : obstacles)
+            if (obstacle->intersects(seg))
             {
-                if (obstacle->intersects(seg))
-                {
-                    has_line_of_sight = false;
-                    break;
-                }
+                has_line_of_sight = false;
+                break;
             }
         }
 

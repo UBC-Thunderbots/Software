@@ -22,5 +22,5 @@ Point closestPointOnLine(const Line &l, const Point &p);
  *
  * @return the Point on line segment closest to point.
  */
-Point closestPointOnSegment(const Point &p, const Segment &segment);
-Point closestPointOnSegment(const Segment &segment, const Point &p);
+Point closestPoint(const Point &p, const Segment &segment);
+Point closestPoint(const Segment &segment, const Point &p);

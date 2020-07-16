@@ -1,12 +1,8 @@
 #include "software/new_geom/segment.h"
 
-Segment::Segment(const Point& start, const Point& end) : start(start), end(end)
-{
-    if (start == end)
-    {
-        throw std::invalid_argument("Attempting to construct a degenerate segment");
-    }
-}
+Segment::Segment() {}
+
+Segment::Segment(const Point& start, const Point& end) : start(start), end(end) {}
 
 void Segment::setStart(Point o)
 {

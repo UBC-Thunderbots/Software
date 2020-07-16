@@ -52,15 +52,12 @@ void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
     // Check that no line segment on the path intersects the obstacle
     for (std::size_t i = 0; i < path_points.size() - 1; i++)
     {
-        if (path_points[i] != path_points[i + 1])
+        Segment path_segment(path_points[i], path_points[i + 1]);
+        for (auto const& obstacle : obstacles)
         {
-            Segment path_segment(path_points[i], path_points[i + 1]);
-            for (auto const& obstacle : obstacles)
-            {
-                EXPECT_FALSE(obstacle->intersects(path_segment))
-                    << "Line segment {" << path_points[i] << "," << path_points[i + 1]
-                    << "} intersects obstacle " << obstacle;
-            }
+            EXPECT_FALSE(obstacle->intersects(path_segment))
+                << "Line segment {" << path_points[i] << "," << path_points[i + 1]
+                << "} intersects obstacle " << obstacle;
         }
     }
 }

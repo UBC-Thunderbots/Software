@@ -183,7 +183,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
 
     // Figure out how long the enemy robot and ball will take to reach the closest
     // point on the pass to the enemy's current position
-    Point closest_point_on_pass_to_robot = closestPointOnSegment(
+    Point closest_point_on_pass_to_robot = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
     Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(
         enemy_robot.position(), closest_point_on_pass_to_robot,

@@ -9,11 +9,6 @@ TEST(SegmentConstructorTests, segment_default_constructor)
     EXPECT_EQ(s.getEnd(), Point(2, 5));
 }
 
-TEST(SegmentConstructorTests, segment_degenerate_constructor)
-{
-    EXPECT_THROW(Segment(Point(0, 0), Point(0, 0)), std::invalid_argument);
-}
-
 TEST(SegmentSetTests, segment_set_start)
 {
     Segment s = Segment(Point(0, 0), Point(4, 5));
