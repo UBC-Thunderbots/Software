@@ -9,6 +9,7 @@
  * 1. no initial spin
  * 2. slides with a constant sliding friction above a certain speed threshold
  * 3. rolls with a constant rolling friction below a certain speed threshold
+ * 4. the transition between sliding and rolling is instantaneous
  */
 class LinearBallModel : public BallModel
 {
@@ -32,7 +33,7 @@ class LinearBallModel : public BallModel
         double sliding_friction_acceleration_m_per_s_squared         = 0,
         double sliding_to_rolling_transition_speed_threshold_m_per_s = 0);
 
-    BallState estimateFutureState(Duration duration_in_future) override;
+    BallState estimateFutureState(const Duration &duration_in_future) override;
 
    private:
     const BallState initial_ball_state_;
@@ -47,22 +48,11 @@ class LinearBallModel : public BallModel
     /**
      * Applies linear friction model
      *
-     * @param initial_ball_state initial ball state
      * @param duration_in_future Duration into the future
-     * @param rolling_friction_acceleration_m_per_s_squared acceleration opposing the
-     * direction of travel of a rolling ball
-     * @param sliding_friction_acceleration_m_per_s_squared acceleration opposing the
-     * direction of travel of a sliding ball
-     * @param    sliding_to_rolling_transition_speed_threshold_m_per_s threshold above
-     * which the ball slides and below which the ball rolls
      *
      * @return future ball state
      */
-    static BallState applyLinearFrictionModel(
-        const BallState& initial_ball_state, Duration duration_in_future,
-        double rolling_friction_acceleration_m_per_s_squared,
-        double sliding_friction_acceleration_m_per_s_squared,
-        double sliding_to_rolling_transition_speed_threshold_m_per_s);
+    BallState applyLinearFrictionModel(const Duration &duration_in_future) const;
 
     /**
      * Calculates the future ball state assuming constant acceleration opposing the
@@ -75,7 +65,7 @@ class LinearBallModel : public BallModel
      *
      * @return future ball state
      */
-    static BallState calculateFutureBallState(BallState initial_ball_state,
-                                              double friction_acceleration,
-                                              Duration duration_in_future);
+    BallState calculateFutureBallState(BallState initial_ball_state,
+                                       double friction_acceleration,
+                                       Duration duration_in_future) const;
 };
