@@ -64,26 +64,6 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_direct_wheels_primitive)
                                                                    actual_primitive_msg));
 }
 
-TEST(ProtoCreatorPrimitiveVisitor, visit_dribble_primitive)
-{
-    DribblePrimitive primitive(11, Point(22, 33.3), Angle::half(), 30000, true);
-    PrimitiveParamsMsg expected_primitive_params;
-    expected_primitive_params.set_parameter1(static_cast<float>(22 * 1000));
-    expected_primitive_params.set_parameter2(static_cast<float>(33.3 * 1000));
-    expected_primitive_params.set_parameter3(
-        static_cast<float>(Angle::half().toRadians() * 100));
-    expected_primitive_params.set_parameter4(static_cast<float>(30000));
-    expected_primitive_params.set_extra_bits(1);
-
-    PrimitiveMsg expected_primitive;
-    *(expected_primitive.mutable_dribble()) = expected_primitive_params;
-
-    PrimitiveMsg actual_primitive_msg =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
-                                                                   actual_primitive_msg));
-}
-
 TEST(ProtoCreatorPrimitiveVisitor, visit_kick_primitive)
 {
     KickPrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33);
@@ -199,28 +179,6 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_movespin_primitive)
 
     PrimitiveMsg expected_primitive;
     *(expected_primitive.mutable_movespin()) = expected_primitive_params;
-
-    PrimitiveMsg actual_primitive_msg =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive,
-                                                                   actual_primitive_msg));
-}
-
-TEST(ProtoCreatorPrimitiveVisitor, visit_pivot_primitive)
-{
-    PivotPrimitive primitive(11, Point(22, 33.3), Angle::half(), Angle::fromRadians(2.71),
-                             true);
-    PrimitiveParamsMsg expected_primitive_params;
-    expected_primitive_params.set_parameter1(static_cast<float>(22 * 1000));
-    expected_primitive_params.set_parameter2(static_cast<float>(33.3 * 1000));
-    expected_primitive_params.set_parameter3(
-        static_cast<float>(Angle::half().toRadians() * 100));
-    expected_primitive_params.set_parameter4(
-        static_cast<float>(Angle::fromRadians(2.71).toRadians() * 100));
-    expected_primitive_params.set_extra_bits(1);
-
-    PrimitiveMsg expected_primitive;
-    *(expected_primitive.mutable_pivot()) = expected_primitive_params;
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);

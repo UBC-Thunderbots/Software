@@ -183,10 +183,10 @@ TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
     EXPECT_EQ(primitive_ptrs.size(), 2);
 
     auto expected_stop_primitive_1 = StopPrimitive(0, false);
-    auto stop_primitive_1          = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(0)));
+    auto stop_primitive_1 = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(0)));
     EXPECT_EQ(expected_stop_primitive_1, stop_primitive_1);
     auto expected_stop_primitive_2 = StopPrimitive(1, false);
-    auto stop_primitive_2          = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(1)));
+    auto stop_primitive_2 = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(1)));
     EXPECT_EQ(expected_stop_primitive_2, stop_primitive_2);
 }
 

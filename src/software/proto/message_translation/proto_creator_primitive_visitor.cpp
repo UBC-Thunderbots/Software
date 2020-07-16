@@ -77,24 +77,6 @@ void ProtoCreatorPrimitiveVisitor::visit(
     prim->set_allocated_direct_wheels(params);
 }
 
-void ProtoCreatorPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
-{
-    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
-    params->set_parameter1(static_cast<float>(dribble_primitive.getDestination().x() *
-                                              MILLIMETERS_PER_METER));
-    params->set_parameter2(static_cast<float>(dribble_primitive.getDestination().y() *
-                                              MILLIMETERS_PER_METER));
-    params->set_parameter3(static_cast<float>(
-        dribble_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN));
-    // For this primitive, we don't divide the RPM
-    params->set_parameter4(static_cast<float>(dribble_primitive.getRpm()));
-    params->set_extra_bits(dribble_primitive.isSmallKickAllowed());
-    params->set_slow(false);
-
-    prim = PrimitiveMsg();
-    prim->set_allocated_dribble(params);
-}
-
 void ProtoCreatorPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
     PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
@@ -151,24 +133,6 @@ void ProtoCreatorPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primi
 
     prim = PrimitiveMsg();
     prim->set_allocated_movespin(params);
-}
-
-void ProtoCreatorPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
-{
-    PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
-    params->set_parameter1(
-        static_cast<float>(pivot_primitive.getPivotPoint().x() * MILLIMETERS_PER_METER));
-    params->set_parameter2(
-        static_cast<float>(pivot_primitive.getPivotPoint().y() * MILLIMETERS_PER_METER));
-    params->set_parameter3(static_cast<float>(
-        pivot_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN));
-    params->set_parameter4(static_cast<float>(
-        pivot_primitive.getPivotSpeed().toRadians() * CENTIRADIANS_PER_RADIAN));
-    params->set_extra_bits(pivot_primitive.isDribblerEnabled());
-    params->set_slow(false);
-
-    prim = PrimitiveMsg();
-    prim->set_allocated_pivot(params);
 }
 
 void ProtoCreatorPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
