@@ -38,37 +38,25 @@ class InterceptBallAction : public Action
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
+    /**
+     * Moves the robot to intercept a slow moving ball by running into
+     * it with the dribbler and bringing it to a stop.
+     *
+     * @param yield The coroutine for the action
+     */
     void interceptSlowBall(IntentCoroutine::push_type& yield);
 
     /**
-     * Determines the best place to intercept the ball and move the robot to that
-     * position.
+     * Moves the robot to intercept a fast moving ball by predicting its future
+     * location and moving there to catch it.
      *
-     * @param yield The coroutine to yield to
-     * @param closest_point_on_ball_trajectory The closest point on the ball's trajectory
-     * to the robot's current position
+     * @param yield The coroutine for the action
      */
-    void moveToInterceptPosition(IntentCoroutine::push_type& yield,
-                                 Point closest_point_on_ball_trajectory);
-
-    /**
-     * Returns the point at which the ball would leave the field given its current
-     * trajectory. This function assumes the ball's current position is within the field.
-     * If it is not, an std::nullopt is returned.
-     *
-     * @param field The field
-     * @param ball The ball
-     * @return An optional containing the point at which the ball would leave the field.
-     * If the ball's position is not within the field, std::nullopt is returned
-     */
-    std::optional<Point> getPointBallLeavesField(const Field& field, const Ball& ball);
+    void interceptFastBall(IntentCoroutine::push_type& yield);
 
     const double BALL_MOVING_SLOW_SPEED_THRESHOLD              = 0.3;
-    const double ROBOT_CLOSE_TO_BALL_TRAJECTORY_LINE_THRESHOLD = 0.02;
-    const double FINAL_SPEED_AT_SLOW_BALL                      = 0.3;
 
     // Action parameters
     Field field;
     Ball ball;
-
 };
