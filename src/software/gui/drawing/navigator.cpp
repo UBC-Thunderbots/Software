@@ -18,7 +18,7 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
         // distinguishable as dashed lines.
         QVector<qreal> dashes;
         qreal space = 7;
-        dashes << 2 << space << 2;
+        dashes << 2 << space << 2 << space;
         path_pen.setDashPattern(dashes);
 
         for (const auto& path : planned_paths)
