@@ -26,12 +26,10 @@ message PrimitiveMsg
     {
         PrimitiveParamsMsg move            = 1;
         PrimitiveParamsMsg stop            = 2;
-        PrimitiveParamsMsg dribble         = 3;
-        PrimitiveParamsMsg shoot           = 4;
-        PrimitiveParamsMsg pivot           = 5;
-        PrimitiveParamsMsg spin            = 6;
-        PrimitiveParamsMsg movespin        = 7;
-        PrimitiveParamsMsg direct_wheels   = 8;
-        PrimitiveParamsMsg direct_velocity = 9;
+        PrimitiveParamsMsg shoot           = 3;
+        PrimitiveParamsMsg spin            = 4;
+        PrimitiveParamsMsg movespin        = 5;
+        PrimitiveParamsMsg direct_wheels   = 6;
+        PrimitiveParamsMsg direct_velocity = 7;
     }
 }

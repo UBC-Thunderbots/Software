@@ -8,7 +8,7 @@
 
 /**
  * Defines a Robot Primitive, which is the most basic action / unit of work a robot can
- * do. For example, moving straight to a point, pivoting around a point,
+ * do. For example, moving straight to a point or stopping.
  * or shooting the ball at a target.
  *
  * This is an Abstract, pure-virtual class. It is meant to define the interface that all
