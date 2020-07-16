@@ -51,7 +51,7 @@ class StandaloneSimulator
      */
     void setupInitialSimulationState();
 
-    const SSL_WrapperPacket& getSSLWrapperPacket() const;
+    SSL_WrapperPacket getSSLWrapperPacket() const;
 
     /**
      * Starts the simulation. If the simulator is already running, this
@@ -131,4 +131,5 @@ class StandaloneSimulator
     ThreadedSimulator simulator;
 
     SSL_WrapperPacket most_recent_ssl_wrapper_packet;
+    mutable std::mutex most_recent_ssl_wrapper_packet_mutex;
 };
