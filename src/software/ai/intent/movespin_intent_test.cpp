@@ -1,7 +1,3 @@
-/**
- * This file contains unit tests for the MoveSpin Intent class
- */
-
 #include "software/ai/intent/movespin_intent.h"
 
 #include <gtest/gtest.h>

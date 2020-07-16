@@ -1,7 +1,3 @@
-/**
- * This file contains the unit tests for the DribblePrimitive class
- */
-
 #include "software/primitive/dribble_primitive.h"
 
 #include <gtest/gtest.h>

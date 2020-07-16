@@ -1,15 +1,14 @@
-/**
- * This file contains the unit tests for the Intent class (NOTE: `Intent` is virtual, so
- * we use `MoveIntent` instead, but we're only testing functionality of the `Intent`
- * class)
- */
-
 #include "software/ai/intent/intent.h"
 
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/move_intent.h"
 
+/**
+ * This file contains the unit tests for the Intent class (NOTE: `Intent` is virtual, so
+ * we use `MoveIntent` instead, but we're only testing functionality of the `Intent`
+ * class)
+ */
 
 TEST(IntentTest, test_get_priority)
 {

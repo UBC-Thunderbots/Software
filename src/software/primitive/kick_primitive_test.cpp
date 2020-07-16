@@ -1,7 +1,3 @@
-/**
- * This file contains the unit tests for the KickPrimitive class
- */
-
 #include "software/primitive/kick_primitive.h"
 
 #include <gtest/gtest.h>

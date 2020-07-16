@@ -1,7 +1,3 @@
-/**
- * This file contains unit tests for the DirectWheels Intent class
- */
-
 #include "software/ai/intent/direct_wheels_intent.h"
 
 #include <gtest/gtest.h>

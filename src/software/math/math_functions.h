@@ -1,7 +1,3 @@
-/*
- * This file contains declarations for math functions
- */
-
 #pragma once
 
 #include <algorithm>

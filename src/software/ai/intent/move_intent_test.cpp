@@ -1,7 +1,3 @@
-/**
- * This file contains unit tests for the Move Intent class
- */
-
 #include "software/ai/intent/move_intent.h"
 
 #include <gtest/gtest.h>
