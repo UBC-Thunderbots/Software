@@ -132,18 +132,16 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
     // provided by refbox. The 'defending_positive_side' parameter dictates the side
     // we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-//    const bool override_refbox_defending_side =
-//        sensor_fusion_config->OverrideRefboxDefendingSide()->value();
-//    const bool defending_positive_side =
-//        sensor_fusion_config->DefendingPositiveSide()->value();
-//    const bool should_invert_field =
-//        override_refbox_defending_side && defending_positive_side;
+    const bool override_refbox_defending_side =
+        sensor_fusion_config->OverrideRefboxDefendingSide()->value();
+    const bool defending_positive_side =
+        sensor_fusion_config->DefendingPositiveSide()->value();
+    const bool should_invert_field =
+        override_refbox_defending_side && defending_positive_side;
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
     bool friendly_team_is_yellow = sensor_fusion_config->FriendlyColorYellow()->value();
-
-    const bool should_invert_field = !friendly_team_is_yellow;
 
     std::optional<TimestampedBallState> new_ball_state;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
