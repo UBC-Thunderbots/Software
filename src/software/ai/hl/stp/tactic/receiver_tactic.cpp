@@ -81,7 +81,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // rotate to the correct orientation
         move_action->updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
                                          DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutokickType::NONE, BallCollisionType::ALLOW);
+                                         AutochickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
@@ -111,7 +111,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
             move_action->updateControlParams(
                 *robot, ideal_position, ideal_orientation, 0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOKICK, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::AUTOKICK, BallCollisionType::ALLOW);
             yield(move_action);
 
             // Calculations to check for termination conditions
@@ -137,7 +137,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             // Move into position with the dribbler on
             move_action->updateControlParams(
                 *robot, ball_receive_pos, ball_receive_orientation, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW);
             yield(move_action);
         }
     }

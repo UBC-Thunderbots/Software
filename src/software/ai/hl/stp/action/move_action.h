@@ -43,7 +43,7 @@ class MoveAction : public Action
     void updateControlParams(const Robot& robot, Point destination,
                              Angle final_orientation, double final_speed,
                              DribblerEnable enable_dribbler, MoveType move_type,
-                             AutokickType autokick,
+                             AutochickType autokick,
                              BallCollisionType ball_collision_type);
 
     /**
@@ -74,7 +74,7 @@ class MoveAction : public Action
      *
      * @return The auto-kick mode this move action should operate with
      */
-    AutokickType getAutoKickType();
+    AutochickType getAutochickType();
 
     /**
      * Gets the dribbler mode this move action should operate with
@@ -94,7 +94,7 @@ class MoveAction : public Action
     double final_speed;
     DribblerEnable enable_dribbler;
     MoveType move_type;
-    AutokickType autokick_type;
+    AutochickType autokick_type;
     BallCollisionType ball_collision_type;
 
     double close_to_dest_threshold;

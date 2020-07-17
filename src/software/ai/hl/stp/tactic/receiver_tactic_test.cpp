@@ -39,7 +39,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
     EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
               move_action->getFinalOrientation());
     EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutoKickType(), AutokickType::NONE);
+    EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
@@ -80,7 +80,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
         EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
                   move_action->getFinalOrientation());
         EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
-        EXPECT_EQ(move_action->getAutoKickType(), AutokickType::NONE);
+        EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
     }
 }
 
@@ -124,7 +124,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
     EXPECT_GT(move_action->getFinalOrientation().toDegrees(), -90);
 
     EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutoKickType(), AutokickType::AUTOKICK);
+    EXPECT_EQ(move_action->getAutochickType(), AutochickType::AUTOKICK);
 }
 
 TEST(ReceiverTacticTest,
@@ -162,7 +162,7 @@ TEST(ReceiverTacticTest,
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
     EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutoKickType(), AutokickType::NONE);
+    EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
@@ -207,7 +207,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
     EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutoKickType(), AutokickType::NONE);
+    EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)

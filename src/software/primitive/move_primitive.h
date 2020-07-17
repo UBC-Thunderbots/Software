@@ -5,7 +5,7 @@
 #include "software/primitive/primitive.h"
 #include "software/util/make_enum/make_enum.h"
 
-MAKE_ENUM(AutokickType, NONE, AUTOKICK, AUTOCHIP);
+MAKE_ENUM(AutochickType, NONE, AUTOKICK, AUTOCHIP);
 
 MAKE_ENUM(MoveType, NORMAL, SLOW);
 
@@ -35,7 +35,7 @@ class MovePrimitive : public Primitive
     explicit MovePrimitive(unsigned int robot_id, const Point &dest,
                            const Angle &final_angle, double final_speed,
                            DribblerEnable enable_dribbler, MoveType move_type,
-                           AutokickType autokick);
+                           AutochickType autokick);
 
     /**
      * Gets the primitive name
@@ -76,7 +76,7 @@ class MovePrimitive : public Primitive
      *
      * @return whether or not auto-kick should be enabled while moving
      */
-    AutokickType getAutoKickType() const;
+    AutochickType getAutochickType() const;
 
     /**
      * Gets whether or not the dribbler should be enabled while moving
@@ -118,5 +118,5 @@ class MovePrimitive : public Primitive
     double final_speed;
     DribblerEnable enable_dribbler;
     MoveType move_type;
-    AutokickType autokick;
+    AutochickType autokick;
 };

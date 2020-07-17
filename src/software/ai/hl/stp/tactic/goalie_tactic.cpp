@@ -220,7 +220,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
             move_action->updateControlParams(
                 *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
             next_action = move_action;
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
@@ -300,7 +300,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
             move_action->updateControlParams(*robot, goalie_pos, goalie_orientation,
                                              goalie_final_speed, DribblerEnable::OFF,
-                                             MoveType::NORMAL, AutokickType::AUTOCHIP,
+                                             MoveType::NORMAL, AutochickType::AUTOCHIP,
                                              BallCollisionType::ALLOW);
             next_action = move_action;
         }

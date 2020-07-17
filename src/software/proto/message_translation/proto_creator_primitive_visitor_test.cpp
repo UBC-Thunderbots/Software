@@ -105,7 +105,7 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_kick_primitive)
 TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_and_dribble_off)
 {
     MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, DribblerEnable::OFF,
-                            MoveType::NORMAL, AutokickType::NONE);
+                            MoveType::NORMAL, AutochickType::NONE);
     PrimitiveParamsMsg expected_primitive_params;
     expected_primitive_params.set_parameter1(static_cast<float>(22 * 1000));
     expected_primitive_params.set_parameter2(static_cast<float>(33.3 * 1000));
@@ -126,7 +126,7 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_and_dribble_off
 TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_enabled_dribble_off)
 {
     MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, DribblerEnable::OFF,
-                            MoveType::NORMAL, AutokickType::AUTOKICK);
+                            MoveType::NORMAL, AutochickType::AUTOKICK);
     PrimitiveParamsMsg expected_primitive_params;
     expected_primitive_params.set_parameter1(static_cast<float>(22 * 1000));
     expected_primitive_params.set_parameter2(static_cast<float>(33.3 * 1000));
@@ -147,7 +147,7 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_enabled_dribble
 TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_dribble_enabled_autokick_off)
 {
     MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, DribblerEnable::ON,
-                            MoveType::NORMAL, AutokickType::NONE);
+                            MoveType::NORMAL, AutochickType::NONE);
     PrimitiveParamsMsg expected_primitive_params;
     expected_primitive_params.set_parameter1(static_cast<float>(22 * 1000));
     expected_primitive_params.set_parameter2(static_cast<float>(33.3 * 1000));
@@ -168,7 +168,7 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_dribble_enabled_autokick
 TEST(ProtoCreatorPrimitiveVisitor, visit_move_primitive_autokick_and_dribble_enabled)
 {
     MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, DribblerEnable::ON,
-                            MoveType::NORMAL, AutokickType::AUTOKICK);
+                            MoveType::NORMAL, AutochickType::AUTOKICK);
     PrimitiveParamsMsg expected_primitive_params;
     expected_primitive_params.set_parameter1(static_cast<float>(22 * 1000));
     expected_primitive_params.set_parameter2(static_cast<float>(33.3 * 1000));

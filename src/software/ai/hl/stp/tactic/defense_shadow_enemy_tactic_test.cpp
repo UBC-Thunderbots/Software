@@ -37,7 +37,7 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
                                                Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
 }
 
 TEST(DefenseShadowEnemyTacticTest,
@@ -73,7 +73,7 @@ TEST(DefenseShadowEnemyTacticTest,
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - field.friendlyGoalCenter()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
 }
 
 
@@ -111,5 +111,5 @@ TEST(
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
 }
