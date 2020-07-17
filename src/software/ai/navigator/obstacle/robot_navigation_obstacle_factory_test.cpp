@@ -96,7 +96,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, create_ball_obstacle)
 {
     Point origin(2.5, 4);
     Rectangle rectangle(Point(1, 3), Point(5, 8));
-    Circle expected(origin, 0.1385);
+    Circle expected(origin, 0.203);
     ObstaclePtr obstacle =
         robot_navigation_obstacle_factory.createFromBallPosition(origin);
 

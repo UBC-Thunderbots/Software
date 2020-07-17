@@ -25,6 +25,8 @@ class SensorFusionTest : public ::testing::Test
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart())
     {
+        MutableDynamicParameters->getMutableSensorFusionConfig()->mutableOverrideRefboxDefendingSide()->setValue(true);
+        MutableDynamicParameters->getMutableSensorFusionConfig()->mutableDefendingPositiveSide()->setValue(false);
     }
 
     SensorFusion sensor_fusion;
