@@ -54,7 +54,7 @@ class InterceptBallAction : public Action
      */
     void interceptFastBall(IntentCoroutine::push_type& yield);
 
-    const double BALL_MOVING_SLOW_SPEED_THRESHOLD              = 0.3;
+    const double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
 
     // Action parameters
     Field field;

@@ -22,7 +22,8 @@ class PasserTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PasserTactic(Pass pass, const Ball& ball, const Field& field, bool loop_forever);
+    explicit PasserTactic(Pass pass, const Ball& ball, const Field& field,
+                          bool loop_forever);
 
     std::string getName() const override;
 

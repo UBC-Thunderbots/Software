@@ -1,14 +1,18 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
+#include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 
-PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick}), pass(std::move(pass)), ball(ball), field(field)
+PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
+                           bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Kick}),
+      pass(std::move(pass)),
+      ball(ball),
+      field(field)
 {
 }
 
@@ -19,7 +23,7 @@ std::string PasserTactic::getName() const
 
 void PasserTactic::updateWorldParams(const Ball& updated_ball, const Field& updated_field)
 {
-    this->ball = updated_ball;
+    this->ball  = updated_ball;
     this->field = updated_field;
 }
 
@@ -42,10 +46,11 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     // Collect the ball
     auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, false);
-    do {
+    do
+    {
         intercept_action->updateControlParams(*robot);
         yield(intercept_action);
-    } while(!intercept_action->done());
+    } while (!intercept_action->done());
 
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass

@@ -3,9 +3,9 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
+#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/test_util/test_util.h"
 
 TEST(PasserTacticTest,
@@ -24,7 +24,8 @@ TEST(PasserTacticTest,
     tactic.updateRobot(robot);
 
     // Initially try intercept the ball to make sure we have control
-    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
+    auto intercept_action =
+        std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
     ASSERT_TRUE(intercept_action);
     EXPECT_TRUE(intercept_action->getRobot().has_value());
     EXPECT_EQ(13, intercept_action->getRobot()->id());
@@ -46,7 +47,8 @@ TEST(PasserTacticTest,
     tactic.updateRobot(robot);
 
     // Initially try intercept the ball to make sure we have control
-    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
+    auto intercept_action =
+        std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
     ASSERT_TRUE(intercept_action);
     EXPECT_TRUE(intercept_action->getRobot().has_value());
     EXPECT_EQ(13, intercept_action->getRobot()->id());
@@ -70,7 +72,8 @@ TEST(
     tactic.updateRobot(robot);
 
     // Initially try intercept the ball to make sure we have control
-    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
+    auto intercept_action =
+        std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
     ASSERT_TRUE(intercept_action);
     EXPECT_TRUE(intercept_action->getRobot().has_value());
     EXPECT_EQ(13, intercept_action->getRobot()->id());
@@ -80,8 +83,9 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_not_yet_started)
 {
     // Robot is sitting just behind where we want to pass from, in the perfect
     // position to just move forward a bit and take the kick
-    Robot robot = Robot(13, Point(0, DIST_TO_FRONT_OF_ROBOT_METERS), Vector(), Angle::fromDegrees(-90),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot robot = Robot(13, Point(0, DIST_TO_FRONT_OF_ROBOT_METERS), Vector(),
+                        Angle::fromDegrees(-90), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     Field field = Field::createSSLDivisionBField();
 
@@ -92,7 +96,8 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_not_yet_started)
     tactic.updateRobot(robot);
 
     // Initially try intercept the ball to make sure we have control
-    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
+    auto intercept_action =
+        std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
     ASSERT_TRUE(intercept_action);
     EXPECT_TRUE(intercept_action->getRobot().has_value());
     EXPECT_EQ(13, intercept_action->getRobot()->id());
@@ -122,8 +127,9 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
 {
     // Robot is sitting just behind where we want to pass from, in the perfect
     // position to take the kick
-    Robot robot = Robot(13, Point(0, DIST_TO_FRONT_OF_ROBOT_METERS), Vector(), Angle::fromDegrees(-90),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot robot = Robot(13, Point(0, DIST_TO_FRONT_OF_ROBOT_METERS), Vector(),
+                        Angle::fromDegrees(-90), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
 
     // Ball not moving initially
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5));
@@ -136,7 +142,8 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
     tactic.updateRobot(robot);
 
     // Initially try intercept the ball to make sure we have control
-    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
+    auto intercept_action =
+        std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
     ASSERT_TRUE(intercept_action);
     EXPECT_TRUE(intercept_action->getRobot().has_value());
     EXPECT_EQ(13, intercept_action->getRobot()->id());

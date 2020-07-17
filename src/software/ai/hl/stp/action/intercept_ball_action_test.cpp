@@ -3,10 +3,10 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/move_intent.h"
-#include "software/test_util/test_util.h"
-#include "software/world/ball.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/util/distance.h"
+#include "software/test_util/test_util.h"
+#include "software/world/ball.h"
 
 TEST(InterceptBallActionTest, intercept_fast_moving_ball)
 {
