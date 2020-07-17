@@ -6,7 +6,7 @@
 #include "boost/bind.hpp"
 #include "google/protobuf/message.h"
 #include "shared/constants.h"
-#include "shared/proto/tbots_robot_msg.pb.h"
+#include "shared/proto/tbots_robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
@@ -28,7 +28,7 @@ using google::protobuf::Message;
  * bazel run //firmware_new/tools:send_proto_over_udp -- your_interface_here
  *
  */
-void callback(TbotsRobotMsg test)
+void callback(TbotsRobotStatusMsg test)
 {
     if (test.has_time_sent())
     {
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
         std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]), PRIMITIVE_PORT);
 
     auto status_listener =
-        std::make_unique<ThreadedProtoMulticastListener<TbotsRobotMsg>>(
+        std::make_unique<ThreadedProtoMulticastListener<TbotsRobotStatusMsg>>(
             std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
             ROBOT_STATUS_PORT, std::function(callback));
 

@@ -53,7 +53,7 @@ void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
         updateWorld(sensor_msg.ssl_refbox_msg());
     }
 
-    updateWorld(sensor_msg.tbots_robot_msgs());
+    updateWorld(sensor_msg.tbots_robot_status_msgs());
 }
 
 void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
@@ -113,9 +113,10 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
 }
 
 void SensorFusion::updateWorld(
-    const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs)
+    const google::protobuf::RepeatedPtrField<TbotsRobotStatusMsg>
+        &tbots_robot_status_msgs)
 {
-    // TODO (issue #1149): incorporate TbotsRobotMsg into world and update world
+    // TODO (issue #1149): incorporate TbotsRobotStatusMsg into world and update world
 }
 
 void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)

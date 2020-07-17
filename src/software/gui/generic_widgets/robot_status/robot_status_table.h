@@ -4,7 +4,7 @@
 #include <QtWidgets/QTableWidget>
 #include <chrono>
 
-#include "shared/proto/tbots_robot_msg.pb.h"
+#include "shared/proto/tbots_robot_status_msg.pb.h"
 #include "software/time/duration.h"
 
 /**
@@ -48,9 +48,9 @@ class RobotStatusTable : public QTableWidget
      * the message age is refreshed to 0. Otherwise, a new message is added with an age of
      * 0.
      *
-     * @param tbots_robot_msg The status to add to the table
+     * @param tbots_robot_status_msg The status to add to the table
      */
-    void updateTbotsRobotMsg(const TbotsRobotMsg& tbots_robot_msg);
+    void updateTbotsRobotStatusMsg(const TbotsRobotStatusMsg& tbots_robot_status_msg);
 
    private:
     /**

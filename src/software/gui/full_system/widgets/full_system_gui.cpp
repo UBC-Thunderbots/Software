@@ -82,9 +82,9 @@ void FullSystemGUI::updateSensorMsg()
 {
     while (auto sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue())
     {
-        for (const auto& robot_msg : sensor_msg->tbots_robot_msgs())
+        for (const auto& robot_msg : sensor_msg->tbots_robot_status_msgs())
         {
-            main_widget->robot_status_table_widget->updateTbotsRobotMsg(robot_msg);
+            main_widget->robot_status_table_widget->updateTbotsRobotStatusMsg(robot_msg);
         }
     }
 }

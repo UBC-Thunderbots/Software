@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include "shared/proto/tbots_robot_msg.pb.h"
+#include "shared/proto/tbots_robot_status_msg.pb.h"
 #include "software/backend/radio/mrf/messages.h"
 
-TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_robot_msg)
+TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_status_msg_valid_robot_msg)
 {
     // Mock robot_messages with valid ErrorCode messages
     std::vector<std::string> robot_messages = {
@@ -80,7 +80,7 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_robot_msg)
                                 .fw_build_id = 2,
                                 1};
 
-    auto robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
+    auto robot_msg = convertRobotStatusToTbotsRobotStatusMsg(robot_status);
 
     EXPECT_EQ(robot_msg->robot_id(), 1);
     EXPECT_EQ(robot_msg->error_code_size(), expected_error_code.size());
@@ -141,7 +141,7 @@ TEST(RobotStatusTest, test_dongle_message_to_error_code)
                                 .fw_build_id = 2,
                                 1};
 
-    auto robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
+    auto robot_msg = convertRobotStatusToTbotsRobotStatusMsg(robot_status);
 
     EXPECT_EQ(robot_msg->error_code_size(), expected_error_code.size());
     for (int i = 0; i < robot_msg->error_code_size(); i++)
@@ -150,7 +150,8 @@ TEST(RobotStatusTest, test_dongle_message_to_error_code)
     }
 }
 
-TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_invalid_robot_msg)
+TEST(RobotStatusTest,
+     test_convert_robot_status_tbots_robot_status_msg_valid_invalid_robot_msg)
 {
     // Mock robot_messages with valid and invalid ErrorCode messages
     std::vector<std::string> robot_messages = {
@@ -197,7 +198,7 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_invalid_ro
                                 .fw_build_id = 2,
                                 1};
 
-    auto robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
+    auto robot_msg = convertRobotStatusToTbotsRobotStatusMsg(robot_status);
 
     EXPECT_EQ(robot_msg->robot_id(), 1);
     EXPECT_EQ(robot_msg->error_code_size(), expected_error_code.size());
@@ -215,7 +216,7 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_valid_invalid_ro
     EXPECT_EQ(robot_msg->temperature_status().board_temperature(), 7.0);
 }
 
-TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_invalid_robot_msg)
+TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_status_msg_invalid_robot_msg)
 {
     // Mock robot_messages with invalid ErrorCode messages
     std::vector<std::string> robot_messages = {
@@ -251,7 +252,7 @@ TEST(RobotStatusTest, test_convert_robot_status_tbots_robot_msg_invalid_robot_ms
                                 .fw_build_id = 2,
                                 1};
 
-    auto robot_msg = convertRobotStatusToTbotsRobotMsg(robot_status);
+    auto robot_msg = convertRobotStatusToTbotsRobotStatusMsg(robot_status);
 
     EXPECT_EQ(robot_msg->robot_id(), 1);
     EXPECT_EQ(robot_msg->error_code_size(), 0);
