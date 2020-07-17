@@ -1,73 +1,76 @@
 #pragma once
 
+#include <stdlib.h>
 /**
  * A representation of a matrix that has an arbitrary number of rows and columns specified
  * by n_cols and n_rows. The recommended way to use this struct is to use the get_matrix
  * function, which will allocate the memory required for each of the rows in the matrix
  * and each of the entries in each of those rows. It will also assign the n_cols and
  * n_rows for the matrix. Then when you are done with the matrix, you will need to call
- * free_matrix.
+ * shared_matrix_destroy.
  */
-typedef struct Matrix
-{
-    float **rows;
-    int n_cols;
-    int n_rows;
-} Matrix_t;
+typedef struct Matrix Matrix_t;
 
 /**
  * Gets a matrix of the given size. This uses dynamic memory allocation so make sure to
- * call free_matrix when you are done using it if you don't want memory leaks.
+ * call shared_matrix_destroy when you are done using it if you don't want memory leaks.
  *
- * @param n_rows the number of rows in the matrix
- * @param n_cols the number of columns in the matrix
- * @return a Matrix object
+ * @param n_rows [in] The number of rows in the matrix
+ * @param n_cols [in] The number of columns in the matrix
+ * @return Pointer to the created Matrix
  */
-Matrix_t create_matrix(int n_rows, int n_cols);
+Matrix_t* shared_matrix_create(unsigned int n_rows, unsigned int n_cols);
 
 /**
  * Frees the memory used up by a matrix.
  *
- * @param matrix the matrix to free
+ * @param matrix [in] The matrix to destroy
  */
-void free_matrix(Matrix_t matrix);
+void shared_matrix_destroy(Matrix_t* matrix);
 
 /**
  * Multiplies two matrices together and returns the resulting matrix, which is of size
  * A.n_rows x B.n_cols
  *
- * @param A the left matrix
- * @param B the right matrix
+ * @param A [in] the left matrix
+ * @param B [in] the right matrix
  * @return the resulting Matrix from the matrix multiplication
  */
-Matrix_t matmul(Matrix_t A, Matrix_t B);
+Matrix_t* shared_matrix_multiply(Matrix_t* A, Matrix_t* B);
 
 /**
- * Rotates the coordinate axis through the angle represented by the given
- * unit vector such that the given vector is in a new reference frame.
- * The unit vector should be of the form {cos(theta), sin(theta)},
- * where theta is the angle you want to rotate the axis by.
+ * Creates a shared_matrix_transpose of the given in_matrix.
  *
- * @param vector the vector to rotate
- * @param unit_vector {cos(theta), sin(theta)} of the angle you want to rotate the axis by
+ * @param in_matrix [in] the matrix to shared_matrix_transpose
+ * @return the shared_matrix_transpose of the given matrix
  */
-void rotate_axis_2D(float vector[2], const float unit_vector[2]);
+Matrix_t* shared_matrix_transpose(Matrix_t* in_matrix);
 
 /**
- * Rotates the given vector through the angle represented by the given
- * unit vector. The unit vector should be of the form {cos(theta), sin(theta)},
- * where theta is the angle you want to rotate the vector by.
+ * Function sets the value of the matrix element at the specified row and column. The first row and column are index '1'.
  *
- * @param vector the vector to rotate
- * @param unit_vector {cos(theta), sin(theta)} of the angle you want to rotate the vector
- * by
+ * NOTE: If any of the @pre conditions are not met, the function will do nothing
+ * @pre row <= the number of rows in the matrix and row >= 1
+ * @pre column <= the number of columns in the matrix and column >= 1
+ *
+ * @param row [in] The row of the matrix element
+ * @param column [in] The column of the matrix element
+ * @param value [in] The value to set
+ * @param matrix [in] The matrix
  */
-void rotate_vector_2D(float vector[2], const float unit_vector[2]);
+void shared_matrix_setValueAtIndex(unsigned int row, unsigned int column, float value, Matrix_t* matrix);
 
 /**
- * Creates a transpose of the given in_matrix.
+ * Function gets the value of the matrix element at the specified row and column, The first row and column are index '1'.
  *
- * @param in_matrix the matrix to transpose
- * @return the transpose of the given matrix
+ *
+ * @pre row <= the number of rows in the matrix and row >= 1
+ * @pre column <= the number of columns in the matrix and column >= 1
+ *
+ * @param row [in] The row of the matrix element
+ * @param column [in] The column of the matrix element
+ * @param matrix [in] The matrix
+ *
+ * @return The value of the matrix element at the specified index. If the pre conditions are not met, it will return zero.
  */
-Matrix_t transpose(Matrix_t in_matrix);
+float shared_matrix_getValueAtIndex(unsigned int row, unsigned int column, Matrix_t* matrix);
