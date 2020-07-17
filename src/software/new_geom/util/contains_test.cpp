@@ -431,7 +431,7 @@ TEST(ContainsTest, test_segment_contains_endpoints)
 {
     Segment segment = Segment(Point(2, 2), Point(-1, -1));
 
-    EXPECT_TRUE(contains(segment, segment.getSegStart()));
+    EXPECT_TRUE(contains(segment, segment.getStart()));
     EXPECT_TRUE(contains(segment, segment.getEnd()));
 }
 
