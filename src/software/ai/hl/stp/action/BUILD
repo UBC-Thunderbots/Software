@@ -65,6 +65,8 @@ cc_test(
     deps = [
         ":intercept_ball_action",
         "//software/ai/intent:move_intent",
+        "//software/new_geom:segment",
+        "//software/new_geom/util:algorithms",
         "//software/test_util",
         "//software/world:ball",
         "@gtest//:gtest_main",
