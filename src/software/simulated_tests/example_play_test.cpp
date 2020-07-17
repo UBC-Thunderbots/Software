@@ -1,6 +1,4 @@
 #include "software/ai/hl/stp/play/example_play.h"
-#include "software/ai/hl/stp/play/shoot_or_pass_play.h"
-#include "software/ai/hl/stp/play/defense_play.h"
 
 #include <gtest/gtest.h>
 
@@ -53,33 +51,4 @@ TEST_F(ExamplePlayTest, test_example_play)
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(8));
-}
-
-TEST_F(ExamplePlayTest, test_ball_interception)
-{
-    enableVisualizer();
-    setBallState(BallState(Point(2, 0.2), Vector(-0.0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-            {Point(-4.5, 0), Point(-2.5, -2)}));
-    // Set the goalie ID to that of a non-existent robot so that all robots
-    // take on non-goalie roles
-    setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-            {
-                Point(4.4, 0.4),
-                Point(4.4, 0.2),
-                Point(4.4, 0.0),
-                Point(4.4, -0.2),
-                Point(4.4, -0.4),
-            }));
-    setEnemyGoalie(0);
-    setAIPlay(ShootOrPassPlay::name);
-    setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::HALT);
-
-    std::vector<ValidationFunction> terminating_validation_functions = {};
-
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
-
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
 }

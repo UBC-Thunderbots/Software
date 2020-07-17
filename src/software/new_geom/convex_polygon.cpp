@@ -1,26 +1,21 @@
 #include "software/new_geom/convex_polygon.h"
 
 #include <algorithm>
-#include <sstream>
 
 ConvexPolygon::ConvexPolygon(const std::vector<Point>& points) : Polygon(points)
 {
     if (!isConvex())
     {
-        std::stringstream ss;
-        ss << "Points do not make a convex polygon: {";
-        for (auto& point : points)
-        {
-            ss << point << ", ";
-        }
-        ss << "}";
-        throw std::invalid_argument(ss.str());
+        throw std::invalid_argument("Points do not make a convex polygon");
     }
 }
 
-ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points)
-    : ConvexPolygon(std::vector(points))
+ConvexPolygon::ConvexPolygon(const std::initializer_list<Point>& points) : Polygon(points)
 {
+    if (!isConvex())
+    {
+        throw std::invalid_argument("Points do not make a convex polygon");
+    }
 }
 
 // From:

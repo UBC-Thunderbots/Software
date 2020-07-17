@@ -20,9 +20,8 @@ class PasserTactic : public Tactic
      * @param ball The ball that we're trying to pass
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
-     * TODO: jdocs
      */
-    explicit PasserTactic(Pass pass, const Ball& ball, const Field& field, bool loop_forever);
+    explicit PasserTactic(Pass pass, const Ball& ball, bool loop_forever);
 
     std::string getName() const override;
 
@@ -30,9 +29,8 @@ class PasserTactic : public Tactic
      * Updates the world parameters for this PasserTactic.
      *
      * @param updated_ball The ball we're passing
-     * TODO: jdoc
      */
-    void updateWorldParams(const Ball& updated_ball, const Field& updated_field);
+    void updateWorldParams(const Ball& updated_ball);
 
     /**
      * Updates the control parameters for this PasserTactic.
@@ -62,5 +60,4 @@ class PasserTactic : public Tactic
     // Tactic parameters
     Pass pass;
     Ball ball;
-    Field field;
 };

@@ -10,7 +10,6 @@ Ray::Ray(const Point& start, const Angle& direction)
 Ray::Ray(const Point& start, const Vector& direction)
     : start_(start), direction_(direction.orientation())
 {
-    // TODO: assert non-zero length
 }
 
 Point Ray::getStart() const

@@ -2,13 +2,12 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/kick_action.h"
-#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 
-PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick}), pass(std::move(pass)), ball(ball), field(field)
+PasserTactic::PasserTactic(Pass pass, const Ball& ball, bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Kick}), pass(std::move(pass)), ball(ball)
 {
 }
 
@@ -17,10 +16,9 @@ std::string PasserTactic::getName() const
     return "Passer Tactic";
 }
 
-void PasserTactic::updateWorldParams(const Ball& updated_ball, const Field& updated_field)
+void PasserTactic::updateWorldParams(const Ball& updated_ball)
 {
     this->ball = updated_ball;
-    this->field = updated_field;
 }
 
 void PasserTactic::updateControlParams(const Pass& updated_pass)
@@ -40,19 +38,10 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
 
 void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    // Collect the ball
-    auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, false);
-    do {
-        intercept_action->updateControlParams(*robot);
-        yield(intercept_action);
-    } while(!intercept_action->done());
-
-    LOG(INFO) << "Passer done collecting ball";
-
-    // Move to a position just behind the ball (in the direction of the pass)
-    // until it's time to perform the pass
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
+    // Move to a position just behind the ball (in the direction of the pass)
+    // until it's time to perform the pass
     while (ball.lastUpdateTimestamp() < pass.startTime())
     {
         // We want to wait just behind where the pass is supposed to start, so that the
@@ -66,7 +55,6 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
                                          0, DribblerEnable::OFF, MoveType::NORMAL,
                                          AutokickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
-        LOG(INFO) << "Passer waiting for pass time";
     }
 
     // The angle between the ball velocity vector and a vector from the passer
@@ -76,7 +64,6 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     auto kick_action = std::make_shared<KickAction>();
     do
     {
-        LOG(INFO) << "Passer passing";
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
         kick_action->updateControlParams(*robot, ball.position(), pass.receiverPoint(),
