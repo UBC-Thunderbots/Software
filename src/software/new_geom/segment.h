@@ -2,94 +2,90 @@
 
 #include "software/new_geom/point.h"
 
-// This is a direct copy of geom/segment.h, this is needed to unblock work on the new_geom
-// shape hierarchy.
-// TODO (Issue #1098): Refactor this to fit the new_geom hierarchy
 class Segment final
 {
    public:
+    /**
+     * Creates a degenerate Segment at (0, 0)
+     */
+    Segment();
+
+    /**
+     * Creates a Segment that starts and ends at the given points
+     */
+    Segment(const Point& start, const Point& end);
+
     /**
      * Sets the start point of the segment to o
      *
      * @param o new start point of segment
      */
-    void setSegStart(Point o)
-    {
-        start = o;
-    }
+    void setStart(Point o);
 
     /**
      * Gets the start point of the segment
      *
      * @return start point of segment
      */
-    const Point& getSegStart() const
-    {
-        return start;
-    }
+    const Point& getStart() const;
 
     /**
      * Sets the end point of the segment to o
      *
      * @param o new end point of segment
      */
-    void setEnd(Point o)
-    {
-        end = o;
-    }
+    void setEnd(Point o);
 
     /**
      * Gets the end point of the segment
      *
      * @return end point of segment
      */
-    const Point& getEnd() const
-    {
-        return end;
-    }
+    const Point& getEnd() const;
 
     /**
-     * Creates a degenerate Segment at (0, 0)
+     * Gets the length of the segment
+     *
+     * @return length of segment
      */
-    inline explicit Segment() {}
+    double length() const;
 
     /**
-     * Creates a Segment that starts and ends at the given points
+     * Gets the squared length of the segment
+     *
+     * @return squared length of segment
      */
-    inline explicit Segment(const Point& start, const Point& end) : start(start), end(end)
-    {
-    }
+    double lengthSquared() const;
 
     /**
      * Creates a Segment that is reversed
+     *
+     * @return reversed segment
      */
-    inline Segment reverse() const
-    {
-        return Segment(end, start);
-    }
+    Segment reverse() const;
 
     /**
-     * Makes a Vector out of this Segment.
+     * Makes a Vector out of this Segment
+     *
+     * @return vector representation of the segment
      */
-    inline Vector toVector() const
-    {
-        return end - start;
-    }
+    Vector toVector() const;
 
-    inline double length() const
-    {
-        return (end - start).length();
-    }
+    /**
+     * Gets mid point of the Segment, halfway between the start and end points
+     *
+     * @return mid point
+     */
+    Point midPoint() const;
 
-    inline double slope() const
-    {
-        return (end.y() - start.y()) / (end.x() - start.x());
-    }
-
-    inline bool operator==(const Segment& other) const
-    {
-        return start == other.start && end == other.end;
-    }
+    /**
+     * Compares with another segment for equality
+     *
+     * @param other the other segment
+     *
+     * @return true if segment is equal to other, and false otherwise.
+     */
+    bool operator==(const Segment& other) const;
 
    private:
     Point start;
@@ -101,7 +97,7 @@ struct std::hash<Segment>
 {
     std::size_t operator()(const Segment& seg) const
     {
-        std::size_t const h1(std::hash<Point>()(seg.getSegStart()));
+        std::size_t const h1(std::hash<Point>()(seg.getStart()));
         std::size_t const h2(std::hash<Point>()(seg.getEnd()));
         return h1 ^ (h2 << 1);
     }

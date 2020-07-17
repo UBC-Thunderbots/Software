@@ -11,7 +11,6 @@
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
 
-
 class RobotNavigationObstacleFactoryTest : public testing::Test
 {
    public:
@@ -143,8 +142,8 @@ TEST_F(RobotNavigationObstacleFactoryTest, stationary_robot_obstacle)
     try
     {
         auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
-        EXPECT_TRUE(::TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
-                                                     METERS_PER_MILLIMETER));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -188,8 +187,8 @@ TEST_F(RobotNavigationObstacleFactoryTest, fast_moving_robot_obstacle)
     try
     {
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
-        EXPECT_TRUE(::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
-                                                     METERS_PER_MILLIMETER));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -211,8 +210,8 @@ TEST_F(RobotNavigationObstacleFactoryTest, another_fast_moving_robot_obstacle)
     try
     {
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -229,8 +228,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_robots_collisio
     {
         Circle expected({0.5, -2.5}, 0.207);
         auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacles[0]);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom()));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -246,8 +245,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_robots_collisio
                           {0.123, 0.946},
                           {-0.352, 0.886}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[1]);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -264,8 +263,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, centre_circle)
     {
         Circle expected({0, 0}, 0.617);
         auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacles[0]);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom()));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -282,8 +281,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, half_metre_around_bal
     {
         Circle expected({1, 2}, 0.617);
         auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacles[0]);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom()));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -300,8 +299,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, inflated_enemy_defens
     {
         Polygon expected({{3.083, -1.417}, {3.083, 1.417}, {4.8, 1.417}, {4.8, -1.417}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -319,8 +318,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_defense_area
         Polygon expected(
             {{-4.8, -1.117}, {-4.8, 1.117}, {-3.383, 1.117}, {-3.383, -1.117}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -337,8 +336,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_defense_area)
     {
         Polygon expected({{3.383, -1.117}, {3.383, 1.117}, {4.8, 1.117}, {4.8, -1.117}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -355,8 +354,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_half)
     {
         Polygon expected({{-4.8, -3.3}, {-4.8, 3.3}, {0.117, 3.3}, {0.117, -3.3}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {
@@ -373,8 +372,9 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
     {
         Polygon expected({{-0.117, -3.3}, {-0.117, 3.3}, {4.8, 3.3}, {4.8, -3.3}});
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
-        EXPECT_TRUE(
-            ::TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom()));
+        std::cout << 1.0 / 1000.0 << std::endl;
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
+                                                   METERS_PER_MILLIMETER));
     }
     catch (std::bad_cast)
     {

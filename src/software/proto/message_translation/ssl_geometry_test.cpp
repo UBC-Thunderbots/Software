@@ -35,17 +35,17 @@ class SSLGeometryTest : public ::testing::Test
                         field_segment.thickness());
 
         auto segment_eq =
-            equalWithinTolerance(segment.getSegStart(), field_segment.p1(), tolerance) &&
+            equalWithinTolerance(segment.getStart(), field_segment.p1(), tolerance) &&
             equalWithinTolerance(segment.getEnd(), field_segment.p2(), tolerance);
         auto reversed_segment_eq =
             equalWithinTolerance(segment.getEnd(), field_segment.p1(), tolerance) &&
-            equalWithinTolerance(segment.getSegStart(), field_segment.p2(), tolerance);
+            equalWithinTolerance(segment.getStart(), field_segment.p2(), tolerance);
 
         if (!segment_eq && !reversed_segment_eq)
         {
             return ::testing::AssertionFailure()
                    << "LineSegments not equal. Expected segment with points "
-                   << segment.getSegStart() << ", " << segment.getEnd()
+                   << segment.getStart() << ", " << segment.getEnd()
                    << " but got segment points (" << field_segment.p1().x() << ", "
                    << field_segment.p1().y() << "), (" << field_segment.p2().x() << ", "
                    << field_segment.p2().y() << ")";
@@ -321,7 +321,7 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_valid_values)
     EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
                     field_line_msg->thickness());
     EXPECT_TRUE(
-        equalWithinTolerance(segment.getSegStart(), field_line_msg->p1(), tolerance));
+        equalWithinTolerance(segment.getStart(), field_line_msg->p1(), tolerance));
     EXPECT_TRUE(equalWithinTolerance(segment.getEnd(), field_line_msg->p2(), tolerance));
     EXPECT_EQ(SSL_FieldShapeType::CenterLine, field_line_msg->type());
 }

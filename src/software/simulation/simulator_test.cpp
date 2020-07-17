@@ -478,7 +478,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_NE(yellow_robot_1, yellow_robots.end());
     EXPECT_NEAR(1000.0f, yellow_robot_1->x(), 200);
     EXPECT_NEAR(1000.0f, yellow_robot_1->y(), 200);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Angle::zero(), Angle::fromRadians(yellow_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
@@ -488,7 +488,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_NE(yellow_robot_2, yellow_robots.end());
     EXPECT_NEAR(3000.0f, yellow_robot_2->x(), 200);
     EXPECT_NEAR(-2000.0f, yellow_robot_2->y(), 200);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Angle::zero(), Angle::fromRadians(yellow_robot_2->orientation()),
         Angle::fromDegrees(10)));
 
@@ -499,7 +499,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_NE(blue_robot_1, blue_robots.end());
     EXPECT_NEAR(-1000.0f, blue_robot_1->x(), 300);
     EXPECT_NEAR(-1000.0f, blue_robot_1->y(), 300);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Angle::zero(), Angle::fromRadians(blue_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
@@ -509,7 +509,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_NE(blue_robot_2, blue_robots.end());
     EXPECT_NEAR(-3000.0f, blue_robot_2->x(), 300);
     EXPECT_NEAR(0.0f, blue_robot_2->y(), 300);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Angle::half(), Angle::fromRadians(blue_robot_2->orientation()),
         Angle::fromDegrees(10)));
 }

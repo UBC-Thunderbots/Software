@@ -11,10 +11,10 @@
 #include "software/new_geom/ray.h"
 #include "software/new_geom/segment.h"
 #include "software/new_geom/util/calculate_block_cone.h"
+#include "software/new_geom/util/closest_point.h"
 #include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
-
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team)
@@ -214,8 +214,8 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // the final speed is a dynamic parameter so that if the goalie needs
             // to dive for the shot instead of stop when reaching the intersection
             // point it can do so.
-            Point goalie_pos = closestPointOnSeg(
-                (*robot).position(), Segment(ball.position(), intersections[0]));
+            Point goalie_pos         = closestPoint((*robot).position(),
+                                            Segment(ball.position(), intersections[0]));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             move_action->updateControlParams(

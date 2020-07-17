@@ -8,6 +8,7 @@
 #include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/util/acute_angle.h"
+#include "software/new_geom/util/closest_point.h"
 #include "software/parameter/dynamic_parameters.h"
 
 double ratePass(const World& world, const Pass& pass,
@@ -182,8 +183,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
 
     // Figure out how long the enemy robot and ball will take to reach the closest
     // point on the pass to the enemy's current position
-    Point closest_point_on_pass_to_robot = closestPointOnSeg(
-        enemy_robot.position(), pass.passerPoint(), pass.receiverPoint());
+    Point closest_point_on_pass_to_robot = closestPoint(
+        enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
     Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(
         enemy_robot.position(), closest_point_on_pass_to_robot,
         ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,

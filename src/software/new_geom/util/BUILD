@@ -117,6 +117,7 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

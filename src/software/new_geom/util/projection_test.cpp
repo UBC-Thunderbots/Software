@@ -16,8 +16,8 @@ TEST(ProjectionTest, test_project_circles_origin_inside_circle)
 
     EXPECT_EQ(proj_segments.size(), 1);
     EXPECT_EQ(proj_segments.front().length(), 10);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().x(), 5.0);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().x(), 5.0);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().y(), 5.0);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().x(), -5.0);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
 }
@@ -33,8 +33,8 @@ TEST(ProjectionTest, test_project_circles_one_circle)
 
     EXPECT_EQ(proj_segments.size(), 1);
     EXPECT_NEAR(proj_segments.front().length(), 1.26, 0.01);
-    EXPECT_NEAR(proj_segments.front().getSegStart().x(), 0.63, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.front().getStart().x(), 0.63, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.front().getEnd().x(), -0.63, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
 }
@@ -53,15 +53,15 @@ TEST(ProjectionTest, test_project_circles_multiple_circles)
     EXPECT_NEAR(proj_segments.front().length(), 1.30, 0.01);
 
     // Circle 1
-    EXPECT_NEAR(proj_segments.front().getSegStart().x(), -0.62, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.front().getStart().x(), -0.62, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.front().getEnd().x(), -1.92, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
 
 
     // Circle 2
-    EXPECT_NEAR(proj_segments.back().getSegStart().x(), 1.92, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.back().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.back().getStart().x(), 1.92, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.back().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.back().getEnd().x(), 0.62, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.back().getEnd().y(), 5.0);
 }
@@ -81,15 +81,15 @@ TEST(ProjectionTest, test_project_circles_multiple_circles_one_has_zero_projecti
     EXPECT_NEAR(proj_segments.front().length(), 1.30, 0.01);
 
     // Circle 1
-    EXPECT_NEAR(proj_segments.front().getSegStart().x(), -0.62, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.front().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.front().getStart().x(), -0.62, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.front().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.front().getEnd().x(), -1.92, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.front().getEnd().y(), 5.0);
 
 
     // Circle 2
-    EXPECT_NEAR(proj_segments.back().getSegStart().x(), 1.92, 0.01);
-    EXPECT_DOUBLE_EQ(proj_segments.back().getSegStart().y(), 5.0);
+    EXPECT_NEAR(proj_segments.back().getStart().x(), 1.92, 0.01);
+    EXPECT_DOUBLE_EQ(proj_segments.back().getStart().y(), 5.0);
     EXPECT_NEAR(proj_segments.back().getEnd().x(), 0.62, 0.01);
     EXPECT_DOUBLE_EQ(proj_segments.back().getEnd().y(), 5.0);
 }

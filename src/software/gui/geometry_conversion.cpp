@@ -27,7 +27,7 @@ QPolygonF createQPolygonF(const Polygon& polygon)
 
 QLineF createQLineF(const Segment& segment)
 {
-    return QLineF(createQPointF(segment.getSegStart()), createQPointF(segment.getEnd()));
+    return QLineF(createQPointF(segment.getStart()), createQPointF(segment.getEnd()));
 }
 
 Point createPoint(const QPointF& point)

@@ -70,7 +70,7 @@ double distance(const Circle &first, const Point &second)
 double distanceSquared(const Point &first, const Segment &second)
 {
     Vector seg_vec            = second.toVector();
-    Vector seg_start_to_point = first - second.getSegStart();
+    Vector seg_start_to_point = first - second.getStart();
 
     if (seg_vec.dot(seg_start_to_point) <= 0)
     {

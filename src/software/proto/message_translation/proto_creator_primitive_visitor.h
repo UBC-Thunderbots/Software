@@ -25,11 +25,9 @@ class ProtoCreatorPrimitiveVisitor : public PrimitiveVisitor
     void visit(const ChipPrimitive &chip_primitive) override;
     void visit(const DirectVelocityPrimitive &direct_velocity_primitive) override;
     void visit(const DirectWheelsPrimitive &direct_wheels_primitive) override;
-    void visit(const DribblePrimitive &dribble_primitive) override;
     void visit(const KickPrimitive &kick_primitive) override;
     void visit(const MovePrimitive &move_primitive) override;
     void visit(const MoveSpinPrimitive &movespin_primitive) override;
-    void visit(const PivotPrimitive &pivot_primitive) override;
     void visit(const StopPrimitive &stop_primitive) override;
 
     /**
