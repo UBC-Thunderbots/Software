@@ -18,9 +18,9 @@ class PasserTactic : public Tactic
      *
      * @param pass The pass this tactic should try to execute
      * @param ball The ball that we're trying to pass
+     * @param field The field being played on
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
-     * TODO: jdocs
      */
     explicit PasserTactic(Pass pass, const Ball& ball, const Field& field, bool loop_forever);
 
@@ -30,7 +30,7 @@ class PasserTactic : public Tactic
      * Updates the world parameters for this PasserTactic.
      *
      * @param updated_ball The ball we're passing
-     * TODO: jdoc
+     * @param updated_field The field being played on
      */
     void updateWorldParams(const Ball& updated_ball, const Field& updated_field);
 

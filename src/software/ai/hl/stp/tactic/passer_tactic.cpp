@@ -47,8 +47,6 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         yield(intercept_action);
     } while(!intercept_action->done());
 
-    LOG(INFO) << "Passer done collecting ball";
-
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass
     auto move_action = std::make_shared<MoveAction>(
@@ -66,7 +64,6 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
                                          0, DribblerEnable::OFF, MoveType::NORMAL,
                                          AutokickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
-        LOG(INFO) << "Passer waiting for pass time";
     }
 
     // The angle between the ball velocity vector and a vector from the passer
@@ -76,7 +73,6 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     auto kick_action = std::make_shared<KickAction>();
     do
     {
-        LOG(INFO) << "Passer passing";
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
         kick_action->updateControlParams(*robot, ball.position(), pass.receiverPoint(),
