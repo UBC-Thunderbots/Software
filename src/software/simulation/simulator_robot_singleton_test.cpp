@@ -441,7 +441,7 @@ TEST_F(SimulatorRobotSingletonTest,
     auto [world, firmware_robot, simulator_ball] =
         createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
 
-    // Simulate for 1/2 second without chipping
+    // Simulate for 0.5 second without chipping
     for (unsigned int i = 0; i < 30; i++)
     {
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
