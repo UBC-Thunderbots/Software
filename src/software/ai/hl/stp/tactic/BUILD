@@ -9,8 +9,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/new_geom/util:algorithms",
         "//software/world",
     ],
 )
@@ -89,8 +89,8 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/new_geom/util:algorithms",
     ],
 )
 
@@ -144,9 +144,9 @@ cc_library(
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
+        "//software/geom:line",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/new_geom:line",
-        "//software/new_geom/util:algorithms",
     ],
 )
 
@@ -242,8 +242,8 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/new_geom/util:algorithms",
     ],
 )
 
@@ -271,8 +271,8 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/new_geom/util:algorithms",
     ],
 )
 
@@ -320,8 +320,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/new_geom/util:algorithms",
         "//software/parameter:dynamic_parameters",
     ],
 )

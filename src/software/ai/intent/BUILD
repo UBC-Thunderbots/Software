@@ -25,8 +25,8 @@ cc_library(
     hdrs = ["direct_velocity_intent.h"],
     deps = [
         ":intent",
-        "//software/new_geom:angle",
-        "//software/new_geom:point",
+        "//software/geom:angle",
+        "//software/geom:point",
         "//software/primitive:direct_velocity_primitive",
     ],
 )
@@ -84,8 +84,8 @@ cc_library(
     hdrs = ["move_intent.h"],
     deps = [
         ":intent",
-        "//software/new_geom:angle",
-        "//software/new_geom:point",
+        "//software/geom:angle",
+        "//software/geom:point",
         "//software/primitive:move_primitive",
     ],
 )

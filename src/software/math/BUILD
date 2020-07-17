@@ -5,8 +5,8 @@ cc_library(
     srcs = ["math_functions.cpp"],
     hdrs = ["math_functions.h"],
     deps = [
-        "//software/new_geom:circle",
-        "//software/new_geom:rectangle",
+        "//software/geom:circle",
+        "//software/geom:rectangle",
     ],
 )
 

@@ -7,9 +7,9 @@ qt_cc_library(
     src = "standalone_simulator_draw_function_visualizer.cpp",
     hdr = "standalone_simulator_draw_function_visualizer.h",
     deps = [
+        "//software/geom:point",
         "//software/gui:geometry_conversion",
         "//software/gui/generic_widgets/draw_function_visualizer",
-        "//software/new_geom:point",
         "//software/simulation:standalone_simulator",
         "//software/simulation/physics:physics_robot",
         "//software/world:robot_state",

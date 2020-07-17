@@ -9,9 +9,9 @@ cc_library(
         "//shared:constants",
         "//software/ai/intent:chip_intent",
         "//software/ai/intent:move_intent",
-        "//software/new_geom:polygon",
-        "//software/new_geom:triangle",
-        "//software/new_geom/util:algorithms",
+        "//software/geom:polygon",
+        "//software/geom:triangle",
+        "//software/geom/algorithms",
     ],
 )
 
@@ -35,8 +35,8 @@ cc_library(
         "//software/ai/evaluation:intercept",
         "//software/ai/evaluation:robot",
         "//software/ai/intent:move_intent",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/new_geom/util:algorithms",
         "//software/world:ball",
         "//software/world:field",
     ],
@@ -63,8 +63,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/intent:kick_intent",
         "//software/ai/intent:move_intent",
-        "//software/new_geom:polygon",
-        "//software/new_geom/util:algorithms",
+        "//software/geom:polygon",
+        "//software/geom/algorithms",
         "//software/world:ball",
     ],
 )

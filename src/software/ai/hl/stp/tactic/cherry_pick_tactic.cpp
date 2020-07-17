@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
     : Tactic(true),

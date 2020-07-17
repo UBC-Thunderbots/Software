@@ -4,11 +4,11 @@
 
 #include <functional>
 
+#include "software/geom/angle.h"
+#include "software/geom/angular_velocity.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/angular_velocity.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/world/robot_state.h"
 

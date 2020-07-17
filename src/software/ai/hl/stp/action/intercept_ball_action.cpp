@@ -5,12 +5,12 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/intent/move_intent.h"
+#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/ray.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/ray.h"
-#include "software/new_geom/util/acute_angle.h"
-#include "software/new_geom/util/closest_point.h"
-#include "software/new_geom/util/distance.h"
-#include "software/new_geom/util/intersection.h"
 
 InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
                                          bool loop_forever)

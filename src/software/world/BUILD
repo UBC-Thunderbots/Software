@@ -6,8 +6,8 @@ cc_library(
     hdrs = ["ball.h"],
     deps = [
         "//shared:constants",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:point",
+        "//software/geom:vector",
         "//software/time:timestamp",
         "//software/world:timestamped_ball_state",
         "@boost//:circular_buffer",
@@ -30,8 +30,8 @@ cc_library(
     hdrs = ["timestamped_ball_state.h"],
     deps = [
         ":ball_state",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:point",
+        "//software/geom:vector",
         "//software/time:timestamp",
         "@boost//:circular_buffer",
     ],
@@ -51,8 +51,8 @@ cc_library(
     srcs = ["ball_state.cpp"],
     hdrs = ["ball_state.h"],
     deps = [
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:point",
+        "//software/geom:vector",
     ],
 )
 
@@ -71,9 +71,9 @@ cc_library(
     hdrs = ["field.h"],
     deps = [
         "//shared:constants",
-        "//software/new_geom:circle",
-        "//software/new_geom:rectangle",
-        "//software/new_geom/util:algorithms",
+        "//software/geom:circle",
+        "//software/geom:rectangle",
+        "//software/geom/algorithms",
         "//software/time:timestamp",
         "@boost//:circular_buffer",
     ],
@@ -145,10 +145,10 @@ cc_library(
     hdrs = ["timestamped_robot_state.h"],
     deps = [
         ":robot_state",
-        "//software/new_geom:angle",
-        "//software/new_geom:angular_velocity",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
         "//software/time:timestamp",
         "@boost//:circular_buffer",
     ],
@@ -170,10 +170,10 @@ cc_library(
     deps = [
         "team_colour",
         "//shared:constants",
-        "//software/new_geom:angle",
-        "//software/new_geom:angular_velocity",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
         "//software/time:duration",
     ],
 )

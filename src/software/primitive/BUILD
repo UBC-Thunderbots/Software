@@ -6,8 +6,8 @@ cc_library(
     hdrs = ["chip_primitive.h"],
     deps = [
         ":primitive",
-        "//software/new_geom:angle",
-        "//software/new_geom:point",
+        "//software/geom:angle",
+        "//software/geom:point",
     ],
 )
 
@@ -44,9 +44,9 @@ cc_library(
     hdrs = ["direct_wheels_primitive.h"],
     deps = [
         ":primitive",
+        "//software/geom:angle",
+        "//software/geom:point",
         "//software/logger",
-        "//software/new_geom:angle",
-        "//software/new_geom:point",
     ],
 )
 
@@ -65,8 +65,8 @@ cc_library(
     hdrs = ["kick_primitive.h"],
     deps = [
         ":primitive",
-        "//software/new_geom:angle",
-        "//software/new_geom:point",
+        "//software/geom:angle",
+        "//software/geom:point",
     ],
 )
 
@@ -85,8 +85,8 @@ cc_library(
     hdrs = ["move_primitive.h"],
     deps = [
         ":primitive",
-        "//software/new_geom:angle",
-        "//software/new_geom:point",
+        "//software/geom:angle",
+        "//software/geom:point",
     ],
 )
 
@@ -105,8 +105,8 @@ cc_library(
     hdrs = ["movespin_primitive.h"],
     deps = [
         ":primitive",
-        "//software/new_geom:angular_velocity",
-        "//software/new_geom:point",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
     ],
 )
 

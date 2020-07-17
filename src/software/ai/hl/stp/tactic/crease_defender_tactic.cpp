@@ -4,11 +4,11 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/point.h"
+#include "software/geom/ray.h"
+#include "software/geom/segment.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/ray.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(

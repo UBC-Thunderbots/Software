@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 
 TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)

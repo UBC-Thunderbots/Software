@@ -6,11 +6,11 @@
 #include <QtGui/QPolygonF>
 #include <QtWidgets/QGraphicsScene>
 
+#include "software/geom/circle.h"
+#include "software/geom/polygon.h"
+#include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 #include "software/gui/geometry_conversion.h"
-#include "software/new_geom/circle.h"
-#include "software/new_geom/polygon.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/segment.h"
 
 /**
  * Draws the Rectangle on the given scene.

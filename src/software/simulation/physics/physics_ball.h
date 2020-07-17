@@ -4,8 +4,8 @@
 
 #include <optional>
 
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
 #include "software/world/ball_state.h"
 
 /**

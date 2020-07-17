@@ -2,9 +2,9 @@
 
 #include <stack>
 
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/util/distance.h"
-#include "software/new_geom/util/intersects.h"
 
 ThetaStarPathPlanner::ThetaStarPathPlanner()
     : num_grid_rows(0),

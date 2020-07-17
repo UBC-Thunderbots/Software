@@ -1,9 +1,9 @@
 #include "software/ai/evaluation/deflect_off_enemy_target.h"
 
 #include "shared/constants.h"
-#include "software/new_geom/triangle.h"
-#include "software/new_geom/util/contains.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/triangle.h"
 #include "software/world/world.h"
 
 Point deflect_off_enemy_target(World world)

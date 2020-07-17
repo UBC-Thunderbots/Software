@@ -7,9 +7,9 @@
 #include <random>
 
 #include "shared/constants.h"
-#include "software/new_geom/ray.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/ray.h"
+#include "software/geom/segment.h"
 
 class BallFilterTest : public ::testing::Test
 {

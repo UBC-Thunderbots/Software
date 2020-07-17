@@ -5,7 +5,7 @@ cc_library(
     hdrs = ["path_planner.h"],
     deps = [
         "//software/ai/navigator/obstacle",
-        "//software/new_geom:linear_spline2d",
+        "//software/geom:linear_spline2d",
     ],
 )
 
@@ -31,7 +31,7 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
-        "//software/new_geom/util:algorithms",
+        "//software/geom/algorithms",
     ],
 )
 

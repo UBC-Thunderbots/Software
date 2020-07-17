@@ -5,8 +5,8 @@
 #include <limits>
 
 #include "shared/constants.h"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/math/math_functions.h"
-#include "software/new_geom/util/closest_point.h"
 
 BallFilter::BallFilter(unsigned int min_buffer_size, unsigned int max_buffer_size)
     : _min_buffer_size(min_buffer_size),
