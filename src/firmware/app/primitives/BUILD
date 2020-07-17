@@ -64,7 +64,7 @@ cc_library(
         ":move",
         ":primitive",
         ":shoot",
-        ":spin",
+        ":movespin",
         ":stop",
         "//firmware/app/world:firmware_world",
     ] + select({
@@ -90,9 +90,9 @@ cc_library(
 )
 
 cc_library(
-    name = "spin",
-    srcs = ["spin_primitive.c"],
-    hdrs = ["spin_primitive.h"],
+    name = "movespin",
+    srcs = ["movespin_primitive.c"],
+    hdrs = ["movespin_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/app/control",
