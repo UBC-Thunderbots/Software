@@ -34,5 +34,6 @@
  * @return vector<Segment> : All of the projections of the Circles onto the reference
  * Segment
  */
-std::vector<Segment> projectCirclesOntoSegment(Segment segment,
-                                               std::vector<Circle> circles, Point origin);
+std::vector<Segment> projectCirclesOntoSegment(const Segment &segment,
+                                               const std::vector<Circle> &circles,
+                                               const Point &origin);

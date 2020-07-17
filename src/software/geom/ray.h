@@ -31,14 +31,14 @@ class Ray final
      *
      * @return the start point of this Ray
      */
-    Point getStart() const;
+    const Point& getStart() const;
 
     /**
      * Returns the direction of this Ray
      *
      * @return the direction of this Ray
      */
-    Angle getDirection() const;
+    const Angle& getDirection() const;
 
     /**
      * Sets the start point of this Ray

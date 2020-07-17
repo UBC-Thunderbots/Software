@@ -11,7 +11,7 @@ Line::Line(const Point &first, const Point &second)
     coeffs.c = first.x() * second.y() - second.x() * first.y();
 }
 
-Line::Coeffs Line::getCoeffs() const
+const Line::Coeffs &Line::getCoeffs() const
 {
     return coeffs;
 }

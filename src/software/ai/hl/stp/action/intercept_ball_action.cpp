@@ -68,7 +68,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // Finally, if the ball is moving slowly the robot will go directly to the ball.
     do
     {
-        Point closest_point = closestPointOnLine(
+        Point closest_point = closestPoint(
             robot->position(), Line(ball.position(), ball.position() + ball.velocity()));
         bool point_in_front_of_ball =
             acuteAngle(ball.velocity(), closest_point - ball.position()) <
@@ -105,7 +105,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             {
                 moveToInterceptPosition(yield, closest_point);
 
-                closest_point = closestPointOnLine(
+                closest_point = closestPoint(
                     robot->position(),
                     Line(ball.position(), ball.position() + ball.velocity()));
                 point_in_front_of_ball =

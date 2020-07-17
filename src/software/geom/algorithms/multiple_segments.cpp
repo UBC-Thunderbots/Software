@@ -6,7 +6,7 @@
 #include "software/geom/algorithms/contains.h"
 
 std::vector<Segment> realignSegmentsOntoVector(std::vector<Segment> segments,
-                                               Vector direction)
+                                               const Vector &direction)
 {
     std::vector<Segment> projected_segments = {};
 
@@ -55,8 +55,8 @@ std::vector<Segment> realignSegmentsOntoVector(std::vector<Segment> segments,
     return unique_segments;
 }
 
-std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
-                                                        Segment segment2)
+std::optional<Segment> mergeOverlappingParallelSegments(const Segment &segment1,
+                                                        const Segment &segment2)
 {
     std::optional<Segment> redundant_segment =
         mergeFullyOverlappingSegments(segment1, segment2);
@@ -95,7 +95,8 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
     return std::nullopt;
 }
 
-std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2)
+std::optional<Segment> mergeFullyOverlappingSegments(const Segment &segment1,
+                                                     const Segment &segment2)
 {
     // If the segments are not parallel, then return std::nullopt. (The segments are
     // parallel if all points are collinear)
@@ -131,7 +132,7 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 }
 
 std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segments,
-                                                      Segment parent_segment)
+                                                      const Segment &parent_segment)
 {
     // Make sure the starting point of all segments is closer to the start of the
     // reference segment to simplify the evaluation

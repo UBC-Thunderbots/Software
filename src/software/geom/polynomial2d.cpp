@@ -50,12 +50,12 @@ Point Polynomial2d::getValueAt(double val) const
     return Point(poly_x.valueAt(val), poly_y.valueAt(val));
 }
 
-Polynomial1d Polynomial2d::getPolyX() const
+const Polynomial1d &Polynomial2d::getPolyX() const
 {
     return poly_x;
 }
 
-Polynomial1d Polynomial2d::getPolyY() const
+const Polynomial1d &Polynomial2d::getPolyY() const
 {
     return poly_y;
 }

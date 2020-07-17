@@ -121,14 +121,14 @@ std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
             }
 
             // Snap the detection positions to the regression line if it was provided
-            Point current_position = ball_regression_line
-                                         ? closestPointOnLine(current_detection.position,
-                                                              *ball_regression_line)
-                                         : current_detection.position;
+            Point current_position =
+                ball_regression_line
+                    ? closestPoint(current_detection.position, *ball_regression_line)
+                    : current_detection.position;
             Point previous_position =
-                ball_regression_line ? closestPointOnLine(previous_detection.position,
-                                                          *ball_regression_line)
-                                     : previous_detection.position;
+                ball_regression_line
+                    ? closestPoint(previous_detection.position, *ball_regression_line)
+                    : previous_detection.position;
             Vector velocity_vector    = current_position - previous_position;
             double velocity_magnitude = velocity_vector.length() / time_diff.getSeconds();
             Vector velocity           = velocity_vector.normalize(velocity_magnitude);
@@ -312,7 +312,7 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
     // detection
     BallDetection latest_ball_detection = ball_detections.front();
     Point filtered_ball_position =
-        closestPointOnLine(latest_ball_detection.position, regression_line);
+        closestPoint(latest_ball_detection.position, regression_line);
 
     std::optional<BallVelocityEstimate> velocity_estimate =
         estimateBallVelocity(ball_detections, regression_line);

@@ -28,7 +28,7 @@
  * segment
  */
 std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segments,
-                                                      Segment parent_segment);
+                                                      const Segment &parent_segment);
 
 
 /**
@@ -53,7 +53,7 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
  * independent Segments
  */
 std::vector<Segment> realignSegmentsOntoVector(std::vector<Segment> segments,
-                                               Vector direction);
+                                               const Vector &direction);
 
 /**
  * Function merges overlapping parallel segments into one combined segment
@@ -64,8 +64,8 @@ std::vector<Segment> realignSegmentsOntoVector(std::vector<Segment> segments,
  * partially/completely overlapping
  * Returns std::nullopt if the segments aren't parallel or overlapping
  */
-std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
-                                                        Segment segment2);
+std::optional<Segment> mergeOverlappingParallelSegments(const Segment &segment1,
+                                                        const Segment &segment2);
 
 /**
  * Function merges two parameter segments into a single segment ONLY IF one of the
@@ -78,4 +78,5 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
  * @return nullopt : One of the segments is not fully contained in the other, OR the
  * segments are not collinear
  */
-std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
+std::optional<Segment> mergeFullyOverlappingSegments(const Segment &segment1,
+                                                     const Segment &segment2);

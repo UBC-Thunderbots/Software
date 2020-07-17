@@ -64,13 +64,13 @@ class Polynomial2d
      * Get the polynomial x(t) underlying this 2d Polynomial
      * @return The polynomial x(t) underlying this 2d Polynomial
      */
-    Polynomial1d getPolyX() const;
+    const Polynomial1d &getPolyX() const;
 
     /**
      * Get the polynomial y(t) underlying this 2d Polynomial
      * @return The polynomial y(t) underlying this 2d Polynomial
      */
-    Polynomial1d getPolyY() const;
+    const Polynomial1d &getPolyY() const;
 
    private:
     Polynomial1d poly_x;

@@ -16,7 +16,7 @@ double SplineSegment2d::getParametrizationEndVal() const
     return end_val;
 }
 
-Polynomial2d SplineSegment2d::getPolynomial() const
+const Polynomial2d& SplineSegment2d::getPolynomial() const
 {
     return polynomial;
 }

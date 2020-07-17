@@ -12,7 +12,7 @@ void Circle::setOrigin(const Point &o)
     origin_ = o;
 }
 
-Point Circle::getOrigin() const
+const Point &Circle::getOrigin() const
 {
     return origin_;
 }

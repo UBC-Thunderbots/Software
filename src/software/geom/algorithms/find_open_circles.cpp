@@ -119,7 +119,7 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
 }
 
 std::optional<Point> findClosestPoint(const Point &origin_point,
-                                      std::vector<Point> test_points)
+                                      const std::vector<Point> &test_points)
 {
     std::optional<Point> closest_point = std::nullopt;
 

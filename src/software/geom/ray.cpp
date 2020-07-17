@@ -12,12 +12,12 @@ Ray::Ray(const Point& start, const Vector& direction)
 {
 }
 
-Point Ray::getStart() const
+const Point& Ray::getStart() const
 {
     return start_;
 }
 
-Angle Ray::getDirection() const
+const Angle& Ray::getDirection() const
 {
     return direction_;
 }

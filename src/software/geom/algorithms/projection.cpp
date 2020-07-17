@@ -4,8 +4,9 @@
 #include "software/geom/algorithms/multiple_segments.h"
 #include "software/geom/algorithms/projection_impl.h"
 
-std::vector<Segment> projectCirclesOntoSegment(Segment segment,
-                                               std::vector<Circle> circles, Point origin)
+std::vector<Segment> projectCirclesOntoSegment(const Segment &segment,
+                                               const std::vector<Circle> &circles,
+                                               const Point &origin)
 {
     // Loop through all obstacles to create their projected Segment
     std::vector<Segment> obstacle_segment_projections = {};

@@ -5,7 +5,8 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 
-std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2)
+std::optional<Segment> segmentEnclosedBetweenRays(const Segment &segment, const Ray &ray1,
+                                                  const Ray &ray2)
 {
     // Create rays located at the extremes of the segment, that point in the direction
     // outwards are parallel to the segment
@@ -43,7 +44,8 @@ std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray
     }
 }
 
-std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segment)
+std::optional<Segment> getIntersectingSegment(const Ray &ray1, const Ray &ray2,
+                                              const Segment &segment)
 {
     // Check if the segment is enclosed between the rays
     if (segmentEnclosedBetweenRays(segment, ray1, ray2))
@@ -175,8 +177,8 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     }
 }
 
-std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point reference,
-                                                            const Circle circle)
+std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point &reference,
+                                                            const Circle &circle)
 {
     auto [tangent_point1, tangent_point2] = getCircleTangentPoints(reference, circle);
 

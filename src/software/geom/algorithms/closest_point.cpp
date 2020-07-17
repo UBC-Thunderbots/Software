@@ -1,6 +1,6 @@
 #include "software/geom/algorithms/closest_point.h"
 
-Point closestPointOnLine(const Point &p, const Line &l)
+Point closestPoint(const Point &p, const Line &l)
 {
     Line::Coeffs coeffs = l.getCoeffs();
     double denominator  = pow(coeffs.a, 2) + pow(coeffs.b, 2);
@@ -11,9 +11,9 @@ Point closestPointOnLine(const Point &p, const Line &l)
     return Point(x, y);
 }
 
-Point closestPointOnLine(const Line &l, const Point &p)
+Point closestPoint(const Line &l, const Point &p)
 {
-    return closestPointOnLine(p, l);
+    return closestPoint(p, l);
 }
 
 Point closestPoint(const Point &p, const Segment &segment)

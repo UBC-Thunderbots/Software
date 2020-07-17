@@ -34,7 +34,7 @@ class Line final
      *
      * @return the coefficient struct
      */
-    Coeffs getCoeffs() const;
+    const Coeffs& getCoeffs() const;
 
     /**
      * Returns the normal unit vector of the Line

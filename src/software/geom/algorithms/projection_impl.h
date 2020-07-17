@@ -19,7 +19,8 @@
  * segment is not enclosed between the rays Segment, if one ray intersects the segment,
  * but one of the segment parameters extremes are enclosed within the two rays
  */
-std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segment);
+std::optional<Segment> getIntersectingSegment(const Ray &ray1, const Ray &ray2,
+                                              const Segment &segment);
 
 /**
  * Function calculates whether the segment parameter is enclosed between the ray
@@ -42,7 +43,8 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
  * Returns std::nullopt of the ray is not completely enclosed between the rays, or
  * not at all
  */
-std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2);
+std::optional<Segment> segmentEnclosedBetweenRays(const Segment &segment, const Ray &ray1,
+                                                  const Ray &ray2);
 
 /**
  * Returns the circle's tangent points.
@@ -62,5 +64,5 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
  * @param circle: The circle to calculate the tangent vectors of
  * @return the mean point of points
  */
-std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point reference,
-                                                            const Circle circle);
+std::pair<Ray, Ray> getCircleTangentRaysWithReferenceOrigin(const Point &reference,
+                                                            const Circle &circle);

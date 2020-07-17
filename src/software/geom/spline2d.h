@@ -31,7 +31,7 @@ class SplineSegment2d
      * Get the polynomial underlying this spline segment
      * @return The polynomial underlying this spline segment
      */
-    Polynomial2d getPolynomial() const;
+    const Polynomial2d &getPolynomial() const;
 
    protected:
     friend class Spline2d;

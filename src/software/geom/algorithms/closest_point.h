@@ -11,8 +11,8 @@
  * @param l the Line
  * @return the Point closest to Point p on Line l
  */
-Point closestPointOnLine(const Point &p, const Line &l);
-Point closestPointOnLine(const Line &l, const Point &p);
+Point closestPoint(const Point &p, const Line &l);
+Point closestPoint(const Line &l, const Point &p);
 
 /**
  * Finds the Point on line segment closest to point.

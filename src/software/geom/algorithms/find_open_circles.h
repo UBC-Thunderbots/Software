@@ -33,4 +33,4 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
  * @return The point in testPoints closest to testPoints.
  */
 std::optional<Point> findClosestPoint(const Point &origin_point,
-                                      const std::vector<Point> test_points);
+                                      const std::vector<Point> &test_points);
