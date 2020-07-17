@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/intent/kick_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/util.h"
 #include "software/new_geom/polygon.h"
 #include "software/new_geom/util/contains.h"
 #include "software/world/ball.h"

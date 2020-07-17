@@ -5,7 +5,6 @@ cc_library(
     hdrs = ["path_planner.h"],
     deps = [
         "//software/ai/navigator/obstacle",
-        "//software/geom",
         "//software/new_geom:linear_spline2d",
     ],
 )

@@ -11,6 +11,7 @@ qt_cc_library(
         "//software/gui:geometry_conversion",
         "//software/gui/drawing:colors",
         "//software/gui/drawing:draw_functions",
+        "//software/logger",
         "//software/new_geom:rectangle",
         "@qt//:qt_core",
         "@qt//:qt_widgets",

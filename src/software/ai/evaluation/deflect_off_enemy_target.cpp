@@ -1,7 +1,6 @@
 #include "software/ai/evaluation/deflect_off_enemy_target.h"
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
 #include "software/new_geom/triangle.h"
 #include "software/new_geom/util/contains.h"
 #include "software/new_geom/util/distance.h"

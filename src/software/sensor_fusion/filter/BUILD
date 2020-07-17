@@ -19,7 +19,6 @@ cc_library(
     hdrs = ["ball_filter.h"],
     deps = [
         ":vision_detection",
-        "//software/geom",
         "//software/math:math_functions",
         "//software/new_geom/util:algorithms",
         "//software/world:ball",
@@ -43,7 +42,6 @@ cc_library(
     hdrs = ["robot_filter.h"],
     deps = [
         ":vision_detection",
-        "//software/geom",
         "//software/world:robot",
     ],
 )

@@ -9,7 +9,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
-        "//software/geom",
         "//software/logger",
         "//software/new_geom/util:algorithms",
         "//software/world",
@@ -34,7 +33,6 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
-        "//software/geom",
         "//software/logger",
     ],
 )
@@ -77,7 +75,6 @@ cc_library(
         ":chip_tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
-        "//software/geom",
         "//software/logger",
     ],
 )
@@ -92,7 +89,6 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
-        "//software/geom",
         "//software/logger",
         "//software/new_geom/util:algorithms",
     ],
@@ -148,7 +144,6 @@ cc_library(
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
-        "//software/geom",
         "//software/logger",
         "//software/new_geom:line",
         "//software/new_geom/util:algorithms",
@@ -163,7 +158,6 @@ cc_test(
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
-        "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -177,7 +171,6 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
-        "//software/geom",
         "//software/logger",
     ],
 )
@@ -202,7 +195,6 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
-        "//software/geom",
         "//software/logger",
     ],
 )
@@ -226,7 +218,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
-        "//software/geom",
         "//software/logger",
     ],
 )
@@ -251,7 +242,6 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
-        "//software/geom",
         "//software/logger",
         "//software/new_geom/util:algorithms",
     ],
@@ -267,7 +257,6 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
-        "//software/geom",
         "//software/logger",
     ],
 )
@@ -282,7 +271,6 @@ cc_library(
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
-        "//software/geom",
         "//software/logger",
         "//software/new_geom/util:algorithms",
     ],
@@ -309,7 +297,6 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
-        "//software/geom",
         "//software/logger",
     ],
 )
@@ -333,7 +320,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
-        "//software/geom",
         "//software/logger",
         "//software/new_geom/util:algorithms",
         "//software/parameter:dynamic_parameters",
@@ -345,7 +331,6 @@ cc_test(
     srcs = ["shadow_freekicker_tactic_test.cpp"],
     deps = [
         ":shadow_freekicker_tactic",
-        "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -363,7 +348,6 @@ cc_library(
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
-        "//software/geom",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
     ],
@@ -388,7 +372,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
-        "//software/geom",
         "//software/logger",
     ],
 )
@@ -469,7 +452,6 @@ cc_test(
     srcs = ["tactic_world_params_update_visitor_test.cpp"],
     deps = [
         ":tactic_world_params_update_visitor",
-        "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

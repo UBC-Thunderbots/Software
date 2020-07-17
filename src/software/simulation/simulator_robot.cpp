@@ -1,7 +1,6 @@
 #include "software/simulation/simulator_robot.h"
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/util/acute_angle.h"
 

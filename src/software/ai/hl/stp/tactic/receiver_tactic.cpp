@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/util/acute_angle.h"
 #include "software/new_geom/util/closest_point.h"

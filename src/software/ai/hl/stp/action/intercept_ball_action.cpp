@@ -5,7 +5,6 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/ray.h"
 #include "software/new_geom/util/acute_angle.h"

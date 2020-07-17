@@ -34,8 +34,8 @@ cc_library(
     deps = [
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//software/geom",
         "//software/logger",
+        "//software/new_geom/util:algorithms",
         "//software/primitive",
         "//software/simulation/physics:physics_ball",
         "//software/simulation/physics:physics_robot",

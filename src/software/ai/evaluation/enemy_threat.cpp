@@ -8,7 +8,6 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/evaluation/team.h"
-#include "software/geom/util.h"
 #include "software/new_geom/util/intersects.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPairs(

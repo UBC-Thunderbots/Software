@@ -71,8 +71,9 @@ cc_library(
     hdrs = ["field.h"],
     deps = [
         "//shared:constants",
-        "//software/geom",
+        "//software/new_geom:circle",
         "//software/new_geom:rectangle",
+        "//software/new_geom/util:algorithms",
         "//software/time:timestamp",
         "@boost//:circular_buffer",
     ],
@@ -122,7 +123,7 @@ cc_library(
     deps = [
         ":robot_capabilities",
         ":timestamped_robot_state",
-        "//software/geom",
+        "//software/logger",
         "//software/time:duration",
         "//software/time:timestamp",
         "@boost//:circular_buffer",
@@ -205,7 +206,10 @@ cc_library(
     name = "team",
     srcs = ["team.cpp"],
     hdrs = ["team.h"],
-    deps = [":robot"],
+    deps = [
+        ":robot",
+        "//software/logger",
+    ],
 )
 
 cc_test(

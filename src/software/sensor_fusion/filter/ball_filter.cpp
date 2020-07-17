@@ -5,7 +5,6 @@
 #include <limits>
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
 #include "software/math/math_functions.h"
 #include "software/new_geom/util/closest_point.h"
 

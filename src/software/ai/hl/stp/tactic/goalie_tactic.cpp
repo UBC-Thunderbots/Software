@@ -5,7 +5,6 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/geom/util.h"
 #include "software/new_geom/line.h"
 #include "software/new_geom/point.h"
 #include "software/new_geom/ray.h"

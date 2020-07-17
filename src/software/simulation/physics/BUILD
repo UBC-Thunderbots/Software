@@ -5,7 +5,7 @@ cc_library(
     srcs = ["box2d_util.cpp"],
     hdrs = ["box2d_util.h"],
     deps = [
-        "//software/geom",
+        "//software/new_geom:point",
         "@box2d",
     ],
 )
@@ -15,7 +15,6 @@ cc_test(
     srcs = ["box2d_util_test.cpp"],
     deps = [
         ":box2d_util",
-        "//software/geom",
         "@box2d",
         "@gtest//:gtest_main",
     ],

@@ -4,7 +4,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
 #include "software/new_geom/util/distance.h"
 #include "software/test_util/test_util.h"
 
