@@ -15,12 +15,6 @@ QRectF createQRectF(const Rectangle& rectangle)
                   createQPointF(rectangle.posXPosYCorner()));
 }
 
-Rectangle createRectangle(const QRectF& rectangle)
-{
-    return Rectangle(createPoint(rectangle.topLeft()),
-                     createPoint(rectangle.bottomRight()));
-}
-
 QPolygonF createQPolygonF(const Polygon& polygon)
 {
     std::vector<QPointF> qpoints;

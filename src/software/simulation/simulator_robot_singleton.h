@@ -79,7 +79,7 @@ class SimulatorRobotSingleton
      *
      * @param robot The SimulatorRobot being controlled by this class
      */
-    static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot, bool invert);
+    static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot);
 
     /**
      * Creates a FirmwareRobot_t with functions bound to the static functions in this
@@ -275,5 +275,4 @@ class SimulatorRobotSingleton
 
     // The simulator robot being controlled by this class
     static std::shared_ptr<SimulatorRobot> simulator_robot;
-    static bool invert_;
 };

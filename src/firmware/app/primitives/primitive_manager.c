@@ -204,17 +204,17 @@ void app_primitive_manager_makeRobotSafe(PrimitiveManager_t *manager,
                                          FirmwareWorld_t *world)
 {
     // Disable chipper, kicker, dribbler
-//    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
-//    Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
-//    Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
+    Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
 
-//    app_chicker_disableAutochip(chicker);
-//    app_chicker_disableAutokick(chicker);
-//    app_dribbler_setSpeed(dribbler, 0);
+    app_chicker_disableAutochip(chicker);
+    app_chicker_disableAutokick(chicker);
+    app_dribbler_setSpeed(dribbler, 0);
 
     // Set the current primitive to STOP to stop the robot moving
-//    manager->current_primitive       = &STOP_PRIMITIVE;
-//    manager->current_primitive_state = manager->current_primitive->create_state();
-//    PrimitiveParamsMsg params        = PrimitiveParamsMsg_init_zero;
-//    app_stop_primitive_start(params, manager->current_primitive_state, world);
+    manager->current_primitive       = &STOP_PRIMITIVE;
+    manager->current_primitive_state = manager->current_primitive->create_state();
+    PrimitiveParamsMsg params        = PrimitiveParamsMsg_init_zero;
+    app_stop_primitive_start(params, manager->current_primitive_state, world);
 }

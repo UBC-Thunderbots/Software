@@ -96,7 +96,7 @@ class PhysicsField
 
     // We set the field restitution to 0 so that behavioiur of bouncing off walls is
     // completely determined by the ball's restitution
-    const float field_restitution = 0.1f;
+    const float field_restitution = 0.0f;
 
     // Since the field never changes during simulation, we store the initial field
     // used during construction to make it easy to return Field objects when requested

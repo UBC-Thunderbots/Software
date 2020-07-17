@@ -143,30 +143,3 @@ bool PhysicsBall::isInFlight()
 
     return false;
 }
-
-void PhysicsBall::setPosition(const Point &position, const Vector& velocity) {
-    auto func = [=]() {
-        b2World* world = ball_body->GetWorld();
-        if (bodyExistsInWorld(ball_body, world))
-        {
-            ball_body->SetLinearVelocity(createVec2(velocity));
-            ball_body->SetAngularVelocity(0.0);
-            ball_body->SetTransform(createVec2(position), ball_body->GetAngle());
-        }
-    };
-
-    // We can't set the robot body's position immediately because we may be in the middle
-    // of a Box2D world update, so we defer calling this function until after a physics
-    // step
-    post_physics_step_functions.emplace(func);
-}
-
-void PhysicsBall::runPostPhysicsStep()
-{
-    while (!post_physics_step_functions.empty())
-    {
-        auto post_physics_step_function = post_physics_step_functions.front();
-        post_physics_step_function();
-        post_physics_step_functions.pop();
-    }
-}

@@ -1,15 +1,10 @@
 #include "software/new_geom/line.h"
 
-#include <sstream>
-
 Line::Line(const Point &first, const Point &second)
 {
     if (first == second)
     {
-        std::stringstream ss;
-        ss << "Cannot create a Line with two equal Points: {" << first << ", " << second
-           << "}";
-        throw std::runtime_error(ss.str());
+        throw std::runtime_error("Cannot create a Line with two equal Points");
     }
     coeffs.a = first.y() - second.y();
     coeffs.b = second.x() - first.x();

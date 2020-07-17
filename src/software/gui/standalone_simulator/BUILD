@@ -8,9 +8,12 @@ cc_library(
     hdrs = ["threaded_standalone_simulator_gui.h"],
     deps = [
         "//software/gui/standalone_simulator/widgets:standalone_simulator_gui",
+        "//software/multithreading:thread_safe_buffer",
+        "//software/multithreading:threaded_observer",
         "//software/new_geom:rectangle",
         "//software/parameter:dynamic_parameters",
         "//software/proto:ssl_cc_proto",
+        "//software/proto/message_translation:ssl_geometry",
         "//software/simulation:standalone_simulator",
         "@qt//:qt_widgets",
     ],

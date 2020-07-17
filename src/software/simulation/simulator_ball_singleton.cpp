@@ -3,12 +3,10 @@
 #include "software/logger/logger.h"
 
 std::shared_ptr<SimulatorBall> SimulatorBallSingleton::simulator_ball = nullptr;
-bool SimulatorBallSingleton::invert_ = false;
 
-void SimulatorBallSingleton::setSimulatorBall(std::shared_ptr<SimulatorBall> ball, bool invert)
+void SimulatorBallSingleton::setSimulatorBall(std::shared_ptr<SimulatorBall> ball)
 {
     simulator_ball = ball;
-    invert_ = invert;
 }
 
 std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter>
@@ -41,32 +39,20 @@ float SimulatorBallSingleton::checkValidAndReturnFloat(
 
 float SimulatorBallSingleton::getBallPositionX()
 {
-    if(invert_) {
-        return checkValidAndReturnFloat([](auto ball) { return -ball->position().x(); });
-    }
     return checkValidAndReturnFloat([](auto ball) { return ball->position().x(); });
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
-    if(invert_) {
-        return checkValidAndReturnFloat([](auto ball) { return -ball->position().y(); });
-    }
     return checkValidAndReturnFloat([](auto ball) { return ball->position().y(); });
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
-    if(invert_) {
-        return checkValidAndReturnFloat([](auto ball) { return -ball->velocity().x(); });
-    }
     return checkValidAndReturnFloat([](auto ball) { return ball->velocity().x(); });
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
-    if(invert_) {
-        return checkValidAndReturnFloat([](auto ball) { return -ball->velocity().y(); });
-    }
     return checkValidAndReturnFloat([](auto ball) { return ball->velocity().y(); });
 }

@@ -22,7 +22,6 @@ QPointF createQPointF(const Point& point);
  * @return The QRectF representation of the given Rectangle
  */
 QRectF createQRectF(const Rectangle& rectangle);
-Rectangle createRectangle(const QRectF& rectangle);
 
 /**
  * Converts our Polygon class to a QPolygonF

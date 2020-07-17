@@ -3,14 +3,10 @@
 #include <Box2D/Box2D.h>
 
 #include <optional>
-#include <functional>
-#include <queue>
 
 #include "software/new_geom/point.h"
 #include "software/new_geom/vector.h"
 #include "software/world/ball_state.h"
-
-class PhysicsWorld;
 
 /**
  * This class represents a ball in a Box2D physics simulation. It provides a convenient
@@ -19,8 +15,6 @@ class PhysicsWorld;
 class PhysicsBall
 {
    public:
-    friend PhysicsWorld;
-
     /**
      * Creates a new PhysicsBall given a Box2D world and a Ball object. A Box2D body
      * representing the ball will be automatically added to the Box2D world and updated
@@ -114,25 +108,6 @@ class PhysicsBall
      */
     void applyImpulse(const Vector& impulse);
 
-    /**
-     * Sets the position of the PhysicsRobot to the given position. The robot
-     * will maintain its orientation, but will have its linear and angular
-     * velocity set to zero.
-     *
-     * @param position The new position of the robot
-     */
-    void setPosition(const Point &position, const Vector& velocity);
-
-protected:
-    /**
-     * This functions runs any operations this PhysicsRobot wants to perform
-     * after a physics step has happened. We assume this function will be called
-     * by the PhysicsWorld at the correct time. This exists so that this class
-     * doesn't accidentally make a change to the Box2D world in the middle of
-     * a physics step, which causes the system to crash.
-     */
-    void runPostPhysicsStep();
-
    private:
     /**
      * Returns true if this ball is touching another object in the physics world
@@ -161,6 +136,4 @@ protected:
     // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
     const double ball_restitution;
     const double ball_linear_damping;
-
-    std::queue<std::function<void()>> post_physics_step_functions;
 };
