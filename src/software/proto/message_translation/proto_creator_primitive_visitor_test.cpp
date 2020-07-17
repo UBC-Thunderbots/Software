@@ -178,7 +178,7 @@ TEST(ProtoCreatorPrimitiveVisitor, visit_movespin_primitive)
     expected_primitive_params.set_extra_bits(0);
 
     PrimitiveMsg expected_primitive;
-    *(expected_primitive.mutable_movespin()) = expected_primitive_params;
+    *(expected_primitive.mutable_spin()) = expected_primitive_params;
 
     PrimitiveMsg actual_primitive_msg =
         ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);

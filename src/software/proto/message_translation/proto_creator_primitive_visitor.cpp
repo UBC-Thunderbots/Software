@@ -132,7 +132,7 @@ void ProtoCreatorPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primi
     params->set_slow(false);
 
     prim = PrimitiveMsg();
-    prim->set_allocated_movespin(params);
+    prim->set_allocated_spin(params);
 }
 
 void ProtoCreatorPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
