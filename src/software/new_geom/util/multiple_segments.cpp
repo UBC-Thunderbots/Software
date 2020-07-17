@@ -21,7 +21,7 @@ std::vector<Segment> realignSegmentsOntoVector(std::vector<Segment> segments,
         if (raw_projection.lengthSquared() > FIXED_EPSILON)
         {
             projected_segments.push_back(
-                Segment(segment.getSegStart(), segment.getSegStart() + raw_projection));
+                Segment(segment.getStart(), segment.getStart() + raw_projection));
         }
     }
     std::vector<Segment> unique_segments;
@@ -73,24 +73,24 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
         return redundant_segment;
     }
     // Check if the beginning of segment2 lays inside segment1
-    else if (contains(segment1, segment2.getSegStart()))
+    else if (contains(segment1, segment2.getStart()))
     {
-        // If segment2.getSegStart() lays in segment1, then the combined segment is
+        // If segment2.getStart() lays in segment1, then the combined segment is
         // segment2,getEnd() and the point furthest from segment2.getEnd()
-        return (segment1.getSegStart() - segment2.getEnd()).lengthSquared() >
+        return (segment1.getStart() - segment2.getEnd()).lengthSquared() >
                        (segment1.getEnd() - segment2.getEnd()).lengthSquared()
-                   ? Segment(segment1.getSegStart(), segment2.getEnd())
+                   ? Segment(segment1.getStart(), segment2.getEnd())
                    : Segment(segment1.getEnd(), segment2.getEnd());
     }
     // Now check if the end of segment2 lays inside segment1
     else if (contains(segment1, segment2.getEnd()))
     {
-        // If segment2.getSegStart() lays in segment1, then the combined segment is
+        // If segment2.getStart() lays in segment1, then the combined segment is
         // segment2,getEnd() and the point furtherst from segmen2.getEnd()
-        return (segment1.getSegStart() - segment2.getSegStart()).lengthSquared() >
-                       (segment1.getEnd() - segment2.getSegStart()).lengthSquared()
-                   ? Segment(segment1.getSegStart(), segment2.getSegStart())
-                   : Segment(segment1.getEnd(), segment2.getSegStart());
+        return (segment1.getStart() - segment2.getStart()).lengthSquared() >
+                       (segment1.getEnd() - segment2.getStart()).lengthSquared()
+                   ? Segment(segment1.getStart(), segment2.getStart())
+                   : Segment(segment1.getEnd(), segment2.getStart());
     }
     return std::nullopt;
 }
@@ -119,7 +119,7 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 
     // The segment is redundant if both points of the smallest segment are contained in
     // the largest segment
-    if (contains(largest_segment, smallest_segment.getSegStart()) &&
+    if (contains(largest_segment, smallest_segment.getStart()) &&
         contains(largest_segment, smallest_segment.getEnd()))
     {
         return std::make_optional(largest_segment);
@@ -137,13 +137,13 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
     // reference segment to simplify the evaluation
     for (auto &unordered_seg : segments)
     {
-        if ((parent_segment.getSegStart() - unordered_seg.getSegStart()).length() >
-            (parent_segment.getSegStart() - unordered_seg.getEnd()).length())
+        if ((parent_segment.getStart() - unordered_seg.getStart()).length() >
+            (parent_segment.getStart() - unordered_seg.getEnd()).length())
         {
             // We need to flip the start/end of the segment
             Segment temp = unordered_seg;
-            unordered_seg.setSegStart(temp.getEnd());
-            unordered_seg.setEnd(temp.getSegStart());
+            unordered_seg.setStart(temp.getEnd());
+            unordered_seg.setEnd(temp.getStart());
         }
     }
 
@@ -152,8 +152,8 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
     // We sort the segments based on how close their 'start' point is to the 'start'
     // of the reference Segment
     std::sort(segments.begin(), segments.end(), [parent_segment](Segment &a, Segment &b) {
-        return (parent_segment.getSegStart() - a.getSegStart()).length() <
-               (parent_segment.getSegStart() - b.getSegStart()).length();
+        return (parent_segment.getStart() - a.getStart()).length() <
+               (parent_segment.getStart() - b.getStart()).length();
     });
 
     // Now we need to find the largest open segment/angle
@@ -162,14 +162,13 @@ std::vector<Segment> getEmptySpaceWithinParentSegment(std::vector<Segment> segme
     // The first Angle is between the reference Segment and the first obstacle Segment
     // After this one, ever open angle is between segment(i).end and
     // segment(i+1).start
-    open_segs.push_back(
-        Segment(parent_segment.getSegStart(), segments.front().getSegStart()));
+    open_segs.push_back(Segment(parent_segment.getStart(), segments.front().getStart()));
 
     // The 'open' Segment in the space between consecutive 'blocking' Segments
     for (std::vector<Segment>::const_iterator it = segments.begin();
          it != segments.end() - 1; it++)
     {
-        open_segs.push_back(Segment(it->getEnd(), (it + 1)->getSegStart()));
+        open_segs.push_back(Segment(it->getEnd(), (it + 1)->getStart()));
     }
 
     // Lastly, the final open angle is between obstacles.end().getEnd() and

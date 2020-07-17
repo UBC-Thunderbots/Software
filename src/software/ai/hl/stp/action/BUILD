@@ -23,25 +23,6 @@ cc_test(
 )
 
 cc_library(
-    name = "dribble_action",
-    srcs = ["dribble_action.cpp"],
-    hdrs = ["dribble_action.h"],
-    deps = [
-        ":action",
-        "//software/ai/intent:dribble_intent",
-    ],
-)
-
-cc_test(
-    name = "dribble_action_test",
-    srcs = ["dribble_action_test.cpp"],
-    deps = [
-        ":dribble_action",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "intercept_ball_action",
     srcs = ["intercept_ball_action.cpp"],
     hdrs = ["intercept_ball_action.h"],
@@ -133,29 +114,6 @@ cc_test(
 )
 
 cc_library(
-    name = "pivot_action",
-    srcs = ["pivot_action.cpp"],
-    hdrs = ["pivot_action.h"],
-    deps = [
-        ":action",
-        "//shared:constants",
-        "//software/ai/intent:move_intent",
-        "//software/ai/intent:pivot_intent",
-        "//software/logger",
-        "//software/parameter:dynamic_parameters",
-    ],
-)
-
-cc_test(
-    name = "pivot_action_test",
-    srcs = ["pivot_action_test.cpp"],
-    deps = [
-        ":pivot_action",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "stop_action",
     srcs = ["stop_action.cpp"],
     hdrs = ["stop_action.h"],
@@ -179,12 +137,10 @@ cc_library(
     srcs = ["all_actions.h"],
     deps = [
         ":chip_action",
-        ":dribble_action",
         ":intercept_ball_action",
         ":kick_action",
         ":move_action",
         ":movespin_action",
-        ":pivot_action",
         ":stop_action",
     ],
 )

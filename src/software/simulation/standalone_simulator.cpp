@@ -9,7 +9,8 @@ extern "C"
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField(), 0.8, 0.2)
+      simulator(Field::createSSLDivisionBField(), 0.8, 0.2),
+      most_recent_ssl_wrapper_packet(SSL_WrapperPacket())
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(
         [this](int) { this->initNetworking(); });
@@ -26,6 +27,8 @@ StandaloneSimulator::StandaloneSimulator(
 
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [this](SSL_WrapperPacket wrapper_packet) {
+            std::scoped_lock lock(this->most_recent_ssl_wrapper_packet_mutex);
+            this->most_recent_ssl_wrapper_packet = wrapper_packet;
             this->wrapper_packet_sender->sendProto(wrapper_packet);
         });
 
@@ -112,6 +115,12 @@ void StandaloneSimulator::setupInitialSimulationState()
     simulator.addYellowRobots(yellow_robot_states);
 }
 
+SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
+{
+    std::scoped_lock lock(most_recent_ssl_wrapper_packet_mutex);
+    return most_recent_ssl_wrapper_packet;
+}
+
 void StandaloneSimulator::setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
@@ -155,4 +164,9 @@ void StandaloneSimulator::resetSlowMotionMultiplier()
 void StandaloneSimulator::setBallState(const BallState& state)
 {
     simulator.setBallState(state);
+}
+
+std::weak_ptr<PhysicsRobot> StandaloneSimulator::getRobotAtPosition(const Point& position)
+{
+    return simulator.getRobotAtPosition(position);
 }

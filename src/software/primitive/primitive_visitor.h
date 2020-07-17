@@ -8,11 +8,9 @@
 class ChipPrimitive;
 class DirectVelocityPrimitive;
 class DirectWheelsPrimitive;
-class DribblePrimitive;
 class KickPrimitive;
 class MovePrimitive;
 class MoveSpinPrimitive;
-class PivotPrimitive;
 class StopPrimitive;
 
 /**
@@ -40,7 +38,5 @@ class PrimitiveVisitor
     virtual void visit(const KickPrimitive &kick_primitive)                      = 0;
     virtual void visit(const MovePrimitive &move_primitive)                      = 0;
     virtual void visit(const MoveSpinPrimitive &movespin_primitive)              = 0;
-    virtual void visit(const DribblePrimitive &dribble_primitive)                = 0;
-    virtual void visit(const PivotPrimitive &pivot_primitive)                    = 0;
     virtual void visit(const StopPrimitive &stop_primitive)                      = 0;
 };

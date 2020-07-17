@@ -31,8 +31,8 @@ bool collinear(const Point &a, const Point &b, const Point &c, double fixed_epsi
 bool collinear(const Segment &segment1, const Segment &segment2)
 {
     // Two segments are collinear if all Points are collinear
-    if (collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) &&
-        collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()))
+    if (collinear(segment1.getStart(), segment1.getEnd(), segment2.getStart()) &&
+        collinear(segment1.getStart(), segment1.getEnd(), segment2.getEnd()))
     {
         return true;
     }

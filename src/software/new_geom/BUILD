@@ -8,10 +8,9 @@ cc_library(
 
 cc_library(
     name = "segment",
+    srcs = ["segment.cpp"],
     hdrs = ["segment.h"],
-    deps = [
-        ":point",
-    ],
+    deps = [":point"],
 )
 
 cc_library(
@@ -318,6 +317,17 @@ cc_test(
     ],
     deps = [
         ":rectangle",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "segment_test",
+    srcs = [
+        "segment_test.cpp",
+    ],
+    deps = [
+        ":segment",
         "@gtest//:gtest_main",
     ],
 )
