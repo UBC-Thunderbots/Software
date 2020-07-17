@@ -77,14 +77,14 @@ bool PenaltyKickTactic::evaluate_penalty_shot()
 
         // Based on constant acceleration -> // dX = init_vel*t + 0.5*a*t^2
         //          dX - init_vel - (0.5*a*t)t
-        const double max_enemy_movement_x = robot.value().velocity().x() * time_to_score +
-                                            0.5 * sign(goalie_to_goal_distance.x()) *
-                                                PENALTY_KICK_GOALIE_MAX_ACC *
-                                                pow(time_to_score, 2);
-        const double max_enemy_movement_y = robot.value().velocity().y() * time_to_score +
-                                            0.5 * sign(goalie_to_goal_distance.y()) *
-                                                PENALTY_KICK_GOALIE_MAX_ACC *
-                                                pow(time_to_score, 2);
+        const double max_enemy_movement_x =
+            robot.value().velocity().x() * time_to_score +
+            0.5 * -std::signbit(goalie_to_goal_distance.x()) *
+                PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_score, 2);
+        const double max_enemy_movement_y =
+            robot.value().velocity().y() * time_to_score +
+            0.5 * -std::signbit(goalie_to_goal_distance.y()) *
+                PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_score, 2);
 
         // If the position to block the ball is further than the enemy goalie can reach in
         // the time required to score

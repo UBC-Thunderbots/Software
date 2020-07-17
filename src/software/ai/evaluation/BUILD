@@ -75,6 +75,7 @@ cc_library(
         "//shared:constants",
         "//software/geom",
         "//software/new_geom:triangle",
+        "//software/new_geom/util:algorithms",
         "//software/world",
     ],
 )

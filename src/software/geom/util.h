@@ -13,11 +13,6 @@
 #include "software/new_geom/segment.h"
 #include "software/new_geom/triangle.h"
 
-constexpr int sign(double n)
-{
-    return n > FIXED_EPSILON ? 1 : (n < -FIXED_EPSILON ? -1 : 0);
-}
-
 /**
  * returns perpendicular offset from line x0-x1 to point p
  */

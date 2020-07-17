@@ -1,9 +1,8 @@
 #include "software/new_geom/util/intersection.h"
 
+#include "software/new_geom/util/acute_angle.h"
 #include "software/new_geom/util/almost_equal.h"
 #include "software/new_geom/util/collinear.h"
-#define POINT_BOOST_COMPATABILITY_THIS_IS_NOT_IN_A_HEADER
-#include "software/new_geom/point_boost_geometry_compatability.h"
 #include "software/new_geom/util/contains.h"
 
 std::optional<Point> intersection(const Point &a, const Point &b, const Point &c,
@@ -38,27 +37,52 @@ std::optional<Point> intersection(const Point &a, const Point &b, const Point &c
     return std::make_optional(intersection);
 }
 
-/**
- * Returns the sign of the given double, or zero if is in the range (-EPSILON, EPSILON).
- *
- * @param n the given double
- *
- * @return the sign of the given double, or zero if is in the range (-EPSILON, EPSILON)
- */
-constexpr int sign(double n)
-{
-    return n > FIXED_EPSILON ? 1 : (n < -FIXED_EPSILON ? -1 : 0);
-}
-
 std::vector<Point> intersection(const Segment &first, const Segment &second)
 {
-    std::vector<Point> output;
+    if (first == second)
+    {
+        return {first.getStart(), first.getEnd()};
+    }
 
-    boost::geometry::model::segment<Point> seg_1(first.getStart(), first.getEnd());
-    boost::geometry::model::segment<Point> seg_2(second.getStart(), second.getEnd());
-    boost::geometry::intersection(seg_1, seg_2, output);
+    std::vector<Point> intersections;
 
-    return output;
+    Point a = first.getStart();
+    Point b = first.getEnd();
+    Point c = second.getStart();
+    Point d = second.getEnd();
+
+    // check for overlaps
+    if (contains(second, a))
+    {
+        intersections.emplace_back(a);
+    }
+    if (contains(second, b))
+    {
+        intersections.emplace_back(b);
+    }
+    if (contains(first, c))
+    {
+        intersections.emplace_back(c);
+    }
+    if (contains(first, d))
+    {
+        intersections.emplace_back(d);
+    }
+    if (intersections.size() > 0)
+    {
+        return intersections;
+    }
+
+    auto intersection_value = intersection(a, b, c, d);
+    if (intersection_value)
+    {
+        if (contains(first, *intersection_value) && contains(second, *intersection_value))
+        {
+            intersections.emplace_back(*intersection_value);
+        }
+    }
+
+    return intersections;
 }
 
 std::unordered_set<Point> intersection(const Polygon &polygon, const Segment &segment)
@@ -181,10 +205,10 @@ std::optional<Point> intersection(const Ray &first, const Ray &second)
     Vector intersection_second_direction =
         (point_of_intersection.value() - second.getStart());
 
-    if (sign(intersection_first_direction.x()) == sign(first.toUnitVector().x()) &&
-        sign(intersection_first_direction.y()) == sign(first.toUnitVector().y()) &&
-        sign(intersection_second_direction.x()) == sign(second.toUnitVector().x()) &&
-        sign(intersection_second_direction.y()) == sign(second.toUnitVector().y()))
+    if (acuteAngle(intersection_first_direction, first.toUnitVector()) <
+            Angle::quarter() &&
+        acuteAngle(intersection_second_direction, second.toUnitVector()) <
+            Angle::quarter())
     {
         return point_of_intersection.value();
     }
