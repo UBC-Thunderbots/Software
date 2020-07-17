@@ -5,6 +5,7 @@
 #include "software/networking/threaded_proto_multicast_sender.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/simulation/threaded_simulator.h"
+#include "software/proto/team_side_msg.pb.h"
 
 extern "C"
 {
@@ -117,6 +118,9 @@ class StandaloneSimulator
     void setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg);
     void setBlueRobotPrimitives(PrimitiveSetMsg primitive_set_msg);
 
+    void setYellowTeamDefendingSide(TeamSideMsg team_side_msg);
+    void setBlueTeamDefendingSide(TeamSideMsg team_side_msg);
+
     /**
      * A helper function that sets up all networking functionality with
      * the networking information in the StandlaoneSimulatorConfig
@@ -126,6 +130,7 @@ class StandaloneSimulator
     std::shared_ptr<const StandaloneSimulatorConfig> standalone_simulator_config;
     std::unique_ptr<ThreadedNanoPbPrimitiveSetMulticastListener>
         yellow_team_primitive_listener, blue_team_primitive_listener;
+    std::unique_ptr<ThreadedProtoMulticastListener<TeamSideMsg>> yellow_team_side_listener, blue_team_side_listener;
     std::unique_ptr<ThreadedProtoMulticastSender<SSL_WrapperPacket>>
         wrapper_packet_sender;
     ThreadedSimulator simulator;

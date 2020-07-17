@@ -205,6 +205,7 @@ cc_library(
         "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
         "//software/parameter:dynamic_parameters",
+        "//software/proto:team_side_msg_cc_proto",
         "//software/world:field",
     ],
 )

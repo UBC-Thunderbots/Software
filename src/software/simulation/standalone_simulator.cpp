@@ -66,6 +66,14 @@ void StandaloneSimulator::initNetworking()
         std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             blue_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
+    yellow_team_side_listener =
+            std::make_unique<ThreadedProtoMulticastListener<TeamSideMsg>>(
+                    yellow_team_ip, TEAM_SIDE_PORT,
+                    boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1));
+    blue_team_side_listener =
+            std::make_unique<ThreadedProtoMulticastListener<TeamSideMsg>>(
+                    blue_team_ip, TEAM_SIDE_PORT,
+                    boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1));
 }
 
 void StandaloneSimulator::setupInitialSimulationState()
@@ -169,4 +177,14 @@ void StandaloneSimulator::setBallState(const BallState& state)
 std::weak_ptr<PhysicsRobot> StandaloneSimulator::getRobotAtPosition(const Point& position)
 {
     return simulator.getRobotAtPosition(position);
+}
+
+void StandaloneSimulator::setBlueTeamDefendingSide(TeamSideMsg team_side_msg) {
+    std::string side = team_side_msg.defending_positive_side() ? "positive" : "negative";
+    std::cout << "Set blue team to defend " << side << " side" << std::endl;
+}
+
+void StandaloneSimulator::setYellowTeamDefendingSide(TeamSideMsg team_side_msg) {
+    std::string side = team_side_msg.defending_positive_side() ? "positive" : "negative";
+    std::cout << "Set yellow team to defend " << side << " side" << std::endl;
 }
