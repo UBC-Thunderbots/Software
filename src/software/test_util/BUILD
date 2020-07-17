@@ -3,8 +3,14 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "test_util",
     testonly = True,
-    srcs = ["test_util.cpp"],
-    hdrs = ["test_util.h"],
+    srcs = [
+        "equal_within_tolerance.cpp",
+        "test_util.cpp",
+    ],
+    hdrs = [
+        "equal_within_tolerance.h",
+        "test_util.h",
+    ],
     deps = [
         "//shared:constants",
         "//software/new_geom:angle",
@@ -24,6 +30,15 @@ cc_library(
 cc_test(
     name = "test_util_test",
     srcs = ["test_util_test.cpp"],
+    deps = [
+        ":test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "equal_within_tolerance_test",
+    srcs = ["equal_within_tolerance_test.cpp"],
     deps = [
         ":test_util",
         "@gtest//:gtest_main",

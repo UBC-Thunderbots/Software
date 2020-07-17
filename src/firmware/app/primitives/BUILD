@@ -22,19 +22,6 @@ cc_library(
 )
 
 cc_library(
-    name = "dribble",
-    srcs = ["dribble_primitive.c"],
-    hdrs = ["dribble_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
     name = "move",
     srcs = ["move_primitive.c"],
     hdrs = ["move_primitive.h"],
@@ -47,19 +34,6 @@ cc_library(
         "//firmware/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
-    name = "pivot",
-    srcs = ["pivot_primitive.c"],
-    hdrs = ["pivot_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:util",
         "//shared/proto:tbots_nanopb_proto",
     ],
 )
@@ -87,9 +61,7 @@ cc_library(
     deps = [
         ":direct_velocity",
         ":direct_wheels",
-        ":dribble",
         ":move",
-        ":pivot",
         ":primitive",
         ":shoot",
         ":spin",

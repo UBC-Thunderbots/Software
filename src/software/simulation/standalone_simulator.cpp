@@ -9,7 +9,7 @@ extern "C"
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField(), 0.1, 0.8),
+      simulator(Field::createSSLDivisionBField(), 0.8, 0.2),
       most_recent_ssl_wrapper_packet(SSL_WrapperPacket())
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(
@@ -27,12 +27,12 @@ StandaloneSimulator::StandaloneSimulator(
 
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [this](SSL_WrapperPacket wrapper_packet) {
-            std::scoped_lock ssl_wrapper_packet_lock(most_recent_ssl_wrapper_packet_mutex);
+            std::scoped_lock lock(this->most_recent_ssl_wrapper_packet_mutex);
             this->most_recent_ssl_wrapper_packet = wrapper_packet;
             this->wrapper_packet_sender->sendProto(wrapper_packet);
         });
 
-    simulator.setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    simulator.setBallState(BallState(Point(0, 0), Vector(5, 2)));
 
     simulator.startSimulation();
 }
@@ -115,57 +115,9 @@ void StandaloneSimulator::setupInitialSimulationState()
     simulator.addYellowRobots(yellow_robot_states);
 }
 
-void StandaloneSimulator::setupShortPassState() {
-    RobotState blue_robot_state1(Point(4.48, 0.4), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state2(Point(4.43, 0.23), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state3(Point(4.4, 0.059), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state4(Point(4.34, -0.107), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state5(Point(1.806, 1.08), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state6(Point(2.467, 2.06), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    std::vector<RobotStateWithId> blue_robot_states = {
-            RobotStateWithId{.id = 0, .robot_state = blue_robot_state1},
-            RobotStateWithId{.id = 1, .robot_state = blue_robot_state2},
-            RobotStateWithId{.id = 2, .robot_state = blue_robot_state3},
-            RobotStateWithId{.id = 3, .robot_state = blue_robot_state4},
-            RobotStateWithId{.id = 4, .robot_state = blue_robot_state5},
-            RobotStateWithId{.id = 5, .robot_state = blue_robot_state6},
-    };
-    simulator.addBlueRobots(blue_robot_states);
-
-//    RobotState yellow_robot_state1(Point(-3, 2.5), Vector(0, 0), Angle::zero(),
-//                                   AngularVelocity::zero());
-//    RobotState yellow_robot_state2(Point(-3, 1.5), Vector(0, 0), Angle::zero(),
-//                                   AngularVelocity::zero());
-//    RobotState yellow_robot_state3(Point(-3, 0.5), Vector(0, 0), Angle::zero(),
-//                                   AngularVelocity::zero());
-//    RobotState yellow_robot_state4(Point(-3, -0.5), Vector(0, 0), Angle::zero(),
-//                                   AngularVelocity::zero());
-//    RobotState yellow_robot_state5(Point(-3, -1.5), Vector(0, 0), Angle::zero(),
-//                                   AngularVelocity::zero());
-//    RobotState yellow_robot_state6(Point(-3, -2.5), Vector(0, 0), Angle::zero(),
-//                                   AngularVelocity::zero());
-//    std::vector<RobotStateWithId> yellow_robot_states = {
-//            RobotStateWithId{.id = 0, .robot_state = yellow_robot_state1},
-//            RobotStateWithId{.id = 1, .robot_state = yellow_robot_state2},
-//            RobotStateWithId{.id = 2, .robot_state = yellow_robot_state3},
-//            RobotStateWithId{.id = 3, .robot_state = yellow_robot_state4},
-//            RobotStateWithId{.id = 4, .robot_state = yellow_robot_state5},
-//            RobotStateWithId{.id = 5, .robot_state = yellow_robot_state6},
-//    };
-//    simulator.addYellowRobots(yellow_robot_states);
-
-    simulator.setBallState(BallState(Point(1.8, 2.06), Vector(0, 0)));
-}
-
 SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
 {
-    std::scoped_lock ssl_wrapper_packet_lock(most_recent_ssl_wrapper_packet_mutex);
+    std::scoped_lock lock(most_recent_ssl_wrapper_packet_mutex);
     return most_recent_ssl_wrapper_packet;
 }
 

@@ -58,25 +58,6 @@ cc_test(
 )
 
 cc_library(
-    name = "dribble_primitive",
-    srcs = ["dribble_primitive.cpp"],
-    hdrs = ["dribble_primitive.h"],
-    deps = [
-        ":primitive",
-        "//software/geom",
-    ],
-)
-
-cc_test(
-    name = "dribble_primitive_test",
-    srcs = ["dribble_primitive_test.cpp"],
-    deps = [
-        ":dribble_primitive",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "kick_primitive",
     srcs = ["kick_primitive.cpp"],
     hdrs = ["kick_primitive.h"],
@@ -135,26 +116,6 @@ cc_test(
 )
 
 cc_library(
-    name = "pivot_primitive",
-    srcs = ["pivot_primitive.cpp"],
-    hdrs = ["pivot_primitive.h"],
-    deps = [
-        ":primitive",
-        "//shared:constants",
-        "//software/geom",
-    ],
-)
-
-cc_test(
-    name = "pivot_primitive_test",
-    srcs = ["pivot_primitive_test.cpp"],
-    deps = [
-        ":pivot_primitive",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "stop_primitive",
     srcs = ["stop_primitive.cpp"],
     hdrs = ["stop_primitive.h"],
@@ -180,11 +141,9 @@ cc_library(
         ":chip_primitive",
         ":direct_velocity_primitive",
         ":direct_wheels_primitive",
-        ":dribble_primitive",
         ":kick_primitive",
         ":move_primitive",
         ":movespin_primitive",
-        ":pivot_primitive",
         ":stop_primitive",
     ],
 )
