@@ -65,11 +65,9 @@ class Navigator : public IntentVisitor
     void visit(const ChipIntent &chip_intent) override;
     void visit(const DirectVelocityIntent &direct_velocity_intent) override;
     void visit(const DirectWheelsIntent &direct_wheels_intent) override;
-    void visit(const DribbleIntent &dribble_intent) override;
     void visit(const KickIntent &kick_intent) override;
     void visit(const MoveIntent &move_intent) override;
     void visit(const MoveSpinIntent &move_spin_intent) override;
-    void visit(const PivotIntent &pivot_intent) override;
     void visit(const StopIntent &stop_intent) override;
 
     /**
