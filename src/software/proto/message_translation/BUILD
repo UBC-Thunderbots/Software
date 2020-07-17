@@ -134,3 +134,21 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "team_side",
+    srcs = ["team_side.cpp"],
+    hdrs = ["team_side.h"],
+    deps = [
+        "//software/proto:team_side_msg_cc_proto",
+    ],
+)
+
+cc_test(
+    name = "team_side_test",
+    srcs = ["team_side_test.cpp"],
+    deps = [
+        ":team_side",
+        "@gtest//:gtest_main",
+    ],
+)

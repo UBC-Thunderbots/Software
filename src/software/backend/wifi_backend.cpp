@@ -4,12 +4,14 @@
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
+#include "software/proto/message_translation/team_side.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 const std::string WifiBackend::name = "wifi";
 
-WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
+WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config, std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : network_config(network_config),
+    sensor_fusion_config(sensor_fusion_config),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->getSSLCommunicationConfig())
@@ -33,6 +35,12 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
 void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
 {
     primitive_output->sendProto(*createPrimitiveSetMsg(primitives_ptr));
+
+    if(sensor_fusion_config->OverrideRefboxDefendingSide()->value()) {
+        team_side_output->sendProto(*createTeamSideMsg(sensor_fusion_config->DefendingPositiveSide()->value()));
+    }else {
+        team_side_output->sendProto(*createTeamSideMsg(false));
+    }
 }
 
 void WifiBackend::onValueReceived(World world)
@@ -47,6 +55,9 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
 
     primitive_output.reset(new ThreadedProtoMulticastSender<PrimitiveSetMsg>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, PRIMITIVE_PORT));
+
+    team_side_output.reset(new ThreadedProtoMulticastSender<TeamSideMsg>(
+            std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, TEAM_SIDE_PORT));
 
     robot_msg_input.reset(new ThreadedProtoMulticastListener<TbotsRobotMsg>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
