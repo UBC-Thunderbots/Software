@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "shared/proto/geometry.proto";
+
 // This message is used to ensure backwards compatibility with our old format
 // for primitive parameters while we migrate to a new format where each primitive
 // has it's own unique proto message
@@ -30,5 +32,103 @@ message PrimitiveMsg
         PrimitiveParamsMsg spin            = 4;
         PrimitiveParamsMsg direct_wheels   = 5;
         PrimitiveParamsMsg direct_velocity = 6;
+    }
+}
+
+message MovePrimitiveMsg
+{
+    PointMsg destination                = 1;
+    AngleMsg final_angle                = 2;
+    float final_speed_meters_per_second = 3;
+    AutochickMsg autochick_msg          = 4;
+    float dribbler_speed_rpm            = 5;
+    bool slow                           = 6;
+}
+
+message StopPrimitiveMsg
+{
+    enum StopTypeMsg
+    {
+        BRAKE = 0;
+        COAST = 1;
+    }
+    StopTypeMsg stop_type = 1;
+}
+
+message ShootPrimitiveMsg
+{
+    PointMsg shoot_origin      = 1;
+    AngleMsg shoot_direction   = 2;
+    AutochickMsg autochick_msg = 3;
+}
+
+message MoveSpinPrimitiveMsg
+{
+    PointMsg destination                = 1;
+    AngularVelocityMsg angular_velocity = 2;
+    float final_speed_meters_per_second = 3;
+    bool slow                           = 4;
+}
+
+message DirectRobotControlPrimitiveMsg
+{
+    enum ChickMode
+    {
+        NONE     = 0;
+        KICK     = 1;
+        CHIP     = 2;
+        AUTOKICK = 3;
+        AUTOCHIP = 4;
+    }
+
+    enum ChargeMode
+    {
+        DISCHARGE = 0;
+        CHARGE    = 1;
+        FLOAT     = 2;
+    }
+
+    message DirectPerWheelControlMsg
+    {
+        float front_left_wheel_rpm  = 1;
+        float back_left_wheel_rpm   = 2;
+        float front_right_wheel_rpm = 3;
+        float back_right_wheel_rpm  = 4;
+    }
+
+    message DirectVelocityControlMsg
+    {
+        VectorMsg velocity                  = 1;
+        AngularVelocityMsg angular_velocity = 2;
+    }
+
+
+    oneof wheel_control
+    {
+        DirectPerWheelControlMsg direct_per_wheel_control = 1;
+        DirectVelocityControlMsg direct_velocity_control  = 2;
+    }
+    float dribbler_speed_rpm = 3;
+    ChargeMode charge_mode   = 4;
+    float charge_level_volts = 5;
+    ChickMode chick_mode     = 6;
+}
+
+message AutochickMsg
+{
+    message KickCommandMsg
+    {
+        float kick_speed_meters_per_second = 1;
+    }
+
+    message ChipCommandMsg
+    {
+        float chip_distance_meters = 1;
+    }
+
+    oneof chick_param
+    {
+        ChipCommandMsg chip_command = 1;
+        KickCommandMsg kick_command = 2;
     }
 }
