@@ -10,9 +10,9 @@ cc_library(
 )
 
 cc_library(
-    name = "linear_ball_model",
-    srcs = ["linear_ball_model.cpp"],
-    hdrs = ["linear_ball_model.h"],
+    name = "two_stage_linear_ball_model",
+    srcs = ["two_stage_linear_ball_model.cpp"],
+    hdrs = ["two_stage_linear_ball_model.h"],
     deps = [
         ":ball_model",
         "//software/physics",
@@ -20,10 +20,10 @@ cc_library(
 )
 
 cc_test(
-    name = "linear_ball_model_test",
-    srcs = ["linear_ball_model_test.cpp"],
+    name = "two_stage_linear_ball_model_test",
+    srcs = ["two_stage_linear_ball_model_test.cpp"],
     deps = [
-        ":linear_ball_model",
+        ":two_stage_linear_ball_model",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

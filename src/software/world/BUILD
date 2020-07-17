@@ -11,7 +11,7 @@ cc_library(
         "//software/time:timestamp",
         "//software/world:timestamped_ball_state",
         "//software/world/ball_model",
-        "//software/world/ball_model:linear_ball_model",
+        "//software/world/ball_model:two_stage_linear_ball_model",
     ],
 )
 

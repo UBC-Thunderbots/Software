@@ -1,11 +1,11 @@
-#include "software/world/ball_model/linear_ball_model.h"
+#include "software/world/ball_model/two_stage_linear_ball_model.h"
 
 #include "software/physics/physics.h"
 
-LinearBallModel::LinearBallModel(BallState initial_ball_state,
-                                 double rolling_friction_acceleration_m_per_s_squared,
-                                 double sliding_friction_acceleration_m_per_s_squared,
-                                 double sliding_to_rolling_speed_threshold_m_per_s)
+TwoStageLinearBallModel::TwoStageLinearBallModel(
+    BallState initial_ball_state, double rolling_friction_acceleration_m_per_s_squared,
+    double sliding_friction_acceleration_m_per_s_squared,
+    double sliding_to_rolling_speed_threshold_m_per_s)
     : initial_ball_state_(initial_ball_state),
       rolling_friction_acceleration_m_per_s_squared_(
           rolling_friction_acceleration_m_per_s_squared),
@@ -22,7 +22,7 @@ LinearBallModel::LinearBallModel(BallState initial_ball_state,
     }
 }
 
-BallState LinearBallModel::estimateFutureState(const Duration &duration_in_future)
+BallState TwoStageLinearBallModel::estimateFutureState(const Duration &duration_in_future)
 {
     if (duration_in_future < Duration::fromSeconds(0.0))
     {
@@ -33,7 +33,8 @@ BallState LinearBallModel::estimateFutureState(const Duration &duration_in_futur
     return applyLinearFrictionModel(duration_in_future.getSeconds());
 }
 
-BallState LinearBallModel::applyLinearFrictionModel(const double seconds_in_future) const
+BallState TwoStageLinearBallModel::applyLinearFrictionModel(
+    const double seconds_in_future) const
 {
     const double initial_speed_m_per_s = initial_ball_state_.velocity().length();
 
@@ -61,7 +62,7 @@ BallState LinearBallModel::applyLinearFrictionModel(const double seconds_in_futu
     return ball_state_after_rolling;
 }
 
-BallState LinearBallModel::calculateFutureBallState(
+BallState TwoStageLinearBallModel::calculateFutureBallState(
     const BallState &initial_ball_state,
     const double constant_friction_acceleration_m_per_s,
     const double seconds_in_future) const
