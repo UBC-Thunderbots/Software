@@ -314,9 +314,6 @@ float PhysicsRobot::getMotorSpeedFrontRight()
 
 void PhysicsRobot::brakeMotorFrontLeft()
 {
-//    Vector momentum = velocity() * 2.465;
-//    b2Vec2 impulse_vector = createVec2(-momentum);
-//    robot_body->ApplyLinearImpulseToCenter(impulse_vector, true);
     float motor_speed = getMotorSpeedFrontLeft();
     float wheel_force = getMotorBrakeForce(motor_speed);
     applyWheelForceFrontLeft(wheel_force);
@@ -324,9 +321,6 @@ void PhysicsRobot::brakeMotorFrontLeft()
 
 void PhysicsRobot::brakeMotorBackLeft()
 {
-//    Vector momentum = velocity() * 2.465;
-//    b2Vec2 impulse_vector = createVec2(-momentum);
-//    robot_body->ApplyLinearImpulseToCenter(impulse_vector, true);
     float motor_speed = getMotorSpeedBackLeft();
     float wheel_force = getMotorBrakeForce(motor_speed);
     applyWheelForceBackLeft(wheel_force);
@@ -334,9 +328,6 @@ void PhysicsRobot::brakeMotorBackLeft()
 
 void PhysicsRobot::brakeMotorBackRight()
 {
-//    Vector momentum = velocity() * 2.465;
-//    b2Vec2 impulse_vector = createVec2(-momentum);
-//    robot_body->ApplyLinearImpulseToCenter(impulse_vector, true);
     float motor_speed = getMotorSpeedBackRight();
     float wheel_force = getMotorBrakeForce(motor_speed);
     applyWheelForceBackRight(wheel_force);
@@ -344,9 +335,6 @@ void PhysicsRobot::brakeMotorBackRight()
 
 void PhysicsRobot::brakeMotorFrontRight()
 {
-//    Vector momentum = velocity() * 2.465;
-//    b2Vec2 impulse_vector = createVec2(-momentum);
-//    robot_body->ApplyLinearImpulseToCenter(impulse_vector, true);
     float motor_speed = getMotorSpeedFrontRight();
     float wheel_force = getMotorBrakeForce(motor_speed);
     applyWheelForceFrontRight(wheel_force);

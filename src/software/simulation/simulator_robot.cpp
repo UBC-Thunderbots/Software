@@ -163,7 +163,6 @@ void SimulatorRobot::kick(float speed_m_per_s)
                 robot_orientation_vector.normalize(ball_head_on_momentum.length()));
             ball->applyImpulse(kick_impulse);
         }
-        balls_in_dribbler_area.clear();
     });
 }
 
@@ -194,7 +193,6 @@ void SimulatorRobot::chip(float distance_m)
                 initial_velocity * static_cast<float>(chip_angle.cos());
             kick(ground_velocity);
         }
-        balls_in_dribbler_area.clear();
     });
 }
 
@@ -357,54 +355,43 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
 {
     if (dribbler_rpm > 0)
     {
+        auto robot = physics_robot->getRobotState();
+        auto ball  = physics_ball->getBallState();
 
-        for (auto ball : this->balls_in_dribbler_area) {
-            auto robot = physics_robot->getRobotState();
-//        auto ball  = physics_ball->getBallState();
+        // To dribble, we apply a force towards the center and back of the dribbling area,
+        // closest to the chicker. We vary the magnitude of the force by how far the ball
+        // is from this "dribbling point". This more-or-less acts like a tiny gravity well
+        // that sucks the ball into place, except with more force the further away the
+        // ball is. Once the ball is no longer in the dribbler area this force is not
+        // applied (it is only applied as long as the ball is in the dribbler area).
 
-            // To dribble, we apply a force towards the center and back of the dribbling area,
-            // closest to the chicker. We vary the magnitude of the force by how far the ball
-            // is from this "dribbling point". This more-or-less acts like a tiny gravity well
-            // that sucks the ball into place, except with more force the further away the
-            // ball is. Once the ball is no longer in the dribbler area this force is not
-            // applied (it is only applied as long as the ball is in the dribbler area).
+        Point dribble_point =
+            robot.position() +
+            Vector::createFromAngle(robot.orientation())
+                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS -
+                           PhysicsRobot::dribbler_depth);
+        Vector dribble_force_vector = dribble_point - ball.position();
+        // convert to cm so we operate on a small scale
+        double dist_from_dribble_point_cm =
+            dribble_force_vector.length() * CENTIMETERS_PER_METER;
+        // Combine a polynomial with a slightly offset linear function. This shifts the
+        // intercept with the x-axis to a small positive x-value, so that there is a small
+        // region when the ball is extremely close to the back of the dribbler area (and
+        // close to the chicker) where a tiny amount of force will be applied away from
+        // the robot. This helps prevent us from applying a force into the robot while the
+        // ball is touching it and creating a net force that moves the robot.
+        //
+        // The constants in this equation have been tuned manually so that the dribbling
+        // scenarios in the unit tests pass, which represent reasonable dribbling
+        // behaviour.
+        double polynomial_component = 0.1 * std::pow(dist_from_dribble_point_cm, 4);
+        double linear_component     = ((1.0 / 10.0) * (dist_from_dribble_point_cm - 0.5));
+        double dribble_force_magnitude = polynomial_component + linear_component;
+        dribble_force_magnitude =
+            std::clamp<double>(dribble_force_magnitude, 0, dribble_force_magnitude);
+        dribble_force_vector = dribble_force_vector.normalize(dribble_force_magnitude);
 
-            Point dribble_point =
-                    robot.position() +
-                    Vector::createFromAngle(robot.orientation())
-                            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS -
-                                       PhysicsRobot::dribbler_depth);
-
-            Vector tangential_velocity = Vector::createFromAngle(robot.orientation()).perpendicular().normalize((DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS) * robot.angularVelocity().toRadians());
-            Vector ball_velocity = robot.velocity() + tangential_velocity;
-            ball->setPosition(dribble_point, ball_velocity);
-        }
-
-
-
-
-//        Vector dribble_force_vector = dribble_point - ball.position();
-//        // convert to cm so we operate on a small scale
-//        double dist_from_dribble_point_cm =
-//            dribble_force_vector.length() * CENTIMETERS_PER_METER;
-//        // Combine a polynomial with a slightly offset linear function. This shifts the
-//        // intercept with the x-axis to a small positive x-value, so that there is a small
-//        // region when the ball is extremely close to the back of the dribbler area (and
-//        // close to the chicker) where a tiny amount of force will be applied away from
-//        // the robot. This helps prevent us from applying a force into the robot while the
-//        // ball is touching it and creating a net force that moves the robot.
-//        //
-//        // The constants in this equation have been tuned manually so that the dribbling
-//        // scenarios in the unit tests pass, which represent reasonable dribbling
-//        // behaviour.
-//        double polynomial_component = 0.1 * std::pow(dist_from_dribble_point_cm, 4);
-//        double linear_component     = ((1.0 / 10.0) * (dist_from_dribble_point_cm - 0.5));
-//        double dribble_force_magnitude = polynomial_component + linear_component;
-//        dribble_force_magnitude =
-//            std::clamp<double>(dribble_force_magnitude, 0, dribble_force_magnitude);
-//        dribble_force_vector = dribble_force_vector.normalize(dribble_force_magnitude);
-//
-//        physics_ball->applyForce(dribble_force_vector);
+        physics_ball->applyForce(dribble_force_vector);
     }
 }
 
