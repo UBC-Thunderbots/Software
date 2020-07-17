@@ -9,6 +9,11 @@ qt_cc_library(
     deps = [
         "//software/gui:geometry_conversion",
         "//software/gui/generic_widgets/draw_function_visualizer",
+        "//software/new_geom:point",
+        "//software/simulation:standalone_simulator",
+        "//software/simulation/physics:physics_robot",
+        "//software/world:robot_state",
+        "//software/world:team_colour",
         "@qt//:qt_widgets",
     ],
 )
@@ -20,7 +25,6 @@ qt_cc_library(
     deps = [
         "//software/gui/drawing:ssl_wrapper_packet",
         "//software/gui/standalone_simulator/ui:main_widget",
-        "//software/multithreading:thread_safe_buffer",
         "//software/proto:ssl_cc_proto",
         "//software/simulation:standalone_simulator",
         "@qt//:qt_widgets",
