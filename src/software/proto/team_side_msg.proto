@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message TeamSideMsg
+{
+    bool defending_positive_side              = 1;
+}

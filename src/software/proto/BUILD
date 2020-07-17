@@ -27,6 +27,14 @@ proto_library(
     ],
 )
 
+proto_library(
+    name = "team_side_msg_proto",
+    srcs = [
+        "team_side_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
+)
+
 cc_proto_library(
     name = "ssl_cc_proto",
     deps = [":ssl_proto"],
@@ -35,4 +43,9 @@ cc_proto_library(
 cc_proto_library(
     name = "sensor_msg_cc_proto",
     deps = [":sensor_msg_proto"],
+)
+
+cc_proto_library(
+    name = "team_side_msg_cc_proto",
+    deps = [":team_side_msg_proto"],
 )
