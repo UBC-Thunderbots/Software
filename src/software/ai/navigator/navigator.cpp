@@ -19,20 +19,6 @@ void Navigator::visit(const ChipIntent &intent)
     current_robot_id  = intent.getRobotId();
 }
 
-void Navigator::visit(const DirectVelocityIntent &intent)
-{
-    auto p            = std::make_unique<DirectVelocityPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
-void Navigator::visit(const DirectWheelsIntent &intent)
-{
-    auto p            = std::make_unique<DirectWheelsPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
 void Navigator::visit(const KickIntent &intent)
 {
     auto p            = std::make_unique<KickPrimitive>(intent);

@@ -63,8 +63,6 @@ class Navigator : public IntentVisitor
      * @param The Intent to register
      */
     void visit(const ChipIntent &chip_intent) override;
-    void visit(const DirectVelocityIntent &direct_velocity_intent) override;
-    void visit(const DirectWheelsIntent &direct_wheels_intent) override;
     void visit(const KickIntent &kick_intent) override;
     void visit(const MoveIntent &move_intent) override;
     void visit(const MoveSpinIntent &move_spin_intent) override;

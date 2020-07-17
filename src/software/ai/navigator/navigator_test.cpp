@@ -80,42 +80,6 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorTest,
-       convert_direct_velocity_intent_to_direct_velocity_primitive)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(std::make_unique<DirectVelocityIntent>(3, 1, -2, 0.4, 1000, 4));
-
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
-
-    // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
-
-    auto expected_primitive = DirectVelocityPrimitive(3, 1, -2, 0.4, 1000);
-    auto primitive = dynamic_cast<DirectVelocityPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
-}
-
-TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_primitive)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<DirectWheelsIntent>(2, 80, 22, 55, 201, 5000, 60));
-
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
-
-    // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
-
-    auto expected_primitive = DirectWheelsPrimitive(2, 80, 22, 55, 201, 5000);
-    auto primitive = dynamic_cast<DirectWheelsPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
-}
-
 TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
 {
     World world = ::TestUtil::createBlankTestingWorld();

@@ -3,24 +3,10 @@
 #include "shared/constants.h"
 #include "software/primitive/all_primitives.h"
 
-PrimitiveMsg ProtoCreatorPrimitiveVisitor::getProto()
-{
-    // If we've never visited a primitive (and so have never populated the
-    // `prim`) then throw an exception
-    if (!prim)
-    {
-        std::string err_msg = std::string(typeid(this).name()) + ": " + __func__ +
-                              " called without ever having visited anything";
-        throw std::runtime_error(err_msg);
-    }
-
-    return *prim;
-}
-
 PrimitiveMsg ProtoCreatorPrimitiveVisitor::createPrimitiveMsg(const Primitive &primitive)
 {
     primitive.accept(*static_cast<PrimitiveVisitor *>(this));
-    return getProto();
+    return *prim;
 }
 
 void ProtoCreatorPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
