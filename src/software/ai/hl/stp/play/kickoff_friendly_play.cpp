@@ -129,8 +129,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // in the middle of the enemy field
         kickoff_chip_tactic->updateControlParams(
             world.ball().position(),
-            world.field().centerPoint() + Vector(world.field().xLength() / 6, 0),
-            world.field().xLength() / 2);
+            world.field().centerPoint() + Vector(world.field().xLength() / 6, 0));
         result.emplace_back(kickoff_chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from

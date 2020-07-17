@@ -128,7 +128,7 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
             chip_action->updateControlParams(*robot, ball.position(),
-                                             shot_target->getPointToShootAt(), CHIP_DIST);
+                                             shot_target->getPointToShootAt());
             yield(chip_action);
         }
 
@@ -167,7 +167,7 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             Point fallback_chip_target =
                 chip_target ? *chip_target : field.enemyGoalCenter();
             chip_action->updateControlParams(*robot, ball.position(),
-                                             fallback_chip_target, CHIP_DIST);
+                                             fallback_chip_target);
             yield(chip_action);
         }
         else
