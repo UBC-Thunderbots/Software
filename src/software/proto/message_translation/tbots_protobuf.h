@@ -1,9 +1,9 @@
 #pragma once
 
-#include "shared/proto/geometry.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "shared/proto/vision.pb.h"
 #include "software/primitive/primitive.h"
+#include "software/proto/message_translation/tbots_geometry.h"
 #include "software/world/world.h"
 
 /**
@@ -32,16 +32,6 @@ std::unique_ptr<PrimitiveSetMsg> createPrimitiveSetMsg(
  */
 std::unique_ptr<RobotStateMsg> createRobotStateMsg(const Robot& robot);
 std::unique_ptr<BallStateMsg> createBallStateMsg(const Ball& ball);
-
-/**
- * Internal geometry types to protobuf msg conversions
- *
- * @param The geom type (Point, Angle, Vector) to convert to proto
- * @return The unique_ptr to the converted GeomMsg
- */
-std::unique_ptr<PointMsg> createPointMsg(const Point& point);
-std::unique_ptr<AngleMsg> createAngleMsg(const Angle& angle);
-std::unique_ptr<VectorMsg> createVectorMsg(const Vector& vector);
 
 /**
  * Returns a timestamp msg with the time that this function was called
