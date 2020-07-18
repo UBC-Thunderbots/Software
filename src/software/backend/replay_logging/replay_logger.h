@@ -1,12 +1,12 @@
 #pragma once
 #include <experimental/filesystem>
 
-#include "software/multithreading/threaded_observer.h"
+#include "software/multithreading/last_in_first_out_threaded_observer.h"
 #include "software/proto/replay_msg.pb.h"
 #include "software/proto/sensor_msg.pb.h"
 
 
-class ReplayLogger : public FirstInFirstOutThreadedObserver<SensorMsg>
+class ReplayLogger : public LastInFirstOutThreadedObserver<SensorMsg>
 {
    public:
     /**

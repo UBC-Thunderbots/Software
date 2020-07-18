@@ -13,35 +13,33 @@ extern "C"
 
 namespace fs = std::experimental::filesystem;
 
-namespace
+ReplayMsg ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_path)
 {
-    ReplayMsg readDelimitedReplayProtobufFile(const fs::path& file_path)
+    // imagine having to write caveman code to read protobuf msgs from files
+    ReplayMsg msg;
+    int fd = open(file_path.c_str(), O_RDONLY);
+
+    if (fd < 0)
     {
-        // imagine having to write caveman code to read protobuf msgs from files
-        ReplayMsg msg;
-        int fd = open(file_path.c_str(), O_RDONLY);
-
-        if (fd < 0)
-        {
-            throw std::invalid_argument(std::string("Failed to open() ") +
-                                        file_path.string() + " with error " +
-                                        std::to_string(fd));
-        }
-
-        auto file_input = std::make_unique<google::protobuf::io::FileInputStream>(fd);
-        auto coded_input =
-            std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
-        bool result = google::protobuf::util::ParseDelimitedFromCodedStream(
-            &msg, coded_input.get(), nullptr);
-        if (!result)
-        {
-            throw std::invalid_argument("Failed to parse protobuf from file " +
-                                        file_path.string());
-        }
-        close(fd);
-        return msg;
+        throw std::invalid_argument(std::string("Failed to open() ") +
+                                    file_path.string() + " with error " +
+                                    std::to_string(fd));
     }
-}  // namespace
+
+    auto file_input = std::make_unique<google::protobuf::io::FileInputStream>(fd);
+    auto coded_input =
+        std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
+    bool result = google::protobuf::util::ParseDelimitedFromCodedStream(
+        &msg, coded_input.get(), nullptr);
+    if (!result)
+    {
+        throw std::invalid_argument("Failed to parse protobuf from file " +
+                                    file_path.string());
+    }
+    close(fd);
+    return msg;
+}
+
 
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const std::vector<T>& set)
@@ -98,7 +96,7 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
     max_chunk_idx   = *chunk_indices.rbegin();
     auto chunk_path = replay_dir / std::to_string(cur_chunk_idx);
 
-    cur_chunk.CopyFrom(::readDelimitedReplayProtobufFile(chunk_path));
+    cur_chunk.CopyFrom(readDelimitedReplayProtobufFile(chunk_path));
 }
 
 std::optional<SensorMsg> ReplayReader::getNextMsg()
@@ -134,6 +132,6 @@ void ReplayReader::nextChunk()
         throw std::out_of_range("Reached end of replay_logging!");
     }
 
-    cur_chunk   = ::readDelimitedReplayProtobufFile(chunk_path);
+    cur_chunk   = readDelimitedReplayProtobufFile(chunk_path);
     cur_msg_idx = 0;
 }

@@ -10,8 +10,8 @@
 #include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/full_system/widgets/full_system_gui.h"
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/multithreading/threaded_observer.h"
 #include "software/new_geom/rectangle.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
@@ -20,11 +20,11 @@
  * This class wraps our FullSystemGUI object which is responsible for
  * visualizing information about our AI, and allowing users to control it.
  */
-class ThreadedFullSystemGUI : public ThreadedObserver<World>,
-                              public ThreadedObserver<AIDrawFunction>,
-                              public ThreadedObserver<PlayInfo>,
-                              public ThreadedObserver<SensorMsg>,
-                              public ThreadedObserver<RobotStatus>
+class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
+                              public FirstInFirstOutThreadedObserver<AIDrawFunction>,
+                              public FirstInFirstOutThreadedObserver<PlayInfo>,
+                              public FirstInFirstOutThreadedObserver<SensorMsg>,
+                              public FirstInFirstOutThreadedObserver<RobotStatus>
 {
    public:
     explicit ThreadedFullSystemGUI();

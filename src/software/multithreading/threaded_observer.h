@@ -8,26 +8,24 @@
 /**
  * The general usage of this class should be to extend it, then override
  * `onValueReceived` with whatever custom functionality should occur when a new value
- * is received.
+ * is received, and `getNextValue` with a function that returns either the first or
+ * last received value from the internal buffer.
  *
  * @tparam T The type of object this class is observing
- * @tparam Ordering the ordering of which objects in the internal buffer are iterated
- *                  through when calling `onValueReceived`.
  */
 template <typename T>
-class GenericThreadedObserver : public Observer<T>
+class ThreadedObserver : public Observer<T>
 {
    public:
-    explicit GenericThreadedObserver(
-        size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
+    explicit ThreadedObserver(size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
 
-    ~GenericThreadedObserver() override;
+    ~ThreadedObserver() override;
 
     // Delete the copy and assignment operators because this class really shouldn't need
     // them and we don't want to risk doing anything nasty with the internal
     // multithreading this class uses
-    GenericThreadedObserver& operator=(const GenericThreadedObserver&) = delete;
-    GenericThreadedObserver(const GenericThreadedObserver&)            = delete;
+    ThreadedObserver& operator=(const ThreadedObserver&) = delete;
+    ThreadedObserver(const ThreadedObserver&)            = delete;
 
    private:
     /**
@@ -58,7 +56,7 @@ class GenericThreadedObserver : public Observer<T>
     /**
      * This function will return the next value from the internal buffer.
      */
-    virtual std::optional<T> getNextValue(const Duration& max_wait_time) = 0;
+    virtual std::optional<T> getNextValue(const Duration& max_wait_time);
 
     // This indicates if the destructor of this class has been called
     std::mutex in_destructor_mutex;
@@ -72,28 +70,5 @@ class GenericThreadedObserver : public Observer<T>
     // and pass them into the `onValueReceived`
     std::thread pull_from_buffer_thread;
 };
-
-template <typename T>
-class FirstInFirstOutThreadedObserver : public GenericThreadedObserver<T>
-{
-   public:
-    FirstInFirstOutThreadedObserver<T>() : GenericThreadedObserver<T>(){};
-    explicit FirstInFirstOutThreadedObserver<T>(size_t buffer_size)
-        : GenericThreadedObserver<T>(buffer_size){};
-    std::optional<T> getNextValue(const Duration& max_wait_time) final;
-};
-
-template <typename T>
-class LastInFirstOutThreadedObserver : public GenericThreadedObserver<T>
-{
-   public:
-    LastInFirstOutThreadedObserver<T>() : GenericThreadedObserver<T>(){};
-    explicit LastInFirstOutThreadedObserver<T>(size_t buffer_size)
-        : GenericThreadedObserver<T>(buffer_size){};
-    std::optional<T> getNextValue(const Duration& max_wait_time) final;
-};
-
-template <typename T>
-using ThreadedObserver = LastInFirstOutThreadedObserver<T>;
 
 #include "software/multithreading/threaded_observer.tpp"

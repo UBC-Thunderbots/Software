@@ -1,24 +1,26 @@
 #pragma once
 
+#include "software/multithreading/threaded_observer.h"
+
 template <typename T>
-GenericThreadedObserver<T>::GenericThreadedObserver(size_t buffer_size)
+ThreadedObserver<T>::ThreadedObserver(size_t buffer_size)
     : Observer<T>(buffer_size),
       in_destructor(false),
       IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {
     pull_from_buffer_thread = std::thread(
-        boost::bind(&GenericThreadedObserver::continuouslyPullValuesFromBuffer, this));
+        boost::bind(&ThreadedObserver::continuouslyPullValuesFromBuffer, this));
 }
 
 template <typename T>
-void GenericThreadedObserver<T>::onValueReceived(T val)
+void ThreadedObserver<T>::onValueReceived(T val)
 {
     // Do nothing, this function should be overriden to enable custom behavior on
     // message reception.
 }
 
 template <typename T>
-void GenericThreadedObserver<T>::continuouslyPullValuesFromBuffer()
+void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
 {
     do
     {
@@ -36,8 +38,9 @@ void GenericThreadedObserver<T>::continuouslyPullValuesFromBuffer()
     } while (!in_destructor);
 }
 
+
 template <typename T>
-GenericThreadedObserver<T>::~GenericThreadedObserver()
+ThreadedObserver<T>::~ThreadedObserver()
 {
     in_destructor_mutex.lock();
     in_destructor = true;
@@ -49,15 +52,13 @@ GenericThreadedObserver<T>::~GenericThreadedObserver()
 }
 
 template <typename T>
-std::optional<T> FirstInFirstOutThreadedObserver<T>::getNextValue(
-    const Duration& max_wait_time)
+std::optional<T> ThreadedObserver<T>::getNextValue(const Duration& max_wait_time)
 {
-    return this->popLeastRecentlyReceivedValue(max_wait_time);
-}
-
-template <typename T>
-std::optional<T> LastInFirstOutThreadedObserver<T>::getNextValue(
-    const Duration& max_wait_time)
-{
-    return this->popLeastRecentlyReceivedValue(max_wait_time);
+    // Do nothing, this function should be overriden to enable custom behavior on
+    // message reception.
+    // We *must* provide an implementation here instead of making it pure virtual because
+    // this function may be called from the `pull_from_buffer_thread` *before* the
+    // subclass constructor has completed (ie. before it has "finished overriding" all the
+    // methods). If this functions is pure virtual then this case would cause a crash.
+    return std::nullopt;
 }

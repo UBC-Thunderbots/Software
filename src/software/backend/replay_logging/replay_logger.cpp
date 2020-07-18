@@ -9,7 +9,7 @@
 namespace fs = std::experimental::filesystem;
 
 ReplayLogger::ReplayLogger(const std::string& out_dir_path, int _msgs_per_chunk)
-    : FirstInFirstOutThreadedObserver<SensorMsg>(2000),
+    : LastInFirstOutThreadedObserver<SensorMsg>(2000),
       current_chunk(),
       current_chunk_idx(0),
       output_dir_path(out_dir_path),
@@ -76,10 +76,10 @@ void ReplayLogger::saveCurrentChunk()
                                                                       &chunk_ofstream);
     if (!result)
     {
-        LOG(WARNING) << "Failed to serialize chunk to output filestream of "
-                     << chunk_path;
+        LOG(WARNING) << "Failed to serialize chunk to output filestream: " << chunk_path;
     }
-    else {
+    else
+    {
         LOG(DEBUG) << "Successfully saved chunk " << current_chunk_idx << "to disk";
     }
 }

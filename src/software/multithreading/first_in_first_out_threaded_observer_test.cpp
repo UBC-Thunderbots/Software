@@ -1,4 +1,4 @@
-#include "software/multithreading/threaded_observer.h"
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
 
 #include <gtest/gtest.h>
 
@@ -6,7 +6,7 @@
 
 using namespace std::chrono_literals;
 
-class TestThreadedObserver : public ThreadedObserver<int>
+class TestThreadedObserver : public FirstInFirstOutThreadedObserver<int>
 {
    public:
     int received_value = 0;
@@ -18,7 +18,7 @@ class TestThreadedObserver : public ThreadedObserver<int>
     }
 };
 
-TEST(ThreadedObserver, receiveValue)
+TEST(FirstInFirstOutThreadedObserver, receiveValue)
 {
     TestThreadedObserver test_threaded_observer;
 
@@ -31,7 +31,7 @@ TEST(ThreadedObserver, receiveValue)
     EXPECT_EQ(83, test_threaded_observer.received_value);
 }
 
-TEST(ThreadedObserver, destructor)
+TEST(FirstInFirstOutThreadedObserver, destructor)
 {
     // Because the destructor has to manage the internal thread to make sure it
     // finishes, this test ensures that it actually can succeed

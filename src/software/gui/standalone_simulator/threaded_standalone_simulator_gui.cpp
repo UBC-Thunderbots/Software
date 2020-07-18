@@ -7,7 +7,7 @@
 #include "software/proto/message_translation/ssl_geometry.h"
 
 ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI()
-    : ThreadedObserver<SSL_WrapperPacket>(),
+    : FirstInFirstOutThreadedObserver<SSL_WrapperPacket>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       ssl_wrapper_packet_buffer(std::make_shared<ThreadSafeBuffer<SSL_WrapperPacket>>(
           SSL_WRAPPER_PACKET_BUFFER_SIZE, false)),

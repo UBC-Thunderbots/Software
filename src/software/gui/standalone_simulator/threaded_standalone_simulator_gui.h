@@ -6,8 +6,8 @@
 #include <future>
 #include <thread>
 
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/multithreading/threaded_observer.h"
 #include "software/new_geom/rectangle.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
@@ -16,7 +16,8 @@
  * in its own thread. This way the GUI can be rendered and handle events separately
  * without affecting the main application.
  */
-class ThreadedStandaloneSimulatorGUI : public ThreadedObserver<SSL_WrapperPacket>
+class ThreadedStandaloneSimulatorGUI
+    : public FirstInFirstOutThreadedObserver<SSL_WrapperPacket>
 {
    public:
     explicit ThreadedStandaloneSimulatorGUI();

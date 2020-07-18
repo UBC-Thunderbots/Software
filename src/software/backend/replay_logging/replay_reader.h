@@ -13,6 +13,8 @@ class ReplayReader
    private:
     bool hasNextMsg() const;
     void nextChunk();
+    static ReplayMsg readDelimitedReplayProtobufFile(
+        const std::experimental::filesystem::path& file_path);
     size_t max_chunk_idx;
     size_t cur_chunk_idx;
     int cur_msg_idx;
