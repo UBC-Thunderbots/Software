@@ -7,25 +7,6 @@
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 
-/**
- * A light structure for a robot ID with TeamSide
- */
-struct RobotIdWithTeamSide
-{
-    unsigned int id;
-    TeamSide team_side;
-
-    bool operator==(const RobotIdWithTeamSide &other) const
-    {
-        return id == other.id && team_side == other.team_side;
-    }
-
-    bool operator<(const RobotIdWithTeamSide &other) const
-    {
-        return id < other.id || team_side < other.team_side;
-    }
-};
-
 class TimestampedPossessionState
 {
    public:
@@ -38,7 +19,7 @@ class TimestampedPossessionState
     /**
      * Updates the possession state
      *
-     * @throws std::invalid_argument if update_time is older than timestamp()
+     * @throws std::invalid_argument if update_time is older than lastUpdateTimestamp()
      *
      * @param possessions The robots that have possession of the ball at update_time
      * @param update_time The timestamp to update possession state
@@ -50,23 +31,25 @@ class TimestampedPossessionState
      *
      * @return the timestamp
      */
-    Timestamp timestamp() const;
+    Timestamp lastUpdateTimestamp() const;
 
     /**
-     * Returns the robots that currently have possession of the ball. Usually, this will
-     * be only one robot, but multiple robots could be fighting over the ball. If there
-     * isn't enough data or if no robots have possession, then returns an empty vector
+     * Returns the friendly/enemy robots that currently have possession of the ball.
+     * Usually, this will be only one robot, but multiple robots could be fighting over
+     * the ball. If there isn't enough data or if no robots have possession, then returns
+     * an empty vector
      *
-     * @return The vector of RobotIdWithTeamSide with possession of the ball
+     * @return The vector of RobotId with possession of the ball
      */
-    const std::vector<RobotIdWithTeamSide> &getRobotsWithPossession() const;
+    const std::vector<RobotId> &getFriendlyRobotsWithPossession() const;
+    const std::vector<RobotId> &getEnemyRobotsWithPossession() const;
 
     /**
      * Returns the Team Side that currently has exclusive possession of the ball
      *
      * @return TeamSide with possession or std::nullopt if it can't be determined
      */
-    std::optional<TeamSide> getTeamWithPossession() const;
+    std::optional<TeamSide> getTeamWithExclusivePossession() const;
 
     /**
      * Returns the last time a robot had possession of the ball
@@ -101,6 +84,7 @@ class TimestampedPossessionState
 
    private:
     std::map<RobotIdWithTeamSide, Timestamp> last_possession_map_;
-    std::vector<RobotIdWithTeamSide> current_possessions_;
+    std::vector<RobotId> current_friendly_possessions_;
+    std::vector<RobotId> current_enemy_possessions_;
     Timestamp timestamp_;
 };

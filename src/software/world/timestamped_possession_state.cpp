@@ -13,35 +13,52 @@ void TimestampedPossessionState::updateState(std::vector<RobotIdWithTeamSide> po
     {
         throw std::invalid_argument("Update time is older than the last update time");
     }
-    timestamp_           = update_time;
-    current_possessions_ = possessions;
+    timestamp_ = update_time;
+    current_friendly_possessions_.clear();
+    current_enemy_possessions_.clear();
     for (const auto &poss : possessions)
     {
         last_possession_map_[poss] = update_time;
+        if (poss.team_side == TeamSide::FRIENDLY)
+        {
+            current_friendly_possessions_.push_back(poss.id);
+        }
+        if (poss.team_side == TeamSide::FRIENDLY)
+        {
+            current_enemy_possessions_.push_back(poss.id);
+        }
     }
 }
 
-Timestamp TimestampedPossessionState::timestamp() const
+Timestamp TimestampedPossessionState::lastUpdateTimestamp() const
 {
     return timestamp_;
 }
 
-const std::vector<RobotIdWithTeamSide>
-    &TimestampedPossessionState::getRobotsWithPossession() const
+const std::vector<RobotId> &TimestampedPossessionState::getFriendlyRobotsWithPossession()
+    const
 {
-    return current_possessions_;
+    return current_friendly_possessions_;
 }
 
-std::optional<TeamSide> TimestampedPossessionState::getTeamWithPossession() const
+const std::vector<RobotId> &TimestampedPossessionState::getEnemyRobotsWithPossession()
+    const
 {
-    if (current_possessions_.size() == 1)
+    return current_enemy_possessions_;
+}
+
+std::optional<TeamSide> TimestampedPossessionState::getTeamWithExclusivePossession() const
+{
+    if (current_friendly_possessions_.size() == 1)
     {
-        return current_possessions_.begin()->team_side;
+        return TeamSide::FRIENDLY;
     }
-    else
+
+    if (current_enemy_possessions_.size() == 1)
     {
-        return std::nullopt;
+        return TeamSide::ENEMY;
     }
+    return std::nullopt;
 }
 
 std::optional<Timestamp> TimestampedPossessionState::getLastPossessionTime(
@@ -61,7 +78,8 @@ std::optional<Timestamp> TimestampedPossessionState::getLastPossessionTime(
 bool TimestampedPossessionState::operator==(const TimestampedPossessionState &other) const
 {
     return this->last_possession_map_ == other.last_possession_map_ &&
-           this->current_possessions_ == other.current_possessions_;
+           this->current_friendly_possessions_ == other.current_friendly_possessions_ &&
+           this->current_enemy_possessions_ == other.current_enemy_possessions_;
 }
 
 bool TimestampedPossessionState::operator!=(const TimestampedPossessionState &other) const
