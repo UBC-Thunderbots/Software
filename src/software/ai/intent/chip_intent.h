@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/primitive/chip_primitive.h"
 
 class ChipIntent : public ChipPrimitive, public Intent

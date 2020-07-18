@@ -9,7 +9,7 @@ cc_library(
         "physics.h",
     ],
     deps = [
-        "//software/new_geom:point",
+        "//software/geom:point",
     ],
 )
 

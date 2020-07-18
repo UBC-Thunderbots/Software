@@ -5,10 +5,10 @@
 #include <chrono>
 
 #include "shared/constants.h"
-#include "software/new_geom/geom_constants.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/polygon.h"
-#include "software/new_geom/util/almost_equal.h"
+#include "software/geom/algorithms/almost_equal.h"
+#include "software/geom/geom_constants.h"
+#include "software/geom/point.h"
+#include "software/geom/polygon.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/test_util/equal_within_tolerance.h"
 #include "software/world/ball.h"

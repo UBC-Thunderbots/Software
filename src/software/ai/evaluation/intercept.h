@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "software/new_geom/point.h"
+#include "software/geom/point.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"

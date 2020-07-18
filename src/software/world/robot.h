@@ -2,10 +2,10 @@
 
 #include <optional>
 
-#include "software/new_geom/angle.h"
-#include "software/new_geom/angular_velocity.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
+#include "software/geom/angle.h"
+#include "software/geom/angular_velocity.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 #include "software/world/timestamped_robot_state.h"

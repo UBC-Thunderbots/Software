@@ -13,7 +13,7 @@ extern "C"
 #include "firmware/shared/math/polynomial_1d.h"
 #include "firmware/shared/math/polynomial_2d.h"
 #include "firmware/shared/math/vector_2d.h"
-#include "software/new_geom/vector.h"
+#include "software/geom/vector.h"
 
 class TrajectoryPlannerTest : public testing::Test
 {

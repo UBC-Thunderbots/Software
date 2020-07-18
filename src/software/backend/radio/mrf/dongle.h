@@ -20,8 +20,8 @@
 #include "software/backend/radio/mrf/usb/libusb.h"
 #include "software/backend/radio/mrf/util/async_operation.h"
 #include "software/backend/radio/mrf/util/noncopyable.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/primitive/primitive.h"
 
 /**

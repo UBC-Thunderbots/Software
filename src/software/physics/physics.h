@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/new_geom/point.h"
+#include "software/geom/point.h"
 
 /**
  * Calculates the future position of a moving object

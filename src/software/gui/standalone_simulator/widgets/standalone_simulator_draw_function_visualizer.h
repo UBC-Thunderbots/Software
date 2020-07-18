@@ -3,8 +3,8 @@
 #include <QtWidgets/QWidget>
 #include <memory>
 
+#include "software/geom/point.h"
 #include "software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h"
-#include "software/new_geom/point.h"
 #include "software/simulation/physics/physics_robot.h"
 #include "software/simulation/standalone_simulator.h"
 #include "software/world/robot_state.h"

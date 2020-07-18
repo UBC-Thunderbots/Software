@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
-#include "software/new_geom/util/contains.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 const std::string HaltTestPlay::name = "Halt Test Play";

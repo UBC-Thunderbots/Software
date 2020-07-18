@@ -8,9 +8,9 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/new_geom/line.h"
-#include "software/new_geom/util/contains.h"
-#include "software/new_geom/util/intersection.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/line.h"
 #include "software/test_util/test_util.h"
 
 // The following tests will make sure the goalie stays in the requested

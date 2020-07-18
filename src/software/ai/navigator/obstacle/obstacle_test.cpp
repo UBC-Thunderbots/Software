@@ -3,12 +3,12 @@
 #include <gtest/gtest.h>
 #include <math.h>
 
-#include "software/new_geom/circle.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/polygon.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/util/distance.h"
-#include "software/new_geom/util/intersects.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersects.h"
+#include "software/geom/circle.h"
+#include "software/geom/point.h"
+#include "software/geom/polygon.h"
+#include "software/geom/rectangle.h"
 
 TEST(NavigatorObstacleTest, create_from_rectangle)
 {
