@@ -2,8 +2,8 @@
 
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/primitive/move_primitive.h"
 
 class MoveAction : public Action

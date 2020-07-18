@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/primitive/primitive.h"
 
 class KickPrimitive : public Primitive

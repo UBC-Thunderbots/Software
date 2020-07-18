@@ -5,9 +5,9 @@
 #include <QtCore/QRect>
 #include <QtGui/QPolygonF>
 
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/segment.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 
 /**
  * Converts our Point class to a QPointF

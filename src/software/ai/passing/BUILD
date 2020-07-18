@@ -7,7 +7,6 @@ cc_library(
     deps = [
         ":pass",
         "//software/ai/evaluation:pass",
-        "//software/geom",
         "//software/logger",
         "//software/math:math_functions",
         "//software/util/make_enum",
@@ -31,7 +30,6 @@ cc_library(
     srcs = ["pass.cpp"],
     hdrs = ["pass.h"],
     deps = [
-        "//software/geom",
         "//software/time:timestamp",
         "//software/world:field",
     ],

@@ -3,9 +3,8 @@
 #include "shared/constants.h"
 #include "software/ai/intent/kick_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/util.h"
-#include "software/new_geom/polygon.h"
-#include "software/new_geom/util/contains.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/polygon.h"
 #include "software/world/ball.h"
 
 KickAction::KickAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))

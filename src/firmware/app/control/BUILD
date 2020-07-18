@@ -31,7 +31,7 @@ cc_test(
     ],
     deps = [
         ":trajectory_planner",
-        "//software/new_geom:vector",
+        "//software/geom:vector",
         "@gtest//:gtest_main",
     ],
 )
@@ -65,7 +65,7 @@ cc_test(
     ],
     deps = [
         ":trajectory_planner",
-        "//software/new_geom:vector",
+        "//software/geom:vector",
         "@gtest//:gtest_main",
     ],
 )

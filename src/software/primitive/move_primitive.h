@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/primitive/primitive.h"
 #include "software/util/make_enum/make_enum.h"
 

@@ -3,8 +3,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/util/contains.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/rectangle.h"
 #include "software/parameter/dynamic_parameters.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,

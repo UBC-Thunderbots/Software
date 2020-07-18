@@ -350,3 +350,31 @@ float PhysicsRobot::getMotorBrakeForce(float motor_speed) const
     // amount of time via the unit tests
     return -0.5f * robot_body->GetMass() * motor_speed;
 }
+
+void PhysicsRobot::setPosition(const Point& position)
+{
+    auto func = [=]() {
+        b2World* world = robot_body->GetWorld();
+        if (bodyExistsInWorld(robot_body, world))
+        {
+            robot_body->SetLinearVelocity(createVec2(Vector(0, 0)));
+            robot_body->SetAngularVelocity(0.0);
+            robot_body->SetTransform(createVec2(position), robot_body->GetAngle());
+        }
+    };
+
+    // We can't set the robot body's position immediately because we may be in the middle
+    // of a Box2D world update, so we defer calling this function until after a physics
+    // step
+    post_physics_step_functions.emplace(func);
+}
+
+void PhysicsRobot::runPostPhysicsStep()
+{
+    while (!post_physics_step_functions.empty())
+    {
+        auto post_physics_step_function = post_physics_step_functions.front();
+        post_physics_step_function();
+        post_physics_step_functions.pop();
+    }
+}

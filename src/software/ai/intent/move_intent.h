@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/primitive/move_primitive.h"
 #include "software/util/make_enum/make_enum.h"
 
