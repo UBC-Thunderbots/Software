@@ -45,7 +45,7 @@ Matrix_t* shared_matrix_multiply(Matrix_t* A, Matrix_t* B);
 /**
  * Creates a shared_matrix_transpose of the given in_matrix.
  *
- * @param in_matrix [in] the matrix to shared_matrix_transpose
+ * @param in_matrix [in] the matrix to transpose
  * @return the shared_matrix_transpose of the given matrix
  */
 Matrix_t* shared_matrix_transpose(Matrix_t* in_matrix);
