@@ -1,4 +1,5 @@
 #include "firmware/shared/math/matrix.h"
+
 #include <assert.h>
 #include <stdlib.h>
 
@@ -64,27 +65,33 @@ Matrix_t* shared_matrix_transpose(Matrix_t* in_matrix)
     return out_matrix;
 }
 
-void shared_matrix_setValueAtIndex(unsigned int row, unsigned int column, float value,  Matrix_t* matrix ){
+void shared_matrix_setValueAtIndex(unsigned int row, unsigned int column, float value,
+                                   Matrix_t* matrix)
+{
     assert(row <= matrix->n_rows && row >= 1);
     assert(column <= matrix->n_cols && column >= 1);
 
     // If the row or column are out of the range of the array then return.
     // It is likely safer to do nothing than segfault
-    if(row > matrix->n_rows || column > matrix->n_cols){
+    if (row > matrix->n_rows || column > matrix->n_cols)
+    {
         return;
     }
-    matrix->rows[row-1][column-1] = value;
+    matrix->rows[row - 1][column - 1] = value;
 }
 
-float shared_matrix_getValueAtIndex(unsigned int row, unsigned int column, Matrix_t* matrix)  {
+float shared_matrix_getValueAtIndex(unsigned int row, unsigned int column,
+                                    Matrix_t* matrix)
+{
     assert(row <= matrix->n_rows && row >= 1);
     assert(column <= matrix->n_cols && column >= 1);
 
     // If the row or column are out of the range of the array then return.
     // It is likely safer to do nothing than segfault
-    if(row > matrix->n_rows || column > matrix->n_cols || row < 1 || column < 1){
+    if (row > matrix->n_rows || column > matrix->n_cols || row < 1 || column < 1)
+    {
         return 0.0f;
     }
 
-    return matrix->rows[row-1][column-1];
+    return matrix->rows[row - 1][column - 1];
 }

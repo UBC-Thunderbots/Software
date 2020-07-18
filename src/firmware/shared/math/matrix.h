@@ -47,7 +47,8 @@ Matrix_t* shared_matrix_multiply(Matrix_t* A, Matrix_t* B);
 Matrix_t* shared_matrix_transpose(Matrix_t* in_matrix);
 
 /**
- * Function sets the value of the matrix element at the specified row and column. The first row and column are index '1'.
+ * Function sets the value of the matrix element at the specified row and column. The
+ * first row and column are index '1'.
  *
  * NOTE: If any of the @pre conditions are not met, the function will do nothing
  * @pre row <= the number of rows in the matrix and row >= 1
@@ -58,10 +59,12 @@ Matrix_t* shared_matrix_transpose(Matrix_t* in_matrix);
  * @param value [in] The value to set
  * @param matrix [in] The matrix
  */
-void shared_matrix_setValueAtIndex(unsigned int row, unsigned int column, float value, Matrix_t* matrix);
+void shared_matrix_setValueAtIndex(unsigned int row, unsigned int column, float value,
+                                   Matrix_t* matrix);
 
 /**
- * Function gets the value of the matrix element at the specified row and column, The first row and column are index '1'.
+ * Function gets the value of the matrix element at the specified row and column, The
+ * first row and column are index '1'.
  *
  *
  * @pre row <= the number of rows in the matrix and row >= 1
@@ -71,6 +74,8 @@ void shared_matrix_setValueAtIndex(unsigned int row, unsigned int column, float 
  * @param column [in] The column of the matrix element
  * @param matrix [in] The matrix
  *
- * @return The value of the matrix element at the specified index. If the pre conditions are not met, it will return zero.
+ * @return The value of the matrix element at the specified index. If the pre conditions
+ * are not met, it will return zero.
  */
-float shared_matrix_getValueAtIndex(unsigned int row, unsigned int column, Matrix_t* matrix);
+float shared_matrix_getValueAtIndex(unsigned int row, unsigned int column,
+                                    Matrix_t* matrix);
