@@ -23,7 +23,7 @@ void TimestampedPossessionState::updateState(std::vector<RobotIdWithTeamSide> po
         {
             current_friendly_possessions_.push_back(poss.id);
         }
-        if (poss.team_side == TeamSide::FRIENDLY)
+        if (poss.team_side == TeamSide::ENEMY)
         {
             current_enemy_possessions_.push_back(poss.id);
         }
@@ -49,12 +49,14 @@ const std::vector<RobotId> &TimestampedPossessionState::getEnemyRobotsWithPosses
 
 std::optional<TeamSide> TimestampedPossessionState::getTeamWithExclusivePossession() const
 {
-    if (current_friendly_possessions_.size() == 1)
+    if (current_friendly_possessions_.size() == 1 &&
+        current_enemy_possessions_.size() == 0)
     {
         return TeamSide::FRIENDLY;
     }
 
-    if (current_enemy_possessions_.size() == 1)
+    if (current_enemy_possessions_.size() == 1 &&
+        current_friendly_possessions_.size() == 0)
     {
         return TeamSide::ENEMY;
     }
