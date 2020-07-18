@@ -3,8 +3,8 @@
 #include <limits>
 
 #include "shared/constants.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/util/distance.h"
 
 PhysicsWorld::PhysicsWorld(const Field& field, double ball_restitution,
                            double ball_linear_damping)

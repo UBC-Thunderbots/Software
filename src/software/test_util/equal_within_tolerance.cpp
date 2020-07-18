@@ -1,6 +1,6 @@
 #include "software/test_util/equal_within_tolerance.h"
 
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
 
 namespace TestUtil
 {

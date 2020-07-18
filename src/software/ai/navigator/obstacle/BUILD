@@ -11,9 +11,9 @@ cc_library(
     deps = [
         "obstacle_visitor",
         "//shared:constants",
-        "//software/new_geom:point",
-        "//software/new_geom:segment",
-        "//software/new_geom/util:algorithms",
+        "//software/geom:point",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
     ],
 )
 
@@ -24,9 +24,8 @@ cc_library(
     deps = [
         ":obstacle",
         "//software/ai/motion_constraint",
-        "//software/geom",
+        "//software/geom:point",
         "//software/logger",
-        "//software/new_geom:point",
         "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
@@ -37,8 +36,8 @@ cc_test(
     srcs = ["obstacle_test.cpp"],
     deps = [
         ":obstacle",
-        "//software/new_geom:point",
-        "//software/new_geom:rectangle",
+        "//software/geom:point",
+        "//software/geom:rectangle",
         "@gtest//:gtest_main",
     ],
 )
@@ -48,8 +47,8 @@ cc_test(
     srcs = ["robot_navigation_obstacle_factory_test.cpp"],
     deps = [
         ":robot_navigation_obstacle_factory",
-        "//software/new_geom:point",
-        "//software/new_geom:rectangle",
+        "//software/geom:point",
+        "//software/geom:rectangle",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
@@ -62,7 +61,7 @@ cc_library(
     # We expose obstacle visitor so that it can visualized
     visibility = ["//visibility:public"],
     deps = [
-        "//software/new_geom:circle",
-        "//software/new_geom:polygon",
+        "//software/geom:circle",
+        "//software/geom:polygon",
     ],
 )

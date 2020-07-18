@@ -5,7 +5,9 @@ cc_library(
     srcs = ["geometry_conversion.cpp"],
     hdrs = ["geometry_conversion.h"],
     deps = [
-        "//software/geom",
+        "//software/geom:point",
+        "//software/geom:rectangle",
+        "//software/geom:segment",
         "@qt//:qt_core",
         "@qt//:qt_gui",
     ],

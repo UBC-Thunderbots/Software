@@ -44,6 +44,8 @@ cc_library(
     hdrs = ["move_intent.h"],
     deps = [
         ":intent",
+        "//software/geom:angle",
+        "//software/geom:point",
         "//software/primitive:move_primitive",
     ],
 )
