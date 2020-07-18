@@ -30,12 +30,13 @@ BallState TwoStageLinearBallModel::estimateFutureState(const Duration &duration_
             "Position estimate is updating to a time in the past");
     }
 
-    return applyLinearFrictionModel(duration_in_future.getSeconds());
+    return applyLinearFrictionModel(duration_in_future);
 }
 
 BallState TwoStageLinearBallModel::applyLinearFrictionModel(
-    const double seconds_in_future) const
+    const Duration &duration_in_future) const
 {
+    const double seconds_in_future     = duration_in_future.getSeconds();
     const double initial_speed_m_per_s = initial_ball_state_.velocity().length();
 
     // Figure out how long the ball will roll/slide, if at all
@@ -54,10 +55,10 @@ BallState TwoStageLinearBallModel::applyLinearFrictionModel(
     // Figure out where the ball is after the two stages
     const BallState ball_state_after_sliding = calculateFutureBallState(
         initial_ball_state_, sliding_friction_acceleration_m_per_s_squared_,
-        sliding_duration_secs);
+        Duration::fromSeconds(sliding_duration_secs));
     const BallState ball_state_after_rolling = calculateFutureBallState(
         ball_state_after_sliding, rolling_friction_acceleration_m_per_s_squared_,
-        rolling_duration_secs);
+        Duration::fromSeconds(rolling_duration_secs));
 
     return ball_state_after_rolling;
 }
@@ -65,8 +66,9 @@ BallState TwoStageLinearBallModel::applyLinearFrictionModel(
 BallState TwoStageLinearBallModel::calculateFutureBallState(
     const BallState &initial_ball_state,
     const double constant_friction_acceleration_m_per_s,
-    const double seconds_in_future) const
+    const Duration &duration_in_future) const
 {
+    const double seconds_in_future = duration_in_future.getSeconds();
     const Vector acceleration_vector =
         initial_ball_state.velocity().normalize(-constant_friction_acceleration_m_per_s);
     const Point future_position = calculateFuturePosition(

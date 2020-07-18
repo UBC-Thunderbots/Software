@@ -45,15 +45,14 @@ class TwoStageLinearBallModel final : public BallModel
     // threshold above which the ball slides and below which the ball rolls
     double sliding_to_rolling_speed_threshold_m_per_s_;
 
-
     /**
      * Applies linear friction model
      *
-     * @param seconds_in_future Seconds into the future
+     * @param duration_in_future Duration into the future
      *
      * @return future ball state
      */
-    BallState applyLinearFrictionModel(const double seconds_in_future) const;
+    BallState applyLinearFrictionModel(const Duration &duration_in_future) const;
 
     /**
      * Calculates the future ball state assuming constant acceleration opposing the
@@ -62,12 +61,12 @@ class TwoStageLinearBallModel final : public BallModel
      * @param initial_ball_state The initial ball state
      * @param constant_friction_acceleration_m_per_s The magnitude of the acceleration due
      * to friction
-     * @param seconds_in_future Seconds into the future
+     * @param duration_in_future Duration into the future
      *
      * @return future ball state
      */
     BallState calculateFutureBallState(
         const BallState &initial_ball_state,
         const double constant_friction_acceleration_m_per_s,
-        const double seconds_in_future) const;
+        const Duration &duration_in_future) const;
 };
