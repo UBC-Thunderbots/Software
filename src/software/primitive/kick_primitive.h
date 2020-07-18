@@ -27,9 +27,6 @@ class KickPrimitive : public Primitive
                            const Angle &kick_direction,
                            double kick_speed_meters_per_second);
 
-    std::string getPrimitiveName() const override;
-
-    unsigned int getRobotId() const override;
     /**
      * Gets the location of where the kick will be taken
      *
@@ -52,6 +49,8 @@ class KickPrimitive : public Primitive
     double getKickSpeed() const;
 
     void accept(PrimitiveVisitor &visitor) const override;
+    std::string getPrimitiveName() const override;
+    unsigned int getRobotId() const override;
 
     /**
      * Compares KickPrimitives for equality. KickPrimitives are considered equal if all
