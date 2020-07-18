@@ -3,8 +3,8 @@
 #include <boost/circular_buffer.hpp>
 #include <optional>
 
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
 #include "software/time/timestamp.h"
 #include "software/world/timestamped_ball_state.h"
 
@@ -62,23 +62,6 @@ class Ball final
      * @return the current position of the ball
      */
     Point position() const;
-
-    /**
-     * Returns the estimated position of the ball at a future time, relative to when the
-     * ball was last updated.
-     *
-     * @param duration_in_future The relative amount of time in the future
-     * at which to predict the ball's position. Value must be >= 0.
-     * For example, a value of 1.5 seconds would return the estimated position of the ball
-     * 1.5 seconds in the future.
-     *
-     * @throws std::invalid_argument if the ball is estimating the position with a time
-     * from the past
-     * @return the estimated position of the ball at the given number of milliseconds
-     * in the future. Coordinates are in metres.
-     */
-    // TODO (Issue #1416): Delete this when grsim get removed
-    Point estimatePositionAtFutureTime(const Duration &duration_in_future) const;
 
     /**
      * Returns the current velocity of the ball

@@ -2,9 +2,9 @@
 
 #include <stack>
 
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/util/distance.h"
-#include "software/new_geom/util/intersects.h"
 
 ThetaStarPathPlanner::ThetaStarPathPlanner()
     : num_grid_rows(0),
@@ -65,6 +65,7 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinat
     {
         Segment seg(convertCoordToPoint(coord1), convertCoordToPoint(coord2));
         bool has_line_of_sight = true;
+
         for (const auto &obstacle : obstacles)
         {
             if (obstacle->intersects(seg))

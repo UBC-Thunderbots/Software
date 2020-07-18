@@ -1,7 +1,7 @@
 #include "software/ai/navigator/navigator.h"
 
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/util/distance.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
                      RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
@@ -10,13 +10,6 @@ Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
       robot_navigation_obstacle_factory(std::move(robot_navigation_obstacle_factory)),
       path_manager(std::move(path_manager))
 {
-}
-
-void Navigator::visit(const CatchIntent &intent)
-{
-    auto p            = std::make_unique<CatchPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
 }
 
 void Navigator::visit(const ChipIntent &intent)
@@ -40,13 +33,6 @@ void Navigator::visit(const DirectWheelsIntent &intent)
     current_robot_id  = intent.getRobotId();
 }
 
-void Navigator::visit(const DribbleIntent &intent)
-{
-    auto p            = std::make_unique<DribblePrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
 void Navigator::visit(const KickIntent &intent)
 {
     auto p            = std::make_unique<KickPrimitive>(intent);
@@ -63,13 +49,6 @@ void Navigator::visit(const MoveIntent &intent)
 void Navigator::visit(const MoveSpinIntent &intent)
 {
     auto p            = std::make_unique<MoveSpinPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
-void Navigator::visit(const PivotIntent &intent)
-{
-    auto p            = std::make_unique<PivotPrimitive>(intent);
     current_primitive = std::move(p);
     current_robot_id  = intent.getRobotId();
 }

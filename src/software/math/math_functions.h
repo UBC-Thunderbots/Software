@@ -6,9 +6,9 @@
 
 #include <algorithm>
 
-#include "software/new_geom/circle.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
+#include "software/geom/circle.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 
 /**
  * Linearly maps an input value to an output value in the range [0,1]

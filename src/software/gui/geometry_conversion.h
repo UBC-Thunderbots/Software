@@ -5,9 +5,9 @@
 #include <QtCore/QRect>
 #include <QtGui/QPolygonF>
 
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/segment.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 
 /**
  * Converts our Point class to a QPointF
@@ -36,3 +36,23 @@ QPolygonF createQPolygonF(const Polygon& polygon);
  * @return The QLineF representation of the given Segment
  */
 QLineF createQLineF(const Segment& segment);
+
+/**
+ * Converts Qt's Point class to our Point class
+ *
+ * @param point The Point to convert
+ *
+ * @return The Point representation of the given QPoint
+ */
+Point createPoint(const QPointF& point);
+Point createPoint(const QPoint& point);
+
+/**
+ * Converts our Angle class to an angle value consumable by Qt.
+ * Qt uses integers to represent angles.
+ *
+ * @param angle The Angle to convert
+ *
+ * @return The Qt angle representation of the given Angle
+ */
+int createQAngle(const Angle& angle);

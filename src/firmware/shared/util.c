@@ -5,7 +5,7 @@
 float fmax_of_array(float array[], unsigned size)
 {
     unsigned i;
-    float max_value;
+    float max_value = 0.0f;
     for (i = 0; i < size; i++)
     {
         if (i == 0)
@@ -24,7 +24,7 @@ float fmax_of_array(float array[], unsigned size)
 float fmin_of_array(float array[], unsigned size)
 {
     unsigned i;
-    float min_value;
+    float min_value = 0.0f;
     for (i = 0; i < size; i++)
     {
         if (i == 0)

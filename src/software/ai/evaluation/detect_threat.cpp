@@ -3,7 +3,7 @@
 #include <optional>
 
 #include "shared/constants.h"
-#include "software/new_geom/util/intersection.h"
+#include "software/geom/algorithms/intersection.h"
 #include "software/world/field.h"
 
 std::optional<Point> calcBallVelIntersectFriendlyNet(Ball ball, Field field)

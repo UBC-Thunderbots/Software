@@ -8,8 +8,8 @@
 #include "software/ai/navigator/path_planner/path_planner.h"
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
 

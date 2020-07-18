@@ -8,7 +8,6 @@ FullSystemGUI::FullSystemGUI(
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
     std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer,
-    std::shared_ptr<ThreadSafeBuffer<RobotStatus>> robot_status_buffer,
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
     std::shared_ptr<ThunderbotsConfig> config)
     : QMainWindow(),
@@ -18,7 +17,6 @@ FullSystemGUI::FullSystemGUI(
       ai_draw_functions_buffer(ai_draw_functions_buffer),
       play_info_buffer(play_info_buffer),
       sensor_msg_buffer(sensor_msg_buffer),
-      robot_status_buffer(robot_status_buffer),
       view_area_buffer(view_area_buffer),
       most_recent_world_draw_function([](QGraphicsScene*) { return; }),
       most_recent_ai_draw_function([](QGraphicsScene*) { return; })
@@ -43,7 +41,7 @@ FullSystemGUI::FullSystemGUI(
 
     connect(update_timer, &QTimer::timeout, this, &FullSystemGUI::handleUpdate);
     update_timer->start(static_cast<int>(
-        Duration::fromMilliseconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
+        Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
 }
 
 void FullSystemGUI::handleUpdate()
@@ -51,7 +49,6 @@ void FullSystemGUI::handleUpdate()
     draw();
     updatePlayInfo();
     updateSensorMsg();
-    updateRobotStatus();
     updateDrawViewArea();
 }
 
@@ -89,14 +86,6 @@ void FullSystemGUI::updateSensorMsg()
         {
             main_widget->robot_status_table_widget->updateTbotsRobotMsg(robot_msg);
         }
-    }
-}
-
-void FullSystemGUI::updateRobotStatus()
-{
-    while (auto robot_status = robot_status_buffer->popLeastRecentlyAddedValue())
-    {
-        main_widget->robot_status_table_widget->updateRobotStatus(robot_status.value());
     }
 }
 

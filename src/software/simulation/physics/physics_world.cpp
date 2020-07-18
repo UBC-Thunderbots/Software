@@ -3,14 +3,18 @@
 #include <limits>
 
 #include "shared/constants.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
-PhysicsWorld::PhysicsWorld(const Field& field)
+PhysicsWorld::PhysicsWorld(const Field& field, double ball_restitution,
+                           double ball_linear_damping)
     : b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
       current_timestamp(Timestamp::fromSeconds(0)),
       contact_listener(std::make_unique<SimulationContactListener>()),
       physics_field(b2_world, field),
-      physics_ball(nullptr)
+      physics_ball(nullptr),
+      ball_restitution(ball_restitution),
+      ball_linear_damping(ball_linear_damping)
 {
     b2_world->SetContactListener(contact_listener.get());
 }
@@ -74,7 +78,7 @@ const Timestamp PhysicsWorld::getTimestamp() const
 void PhysicsWorld::setBallState(const BallState& ball_state)
 {
     physics_ball = std::make_shared<PhysicsBall>(b2_world, ball_state, BALL_MASS_KG,
-                                                 acceleration_due_to_gravity);
+                                                 ball_restitution, ball_linear_damping);
 }
 
 void PhysicsWorld::removeBall()
@@ -189,6 +193,15 @@ void PhysicsWorld::stepSimulation(const Duration& time_step)
 {
     b2_world->Step(static_cast<float>(time_step.getSeconds()), velocity_iterations,
                    position_iterations);
+
+    for (const auto& physics_robots : {yellow_physics_robots, blue_physics_robots})
+    {
+        for (auto& robot : physics_robots)
+        {
+            robot->runPostPhysicsStep();
+        }
+    }
+
     current_timestamp = current_timestamp + time_step;
 }
 
@@ -227,4 +240,22 @@ std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getBluePhysicsRobots() co
 std::weak_ptr<PhysicsBall> PhysicsWorld::getPhysicsBall() const
 {
     return std::weak_ptr<PhysicsBall>(physics_ball);
+}
+
+std::weak_ptr<PhysicsRobot> PhysicsWorld::getRobotAtPosition(const Point& position)
+{
+    std::weak_ptr<PhysicsRobot> result;
+
+    for (const auto& physics_robots : {yellow_physics_robots, blue_physics_robots})
+    {
+        for (const auto& robot : physics_robots)
+        {
+            if (distance(position, robot->position()) < ROBOT_MAX_RADIUS_METERS)
+            {
+                result = robot;
+            }
+        }
+    }
+
+    return result;
 }

@@ -3,9 +3,9 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QOpenGLWidget>
 
+#include "software/geom/rectangle.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/generic_widgets/draw_function_visualizer/zoomable_qgraphics_view.h"
-#include "software/new_geom/rectangle.h"
 
 /**
  * This class is a QGraphicsView widget that allows the user to zoom

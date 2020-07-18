@@ -47,8 +47,8 @@ cc_library(
     deps = [
         ":shot",
         "//shared:constants",
-        "//software/geom",
-        "//software/new_geom:segment",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
         "//software/world",
     ],
 )
@@ -72,8 +72,8 @@ cc_library(
     deps = [
         ":shot",
         "//shared:constants",
-        "//software/geom",
-        "//software/new_geom:triangle",
+        "//software/geom:triangle",
+        "//software/geom/algorithms",
         "//software/world",
     ],
 )
@@ -95,7 +95,7 @@ cc_library(
     hdrs = ["detect_threat.h"],
     deps = [
         "//shared:constants",
-        "//software/new_geom/util:algorithms",
+        "//software/geom/algorithms",
         "//software/world:ball",
         "//software/world:field",
     ],
@@ -126,7 +126,7 @@ cc_library(
         ":shot",
         ":team",
         "//shared:constants",
-        "//software/new_geom/util:algorithms",
+        "//software/geom/algorithms",
         "//software/world",
     ],
 )
@@ -148,7 +148,7 @@ cc_library(
     hdrs = ["find_open_areas.h"],
     deps = [
         ":shot",
-        "//software/new_geom/util:algorithms",
+        "//software/geom/algorithms",
         "//software/world",
     ],
 )
@@ -248,5 +248,5 @@ cc_library(
     name = "shot",
     srcs = ["shot.cpp"],
     hdrs = ["shot.h"],
-    deps = ["//software/new_geom:point"],
+    deps = ["//software/geom:point"],
 )

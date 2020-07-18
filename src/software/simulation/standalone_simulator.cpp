@@ -9,7 +9,8 @@ extern "C"
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField())
+      simulator(Field::createSSLDivisionBField(), 0.8, 0.2),
+      most_recent_ssl_wrapper_packet(SSL_WrapperPacket())
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(
         [this](int) { this->initNetworking(); });
@@ -26,10 +27,12 @@ StandaloneSimulator::StandaloneSimulator(
 
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [this](SSL_WrapperPacket wrapper_packet) {
+            std::scoped_lock lock(this->most_recent_ssl_wrapper_packet_mutex);
+            this->most_recent_ssl_wrapper_packet = wrapper_packet;
             this->wrapper_packet_sender->sendProto(wrapper_packet);
         });
 
-    simulator.setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    simulator.setBallState(BallState(Point(0, 0), Vector(5, 2)));
 
     simulator.startSimulation();
 }
@@ -56,70 +59,114 @@ void StandaloneSimulator::initNetworking()
             static_cast<unsigned short>(
                 standalone_simulator_config->VisionPort()->value()));
     yellow_team_primitive_listener =
-        std::make_unique<ThreadedProtoMulticastListener<PrimitiveSetMsg>>(
+        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             yellow_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1));
     blue_team_primitive_listener =
-        std::make_unique<ThreadedProtoMulticastListener<PrimitiveSetMsg>>(
+        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             blue_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
 }
 
 void StandaloneSimulator::setupInitialSimulationState()
 {
-    RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0), Angle::zero(),
+    RobotState blue_robot_state1(Point(3, 2.5), Vector(0, 0), Angle::half(),
                                  AngularVelocity::zero());
-    RobotState blue_robot_state2(Point(-2, 1), Vector(0, 0), Angle::quarter(),
+    RobotState blue_robot_state2(Point(3, 1.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state3(Point(3, 0.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state4(Point(3, -0.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state5(Point(3, -1.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state6(Point(3, -2.5), Vector(0, 0), Angle::half(),
                                  AngularVelocity::zero());
     std::vector<RobotStateWithId> blue_robot_states = {
-        RobotStateWithId{.id = 1, .robot_state = blue_robot_state1},
-        RobotStateWithId{.id = 2, .robot_state = blue_robot_state2},
+        RobotStateWithId{.id = 0, .robot_state = blue_robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = blue_robot_state2},
+        RobotStateWithId{.id = 2, .robot_state = blue_robot_state3},
+        RobotStateWithId{.id = 3, .robot_state = blue_robot_state4},
+        RobotStateWithId{.id = 4, .robot_state = blue_robot_state5},
+        RobotStateWithId{.id = 5, .robot_state = blue_robot_state6},
     };
     simulator.addBlueRobots(blue_robot_states);
 
-    RobotState yellow_robot_state1(Point(1, 1.5), Vector(0, 0), Angle::half(),
+    RobotState yellow_robot_state1(Point(-3, 2.5), Vector(0, 0), Angle::zero(),
                                    AngularVelocity::zero());
-    RobotState yellow_robot_state2(Point(2.5, -1), Vector(0, 0), Angle::threeQuarter(),
+    RobotState yellow_robot_state2(Point(-3, 1.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state3(Point(-3, 0.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state4(Point(-3, -0.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state5(Point(-3, -1.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state6(Point(-3, -2.5), Vector(0, 0), Angle::zero(),
                                    AngularVelocity::zero());
     std::vector<RobotStateWithId> yellow_robot_states = {
-        RobotStateWithId{.id = 1, .robot_state = yellow_robot_state1},
-        RobotStateWithId{.id = 2, .robot_state = yellow_robot_state2},
+        RobotStateWithId{.id = 0, .robot_state = yellow_robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = yellow_robot_state2},
+        RobotStateWithId{.id = 2, .robot_state = yellow_robot_state3},
+        RobotStateWithId{.id = 3, .robot_state = yellow_robot_state4},
+        RobotStateWithId{.id = 4, .robot_state = yellow_robot_state5},
+        RobotStateWithId{.id = 5, .robot_state = yellow_robot_state6},
     };
     simulator.addYellowRobots(yellow_robot_states);
 }
 
-void StandaloneSimulator::setYellowRobotPrimitives(PrimitiveSetMsg msg)
+SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
 {
-    for (const auto& primitive : msg.robot_primitives())
+    std::scoped_lock lock(most_recent_ssl_wrapper_packet_mutex);
+    return most_recent_ssl_wrapper_packet;
+}
+
+void StandaloneSimulator::setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg)
+{
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        RobotId id                               = primitive.first;
-        auto [primitive_index, primitive_params] = decodePrimitiveMsg(primitive.second);
-        simulator.setYellowRobotPrimitive(id, primitive_index, primitive_params);
+        RobotId id                 = primitive_set_msg.robot_primitives[i].key;
+        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
+        simulator.setYellowRobotPrimitive(id, primitive_msg);
     }
 }
 
-void StandaloneSimulator::setBlueRobotPrimitives(PrimitiveSetMsg msg)
+void StandaloneSimulator::setBlueRobotPrimitives(PrimitiveSetMsg primitive_set_msg)
 {
-    for (const auto& primitive : msg.robot_primitives())
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        RobotId id                               = primitive.first;
-        auto [primitive_index, primitive_params] = decodePrimitiveMsg(primitive.second);
-        simulator.setBlueRobotPrimitive(id, primitive_index, primitive_params);
+        RobotId id                 = primitive_set_msg.robot_primitives[i].key;
+        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
+        simulator.setBlueRobotPrimitive(id, primitive_msg);
     }
 }
 
-std::pair<unsigned int, primitive_params_t> StandaloneSimulator::decodePrimitiveMsg(
-    const PrimitiveMsg& msg)
+void StandaloneSimulator::startSimulation()
 {
-    auto primitive_index = static_cast<unsigned int>(msg.prim_type());
+    simulator.startSimulation();
+}
 
-    primitive_params_t params;
-    params.params[0] = static_cast<uint16_t>(msg.parameter1());
-    params.params[1] = static_cast<uint16_t>(msg.parameter2());
-    params.params[2] = static_cast<uint16_t>(msg.parameter3());
-    params.params[3] = static_cast<uint16_t>(msg.parameter4());
-    params.extra     = static_cast<uint8_t>(msg.extra_bits());
-    params.slow      = msg.slow();
+void StandaloneSimulator::stopSimulation()
+{
+    simulator.stopSimulation();
+}
 
-    return std::make_pair(primitive_index, params);
+void StandaloneSimulator::setSlowMotionMultiplier(double multiplier)
+{
+    simulator.setSlowMotionMultiplier(multiplier);
+}
+
+void StandaloneSimulator::resetSlowMotionMultiplier()
+{
+    simulator.resetSlowMotionMultiplier();
+}
+
+void StandaloneSimulator::setBallState(const BallState& state)
+{
+    simulator.setBallState(state);
+}
+
+std::weak_ptr<PhysicsRobot> StandaloneSimulator::getRobotAtPosition(const Point& position)
+{
+    return simulator.getRobotAtPosition(position);
 }

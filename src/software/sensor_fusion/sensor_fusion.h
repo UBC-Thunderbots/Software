@@ -23,6 +23,11 @@
 class SensorFusion
 {
    public:
+    /**
+     * Creates a SensorFusion with a sensor_fusion_config
+     *
+     * @param sensor_fusion_config the config to fetch parameters from
+     */
     explicit SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
 
     virtual ~SensorFusion() = default;

@@ -8,8 +8,6 @@ cc_library(
     hdrs = ["threaded_full_system_gui.h"],
     deps = [
         "//software/ai/hl/stp:play_info",
-        "//software/backend:robot_status",
-        "//software/geom",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:world",
         "//software/gui/full_system/widgets:full_system_gui",

@@ -35,17 +35,17 @@ class SSLGeometryTest : public ::testing::Test
                         field_segment.thickness());
 
         auto segment_eq =
-            equalWithinTolerance(segment.getSegStart(), field_segment.p1(), tolerance) &&
+            equalWithinTolerance(segment.getStart(), field_segment.p1(), tolerance) &&
             equalWithinTolerance(segment.getEnd(), field_segment.p2(), tolerance);
         auto reversed_segment_eq =
             equalWithinTolerance(segment.getEnd(), field_segment.p1(), tolerance) &&
-            equalWithinTolerance(segment.getSegStart(), field_segment.p2(), tolerance);
+            equalWithinTolerance(segment.getStart(), field_segment.p2(), tolerance);
 
         if (!segment_eq && !reversed_segment_eq)
         {
             return ::testing::AssertionFailure()
                    << "LineSegments not equal. Expected segment with points "
-                   << segment.getSegStart() << ", " << segment.getEnd()
+                   << segment.getStart() << ", " << segment.getEnd()
                    << " but got segment points (" << field_segment.p1().x() << ", "
                    << field_segment.p1().y() << "), (" << field_segment.p2().x() << ", "
                    << field_segment.p2().y() << ")";
@@ -117,13 +117,13 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_nonexistent_name)
     auto segment_1_p1 = std::make_unique<Vector2f>();
     segment_1_p1->set_x(1.0);
     segment_1_p1->set_y(2.0);
-    segment_1->set_allocated_p1(segment_1_p1.release());
-    auto segment_1_p2 = std::make_unique<Vector2f>();
+    *(segment_1->mutable_p1()) = *segment_1_p1;
+    auto segment_1_p2          = std::make_unique<Vector2f>();
     segment_1_p2->set_x(2.0);
     segment_1_p2->set_y(2.5);
-    segment_1->set_allocated_p2(segment_1_p2.release());
+    *(segment_1->mutable_p2()) = *segment_1_p2;
     segment_1->set_thickness(0.01f);
-    segments.AddAllocated(segment_1.release());
+    *(segments.Add()) = *segment_1;
 
     auto result = findLineSegment(segments, SSLFieldLines::CENTER_LINE);
     EXPECT_FALSE(result);
@@ -138,26 +138,26 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_valid_name)
     auto segment_1_p1 = std::make_unique<Vector2f>();
     segment_1_p1->set_x(1.0);
     segment_1_p1->set_y(2.0);
-    segment_1->set_allocated_p1(segment_1_p1.release());
-    auto segment_1_p2 = std::make_unique<Vector2f>();
+    *(segment_1->mutable_p1()) = *segment_1_p1;
+    auto segment_1_p2          = std::make_unique<Vector2f>();
     segment_1_p2->set_x(2.0);
     segment_1_p2->set_y(2.5);
-    segment_1->set_allocated_p2(segment_1_p2.release());
+    *(segment_1->mutable_p2()) = *segment_1_p2;
     segment_1->set_thickness(0.01f);
-    segments.AddAllocated(segment_1.release());
+    *(segments.Add()) = *segment_1;
 
     auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
     segment_2->set_name("BottomTouchLine");
     auto segment_2_p1 = std::make_unique<Vector2f>();
     segment_2_p1->set_x(1.0);
     segment_2_p1->set_y(2.0);
-    segment_2->set_allocated_p1(segment_2_p1.release());
-    auto segment_2_p2 = std::make_unique<Vector2f>();
+    *(segment_2->mutable_p1()) = *segment_2_p1;
+    auto segment_2_p2          = std::make_unique<Vector2f>();
     segment_2_p2->set_x(2.0);
     segment_2_p2->set_y(2.5);
-    segment_2->set_allocated_p2(segment_2_p2.release());
+    *(segment_2->mutable_p2()) = *segment_2_p2;
     segment_2->set_thickness(0.01f);
-    segments.AddAllocated(segment_2.release());
+    *(segments.Add()) = *segment_2;
 
     auto result = findLineSegment(segments, SSLFieldLines::NEG_Y_FIELD_LINE);
     ASSERT_TRUE(result);
@@ -173,26 +173,26 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_duplicate_names)
     auto segment_1_p1 = std::make_unique<Vector2f>();
     segment_1_p1->set_x(1.0);
     segment_1_p1->set_y(2.0);
-    segment_1->set_allocated_p1(segment_1_p1.release());
-    auto segment_1_p2 = std::make_unique<Vector2f>();
+    *(segment_1->mutable_p1()) = *segment_1_p1;
+    auto segment_1_p2          = std::make_unique<Vector2f>();
     segment_1_p2->set_x(2.0);
     segment_1_p2->set_y(2.5);
-    segment_1->set_allocated_p2(segment_1_p2.release());
+    *(segment_1->mutable_p2()) = *segment_1_p2;
     segment_1->set_thickness(0.01f);
-    segments.AddAllocated(segment_1.release());
+    *(segments.Add()) = *segment_1;
 
     auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
     segment_2->set_name("TopTouchLine");
     auto segment_2_p1 = std::make_unique<Vector2f>();
     segment_2_p1->set_x(5.0);
     segment_2_p1->set_y(5.0);
-    segment_2->set_allocated_p1(segment_2_p1.release());
-    auto segment_2_p2 = std::make_unique<Vector2f>();
+    *(segment_2->mutable_p1()) = *segment_2_p1;
+    auto segment_2_p2          = std::make_unique<Vector2f>();
     segment_2_p2->set_x(5.0);
     segment_2_p2->set_y(6.0);
-    segment_2->set_allocated_p2(segment_2_p2.release());
+    *(segment_2->mutable_p2()) = *segment_2_p2;
     segment_2->set_thickness(0.05f);
-    segments.AddAllocated(segment_2.release());
+    *(segments.Add()) = *segment_2;
 
     auto result = findLineSegment(segments, SSLFieldLines::POS_Y_FIELD_LINE);
     ASSERT_TRUE(result);
@@ -218,12 +218,12 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_nonexistent_name)
     auto arc_1_center = std::make_unique<Vector2f>();
     arc_1_center->set_x(1.0);
     arc_1_center->set_y(2.0);
-    arc_1->set_allocated_center(arc_1_center.release());
+    *(arc_1->mutable_center()) = *arc_1_center;
     arc_1->set_radius(0.5);
     arc_1->set_a1(0.0);
     arc_1->set_a2(5.0);
     arc_1->set_thickness(0.01f);
-    arcs.AddAllocated(arc_1.release());
+    *(arcs.Add()) = *arc_1;
 
     auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
     EXPECT_FALSE(result);
@@ -238,24 +238,24 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_valid_name)
     auto arc_1_center = std::make_unique<Vector2f>();
     arc_1_center->set_x(1.0);
     arc_1_center->set_y(2.0);
-    arc_1->set_allocated_center(arc_1_center.release());
+    *(arc_1->mutable_center()) = *arc_1_center;
     arc_1->set_radius(0.5);
     arc_1->set_a1(0.0);
     arc_1->set_a2(5.0);
     arc_1->set_thickness(0.01f);
-    arcs.AddAllocated(arc_1.release());
+    *(arcs.Add()) = *arc_1;
 
     auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
     arc_2->set_name("CenterCircle");
     auto arc_2_center = std::make_unique<Vector2f>();
     arc_2_center->set_x(1.0);
     arc_2_center->set_y(2.0);
-    arc_2->set_allocated_center(arc_2_center.release());
+    *(arc_2->mutable_center()) = *arc_2_center;
     arc_2->set_radius(0.5);
     arc_2->set_a1(0.0);
     arc_2->set_a2(5.0);
     arc_2->set_thickness(0.01f);
-    arcs.AddAllocated(arc_2.release());
+    *(arcs.Add()) = *arc_2;
 
     auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
     ASSERT_TRUE(result);
@@ -271,24 +271,24 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_duplicate_names)
     auto arc_1_center = std::make_unique<Vector2f>();
     arc_1_center->set_x(1.0);
     arc_1_center->set_y(2.0);
-    arc_1->set_allocated_center(arc_1_center.release());
+    *(arc_1->mutable_center()) = *arc_1_center;
     arc_1->set_radius(0.5);
     arc_1->set_a1(0.0);
     arc_1->set_a2(5.0);
     arc_1->set_thickness(0.01f);
-    arcs.AddAllocated(arc_1.release());
+    *(arcs.Add()) = *arc_1;
 
     auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
     arc_2->set_name("CenterCircle");
     auto arc_2_center = std::make_unique<Vector2f>();
     arc_2_center->set_x(-2.0);
     arc_2_center->set_y(3.0);
-    arc_2->set_allocated_center(arc_2_center.release());
+    *(arc_2->mutable_center()) = *arc_2_center;
     arc_2->set_radius(0.2f);
     arc_2->set_a1(0.5);
     arc_2->set_a2(3.0);
     arc_2->set_thickness(0.5);
-    arcs.AddAllocated(arc_2.release());
+    *(arcs.Add()) = *arc_2;
 
     auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
     ASSERT_TRUE(result);
@@ -321,7 +321,7 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_valid_values)
     EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
                     field_line_msg->thickness());
     EXPECT_TRUE(
-        equalWithinTolerance(segment.getSegStart(), field_line_msg->p1(), tolerance));
+        equalWithinTolerance(segment.getStart(), field_line_msg->p1(), tolerance));
     EXPECT_TRUE(equalWithinTolerance(segment.getEnd(), field_line_msg->p2(), tolerance));
     EXPECT_EQ(SSL_FieldShapeType::CenterLine, field_line_msg->type());
 }

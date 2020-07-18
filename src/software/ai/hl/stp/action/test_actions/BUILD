@@ -9,6 +9,5 @@ cc_library(
         "//software/ai/hl/stp/action",
         "//software/ai/hl/stp/action:mutable_action_visitor",
         "//software/ai/intent:move_intent",
-        "//software/geom",
     ],
 )

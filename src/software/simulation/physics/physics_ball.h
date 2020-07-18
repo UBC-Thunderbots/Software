@@ -4,8 +4,8 @@
 
 #include <optional>
 
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
 #include "software/world/ball_state.h"
 
 /**
@@ -23,10 +23,12 @@ class PhysicsBall
      * @param world A shared_ptr to a Box2D World
      * @param ball_state The initial state of the ball
      * @param mass_kg The mass of the ball in kg
-     * @param gravity The acceleration due to gravity on the ball, in m/s^2
+     * @param restitution The restitution of the ball
+     * @param linear_damping The linear damping of the ball
      */
     explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
-                         const double mass_kg, const double gravity);
+                         const double mass_kg, double restitution = 1.0,
+                         double linear_damping = 0.0);
 
     PhysicsBall() = delete;
 
@@ -64,28 +66,31 @@ class PhysicsBall
     Vector velocity() const;
 
     /**
-     * Kicks the ball in the direction of the given vector, and applies a change in
-     * velocity equal to the magnitude of the vector.
+     * Returns the momentum of the ball, in kg*m/s
      *
-     * @param kick_vector The kick vector to apply
+     * @return the momentum of the ball, in kg*m/s
      */
-    void kick(Vector kick_vector);
+    Vector momentum() const;
 
     /**
-     * Chips the ball in the direction of the given vector. The isInFlight() function will
-     * return true until the ball has travelled a distance equal to the magnitude of the
-     * vector from its current location when this function is called.
+     * Returns the mass of the ball in kg
      *
-     * @param chip_vector The chip_vector to apply
+     * @return the mass of the ball in kg
      */
-    void chip(const Vector& chip_vector);
+    float massKg() const;
 
     /**
-     * Returns true if the ball is currently in flight / a chip is in progress,
-     * and false otherwise
+     * Marks the ball as "in flight" until it has travelled the given distance
+     * from its current location.
      *
-     * @return true if the ball is currently in flight / a chip is in progress,
-     * and false otherwise
+     * @param in_flight_distance The distance for which the ball will be in flight
+     */
+    void setInFlightForDistance(double in_flight_distance);
+
+    /**
+     * Returns true if the ball is currently in flight, and false otherwise
+     *
+     * @return true if the ball is currently in flight, and false otherwise
      */
     bool isInFlight();
 
@@ -116,19 +121,19 @@ class PhysicsBall
     // Bodies, and Fixtures
     b2Body* ball_body;
 
-    // The gravity acting on this ball, pulling it towards the ground
-    const double gravity;
-    // If the ball is currently being chipped, the chip_origin holds the point
-    // where the chip was started from
-    std::optional<Point> chip_origin;
-    // The distance of the most recent chip
-    double chip_distance_meters;
+    // If the ball is currently in flight, the in_flight_origin holds the point
+    // where the ball initially became in flight
+    std::optional<Point> in_flight_origin;
+    double in_flight_distance_meters;
+    // friction with other objects, such as robots/wall
+    static constexpr double BALL_FRICTION = 0.0;
 
-    // These restitution and friction values are somewhat arbitrary. Because this is an
-    // "ideal" simulation, we can approximate the ball as having perfectly elastic
-    // collisions and no friction. Because we also do not generally depend on specific
-    // behaviour when the ball collides with something, getting these values to perfectly
-    // match reality isn't too important.
-    const double ball_restitution = 1.0;
-    const double ball_friction    = 0.0;
+    // The restitution is the amount of energy retained when bouncing off walls and
+    // robots, 0.0 means perfectly inelastic and 1.0 means perfectly elastic collision.
+    // The linear damping determines how the linear motion of the ball decreases over
+    // time, 0.0 means no damping and the damping increases as linear_damping increases.
+    // Linear Damping link:
+    // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
+    const double ball_restitution;
+    const double ball_linear_damping;
 };

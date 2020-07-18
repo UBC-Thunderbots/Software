@@ -24,15 +24,6 @@ void RobotStatusTable::updateTbotsRobotMsg(const TbotsRobotMsg& tbots_robot_msg)
     updateTableView();
 }
 
-void RobotStatusTable::updateRobotStatus(const RobotStatus& robot_status)
-{
-    for (const auto& message : robot_status.robot_messages)
-    {
-        updateStatusMessageString(message);
-    }
-    updateTableView();
-}
-
 void RobotStatusTable::updateStatusMessageString(const std::string& message)
 {
     auto iter = status_messages.find(message);
@@ -70,7 +61,7 @@ void RobotStatusTable::removeOldStatusMessages()
         auto age = iter->second;
         if (age > message_expiry_age)
         {
-            status_messages.erase(iter);
+            status_messages.erase(iter++);
         }
         else
         {

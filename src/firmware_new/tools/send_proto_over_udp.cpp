@@ -67,13 +67,13 @@ int main(int argc, char* argv[])
     auto status_listener =
         std::make_unique<ThreadedProtoMulticastListener<TbotsRobotMsg>>(
             std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
-            ROBOT_STATUS_PORT, &callback);
+            ROBOT_STATUS_PORT, std::function(callback));
 
     while (1)
     {
         // primitive and vision sender
         primitive_sender->sendProto(test_primitive_msg);
-        test_vision_msg.set_allocated_time_sent(createCurrentTimestampMsg().release());
+        *(test_vision_msg.mutable_time_sent()) = *createCurrentTimestampMsg();
         vision_sender->sendProto(test_vision_msg);
 
         // 100 hz test

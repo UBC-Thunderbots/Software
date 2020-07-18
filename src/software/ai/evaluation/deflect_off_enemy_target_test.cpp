@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "software/geom/util.h"
 #include "software/test_util/test_util.h"
 
 
