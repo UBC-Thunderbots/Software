@@ -40,9 +40,13 @@ message MovePrimitiveMsg
     PointMsg destination                = 1;
     AngleMsg final_angle                = 2;
     float final_speed_meters_per_second = 3;
-    AutochickMsg autochick_msg          = 4;
-    float dribbler_speed_rpm            = 5;
-    bool slow                           = 6;
+    oneof autochick_msg
+    {
+        ChipCommandMsg chip_command = 4;
+        KickCommandMsg kick_command = 5;
+    }
+    float dribbler_speed_rpm = 6;
+    bool slow                = 7;
 }
 
 message StopPrimitiveMsg
@@ -57,9 +61,13 @@ message StopPrimitiveMsg
 
 message ShootPrimitiveMsg
 {
-    PointMsg shoot_origin      = 1;
-    AngleMsg shoot_direction   = 2;
-    AutochickMsg autochick_msg = 3;
+    PointMsg shoot_origin    = 1;
+    AngleMsg shoot_direction = 2;
+    oneof autochick_msg
+    {
+        ChipCommandMsg chip_command = 3;
+        KickCommandMsg kick_command = 4;
+    }
 }
 
 message MoveSpinPrimitiveMsg
@@ -72,15 +80,6 @@ message MoveSpinPrimitiveMsg
 
 message DirectRobotControlPrimitiveMsg
 {
-    enum ChickMode
-    {
-        NONE     = 0;
-        KICK     = 1;
-        CHIP     = 2;
-        AUTOKICK = 3;
-        AUTOCHIP = 4;
-    }
-
     enum ChargeMode
     {
         DISCHARGE = 0;
@@ -107,27 +106,23 @@ message DirectRobotControlPrimitiveMsg
         DirectPerWheelControlMsg direct_per_wheel_control = 1;
         DirectVelocityControlMsg direct_velocity_control  = 2;
     }
-    float dribbler_speed_rpm = 3;
-    ChargeMode charge_mode   = 4;
-    float charge_level_volts = 5;
-    ChickMode chick_mode     = 6;
+    ChargeMode charge_mode = 3;
+    oneof chick_command
+    {
+        KickCommandMsg kick_command     = 4;
+        ChipCommandMsg chip_command     = 5;
+        KickCommandMsg autokick_command = 6;
+        ChipCommandMsg autochip_command = 7;
+    }
+    float dribbler_speed_rpm = 8;
 }
 
-message AutochickMsg
+message KickCommandMsg
 {
-    message KickCommandMsg
-    {
-        float kick_speed_meters_per_second = 1;
-    }
+    float kick_speed_meters_per_second = 1;
+}
 
-    message ChipCommandMsg
-    {
-        float chip_distance_meters = 1;
-    }
-
-    oneof chick_param
-    {
-        ChipCommandMsg chip_command = 1;
-        KickCommandMsg kick_command = 2;
-    }
+message ChipCommandMsg
+{
+    float chip_distance_meters = 1;
 }
