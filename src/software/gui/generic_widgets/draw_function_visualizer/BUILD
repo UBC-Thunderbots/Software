@@ -8,10 +8,11 @@ qt_cc_library(
     hdr = "draw_function_visualizer.h",
     deps = [
         ":zoomable_qgraphics_view",
+        "//software/geom:rectangle",
         "//software/gui:geometry_conversion",
         "//software/gui/drawing:colors",
         "//software/gui/drawing:draw_functions",
-        "//software/new_geom:rectangle",
+        "//software/logger",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ],

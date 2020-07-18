@@ -1,6 +1,5 @@
 #include "software/ai/passing/pass.h"
 
-#include "software/geom/util.h"
 
 Pass::Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
            Timestamp pass_start_time)

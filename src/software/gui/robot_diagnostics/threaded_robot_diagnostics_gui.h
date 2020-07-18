@@ -6,10 +6,10 @@
 #include <future>
 #include <thread>
 
+#include "software/geom/rectangle.h"
 #include "software/gui/robot_diagnostics/widgets/robot_diagnostics_gui.h"
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/multithreading/threaded_observer.h"
-#include "software/new_geom/rectangle.h"
 #include "software/primitive/primitive.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"

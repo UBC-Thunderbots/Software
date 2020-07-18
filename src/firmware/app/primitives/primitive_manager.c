@@ -17,9 +17,7 @@
 
 #include "firmware/app/primitives/direct_velocity_primitive.h"
 #include "firmware/app/primitives/direct_wheels_primitive.h"
-#include "firmware/app/primitives/dribble_primitive.h"
 #include "firmware/app/primitives/move_primitive.h"
-#include "firmware/app/primitives/pivot_primitive.h"
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/primitives/shoot_primitive.h"
 #include "firmware/app/primitives/spin_primitive.h"
@@ -129,22 +127,10 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
             app_stop_primitive_start(primitive_msg.primitive.stop,
                                      manager->current_primitive_state, world);
             break;
-        case PrimitiveMsg_dribble_tag:
-            manager->current_primitive       = &DRIBBLE_PRIMITIVE;
-            manager->current_primitive_state = manager->current_primitive->create_state();
-            app_dribble_primitive_start(primitive_msg.primitive.dribble,
-                                        manager->current_primitive_state, world);
-            break;
         case PrimitiveMsg_shoot_tag:
             manager->current_primitive       = &SHOOT_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_shoot_primitive_start(primitive_msg.primitive.shoot,
-                                      manager->current_primitive_state, world);
-            break;
-        case PrimitiveMsg_pivot_tag:
-            manager->current_primitive       = &PIVOT_PRIMITIVE;
-            manager->current_primitive_state = manager->current_primitive->create_state();
-            app_pivot_primitive_start(primitive_msg.primitive.pivot,
                                       manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_spin_tag:
