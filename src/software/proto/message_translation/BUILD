@@ -34,10 +34,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//shared/proto:tbots_cc_proto",
-        "//software/new_geom:angle",
-        "//software/new_geom:angular_velocity",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
     ],
 )
 

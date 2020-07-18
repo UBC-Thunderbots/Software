@@ -1,9 +1,9 @@
 #pragma once
 
 #include "shared/proto/geometry.pb.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/angular_velocity.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/angular_velocity.h"
+#include "software/geom/point.h"
 
 /**
  * Internal geometry types to protobuf msg conversions
