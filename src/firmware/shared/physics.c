@@ -21,7 +21,7 @@ static const float force4_to_force3_mat[3][4] = {{-0.8192f, -0.7071f, 0.7071f, 0
 
 // Transformation matricies to convert a 4 velocity to
 // a 3 velocity (derived as pinv(force4_to_force3^t)
-// this is also the shared_matrix_transpose of force3_to_force4 mat
+// this is also the transpose of force3_to_force4 mat
 static const float speed4_to_speed3_mat[3][4] = {{-0.3498f, -0.3019f, 0.3019f, 0.3498f},
                                                  {0.3904f, -0.3904f, -0.3904f, 0.3904f},
                                                  {0.2761f, 0.2239f, 0.2239f, 0.2761f}};
