@@ -25,6 +25,8 @@ cc_library(
     hdrs = ["direct_velocity_intent.h"],
     deps = [
         ":intent",
+        "//software/geom:angle",
+        "//software/geom:point",
         "//software/primitive:direct_velocity_primitive",
     ],
 )
@@ -58,25 +60,6 @@ cc_test(
 )
 
 cc_library(
-    name = "dribble_intent",
-    srcs = ["dribble_intent.cpp"],
-    hdrs = ["dribble_intent.h"],
-    deps = [
-        ":intent",
-        "//software/primitive:dribble_primitive",
-    ],
-)
-
-cc_test(
-    name = "dribble_intent_test",
-    srcs = ["dribble_intent_test.cpp"],
-    deps = [
-        ":dribble_intent",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "kick_intent",
     srcs = ["kick_intent.cpp"],
     hdrs = ["kick_intent.h"],
@@ -101,6 +84,8 @@ cc_library(
     hdrs = ["move_intent.h"],
     deps = [
         ":intent",
+        "//software/geom:angle",
+        "//software/geom:point",
         "//software/primitive:move_primitive",
     ],
 )
@@ -134,25 +119,6 @@ cc_test(
 )
 
 cc_library(
-    name = "pivot_intent",
-    srcs = ["pivot_intent.cpp"],
-    hdrs = ["pivot_intent.h"],
-    deps = [
-        ":intent",
-        "//software/primitive:pivot_primitive",
-    ],
-)
-
-cc_test(
-    name = "pivot_intent_test",
-    srcs = ["pivot_intent_test.cpp"],
-    deps = [
-        ":pivot_intent",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "stop_intent",
     srcs = ["stop_intent.cpp"],
     hdrs = ["stop_intent.h"],
@@ -178,11 +144,9 @@ cc_library(
         ":chip_intent",
         ":direct_velocity_intent",
         ":direct_wheels_intent",
-        ":dribble_intent",
         ":kick_intent",
         ":move_intent",
         ":movespin_intent",
-        ":pivot_intent",
         ":stop_intent",
     ],
 )

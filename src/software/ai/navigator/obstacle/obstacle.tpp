@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/new_geom/util/contains.h"
+#include "software/geom/algorithms/contains.h"
 
 template <typename GEOM_TYPE>
 GeomObstacle<GEOM_TYPE>::GeomObstacle(const GEOM_TYPE& geom) : geom_(geom)

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "shared/constants.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/angular_velocity.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
+#include "software/geom/angle.h"
+#include "software/geom/angular_velocity.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
 
 using RobotId = unsigned int;
 

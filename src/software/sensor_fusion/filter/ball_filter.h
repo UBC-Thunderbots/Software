@@ -3,8 +3,8 @@
 #include <boost/circular_buffer.hpp>
 #include <optional>
 
-#include "software/new_geom/line.h"
-#include "software/new_geom/point.h"
+#include "software/geom/line.h"
+#include "software/geom/point.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"

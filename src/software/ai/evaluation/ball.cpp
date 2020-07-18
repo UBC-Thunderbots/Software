@@ -1,6 +1,6 @@
 #include "software/ai/evaluation/ball.h"
 
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
 
 bool ballInFriendlyHalf(const Field &field, const Ball &ball)
 {

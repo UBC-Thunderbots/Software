@@ -5,7 +5,6 @@ cc_library(
     srcs = ["threaded_robot_diagnostics_gui.cpp"],
     hdrs = ["threaded_robot_diagnostics_gui.h"],
     deps = [
-        "//software/geom",
         "//software/gui/robot_diagnostics/widgets:robot_diagnostics_gui",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",

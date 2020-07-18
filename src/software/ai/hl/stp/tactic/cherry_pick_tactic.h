@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/new_geom/rectangle.h"
+#include "software/geom/rectangle.h"
 #include "software/world/world.h"
 
 /**
