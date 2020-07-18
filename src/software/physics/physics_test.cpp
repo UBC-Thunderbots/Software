@@ -15,7 +15,8 @@ TEST(PhysicsUtilTest, test_future_position_opposing_acceleration)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_p,
-        calculateFuturePosition(initial_position, initial_velocity, acceleration, 1.0),
+        calculateFuturePosition(initial_position, initial_velocity, acceleration,
+                                Duration::fromSeconds(1.0)),
         0.001));
 }
 
@@ -29,7 +30,10 @@ TEST(PhysicsUtilTest, test_future_velocity_opposing_acceleration)
     Vector expected_v(0, 0);
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_v, calculateFutureVelocity(initial_velocity, acceleration, 1.0), 0.001));
+        expected_v,
+        calculateFutureVelocity(initial_velocity, acceleration,
+                                Duration::fromSeconds(1.0)),
+        0.001));
 }
 
 TEST(PhysicsUtilTest, test_future_position_supporting_acceleration)
@@ -43,7 +47,8 @@ TEST(PhysicsUtilTest, test_future_position_supporting_acceleration)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_p,
-        calculateFuturePosition(initial_position, initial_velocity, acceleration, 0.5),
+        calculateFuturePosition(initial_position, initial_velocity, acceleration,
+                                Duration::fromSeconds(0.5)),
         0.001));
 }
 
@@ -57,7 +62,10 @@ TEST(PhysicsUtilTest, test_future_velocity_supporting_acceleration)
     Vector expected_v(1.5, -3);
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_v, calculateFutureVelocity(initial_velocity, acceleration, 0.5), 0.001));
+        expected_v,
+        calculateFutureVelocity(initial_velocity, acceleration,
+                                Duration::fromSeconds(0.5)),
+        0.001));
 }
 
 TEST(PhysicsUtilTest, test_future_position_sideways_acceleration)
@@ -71,7 +79,8 @@ TEST(PhysicsUtilTest, test_future_position_sideways_acceleration)
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_p,
-        calculateFuturePosition(initial_position, initial_velocity, acceleration, 2.5),
+        calculateFuturePosition(initial_position, initial_velocity, acceleration,
+                                Duration::fromSeconds(2.5)),
         0.001));
 }
 
@@ -85,5 +94,8 @@ TEST(PhysicsUtilTest, test_future_velocity_sideways_acceleration)
     Vector expected_v(11.5, 3);
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        expected_v, calculateFutureVelocity(initial_velocity, acceleration, 2.5), 0.001));
+        expected_v,
+        calculateFutureVelocity(initial_velocity, acceleration,
+                                Duration::fromSeconds(2.5)),
+        0.001));
 }

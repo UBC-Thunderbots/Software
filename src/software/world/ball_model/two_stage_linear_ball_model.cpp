@@ -68,14 +68,13 @@ BallState TwoStageLinearBallModel::calculateFutureBallState(
     const double constant_friction_acceleration_m_per_s,
     const Duration &duration_in_future) const
 {
-    const double seconds_in_future = duration_in_future.getSeconds();
     const Vector acceleration_vector =
         initial_ball_state.velocity().normalize(-constant_friction_acceleration_m_per_s);
     const Point future_position = calculateFuturePosition(
         initial_ball_state.position(), initial_ball_state.velocity(), acceleration_vector,
-        seconds_in_future);
+        duration_in_future);
     const Vector future_velocity = calculateFutureVelocity(
-        initial_ball_state.velocity(), acceleration_vector, seconds_in_future);
+        initial_ball_state.velocity(), acceleration_vector, duration_in_future);
 
     return BallState(future_position, future_velocity);
 }
