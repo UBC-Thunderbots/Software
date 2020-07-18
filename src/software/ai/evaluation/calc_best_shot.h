@@ -2,8 +2,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/shot.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/segment.h"
+#include "software/geom/point.h"
+#include "software/geom/segment.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"

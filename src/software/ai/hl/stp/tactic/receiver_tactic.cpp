@@ -3,10 +3,9 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
+#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/util/acute_angle.h"
-#include "software/new_geom/util/closest_point.h"
 
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
                                const Team& enemy_team, const Pass pass, const Ball& ball,
@@ -128,9 +127,9 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         while ((ball.position() - robot->position()).length() >
                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
-            Point ball_receive_pos = closestPointOnLine(
-                robot->position(),
-                Line(ball.position(), ball.position() + ball.velocity()));
+            Point ball_receive_pos =
+                closestPoint(robot->position(),
+                             Line(ball.position(), ball.position() + ball.velocity()));
             Angle ball_receive_orientation =
                 (ball.position() - robot->position()).orientation();
 
@@ -221,7 +220,7 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
         Vector::createFromAngle(robot.orientation()).normalize(dist_to_ball_in_dribbler);
 
     // Find the closest point to the ball contact point on the ball's trajectory
-    Point closest_ball_pos = closestPointOnLine(
+    Point closest_ball_pos = closestPoint(
         ball_contact_point, Line(ball.position(), ball.position() + ball.velocity()));
     Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
 

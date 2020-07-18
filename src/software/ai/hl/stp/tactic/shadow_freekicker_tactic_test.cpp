@@ -4,9 +4,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/util.h"
-#include "software/new_geom/line.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/line.h"
 #include "software/test_util/test_util.h"
 
 class ShadowFreekickerTacticTest : public testing::Test
