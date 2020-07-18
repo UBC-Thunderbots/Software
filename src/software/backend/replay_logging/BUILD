@@ -7,7 +7,6 @@ cc_library(
         "replay_logger.h",
     ],
     deps = [
-        "//software/geom",
         "//software/multithreading:threaded_observer",
         "//software/proto:replay_msg_cc_proto",
         "//software/proto:sensor_msg_cc_proto",
@@ -23,7 +22,6 @@ cc_library(
         "replay_reader.h",
     ],
     deps = [
-        "//software/geom",
         "//software/proto:replay_msg_cc_proto",
         "//software/proto:sensor_msg_cc_proto",
         "//software/time:timestamp",
