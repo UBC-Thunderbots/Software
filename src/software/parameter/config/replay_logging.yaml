@@ -1,0 +1,9 @@
+ReplayLoggingConfig:
+  RecordReplay:
+    default: true
+    type: "bool"
+    description: "Whether we should be logging incoming data for replay"
+  ReplayPath:
+    default: "/tmp/thunderbots_replay"
+    type: "std::string"
+    description: "The directory we will create replay output directories in"

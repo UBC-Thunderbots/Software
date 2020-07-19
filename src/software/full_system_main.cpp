@@ -1,10 +1,13 @@
 #include <boost/program_options.hpp>
+#include <experimental/filesystem>
 #include <iostream>
+#include <iomanip>
 #include <numeric>
 
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
+#include "software/backend/replay_logging/replay_logger.h"
 #include "software/constants.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
@@ -32,6 +35,8 @@ std::string BANNER =
 "   /,'                                                                                                                    /,'       \n"
 "  /'                                                                                                                     /'          \n";
 // clang-format on
+
+namespace fs = std::experimental::filesystem;
 
 /**
  * Parses arguments and indicates which arguments were received
@@ -111,6 +116,8 @@ int main(int argc, char **argv)
             DynamicParameters->getAIControlConfig();
         std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
             DynamicParameters->getSensorFusionConfig();
+        std::shared_ptr<const ReplayLoggingConfig> replay_logging_config =
+            DynamicParameters->getReplayLoggingConfig();
 
         // TODO remove this when we move to non-generic factories for backends
         // https://github.com/UBC-Thunderbots/Software/issues/1452
@@ -131,6 +138,27 @@ int main(int argc, char **argv)
         ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
         sensor_fusion->Subject<World>::registerObserver(ai);
         backend->Subject<SensorMsg>::registerObserver(sensor_fusion);
+
+        if (replay_logging_config->RecordReplay()->value()) {
+            fs::path replay_parent_dir(
+                replay_logging_config->ReplayPath()->value());
+            if (!fs::exists(replay_parent_dir)) {
+                fs::create_directories(replay_parent_dir);
+            }
+
+            // read the current local time and put it in a string so we can use it
+            // as a directory name
+            std::stringstream replay_dir_name_stream;
+            std::time_t now_time = std::chrono::system_clock::to_time_t(
+                std::chrono::system_clock::now());
+            std::tm now_time_tm = *std::localtime(&now_time);
+            replay_dir_name_stream << std::put_time(&now_time_tm, "%Y%m%d_%H%M%S");
+
+            fs::path replay_dir = replay_parent_dir / replay_dir_name_stream.str();
+            auto replay_logger_ptr = std::make_shared<ReplayLogger>(replay_dir);
+            backend->Subject<SensorMsg>::registerObserver(replay_logger_ptr);
+        }
+
         if (!args.headless)
         {
             visualizer = std::make_shared<ThreadedFullSystemGUI>();
