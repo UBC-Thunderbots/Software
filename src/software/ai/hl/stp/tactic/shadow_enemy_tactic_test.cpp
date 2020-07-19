@@ -37,7 +37,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
                                                Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == NONE);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::NONE);
 }
 
 TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
@@ -77,7 +77,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
                                                Point(0, 0.2), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::quarter()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == NONE);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::NONE);
 }
 
 
@@ -114,7 +114,7 @@ TEST(ShadowEnemyTacticTest,
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (ball.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
 }
 
 TEST(
@@ -150,5 +150,5 @@ TEST(
                                                Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == NONE);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::NONE);
 }

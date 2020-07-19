@@ -1,7 +1,3 @@
-/**
- * This file contains the unit tests for the MoveSpinPrimitive class
- */
-
 #include "software/primitive/direct_wheels_primitive.h"
 
 #include <gtest/gtest.h>

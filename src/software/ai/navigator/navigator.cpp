@@ -195,7 +195,7 @@ std::unique_ptr<Primitive> Navigator::getPrimitiveFromPathAndMoveIntent(
             // slow down around enemy robots
             desired_final_speed *
                 getEnemyObstacleProximityFactor(path_points[1], world.enemyTeam()),
-            intent.getDribblerEnable(), intent.getMoveType(), intent.getAutoKickType());
+            intent.getDribblerEnable(), intent.getMoveType(), intent.getAutochickType());
     }
     else
     {

@@ -177,7 +177,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
             move_action->updateControlParams(
                 *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
             yield(move_action);
         }
         else
