@@ -1,7 +1,3 @@
-/**
- * This file contains the unit tests for the ChipPrimitive class
- */
-
 #include "software/primitive/chip_primitive.h"
 
 #include <gtest/gtest.h>

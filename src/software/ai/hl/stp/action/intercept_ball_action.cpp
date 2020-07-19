@@ -119,7 +119,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(std::make_unique<MoveIntent>(
                 robot->id(), point_ball_leaves_field.value(),
                 (ball.position() - robot->position()).orientation(), 0, 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::ALLOW));
         }
         else
@@ -131,7 +131,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(std::make_unique<MoveIntent>(
                 robot->id(), ball.position(),
                 (ball.position() - robot->position()).orientation(), 0, 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::ALLOW));
         }
     } while (!robotHasPossession(ball.getPreviousStates(), robot->getPreviousStates()));
@@ -153,7 +153,7 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
         yield(std::make_unique<MoveIntent>(
             robot->id(), ball.position(),
             (ball.position() - robot->position()).orientation(), FINAL_SPEED_AT_SLOW_BALL,
-            0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+            0, DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
             BallCollisionType::ALLOW));
     }
     else if (robot_on_ball_line)
@@ -167,13 +167,13 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
         yield(std::make_unique<MoveIntent>(
             robot->id(), point_to_meet_ball,
             (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON,
-            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
     }
     else
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), closest_point_on_ball_trajectory,
             (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON,
-            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
     }
 }

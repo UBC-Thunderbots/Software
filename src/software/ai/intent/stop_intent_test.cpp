@@ -1,7 +1,3 @@
-/**
- * This file contains unit tests for the Stop Intent class
- */
-
 #include "software/ai/intent/stop_intent.h"
 
 #include <gtest/gtest.h>

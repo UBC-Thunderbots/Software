@@ -52,7 +52,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
         move_action->updateControlParams(*robot, wait_position, pass.passerOrientation(),
                                          0, DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutokickType::NONE, BallCollisionType::ALLOW);
+                                         AutochickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
     }
 

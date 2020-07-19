@@ -42,7 +42,7 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         move_action->updateControlParams(*robot, pass.receiverPoint(),
                                          pass.receiverOrientation(), 0,
                                          DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutokickType::NONE, BallCollisionType::AVOID);
+                                         AutochickType::NONE, BallCollisionType::AVOID);
         yield(move_action);
     } while (true);
 }

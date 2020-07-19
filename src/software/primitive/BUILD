@@ -87,6 +87,7 @@ cc_library(
         ":primitive",
         "//software/geom:angle",
         "//software/geom:point",
+        "//software/util/make_enum",
     ],
 )
 

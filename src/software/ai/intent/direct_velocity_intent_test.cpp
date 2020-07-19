@@ -1,7 +1,3 @@
-/**
- * This file contains unit tests for the DirectVelocity Intent class
- */
-
 #include "software/ai/intent/direct_velocity_intent.h"
 
 #include <gtest/gtest.h>

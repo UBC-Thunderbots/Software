@@ -183,7 +183,7 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // The default behaviour is to move behind the ball and face the net
             move_action->updateControlParams(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::ALLOW);
             yield(move_action);
         }

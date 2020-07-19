@@ -1,7 +1,3 @@
-/**
- * This file contains the unit tests for the DirectVelocityPrimitive class
- */
-
 #include "software/primitive/direct_velocity_primitive.h"
 
 #include <gtest/gtest.h>

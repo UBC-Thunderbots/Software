@@ -190,7 +190,7 @@ cc_test(
 cc_library(
     name = "robot_capabilities",
     hdrs = ["robot_capabilities.h"],
-    deps = [],
+    deps = ["//software/util/make_enum"],
 )
 
 cc_test(

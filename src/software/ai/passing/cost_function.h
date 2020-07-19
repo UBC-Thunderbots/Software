@@ -4,18 +4,17 @@
 
 #include "software/ai/passing/pass.h"
 #include "software/math/math_functions.h"
+#include "software/util/make_enum/make_enum.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
 
 // The types of passes we can perform
-enum PassType
-{
-    // Receive the pass and keep possession by just dribbling it
-    RECEIVE_AND_DRIBBLE,
-    // One-touch shot where the receiving robot immediately takes a shot on net
-    ONE_TOUCH_SHOT,
-};
+MAKE_ENUM(PassType,
+          // Receive the pass and keep possession by just dribbling it
+          RECEIVE_AND_DRIBBLE,
+          // One-touch shot where the receiving robot immediately takes a shot on net
+          ONE_TOUCH_SHOT, );
 
 /**
  * Calculate the quality of a given pass
