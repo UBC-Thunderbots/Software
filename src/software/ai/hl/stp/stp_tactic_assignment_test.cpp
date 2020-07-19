@@ -374,6 +374,8 @@ TEST_F(STPTacticAssignmentTest,
     // this robot has no capabilities
     Robot robot_0(0, Point(0.1, 0.1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0), 10, allRobotCapabilities());
+    // TODO robot_0 needs move for stop tactic?
+    // TODO it does because all tactics do
     Robot robot_1(1, Point(-10, -10), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
@@ -384,7 +386,6 @@ TEST_F(STPTacticAssignmentTest,
     move_tactic_1->updateControlParams(Point(0, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
-
 
     stp.assignRobotsToTactics(world, tactics);
 
