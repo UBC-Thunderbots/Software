@@ -51,9 +51,31 @@ cc_library(
 )
 
 cc_library(
+    name = "replay_backend",
+    srcs = ["replay_backend.cpp"],
+    hdrs = ["replay_backend.h"],
+    deps = [
+        ":backend",
+        ":ssl_proto_client",
+        "//shared:constants",
+        "//software:constants",
+        "//software/backend/replay_logging:replay_reader",
+        "//software/networking:threaded_proto_multicast_listener",
+        "//software/networking:threaded_proto_multicast_sender",
+        "//software/proto/message_translation:tbots_protobuf",
+        "//software/util/design_patterns:generic_factory",
+    ],
+    # We force linking so that the static variables required for the "factory"
+    # design pattern to work are linked in
+    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+    alwayslink = True,
+)
+
+cc_library(
     name = "all_backends",
     deps = [
         ":radio_backend",
+        ":replay_backend",
         ":wifi_backend",
     ],
 )
