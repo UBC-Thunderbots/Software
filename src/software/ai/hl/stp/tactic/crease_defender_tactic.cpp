@@ -14,7 +14,7 @@
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,
     const Team &enemy_team, CreaseDefenderTactic::LeftOrRight left_or_right)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       field(field),
       ball(ball),
       friendly_team(friendly_team),

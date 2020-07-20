@@ -17,7 +17,7 @@
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       ball(ball),
       field(field),
       friendly_team(friendly_team),

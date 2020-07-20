@@ -118,7 +118,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     std::vector<std::unique_ptr<Intent>> intents;
     if (current_tactics)
     {
-        assignRobotsToTactics(world, *current_tactics);
+        assignRobotsToTactics(world, &(*current_tactics));
 
         ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
         TacticWorldParamsUpdateVisitor tactic_world_params_update_visitor(world);
@@ -169,7 +169,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 }
 
 void STP::assignRobotsToTactics(const World& world,
-                                std::vector<std::shared_ptr<Tactic>> tactics) const
+                                std::vector<std::shared_ptr<Tactic>>* tactics) const
 {
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
@@ -196,45 +196,36 @@ void STP::assignRobotsToTactics(const World& world,
             std::find(non_goalie_robots.begin(), non_goalie_robots.end(), *goalie));
 
         // Assign the goalie to the first goalie tactic
-        auto iter = std::find_if(tactics.begin(), tactics.end(), isGoalieTactic);
-        if (iter != tactics.end())
+        auto iter = std::find_if(tactics->begin(), tactics->end(), isGoalieTactic);
+        if (iter != tactics->end())
         {
             (*iter)->updateRobot(*goalie);
         }
     }
-    std::cout << "Tactics Size: " << tactics.size() << std::endl;
-    std::cout << "Non-Goalie Size: " << non_goalie_robots.size() << std::endl;
 
     // Discard all goalie tactics, since we have already assigned the goalie robot (if
     // there is one) to the first goalie tactic, and there should only ever be one goalie
-    tactics.erase(std::remove_if(tactics.begin(), tactics.end(), isGoalieTactic),
-                  tactics.end());
+    tactics->erase(std::remove_if(tactics->begin(), tactics->end(), isGoalieTactic),
+                   tactics->end());
 
-    if (non_goalie_robots.size() < tactics.size())
+    if (non_goalie_robots.size() < tactics->size())
     {
         // We do not have enough robots to assign all the tactics to. We "drop"
         // (aka don't assign) the tactics at the end of the vector since they are
         // considered lower priority
-        tactics.resize(non_goalie_robots.size());
+        tactics->resize(non_goalie_robots.size());
     }
     else
     {
-        std::cout << "Adding StopTactics" << std::endl;
         // Assign rest of robots with StopTactic
-        for (auto i = tactics.size(); i < non_goalie_robots.size(); i++)
+        for (auto i = tactics->size(); i < non_goalie_robots.size(); i++)
         {
-            tactics.push_back(std::make_shared<StopTactic>(false));
+            tactics->push_back(std::make_shared<StopTactic>(false));
         }
     }
 
-    std::cout << "Printing Tactics in tactic queue" << std::endl;
-    for (auto tactic : tactics)
-    {
-        std::cout << tactic->getName() << std::endl;
-    }
-
     size_t num_rows = non_goalie_robots.size();
-    size_t num_cols = tactics.size();
+    size_t num_cols = tactics->size();
 
     // The Matrix constructor will assert if the rows and columns of the matrix are
     // not >= 1, so we perform that check first and return an empty vector of tactics.
@@ -255,7 +246,7 @@ void STP::assignRobotsToTactics(const World& world,
         {
             Robot robot = non_goalie_robots.at(row);
 
-            std::shared_ptr<Tactic>& tactic = tactics.at(col);
+            std::shared_ptr<Tactic>& tactic = tactics->at(col);
             double robot_cost_for_tactic    = tactic->calculateRobotCost(robot, world);
 
             std::set<RobotCapability> required_capabilities =
@@ -293,18 +284,14 @@ void STP::assignRobotsToTactics(const World& world,
     //        -1, 0,-1,         and            0,-1,
     //         0,-1,-1,                       -1, 0,
     //        -1,-1, 0,
-    std::cout << "MATRIX of " << num_rows << " and " << num_cols << std::endl;
     for (size_t row = 0; row < num_rows; row++)
     {
         for (size_t col = 0; col < num_cols; col++)
         {
             auto val = matrix(row, col);
-            std::cout << val << " at (" << row << ", " << col << ")" << std::endl;
             if (val == 0)
             {
-                tactics.at(col)->updateRobot(non_goalie_robots.at(row));
-                std::cout << tactics.at(col)->getName() << std::endl;
-                std::cout << tactics.at(col)->getAssignedRobot().has_value() << std::endl;
+                tactics->at(col)->updateRobot(non_goalie_robots.at(row));
                 break;
             }
         }

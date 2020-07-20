@@ -9,7 +9,7 @@
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
                                                Team enemy_team, Ball ball, Field field,
                                                bool loop_forever)
-    : Tactic(loop_forever),
+    : Tactic(loop_forever, {RobotCapability::Move}),
       free_kick_shadower(free_kick_shadower),
       enemy_team(enemy_team),
       ball(ball),
