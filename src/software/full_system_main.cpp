@@ -19,6 +19,7 @@ struct commandLineArgs
     bool help                          = false;
     std::string backend_name           = "";
     std::string network_interface_name = "";
+    std::string replay_path = "";
     bool headless                      = false;
     bool err                           = false;
 };
@@ -62,6 +63,9 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     std::string interface_help_str =
         "The interface to send and receive packets over (can be found through ifconfig)";
 
+    std::string replay_dir_help_str =
+        "The sensor msg log directory to playback";
+
     boost::program_options::options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
                        "Help screen");
@@ -73,6 +77,10 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
         "interface",
         boost::program_options::value<std::string>(&args.network_interface_name),
         interface_help_str.c_str());
+    desc.add_options()(
+        "replay_path",
+        boost::program_options::value<std::string>(&args.replay_path),
+        replay_dir_help_str.c_str());
     desc.add_options()("headless", boost::program_options::bool_switch(&args.headless),
                        "Run without the FullSystemGUI");
 
@@ -118,6 +126,8 @@ int main(int argc, char **argv)
             DynamicParameters->getSensorFusionConfig();
         std::shared_ptr<const ReplayLoggingConfig> replay_logging_config =
             DynamicParameters->getReplayLoggingConfig();
+        std::shared_ptr<const ReplayBackendConfig> replay_backend_config =
+            DynamicParameters->getReplayBackendConfig();
 
         // TODO remove this when we move to non-generic factories for backends
         // https://github.com/UBC-Thunderbots/Software/issues/1452
@@ -126,6 +136,20 @@ int main(int argc, char **argv)
             MutableDynamicParameters->getMutableNetworkConfig()
                 ->mutableNetworkInterface()
                 ->setValue(args.network_interface_name);
+        }
+
+        // if the replay backend is selected, check that the replay directory is set
+        // and set the parameter from the command line option before the ReplayBackend
+        // is constructed
+        if (args.backend_name == "replay") {
+            if (args.replay_path.empty()) {
+                throw std::invalid_argument("No replay directory given! Please give a "
+                                            "replay directory to playback with the "
+                                            "--replay_path parameter");
+            }
+
+            MutableDynamicParameters->getMutableReplayBackendConfig()
+                ->mutableReplayPath()->setValue(args.replay_path);
         }
 
         std::shared_ptr<Backend> backend =
@@ -139,6 +163,7 @@ int main(int argc, char **argv)
         sensor_fusion->Subject<World>::registerObserver(ai);
         backend->Subject<SensorMsg>::registerObserver(sensor_fusion);
 
+        // create a directory in /tmp to store replays if the parameter is set
         if (replay_logging_config->RecordReplay()->value()) {
             fs::path replay_parent_dir(
                 replay_logging_config->ReplayPath()->value());
