@@ -374,8 +374,6 @@ TEST_F(STPTacticAssignmentTest,
     // this robot has no capabilities
     Robot robot_0(0, Point(0.1, 0.1), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0), 10, allRobotCapabilities());
-    // TODO robot_0 needs move for stop tactic?
-    // TODO it does because all tactics do
     Robot robot_1(1, Point(-10, -10), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
@@ -388,6 +386,12 @@ TEST_F(STPTacticAssignmentTest,
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
     stp.assignRobotsToTactics(world, tactics);
+
+    std::cout << "Printing Tactics" << std::endl;
+    for (auto tactic : tactics)
+    {
+        std::cout << tactic->getName() << std::endl;
+    }
 
     ASSERT_TRUE(move_tactic_1->getAssignedRobot().has_value());
     EXPECT_EQ(move_tactic_1->getAssignedRobot().value(), robot_1);
@@ -478,4 +482,28 @@ TEST_F(STPTacticAssignmentTest,
     ASSERT_TRUE(goalie_tactic_1->getAssignedRobot().has_value());
     EXPECT_FALSE(goalie_tactic_2->getAssignedRobot().has_value());
     EXPECT_EQ(goalie_tactic_1->getAssignedRobot().value(), robot_0);
+}
+
+TEST_F(STPTacticAssignmentTest,
+       test_assigning_stop_tactics_to_non_assigned_non_goalie_robots)
+{
+    Team friendly_team(Duration::fromSeconds(0));
+    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_1(1, Point(-3, 5), Vector(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_2(2, Point(6, 7), Vector(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1, robot_2});
+    world.updateFriendlyTeamState(friendly_team);
+
+    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+
+    move_tactic_1->updateControlParams(Point(-1, 0));
+
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
+
+    stp.assignRobotsToTactics(world, tactics);
+
+    EXPECT_TRUE(move_tactic_1->getAssignedRobot().has_value());
 }

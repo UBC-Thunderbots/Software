@@ -202,7 +202,8 @@ void STP::assignRobotsToTactics(const World& world,
             (*iter)->updateRobot(*goalie);
         }
     }
-    std::cout << tactics.size() << std::endl;
+    std::cout << "Tactics Size: " << tactics.size() << std::endl;
+    std::cout << "Non-Goalie Size: " << non_goalie_robots.size() << std::endl;
 
     // Discard all goalie tactics, since we have already assigned the goalie robot (if
     // there is one) to the first goalie tactic, and there should only ever be one goalie
@@ -218,6 +219,7 @@ void STP::assignRobotsToTactics(const World& world,
     }
     else
     {
+        std::cout << "Adding StopTactics" << std::endl;
         // Assign rest of robots with StopTactic
         for (auto i = tactics.size(); i < non_goalie_robots.size(); i++)
         {
@@ -225,13 +227,11 @@ void STP::assignRobotsToTactics(const World& world,
         }
     }
 
+    std::cout << "Printing Tactics in tactic queue" << std::endl;
     for (auto tactic : tactics)
     {
         std::cout << tactic->getName() << std::endl;
     }
-
-    std::cout << tactics.size() << std::endl;
-    std::cout << non_goalie_robots.size() << std::endl;
 
     size_t num_rows = non_goalie_robots.size();
     size_t num_cols = tactics.size();
@@ -253,9 +253,7 @@ void STP::assignRobotsToTactics(const World& world,
     {
         for (size_t col = 0; col < num_cols; col++)
         {
-            Robot robot                     = non_goalie_robots.at(row);
-
-            std::cout << "ROBOT ID: " << robot.id() << std::endl;
+            Robot robot = non_goalie_robots.at(row);
 
             std::shared_ptr<Tactic>& tactic = tactics.at(col);
             double robot_cost_for_tactic    = tactic->calculateRobotCost(robot, world);
@@ -269,29 +267,16 @@ void STP::assignRobotsToTactics(const World& world,
                 required_capabilities.begin(), required_capabilities.end(),
                 robot_capabilities.begin(), robot_capabilities.end(),
                 std::inserter(missing_capabilities, missing_capabilities.begin()));
-            // TODO missing_capabilities for robot_0 and stoptactic isn't working
-            std::cout << tactic->getName() << std::endl;
-            std::cout << missing_capabilities.size() << std::endl;
-            std::cout << "req_cap: " << required_capabilities.size() << std::endl;
-            std::cout << "rob_cap: " << robot_capabilities.size() << std::endl;
-
-            for (auto req : required_capabilities)
-            {
-                std::cout << "req_cap requires: " << static_cast<int>(req) << std::endl;
-            }
 
             if (missing_capabilities.size() > 0)
             {
-                std::cout << "REQ NOT MET" << std::endl;
                 matrix(row, col) = robot_cost_for_tactic + 10.0f;
             }
             else
             {
-                std::cout << "REQ MET" << std::endl;
                 // capability requirements are satisfied, use real cost
                 matrix(row, col) = robot_cost_for_tactic;
             }
-            std::cout << "----" << std::endl;
         }
     }
 
@@ -318,6 +303,8 @@ void STP::assignRobotsToTactics(const World& world,
             if (val == 0)
             {
                 tactics.at(col)->updateRobot(non_goalie_robots.at(row));
+                std::cout << tactics.at(col)->getName() << std::endl;
+                std::cout << tactics.at(col)->getAssignedRobot().has_value() << std::endl;
                 break;
             }
         }
