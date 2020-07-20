@@ -1,0 +1,5 @@
+ReplayBackendConfig:
+  ReplayPath:
+    default: ""
+    type: "std::string"
+    description: "The directory containing the replay that will be played back"
