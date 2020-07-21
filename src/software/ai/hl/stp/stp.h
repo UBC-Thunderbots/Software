@@ -52,7 +52,7 @@ class STP : public HL
      * @param tactics The list of tactics that should be assigned a robot
      */
     void assignRobotsToTactics(const World &world,
-                               std::vector<std::shared_ptr<Tactic>> *tactics) const;
+                               std::vector<std::shared_ptr<Tactic>> &tactics) const;
 
     /**
      * Given the state of the world, returns a unique_ptr to the Play that should be run
