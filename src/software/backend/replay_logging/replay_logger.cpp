@@ -31,9 +31,7 @@ ReplayLogger::ReplayLogger(const std::string& out_dir_path, int _msgs_per_chunk)
                                         " is not empty! Find another directory!");
         }
     }
-
-
-    if (!fs::exists(output_dir_path))
+    else
     {
         fs::create_directory(output_dir_path);
         LOG(INFO) << "Created directory " << output_dir_path;
@@ -51,8 +49,7 @@ ReplayLogger::~ReplayLogger()
 
 void ReplayLogger::onValueReceived(SensorMsg msg)
 {
-    current_chunk.mutable_replay_msgs()->Add();
-    (current_chunk.mutable_replay_msgs()->end() - 1)->CopyFrom(msg);
+    current_chunk.mutable_replay_msgs()->Add(std::move(msg));
     if (current_chunk.replay_msgs_size() >= msgs_per_chunk)
     {
         saveCurrentChunk();
