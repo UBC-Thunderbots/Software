@@ -32,9 +32,9 @@ void Navigator::visit(const MoveIntent &intent)
     current_primitive = std::unique_ptr<Primitive>(nullptr);
 }
 
-void Navigator::visit(const MoveSpinIntent &intent)
+void Navigator::visit(const SpinningMoveIntent &intent)
 {
-    auto p            = std::make_unique<MoveSpinPrimitive>(intent);
+    auto p            = std::make_unique<SpinningMovePrimitive>(intent);
     current_primitive = std::move(p);
     current_robot_id  = intent.getRobotId();
 }

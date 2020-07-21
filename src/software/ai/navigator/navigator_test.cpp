@@ -98,21 +98,22 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
     EXPECT_EQ(expected_primitive, primitive);
 }
 
-TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_spinning_move_intent_to_spinning_move_primitive)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
-        std::make_unique<MoveSpinIntent>(0, Point(), AngularVelocity::full(), 1, 0));
+        std::make_unique<SpinningMoveIntent>(0, Point(), AngularVelocity::full(), 1, 0));
 
     auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
 
-    auto expected_primitive = MoveSpinPrimitive(0, Point(), AngularVelocity::full(), 1);
-    auto primitive          = dynamic_cast<MoveSpinPrimitive &>(*(primitive_ptrs.at(0)));
+    auto expected_primitive =
+        SpinningMovePrimitive(0, Point(), AngularVelocity::full(), 1);
+    auto primitive = dynamic_cast<SpinningMovePrimitive &>(*(primitive_ptrs.at(0)));
     EXPECT_EQ(expected_primitive, primitive);
 }
 

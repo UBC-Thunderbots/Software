@@ -29,7 +29,7 @@ message PrimitiveMsg
         PrimitiveParamsMsg move            = 1;
         PrimitiveParamsMsg stop            = 2;
         PrimitiveParamsMsg shoot           = 3;
-        PrimitiveParamsMsg movespin        = 4;
+        PrimitiveParamsMsg spinning_move   = 4;
         PrimitiveParamsMsg direct_wheels   = 5;
         PrimitiveParamsMsg direct_velocity = 6;
     }

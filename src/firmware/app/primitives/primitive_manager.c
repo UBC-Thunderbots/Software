@@ -18,9 +18,9 @@
 #include "firmware/app/primitives/direct_velocity_primitive.h"
 #include "firmware/app/primitives/direct_wheels_primitive.h"
 #include "firmware/app/primitives/move_primitive.h"
-#include "firmware/app/primitives/movespin_primitive.h"
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/primitives/shoot_primitive.h"
+#include "firmware/app/primitives/spinning_move_primitive.h"
 #include "firmware/app/primitives/stop_primitive.h"
 
 struct PrimitiveManager
@@ -133,11 +133,11 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
             app_shoot_primitive_start(primitive_msg.primitive.shoot,
                                       manager->current_primitive_state, world);
             break;
-        case PrimitiveMsg_movespin_tag:
+        case PrimitiveMsg_spinning_move_tag:
             manager->current_primitive       = &SPIN_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
-            app_movespin_primitive_start(primitive_msg.primitive.movespin,
-                                         manager->current_primitive_state, world);
+            app_spinning_move_primitive_start(primitive_msg.primitive.spinning_move,
+                                              manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_direct_wheels_tag:
             manager->current_primitive       = &DIRECT_WHEELS_PRIMITIVE;

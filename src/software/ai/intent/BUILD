@@ -61,20 +61,20 @@ cc_test(
 )
 
 cc_library(
-    name = "movespin_intent",
-    srcs = ["movespin_intent.cpp"],
-    hdrs = ["movespin_intent.h"],
+    name = "spinning_move_intent",
+    srcs = ["spinning_move_intent.cpp"],
+    hdrs = ["spinning_move_intent.h"],
     deps = [
         ":intent",
-        "//software/primitive:movespin_primitive",
+        "//software/primitive:spinning_move_primitive",
     ],
 )
 
 cc_test(
-    name = "movespin_intent_test",
-    srcs = ["movespin_intent_test.cpp"],
+    name = "spinning_move_intent_test",
+    srcs = ["spinning_move_intent_test.cpp"],
     deps = [
-        ":movespin_intent",
+        ":spinning_move_intent",
         "@gtest//:gtest_main",
     ],
 )
@@ -105,7 +105,7 @@ cc_library(
         ":chip_intent",
         ":kick_intent",
         ":move_intent",
-        ":movespin_intent",
+        ":spinning_move_intent",
         ":stop_intent",
     ],
 )
