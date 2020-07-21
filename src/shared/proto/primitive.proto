@@ -35,18 +35,31 @@ message PrimitiveMsg
     }
 }
 
-message MovePrimitiveMsg
+message SpinningMovePrimitiveMsg
 {
-    PointMsg destination                = 1;
-    AngleMsg final_angle                = 2;
-    float final_speed_meters_per_second = 3;
-    oneof autochick_msg
-    {
-        ChipCommandMsg chip_command = 4;
-        KickCommandMsg kick_command = 5;
-    }
-    float dribbler_speed_rpm = 6;
-    bool slow                = 7;
+    PositionTrajectory position_trajectory = 1;
+    AngularVelocityMsg angular_velocity    = 2;
+}
+
+message AutochipMovePrimitiveMsg
+{
+    PositionTrajectory position_trajectory = 1;
+    AngleMsg final_angle                   = 2;
+    float chip_distance_meters             = 3;
+}
+
+message AutokickMovePrimitiveMsg
+{
+    PositionTrajectory position_trajectory = 1;
+    AngleMsg final_angle                   = 2;
+    float kick_speed_meters_per_second     = 3;
+}
+
+message DribbleMovePrimitiveMsg
+{
+    PositionTrajectory position_trajectory = 1;
+    AngleMsg final_angle                   = 2;
+    float dribbler_speed_rpm               = 3;
 }
 
 message StopPrimitiveMsg
@@ -59,23 +72,18 @@ message StopPrimitiveMsg
     StopTypeMsg stop_type = 1;
 }
 
-message ShootPrimitiveMsg
+message AlignAndChipPrimitiveMSg
 {
-    PointMsg shoot_origin    = 1;
-    AngleMsg shoot_direction = 2;
-    oneof autochick_msg
-    {
-        ChipCommandMsg chip_command = 3;
-        KickCommandMsg kick_command = 4;
-    }
+    PointMsg chip_origin       = 1;
+    AngleMsg chip_direction    = 2;
+    float chip_distance_meters = 3;
 }
 
-message MoveSpinPrimitiveMsg
+message AlignAndKickPrimitiveMSg
 {
-    PointMsg destination                = 1;
-    AngularVelocityMsg angular_velocity = 2;
-    float final_speed_meters_per_second = 3;
-    bool slow                           = 4;
+    PointMsg kick_origin       = 1;
+    AngleMsg kick_direction    = 2;
+    float chip_distance_meters = 3;
 }
 
 message DirectRobotControlPrimitiveMsg
@@ -109,20 +117,17 @@ message DirectRobotControlPrimitiveMsg
     ChargeMode charge_mode = 3;
     oneof chick_command
     {
-        KickCommandMsg kick_command     = 4;
-        ChipCommandMsg chip_command     = 5;
-        KickCommandMsg autokick_command = 6;
-        ChipCommandMsg autochip_command = 7;
+        float kick_speed_meters_per_second     = 4;
+        float chip_distance_meters             = 5;
+        float autokick_speed_meters_per_second = 6;
+        float autochip_distance_meters         = 7;
     }
     float dribbler_speed_rpm = 8;
 }
 
-message KickCommandMsg
+message PositionTrajectory
 {
-    float kick_speed_meters_per_second = 1;
-}
-
-message ChipCommandMsg
-{
-    float chip_distance_meters = 1;
+    PointMsg destination                = 1;
+    float final_speed_meters_per_second = 2;
+    bool slow                           = 3;
 }
