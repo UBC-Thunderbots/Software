@@ -27,29 +27,24 @@ TEST(MatrixTest, matrixMultiplication)
 {
     Matrix_t* matrix = shared_matrix_create(3, 4);
 
-    shared_matrix_setValueAtIndex(1, 1, 1, matrix);
-    shared_matrix_setValueAtIndex(1, 2, 2, matrix);
-    shared_matrix_setValueAtIndex(1, 3, 3, matrix);
-    shared_matrix_setValueAtIndex(1, 4, 4, matrix);
-    shared_matrix_setValueAtIndex(2, 1, 5, matrix);
-    shared_matrix_setValueAtIndex(2, 2, 6, matrix);
-    shared_matrix_setValueAtIndex(2, 3, 7, matrix);
-    shared_matrix_setValueAtIndex(2, 4, 8, matrix);
-    shared_matrix_setValueAtIndex(3, 1, 9, matrix);
-    shared_matrix_setValueAtIndex(3, 2, 10, matrix);
-    shared_matrix_setValueAtIndex(3, 3, 11, matrix);
-    shared_matrix_setValueAtIndex(3, 4, 12, matrix);
+    float row1[4] = {1, 2, 3, 4};
+    float row2[4] = {5, 6, 7, 8};
+    float row3[4] = {9, 10, 11, 12};
+
+    shared_matrix_insertRow(1, row1, 4, matrix);
+    shared_matrix_insertRow(2, row2, 4, matrix);
+    shared_matrix_insertRow(3, row3, 4, matrix);
 
     Matrix_t* matrix2 = shared_matrix_create(4, 2);
-    shared_matrix_setValueAtIndex(1, 1, 13, matrix2);
-    shared_matrix_setValueAtIndex(1, 2, 14, matrix2);
-    shared_matrix_setValueAtIndex(2, 1, 15, matrix2);
-    shared_matrix_setValueAtIndex(2, 2, 16, matrix2);
-    shared_matrix_setValueAtIndex(3, 1, 17, matrix2);
-    shared_matrix_setValueAtIndex(3, 2, 18, matrix2);
-    shared_matrix_setValueAtIndex(4, 1, 19, matrix2);
-    shared_matrix_setValueAtIndex(4, 2, 20, matrix2);
 
+    float mat2_row1[2] = {13, 14};
+    float mat2_row2[2] = {15, 16};
+    float mat2_row3[2] = {17, 18};
+    float mat2_row4[2] = {19, 20};
+    shared_matrix_insertRow(1, mat2_row1, 2, matrix2);
+    shared_matrix_insertRow(2, mat2_row2, 2, matrix2);
+    shared_matrix_insertRow(3, mat2_row3, 2, matrix2);
+    shared_matrix_insertRow(4, mat2_row4, 2, matrix2);
     Matrix_t* result = shared_matrix_multiply(matrix, matrix2);
 
     EXPECT_EQ(shared_matrix_getValueAtIndex(1, 1, result), 170);
@@ -64,17 +59,40 @@ TEST(MatrixTest, matrixMultiplication)
     shared_matrix_destroy(result);
 }
 
+TEST(MatrixTest, testCreateMatrixFromValues)
+{
+    float matrix_values[3][4] = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+
+    float* p_values[] = {matrix_values[0], matrix_values[1], matrix_values[2],
+                         matrix_values[3]};
+
+    Matrix_t* matrix = shared_matrix_createMatrixFromValues(p_values, 3, 4);
+
+    EXPECT_EQ(shared_matrix_getValueAtIndex(1, 1, matrix), 1);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(1, 2, matrix), 2);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(1, 3, matrix), 3);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(1, 4, matrix), 4);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(2, 1, matrix), 5);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(2, 2, matrix), 6);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(2, 3, matrix), 7);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(2, 4, matrix), 8);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(3, 1, matrix), 9);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(3, 2, matrix), 10);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(3, 3, matrix), 11);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(3, 4, matrix), 12);
+
+    shared_matrix_destroy(matrix);
+}
+
 TEST(MatrixTest, transposeMatrix)
 {
     Matrix_t* matrix = shared_matrix_create(2, 3);
 
-    shared_matrix_setValueAtIndex(1, 1, 1, matrix);
-    shared_matrix_setValueAtIndex(1, 2, 2, matrix);
-    shared_matrix_setValueAtIndex(1, 3, 3, matrix);
-    shared_matrix_setValueAtIndex(2, 1, 4, matrix);
-    shared_matrix_setValueAtIndex(2, 2, 5, matrix);
-    shared_matrix_setValueAtIndex(2, 3, 6, matrix);
+    float row1[3] = {1, 2, 3};
+    float row2[3] = {4, 5, 6};
 
+    shared_matrix_insertRow(1, row1, 3, matrix);
+    shared_matrix_insertRow(2, row2, 3, matrix);
     Matrix_t* transpose = shared_matrix_transpose(matrix);
 
     EXPECT_EQ(shared_matrix_getValueAtIndex(1, 1, transpose), 1.0f);
@@ -85,5 +103,31 @@ TEST(MatrixTest, transposeMatrix)
     EXPECT_EQ(shared_matrix_getValueAtIndex(3, 2, transpose), 6.0f);
 
     shared_matrix_destroy(transpose);
+    shared_matrix_destroy(matrix);
+}
+
+TEST(MatrixTest, getColumnsAndRows)
+{
+    Matrix_t* matrix = shared_matrix_create(2, 3);
+
+    EXPECT_EQ(shared_matrix_getNumRows(matrix), 2);
+    EXPECT_EQ(shared_matrix_getNumColumns(matrix), 3);
+
+    shared_matrix_destroy(matrix);
+}
+
+TEST(MatrixTest, setRow)
+{
+    unsigned int num_rows    = 2;
+    unsigned int num_columns = 3;
+
+    float row[] = {4, 5, 6};
+
+    Matrix_t* matrix = shared_matrix_create(2, 3);
+    shared_matrix_insertRow(2, row, num_columns, matrix);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(num_rows, 1, matrix), 4);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(num_rows, 2, matrix), 5);
+    EXPECT_EQ(shared_matrix_getValueAtIndex(num_rows, 3, matrix), 6);
+
     shared_matrix_destroy(matrix);
 }

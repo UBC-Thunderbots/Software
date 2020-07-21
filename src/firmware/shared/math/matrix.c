@@ -20,7 +20,7 @@ Matrix_t* shared_matrix_create(unsigned int n_rows, unsigned int n_cols)
 
     for (unsigned int i = 0; i < n_rows; i++)
     {
-        matrix->rows[i] = (float*)calloc((unsigned)n_cols, sizeof(float));
+        matrix->rows[i] = (float*)calloc(n_cols, sizeof(float));
     }
     return matrix;
 }
@@ -94,4 +94,37 @@ float shared_matrix_getValueAtIndex(unsigned int row, unsigned int column,
     }
 
     return matrix->rows[row - 1][column - 1];
+}
+
+unsigned int shared_matrix_getNumRows(Matrix_t* matrix)
+{
+    return matrix->n_rows;
+}
+
+unsigned int shared_matrix_getNumColumns(Matrix_t* matrix)
+{
+    return matrix->n_cols;
+}
+
+void shared_matrix_insertRow(unsigned int row, float column_values[],
+                             unsigned int num_columns, Matrix_t* matrix)
+{
+    for (unsigned int column = 1; column <= num_columns; column++)
+    {
+        shared_matrix_setValueAtIndex(row, column, column_values[column - 1], matrix);
+    }
+}
+
+Matrix_t* shared_matrix_createMatrixFromValues(float** matrix_values,
+                                               unsigned int num_rows,
+                                               unsigned int num_columns)
+{
+    Matrix_t* matrix = shared_matrix_create(num_rows, num_columns);
+
+    for (unsigned int row = 1; row <= num_rows; row++)
+    {
+        shared_matrix_insertRow(row, matrix_values[row - 1], num_columns, matrix);
+    }
+
+    return matrix;
 }

@@ -10,17 +10,17 @@
  *
  * *******************************************************************
  * NOTE: Then when you are done with the matrix, you will need to call
- * shared_matrix_destroy().
+ * shared_matrix_destroy(matrix).
  * ********************************************************************
  */
 typedef struct Matrix Matrix_t;
 
 /**
- * Gets a matrix of the given size. This uses dynamic memory allocation so make sure to
- * call shared_matrix_destroy when you are done using it if you don't want memory leaks.
+ * Creates a Matrix with the given numbers of rows and columns
  *
  * @param n_rows [in] The number of rows in the matrix
  * @param n_cols [in] The number of columns in the matrix
+ *
  * @return Pointer to the created Matrix
  */
 Matrix_t* shared_matrix_create(unsigned int n_rows, unsigned int n_cols);
@@ -38,6 +38,7 @@ void shared_matrix_destroy(Matrix_t* matrix);
  *
  * @param A [in] the left matrix
  * @param B [in] the right matrix
+ *
  * @return the resulting Matrix from the matrix multiplication
  */
 Matrix_t* shared_matrix_multiply(Matrix_t* A, Matrix_t* B);
@@ -46,6 +47,7 @@ Matrix_t* shared_matrix_multiply(Matrix_t* A, Matrix_t* B);
  * Creates a shared_matrix_transpose of the given in_matrix.
  *
  * @param in_matrix [in] the matrix to shared_matrix_transpose
+ *
  * @return the shared_matrix_transpose of the given matrix
  */
 Matrix_t* shared_matrix_transpose(Matrix_t* in_matrix);
@@ -70,7 +72,6 @@ void shared_matrix_setValueAtIndex(unsigned int row, unsigned int column, float 
  * Function gets the value of the matrix element at the specified row and column, The
  * first row and column are index '1'.
  *
- *
  * @pre row <= the number of rows in the matrix and row >= 1
  * @pre column <= the number of columns in the matrix and column >= 1
  *
@@ -83,3 +84,54 @@ void shared_matrix_setValueAtIndex(unsigned int row, unsigned int column, float 
  */
 float shared_matrix_getValueAtIndex(unsigned int row, unsigned int column,
                                     Matrix_t* matrix);
+
+/**
+ * Function returns the number of rows in a Matrix
+ *
+ * @param matrix [in] The Matrix
+ *
+ * @return The number of rows in the matrix
+ */
+unsigned int shared_matrix_getNumRows(Matrix_t* matrix);
+
+/**
+ * Returns the number of columns in the Matrix
+ *
+ * @param matrix [in] The Matrix
+ *
+ * @return The number of columns in the Matrix
+ */
+unsigned int shared_matrix_getNumColumns(Matrix_t* matrix);
+
+/**
+ * Function inserts a specified row of values into a Matrix
+ *
+ * @pre The number of column values does not exceed the number of columns in the matrix
+ * @pre The specified row number is equal to or less-than the number of rows in the matrix
+ *
+ * @param row [in] The row number to insert. The first row is index '1'
+ * @param column_values [in] The value at each column in the row
+ * @param num_columns [in] The number of columns in the matrix, this should be equal to
+ * the number of elements in column_values
+ * @param matrix [in/out] The Matrix that will be modified in-place to contain the new row
+ * of values
+ */
+void shared_matrix_insertRow(unsigned int row, float column_values[],
+                             unsigned int num_columns, Matrix_t* matrix);
+
+/**
+ * Function creates a Matrix and sets all elements. The dimensions of the Matrix will be
+ * the same as the input array.
+ *
+ * @param matrix_values [in] The 2d array representing the matrix. matrix_values[x][y]
+ * holds the value on the xth row and yth column.
+ *
+ * @param num_rows [in] The number of rows in the matrix
+ *
+ * @param num_columns [in] The number of columns in the matrix
+ *
+ * @return A pointer ot the Matrix
+ */
+Matrix_t* shared_matrix_createMatrixFromValues(float** matrix_values,
+                                               unsigned int num_rows,
+                                               unsigned int num_columns);
