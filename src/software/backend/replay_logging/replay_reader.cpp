@@ -15,42 +15,21 @@ namespace fs = std::experimental::filesystem;
 
 ReplayMsg ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_path)
 {
-    // imagine having to write caveman code to read protobuf msgs from files
-    ReplayMsg msg;
-    int fd = open(file_path.c_str(), O_RDONLY);
-
-    if (fd < 0)
-    {
-        throw std::invalid_argument(std::string("Failed to open() ") +
-                                    file_path.string() + " with error " +
-                                    std::to_string(fd));
-    }
-
-    auto file_input = std::make_unique<google::protobuf::io::FileInputStream>(fd);
+    std::ifstream file_ifstream(file_path, std::ios_base::in | std::ios_base::binary);
+    auto file_input = std::make_unique<google::protobuf::io::IstreamInputStream>(
+        &file_ifstream);
     auto coded_input =
         std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
+
+    ReplayMsg msg;
     bool result = google::protobuf::util::ParseDelimitedFromCodedStream(
-        &msg, coded_input.get(), nullptr);
+        dynamic_cast<google::protobuf::MessageLite*>(&msg), coded_input.get(), nullptr);
     if (!result)
     {
         throw std::invalid_argument("Failed to parse protobuf from file " +
                                     file_path.string());
     }
-    close(fd);
     return msg;
-}
-
-
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T>& set)
-{
-    os << '{';
-    for (const auto& val : set)
-    {
-        os << val << ' ';
-    }
-    os << '}';
-    return os;
 }
 
 ReplayReader::ReplayReader(const std::string& _replay_dir)

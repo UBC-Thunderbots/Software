@@ -18,6 +18,22 @@ class TestThreadedObserver : public LastInFirstOutThreadedObserver<int>
     }
 };
 
+class TestVectorThreadedObserver : public LastInFirstOutThreadedObserver<int>
+{
+   public:
+    TestVectorThreadedObserver() : LastInFirstOutThreadedObserver(10) {}
+
+    std::vector<int> received_values;
+
+   private:
+    void onValueReceived(int i) override
+    {
+        received_values.emplace_back(i);
+        // sleep for a while to ensure that the buffer fills up
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+};
+
 TEST(LastInFirstOutThreadedObserver, receiveValue)
 {
     TestThreadedObserver test_threaded_observer;
@@ -29,6 +45,21 @@ TEST(LastInFirstOutThreadedObserver, receiveValue)
     // The value should have been updated by the thread running
     // in the ThreadedObserver
     EXPECT_EQ(83, test_threaded_observer.received_value);
+}
+
+TEST(LastInFirstOutThreadedObserver, receiveMultipleValuesInOrder)
+{
+    TestVectorThreadedObserver test_vector_threaded_observer;
+    std::vector<int> test_values{1, 2, 3, 4, 5};
+    std::vector<int> expected_values(test_values.rbegin(), test_values.rend());
+
+    for (auto num : test_values) {
+        test_vector_threaded_observer.receiveValue(num);
+    }
+
+    std::this_thread::sleep_for(5s);
+
+    EXPECT_EQ(test_vector_threaded_observer.received_values, expected_values);
 }
 
 TEST(LastInFirstOutThreadedObserver, destructor)

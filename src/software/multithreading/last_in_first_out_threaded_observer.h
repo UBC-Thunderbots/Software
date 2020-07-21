@@ -23,5 +23,5 @@ template <typename T>
 std::optional<T> LastInFirstOutThreadedObserver<T>::getNextValue(
     const Duration& max_wait_time)
 {
-    return this->popLeastRecentlyReceivedValue(max_wait_time);
+    return this->popMostRecentlyReceivedValue(max_wait_time);
 }

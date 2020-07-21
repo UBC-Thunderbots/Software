@@ -1,12 +1,12 @@
 #pragma once
 #include <experimental/filesystem>
 
-#include "software/multithreading/last_in_first_out_threaded_observer.h"
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/proto/replay_msg.pb.h"
 #include "software/proto/sensor_msg.pb.h"
 
 
-class ReplayLogger : public LastInFirstOutThreadedObserver<SensorMsg>
+class ReplayLogger : public FirstInFirstOutThreadedObserver<SensorMsg>
 {
    public:
     /**
@@ -14,11 +14,16 @@ class ReplayLogger : public LastInFirstOutThreadedObserver<SensorMsg>
      * how many individual SensorMsg's go into one replay_logging 'chunk' file.
      * We separate replays into files of a certain number of messages to
      * reduce the amount of lost data in the case of a crash.
-     * @param output_directory The directory that we output replay_logging chunk files to.
+     *
+     * @param output_directory The absolute path of the directory that we output
+     *                         replay_logging chunk files to.
      * @param _msgs_per_chunk number of messages per chunk
      */
     explicit ReplayLogger(const std::string& output_directory,
                           int _msgs_per_chunk = DEFAULT_MSGS_PER_CHUNK);
+
+    // if we allow copying of a `ReplayLogger`, we could end up with 2 `ReplayLogger`s
+    // writing over each other and possibly resulting in lost data
     ReplayLogger(const ReplayLogger&) = delete;
     ~ReplayLogger() override;
 
@@ -26,10 +31,20 @@ class ReplayLogger : public LastInFirstOutThreadedObserver<SensorMsg>
     /**
      * Adds a SensorMsg to the current chunk. This will also save it to disk and
      * clear the chunk in memory.
+     *
      * @param frame a SensorMsg
      */
     void onValueReceived(SensorMsg msg) override;
+
+    /**
+     * Increments the chunk index of the file we are writing to.
+     */
     void nextChunk();
+
+    /**
+     * Saves the current chunk to a file in the output directory with a filename that is
+     * the index of the chunk.
+     */
     void saveCurrentChunk();
 
     static constexpr int DEFAULT_MSGS_PER_CHUNK = 1000;

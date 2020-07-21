@@ -9,7 +9,7 @@
 namespace fs = std::experimental::filesystem;
 
 ReplayLogger::ReplayLogger(const std::string& out_dir_path, int _msgs_per_chunk)
-    : LastInFirstOutThreadedObserver<SensorMsg>(2000),
+    : FirstInFirstOutThreadedObserver<SensorMsg>(2000),
       current_chunk(),
       current_chunk_idx(0),
       output_dir_path(out_dir_path),
