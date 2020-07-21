@@ -78,18 +78,6 @@ class Polynomial2d
 };
 
 /**
- * Compares two Polynomials for equality
- *
- * The two polynomials are equal if both the underlying x and y polynomials are equal
- *
- * @param p1 the first Polynomial2d.
- * @param p2 the second Polynomial2d.
- *
- * @return true if p1 is equal to p2, and false otherwise.
- */
-bool operator==(const Polynomial2d &p1, const Polynomial2d &p2);
-
-/**
  * Adds two Polynomials
  *
  * @param p1 the first Polynomial2d
@@ -100,6 +88,16 @@ bool operator==(const Polynomial2d &p1, const Polynomial2d &p2);
 Polynomial2d operator+(const Polynomial2d &p1, const Polynomial2d &p2);
 
 /**
+ * Subtracts two Polynomials
+ *
+ * @param p1 the first Polynomial2d
+ * @param p2 the second Polynomial2d
+ *
+ * @return the difference of the Polynomials
+ */
+Polynomial2d operator-(const Polynomial2d &p1, const Polynomial2d &p2);
+
+/**
  * Adds a Polynomial2d to another Polynomial2d
  *
  * @param p1 the Polynomial2d to add to.
@@ -108,3 +106,25 @@ Polynomial2d operator+(const Polynomial2d &p1, const Polynomial2d &p2);
  * @return the new Polynomial2d
  */
 Polynomial2d &operator+=(Polynomial2d &p1, const Polynomial2d &p2);
+
+/**
+ * Subtracts a Polynomial2d to another Polynomial2d
+ *
+ * @param p1 the Polynomial2d to subtract from.
+ * @param p2 the Polynomial2d to subtract.
+ *
+ * @return the new Polynomial2d
+ */
+Polynomial2d &operator-=(Polynomial2d &p1, const Polynomial2d &p2);
+
+/**
+ * Compares two Polynomials for equality
+ *
+ * The two polynomials are equal if both the underlying x and y polynomials are equal
+ *
+ * @param p1 the first Polynomial2d.
+ * @param p2 the second Polynomial2d.
+ *
+ * @return true if p1 is equal to p2, and false otherwise.
+ */
+bool operator==(const Polynomial2d &p1, const Polynomial2d &p2);
