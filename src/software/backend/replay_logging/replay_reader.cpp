@@ -4,13 +4,6 @@
 
 #include <fstream>
 
-// unfortunately protobuf forces me to write caveman code
-extern "C"
-{
-#include <fcntl.h>
-#include <unistd.h>
-}
-
 namespace fs = std::experimental::filesystem;
 
 ReplayMsg ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_path)
