@@ -9,8 +9,8 @@ namespace fs = std::experimental::filesystem;
 ReplayMsg ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_path)
 {
     std::ifstream file_ifstream(file_path, std::ios_base::in | std::ios_base::binary);
-    auto file_input = std::make_unique<google::protobuf::io::IstreamInputStream>(
-        &file_ifstream);
+    auto file_input =
+        std::make_unique<google::protobuf::io::IstreamInputStream>(&file_ifstream);
     auto coded_input =
         std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
 

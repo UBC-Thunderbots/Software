@@ -53,7 +53,8 @@ TEST(LastInFirstOutThreadedObserver, receiveMultipleValuesInOrder)
     std::vector<int> test_values{1, 2, 3, 4, 5};
     std::vector<int> expected_values(test_values.rbegin(), test_values.rend());
 
-    for (auto num : test_values) {
+    for (auto num : test_values)
+    {
         test_vector_threaded_observer.receiveValue(num);
     }
 
