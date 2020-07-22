@@ -171,10 +171,10 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
 
     std::unique_ptr<Primitive> blue_move_primitive1 = std::make_unique<MovePrimitive>(
         1, Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::unique_ptr<Primitive> blue_move_primitive2 = std::make_unique<MovePrimitive>(
         2, Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> blue_robot_primitives;
     blue_robot_primitives.emplace_back(std::move(blue_move_primitive1));
     blue_robot_primitives.emplace_back(std::move(blue_move_primitive2));
@@ -185,10 +185,10 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
 
     std::unique_ptr<Primitive> yellow_move_primitive1 = std::make_unique<MovePrimitive>(
         1, Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::unique_ptr<Primitive> yellow_move_primitive2 = std::make_unique<MovePrimitive>(
         2, Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> yellow_robot_primitives;
     yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive1));
     yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive2));
@@ -223,7 +223,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     ASSERT_NE(yellow_robot_1, yellow_robots.end());
     EXPECT_NEAR(1000.0f, yellow_robot_1->x(), 200);
     EXPECT_NEAR(1000.0f, yellow_robot_1->y(), 200);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Angle::zero(), Angle::fromRadians(yellow_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
@@ -233,7 +233,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     ASSERT_NE(yellow_robot_2, yellow_robots.end());
     EXPECT_NEAR(3000.0f, yellow_robot_2->x(), 200);
     EXPECT_NEAR(-2000.0f, yellow_robot_2->y(), 200);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Angle::zero(), Angle::fromRadians(yellow_robot_2->orientation()),
         Angle::fromDegrees(10)));
 
@@ -244,7 +244,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     ASSERT_NE(blue_robot_1, blue_robots.end());
     EXPECT_NEAR(-1000.0f, blue_robot_1->x(), 300);
     EXPECT_NEAR(-1000.0f, blue_robot_1->y(), 300);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Angle::zero(), Angle::fromRadians(blue_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
@@ -254,7 +254,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     ASSERT_NE(blue_robot_2, blue_robots.end());
     EXPECT_NEAR(-3000.0f, blue_robot_2->x(), 300);
     EXPECT_NEAR(0.0f, blue_robot_2->y(), 300);
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
         Angle::half(), Angle::fromRadians(blue_robot_2->orientation()),
         Angle::fromDegrees(10)));
 }

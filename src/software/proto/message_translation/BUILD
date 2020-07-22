@@ -8,9 +8,9 @@ cc_library(
     deps = [
         ":proto_creator_primitive_visitor",
         "//shared/proto:tbots_cc_proto",
-        "//software/new_geom:angle",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:angle",
+        "//software/geom:point",
+        "//software/geom:vector",
         "//software/primitive:all_primitives",
         "//software/primitive:primitive_visitor",
         "//software/world",
@@ -97,7 +97,7 @@ cc_library(
     srcs = ["ssl_referee.cpp"],
     hdrs = ["ssl_referee.h"],
     deps = [
-        "//software/new_geom:point",
+        "//software/geom:point",
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion:refbox_data",
         "//software/world:team_colour",

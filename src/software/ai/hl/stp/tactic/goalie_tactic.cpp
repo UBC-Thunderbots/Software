@@ -5,16 +5,15 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/geom/util.h"
-#include "software/new_geom/line.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/ray.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/calculate_block_cone.h"
-#include "software/new_geom/util/contains.h"
-#include "software/new_geom/util/intersection.h"
+#include "software/geom/algorithms/calculate_block_cone.h"
+#include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/line.h"
+#include "software/geom/point.h"
+#include "software/geom/ray.h"
+#include "software/geom/segment.h"
 #include "software/parameter/dynamic_parameters.h"
-
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team)
@@ -214,13 +213,13 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // the final speed is a dynamic parameter so that if the goalie needs
             // to dive for the shot instead of stop when reaching the intersection
             // point it can do so.
-            Point goalie_pos = closestPointOnSeg(
-                (*robot).position(), Segment(ball.position(), intersections[0]));
+            Point goalie_pos         = closestPoint((*robot).position(),
+                                            Segment(ball.position(), intersections[0]));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             move_action->updateControlParams(
                 *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
             next_action = move_action;
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
@@ -300,7 +299,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
             move_action->updateControlParams(*robot, goalie_pos, goalie_orientation,
                                              goalie_final_speed, DribblerEnable::OFF,
-                                             MoveType::NORMAL, AUTOCHIP,
+                                             MoveType::NORMAL, AutochickType::AUTOCHIP,
                                              BallCollisionType::ALLOW);
             next_action = move_action;
         }

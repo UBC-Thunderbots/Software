@@ -4,7 +4,6 @@
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
 #include "software/logger/logger.h"
 
 PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
@@ -67,7 +66,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
         move_action->updateControlParams(*robot, wait_position, pass.passerOrientation(),
                                          0, DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutokickType::NONE, BallCollisionType::ALLOW);
+                                         AutochickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
     }
 

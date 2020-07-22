@@ -3,9 +3,9 @@
 #include "shared/constants.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/new_geom/polygon.h"
-#include "software/new_geom/triangle.h"
-#include "software/new_geom/util/contains.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/polygon.h"
+#include "software/geom/triangle.h"
 
 ChipAction::ChipAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
 {
@@ -116,9 +116,9 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // If we're not in position to chip, move into position
     if (!robot_behind_ball)
     {
-        yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, chip_direction,
-                                           0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-                                           AutokickType::NONE, BallCollisionType::ALLOW));
+        yield(std::make_unique<MoveIntent>(
+            robot->id(), point_behind_ball, chip_direction, 0.0, 0, DribblerEnable::OFF,
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
     }
     else
     {

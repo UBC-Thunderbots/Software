@@ -1,32 +1,15 @@
-/**
- * This file includes the definition of the MovePrimitive class and it's member functions
- * and data
- */
-
 #pragma once
 
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/primitive/primitive.h"
+#include "software/util/make_enum/make_enum.h"
 
-enum AutokickType
-{
-    NONE,
-    AUTOKICK,
-    AUTOCHIP
-};
+MAKE_ENUM(AutochickType, NONE, AUTOKICK, AUTOCHIP);
 
-enum MoveType
-{
-    NORMAL,
-    SLOW,
-};
+MAKE_ENUM(MoveType, NORMAL, SLOW);
 
-enum DribblerEnable
-{
-    OFF = false,
-    ON  = true,
-};
+MAKE_ENUM(DribblerEnable, OFF, ON);
 
 class MovePrimitive : public Primitive
 {
@@ -52,7 +35,7 @@ class MovePrimitive : public Primitive
     explicit MovePrimitive(unsigned int robot_id, const Point &dest,
                            const Angle &final_angle, double final_speed,
                            DribblerEnable enable_dribbler, MoveType move_type,
-                           AutokickType autokick);
+                           AutochickType autokick);
 
     /**
      * Gets the primitive name
@@ -93,7 +76,7 @@ class MovePrimitive : public Primitive
      *
      * @return whether or not auto-kick should be enabled while moving
      */
-    AutokickType getAutoKickType() const;
+    AutochickType getAutochickType() const;
 
     /**
      * Gets whether or not the dribbler should be enabled while moving
@@ -135,5 +118,5 @@ class MovePrimitive : public Primitive
     double final_speed;
     DribblerEnable enable_dribbler;
     MoveType move_type;
-    AutokickType autokick;
+    AutochickType autokick;
 };

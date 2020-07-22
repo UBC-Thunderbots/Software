@@ -5,14 +5,14 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/util.h"
+#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/ray.h"
 #include "software/logger/logger.h"
 #include "software/new_geom/ray.h"
-#include "software/new_geom/util/acute_angle.h"
-#include "software/new_geom/util/closest_point.h"
-#include "software/new_geom/util/contains.h"
-#include "software/new_geom/util/distance.h"
-#include "software/new_geom/util/intersection.h"
 
 InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
                                          bool loop_forever)
@@ -83,7 +83,7 @@ void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)
         yield(std::make_unique<MoveIntent>(robot->id(), robot->position(),
                                            face_ball_orientation, 0, 0,
                                            DribblerEnable::ON, MoveType::NORMAL,
-                                           AutokickType::NONE, BallCollisionType::ALLOW));
+                                           AutochickType::NONE, BallCollisionType::ALLOW));
     } while (robot->velocity().length() > 0.03);
 }
 
@@ -114,7 +114,7 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
         yield(std::make_unique<MoveIntent>(robot->id(), intercept_position,
                                            (-ball.velocity()).orientation(), 0, 0,
                                            DribblerEnable::ON, MoveType::NORMAL,
-                                           AutokickType::NONE, BallCollisionType::AVOID));
+                                           AutochickType::NONE, BallCollisionType::AVOID));
 
         if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD / 2.0)
         {
@@ -138,7 +138,7 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
         yield(std::make_unique<MoveIntent>(robot->id(), intercept_position,
                                            (-ball.velocity()).orientation(), 0, 0,
                                            DribblerEnable::ON, MoveType::NORMAL,
-                                           AutokickType::NONE, BallCollisionType::ALLOW));
+                                           AutochickType::NONE, BallCollisionType::ALLOW));
 
         if (!intercept_done &&
             ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD / 2.0)

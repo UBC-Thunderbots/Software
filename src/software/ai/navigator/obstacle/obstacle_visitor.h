@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/new_geom/circle.h"
-#include "software/new_geom/polygon.h"
+#include "software/geom/circle.h"
+#include "software/geom/polygon.h"
 
 // We forward-declare GeomObstacle because if we include them we induce a
 // circular dependency between the Individual library for each obstacle and this

@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/move_intent.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/segment.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 #include "software/world/ball.h"
 
@@ -33,7 +33,7 @@ TEST(InterceptBallActionTest, intercept_fast_moving_ball)
 
         // The robot should immediately try facing the direction the ball is coming from
         EXPECT_EQ((-ball.velocity()).orientation(), move_intent.getFinalAngle());
-        EXPECT_EQ(AutokickType::NONE, move_intent.getAutoKickType());
+        EXPECT_EQ(AutochickType::NONE, move_intent.getAutochickType());
     }
     catch (std::bad_cast)
     {
@@ -65,7 +65,7 @@ TEST(InterceptBallActionTest, ball_moving_too_fast_to_intercept_within_field)
                                                    move_intent.getDestination(), 0.15));
 
         EXPECT_EQ((-ball.velocity()).orientation(), move_intent.getFinalAngle());
-        EXPECT_EQ(AutokickType::NONE, move_intent.getAutoKickType());
+        EXPECT_EQ(AutochickType::NONE, move_intent.getAutochickType());
     }
     catch (std::bad_cast)
     {
@@ -98,7 +98,7 @@ TEST(InterceptBallActionTest, intercept_slow_moving_ball)
                                                    move_intent.getDestination(), 0.01));
         Angle angle_facing_ball = (ball.position() - robot.position()).orientation();
         EXPECT_EQ(angle_facing_ball, move_intent.getFinalAngle());
-        EXPECT_EQ(AutokickType::NONE, move_intent.getAutoKickType());
+        EXPECT_EQ(AutochickType::NONE, move_intent.getAutochickType());
     }
     catch (std::bad_cast)
     {
