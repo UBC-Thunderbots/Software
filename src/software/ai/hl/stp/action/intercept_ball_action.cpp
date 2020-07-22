@@ -12,7 +12,7 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/ray.h"
+#include "software/geom/ray.h"
 
 InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
                                          bool loop_forever)
@@ -46,7 +46,7 @@ void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)
         auto face_ball_orientation = (ball.position() - robot->position()).orientation();
         yield(std::make_unique<MoveIntent>(
             robot->id(), ball.position(), face_ball_orientation, 0, 0, DribblerEnable::ON,
-            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
 
         if (ball.velocity().length() > BALL_MOVING_SLOW_SPEED_THRESHOLD * 2)
         {
