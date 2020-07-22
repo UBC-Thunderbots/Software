@@ -134,7 +134,7 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                       manager->current_primitive_state, world);
             break;
         case PrimitiveMsg_spinning_move_tag:
-            manager->current_primitive       = &SPIN_PRIMITIVE;
+            manager->current_primitive       = &SPINNING_MOVE_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_spinning_move_primitive_start(primitive_msg.primitive.spinning_move,
                                               manager->current_primitive_state, world);

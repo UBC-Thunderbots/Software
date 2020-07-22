@@ -140,7 +140,7 @@ static void spinning_move_tick(void *void_state_ptr, FirmwareWorld_t *world)
 /**
  * \brief The spinning_move movement primitive.
  */
-const primitive_t SPIN_PRIMITIVE = {
+const primitive_t SPINNING_MOVE_PRIMITIVE = {
     .direct        = false,
     .end           = &spinning_move_end,
     .tick          = &spinning_move_tick,

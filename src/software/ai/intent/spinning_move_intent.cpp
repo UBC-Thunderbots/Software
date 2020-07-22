@@ -1,6 +1,6 @@
 #include "software/ai/intent/spinning_move_intent.h"
 
-const std::string SpinningMoveIntent::INTENT_NAME = "SpinningMove Intent";
+const std::string SpinningMoveIntent::INTENT_NAME = "Spinning Move Intent";
 
 SpinningMoveIntent::SpinningMoveIntent(unsigned int robot_id, const Point &dest,
                                        const AngularVelocity &angular_vel,

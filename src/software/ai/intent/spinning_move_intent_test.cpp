@@ -8,7 +8,7 @@ TEST(SpinningMoveIntentTest, intent_name_test)
     SpinningMoveIntent spinning_move_intent =
         SpinningMoveIntent(0, Point(), Angle::zero(), 1.0, 0);
 
-    EXPECT_EQ("SpinningMove Intent", spinning_move_intent.getIntentName());
+    EXPECT_EQ("Spinning Move Intent", spinning_move_intent.getIntentName());
 }
 
 // For equality operators, we only check for cases not covered in the Primitive tests,

@@ -8,7 +8,7 @@ class SpinningMoveIntent : public SpinningMovePrimitive, public Intent
    public:
     static const std::string INTENT_NAME;
     /**
-     * Creates a new SpinningMove Intent
+     * Creates a new Spinning Move Intent
      *
      * @param robot_id The id of the Robot to run this Intent
      * @param dest The final destination of the movement
@@ -31,6 +31,7 @@ class SpinningMoveIntent : public SpinningMovePrimitive, public Intent
      * if all their member variables are equal.
      *
      * @param other the SpinningMoveIntents to compare with for equality
+     *
      * @return true if the SpinningMoveIntents are equal and false otherwise
      */
     bool operator==(const SpinningMoveIntent& other) const;
@@ -39,6 +40,7 @@ class SpinningMoveIntent : public SpinningMovePrimitive, public Intent
      * Compares SpinningMoveIntents for inequality.
      *
      * @param other the SpinningMoveIntent to compare with for inequality
+     *
      * @return true if the SpinningMoveIntents are not equal and false otherwise
      */
     bool operator!=(const SpinningMoveIntent& other) const;

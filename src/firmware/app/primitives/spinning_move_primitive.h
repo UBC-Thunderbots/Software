@@ -2,7 +2,7 @@
 #include "firmware/app/primitives/primitive.h"
 #include "shared/proto/primitive.nanopb.h"
 
-extern const primitive_t SPIN_PRIMITIVE;
+extern const primitive_t SPINNING_MOVE_PRIMITIVE;
 
 /**
  * Start the SpinningMove primitive in the given world
