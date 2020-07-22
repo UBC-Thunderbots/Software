@@ -1,7 +1,7 @@
 #pragma once
 
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
-#include "software/multithreading/threaded_observer.h"
 #include "software/primitive/primitive.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
@@ -14,8 +14,8 @@
  * "Subject". Please see the implementation of those classes for details.
  */
 class Backend : public Subject<SensorMsg>,
-                public ThreadedObserver<World>,
-                public ThreadedObserver<ConstPrimitiveVectorPtr>
+                public FirstInFirstOutThreadedObserver<World>,
+                public FirstInFirstOutThreadedObserver<ConstPrimitiveVectorPtr>
 {
    public:
     Backend() = default;

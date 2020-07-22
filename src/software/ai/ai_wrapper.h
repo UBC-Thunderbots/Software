@@ -3,8 +3,8 @@
 #include "software/ai/ai.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/gui/drawing/draw_functions.h"
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
-#include "software/multithreading/threaded_observer.h"
 #include "software/world/world.h"
 
 /**
@@ -12,7 +12,7 @@
  * objects, passing them to the `AI`, getting the primitives to send to the
  * robots based on the World state, and sending them out.
  */
-class AIWrapper : public ThreadedObserver<World>,
+class AIWrapper : public FirstInFirstOutThreadedObserver<World>,
                   public Subject<ConstPrimitiveVectorPtr>,
                   public Subject<AIDrawFunction>,
                   public Subject<PlayInfo>
