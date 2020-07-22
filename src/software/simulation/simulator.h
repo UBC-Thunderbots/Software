@@ -235,6 +235,8 @@ class Simulator
         yellow_simulator_robots;
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         blue_simulator_robots;
+    bool invert_yellow_robot_coordinates;
+    bool invert_blue_robot_coordinates;
 
     unsigned int frame_number;
 
