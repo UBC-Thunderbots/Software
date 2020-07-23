@@ -118,12 +118,13 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     std::vector<std::unique_ptr<Intent>> intents;
     if (current_tactics)
     {
-        assignRobotsToTactics(world, *current_tactics);
+        std::vector<std::shared_ptr<Tactic>> assigned_tactics =
+            assignRobotsToTactics(world, *current_tactics);
 
         ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
         TacticWorldParamsUpdateVisitor tactic_world_params_update_visitor(world);
 
-        for (const std::shared_ptr<Tactic>& tactic : *current_tactics)
+        for (const std::shared_ptr<Tactic>& tactic : assigned_tactics)
         {
             tactic->accept(tactic_world_params_update_visitor);
 
@@ -168,8 +169,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return getIntentsFromCurrentPlay(world);
 }
 
-void STP::assignRobotsToTactics(const World& world,
-                                std::vector<std::shared_ptr<Tactic>> &tactics) const
+std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
+    const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
 {
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
@@ -206,7 +207,7 @@ void STP::assignRobotsToTactics(const World& world,
     // Discard all goalie tactics, since we have already assigned the goalie robot (if
     // there is one) to the first goalie tactic, and there should only ever be one goalie
     tactics.erase(std::remove_if(tactics.begin(), tactics.end(), isGoalieTactic),
-                   tactics.end());
+                  tactics.end());
 
     if (non_goalie_robots.size() < tactics.size())
     {
@@ -232,7 +233,7 @@ void STP::assignRobotsToTactics(const World& world,
     // This represents the cases where there are either no tactics or no robots
     if (num_rows == 0 || num_cols == 0)
     {
-        return;
+        return tactics;
     }
 
     // The rows of the matrix are the "workers" (the robots) and the columns are the
@@ -296,6 +297,8 @@ void STP::assignRobotsToTactics(const World& world,
             }
         }
     }
+
+    return tactics;
 }
 
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)

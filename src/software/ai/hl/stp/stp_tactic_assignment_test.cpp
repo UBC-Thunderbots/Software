@@ -507,12 +507,16 @@ TEST_F(STPTacticAssignmentTest,
     std::vector<std::string> expected_tactics    = {"Move Test Tactic", "Stop Tactic",
                                                  "Stop Tactic"};
 
-    stp.assignRobotsToTactics(world, tactics);
+    std::vector<std::shared_ptr<Tactic>> assigned_tactics =
+        stp.assignRobotsToTactics(world, tactics);
 
-    for (unsigned int i = 0; i < tactics.size(); i++) {
-        EXPECT_EQ(tactics[i]->getAssignedRobot().value(), expected_robots_assigned[i]);
+    for (unsigned int i = 0; i < assigned_tactics.size(); i++)
+    {
+        EXPECT_EQ(assigned_tactics[i]->getAssignedRobot().value(),
+                  expected_robots_assigned[i]);
     }
 
-    auto tactic1 = dynamic_cast<MoveTestTactic>(*move_tactic_1);
-    ASSERT_TRUE(tactic1);
+    // TODO add tactic dynamic_cast check
+    //    auto tactic1 = dynamic_cast<MoveTestTactic>(*move_tactic_1);
+    //    ASSERT_TRUE(tactic1);
 }
