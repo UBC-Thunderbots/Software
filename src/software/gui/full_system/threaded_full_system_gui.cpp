@@ -7,10 +7,10 @@
 #include "software/parameter/dynamic_parameters.h"
 
 ThreadedFullSystemGUI::ThreadedFullSystemGUI()
-    : ThreadedObserver<World>(),
-      ThreadedObserver<AIDrawFunction>(),
-      ThreadedObserver<PlayInfo>(),
-      ThreadedObserver<SensorMsg>(),
+    : FirstInFirstOutThreadedObserver<World>(),
+      FirstInFirstOutThreadedObserver<AIDrawFunction>(),
+      FirstInFirstOutThreadedObserver<PlayInfo>(),
+      FirstInFirstOutThreadedObserver<SensorMsg>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
           WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),

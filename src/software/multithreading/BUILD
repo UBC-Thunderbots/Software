@@ -36,6 +36,8 @@ cc_library(
 cc_library(
     name = "threaded_observer",
     hdrs = [
+        "first_in_first_out_threaded_observer.h",
+        "last_in_first_out_threaded_observer.h",
         "threaded_observer.h",
         "threaded_observer.tpp",
     ],
@@ -75,8 +77,17 @@ cc_test(
 )
 
 cc_test(
-    name = "threaded_observer_test",
-    srcs = ["threaded_observer_test.cpp"],
+    name = "first_in_first_out_threaded_observer_test",
+    srcs = ["first_in_first_out_threaded_observer_test.cpp"],
+    deps = [
+        ":threaded_observer",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "last_in_first_out_threaded_observer_test",
+    srcs = ["last_in_first_out_threaded_observer_test.cpp"],
     deps = [
         ":threaded_observer",
         "@gtest//:gtest_main",

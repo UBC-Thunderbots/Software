@@ -4,7 +4,7 @@
 #include <QtWidgets/QApplication>
 
 ThreadedRobotDiagnosticsGUI::ThreadedRobotDiagnosticsGUI(int argc, char** argv)
-    : ThreadedObserver<SensorMsg>(),
+    : FirstInFirstOutThreadedObserver<SensorMsg>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorMsg>>(sensor_msg_buffer_size)),

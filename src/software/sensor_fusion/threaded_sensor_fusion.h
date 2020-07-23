@@ -1,13 +1,14 @@
 #pragma once
 
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
-#include "software/multithreading/threaded_observer.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/world/world.h"
 
-class ThreadedSensorFusion : public Subject<World>, public ThreadedObserver<SensorMsg>
+class ThreadedSensorFusion : public Subject<World>,
+                             public FirstInFirstOutThreadedObserver<SensorMsg>
 {
    public:
     explicit ThreadedSensorFusion(
