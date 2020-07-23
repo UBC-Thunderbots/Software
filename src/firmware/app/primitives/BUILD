@@ -1,6 +1,17 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "direct_robot_control",
+    srcs = ["direct_robot_control_primitive.c"],
+    hdrs = ["direct_robot_control_primitive.h"],
+    deps = [
+        ":primitive",
+        "//firmware/app/control",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
     name = "direct_velocity",
     srcs = ["direct_velocity_primitive.c"],
     hdrs = ["direct_velocity_primitive.h"],
