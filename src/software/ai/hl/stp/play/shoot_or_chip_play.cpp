@@ -28,11 +28,9 @@ std::string ShootOrChipPlay::getName() const
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
-    // TODO: figure out whether or not ShootOrChip and ShootOrPass should be separate
-    //       plays, or if we should combine them
+    // NOTE: We do not currently use this play, as passing is generally superior. However we keep it around and
+    //       maintain it so as to have a backup if passing become unreliable for whatever reason
     return false;
-    //    return world.gameState().isPlaying() &&
-    //           teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
