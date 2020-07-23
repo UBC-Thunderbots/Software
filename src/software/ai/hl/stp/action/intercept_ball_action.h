@@ -61,7 +61,7 @@ class InterceptBallAction : public Action
     const double ROBOT_STOPPED_SPEED_M_PER_S          = 0.03;
     const double INTERCEPT_POSITION_SEARCH_INTERVAL   = 0.1;
 
-        // Action parameters
-        Field field;
+    // Action parameters
+    Field field;
     Ball ball;
 };
