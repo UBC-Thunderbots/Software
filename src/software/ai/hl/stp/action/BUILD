@@ -31,6 +31,7 @@ cc_library(
     hdrs = ["intercept_ball_action.h"],
     deps = [
         ":action",
+        ":move_action",
         "//shared:constants",
         "//software/ai/evaluation:intercept",
         "//software/ai/evaluation:robot",

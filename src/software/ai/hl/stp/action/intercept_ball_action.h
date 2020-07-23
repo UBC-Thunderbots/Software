@@ -60,7 +60,6 @@ class InterceptBallAction : public Action
     const Angle SIMILAR_VELOCITY_ANGLE_THRESHOLD      = Angle::fromDegrees(10);
     const double ROBOT_STOPPED_SPEED_M_PER_S          = 0.03;
     const double INTERCEPT_POSITION_SEARCH_INTERVAL   = 0.1;
-    const double h
 
         // Action parameters
         Field field;
