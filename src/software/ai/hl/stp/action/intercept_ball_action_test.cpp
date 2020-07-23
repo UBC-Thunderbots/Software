@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/segment.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/geom/segment.h"
 #include "software/test_util/test_util.h"
 #include "software/world/ball.h"
 

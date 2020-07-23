@@ -44,11 +44,13 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<SSL_Referee> referee_indirect_blue;
     std::unique_ptr<SSL_Referee> referee_normal_start;
 
-    BallState initBallState() {
+    BallState initBallState()
+    {
         return BallState(Point(-1.2, 0), Vector(0.0, 0.0), 0.2);
     }
 
-    BallState initInvertedBallState() {
+    BallState initInvertedBallState()
+    {
         return BallState(Point(1.2, 0), Vector(0.0, 0.0), 0.2);
     }
 
@@ -66,13 +68,15 @@ class SensorFusionTest : public ::testing::Test
 
     std::vector<RobotStateWithId> initInvertedYellowRobotStates()
     {
-        RobotState yellow_robot_state1(Point(-1, 0), Vector(0, 0), Angle::fromRadians(2) + Angle::half(),
+        RobotState yellow_robot_state1(Point(-1, 0), Vector(0, 0),
+                                       Angle::fromRadians(2) + Angle::half(),
                                        AngularVelocity::zero());
-        RobotState yellow_robot_state2(Point(0, 0), Vector(0, 0), Angle::fromRadians(1) + Angle::half(),
+        RobotState yellow_robot_state2(Point(0, 0), Vector(0, 0),
+                                       Angle::fromRadians(1) + Angle::half(),
                                        AngularVelocity::zero());
         return {
-                RobotStateWithId{.id = 1, .robot_state = yellow_robot_state1},
-                RobotStateWithId{.id = 2, .robot_state = yellow_robot_state2},
+            RobotStateWithId{.id = 1, .robot_state = yellow_robot_state1},
+            RobotStateWithId{.id = 2, .robot_state = yellow_robot_state2},
         };
     }
 
@@ -93,16 +97,19 @@ class SensorFusionTest : public ::testing::Test
 
     std::vector<RobotStateWithId> initInvertedBlueRobotStates()
     {
-        RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0), Angle::fromRadians(0.5) + Angle::half(),
+        RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0),
+                                     Angle::fromRadians(0.5) + Angle::half(),
                                      AngularVelocity::zero());
-        RobotState blue_robot_state2(Point(0, 0), Vector(0, 0), Angle::fromRadians(1.5) + Angle::half(),
+        RobotState blue_robot_state2(Point(0, 0), Vector(0, 0),
+                                     Angle::fromRadians(1.5) + Angle::half(),
                                      AngularVelocity::zero());
-        RobotState blue_robot_state3(Point(1, 1), Vector(0, 0), Angle::fromRadians(2.5) + Angle::half(),
+        RobotState blue_robot_state3(Point(1, 1), Vector(0, 0),
+                                     Angle::fromRadians(2.5) + Angle::half(),
                                      AngularVelocity::zero());
         return {
-                RobotStateWithId{.id = 1, .robot_state = blue_robot_state1},
-                RobotStateWithId{.id = 2, .robot_state = blue_robot_state2},
-                RobotStateWithId{.id = 3, .robot_state = blue_robot_state3},
+            RobotStateWithId{.id = 1, .robot_state = blue_robot_state1},
+            RobotStateWithId{.id = 2, .robot_state = blue_robot_state2},
+            RobotStateWithId{.id = 3, .robot_state = blue_robot_state3},
         };
     }
 
@@ -155,7 +162,7 @@ class SensorFusionTest : public ::testing::Test
         for (const auto &state : initInvertedYellowRobotStates())
         {
             friendly_robots.emplace_back(
-                    state.id, TimestampedRobotState(state.robot_state, current_time));
+                state.id, TimestampedRobotState(state.robot_state, current_time));
         }
         friendly_team.updateRobots(friendly_robots);
         Team enemy_team;
@@ -163,7 +170,7 @@ class SensorFusionTest : public ::testing::Test
         for (const auto &state : initInvertedBlueRobotStates())
         {
             enemy_robots.emplace_back(
-                    state.id, TimestampedRobotState(state.robot_state, current_time));
+                state.id, TimestampedRobotState(state.robot_state, current_time));
         }
         enemy_team.updateRobots(enemy_robots);
         return World(field, ball, friendly_team, enemy_team);
@@ -242,8 +249,8 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 {
     config->mutableDefendingPositiveSide()->setValue(true);
     SensorMsg sensor_msg;
-    auto ssl_wrapper_packet = createWrapperPacket(std::unique_ptr<SSL_GeometryData>(),
-                                                  initDetectionFrame());
+    auto ssl_wrapper_packet =
+        createWrapperPacket(std::unique_ptr<SSL_GeometryData>(), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -254,8 +261,8 @@ TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
 {
     config->mutableDefendingPositiveSide()->setValue(true);
     SensorMsg sensor_msg;
-    auto ssl_wrapper_packet = createWrapperPacket(std::move(geom_data),
-                                                  initDetectionFrame());
+    auto ssl_wrapper_packet =
+        createWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);

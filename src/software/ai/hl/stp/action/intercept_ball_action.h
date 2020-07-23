@@ -54,15 +54,15 @@ class InterceptBallAction : public Action
      */
     void interceptFastBall(IntentCoroutine::push_type& yield);
 
-    const double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
-    const double BALL_CLOSE_TO_DRIBBLER_THRESHOLD = 0.2 + BALL_MAX_RADIUS_METERS;
+    const double BALL_MOVING_SLOW_SPEED_THRESHOLD     = 0.3;
+    const double BALL_CLOSE_TO_DRIBBLER_THRESHOLD     = 0.2 + BALL_MAX_RADIUS_METERS;
     const double SIMILAR_VELOCITY_MAGNITUDE_THRESHOLD = 0.05;
-    const Angle SIMILAR_VELOCITY_ANGLE_THRESHOLD = Angle::fromDegrees(10);
-    const double ROBOT_STOPPED_SPEED_M_PER_S = 0.03;
-    const double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
+    const Angle SIMILAR_VELOCITY_ANGLE_THRESHOLD      = Angle::fromDegrees(10);
+    const double ROBOT_STOPPED_SPEED_M_PER_S          = 0.03;
+    const double INTERCEPT_POSITION_SEARCH_INTERVAL   = 0.1;
     const double h
 
-    // Action parameters
-    Field field;
+        // Action parameters
+        Field field;
     Ball ball;
 };

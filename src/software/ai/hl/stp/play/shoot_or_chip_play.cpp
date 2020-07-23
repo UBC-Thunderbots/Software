@@ -28,8 +28,10 @@ std::string ShootOrChipPlay::getName() const
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
-    // NOTE: We do not currently use this play, as passing is generally superior. However we keep it around and
-    //       maintain it so as to have a backup if passing become unreliable for whatever reason
+    // NOTE: We do not currently use this play, as passing is generally superior. However
+    // we keep it around and
+    //       maintain it so as to have a backup if passing become unreliable for whatever
+    //       reason
     return false;
 }
 
