@@ -75,6 +75,21 @@ cc_library(
 )
 
 cc_library(
+    name = "shoot_alignment",
+    srcs = ["shoot_alignment.c"],
+    hdrs = ["shoot_alignment.h"],
+    deps = [
+        ":primitive",
+        "//firmware/app/control",
+        "//firmware/app/control:bangbang",
+        "//firmware/app/control:physbot",
+        "//firmware/shared:physics",
+        "//firmware/shared:util",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
     name = "shoot",
     srcs = ["shoot_primitive.c"],
     hdrs = ["shoot_primitive.h"],
@@ -85,6 +100,28 @@ cc_library(
         "//firmware/app/control:physbot",
         "//firmware/shared:physics",
         "//firmware/shared:util",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "chip",
+    srcs = ["chip_primitive.c"],
+    hdrs = ["chip_primitive.h"],
+    deps = [
+        "shoot_alignment",
+        ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "kick",
+    srcs = ["kick_primitive.c"],
+    hdrs = ["kick_primitive.h"],
+    deps = [
+        "shoot_alignment",
+        ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],
 )
