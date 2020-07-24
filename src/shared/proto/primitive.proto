@@ -37,29 +37,29 @@ message PrimitiveMsg
 
 message SpinningMovePrimitiveMsg
 {
-    PositionTrajectory position_trajectory = 1;
-    AngularVelocityMsg angular_velocity    = 2;
+    PositionParams position_params      = 1;
+    AngularVelocityMsg angular_velocity = 2;
 }
 
 message AutochipMovePrimitiveMsg
 {
-    PositionTrajectory position_trajectory = 1;
-    AngleMsg final_angle                   = 2;
-    float chip_distance_meters             = 3;
+    PositionParams position_params = 1;
+    AngleMsg final_angle           = 2;
+    float chip_distance_meters     = 3;
 }
 
 message AutokickMovePrimitiveMsg
 {
-    PositionTrajectory position_trajectory = 1;
-    AngleMsg final_angle                   = 2;
-    float kick_speed_meters_per_second     = 3;
+    PositionParams position_params     = 1;
+    AngleMsg final_angle               = 2;
+    float kick_speed_meters_per_second = 3;
 }
 
 message DribbleMovePrimitiveMsg
 {
-    PositionTrajectory position_trajectory = 1;
-    AngleMsg final_angle                   = 2;
-    float dribbler_speed_rpm               = 3;
+    PositionParams position_params = 1;
+    AngleMsg final_angle           = 2;
+    float dribbler_speed_rpm       = 3;
 }
 
 message StopPrimitiveMsg
@@ -125,7 +125,7 @@ message DirectRobotControlPrimitiveMsg
     float dribbler_speed_rpm = 8;
 }
 
-message PositionTrajectory
+message PositionParams
 {
     PointMsg destination                = 1;
     float final_speed_meters_per_second = 2;
