@@ -63,7 +63,7 @@ class World final
      *
      * @param game_state the game state sent by refbox
      */
-    void updateGameState(const RefboxGameState& game_state);
+    void updateRefboxGameState(const RefboxGameState& game_state);
 
     /**
      * Updates the refbox game state
@@ -71,7 +71,7 @@ class World final
      * @param game_state the game state sent by refbox
      * @param ball_placement_point ball placement point
      */
-    void updateGameState(const RefboxGameState& game_state, Point ball_placement_point);
+    void updateRefboxGameState(const RefboxGameState& game_state, Point ball_placement_point);
 
     /**
      * Updates the refbox stage
@@ -116,11 +116,25 @@ class World final
     const GameState& gameState() const;
 
     /**
-     * Returns a mutable reference to the Game State
+     * Updates the current Game State
      *
-     * @return a mutable reference to the Game State
+     * @param game_state the game state to update with
      */
-    GameState& mutableGameState();
+    void updateGameState(const GameState& game_state);
+
+    /**
+     * Updates the ball inside of game state
+     *
+     * @param ball the ball to update with
+     */
+    void updateGameStateBall(const Ball& ball);
+
+    /**
+     * Returns the current refbox stage
+     *
+     * @return the current refbox stage
+     */
+    const RefboxStage& getRefboxStage() const;
 
     /**
      * Returns the most recent timestamp value of all timestamped member

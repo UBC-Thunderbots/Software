@@ -39,25 +39,13 @@ class GameState
         BALL_PLACEMENT
     };
 
-    State state;
-    RestartReason restart_reason;
-    RefboxGameState game_state;
-    std::optional<Ball> ball_state;
-
-    // True if our team can kick the ball during a restart
-    bool our_restart;
-
-    // The point at which the ball should be placed by robots before a restart. See
-    // Robocup SSL Rules 9.2.
-    std::optional<Point> ball_placement_point;
-
     GameState()
-        : state(HALT),
-          restart_reason(NONE),
-          game_state(RefboxGameState::HALT),
-          ball_state(std::nullopt),
-          our_restart(false),
-          ball_placement_point(std::nullopt)
+        : state_(HALT),
+          restart_reason_(NONE),
+          game_state_(RefboxGameState::HALT),
+          ball_state_(std::nullopt),
+          our_restart_(false),
+          ball_placement_point_(std::nullopt)
     {
     }
 
@@ -357,4 +345,25 @@ class GameState
      *         in a state of play where the ball needs to be placed
      */
     std::optional<Point> getBallPlacementPoint() const;
+
+    State getState() const;
+
+    void setState(State state);
+    void setRestartReason(RestartReason restart_reason);
+    void setOurRestart(bool our_restart);
+
+   private:
+    State state_;
+    RestartReason restart_reason_;
+    RefboxGameState game_state_;
+    std::optional<Ball> ball_state_;
+
+    // True if our team can kick the ball during a restart
+    bool our_restart_;
+
+    // The point at which the ball should be placed by robots before a restart. See
+    // Robocup SSL Rules 9.2.
+    std::optional<Point> ball_placement_point_;
+
+
 };
