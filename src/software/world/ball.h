@@ -1,11 +1,11 @@
 #pragma once
 
-#include <boost/circular_buffer.hpp>
 #include <optional>
 
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
 #include "software/time/timestamp.h"
+#include "software/world/ball_model/ball_model.h"
 #include "software/world/timestamped_ball_state.h"
 
 class Ball final
@@ -38,8 +38,17 @@ class Ball final
 
     /**
      * Returns the current state of the ball
+     *
+     * @return TimestampedBallState
      */
     TimestampedBallState currentState() const;
+
+    /**
+     * Returns the ball model to predict future states
+     *
+     * @return ball model
+     */
+    const std::shared_ptr<BallModel> &ballModel() const;
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
@@ -101,4 +110,6 @@ class Ball final
     // creation
     // The buffer size (history_size) must be > 0
     BallHistory states_;
+
+    std::shared_ptr<BallModel> ball_model_;
 };

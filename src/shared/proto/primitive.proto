@@ -72,18 +72,18 @@ message StopPrimitiveMsg
     StopTypeMsg stop_type = 1;
 }
 
-message AlignAndChipPrimitiveMSg
+message ChipPrimitiveMsg
 {
     PointMsg chip_origin       = 1;
     AngleMsg chip_direction    = 2;
     float chip_distance_meters = 3;
 }
 
-message AlignAndKickPrimitiveMSg
+message KickPrimitiveMsg
 {
-    PointMsg kick_origin       = 1;
-    AngleMsg kick_direction    = 2;
-    float chip_distance_meters = 3;
+    PointMsg kick_origin               = 1;
+    AngleMsg kick_direction            = 2;
+    float kick_speed_meters_per_second = 3;
 }
 
 message DirectRobotControlPrimitiveMsg

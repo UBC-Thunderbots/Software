@@ -2,7 +2,6 @@
 
 #include <optional>
 
-#include "boost/circular_buffer.hpp"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
