@@ -5,8 +5,8 @@
 
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
-#include "software/geom/point.h"
 #include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 
@@ -119,7 +119,7 @@ class Intent
      * @param destination The destination
      * @param final_speed The final speed
      */
-    void updateFinalSpeedAndDestination(Point destination, double final_speed);
+    virtual void updateFinalSpeedAndDestination(Point destination, double final_speed);
 
     virtual ~Intent() = default;
 
@@ -133,8 +133,8 @@ class Intent
      * @param final_angle The final angle
      * @param ball_collision_type The ball collision type
      */
-    void updateNavigatorParams(Point destination,Angle final_angle, double final_speed,
-                                   BallCollisionType ball_collision_type);
+    void updateNavigatorParams(Point destination, Angle final_angle, double final_speed,
+                               BallCollisionType ball_collision_type);
 
    private:
     /**

@@ -11,6 +11,7 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &fi
       Intent(priority),
       ball_collision_type(ball_collision_type)
 {
+    Intent::updateNavigatorParams(dest, final_angle, final_speed, ball_collision_type);
 }
 
 std::string MoveIntent::getIntentName(void) const
@@ -26,6 +27,11 @@ BallCollisionType MoveIntent::getBallCollisionType() const
 void MoveIntent::accept(IntentVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+void MoveIntent::updateFinalSpeedAndDestination(Point destination, double final_speed)
+{
+    MovePrimitive::updateFinalSpeedAndDestination(destination, final_speed);
 }
 
 bool MoveIntent::operator==(const MoveIntent &other) const

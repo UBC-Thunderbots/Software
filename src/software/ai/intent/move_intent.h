@@ -44,6 +44,7 @@ class MoveIntent : public MovePrimitive, public Intent
     BallCollisionType getBallCollisionType() const;
 
     void accept(IntentVisitor& visitor) const override;
+    void updateFinalSpeedAndDestination(Point destination, double final_speed) override;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
