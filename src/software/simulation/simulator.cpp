@@ -81,6 +81,22 @@ void Simulator::setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_
     setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball);
 }
 
+void Simulator::setYellowRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg)
+{
+    for (auto& [robot_id, primitive_msg] : primitive_set_msg.robot_primitives)
+    {
+        setYellowRobotPrimitive(robot_id, primitive_msg);
+    }
+}
+
+void Simulator::setBlueRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg)
+{
+    for (auto& [robot_id, primitive_msg] : primitive_set_msg.robot_primitives)
+    {
+        setBlueRobotPrimitive(robot_id, primitive_msg);
+    }
+}
+
 void Simulator::setRobotPrimitive(
     RobotId id, const PrimitiveMsg& primitive_msg,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&

@@ -10,6 +10,7 @@
 extern "C"
 {
 #include "shared/proto/primitive.nanopb.h"
+#include "shared/proto/tbots_software_msgs.nanopb.h"
 }
 
 /**
@@ -131,6 +132,15 @@ class Simulator
      */
     void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
     void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+
+    /**
+     * Sets the primitive being simulated by the robot on the corresponding team
+     * in simulation
+     *
+     * @param primitive_set_msg The set of primitives to run on the robot
+     */
+    void setYellowRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
+    void setBlueRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate

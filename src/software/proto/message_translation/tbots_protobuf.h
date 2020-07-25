@@ -44,8 +44,8 @@ std::unique_ptr<AngleMsg> createAngleMsg(const Angle& angle);
 std::unique_ptr<VectorMsg> createVectorMsg(const Vector& vector);
 
 /**
- * Returns a timestamp msg with the time that this function was called
+ * Returns the time that this function was called
  *
- * @return The unique_ptr to a TimestampMsg with the current UTC time
+ * @return current time in seconds
  */
-std::unique_ptr<TimestampMsg> createCurrentTimestampMsg();
+double createCurrentTime();

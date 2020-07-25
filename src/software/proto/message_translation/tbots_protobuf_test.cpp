@@ -53,7 +53,7 @@ class TbotsProtobufTest : public ::testing::Test
             robot_state_msg.global_angular_velocity_radians_per_sec());
     }
 
-    static void assertSaneTimestamp(const TimestampMsg& timestamp)
+    static void assertSaneTimestamp(double timestamp_seconds)
     {
         // time will only move forward
         // we make sure the number that the timestamp is from the past
@@ -63,7 +63,7 @@ class TbotsProtobufTest : public ::testing::Test
                                     clock_time.time_since_epoch())
                                     .count()) /
             MICROSECONDS_PER_SECOND;
-        ASSERT_TRUE(timestamp.epoch_timestamp_seconds() <= time_in_seconds);
+        ASSERT_TRUE(timestamp_seconds <= time_in_seconds);
     }
 };
 
@@ -89,12 +89,6 @@ TEST(TbotsProtobufTest, vector_msg_test)
     auto vector_msg = createVectorMsg(vector);
 
     TbotsProtobufTest::assertVectorMessageEqual(vector, *vector_msg);
-}
-
-TEST(TbotsProtobufTest, timestamp_msg_test)
-{
-    auto timestamp_msg = createCurrentTimestampMsg();
-    TbotsProtobufTest::assertSaneTimestamp(*timestamp_msg);
 }
 
 TEST(TbotsProtobufTest, robot_state_msg_test)
@@ -133,7 +127,7 @@ TEST(TbotsProtobufTest, vision_msg_test)
 
     TbotsProtobufTest::assertBallStateMessageFromBall(world.ball(),
                                                       vision_msg->ball_state());
-    TbotsProtobufTest::assertSaneTimestamp(vision_msg->time_sent());
+    TbotsProtobufTest::assertSaneTimestamp(vision_msg->timestamp_seconds());
 
     auto friendly_robots   = world.friendlyTeam().getAllRobots();
     auto& robot_states_map = *vision_msg->mutable_robot_states();
