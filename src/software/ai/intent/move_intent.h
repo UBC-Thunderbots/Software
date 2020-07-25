@@ -6,8 +6,6 @@
 #include "software/primitive/move_primitive.h"
 #include "software/util/make_enum/make_enum.h"
 
-MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
-
 class MoveIntent : public MovePrimitive, public Intent
 {
    public:

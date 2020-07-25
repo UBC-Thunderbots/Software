@@ -159,6 +159,8 @@ cc_library(
     deps = [
         "intent_visitor",
         "//software/ai/motion_constraint",
+        "//software/geom:point",
+        "//software/geom:angle",
         "//software/logger",
     ],
 )

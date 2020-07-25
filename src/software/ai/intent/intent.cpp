@@ -7,6 +7,11 @@
 // Implement concrete functions shared by all intents
 
 Intent::Intent(unsigned int priority)
+    : navigator_params_updated(false),motion_constraints(),
+      destination(),
+      final_speed(0.0),
+      final_angle(),
+      ball_collision_type()
 {
     setPriority(priority);
 }
@@ -45,4 +50,29 @@ void Intent::setMotionConstraints(const std::set<MotionConstraint> &motion_const
 std::set<MotionConstraint> Intent::getMotionConstraints(void) const
 {
     return motion_constraints;
+}
+
+std::optional<NavigatorParams> Intent::getNavigatorParams() const
+{
+    if (navigator_params_updated)
+    {
+        return NavigatorParams{.motion_constraints  = motion_constraints,
+                               .destination         = destination,
+                               .final_speed         = final_speed,
+                               .final_angle         = final_angle,
+                               .ball_collision_type = ball_collision_type};
+    }
+    return std::nullopt;
+}
+
+void Intent::updateFinalSpeedAndDestination(Point destination, double final_speed) {}
+
+void Intent::updateNavigatorParams(Point destination,Angle final_angle, double final_speed,
+                                   BallCollisionType ball_collision_type)
+{
+    this->navigator_params_updated = true;
+    this->destination         = destination;
+    this->final_speed         = final_speed;
+    this->final_angle         = final_angle;
+    this->ball_collision_type = ball_collision_type;
 }

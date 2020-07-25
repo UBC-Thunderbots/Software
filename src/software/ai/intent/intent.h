@@ -5,6 +5,20 @@
 
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
+#include "software/geom/point.h"
+#include "software/geom/angle.h"
+
+MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
+
+// Lightweight data type to pass to the Navigator
+struct NavigatorParams
+{
+    std::set<MotionConstraint> motion_constraints;
+    Point destination;
+    double final_speed;
+    Angle final_angle;
+    BallCollisionType ball_collision_type;
+};
 
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a
@@ -90,7 +104,37 @@ class Intent
      */
     std::set<MotionConstraint> getMotionConstraints(void) const;
 
+    /**
+     * Gets the navigator params if this intent requires navigation. For example,
+     * StopIntent does not need to navigate, while MoveIntent does.
+     *
+     * @return navigator params
+     */
+    std::optional<NavigatorParams> getNavigatorParams() const;
+
+    /**
+     * Updates the final speed and destination of this param
+     * NOTE: This should be overridden if the Intent requires navigation
+     *
+     * @param destination The destination
+     * @param final_speed The final speed
+     */
+    void updateFinalSpeedAndDestination(Point destination, double final_speed);
+
     virtual ~Intent() = default;
+
+   protected:
+    /**
+     * Updates the navigation params so that this Intent will be used for navigation in
+     * the Navigator
+     *
+     * @param destination The destination
+     * @param final_speed The final speed
+     * @param final_angle The final angle
+     * @param ball_collision_type The ball collision type
+     */
+    void updateNavigatorParams(Point destination,Angle final_angle, double final_speed,
+                                   BallCollisionType ball_collision_type);
 
    private:
     /**
@@ -99,8 +143,10 @@ class Intent
      */
     unsigned int priority;
 
-    /**
-     * The constraints on this intent's motion. These are enforced by the navigator
-     */
+    bool navigator_params_updated;
     std::set<MotionConstraint> motion_constraints;
+    Point destination;
+    double final_speed;
+    Angle final_angle;
+    BallCollisionType ball_collision_type;
 };
