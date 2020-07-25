@@ -113,16 +113,6 @@ class ThreadedSimulator
     void addBlueRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Sets the primitives being simulated by the robots in simulation
-     *
-     * Note: These functions are threadsafe.
-     *
-     * @param primitives The primitives to simulate
-     */
-    void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-    void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-
-    /**
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for

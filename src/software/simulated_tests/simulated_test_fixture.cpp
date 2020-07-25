@@ -2,6 +2,7 @@
 
 #include "software/gui/drawing/navigator.h"
 #include "software/logger/logger.h"
+#include "software/simulation/convert_primitive_to_nanopb.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 
@@ -216,10 +217,16 @@ void SimulatedTestFixture::runTest(
             }
 
             auto primitives = ai.getPrimitives(*world);
-            auto primitives_ptr =
+            auto yellow_primitives_ptr =
                 std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
                     std::move(primitives));
-            simulator->setYellowRobotPrimitives(primitives_ptr);
+            for (const auto &primitive_ptr : *yellow_primitives_ptr)
+            {
+                PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+
+                simulator->setYellowRobotPrimitive(primitive_ptr->getRobotId(),
+                                                   primitive_msg);
+            }
 
             if (run_simulation_in_realtime)
             {

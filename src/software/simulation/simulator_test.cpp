@@ -4,6 +4,7 @@
 
 #include "software/primitive/move_primitive.h"
 #include "software/primitive/primitive.h"
+#include "software/simulation/convert_primitive_to_nanopb.h"
 #include "software/test_util/test_util.h"
 
 TEST(SimulatorTest, get_field)
@@ -307,9 +308,15 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
         AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> primitives;
     primitives.emplace_back(std::move(move_primitive));
-    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-        std::move(primitives));
-    simulator.setYellowRobotPrimitives(primitives_ptr);
+    auto yellow_primitives_ptr =
+        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
+            std::move(primitives));
+    for (const auto& primitive_ptr : *yellow_primitives_ptr)
+    {
+        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+
+        simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
+    }
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -374,9 +381,15 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
         AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> primitives;
     primitives.emplace_back(std::move(move_primitive));
-    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-        std::move(primitives));
-    simulator.setBlueRobotPrimitives(primitives_ptr);
+    auto blue_primitives_ptr =
+        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
+            std::move(primitives));
+    for (const auto& primitive_ptr : *blue_primitives_ptr)
+    {
+        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+
+        simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
+    }
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -435,7 +448,12 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     auto blue_primitives_ptr =
         std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
             std::move(blue_robot_primitives));
-    simulator.setBlueRobotPrimitives(blue_primitives_ptr);
+    for (const auto& primitive_ptr : *blue_primitives_ptr)
+    {
+        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+
+        simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
+    }
 
     std::unique_ptr<Primitive> yellow_move_primitive1 = std::make_unique<MovePrimitive>(
         1, Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
@@ -449,7 +467,12 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     auto yellow_primitives_ptr =
         std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
             std::move(yellow_robot_primitives));
-    simulator.setYellowRobotPrimitives(yellow_primitives_ptr);
+    for (const auto& primitive_ptr : *yellow_primitives_ptr)
+    {
+        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+
+        simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
+    }
 
     for (unsigned int i = 0; i < 120; i++)
     {
