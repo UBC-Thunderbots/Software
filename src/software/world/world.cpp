@@ -99,7 +99,6 @@ void World::updateRefboxGameState(const RefboxGameState &game_state, Point ball_
 
 void World::updateRefboxStage(const RefboxStage &stage)
 {
-    // TODO (Issue #1369): Clean this up
     refbox_stage_history.push_back(stage);
     // Take the consensus of the previous refbox messages
     if (!refbox_stage_history.empty() &&
