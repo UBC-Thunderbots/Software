@@ -316,8 +316,10 @@ void GameState::setOurRestart(bool our_restart)
 
 bool GameState::operator==(const GameState& other) const
 {
-    return this->state_ == other.state_ && this->restart_reason_ == other.restart_reason_ &&
-           this->game_state_ == other.game_state_ && this->ball_state_ == other.ball_state_ &&
+    return this->state_ == other.state_ &&
+           this->restart_reason_ == other.restart_reason_ &&
+           this->game_state_ == other.game_state_ &&
+           this->ball_state_ == other.ball_state_ &&
            this->our_restart_ == other.our_restart_ &&
            this->ball_placement_point_ == other.ball_placement_point_;
 }
@@ -326,4 +328,3 @@ bool GameState::operator!=(const GameState& other) const
 {
     return !(*this == other);
 }
-

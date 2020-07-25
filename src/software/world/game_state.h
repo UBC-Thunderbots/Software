@@ -364,6 +364,4 @@ class GameState
     // The point at which the ball should be placed by robots before a restart. See
     // Robocup SSL Rules 9.2.
     std::optional<Point> ball_placement_point_;
-
-
 };

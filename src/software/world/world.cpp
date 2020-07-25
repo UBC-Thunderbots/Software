@@ -91,7 +91,8 @@ void World::updateRefboxGameState(const RefboxGameState &game_state)
     }
 }
 
-void World::updateRefboxGameState(const RefboxGameState &game_state, Point ball_placement_point)
+void World::updateRefboxGameState(const RefboxGameState &game_state,
+                                  Point ball_placement_point)
 {
     updateRefboxGameState(game_state);
     current_game_state_.setBallPlacementPoint(ball_placement_point);
@@ -163,7 +164,7 @@ void World::updateGameState(const GameState &game_state)
     current_game_state_ = game_state;
 }
 
-const RefboxStage& World::getRefboxStage() const
+const RefboxStage &World::getRefboxStage() const
 {
     return current_refbox_stage_;
 }

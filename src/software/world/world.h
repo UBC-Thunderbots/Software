@@ -71,7 +71,8 @@ class World final
      * @param game_state the game state sent by refbox
      * @param ball_placement_point ball placement point
      */
-    void updateRefboxGameState(const RefboxGameState& game_state, Point ball_placement_point);
+    void updateRefboxGameState(const RefboxGameState& game_state,
+                               Point ball_placement_point);
 
     /**
      * Updates the refbox stage
