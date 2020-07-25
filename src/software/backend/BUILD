@@ -8,6 +8,7 @@ cc_library(
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/proto:sensor_msg_cc_proto",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/world",
     ],
 )
