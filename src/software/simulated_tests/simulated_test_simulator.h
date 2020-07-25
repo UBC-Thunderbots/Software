@@ -9,11 +9,6 @@
 #include "software/world/field.h"
 #include "software/world/robot_state.h"
 
-extern "C"
-{
-#include "shared/proto/primitive.nanopb.h"
-}
-
 /**
  * This class wraps Simulator for the SimulatedTestFixture
  */
@@ -87,11 +82,11 @@ class SimulatedTestSimulator
     void stepSimulation(const Duration& time_step);
 
     /**
-     * Sets the primitive being simulated by the robot on the corresponding team
-     * in simulation
+     * Sets the primitives on the corresponding team in simulation
      *
-     * @param id The id of the robot to set the primitive for
-     * @param primitive_msg The primitive to run on the robot
+     * @param serialized_primitive_set_msg the serialized proto of the PrimitiveSetMsg to
+     * set
      */
-    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setYellowRobotSerializedPrimitiveSet(
+        std::vector<uint8_t> serialized_primitive_set_msg);
 };

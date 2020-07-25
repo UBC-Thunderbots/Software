@@ -1,5 +1,7 @@
 #include "software/simulated_tests/simulated_test_simulator.h"
 
+#include <pb_decode.h>
+
 #include "software/simulation/simulator.h"
 
 // We use a static variable here to hide simulator.h's NanoPb PrimitiveSetMsg from users
@@ -46,8 +48,18 @@ void SimulatedTestSimulator::stepSimulation(const Duration& time_step)
     simulator_static->stepSimulation(time_step);
 }
 
-void SimulatedTestSimulator::setYellowRobotPrimitive(RobotId id,
-                                                     const PrimitiveMsg& primitive_msg)
+void SimulatedTestSimulator::setYellowRobotSerializedPrimitiveSet(
+    std::vector<uint8_t> serialized_primitive_set_msg)
 {
-    simulator_static->setYellowRobotPrimitive(id, primitive_msg);
+    PrimitiveSetMsg primitive_set_msg = PrimitiveSetMsg_init_zero;
+
+    pb_istream_t pb_in_stream =
+        pb_istream_from_buffer(static_cast<uint8_t*>(serialized_primitive_set_msg.data()),
+                               serialized_primitive_set_msg.size());
+    if (!pb_decode(&pb_in_stream, PrimitiveSetMsg_fields, &primitive_set_msg))
+    {
+        throw std::runtime_error("Failed to decode serialized primitive to NanoPb");
+    }
+
+    simulator_static->setYellowRobotPrimitiveSet(primitive_set_msg);
 }

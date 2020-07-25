@@ -2,7 +2,7 @@
 
 #include "software/gui/drawing/navigator.h"
 #include "software/logger/logger.h"
-#include "software/simulation/convert_primitive_to_nanopb.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 
@@ -219,16 +219,17 @@ void SimulatedTestFixture::runTest(
             }
 
             auto primitives = ai.getPrimitives(*world);
+
             auto yellow_primitives_ptr =
                 std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
                     std::move(primitives));
-            for (const auto &primitive_ptr : *yellow_primitives_ptr)
-            {
-                PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
-
-                simulated_test_simulator->setYellowRobotPrimitive(
-                    primitive_ptr->getRobotId(), primitive_msg);
-            }
+            auto primitive_set_msg = createPrimitiveSetMsg(yellow_primitives_ptr);
+            std::vector<uint8_t> serialized_proto(primitive_set_msg->ByteSizeLong());
+            primitive_set_msg->SerializeToArray(
+                serialized_proto.data(),
+                static_cast<int>(primitive_set_msg->ByteSizeLong()));
+            simulated_test_simulator->setYellowRobotSerializedPrimitiveSet(
+                serialized_proto);
 
             if (run_simulation_in_realtime)
             {

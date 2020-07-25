@@ -83,17 +83,19 @@ void Simulator::setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_
 
 void Simulator::setYellowRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg)
 {
-    for (auto& [robot_id, primitive_msg] : primitive_set_msg.robot_primitives)
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        setYellowRobotPrimitive(robot_id, primitive_msg);
+        setYellowRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                                primitive_set_msg.robot_primitives[i].value);
     }
 }
 
 void Simulator::setBlueRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg)
 {
-    for (auto& [robot_id, primitive_msg] : primitive_set_msg.robot_primitives)
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        setBlueRobotPrimitive(robot_id, primitive_msg);
+        setBlueRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                              primitive_set_msg.robot_primitives[i].value);
     }
 }
 
