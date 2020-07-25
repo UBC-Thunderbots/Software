@@ -162,6 +162,7 @@ cc_library(
         "//software/geom:angle",
         "//software/geom:point",
         "//software/logger",
+        "//software/primitive",
     ],
 )
 

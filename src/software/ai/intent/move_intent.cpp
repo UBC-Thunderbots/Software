@@ -11,7 +11,8 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &fi
       Intent(priority),
       ball_collision_type(ball_collision_type)
 {
-    Intent::updateNavigatorParams(dest, final_angle, final_speed, ball_collision_type);
+    Intent::updateNavigatorParams(robot_id, dest, final_angle, final_speed,
+                                  ball_collision_type);
 }
 
 std::string MoveIntent::getIntentName(void) const

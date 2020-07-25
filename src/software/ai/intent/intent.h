@@ -7,12 +7,14 @@
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
+#include "software/primitive/primitive.h"
 
 MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 
 // Lightweight data type to pass to the Navigator
 struct NavigatorParams
 {
+    unsigned int robot_id;
     std::set<MotionConstraint> motion_constraints;
     Point destination;
     double final_speed;
@@ -112,6 +114,8 @@ class Intent
      */
     std::optional<NavigatorParams> getNavigatorParams() const;
 
+    const std::shared_ptr<Primitive>& getPrimitive() const;
+
     /**
      * Updates the final speed and destination of this param
      * NOTE: This should be overridden if the Intent requires navigation
@@ -128,12 +132,14 @@ class Intent
      * Updates the navigation params so that this Intent will be used for navigation in
      * the Navigator
      *
+     * @param robot_id The id of the robot that this Intent is for
      * @param destination The destination
      * @param final_speed The final speed
      * @param final_angle The final angle
      * @param ball_collision_type The ball collision type
      */
-    void updateNavigatorParams(Point destination, Angle final_angle, double final_speed,
+    void updateNavigatorParams(unsigned int robot_id, Point destination,
+                               Angle final_angle, double final_speed,
                                BallCollisionType ball_collision_type);
 
    private:
@@ -144,9 +150,6 @@ class Intent
     unsigned int priority;
 
     bool navigator_params_updated;
-    std::set<MotionConstraint> motion_constraints;
-    Point destination;
-    double final_speed;
-    Angle final_angle;
-    BallCollisionType ball_collision_type;
+    NavigatorParams navigator_params;
+    std::shared_ptr<Primitive> primitive;
 };

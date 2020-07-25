@@ -36,12 +36,12 @@ class Navigator : public IntentVisitor
      * Get assigned primitives for given assigned intents
      *
      * @param world World to navigate around
-     * @assignedIntents intents to process into primitives
+     * @assigned_intents intents to process into primitives
      *
      * @return vector of primitives for the given intents
      */
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
-        const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents);
+        const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents);
 
     /**
      * Get the planned paths for navigation
@@ -92,39 +92,30 @@ class Navigator : public IntentVisitor
 
    private:
     /**
-     * Generates path objectives from move intents
+     * Generates path objectives from intents
      *
-     * @param move_intents intents to make into path objectives
+     * @param intents intents to make into path objectives
      * @param world World to navigate around
      *
      * @return set of PathObjectives
      */
-    std::unordered_set<PathObjective> getPathObjectivesFromMoveIntents(
-        const std::vector<MoveIntent> &move_intents, const World &world);
+    std::unordered_set<PathObjective> getPathObjectivesFromIntents(
+        const std::vector<std::unique_ptr<Intent>> &intents, const World &world);
 
     /**
-     * Creates a list primitives for the list of MoveIntents
+     * Updates the intent with the given path and return the primitive
      *
-     * @param move_intents intents to make into primitives
-     * @param world World to navigate around
-     *
-     * @return list of primitives
-     */
-    std::vector<std::unique_ptr<Primitive>> getPrimitivesFromMoveIntents(
-        const std::vector<MoveIntent> &move_intents, const World &world);
-
-    /**
-     * Creates a primitive for a given path and move intent
-     *
+     * @param navigator_params NavigatorParams
      * @param path path to make primitive for
-     * @param intent intent to make primitive
+     * @param intent intent to update
      * @param world World to navigate around
      *
-     * @return unique pointer to the primitive
+     * @return primitive after updating the intent
      */
-    std::unique_ptr<Primitive> getPrimitiveFromPathAndMoveIntent(std::optional<Path> path,
-                                                                 MoveIntent intent,
-                                                                 const World &world);
+    std::unique_ptr<Primitive> updateIntentWithPath(NavigatorParams navigator_params,
+                                                    std::optional<Path> path,
+                                                    std::unique_ptr<Intent> intent,
+                                                    const World &world);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.

@@ -8,11 +8,12 @@
 
 Intent::Intent(unsigned int priority)
     : navigator_params_updated(false),
-      motion_constraints(),
-      destination(),
-      final_speed(0.0),
-      final_angle(),
-      ball_collision_type()
+      navigator_params{.robot_id            = 0,
+                       .motion_constraints  = std::set<MotionConstraint>(),
+                       .destination         = Point(),
+                       .final_speed         = 0.0,
+                       .final_angle         = Angle(),
+                       .ball_collision_type = BallCollisionType::ALLOW}
 {
     setPriority(priority);
 }
@@ -45,36 +46,40 @@ bool Intent::operator!=(const Intent &other) const
 
 void Intent::setMotionConstraints(const std::set<MotionConstraint> &motion_constraints)
 {
-    this->motion_constraints = motion_constraints;
+    this->navigator_params.motion_constraints = motion_constraints;
 }
 
 std::set<MotionConstraint> Intent::getMotionConstraints(void) const
 {
-    return motion_constraints;
+    return navigator_params.motion_constraints;
 }
 
 std::optional<NavigatorParams> Intent::getNavigatorParams() const
 {
     if (navigator_params_updated)
     {
-        return NavigatorParams{.motion_constraints  = motion_constraints,
-                               .destination         = destination,
-                               .final_speed         = final_speed,
-                               .final_angle         = final_angle,
-                               .ball_collision_type = ball_collision_type};
+        return navigator_params;
     }
     return std::nullopt;
 }
 
+const std::shared_ptr<Primitive> &Intent::getPrimitive() const
+{
+    return primitive;
+}
+
 void Intent::updateFinalSpeedAndDestination(Point destination, double final_speed) {}
 
-void Intent::updateNavigatorParams(Point destination, Angle final_angle,
-                                   double final_speed,
+void Intent::updateNavigatorParams(unsigned int robot_id, Point destination,
+                                   Angle final_angle, double final_speed,
                                    BallCollisionType ball_collision_type)
 {
-    this->navigator_params_updated = true;
-    this->destination              = destination;
-    this->final_speed              = final_speed;
-    this->final_angle              = final_angle;
-    this->ball_collision_type      = ball_collision_type;
+    navigator_params =
+        NavigatorParams{.robot_id            = robot_id,
+                        .motion_constraints  = navigator_params.motion_constraints,
+                        .destination         = destination,
+                        .final_speed         = final_speed,
+                        .final_angle         = final_angle,
+                        .ball_collision_type = ball_collision_type};
+    navigator_params_updated = true;
 }
