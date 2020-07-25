@@ -2,6 +2,7 @@
 
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
                      RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
@@ -60,15 +61,25 @@ void Navigator::visit(const StopIntent &intent)
     current_robot_id  = intent.getRobotId();
 }
 
+std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
+    const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents)
+{
+    auto primitives     = getAssignedPrimitives(world, assigned_intents);
+    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
+        std::move(primitives));
+
+    return createPrimitiveSetMsg(primitives_ptr);
+}
+
 std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
-    const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
+    const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents)
 {
     planned_paths.clear();
     move_intents_for_path_planning.clear();
     friendly_non_move_intent_robot_obstacles.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
-    for (const auto &intent : assignedIntents)
+    for (const auto &intent : assigned_intents)
     {
         current_primitive.reset(nullptr);
         current_robot_id.reset();

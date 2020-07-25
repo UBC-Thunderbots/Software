@@ -218,12 +218,7 @@ void SimulatedTestFixture::runTest(
                 break;
             }
 
-            auto primitives = ai.getPrimitives(*world);
-
-            auto yellow_primitives_ptr =
-                std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-                    std::move(primitives));
-            auto primitive_set_msg = createPrimitiveSetMsg(yellow_primitives_ptr);
+            auto primitive_set_msg = ai.getPrimitiveSetMsg(*world);
             std::vector<uint8_t> serialized_proto(primitive_set_msg->ByteSizeLong());
             primitive_set_msg->SerializeToArray(
                 serialized_proto.data(),

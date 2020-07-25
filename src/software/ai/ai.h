@@ -35,6 +35,17 @@ class AI final
     std::vector<std::unique_ptr<Primitive>> getPrimitives(const World& world) const;
 
     /**
+     * Calculates the PrimitiveSetMsg that should be run by our Robots given the current
+     * state of the world.
+     *
+     * @param world The state of the World with which to make the decisions
+     *
+     * @return the PrimitiveSetMsg that should be run by our Robots given the current
+     * state of the world.
+     */
+    std::unique_ptr<PrimitiveSetMsg> getPrimitiveSetMsg(const World& world) const;
+
+    /**
      * Returns information about the currently running plays and tactics, including the
      * name of the play, and which robots are running which tactics
      *
