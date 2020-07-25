@@ -6,6 +6,7 @@ cc_library(
     srcs = ["simulated_test_fixture.cpp"],
     hdrs = ["simulated_test_fixture.h"],
     deps = [
+        ":simulated_test_simulator",
         "//software/ai",
         "//software/gui/drawing:navigator",
         "//software/gui/full_system:threaded_full_system_gui",
@@ -13,9 +14,19 @@ cc_library(
         "//software/sensor_fusion",
         "//software/simulated_tests/validation:non_terminating_function_validator",
         "//software/simulated_tests/validation:terminating_function_validator",
-        "//software/simulation:simulator",
         "//software/test_util",
         "//software/time:duration",
+        "@gtest",
+    ],
+)
+
+cc_library(
+    name = "simulated_test_simulator",
+    testonly = True,
+    srcs = ["simulated_test_simulator.cpp"],
+    hdrs = ["simulated_test_simulator.h"],
+    deps = [
+        "//software/simulation:simulator",
         "@gtest",
     ],
 )

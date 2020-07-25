@@ -7,7 +7,8 @@
 #include "software/time/duration.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
-    : simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField())),
+    : simulated_test_simulator(
+          std::make_unique<SimulatedTestSimulator>(Field::createSSLDivisionBField())),
       sensor_fusion(DynamicParameters->getSensorFusionConfig()),
       ai(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig()),
       run_simulation_in_realtime(false)
@@ -23,10 +24,11 @@ void SimulatedTestFixture::SetUp()
     // until https://github.com/UBC-Thunderbots/Software/issues/1483 is complete
 
     // Re-create all objects for each test so we start from a clean setup
-    // every time. Because the simulator is created initially in the constructor's
-    // initialization list, and before every test in this SetUp function, we can
-    // guarantee the pointer will never be null / empty
-    simulator = std::make_unique<Simulator>(Field::createSSLDivisionBField());
+    // every time. Because the simulated_test_simulator is created initially in the
+    // constructor's initialization list, and before every test in this SetUp function, we
+    // can guarantee the pointer will never be null / empty
+    simulated_test_simulator =
+        std::make_unique<SimulatedTestSimulator>(Field::createSSLDivisionBField());
     ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
 
@@ -55,22 +57,22 @@ void SimulatedTestFixture::SetUp()
 
 void SimulatedTestFixture::setBallState(const BallState &ball)
 {
-    simulator->setBallState(ball);
+    simulated_test_simulator->setBallState(ball);
 }
 
 void SimulatedTestFixture::addFriendlyRobots(const std::vector<RobotStateWithId> &robots)
 {
-    simulator->addYellowRobots(robots);
+    simulated_test_simulator->addYellowRobots(robots);
 }
 
 void SimulatedTestFixture::addEnemyRobots(const std::vector<RobotStateWithId> &robots)
 {
-    simulator->addBlueRobots(robots);
+    simulated_test_simulator->addBlueRobots(robots);
 }
 
 Field SimulatedTestFixture::field() const
 {
-    return simulator->getField();
+    return simulated_test_simulator->getField();
 }
 
 void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
@@ -136,7 +138,7 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
 
 void SimulatedTestFixture::updateSensorFusion()
 {
-    auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
+    auto ssl_wrapper_packet = simulated_test_simulator->getSSLWrapperPacket();
     assert(ssl_wrapper_packet);
 
     auto sensor_msg                        = SensorMsg();
@@ -190,18 +192,18 @@ void SimulatedTestFixture::runTest(
             NonTerminatingFunctionValidator(validation_function, world));
     }
 
-    const Timestamp timeout_time = simulator->getTimestamp() + timeout;
+    const Timestamp timeout_time = simulated_test_simulator->getTimestamp() + timeout;
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
     const Duration ai_time_step = Duration::fromSeconds(
         simulation_time_step.getSeconds() * CAMERA_FRAMES_PER_AI_TICK);
     bool validation_functions_done = false;
-    while (simulator->getTimestamp() < timeout_time)
+    while (simulated_test_simulator->getTimestamp() < timeout_time)
     {
         auto wall_start_time = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {
-            simulator->stepSimulation(simulation_time_step);
+            simulated_test_simulator->stepSimulation(simulation_time_step);
             updateSensorFusion();
         }
 
@@ -224,8 +226,8 @@ void SimulatedTestFixture::runTest(
             {
                 PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
 
-                simulator->setYellowRobotPrimitive(primitive_ptr->getRobotId(),
-                                                   primitive_msg);
+                simulated_test_simulator->setYellowRobotPrimitive(
+                    primitive_ptr->getRobotId(), primitive_msg);
             }
 
             if (run_simulation_in_realtime)

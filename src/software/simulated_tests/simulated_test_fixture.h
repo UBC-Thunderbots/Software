@@ -5,9 +5,9 @@
 #include "software/ai/ai.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
+#include "software/simulated_tests/simulated_test_simulator.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
-#include "software/simulation/simulator.h"
 
 /**
  * This is a test fixture designed to make it easy to write integration tests. It provides
@@ -153,7 +153,7 @@ class SimulatedTestFixture : public ::testing::Test
     // the object in the SetUp function. Because the simulator has no
     // copy assignment operator, we have to make it a dynamically-allocated
     // object so we can assign new instances to this variable
-    std::unique_ptr<Simulator> simulator;
+    std::unique_ptr<SimulatedTestSimulator> simulated_test_simulator;
     // The SensorFusion being tested and used in simulation
     SensorFusion sensor_fusion;
     // The AI being tested and used in simulation
