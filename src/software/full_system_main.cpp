@@ -1,7 +1,7 @@
 #include <boost/program_options.hpp>
 #include <experimental/filesystem>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <numeric>
 
 #include "software/ai/ai_wrapper.h"
@@ -19,7 +19,7 @@ struct commandLineArgs
     bool help                          = false;
     std::string backend_name           = "";
     std::string network_interface_name = "";
-    std::string replay_path = "";
+    std::string replay_path            = "";
     bool headless                      = false;
     bool err                           = false;
 };
@@ -63,8 +63,7 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     std::string interface_help_str =
         "The interface to send and receive packets over (can be found through ifconfig)";
 
-    std::string replay_dir_help_str =
-        "The sensor msg log directory to playback";
+    std::string replay_dir_help_str = "The sensor msg log directory to playback";
 
     boost::program_options::options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
@@ -77,10 +76,9 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
         "interface",
         boost::program_options::value<std::string>(&args.network_interface_name),
         interface_help_str.c_str());
-    desc.add_options()(
-        "replay_path",
-        boost::program_options::value<std::string>(&args.replay_path),
-        replay_dir_help_str.c_str());
+    desc.add_options()("replay_path",
+                       boost::program_options::value<std::string>(&args.replay_path),
+                       replay_dir_help_str.c_str());
     desc.add_options()("headless", boost::program_options::bool_switch(&args.headless),
                        "Run without the FullSystemGUI");
 
@@ -141,15 +139,19 @@ int main(int argc, char **argv)
         // if the replay backend is selected, check that the replay directory is set
         // and set the parameter from the command line option before the ReplayBackend
         // is constructed
-        if (args.backend_name == "replay") {
-            if (args.replay_path.empty()) {
-                throw std::invalid_argument("No replay directory given! Please give a "
-                                            "replay directory to playback with the "
-                                            "--replay_path parameter");
+        if (args.backend_name == "replay")
+        {
+            if (args.replay_path.empty())
+            {
+                throw std::invalid_argument(
+                    "No replay directory given! Please give a "
+                    "replay directory to playback with the "
+                    "--replay_path parameter");
             }
 
             MutableDynamicParameters->getMutableReplayBackendConfig()
-                ->mutableReplayPath()->setValue(args.replay_path);
+                ->mutableReplayPath()
+                ->setValue(args.replay_path);
         }
 
         std::shared_ptr<Backend> backend =
@@ -164,22 +166,23 @@ int main(int argc, char **argv)
         backend->Subject<SensorMsg>::registerObserver(sensor_fusion);
 
         // create a directory in /tmp to store replays if the parameter is set
-        if (replay_logging_config->RecordReplay()->value()) {
-            fs::path replay_parent_dir(
-                replay_logging_config->ReplayPath()->value());
-            if (!fs::exists(replay_parent_dir)) {
+        if (replay_logging_config->RecordReplay()->value())
+        {
+            fs::path replay_parent_dir(replay_logging_config->ReplayPath()->value());
+            if (!fs::exists(replay_parent_dir))
+            {
                 fs::create_directories(replay_parent_dir);
             }
 
             // read the current local time and put it in a string so we can use it
             // as a directory name
             std::stringstream replay_dir_name_stream;
-            std::time_t now_time = std::chrono::system_clock::to_time_t(
-                std::chrono::system_clock::now());
+            std::time_t now_time =
+                std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
             std::tm now_time_tm = *std::localtime(&now_time);
             replay_dir_name_stream << std::put_time(&now_time_tm, "%Y%m%d_%H%M%S");
 
-            fs::path replay_dir = replay_parent_dir / replay_dir_name_stream.str();
+            fs::path replay_dir    = replay_parent_dir / replay_dir_name_stream.str();
             auto replay_logger_ptr = std::make_shared<ReplayLogger>(replay_dir);
             backend->Subject<SensorMsg>::registerObserver(replay_logger_ptr);
         }
