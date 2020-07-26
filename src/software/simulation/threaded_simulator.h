@@ -113,16 +113,6 @@ class ThreadedSimulator
     void addBlueRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Sets the primitives being simulated by the robots in simulation
-     *
-     * Note: These functions are threadsafe.
-     *
-     * @param primitives The primitives to simulate
-     */
-    void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-    void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-
-    /**
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
@@ -130,6 +120,15 @@ class ThreadedSimulator
      */
     void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
     void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+
+    /**
+     * Sets the primitive being simulated by the robot on the corresponding team
+     * in simulation
+     *
+     * @param primitive_set_msg The set of primitives to run on the robot
+     */
+    void setYellowRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
+    void setBlueRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
 
     /**
      * Returns the PhysicsRobot at the given position. This function accounts

@@ -114,8 +114,8 @@ class StandaloneSimulator
      *
      * @param primitive_set_msg The set of primitives to run on the respective team
      */
-    void setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg);
-    void setBlueRobotPrimitives(PrimitiveSetMsg primitive_set_msg);
+    void setYellowRobotPrimitiveSet(PrimitiveSetMsg primitive_set_msg);
+    void setBlueRobotPrimitiveSet(PrimitiveSetMsg primitive_set_msg);
 
     /**
      * A helper function that sets up all networking functionality with

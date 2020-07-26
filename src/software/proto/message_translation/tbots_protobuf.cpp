@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "shared/proto/geometry.pb.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 #include "shared/proto/vision.pb.h"
 #include "software/primitive/primitive.h"
 #include "software/proto/message_translation/proto_creator_primitive_visitor.h"
@@ -11,8 +10,9 @@
 std::unique_ptr<VisionMsg> createVisionMsg(const World& world)
 {
     // create msg and set timestamp
-    auto vision_msg                    = std::make_unique<VisionMsg>();
-    *(vision_msg->mutable_time_sent()) = *createCurrentTimestampMsg();
+    auto vision_msg = std::make_unique<VisionMsg>();
+
+    vision_msg->set_timestamp_seconds(createCurrentTime());
 
     // set robot_states map
     auto& robot_states_map = *vision_msg->mutable_robot_states();
@@ -38,8 +38,8 @@ std::unique_ptr<PrimitiveSetMsg> createPrimitiveSetMsg(
     const ConstPrimitiveVectorPtr& primitives)
 {
     // create msg and update timestamp
-    auto primitive_set_msg                    = std::make_unique<PrimitiveSetMsg>();
-    *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestampMsg();
+    auto primitive_set_msg = std::make_unique<PrimitiveSetMsg>();
+    primitive_set_msg->set_timestamp_seconds(createCurrentTime());
 
     // set robot primitives
     auto& robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
@@ -111,9 +111,8 @@ std::unique_ptr<VectorMsg> createVectorMsg(const Vector& vector)
     return std::move(vector_msg);
 }
 
-std::unique_ptr<TimestampMsg> createCurrentTimestampMsg()
+double createCurrentTime()
 {
-    auto timestamp_msg    = std::make_unique<TimestampMsg>();
     const auto clock_time = std::chrono::system_clock::now();
     double time_in_seconds =
         static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
@@ -121,6 +120,5 @@ std::unique_ptr<TimestampMsg> createCurrentTimestampMsg()
                                 .count()) /
         MICROSECONDS_PER_SECOND;
 
-    timestamp_msg->set_epoch_timestamp_seconds(time_in_seconds);
-    return std::move(timestamp_msg);
+    return time_in_seconds;
 }

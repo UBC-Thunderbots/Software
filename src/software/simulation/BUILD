@@ -165,6 +165,7 @@ cc_test(
     name = "simulator_test",
     srcs = ["simulator_test.cpp"],
     deps = [
+        ":convert_primitive_to_nanopb",
         ":simulator",
         "//software/test_util",
         "//software/world",
@@ -186,7 +187,9 @@ cc_test(
     name = "threaded_simulator_test",
     srcs = ["threaded_simulator_test.cpp"],
     deps = [
+        ":convert_primitive_to_nanopb",
         ":threaded_simulator",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",

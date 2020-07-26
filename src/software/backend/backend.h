@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
 #include "software/primitive/primitive.h"
@@ -15,7 +16,7 @@
  */
 class Backend : public Subject<SensorMsg>,
                 public FirstInFirstOutThreadedObserver<World>,
-                public FirstInFirstOutThreadedObserver<ConstPrimitiveVectorPtr>
+                public FirstInFirstOutThreadedObserver<PrimitiveSetMsg>
 {
    public:
     Backend() = default;

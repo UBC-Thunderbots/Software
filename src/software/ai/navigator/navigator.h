@@ -2,6 +2,7 @@
 
 #include <unordered_set>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
@@ -42,6 +43,17 @@ class Navigator : public IntentVisitor
      */
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents);
+
+    /**
+     * Get PrimitiveSetMsg for given assigned intents
+     *
+     * @param world World to navigate around
+     * @assignedIntents intents to process into primitives
+     *
+     * @return PrimitiveSetMsg
+     */
+    std::unique_ptr<PrimitiveSetMsg> getAssignedPrimitiveSetMsg(
+        const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents);
 
     /**
      * Get the planned paths for navigation

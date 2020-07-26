@@ -2,6 +2,7 @@
 
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
                      RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
@@ -58,6 +59,16 @@ void Navigator::visit(const StopIntent &intent)
     auto p            = std::make_unique<StopPrimitive>(intent);
     current_primitive = std::move(p);
     current_robot_id  = intent.getRobotId();
+}
+
+std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
+    const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents)
+{
+    auto primitives     = getAssignedPrimitives(world, assigned_intents);
+    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
+        std::move(primitives));
+
+    return createPrimitiveSetMsg(primitives_ptr);
 }
 
 std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(

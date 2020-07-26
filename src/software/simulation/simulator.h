@@ -10,6 +10,7 @@
 extern "C"
 {
 #include "shared/proto/primitive.nanopb.h"
+#include "shared/proto/tbots_software_msgs.nanopb.h"
 }
 
 /**
@@ -123,14 +124,6 @@ class Simulator
     void addBlueRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Sets the primitives being simulated by the robots in simulation
-     *
-     * @param primitives The primitives to simulate
-     */
-    void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-    void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-
-    /**
      * Sets the primitive being simulated by the robot on the corresponding team
      * in simulation
      *
@@ -139,6 +132,15 @@ class Simulator
      */
     void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
     void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+
+    /**
+     * Sets the primitive being simulated by the robot on the corresponding team
+     * in simulation
+     *
+     * @param primitive_set_msg The set of primitives to run on the robot
+     */
+    void setYellowRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
+    void setBlueRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -201,19 +203,6 @@ class Simulator
         const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots);
-
-    /**
-     * Sets the given primitives on the given simulator robots
-     *
-     * @param primitives The primitives to set
-     * @param simulator_robots The robots to set the primitives on
-     * @param simulator_ball The simulator ball to use in the primitives
-     */
-    static void setRobotPrimitives(
-        ConstPrimitiveVectorPtr primitives,
-        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-            simulator_robots,
-        const std::shared_ptr<SimulatorBall>& simulator_ball);
 
     /**
      * Sets the primitive being simulated by the robot in simulation

@@ -24,14 +24,11 @@ AI::AI(std::shared_ptr<const AIConfig> ai_config,
 {
 }
 
-std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(const World &world) const
+std::unique_ptr<PrimitiveSetMsg> AI::getPrimitiveSetMsg(const World &world) const
 {
-    std::vector<std::unique_ptr<Intent>> assignedIntents = high_level->getIntents(world);
+    std::vector<std::unique_ptr<Intent>> assigned_intents = high_level->getIntents(world);
 
-    std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
-        navigator->getAssignedPrimitives(world, assignedIntents);
-
-    return assignedPrimitives;
+    return navigator->getAssignedPrimitiveSetMsg(world, assigned_intents);
 }
 
 PlayInfo AI::getPlayInfo() const
