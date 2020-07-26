@@ -5,6 +5,7 @@
 #include "software/gui/drawing/draw_functions.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/world/world.h"
 
 /**
@@ -13,7 +14,7 @@
  * robots based on the World state, and sending them out.
  */
 class AIWrapper : public FirstInFirstOutThreadedObserver<World>,
-                  public Subject<ConstPrimitiveVectorPtr>,
+                  public Subject<PrimitiveSetMsg>,
                   public Subject<AIDrawFunction>,
                   public Subject<PlayInfo>
 {

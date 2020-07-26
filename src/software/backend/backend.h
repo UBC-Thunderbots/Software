@@ -2,6 +2,7 @@
 
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/primitive/primitive.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
@@ -15,7 +16,7 @@
  */
 class Backend : public Subject<SensorMsg>,
                 public FirstInFirstOutThreadedObserver<World>,
-                public FirstInFirstOutThreadedObserver<ConstPrimitiveVectorPtr>
+                public FirstInFirstOutThreadedObserver<PrimitiveSetMsg>
 {
    public:
     Backend() = default;

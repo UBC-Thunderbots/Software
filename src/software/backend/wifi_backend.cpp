@@ -30,9 +30,9 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
     joinMulticastChannel(channel, network_interface);
 }
 
-void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
+void WifiBackend::onValueReceived(PrimitiveSetMsg primitives)
 {
-    primitive_output->sendProto(*createPrimitiveSetMsg(primitives_ptr));
+    primitive_output->sendProto(primitives);
 }
 
 void WifiBackend::onValueReceived(World world)

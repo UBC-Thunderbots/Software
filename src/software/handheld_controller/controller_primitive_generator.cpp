@@ -2,6 +2,7 @@
 
 #include "software/primitive/chip_primitive.h"
 #include "software/primitive/direct_velocity_primitive.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/primitive/kick_primitive.h"
 
 ControllerPrimitiveGenerator::ControllerPrimitiveGenerator(
@@ -16,7 +17,7 @@ void ControllerPrimitiveGenerator::onValueReceived(ControllerInput controller_in
     primitives.emplace_back(createPrimitiveFromControllerInput(controller_input));
     auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
         std::move(primitives));
-    Subject<ConstPrimitiveVectorPtr>::sendValueToObservers(primitives_ptr);
+    Subject<PrimitiveSetMsg>::sendValueToObservers(*createPrimitiveSetMsg(primitives_ptr));
 }
 
 std::unique_ptr<Primitive>

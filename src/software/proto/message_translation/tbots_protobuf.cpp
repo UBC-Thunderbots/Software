@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "shared/proto/geometry.pb.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 #include "shared/proto/vision.pb.h"
 #include "software/primitive/primitive.h"
 #include "software/proto/message_translation/proto_creator_primitive_visitor.h"

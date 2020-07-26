@@ -21,16 +21,13 @@ void AIWrapper::runAIAndSendPrimitives()
 {
     if (most_recent_world && control_config->RunAI()->value())
     {
-        std::vector<std::unique_ptr<Primitive>> new_primitives =
-            ai.getPrimitives(*most_recent_world);
+        auto new_primitives =
+            ai.getPrimitiveSetMsg(*most_recent_world);
 
         PlayInfo play_info = ai.getPlayInfo();
         Subject<PlayInfo>::sendValueToObservers(play_info);
 
-        auto new_primitives_ptr =
-            std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-                std::move(new_primitives));
-        Subject<ConstPrimitiveVectorPtr>::sendValueToObservers(new_primitives_ptr);
+        Subject<PrimitiveSetMsg>::sendValueToObservers(*new_primitives);
     }
     drawAI();
 }

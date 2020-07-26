@@ -24,17 +24,6 @@ class AI final
                 std::shared_ptr<const AIControlConfig> control_config);
 
     /**
-     * Calculates the Primitives that should be run by our Robots given the current
-     * state of the world.
-     *
-     * @param world The state of the World with which to make the decisions
-     *
-     * @return the Primitives that should be run by our Robots given the current state
-     * of the world.
-     */
-    std::vector<std::unique_ptr<Primitive>> getPrimitives(const World& world) const;
-
-    /**
      * Calculates the PrimitiveSetMsg that should be run by our Robots given the current
      * state of the world.
      *
