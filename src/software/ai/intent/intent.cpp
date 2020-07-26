@@ -6,25 +6,20 @@
 
 // Implement concrete functions shared by all intents
 
-Intent::Intent(unsigned int priority)
-    :       navigator_params(std::nullopt){
+Intent::Intent(unsigned int robot_id,     PrimitiveMsg primitive_msg, unsigned int priority)
+    :       motion_constraints(),navigator_params(std::nullopt), robot_id(robot_id), primitive_msg(primitive_msg){
     setPriority(priority);
 }
-
-//Intent::Intent(unsigned int robot_id,     PrimitiveMsg primitive_msg, unsigned int priority)
-//    :       motion_constraints(),navigator_params(std::nullopt), robot_id(robot_id), primitive_msg(primitive_msg){
-//    setPriority(priority);
-//}
 
 unsigned int Intent::getPriority(void) const
 {
     return priority;
 }
 
-//    unsigned int Intent::getRobotId() const
-//{
-//    return robot_id;
-//}
+    unsigned int Intent::getRobotId() const
+{
+    return robot_id;
+}
 
 void Intent::setPriority(unsigned int new_priority)
 {

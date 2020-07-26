@@ -8,10 +8,9 @@ DirectWheelsIntent::DirectWheelsIntent(unsigned int robot_id,
                                        int16_t front_right_wheel_power,
                                        int16_t back_right_wheel_power,
                                        double dribbler_rpm, unsigned int priority)
-    : DirectWheelsPrimitive(robot_id, front_left_wheel_power, back_left_wheel_power,
+    : Intent(robot_id, ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(DirectWheelsPrimitive(robot_id, front_left_wheel_power, back_left_wheel_power,
                             front_right_wheel_power, back_right_wheel_power,
-                            dribbler_rpm),
-      Intent(priority)
+                            dribbler_rpm)), priority)
 {
 }
 
@@ -27,7 +26,7 @@ std::string DirectWheelsIntent::getIntentName(void) const
 
 bool DirectWheelsIntent::operator==(const DirectWheelsIntent &other) const
 {
-    return DirectWheelsPrimitive::operator==(other) && Intent::operator==(other);
+    return Intent::operator==(other);
 }
 
 bool DirectWheelsIntent::operator!=(const DirectWheelsIntent &other) const

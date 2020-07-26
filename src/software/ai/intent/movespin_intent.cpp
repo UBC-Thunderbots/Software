@@ -5,7 +5,8 @@ const std::string MoveSpinIntent::INTENT_NAME = "MoveSpin Intent";
 MoveSpinIntent::MoveSpinIntent(unsigned int robot_id, const Point &dest,
                                const AngularVelocity &angular_vel, double final_speed,
                                unsigned int priority)
-    : MoveSpinPrimitive(robot_id, dest, angular_vel, final_speed), Intent(priority)
+    : Intent(robot_id, ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(MoveSpinPrimitive(robot_id, dest, angular_vel, final_speed)), priority)
+
 {
 }
 
@@ -21,7 +22,7 @@ void MoveSpinIntent::accept(IntentVisitor &visitor) const
 
 bool MoveSpinIntent::operator==(const MoveSpinIntent &other) const
 {
-    return MoveSpinPrimitive::operator==(other) && Intent::operator==(other);
+    return Intent::operator==(other);
 }
 
 bool MoveSpinIntent::operator!=(const MoveSpinIntent &other) const

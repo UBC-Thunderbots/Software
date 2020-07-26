@@ -5,8 +5,8 @@ const std::string KickIntent::INTENT_NAME = "Kick Intent";
 KickIntent::KickIntent(unsigned int robot_id, const Point &kick_origin,
                        const Angle &kick_direction, double kick_speed_meters_per_second,
                        unsigned int priority)
-    : KickPrimitive(robot_id, kick_origin, kick_direction, kick_speed_meters_per_second),
-      Intent(priority)
+    : Intent(robot_id, ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(KickPrimitive(robot_id, kick_origin, kick_direction, kick_speed_meters_per_second)), priority)
+
 {
 }
 
@@ -22,7 +22,7 @@ void KickIntent::accept(IntentVisitor &visitor) const
 
 bool KickIntent::operator==(const KickIntent &other) const
 {
-    return KickPrimitive::operator==(other) && Intent::operator==(other);
+    return Intent::operator==(other);
 }
 
 bool KickIntent::operator!=(const KickIntent &other) const

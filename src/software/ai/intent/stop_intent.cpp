@@ -3,7 +3,7 @@
 const std::string StopIntent::INTENT_NAME = "Stop Intent";
 
 StopIntent::StopIntent(unsigned int robot_id, bool coast, unsigned int priority)
-    : StopPrimitive(robot_id, coast), Intent(priority)
+    : Intent(robot_id, ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(StopPrimitive(robot_id, coast)), priority)
 {
 }
 
@@ -19,7 +19,7 @@ void StopIntent::accept(IntentVisitor &visitor) const
 
 bool StopIntent::operator==(const StopIntent &other) const
 {
-    return StopPrimitive::operator==(other) && Intent::operator==(other);
+    return Intent::operator==(other);
 }
 
 bool StopIntent::operator!=(const StopIntent &other) const

@@ -49,8 +49,7 @@ class Intent
      * @param primitive_msg The PrimitiveMsg that underlies this Intent
      * @param priority The priority of this Intent
      */
-    //explicit Intent(unsigned int robot_id,     PrimitiveMsg primitive_msg, unsigned int priority);
-    explicit Intent(unsigned int priority);
+    explicit Intent(unsigned int robot_id,     PrimitiveMsg primitive_msg, unsigned int priority);
 
     /**
      * Returns the name of this Intent
@@ -73,7 +72,7 @@ class Intent
      *
      * @return The ID of the robot this Intent is controlling
      */
-    //unsigned int getRobotId() const;
+    unsigned int getRobotId() const;
 
     /**
      * Sets the priority of this Intent. The priority value must be an integer in the

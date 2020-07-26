@@ -3,7 +3,7 @@
 #include "software/ai/intent/intent.h"
 #include "software/primitive/movespin_primitive.h"
 
-class MoveSpinIntent : public MoveSpinPrimitive, public Intent
+class MoveSpinIntent : public Intent
 {
    public:
     static const std::string INTENT_NAME;
