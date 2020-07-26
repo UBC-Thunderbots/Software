@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/stp.h"
+#include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/ai/hl/stp/tactic/test_tactics/goalie_test_tactic.h"
 #include "software/ai/hl/stp/tactic/test_tactics/move_test_tactic.h"
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
@@ -504,19 +505,19 @@ TEST_F(STPTacticAssignmentTest,
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
     std::vector<Robot> expected_robots_assigned  = {robot_0, robot_1, robot_2};
-    std::vector<std::string> expected_tactics    = {"Move Test Tactic", "Stop Tactic",
-                                                 "Stop Tactic"};
 
     std::vector<std::shared_ptr<Tactic>> assigned_tactics =
         stp.assignRobotsToTactics(world, tactics);
 
+    // Check each tactic is assigned to the intended robot
     for (unsigned int i = 0; i < assigned_tactics.size(); i++)
     {
         EXPECT_EQ(assigned_tactics[i]->getAssignedRobot().value(),
                   expected_robots_assigned[i]);
     }
 
-    // TODO add tactic dynamic_cast check
-    //    auto tactic1 = dynamic_cast<MoveTestTactic>(*move_tactic_1);
-    //    ASSERT_TRUE(tactic1);
+    // Check that StopTactics are added
+    ASSERT_TRUE(dynamic_cast<MoveTestTactic*>(assigned_tactics[0].get()));
+    ASSERT_TRUE(dynamic_cast<StopTactic*>(assigned_tactics[1].get()));
+    ASSERT_TRUE(dynamic_cast<StopTactic*>(assigned_tactics[2].get()));
 }
