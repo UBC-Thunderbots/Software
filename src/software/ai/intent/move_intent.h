@@ -44,8 +44,7 @@ class MoveIntent : public Intent
     BallCollisionType getBallCollisionType() const;
 
     void accept(IntentVisitor& visitor) const override;
-//    std::optional<std::unique_ptr<Intent>> createWithNewFinalSpeedAndDestination(
-//        Point destination, double final_speed) const override;
+    PrimitiveMsg getPrimitiveMsg( Point destination, double final_speed) const override;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all

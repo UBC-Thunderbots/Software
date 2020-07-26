@@ -62,10 +62,9 @@ PrimitiveMsg Intent::getPrimitiveMsg() const
     return primitive_msg;
 }
 
-std::optional<std::unique_ptr<Intent>> Intent::createWithNewFinalSpeedAndDestination(
-    Point destination, double final_speed) const
+PrimitiveMsg Intent::getPrimitiveMsg( Point destination, double final_speed) const
 {
-    return std::nullopt;
+    return primitive_msg;
 }
 
 void Intent::updateNavigatorParams(unsigned int robot_id, Point destination,

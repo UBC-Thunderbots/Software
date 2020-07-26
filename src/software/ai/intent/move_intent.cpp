@@ -1,5 +1,7 @@
 #include "software/ai/intent/move_intent.h"
 
+#include "shared/constants.h"
+
 const std::string MoveIntent::INTENT_NAME = "Move Intent";
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
@@ -26,15 +28,19 @@ void MoveIntent::accept(IntentVisitor &visitor) const
     visitor.visit(*this);
 }
 
-//std::optional<std::unique_ptr<Intent>> MoveIntent::createWithNewFinalSpeedAndDestination(
-//    Point destination, double final_speed) const
-//{
-//    // MovePrimitive::updateFinalSpeedAndDestination(destination, final_speed);
-//    MovePrimitive move_primitive(*this);
-//    move_primitive.updateFinalSpeedAndDestination(destination, final_speed);
-//    return std::make_unique<MoveIntent>(move_primitive, getPriority(),
-//                                        getBallCollisionType());
-//}
+    PrimitiveMsg MoveIntent::getPrimitiveMsg( Point destination, double final_speed) const 
+{
+    PrimitiveMsg new_primitive_msg = Intent::getPrimitiveMsg();
+
+PrimitiveParamsMsg new_primitive_params_msg = new_primitive_msg.move();
+    new_primitive_params_msg.set_parameter1( static_cast<float>(destination.x() * MILLIMETERS_PER_METER));
+    new_primitive_params_msg.set_parameter2( static_cast<float>(destination.y() * MILLIMETERS_PER_METER));
+    new_primitive_params_msg.set_parameter4( static_cast<float>(final_speed * MILLIMETERS_PER_METER));
+
+    *(new_primitive_msg.mutable_move()) = new_primitive_params_msg;
+
+    return new_primitive_msg;
+}
 
 bool MoveIntent::operator==(const MoveIntent &other) const
 {

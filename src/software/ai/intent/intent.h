@@ -126,20 +126,23 @@ class Intent
      */
     std::optional<NavigatorParams> getNavigatorParams() const;
 
+    /**
+     * Get PrimitiveMsg that underlies this Intent
+     *
+     * @return PrimitiveMsg
+     */
     PrimitiveMsg getPrimitiveMsg() const;
 
     /**
-     * Uses this Intent to create a new Intent with the given final speed and destination
-     * if possible If not possible then return std::nullopt NOTE: This should be
-     * overridden if the Intent requires navigation
+     * Gets a PrimitiveMsg updated with destination and final_speed
+     * NOTE: not all Intents update PrimitiveMsg
      *
      * @param destination The destination
      * @param final_speed The final speed
      *
-     * @return the Intent if creation was successful, if not return std::nullopt
+     * @return PrimitiveMsg updated with destination and final_speed
      */
-    virtual std::optional<std::unique_ptr<Intent>> createWithNewFinalSpeedAndDestination(
-        Point destination, double final_speed) const;
+    virtual PrimitiveMsg getPrimitiveMsg( Point destination, double final_speed) const;
 
     virtual ~Intent() = default;
 
