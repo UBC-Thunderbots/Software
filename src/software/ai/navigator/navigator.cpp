@@ -13,53 +13,6 @@ Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
 {
 }
 
-void Navigator::visit(const ChipIntent &intent)
-{
-    auto p            = std::make_unique<ChipPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
-void Navigator::visit(const DirectVelocityIntent &intent)
-{
-    auto p            = std::make_unique<DirectVelocityPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
-void Navigator::visit(const DirectWheelsIntent &intent)
-{
-    auto p            = std::make_unique<DirectWheelsPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
-void Navigator::visit(const KickIntent &intent)
-{
-    auto p            = std::make_unique<KickPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
-void Navigator::visit(const MoveIntent &intent)
-{
-    current_primitive = std::unique_ptr<Primitive>(nullptr);
-}
-
-void Navigator::visit(const MoveSpinIntent &intent)
-{
-    auto p            = std::make_unique<MoveSpinPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
-void Navigator::visit(const StopIntent &intent)
-{
-    auto p            = std::make_unique<StopPrimitive>(intent);
-    current_primitive = std::move(p);
-    current_robot_id  = intent.getRobotId();
-}
-
 std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents)
 {
@@ -89,7 +42,6 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         (void)navigator_params;
         current_primitive.reset(nullptr);
         current_robot_id.reset();
-        intent->accept(*this);
         if (current_primitive)
         {
             assigned_primitives.emplace_back(std::move(current_primitive));

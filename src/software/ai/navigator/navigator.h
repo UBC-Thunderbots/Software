@@ -18,7 +18,7 @@
  * This Navigator converts the given Intents into their respective Primitives
  * and navigate around obstacles
  */
-class Navigator : public IntentVisitor
+class Navigator
 {
    public:
     /**
@@ -68,19 +68,6 @@ class Navigator : public IntentVisitor
      * @return obstacles
      */
     std::vector<ObstaclePtr> getObstacles();
-
-    /**
-     * Registers the given Intent for navigation
-     *
-     * @param The Intent to register
-     */
-    void visit(const ChipIntent &chip_intent) override;
-    void visit(const DirectVelocityIntent &direct_velocity_intent) override;
-    void visit(const DirectWheelsIntent &direct_wheels_intent) override;
-    void visit(const KickIntent &kick_intent) override;
-    void visit(const MoveIntent &move_intent) override;
-    void visit(const MoveSpinIntent &move_spin_intent) override;
-    void visit(const StopIntent &stop_intent) override;
 
     /**
      * Calculates the transition speed for the robot between two line segments
