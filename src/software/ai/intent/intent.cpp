@@ -7,8 +7,7 @@
 // Implement concrete functions shared by all intents
 
 Intent::Intent(unsigned int priority)
-    : navigator_params_updated(false),
-      navigator_params{.robot_id            = 0,
+    :       navigator_params{.robot_id            = 0,
                        .motion_constraints  = std::set<MotionConstraint>(),
                        .destination         = Point(),
                        .final_speed         = 0.0,
@@ -21,6 +20,11 @@ Intent::Intent(unsigned int priority)
 unsigned int Intent::getPriority(void) const
 {
     return priority;
+}
+
+    unsigned int Intent::getRobotId() const
+{
+    return robot_id;
 }
 
 void Intent::setPriority(unsigned int new_priority)
@@ -46,21 +50,17 @@ bool Intent::operator!=(const Intent &other) const
 
 void Intent::setMotionConstraints(const std::set<MotionConstraint> &motion_constraints)
 {
-    this->navigator_params.motion_constraints = motion_constraints;
+    this->motion_constraints = motion_constraints;
 }
 
 std::set<MotionConstraint> Intent::getMotionConstraints(void) const
 {
-    return navigator_params.motion_constraints;
+    return this->motion_constraints;
 }
 
 std::optional<NavigatorParams> Intent::getNavigatorParams() const
 {
-    if (navigator_params_updated)
-    {
-        return navigator_params;
-    }
-    return std::nullopt;
+    return navigator_params;
 }
 
 PrimitiveMsg Intent::getPrimitiveMsg() const
@@ -80,10 +80,9 @@ void Intent::updateNavigatorParams(unsigned int robot_id, Point destination,
 {
     navigator_params =
         NavigatorParams{.robot_id            = robot_id,
-                        .motion_constraints  = navigator_params.motion_constraints,
+                        .motion_constraints  = this->motion_constraints,
                         .destination         = destination,
                         .final_speed         = final_speed,
                         .final_angle         = final_angle,
                         .ball_collision_type = ball_collision_type};
-    navigator_params_updated = true;
 }

@@ -64,6 +64,14 @@ class Intent
     unsigned int getPriority(void) const;
 
     /**
+     * Returns the ID of the robot that this Intent corresponds
+     * to / is controlling
+     *
+     * @return The ID of the robot this Intent is controlling
+     */
+    unsigned int getRobotId() const;
+
+    /**
      * Sets the priority of this Intent. The priority value must be an integer in the
      * range [0, 100]
      */
@@ -154,8 +162,8 @@ class Intent
      */
     unsigned int priority;
 
-    bool navigator_params_updated;
-    NavigatorParams navigator_params;
+std::set<MotionConstraint>motion_constraints; 
+    std::optional<NavigatorParams> navigator_params;
     PrimitiveMsg primitive_msg;
-    //std::unique_ptr<Primitive> primitive;
+    unsigned int robot_id;
 };
