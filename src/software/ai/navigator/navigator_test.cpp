@@ -1,5 +1,6 @@
 #include "software/ai/navigator/navigator.h"
 
+#include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/all_intents.h"
@@ -8,6 +9,7 @@
 #include "software/ai/navigator/path_planner/one_point_path_test_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 #include "software/primitive/all_primitives.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/test_util/test_util.h"
 
 class NoPathNavigatorTest : public testing::Test
@@ -70,14 +72,15 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
     intents.emplace_back(
         std::make_unique<ChipIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
     // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
+    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = ChipPrimitive(0, Point(), Angle::quarter(), 0);
-    auto primitive          = dynamic_cast<ChipPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+        ChipPrimitive(0, Point(), Angle::quarter(), 0));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
 
 TEST_F(ThetaStarNavigatorTest,
@@ -88,14 +91,15 @@ TEST_F(ThetaStarNavigatorTest,
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<DirectVelocityIntent>(3, 1, -2, 0.4, 1000, 4));
 
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
     // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
+    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = DirectVelocityPrimitive(3, 1, -2, 0.4, 1000);
-    auto primitive = dynamic_cast<DirectVelocityPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+        DirectVelocityPrimitive(3, 1, -2, 0.4, 1000));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_primitive, primitive_set_msg->robot_primitives().at(3)));
 }
 
 TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_primitive)
@@ -106,14 +110,15 @@ TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_pri
     intents.emplace_back(
         std::make_unique<DirectWheelsIntent>(2, 80, 22, 55, 201, 5000, 60));
 
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
     // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
+    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = DirectWheelsPrimitive(2, 80, 22, 55, 201, 5000);
-    auto primitive = dynamic_cast<DirectWheelsPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+        DirectWheelsPrimitive(2, 80, 22, 55, 201, 5000));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_primitive, primitive_set_msg->robot_primitives().at(2)));
 }
 
 TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
@@ -124,14 +129,15 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
     intents.emplace_back(
         std::make_unique<KickIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
     // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
+    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = KickPrimitive(0, Point(), Angle::quarter(), 0);
-    auto primitive          = dynamic_cast<KickPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+        KickPrimitive(0, Point(), Angle::quarter(), 0));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
 
 TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
@@ -142,14 +148,15 @@ TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
     intents.emplace_back(
         std::make_unique<MoveSpinIntent>(0, Point(), AngularVelocity::full(), 1, 0));
 
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
     // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
+    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = MoveSpinPrimitive(0, Point(), AngularVelocity::full(), 1);
-    auto primitive          = dynamic_cast<MoveSpinPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+        MoveSpinPrimitive(0, Point(), AngularVelocity::full(), 1));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
 
 TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
@@ -159,14 +166,15 @@ TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
 
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
     // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
+    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = StopPrimitive(0, false);
-    auto primitive          = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
+    auto expected_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(StopPrimitive(0, false));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
 
 TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
@@ -177,17 +185,20 @@ TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
     intents.emplace_back(std::make_unique<StopIntent>(1, false, 1));
 
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
-    // Make sure we got exactly 3 primitives back
-    EXPECT_EQ(primitive_ptrs.size(), 2);
+    // Make sure we got exactly 1 primitive back
+    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 2);
 
-    auto expected_stop_primitive_1 = StopPrimitive(0, false);
-    auto stop_primitive_1 = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_stop_primitive_1, stop_primitive_1);
-    auto expected_stop_primitive_2 = StopPrimitive(1, false);
-    auto stop_primitive_2 = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(1)));
-    EXPECT_EQ(expected_stop_primitive_2, stop_primitive_2);
+    auto expected_stop_primitive_1 =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(StopPrimitive(0, false));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_stop_primitive_1, primitive_set_msg->robot_primitives().at(0)));
+
+    auto expected_stop_primitive_2 =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(StopPrimitive(1, false));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_stop_primitive_2, primitive_set_msg->robot_primitives().at(1)));
 }
 
 TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
@@ -238,14 +249,16 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
         0, poi, Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
         AutochickType::NONE, BallCollisionType::AVOID));
 
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
     // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
+    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-
-    auto primitive = dynamic_cast<MovePrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(primitive.getDestination(), poi);
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+        MovePrimitive(0, poi, Angle::zero(), 0, DribblerEnable::OFF, MoveType::NORMAL,
+                      AutochickType::NONE));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
 
 TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
@@ -276,15 +289,15 @@ TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
         0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
         AutochickType::NONE, BallCollisionType::AVOID));
 
-    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
     // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_ptrs.size(), 1);
+    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-
-    auto expected_primitive = StopPrimitive(0, false);
-    auto primitive          = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(0)));
-    EXPECT_EQ(expected_primitive, primitive);
+    auto expected_primitive =
+        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(StopPrimitive(0, false));
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
 
 TEST_F(NoPathNavigatorTest,
