@@ -5,7 +5,10 @@ const std::string MoveSpinIntent::INTENT_NAME = "MoveSpin Intent";
 MoveSpinIntent::MoveSpinIntent(unsigned int robot_id, const Point &dest,
                                const AngularVelocity &angular_vel, double final_speed,
                                unsigned int priority)
-    : Intent(robot_id, ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(MoveSpinPrimitive(robot_id, dest, angular_vel, final_speed)), priority)
+    : Intent(robot_id,
+             ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+                 MoveSpinPrimitive(robot_id, dest, angular_vel, final_speed)),
+             priority)
 
 {
 }

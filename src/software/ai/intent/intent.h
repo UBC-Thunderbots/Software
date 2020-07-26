@@ -3,13 +3,13 @@
 #include <set>
 #include <string>
 
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "shared/proto/primitive.pb.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/primitive/primitive.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 
 MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 
@@ -49,7 +49,8 @@ class Intent
      * @param primitive_msg The PrimitiveMsg that underlies this Intent
      * @param priority The priority of this Intent
      */
-    explicit Intent(unsigned int robot_id,     PrimitiveMsg primitive_msg, unsigned int priority);
+    explicit Intent(unsigned int robot_id, PrimitiveMsg primitive_msg,
+                    unsigned int priority);
 
     /**
      * Returns the name of this Intent
@@ -142,7 +143,7 @@ class Intent
      *
      * @return PrimitiveMsg updated with destination and final_speed
      */
-    virtual PrimitiveMsg getPrimitiveMsg( Point destination, double final_speed) const;
+    virtual PrimitiveMsg getPrimitiveMsg(Point destination, double final_speed) const;
 
     virtual ~Intent() = default;
 
@@ -168,7 +169,7 @@ class Intent
      */
     unsigned int priority;
 
-std::set<MotionConstraint>motion_constraints; 
+    std::set<MotionConstraint> motion_constraints;
     std::optional<NavigatorParams> navigator_params;
     unsigned int robot_id;
     PrimitiveMsg primitive_msg;

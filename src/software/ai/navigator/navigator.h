@@ -95,14 +95,18 @@ class Navigator
      *
      * @param intents intents to make into path objectives
      * @param world World to navigate around
+     * @param friendly_non_navigating_robot_obstacles The obstacles representing friendly
+     * non-navigating robots
      *
      * @return set of PathObjectives
      */
     std::unordered_set<PathObjective> getPathObjectivesFromIntents(
-        const std::vector<std::unique_ptr<Intent>> &intents, const World &world);
+        const std::vector<std::unique_ptr<Intent>> &intents, const World &world,
+        std::vector<ObstaclePtr> friendly_non_navigating_robot_obstacles);
 
     /**
-     * Creates the final speed and destination given the navigator params, the path, the intent, and the world
+     * Creates the final speed and destination given the navigator params, the path, the
+     * intent, and the world
      *
      * @param navigator_params NavigatorParams
      * @param path path to make primitive for
@@ -111,7 +115,7 @@ class Navigator
      *
      * @return the final destination and speed
      */
-    std::pair<Point, double> calculateFinalDestinationAndSpeed(
+    std::pair<Point, double> calculateDestinationAndFinalSpeed(
         NavigatorParams navigator_params, Path path,
         const std::unique_ptr<Intent> &intent, const World &world);
 
@@ -132,18 +136,4 @@ class Navigator
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
     std::unique_ptr<PathManager> path_manager;
     std::vector<std::vector<Point>> planned_paths;
-
-    // The current Primitive the navigator has created from an Intent.
-    // This variable is set by each `visit` function
-    std::unique_ptr<Primitive> current_primitive;
-    std::optional<RobotId> current_robot_id;
-
-    // These are obstacles that represent robots that aren't
-    // assigned move intents
-    // When move intents are processed to path plan,
-    // we can avoid these non-"moving" robots
-    std::vector<ObstaclePtr> friendly_non_move_intent_robot_obstacles;
-
-    // intents that need path planning
-    std::vector<MoveIntent> move_intents_for_path_planning;
 };

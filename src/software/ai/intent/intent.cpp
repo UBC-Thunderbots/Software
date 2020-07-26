@@ -6,8 +6,12 @@
 
 // Implement concrete functions shared by all intents
 
-Intent::Intent(unsigned int robot_id,     PrimitiveMsg primitive_msg, unsigned int priority)
-    :       motion_constraints(),navigator_params(std::nullopt), robot_id(robot_id), primitive_msg(primitive_msg){
+Intent::Intent(unsigned int robot_id, PrimitiveMsg primitive_msg, unsigned int priority)
+    : motion_constraints(),
+      navigator_params(std::nullopt),
+      robot_id(robot_id),
+      primitive_msg(primitive_msg)
+{
     setPriority(priority);
 }
 
@@ -16,7 +20,7 @@ unsigned int Intent::getPriority(void) const
     return priority;
 }
 
-    unsigned int Intent::getRobotId() const
+unsigned int Intent::getRobotId() const
 {
     return robot_id;
 }
@@ -62,7 +66,7 @@ PrimitiveMsg Intent::getPrimitiveMsg() const
     return primitive_msg;
 }
 
-PrimitiveMsg Intent::getPrimitiveMsg( Point destination, double final_speed) const
+PrimitiveMsg Intent::getPrimitiveMsg(Point destination, double final_speed) const
 {
     return primitive_msg;
 }
@@ -71,11 +75,10 @@ void Intent::updateNavigatorParams(unsigned int robot_id, Point destination,
                                    Angle final_angle, double final_speed,
                                    BallCollisionType ball_collision_type)
 {
-    navigator_params =
-        NavigatorParams{.robot_id            = robot_id,
-                        .motion_constraints  = this->motion_constraints,
-                        .destination         = destination,
-                        .final_speed         = final_speed,
-                        .final_angle         = final_angle,
-                        .ball_collision_type = ball_collision_type};
+    navigator_params = NavigatorParams{.robot_id            = robot_id,
+                                       .motion_constraints  = this->motion_constraints,
+                                       .destination         = destination,
+                                       .final_speed         = final_speed,
+                                       .final_angle         = final_angle,
+                                       .ball_collision_type = ball_collision_type};
 }
