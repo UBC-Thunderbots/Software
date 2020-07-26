@@ -115,19 +115,18 @@ class Navigator : public IntentVisitor
         const std::vector<std::unique_ptr<Intent>> &intents, const World &world);
 
     /**
-     * Updates the intent with the given path and return the primitive
+     * Creates the intent updated with the given path and return the primitive
      *
      * @param navigator_params NavigatorParams
      * @param path path to make primitive for
      * @param intent intent to update
      * @param world World to navigate around
      *
-     * @return primitive after updating the intent
+     * @return Intent after updating the intent
      */
-    std::unique_ptr<Primitive> updateIntentWithPath(NavigatorParams navigator_params,
-                                                    std::optional<Path> path,
-                                                    std::unique_ptr<Intent> intent,
-                                                    const World &world);
+    std::unique_ptr<Intent> createIntentUpdatedWithPath(
+        NavigatorParams navigator_params, std::optional<Path> path,
+        const std::unique_ptr<Intent> &intent, const World &world);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.

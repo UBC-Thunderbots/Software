@@ -43,7 +43,6 @@ void Navigator::visit(const KickIntent &intent)
 
 void Navigator::visit(const MoveIntent &intent)
 {
-    move_intents_for_path_planning.push_back(intent);
     current_primitive = std::unique_ptr<Primitive>(nullptr);
 }
 
@@ -116,27 +115,34 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         path_manager->getManagedPaths(path_objectives, navigable_area);
 
     // Turn each intent and associated path into primitives
-    for (const auto &intent : assigned_intents)
-    {
-        auto navigator_params = intent->getNavigatorParams();
-        if (navigator_params)
-        {
-            //            if (robot_id_to_path.find(navigator_params->robot_id) !=
-            //                robot_id_to_path.end())
-            //            {
-            //                auto path = robot_id_to_path.at(navigator_params->robot_id);
-            //                updateIntentWithPath(navigator_params.value(), path, intent,
-            //                world);
-            //            }
-            //            else
-            //            {
-            //                LOG(WARNING) << "Path manager did not map RobotId = "
-            //                             << navigator_params->robot_id << " to a path";
-            //            }
-            // primitives.emplace_back(std::move(primitive));
-            // assigned_primitives.emplace_back(std::move(intent));
-        }
-    }
+    //    for (const auto &intent : assigned_intents)
+    //    {
+    //        auto navigator_params = intent->getNavigatorParams();
+    //        if (navigator_params)
+    //        {
+    //                        if (robot_id_to_path.find(navigator_params->robot_id) !=
+    //                            robot_id_to_path.end())
+    //                        {
+    //                            auto path =
+    //                            robot_id_to_path.at(navigator_params->robot_id); auto
+    //                            updated_intent =
+    //                            createIntentUpdatedWithPath(navigator_params.value(),
+    //                            path, intent, world);
+    //             assigned_primitives.emplace_back(std::move(updated_intent));
+    //                        }
+    //                        else
+    //                        {
+    //                            LOG(WARNING) << "Path manager did not map RobotId = "
+    //                                         << navigator_params->robot_id << " to a
+    //                                         path";
+    //             assigned_primitives.emplace_back(std::move(intent));
+    //                        }
+    //        }
+    //        else
+    //        {
+    //             assigned_primitives.emplace_back(std::move(intent));
+    //        }
+    //    }
 
     return assigned_primitives;
 }
@@ -191,7 +197,8 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromIntents(
     return path_objectives;
 }
 
-// bool Navigator::updateIntentWithPath(NavigatorParams navigator_params,
+// std::unique_ptr<Intent> Navigator::createIntentUpdatedWithPath(NavigatorParams
+// navigator_params,
 //                                     std::optional<Path> path,
 //                                     std::unique_ptr<Intent> intent, const World &world)
 //{
@@ -220,18 +227,27 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromIntents(
 //            final_dest = path_points[1];
 //        }
 //
-//        intent->updateFinalSpeedAndDestination(
+//        auto new_intent = intent->createWithNewFinalSpeedAndDestination(
 //            final_dest,  // slow down around enemy robots
 //            desired_final_speed *
 //                getEnemyObstacleProximityFactor(path_points[1], world.enemyTeam()));
-//        return true;
+//        if(new_intent)
+//        {
+//            return std::move(*new_intent);
+//        }
+//        else
+//        {
+//        LOG(WARNING) << "Was not able to create Intent with new final speed and
+//        destination for RobotId = "
+//                     << navigator_params.robot_id;
+//        }
 //    }
 //    else
 //    {
 //        LOG(WARNING) << "Path manager could not find a path for RobotId = "
 //                     << navigator_params.robot_id;
-//        return false;
 //    }
+//        return intent;
 //}
 
 double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team)

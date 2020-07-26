@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 
+#include "shared/proto/primitive.pb.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/geom/angle.h"
@@ -114,16 +115,20 @@ class Intent
      */
     std::optional<NavigatorParams> getNavigatorParams() const;
 
-    const std::shared_ptr<Primitive>& getPrimitive() const;
+    PrimitiveMsg getPrimitiveMsg() const;
 
     /**
-     * Updates the final speed and destination of this param
-     * NOTE: This should be overridden if the Intent requires navigation
+     * Uses this Intent to create a new Intent with the given final speed and destination
+     * if possible If not possible then return std::nullopt NOTE: This should be
+     * overridden if the Intent requires navigation
      *
      * @param destination The destination
      * @param final_speed The final speed
+     *
+     * @return the Intent if creation was successful, if not return std::nullopt
      */
-    virtual void updateFinalSpeedAndDestination(Point destination, double final_speed);
+    virtual std::optional<std::unique_ptr<Intent>> createWithNewFinalSpeedAndDestination(
+        Point destination, double final_speed) const;
 
     virtual ~Intent() = default;
 
@@ -151,5 +156,6 @@ class Intent
 
     bool navigator_params_updated;
     NavigatorParams navigator_params;
-    std::shared_ptr<Primitive> primitive;
+    PrimitiveMsg primitive_msg;
+    //std::unique_ptr<Primitive> primitive;
 };

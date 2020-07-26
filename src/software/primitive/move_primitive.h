@@ -112,7 +112,6 @@ class MovePrimitive : public Primitive
      */
     bool operator!=(const MovePrimitive &other) const;
 
-   protected:
     /**
      * Updates the primitive's destination and final speed in m/s
      *

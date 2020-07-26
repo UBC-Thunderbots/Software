@@ -44,7 +44,8 @@ class MoveIntent : public MovePrimitive, public Intent
     BallCollisionType getBallCollisionType() const;
 
     void accept(IntentVisitor& visitor) const override;
-    void updateFinalSpeedAndDestination(Point destination, double final_speed) override;
+    std::optional<std::unique_ptr<Intent>> createWithNewFinalSpeedAndDestination(
+        Point destination, double final_speed) const override;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
@@ -62,6 +63,17 @@ class MoveIntent : public MovePrimitive, public Intent
      * @return true if the MoveIntents are not equal and false otherwise
      */
     bool operator!=(const MoveIntent& other) const;
+
+    /**
+     * Creates a new Move Intent
+     *
+     * @param move_primitive MovePrimitive
+     * @param priority The priority of this Intent. A larger number indicates a higher
+     * priority
+     * @param ball_collision_type how to navigate around the ball
+     */
+    explicit MoveIntent(MovePrimitive move_primitive, unsigned int priority,
+                        BallCollisionType ball_collision_type);
 
    private:
     BallCollisionType ball_collision_type;

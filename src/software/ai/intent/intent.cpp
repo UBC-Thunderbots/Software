@@ -63,12 +63,16 @@ std::optional<NavigatorParams> Intent::getNavigatorParams() const
     return std::nullopt;
 }
 
-const std::shared_ptr<Primitive> &Intent::getPrimitive() const
+PrimitiveMsg Intent::getPrimitiveMsg() const
 {
-    return primitive;
+    return primitive_msg;
 }
 
-void Intent::updateFinalSpeedAndDestination(Point destination, double final_speed) {}
+std::optional<std::unique_ptr<Intent>> Intent::createWithNewFinalSpeedAndDestination(
+    Point destination, double final_speed) const
+{
+    return std::nullopt;
+}
 
 void Intent::updateNavigatorParams(unsigned int robot_id, Point destination,
                                    Angle final_angle, double final_speed,

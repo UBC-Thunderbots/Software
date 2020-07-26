@@ -158,6 +158,7 @@ cc_library(
     hdrs = ["intent.h"],
     deps = [
         "intent_visitor",
+        "//shared/proto:tbots_cc_proto",
         "//software/ai/motion_constraint",
         "//software/geom:angle",
         "//software/geom:point",
