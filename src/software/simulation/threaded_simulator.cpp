@@ -110,6 +110,19 @@ void ThreadedSimulator::setBlueRobotPrimitive(RobotId id,
     simulator.setBlueRobotPrimitive(id, primitive_msg);
 }
 
+void ThreadedSimulator::setYellowRobotPrimitiveSet(
+    const PrimitiveSetMsg &primitive_set_msg)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.setYellowRobotPrimitiveSet(primitive_set_msg);
+}
+
+void ThreadedSimulator::setBlueRobotPrimitiveSet(const PrimitiveSetMsg &primitive_set_msg)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.setBlueRobotPrimitiveSet(primitive_set_msg);
+}
+
 void ThreadedSimulator::runSimulationLoop()
 {
     Duration time_step = Duration::fromSeconds(TIME_STEP_SECONDS);

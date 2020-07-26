@@ -21,8 +21,7 @@ void AIWrapper::runAIAndSendPrimitives()
 {
     if (most_recent_world && control_config->RunAI()->value())
     {
-        auto new_primitives =
-            ai.getPrimitiveSetMsg(*most_recent_world);
+        auto new_primitives = ai.getPrimitiveSetMsg(*most_recent_world);
 
         PlayInfo play_info = ai.getPlayInfo();
         Subject<PlayInfo>::sendValueToObservers(play_info);

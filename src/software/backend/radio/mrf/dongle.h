@@ -15,11 +15,11 @@
 #include <utility>
 #include <vector>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/radio/mrf/annunciator.h"
 #include "software/backend/radio/mrf/send_reliable_message_operation.h"
 #include "software/backend/radio/mrf/usb/libusb.h"
 #include "software/backend/radio/mrf/util/async_operation.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/radio/mrf/util/noncopyable.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"

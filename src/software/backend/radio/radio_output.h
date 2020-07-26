@@ -2,8 +2,8 @@
 
 #include <limits>
 
-#include "software/backend/radio/mrf/dongle.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
+#include "software/backend/radio/mrf/dongle.h"
 #include "software/backend/radio/robot_status.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
@@ -27,7 +27,7 @@ class RadioOutput
      *
      * @param primitives the PrimitiveSetMsg to send
      */
-    void sendPrimitives( const PrimitiveSetMsg &primitives);
+    void sendPrimitives(const PrimitiveSetMsg& primitives);
 
     /**
      * Sends a camera packet with the detected robots and ball.

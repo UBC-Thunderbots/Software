@@ -122,6 +122,15 @@ class ThreadedSimulator
     void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
 
     /**
+     * Sets the primitive being simulated by the robot on the corresponding team
+     * in simulation
+     *
+     * @param primitive_set_msg The set of primitives to run on the robot
+     */
+    void setYellowRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
+    void setBlueRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
+
+    /**
      * Returns the PhysicsRobot at the given position. This function accounts
      * for robot radius, so a robot will be returned if the given position is
      * within the robot's radius from its position.

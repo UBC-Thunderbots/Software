@@ -61,11 +61,11 @@ void StandaloneSimulator::initNetworking()
     yellow_team_primitive_listener =
         std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             yellow_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1));
+            boost::bind(&StandaloneSimulator::setYellowRobotPrimitiveSet, this, _1));
     blue_team_primitive_listener =
         std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             blue_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
+            boost::bind(&StandaloneSimulator::setBlueRobotPrimitiveSet, this, _1));
 }
 
 void StandaloneSimulator::setupInitialSimulationState()
@@ -121,24 +121,14 @@ SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
     return most_recent_ssl_wrapper_packet;
 }
 
-void StandaloneSimulator::setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg)
+void StandaloneSimulator::setYellowRobotPrimitiveSet(PrimitiveSetMsg primitive_set_msg)
 {
-    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
-    {
-        RobotId id                 = primitive_set_msg.robot_primitives[i].key;
-        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
-        simulator.setYellowRobotPrimitive(id, primitive_msg);
-    }
+    simulator.setYellowRobotPrimitiveSet(primitive_set_msg);
 }
 
-void StandaloneSimulator::setBlueRobotPrimitives(PrimitiveSetMsg primitive_set_msg)
+void StandaloneSimulator::setBlueRobotPrimitiveSet(PrimitiveSetMsg primitive_set_msg)
 {
-    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
-    {
-        RobotId id                 = primitive_set_msg.robot_primitives[i].key;
-        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
-        simulator.setBlueRobotPrimitive(id, primitive_msg);
-    }
+    simulator.setBlueRobotPrimitiveSet(primitive_set_msg);
 }
 
 void StandaloneSimulator::startSimulation()

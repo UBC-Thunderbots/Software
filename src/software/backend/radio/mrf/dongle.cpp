@@ -415,14 +415,14 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
 
 void MRFDongle::send_drive_packet(const PrimitiveSetMsg &prims)
 {
-    for (auto &[robot_id,prim_proto] : prims.robot_primitives())
+    for (auto &[robot_id, prim_proto] : prims.robot_primitives())
     {
         std::vector<uint8_t> encoded_primitive = encode_primitive(robot_id, prim_proto);
         if (encoded_primitive.size() > MAX_RADIO_PACKET_SIZE)
         {
-            LOG(WARNING) << "Failed to send a primitive, because it had an encoded length of"
-                << encoded_primitive.size()
-                         << ", max is  " << MAX_RADIO_PACKET_SIZE;
+            LOG(WARNING)
+                << "Failed to send a primitive, because it had an encoded length of"
+                << encoded_primitive.size() << ", max is  " << MAX_RADIO_PACKET_SIZE;
         }
         else
         {
@@ -454,7 +454,8 @@ void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
     }
 }
 
-std::vector<uint8_t> MRFDongle::encode_primitive(unsigned int robot_id, PrimitiveMsg prim_proto)
+std::vector<uint8_t> MRFDongle::encode_primitive(unsigned int robot_id,
+                                                 PrimitiveMsg prim_proto)
 {
     // Serialize the proto representation
     std::vector<uint8_t> serialized_proto(prim_proto.ByteSizeLong());

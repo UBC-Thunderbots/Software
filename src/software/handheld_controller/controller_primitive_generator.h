@@ -1,9 +1,9 @@
 #pragma once
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/handheld_controller/controller.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/primitive/primitive.h"
 
 /**

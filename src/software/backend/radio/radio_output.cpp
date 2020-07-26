@@ -12,7 +12,7 @@ RadioOutput::RadioOutput(unsigned int config,
 {
 }
 
-void RadioOutput::sendPrimitives( const PrimitiveSetMsg &primitives)
+void RadioOutput::sendPrimitives(const PrimitiveSetMsg &primitives)
 {
     dongle.send_drive_packet(primitives);
 }

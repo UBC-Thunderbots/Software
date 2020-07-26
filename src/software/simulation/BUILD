@@ -189,6 +189,7 @@ cc_test(
     deps = [
         ":convert_primitive_to_nanopb",
         ":threaded_simulator",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
