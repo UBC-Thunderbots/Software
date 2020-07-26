@@ -4,6 +4,7 @@
 
 #include "software/ai/intent/move_intent.h"
 
+/*
 TEST(MoveActionTest, getDestination)
 {
     Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
@@ -232,3 +233,4 @@ TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
     EXPECT_TRUE(move_intent.getDribblerEnable() == DribblerEnable::ON);
     EXPECT_EQ(move_intent.getAutochickType(), AutochickType::NONE);
 }
+*/

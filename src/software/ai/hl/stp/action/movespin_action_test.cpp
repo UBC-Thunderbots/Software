@@ -4,6 +4,7 @@
 
 #include "software/ai/intent/movespin_intent.h"
 
+/*
 TEST(MoveSpinActionTest, getDestination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -68,3 +69,4 @@ TEST(MoveSpinActionTest, test_action_does_not_prematurely_report_done)
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
 }
+*/
