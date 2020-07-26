@@ -102,17 +102,17 @@ class Navigator
         const std::vector<std::unique_ptr<Intent>> &intents, const World &world);
 
     /**
-     * Creates the intent updated with the given path and return the primitive
+     * Creates the final speed and destination given the navigator params, the path, the intent, and the world
      *
      * @param navigator_params NavigatorParams
      * @param path path to make primitive for
      * @param intent intent to update
      * @param world World to navigate around
      *
-     * @return Intent after updating the intent
+     * @return the final destination and speed
      */
-    std::unique_ptr<Intent> createIntentUpdatedWithPath(
-        NavigatorParams navigator_params, std::optional<Path> path,
+    std::pair<Point, double> calculateFinalDestinationAndSpeed(
+        NavigatorParams navigator_params, Path path,
         const std::unique_ptr<Intent> &intent, const World &world);
 
     /**
