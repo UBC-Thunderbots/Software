@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "shared/proto/primitive.pb.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
@@ -44,8 +45,11 @@ class Intent
      * Creates a new Intent with the given priority. A larger number indicates a higher
      * priority. The priority value must be in the range [0, 100]
      *
+     * @param robot_id The id of the Robot to run this Primitive
+     * @param primitive_msg The PrimitiveMsg that underlies this Intent
      * @param priority The priority of this Intent
      */
+    //explicit Intent(unsigned int robot_id,     PrimitiveMsg primitive_msg, unsigned int priority);
     explicit Intent(unsigned int priority);
 
     /**
@@ -69,7 +73,7 @@ class Intent
      *
      * @return The ID of the robot this Intent is controlling
      */
-    unsigned int getRobotId() const;
+    //unsigned int getRobotId() const;
 
     /**
      * Sets the priority of this Intent. The priority value must be an integer in the
@@ -164,6 +168,6 @@ class Intent
 
 std::set<MotionConstraint>motion_constraints; 
     std::optional<NavigatorParams> navigator_params;
-    PrimitiveMsg primitive_msg;
     unsigned int robot_id;
+    PrimitiveMsg primitive_msg;
 };

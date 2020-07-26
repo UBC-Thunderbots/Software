@@ -6,20 +6,11 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &fi
                        double final_speed, unsigned int priority,
                        DribblerEnable enable_dribbler, MoveType move_type,
                        AutochickType autokick, BallCollisionType ball_collision_type)
-    : MoveIntent(MovePrimitive(robot_id, dest, final_angle, final_speed, enable_dribbler,
+    : MovePrimitive(robot_id, dest, final_angle, final_speed, enable_dribbler,
                                move_type, autokick),
-                 priority, ball_collision_type)
-{
-}
-
-MoveIntent::MoveIntent(MovePrimitive move_primitive, unsigned int priority,
-                       BallCollisionType ball_collision_type)
-    : MovePrimitive(move_primitive),
       Intent(priority),
       ball_collision_type(ball_collision_type)
 {
-    Intent::updateNavigatorParams(getRobotId(), getDestination(), getFinalAngle(),
-                                  getFinalSpeed(), getBallCollisionType());
 }
 
 std::string MoveIntent::getIntentName(void) const

@@ -164,6 +164,7 @@ cc_library(
         "//software/geom:point",
         "//software/logger",
         "//software/primitive",
+        "//software/proto/message_translation:proto_creator_primitive_visitor",
     ],
 )
 

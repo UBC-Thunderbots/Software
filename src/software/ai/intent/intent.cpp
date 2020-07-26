@@ -7,25 +7,24 @@
 // Implement concrete functions shared by all intents
 
 Intent::Intent(unsigned int priority)
-    :       navigator_params{.robot_id            = 0,
-                       .motion_constraints  = std::set<MotionConstraint>(),
-                       .destination         = Point(),
-                       .final_speed         = 0.0,
-                       .final_angle         = Angle(),
-                       .ball_collision_type = BallCollisionType::ALLOW}
-{
+    :       navigator_params(std::nullopt){
     setPriority(priority);
 }
+
+//Intent::Intent(unsigned int robot_id,     PrimitiveMsg primitive_msg, unsigned int priority)
+//    :       motion_constraints(),navigator_params(std::nullopt), robot_id(robot_id), primitive_msg(primitive_msg){
+//    setPriority(priority);
+//}
 
 unsigned int Intent::getPriority(void) const
 {
     return priority;
 }
 
-    unsigned int Intent::getRobotId() const
-{
-    return robot_id;
-}
+//    unsigned int Intent::getRobotId() const
+//{
+//    return robot_id;
+//}
 
 void Intent::setPriority(unsigned int new_priority)
 {
