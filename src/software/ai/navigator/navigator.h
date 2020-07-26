@@ -5,7 +5,6 @@
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
-#include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"

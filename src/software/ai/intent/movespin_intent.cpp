@@ -18,11 +18,6 @@ std::string MoveSpinIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void MoveSpinIntent::accept(IntentVisitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
 bool MoveSpinIntent::operator==(const MoveSpinIntent &other) const
 {
     return Intent::operator==(other);

@@ -75,8 +75,7 @@ void Intent::updateNavigatorParams(unsigned int robot_id, Point destination,
                                    Angle final_angle, double final_speed,
                                    BallCollisionType ball_collision_type)
 {
-    navigator_params = NavigatorParams{.robot_id            = robot_id,
-                                       .motion_constraints  = this->motion_constraints,
+    navigator_params = NavigatorParams{.motion_constraints  = this->motion_constraints,
                                        .destination         = destination,
                                        .final_speed         = final_speed,
                                        .final_angle         = final_angle,

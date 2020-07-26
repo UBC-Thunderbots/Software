@@ -16,11 +16,6 @@ DirectWheelsIntent::DirectWheelsIntent(unsigned int robot_id,
 {
 }
 
-void DirectWheelsIntent::accept(IntentVisitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
 std::string DirectWheelsIntent::getIntentName(void) const
 {
     return INTENT_NAME;

@@ -55,10 +55,9 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
         auto navigator_params = intent->getNavigatorParams();
         if (navigator_params)
         {
-            if (robot_id_to_path.find(navigator_params->robot_id) !=
-                robot_id_to_path.end())
+            if (robot_id_to_path.find(intent->getRobotId()) != robot_id_to_path.end())
             {
-                auto path = robot_id_to_path.at(navigator_params->robot_id);
+                auto path = robot_id_to_path.at(intent->getRobotId());
                 if (path)
                 {
                     auto [destination, final_speed] = calculateDestinationAndFinalSpeed(
@@ -79,7 +78,7 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
             else
             {
                 LOG(WARNING) << "Path manager did not map RobotId = "
-                             << navigator_params->robot_id << " to a path";
+                             << intent->getRobotId() << " to a path";
                 robot_primitives_map[intent->getRobotId()] = intent->getPrimitiveMsg();
             }
         }
@@ -127,22 +126,22 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromIntents(
                 obstacles.push_back(ball_obstacle);
             }
 
-            auto robot = world.friendlyTeam().getRobotById(navigator_params->robot_id);
+            auto robot = world.friendlyTeam().getRobotById(intent->getRobotId());
 
             if (robot)
             {
                 Point start = robot->position();
                 Point end   = navigator_params->destination;
 
-                path_objectives.insert(
-                    PathObjective(start, end, robot->velocity().length(), obstacles,
-                                  navigator_params->robot_id));
+                path_objectives.insert(PathObjective(start, end,
+                                                     robot->velocity().length(),
+                                                     obstacles, intent->getRobotId()));
             }
             else
             {
                 std::stringstream ss;
                 ss << "Failed to find robot associated with robot id = "
-                   << navigator_params->robot_id;
+                   << intent->getRobotId();
                 LOG(WARNING) << ss.str();
             }
         }

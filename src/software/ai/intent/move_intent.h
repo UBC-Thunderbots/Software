@@ -43,7 +43,6 @@ class MoveIntent : public Intent
      */
     BallCollisionType getBallCollisionType() const;
 
-    void accept(IntentVisitor& visitor) const override;
     PrimitiveMsg getPrimitiveMsg(Point destination, double final_speed) const override;
 
     /**

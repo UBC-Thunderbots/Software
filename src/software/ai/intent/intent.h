@@ -4,7 +4,6 @@
 #include <string>
 
 #include "shared/proto/primitive.pb.h"
-#include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
@@ -16,7 +15,6 @@ MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 // Lightweight data type to pass to the Navigator
 struct NavigatorParams
 {
-    unsigned int robot_id;
     std::set<MotionConstraint> motion_constraints;
     Point destination;
     double final_speed;
@@ -97,13 +95,6 @@ class Intent
      * @return true if the Intents are not equal and false otherwise
      */
     bool operator!=(const Intent& other) const;
-
-    /**
-     * Accepts an Intent Visitor and calls the visit function
-     *
-     * @param visitor An Intent Visitor
-     */
-    virtual void accept(IntentVisitor& visitor) const = 0;
 
     /**
      * Set the constraints on this intent's motion

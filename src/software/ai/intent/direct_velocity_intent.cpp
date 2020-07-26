@@ -12,11 +12,6 @@ DirectVelocityIntent::DirectVelocityIntent(unsigned int robot_id, double x_veloc
 {
 }
 
-void DirectVelocityIntent::accept(IntentVisitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
 std::string DirectVelocityIntent::getIntentName(void) const
 {
     return INTENT_NAME;

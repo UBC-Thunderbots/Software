@@ -8,7 +8,6 @@ cc_library(
     deps = [
         "//software/ai/intent",
         "//software/ai/intent:all_intents",
-        "//software/ai/intent:intent_visitor",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/ai/navigator/path_manager",

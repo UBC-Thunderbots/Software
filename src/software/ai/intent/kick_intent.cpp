@@ -18,11 +18,6 @@ std::string KickIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void KickIntent::accept(IntentVisitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
 bool KickIntent::operator==(const KickIntent &other) const
 {
     return Intent::operator==(other);

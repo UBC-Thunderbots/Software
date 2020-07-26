@@ -29,11 +29,6 @@ BallCollisionType MoveIntent::getBallCollisionType() const
     return ball_collision_type;
 }
 
-void MoveIntent::accept(IntentVisitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
 PrimitiveMsg MoveIntent::getPrimitiveMsg(Point destination, double final_speed) const
 {
     PrimitiveMsg new_primitive_msg = Intent::getPrimitiveMsg();
