@@ -109,7 +109,7 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromIntents(
         auto navigator_params = intent->getNavigatorParams();
         if (navigator_params)
         {
-            // start with non-MoveIntent robots and then add motion constraints
+            // start with non-navigating robots and then add motion constraints
             auto obstacles = friendly_non_navigating_robot_obstacles;
 
             auto motion_constraint_obstacles =
