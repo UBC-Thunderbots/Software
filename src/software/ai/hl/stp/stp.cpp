@@ -245,8 +245,7 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     {
         for (size_t col = 0; col < num_cols; col++)
         {
-            Robot robot = non_goalie_robots.at(row);
-
+            Robot robot                     = non_goalie_robots.at(row);
             std::shared_ptr<Tactic>& tactic = tactics.at(col);
             double robot_cost_for_tactic    = tactic->calculateRobotCost(robot, world);
 
