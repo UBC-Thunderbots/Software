@@ -26,6 +26,6 @@ message AngleMsg
 
 message AngularVelocityMsg
 {
-    // the angle in radians
+    // the angular velocity in radians
     float radians_per_second = 1;
 }
