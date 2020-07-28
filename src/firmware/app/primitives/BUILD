@@ -1,9 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "direct_robot_control",
-    srcs = ["direct_robot_control_primitive.c"],
-    hdrs = ["direct_robot_control_primitive.h"],
+    name = "direct_control",
+    srcs = ["direct_control_primitive.c"],
+    hdrs = ["direct_control_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/app/control",

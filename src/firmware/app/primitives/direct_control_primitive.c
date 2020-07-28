@@ -1,34 +1,32 @@
-#include "firmware/app/primitives/direct_robot_control_primitive.h"
+#include "firmware/app/primitives/direct_control_primitive.h"
 
 #include <assert.h>
 
 #include "firmware/app/control/control.h"
 
-typedef struct DirectRobotControlPrimitiveState
+typedef struct DirectControlPrimitiveState
 {
     bool direct_velocity;
     float direct_target_velocity_x;
     float direct_target_velocity_y;
     float direct_target_velocity_angular;
-} DirectRobotControlPrimitiveState_t;
-DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DirectRobotControlPrimitiveState_t)
+} DirectControlPrimitiveState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DirectControlPrimitiveState_t)
 
-void app_direct_robot_control_primitive_start(DirectRobotControlPrimitiveMsg prim_msg,
-                                              void* void_state_ptr,
-                                              FirmwareWorld_t* world)
+void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
+                                        void* void_state_ptr, FirmwareWorld_t* world)
 {
-    DirectRobotControlPrimitiveState_t* state =
-        (DirectRobotControlPrimitiveState_t*)void_state_ptr;
-    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-    Chicker_t* chicker           = app_firmware_robot_getChicker(robot);
-    Dribbler_t* dribbler         = app_firmware_robot_getDribbler(robot);
-    Charger_t* charger           = app_firmware_robot_getCharger(robot);
+    DirectControlPrimitiveState_t* state = (DirectControlPrimitiveState_t*)void_state_ptr;
+    const FirmwareRobot_t* robot         = app_firmware_world_getRobot(world);
+    Chicker_t* chicker                   = app_firmware_robot_getChicker(robot);
+    Dribbler_t* dribbler                 = app_firmware_robot_getDribbler(robot);
+    Charger_t* charger                   = app_firmware_robot_getCharger(robot);
 
     switch (prim_msg.which_wheel_control)
     {
-        case DirectRobotControlPrimitiveMsg_direct_per_wheel_control_tag:
+        case DirectControlPrimitiveMsg_direct_per_wheel_control_tag:
         {
-            DirectRobotControlPrimitiveMsg_DirectPerWheelControlMsg control_msg =
+            DirectControlPrimitiveMsg_DirectPerWheelControlMsg control_msg =
                 prim_msg.wheel_control.direct_per_wheel_control;
             state->direct_velocity = false;
             // TODO: Fix passing rpm into an applyForce function
@@ -42,9 +40,9 @@ void app_direct_robot_control_primitive_start(DirectRobotControlPrimitiveMsg pri
                                  control_msg.front_right_wheel_rpm);
             break;
         }
-        case DirectRobotControlPrimitiveMsg_direct_velocity_control_tag:
+        case DirectControlPrimitiveMsg_direct_velocity_control_tag:
         {
-            DirectRobotControlPrimitiveMsg_DirectVelocityControlMsg control_msg =
+            DirectControlPrimitiveMsg_DirectVelocityControlMsg control_msg =
                 prim_msg.wheel_control.direct_velocity_control;
             state->direct_velocity          = true;
             state->direct_target_velocity_x = control_msg.velocity.x_component_meters;
@@ -63,17 +61,17 @@ void app_direct_robot_control_primitive_start(DirectRobotControlPrimitiveMsg pri
 
     switch (prim_msg.charge_mode)
     {
-        case DirectRobotControlPrimitiveMsg_ChargeMode_CHARGE:
+        case DirectControlPrimitiveMsg_ChargeMode_CHARGE:
         {
             app_charger_charge_capacitor(charger);
             break;
         }
-        case DirectRobotControlPrimitiveMsg_ChargeMode_FLOAT:
+        case DirectControlPrimitiveMsg_ChargeMode_FLOAT:
         {
             app_charger_float_capacitor(charger);
             break;
         }
-        case DirectRobotControlPrimitiveMsg_ChargeMode_DISCHARGE:
+        case DirectControlPrimitiveMsg_ChargeMode_DISCHARGE:
         {
             app_charger_float_capacitor(charger);
             app_chicker_disableAutochip(chicker);
@@ -91,24 +89,24 @@ void app_direct_robot_control_primitive_start(DirectRobotControlPrimitiveMsg pri
 
     switch (prim_msg.which_chick_command)
     {
-        case DirectRobotControlPrimitiveMsg_kick_speed_meters_per_second_tag:
+        case DirectControlPrimitiveMsg_kick_speed_meters_per_second_tag:
         {
             app_chicker_kick(chicker,
                              prim_msg.chick_command.kick_speed_meters_per_second);
             break;
         }
-        case DirectRobotControlPrimitiveMsg_chip_distance_meters_tag:
+        case DirectControlPrimitiveMsg_chip_distance_meters_tag:
         {
             app_chicker_chip(chicker, prim_msg.chick_command.chip_distance_meters);
             break;
         }
-        case DirectRobotControlPrimitiveMsg_autokick_speed_meters_per_second_tag:
+        case DirectControlPrimitiveMsg_autokick_speed_meters_per_second_tag:
         {
             app_chicker_enableAutokick(
                 chicker, prim_msg.chick_command.autokick_speed_meters_per_second);
             break;
         }
-        case DirectRobotControlPrimitiveMsg_autochip_distance_meters_tag:
+        case DirectControlPrimitiveMsg_autochip_distance_meters_tag:
         {
             app_chicker_enableAutochip(chicker,
                                        prim_msg.chick_command.autochip_distance_meters);
@@ -124,12 +122,11 @@ void app_direct_robot_control_primitive_start(DirectRobotControlPrimitiveMsg pri
     app_dribbler_setSpeed(dribbler, (uint32_t)prim_msg.dribbler_speed_rpm);
 }
 
-static void direct_robot_control_end(void* void_state_ptr, FirmwareWorld_t* world) {}
+static void direct_control_end(void* void_state_ptr, FirmwareWorld_t* world) {}
 
-static void direct_robot_control_tick(void* void_state_ptr, FirmwareWorld_t* world)
+static void direct_control_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
-    DirectRobotControlPrimitiveState_t* state =
-        (DirectRobotControlPrimitiveState_t*)void_state_ptr;
+    DirectControlPrimitiveState_t* state = (DirectControlPrimitiveState_t*)void_state_ptr;
     if (state->direct_velocity)
     {
         FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
@@ -140,11 +137,11 @@ static void direct_robot_control_tick(void* void_state_ptr, FirmwareWorld_t* wor
 }
 
 /**
- * \brief The direct_robot_control movement primitive.
+ * \brief The direct_control movement primitive.
  */
-const primitive_t DIRECT_ROBOT_CONTROL_PRIMITIVE = {
+const primitive_t DIRECT_CONTROL_PRIMITIVE = {
     .direct        = true,
-    .end           = &direct_robot_control_end,
-    .tick          = &direct_robot_control_tick,
-    .create_state  = &createDirectRobotControlPrimitiveState_t,
-    .destroy_state = &destroyDirectRobotControlPrimitiveState_t};
+    .end           = &direct_control_end,
+    .tick          = &direct_control_tick,
+    .create_state  = &createDirectControlPrimitiveState_t,
+    .destroy_state = &destroyDirectControlPrimitiveState_t};
