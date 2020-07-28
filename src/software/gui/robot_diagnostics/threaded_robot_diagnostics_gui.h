@@ -6,11 +6,11 @@
 #include <future>
 #include <thread>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/geom/rectangle.h"
 #include "software/gui/robot_diagnostics/widgets/robot_diagnostics_gui.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/primitive/primitive.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
 
@@ -64,11 +64,12 @@ class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<Senso
     // Buffers that are shared with the instance of the RobotDiagnosticsGUI so that data
     // can be passed safely
     std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
-    std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<Primitive>>> primitive_buffer;
+    std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<PrimitiveSetMsg>>>
+        primitive_set_msg_buffer;
 
     // We don't want to miss any updates so we make the buffer larger
-    static constexpr std::size_t sensor_msg_buffer_size = 60;
-    static constexpr std::size_t primitive_buffer_size  = 60;
+    static constexpr std::size_t sensor_msg_buffer_size        = 60;
+    static constexpr std::size_t primitive_set_msg_buffer_size = 60;
 
     std::atomic_bool application_shutting_down;
 };
