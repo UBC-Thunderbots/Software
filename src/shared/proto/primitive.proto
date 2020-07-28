@@ -35,41 +35,19 @@ message PrimitiveMsg
     }
 }
 
-message SpinningMovePrimitiveMsg
+message PrimitiveNewMsg
 {
-    PositionTrajectory position_trajectory = 1;
-    AngularVelocityMsg angular_velocity    = 2;
-}
-
-message AutochipMovePrimitiveMsg
-{
-    PositionTrajectory position_trajectory = 1;
-    AngleMsg final_angle                   = 2;
-    float chip_distance_meters             = 3;
-}
-
-message AutokickMovePrimitiveMsg
-{
-    PositionTrajectory position_trajectory = 1;
-    AngleMsg final_angle                   = 2;
-    float kick_speed_meters_per_second     = 3;
-}
-
-message DribbleMovePrimitiveMsg
-{
-    PositionTrajectory position_trajectory = 1;
-    AngleMsg final_angle                   = 2;
-    float dribbler_speed_rpm               = 3;
-}
-
-message StopPrimitiveMsg
-{
-    enum StopTypeMsg
+    oneof primitive
     {
-        BRAKE = 0;
-        COAST = 1;
+        ChipPrimitiveMsg chip                    = 1;
+        KickPrimitiveMsg kick                    = 2;
+        MovePrimitiveMsg move                    = 3;
+        SpinningMovePrimitiveMsg spinning_move   = 4;
+        AutochipMovePrimitiveMsg autochip_move   = 5;
+        AutokickMovePrimitiveMsg autokick_move   = 6;
+        StopPrimitiveMsg stop                    = 7;
+        DirectControlPrimitiveMsg direct_control = 8;
     }
-    StopTypeMsg stop_type = 1;
 }
 
 message ChipPrimitiveMsg
@@ -86,7 +64,47 @@ message KickPrimitiveMsg
     float kick_speed_meters_per_second = 3;
 }
 
-message DirectRobotControlPrimitiveMsg
+message MovePrimitiveMsg
+{
+    MovePositionParams position_params = 1;
+    AngleMsg final_angle               = 2;
+    float dribbler_speed_rpm           = 3;
+}
+
+message SpinningMovePrimitiveMsg
+{
+    MovePositionParams position_params  = 1;
+    AngularVelocityMsg angular_velocity = 2;
+    float dribbler_speed_rpm            = 3;
+}
+
+message AutochipMovePrimitiveMsg
+{
+    MovePositionParams position_params = 1;
+    AngleMsg final_angle               = 2;
+    float dribbler_speed_rpm           = 3;
+    float chip_distance_meters         = 4;
+}
+
+message AutokickMovePrimitiveMsg
+{
+    MovePositionParams position_params = 1;
+    AngleMsg final_angle               = 2;
+    float dribbler_speed_rpm           = 3;
+    float kick_speed_meters_per_second = 4;
+}
+
+message StopPrimitiveMsg
+{
+    enum StopTypeMsg
+    {
+        BRAKE = 0;
+        COAST = 1;
+    }
+    StopTypeMsg stop_type = 1;
+}
+
+message DirectControlPrimitiveMsg
 {
     enum ChargeMode
     {
@@ -125,7 +143,7 @@ message DirectRobotControlPrimitiveMsg
     float dribbler_speed_rpm = 8;
 }
 
-message PositionTrajectory
+message MovePositionParams
 {
     PointMsg destination                = 1;
     float final_speed_meters_per_second = 2;
