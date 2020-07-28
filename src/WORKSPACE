@@ -75,6 +75,7 @@ new_git_repository(
     build_file = "@//external:munkres_cpp.BUILD",
     commit = "61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
     remote = "https://github.com/saebyn/munkres-cpp.git",
+    shallow_since = "1479502661 -0800",
 )
 
 # yaml cpp parser for dynamic parameters test
@@ -90,6 +91,7 @@ git_repository(
     name = "bazel_rules_qt",
     commit = "3f949bf4b5dcae2941ba3b71b3ddeb5d39637907",
     remote = "https://github.com/justbuchanan/bazel_rules_qt.git",
+    shallow_since = "1549966854 -0800",
 )
 
 # Right now qt5 is installed on the system using the setup_software.sh script
@@ -116,7 +118,7 @@ http_archive(
     ],
 )
 
-# We use our own fork of Box2D as we have made a few small modifications
+# We use our ownfork of Box2D as we have made a few small modifications
 # See the repository readme for details
 new_git_repository(
     name = "box2d",
