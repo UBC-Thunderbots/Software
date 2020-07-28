@@ -64,7 +64,7 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
                         navigator_params.value(), *path, intent, world);
 
                     robot_primitives_map[intent->getRobotId()] =
-                        intent->getPrimitiveMsg(destination, final_speed);
+                        intent->getUpdatedPrimitiveMsg(destination, final_speed);
                 }
                 else
                 {
@@ -100,7 +100,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
 
 std::unordered_set<PathObjective> Navigator::getPathObjectivesFromIntents(
     const std::vector<std::unique_ptr<Intent>> &intents, const World &world,
-    std::vector<ObstaclePtr> friendly_non_navigating_robot_obstacles)
+    const std::vector<ObstaclePtr> &friendly_non_navigating_robot_obstacles)
 {
     std::unordered_set<PathObjective> path_objectives;
 
@@ -110,11 +110,10 @@ std::unordered_set<PathObjective> Navigator::getPathObjectivesFromIntents(
         if (navigator_params)
         {
             // start with non-navigating robots and then add motion constraints
-            auto obstacles = friendly_non_navigating_robot_obstacles;
-
+            std::vector<ObstaclePtr> obstacles = friendly_non_navigating_robot_obstacles;
             auto motion_constraint_obstacles =
                 robot_navigation_obstacle_factory.createFromMotionConstraints(
-                    navigator_params->motion_constraints, world);
+                    intent->getMotionConstraints(), world);
             obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
                              motion_constraint_obstacles.end());
 

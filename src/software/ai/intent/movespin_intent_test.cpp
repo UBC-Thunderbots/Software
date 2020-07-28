@@ -29,3 +29,9 @@ TEST(MoveSpinIntentTest, test_inequality_operator_with_mismatched_priorities)
 
     EXPECT_NE(movespin_intent, movespin_intent_other);
 }
+
+TEST(MoveSpinIntentTest, test_get_navigator_params)
+{
+    MoveSpinIntent movespin_intent = MoveSpinIntent(0, Point(), Angle::zero(), 1.0, 3);
+    EXPECT_FALSE(movespin_intent.getNavigatorParams());
+}

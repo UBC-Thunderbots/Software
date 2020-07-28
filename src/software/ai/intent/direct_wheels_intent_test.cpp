@@ -29,3 +29,9 @@ TEST(DirectWheelsIntentTest, test_inequality_operator_with_mismatched_priorities
 
     EXPECT_NE(direct_wheels_intent, direct_wheels_intent_other);
 }
+
+TEST(DirectWheelsIntentTest, test_get_navigator_params)
+{
+    DirectWheelsIntent direct_wheels_intent = DirectWheelsIntent(0, 0, 0, 0, 0, 0, 1);
+    EXPECT_FALSE(direct_wheels_intent.getNavigatorParams());
+}

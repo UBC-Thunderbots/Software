@@ -173,6 +173,7 @@ cc_test(
     deps = [
         ":intent",
         ":move_intent",
+        ":stop_intent",
         "@gtest//:gtest_main",
     ],
 )

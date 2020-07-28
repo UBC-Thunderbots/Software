@@ -1,15 +1,15 @@
 #include "software/ai/intent/intent.h"
 
+#include <google/protobuf/util/message_differencer.h>
+
 #include <algorithm>
 
 #include "software/logger/logger.h"
 
-// Implement concrete functions shared by all intents
-
 Intent::Intent(unsigned int robot_id, PrimitiveMsg primitive_msg, unsigned int priority)
-    : motion_constraints(),
+    : robot_id(robot_id),
+      motion_constraints(),
       navigator_params(std::nullopt),
-      robot_id(robot_id),
       primitive_msg(primitive_msg)
 {
     setPriority(priority);
@@ -38,7 +38,12 @@ void Intent::setPriority(unsigned int new_priority)
 
 bool Intent::operator==(const Intent &other) const
 {
-    return this->priority == other.priority;
+    return this->priority == other.priority &&
+           this->motion_constraints == other.motion_constraints &&
+           this->navigator_params == other.navigator_params &&
+           this->robot_id == other.robot_id &&
+           google::protobuf::util::MessageDifferencer::Equals(this->primitive_msg,
+                                                              other.primitive_msg);
 }
 
 bool Intent::operator!=(const Intent &other) const
@@ -66,7 +71,7 @@ PrimitiveMsg Intent::getPrimitiveMsg() const
     return primitive_msg;
 }
 
-PrimitiveMsg Intent::getPrimitiveMsg(Point destination, double final_speed) const
+PrimitiveMsg Intent::getUpdatedPrimitiveMsg(Point destination, double final_speed) const
 {
     return primitive_msg;
 }
@@ -75,8 +80,7 @@ void Intent::updateNavigatorParams(unsigned int robot_id, Point destination,
                                    Angle final_angle, double final_speed,
                                    BallCollisionType ball_collision_type)
 {
-    navigator_params = NavigatorParams{.motion_constraints  = this->motion_constraints,
-                                       .destination         = destination,
+    navigator_params = NavigatorParams{.destination         = destination,
                                        .final_speed         = final_speed,
                                        .final_angle         = final_angle,
                                        .ball_collision_type = ball_collision_type};

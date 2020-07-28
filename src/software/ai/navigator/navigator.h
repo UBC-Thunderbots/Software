@@ -101,7 +101,7 @@ class Navigator
      */
     std::unordered_set<PathObjective> getPathObjectivesFromIntents(
         const std::vector<std::unique_ptr<Intent>> &intents, const World &world,
-        std::vector<ObstaclePtr> friendly_non_navigating_robot_obstacles);
+        const std::vector<ObstaclePtr> &friendly_non_navigating_robot_obstacles);
 
     /**
      * Creates the final speed and destination given the navigator params, the path, the

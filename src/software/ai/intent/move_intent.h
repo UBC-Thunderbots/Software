@@ -43,7 +43,8 @@ class MoveIntent : public Intent
      */
     BallCollisionType getBallCollisionType() const;
 
-    PrimitiveMsg getPrimitiveMsg(Point destination, double final_speed) const override;
+    PrimitiveMsg getUpdatedPrimitiveMsg(Point destination,
+                                        double final_speed) const override;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all

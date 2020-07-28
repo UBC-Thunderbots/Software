@@ -15,11 +15,17 @@ MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 // Lightweight data type to pass to the Navigator
 struct NavigatorParams
 {
-    std::set<MotionConstraint> motion_constraints;
     Point destination;
     double final_speed;
     Angle final_angle;
     BallCollisionType ball_collision_type;
+
+    bool operator==(const NavigatorParams& other) const
+    {
+        return destination == other.destination && final_speed == other.final_speed &&
+               final_angle == other.final_angle &&
+               ball_collision_type == other.ball_collision_type;
+    }
 };
 
 /**
@@ -134,7 +140,8 @@ class Intent
      *
      * @return PrimitiveMsg updated with destination and final_speed
      */
-    virtual PrimitiveMsg getPrimitiveMsg(Point destination, double final_speed) const;
+    virtual PrimitiveMsg getUpdatedPrimitiveMsg(Point destination,
+                                                double final_speed) const;
 
     virtual ~Intent() = default;
 
@@ -160,8 +167,8 @@ class Intent
      */
     unsigned int priority;
 
+    unsigned int robot_id;
     std::set<MotionConstraint> motion_constraints;
     std::optional<NavigatorParams> navigator_params;
-    unsigned int robot_id;
     PrimitiveMsg primitive_msg;
 };

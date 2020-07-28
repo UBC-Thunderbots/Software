@@ -29,7 +29,8 @@ BallCollisionType MoveIntent::getBallCollisionType() const
     return ball_collision_type;
 }
 
-PrimitiveMsg MoveIntent::getPrimitiveMsg(Point destination, double final_speed) const
+PrimitiveMsg MoveIntent::getUpdatedPrimitiveMsg(Point destination,
+                                                double final_speed) const
 {
     PrimitiveMsg new_primitive_msg = Intent::getPrimitiveMsg();
 

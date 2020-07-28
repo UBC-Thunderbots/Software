@@ -29,3 +29,9 @@ TEST(DirectVelocityIntentTest, test_inequality_operator_with_mismatched_prioriti
 
     EXPECT_NE(direct_velocity_intent, direct_velocity_intent_other);
 }
+
+TEST(DirectVelocityIntentTest, test_get_navigator_params)
+{
+    DirectVelocityIntent direct_velocity_intent = DirectVelocityIntent(0, 0, 0, 0, 0, 0);
+    EXPECT_FALSE(direct_velocity_intent.getNavigatorParams());
+}
