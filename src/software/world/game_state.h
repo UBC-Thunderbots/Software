@@ -19,7 +19,7 @@
 class GameState
 {
    public:
-    enum State
+    enum PlayState
     {
         HALT,    // Robots must not move
         STOP,    // Robots must stay a set distance away from ball
@@ -338,22 +338,8 @@ class GameState
      */
     void setBallPlacementPoint(Point placementPoint);
 
-    /**
-     * Returns the point where the ball should be placed
-     *
-     * @return the point where the ball should be placed, or std::nullopt if we are not
-     *         in a state of play where the ball needs to be placed
-     */
-    std::optional<Point> getBallPlacementPoint() const;
-
-    State getState() const;
-
-    void setState(State state);
-    void setRestartReason(RestartReason restart_reason);
-    void setOurRestart(bool our_restart);
-
    private:
-    State state_;
+    PlayState state_;
     RestartReason restart_reason_;
     RefboxGameState game_state_;
     std::optional<Ball> ball_state_;

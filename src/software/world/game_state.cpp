@@ -147,28 +147,19 @@ bool GameState::stayBehindPenaltyLine() const
     return restart_reason_ == PENALTY;
 }
 
-void GameState::setBallPlacementPoint(Point placementPoint)
+void GameState::setBallPlacementPoint(Point placement_point)
 {
-    ball_placement_point_ = placementPoint;
-}
-
-std::optional<Point> GameState::getBallPlacementPoint() const
-{
-    if (isSetupRestart())
-    {
-        return ball_placement_point_;
-    }
-    return std::nullopt;
+    ball_placement_point_ = placement_point;
 }
 
 // apologies for this monster switch statement
-void GameState::updateRefboxGameState(RefboxGameState gameState)
+void GameState::updateRefboxGameState(RefboxGameState game_state)
 {
-    if (gameState != game_state_)
+    if (game_state != game_state_)
     {
-        game_state_ = gameState;
+        game_state_ = game_state;
 
-        switch (gameState)
+        switch (game_state)
         {
             case RefboxGameState::HALT:
                 state_          = HALT;
@@ -277,11 +268,6 @@ void GameState::updateBall(const Ball& ball)
     }
 }
 
-GameState::State GameState::getState() const
-{
-    return state_;
-}
-
 GameState::RestartReason GameState::getRestartReason() const
 {
     return restart_reason_;
@@ -297,21 +283,6 @@ void GameState::setRestartCompleted()
 {
     state_          = PLAYING;
     restart_reason_ = NONE;
-}
-
-void GameState::setState(State state)
-{
-    state_ = state;
-}
-
-void GameState::setRestartReason(GameState::RestartReason restart_reason)
-{
-    restart_reason_ = restart_reason;
-}
-
-void GameState::setOurRestart(bool our_restart)
-{
-    our_restart_ = our_restart;
 }
 
 bool GameState::operator==(const GameState& other) const
