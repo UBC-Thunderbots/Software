@@ -6,6 +6,7 @@
 #include "software/test_util/test_util.h"
 #include "software/world/ball.h"
 
+// TODO (Issue #1644): refactor and reenable these tests
 /*
 TEST(InterceptBallActionTest, test_robot_ahead_of_ball_moves_in_front_of_ball)
 {

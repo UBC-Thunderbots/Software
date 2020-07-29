@@ -91,13 +91,6 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
     return primitive_set_msg;
 }
 
-std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
-    const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents)
-{
-    auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
-    return assigned_primitives;
-}
-
 std::unordered_set<PathObjective> Navigator::getPathObjectivesFromIntents(
     const std::vector<std::unique_ptr<Intent>> &intents, const World &world,
     const std::vector<ObstaclePtr> &friendly_non_navigating_robot_obstacles)

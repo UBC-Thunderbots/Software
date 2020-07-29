@@ -33,17 +33,6 @@ class Navigator
                        std::shared_ptr<const NavigatorConfig> config);
 
     /**
-     * Get assigned primitives for given assigned intents
-     *
-     * @param world World to navigate around
-     * @assigned_intents intents to process into primitives
-     *
-     * @return vector of primitives for the given intents
-     */
-    std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
-        const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents);
-
-    /**
      * Get PrimitiveSetMsg for given assigned intents
      *
      * @param world World to navigate around

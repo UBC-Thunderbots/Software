@@ -7,8 +7,8 @@
 #include "software/time/duration.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
-    : simulated_test_simulator(
-          std::make_unique<SimulatedTestSimulator>(Field::createSSLDivisionBField())),
+    : simulated_test_simulator(std::make_unique<SerializedToNanoPbSimulatorAdapter>(
+          Field::createSSLDivisionBField())),
       sensor_fusion(DynamicParameters->getSensorFusionConfig()),
       ai(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig()),
       run_simulation_in_realtime(false)
@@ -27,8 +27,8 @@ void SimulatedTestFixture::SetUp()
     // every time. Because the simulated_test_simulator is created initially in the
     // constructor's initialization list, and before every test in this SetUp function, we
     // can guarantee the pointer will never be null / empty
-    simulated_test_simulator =
-        std::make_unique<SimulatedTestSimulator>(Field::createSSLDivisionBField());
+    simulated_test_simulator = std::make_unique<SerializedToNanoPbSimulatorAdapter>(
+        Field::createSSLDivisionBField());
     ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
 

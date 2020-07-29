@@ -4,7 +4,7 @@
 
 #include "software/ai/intent/stop_intent.h"
 
-
+// TODO (Issue #1644): refactor and reenable these tests
 /*
 TEST(StopActionTest, robot_stopping_without_coasting_while_already_moving)
 {

@@ -4,6 +4,7 @@
 
 #include "software/ai/intent/movespin_intent.h"
 
+// TODO (Issue #1644): refactor and reenable these tests
 /*
 TEST(MoveSpinActionTest, getDestination)
 {

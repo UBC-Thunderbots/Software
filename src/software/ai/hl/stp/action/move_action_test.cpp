@@ -4,6 +4,7 @@
 
 #include "software/ai/intent/move_intent.h"
 
+// TODO (Issue #1644): refactor and reenable these tests
 /*
 TEST(MoveActionTest, getDestination)
 {

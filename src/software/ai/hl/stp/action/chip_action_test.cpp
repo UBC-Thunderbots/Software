@@ -6,6 +6,7 @@
 #include "software/ai/intent/move_intent.h"
 #include "software/test_util/test_util.h"
 
+// TODO (Issue #1644): refactor and reenable these tests
 /*
 TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)
 {

@@ -9,21 +9,26 @@
 #include "software/world/field.h"
 #include "software/world/robot_state.h"
 
+// We forward declare the Simulator because the simulator depends on NanoPb
+// PrimitiveSetMsg, which we will not expose to users of this class by only including
+// simulator.h in serialized_to_nano_pb_simulator_adapter.cpp
+class Simulator;
 /**
- * This class wraps Simulator for the SimulatedTestFixture
+ * This class adapts the Simulator's NanoPb protobuf interface to serialized protobufs, so
+ * that users of this class do not have to depend on NanoPb protobufs
  */
-class SimulatedTestSimulator
+class SerializedToNanoPbSimulatorAdapter
 {
    public:
-    SimulatedTestSimulator() = delete;
+    SerializedToNanoPbSimulatorAdapter() = delete;
 
     /**
-     * Creates a new SimulatedTestSimulator. The starting state of the simulation
-     * will have the given field, with no robots or ball.
+     * Creates a new SerializedToNanoPbSimulatorAdapter. The starting state of the
+     * simulation will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
      */
-    explicit SimulatedTestSimulator(const Field& field);
+    explicit SerializedToNanoPbSimulatorAdapter(const Field& field);
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
@@ -89,4 +94,7 @@ class SimulatedTestSimulator
      */
     void setYellowRobotSerializedPrimitiveSet(
         std::vector<uint8_t> serialized_primitive_set_msg);
+
+   private:
+    std::shared_ptr<Simulator> simulator;
 };

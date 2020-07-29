@@ -6,7 +6,7 @@ cc_library(
     srcs = ["simulated_test_fixture.cpp"],
     hdrs = ["simulated_test_fixture.h"],
     deps = [
-        ":simulated_test_simulator",
+        ":serialized_to_nano_pb_simulator_adapter",
         "//software/ai",
         "//software/gui/drawing:navigator",
         "//software/gui/full_system:threaded_full_system_gui",
@@ -22,10 +22,10 @@ cc_library(
 )
 
 cc_library(
-    name = "simulated_test_simulator",
+    name = "serialized_to_nano_pb_simulator_adapter",
     testonly = True,
-    srcs = ["simulated_test_simulator.cpp"],
-    hdrs = ["simulated_test_simulator.h"],
+    srcs = ["serialized_to_nano_pb_simulator_adapter.cpp"],
+    hdrs = ["serialized_to_nano_pb_simulator_adapter.h"],
     deps = [
         "//software/simulation:simulator",
         "@gtest",
