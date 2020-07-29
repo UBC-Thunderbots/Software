@@ -118,7 +118,7 @@ http_archive(
     ],
 )
 
-# We use our ownfork of Box2D as we have made a few small modifications
+# We use our own fork of Box2D as we have made a few small modifications
 # See the repository readme for details
 new_git_repository(
     name = "box2d",
