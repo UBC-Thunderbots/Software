@@ -2,11 +2,12 @@
 
 const std::string ChipIntent::INTENT_NAME = "Chip Intent";
 
-ChipIntent::ChipIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed, unsigned int priority)
+ChipIntent::ChipIntent(unsigned int robot_id, const Point &chip_origin,
+                       const Angle &chip_direction, double chip_distance_meters,
+                       unsigned int priority)
     : Intent(robot_id,
-             ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
-                 ChipPrimitive(robot_id, dest, final_angle, final_speed)),
+             ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(ChipPrimitive(
+                 robot_id, chip_origin, chip_direction, chip_distance_meters)),
              priority)
 {
 }

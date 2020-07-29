@@ -83,44 +83,6 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
 
-TEST_F(ThetaStarNavigatorTest,
-       convert_direct_velocity_intent_to_direct_velocity_primitive)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(std::make_unique<DirectVelocityIntent>(3, 1, -2, 0.4, 1000, 4));
-
-    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
-
-    // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
-
-    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
-        DirectVelocityPrimitive(3, 1, -2, 0.4, 1000));
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, primitive_set_msg->robot_primitives().at(3)));
-}
-
-TEST_F(ThetaStarNavigatorTest, convert_direct_wheels_intent_to_direct_wheels_primitive)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<DirectWheelsIntent>(2, 80, 22, 55, 201, 5000, 60));
-
-    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
-
-    // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
-
-    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
-        DirectWheelsPrimitive(2, 80, 22, 55, 201, 5000));
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, primitive_set_msg->robot_primitives().at(2)));
-}
-
 TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
 {
     World world = ::TestUtil::createBlankTestingWorld();
@@ -140,13 +102,13 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
 
-TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_spinning_move_intent_to_spinning_move_primitive)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
-        std::make_unique<MoveSpinIntent>(0, Point(), AngularVelocity::full(), 1, 0));
+        std::make_unique<SpinningMoveIntent>(0, Point(), AngularVelocity::full(), 1, 0));
 
     auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
 
@@ -154,7 +116,7 @@ TEST_F(ThetaStarNavigatorTest, convert_movespin_intent_to_movespin_primitive)
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
     auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
-        MoveSpinPrimitive(0, Point(), AngularVelocity::full(), 1));
+        SpinningMovePrimitive(0, Point(), AngularVelocity::full(), 1));
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }

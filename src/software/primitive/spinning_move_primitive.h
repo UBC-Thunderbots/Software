@@ -5,12 +5,12 @@
 #include "software/geom/point.h"
 #include "software/primitive/primitive.h"
 
-class MoveSpinPrimitive : public Primitive
+class SpinningMovePrimitive : public Primitive
 {
    public:
     static const std::string PRIMITIVE_NAME;
     /**
-     * Creates a new MoveSpin Primitive
+     * Creates a new SpinningMove Primitive
      *
      * @param robot_id The id of the Robot to run this Primitive
      * @param dest The final destination of the movement
@@ -18,8 +18,9 @@ class MoveSpinPrimitive : public Primitive
      * of the movement
      * @param final_speed The speed at final destination
      */
-    explicit MoveSpinPrimitive(unsigned int robot_id, const Point &dest,
-                               const AngularVelocity &angular_vel, double final_speed);
+    explicit SpinningMovePrimitive(unsigned int robot_id, const Point &dest,
+                                   const AngularVelocity &angular_vel,
+                                   double final_speed);
 
     std::string getPrimitiveName() const override;
 
@@ -49,21 +50,23 @@ class MoveSpinPrimitive : public Primitive
     void accept(PrimitiveVisitor &visitor) const override;
 
     /**
-     * Compares MoveSpinPrimitives for equality. MoveSpinPrimitives are considered equal
-     * if all their member variables are equal.
+     * Compares SpinningMovePrimitives for equality. SpinningMovePrimitives are considered
+     * equal if all their member variables are equal.
      *
-     * @param other the MoveSpinPrimitive to compare with for equality
-     * @return true if the MoveSpinPrimitives are equal and false otherwise
+     * @param other the SpinningMovePrimitive to compare with for equality
+     *
+     * @return true if the SpinningMovePrimitives are equal and false otherwise
      */
-    bool operator==(const MoveSpinPrimitive &other) const;
+    bool operator==(const SpinningMovePrimitive &other) const;
 
     /**
-     * Compares MoveSpinPrimitives for inequality.
+     * Compares SpinningMovePrimitives for inequality.
      *
-     * @param other the MoveSpinPrimitive to compare with for inequality
-     * @return true if the MoveSpinPrimitives are not equal and false otherwise
+     * @param other the SpinningMovePrimitive to compare with for inequality
+     *
+     * @return true if the SpinningMovePrimitives are not equal and false otherwise
      */
-    bool operator!=(const MoveSpinPrimitive &other) const;
+    bool operator!=(const SpinningMovePrimitive &other) const;
 
    private:
     unsigned int robot_id;

@@ -7,6 +7,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":proto_creator_primitive_visitor",
+        ":tbots_geometry",
         "//shared/proto:tbots_cc_proto",
         "//software/geom:angle",
         "//software/geom:point",
@@ -21,8 +22,32 @@ cc_test(
     name = "tbots_protobuf_test",
     srcs = ["tbots_protobuf_test.cpp"],
     deps = [
-        "//software/proto/message_translation:tbots_protobuf",
+        "tbots_protobuf",
         "//software/test_util",
+    ],
+)
+
+cc_library(
+    name = "tbots_geometry",
+    srcs = ["tbots_geometry.cpp"],
+    hdrs = ["tbots_geometry.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//shared/proto:tbots_cc_proto",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
+    ],
+)
+
+cc_test(
+    name = "tbots_geometry_test",
+    srcs = ["tbots_geometry_test.cpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "tbots_geometry",
+        "@gtest//:gtest_main",
     ],
 )
 

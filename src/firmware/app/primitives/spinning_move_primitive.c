@@ -1,4 +1,4 @@
-#include "firmware/app/primitives/spin_primitive.h"
+#include "firmware/app/primitives/spinning_move_primitive.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -9,7 +9,7 @@
 
 #define TIME_HORIZON 0.5f
 
-typedef struct SpinPrimitiveState
+typedef struct SpinningMovePrimitiveState
 {
     float x_final;
     float y_final;
@@ -20,13 +20,13 @@ typedef struct SpinPrimitiveState
     float major_vec[2];
     float minor_vec[2];
     float major_angle;
-} SpinPrimitiveState_t;
-DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(SpinPrimitiveState_t)
+} SpinningMovePrimitiveState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(SpinningMovePrimitiveState_t)
 
-void app_spin_primitive_start(PrimitiveParamsMsg params, void *void_state_ptr,
-                              FirmwareWorld_t *world)
+void app_spinning_move_primitive_start(PrimitiveParamsMsg params, void *void_state_ptr,
+                                       FirmwareWorld_t *world)
 {
-    SpinPrimitiveState_t *state = (SpinPrimitiveState_t *)void_state_ptr;
+    SpinningMovePrimitiveState_t *state = (SpinningMovePrimitiveState_t *)void_state_ptr;
 
     // Parameters:  param[0]: g_destination_x   [mm]
     //              param[1]: g_destination_y   [mm]
@@ -61,12 +61,13 @@ void app_spin_primitive_start(PrimitiveParamsMsg params, void *void_state_ptr,
     state->major_angle = atan2f(state->major_vec[1], state->major_vec[0]);
 }
 
-static void spin_end(void *void_state_ptr, FirmwareWorld_t *world) {}
+static void spinning_move_end(void *void_state_ptr, FirmwareWorld_t *world) {}
 
-static void spin_tick(void *void_state_ptr, FirmwareWorld_t *world)
+static void spinning_move_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
-    const FirmwareRobot_t *robot      = app_firmware_world_getRobot(world);
-    const SpinPrimitiveState_t *state = (SpinPrimitiveState_t *)void_state_ptr;
+    const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    const SpinningMovePrimitiveState_t *state =
+        (SpinningMovePrimitiveState_t *)void_state_ptr;
 
     // Trajectories
     BBProfile major;
@@ -137,10 +138,11 @@ static void spin_tick(void *void_state_ptr, FirmwareWorld_t *world)
 }
 
 /**
- * \brief The spin movement primitive.
+ * \brief The spinning_move movement primitive.
  */
-const primitive_t SPIN_PRIMITIVE = {.direct        = false,
-                                    .end           = &spin_end,
-                                    .tick          = &spin_tick,
-                                    .create_state  = &createSpinPrimitiveState_t,
-                                    .destroy_state = &destroySpinPrimitiveState_t};
+const primitive_t SPINNING_MOVE_PRIMITIVE = {
+    .direct        = false,
+    .end           = &spinning_move_end,
+    .tick          = &spinning_move_tick,
+    .create_state  = &createSpinningMovePrimitiveState_t,
+    .destroy_state = &destroySpinningMovePrimitiveState_t};

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "shared/proto/tbots_robot_msg.pb.h"
+#include "shared/proto/robot_status_msg.pb.h"
 
 // This struct contains various robot diagnostics (e.g. voltages, link quality, etc.)
 // and messages related to robot and dongle condition.
@@ -88,11 +88,11 @@ struct RobotStatus
 };
 
 /**
- * Converts RobotStatus to TbotsRobotMsg
+ * Converts RobotStatus to RobotStatusMsg
  * Does not convert ChipperKickerStatus,
  * DriveUnits, and NetworkStatus due to insufficient info
  *
  * @param robot_status The RobotStatus
  */
-std::unique_ptr<TbotsRobotMsg> convertRobotStatusToTbotsRobotMsg(
+std::unique_ptr<RobotStatusMsg> convertRobotStatusToRobotStatusMsg(
     const RobotStatus &robot_status);
