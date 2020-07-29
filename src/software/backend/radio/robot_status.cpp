@@ -16,12 +16,12 @@ static const std::map<const std::string, ErrorCode> dongle_message_error_codes =
     {MRF::RECEIVE_QUEUE_FULL_MESSAGE, ErrorCode::RECEIVE_QUEUE_FULL},
     {MRF::PACKET_ABOVE_MAX_SIZE, ErrorCode::PACKET_ABOVE_MAX_SIZE}};
 
-std::unique_ptr<TbotsRobotStatusMsg> convertRobotStatusToTbotsRobotStatusMsg(
+std::unique_ptr<RobotStatusMsg> convertRobotStatusToRobotStatusMsg(
     const RobotStatus& robot_status)
 {
-    // Insufficient information to make the TbotsRobotStatusMsg fields for
+    // Insufficient information to make the RobotStatusMsg fields for
     // ChipperKickerStatus, DriveUnits, and NetworkStatus
-    auto robot_msg = std::make_unique<TbotsRobotStatusMsg>();
+    auto robot_msg = std::make_unique<RobotStatusMsg>();
 
     robot_msg->set_robot_id(robot_status.robot);
 

@@ -8,7 +8,7 @@ proto_library(
     srcs = [
         "geometry.proto",
         "primitive.proto",
-        "tbots_robot_status_msg.proto",
+        "robot_status_msg.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
         "vision.proto",

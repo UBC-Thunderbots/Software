@@ -54,6 +54,7 @@ class SpinningMovePrimitive : public Primitive
      * equal if all their member variables are equal.
      *
      * @param other the SpinningMovePrimitive to compare with for equality
+     *
      * @return true if the SpinningMovePrimitives are equal and false otherwise
      */
     bool operator==(const SpinningMovePrimitive &other) const;
@@ -62,6 +63,7 @@ class SpinningMovePrimitive : public Primitive
      * Compares SpinningMovePrimitives for inequality.
      *
      * @param other the SpinningMovePrimitive to compare with for inequality
+     *
      * @return true if the SpinningMovePrimitives are not equal and false otherwise
      */
     bool operator!=(const SpinningMovePrimitive &other) const;
