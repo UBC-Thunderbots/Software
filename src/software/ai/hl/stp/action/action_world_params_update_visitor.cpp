@@ -22,6 +22,6 @@ void ActionWorldParamsUpdateVisitor::visit(KickAction& action)
 
 void ActionWorldParamsUpdateVisitor::visit(MoveAction& action) {}
 
-void ActionWorldParamsUpdateVisitor::visit(MoveSpinAction& action) {}
+void ActionWorldParamsUpdateVisitor::visit(SpinningMoveAction& action) {}
 
 void ActionWorldParamsUpdateVisitor::visit(StopAction& action) {}

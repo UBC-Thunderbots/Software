@@ -3,24 +3,10 @@
 #include "shared/constants.h"
 #include "software/primitive/all_primitives.h"
 
-PrimitiveMsg ProtoCreatorPrimitiveVisitor::getProto()
-{
-    // If we've never visited a primitive (and so have never populated the
-    // `prim`) then throw an exception
-    if (!prim)
-    {
-        std::string err_msg = std::string(typeid(this).name()) + ": " + __func__ +
-                              " called without ever having visited anything";
-        throw std::runtime_error(err_msg);
-    }
-
-    return *prim;
-}
-
 PrimitiveMsg ProtoCreatorPrimitiveVisitor::createPrimitiveMsg(const Primitive &primitive)
 {
     primitive.accept(*static_cast<PrimitiveVisitor *>(this));
-    return getProto();
+    return *prim;
 }
 
 void ProtoCreatorPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
@@ -117,22 +103,24 @@ void ProtoCreatorPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
     prim->set_allocated_move(params);
 }
 
-void ProtoCreatorPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive)
+void ProtoCreatorPrimitiveVisitor::visit(
+    const SpinningMovePrimitive &spinning_move_primitive)
 {
     PrimitiveParamsMsg *params = new PrimitiveParamsMsg();
-    params->set_parameter1(static_cast<float>(movespin_primitive.getDestination().x() *
+    params->set_parameter1(static_cast<float>(
+        spinning_move_primitive.getDestination().x() * MILLIMETERS_PER_METER));
+    params->set_parameter2(static_cast<float>(
+        spinning_move_primitive.getDestination().y() * MILLIMETERS_PER_METER));
+    params->set_parameter3(
+        static_cast<float>(spinning_move_primitive.getAngularVelocity().toRadians() *
+                           CENTIRADIANS_PER_RADIAN));
+    params->set_parameter4(static_cast<float>(spinning_move_primitive.getFinalSpeed() *
                                               MILLIMETERS_PER_METER));
-    params->set_parameter2(static_cast<float>(movespin_primitive.getDestination().y() *
-                                              MILLIMETERS_PER_METER));
-    params->set_parameter3(static_cast<float>(
-        movespin_primitive.getAngularVelocity().toRadians() * CENTIRADIANS_PER_RADIAN));
-    params->set_parameter4(
-        static_cast<float>(movespin_primitive.getFinalSpeed() * MILLIMETERS_PER_METER));
     params->set_extra_bits(0);
     params->set_slow(false);
 
     prim = PrimitiveMsg();
-    prim->set_allocated_spin(params);
+    prim->set_allocated_spinning_move(params);
 }
 
 void ProtoCreatorPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)

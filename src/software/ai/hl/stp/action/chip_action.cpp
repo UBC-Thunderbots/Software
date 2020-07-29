@@ -26,10 +26,10 @@ void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
 }
 
 void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
-                                     Point chip_target, double chip_distance_meters)
+                                     Point chip_target)
 {
     updateControlParams(robot, chip_origin, (chip_target - chip_origin).orientation(),
-                        chip_distance_meters);
+                        (chip_target - chip_origin).length());
 }
 
 Ball ChipAction::getBall()

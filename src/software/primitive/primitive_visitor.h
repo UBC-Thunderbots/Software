@@ -10,7 +10,7 @@ class DirectVelocityPrimitive;
 class DirectWheelsPrimitive;
 class KickPrimitive;
 class MovePrimitive;
-class MoveSpinPrimitive;
+class SpinningMovePrimitive;
 class StopPrimitive;
 
 /**
@@ -37,6 +37,6 @@ class PrimitiveVisitor
     virtual void visit(const DirectWheelsPrimitive &direct_wheels_primitive)     = 0;
     virtual void visit(const KickPrimitive &kick_primitive)                      = 0;
     virtual void visit(const MovePrimitive &move_primitive)                      = 0;
-    virtual void visit(const MoveSpinPrimitive &movespin_primitive)              = 0;
+    virtual void visit(const SpinningMovePrimitive &spinning_move_primitive)     = 0;
     virtual void visit(const StopPrimitive &stop_primitive)                      = 0;
 };
