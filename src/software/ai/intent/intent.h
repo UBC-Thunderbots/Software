@@ -72,10 +72,9 @@ class Intent
     unsigned int getPriority(void) const;
 
     /**
-     * Returns the ID of the robot that this Intent corresponds
-     * to / is controlling
+     * Returns the ID of the robot that this Intent corresponds to
      *
-     * @return The ID of the robot this Intent is controlling
+     * @return The robot id
      */
     unsigned int getRobotId() const;
 
@@ -133,7 +132,7 @@ class Intent
 
     /**
      * Gets a PrimitiveMsg updated with destination and final_speed
-     * NOTE: not all Intents update PrimitiveMsg
+     * NOTE: only Intents that navigate update PrimitiveMsg
      *
      * @param destination The destination
      * @param final_speed The final speed

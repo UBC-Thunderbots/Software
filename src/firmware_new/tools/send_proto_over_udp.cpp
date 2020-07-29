@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     {
         // primitive and vision sender
         primitive_sender->sendProto(test_primitive_msg);
-        test_vision_msg.set_timestamp_seconds(createCurrentTime());
+        *(test_vision_msg.mutable_time_sent()) = *createCurrentTimestampMsg();
         vision_sender->sendProto(test_vision_msg);
 
         // 100 hz test

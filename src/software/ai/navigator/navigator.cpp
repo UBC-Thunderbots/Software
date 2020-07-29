@@ -43,8 +43,8 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
         path_manager->getManagedPaths(path_objectives, navigable_area);
 
     // create msg and update timestamp
-    auto primitive_set_msg = std::make_unique<PrimitiveSetMsg>();
-    primitive_set_msg->set_timestamp_seconds(createCurrentTime());
+    auto primitive_set_msg                    = std::make_unique<PrimitiveSetMsg>();
+    *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestampMsg();
 
     // set robot primitives
     auto &robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
