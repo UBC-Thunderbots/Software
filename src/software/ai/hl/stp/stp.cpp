@@ -190,6 +190,7 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     auto isGoalieTactic                  = [](std::shared_ptr<Tactic> tactic) {
         return tactic->isGoalieTactic();
     };
+    std::vector<std::shared_ptr<Tactic>> goalie_tactics;
 
     if (goalie)
     {
@@ -203,6 +204,10 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
             (*iter)->updateRobot(*goalie);
         }
     }
+
+    // Store goalie tactics, which will be added at the end
+    std::copy_if(tactics.begin(), tactics.end(), back_inserter(goalie_tactics),
+                 isGoalieTactic);
 
     // Discard all goalie tactics, since we have already assigned the goalie robot (if
     // there is one) to the first goalie tactic, and there should only ever be one goalie
@@ -296,6 +301,9 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
             }
         }
     }
+
+    // Re-insert goalie tactics to returned tactics
+    tactics.insert(tactics.begin(), goalie_tactics.begin(), goalie_tactics.end());
 
     return tactics;
 }

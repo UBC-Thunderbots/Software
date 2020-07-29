@@ -411,10 +411,13 @@ TEST_F(STPTacticAssignmentTest,
     auto goalie_tactic_2                         = std::make_shared<GoalieTestTactic>();
     std::vector<std::shared_ptr<Tactic>> tactics = {goalie_tactic_1, goalie_tactic_2};
 
-    stp.assignRobotsToTactics(world, tactics);
+    std::vector<std::shared_ptr<Tactic>> assigned_tactics =
+        stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_FALSE(goalie_tactic_1->getAssignedRobot().has_value());
     EXPECT_FALSE(goalie_tactic_2->getAssignedRobot().has_value());
+    ASSERT_FALSE(assigned_tactics[0]->getAssignedRobot().has_value());
+    ASSERT_FALSE(assigned_tactics[1]->getAssignedRobot().has_value());
 }
 
 TEST_F(STPTacticAssignmentTest,
@@ -445,18 +448,16 @@ TEST_F(STPTacticAssignmentTest,
     EXPECT_EQ(goalie_tactic_1->getAssignedRobot().value(), robot_0);
 
     // Change the goalie and perform the same check in case we have a fluke bug
-    // Re-insert goalie tactic into queue since goalie tactics are removed after
-    // assignment
-    tactics.insert(tactics.begin(), goalie_tactic_1);
-
     friendly_team.assignGoalie(1);
     world.updateFriendlyTeamState(friendly_team);
 
-    stp.assignRobotsToTactics(world, tactics);
+    std::vector<std::shared_ptr<Tactic>> assigned_tactics =
+        stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_TRUE(allTacticsAssigned(tactics));
     ASSERT_TRUE(goalie_tactic_1->getAssignedRobot().has_value());
     EXPECT_EQ(goalie_tactic_1->getAssignedRobot().value(), robot_1);
+    ASSERT_TRUE(assigned_tactics[0]->getAssignedRobot().has_value());
 }
 
 TEST_F(STPTacticAssignmentTest,
@@ -477,11 +478,14 @@ TEST_F(STPTacticAssignmentTest,
     auto goalie_tactic_2                         = std::make_shared<GoalieTestTactic>();
     std::vector<std::shared_ptr<Tactic>> tactics = {goalie_tactic_1, goalie_tactic_2};
 
-    stp.assignRobotsToTactics(world, tactics);
+    std::vector<std::shared_ptr<Tactic>> assigned_tactics =
+        stp.assignRobotsToTactics(world, tactics);
 
     ASSERT_TRUE(goalie_tactic_1->getAssignedRobot().has_value());
     EXPECT_FALSE(goalie_tactic_2->getAssignedRobot().has_value());
     EXPECT_EQ(goalie_tactic_1->getAssignedRobot().value(), robot_0);
+    ASSERT_TRUE(assigned_tactics[0]->getAssignedRobot().has_value());
+    ASSERT_FALSE(assigned_tactics[1]->getAssignedRobot().has_value());
 }
 
 TEST_F(STPTacticAssignmentTest,
