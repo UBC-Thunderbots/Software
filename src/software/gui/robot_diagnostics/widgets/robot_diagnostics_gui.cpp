@@ -76,9 +76,9 @@ void RobotDiagnosticsGUI::updateRobotDiagnostics()
         updateSensorStatus(main_widget, sensor_msg.value());
 
         // update robot status table
-        for (const auto& robot_msg : sensor_msg.value().tbots_robot_status_msgs())
+        for (const auto& robot_msg : sensor_msg.value().robot_status_msgs())
         {
-            main_widget->robot_status_table_widget->updateTbotsRobotStatusMsg(robot_msg);
+            main_widget->robot_status_table_widget->updateRobotStatusMsg(robot_msg);
         }
 
         sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue();

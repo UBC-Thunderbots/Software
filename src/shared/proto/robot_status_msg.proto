@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "shared/proto/tbots_timestamp_msg.proto";
 
-message TbotsRobotStatusMsg
+message RobotStatusMsg
 {
     uint32 robot_id                           = 1;
     repeated ErrorCode error_code             = 2;
