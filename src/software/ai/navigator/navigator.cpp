@@ -65,22 +65,15 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
 
                     robot_primitives_map[intent->getRobotId()] =
                         intent->getUpdatedPrimitiveMsg(destination, final_speed);
-                }
-                else
-                {
-                    LOG(WARNING) << "Path manager could not find a path for RobotId = "
-                                 << intent->getRobotId();
-                    robot_primitives_map[intent->getRobotId()] =
-                        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
-                            StopPrimitive(intent->getRobotId(), false));
+                    continue;
                 }
             }
-            else
-            {
-                LOG(WARNING) << "Path manager did not map RobotId = "
-                             << intent->getRobotId() << " to a path";
-                robot_primitives_map[intent->getRobotId()] = intent->getPrimitiveMsg();
-            }
+            LOG(WARNING)
+                << "Navigator's path manager could not find a path for RobotId = "
+                << intent->getRobotId();
+            robot_primitives_map[intent->getRobotId()] =
+                ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+                    StopPrimitive(intent->getRobotId(), false));
         }
         else
         {
