@@ -11,8 +11,8 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       enemy_team_(enemy_team),
       current_game_state_(),
       // Store a small buffer of previous refbox game states so we can filter out noise
-      refbox_game_state_history(3),
-      refbox_stage_history(3)
+      refbox_game_state_history(REFBOX_GAMESTATE_BUFFER_SIZE),
+      refbox_stage_history(REFBOX_GAMESTATE_BUFFER_SIZE)
 {
     // Grab the most recent timestamp from all of the members used to update the world
     last_update_timestamps.set_capacity(buffer_size);

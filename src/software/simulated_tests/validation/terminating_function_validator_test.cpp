@@ -193,7 +193,7 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
         EXPECT_FALSE(result);
     }
 
-    for (unsigned int i = 0; i < 3; i++)
+    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
     {
         world->updateRefboxGameState(RefboxGameState::HALT);
     }
