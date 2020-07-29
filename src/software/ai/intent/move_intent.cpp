@@ -12,8 +12,7 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &fi
              ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
                  MovePrimitive(robot_id, dest, final_angle, final_speed, enable_dribbler,
                                move_type, autokick)),
-             priority),
-      ball_collision_type(ball_collision_type)
+             priority)
 {
     Intent::updateNavigatorParams(robot_id, dest, final_angle, final_speed,
                                   ball_collision_type);
@@ -22,11 +21,6 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &fi
 std::string MoveIntent::getIntentName(void) const
 {
     return INTENT_NAME;
-}
-
-BallCollisionType MoveIntent::getBallCollisionType() const
-{
-    return ball_collision_type;
 }
 
 PrimitiveMsg MoveIntent::getUpdatedPrimitiveMsg(Point destination,

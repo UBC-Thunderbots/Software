@@ -62,7 +62,4 @@ class MoveIntent : public Intent
      * @return true if the MoveIntents are not equal and false otherwise
      */
     bool operator!=(const MoveIntent& other) const;
-
-   private:
-    BallCollisionType ball_collision_type;
 };
