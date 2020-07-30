@@ -38,7 +38,7 @@ typedef struct MoveManagerState
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveManagerState_t)
 
 /**
- * call from move_start to choose which wheel axis we will be
+ * Call from move_start to choose which wheel axis we will be
  * using for preliminary rotation. The idea is to pick the wheel
  * axis that will result in the minimum remaining rotation onto
  * the bot's final destination angle.
@@ -62,7 +62,7 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
 void plan_move_rotation(PhysBot* pb, float avel);
 
 /**
- * builds an array that contains all of the axes perpendicular to
+ * Builds an array that contains all of the axes perpendicular to
  * each of the wheels on the bot.
  *
  * @param wheel_axes A pointer to the wheel_axes array to populate
