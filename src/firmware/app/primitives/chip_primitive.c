@@ -21,6 +21,10 @@ void app_chip_primitive_start(ChipPrimitiveMsg prim_msg, void *void_state_ptr,
 static void chip_end(void *void_state_ptr, FirmwareWorld_t *world)
 {
     app_shoot_alignment_end(void_state_ptr, world);
+    Chicker_t *chicker =
+        app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
+    app_chicker_disableAutokick(chicker);
+    app_chicker_disableAutochip(chicker);
 }
 
 static void chip_tick(void *void_state_ptr, FirmwareWorld_t *world)

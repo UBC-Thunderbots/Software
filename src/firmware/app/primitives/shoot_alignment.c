@@ -7,9 +7,9 @@
 #include "firmware/app/control/bangbang.h"
 #include "firmware/app/control/control.h"
 #include "firmware/app/control/physbot.h"
+#include "firmware/app/primitives/primitive.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
-#include "primitive.h"
 
 #define TIME_HORIZON 0.05f  // s
 
@@ -81,13 +81,7 @@ void app_shoot_alignment_start(void *void_state_ptr, FirmwareWorld_t *world,
         min_angle_delta(state->destination[2], app_firmware_robot_getOrientation(robot));
 }
 
-void app_shoot_alignment_end(void *void_state_ptr, FirmwareWorld_t *world)
-{
-    Chicker_t *chicker =
-        app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
-    app_chicker_disableAutokick(chicker);
-    app_chicker_disableAutochip(chicker);
-}
+void app_shoot_alignment_end(void *void_state_ptr, FirmwareWorld_t *world) {}
 
 void app_shoot_alignment_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {

@@ -1,4 +1,4 @@
-#include "primitive_manager.h"
+#include "firmware/app/primitives/primitive_manager.h"
 
 // There are different semaphore implementations depending on if we're on a x86 or arm
 // system, and we use typdefs here to switch between them

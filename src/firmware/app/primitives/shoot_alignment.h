@@ -3,7 +3,7 @@
 #include "firmware/app/world/firmware_world.h"
 
 /**
- * Start the Shoot primitive in the given world
+ * Start the shoot alignment in the given world
  * @param void_state_ptr [in] A pointer to this primitives state, as allocated by the
  *                            `create_state` function
  * @param world [in] The world this primitive is running in.
