@@ -13,6 +13,7 @@ cc_library(
         "//software/geom:point",
         "//software/primitive",
         "//software/proto/message_translation:tbots_protobuf",
+        "//software/util/make_enum",
     ],
 )
 

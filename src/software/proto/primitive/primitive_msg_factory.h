@@ -5,15 +5,13 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
 #include "software/primitive/primitive.h"
+#include "software/util/make_enum/make_enum.h"
 
 /**
  * Enum for indicating the stop type for the Stop Primitive
  */
-enum StopType
-{
-    BRAKE,
-    COAST
-};
+MAKE_ENUM(StopType, BRAKE, COAST)
+
 
 /**
  * Create a Chip Primitive Message
@@ -25,9 +23,9 @@ enum StopType
  *
  * @return Pointer to Chip Primitive Message
  */
-std::unique_ptr<ChipPrimitiveMsg> createChipPrimitiveMsg(const Point &chip_origin,
-                                                         const Angle &chip_direction,
-                                                         float chip_distance_meters);
+std::unique_ptr<PrimitiveNewMsg> createChipPrimitiveMsg(const Point &chip_origin,
+                                                        const Angle &chip_direction,
+                                                        float chip_distance_meters);
 
 /**
  * Create a Kick Primitive Message
@@ -39,7 +37,7 @@ std::unique_ptr<ChipPrimitiveMsg> createChipPrimitiveMsg(const Point &chip_origi
  *
  * @return Pointer to Kick Primitive Message
  */
-std::unique_ptr<KickPrimitiveMsg> createKickPrimitiveMsg(
+std::unique_ptr<PrimitiveNewMsg> createKickPrimitiveMsg(
     const Point &kick_origin, const Angle &kick_direction,
     float kick_speed_meters_per_second);
 
@@ -55,7 +53,7 @@ std::unique_ptr<KickPrimitiveMsg> createKickPrimitiveMsg(
  *
  * @return Pointer to Move Primitive Message
  */
-std::unique_ptr<MovePrimitiveMsg> createMovePrimitiveMsg(
+std::unique_ptr<PrimitiveNewMsg> createMovePrimitiveMsg(
     const Point &dest, float final_speed_meters_per_second, bool slow,
     const Angle &final_angle, float dribbler_speed_rpm);
 
@@ -71,7 +69,7 @@ std::unique_ptr<MovePrimitiveMsg> createMovePrimitiveMsg(
  *
  * @return Pointer to Spinning Move Primitive Message
  */
-std::unique_ptr<SpinningMovePrimitiveMsg> createSpinningMovePrimitiveMsg(
+std::unique_ptr<PrimitiveNewMsg> createSpinningMovePrimitiveMsg(
     const Point &dest, float final_speed_meters_per_second, bool slow,
     const AngularVelocity &angular_velocity, float dribbler_speed_rpm);
 
@@ -89,7 +87,7 @@ std::unique_ptr<SpinningMovePrimitiveMsg> createSpinningMovePrimitiveMsg(
  *
  * @return Pointer to Autochip Move Primitive Message
  */
-std::unique_ptr<AutochipMovePrimitiveMsg> createAutochipMovePrimitiveMsg(
+std::unique_ptr<PrimitiveNewMsg> createAutochipMovePrimitiveMsg(
     const Point &dest, float final_speed_meters_per_second, bool slow,
     const Angle &final_angle, float dribbler_speed_rpm, float chip_distance_meters);
 
@@ -107,7 +105,7 @@ std::unique_ptr<AutochipMovePrimitiveMsg> createAutochipMovePrimitiveMsg(
  *
  * @return Pointer to Autokick Move Primitive Message
  */
-std::unique_ptr<AutokickMovePrimitiveMsg> createAutokickMovePrimitiveMsg(
+std::unique_ptr<PrimitiveNewMsg> createAutokickMovePrimitiveMsg(
     const Point &dest, float final_speed_meters_per_second, bool slow,
     const Angle &final_angle, float dribbler_speed_rpm,
     float kick_speed_meters_per_second);
@@ -119,4 +117,4 @@ std::unique_ptr<AutokickMovePrimitiveMsg> createAutokickMovePrimitiveMsg(
  *
  * @return Pointer to Stop Primitive Message
  */
-std::unique_ptr<StopPrimitiveMsg> createStopPrimitiveMsg(StopType stop_type);
+std::unique_ptr<PrimitiveNewMsg> createStopPrimitiveMsg(StopType stop_type);
