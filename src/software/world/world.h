@@ -188,7 +188,7 @@ class World final
     bool operator!=(const World& other) const;
 
     // The size of the refbox history buffers to filter out noise with
-    static constexpr int REFBOX_GAMESTATE_BUFFER_SIZE = 3;
+    static constexpr unsigned int REFBOX_GAMESTATE_BUFFER_SIZE = 3;
 
    private:
     Field field_;
