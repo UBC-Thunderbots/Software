@@ -1,4 +1,4 @@
-#include "software/primitive/primitive_msg_factory.h"
+#include "software/proto/primitive/primitive_msg_factory.h"
 
 #include <gtest/gtest.h>
 

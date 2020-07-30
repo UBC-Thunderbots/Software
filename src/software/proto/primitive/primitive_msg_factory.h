@@ -9,7 +9,7 @@
 /**
  * Enum for indicating the stop type for the Stop Primitive
  */
-enum StopTypeMsg
+enum StopType
 {
     BRAKE,
     COAST
@@ -119,4 +119,4 @@ std::unique_ptr<AutokickMovePrimitiveMsg> createAutokickMovePrimitiveMsg(
  *
  * @return Pointer to Stop Primitive Message
  */
-std::unique_ptr<StopPrimitiveMsg> createStopPrimitiveMsg(StopTypeMsg stop_type);
+std::unique_ptr<StopPrimitiveMsg> createStopPrimitiveMsg(StopType stop_type);
