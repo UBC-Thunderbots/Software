@@ -16,14 +16,14 @@ enum StopType
 };
 
 /**
- * Create a Chip Primitive
+ * Create a Chip Primitive Message
  *
  * @param chip_origin The location where the chip will be taken
  * @param chip_direction The orientation the Robot will chip at
  * @param chip_distance_meters The distance between the starting location
  * of the chip and the location of the first bounce
  *
- * @return Pointer to Chip Primitive
+ * @return Pointer to Chip Primitive Message
  */
 std::unique_ptr<ChipPrimitiveMsg> createChipPrimitiveMsg(const Point &chip_origin,
                                                          const Angle &chip_direction,
