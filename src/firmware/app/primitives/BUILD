@@ -74,7 +74,6 @@ cc_library(
         ":direct_wheels",
         ":move",
         ":primitive",
-        ":shoot",
         ":spinning_move",
         ":stop",
         "//firmware/app/world:firmware_world",
@@ -96,22 +95,6 @@ cc_library(
         "//firmware/app/control:physbot",
         "//firmware/shared:physics",
         "//firmware/shared:util",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
-    name = "shoot",
-    srcs = ["shoot_primitive.c"],
-    hdrs = ["shoot_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/app/control:physbot",
-        "//firmware/shared:physics",
-        "//firmware/shared:util",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
