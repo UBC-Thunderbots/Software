@@ -1,4 +1,4 @@
-#include "firmware/app/primitives/shoot_alignment.h"
+#include "firmware/app/primitives/chick_alignment.h"
 
 #include "firmware/app/control/bangbang.h"
 #include "firmware/app/control/control.h"
@@ -56,7 +56,7 @@ void plan_shoot_rotation(PhysBot *pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void app_shoot_alignment_start(void *void_state_ptr, FirmwareWorld_t *world,
+void app_chick_alignment_start(void *void_state_ptr, FirmwareWorld_t *world,
                                float x_destination, float y_destination,
                                float alignment_angle)
 {
@@ -79,9 +79,9 @@ void app_shoot_alignment_start(void *void_state_ptr, FirmwareWorld_t *world,
         min_angle_delta(state->destination[2], app_firmware_robot_getOrientation(robot));
 }
 
-void app_shoot_alignment_end(void *void_state_ptr, FirmwareWorld_t *world) {}
+void app_chick_alignment_end(void *void_state_ptr, FirmwareWorld_t *world) {}
 
-void app_shoot_alignment_tick(void *void_state_ptr, FirmwareWorld_t *world)
+void app_chick_alignment_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
     ShootAlignmentState_t *state = (ShootAlignmentState_t *)void_state_ptr;
