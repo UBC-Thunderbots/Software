@@ -148,26 +148,26 @@ TEST_F(WorldTest, update_refbox_game_state)
 {
     world.updateRefboxGameState(RefboxGameState::HALT);
     EXPECT_EQ(world.gameState().getRefboxGameState(), RefboxGameState::HALT);
-    for (int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
+    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
     {
         world.updateRefboxGameState(RefboxGameState::FORCE_START);
         EXPECT_NE(world.gameState().getRefboxGameState(), RefboxGameState::FORCE_START);
     }
 
-    for (int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
+    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
     {
         world.updateRefboxGameState(RefboxGameState::FORCE_START);
         EXPECT_EQ(world.gameState().getRefboxGameState(), RefboxGameState::FORCE_START);
     }
 
-    for (int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
+    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
     {
         world.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_US, Point(0, 0));
         EXPECT_NE(world.gameState().getRefboxGameState(),
                   RefboxGameState::BALL_PLACEMENT_US);
     }
 
-    for (int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
+    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
     {
         world.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_US, Point(0, 0));
         EXPECT_EQ(world.gameState().getRefboxGameState(),
@@ -179,25 +179,25 @@ TEST_F(WorldTest, update_refbox_stage)
 {
     world.updateRefboxStage(RefboxStage::NORMAL_FIRST_HALF_PRE);
     EXPECT_EQ(world.getRefboxStage(), RefboxStage::NORMAL_FIRST_HALF_PRE);
-    for (int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
+    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
     {
         world.updateRefboxStage(RefboxStage::NORMAL_FIRST_HALF);
         EXPECT_NE(world.getRefboxStage(), RefboxStage::NORMAL_FIRST_HALF);
     }
 
-    for (int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
+    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
     {
         world.updateRefboxStage(RefboxStage::NORMAL_FIRST_HALF);
         EXPECT_EQ(world.getRefboxStage(), RefboxStage::NORMAL_FIRST_HALF);
     }
 
-    for (int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
+    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
     {
         world.updateRefboxStage(RefboxStage::NORMAL_SECOND_HALF_PRE);
         EXPECT_NE(world.getRefboxStage(), RefboxStage::NORMAL_SECOND_HALF_PRE);
     }
 
-    for (int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
+    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
     {
         world.updateRefboxStage(RefboxStage::NORMAL_SECOND_HALF_PRE);
         EXPECT_EQ(world.getRefboxStage(), RefboxStage::NORMAL_SECOND_HALF_PRE);
