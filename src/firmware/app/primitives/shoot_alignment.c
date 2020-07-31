@@ -1,9 +1,5 @@
 #include "firmware/app/primitives/shoot_alignment.h"
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "firmware/app/control/bangbang.h"
 #include "firmware/app/control/control.h"
 #include "firmware/app/control/physbot.h"
@@ -11,7 +7,7 @@
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
 
-#define TIME_HORIZON 0.05f  // s
+#define TIME_HORIZON 0.05f  // in seconds
 
 typedef struct ShootAlignmentState
 {
@@ -21,7 +17,9 @@ DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(ShootAlignmentState_t)
 
 /**
  * Scales the major acceleration by the distance from the major axis and the
- * amount required left to rotate. Total rotation and the distance vector should
+ * amount required left to rotate.
+ *
+ * @pre Total rotation and the distance vector should
  * not be zero so as to avoid divide by zero errors.
  *
  * @param pb The PhysBot data container that contains information about the

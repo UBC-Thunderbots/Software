@@ -1,9 +1,5 @@
 #include "firmware/app/primitives/chip_primitive.h"
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "firmware/app/primitives/shoot_alignment.h"
 
 void app_chip_primitive_start(ChipPrimitiveMsg prim_msg, void *void_state_ptr,
@@ -33,7 +29,7 @@ static void chip_tick(void *void_state_ptr, FirmwareWorld_t *world)
 }
 
 /**
- * \brief The chip movement primitive.
+ * \brief The chip primitive.
  */
 const primitive_t CHIP_PRIMITIVE = {.direct        = false,
                                     .end           = &chip_end,

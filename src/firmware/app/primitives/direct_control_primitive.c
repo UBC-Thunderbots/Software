@@ -29,7 +29,7 @@ void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
             DirectControlPrimitiveMsg_DirectPerWheelControlMsg control_msg =
                 prim_msg.wheel_control.direct_per_wheel_control;
             state->direct_velocity = false;
-            // TODO: Fix passing rpm into an applyForce function
+            // TODO (#1649): Fix passing rpm into an applyForce function
             app_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot),
                                  control_msg.front_left_wheel_rpm);
             app_wheel_applyForce(app_firmware_robot_getBackLeftWheel(robot),
@@ -137,7 +137,7 @@ static void direct_control_tick(void* void_state_ptr, FirmwareWorld_t* world)
 }
 
 /**
- * \brief The direct_control movement primitive.
+ * \brief The direct control primitive.
  */
 const primitive_t DIRECT_CONTROL_PRIMITIVE = {
     .direct        = true,

@@ -1,9 +1,5 @@
 #include "firmware/app/primitives/kick_primitive.h"
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "firmware/app/primitives/shoot_alignment.h"
 
 void app_kick_primitive_start(KickPrimitiveMsg prim_msg, void *void_state_ptr,
@@ -33,7 +29,7 @@ static void kick_tick(void *void_state_ptr, FirmwareWorld_t *world)
 }
 
 /**
- * \brief The kick movement primitive.
+ * \brief The kick primitive.
  */
 const primitive_t KICK_PRIMITIVE = {.direct        = false,
                                     .end           = &kick_end,
