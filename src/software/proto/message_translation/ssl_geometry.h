@@ -17,7 +17,7 @@
  *
  * Several values like the various goal lines are not listed in the wiki
  * and so have been determined "experimentally" by inspecting messages
- * received from SSL Vision or Grsim.
+ * received from SSL Vision
  *
  * We have named the enums according to our own style to be more descriptive
  * than the SSL defaults. See the map in the .cpp file for how these map to
