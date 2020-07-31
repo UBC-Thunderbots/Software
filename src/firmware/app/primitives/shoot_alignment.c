@@ -22,7 +22,7 @@ DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(ShootAlignmentState_t)
  * @pre Total rotation and the distance vector should
  * not be zero so as to avoid divide by zero errors.
  *
- * @param pb The PhysBot data container that contains information about the
+ * @param pb [in/out] The PhysBot data container that contains information about the
  * major and minor axis.
  */
 void scale(PhysBot *pb)
@@ -43,7 +43,7 @@ void scale(PhysBot *pb)
  * is used to determine the rotation time, and thus the rotation velocity and
  * acceleration. The rotational acceleration is clamped under the MAX_T_A.
  *
- * @param pb The PhysBot data container that should have minor axis time and
+ * @param pb [in/out] The PhysBot data container that should have minor axis time and
  * will store the rotational information
  * @param avel The rotational velocity of the bot
  */
