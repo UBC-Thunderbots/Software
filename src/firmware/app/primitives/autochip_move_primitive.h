@@ -7,6 +7,7 @@ extern const primitive_t AUTOCHIP_MOVE_PRIMITIVE;
 
 /**
  * Start the Autochip Move primitive in the given world
+ *
  * @param prim_msg [in] The msg for the primitive
  * @param void_state_ptr [in] A pointer to this primitives state, as allocated by the
  *                            `create_state` function

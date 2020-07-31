@@ -55,7 +55,7 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
  * Calculates the rotation time, velocity, and acceleration to be stored
  * in a PhysBot data container.
  *
- * @param pb The data container that has information about major axis time
+ * @param pb [in/out] The data container that has information about major axis time
  * and will store the rotational information
  * @param avel The current rotational velocity of the bot
  */
@@ -117,7 +117,7 @@ unsigned choose_wheel_axis(float dx, float dy, float current_angle, float final_
  * axis.
  *
  * @param optimal_wheel_axes_index The index of the wheel axes to rotate onto
- * @param pb The data container that contains information about
+ * @param pb [in/out] The data container that contains information about
  * the direction the robot will move along.
  * @param angle The angle that the robot is currently facing
  */
