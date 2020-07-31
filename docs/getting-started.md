@@ -15,7 +15,6 @@
    * [Installing Software Dependencies](#installing-software-dependencies)
    * [Installing Firmware Dependencies](#installing-firmware-dependencies)
    * [Setting Up USB Permissions](#setting-up-usb-permissions)
-   * [Installing grSim](#installing-grsim)
    * [Installing CLion](#installing-clion)
       * [Getting your Student License](#getting-your-student-license)
       * [Installing CLion](#installing-clion-1)
@@ -38,7 +37,7 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 We currently only support Linux, specifically Ubuntu 18.04 LTS. You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
 
-You can use Ubuntu 18.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots AI and grSim on Windows is experimental and not officially supported.**
+You can use Ubuntu 18.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ## Getting the Code
 
@@ -87,13 +86,6 @@ We have several setup scripts to help you easily install the necessary dependenc
   * Run `./setup_udev_rules.sh`
     * You will be prompted for your admin password
     * This script will set up the USB permissions required in order to use our radio/wifi dongle
-
-### Installing grSim
-
-* Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-* Run `./setup_grsim.sh`
-  * You will be prompted for your admin password
-  * This script will install `grSim`, which is the main simulator we use for development
 
 ### Installing CLion
 

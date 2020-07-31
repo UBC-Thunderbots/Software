@@ -12,7 +12,7 @@
  *
  * Several values like the various goal lines are not listed in the wiki
  * and so have been determined "experimentally" by inspecting messages
- * received from SSL Vision or Grsim
+ * received from SSL Vision
  *
  * Conventions and naming from the SSL
  * - "Top" refers to +y in our coordinate system. "Bottom" refers to -y
