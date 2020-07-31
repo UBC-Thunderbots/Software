@@ -44,8 +44,7 @@ class Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes and will never report done
      */
-    explicit Tactic(bool loop_forever,
-                    const std::set<RobotCapability> &capability_reqs_ = {});
+    explicit Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_);
 
     /**
      * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed

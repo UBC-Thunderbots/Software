@@ -12,7 +12,7 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
                                                    const Team &enemy_team,
                                                    const Ball &ball, bool ignore_goalie,
                                                    double shadow_distance)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),

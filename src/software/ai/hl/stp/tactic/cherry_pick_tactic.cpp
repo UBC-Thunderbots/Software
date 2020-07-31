@@ -4,7 +4,7 @@
 #include "software/geom/algorithms/distance.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       pass_generator(world, world.ball().position(), PassType::ONE_TOUCH_SHOT),
       world(world),
       target_region(target_region)

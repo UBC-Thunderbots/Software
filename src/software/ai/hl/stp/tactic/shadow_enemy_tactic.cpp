@@ -9,7 +9,7 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
                                      const Team &enemy_team, bool ignore_goalie,
                                      const Ball &ball, const double ball_steal_speed,
                                      bool enemy_team_can_pass, bool loop_forever)
-    : Tactic(loop_forever),
+    : Tactic(loop_forever, {RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
