@@ -1,6 +1,9 @@
 #include "software/ai/hl/stp/tactic/test_tactics/goalie_test_tactic.h"
 
-GoalieTestTactic::GoalieTestTactic(bool loop_forever) : Tactic(loop_forever) {}
+GoalieTestTactic::GoalieTestTactic(bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Move})
+{
+}
 
 std::string GoalieTestTactic::getName() const
 {

@@ -10,7 +10,7 @@
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
                                const Team& enemy_team, const Pass pass, const Ball& ball,
                                bool loop_forever)
-    : Tactic(loop_forever),
+    : Tactic(loop_forever, {RobotCapability::Move}),
       field(field),
       pass(pass),
       ball(ball),

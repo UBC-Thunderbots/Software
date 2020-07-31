@@ -3,7 +3,9 @@
 #include <algorithm>
 
 
-MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
+MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever, {RobotCapability::Move})
+{
+}
 
 std::string MoveTactic::getName() const
 {
