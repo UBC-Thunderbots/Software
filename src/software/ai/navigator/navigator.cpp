@@ -18,7 +18,7 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
 {
     planned_paths.clear();
     Rectangle navigable_area = world.field().fieldBoundary();
-    auto path_objectives     = getPathObjectivesFromIntents(assigned_intents, world);
+    auto path_objectives     = createPathObjectives(assigned_intents, world);
     auto robot_id_to_path =
         path_manager->getManagedPaths(path_objectives, navigable_area);
 
@@ -60,48 +60,55 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
     return primitive_set_msg;
 }
 
-std::vector<PathObjective> Navigator::getPathObjectivesFromIntents(
+std::optional<PathObjective> Navigator::createPathObjective(
+    RobotId robot_id, const NavigatorParams &navigator_params,
+    const std::set<MotionConstraint> &motion_constraints, const World &world)
+{
+    std::vector<ObstaclePtr> obstacles =
+        robot_navigation_obstacle_factory.createFromMotionConstraints(motion_constraints,
+                                                                      world);
+
+    if (navigator_params.ball_collision_type == BallCollisionType::AVOID)
+    {
+        const auto ball_obstacle =
+            robot_navigation_obstacle_factory.createFromBallPosition(
+                world.ball().position());
+        obstacles.push_back(ball_obstacle);
+    }
+
+    auto robot = world.friendlyTeam().getRobotById(robot_id);
+    if (robot)
+    {
+        return PathObjective{.robot_id      = robot_id,
+                             .start         = robot->position(),
+                             .end           = navigator_params.destination,
+                             .current_speed = robot->velocity().length(),
+                             .obstacles     = obstacles};
+    }
+    else
+    {
+        LOG(WARNING) << "Failed to find robot associated with robot id = " << robot_id;
+        return std::nullopt;
+    }
+}
+
+std::vector<PathObjective> Navigator::createPathObjectives(
     const std::vector<std::unique_ptr<Intent>> &intents, const World &world)
 {
     std::vector<ObstaclePtr> friendly_non_navigating_robot_obstacles;
     std::vector<PathObjective> path_objectives;
-    // Common ball obstacle that can be reused
-    const auto ball_obstacle =
-        robot_navigation_obstacle_factory.createFromBallPosition(world.ball().position());
 
     for (const auto &intent : intents)
     {
         auto navigator_params = intent->getNavigatorParams();
-
         if (navigator_params)
         {
-            // start with non-navigating robots and then add motion constraints
-            std::vector<ObstaclePtr> obstacles =
-                robot_navigation_obstacle_factory.createFromMotionConstraints(
-                    intent->getMotionConstraints(), world);
-
-            if (navigator_params->ball_collision_type == BallCollisionType::AVOID)
+            auto path_objective =
+                createPathObjective(intent->getRobotId(), *navigator_params,
+                                    intent->getMotionConstraints(), world);
+            if (path_objective)
             {
-                obstacles.push_back(ball_obstacle);
-            }
-
-            auto robot = world.friendlyTeam().getRobotById(intent->getRobotId());
-
-            if (robot)
-            {
-                path_objectives.emplace_back(
-                    PathObjective{.robot_id      = intent->getRobotId(),
-                                  .start         = robot->position(),
-                                  .end           = navigator_params->destination,
-                                  .current_speed = robot->velocity().length(),
-                                  .obstacles     = obstacles});
-            }
-            else
-            {
-                std::stringstream ss;
-                ss << "Failed to find robot associated with robot id = "
-                   << intent->getRobotId();
-                LOG(WARNING) << ss.str();
+                path_objectives.emplace_back(*path_objective);
             }
         }
         else

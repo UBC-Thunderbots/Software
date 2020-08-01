@@ -9,8 +9,6 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/primitive/all_primitives.h"
-#include "software/primitive/primitive.h"
 #include "software/world/world.h"
 
 /**
@@ -33,15 +31,15 @@ class Navigator
                        std::shared_ptr<const NavigatorConfig> config);
 
     /**
-     * Get PrimitiveSetMsg for given assigned intents
+     * Get Primitives for given assigned intents
      *
      * @param world World to navigate around
-     * @assignedIntents intents to process into primitives
+     * @assigned_intents intents to process into primitives
      *
-     * @return PrimitiveSetMsg
+     * @return Primitives
      */
     std::unique_ptr<PrimitiveSetMsg> getAssignedPrimitiveSetMsg(
-        const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents);
+        const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents);
 
     /**
      * Get the planned paths for navigation
@@ -79,15 +77,30 @@ class Navigator
 
    private:
     /**
-     * Generates path objectives from intents
+     * Generates path objectives
      *
      * @param intents intents to make into path objectives
      * @param world World to navigate around
      *
      * @return vector of PathObjectives
      */
-    std::vector<PathObjective> getPathObjectivesFromIntents(
+    std::vector<PathObjective> createPathObjectives(
         const std::vector<std::unique_ptr<Intent>> &intents, const World &world);
+
+    /**
+     * Creates a path objective for the given robot id, using navigator params, motion
+     * constraints, and the world
+     *
+     * @param robot_id The robot id
+     * @param navigator_params The navigator params for navigating for this robot
+     * @param motion_constraints The motion constraints for this robot
+     * @param world The current state of the world
+     *
+     * @return the PathObjective if robot_id is valid, std::nullopt if not valid
+     */
+    std::optional<PathObjective> createPathObjective(
+        RobotId robot_id, const NavigatorParams &navigator_params,
+        const std::set<MotionConstraint> &motion_constraints, const World &world);
 
     /**
      * Creates the final speed and destination given the navigator params, the path, the

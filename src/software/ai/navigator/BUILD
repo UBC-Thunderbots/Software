@@ -14,7 +14,6 @@ cc_library(
         "//software/geom/algorithms",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
-        "//software/primitive:all_primitives",
         "//software/proto/message_translation:tbots_protobuf",
         "//software/world",
     ],
