@@ -33,13 +33,13 @@ class Navigator
     /**
      * Get Primitives for given assigned intents
      *
-     * @param world World to navigate around
-     * @assigned_intents intents to process into primitives
+     * @param world The World to navigate around
+     * @param intents The intents to process into primitives
      *
      * @return Primitives
      */
     std::unique_ptr<PrimitiveSetMsg> getAssignedPrimitiveSetMsg(
-        const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents);
+        const World &world, const std::vector<std::unique_ptr<Intent>> &intents);
 
     /**
      * Get the planned paths for navigation
@@ -99,6 +99,19 @@ class Navigator
      */
     std::optional<PathObjective> createPathObjective(
         RobotId robot_id, const NavigatorParams &navigator_params, const World &world);
+
+    /**
+     * Creates Primitives for given intents using the world and paths
+     *
+     * @param intents The intents to create primitives for
+     * @param world The world
+     * @param robot_id_to_path map of all the planned paths
+     *
+     * @return primitives for the given intents
+     */
+    std::unique_ptr<PrimitiveSetMsg> createPrimitives(
+        const std::vector<std::unique_ptr<Intent>> &intents, const World &world,
+        std::map<RobotId, std::optional<Path>> robot_id_to_path);
 
     /**
      * Creates the final speed and destination given the navigator params, the path, the

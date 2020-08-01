@@ -24,12 +24,12 @@ class AI final
                 std::shared_ptr<const AIControlConfig> control_config);
 
     /**
-     * Calculates the PrimitiveSetMsg that should be run by our Robots given the current
+     * Calculates the Primitives that should be run by our Robots given the current
      * state of the world.
      *
      * @param world The state of the World with which to make the decisions
      *
-     * @return the PrimitiveSetMsg that should be run by our Robots given the current
+     * @return the Primitives that should be run by our Robots given the current
      * state of the world.
      */
     std::unique_ptr<PrimitiveSetMsg> getPrimitiveSetMsg(const World& world) const;

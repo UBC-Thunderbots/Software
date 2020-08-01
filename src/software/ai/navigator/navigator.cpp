@@ -14,50 +14,14 @@ Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
 }
 
 std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
-    const World &world, const std::vector<std::unique_ptr<Intent>> &assigned_intents)
+    const World &world, const std::vector<std::unique_ptr<Intent>> &intents)
 {
     planned_paths.clear();
     Rectangle navigable_area = world.field().fieldBoundary();
-    auto path_objectives     = createPathObjectives(assigned_intents, world);
+    auto path_objectives     = createPathObjectives(intents, world);
     auto robot_id_to_path =
         path_manager->getManagedPaths(path_objectives, navigable_area);
-
-    auto primitive_set_msg                    = std::make_unique<PrimitiveSetMsg>();
-    *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestampMsg();
-    auto &robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
-
-    // Turn each intent and associated path into primitives
-    for (const auto &intent : assigned_intents)
-    {
-        auto navigator_params = intent->getNavigatorParams();
-        if (navigator_params)
-        {
-            auto robot_id_to_path_iter = robot_id_to_path.find(intent->getRobotId());
-            if (robot_id_to_path_iter != robot_id_to_path.end() &&
-                robot_id_to_path_iter->second)
-            {
-                auto [destination, final_speed] = calculateDestinationAndFinalSpeed(
-                    navigator_params.value(), *(robot_id_to_path_iter->second), world);
-                robot_primitives_map[intent->getRobotId()] =
-                    navigator_params->primitive_msg_update_function(destination,
-                                                                    final_speed);
-            }
-            else
-            {
-                LOG(WARNING)
-                    << "Navigator's path manager could not find a path for RobotId = "
-                    << intent->getRobotId();
-                robot_primitives_map[intent->getRobotId()] =
-                    ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
-                        StopPrimitive(intent->getRobotId(), false));
-            }
-        }
-        else
-        {
-            robot_primitives_map[intent->getRobotId()] = intent->getPrimitiveMsg();
-        }
-    }
-    return primitive_set_msg;
+    return createPrimitives(intents, world, robot_id_to_path);
 }
 
 std::optional<PathObjective> Navigator::createPathObjective(
@@ -128,6 +92,47 @@ std::vector<PathObjective> Navigator::createPathObjectives(
                                         friendly_non_navigating_robot_obstacles.end());
     }
     return path_objectives;
+}
+
+std::unique_ptr<PrimitiveSetMsg> Navigator::createPrimitives(
+    const std::vector<std::unique_ptr<Intent>> &intents, const World &world,
+    std::map<RobotId, std::optional<Path>> robot_id_to_path)
+{
+    auto primitive_set_msg                    = std::make_unique<PrimitiveSetMsg>();
+    *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestampMsg();
+    auto &robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
+
+    for (const auto &intent : intents)
+    {
+        auto navigator_params = intent->getNavigatorParams();
+        if (navigator_params)
+        {
+            auto robot_id_to_path_iter = robot_id_to_path.find(intent->getRobotId());
+            if (robot_id_to_path_iter != robot_id_to_path.end() &&
+                robot_id_to_path_iter->second)
+            {
+                auto [destination, final_speed] = calculateDestinationAndFinalSpeed(
+                    navigator_params.value(), *(robot_id_to_path_iter->second), world);
+                robot_primitives_map[intent->getRobotId()] =
+                    navigator_params->primitive_msg_update_function(destination,
+                                                                    final_speed);
+            }
+            else
+            {
+                LOG(WARNING)
+                    << "Navigator's path manager could not find a path for RobotId = "
+                    << intent->getRobotId();
+                robot_primitives_map[intent->getRobotId()] =
+                    ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+                        StopPrimitive(intent->getRobotId(), false));
+            }
+        }
+        else
+        {
+            robot_primitives_map[intent->getRobotId()] = intent->getPrimitiveMsg();
+        }
+    }
+    return primitive_set_msg;
 }
 
 std::pair<Point, double> Navigator::calculateDestinationAndFinalSpeed(
