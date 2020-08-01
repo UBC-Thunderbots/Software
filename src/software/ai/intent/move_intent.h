@@ -1,12 +1,9 @@
 #pragma once
 
-#include "software/ai/intent/intent.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/ai/intent/navigating_intent.h"
 #include "software/primitive/move_primitive.h"
-#include "software/util/make_enum/make_enum.h"
 
-class MoveIntent : public Intent
+class MoveIntent : public NavigatingIntent
 {
    public:
     static const std::string INTENT_NAME;
@@ -34,36 +31,5 @@ class MoveIntent : public Intent
                         MoveType move_type, AutochickType autokick,
                         BallCollisionType ball_collision_type);
 
-
-    /**
-     * Gets type of navigation around the ball
-     *
-     * @return type of navigation around the ball
-     */
-    BallCollisionType getBallCollisionType() const;
-
     std::string getIntentName(void) const override;
-    PrimitiveMsg getUpdatedPrimitiveMsg(Point destination,
-                                        double final_speed) const override;
-    std::optional<NavigatorParams> getNavigatorParams() const override;
-
-    /**
-     * Compares MoveIntents for equality. MoveIntents are considered equal if all
-     * their member variables are equal.
-     *
-     * @param other the MoveIntents to compare with for equality
-     * @return true if the MoveIntents are equal and false otherwise
-     */
-    bool operator==(const MoveIntent& other) const;
-
-    /**
-     * Compares MoveIntents for inequality.
-     *
-     * @param other the MoveIntent to compare with for inequality
-     * @return true if the MoveIntents are not equal and false otherwise
-     */
-    bool operator!=(const MoveIntent& other) const;
-
-   private:
-    NavigatorParams navigator_params;
 };

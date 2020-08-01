@@ -88,19 +88,17 @@ class Navigator
         const std::vector<std::unique_ptr<Intent>> &intents, const World &world);
 
     /**
-     * Creates a path objective for the given robot id, using navigator params, motion
-     * constraints, and the world
+     * Creates a path objective for the given robot id, using navigator params and the
+     * world
      *
      * @param robot_id The robot id
      * @param navigator_params The navigator params for navigating for this robot
-     * @param motion_constraints The motion constraints for this robot
      * @param world The current state of the world
      *
      * @return the PathObjective if robot_id is valid, std::nullopt if not valid
      */
     std::optional<PathObjective> createPathObjective(
-        RobotId robot_id, const NavigatorParams &navigator_params,
-        const std::set<MotionConstraint> &motion_constraints, const World &world);
+        RobotId robot_id, const NavigatorParams &navigator_params, const World &world);
 
     /**
      * Creates the final speed and destination given the navigator params, the path, the

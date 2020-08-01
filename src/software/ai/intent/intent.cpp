@@ -7,7 +7,7 @@
 #include "software/logger/logger.h"
 
 Intent::Intent(unsigned int robot_id, PrimitiveMsg primitive_msg, unsigned int priority)
-    : robot_id(robot_id), motion_constraints(), primitive_msg(primitive_msg)
+    : robot_id(robot_id), primitive_msg(primitive_msg)
 {
     setPriority(priority);
 }
@@ -35,9 +35,7 @@ void Intent::setPriority(unsigned int new_priority)
 
 bool Intent::operator==(const Intent &other) const
 {
-    return this->priority == other.priority &&
-           this->motion_constraints == other.motion_constraints &&
-           this->robot_id == other.robot_id &&
+    return this->priority == other.priority && this->robot_id == other.robot_id &&
            google::protobuf::util::MessageDifferencer::Equals(this->primitive_msg,
                                                               other.primitive_msg);
 }
@@ -47,15 +45,7 @@ bool Intent::operator!=(const Intent &other) const
     return !((*this) == other);
 }
 
-void Intent::setMotionConstraints(const std::set<MotionConstraint> &motion_constraints)
-{
-    this->motion_constraints = motion_constraints;
-}
-
-std::set<MotionConstraint> Intent::getMotionConstraints(void) const
-{
-    return this->motion_constraints;
-}
+void Intent::setMotionConstraints(const std::set<MotionConstraint> &motion_constraints) {}
 
 std::optional<NavigatorParams> Intent::getNavigatorParams() const
 {
@@ -63,11 +53,6 @@ std::optional<NavigatorParams> Intent::getNavigatorParams() const
 }
 
 PrimitiveMsg Intent::getPrimitiveMsg() const
-{
-    return primitive_msg;
-}
-
-PrimitiveMsg Intent::getUpdatedPrimitiveMsg(Point destination, double final_speed) const
 {
     return primitive_msg;
 }

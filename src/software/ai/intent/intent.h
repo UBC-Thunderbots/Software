@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <set>
 #include <string>
 
@@ -19,12 +20,23 @@ struct NavigatorParams
     double final_speed;
     Angle final_angle;
     BallCollisionType ball_collision_type;
+    std::set<MotionConstraint> motion_constraints;
+    /**
+     * Gets a PrimitiveMsg updated with destination and final_speed
+     *
+     * @param destination The destination
+     * @param final_speed The final speed
+     *
+     * @return PrimitiveMsg updated with destination and final_speed
+     */
+    std::function<PrimitiveMsg(Point, double)> primitive_msg_update_function;
 
     bool operator==(const NavigatorParams& other) const
     {
         return destination == other.destination && final_speed == other.final_speed &&
                final_angle == other.final_angle &&
-               ball_collision_type == other.ball_collision_type;
+               ball_collision_type == other.ball_collision_type &&
+               motion_constraints == other.motion_constraints;
     }
 };
 
@@ -106,14 +118,8 @@ class Intent
      *
      * @param motion_constraints
      */
-    void setMotionConstraints(const std::set<MotionConstraint>& motion_constraints);
-
-    /**
-     * Get the constraints on this intent's motion
-     *
-     * @return motion constraints
-     */
-    std::set<MotionConstraint> getMotionConstraints(void) const;
+    virtual void setMotionConstraints(
+        const std::set<MotionConstraint>& motion_constraints);
 
     /**
      * Gets the navigator params if this intent requires navigation. For example,
@@ -130,18 +136,6 @@ class Intent
      */
     PrimitiveMsg getPrimitiveMsg() const;
 
-    /**
-     * Gets a PrimitiveMsg updated with destination and final_speed
-     * NOTE: only Intents that navigate update PrimitiveMsg
-     *
-     * @param destination The destination
-     * @param final_speed The final speed
-     *
-     * @return PrimitiveMsg updated with destination and final_speed
-     */
-    virtual PrimitiveMsg getUpdatedPrimitiveMsg(Point destination,
-                                                double final_speed) const;
-
     virtual ~Intent() = default;
 
    private:
@@ -152,6 +146,5 @@ class Intent
     unsigned int priority;
 
     unsigned int robot_id;
-    std::set<MotionConstraint> motion_constraints;
     PrimitiveMsg primitive_msg;
 };

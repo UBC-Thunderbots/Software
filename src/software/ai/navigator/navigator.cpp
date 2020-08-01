@@ -38,9 +38,9 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
             {
                 auto [destination, final_speed] = calculateDestinationAndFinalSpeed(
                     navigator_params.value(), *(robot_id_to_path_iter->second), world);
-
                 robot_primitives_map[intent->getRobotId()] =
-                    intent->getUpdatedPrimitiveMsg(destination, final_speed);
+                    navigator_params->primitive_msg_update_function(destination,
+                                                                    final_speed);
             }
             else
             {
@@ -61,12 +61,11 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
 }
 
 std::optional<PathObjective> Navigator::createPathObjective(
-    RobotId robot_id, const NavigatorParams &navigator_params,
-    const std::set<MotionConstraint> &motion_constraints, const World &world)
+    RobotId robot_id, const NavigatorParams &navigator_params, const World &world)
 {
     std::vector<ObstaclePtr> obstacles =
-        robot_navigation_obstacle_factory.createFromMotionConstraints(motion_constraints,
-                                                                      world);
+        robot_navigation_obstacle_factory.createFromMotionConstraints(
+            navigator_params.motion_constraints, world);
 
     if (navigator_params.ball_collision_type == BallCollisionType::AVOID)
     {
@@ -104,8 +103,7 @@ std::vector<PathObjective> Navigator::createPathObjectives(
         if (navigator_params)
         {
             auto path_objective =
-                createPathObjective(intent->getRobotId(), *navigator_params,
-                                    intent->getMotionConstraints(), world);
+                createPathObjective(intent->getRobotId(), *navigator_params, world);
             if (path_objective)
             {
                 path_objectives.emplace_back(*path_objective);
