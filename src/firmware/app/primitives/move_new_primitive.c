@@ -4,13 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "firmware/app/primitives/move_manager.h"
+#include "firmware/app/primitives/move_helper.h"
 
 void app_move_primitive_start(MovePrimitiveMsg prim_msg, void *void_state_ptr,
                               FirmwareWorld_t *world)
 {
-    app_move_manager_start(void_state_ptr, world, prim_msg.position_params,
-                           prim_msg.final_angle.radians);
+    app_move_helper_start(void_state_ptr, world, prim_msg.position_params,
+                          prim_msg.final_angle.radians);
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 
@@ -20,7 +20,7 @@ void app_move_primitive_start(MovePrimitiveMsg prim_msg, void *void_state_ptr,
 
 static void move_end(void *void_state_ptr, FirmwareWorld_t *world)
 {
-    app_move_manager_end(void_state_ptr, world);
+    app_move_helper_end(void_state_ptr, world);
     FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 
     Chicker_t *chicker = app_firmware_robot_getChicker(robot);
@@ -33,7 +33,7 @@ static void move_end(void *void_state_ptr, FirmwareWorld_t *world)
 
 static void move_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
-    app_move_manager_tick(void_state_ptr, world);
+    app_move_helper_tick(void_state_ptr, world);
 }
 
 /**
@@ -42,5 +42,5 @@ static void move_tick(void *void_state_ptr, FirmwareWorld_t *world)
 const primitive_t MOVE_PRIMITIVE = {.direct        = false,
                                     .end           = &move_end,
                                     .tick          = &move_tick,
-                                    .create_state  = &createMoveManagerState_t,
-                                    .destroy_state = &destroyMoveManagerState_t};
+                                    .create_state  = &createMoveHelperState_t,
+                                    .destroy_state = &destroyMoveHelperState_t};

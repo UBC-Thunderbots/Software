@@ -13,11 +13,11 @@
  * @param move_position_params Move Position Params
  * @param final_angle The final angle
  */
-void app_move_manager_start(void *void_state_ptr, FirmwareWorld_t *world,
-                            MovePositionParams move_position_params, float final_angle);
+void app_move_helper_start(void *void_state_ptr, FirmwareWorld_t *world,
+                           MovePositionParams move_position_params, float final_angle);
 
 // The following function definitions mirror those in primitive_t
-void app_move_manager_end(void *void_state_ptr, FirmwareWorld_t *world);
-void app_move_manager_tick(void *void_state_ptr, FirmwareWorld_t *world);
-void *createMoveManagerState_t(void);
-void destroyMoveManagerState_t(void *state);
+void app_move_helper_end(void *void_state_ptr, FirmwareWorld_t *world);
+void app_move_helper_tick(void *void_state_ptr, FirmwareWorld_t *world);
+void *createMoveHelperState_t(void);
+void destroyMoveHelperState_t(void *state);

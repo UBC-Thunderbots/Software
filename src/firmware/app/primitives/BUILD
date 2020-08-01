@@ -103,9 +103,9 @@ cc_library(
 )
 
 cc_library(
-    name = "move_manager",
-    srcs = ["move_manager.c"],
-    hdrs = ["move_manager.h"],
+    name = "move_helper",
+    srcs = ["move_helper.c"],
+    hdrs = ["move_helper.h"],
     deps = [
         ":primitive",
         "//firmware/app/control",
@@ -124,7 +124,7 @@ cc_library(
     srcs = ["move_new_primitive.c"],
     hdrs = ["move_new_primitive.h"],
     deps = [
-        "move_manager",
+        "move_helper",
         ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],
@@ -135,7 +135,7 @@ cc_library(
     srcs = ["autokick_move_primitive.c"],
     hdrs = ["autokick_move_primitive.h"],
     deps = [
-        "move_manager",
+        "move_helper",
         ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],
@@ -146,7 +146,7 @@ cc_library(
     srcs = ["autochip_move_primitive.c"],
     hdrs = ["autochip_move_primitive.h"],
     deps = [
-        "move_manager",
+        "move_helper",
         ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],

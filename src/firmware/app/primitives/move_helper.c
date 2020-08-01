@@ -1,4 +1,4 @@
-#include "firmware/app/primitives/move_manager.h"
+#include "firmware/app/primitives/move_helper.h"
 
 #include <assert.h>
 #include <math.h>
@@ -27,15 +27,15 @@ const float APPROACH_LIMIT = 3 * P_PI * ROBOT_RADIUS;
 
 const float PI_2 = P_PI / 2.0f;
 
-typedef struct MoveManagerState
+typedef struct MoveHelperState
 {
     float destination[3], end_speed, major_vec[2], minor_vec[2];
     // We store a wheel index here so we only have to calculate the axis
     // we want to use when move start is called
     unsigned optimal_wheel_axes_index;
     bool slow;
-} MoveManagerState_t;
-DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveManagerState_t)
+} MoveHelperState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveHelperState_t)
 
 /**
  * Call from move_start to choose which wheel axis we will be
@@ -150,10 +150,10 @@ void plan_move_rotation(PhysBot* pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void app_move_manager_start(void* void_state_ptr, FirmwareWorld_t* world,
-                            MovePositionParams move_position_params, float final_angle)
+void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
+                           MovePositionParams move_position_params, float final_angle)
 {
-    MoveManagerState_t* state = (MoveManagerState_t*)void_state_ptr;
+    MoveHelperState_t* state = (MoveHelperState_t*)void_state_ptr;
 
     // Convert into m/s and rad/s because physics is in m and s
     state->destination[0] = move_position_params.destination.x_meters;
@@ -179,11 +179,11 @@ void app_move_manager_start(void* void_state_ptr, FirmwareWorld_t* world,
         dx, dy, app_firmware_robot_getOrientation(robot), state->destination[2]);
 }
 
-void app_move_manager_end(void* void_state_ptr, FirmwareWorld_t* world) {}
+void app_move_helper_end(void* void_state_ptr, FirmwareWorld_t* world) {}
 
-void app_move_manager_tick(void* void_state_ptr, FirmwareWorld_t* world)
+void app_move_helper_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
-    MoveManagerState_t* state = (MoveManagerState_t*)(void_state_ptr);
+    MoveHelperState_t* state = (MoveHelperState_t*)(void_state_ptr);
     assert(!isnan(state->major_vec[0]));
     assert(!isnan(state->major_vec[1]));
     assert(!isnan(state->minor_vec[0]));
