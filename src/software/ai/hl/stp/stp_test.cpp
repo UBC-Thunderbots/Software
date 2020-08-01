@@ -152,7 +152,7 @@ TEST_F(STPTest, test_get_play_info)
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     world = ::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 0)},
                                                   Timestamp::fromSeconds(0));
-    world.mutableGameState().game_state = RefboxGameState::HALT;
+    world.updateRefboxGameState(RefboxGameState::HALT);
     stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), HaltTestPlay::name);
 
