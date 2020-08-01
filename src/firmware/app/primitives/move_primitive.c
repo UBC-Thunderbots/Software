@@ -15,16 +15,7 @@
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
 // so that the axes would never have to compete for resources
-#define TIME_HORIZON 0.01f  // s
-
-// The minimum distance away from our destination that we must be if we
-// are going to rotate the bot onto its wheel axis
-// 2 * P_PI * ROBOT_RADIUS = robot circumference, which is approximately
-// how far the bot would have to turn for one full rotation, so we
-// set it a litle larger than that.
-const float APPROACH_LIMIT = 3 * P_PI * ROBOT_RADIUS;
-
-const float PI_2 = P_PI / 2.0f;
+#define TIME_HORIZON 0.05f  // s
 
 typedef struct MovePrimitiveState
 {
@@ -38,7 +29,6 @@ typedef struct MovePrimitiveState
     float primitive_start_time_seconds;
 
     // Whether or not we're trying to move slowly
-    // TODO: we should probably just plan for this in the trajectory planner....
     bool move_slow;
 } MovePrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MovePrimitiveState_t);
@@ -93,7 +83,7 @@ void app_move_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
     const float current_speed = sqrtf(powf(app_firmware_robot_getVelocityX(robot), 2) +
                                       powf(app_firmware_robot_getVelocityY(robot), 2));
 
-    // Plan a trajectory to track
+    // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {
         .path = {.x = {.coefficients = {0, 0, destination_x - current_x, current_x}},
                  .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
@@ -113,15 +103,10 @@ void app_move_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
         .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
         .initial_linear_speed        = current_speed,
         .final_linear_speed          = speed_at_dest_m_per_s};
-    //    TrajectoryPlannerGenerationStatus_t status =
     state->num_trajectory_elems = path_parameters.num_elements;
-    app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
-        path_parameters, &(state->position_trajectory));
+        app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
+            path_parameters, &(state->position_trajectory));
 
-    // TODO: this assertion fails, check why!
-    // assert(status == OK);
-
-    // TODO: delete commented out code
     // NOTE: We set this after doing the trajectory generation in case the generation
     //       took a while, since we're going to use this as our reference time when
     //       tracking the trajectory, and so what it to be as close as possible to
@@ -175,13 +160,12 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
     const float curr_x = app_firmware_robot_getPositionX(robot);
     const float curr_y = app_firmware_robot_getPositionY(robot);
 
-    // TODO: comment here
     const float dx = dest_x - curr_x;
     const float dy = dest_y - curr_y;
 
+    float total_disp   = sqrtf(dx * dx + dy * dy);
     // Add a small number to avoid division by zero
-    float total_disp   = sqrtf(dx * dx + dy * dy) + 1e-6f;
-    float major_vec[2] = {dx / total_disp, dy / total_disp};
+    float major_vec[2] = {dx / total_disp, dy / (total_disp + 1e-6f)};
     float minor_vec[2] = {major_vec[0], major_vec[1]};
     rotate(minor_vec, P_PI / 2);
 
@@ -192,14 +176,14 @@ void move_tick(void* void_state_ptr, FirmwareWorld_t* world)
     // TODO: why the heck aren't we using the constants for max a/v in lin/ang here?
     //       (note lower values used for minor axis)
     // plan major axis movement
-    float max_major_a     = 3.5;
-    float max_major_v     = state->move_slow ? 1.25 : 3.0;
+    float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    float max_major_v     = state->move_slow ? 1.25f : (float)ROBOT_MAX_SPEED_METERS_PER_SECOND;
     float major_params[3] = {dest_speed, max_major_a, max_major_v};
     app_physbot_planMove(&pb.maj, major_params);
 
     // plan minor axis movement
-    float max_minor_a     = 1.5;
-    float max_minor_v     = 1.5;
+    float max_minor_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f;
+    float max_minor_v     = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND / 2.0f;
     float minor_params[3] = {0, max_minor_a, max_minor_v};
     app_physbot_planMove(&pb.min, minor_params);
 
