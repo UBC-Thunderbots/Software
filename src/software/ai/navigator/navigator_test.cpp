@@ -72,7 +72,7 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
     intents.emplace_back(
         std::make_unique<ChipIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
@@ -91,7 +91,7 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
     intents.emplace_back(
         std::make_unique<KickIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
@@ -110,7 +110,7 @@ TEST_F(ThetaStarNavigatorTest, convert_spinning_move_intent_to_spinning_move_pri
     intents.emplace_back(
         std::make_unique<SpinningMoveIntent>(0, Point(), AngularVelocity::full(), 1, 0));
 
-    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
@@ -128,7 +128,7 @@ TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
 
-    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
@@ -147,7 +147,7 @@ TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
     intents.emplace_back(std::make_unique<StopIntent>(1, false, 1));
 
-    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 2);
@@ -211,7 +211,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
         0, poi, Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
         AutochickType::NONE, BallCollisionType::AVOID));
 
-    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
@@ -251,7 +251,7 @@ TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
         0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
         AutochickType::NONE, BallCollisionType::AVOID));
 
-    auto primitive_set_msg = navigator.getAssignedPrimitiveSetMsg(world, intents);
+    auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);

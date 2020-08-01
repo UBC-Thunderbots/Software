@@ -38,7 +38,7 @@ class Navigator
      *
      * @return Primitives
      */
-    std::unique_ptr<PrimitiveSetMsg> getAssignedPrimitiveSetMsg(
+    std::unique_ptr<PrimitiveSetMsg> getAssignedPrimitives(
         const World &world, const std::vector<std::unique_ptr<Intent>> &intents);
 
     /**

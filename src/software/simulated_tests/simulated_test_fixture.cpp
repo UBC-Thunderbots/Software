@@ -218,7 +218,7 @@ void SimulatedTestFixture::runTest(
                 break;
             }
 
-            auto primitive_set_msg = ai.getPrimitiveSetMsg(*world);
+            auto primitive_set_msg = ai.getPrimitives(*world);
             std::vector<uint8_t> serialized_proto(primitive_set_msg->ByteSizeLong());
             primitive_set_msg->SerializeToArray(
                 serialized_proto.data(),

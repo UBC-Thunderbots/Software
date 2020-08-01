@@ -13,7 +13,7 @@ Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
 {
 }
 
-std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitiveSetMsg(
+std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &intents)
 {
     planned_paths.clear();
