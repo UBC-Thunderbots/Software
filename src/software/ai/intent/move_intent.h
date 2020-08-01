@@ -34,7 +34,6 @@ class MoveIntent : public Intent
                         MoveType move_type, AutochickType autokick,
                         BallCollisionType ball_collision_type);
 
-    std::string getIntentName(void) const override;
 
     /**
      * Gets type of navigation around the ball
@@ -43,8 +42,10 @@ class MoveIntent : public Intent
      */
     BallCollisionType getBallCollisionType() const;
 
+    std::string getIntentName(void) const override;
     PrimitiveMsg getUpdatedPrimitiveMsg(Point destination,
                                         double final_speed) const override;
+    std::optional<NavigatorParams> getNavigatorParams() const override;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
@@ -62,4 +63,7 @@ class MoveIntent : public Intent
      * @return true if the MoveIntents are not equal and false otherwise
      */
     bool operator!=(const MoveIntent& other) const;
+
+   private:
+    NavigatorParams navigator_params;
 };

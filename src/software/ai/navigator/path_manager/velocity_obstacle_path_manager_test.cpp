@@ -15,11 +15,19 @@ TEST(TestVelocityObstaclePathManager, test_no_obstacles)
     std::vector<ObstaclePtr> obstacles;
 
     Rectangle navigable_area = Rectangle(Point(0, 0), Point(1, 1));
-    std::unordered_set<PathObjective> path_objectives;
-    PathObjective po1(Point(1, 3), Point(2, 3), 2.0, obstacles, 1);
-    PathObjective po2(Point(2, 4), Point(2, 5), 1.0, obstacles, 2);
-    path_objectives.insert(po1);
-    path_objectives.insert(po2);
+    std::vector<PathObjective> path_objectives;
+    PathObjective po1{.robot_id      = 1,
+                      .start         = Point(1, 3),
+                      .end           = Point(2, 3),
+                      .current_speed = 2.0,
+                      .obstacles     = obstacles};
+    PathObjective po2{.robot_id      = 2,
+                      .start         = Point(2, 4),
+                      .end           = Point(2, 5),
+                      .current_speed = 1.0,
+                      .obstacles     = obstacles};
+    path_objectives.emplace_back(po1);
+    path_objectives.emplace_back(po2);
 
     auto paths = path_manager->getManagedPaths(path_objectives, navigable_area);
 

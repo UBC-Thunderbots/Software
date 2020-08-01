@@ -121,7 +121,7 @@ class Intent
      *
      * @return navigator params
      */
-    std::optional<NavigatorParams> getNavigatorParams() const;
+    virtual std::optional<NavigatorParams> getNavigatorParams() const;
 
     /**
      * Get PrimitiveMsg that underlies this Intent
@@ -144,21 +144,6 @@ class Intent
 
     virtual ~Intent() = default;
 
-   protected:
-    /**
-     * Updates the navigation params so that this Intent will be used for navigation in
-     * the Navigator
-     *
-     * @param robot_id The id of the robot that this Intent is for
-     * @param destination The destination
-     * @param final_speed The final speed
-     * @param final_angle The final angle
-     * @param ball_collision_type The ball collision type
-     */
-    void updateNavigatorParams(unsigned int robot_id, Point destination,
-                               Angle final_angle, double final_speed,
-                               BallCollisionType ball_collision_type);
-
    private:
     /**
      * The priority of this intent. Must be in the range [0, 100]
@@ -168,6 +153,5 @@ class Intent
 
     unsigned int robot_id;
     std::set<MotionConstraint> motion_constraints;
-    std::optional<NavigatorParams> navigator_params;
     PrimitiveMsg primitive_msg;
 };

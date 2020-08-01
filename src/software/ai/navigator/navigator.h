@@ -83,14 +83,11 @@ class Navigator
      *
      * @param intents intents to make into path objectives
      * @param world World to navigate around
-     * @param friendly_non_navigating_robot_obstacles The obstacles representing friendly
-     * non-navigating robots
      *
-     * @return set of PathObjectives
+     * @return vector of PathObjectives
      */
-    std::unordered_set<PathObjective> getPathObjectivesFromIntents(
-        const std::vector<std::unique_ptr<Intent>> &intents, const World &world,
-        const std::vector<ObstaclePtr> &friendly_non_navigating_robot_obstacles);
+    std::vector<PathObjective> getPathObjectivesFromIntents(
+        const std::vector<std::unique_ptr<Intent>> &intents, const World &world);
 
     /**
      * Creates the final speed and destination given the navigator params, the path, the
@@ -98,14 +95,12 @@ class Navigator
      *
      * @param navigator_params NavigatorParams
      * @param path path to make primitive for
-     * @param intent intent to update
      * @param world World to navigate around
      *
      * @return the final destination and speed
      */
     std::pair<Point, double> calculateDestinationAndFinalSpeed(
-        NavigatorParams navigator_params, Path path,
-        const std::unique_ptr<Intent> &intent, const World &world);
+        const NavigatorParams &navigator_params, const Path &path, const World &world);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.

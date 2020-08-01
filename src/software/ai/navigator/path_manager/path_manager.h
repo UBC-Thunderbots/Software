@@ -1,5 +1,4 @@
 #pragma once
-#include <unordered_set>
 #include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
@@ -31,7 +30,7 @@ class PathManager
      *  *no path is represented by std::nullopt
      */
     virtual const std::map<RobotId, std::optional<Path>> getManagedPaths(
-        const std::unordered_set<PathObjective> &objectives,
+        const std::vector<PathObjective> &objectives,
         const Rectangle &navigable_area) = 0;
 
     virtual ~PathManager() = default;

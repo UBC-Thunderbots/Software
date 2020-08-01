@@ -9,33 +9,13 @@
  * Path objective is used to pass information from navigator
  * to path manager to plan paths
  */
-class PathObjective
+struct PathObjective
 {
-   public:
-    PathObjective(const Point start, const Point end, const double current_speed,
-                  const std::vector<ObstaclePtr> &obstacles, RobotId robot_id)
-        : robot_id(robot_id),
-          start(start),
-          end(end),
-          current_speed(current_speed),
-          obstacles(obstacles)
-    {
-    }
-
-    PathObjective(const PathObjective &other)
-        : robot_id(other.robot_id),
-          start(other.start),
-          end(other.end),
-          current_speed(other.current_speed),
-          obstacles(other.obstacles)
-    {
-    }
-
     const RobotId robot_id;
     const Point start;
     const Point end;
     const double current_speed;
-    const std::vector<ObstaclePtr> obstacles;
+    std::vector<ObstaclePtr> obstacles;
 
     bool operator==(const PathObjective &other) const
     {
