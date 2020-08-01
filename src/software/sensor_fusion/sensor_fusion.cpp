@@ -28,7 +28,7 @@ std::optional<World> SensorFusion::getWorld() const
     if (field && ball)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
-        new_world.mutableGameState() = game_state;
+        new_world.updateGameState(game_state);
         if (refbox_stage)
         {
             new_world.updateRefboxStage(*refbox_stage);

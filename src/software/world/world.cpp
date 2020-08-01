@@ -11,7 +11,8 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       enemy_team_(enemy_team),
       current_game_state_(),
       // Store a small buffer of previous refbox game states so we can filter out noise
-      refbox_game_state_history(3)
+      refbox_game_state_history(REFBOX_GAMESTATE_BUFFER_SIZE),
+      refbox_stage_history(REFBOX_GAMESTATE_BUFFER_SIZE)
 {
     // Grab the most recent timestamp from all of the members used to update the world
     last_update_timestamps.set_capacity(buffer_size);
@@ -76,7 +77,7 @@ const Team &World::enemyTeam() const
     return enemy_team_;
 }
 
-void World::updateGameState(const RefboxGameState &game_state)
+void World::updateRefboxGameState(const RefboxGameState &game_state)
 {
     refbox_game_state_history.push_back(game_state);
     // Take the consensus of the previous refbox messages
@@ -88,22 +89,17 @@ void World::updateGameState(const RefboxGameState &game_state)
     {
         current_game_state_.updateRefboxGameState(game_state);
     }
-    else
-    {
-        current_game_state_.updateRefboxGameState(
-            current_game_state_.getRefboxGameState());
-    }
 }
 
-void World::updateGameState(const RefboxGameState &game_state, Point ball_placement_point)
+void World::updateRefboxGameState(const RefboxGameState &game_state,
+                                  Point ball_placement_point)
 {
-    updateGameState(game_state);
+    updateRefboxGameState(game_state);
     current_game_state_.setBallPlacementPoint(ball_placement_point);
 }
 
 void World::updateRefboxStage(const RefboxStage &stage)
 {
-    // TODO (Issue #1369): Clean this up
     refbox_stage_history.push_back(stage);
     // Take the consensus of the previous refbox messages
     if (!refbox_stage_history.empty() &&
@@ -144,11 +140,6 @@ const GameState &World::gameState() const
     return current_game_state_;
 }
 
-GameState &World::mutableGameState()
-{
-    return current_game_state_;
-}
-
 bool World::operator==(const World &other) const
 {
     return this->field() == other.field() && this->ball() == other.ball() &&
@@ -160,4 +151,20 @@ bool World::operator==(const World &other) const
 bool World::operator!=(const World &other) const
 {
     return !(*this == other);
+}
+
+
+void World::updateGameStateBall(const Ball &ball)
+{
+    current_game_state_.updateBall(ball);
+}
+
+void World::updateGameState(const GameState &game_state)
+{
+    current_game_state_ = game_state;
+}
+
+const RefboxStage &World::getRefboxStage() const
+{
+    return current_refbox_stage_;
 }

@@ -53,7 +53,7 @@ TEST(GameStateTest, equality_diff_state)
 {
     GameState gameState1;
     GameState gameState2;
-    gameState2.state = GameState::STOP;
+    gameState2.updateRefboxGameState(RefboxGameState::NORMAL_START);
     EXPECT_NE(gameState1, gameState2);
 }
 
@@ -61,7 +61,8 @@ TEST(GameStateTest, equality_diff_restart_reason)
 {
     GameState gameState1;
     GameState gameState2;
-    gameState2.restart_reason = GameState::PENALTY;
+    gameState1.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_THEM);
+    gameState2.updateRefboxGameState(RefboxGameState::DIRECT_FREE_THEM);
     EXPECT_NE(gameState1, gameState2);
 }
 
@@ -69,7 +70,7 @@ TEST(GameStateTest, equality_diff_game_state)
 {
     GameState gameState1;
     GameState gameState2;
-    gameState2.game_state = RefboxGameState::STOP;
+    gameState2.updateRefboxGameState(RefboxGameState::STOP);
     EXPECT_NE(gameState1, gameState2);
 }
 
@@ -77,7 +78,7 @@ TEST(GameStateTest, equality_diff_ball_state)
 {
     GameState gameState1;
     GameState gameState2;
-    gameState2.state = GameState::READY;
+    gameState2.updateRefboxGameState(RefboxGameState::NORMAL_START);
     gameState2.updateBall(
         Ball(Point(100, 100), Vector(20, 0), Timestamp::fromSeconds(0)));
     EXPECT_NE(gameState1, gameState2);
@@ -87,7 +88,8 @@ TEST(GameStateTest, equality_diff_our_restart)
 {
     GameState gameState1;
     GameState gameState2;
-    gameState2.our_restart = true;
+    gameState1.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_US);
+    gameState2.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_THEM);
     EXPECT_NE(gameState1, gameState2);
 }
 
