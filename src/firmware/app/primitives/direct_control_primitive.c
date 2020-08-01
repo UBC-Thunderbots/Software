@@ -54,8 +54,9 @@ void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
         default:
         {
             // Do nothing
+            // TODO (Issue #1652): LOG(WARNING)<<"Wheel control command is not a valid
+            // type"
             state->direct_velocity = false;
-            assert(false);
         }
     }
 
@@ -71,19 +72,12 @@ void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
             app_charger_float_capacitor(charger);
             break;
         }
-        case DirectControlPrimitiveMsg_ChargeMode_DISCHARGE:
-        {
-            app_charger_float_capacitor(charger);
-            app_chicker_disableAutochip(chicker);
-            app_chicker_disableAutokick(chicker);
-            break;
-        }
         default:
         {
             // discharge
-            app_charger_float_capacitor(charger);
             app_chicker_disableAutochip(chicker);
             app_chicker_disableAutokick(chicker);
+            app_charger_discharge_capacitor(charger);
         }
     }
 
@@ -115,7 +109,7 @@ void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
         default:
         {
             // Do nothing
-            assert(false);
+            // TODO (Issue #1652): LOG(WARNING)<<"Chick command is not a valid type"
         }
     }
 

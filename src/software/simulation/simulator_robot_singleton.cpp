@@ -30,7 +30,7 @@ std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
 SimulatorRobotSingleton::createFirmwareRobot()
 {
     // Charger does nothing in sim
-    Charger_t* charger = app_charger_create([]() {}, []() {});
+    Charger_t* charger = app_charger_create([]() {}, []() {}, []() {});
 
     // TODO: Make sure all objects de-allocated properly
     // See issue https://github.com/UBC-Thunderbots/Software/issues/1128

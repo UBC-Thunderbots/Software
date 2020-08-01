@@ -360,6 +360,12 @@ static void stm32_main(void)
     __builtin_unreachable();
 }
 
+static void charger_discharge_and_disable(void)
+{
+    charger_enable(false);
+    chicker_discharge(true);
+}
+
 static void run_normal(void)
 {
     // Read the configuration switches.
@@ -477,7 +483,8 @@ static void run_normal(void)
     Wheel_t* back_left_wheel =
         app_wheel_create(apply_wheel_force_back_left, wheels_get_back_left_rpm,
                          wheels_brake_back_left, wheels_coast_back_left, wheel_constants);
-    Charger_t* charger = app_charger_create(charger_charge, charger_float);
+    Charger_t* charger =
+        app_charger_create(charger_charge, charger_discharge_and_disable, charger_float);
     Chicker_t* chicker = app_chicker_create(
         chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
         chicker_auto_disarm, chicker_auto_disarm);

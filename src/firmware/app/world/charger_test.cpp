@@ -13,7 +13,9 @@ class ChargerTest : public testing::Test
         charge_capacitor = false;
         float_capacitor  = false;
 
-        charger = app_charger_create(&(this->chargeCapacitor), &(this->floatCapacitor));
+        charger =
+            app_charger_create(&(this->chargeCapacitor), &(this->dischargeCapacitor),
+                               &(this->floatCapacitor));
     }
 
     virtual void TearDown(void)
@@ -24,6 +26,12 @@ class ChargerTest : public testing::Test
     static void chargeCapacitor(void)
     {
         charge_capacitor = true;
+        float_capacitor  = false;
+    }
+
+    static void dischargeCapacitor(void)
+    {
+        charge_capacitor = false;
         float_capacitor  = false;
     }
 
@@ -44,6 +52,14 @@ TEST_F(ChargerTest, charge_capacitor)
     app_charger_charge_capacitor(charger);
 
     EXPECT_TRUE(charge_capacitor);
+    EXPECT_FALSE(float_capacitor);
+}
+
+TEST_F(ChargerTest, discharge_capacitor)
+{
+    app_charger_discharge_capacitor(charger);
+
+    EXPECT_FALSE(charge_capacitor);
     EXPECT_FALSE(float_capacitor);
 }
 
