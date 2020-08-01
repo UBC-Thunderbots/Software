@@ -120,17 +120,6 @@ cc_library(
 )
 
 cc_library(
-    name = "move_new",
-    srcs = ["move_new_primitive.c"],
-    hdrs = ["move_new_primitive.h"],
-    deps = [
-        "move_helper",
-        ":primitive",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
     name = "autokick_move",
     srcs = ["autokick_move_primitive.c"],
     hdrs = ["autokick_move_primitive.h"],
