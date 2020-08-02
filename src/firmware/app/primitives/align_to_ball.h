@@ -1,18 +1,14 @@
 #pragma once
 
-#include "primitive.h"
+#include "firmware/app/world/firmware_world.h"
 
 /**
  * Align to ball figures out how to line the robot up for a kick or chip, but it is up
- * to users of these helper functions to arm the appropriate autokick and autochip. Align
- * to ball uses the primitive structure for ease of use by other primitives, but it is not
- * meant to be used as a standalone primitive
+ * to users of these helper functions to arm the appropriate autokick and autochip
  */
-extern const primitive_t ALIGN_TO_BALL;
 
 /**
  * Start the align to ball in the given world
- *
  *
  * @param void_state_ptr [in] A pointer to this primitives state, as allocated by the
  *                            `create_state` function
@@ -24,3 +20,10 @@ extern const primitive_t ALIGN_TO_BALL;
 void app_align_to_ball_start(void *void_state_ptr, FirmwareWorld_t *world,
                              float x_destination, float y_destination,
                              float alignment_angle);
+
+
+// The following function definitions mirror those in primitive_t
+void app_align_to_ball_end(void *void_state_ptr, FirmwareWorld_t *world);
+void app_align_to_ball_tick(void *void_state_ptr, FirmwareWorld_t *world);
+void *createAlignToBallState_t(void);
+void destroyAlignToBallState_t(void *state);

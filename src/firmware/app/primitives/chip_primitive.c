@@ -16,7 +16,7 @@ void app_chip_primitive_start(ChipPrimitiveMsg prim_msg, void *void_state_ptr,
 
 static void chip_end(void *void_state_ptr, FirmwareWorld_t *world)
 {
-    ALIGN_TO_BALL.end(void_state_ptr, world);
+    app_align_to_ball_end(void_state_ptr, world);
     Chicker_t *chicker =
         app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
     app_chicker_disableAutokick(chicker);
@@ -25,7 +25,7 @@ static void chip_end(void *void_state_ptr, FirmwareWorld_t *world)
 
 static void chip_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
-    ALIGN_TO_BALL.tick(void_state_ptr, world);
+    app_align_to_ball_tick(void_state_ptr, world);
 }
 
 /**
@@ -34,5 +34,5 @@ static void chip_tick(void *void_state_ptr, FirmwareWorld_t *world)
 const primitive_t CHIP_PRIMITIVE = {.direct        = false,
                                     .end           = &chip_end,
                                     .tick          = &chip_tick,
-                                    .create_state  = ALIGN_TO_BALL.create_state,
-                                    .destroy_state = ALIGN_TO_BALL.destroy_state};
+                                    .create_state  = createAlignToBallState_t,
+                                    .destroy_state = destroyAlignToBallState_t};

@@ -3,6 +3,7 @@
 #include "firmware/app/control/bangbang.h"
 #include "firmware/app/control/control.h"
 #include "firmware/app/control/physbot.h"
+#include "firmware/app/primitives/primitive.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
 
@@ -105,9 +106,3 @@ void app_align_to_ball_tick(void *void_state_ptr, FirmwareWorld_t *world)
 
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
-
-const primitive_t ALIGN_TO_BALL = {.direct        = false,
-                                   .end           = &app_align_to_ball_end,
-                                   .tick          = &app_align_to_ball_tick,
-                                   .create_state  = &createAlignToBallState_t,
-                                   .destroy_state = &destroyAlignToBallState_t};
