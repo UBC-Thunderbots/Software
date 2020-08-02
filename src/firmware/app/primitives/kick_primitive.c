@@ -1,13 +1,13 @@
 #include "firmware/app/primitives/kick_primitive.h"
 
-#include "firmware/app/primitives/chick_alignment.h"
+#include "firmware/app/primitives/align_to_ball.h"
 
 void app_kick_primitive_start(KickPrimitiveMsg prim_msg, void *void_state_ptr,
                               FirmwareWorld_t *world)
 {
-    app_chick_alignment_start(void_state_ptr, world, prim_msg.kick_origin.x_meters,
-                              prim_msg.kick_origin.y_meters,
-                              prim_msg.kick_direction.radians);
+    app_align_to_ball_start(void_state_ptr, world, prim_msg.kick_origin.x_meters,
+                            prim_msg.kick_origin.y_meters,
+                            prim_msg.kick_direction.radians);
 
     Chicker_t *chicker =
         app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
@@ -16,7 +16,7 @@ void app_kick_primitive_start(KickPrimitiveMsg prim_msg, void *void_state_ptr,
 
 static void kick_end(void *void_state_ptr, FirmwareWorld_t *world)
 {
-    app_chick_alignment_end(void_state_ptr, world);
+    ALIGN_TO_BALL.end(void_state_ptr, world);
     Chicker_t *chicker =
         app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
     app_chicker_disableAutokick(chicker);
@@ -25,7 +25,7 @@ static void kick_end(void *void_state_ptr, FirmwareWorld_t *world)
 
 static void kick_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
-    app_chick_alignment_tick(void_state_ptr, world);
+    ALIGN_TO_BALL.tick(void_state_ptr, world);
 }
 
 /**
@@ -34,5 +34,5 @@ static void kick_tick(void *void_state_ptr, FirmwareWorld_t *world)
 const primitive_t KICK_PRIMITIVE = {.direct        = false,
                                     .end           = &kick_end,
                                     .tick          = &kick_tick,
-                                    .create_state  = &createShootAlignmentState_t,
-                                    .destroy_state = &destroyShootAlignmentState_t};
+                                    .create_state  = ALIGN_TO_BALL.create_state,
+                                    .destroy_state = ALIGN_TO_BALL.destroy_state};

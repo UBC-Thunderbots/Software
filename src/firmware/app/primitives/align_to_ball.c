@@ -1,19 +1,18 @@
-#include "firmware/app/primitives/chick_alignment.h"
+#include "firmware/app/primitives/align_to_ball.h"
 
 #include "firmware/app/control/bangbang.h"
 #include "firmware/app/control/control.h"
 #include "firmware/app/control/physbot.h"
-#include "firmware/app/primitives/primitive.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
 
 #define TIME_HORIZON 0.05f  // in seconds
 
-typedef struct ShootAlignmentState
+typedef struct AlignToBallState
 {
     float destination[3], major_vec[2], minor_vec[2], total_rot;
-} ShootAlignmentState_t;
-DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(ShootAlignmentState_t)
+} AlignToBallState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(AlignToBallState_t)
 
 /**
  * Scales the major acceleration by the distance from the major axis and the
@@ -56,11 +55,11 @@ void plan_shoot_rotation(PhysBot *pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void app_chick_alignment_start(void *void_state_ptr, FirmwareWorld_t *world,
-                               float x_destination, float y_destination,
-                               float alignment_angle)
+void app_align_to_ball_start(void *void_state_ptr, FirmwareWorld_t *world,
+                             float x_destination, float y_destination,
+                             float alignment_angle)
 {
-    ShootAlignmentState_t *state = (ShootAlignmentState_t *)void_state_ptr;
+    AlignToBallState_t *state = (AlignToBallState_t *)void_state_ptr;
 
     state->destination[0] = x_destination;
     state->destination[1] = y_destination;
@@ -79,12 +78,12 @@ void app_chick_alignment_start(void *void_state_ptr, FirmwareWorld_t *world,
         min_angle_delta(state->destination[2], app_firmware_robot_getOrientation(robot));
 }
 
-void app_chick_alignment_end(void *void_state_ptr, FirmwareWorld_t *world) {}
+void app_align_to_ball_end(void *void_state_ptr, FirmwareWorld_t *world) {}
 
-void app_chick_alignment_tick(void *void_state_ptr, FirmwareWorld_t *world)
+void app_align_to_ball_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
-    ShootAlignmentState_t *state = (ShootAlignmentState_t *)void_state_ptr;
+    AlignToBallState_t *state    = (AlignToBallState_t *)void_state_ptr;
 
     PhysBot pb =
         app_physbot_create(robot, state->destination, state->major_vec, state->minor_vec);
@@ -106,3 +105,9 @@ void app_chick_alignment_tick(void *void_state_ptr, FirmwareWorld_t *world)
 
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
+
+const primitive_t ALIGN_TO_BALL = {.direct        = false,
+                                   .end           = &app_align_to_ball_end,
+                                   .tick          = &app_align_to_ball_tick,
+                                   .create_state  = &createAlignToBallState_t,
+                                   .destroy_state = &destroyAlignToBallState_t};

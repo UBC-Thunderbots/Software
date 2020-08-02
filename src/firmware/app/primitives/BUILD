@@ -86,7 +86,9 @@ cc_library(
 )
 
 cc_library(
-    name = "chick_alignment_deps",
+    name = "align_to_ball",
+    srcs = ["align_to_ball.c"],
+    hdrs = ["align_to_ball.h"],
     deps = [
         ":primitive",
         "//firmware/app/control",
@@ -94,7 +96,6 @@ cc_library(
         "//firmware/app/control:physbot",
         "//firmware/shared:physics",
         "//firmware/shared:util",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -116,13 +117,11 @@ cc_library(
 cc_library(
     name = "chip",
     srcs = [
-        "chick_alignment.c",
-        "chick_alignment.h",
         "chip_primitive.c",
     ],
     hdrs = ["chip_primitive.h"],
     deps = [
-        "chick_alignment_deps",
+        "align_to_ball",
         ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],
@@ -130,14 +129,10 @@ cc_library(
 
 cc_library(
     name = "kick",
-    srcs = [
-        "chick_alignment.c",
-        "chick_alignment.h",
-        "kick_primitive.c",
-    ],
+    srcs = ["kick_primitive.c"],
     hdrs = ["kick_primitive.h"],
     deps = [
-        "chick_alignment_deps",
+        "align_to_ball",
         ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],
