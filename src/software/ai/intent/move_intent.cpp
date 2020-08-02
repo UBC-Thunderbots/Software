@@ -8,34 +8,11 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &fi
                        double final_speed, unsigned int priority,
                        DribblerEnable enable_dribbler, MoveType move_type,
                        AutochickType autokick, BallCollisionType ball_collision_type)
-    : NavigatingIntent(
-          robot_id,
-          ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
-              MovePrimitive(robot_id, dest, final_angle, final_speed, enable_dribbler,
-                            move_type, autokick)),
-          priority,
-          NavigatorParams{
-              .destination                   = dest,
-              .final_speed                   = final_speed,
-              .final_angle                   = final_angle,
-              .ball_collision_type           = ball_collision_type,
-              .motion_constraints            = std::set<MotionConstraint>(),
-              .primitive_msg_update_function = [&](Point destination,
-                                                   double final_speed) {
-                  PrimitiveMsg new_primitive_msg = Intent::getPrimitiveMsg();
-
-                  PrimitiveParamsMsg new_primitive_params_msg = new_primitive_msg.move();
-                  new_primitive_params_msg.set_parameter1(
-                      static_cast<float>(destination.x() * MILLIMETERS_PER_METER));
-                  new_primitive_params_msg.set_parameter2(
-                      static_cast<float>(destination.y() * MILLIMETERS_PER_METER));
-                  new_primitive_params_msg.set_parameter4(
-                      static_cast<float>(final_speed * MILLIMETERS_PER_METER));
-
-                  *(new_primitive_msg.mutable_move()) = new_primitive_params_msg;
-
-                  return new_primitive_msg;
-              }})
+    : NavigatingIntent(robot_id,
+                       ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+                           MovePrimitive(robot_id, dest, final_angle, final_speed,
+                                         enable_dribbler, move_type, autokick)),
+                       priority, dest, final_angle, final_speed, ball_collision_type)
 {
 }
 

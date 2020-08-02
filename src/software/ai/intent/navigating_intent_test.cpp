@@ -30,10 +30,6 @@ TEST(NavigatingIntentTest, test_get_primitive_msg)
                    AutochickType::NONE, BallCollisionType::AVOID);
 
     EXPECT_TRUE(move_intent.getPrimitiveMsg().has_move());
-    ASSERT_TRUE(move_intent.getNavigatorParams());
-    EXPECT_TRUE(move_intent.getNavigatorParams()
-                    ->primitive_msg_update_function(Point(), 0)
-                    .has_move());
 }
 
 TEST(NavigatingIntentTest, test_motion_constraints_inequality)

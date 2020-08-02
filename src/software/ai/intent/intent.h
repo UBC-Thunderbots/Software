@@ -21,15 +21,6 @@ struct NavigatorParams
     Angle final_angle;
     BallCollisionType ball_collision_type;
     std::set<MotionConstraint> motion_constraints;
-    /**
-     * Gets a PrimitiveMsg updated with destination and final_speed
-     *
-     * @param destination The destination
-     * @param final_speed The final speed
-     *
-     * @return PrimitiveMsg updated with destination and final_speed
-     */
-    std::function<PrimitiveMsg(Point, double)> primitive_msg_update_function;
 
     bool operator==(const NavigatorParams& other) const
     {

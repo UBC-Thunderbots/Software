@@ -111,11 +111,9 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::createPrimitives(
             if (robot_id_to_path_iter != robot_id_to_path.end() &&
                 robot_id_to_path_iter->second)
             {
-                auto [destination, final_speed] = calculateDestinationAndFinalSpeed(
-                    navigator_params.value(), *(robot_id_to_path_iter->second), world);
-                robot_primitives_map[intent->getRobotId()] =
-                    navigator_params->primitive_msg_update_function(destination,
-                                                                    final_speed);
+                robot_primitives_map[intent->getRobotId()] = getUpdatedPrimitive(
+                    intent->getPrimitiveMsg(), navigator_params.value(),
+                    *(robot_id_to_path_iter->second), world);
             }
             else
             {
@@ -135,8 +133,9 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::createPrimitives(
     return primitive_set_msg;
 }
 
-std::pair<Point, double> Navigator::calculateDestinationAndFinalSpeed(
-    const NavigatorParams &navigator_params, const Path &path, const World &world)
+PrimitiveMsg Navigator::getUpdatedPrimitive(const PrimitiveMsg &primitive_msg,
+                                            const NavigatorParams &navigator_params,
+                                            const Path &path, const World &world)
 {
     double desired_final_speed;
     Point final_dest;
@@ -160,11 +159,36 @@ std::pair<Point, double> Navigator::calculateDestinationAndFinalSpeed(
 
         final_dest = path_points[1];
     }
+    double final_speed = desired_final_speed * getEnemyObstacleProximityFactor(
+                                                   path_points[1], world.enemyTeam());
 
-    return std::make_pair<Point, double>(
-        Point(final_dest),  // slow down around enemy robots
-        desired_final_speed *
-            getEnemyObstacleProximityFactor(path_points[1], world.enemyTeam()));
+    if (primitive_msg.has_move())
+    {
+        PrimitiveMsg new_primitive_msg = primitive_msg;
+        *(new_primitive_msg.mutable_move()) =
+            getUpdatedPrimitiveParams(new_primitive_msg.move(), final_dest, final_speed);
+        return new_primitive_msg;
+    }
+    else
+    {
+        LOG(WARNING) << "PrimitiveMsg of type " << primitive_msg.primitive_case()
+                     << " is not supported by getUpdatedPrimitive";
+        return primitive_msg;
+    }
+}
+
+PrimitiveParamsMsg Navigator::getUpdatedPrimitiveParams(
+    const PrimitiveParamsMsg &primitive_params_msg, const Point &new_destination,
+    double new_final_speed)
+{
+    PrimitiveParamsMsg new_primitive_params_msg = primitive_params_msg;
+    new_primitive_params_msg.set_parameter1(
+        static_cast<float>(new_destination.x() * MILLIMETERS_PER_METER));
+    new_primitive_params_msg.set_parameter2(
+        static_cast<float>(new_destination.y() * MILLIMETERS_PER_METER));
+    new_primitive_params_msg.set_parameter4(
+        static_cast<float>(new_final_speed * MILLIMETERS_PER_METER));
+    return new_primitive_params_msg;
 }
 
 double Navigator::getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team)

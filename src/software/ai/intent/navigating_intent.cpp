@@ -1,11 +1,19 @@
 #include "software/ai/intent/navigating_intent.h"
 
 NavigatingIntent::NavigatingIntent(unsigned int robot_id, PrimitiveMsg primitive_msg,
-                                   unsigned int priority,
-                                   NavigatorParams navigator_params)
-    : Intent(robot_id, primitive_msg, priority), navigator_params(navigator_params)
+                                   unsigned int priority, const Point& destination,
+                                   const Angle& final_angle, double final_speed,
+                                   BallCollisionType ball_collision_type)
+    : Intent(robot_id, primitive_msg, priority),
+      navigator_params(
+          NavigatorParams{.destination         = destination,
+                          .final_speed         = final_speed,
+                          .final_angle         = final_angle,
+                          .ball_collision_type = ball_collision_type,
+                          .motion_constraints  = std::set<MotionConstraint>()})
 {
 }
+
 
 void NavigatingIntent::setMotionConstraints(
     const std::set<MotionConstraint>& motion_constraints)

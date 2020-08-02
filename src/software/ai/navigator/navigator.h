@@ -114,17 +114,33 @@ class Navigator
         std::map<RobotId, std::optional<Path>> robot_id_to_path);
 
     /**
-     * Creates the final speed and destination given the navigator params, the path, the
-     * intent, and the world
+     * Gets updated Primitive from the original primitive, path, navigator params and
+     * world
      *
-     * @param navigator_params NavigatorParams
+     * @param primitive_msg The original PrimitiveMsg
+     * @param navigator_params The NavigatorParams
      * @param path path to make primitive for
      * @param world World to navigate around
      *
-     * @return the final destination and speed
+     * @return the updated primitive
      */
-    std::pair<Point, double> calculateDestinationAndFinalSpeed(
-        const NavigatorParams &navigator_params, const Path &path, const World &world);
+    PrimitiveMsg getUpdatedPrimitive(const PrimitiveMsg &primitive_msg,
+                                     const NavigatorParams &navigator_params,
+                                     const Path &path, const World &world);
+
+    /**
+     * Gets updated Primitive Parameters from the original primitive parameters,
+     * destination, and final speed
+     *
+     * @param primitive_params_msg The original PrimitiveParamsMsg
+     * @param new_destination The new destination
+     * @param new_final_speed The new final speed
+     *
+     * @return the updated primitive params msg
+     */
+    PrimitiveParamsMsg getUpdatedPrimitiveParams(
+        const PrimitiveParamsMsg &primitive_params_msg, const Point &new_destination,
+        double new_final_speed);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.

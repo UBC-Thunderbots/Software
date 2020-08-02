@@ -48,8 +48,6 @@ TEST(MoveIntentTest, test_get_navigator_params)
                                      .final_speed         = 2.3,
                                      .final_angle         = Angle::quarter(),
                                      .ball_collision_type = BallCollisionType::AVOID,
-
-                                     .motion_constraints = std::set<MotionConstraint>(),
-                                     .primitive_msg_update_function = nullptr};
+                                     .motion_constraints  = std::set<MotionConstraint>()};
     EXPECT_EQ(navigator_params, move_intent.getNavigatorParams());
 }

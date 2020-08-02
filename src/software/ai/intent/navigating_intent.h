@@ -15,16 +15,16 @@ class NavigatingIntent : public Intent
      * @param robot_id The id of the Robot to run this Primitive
      * @param primitive_msg The PrimitiveMsg that underlies this Intent
      * @param priority The priority of this Intent
-     * @param navigator_params The NavigatorParams
-     *
-     * Gets a PrimitiveMsg updated with destination and final_speed
-     * NOTE: only Intents that navigate update PrimitiveMsg
-     *
-     * @param destination The destination
-     * @param final_speed The final speed
+     * @param destination The destination of the Movement
+     * @param final_angle The final angle the robot should have at the end of the movement
+     * @param final_speed The final speed the robot should have when it arrives at its
+     * destination
+     * @param ball_collision_type how to navigate around the ball
      */
     explicit NavigatingIntent(unsigned int robot_id, PrimitiveMsg primitive_msg,
-                              unsigned int priority, NavigatorParams navigator_params);
+                              unsigned int priority, const Point& destination,
+                              const Angle& final_angle, double final_speed,
+                              BallCollisionType ball_collision_type);
 
     std::optional<NavigatorParams> getNavigatorParams() const override;
 
