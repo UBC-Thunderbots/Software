@@ -1,4 +1,4 @@
-#include "firmware/app/primitives/align_to_ball.h"
+#include "firmware/app/primitives/chick_motion.h"
 
 #include "firmware/app/control/bangbang.h"
 #include "firmware/app/control/control.h"
@@ -9,11 +9,11 @@
 
 #define TIME_HORIZON 0.05f  // in seconds
 
-typedef struct AlignToBallState
+typedef struct ChickMotionState
 {
     float destination[3], major_vec[2], minor_vec[2], total_rot;
-} AlignToBallState_t;
-DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(AlignToBallState_t)
+} ChickMotionState_t;
+DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(ChickMotionState_t)
 
 /**
  * Scales the major acceleration by the distance from the major axis and the
@@ -56,11 +56,11 @@ void plan_shoot_rotation(PhysBot *pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void app_align_to_ball_start(void *void_state_ptr, FirmwareWorld_t *world,
-                             float x_destination, float y_destination,
-                             float alignment_angle)
+void app_chick_motion_start(void *void_state_ptr, FirmwareWorld_t *world,
+                            float x_destination, float y_destination,
+                            float alignment_angle)
 {
-    AlignToBallState_t *state = (AlignToBallState_t *)void_state_ptr;
+    ChickMotionState_t *state = (ChickMotionState_t *)void_state_ptr;
 
     state->destination[0] = x_destination;
     state->destination[1] = y_destination;
@@ -79,12 +79,12 @@ void app_align_to_ball_start(void *void_state_ptr, FirmwareWorld_t *world,
         min_angle_delta(state->destination[2], app_firmware_robot_getOrientation(robot));
 }
 
-void app_align_to_ball_end(void *void_state_ptr, FirmwareWorld_t *world) {}
+void app_chick_motion_end(void *void_state_ptr, FirmwareWorld_t *world) {}
 
-void app_align_to_ball_tick(void *void_state_ptr, FirmwareWorld_t *world)
+void app_chick_motion_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
-    AlignToBallState_t *state    = (AlignToBallState_t *)void_state_ptr;
+    ChickMotionState_t *state    = (ChickMotionState_t *)void_state_ptr;
 
     PhysBot pb =
         app_physbot_create(robot, state->destination, state->major_vec, state->minor_vec);

@@ -86,9 +86,9 @@ cc_library(
 )
 
 cc_library(
-    name = "align_to_ball",
-    srcs = ["align_to_ball.c"],
-    hdrs = ["align_to_ball.h"],
+    name = "chick_motion",
+    srcs = ["chick_motion.c"],
+    hdrs = ["chick_motion.h"],
     deps = [
         ":primitive",
         "//firmware/app/control",
@@ -121,7 +121,7 @@ cc_library(
     ],
     hdrs = ["chip_primitive.h"],
     deps = [
-        "align_to_ball",
+        "chick_motion",
         ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],
@@ -132,7 +132,7 @@ cc_library(
     srcs = ["kick_primitive.c"],
     hdrs = ["kick_primitive.h"],
     deps = [
-        "align_to_ball",
+        "chick_motion",
         ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],
