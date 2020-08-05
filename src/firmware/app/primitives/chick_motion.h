@@ -7,14 +7,16 @@
  * to users of these helper functions to arm the appropriate autokick and autochip
  */
 
-//       <------- B <-------------------------
-//        ^       ^                 ^         \
-// alignment   destination   chick motion path \
-//   angle                                      \
-//                                               \
-//                                                A
-//                                                ^
-//                                              start
+/**
+ * <------- B <-------------------------
+ *        ^       ^                 ^         \
+ * alignment   destination   chick motion path \
+ *   angle                                      \
+ *                                               \
+ *                                                A
+ *                                                ^
+ *                                              start
+ */
 
 /**
  * Start the chick motion in the given world
