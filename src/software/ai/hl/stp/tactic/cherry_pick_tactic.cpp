@@ -1,11 +1,10 @@
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       pass_generator(world, world.ball().position(), PassType::ONE_TOUCH_SHOT),
       world(world),
       target_region(target_region)
@@ -43,7 +42,7 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         move_action->updateControlParams(*robot, pass.receiverPoint(),
                                          pass.receiverOrientation(), 0,
                                          DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutokickType::NONE, BallCollisionType::AVOID);
+                                         AutochickType::NONE, BallCollisionType::AVOID);
         yield(move_action);
     } while (true);
 }

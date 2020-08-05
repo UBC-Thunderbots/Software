@@ -4,18 +4,17 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/geom/util.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/point.h"
+#include "software/geom/ray.h"
+#include "software/geom/segment.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/ray.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,
     const Team &enemy_team, CreaseDefenderTactic::LeftOrRight left_or_right)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       field(field),
       ball(ball),
       friendly_team(friendly_team),
@@ -178,7 +177,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
             move_action->updateControlParams(
                 *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
             yield(move_action);
         }
         else

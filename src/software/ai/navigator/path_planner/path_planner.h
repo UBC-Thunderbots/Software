@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/new_geom/linear_spline2d.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
+#include "software/geom/linear_spline2d.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 
 /**
  * PathPlanner is an interface for a path planner that,

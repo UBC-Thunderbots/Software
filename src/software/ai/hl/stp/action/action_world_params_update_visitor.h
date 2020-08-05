@@ -25,7 +25,7 @@ class ActionWorldParamsUpdateVisitor : public MutableActionVisitor
     void visit(InterceptBallAction& action) override;
     void visit(KickAction& action) override;
     void visit(MoveAction& action) override;
-    void visit(MoveSpinAction& action) override;
+    void visit(SpinningMoveAction& action) override;
     void visit(StopAction& action) override;
 
    private:

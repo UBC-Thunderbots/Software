@@ -9,7 +9,6 @@ cc_library(
     deps = [
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/path_planner",
-        "//software/geom",
         "//software/world",
     ],
 )

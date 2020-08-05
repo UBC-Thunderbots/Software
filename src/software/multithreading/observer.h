@@ -12,7 +12,7 @@ template <typename T>
 class Observer
 {
    public:
-    Observer();
+    Observer(size_t buffer_size = DEFAULT_BUFFER_SIZE);
 
     /**
      * Add the given value to the internal buffer
@@ -40,9 +40,25 @@ class Observer
      */
     virtual std::optional<T> popMostRecentlyReceivedValue(Duration max_wait_time) final;
 
-   private:
-    const size_t DEFAULT_BUFFER_SIZE = 1;
+    /**
+     * Pops the least recently received value and returns it
+     *
+     * If no value is available, this will block until:
+     * - a value becomes available
+     * - the given amount of time is exceeded
+     * - the destructor of this class is called
+     *
+     * @param max_wait_time The maximum duration to wait for a new value before
+     *                      returning
+     *
+     * @return The value least recently added to the buffer or std::nullopt if none is
+     *         available
+     */
+    virtual std::optional<T> popLeastRecentlyReceivedValue(Duration max_wait_time) final;
 
+    static constexpr size_t DEFAULT_BUFFER_SIZE = 1;
+
+   private:
     ThreadSafeBuffer<T> buffer;
 };
 

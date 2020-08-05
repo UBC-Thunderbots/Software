@@ -1,7 +1,3 @@
-/**
- * This file contains the unit tests for functions in motion_constraint_manager.cpp
- */
-
 #include "software/ai/motion_constraint/motion_constraint_manager.h"
 
 #include <gtest/gtest.h>

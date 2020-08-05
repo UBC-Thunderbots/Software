@@ -4,10 +4,10 @@
 
 #include <iostream>
 
-#include "software/new_geom/circle.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/polygon.h"
-#include "software/new_geom/rectangle.h"
+#include "software/geom/circle.h"
+#include "software/geom/point.h"
+#include "software/geom/polygon.h"
+#include "software/geom/rectangle.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
 

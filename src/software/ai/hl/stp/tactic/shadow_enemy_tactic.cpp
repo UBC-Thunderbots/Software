@@ -9,7 +9,7 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
                                      const Team &enemy_team, bool ignore_goalie,
                                      const Ball &ball, const double ball_steal_speed,
                                      bool enemy_team_can_pass, bool loop_forever)
-    : Tactic(loop_forever),
+    : Tactic(loop_forever, {RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -82,7 +82,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 enemy_to_passer_vector.normalize(this->shadow_distance);
             move_action->updateControlParams(
                 *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::AVOID);
             yield(move_action);
         }
@@ -119,7 +119,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 move_action->updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0,
-                    DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                    DribblerEnable::ON, MoveType::NORMAL, AutochickType::AUTOCHIP,
                     BallCollisionType::AVOID);
                 yield(move_action);
             }
@@ -128,7 +128,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 move_action->updateControlParams(
                     *robot, position_to_block_shot,
                     enemy_shot_vector.orientation() + Angle::half(), 0,
-                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                    DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
                     BallCollisionType::AVOID);
                 yield(move_action);
             }

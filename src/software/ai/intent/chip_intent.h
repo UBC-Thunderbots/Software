@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/primitive/chip_primitive.h"
 
 class ChipIntent : public ChipPrimitive, public Intent
@@ -12,16 +12,16 @@ class ChipIntent : public ChipPrimitive, public Intent
     /**
      * Creates a new Chip Intent
      *
-     * @param robot_id The id of the robot that this Intent is for
-     * @param dest The destination of the Movement
-     * @param final_angle The final angle the robot should have at the end of the movement
-     * @param final_speed The final speed the robot should have when it arrives at its
-     * destination
+     * @param robot_id The id of the Robot to run this Primitive
+     * @param chip_origin The location where the chip will be taken
+     * @param chip_direction The orientation the Robot will chip at
+     * @param chip_distance_meters The distance between the starting location
+     * of the chip and the location of the first bounce
      * @param priority The priority of this Intent. A larger number indicates a higher
      * priority
      */
-    explicit ChipIntent(unsigned int robot_id, const Point& dest,
-                        const Angle& final_angle, double final_speed,
+    explicit ChipIntent(unsigned int robot_id, const Point& chip_origin,
+                        const Angle& chip_direction, double chip_distance_meters,
                         unsigned int priority);
 
     std::string getIntentName(void) const override;

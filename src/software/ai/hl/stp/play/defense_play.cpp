@@ -10,7 +10,6 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/geom/util.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"

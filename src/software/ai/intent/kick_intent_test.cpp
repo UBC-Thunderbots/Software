@@ -1,7 +1,3 @@
-/**
- * This file contains unit tests for the Kick Intent class
- */
-
 #include "software/ai/intent/kick_intent.h"
 
 #include <gtest/gtest.h>

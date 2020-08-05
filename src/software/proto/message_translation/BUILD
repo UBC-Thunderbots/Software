@@ -7,10 +7,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":proto_creator_primitive_visitor",
+        ":tbots_geometry",
         "//shared/proto:tbots_cc_proto",
-        "//software/new_geom:angle",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:angle",
+        "//software/geom:point",
+        "//software/geom:vector",
         "//software/primitive:all_primitives",
         "//software/primitive:primitive_visitor",
         "//software/world",
@@ -21,8 +22,32 @@ cc_test(
     name = "tbots_protobuf_test",
     srcs = ["tbots_protobuf_test.cpp"],
     deps = [
-        "//software/proto/message_translation:tbots_protobuf",
+        "tbots_protobuf",
         "//software/test_util",
+    ],
+)
+
+cc_library(
+    name = "tbots_geometry",
+    srcs = ["tbots_geometry.cpp"],
+    hdrs = ["tbots_geometry.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//shared/proto:tbots_cc_proto",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
+    ],
+)
+
+cc_test(
+    name = "tbots_geometry_test",
+    srcs = ["tbots_geometry_test.cpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "tbots_geometry",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -97,7 +122,7 @@ cc_library(
     srcs = ["ssl_referee.cpp"],
     hdrs = ["ssl_referee.h"],
     deps = [
-        "//software/new_geom:point",
+        "//software/geom:point",
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion:refbox_data",
         "//software/world:team_colour",

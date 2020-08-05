@@ -32,11 +32,8 @@ class ChipTactic : public Tactic
      *
      * @param chip_origin The location where the chip will be taken
      * @param chip_direction The direction the Robot will chip in
-     * @param chip_distance_meters The distance between the starting location
-     * of the chip and the location of the first bounce
      */
-    void updateControlParams(Point chip_origin, Point chip_target,
-                             double chip_distance_meters);
+    void updateControlParams(Point chip_origin, Point chip_target);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -60,5 +57,4 @@ class ChipTactic : public Tactic
     Ball ball;
     Point chip_origin;
     Point chip_target;
-    double chip_distance_meters;
 };

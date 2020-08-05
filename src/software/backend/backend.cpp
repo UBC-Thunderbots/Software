@@ -1,9 +1,9 @@
 #include "software/backend/backend.h"
 
-void Backend::receiveTbotsRobotMsg(TbotsRobotMsg msg)
+void Backend::receiveRobotStatusMsg(RobotStatusMsg msg)
 {
     SensorMsg sensor_msg;
-    *(sensor_msg.add_tbots_robot_msgs()) = msg;
+    *(sensor_msg.add_robot_status_msgs()) = msg;
     Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }
 

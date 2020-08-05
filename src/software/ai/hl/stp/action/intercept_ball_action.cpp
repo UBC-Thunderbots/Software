@@ -5,13 +5,12 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/util.h"
+#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/ray.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/ray.h"
-#include "software/new_geom/util/acute_angle.h"
-#include "software/new_geom/util/closest_point.h"
-#include "software/new_geom/util/distance.h"
-#include "software/new_geom/util/intersection.h"
 
 InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
                                          bool loop_forever)
@@ -69,7 +68,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // Finally, if the ball is moving slowly the robot will go directly to the ball.
     do
     {
-        Point closest_point = closestPointOnLine(
+        Point closest_point = closestPoint(
             robot->position(), Line(ball.position(), ball.position() + ball.velocity()));
         bool point_in_front_of_ball =
             acuteAngle(ball.velocity(), closest_point - ball.position()) <
@@ -106,7 +105,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             {
                 moveToInterceptPosition(yield, closest_point);
 
-                closest_point = closestPointOnLine(
+                closest_point = closestPoint(
                     robot->position(),
                     Line(ball.position(), ball.position() + ball.velocity()));
                 point_in_front_of_ball =
@@ -120,7 +119,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(std::make_unique<MoveIntent>(
                 robot->id(), point_ball_leaves_field.value(),
                 (ball.position() - robot->position()).orientation(), 0, 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::ALLOW));
         }
         else
@@ -132,7 +131,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(std::make_unique<MoveIntent>(
                 robot->id(), ball.position(),
                 (ball.position() - robot->position()).orientation(), 0, 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::ALLOW));
         }
     } while (!robotHasPossession(ball.getPreviousStates(), robot->getPreviousStates()));
@@ -154,7 +153,7 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
         yield(std::make_unique<MoveIntent>(
             robot->id(), ball.position(),
             (ball.position() - robot->position()).orientation(), FINAL_SPEED_AT_SLOW_BALL,
-            0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+            0, DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
             BallCollisionType::ALLOW));
     }
     else if (robot_on_ball_line)
@@ -168,13 +167,13 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
         yield(std::make_unique<MoveIntent>(
             robot->id(), point_to_meet_ball,
             (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON,
-            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
     }
     else
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), closest_point_on_ball_trajectory,
             (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON,
-            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW));
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
     }
 }

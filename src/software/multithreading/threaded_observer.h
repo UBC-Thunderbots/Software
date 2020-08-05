@@ -8,7 +8,8 @@
 /**
  * The general usage of this class should be to extend it, then override
  * `onValueReceived` with whatever custom functionality should occur when a new value
- * is received.
+ * is received, and `getNextValue` with a function that returns either the first or
+ * last received value from the internal buffer.
  *
  * @tparam T The type of object this class is observing
  */
@@ -16,14 +17,15 @@ template <typename T>
 class ThreadedObserver : public Observer<T>
 {
    public:
-    ThreadedObserver();
+    explicit ThreadedObserver(size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
+
     ~ThreadedObserver() override;
 
     // Delete the copy and assignment operators because this class really shouldn't need
     // them and we don't want to risk doing anything nasty with the internal
     // multithreading this class uses
-    ThreadedObserver &operator=(const ThreadedObserver &) = delete;
-    ThreadedObserver(const ThreadedObserver &)            = delete;
+    ThreadedObserver& operator=(const ThreadedObserver&) = delete;
+    ThreadedObserver(const ThreadedObserver&)            = delete;
 
    private:
     /**
@@ -50,6 +52,11 @@ class ThreadedObserver : public Observer<T>
      * This is intended to be run in a separate thread.
      */
     void continuouslyPullValuesFromBuffer();
+
+    /**
+     * This function will return the next value from the internal buffer.
+     */
+    virtual std::optional<T> getNextValue(const Duration& max_wait_time);
 
     // This indicates if the destructor of this class has been called
     std::mutex in_destructor_mutex;

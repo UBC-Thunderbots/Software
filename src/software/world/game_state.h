@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/new_geom/point.h"
+#include "software/geom/point.h"
 #include "software/sensor_fusion/refbox_data.h"
 #include "software/world/ball.h"
 
@@ -19,7 +19,7 @@
 class GameState
 {
    public:
-    enum State
+    enum PlayState
     {
         HALT,    // Robots must not move
         STOP,    // Robots must stay a set distance away from ball
@@ -39,25 +39,13 @@ class GameState
         BALL_PLACEMENT
     };
 
-    State state;
-    RestartReason restart_reason;
-    RefboxGameState game_state;
-    std::optional<Ball> ball_state;
-
-    // True if our team can kick the ball during a restart
-    bool our_restart;
-
-    // The point at which the ball should be placed by robots before a restart. See
-    // Robocup SSL Rules 9.2.
-    std::optional<Point> ball_placement_point;
-
     GameState()
-        : state(HALT),
-          restart_reason(NONE),
-          game_state(RefboxGameState::HALT),
-          ball_state(std::nullopt),
-          our_restart(false),
-          ball_placement_point(std::nullopt)
+        : state_(HALT),
+          restart_reason_(NONE),
+          game_state_(RefboxGameState::HALT),
+          ball_state_(std::nullopt),
+          our_restart_(false),
+          ball_placement_point_(std::nullopt)
     {
     }
 
@@ -350,11 +338,16 @@ class GameState
      */
     void setBallPlacementPoint(Point placementPoint);
 
-    /**
-     * Returns the point where the ball should be placed
-     *
-     * @return the point where the ball should be placed, or std::nullopt if we are not
-     *         in a state of play where the ball needs to be placed
-     */
-    std::optional<Point> getBallPlacementPoint() const;
+   private:
+    PlayState state_;
+    RestartReason restart_reason_;
+    RefboxGameState game_state_;
+    std::optional<Ball> ball_state_;
+
+    // True if our team can kick the ball during a restart
+    bool our_restart_;
+
+    // The point at which the ball should be placed by robots before a restart. See
+    // Robocup SSL Rules 9.2.
+    std::optional<Point> ball_placement_point_;
 };

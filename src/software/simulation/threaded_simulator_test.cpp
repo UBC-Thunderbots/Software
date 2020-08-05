@@ -171,10 +171,10 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
 
     std::unique_ptr<Primitive> blue_move_primitive1 = std::make_unique<MovePrimitive>(
         1, Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::unique_ptr<Primitive> blue_move_primitive2 = std::make_unique<MovePrimitive>(
         2, Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> blue_robot_primitives;
     blue_robot_primitives.emplace_back(std::move(blue_move_primitive1));
     blue_robot_primitives.emplace_back(std::move(blue_move_primitive2));
@@ -185,10 +185,10 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
 
     std::unique_ptr<Primitive> yellow_move_primitive1 = std::make_unique<MovePrimitive>(
         1, Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::unique_ptr<Primitive> yellow_move_primitive2 = std::make_unique<MovePrimitive>(
         2, Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> yellow_robot_primitives;
     yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive1));
     yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive2));

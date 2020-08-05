@@ -9,7 +9,7 @@ class ChipAction;
 class InterceptBallAction;
 class KickAction;
 class MoveAction;
-class MoveSpinAction;
+class SpinningMoveAction;
 class StopAction;
 
 /**
@@ -32,6 +32,6 @@ class MutableActionVisitor
     virtual void visit(InterceptBallAction& action) = 0;
     virtual void visit(KickAction& action)          = 0;
     virtual void visit(MoveAction& action)          = 0;
-    virtual void visit(MoveSpinAction& action)      = 0;
+    virtual void visit(SpinningMoveAction& action)  = 0;
     virtual void visit(StopAction& action)          = 0;
 };

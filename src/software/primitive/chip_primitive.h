@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/primitive/primitive.h"
 
 class ChipPrimitive : public Primitive
@@ -27,9 +27,6 @@ class ChipPrimitive : public Primitive
     explicit ChipPrimitive(unsigned int robot_id, const Point &chip_origin,
                            const Angle &chip_direction, double chip_distance_meters);
 
-    std::string getPrimitiveName() const override;
-
-    unsigned int getRobotId() const override;
     /**
      * Gets the location of where the chip will be taken
      *
@@ -53,6 +50,8 @@ class ChipPrimitive : public Primitive
     double getChipDistance() const;
 
     void accept(PrimitiveVisitor &visitor) const override;
+    std::string getPrimitiveName() const override;
+    unsigned int getRobotId() const override;
 
     /**
      * Compares ChipPrimitives for equality. ChipPrimitives are considered equal if all

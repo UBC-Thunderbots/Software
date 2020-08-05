@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/proto/tbots_robot_msg.pb.h"
+#include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/proto/team_side_msg.pb.h"
 #include "software/backend/backend.h"
@@ -45,6 +45,6 @@ class WifiBackend : public Backend
     // ProtoMulticast** to communicate with robots
     std::unique_ptr<ThreadedProtoMulticastSender<VisionMsg>> vision_output;
     std::unique_ptr<ThreadedProtoMulticastSender<PrimitiveSetMsg>> primitive_output;
+    std::unique_ptr<ThreadedProtoMulticastListener<RobotStatusMsg>> robot_msg_input;
     std::unique_ptr<ThreadedProtoMulticastSender<TeamSideMsg>> team_side_output;
-    std::unique_ptr<ThreadedProtoMulticastListener<TbotsRobotMsg>> robot_msg_input;
 };

@@ -16,15 +16,14 @@ std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
         return std::nullopt;
     }
 
-    auto best_intercept = findBestInterceptForBall(
-        ball.currentState(), field, team.getAllRobots().at(0).currentState());
+    auto best_intercept =
+        findBestInterceptForBall(ball, field, team.getAllRobots().at(0));
     auto baller_robot = team.getAllRobots().at(0);
 
     // Find the robot that can intercept the ball the quickest
     for (const auto &robot : team.getAllRobots())
     {
-        auto intercept =
-            findBestInterceptForBall(ball.currentState(), field, robot.currentState());
+        auto intercept = findBestInterceptForBall(ball, field, robot);
         if (!best_intercept || (intercept && intercept->second < best_intercept->second))
         {
             best_intercept = intercept;

@@ -6,7 +6,8 @@ cc_library(
     hdrs = ["chip_primitive.h"],
     deps = [
         ":primitive",
-        "//software/geom",
+        "//software/geom:angle",
+        "//software/geom:point",
     ],
 )
 
@@ -25,7 +26,6 @@ cc_library(
     hdrs = ["direct_velocity_primitive.h"],
     deps = [
         ":primitive",
-        "//software/geom",
     ],
 )
 
@@ -44,7 +44,9 @@ cc_library(
     hdrs = ["direct_wheels_primitive.h"],
     deps = [
         ":primitive",
-        "//software/geom",
+        "//software/geom:angle",
+        "//software/geom:point",
+        "//software/logger",
     ],
 )
 
@@ -63,7 +65,8 @@ cc_library(
     hdrs = ["kick_primitive.h"],
     deps = [
         ":primitive",
-        "//software/geom",
+        "//software/geom:angle",
+        "//software/geom:point",
     ],
 )
 
@@ -82,7 +85,9 @@ cc_library(
     hdrs = ["move_primitive.h"],
     deps = [
         ":primitive",
-        "//software/geom",
+        "//software/geom:angle",
+        "//software/geom:point",
+        "//software/util/make_enum",
     ],
 )
 
@@ -96,21 +101,21 @@ cc_test(
 )
 
 cc_library(
-    name = "movespin_primitive",
-    srcs = ["movespin_primitive.cpp"],
-    hdrs = ["movespin_primitive.h"],
+    name = "spinning_move_primitive",
+    srcs = ["spinning_move_primitive.cpp"],
+    hdrs = ["spinning_move_primitive.h"],
     deps = [
         ":primitive",
-        "//software/geom",
-        "//software/new_geom:angular_velocity",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
     ],
 )
 
 cc_test(
-    name = "movespin_primitive_test",
-    srcs = ["movespin_primitive_test.cpp"],
+    name = "spinning_move_primitive_test",
+    srcs = ["spinning_move_primitive_test.cpp"],
     deps = [
-        ":movespin_primitive",
+        ":spinning_move_primitive",
         "@gtest//:gtest_main",
     ],
 )
@@ -121,7 +126,6 @@ cc_library(
     hdrs = ["stop_primitive.h"],
     deps = [
         ":primitive",
-        "//software/geom",
     ],
 )
 
@@ -143,7 +147,7 @@ cc_library(
         ":direct_wheels_primitive",
         ":kick_primitive",
         ":move_primitive",
-        ":movespin_primitive",
+        ":spinning_move_primitive",
         ":stop_primitive",
     ],
 )

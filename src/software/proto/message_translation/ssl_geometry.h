@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "software/new_geom/circle.h"
-#include "software/new_geom/segment.h"
+#include "software/geom/circle.h"
+#include "software/geom/segment.h"
 #include "software/proto/messages_robocup_ssl_geometry.pb.h"
 #include "software/util/make_enum/make_enum.h"
 #include "software/world/field.h"
@@ -17,7 +17,7 @@
  *
  * Several values like the various goal lines are not listed in the wiki
  * and so have been determined "experimentally" by inspecting messages
- * received from SSL Vision or Grsim.
+ * received from SSL Vision
  *
  * We have named the enums according to our own style to be more descriptive
  * than the SSL defaults. See the map in the .cpp file for how these map to

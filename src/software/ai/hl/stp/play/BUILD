@@ -42,7 +42,6 @@ cc_library(
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:shoot_goal_tactic",
         "//software/ai/hl/stp/tactic:stop_tactic",
-        "//software/geom",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
