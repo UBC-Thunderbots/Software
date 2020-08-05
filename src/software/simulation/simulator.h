@@ -2,6 +2,7 @@
 
 #include "software/primitive/primitive.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/proto/team_side_msg.pb.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
@@ -139,6 +140,9 @@ class Simulator
      */
     void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
     void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+
+    void setYellowTeamDefendingSide(const TeamSideMsg& team_side_msg);
+    void setBlueTeamDefendingSide(const TeamSideMsg& team_side_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate

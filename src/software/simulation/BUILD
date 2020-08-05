@@ -153,6 +153,7 @@ cc_library(
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//software/primitive",
+        "//software/proto:team_side_msg_cc_proto",
         "//software/proto/message_translation:ssl_detection",
         "//software/proto/message_translation:ssl_geometry",
         "//software/proto/message_translation:ssl_wrapper",
@@ -179,6 +180,7 @@ cc_library(
     deps = [
         ":simulator",
         "//software/proto:ssl_cc_proto",
+        "//software/proto:team_side_msg_cc_proto",
     ],
 )
 

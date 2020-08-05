@@ -180,11 +180,13 @@ std::weak_ptr<PhysicsRobot> StandaloneSimulator::getRobotAtPosition(const Point&
 }
 
 void StandaloneSimulator::setBlueTeamDefendingSide(TeamSideMsg team_side_msg) {
+    simulator.setBlueTeamDefendingSide(team_side_msg);
     std::string side = team_side_msg.defending_positive_side() ? "positive" : "negative";
     std::cout << "Set blue team to defend " << side << " side" << std::endl;
 }
 
 void StandaloneSimulator::setYellowTeamDefendingSide(TeamSideMsg team_side_msg) {
+    simulator.setYellowTeamDefendingSide(team_side_msg);
     std::string side = team_side_msg.defending_positive_side() ? "positive" : "negative";
     std::cout << "Set yellow team to defend " << side << " side" << std::endl;
 }

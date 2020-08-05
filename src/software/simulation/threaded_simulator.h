@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include "software/proto/team_side_msg.pb.h"
 #include <thread>
 
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
@@ -130,6 +131,9 @@ class ThreadedSimulator
      */
     void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
     void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+
+    void setYellowTeamDefendingSide(const TeamSideMsg& team_side_msg);
+    void setBlueTeamDefendingSide(const TeamSideMsg& team_side_msg);
 
     /**
      * Returns the PhysicsRobot at the given position. This function accounts

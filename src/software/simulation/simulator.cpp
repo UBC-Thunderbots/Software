@@ -22,6 +22,7 @@ Simulator::Simulator(const Field& field, const Duration& physics_time_step)
 Simulator::Simulator(const Field& field, double ball_restitution,
                      double ball_linear_damping, const Duration& physics_time_step)
     : physics_world(field, ball_restitution, ball_linear_damping),
+      invert_yellow_robot_coordinates(false), invert_blue_robot_coordinates(false),
       frame_number(0),
       physics_time_step(physics_time_step)
 {
@@ -73,12 +74,12 @@ void Simulator::updateSimulatorRobots(
 
 void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball, false);
+    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball, invert_yellow_robot_coordinates);
 }
 
 void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball, true);
+    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball, invert_blue_robot_coordinates);
 }
 
 void Simulator::setRobotPrimitives(
@@ -103,12 +104,12 @@ void Simulator::setRobotPrimitives(
 
 void Simulator::setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball, false);
+    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball, invert_yellow_robot_coordinates);
 }
 
 void Simulator::setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball, true);
+    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball, invert_blue_robot_coordinates);
 }
 
 void Simulator::setRobotPrimitive(
@@ -134,6 +135,14 @@ void Simulator::setRobotPrimitive(
     }
 }
 
+void Simulator::setYellowTeamDefendingSide(const TeamSideMsg &team_side_msg) {
+    invert_yellow_robot_coordinates = team_side_msg.defending_positive_side();
+}
+
+void Simulator::setBlueTeamDefendingSide(const TeamSideMsg &team_side_msg) {
+    invert_blue_robot_coordinates = team_side_msg.defending_positive_side();
+}
+
 void Simulator::stepSimulation(const Duration& time_step)
 {
     // Set the ball being referenced in each firmware_world.
@@ -148,8 +157,8 @@ void Simulator::stepSimulation(const Duration& time_step)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, true);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, true);
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, invert_blue_robot_coordinates);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball, invert_blue_robot_coordinates);
             SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
         }
 
@@ -157,8 +166,8 @@ void Simulator::stepSimulation(const Duration& time_step)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, false);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, false);
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, invert_yellow_robot_coordinates);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball, invert_yellow_robot_coordinates);
             SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
         }
 
