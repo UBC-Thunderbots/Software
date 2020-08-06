@@ -53,17 +53,14 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseMoveEvent(QMouseEvent* even
 
 void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent *event) {
     Point point_in_scene = createPoint(mapToScene(event->pos()));
-    // get robot under cursor if exists
 
     QMenu menu(this);
     menu.addAction("Add Yellow Robot Here", [&]() {
-//        standalone_simulator->addYellowRobot(point_in_scene);
+        standalone_simulator->addYellowRobot(point_in_scene);
     });
     menu.addAction("Add Blue Robot Here", [&]() {
-//        standalone_simulator->addBlueRobot(point_in_scene);
+        standalone_simulator->addBlueRobot(point_in_scene);
     });
-    menu.addAction("Remove robot");
-//    menu.show();
+
     menu.exec(event->globalPos());
-    std::cout << "CONTEXT MENU EVENT " << std::endl;
 }
