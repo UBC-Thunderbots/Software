@@ -169,10 +169,12 @@ std::weak_ptr<PhysicsRobot> ThreadedSimulator::getRobotAtPosition(const Point &p
     return simulator.getRobotAtPosition(position);
 }
 
-void ThreadedSimulator::addYellowRobot(const Point &position) {
+void ThreadedSimulator::addYellowRobot(const Point &position)
+{
     simulator.addYellowRobot(position);
 }
 
-void ThreadedSimulator::addBlueRobot(const Point &position) {
+void ThreadedSimulator::addBlueRobot(const Point &position)
+{
     simulator.addBlueRobot(position);
 }
