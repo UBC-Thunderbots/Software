@@ -103,6 +103,45 @@ cc_library(
 )
 
 cc_library(
+    name = "move_helper",
+    srcs = ["move_helper.c"],
+    hdrs = ["move_helper.h"],
+    deps = [
+        ":primitive",
+        "//firmware/app/control",
+        "//firmware/app/control:bangbang",
+        "//firmware/app/control:physbot",
+        "//firmware/shared:physics",
+        "//firmware/shared:util",
+        "//shared:constants",
+        "//shared:robot_constants",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "autokick_move",
+    srcs = ["autokick_move_primitive.c"],
+    hdrs = ["autokick_move_primitive.h"],
+    deps = [
+        "move_helper",
+        ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "autochip_move",
+    srcs = ["autochip_move_primitive.c"],
+    hdrs = ["autochip_move_primitive.h"],
+    deps = [
+        "move_helper",
+        ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
     name = "stop",
     srcs = ["stop_primitive.c"],
     hdrs = ["stop_primitive.h"],
