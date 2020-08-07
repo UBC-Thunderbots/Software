@@ -10,9 +10,9 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       friendly_team_(friendly_team),
       enemy_team_(enemy_team),
       current_game_state_(),
-      // Store a small buffer of previous refbox game states so we can filter out noise
-      refbox_game_state_history(REFBOX_GAMESTATE_BUFFER_SIZE),
-      refbox_stage_history(REFBOX_GAMESTATE_BUFFER_SIZE)
+      // Store a small buffer of previous referee commands so we can filter out noise
+      referee_command_history(REFEREE_COMMAND_BUFFER_SIZE),
+      refbox_stage_history(REFEREE_COMMAND_BUFFER_SIZE)
 {
     // Grab the most recent timestamp from all of the members used to update the world
     last_update_timestamps.set_capacity(buffer_size);
@@ -77,28 +77,28 @@ const Team &World::enemyTeam() const
     return enemy_team_;
 }
 
-void World::updateRefboxGameState(const RefboxGameState &game_state)
+void World::updateRefereeCommand(const RefereeCommand &game_state)
 {
-    refbox_game_state_history.push_back(game_state);
+    referee_command_history.push_back(game_state);
     // Take the consensus of the previous refbox messages
-    if (!refbox_game_state_history.empty() &&
-        std::all_of(refbox_game_state_history.begin(), refbox_game_state_history.end(),
+    if (!referee_command_history.empty() &&
+        std::all_of(referee_command_history.begin(), referee_command_history.end(),
                     [&](auto gamestate) {
-                        return gamestate == refbox_game_state_history.front();
+                        return gamestate == referee_command_history.front();
                     }))
     {
-        current_game_state_.updateRefboxGameState(game_state);
+        current_game_state_.updateRefereeCommand(game_state);
     }
 }
 
-void World::updateRefboxGameState(const RefboxGameState &game_state,
+void World::updateRefereeCommand(const RefereeCommand &game_state,
                                   Point ball_placement_point)
 {
-    updateRefboxGameState(game_state);
+    updateRefereeCommand(game_state);
     current_game_state_.setBallPlacementPoint(ball_placement_point);
 }
 
-void World::updateRefboxStage(const RefboxStage &stage)
+void World::updateRefereeStage(const RefereeStage &stage)
 {
     refbox_stage_history.push_back(stage);
     // Take the consensus of the previous refbox messages
@@ -164,7 +164,7 @@ void World::updateGameState(const GameState &game_state)
     current_game_state_ = game_state;
 }
 
-const RefboxStage &World::getRefboxStage() const
+const RefereeStage &World::getRefereeStage() const
 {
     return current_refbox_stage_;
 }

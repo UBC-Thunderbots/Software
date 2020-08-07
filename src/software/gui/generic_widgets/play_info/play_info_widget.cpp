@@ -4,9 +4,9 @@ PlayInfoWidget::PlayInfoWidget(QWidget* parent) : QTextEdit(parent) {}
 
 void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
 {
-    QString refbox_game_state_string =
-        QString("Refbox Gamestate: %1\n")
-            .arg(QString::fromStdString(play_info.getRefboxGameStateName()));
+    QString referee_command_string =
+        QString("Referee Command: %1\n")
+            .arg(QString::fromStdString(play_info.getRefereeCommandName()));
     QString play_name_string =
         QString("Play Name: %1\n").arg(QString::fromStdString(play_info.getPlayName()));
     QString tactics_string = QString("Tactics:\n");
@@ -17,7 +17,7 @@ void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
 
     QString play_info_string =
         QString("%1\n%2\n%3")
-            .arg(refbox_game_state_string, play_name_string, tactics_string);
+            .arg(referee_command_string, play_name_string, tactics_string);
 
     setText(play_info_string);
 }

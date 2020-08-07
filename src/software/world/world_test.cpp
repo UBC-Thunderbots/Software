@@ -144,62 +144,62 @@ TEST_F(WorldTest, equality_different_enemy_team)
     EXPECT_NE(world1, world2);
 }
 
-TEST_F(WorldTest, update_refbox_game_state)
+TEST_F(WorldTest, update_referee_command)
 {
-    world.updateRefboxGameState(RefboxGameState::HALT);
-    EXPECT_EQ(world.gameState().getRefboxGameState(), RefboxGameState::HALT);
-    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
+    world.updateRefereeCommand(RefereeCommand::HALT);
+    EXPECT_EQ(world.gameState().getRefereeCommand(), RefereeCommand::HALT);
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE - 1; i++)
     {
-        world.updateRefboxGameState(RefboxGameState::FORCE_START);
-        EXPECT_NE(world.gameState().getRefboxGameState(), RefboxGameState::FORCE_START);
+        world.updateRefereeCommand(RefereeCommand::FORCE_START);
+        EXPECT_NE(world.gameState().getRefereeCommand(), RefereeCommand::FORCE_START);
     }
 
-    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE; i++)
     {
-        world.updateRefboxGameState(RefboxGameState::FORCE_START);
-        EXPECT_EQ(world.gameState().getRefboxGameState(), RefboxGameState::FORCE_START);
+        world.updateRefereeCommand(RefereeCommand::FORCE_START);
+        EXPECT_EQ(world.gameState().getRefereeCommand(), RefereeCommand::FORCE_START);
     }
 
-    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE - 1; i++)
     {
-        world.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_US, Point(0, 0));
-        EXPECT_NE(world.gameState().getRefboxGameState(),
-                  RefboxGameState::BALL_PLACEMENT_US);
+        world.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US, Point(0, 0));
+        EXPECT_NE(world.gameState().getRefereeCommand(),
+                  RefereeCommand::BALL_PLACEMENT_US);
     }
 
-    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE; i++)
     {
-        world.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_US, Point(0, 0));
-        EXPECT_EQ(world.gameState().getRefboxGameState(),
-                  RefboxGameState::BALL_PLACEMENT_US);
+        world.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US, Point(0, 0));
+        EXPECT_EQ(world.gameState().getRefereeCommand(),
+                  RefereeCommand::BALL_PLACEMENT_US);
     }
 }
 
 TEST_F(WorldTest, update_refbox_stage)
 {
-    world.updateRefboxStage(RefboxStage::NORMAL_FIRST_HALF_PRE);
-    EXPECT_EQ(world.getRefboxStage(), RefboxStage::NORMAL_FIRST_HALF_PRE);
-    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
+    world.updateRefereeStage(RefereeStage::NORMAL_FIRST_HALF_PRE);
+    EXPECT_EQ(world.getRefereeStage(), RefereeStage::NORMAL_FIRST_HALF_PRE);
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE - 1; i++)
     {
-        world.updateRefboxStage(RefboxStage::NORMAL_FIRST_HALF);
-        EXPECT_NE(world.getRefboxStage(), RefboxStage::NORMAL_FIRST_HALF);
+        world.updateRefereeStage(RefereeStage::NORMAL_FIRST_HALF);
+        EXPECT_NE(world.getRefereeStage(), RefereeStage::NORMAL_FIRST_HALF);
     }
 
-    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE; i++)
     {
-        world.updateRefboxStage(RefboxStage::NORMAL_FIRST_HALF);
-        EXPECT_EQ(world.getRefboxStage(), RefboxStage::NORMAL_FIRST_HALF);
+        world.updateRefereeStage(RefereeStage::NORMAL_FIRST_HALF);
+        EXPECT_EQ(world.getRefereeStage(), RefereeStage::NORMAL_FIRST_HALF);
     }
 
-    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE - 1; i++)
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE - 1; i++)
     {
-        world.updateRefboxStage(RefboxStage::NORMAL_SECOND_HALF_PRE);
-        EXPECT_NE(world.getRefboxStage(), RefboxStage::NORMAL_SECOND_HALF_PRE);
+        world.updateRefereeStage(RefereeStage::NORMAL_SECOND_HALF_PRE);
+        EXPECT_NE(world.getRefereeStage(), RefereeStage::NORMAL_SECOND_HALF_PRE);
     }
 
-    for (unsigned int i = 0; i < World::REFBOX_GAMESTATE_BUFFER_SIZE; i++)
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE; i++)
     {
-        world.updateRefboxStage(RefboxStage::NORMAL_SECOND_HALF_PRE);
-        EXPECT_EQ(world.getRefboxStage(), RefboxStage::NORMAL_SECOND_HALF_PRE);
+        world.updateRefereeStage(RefereeStage::NORMAL_SECOND_HALF_PRE);
+        EXPECT_EQ(world.getRefereeStage(), RefereeStage::NORMAL_SECOND_HALF_PRE);
     }
 }

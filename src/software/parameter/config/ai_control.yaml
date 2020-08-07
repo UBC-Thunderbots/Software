@@ -30,23 +30,23 @@ AIControlConfig:
         - "ShootOrChip Play"
     description: >-
         Specifies the ai play that should be in use
-  OverrideRefboxGameState:
+  OverrideRefereeCommand:
     type: "bool"
     default: false
     description: >-
-        Overrides the current refbox game state with the play 
-        specified by CurrentRefboxGameState and PreviousRefboxGameState
+        Overrides the current referee command with the play 
+        specified by CurrentRefereeCommand and PreviousRefereeCommand
         parameter
-  CurrentRefboxGameState:
+  CurrentRefereeCommand:
     type: "std::string"
     default: "Halt"
     description: >-
-        Specifies the refbox game state that should be in use
-  PreviousRefboxGameState:
+        Specifies the referee command that should be in use
+  PreviousRefereeCommand:
     type: "std::string"
     default: "Halt"
     description: >-
-        Specifies the previous refbox game state to correctly set up 
+        Specifies the previous referee command to correctly set up 
         the game state state machine when overriding game state. For 
         example, if `PREPARE_KICKOFF_US` followed by `NORMAL_START`, 
         then `isOurRestart()` will be `true`, while 

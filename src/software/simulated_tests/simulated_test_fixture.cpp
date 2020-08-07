@@ -96,19 +96,19 @@ void SimulatedTestFixture::setAIPlay(const std::string &ai_play)
         ->setValue(ai_play);
 }
 
-void SimulatedTestFixture::setRefboxGameState(
-    const RefboxGameState &current_refbox_game_state,
-    const RefboxGameState &previous_refbox_game_state)
+void SimulatedTestFixture::setRefereeCommand(
+    const RefereeCommand &current_referee_command,
+    const RefereeCommand &previous_referee_command)
 {
     MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideRefboxGameState()
+        ->mutableOverrideRefereeCommand()
         ->setValue(true);
     MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentRefboxGameState()
-        ->setValue(toString(current_refbox_game_state));
+        ->mutableCurrentRefereeCommand()
+        ->setValue(toString(current_referee_command));
     MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutablePreviousRefboxGameState()
-        ->setValue(toString(previous_refbox_game_state));
+        ->mutablePreviousRefereeCommand()
+        ->setValue(toString(previous_referee_command));
 }
 
 void SimulatedTestFixture::enableVisualizer()

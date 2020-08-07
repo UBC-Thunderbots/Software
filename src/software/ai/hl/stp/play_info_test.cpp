@@ -4,17 +4,17 @@
 
 #include <string>
 
-TEST(PlayInfoTest, get_refbox_game_state_name_works)
+TEST(PlayInfoTest, get_referee_command_name_works)
 {
     std::string s, empty;
     s                                         = "new type";
     empty                                     = "";
     PlayInfo test_play_info                   = PlayInfo();
     PlayInfo custom_play_info                 = PlayInfo(s, empty, {});
-    std::string test_refbox_game_state_name   = test_play_info.getRefboxGameStateName();
-    std::string custom_refbox_game_state_name = custom_play_info.getRefboxGameStateName();
-    EXPECT_EQ(test_refbox_game_state_name, "");
-    EXPECT_EQ(custom_refbox_game_state_name, "new type");
+    std::string test_referee_command_name   = test_play_info.getRefereeCommandName();
+    std::string custom_referee_command_name = custom_play_info.getRefereeCommandName();
+    EXPECT_EQ(test_referee_command_name, "");
+    EXPECT_EQ(custom_referee_command_name, "new type");
 }
 
 TEST(PlayInfoTest, get_play_name_works)

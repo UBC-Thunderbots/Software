@@ -29,8 +29,8 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
     }));
     setEnemyGoalie(0);
     setAIPlay(PenaltyKickEnemyPlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START,
-                       RefboxGameState::PREPARE_PENALTY_THEM);
+    setRefereeCommand(RefereeCommand::NORMAL_START,
+                       RefereeCommand::PREPARE_PENALTY_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

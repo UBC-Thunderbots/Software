@@ -153,7 +153,7 @@ void GameState::setBallPlacementPoint(Point placement_point)
 }
 
 // apologies for this monster switch statement
-void GameState::updateRefboxGameState(RefboxGameState game_state)
+void GameState::updateRefereeCommand(RefereeCommand game_state)
 {
     if (game_state != game_state_)
     {
@@ -161,90 +161,90 @@ void GameState::updateRefboxGameState(RefboxGameState game_state)
 
         switch (game_state)
         {
-            case RefboxGameState::HALT:
+            case RefereeCommand::HALT:
                 state_          = HALT;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::STOP:
+            case RefereeCommand::STOP:
                 state_          = STOP;
                 restart_reason_ = NONE;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::NORMAL_START:
+            case RefereeCommand::NORMAL_START:
                 state_ = READY;
                 break;
-            case RefboxGameState::FORCE_START:
+            case RefereeCommand::FORCE_START:
                 state_          = PLAYING;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::PREPARE_KICKOFF_US:
+            case RefereeCommand::PREPARE_KICKOFF_US:
                 state_          = SETUP;
                 restart_reason_ = KICKOFF;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::PREPARE_KICKOFF_THEM:
+            case RefereeCommand::PREPARE_KICKOFF_THEM:
                 state_          = SETUP;
                 restart_reason_ = KICKOFF;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::PREPARE_PENALTY_US:
+            case RefereeCommand::PREPARE_PENALTY_US:
                 state_          = SETUP;
                 restart_reason_ = PENALTY;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::PREPARE_PENALTY_THEM:
+            case RefereeCommand::PREPARE_PENALTY_THEM:
                 state_          = SETUP;
                 restart_reason_ = PENALTY;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::DIRECT_FREE_US:
+            case RefereeCommand::DIRECT_FREE_US:
                 state_          = READY;
                 restart_reason_ = DIRECT;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::DIRECT_FREE_THEM:
+            case RefereeCommand::DIRECT_FREE_THEM:
                 state_          = READY;
                 restart_reason_ = DIRECT;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::INDIRECT_FREE_US:
+            case RefereeCommand::INDIRECT_FREE_US:
                 state_          = READY;
                 restart_reason_ = INDIRECT;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::INDIRECT_FREE_THEM:
+            case RefereeCommand::INDIRECT_FREE_THEM:
                 state_          = READY;
                 restart_reason_ = INDIRECT;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::TIMEOUT_US:
+            case RefereeCommand::TIMEOUT_US:
                 state_          = HALT;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::TIMEOUT_THEM:
+            case RefereeCommand::TIMEOUT_THEM:
                 state_          = HALT;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::GOAL_US:
+            case RefereeCommand::GOAL_US:
                 state_          = STOP;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::GOAL_THEM:
+            case RefereeCommand::GOAL_THEM:
                 state_          = STOP;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::BALL_PLACEMENT_US:
+            case RefereeCommand::BALL_PLACEMENT_US:
                 state_          = SETUP;
                 restart_reason_ = BALL_PLACEMENT;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::BALL_PLACEMENT_THEM:
+            case RefereeCommand::BALL_PLACEMENT_THEM:
                 state_          = SETUP;
                 restart_reason_ = BALL_PLACEMENT;
                 our_restart_    = false;
                 break;
             default:
-                LOG(WARNING) << "Unrecognized RefboxGameState" << std::endl;
+                LOG(WARNING) << "Unrecognized RefereeCommand" << std::endl;
                 break;
         }
     }
@@ -273,7 +273,7 @@ GameState::RestartReason GameState::getRestartReason() const
     return restart_reason_;
 }
 
-const RefboxGameState& GameState::getRefboxGameState() const
+const RefereeCommand& GameState::getRefereeCommand() const
 {
     return game_state_;
 }

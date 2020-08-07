@@ -34,20 +34,20 @@ void STP::updateSTPState(const World& world)
 void STP::updateGameState(const World& world)
 {
     current_game_state = world.gameState();
-    if (control_config->OverrideRefboxGameState()->value())
+    if (control_config->OverrideRefereeCommand()->value())
     {
         std::string previous_state_string =
-            control_config->PreviousRefboxGameState()->value();
+            control_config->PreviousRefereeCommand()->value();
         std::string current_state_string =
-            control_config->CurrentRefboxGameState()->value();
+            control_config->CurrentRefereeCommand()->value();
         try
         {
-            RefboxGameState previous_state =
-                fromStringToRefboxGameState(previous_state_string);
-            current_game_state.updateRefboxGameState(previous_state);
-            RefboxGameState current_state =
-                fromStringToRefboxGameState(current_state_string);
-            current_game_state.updateRefboxGameState(current_state);
+            RefereeCommand previous_state =
+                fromStringToRefereeCommand(previous_state_string);
+            current_game_state.updateRefereeCommand(previous_state);
+            RefereeCommand current_state =
+                fromStringToRefereeCommand(current_state_string);
+            current_game_state.updateRefereeCommand(current_state);
         }
         catch (std::invalid_argument e)
         {
@@ -349,11 +349,11 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    std::string info_refbox_game_state =
-        toString(current_game_state.getRefboxGameState());
+    std::string info_referee_command =
+        toString(current_game_state.getRefereeCommand());
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
     std::unordered_set<std::string> info_robot_tactic_assignment = {};
-    info = PlayInfo(info_refbox_game_state, info_play_name, info_robot_tactic_assignment);
+    info = PlayInfo(info_referee_command, info_play_name, info_robot_tactic_assignment);
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report
     // the tactics in order or robot id. This makes it much easier to read if tactics

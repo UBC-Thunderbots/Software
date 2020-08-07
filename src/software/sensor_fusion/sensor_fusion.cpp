@@ -31,7 +31,7 @@ std::optional<World> SensorFusion::getWorld() const
         new_world.updateGameState(game_state);
         if (refbox_stage)
         {
-            new_world.updateRefboxStage(*refbox_stage);
+            new_world.updateRefereeStage(*refbox_stage);
         }
         return new_world;
     }
@@ -86,12 +86,12 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
-        game_state.updateRefboxGameState(
-            createRefboxGameState(packet, TeamColour::YELLOW));
+        game_state.updateRefereeCommand(
+            createRefereeCommand(packet, TeamColour::YELLOW));
     }
     else
     {
-        game_state.updateRefboxGameState(createRefboxGameState(packet, TeamColour::BLUE));
+        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
     }
 
     if (game_state.isOurBallPlacement())
@@ -109,7 +109,7 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
         }
     }
 
-    refbox_stage = createRefboxStage(packet);
+    refbox_stage = createRefereeStage(packet);
 }
 
 void SensorFusion::updateWorld(

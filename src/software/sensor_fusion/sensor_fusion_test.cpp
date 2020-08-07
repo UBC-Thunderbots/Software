@@ -259,10 +259,10 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
     // TODO (Issue #960): Dependency inject config so that we don't have to implicitly
     // assume that friendly is yellow
     GameState expected_1;
-    expected_1.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_US);
+    expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
 
     GameState expected_2 = expected_1;
-    expected_2.updateRefboxGameState(RefboxGameState::NORMAL_START);
+    expected_2.updateRefereeCommand(RefereeCommand::NORMAL_START);
 
     SensorMsg sensor_msg_1;
     auto ssl_wrapper_packet =
@@ -286,10 +286,10 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
     // TODO (Issue #960): Dependency inject config so that we don't have to implicitly
     // assume that friendly is yellow
     GameState expected_1;
-    expected_1.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_THEM);
+    expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_THEM);
 
     GameState expected_2 = expected_1;
-    expected_2.updateRefboxGameState(RefboxGameState::NORMAL_START);
+    expected_2.updateRefereeCommand(RefereeCommand::NORMAL_START);
 
     SensorMsg sensor_msg_1;
     auto ssl_wrapper_packet =

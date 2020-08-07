@@ -10,7 +10,6 @@
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
-#include "software/sensor_fusion/refbox_data.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
@@ -105,7 +104,7 @@ class SensorFusion
     Team friendly_team;
     Team enemy_team;
     GameState game_state;
-    std::optional<RefboxStage> refbox_stage;
+    std::optional<RefereeStage> refbox_stage;
 
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;

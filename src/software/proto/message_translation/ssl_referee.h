@@ -2,29 +2,29 @@
 
 #include "software/geom/point.h"
 #include "software/proto/ssl_referee.pb.h"
-#include "software/sensor_fusion/refbox_data.h"
+#include "software/world/game_state.h"
 #include "software/world/team_colour.h"
 
 /**
- * Converts a SSL_Referee packet into a RefboxGameState for the Refbox command contained
+ * Converts a SSL_Referee packet into a RefereeCommand for the Refbox command contained
  * in the packet, based on which team we are (blue or yellow).
  *
  * @param packet SSL_Referee protobuf
  * @param team_colour the team colour to get game state for
  *
- * @return RefboxGameState from command
+ * @return RefereeCommand from command
  */
-RefboxGameState createRefboxGameState(const SSL_Referee &packet, TeamColour team_colour);
+RefereeCommand createRefereeCommand(const SSL_Referee &packet, TeamColour team_colour);
 
 /**
  * Converts a SSL_Referee protobuf Stage contained in the SSL_Referee packet into a
- * RefboxStage
+ * RefereeStage
  *
  * @param packet SSL_Referee protobuf
  *
- * @return RefboxStage from stage
+ * @return RefereeStage from stage
  */
-RefboxStage createRefboxStage(const SSL_Referee &packet);
+RefereeStage createRefereeStage(const SSL_Referee &packet);
 
 /**
  * Extracts the ball placement point from SSL_Referee packet
