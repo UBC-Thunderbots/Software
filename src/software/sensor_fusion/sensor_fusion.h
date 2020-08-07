@@ -16,8 +16,7 @@
 
 /**
  * Sensor Fusion is an abstraction around all filtering operations that our system may
- * need to perform. It produces Worlds that may be used, and consumes vision detections,
- * refbox data, and robot statuses
+ * need to perform. It produces Worlds that may be used, and consumes SensorMsgs
  */
 class SensorFusion
 {
@@ -104,7 +103,7 @@ class SensorFusion
     Team friendly_team;
     Team enemy_team;
     GameState game_state;
-    std::optional<RefereeStage> refbox_stage;
+    std::optional<RefereeStage> referee_stage;
 
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;

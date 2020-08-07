@@ -18,8 +18,9 @@ TEST(GameStateTest, test_get_name_of_referee_command)
         }
         catch (std::exception &)
         {
-            ADD_FAILURE() << "Unexpected exception thrown while trying to get the refbox"
-                          << " gamestate name for " << i << std::endl;
+            ADD_FAILURE()
+                << "Unexpected exception thrown while trying to get the Refere Command for "
+                << i << std::endl;
         }
     }
 }
@@ -133,9 +134,9 @@ class GameStateTransitionTest : public ::testing::TestWithParam<StateTransitionT
 
 TEST_P(GameStateTransitionTest, test_state_transitions)
 {
-    RefereeCommand start_state             = std::get<0>(GetParam());
-    RefereeCommand update_state            = std::get<1>(GetParam());
-    RefereeCommand end_state               = std::get<2>(GetParam());
+    RefereeCommand start_state              = std::get<0>(GetParam());
+    RefereeCommand update_state             = std::get<1>(GetParam());
+    RefereeCommand end_state                = std::get<2>(GetParam());
     bool our_restart                        = std::get<3>(GetParam());
     GameState::RestartReason restart_reason = std::get<4>(GetParam());
     Ball ball(Point(), Vector(), Timestamp::fromSeconds(0));
@@ -162,10 +163,10 @@ TEST_P(GameStateTransitionTest, test_state_transitions)
  */
 
 #define STATE_TRANSITION_PARAMS(start, update, end, our_restart, restart_reason)         \
-    std::make_tuple<RefereeCommand, RefereeCommand, RefereeCommand, bool,             \
+    std::make_tuple<RefereeCommand, RefereeCommand, RefereeCommand, bool,                \
                     GameState::RestartReason>(                                           \
-        RefereeCommand::start, RefereeCommand::update, RefereeCommand::end,           \
-        our_restart, GameState::RestartReason::restart_reason)
+        RefereeCommand::start, RefereeCommand::update, RefereeCommand::end, our_restart, \
+        GameState::RestartReason::restart_reason)
 
 INSTANTIATE_TEST_CASE_P(
     All, GameStateTransitionTest,
@@ -262,23 +263,23 @@ class GameStatePredicateTest : public ::testing::Test
     TEST_F(GameStatePredicateTest, predicate##_test)                                     \
     {                                                                                    \
         Ball ball(Point(), Vector(), Timestamp::fromSeconds(0));                         \
-        std::set<RefereeCommand> true_states = {__VA_ARGS__};                           \
-        for (auto referee_command : allRefereeCommands)                               \
+        std::set<RefereeCommand> true_states = {__VA_ARGS__};                            \
+        for (auto referee_command : allRefereeCommands)                                  \
         {                                                                                \
             GameState game_state;                                                        \
-            game_state.updateRefereeCommand(referee_command);                         \
+            game_state.updateRefereeCommand(referee_command);                            \
             game_state.updateBall(ball);                                                 \
-            if (true_states.find(referee_command) != true_states.end())                \
+            if (true_states.find(referee_command) != true_states.end())                  \
             {                                                                            \
                 EXPECT_TRUE(game_state.predicate())                                      \
                     << "Expected " << #predicate << " to be true for state "             \
-                    << referee_command << std::endl;                                   \
+                    << referee_command << std::endl;                                     \
             }                                                                            \
             else                                                                         \
             {                                                                            \
                 EXPECT_FALSE(game_state.predicate())                                     \
                     << "Expected " << #predicate << " to be false for state "            \
-                    << referee_command << std::endl;                                   \
+                    << referee_command << std::endl;                                     \
             }                                                                            \
         }                                                                                \
     }

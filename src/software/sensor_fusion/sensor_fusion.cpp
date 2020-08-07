@@ -10,7 +10,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       friendly_team(),
       enemy_team(),
       game_state(),
-      refbox_stage(std::nullopt),
+      referee_stage(std::nullopt),
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
@@ -29,9 +29,9 @@ std::optional<World> SensorFusion::getWorld() const
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
-        if (refbox_stage)
+        if (referee_stage)
         {
-            new_world.updateRefereeStage(*refbox_stage);
+            new_world.updateRefereeStage(*referee_stage);
         }
         return new_world;
     }
@@ -48,9 +48,9 @@ void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
         updateWorld(sensor_msg.ssl_vision_msg());
     }
 
-    if (sensor_msg.has_ssl_refbox_msg())
+    if (sensor_msg.has_ssl_referee_msg())
     {
-        updateWorld(sensor_msg.ssl_refbox_msg());
+        updateWorld(sensor_msg.ssl_referee_msg());
     }
 
     updateWorld(sensor_msg.robot_status_msgs());
@@ -86,8 +86,7 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
-        game_state.updateRefereeCommand(
-            createRefereeCommand(packet, TeamColour::YELLOW));
+        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
     }
     else
     {
@@ -109,7 +108,7 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
         }
     }
 
-    refbox_stage = createRefereeStage(packet);
+    referee_stage = createRefereeStage(packet);
 }
 
 void SensorFusion::updateWorld(

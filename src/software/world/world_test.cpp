@@ -175,7 +175,7 @@ TEST_F(WorldTest, update_referee_command)
     }
 }
 
-TEST_F(WorldTest, update_refbox_stage)
+TEST_F(WorldTest, update_referee_stage)
 {
     world.updateRefereeStage(RefereeStage::NORMAL_FIRST_HALF_PRE);
     EXPECT_EQ(world.getRefereeStage(), RefereeStage::NORMAL_FIRST_HALF_PRE);

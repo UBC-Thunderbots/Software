@@ -17,6 +17,6 @@ void Backend::receiveSSLWrapperPacket(SSL_WrapperPacket msg)
 void Backend::receiveSSLReferee(SSL_Referee msg)
 {
     SensorMsg sensor_msg;
-    *(sensor_msg.mutable_ssl_refbox_msg()) = msg;
+    *(sensor_msg.mutable_ssl_referee_msg()) = msg;
     Subject<SensorMsg>::sendValueToObservers(sensor_msg);
 }

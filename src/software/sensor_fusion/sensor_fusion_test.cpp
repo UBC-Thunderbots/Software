@@ -268,14 +268,14 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
     auto ssl_wrapper_packet =
         createWrapperPacket(std::move(geom_data), std::move(detection_frame));
     // set vision msg so that world is valid
-    *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_yellow;
+    *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
+    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_yellow;
     sensor_fusion.updateWorld(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
     SensorMsg sensor_msg_2;
-    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
+    *(sensor_msg_2.mutable_ssl_referee_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_2, result_2.gameState());
@@ -295,14 +295,14 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
     auto ssl_wrapper_packet =
         createWrapperPacket(std::move(geom_data), std::move(detection_frame));
     // set vision msg so that world is valid
-    *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_blue;
+    *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
+    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_blue;
     sensor_fusion.updateWorld(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
     SensorMsg sensor_msg_2;
-    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
+    *(sensor_msg_2.mutable_ssl_referee_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_2, result_2.gameState());

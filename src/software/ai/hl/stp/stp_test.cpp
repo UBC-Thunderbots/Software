@@ -159,7 +159,7 @@ TEST_F(STPTest, test_get_play_info)
     auto play_info = stp.getPlayInfo();
     PlayInfo expected_play_info;
     std::string expected_referee_command, expected_play_name;
-    expected_referee_command                                       = "HALT";
+    expected_referee_command                                         = "HALT";
     expected_play_name                                               = "Halt Test Play";
     std::unordered_set<std::string> expected_robot_tactic_assignment = {
         "Robot 0  -  Stop Test Tactic", "Robot 1  -  Stop Test Tactic"};

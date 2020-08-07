@@ -105,7 +105,7 @@ class SimulatedTestFixture : public ::testing::Test
      * @param previous_referee_command The name of the previous game state to set
      */
     void setRefereeCommand(const RefereeCommand& current_referee_command,
-                            const RefereeCommand& previous_referee_command);
+                           const RefereeCommand& previous_referee_command);
 
     /**
      * Returns the field in the simulated test

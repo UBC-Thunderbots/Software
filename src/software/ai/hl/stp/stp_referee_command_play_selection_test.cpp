@@ -222,8 +222,7 @@ class STPRefereeCommandPlaySelectionTest
     World world = ::TestUtil::createBlankTestingWorld();
 };
 
-TEST_P(STPRefereeCommandPlaySelectionTest,
-       test_play_selection_for_all_referee_commands)
+TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_commands)
 {
     // TODO (Issue #1330): replace the ball with real parameterized values
     world.updateRefereeCommand(GetParam());

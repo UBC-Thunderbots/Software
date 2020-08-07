@@ -7,10 +7,10 @@
 TEST(PlayInfoTest, get_referee_command_name_works)
 {
     std::string s, empty;
-    s                                         = "new type";
-    empty                                     = "";
-    PlayInfo test_play_info                   = PlayInfo();
-    PlayInfo custom_play_info                 = PlayInfo(s, empty, {});
+    s                                       = "new type";
+    empty                                   = "";
+    PlayInfo test_play_info                 = PlayInfo();
+    PlayInfo custom_play_info               = PlayInfo(s, empty, {});
     std::string test_referee_command_name   = test_play_info.getRefereeCommandName();
     std::string custom_referee_command_name = custom_play_info.getRefereeCommandName();
     EXPECT_EQ(test_referee_command_name, "");

@@ -23,8 +23,7 @@ const static std::unordered_map<SSL_Referee::Command, RefereeCommand>
         {SSL_Referee_Command_GOAL_BLUE, RefereeCommand::GOAL_US},
         {SSL_Referee_Command_GOAL_YELLOW, RefereeCommand::GOAL_THEM},
         {SSL_Referee_Command_BALL_PLACEMENT_BLUE, RefereeCommand::BALL_PLACEMENT_US},
-        {SSL_Referee_Command_BALL_PLACEMENT_YELLOW,
-         RefereeCommand::BALL_PLACEMENT_THEM}};
+        {SSL_Referee_Command_BALL_PLACEMENT_YELLOW, RefereeCommand::BALL_PLACEMENT_THEM}};
 
 // this maps a protobuf SSL_Referee_Command enum to its equivalent internal type
 // this map is used when we are on the yellow team
@@ -62,7 +61,7 @@ RefereeCommand createRefereeCommand(const SSL_Referee &packet, TeamColour team_c
 }
 
 // this maps a protobuf SSL_Referee_Stage enum to its RefereeStage equivalent
-const static std::unordered_map<SSL_Referee::Stage, RefereeStage> refbox_stage_map = {
+const static std::unordered_map<SSL_Referee::Stage, RefereeStage> referee_stage_map = {
     {SSL_Referee_Stage_NORMAL_FIRST_HALF_PRE, RefereeStage::NORMAL_FIRST_HALF_PRE},
     {SSL_Referee_Stage_NORMAL_FIRST_HALF, RefereeStage::NORMAL_FIRST_HALF},
     {SSL_Referee_Stage_NORMAL_HALF_TIME, RefereeStage::NORMAL_HALF_TIME},
@@ -80,7 +79,7 @@ const static std::unordered_map<SSL_Referee::Stage, RefereeStage> refbox_stage_m
 
 RefereeStage createRefereeStage(const SSL_Referee &packet)
 {
-    return refbox_stage_map.at(packet.stage());
+    return referee_stage_map.at(packet.stage());
 }
 
 std::optional<Point> getBallPlacementPoint(const SSL_Referee &packet)

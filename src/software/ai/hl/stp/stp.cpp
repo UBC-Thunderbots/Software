@@ -349,8 +349,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    std::string info_referee_command =
-        toString(current_game_state.getRefereeCommand());
+    std::string info_referee_command = toString(current_game_state.getRefereeCommand());
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
     std::unordered_set<std::string> info_robot_tactic_assignment = {};
     info = PlayInfo(info_referee_command, info_play_name, info_robot_tactic_assignment);

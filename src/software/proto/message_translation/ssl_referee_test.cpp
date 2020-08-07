@@ -10,9 +10,9 @@ class RefereeStageTest
 {
 };
 
-TEST_P(RefereeStageTest, test_refbox_stage)
+TEST_P(RefereeStageTest, test_referee_stage)
 {
-    RefereeStage expected    = std::get<0>(GetParam());
+    RefereeStage expected   = std::get<0>(GetParam());
     SSL_Referee_Stage input = std::get<1>(GetParam());
 
     SSL_Referee ref;
@@ -59,7 +59,7 @@ class RefereeCommandTest
 
 TEST_P(RefereeCommandTest, test_referee_command)
 {
-    RefereeCommand expected  = std::get<0>(GetParam());
+    RefereeCommand expected   = std::get<0>(GetParam());
     SSL_Referee_Command input = std::get<1>(GetParam());
     TeamColour team_colour    = std::get<2>(GetParam());
 
@@ -81,10 +81,8 @@ INSTANTIATE_TEST_CASE_P(
                         TeamColour::YELLOW),
         std::make_tuple(RefereeCommand::FORCE_START, SSL_Referee_Command_FORCE_START,
                         TeamColour::YELLOW),
-        std::make_tuple(RefereeCommand::HALT, SSL_Referee_Command_HALT,
-                        TeamColour::BLUE),
-        std::make_tuple(RefereeCommand::STOP, SSL_Referee_Command_STOP,
-                        TeamColour::BLUE),
+        std::make_tuple(RefereeCommand::HALT, SSL_Referee_Command_HALT, TeamColour::BLUE),
+        std::make_tuple(RefereeCommand::STOP, SSL_Referee_Command_STOP, TeamColour::BLUE),
         std::make_tuple(RefereeCommand::NORMAL_START, SSL_Referee_Command_NORMAL_START,
                         TeamColour::BLUE),
         std::make_tuple(RefereeCommand::FORCE_START, SSL_Referee_Command_FORCE_START,

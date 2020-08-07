@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/geom/point.h"
-#include "software/world/ball.h"
 #include "software/util/make_enum/make_enum.h"
+#include "software/world/ball.h"
 
 // clang-format off
 MAKE_ENUM(RefereeCommand,
@@ -71,7 +71,7 @@ MAKE_ENUM(RefereeStage,
  * @details Contains information on what period of the game it is, what type of
  * play to run, team scores, time remaining, etc.  During normal gameplay, the
  * information in this class is received from the
- * [ssl-refbox](https://github.com/RoboCup-SSL/ssl-refbox)
+ * [ssl-game-controller](https://github.com/RoboCup-SSL/ssl-game-controller)
  * program over the network.
  *
  * Taken from https://github.com/RoboJackets/robocup-software/
@@ -202,7 +202,7 @@ class GameState
      * we get an indirect kick
      * This function will have undefined behaviour if a restart is
      * not being prepared for or occurring, such as after a transition to
-     * HALT or STOP, because of how Refbox state transitions work.
+     * HALT or STOP, because of how GameController state transitions work.
      *
      * @return true if our team is doing the restart
      */
