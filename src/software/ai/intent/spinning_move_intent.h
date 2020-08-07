@@ -42,4 +42,14 @@ class SpinningMoveIntent : public Intent
      * @return true if the SpinningMoveIntents are not equal and false otherwise
      */
     bool operator!=(const SpinningMoveIntent& other) const;
+
+    /**
+     * Generates PrimitiveMsg from this Intent
+     *
+     * @return The PrimitiveMsg that represents this Intent
+     */
+    PrimitiveMsg generatePrimitiveMsg();
+
+   private:
+    PrimitiveMsg primitive_msg;
 };

@@ -39,29 +39,11 @@ cc_test(
 )
 
 cc_library(
-    name = "navigating_intent",
-    srcs = ["navigating_intent.cpp"],
-    hdrs = ["navigating_intent.h"],
-    deps = [
-        ":intent",
-    ],
-)
-
-cc_test(
-    name = "navigating_intent_test",
-    srcs = ["navigating_intent_test.cpp"],
-    deps = [
-        ":move_intent",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "move_intent",
     srcs = ["move_intent.cpp"],
     hdrs = ["move_intent.h"],
     deps = [
-        ":navigating_intent",
+        ":intent",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/primitive:move_primitive",

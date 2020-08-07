@@ -37,4 +37,14 @@ class StopIntent : public Intent
      * @return true if the StopIntents are not equal and false otherwise
      */
     bool operator!=(const StopIntent& other) const;
+
+    /**
+     * Generates PrimitiveMsg from this Intent
+     *
+     * @return The PrimitiveMsg that represents this Intent
+     */
+    PrimitiveMsg generatePrimitiveMsg();
+
+   private:
+    PrimitiveMsg primitive_msg;
 };

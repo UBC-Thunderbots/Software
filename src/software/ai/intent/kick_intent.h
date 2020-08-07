@@ -42,4 +42,14 @@ class KickIntent : public Intent
      * @return true if the KickIntents are not equal and false otherwise
      */
     bool operator!=(const KickIntent& other) const;
+
+    /**
+     * Generates PrimitiveMsg from this Intent
+     *
+     * @return The PrimitiveMsg that represents this Intent
+     */
+    PrimitiveMsg generatePrimitiveMsg();
+
+   private:
+    PrimitiveMsg primitive_msg;
 };

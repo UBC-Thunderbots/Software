@@ -27,9 +27,3 @@ TEST(KickIntentTest, test_inequality_operator_with_mismatched_priorities)
 
     EXPECT_NE(kick_intent, kick_intent_other);
 }
-
-TEST(KickIntentTest, test_get_navigator_params)
-{
-    KickIntent kick_intent = KickIntent(0, Point(), Angle::zero(), 0, 7);
-    EXPECT_FALSE(kick_intent.getNavigatorParams());
-}

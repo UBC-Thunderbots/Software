@@ -42,4 +42,14 @@ class ChipIntent : public Intent
      * @return true if the ChipIntents are not equal and false otherwise
      */
     bool operator!=(const ChipIntent& other) const;
+
+    /**
+     * Generates PrimitiveMsg from this Intent
+     *
+     * @return The PrimitiveMsg that represents this Intent
+     */
+    PrimitiveMsg generatePrimitiveMsg();
+
+   private:
+    PrimitiveMsg primitive_msg;
 };

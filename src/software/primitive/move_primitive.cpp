@@ -56,12 +56,6 @@ MoveType MovePrimitive::getMoveType() const
     return move_type;
 }
 
-void MovePrimitive::updateFinalSpeedAndDestination(Point dest, double final_speed)
-{
-    this->dest        = dest;
-    this->final_speed = final_speed;
-}
-
 void MovePrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);

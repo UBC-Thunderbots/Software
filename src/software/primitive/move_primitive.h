@@ -50,7 +50,6 @@ class MovePrimitive : public Primitive
      * @return The robot ID as an unsigned integer
      */
     unsigned int getRobotId() const override;
-
     /**
      * gets the robot's destination
      *
@@ -111,14 +110,6 @@ class MovePrimitive : public Primitive
      * @return true if the MovePrimitives are not equal and false otherwise
      */
     bool operator!=(const MovePrimitive &other) const;
-
-    /**
-     * Updates the primitive's destination and final speed in m/s
-     *
-     * @param dest The robots destination as a Point(X,Y)
-     * @param final_speed The robots speed in m/s
-     */
-    void updateFinalSpeedAndDestination(Point dest, double final_speed);
 
    private:
     unsigned int robot_id;

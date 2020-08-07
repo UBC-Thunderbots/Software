@@ -27,9 +27,3 @@ TEST(StopIntentTest, test_inequality_operator_with_mismatched_priorities)
 
     EXPECT_NE(stop_intent, stop_intent_other);
 }
-
-TEST(StopIntentTest, test_get_navigator_params)
-{
-    StopIntent stop_intent = StopIntent(0, false, 1);
-    EXPECT_FALSE(stop_intent.getNavigatorParams());
-}

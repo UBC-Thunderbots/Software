@@ -23,22 +23,10 @@ TEST(IntentTest, test_set_priority)
     EXPECT_EQ(7, stop_intent.getPriority());
 }
 
-TEST(IntentTest, test_get_primitive_msg)
-{
-    StopIntent stop_intent = StopIntent(1, false, 2);
-    EXPECT_TRUE(stop_intent.getPrimitiveMsg().has_stop());
-}
-
 TEST(IntentTest, test_get_robot_id)
 {
     StopIntent stop_intent = StopIntent(1, false, 2);
     EXPECT_EQ(stop_intent.getRobotId(), 1);
-}
-
-TEST(IntentTest, test_get_navigator_params)
-{
-    StopIntent stop_intent = StopIntent(0, false, 1);
-    EXPECT_FALSE(stop_intent.getNavigatorParams());
 }
 
 TEST(IntentTest, test_robot_id_inequality)

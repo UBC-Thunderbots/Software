@@ -13,24 +13,6 @@
 
 MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 
-// Lightweight data type to pass to the Navigator
-struct NavigatorParams
-{
-    Point destination;
-    double final_speed;
-    Angle final_angle;
-    BallCollisionType ball_collision_type;
-    std::set<MotionConstraint> motion_constraints;
-
-    bool operator==(const NavigatorParams& other) const
-    {
-        return destination == other.destination && final_speed == other.final_speed &&
-               final_angle == other.final_angle &&
-               ball_collision_type == other.ball_collision_type &&
-               motion_constraints == other.motion_constraints;
-    }
-};
-
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a
  * robot should do, not necessarily exactly how it will do it. Examples are shooting at
@@ -53,11 +35,13 @@ class Intent
      * priority. The priority value must be in the range [0, 100]
      *
      * @param robot_id The id of the Robot to run this Primitive
-     * @param primitive_msg The PrimitiveMsg that underlies this Intent
      * @param priority The priority of this Intent
+     * @param destination The destination of the Movement
+     * @param ball_collision_type how to navigate around the ball
      */
-    explicit Intent(unsigned int robot_id, PrimitiveMsg primitive_msg,
-                    unsigned int priority);
+    explicit Intent(unsigned int robot_id, unsigned int priority,
+                    BallCollisionType ball_collision_type = BallCollisionType::AVOID,
+                    std::optional<Point> destination      = std::nullopt);
 
     /**
      * Returns the name of this Intent
@@ -80,6 +64,27 @@ class Intent
      * @return The robot id
      */
     unsigned int getRobotId() const;
+
+    /**
+     * Gets the destination to navigate to
+     *
+     * @return The destination
+     */
+    std::optional<Point> getNavigationDestination() const;
+
+    /**
+     * Gets the ball collision type
+     *
+     * @return The ball collision type
+     */
+    BallCollisionType getBallCollisionType() const;
+
+    /**
+     * Get the constraints on this intent's motion
+     *
+     * @return motion constraints
+     */
+    std::set<MotionConstraint> getMotionConstraints(void) const;
 
     /**
      * Sets the priority of this Intent. The priority value must be an integer in the
@@ -109,33 +114,18 @@ class Intent
      *
      * @param motion_constraints
      */
-    virtual void setMotionConstraints(
-        const std::set<MotionConstraint>& motion_constraints);
-
-    /**
-     * Gets the navigator params if this intent requires navigation. For example,
-     * StopIntent does not need to navigate, while MoveIntent does.
-     *
-     * @return navigator params
-     */
-    virtual std::optional<NavigatorParams> getNavigatorParams() const;
-
-    /**
-     * Get PrimitiveMsg that underlies this Intent
-     *
-     * @return PrimitiveMsg
-     */
-    PrimitiveMsg getPrimitiveMsg() const;
+    void setMotionConstraints(const std::set<MotionConstraint>& motion_constraints);
 
     virtual ~Intent() = default;
 
    private:
+    unsigned int robot_id;
     /**
      * The priority of this intent. Must be in the range [0, 100]
      * higher value => higher priority
      */
     unsigned int priority;
-
-    unsigned int robot_id;
-    PrimitiveMsg primitive_msg;
+    std::optional<Point> navigation_destination;
+    BallCollisionType ball_collision_type;
+    std::set<MotionConstraint> motion_constraints;
 };
