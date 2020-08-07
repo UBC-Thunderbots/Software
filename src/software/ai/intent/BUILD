@@ -20,46 +20,6 @@ cc_test(
 )
 
 cc_library(
-    name = "direct_velocity_intent",
-    srcs = ["direct_velocity_intent.cpp"],
-    hdrs = ["direct_velocity_intent.h"],
-    deps = [
-        ":intent",
-        "//software/geom:angle",
-        "//software/geom:point",
-        "//software/primitive:direct_velocity_primitive",
-    ],
-)
-
-cc_test(
-    name = "direct_velocity_intent_test",
-    srcs = ["direct_velocity_intent_test.cpp"],
-    deps = [
-        ":direct_velocity_intent",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "direct_wheels_intent",
-    srcs = ["direct_wheels_intent.cpp"],
-    hdrs = ["direct_wheels_intent.h"],
-    deps = [
-        ":intent",
-        "//software/primitive:direct_wheels_primitive",
-    ],
-)
-
-cc_test(
-    name = "direct_wheels_intent_test",
-    srcs = ["direct_wheels_intent_test.cpp"],
-    deps = [
-        ":direct_wheels_intent",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "kick_intent",
     srcs = ["kick_intent.cpp"],
     hdrs = ["kick_intent.h"],
@@ -101,20 +61,20 @@ cc_test(
 )
 
 cc_library(
-    name = "movespin_intent",
-    srcs = ["movespin_intent.cpp"],
-    hdrs = ["movespin_intent.h"],
+    name = "spinning_move_intent",
+    srcs = ["spinning_move_intent.cpp"],
+    hdrs = ["spinning_move_intent.h"],
     deps = [
         ":intent",
-        "//software/primitive:movespin_primitive",
+        "//software/primitive:spinning_move_primitive",
     ],
 )
 
 cc_test(
-    name = "movespin_intent_test",
-    srcs = ["movespin_intent_test.cpp"],
+    name = "spinning_move_intent_test",
+    srcs = ["spinning_move_intent_test.cpp"],
     deps = [
-        ":movespin_intent",
+        ":spinning_move_intent",
         "@gtest//:gtest_main",
     ],
 )
@@ -143,11 +103,9 @@ cc_library(
     hdrs = ["all_intents.h"],
     deps = [
         ":chip_intent",
-        ":direct_velocity_intent",
-        ":direct_wheels_intent",
         ":kick_intent",
         ":move_intent",
-        ":movespin_intent",
+        ":spinning_move_intent",
         ":stop_intent",
     ],
 )

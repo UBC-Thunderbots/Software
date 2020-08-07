@@ -18,8 +18,8 @@ class SensorFusionTest : public ::testing::Test
           ball_state(Point(-1.2, 0), Vector(0.0, 0.0), 0.2),
           current_time(Timestamp::fromSeconds(8.03)),
           geom_data(initSSLDivBGeomData()),
-          tbots_robot_msg_id_1(initTbotsRobotMsgId1()),
-          tbots_robot_msg_id_2(initTbotsRobotMsgId2()),
+          robot_status_msg_id_1(initRobotStatusMsgId1()),
+          robot_status_msg_id_2(initRobotStatusMsgId2()),
           referee_indirect_yellow(initRefereeIndirectYellow()),
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart())
@@ -38,8 +38,9 @@ class SensorFusionTest : public ::testing::Test
     BallState ball_state;
     Timestamp current_time;
     std::unique_ptr<SSL_GeometryData> geom_data;
-    std::unique_ptr<TbotsRobotMsg> tbots_robot_msg_id_1;
-    std::unique_ptr<TbotsRobotMsg> tbots_robot_msg_id_2;
+    // world associated with geom_data and detection_frame only
+    std::unique_ptr<RobotStatusMsg> robot_status_msg_id_1;
+    std::unique_ptr<RobotStatusMsg> robot_status_msg_id_2;
     std::unique_ptr<SSL_Referee> referee_indirect_yellow;
     std::unique_ptr<SSL_Referee> referee_indirect_blue;
     std::unique_ptr<SSL_Referee> referee_normal_start;
@@ -176,9 +177,9 @@ class SensorFusionTest : public ::testing::Test
         return World(field, ball, friendly_team, enemy_team);
     }
 
-    std::unique_ptr<TbotsRobotMsg> initTbotsRobotMsgId1()
+    std::unique_ptr<RobotStatusMsg> initRobotStatusMsgId1()
     {
-        auto robot_msg = std::make_unique<TbotsRobotMsg>();
+        auto robot_msg = std::make_unique<RobotStatusMsg>();
 
         robot_msg->set_robot_id(1);
 
@@ -194,9 +195,9 @@ class SensorFusionTest : public ::testing::Test
         return std::move(robot_msg);
     }
 
-    std::unique_ptr<TbotsRobotMsg> initTbotsRobotMsgId2()
+    std::unique_ptr<RobotStatusMsg> initRobotStatusMsgId2()
     {
-        auto robot_msg = std::make_unique<TbotsRobotMsg>();
+        auto robot_msg = std::make_unique<RobotStatusMsg>();
 
         robot_msg->set_robot_id(2);
 
@@ -284,34 +285,34 @@ TEST_F(SensorFusionTest, test_complete_wrapper_packet)
     EXPECT_EQ(initWorld(), result);
 }
 
-TEST_F(SensorFusionTest, test_tbots_robot_msg_packet)
+TEST_F(SensorFusionTest, test_robot_status_msg_packet)
 {
     SensorMsg sensor_msg;
-    *(sensor_msg.add_tbots_robot_msgs()) = *tbots_robot_msg_id_1;
+    *(sensor_msg.add_robot_status_msgs()) = *robot_status_msg_id_1;
     sensor_fusion.updateWorld(sensor_msg);
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
 }
 
-TEST_F(SensorFusionTest, test_complete_wrapper_with_tbots_robot_msg_1_at_a_time)
+TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_1_at_a_time)
 {
     SensorMsg sensor_msg_1;
     auto ssl_wrapper_packet =
         createWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg_1.add_tbots_robot_msgs())   = *tbots_robot_msg_id_1;
+    *(sensor_msg_1.add_robot_status_msgs())  = *robot_status_msg_id_1;
     sensor_fusion.updateWorld(sensor_msg_1);
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result_1 = *sensor_fusion.getWorld();
     // TODO (Issue #1276): Add checks on the state of World
     SensorMsg sensor_msg_2;
-    *(sensor_msg_2.add_tbots_robot_msgs()) = *tbots_robot_msg_id_2;
+    *(sensor_msg_2.add_robot_status_msgs()) = *robot_status_msg_id_2;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     // TODO (Issue #1276): Add checks on the state of World
 }
 
-TEST_F(SensorFusionTest, test_complete_wrapper_with_tbots_robot_msg_2_at_a_time)
+TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time)
 {
     SensorMsg sensor_msg_1;
     auto ssl_wrapper_packet =
@@ -323,8 +324,8 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_tbots_robot_msg_2_at_a_time)
     World result_1 = *sensor_fusion.getWorld();
     // TODO (Issue #1276): Add checks on the state of World
     SensorMsg sensor_msg_2;
-    *(sensor_msg_2.add_tbots_robot_msgs()) = *tbots_robot_msg_id_1;
-    *(sensor_msg_2.add_tbots_robot_msgs()) = *tbots_robot_msg_id_2;
+    *(sensor_msg_2.add_robot_status_msgs()) = *robot_status_msg_id_1;
+    *(sensor_msg_2.add_robot_status_msgs()) = *robot_status_msg_id_2;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     // TODO (Issue #1276): Add checks on the state of World

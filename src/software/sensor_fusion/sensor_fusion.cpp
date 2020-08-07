@@ -28,7 +28,7 @@ std::optional<World> SensorFusion::getWorld() const
     if (field && ball)
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
-        new_world.mutableGameState() = game_state;
+        new_world.updateGameState(game_state);
         if (refbox_stage)
         {
             new_world.updateRefboxStage(*refbox_stage);
@@ -53,7 +53,7 @@ void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
         updateWorld(sensor_msg.ssl_refbox_msg());
     }
 
-    updateWorld(sensor_msg.tbots_robot_msgs());
+    updateWorld(sensor_msg.robot_status_msgs());
 }
 
 void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
@@ -114,9 +114,9 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
 }
 
 void SensorFusion::updateWorld(
-    const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs)
+    const google::protobuf::RepeatedPtrField<RobotStatusMsg> &robot_status_msgs)
 {
-    // TODO (issue #1149): incorporate TbotsRobotMsg into world and update world
+    // TODO (issue #1149): incorporate RobotStatusMsg into world and update world
 }
 
 void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)

@@ -197,9 +197,7 @@ void FreeKickPlay::chipAtGoalStage(
 
     do
     {
-        double chip_dist = (chip_target - world.ball().position()).length();
-
-        chip_tactic->updateControlParams(world.ball().position(), chip_target, chip_dist);
+        chip_tactic->updateControlParams(world.ball().position(), chip_target);
 
         yield({goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});

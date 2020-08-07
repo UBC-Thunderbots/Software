@@ -12,7 +12,7 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
                                  Angle min_net_open_angle,
                                  std::optional<Point> chip_target, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick}),
+    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -44,8 +44,8 @@ void ShootGoalTactic::updateControlParams(std::optional<Point> chip_target)
 
 double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
-    auto ball_intercept_opt = findBestInterceptForBall(
-        world.ball().currentState(), world.field(), robot.currentState());
+    auto ball_intercept_opt =
+        findBestInterceptForBall(world.ball(), world.field(), robot);
     double cost = 0;
     if (ball_intercept_opt)
     {
@@ -129,7 +129,7 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
             chip_action->updateControlParams(*robot, ball.position(),
-                                             shot_target->getPointToShootAt(), CHIP_DIST);
+                                             shot_target->getPointToShootAt());
             yield(chip_action);
         }
 
@@ -169,7 +169,7 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             Point fallback_chip_target =
                 chip_target ? *chip_target : field.enemyGoalCenter();
             chip_action->updateControlParams(*robot, ball.position(),
-                                             fallback_chip_target, CHIP_DIST);
+                                             fallback_chip_target);
             yield(chip_action);
         }
         else

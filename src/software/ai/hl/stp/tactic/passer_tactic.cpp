@@ -6,9 +6,8 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/logger/logger.h"
 
-PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
-                           bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick}),
+PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field, bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
       pass(std::move(pass)),
       ball(ball),
       field(field)
