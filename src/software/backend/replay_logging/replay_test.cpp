@@ -27,7 +27,7 @@ TEST(ReplayTest, test_read_and_write_replay)
     // unfortunately due to the unavailablity of ordering tests and functions that
     // generate test files that actually work, we have to read recorded replays back,
     // write them, and then read them again in the same test
-    // TODO: record replay_logging data with refbox running , see #1584
+    // TODO: record replay_logging data with the game controller running , see #1584
 
     std::vector<SensorMsg> read_replay_msgs;
 

@@ -100,9 +100,9 @@ class GameState
     };
 
     GameState()
-        : state_(HALT),
+        : play_state_(HALT),
           restart_reason_(NONE),
-          game_state_(RefereeCommand::HALT),
+          command_(RefereeCommand::HALT),
           ball_state_(std::nullopt),
           our_restart_(false),
           ball_placement_point_(std::nullopt)
@@ -399,9 +399,9 @@ class GameState
     void setBallPlacementPoint(Point placementPoint);
 
    private:
-    PlayState state_;
+    PlayState play_state_;
     RestartReason restart_reason_;
-    RefereeCommand game_state_;
+    RefereeCommand command_;
     std::optional<Ball> ball_state_;
 
     // True if our team can kick the ball during a restart

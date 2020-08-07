@@ -7,8 +7,9 @@
 #include "software/world/world.h"
 
 /**
- * A Backend is an abstraction around communication with robots, vision, and refbox. It
- * produces SensorMsgs, and consumes primitives that can be sent to the robots.
+ * A Backend is an abstraction around communication with robots, vision, and the
+ * gamecontroller (Referee). It produces SensorMsgs, and consumes primitives that can be
+ * sent to the robots.
  *
  * This produce/consume pattern is performed by extending both "Observer" and
  * "Subject". Please see the implementation of those classes for details.

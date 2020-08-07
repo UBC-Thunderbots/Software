@@ -127,15 +127,15 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
         sensor_fusion_config->IgnoreInvalidCameraData()->value();
 
     // We invert the field side if we explicitly choose to override the values
-    // provided by refbox. The 'defending_positive_side' parameter dictates the side
-    // we are defending if we are overriding the value
+    // provided by the game controller. The 'defending_positive_side' parameter dictates
+    // the side we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    const bool override_refbox_defending_side =
-        sensor_fusion_config->OverrideRefboxDefendingSide()->value();
+    const bool override_game_controller_defending_side =
+        sensor_fusion_config->OverrideGameControllerDefendingSide()->value();
     const bool defending_positive_side =
         sensor_fusion_config->DefendingPositiveSide()->value();
     const bool should_invert_field =
-        override_refbox_defending_side && defending_positive_side;
+        override_game_controller_defending_side && defending_positive_side;
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960

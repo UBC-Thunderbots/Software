@@ -6,8 +6,8 @@
 #include "software/world/team_colour.h"
 
 /**
- * Converts a SSL_Referee packet into a RefereeCommand for the Refbox command contained
- * in the packet, based on which team we are (blue or yellow).
+ * Converts a SSL_Referee packet into a RefereeCommand for the GameController command
+ * contained in the packet, based on which team we are (blue or yellow).
  *
  * @param packet SSL_Referee protobuf
  * @param team_colour the team colour to get game state for

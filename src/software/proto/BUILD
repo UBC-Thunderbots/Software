@@ -8,7 +8,6 @@ proto_library(
         "messages_robocup_ssl_detection.proto",
         "messages_robocup_ssl_geometry.proto",
         "messages_robocup_ssl_wrapper.proto",
-        "ssl_game_controller_common.proto",
         "ssl_game_event.proto",
         "ssl_referee.proto",
     ],

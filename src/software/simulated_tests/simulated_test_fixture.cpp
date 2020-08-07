@@ -34,7 +34,7 @@ void SimulatedTestFixture::SetUp()
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideRefboxDefendingSide()
+        ->mutableOverrideGameControllerDefendingSide()
         ->setValue(true);
     MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableDefendingPositiveSide()
@@ -45,7 +45,7 @@ void SimulatedTestFixture::SetUp()
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideRefboxFriendlyTeamColor()
+        ->mutableOverrideGameControllerFriendlyTeamColor()
         ->setValue(true);
     MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
