@@ -21,6 +21,8 @@ class StopIntent : public Intent
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor& visitor) const override;
+
     /**
      * Compares StopIntents for equality. StopIntents are considered equal if all
      * their member variables are equal.
@@ -39,11 +41,11 @@ class StopIntent : public Intent
     bool operator!=(const StopIntent& other) const;
 
     /**
-     * Generates PrimitiveMsg from this Intent
+     * Generates Primitive from this Intent
      *
-     * @return The PrimitiveMsg that represents this Intent
+     * @return The Primitive that represents this Intent
      */
-    PrimitiveMsg generatePrimitiveMsg();
+    PrimitiveMsg generatePrimitive() const;
 
    private:
     PrimitiveMsg primitive_msg;

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <functional>
 #include <set>
 #include <string>
 
 #include "shared/proto/primitive.pb.h"
+#include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
@@ -80,13 +80,6 @@ class Intent
     BallCollisionType getBallCollisionType() const;
 
     /**
-     * Get the constraints on this intent's motion
-     *
-     * @return motion constraints
-     */
-    std::set<MotionConstraint> getMotionConstraints(void) const;
-
-    /**
      * Sets the priority of this Intent. The priority value must be an integer in the
      * range [0, 100]
      */
@@ -110,11 +103,25 @@ class Intent
     bool operator!=(const Intent& other) const;
 
     /**
+     * Accepts an Intent Visitor and calls the visit function
+     *
+     * @param visitor An Intent Visitor
+     */
+    virtual void accept(IntentVisitor& visitor) const = 0;
+
+    /**
      * Set the constraints on this intent's motion
      *
      * @param motion_constraints
      */
     void setMotionConstraints(const std::set<MotionConstraint>& motion_constraints);
+
+    /**
+     * Get the constraints on this intent's motion
+     *
+     * @return motion constraints
+     */
+    std::set<MotionConstraint> getMotionConstraints(void) const;
 
     virtual ~Intent() = default;
 

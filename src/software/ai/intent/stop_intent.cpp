@@ -16,6 +16,11 @@ std::string StopIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
+void StopIntent::accept(IntentVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
 bool StopIntent::operator==(const StopIntent &other) const
 {
     return Intent::operator==(other) &&
@@ -28,7 +33,7 @@ bool StopIntent::operator!=(const StopIntent &other) const
     return !((*this) == other);
 }
 
-PrimitiveMsg StopIntent::generatePrimitiveMsg()
+PrimitiveMsg StopIntent::generatePrimitive() const
 {
     return primitive_msg;
 }

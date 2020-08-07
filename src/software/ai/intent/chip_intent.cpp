@@ -18,6 +18,11 @@ std::string ChipIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
+void ChipIntent::accept(IntentVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
 bool ChipIntent::operator==(const ChipIntent &other) const
 {
     return Intent::operator==(other) &&
@@ -30,7 +35,7 @@ bool ChipIntent::operator!=(const ChipIntent &other) const
     return !((*this) == other);
 }
 
-PrimitiveMsg ChipIntent::generatePrimitiveMsg()
+PrimitiveMsg ChipIntent::generatePrimitive() const
 {
     return primitive_msg;
 }

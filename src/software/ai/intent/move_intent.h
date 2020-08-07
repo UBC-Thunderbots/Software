@@ -33,6 +33,8 @@ class MoveIntent : public Intent
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor& visitor) const override;
+
     /**
      * Gets the robot's destination
      *

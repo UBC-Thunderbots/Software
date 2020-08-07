@@ -24,6 +24,11 @@ std::string MoveIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
+void MoveIntent::accept(IntentVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
 Point MoveIntent::getDestination() const
 {
     return destination;

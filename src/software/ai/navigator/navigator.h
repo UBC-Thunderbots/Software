@@ -5,6 +5,7 @@
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
+#include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
@@ -15,7 +16,7 @@
  * This Navigator converts the given Intents into their respective Primitives
  * and navigate around obstacles
  */
-class Navigator
+class Navigator : public IntentVisitor
 {
    public:
     /**
@@ -56,6 +57,17 @@ class Navigator
     std::vector<ObstaclePtr> getObstacles();
 
     /**
+     * Registers the given Intent for navigation
+     *
+     * @param The Intent to register
+     */
+    void visit(const ChipIntent &chip_intent) override;
+    void visit(const KickIntent &kick_intent) override;
+    void visit(const MoveIntent &move_intent) override;
+    void visit(const SpinningMoveIntent &spinning_move_intent) override;
+    void visit(const StopIntent &stop_intent) override;
+
+    /**
      * Calculates the transition speed for the robot between two line segments
      *
      * Calculates the speed that the robot should be at when it is at the end of a
@@ -88,75 +100,20 @@ class Navigator
         const std::vector<std::unique_ptr<Intent>> &intents, const World &world);
 
     /**
-     * Creates a path objective for the given robot id, using navigator params and the
-     * world
+     * Creates the final speed and destination given the final speed and the path
      *
-     * @param robot_id The robot id
-     * @param navigator_params The navigator params for navigating for this robot
-     * @param world The current state of the world
-     *
-     * @return the PathObjective if robot_id is valid, std::nullopt if not valid
-     */
-    std::optional<PathObjective> createPathObjective(
-        RobotId robot_id, const NavigatorParams &navigator_params, const World &world);
-
-    /**
-     * Creates Primitives for given intents using the world and paths
-     *
-     * @param intents The intents to create primitives for
-     * @param world The world
-     * @param robot_id_to_path map of all the planned paths
-     *
-     * @return primitives for the given intents
-     */
-    std::unique_ptr<PrimitiveSetMsg> createPrimitives(
-        const std::vector<std::unique_ptr<Intent>> &intents, const World &world,
-        std::map<RobotId, std::optional<Path>> robot_id_to_path);
-
-    /**
-     * Gets updated Primitive from the original primitive, path, navigator params and
-     * world
-     *
-     * @param primitive_msg The original PrimitiveMsg
-     * @param navigator_params The NavigatorParams
+     * @param final_speed The final speed
      * @param path path to make primitive for
-     * @param world World to navigate around
      *
-     * @return the updated primitive
+     * @return the final destination and speed
      */
-    PrimitiveMsg getUpdatedPrimitive(const PrimitiveMsg &primitive_msg,
-                                     const NavigatorParams &navigator_params,
-                                     const Path &path, const World &world);
-
-    /**
-     * Gets updated Primitive Parameters from the original primitive parameters,
-     * destination, and final speed
-     *
-     * @param primitive_params_msg The original PrimitiveParamsMsg
-     * @param new_destination The new destination
-     * @param new_final_speed The new final speed
-     *
-     * @return the updated primitive params msg
-     */
-    PrimitiveParamsMsg getUpdatedPrimitiveParams(
-        const PrimitiveParamsMsg &primitive_params_msg, const Point &new_destination,
-        double new_final_speed);
-
-    /**
-     * Calculates a factor for how close p is to an enemy obstacle.
-     * 0 = touching or inside
-     * 1 = greater than/equal to EnemyRobotProximityLimit (dynamic parameter) away
-     * scaled linearly between these values
-     *
-     * @param p point to evaluate
-     * @param enemy_team enemy team
-     *
-     * @return A factor from 0 to 1 for how close p is to an enemy obstacle
-     */
-    double getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team);
+    std::pair<Point, double> calculateDestinationAndFinalSpeed(double final_speed,
+                                                               Path path);
 
     std::shared_ptr<const NavigatorConfig> config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
     std::unique_ptr<PathManager> path_manager;
     std::vector<std::vector<Point>> planned_paths;
+    std::optional<PrimitiveMsg> current_primitive;
+    std::map<RobotId, std::optional<Path>> robot_id_to_path;
 };

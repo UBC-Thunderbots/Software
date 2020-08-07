@@ -18,6 +18,11 @@ std::string KickIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
+void KickIntent::accept(IntentVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
 bool KickIntent::operator==(const KickIntent &other) const
 {
     return Intent::operator==(other) &&
@@ -30,7 +35,7 @@ bool KickIntent::operator!=(const KickIntent &other) const
     return !((*this) == other);
 }
 
-PrimitiveMsg KickIntent::generatePrimitiveMsg()
+PrimitiveMsg KickIntent::generatePrimitive() const
 {
     return primitive_msg;
 }

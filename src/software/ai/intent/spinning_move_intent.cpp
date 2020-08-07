@@ -18,6 +18,11 @@ std::string SpinningMoveIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
+void SpinningMoveIntent::accept(IntentVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
 bool SpinningMoveIntent::operator==(const SpinningMoveIntent &other) const
 {
     return Intent::operator==(other) &&
@@ -30,7 +35,7 @@ bool SpinningMoveIntent::operator!=(const SpinningMoveIntent &other) const
     return !((*this) == other);
 }
 
-PrimitiveMsg SpinningMoveIntent::generatePrimitiveMsg()
+PrimitiveMsg SpinningMoveIntent::generatePrimitive() const
 {
     return primitive_msg;
 }

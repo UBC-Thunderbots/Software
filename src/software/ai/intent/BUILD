@@ -115,6 +115,7 @@ cc_library(
     srcs = ["intent.cpp"],
     hdrs = ["intent.h"],
     deps = [
+        "intent_visitor",
         "//shared/proto:tbots_cc_proto",
         "//software/ai/motion_constraint",
         "//software/geom:angle",
@@ -133,4 +134,9 @@ cc_test(
         ":stop_intent",
         "@gtest//:gtest_main",
     ],
+)
+
+cc_library(
+    name = "intent_visitor",
+    hdrs = ["intent_visitor.h"],
 )

@@ -34,11 +34,6 @@ BallCollisionType Intent::getBallCollisionType() const
     return ball_collision_type;
 }
 
-std::set<MotionConstraint> Intent::getMotionConstraints(void) const
-{
-    return motion_constraints;
-}
-
 void Intent::setPriority(unsigned int new_priority)
 {
     if (new_priority > 100)
@@ -66,4 +61,9 @@ bool Intent::operator!=(const Intent &other) const
 void Intent::setMotionConstraints(const std::set<MotionConstraint> &motion_constraints)
 {
     this->motion_constraints = motion_constraints;
+}
+
+std::set<MotionConstraint> Intent::getMotionConstraints(void) const
+{
+    return motion_constraints;
 }

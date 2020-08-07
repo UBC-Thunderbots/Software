@@ -26,6 +26,8 @@ class ChipIntent : public Intent
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor& visitor) const override;
+
     /**
      * Compares ChipIntents for equality. ChipIntents are considered equal if all
      * their member variables are equal.
@@ -44,11 +46,11 @@ class ChipIntent : public Intent
     bool operator!=(const ChipIntent& other) const;
 
     /**
-     * Generates PrimitiveMsg from this Intent
+     * Generates Primitive from this Intent
      *
-     * @return The PrimitiveMsg that represents this Intent
+     * @return The Primitive that represents this Intent
      */
-    PrimitiveMsg generatePrimitiveMsg();
+    PrimitiveMsg generatePrimitive() const;
 
    private:
     PrimitiveMsg primitive_msg;
