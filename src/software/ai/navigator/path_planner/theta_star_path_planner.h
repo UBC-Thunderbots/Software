@@ -39,28 +39,33 @@ class ThetaStarPathPlanner : public PathPlanner
                                  const Rectangle &navigable_area,
                                  const std::vector<ObstaclePtr> &obstacles) override;
 
-   private:
-    class Coordinate : public std::pair<unsigned int, unsigned int>
+
+    class Coordinate
     {
        public:
-        Coordinate(unsigned int row, unsigned int col)
-            : std::pair<unsigned int, unsigned int>(row, col)
+        Coordinate(unsigned int row, unsigned int col): row_(row), col_(col)
+
         {
         }
 
-        Coordinate() : std::pair<unsigned int, unsigned int>() {}
+        Coordinate():row_(0), col_ (0) {}
 
         unsigned int row(void) const
         {
-            return this->first;
+            return row_;
         }
 
         unsigned int col(void) const
         {
-            return this->second;
+            return col_;
         }
-    };
 
+    private:
+        unsigned int row_;
+        unsigned int col_;
+
+    };
+private:
     class CellHeuristic
     {
        public:
@@ -369,3 +374,34 @@ class ThetaStarPathPlanner : public PathPlanner
     // coordinates to whether those two Coordinates have line of sight between them
     std::map<unsigned long, bool> line_of_sight_cache;
 };
+
+bool operator ==(const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
+{
+    return coord1.row()==coord2.row() && coord1.col()== coord2.col();
+}
+
+bool operator > (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
+{
+    return coord1.col()>coord2.col()||(coord1.col()==coord2.col()&& coord1.row()>coord2.row());
+}
+
+bool operator < (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
+{
+    return !(coord1>coord2||coord1==coord2);
+}
+
+bool operator !=(const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
+{
+    return !(coord1==coord2);
+}
+
+bool operator >= (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
+{
+    return !(coord1<coord2);
+}
+
+bool operator <= (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
+{
+    return !(coord1>coord2);
+}
+
