@@ -24,7 +24,7 @@ bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
 {
     // If we haven't checked this Coordinate for obstacles before, check it now
 
-    auto unblocked_grid_it  = unblocked_grid.find(coord);
+    auto unblocked_grid_it = unblocked_grid.find(coord);
     if (unblocked_grid_it == unblocked_grid.end())
     {
         bool blocked = false;
@@ -57,8 +57,7 @@ double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
 
 bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinate &coord2)
 {
-
-    CoordinatePair coord_pair(coord1,coord2);
+    CoordinatePair coord_pair(coord1, coord2);
     // If we haven't checked this Coordinate pair for intersects before, check it now
     auto line_of_sight_cache_it = line_of_sight_cache.find(coord_pair);
     if (line_of_sight_cache_it == line_of_sight_cache.end())
