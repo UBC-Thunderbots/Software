@@ -4,7 +4,7 @@
 
 #include "software/simulation/serialize_primitive_to_proto.h"
 
-TbotsProto_Primitive createNanoPbTbotsProto_Primitive(const Primitive& primitive)
+TbotsProto_Primitive createNanoPbPrimitive(const Primitive& primitive)
 {
     std::vector<uint8_t> serialized_proto = serializePrimitiveToProto(primitive);
 

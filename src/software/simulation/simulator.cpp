@@ -94,8 +94,7 @@ void Simulator::setRobotPrimitives(
 
     for (const auto& primitive_ptr : *primitives)
     {
-        TbotsProto_Primitive primitive_msg =
-            createNanoPbTbotsProto_Primitive(*primitive_ptr);
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(*primitive_ptr);
 
         setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
                           simulator_ball);

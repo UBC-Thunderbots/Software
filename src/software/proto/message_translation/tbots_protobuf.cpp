@@ -12,7 +12,7 @@ std::unique_ptr<TbotsProto::Vision> createVision(const World& world)
     auto& robot_states_map = *vision_msg->mutable_robot_states();
     auto friendly_robots   = world.friendlyTeam().getAllRobots();
 
-    // For every friendly robot, we create a TbotsProto::RobotState proto. The unique_ptr
+    // For every friendly robot, we create a RobotState proto. The unique_ptr
     // is dereferenced, and there is an implicit deep copy into robot_states_map
     //
     // Since the unique_ptr immediately loses scope after the copy, the memory is
