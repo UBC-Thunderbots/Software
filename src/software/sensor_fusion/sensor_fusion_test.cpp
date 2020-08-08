@@ -32,15 +32,15 @@ class SensorFusionTest : public ::testing::Test
     std::vector<RobotStateWithId> blue_robot_states;
     BallState ball_state;
     Timestamp current_time;
-    std::unique_ptr<SSL_GeometryData> geom_data;
-    std::unique_ptr<SSL_DetectionFrame> detection_frame;
+    std::unique_ptr<SSLProto::SSL_GeometryData> geom_data;
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> detection_frame;
     // world associated with geom_data and detection_frame only
     World test_world;
     std::unique_ptr<RobotStatusMsg> robot_status_msg_id_1;
     std::unique_ptr<RobotStatusMsg> robot_status_msg_id_2;
-    std::unique_ptr<SSL::Referee> referee_indirect_yellow;
-    std::unique_ptr<SSL::Referee> referee_indirect_blue;
-    std::unique_ptr<SSL::Referee> referee_normal_start;
+    std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
+    std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
+    std::unique_ptr<SSLProto::Referee> referee_normal_start;
 
    private:
     /**
@@ -73,7 +73,7 @@ class SensorFusionTest : public ::testing::Test
         };
     }
 
-    std::unique_ptr<SSL_DetectionFrame> initDetectionFrame()
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> initDetectionFrame()
     {
         const uint32_t camera_id    = 0;
         const uint32_t frame_number = 40391;
@@ -83,7 +83,7 @@ class SensorFusionTest : public ::testing::Test
                                        blue_robot_states);
     }
 
-    std::unique_ptr<SSL_GeometryData> initSSLDivBGeomData()
+    std::unique_ptr<SSLProto::SSL_GeometryData> initSSLDivBGeomData()
     {
         Field field           = Field::createSSLDivisionBField();
         const float thickness = 0.005f;
@@ -151,24 +151,24 @@ class SensorFusionTest : public ::testing::Test
         return std::move(robot_msg);
     }
 
-    std::unique_ptr<SSL::Referee> initRefereeIndirectYellow()
+    std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()
     {
-        auto ref_msg = std::make_unique<SSL::Referee>();
-        ref_msg->set_command(SSL::Referee_Command_INDIRECT_FREE_YELLOW);
+        auto ref_msg = std::make_unique<SSLProto::Referee>();
+        ref_msg->set_command(SSLProto::Referee_Command_INDIRECT_FREE_YELLOW);
         return ref_msg;
     }
 
-    std::unique_ptr<SSL::Referee> initRefereeIndirectBlue()
+    std::unique_ptr<SSLProto::Referee> initRefereeIndirectBlue()
     {
-        auto ref_msg = std::make_unique<SSL::Referee>();
-        ref_msg->set_command(SSL::Referee_Command_INDIRECT_FREE_BLUE);
+        auto ref_msg = std::make_unique<SSLProto::Referee>();
+        ref_msg->set_command(SSLProto::Referee_Command_INDIRECT_FREE_BLUE);
         return ref_msg;
     }
 
-    std::unique_ptr<SSL::Referee> initRefereeNormalStart()
+    std::unique_ptr<SSLProto::Referee> initRefereeNormalStart()
     {
-        auto ref_msg = std::make_unique<SSL::Referee>();
-        ref_msg->set_command(SSL::Referee_Command_NORMAL_START);
+        auto ref_msg = std::make_unique<SSLProto::Referee>();
+        ref_msg->set_command(SSLProto::Referee_Command_NORMAL_START);
         return ref_msg;
     }
 };
@@ -176,8 +176,8 @@ class SensorFusionTest : public ::testing::Test
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 {
     SensorMsg sensor_msg;
-    auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::unique_ptr<SSL_DetectionFrame>());
+    auto ssl_wrapper_packet = createWrapperPacket(
+        std::move(geom_data), std::unique_ptr<SSLProto::SSL_DetectionFrame>());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -187,8 +187,8 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 {
     SensorMsg sensor_msg;
-    auto ssl_wrapper_packet = createWrapperPacket(std::unique_ptr<SSL_GeometryData>(),
-                                                  std::move(detection_frame));
+    auto ssl_wrapper_packet = createWrapperPacket(
+        std::unique_ptr<SSLProto::SSL_GeometryData>(), std::move(detection_frame));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);

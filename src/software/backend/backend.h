@@ -30,6 +30,6 @@ class Backend : public Subject<SensorMsg>,
      * @param msg The component of SensorMsg
      */
     void receiveRobotStatusMsg(RobotStatusMsg msg);
-    void receiveSSLWrapperPacket(SSL_WrapperPacket msg);
-    void receiveSSLReferee(SSL::Referee msg);
+    void receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg);
+    void receiveSSLReferee(SSLProto::Referee msg);
 };

@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package SSL;
+package SSLProto;
 
 // A vector with two dimensions
 message Vector2

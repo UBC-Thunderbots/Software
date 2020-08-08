@@ -56,7 +56,7 @@ void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
     updateWorld(sensor_msg.robot_status_msgs());
 }
 
-void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
+void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 {
     if (packet.has_geometry())
     {
@@ -69,7 +69,7 @@ void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
     }
 }
 
-void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
+void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet)
 {
     field = createField(geometry_packet);
     if (!field)
@@ -80,7 +80,7 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
     }
 }
 
-void SensorFusion::updateWorld(const SSL::Referee &packet)
+void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
@@ -117,7 +117,7 @@ void SensorFusion::updateWorld(
     // TODO (issue #1149): incorporate RobotStatusMsg into world and update world
 }
 
-void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
+void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960

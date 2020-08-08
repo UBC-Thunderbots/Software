@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package SSL;
+package SSLProto;
 
 import "software/proto/ssl_gc_game_event.proto";
 

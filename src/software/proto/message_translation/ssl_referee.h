@@ -6,31 +6,32 @@
 #include "software/world/team_colour.h"
 
 /**
- * Converts a SSL::Referee packet into a RefereeCommand for the GameController command
- * contained in the packet, based on which team we are (blue or yellow).
+ * Converts a SSLProto::Referee packet into a RefereeCommand for the GameController
+ * command contained in the packet, based on which team we are (blue or yellow).
  *
- * @param packet SSL::Referee protobuf
+ * @param packet SSLProto::Referee protobuf
  * @param team_colour the team colour to get game state for
  *
  * @return RefereeCommand from command
  */
-RefereeCommand createRefereeCommand(const SSL::Referee &packet, TeamColour team_colour);
+RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
+                                    TeamColour team_colour);
 
 /**
- * Converts a SSL::Referee protobuf Stage contained in the SSL::Referee packet
+ * Converts a SSLProto::Referee protobuf Stage contained in the SSLProto::Referee packet
  * into a RefereeStage
  *
- * @param packet SSL::Referee protobuf
+ * @param packet SSLProto::Referee protobuf
  *
  * @return RefereeStage from stage
  */
-RefereeStage createRefereeStage(const SSL::Referee &packet);
+RefereeStage createRefereeStage(const SSLProto::Referee &packet);
 
 /**
- * Extracts the ball placement point from SSL::Referee packet
+ * Extracts the ball placement point from SSLProto::Referee packet
  *
- * @param packet SSL::Referee protobuf
+ * @param packet SSLProto::Referee protobuf
  *
  * @return ball placement point if found
  */
-std::optional<Point> getBallPlacementPoint(const SSL::Referee &packet);
+std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet);
