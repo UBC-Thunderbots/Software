@@ -6,7 +6,7 @@ import "software/proto/messages_robocup_ssl_wrapper.proto";
 
 message SensorMsg
 {
-    SSL_Referee ssl_referee_msg               = 1;
+    SSL.SSL_Referee ssl_referee_msg           = 1;
     SSL_WrapperPacket ssl_vision_msg          = 2;
     repeated RobotStatusMsg robot_status_msgs = 3;
 }

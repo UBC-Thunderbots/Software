@@ -2,6 +2,8 @@ syntax = "proto2";
 
 import "software/proto/ssl_game_event.proto";
 
+package SSL;
+
 // Each UDP packet contains one of these messages.
 message SSL_Referee
 {

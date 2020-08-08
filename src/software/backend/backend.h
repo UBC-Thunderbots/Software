@@ -31,5 +31,5 @@ class Backend : public Subject<SensorMsg>,
      */
     void receiveRobotStatusMsg(RobotStatusMsg msg);
     void receiveSSLWrapperPacket(SSL_WrapperPacket msg);
-    void receiveSSLReferee(SSL_Referee msg);
+    void receiveSSLReferee(SSL::SSL_Referee msg);
 };
