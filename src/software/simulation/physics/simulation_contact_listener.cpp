@@ -12,6 +12,18 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
         PhysicsObjectUserData *user_data_b =
             static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
 
+        if (auto ball = isBallContact(user_data_a, user_data_b))
+        {
+            // Disable collisions with the ball if it is in flight. This is how we
+            // simulate the ball being chipped any flying over other objects
+            // in a 2D simulation
+            if (ball->isInFlight())
+            {
+                contact->SetEnabled(false);
+                return;
+            }
+        }
+
         if (auto ball_chicker_pair = isBallChickerContact(user_data_a, user_data_b))
         {
             PhysicsBall *ball   = ball_chicker_pair->first;
@@ -46,6 +58,18 @@ void SimulationContactListener::PreSolve(b2Contact *contact,
         PhysicsObjectUserData *user_data_b =
             static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
 
+        if (auto ball = isBallContact(user_data_a, user_data_b))
+        {
+            // Disable collisions with the ball if it is in flight. This is how we
+            // simulate the ball being chipped any flying over other objects
+            // in a 2D simulation
+            if (ball->isInFlight())
+            {
+                contact->SetEnabled(false);
+                return;
+            }
+        }
+
         if (auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
         {
             // We always disable contacts between the ball and the dribbler so that the
@@ -66,16 +90,6 @@ void SimulationContactListener::PreSolve(b2Contact *contact,
             // This helps the robot keep the ball while dribbling.
             contact->SetRestitution(0.0);
         }
-        if (auto ball = isBallContact(user_data_a, user_data_b))
-        {
-            // Disable collisions with the ball if it is in flight. This is how we
-            // simulate the ball being chipped any flying over other objects
-            // in a 2D simulation
-            if (ball->isInFlight())
-            {
-                contact->SetEnabled(false);
-            }
-        }
     }
 }
 
@@ -88,6 +102,18 @@ void SimulationContactListener::EndContact(b2Contact *contact)
         static_cast<PhysicsObjectUserData *>(fixture_a->GetUserData());
     PhysicsObjectUserData *user_data_b =
         static_cast<PhysicsObjectUserData *>(fixture_b->GetUserData());
+
+    if (auto ball = isBallContact(user_data_a, user_data_b))
+    {
+        // Disable collisions with the ball if it is in flight. This is how we
+        // simulate the ball being chipped any flying over other objects
+        // in a 2D simulation
+        if (ball->isInFlight())
+        {
+            contact->SetEnabled(false);
+            return;
+        }
+    }
 
     if (auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
     {
