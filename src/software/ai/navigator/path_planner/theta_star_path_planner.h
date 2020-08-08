@@ -345,27 +345,6 @@ private:
     void resetAndInitializeMemberVariables(const Rectangle &navigable_area,
                                            const std::vector<ObstaclePtr> &obstacles);
 
-    /**
-     * Computes a key from the given Coordinate for collision-free access to
-     * unblocked_grid
-     *
-     * @param coord Coordinate to compute
-     *
-     * @return key for the Coordinate
-     */
-    unsigned long computeMapKey(const Coordinate &coord) const;
-
-    /**
-     * Computes a key from the given pair of Coordinates for collision-free access to
-     * line_of_sight_cache
-     * @param coord1 Coordinate 1 of pair to hash
-     * @param coord2 Coordinate 2 of pair to hash
-     *
-     * @return key for the Coordinate pair
-     */
-    unsigned long computeMapKey(const ThetaStarPathPlanner::Coordinate &coord1,
-                                const ThetaStarPathPlanner::Coordinate &coord2) const;
-
     // if close to end then return direct path to end point
     static constexpr double CLOSE_TO_END_THRESHOLD = 0.01;  // in metres
 

@@ -512,26 +512,3 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
         num_grid_rows,
         std::vector<CellHeuristic>(num_grid_cols, ThetaStarPathPlanner::CellHeuristic()));
 }
-
-
-unsigned long ThetaStarPathPlanner::computeMapKey(const Coordinate &coord) const
-{
-    return coord.row() + coord.col() * (num_grid_rows + 1);
-}
-
-unsigned long ThetaStarPathPlanner::computeMapKey(
-    const ThetaStarPathPlanner::Coordinate &coord1,
-    const ThetaStarPathPlanner::Coordinate &coord2) const
-{
-    unsigned long key1 = computeMapKey(coord1);
-    unsigned long key2 = computeMapKey(coord2);
-    if (coord1.row() < coord2.row() ||
-        (coord1.row() == coord2.row() && coord1.col() < coord2.col()))
-    {
-        return key1 + key2 * (num_grid_cols + num_grid_rows + 1);
-    }
-    else
-    {
-        return key2 + key1 * (num_grid_cols + num_grid_rows + 1);
-    }
-}
