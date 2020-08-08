@@ -23,8 +23,8 @@ bool ThetaStarPathPlanner::isCoordNavigable(const Coordinate &coord) const
 bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
 {
     // If we haven't checked this Coordinate for obstacles before, check it now
-    unsigned long coord_key = computeMapKey(coord);
-    auto unblocked_grid_it  = unblocked_grid.find(coord_key);
+
+    auto unblocked_grid_it  = unblocked_grid.find(coord);
     if (unblocked_grid_it == unblocked_grid.end())
     {
         bool blocked = false;
@@ -40,7 +40,7 @@ bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
         }
 
         // We use the opposite convention to indicate blocked or not
-        unblocked_grid[coord_key] = !blocked;
+        unblocked_grid[coord] = !blocked;
         return !blocked;
     }
 
@@ -57,10 +57,10 @@ double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
 
 bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinate &coord2)
 {
-    unsigned long coordinate_pair_key = computeMapKey(coord1, coord2);
 
+    CoordinatePair coord_pair(coord1,coord2);
     // If we haven't checked this Coordinate pair for intersects before, check it now
-    auto line_of_sight_cache_it = line_of_sight_cache.find(coordinate_pair_key);
+    auto line_of_sight_cache_it = line_of_sight_cache.find(coord_pair);
     if (line_of_sight_cache_it == line_of_sight_cache.end())
     {
         Segment seg(convertCoordToPoint(coord1), convertCoordToPoint(coord2));
@@ -76,7 +76,7 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinat
         }
 
         // We use the opposite convention to indicate blocked or not
-        line_of_sight_cache[coordinate_pair_key] = has_line_of_sight;
+        line_of_sight_cache[coord_pair] = has_line_of_sight;
         return has_line_of_sight;
     }
 

@@ -65,6 +65,44 @@ class ThetaStarPathPlanner : public PathPlanner
         unsigned int col_;
 
     };
+
+    class CoordinatePair
+    {
+    public:
+        CoordinatePair(const Coordinate &coord1, const Coordinate &coord2)
+        {
+            if(coord1.col()<coord2.col()||(coord1.col()==coord2.col()&&coord1.row()<=coord2.row()))
+            {
+                coord1_= Coordinate(coord1.row(),coord1.col());
+                coord2_ = Coordinate(coord2.row(),coord2.col());
+            }
+            else
+            {
+                coord1_ = Coordinate(coord2.row(),coord2.col());
+                coord2_ = Coordinate(coord1.row(),coord1.col());
+            }
+        }
+
+        CoordinatePair():coord1_(),coord2_()
+        {
+        }
+
+        Coordinate firstCoordinate(void) const
+        {
+            return coord1_;
+        }
+
+        Coordinate secondCoordinate(void) const
+        {
+            return coord2_;
+        }
+
+    private:
+        Coordinate coord1_;
+        Coordinate coord2_;
+
+    };
+
 private:
     class CellHeuristic
     {
@@ -369,10 +407,10 @@ private:
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::map<unsigned long, bool> unblocked_grid;
+    std::map<Coordinate, bool> unblocked_grid;
     // Cache of line of sight that maps a unsigned long key computed from a pair of
     // coordinates to whether those two Coordinates have line of sight between them
-    std::map<unsigned long, bool> line_of_sight_cache;
+    std::map<CoordinatePair, bool> line_of_sight_cache;
 };
 
 bool operator ==(const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
@@ -380,14 +418,14 @@ bool operator ==(const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStar
     return coord1.row()==coord2.row() && coord1.col()== coord2.col();
 }
 
-bool operator > (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
-{
-    return coord1.col()>coord2.col()||(coord1.col()==coord2.col()&& coord1.row()>coord2.row());
-}
-
 bool operator < (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
 {
-    return !(coord1>coord2||coord1==coord2);
+    return coord1.col()<coord2.col()||(coord1.col()==coord2.col()&& coord1.row()<coord2.row());
+}
+
+bool operator > (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
+{
+    return !(coord1<coord2||coord1==coord2);
 }
 
 bool operator !=(const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
@@ -395,13 +433,48 @@ bool operator !=(const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStar
     return !(coord1==coord2);
 }
 
-bool operator >= (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
-{
-    return !(coord1<coord2);
-}
-
 bool operator <= (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
 {
     return !(coord1>coord2);
 }
 
+bool operator >= (const ThetaStarPathPlanner::Coordinate &coord1, const ThetaStarPathPlanner::Coordinate &coord2)
+{
+    return !(coord1<coord2);
+}
+
+bool operator == (const ThetaStarPathPlanner::CoordinatePair & coord_pair1,
+        const ThetaStarPathPlanner::CoordinatePair & coord_pair2)
+{
+    return coord_pair1.firstCoordinate()==coord_pair2.firstCoordinate()&&
+    coord_pair1.secondCoordinate()==coord_pair2.secondCoordinate();
+}
+
+bool operator < (const ThetaStarPathPlanner::CoordinatePair & coord_pair1,
+                  const ThetaStarPathPlanner::CoordinatePair & coord_pair2)
+{
+    return coord_pair1.firstCoordinate()<coord_pair2.firstCoordinate()||
+    (coord_pair1.firstCoordinate()==coord_pair2.firstCoordinate()&&
+    coord_pair1.secondCoordinate()<coord_pair2.secondCoordinate());
+}
+
+bool operator > (const ThetaStarPathPlanner::CoordinatePair & coord_pair1,
+                 const ThetaStarPathPlanner::CoordinatePair & coord_pair2)
+{
+    return !(coord_pair1<coord_pair2||coord_pair1==coord_pair2);
+}
+bool operator != (const ThetaStarPathPlanner::CoordinatePair & coord_pair1,
+                 const ThetaStarPathPlanner::CoordinatePair & coord_pair2)
+{
+    return !(coord_pair1==coord_pair2);
+}
+bool operator <= (const ThetaStarPathPlanner::CoordinatePair & coord_pair1,
+                 const ThetaStarPathPlanner::CoordinatePair & coord_pair2)
+{
+    return !(coord_pair1>coord_pair2);
+}
+bool operator >= (const ThetaStarPathPlanner::CoordinatePair & coord_pair1,
+                 const ThetaStarPathPlanner::CoordinatePair & coord_pair2)
+{
+    return !(coord_pair1<coord_pair2);
+}
