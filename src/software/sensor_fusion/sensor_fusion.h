@@ -53,7 +53,7 @@ class SensorFusion
      * @param new data
      */
     void updateWorld(const SSL_WrapperPacket &packet);
-    void updateWorld(const SSL::SSL_Referee &packet);
+    void updateWorld(const SSL::Referee &packet);
     void updateWorld(
         const google::protobuf::RepeatedPtrField<RobotStatusMsg> &robot_status_msgs);
     void updateWorld(const SSL_GeometryData &geometry_packet);

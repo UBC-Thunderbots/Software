@@ -38,9 +38,9 @@ class SensorFusionTest : public ::testing::Test
     World test_world;
     std::unique_ptr<RobotStatusMsg> robot_status_msg_id_1;
     std::unique_ptr<RobotStatusMsg> robot_status_msg_id_2;
-    std::unique_ptr<SSL::SSL_Referee> referee_indirect_yellow;
-    std::unique_ptr<SSL::SSL_Referee> referee_indirect_blue;
-    std::unique_ptr<SSL::SSL_Referee> referee_normal_start;
+    std::unique_ptr<SSL::Referee> referee_indirect_yellow;
+    std::unique_ptr<SSL::Referee> referee_indirect_blue;
+    std::unique_ptr<SSL::Referee> referee_normal_start;
 
    private:
     /**
@@ -151,24 +151,24 @@ class SensorFusionTest : public ::testing::Test
         return std::move(robot_msg);
     }
 
-    std::unique_ptr<SSL::SSL_Referee> initRefereeIndirectYellow()
+    std::unique_ptr<SSL::Referee> initRefereeIndirectYellow()
     {
-        auto ref_msg = std::make_unique<SSL::SSL_Referee>();
-        ref_msg->set_command(SSL::SSL_Referee_Command_INDIRECT_FREE_YELLOW);
+        auto ref_msg = std::make_unique<SSL::Referee>();
+        ref_msg->set_command(SSL::Referee_Command_INDIRECT_FREE_YELLOW);
         return ref_msg;
     }
 
-    std::unique_ptr<SSL::SSL_Referee> initRefereeIndirectBlue()
+    std::unique_ptr<SSL::Referee> initRefereeIndirectBlue()
     {
-        auto ref_msg = std::make_unique<SSL::SSL_Referee>();
-        ref_msg->set_command(SSL::SSL_Referee_Command_INDIRECT_FREE_BLUE);
+        auto ref_msg = std::make_unique<SSL::Referee>();
+        ref_msg->set_command(SSL::Referee_Command_INDIRECT_FREE_BLUE);
         return ref_msg;
     }
 
-    std::unique_ptr<SSL::SSL_Referee> initRefereeNormalStart()
+    std::unique_ptr<SSL::Referee> initRefereeNormalStart()
     {
-        auto ref_msg = std::make_unique<SSL::SSL_Referee>();
-        ref_msg->set_command(SSL::SSL_Referee_Command_NORMAL_START);
+        auto ref_msg = std::make_unique<SSL::Referee>();
+        ref_msg->set_command(SSL::Referee_Command_NORMAL_START);
         return ref_msg;
     }
 };

@@ -8,8 +8,10 @@ proto_library(
         "messages_robocup_ssl_detection.proto",
         "messages_robocup_ssl_geometry.proto",
         "messages_robocup_ssl_wrapper.proto",
-        "ssl_game_event.proto",
-        "ssl_referee.proto",
+        "ssl_gc_common.proto",
+        "ssl_gc_game_event.proto",
+        "ssl_gc_geometry.proto",
+        "ssl_gc_referee_message.proto",
     ],
     visibility = ["//visibility:private"],
 )
