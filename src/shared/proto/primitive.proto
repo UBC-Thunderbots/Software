@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "shared/proto/geometry.proto";
+
 // This message is used to ensure backwards compatibility with our old format
 // for primitive parameters while we migrate to a new format where each primitive
 // has it's own unique proto message
@@ -27,8 +29,123 @@ message PrimitiveMsg
         PrimitiveParamsMsg move            = 1;
         PrimitiveParamsMsg stop            = 2;
         PrimitiveParamsMsg shoot           = 3;
-        PrimitiveParamsMsg spin            = 4;
+        PrimitiveParamsMsg spinning_move   = 4;
         PrimitiveParamsMsg direct_wheels   = 5;
         PrimitiveParamsMsg direct_velocity = 6;
     }
+}
+
+message PrimitiveNewMsg
+{
+    oneof primitive
+    {
+        ChipPrimitiveMsg chip                    = 1;
+        KickPrimitiveMsg kick                    = 2;
+        MovePrimitiveMsg move                    = 3;
+        SpinningMovePrimitiveMsg spinning_move   = 4;
+        AutochipMovePrimitiveMsg autochip_move   = 5;
+        AutokickMovePrimitiveMsg autokick_move   = 6;
+        StopPrimitiveMsg stop                    = 7;
+        DirectControlPrimitiveMsg direct_control = 8;
+    }
+}
+
+message ChipPrimitiveMsg
+{
+    PointMsg chip_origin       = 1;
+    AngleMsg chip_direction    = 2;
+    float chip_distance_meters = 3;
+}
+
+message KickPrimitiveMsg
+{
+    PointMsg kick_origin               = 1;
+    AngleMsg kick_direction            = 2;
+    float kick_speed_meters_per_second = 3;
+}
+
+message MovePrimitiveMsg
+{
+    MovePositionParams position_params = 1;
+    AngleMsg final_angle               = 2;
+    float dribbler_speed_rpm           = 3;
+}
+
+message SpinningMovePrimitiveMsg
+{
+    MovePositionParams position_params  = 1;
+    AngularVelocityMsg angular_velocity = 2;
+    float dribbler_speed_rpm            = 3;
+}
+
+message AutochipMovePrimitiveMsg
+{
+    MovePositionParams position_params = 1;
+    AngleMsg final_angle               = 2;
+    float dribbler_speed_rpm           = 3;
+    float chip_distance_meters         = 4;
+}
+
+message AutokickMovePrimitiveMsg
+{
+    MovePositionParams position_params = 1;
+    AngleMsg final_angle               = 2;
+    float dribbler_speed_rpm           = 3;
+    float kick_speed_meters_per_second = 4;
+}
+
+message StopPrimitiveMsg
+{
+    enum StopTypeMsg
+    {
+        BRAKE = 0;
+        COAST = 1;
+    }
+    StopTypeMsg stop_type = 1;
+}
+
+message DirectControlPrimitiveMsg
+{
+    enum ChargeMode
+    {
+        DISCHARGE = 0;
+        CHARGE    = 1;
+        FLOAT     = 2;
+    }
+
+    message DirectPerWheelControlMsg
+    {
+        float front_left_wheel_rpm  = 1;
+        float back_left_wheel_rpm   = 2;
+        float front_right_wheel_rpm = 3;
+        float back_right_wheel_rpm  = 4;
+    }
+
+    message DirectVelocityControlMsg
+    {
+        VectorMsg velocity                  = 1;
+        AngularVelocityMsg angular_velocity = 2;
+    }
+
+    oneof wheel_control
+    {
+        DirectPerWheelControlMsg direct_per_wheel_control = 1;
+        DirectVelocityControlMsg direct_velocity_control  = 2;
+    }
+    ChargeMode charge_mode = 3;
+    oneof chick_command
+    {
+        float kick_speed_meters_per_second     = 4;
+        float chip_distance_meters             = 5;
+        float autokick_speed_meters_per_second = 6;
+        float autochip_distance_meters         = 7;
+    }
+    float dribbler_speed_rpm = 8;
+}
+
+message MovePositionParams
+{
+    PointMsg destination                = 1;
+    float final_speed_meters_per_second = 2;
+    bool slow                           = 3;
 }

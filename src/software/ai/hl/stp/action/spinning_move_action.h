@@ -5,10 +5,10 @@
 #include "software/geom/point.h"
 
 /**
- * The MoveSpinAction will move the given Robot to the specified destination while
+ * The SpinningMoveAction will move the given Robot to the specified destination while
  * spinning with the desired angular velocity
  */
-class MoveSpinAction : public Action
+class SpinningMoveAction : public Action
 {
    public:
     // We consider the robot close to a destination when it is within 2 cm.
@@ -17,12 +17,12 @@ class MoveSpinAction : public Action
     static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD = 0.02;
 
     /**
-     * Creates a new MoveSpinAction
+     * Creates a new SpinningMoveAction
      *
      * @param close_to_dest_threshold How far from the destination the robot must be
      * before the action is considered done
      */
-    explicit MoveSpinAction(
+    explicit SpinningMoveAction(
         double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
 
     /**
@@ -39,9 +39,9 @@ class MoveSpinAction : public Action
                              AngularVelocity angular_velocity, double final_linear_speed);
 
     /**
-     * Gets the destination this MoveSpinAction is trying to move to
+     * Gets the destination this SpinningMoveAction is trying to move to
      *
-     * @return The destination this MoveSpinAction is trying to move to
+     * @return The destination this SpinningMoveAction is trying to move to
      */
     Point getDestination();
 

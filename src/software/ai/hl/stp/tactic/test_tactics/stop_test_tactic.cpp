@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/action/stop_action.h"
 
-StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever) {}
+StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever, {}) {}
 
 std::string StopTestTactic::getName() const
 {

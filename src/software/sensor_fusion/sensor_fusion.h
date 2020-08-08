@@ -57,7 +57,7 @@ class SensorFusion
     void updateWorld(const SSL_WrapperPacket &packet);
     void updateWorld(const SSL_Referee &packet);
     void updateWorld(
-        const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
+        const google::protobuf::RepeatedPtrField<RobotStatusMsg> &robot_status_msgs);
     void updateWorld(const SSL_GeometryData &geometry_packet);
     void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 
