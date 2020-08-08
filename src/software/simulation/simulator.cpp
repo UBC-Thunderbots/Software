@@ -94,25 +94,28 @@ void Simulator::setRobotPrimitives(
 
     for (const auto& primitive_ptr : *primitives)
     {
-        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+        TbotsProto_Primitive primitive_msg =
+            createNanoPbTbotsProto_Primitive(*primitive_ptr);
 
         setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
                           simulator_ball);
     }
 }
 
-void Simulator::setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
+void Simulator::setYellowRobotPrimitive(RobotId id,
+                                        const TbotsProto_Primitive& primitive_msg)
 {
     setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball);
 }
 
-void Simulator::setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
+void Simulator::setBlueRobotPrimitive(RobotId id,
+                                      const TbotsProto_Primitive& primitive_msg)
 {
     setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball);
 }
 
 void Simulator::setRobotPrimitive(
-    RobotId id, const PrimitiveMsg& primitive_msg,
+    RobotId id, const TbotsProto_Primitive& primitive_msg,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
     const std::shared_ptr<SimulatorBall>& simulator_ball)

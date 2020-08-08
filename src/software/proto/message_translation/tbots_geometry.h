@@ -11,8 +11,8 @@
  * @param The geom type to convert to proto
  * @return The unique_ptr to the converted GeomMsg
  */
-std::unique_ptr<PointMsg> createPointMsg(const Point& point);
-std::unique_ptr<AngleMsg> createAngleMsg(const Angle& angle);
-std::unique_ptr<AngularVelocityMsg> createAngularVelocityMsg(
+std::unique_ptr<TbotsProto::Point> createPoint(const Point& point);
+std::unique_ptr<TbotsProto::Angle> createAngle(const Angle& angle);
+std::unique_ptr<TbotsProto::AngularVelocity> createAngularVelocity(
     const AngularVelocity& angular_velocity);
-std::unique_ptr<VectorMsg> createVectorMsg(const Vector& vector);
+std::unique_ptr<TbotsProto::Vector> createVector(const Vector& vector);

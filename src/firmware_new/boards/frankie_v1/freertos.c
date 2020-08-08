@@ -57,7 +57,7 @@ ProtoMulticastCommunicationProfile_t *vision_msg_listener_profile;
 ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
 
 static VisionMsg vision_msg;
-static RobotStatusMsg robot_status_msg;
+static TbotsProto::RobotStatus robot_status_msg;
 static PrimitiveMsg primitive_msg;
 
 /* USER CODE END Variables */
@@ -234,7 +234,7 @@ void initIoNetworking()
 
     robot_status_msg_sender_profile = io_proto_multicast_communication_profile_create(
         "robot_status_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
-        &robot_status_msg, RobotStatusMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &robot_status_msg, TbotsProto::RobotStatus_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 }
 
 

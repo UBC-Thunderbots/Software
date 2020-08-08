@@ -88,11 +88,11 @@ struct RobotStatus
 };
 
 /**
- * Converts RobotStatus to RobotStatusMsg
+ * Converts RobotStatus to TbotsProto::RobotStatus
  * Does not convert ChipperKickerStatus,
  * DriveUnits, and NetworkStatus due to insufficient info
  *
  * @param robot_status The RobotStatus
  */
-std::unique_ptr<RobotStatusMsg> convertRobotStatusToRobotStatusMsg(
+std::unique_ptr<TbotsProto::RobotStatus> convertRobotStatusToRobotStatusProto(
     const RobotStatus &robot_status);

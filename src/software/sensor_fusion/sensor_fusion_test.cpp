@@ -36,8 +36,8 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<SSL_DetectionFrame> detection_frame;
     // world associated with geom_data and detection_frame only
     World test_world;
-    std::unique_ptr<RobotStatusMsg> robot_status_msg_id_1;
-    std::unique_ptr<RobotStatusMsg> robot_status_msg_id_2;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
     std::unique_ptr<SSL_Referee> referee_indirect_yellow;
     std::unique_ptr<SSL_Referee> referee_indirect_blue;
     std::unique_ptr<SSL_Referee> referee_normal_start;
@@ -115,17 +115,17 @@ class SensorFusionTest : public ::testing::Test
         return World(field, ball, friendly_team, enemy_team);
     }
 
-    std::unique_ptr<RobotStatusMsg> initRobotStatusMsgId1()
+    std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusMsgId1()
     {
-        auto robot_msg = std::make_unique<RobotStatusMsg>();
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
 
         robot_msg->set_robot_id(1);
 
-        auto break_beam_msg = std::make_unique<BreakBeamStatus>();
+        auto break_beam_msg = std::make_unique<TbotsProto::BreakBeamStatus>();
         break_beam_msg->set_ball_in_beam(false);
         *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
 
-        auto chipper_kicker_status = std::make_unique<ChipperKickerStatus>();
+        auto chipper_kicker_status = std::make_unique<TbotsProto::ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(13);
         chipper_kicker_status->set_ms_since_kicker_fired(9);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
@@ -133,17 +133,17 @@ class SensorFusionTest : public ::testing::Test
         return std::move(robot_msg);
     }
 
-    std::unique_ptr<RobotStatusMsg> initRobotStatusMsgId2()
+    std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusMsgId2()
     {
-        auto robot_msg = std::make_unique<RobotStatusMsg>();
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
 
         robot_msg->set_robot_id(2);
 
-        auto break_beam_msg = std::make_unique<BreakBeamStatus>();
+        auto break_beam_msg = std::make_unique<TbotsProto::BreakBeamStatus>();
         break_beam_msg->set_ball_in_beam(true);
         *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
 
-        auto chipper_kicker_status = std::make_unique<ChipperKickerStatus>();
+        auto chipper_kicker_status = std::make_unique<TbotsProto::ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(11);
         chipper_kicker_status->set_ms_since_kicker_fired(6);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;

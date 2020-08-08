@@ -32,26 +32,27 @@ TEST(RobotStatusTest, test_convert_robot_status_robot_status_msg_valid_robot_msg
     };
 
     // Mock expected return ErrorCode enums from robot_messages
-    std::vector<ErrorCode> expected_error_code = {CHARGE_TIMEOUT,
-                                                  WHEEL_0_MOTOR_HOT,
-                                                  WHEEL_1_MOTOR_HOT,
-                                                  WHEEL_2_MOTOR_HOT,
-                                                  WHEEL_3_MOTOR_HOT,
-                                                  DRIBBLER_MOTOR_HOT,
-                                                  WHEEL_0_ENCODER_NOT_COMMUTATING,
-                                                  WHEEL_1_ENCODER_NOT_COMMUTATING,
-                                                  WHEEL_2_ENCODER_NOT_COMMUTATING,
-                                                  WHEEL_3_ENCODER_NOT_COMMUTATING,
-                                                  WHEEL_0_HALL_SENSOR_STUCK_LOW,
-                                                  WHEEL_1_HALL_SENSOR_STUCK_LOW,
-                                                  WHEEL_2_HALL_SENSOR_STUCK_LOW,
-                                                  WHEEL_3_HALL_SENSOR_STUCK_LOW,
-                                                  DRIBBLER_HALL_SENSOR_STUCK_LOW,
-                                                  WHEEL_0_HALL_SENSOR_STUCK_HIGH,
-                                                  WHEEL_1_HALL_SENSOR_STUCK_HIGH,
-                                                  WHEEL_2_HALL_SENSOR_STUCK_HIGH,
-                                                  WHEEL_3_HALL_SENSOR_STUCK_HIGH,
-                                                  DRIBBLER_HALL_SENSOR_STUCK_HIGH};
+    std::vector<TbotsProto::ErrorCode> expected_error_code = {
+        TbotsProto::CHARGE_TIMEOUT,
+        TbotsProto::WHEEL_0_MOTOR_HOT,
+        TbotsProto::WHEEL_1_MOTOR_HOT,
+        TbotsProto::WHEEL_2_MOTOR_HOT,
+        TbotsProto::WHEEL_3_MOTOR_HOT,
+        TbotsProto::DRIBBLER_MOTOR_HOT,
+        TbotsProto::WHEEL_0_ENCODER_NOT_COMMUTATING,
+        TbotsProto::WHEEL_1_ENCODER_NOT_COMMUTATING,
+        TbotsProto::WHEEL_2_ENCODER_NOT_COMMUTATING,
+        TbotsProto::WHEEL_3_ENCODER_NOT_COMMUTATING,
+        TbotsProto::WHEEL_0_HALL_SENSOR_STUCK_LOW,
+        TbotsProto::WHEEL_1_HALL_SENSOR_STUCK_LOW,
+        TbotsProto::WHEEL_2_HALL_SENSOR_STUCK_LOW,
+        TbotsProto::WHEEL_3_HALL_SENSOR_STUCK_LOW,
+        TbotsProto::DRIBBLER_HALL_SENSOR_STUCK_LOW,
+        TbotsProto::WHEEL_0_HALL_SENSOR_STUCK_HIGH,
+        TbotsProto::WHEEL_1_HALL_SENSOR_STUCK_HIGH,
+        TbotsProto::WHEEL_2_HALL_SENSOR_STUCK_HIGH,
+        TbotsProto::WHEEL_3_HALL_SENSOR_STUCK_HIGH,
+        TbotsProto::DRIBBLER_HALL_SENSOR_STUCK_HIGH};
 
     // Mock robot_status
     RobotStatus robot_status = {.robot = 1,
@@ -80,7 +81,7 @@ TEST(RobotStatusTest, test_convert_robot_status_robot_status_msg_valid_robot_msg
                                 .fw_build_id = 2,
                                 1};
 
-    auto robot_msg = convertRobotStatusToRobotStatusMsg(robot_status);
+    auto robot_msg = convertRobotStatusToRobotStatusProto(robot_status);
 
     EXPECT_EQ(robot_msg->robot_id(), 1);
     EXPECT_EQ(robot_msg->error_code_size(), expected_error_code.size());
@@ -108,11 +109,14 @@ TEST(RobotStatusTest, test_dongle_message_to_error_code)
         MRF::PACKET_ABOVE_MAX_SIZE};
 
     // Mock expected return ErrorCode enums from dongle_messages
-    std::vector<ErrorCode> expected_error_code = {
-        ErrorCode::ROBOT_DEAD,           ErrorCode::ESTOP_BROKEN,
-        ErrorCode::RX_FCS_FAIL,          ErrorCode::SECOND_DONGLE,
-        ErrorCode::TRANSMIT_QUEUE_FULL,  ErrorCode::RECEIVE_QUEUE_FULL,
-        ErrorCode::PACKET_ABOVE_MAX_SIZE};
+    std::vector<TbotsProto::ErrorCode> expected_error_code = {
+        TbotsProto::ErrorCode::ROBOT_DEAD,
+        TbotsProto::ErrorCode::ESTOP_BROKEN,
+        TbotsProto::ErrorCode::RX_FCS_FAIL,
+        TbotsProto::ErrorCode::SECOND_DONGLE,
+        TbotsProto::ErrorCode::TRANSMIT_QUEUE_FULL,
+        TbotsProto::ErrorCode::RECEIVE_QUEUE_FULL,
+        TbotsProto::ErrorCode::PACKET_ABOVE_MAX_SIZE};
 
     // Mock robot_status
     RobotStatus robot_status = {.robot = 1,
@@ -141,7 +145,7 @@ TEST(RobotStatusTest, test_dongle_message_to_error_code)
                                 .fw_build_id = 2,
                                 1};
 
-    auto robot_msg = convertRobotStatusToRobotStatusMsg(robot_status);
+    auto robot_msg = convertRobotStatusToRobotStatusProto(robot_status);
 
     EXPECT_EQ(robot_msg->error_code_size(), expected_error_code.size());
     for (int i = 0; i < robot_msg->error_code_size(); i++)
@@ -163,11 +167,11 @@ TEST(RobotStatusTest, test_convert_robot_status_robot_status_msg_valid_invalid_r
     };
 
     // Mock expected return ErrorCode enums from robot_messages
-    std::vector<ErrorCode> expected_error_code = {
-        WHEEL_0_MOTOR_HOT,
-        WHEEL_0_ENCODER_NOT_COMMUTATING,
-        WHEEL_0_HALL_SENSOR_STUCK_LOW,
-        WHEEL_0_HALL_SENSOR_STUCK_HIGH,
+    std::vector<TbotsProto::ErrorCode> expected_error_code = {
+        TbotsProto::WHEEL_0_MOTOR_HOT,
+        TbotsProto::WHEEL_0_ENCODER_NOT_COMMUTATING,
+        TbotsProto::WHEEL_0_HALL_SENSOR_STUCK_LOW,
+        TbotsProto::WHEEL_0_HALL_SENSOR_STUCK_HIGH,
     };
 
     // Mock robot_status
@@ -197,7 +201,7 @@ TEST(RobotStatusTest, test_convert_robot_status_robot_status_msg_valid_invalid_r
                                 .fw_build_id = 2,
                                 1};
 
-    auto robot_msg = convertRobotStatusToRobotStatusMsg(robot_status);
+    auto robot_msg = convertRobotStatusToRobotStatusProto(robot_status);
 
     EXPECT_EQ(robot_msg->robot_id(), 1);
     EXPECT_EQ(robot_msg->error_code_size(), expected_error_code.size());
@@ -251,7 +255,7 @@ TEST(RobotStatusTest, test_convert_robot_status_robot_status_msg_invalid_robot_m
                                 .fw_build_id = 2,
                                 1};
 
-    auto robot_msg = convertRobotStatusToRobotStatusMsg(robot_status);
+    auto robot_msg = convertRobotStatusToRobotStatusProto(robot_status);
 
     EXPECT_EQ(robot_msg->robot_id(), 1);
     EXPECT_EQ(robot_msg->error_code_size(), 0);

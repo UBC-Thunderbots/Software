@@ -113,9 +113,9 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
 }
 
 void SensorFusion::updateWorld(
-    const google::protobuf::RepeatedPtrField<RobotStatusMsg> &robot_status_msgs)
+    const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    // TODO (issue #1149): incorporate RobotStatusMsg into world and update world
+    // TODO (issue #1149): incorporate TbotsProto::RobotStatus into world and update world
 }
 
 void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)

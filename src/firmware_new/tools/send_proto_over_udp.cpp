@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
         std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]), PRIMITIVE_PORT);
 
     auto status_listener =
-        std::make_unique<ThreadedProtoMulticastListener<RobotStatusMsg>>(
+        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>(
             std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
             ROBOT_STATUS_PORT, std::function(callback));
 

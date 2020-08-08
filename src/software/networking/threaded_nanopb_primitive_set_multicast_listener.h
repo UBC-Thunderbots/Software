@@ -7,4 +7,5 @@
  * A threaded listener that receives serialized PrimitiveSetMsg's over the network
  */
 using ThreadedNanoPbPrimitiveSetMulticastListener =
-    ThreadedMulticastListener<NanoPbPrimitiveSetMulticastListener, PrimitiveSetMsg>;
+    ThreadedMulticastListener<NanoPbPrimitiveSetMulticastListener,
+                              TbotsProto_PrimitiveSet>;

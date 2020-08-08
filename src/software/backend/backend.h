@@ -28,7 +28,7 @@ class Backend : public Subject<SensorMsg>,
      *
      * @param msg The component of SensorMsg
      */
-    void receiveRobotStatusMsg(RobotStatusMsg msg);
+    void receiveRobotStatus(TbotsProto::RobotStatus msg);
     void receiveSSLWrapperPacket(SSL_WrapperPacket msg);
     void receiveSSLReferee(SSL_Referee msg);
 };

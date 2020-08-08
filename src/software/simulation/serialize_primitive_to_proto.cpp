@@ -4,8 +4,8 @@
 
 std::vector<uint8_t> serializePrimitiveToProto(const Primitive& primitive)
 {
-    PrimitiveMsg primitive_msg =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(primitive);
+    TbotsProto::Primitive primitive_msg =
+        ProtoCreatorPrimitiveVisitor().createPrimitive(primitive);
 
     // Serialize the message to an array of raw values
     std::vector<uint8_t> serialized_proto(primitive_msg.ByteSizeLong());

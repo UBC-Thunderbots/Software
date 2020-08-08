@@ -1,6 +1,6 @@
 #include "software/backend/backend.h"
 
-void Backend::receiveRobotStatusMsg(RobotStatusMsg msg)
+void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
 {
     SensorMsg sensor_msg;
     *(sensor_msg.add_robot_status_msgs()) = msg;

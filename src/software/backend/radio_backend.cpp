@@ -31,7 +31,7 @@ void RadioBackend::onValueReceived(World world)
 
 void RadioBackend::receiveRobotStatus(RobotStatus robot_status)
 {
-    Backend::receiveRobotStatusMsg(*convertRobotStatusToRobotStatusMsg(robot_status));
+    Backend::receiveRobotStatus(*convertRobotStatusToRobotStatusProto(robot_status));
 }
 
 // Register this play in the genericFactory
