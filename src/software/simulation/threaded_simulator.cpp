@@ -168,3 +168,15 @@ std::weak_ptr<PhysicsRobot> ThreadedSimulator::getRobotAtPosition(const Point &p
     std::scoped_lock lock(simulator_mutex);
     return simulator.getRobotAtPosition(position);
 }
+
+void ThreadedSimulator::addYellowRobot(const Point &position)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.addYellowRobot(position);
+}
+
+void ThreadedSimulator::addBlueRobot(const Point &position)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.addBlueRobot(position);
+}
