@@ -16,7 +16,7 @@ message RobotStatus
     NetworkStatus network_status              = 8;
     PowerStatus power_status                  = 9;
     TemperatureStatus temperature_status      = 10;
-    Timestamp time_sent                    = 11;
+    Timestamp time_sent                       = 11;
 }
 
 /* Data about the status of the break beam */

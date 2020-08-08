@@ -54,36 +54,36 @@ message PrimitiveNew
 
 message ChipPrimitive
 {
-    Point chip_origin       = 1;
-    Angle chip_direction    = 2;
+    Point chip_origin          = 1;
+    Angle chip_direction       = 2;
     float chip_distance_meters = 3;
 }
 
 message KickPrimitive
 {
-    Point kick_origin               = 1;
-    Angle kick_direction            = 2;
+    Point kick_origin                  = 1;
+    Angle kick_direction               = 2;
     float kick_speed_meters_per_second = 3;
 }
 
 message MovePrimitive
 {
     MovePositionParams position_params = 1;
-    Angle final_angle               = 2;
+    Angle final_angle                  = 2;
     float dribbler_speed_rpm           = 3;
 }
 
 message SpinningMovePrimitive
 {
-    MovePositionParams position_params  = 1;
-    AngularVelocity angular_velocity = 2;
-    float dribbler_speed_rpm            = 3;
+    MovePositionParams position_params = 1;
+    AngularVelocity angular_velocity   = 2;
+    float dribbler_speed_rpm           = 3;
 }
 
 message AutochipMovePrimitive
 {
     MovePositionParams position_params = 1;
-    Angle final_angle               = 2;
+    Angle final_angle                  = 2;
     float dribbler_speed_rpm           = 3;
     float chip_distance_meters         = 4;
 }
@@ -91,7 +91,7 @@ message AutochipMovePrimitive
 message AutokickMovePrimitive
 {
     MovePositionParams position_params = 1;
-    Angle final_angle               = 2;
+    Angle final_angle                  = 2;
     float dribbler_speed_rpm           = 3;
     float kick_speed_meters_per_second = 4;
 }
@@ -147,7 +147,7 @@ message DirectControlPrimitive
 
 message MovePositionParams
 {
-    Point destination                = 1;
+    Point destination                   = 1;
     float final_speed_meters_per_second = 2;
     bool slow                           = 3;
 }

@@ -27,7 +27,7 @@ void app_primitive_manager_destroy(PrimitiveManager_t *manager);
  */
 void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
-                                             PrimitiveMsg primitive_msg);
+                                             TbotsProto_Primitive primitive_msg);
 /**
  * Runs the current primitive
  *

@@ -106,7 +106,7 @@ void app_primitive_manager_destroy(PrimitiveManager_t *manager)
 
 void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
-                                             PrimitiveMsg primitive_msg)
+                                             TbotsProto_Primitive primitive_msg)
 {
     app_primitive_manager_lockPrimitiveMutex(manager);
 
@@ -115,37 +115,37 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     // Figure out which primitive we're running and start it
     switch (primitive_msg.which_primitive)
     {
-        case PrimitiveMsg_move_tag:
+        case TbotsProto_Primitive_move_tag:
             manager->current_primitive       = &MOVE_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_move_primitive_start(primitive_msg.primitive.move,
                                      manager->current_primitive_state, world);
             break;
-        case PrimitiveMsg_stop_tag:
+        case TbotsProto_Primitive_stop_tag:
             manager->current_primitive       = &STOP_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_stop_primitive_start(primitive_msg.primitive.stop,
                                      manager->current_primitive_state, world);
             break;
-        case PrimitiveMsg_shoot_tag:
+        case TbotsProto_Primitive_shoot_tag:
             manager->current_primitive       = &SHOOT_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_shoot_primitive_start(primitive_msg.primitive.shoot,
                                       manager->current_primitive_state, world);
             break;
-        case PrimitiveMsg_spinning_move_tag:
+        case TbotsProto_Primitive_spinning_move_tag:
             manager->current_primitive       = &SPINNING_MOVE_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_spinning_move_primitive_start(primitive_msg.primitive.spinning_move,
                                               manager->current_primitive_state, world);
             break;
-        case PrimitiveMsg_direct_wheels_tag:
+        case TbotsProto_Primitive_direct_wheels_tag:
             manager->current_primitive       = &DIRECT_WHEELS_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state;
             app_direct_wheels_primitive_start(primitive_msg.primitive.direct_wheels,
                                               manager->current_primitive_state, world);
             break;
-        case PrimitiveMsg_direct_velocity_tag:
+        case TbotsProto_Primitive_direct_velocity_tag:
             manager->current_primitive       = &DIRECT_VELOCITY_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_direct_velocity_primitive_start(primitive_msg.primitive.direct_velocity,
@@ -199,8 +199,8 @@ void app_primitive_manager_makeRobotSafe(PrimitiveManager_t *manager,
     app_dribbler_setSpeed(dribbler, 0);
 
     // Set the current primitive to STOP to stop the robot moving
-    manager->current_primitive       = &STOP_PRIMITIVE;
-    manager->current_primitive_state = manager->current_primitive->create_state();
-    PrimitiveParamsMsg params        = PrimitiveParamsMsg_init_zero;
+    manager->current_primitive        = &STOP_PRIMITIVE;
+    manager->current_primitive_state  = manager->current_primitive->create_state();
+    TbotsProto_PrimitiveParams params = TbotsProto_PrimitiveParams_init_zero;
     app_stop_primitive_start(params, manager->current_primitive_state, world);
 }

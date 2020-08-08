@@ -23,8 +23,8 @@ typedef struct SpinningMovePrimitiveState
 } SpinningMovePrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(SpinningMovePrimitiveState_t)
 
-void app_spinning_move_primitive_start(PrimitiveParamsMsg params, void *void_state_ptr,
-                                       FirmwareWorld_t *world)
+void app_spinning_move_primitive_start(TbotsProto_PrimitiveParams params,
+                                       void *void_state_ptr, FirmwareWorld_t *world)
 {
     SpinningMovePrimitiveState_t *state = (SpinningMovePrimitiveState_t *)void_state_ptr;
 
