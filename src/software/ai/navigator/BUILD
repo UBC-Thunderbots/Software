@@ -53,3 +53,13 @@ cc_library(
         "//software/world",
     ],
 )
+
+cc_test(
+    name = "navigating_primitive_creator_test",
+    srcs = ["navigating_primitive_creator_test.cpp"],
+    deps = [
+        ":navigating_primitive_creator",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
