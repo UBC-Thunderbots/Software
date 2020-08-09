@@ -176,8 +176,8 @@ class SensorFusionTest : public ::testing::Test
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 {
     SensorProto sensor_msg;
-    auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::unique_ptr<SSL_DetectionFrame>());
+    auto ssl_wrapper_packet = createSSLWrapperPacket(
+        std::move(geom_data), std::unique_ptr<SSL_DetectionFrame>());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -187,8 +187,8 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 {
     SensorProto sensor_msg;
-    auto ssl_wrapper_packet = createWrapperPacket(std::unique_ptr<SSL_GeometryData>(),
-                                                  std::move(detection_frame));
+    auto ssl_wrapper_packet = createSSLWrapperPacket(std::unique_ptr<SSL_GeometryData>(),
+                                                     std::move(detection_frame));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -199,7 +199,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_packet)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -220,7 +220,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_1_at_a_time
 {
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg_1.add_robot_status_msgs())  = *robot_status_msg_id_1;
     sensor_fusion.updateWorld(sensor_msg_1);
@@ -239,7 +239,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time
 {
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     sensor_fusion.updateWorld(sensor_msg_1);
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
@@ -266,7 +266,7 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_yellow;
@@ -293,7 +293,7 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
 
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_blue;

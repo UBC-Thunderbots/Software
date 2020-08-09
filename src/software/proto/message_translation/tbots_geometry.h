@@ -12,8 +12,8 @@
  *
  * @return The unique_ptr to the converted Geom proto
  */
-std::unique_ptr<TbotsProto::Point> createPoint(const Point& point);
-std::unique_ptr<TbotsProto::Angle> createAngle(const Angle& angle);
-std::unique_ptr<TbotsProto::AngularVelocity> createAngularVelocity(
+std::unique_ptr<TbotsProto::Point> createPointProto(const Point& point);
+std::unique_ptr<TbotsProto::Angle> createAngleProto(const Angle& angle);
+std::unique_ptr<TbotsProto::AngularVelocity> createAngularVelocityProto(
     const AngularVelocity& angular_velocity);
-std::unique_ptr<TbotsProto::Vector> createVector(const Vector& vector);
+std::unique_ptr<TbotsProto::Vector> createVectorProto(const Vector& vector);

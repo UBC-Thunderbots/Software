@@ -223,7 +223,7 @@ std::unique_ptr<SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
     auto geometry_data =
         createGeometryData(physics_world.getField(), FIELD_LINE_THICKNESS_METRES);
     auto wrapper_packet =
-        createWrapperPacket(std::move(geometry_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geometry_data), std::move(detection_frame));
     return std::move(wrapper_packet);
 }
 

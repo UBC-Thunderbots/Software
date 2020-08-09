@@ -54,10 +54,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> createPrimitiveSet(
 
 std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot)
 {
-    auto position         = createPoint(robot.position());
-    auto orientation      = createAngle(robot.orientation());
-    auto velocity         = createVector(robot.velocity());
-    auto angular_velocity = createAngularVelocity(robot.angularVelocity());
+    auto position         = createPointProto(robot.position());
+    auto orientation      = createAngleProto(robot.orientation());
+    auto velocity         = createVectorProto(robot.velocity());
+    auto angular_velocity = createAngularVelocityProto(robot.angularVelocity());
 
     auto robot_state_msg = std::make_unique<TbotsProto::RobotState>();
 
@@ -71,8 +71,8 @@ std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot)
 
 std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)
 {
-    auto position       = createPoint(ball.position());
-    auto velocity       = createVector(ball.velocity());
+    auto position       = createPointProto(ball.position());
+    auto velocity       = createVectorProto(ball.velocity());
     auto ball_state_msg = std::make_unique<TbotsProto::BallState>();
 
     *(ball_state_msg->mutable_global_position()) = *position;
