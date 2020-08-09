@@ -8,7 +8,7 @@
 #include "software/world/world.h"
 
 class ThreadedSensorFusion : public Subject<World>,
-                             public FirstInFirstOutThreadedObserver<SensorMsg>
+                             public FirstInFirstOutThreadedObserver<SensorProto>
 {
    public:
     explicit ThreadedSensorFusion(
@@ -17,7 +17,7 @@ class ThreadedSensorFusion : public Subject<World>,
     virtual ~ThreadedSensorFusion() = default;
 
    private:
-    void onValueReceived(SensorMsg sensor_msg) override;
+    void onValueReceived(SensorProto sensor_msg) override;
 
     SensorFusion sensor_fusion;
 };

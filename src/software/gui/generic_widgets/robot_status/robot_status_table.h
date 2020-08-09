@@ -50,7 +50,7 @@ class RobotStatusTable : public QTableWidget
      *
      * @param robot_status_msg The status to add to the table
      */
-    void updateRobotStatusMsg(const TbotsProto::RobotStatus& robot_status_msg);
+    void updateRobotStatus(const TbotsProto::RobotStatus& robot_status_msg);
 
    private:
     /**

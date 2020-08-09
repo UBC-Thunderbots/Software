@@ -4,7 +4,7 @@
 #include "software/networking/threaded_network_listener.h"
 
 /**
- * A threaded listener that receives serialized PrimitiveSetMsg's over the network
+ * A threaded listener that receives serialized `PrimitiveSet`s over the network
  */
 using ThreadedNanoPbPrimitiveSetMulticastListener =
     ThreadedMulticastListener<NanoPbPrimitiveSetMulticastListener,

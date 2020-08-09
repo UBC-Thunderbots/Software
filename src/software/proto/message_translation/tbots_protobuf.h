@@ -10,6 +10,7 @@
  * Returns a TbotsProto::Vision proto given a World.
  *
  * @param world The world msg to extract the TbotsProto::Vision from
+ *
  * @return The unique_ptr to a TbotsProto::Vision proto containing the friendly team and
  * ball information
  */
@@ -19,16 +20,18 @@ std::unique_ptr<TbotsProto::Vision> createVision(const World& world);
  * Returns a TbotsProto::Primitive proto given a ConstPrimitiveVectorPtr
  *
  * @param primitives The primitives to include in the TbotsProto::Primitive
+ *
  * @returns The unique_ptr to a TbotsProto::Primitive proto containing the primitives
  */
 std::unique_ptr<TbotsProto::PrimitiveSet> createPrimitiveSet(
     const ConstPrimitiveVectorPtr& primitives);
 
 /**
- * Returns (Robot, Ball)StateMsg given a (Robot, Ball)
+ * Returns (Robot, Ball)State given a (Robot, Ball)
  *
- * @param The (Robot, Ball) to convert to StateMsg proto
- * @return The unique_ptr to a (Robot, Ball)StateMsg after conversion
+ * @param The (Robot, Ball) to convert to State proto
+ *
+ * @return The unique_ptr to a (Robot, Ball)State after conversion
  */
 std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot);
 std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);

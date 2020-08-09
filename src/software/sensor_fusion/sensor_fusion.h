@@ -37,7 +37,7 @@ class SensorFusion
      *
      * @param new data
      */
-    void updateWorld(const SensorMsg &sensor_msg);
+    void updateWorld(const SensorProto &sensor_msg);
 
     /**
      * Returns the most up-to-date world if enough data has been received

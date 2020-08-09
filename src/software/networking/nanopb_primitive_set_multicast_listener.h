@@ -17,7 +17,7 @@ class NanoPbPrimitiveSetMulticastListener
    public:
     /**
      * Creates an NanoPbPrimitiveSetMulticastListener that will listen for primitive sets
-     * sent over the network on the given address and port. For every PrimitiveMsgSet
+     * sent over the network on the given address and port. For every PrimitiveSet
      * received, the receive_callback will be called to perform any operations desired by
      * the caller
      *
@@ -28,7 +28,7 @@ class NanoPbPrimitiveSetMulticastListener
      *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port on which to listen for ReceiveProtoT packets
      * @param receive_callback This function will be called with a map of
-     *                         RobotId -> PrimitiveMsg
+     *                         RobotId -> Primitive
      */
     NanoPbPrimitiveSetMulticastListener(
         boost::asio::io_service& io_service, const std::string& ip_address,

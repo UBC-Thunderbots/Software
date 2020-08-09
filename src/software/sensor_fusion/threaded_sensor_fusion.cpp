@@ -11,7 +11,7 @@ ThreadedSensorFusion::ThreadedSensorFusion(
     }
 }
 
-void ThreadedSensorFusion::onValueReceived(SensorMsg sensor_msg)
+void ThreadedSensorFusion::onValueReceived(SensorProto sensor_msg)
 {
     sensor_fusion.updateWorld(sensor_msg);
     std::optional<World> world = sensor_fusion.getWorld();

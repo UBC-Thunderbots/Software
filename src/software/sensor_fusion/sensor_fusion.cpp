@@ -41,7 +41,7 @@ std::optional<World> SensorFusion::getWorld() const
     }
 }
 
-void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
+void SensorFusion::updateWorld(const SensorProto &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {

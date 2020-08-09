@@ -20,7 +20,7 @@ class RadioBackend : public Backend
     void onValueReceived(World world) override;
 
     /**
-     * Convert robot_status to TbotsProto::RobotStatus and send as a SensorMsg to
+     * Convert robot_status to TbotsProto::RobotStatus and send as a SensorProto to
      * observers
      *
      * @param robot_status The RobotStatus
