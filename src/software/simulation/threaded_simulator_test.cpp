@@ -271,3 +271,25 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
         Angle::half(), Angle::fromRadians(blue_robot_2->orientation()),
         Angle::fromDegrees(10)));
 }
+
+TEST_F(ThreadedSimulatorTest, add_individual_robots_at_position_while_simulation_running)
+{
+    threaded_simulator.startSimulation();
+    // yield and sleep to give the simulation thread the best chance of running
+    std::this_thread::yield();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    threaded_simulator.addYellowRobot(Point(0, 0));
+    threaded_simulator.addBlueRobot(Point(2.1, 1));
+
+    std::this_thread::yield();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    threaded_simulator.stopSimulation();
+
+    auto ssl_wrapper_packet = most_recent_wrapper_packet;
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_yellow_size());
+    ASSERT_EQ(1, detection_frame.robots_blue_size());
+}

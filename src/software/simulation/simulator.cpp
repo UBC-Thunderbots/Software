@@ -225,3 +225,21 @@ std::weak_ptr<PhysicsRobot> Simulator::getRobotAtPosition(const Point& position)
 {
     return physics_world.getRobotAtPosition(position);
 }
+
+void Simulator::addYellowRobot(const Point& position)
+{
+    RobotId id = physics_world.getAvailableYellowRobotId();
+    auto state =
+        RobotState(position, Vector(0, 0), Angle::zero(), AngularVelocity::zero());
+    auto state_with_id = RobotStateWithId{.id = id, .robot_state = state};
+    addYellowRobots({state_with_id});
+}
+
+void Simulator::addBlueRobot(const Point& position)
+{
+    RobotId id = physics_world.getAvailableBlueRobotId();
+    auto state =
+        RobotState(position, Vector(0, 0), Angle::zero(), AngularVelocity::zero());
+    auto state_with_id = RobotStateWithId{.id = id, .robot_state = state};
+    addBlueRobots({state_with_id});
+}

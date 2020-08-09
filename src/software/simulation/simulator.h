@@ -124,6 +124,23 @@ class Simulator
     void addBlueRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
+     * Adds a robots to the specified team at the given position. The robot will
+     * automatically be given a valid ID.
+     *
+     * @param position the position at which to add the robot
+     */
+    void addYellowRobot(const Point& position);
+    void addBlueRobot(const Point& position);
+
+    /**
+     * Sets the primitives being simulated by the robots in simulation
+     *
+     * @param primitives The primitives to simulate
+     */
+    void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
+    void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
+
+    /**
      * Sets the primitive being simulated by the robot on the corresponding team
      * in simulation
      *
