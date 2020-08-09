@@ -56,9 +56,9 @@ ProtoMulticastCommunicationProfile_t *robot_status_msg_sender_profile;
 ProtoMulticastCommunicationProfile_t *vision_msg_listener_profile;
 ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
 
-static VisionMsg vision_msg;
-static TbotsProto::RobotStatus robot_status_msg;
-static PrimitiveMsg primitive_msg;
+static TbotsProto_Vision vision_msg;
+static TbotsProto_RobotStatus robot_status_msg;
+static TbotsProto_Primitive primitive_msg;
 
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
@@ -72,10 +72,10 @@ const osThreadAttr_t RobotStatusTask_attributes = {
     .name       = "RobotStatusTask",
     .priority   = (osPriority_t)osPriorityHigh7,
     .stack_size = 1024 * 4};
-/* Definitions for VisionMsgTask */
-osThreadId_t VisionMsgTaskHandle;
-const osThreadAttr_t VisionMsgTask_attributes = {
-    .name       = "VisionMsgTask",
+/* Definitions for TbotsProto_VisionTask */
+osThreadId_t TbotsProto_VisionTaskHandle;
+const osThreadAttr_t TbotsProto_VisionTask_attributes = {
+    .name       = "TbotsProto_VisionTask",
     .priority   = (osPriority_t)osPriorityHigh7,
     .stack_size = 1024 * 4};
 /* Definitions for PrimMsgTask */
@@ -140,10 +140,10 @@ void MX_FREERTOS_Init(void)
         osThreadNew(io_proto_multicast_sender_task,
                     (void *)robot_status_msg_sender_profile, &RobotStatusTask_attributes);
 
-    /* creation of VisionMsgTask */
-    VisionMsgTaskHandle =
+    /* creation of TbotsProto_VisionTask */
+    TbotsProto_VisionTaskHandle =
         osThreadNew(io_proto_multicast_listener_task, (void *)vision_msg_listener_profile,
-                    &VisionMsgTask_attributes);
+                    &TbotsProto_VisionTask_attributes);
 
     /* creation of PrimMsgTask */
     PrimMsgTaskHandle =
@@ -226,15 +226,15 @@ void initIoNetworking()
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
-        &primitive_msg, PrimitiveMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &primitive_msg, TbotsProto_Primitive_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
-        &vision_msg, VisionMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &vision_msg, TbotsProto_Vision_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     robot_status_msg_sender_profile = io_proto_multicast_communication_profile_create(
         "robot_status_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
-        &robot_status_msg, TbotsProto::RobotStatus_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &robot_status_msg, TbotsProto_RobotStatus_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 }
 
 
