@@ -170,14 +170,15 @@ void SimulatorRobot::chip(float distance_m)
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         for (auto ball : this->balls_in_dribbler_area)
         {
-            // Mark the ball as "in flight" so collisions are turned off
-            // until it has travelled the desired chip distance.
-            ball->setInFlightForDistance(distance_m);
-
             // Assume the ball is chipped at a 45 degree angle
             // TODO: Use a robot-specific constant
             // https://github.com/UBC-Thunderbots/Software/issues/1179
             Angle chip_angle = Angle::fromDegrees(45);
+
+            // Mark the ball as "in flight" so collisions are turned off
+            // until it has travelled the desired chip distance.
+            ball->setInFlightForDistance(distance_m, chip_angle);
+
             // Use the formula for the Range of a parabolic projectile
             // Rearrange to solve for the initial velocity.
             // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
