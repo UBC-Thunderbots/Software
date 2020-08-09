@@ -36,7 +36,7 @@ class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
         const std::vector<ObstaclePtr> &enemy_robot_obstacles);
 
     /**
-     * Converts the given Intent into a Primitive
+     * Converts the given NavigatingIntent into a Primitive
      *
      * @param The NavigatingIntent to convert
      */
