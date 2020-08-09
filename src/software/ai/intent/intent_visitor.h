@@ -6,7 +6,6 @@
 // intent.h. Note: every subclass of this visitor must include all of the classes listed
 // below
 class MoveIntent;
-class NavigatingIntent;
 class DirectPrimitiveIntent;
 
 /**
@@ -27,6 +26,5 @@ class IntentVisitor
      * @param The Intent to visit
      */
     virtual void visit(const MoveIntent &intent)            = 0;
-    virtual void visit(const NavigatingIntent &intent)            = 0;
     virtual void visit(const DirectPrimitiveIntent &intent) = 0;
 };

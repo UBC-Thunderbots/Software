@@ -16,12 +16,13 @@ class NavigatingIntent : public Intent
      * @param robot_id The id of the Robot to run this Primitive
      * @param priority The priority of this Intent
      * @param destination The destination of the Movement
+     * @param final_speed The final speed the robot should have when it arrives at its
+     * destination
      * @param ball_collision_type how to navigate around the ball
      */
     explicit NavigatingIntent(unsigned int robot_id, unsigned int priority,
-                    Point destination, BallCollisionType ball_collision_type );
-
-    void accept(IntentVisitor& visitor) const override;
+                              Point destination, double final_speed,
+                              BallCollisionType ball_collision_type);
 
     /**
      * Accepts an NavigatingIntent Visitor and calls the visit function
@@ -35,14 +36,21 @@ class NavigatingIntent : public Intent
      *
      * @return The destination
      */
-    const Point &getNavigationDestination() const;
+    const Point& getDestination() const;
+
+    /**
+     * Gets the final speed
+     *
+     * @return the final speed
+     */
+    double getFinalSpeed() const;
 
     /**
      * Gets the ball collision type
      *
      * @return The ball collision type
      */
-    const BallCollisionType &getBallCollisionType() const;
+    const BallCollisionType& getBallCollisionType() const;
 
     /**
      * Compares NavigatingIntents for equality. NavigatingIntents are considered
@@ -64,6 +72,7 @@ class NavigatingIntent : public Intent
     bool operator!=(const NavigatingIntent& other) const;
 
    private:
-    Point navigation_destination;
+    Point destination;
+    double final_speed;
     BallCollisionType ball_collision_type;
 };

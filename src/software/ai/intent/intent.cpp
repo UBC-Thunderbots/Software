@@ -5,8 +5,7 @@
 #include "software/logger/logger.h"
 
 Intent::Intent(unsigned int robot_id, unsigned int priority)
-    : robot_id(robot_id),
-      motion_constraints()
+    : robot_id(robot_id), motion_constraints()
 {
     setPriority(priority);
 }

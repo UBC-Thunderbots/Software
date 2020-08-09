@@ -1,7 +1,5 @@
 #pragma once
 
-#include <unordered_set>
-
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
@@ -13,7 +11,7 @@
 #include "software/world/world.h"
 
 /**
- * This Navigator converts the given Intents into their respective Primitives
+ * The Navigator converts the given Intents into their respective Primitives
  * and navigate around obstacles
  */
 class Navigator : public IntentVisitor
@@ -62,56 +60,27 @@ class Navigator : public IntentVisitor
      * @param The Intent to register
      */
     void visit(const DirectPrimitiveIntent &intent) override;
-    void visit(const NavigatingIntent &intent) override;
     void visit(const MoveIntent &intent) override;
-
-    /**
-     * Calculates the transition speed for the robot between two line segments
-     *
-     * Calculates the speed that the robot should be at when it is at the end of a
-     * given line segment in order to smoothly transition to another given line segment,
-     * given a final speed at the end of the two line segments
-     *
-     * This is only public so it is testable.
-     *
-     * @param p1, p2, p3 are 3 points that define two line segments that form a path
-     * @param final_speed is the intended final speed at the end of the path
-     * @return the first segment's final speed after travelling from p1 to p2
-     * for a smooth transition to the p2 to p3 path, scaled by the final speed at the end
-     * of the path
-     */
-    static double calculateTransitionSpeedBetweenSegments(const Point &p1,
-                                                          const Point &p2,
-                                                          const Point &p3,
-                                                          double final_speed);
 
    private:
     /**
      * Generates path objectives
      *
-     * @param intents intents to make into path objectives
      * @param world World to navigate around
      *
-     * @return vector of PathObjectives
+     * @return set of PathObjectives
      */
-    std::vector<PathObjective> createPathObjectives(
-        const std::vector<std::unique_ptr<Intent>> &intents, const World &world);
-
-    /**
-     * Creates the final speed and destination given the final speed and the path
-     *
-     * @param final_speed The final speed
-     * @param path path to make primitive for
-     *
-     * @return the final destination and speed
-     */
-    std::pair<Point, double> calculateDestinationAndFinalSpeed(double final_speed,
-                                                               Path path);
+    std::unordered_set<PathObjective> createPathObjectives(const World &world) const;
 
     std::shared_ptr<const NavigatorConfig> config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
     std::unique_ptr<PathManager> path_manager;
+
     std::vector<std::vector<Point>> planned_paths;
-    std::optional<PrimitiveMsg> current_primitive;
-    std::map<RobotId, std::optional<Path>> robot_id_to_path;
+    std::vector<std::shared_ptr<NavigatingIntent>> navigating_intents;
+    // These are the robots that were assigned direct primitive intents.
+    // When navigating intents are processed to path plan, we can avoid these
+    // non-navigating robots
+    std::vector<RobotId> direct_primitive_intent_robots;
+    std::unique_ptr<PrimitiveSetMsg> primitive_set_msg;
 };

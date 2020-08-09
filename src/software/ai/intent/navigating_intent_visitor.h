@@ -8,11 +8,11 @@
 class MoveIntent;
 
 /**
- * This class provides an interface for all NavigatingIntent Visitors. The Visitor design pattern
- * allows us to perform operations on NavigatingIntent objects without needing to check which
- * concrete type it is with an if/else statement, and we don't need to pollute the
- * NavigatingIntent classes with information or functions that are specific to the task we
- * want to perform.
+ * This class provides an interface for all NavigatingIntent Visitors. The Visitor design
+ * pattern allows us to perform operations on NavigatingIntent objects without needing to
+ * check which concrete type it is with an if/else statement, and we don't need to pollute
+ * the NavigatingIntent classes with information or functions that are specific to the
+ * task we want to perform.
  */
 class NavigatingIntentVisitor
 {
@@ -24,5 +24,5 @@ class NavigatingIntentVisitor
      *
      * @param The NavigatingIntent to visit
      */
-    virtual void visit(const MoveIntent &intent)            = 0;
+    virtual void visit(const MoveIntent &intent) = 0;
 };

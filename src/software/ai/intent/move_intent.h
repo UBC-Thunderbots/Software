@@ -32,50 +32,36 @@ class MoveIntent : public NavigatingIntent
                         BallCollisionType ball_collision_type);
 
     std::string getIntentName(void) const override;
-
+    void accept(IntentVisitor& visitor) const override;
     void accept(NavigatingIntentVisitor& visitor) const override;
-
-    /**
-     * Gets the robot's destination
-     *
-     * @return The robots destination as a Point(X,Y)
-     */
-    const Point &getDestination() const;
 
     /**
      * Gets the robot's destination orientation
      *
      * @return The robots final orientation as an Angle
      */
-    const Angle &getFinalAngle() const;
-
-    /**
-     * Gets the robot's final speed in m/s
-     *
-     * @return The robots speed in m/s
-     */
-    double getFinalSpeed() const;
+    const Angle& getFinalAngle() const;
 
     /**
      * Gets whether or not auto-kick should be enabled while moving
      *
      * @return whether or not auto-kick should be enabled while moving
      */
-    const AutochickType &getAutochickType() const;
+    const AutochickType& getAutochickType() const;
 
     /**
      * Gets whether or not the dribbler should be enabled while moving
      *
      * @return whether or not the dribbler should be enabled while moving
      */
-    const DribblerEnable &getDribblerEnable() const;
+    const DribblerEnable& getDribblerEnable() const;
 
     /**
      * Gets whether or not the robot should be moving slow
      *
      * @return whether or not the robot should be moving slow
      */
-    const MoveType &getMoveType() const;
+    const MoveType& getMoveType() const;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
@@ -96,9 +82,7 @@ class MoveIntent : public NavigatingIntent
 
    private:
     unsigned int robot_id;
-    Point destination;
     Angle final_angle;
-    double final_speed;
     DribblerEnable enable_dribbler;
     MoveType move_type;
     AutochickType autokick;

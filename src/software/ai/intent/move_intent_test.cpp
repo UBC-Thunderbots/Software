@@ -43,6 +43,6 @@ TEST(MoveIntentTest, test_get_destination_ball_collision)
     MoveIntent move_intent =
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, 1, DribblerEnable::OFF,
                    MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID);
-    EXPECT_EQ(move_intent.getNavigationDestination(), Point(1, 2));
+    EXPECT_EQ(move_intent.getDestination(), Point(1, 2));
     EXPECT_EQ(move_intent.getBallCollisionType(), BallCollisionType::AVOID);
 }

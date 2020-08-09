@@ -14,8 +14,8 @@ cc_library(
     srcs = ["navigating_intent.cpp"],
     hdrs = ["navigating_intent.h"],
     deps = [
-        ":intent",
         "navigating_intent_visitor",
+        ":intent",
     ],
 )
 
