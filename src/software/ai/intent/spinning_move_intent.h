@@ -23,23 +23,4 @@ class SpinningMoveIntent : public DirectPrimitiveIntent
                                 unsigned int priority);
 
     std::string getIntentName(void) const override;
-
-    /**
-     * Compares SpinningMoveIntents for equality. SpinningMoveIntents are considered equal
-     * if all their member variables are equal.
-     *
-     * @param other the SpinningMoveIntents to compare with for equality
-     *
-     * @return true if the SpinningMoveIntents are equal and false otherwise
-     */
-    bool operator==(const SpinningMoveIntent& other) const;
-
-    /**
-     * Compares SpinningMoveIntents for inequality.
-     *
-     * @param other the SpinningMoveIntent to compare with for inequality
-     *
-     * @return true if the SpinningMoveIntents are not equal and false otherwise
-     */
-    bool operator!=(const SpinningMoveIntent& other) const;
 };

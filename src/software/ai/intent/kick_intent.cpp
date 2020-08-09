@@ -16,13 +16,3 @@ std::string KickIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
-
-bool KickIntent::operator==(const KickIntent &other) const
-{
-    return DirectPrimitiveIntent::operator==(other);
-}
-
-bool KickIntent::operator!=(const KickIntent &other) const
-{
-    return !((*this) == other);
-}

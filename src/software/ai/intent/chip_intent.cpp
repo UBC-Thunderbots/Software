@@ -16,13 +16,3 @@ std::string ChipIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
-
-bool ChipIntent::operator==(const ChipIntent &other) const
-{
-    return DirectPrimitiveIntent::operator==(other);
-}
-
-bool ChipIntent::operator!=(const ChipIntent &other) const
-{
-    return !((*this) == other);
-}

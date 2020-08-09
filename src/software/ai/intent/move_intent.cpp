@@ -52,7 +52,8 @@ const MoveType &MoveIntent::getMoveType() const
 
 bool MoveIntent::operator==(const MoveIntent &other) const
 {
-    return Intent::operator==(other) && this->final_angle == other.final_angle &&
+    return NavigatingIntent::operator==(other) &&
+           this->final_angle == other.final_angle &&
            this->enable_dribbler == other.enable_dribbler &&
            this->move_type == other.move_type && this->autokick == other.autokick;
 }

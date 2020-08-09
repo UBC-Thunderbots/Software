@@ -16,13 +16,3 @@ std::string SpinningMoveIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
-
-bool SpinningMoveIntent::operator==(const SpinningMoveIntent &other) const
-{
-    return DirectPrimitiveIntent::operator==(other);
-}
-
-bool SpinningMoveIntent::operator!=(const SpinningMoveIntent &other) const
-{
-    return !((*this) == other);
-}

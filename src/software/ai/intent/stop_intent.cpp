@@ -13,13 +13,3 @@ std::string StopIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
-
-bool StopIntent::operator==(const StopIntent &other) const
-{
-    return DirectPrimitiveIntent::operator==(other);
-}
-
-bool StopIntent::operator!=(const StopIntent &other) const
-{
-    return !((*this) == other);
-}
