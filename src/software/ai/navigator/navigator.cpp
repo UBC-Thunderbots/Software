@@ -13,14 +13,9 @@ Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
 {
 }
 
-void Navigator::visit(const ChipIntent &intent)
+void Navigator::visit(const DirectPrimitiveIntent &intent)
 {
-    current_primitive = intent.generatePrimitive();
-}
-
-void Navigator::visit(const KickIntent &intent)
-{
-    current_primitive = intent.generatePrimitive();
+    current_primitive = intent.getDirectPrimitive();
 }
 
 void Navigator::visit(const MoveIntent &intent)
@@ -58,16 +53,6 @@ void Navigator::visit(const MoveIntent &intent)
         current_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
             StopPrimitive(robot_id, false));
     }
-}
-
-void Navigator::visit(const SpinningMoveIntent &intent)
-{
-    current_primitive = intent.generatePrimitive();
-}
-
-void Navigator::visit(const StopIntent &intent)
-{
-    current_primitive = intent.generatePrimitive();
 }
 
 std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitives(

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "software/ai/intent/intent.h"
+#include "software/ai/intent/direct_primitive_intent.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/primitive/kick_primitive.h"
 
-class KickIntent : public Intent
+class KickIntent : public DirectPrimitiveIntent
 {
    public:
     static const std::string INTENT_NAME;
@@ -26,8 +26,6 @@ class KickIntent : public Intent
 
     std::string getIntentName(void) const override;
 
-    void accept(IntentVisitor& visitor) const override;
-
     /**
      * Compares KickIntents for equality. KickIntents are considered equal if all
      * their member variables are equal.
@@ -44,14 +42,4 @@ class KickIntent : public Intent
      * @return true if the KickIntents are not equal and false otherwise
      */
     bool operator!=(const KickIntent& other) const;
-
-    /**
-     * Generates Primitive from this Intent
-     *
-     * @return The Primitive that represents this Intent
-     */
-    PrimitiveMsg generatePrimitive() const;
-
-   private:
-    PrimitiveMsg primitive_msg;
 };

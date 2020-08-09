@@ -61,11 +61,8 @@ class Navigator : public IntentVisitor
      *
      * @param The Intent to register
      */
-    void visit(const ChipIntent &chip_intent) override;
-    void visit(const KickIntent &kick_intent) override;
+    void visit(const DirectPrimitiveIntent &direct_primitive_intent) override;
     void visit(const MoveIntent &move_intent) override;
-    void visit(const SpinningMoveIntent &spinning_move_intent) override;
-    void visit(const StopIntent &stop_intent) override;
 
     /**
      * Calculates the transition speed for the robot between two line segments

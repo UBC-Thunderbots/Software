@@ -1,9 +1,9 @@
 #pragma once
 
-#include "software/ai/intent/intent.h"
+#include "software/ai/intent/direct_primitive_intent.h"
 #include "software/primitive/stop_primitive.h"
 
-class StopIntent : public Intent
+class StopIntent : public DirectPrimitiveIntent
 {
    public:
     static const std::string INTENT_NAME;
@@ -21,8 +21,6 @@ class StopIntent : public Intent
 
     std::string getIntentName(void) const override;
 
-    void accept(IntentVisitor& visitor) const override;
-
     /**
      * Compares StopIntents for equality. StopIntents are considered equal if all
      * their member variables are equal.
@@ -39,14 +37,4 @@ class StopIntent : public Intent
      * @return true if the StopIntents are not equal and false otherwise
      */
     bool operator!=(const StopIntent& other) const;
-
-    /**
-     * Generates Primitive from this Intent
-     *
-     * @return The Primitive that represents this Intent
-     */
-    PrimitiveMsg generatePrimitive() const;
-
-   private:
-    PrimitiveMsg primitive_msg;
 };

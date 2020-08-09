@@ -1,9 +1,9 @@
 #pragma once
 
-#include "software/ai/intent/intent.h"
+#include "software/ai/intent/direct_primitive_intent.h"
 #include "software/primitive/spinning_move_primitive.h"
 
-class SpinningMoveIntent : public Intent
+class SpinningMoveIntent : public DirectPrimitiveIntent
 {
    public:
     static const std::string INTENT_NAME;
@@ -24,8 +24,6 @@ class SpinningMoveIntent : public Intent
 
     std::string getIntentName(void) const override;
 
-    void accept(IntentVisitor& visitor) const override;
-
     /**
      * Compares SpinningMoveIntents for equality. SpinningMoveIntents are considered equal
      * if all their member variables are equal.
@@ -44,14 +42,4 @@ class SpinningMoveIntent : public Intent
      * @return true if the SpinningMoveIntents are not equal and false otherwise
      */
     bool operator!=(const SpinningMoveIntent& other) const;
-
-    /**
-     * Generates Primitive from this Intent
-     *
-     * @return The Primitive that represents this Intent
-     */
-    PrimitiveMsg generatePrimitive() const;
-
-   private:
-    PrimitiveMsg primitive_msg;
 };

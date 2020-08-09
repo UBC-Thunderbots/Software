@@ -1,15 +1,14 @@
 #include "software/ai/intent/chip_intent.h"
 
-#include <google/protobuf/util/message_differencer.h>
-
 const std::string ChipIntent::INTENT_NAME = "Chip Intent";
 
 ChipIntent::ChipIntent(unsigned int robot_id, const Point &chip_origin,
                        const Angle &chip_direction, double chip_distance_meters,
                        unsigned int priority)
-    : Intent(robot_id, priority),
-      primitive_msg(ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
-          ChipPrimitive(robot_id, chip_origin, chip_direction, chip_distance_meters)))
+    : DirectPrimitiveIntent(
+          robot_id, priority,
+          ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+              ChipPrimitive(robot_id, chip_origin, chip_direction, chip_distance_meters)))
 {
 }
 
@@ -18,24 +17,12 @@ std::string ChipIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void ChipIntent::accept(IntentVisitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
 bool ChipIntent::operator==(const ChipIntent &other) const
 {
-    return Intent::operator==(other) &&
-           google::protobuf::util::MessageDifferencer::Equals(this->primitive_msg,
-                                                              other.primitive_msg);
+    return DirectPrimitiveIntent::operator==(other);
 }
 
 bool ChipIntent::operator!=(const ChipIntent &other) const
 {
     return !((*this) == other);
-}
-
-PrimitiveMsg ChipIntent::generatePrimitive() const
-{
-    return primitive_msg;
 }

@@ -1,11 +1,20 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "direct_primitive_intent",
+    srcs = ["direct_primitive_intent.cpp"],
+    hdrs = ["direct_primitive_intent.h"],
+    deps = [
+        ":intent",
+    ],
+)
+
+cc_library(
     name = "chip_intent",
     srcs = ["chip_intent.cpp"],
     hdrs = ["chip_intent.h"],
     deps = [
-        ":intent",
+        ":direct_primitive_intent",
         "//software/primitive:chip_primitive",
     ],
 )
@@ -24,7 +33,7 @@ cc_library(
     srcs = ["kick_intent.cpp"],
     hdrs = ["kick_intent.h"],
     deps = [
-        ":intent",
+        ":direct_primitive_intent",
         "//software/primitive:kick_primitive",
     ],
 )
@@ -65,7 +74,7 @@ cc_library(
     srcs = ["spinning_move_intent.cpp"],
     hdrs = ["spinning_move_intent.h"],
     deps = [
-        ":intent",
+        ":direct_primitive_intent",
         "//software/primitive:spinning_move_primitive",
     ],
 )
@@ -84,7 +93,7 @@ cc_library(
     srcs = ["stop_intent.cpp"],
     hdrs = ["stop_intent.h"],
     deps = [
-        ":intent",
+        ":direct_primitive_intent",
         "//software/primitive:stop_primitive",
     ],
 )
@@ -103,6 +112,7 @@ cc_library(
     hdrs = ["all_intents.h"],
     deps = [
         ":chip_intent",
+        ":direct_primitive_intent",
         ":kick_intent",
         ":move_intent",
         ":spinning_move_intent",
