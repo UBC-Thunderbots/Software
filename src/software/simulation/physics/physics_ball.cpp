@@ -1,7 +1,7 @@
 #include "software/simulation/physics/physics_ball.h"
 
 #include "shared/constants.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 
