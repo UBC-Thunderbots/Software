@@ -1,9 +1,10 @@
 #include "software/simulation/simulator.h"
 
+#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
-#include "software/simulation/convert_primitive_to_nanopb.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/simulation/simulator_robot_singleton.h"
 
@@ -94,7 +95,8 @@ void Simulator::setRobotPrimitives(
 
     for (const auto& primitive_ptr : *primitives)
     {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(*primitive_ptr);
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
                           simulator_ball);
