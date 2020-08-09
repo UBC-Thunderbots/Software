@@ -36,12 +36,8 @@ class Intent
      *
      * @param robot_id The id of the Robot to run this Primitive
      * @param priority The priority of this Intent
-     * @param destination The destination of the Movement
-     * @param ball_collision_type how to navigate around the ball
      */
-    explicit Intent(unsigned int robot_id, unsigned int priority,
-                    BallCollisionType ball_collision_type = BallCollisionType::AVOID,
-                    std::optional<Point> destination      = std::nullopt);
+    explicit Intent(unsigned int robot_id, unsigned int priority);
 
     /**
      * Returns the name of this Intent
@@ -66,20 +62,6 @@ class Intent
     unsigned int getRobotId() const;
 
     /**
-     * Gets the destination to navigate to
-     *
-     * @return The destination
-     */
-    std::optional<Point> getNavigationDestination() const;
-
-    /**
-     * Gets the ball collision type
-     *
-     * @return The ball collision type
-     */
-    BallCollisionType getBallCollisionType() const;
-
-    /**
      * Sets the priority of this Intent. The priority value must be an integer in the
      * range [0, 100]
      */
@@ -90,6 +72,7 @@ class Intent
      * their member variables are equal.
      *
      * @param other the Intents to compare with for equality
+     *
      * @return true if the Intents are equal and false otherwise
      */
     bool operator==(const Intent& other) const;
@@ -98,6 +81,7 @@ class Intent
      * Compares Intents for inequality.
      *
      * @param other the Intent to compare with for inequality
+     *
      * @return true if the Intents are not equal and false otherwise
      */
     bool operator!=(const Intent& other) const;
@@ -132,7 +116,5 @@ class Intent
      * higher value => higher priority
      */
     unsigned int priority;
-    std::optional<Point> navigation_destination;
-    BallCollisionType ball_collision_type;
     std::set<MotionConstraint> motion_constraints;
 };

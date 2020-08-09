@@ -18,6 +18,10 @@ void Navigator::visit(const DirectPrimitiveIntent &intent)
     current_primitive = intent.getDirectPrimitive();
 }
 
+void Navigator::visit(const NavigatingIntent &intent)
+{
+}
+
 void Navigator::visit(const MoveIntent &intent)
 {
     unsigned int robot_id      = intent.getRobotId();

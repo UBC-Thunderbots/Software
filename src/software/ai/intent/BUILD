@@ -10,6 +10,16 @@ cc_library(
 )
 
 cc_library(
+    name = "navigating_intent",
+    srcs = ["navigating_intent.cpp"],
+    hdrs = ["navigating_intent.h"],
+    deps = [
+        ":intent",
+        "navigating_intent_visitor",
+    ],
+)
+
+cc_library(
     name = "chip_intent",
     srcs = ["chip_intent.cpp"],
     hdrs = ["chip_intent.h"],
@@ -52,7 +62,7 @@ cc_library(
     srcs = ["move_intent.cpp"],
     hdrs = ["move_intent.h"],
     deps = [
-        ":intent",
+        ":navigating_intent",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/primitive:move_primitive",
@@ -115,6 +125,7 @@ cc_library(
         ":direct_primitive_intent",
         ":kick_intent",
         ":move_intent",
+        ":navigating_intent",
         ":spinning_move_intent",
         ":stop_intent",
     ],
@@ -149,4 +160,9 @@ cc_test(
 cc_library(
     name = "intent_visitor",
     hdrs = ["intent_visitor.h"],
+)
+
+cc_library(
+    name = "navigating_intent_visitor",
+    hdrs = ["navigating_intent_visitor.h"],
 )

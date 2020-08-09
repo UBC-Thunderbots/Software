@@ -1,9 +1,9 @@
 #pragma once
 
-#include "software/ai/intent/intent.h"
+#include "software/ai/intent/navigating_intent.h"
 #include "software/primitive/move_primitive.h"
 
-class MoveIntent : public Intent
+class MoveIntent : public NavigatingIntent
 {
    public:
     static const std::string INTENT_NAME;
@@ -33,21 +33,21 @@ class MoveIntent : public Intent
 
     std::string getIntentName(void) const override;
 
-    void accept(IntentVisitor& visitor) const override;
+    void accept(NavigatingIntentVisitor& visitor) const override;
 
     /**
      * Gets the robot's destination
      *
      * @return The robots destination as a Point(X,Y)
      */
-    Point getDestination() const;
+    const Point &getDestination() const;
 
     /**
      * Gets the robot's destination orientation
      *
      * @return The robots final orientation as an Angle
      */
-    Angle getFinalAngle() const;
+    const Angle &getFinalAngle() const;
 
     /**
      * Gets the robot's final speed in m/s
@@ -61,21 +61,21 @@ class MoveIntent : public Intent
      *
      * @return whether or not auto-kick should be enabled while moving
      */
-    AutochickType getAutochickType() const;
+    const AutochickType &getAutochickType() const;
 
     /**
      * Gets whether or not the dribbler should be enabled while moving
      *
      * @return whether or not the dribbler should be enabled while moving
      */
-    DribblerEnable getDribblerEnable() const;
+    const DribblerEnable &getDribblerEnable() const;
 
     /**
      * Gets whether or not the robot should be moving slow
      *
      * @return whether or not the robot should be moving slow
      */
-    MoveType getMoveType() const;
+    const MoveType &getMoveType() const;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all

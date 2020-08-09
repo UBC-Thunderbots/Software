@@ -27,6 +27,7 @@ class DirectPrimitiveIntent : public Intent
      * equal if all their member variables are equal.
      *
      * @param other the DirectPrimitiveIntents to compare with for equality
+     *
      * @return true if the DirectPrimitiveIntents are equal and false otherwise
      */
     bool operator==(const DirectPrimitiveIntent& other) const;
@@ -35,6 +36,7 @@ class DirectPrimitiveIntent : public Intent
      * Compares DirectPrimitiveIntents for inequality.
      *
      * @param other the DirectPrimitiveIntent to compare with for inequality
+     *
      * @return true if the DirectPrimitiveIntents are not equal and false otherwise
      */
     bool operator!=(const DirectPrimitiveIntent& other) const;

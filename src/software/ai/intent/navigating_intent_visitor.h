@@ -6,27 +6,23 @@
 // intent.h. Note: every subclass of this visitor must include all of the classes listed
 // below
 class MoveIntent;
-class NavigatingIntent;
-class DirectPrimitiveIntent;
 
 /**
- * This class provides an interface for all Intent Visitors. The Visitor design pattern
- * allows us to perform operations on Intent objects without needing to check which
+ * This class provides an interface for all NavigatingIntent Visitors. The Visitor design pattern
+ * allows us to perform operations on NavigatingIntent objects without needing to check which
  * concrete type it is with an if/else statement, and we don't need to pollute the
- * Intent classes with information or functions that are specific to the task we
+ * NavigatingIntent classes with information or functions that are specific to the task we
  * want to perform.
  */
-class IntentVisitor
+class NavigatingIntentVisitor
 {
    public:
-    virtual ~IntentVisitor() = default;
+    virtual ~NavigatingIntentVisitor() = default;
 
     /**
-     * Visits an Intent to perform an operation.
+     * Visits an NavigatingIntent to perform an operation.
      *
-     * @param The Intent to visit
+     * @param The NavigatingIntent to visit
      */
     virtual void visit(const MoveIntent &intent)            = 0;
-    virtual void visit(const NavigatingIntent &intent)            = 0;
-    virtual void visit(const DirectPrimitiveIntent &intent) = 0;
 };

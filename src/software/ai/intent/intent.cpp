@@ -4,11 +4,8 @@
 
 #include "software/logger/logger.h"
 
-Intent::Intent(unsigned int robot_id, unsigned int priority,
-               BallCollisionType ball_collision_type, std::optional<Point> destination)
+Intent::Intent(unsigned int robot_id, unsigned int priority)
     : robot_id(robot_id),
-      navigation_destination(destination),
-      ball_collision_type(ball_collision_type),
       motion_constraints()
 {
     setPriority(priority);
@@ -22,16 +19,6 @@ unsigned int Intent::getPriority(void) const
 unsigned int Intent::getRobotId() const
 {
     return robot_id;
-}
-
-std::optional<Point> Intent::getNavigationDestination() const
-{
-    return navigation_destination;
-}
-
-BallCollisionType Intent::getBallCollisionType() const
-{
-    return ball_collision_type;
 }
 
 void Intent::setPriority(unsigned int new_priority)
@@ -48,8 +35,6 @@ void Intent::setPriority(unsigned int new_priority)
 bool Intent::operator==(const Intent &other) const
 {
     return this->priority == other.priority && this->robot_id == other.robot_id &&
-           navigation_destination == other.navigation_destination &&
-           ball_collision_type == other.ball_collision_type &&
            motion_constraints == other.motion_constraints;
 }
 

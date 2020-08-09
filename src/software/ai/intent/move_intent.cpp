@@ -9,7 +9,7 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &destination,
                        unsigned int priority, DribblerEnable enable_dribbler,
                        MoveType move_type, AutochickType autokick,
                        BallCollisionType ball_collision_type)
-    : Intent(robot_id, priority, ball_collision_type, destination),
+    : NavigatingIntent(robot_id, priority, destination, ball_collision_type),
       destination(destination),
       final_angle(final_angle),
       final_speed(final_speed),
@@ -24,17 +24,17 @@ std::string MoveIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void MoveIntent::accept(IntentVisitor &visitor) const
+void MoveIntent::accept(NavigatingIntentVisitor &visitor) const
 {
     visitor.visit(*this);
 }
 
-Point MoveIntent::getDestination() const
+const Point &MoveIntent::getDestination() const
 {
     return destination;
 }
 
-Angle MoveIntent::getFinalAngle() const
+const Angle &MoveIntent::getFinalAngle() const
 {
     return final_angle;
 }
@@ -44,17 +44,17 @@ double MoveIntent::getFinalSpeed() const
     return final_speed;
 }
 
-AutochickType MoveIntent::getAutochickType() const
+const AutochickType &MoveIntent::getAutochickType() const
 {
     return autokick;
 }
 
-DribblerEnable MoveIntent::getDribblerEnable() const
+const DribblerEnable &MoveIntent::getDribblerEnable() const
 {
     return enable_dribbler;
 }
 
-MoveType MoveIntent::getMoveType() const
+const MoveType &MoveIntent::getMoveType() const
 {
     return move_type;
 }
