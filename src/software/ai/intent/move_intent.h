@@ -68,6 +68,7 @@ class MoveIntent : public NavigatingIntent
      * their member variables are equal.
      *
      * @param other the MoveIntent to compare with for equality
+     *
      * @return true if the MoveIntents are equal and false otherwise
      */
     bool operator==(const MoveIntent& other) const;
@@ -76,12 +77,12 @@ class MoveIntent : public NavigatingIntent
      * Compares MoveIntents for inequality.
      *
      * @param other the MoveIntent to compare with for inequality
+     *
      * @return true if the MoveIntents are not equal and false otherwise
      */
     bool operator!=(const MoveIntent& other) const;
 
    private:
-    unsigned int robot_id;
     Angle final_angle;
     DribblerEnable enable_dribbler;
     MoveType move_type;

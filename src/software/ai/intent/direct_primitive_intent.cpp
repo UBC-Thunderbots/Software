@@ -25,7 +25,7 @@ bool DirectPrimitiveIntent::operator!=(const DirectPrimitiveIntent &other) const
     return !((*this) == other);
 }
 
-PrimitiveMsg DirectPrimitiveIntent::getDirectPrimitive() const
+PrimitiveMsg DirectPrimitiveIntent::getPrimitive() const
 {
     return primitive_msg;
 }

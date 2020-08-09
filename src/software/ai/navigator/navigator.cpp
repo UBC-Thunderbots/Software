@@ -17,7 +17,7 @@ Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
 void Navigator::visit(const DirectPrimitiveIntent &intent)
 {
     (*primitive_set_msg->mutable_robot_primitives())[intent.getRobotId()] =
-        intent.getDirectPrimitive();
+        intent.getPrimitive();
     direct_primitive_intent_robots.push_back(intent.getRobotId());
 }
 

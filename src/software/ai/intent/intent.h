@@ -116,5 +116,9 @@ class Intent
      * higher value => higher priority
      */
     unsigned int priority;
+
+    /**
+     * The constraints on this intent's motion. These are enforced by the navigator
+     */
     std::set<MotionConstraint> motion_constraints;
 };

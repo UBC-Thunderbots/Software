@@ -31,6 +31,7 @@ class KickIntent : public DirectPrimitiveIntent
      * their member variables are equal.
      *
      * @param other the KickIntents to compare with for equality
+     *
      * @return true if the KickIntents are equal and false otherwise
      */
     bool operator==(const KickIntent& other) const;
@@ -39,6 +40,7 @@ class KickIntent : public DirectPrimitiveIntent
      * Compares KickIntents for inequality.
      *
      * @param other the KickIntent to compare with for inequality
+     *
      * @return true if the KickIntents are not equal and false otherwise
      */
     bool operator!=(const KickIntent& other) const;

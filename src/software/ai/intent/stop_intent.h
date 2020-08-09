@@ -26,6 +26,7 @@ class StopIntent : public DirectPrimitiveIntent
      * their member variables are equal.
      *
      * @param other the StopIntents to compare with for equality
+     *
      * @return true if the StopIntents are equal and false otherwise
      */
     bool operator==(const StopIntent& other) const;
@@ -34,6 +35,7 @@ class StopIntent : public DirectPrimitiveIntent
      * Compares StopIntents for inequality.
      *
      * @param other the StopIntent to compare with for inequality
+     *
      * @return true if the StopIntents are not equal and false otherwise
      */
     bool operator!=(const StopIntent& other) const;

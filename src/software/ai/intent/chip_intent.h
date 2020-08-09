@@ -31,6 +31,7 @@ class ChipIntent : public DirectPrimitiveIntent
      * their member variables are equal.
      *
      * @param other the ChipIntents to compare with for equality
+     *
      * @return true if the ChipIntents are equal and false otherwise
      */
     bool operator==(const ChipIntent& other) const;
@@ -39,6 +40,7 @@ class ChipIntent : public DirectPrimitiveIntent
      * Compares ChipIntents for inequality.
      *
      * @param other the ChipIntent to compare with for inequality
+     *
      * @return true if the ChipIntents are not equal and false otherwise
      */
     bool operator!=(const ChipIntent& other) const;

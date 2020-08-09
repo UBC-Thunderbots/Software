@@ -46,7 +46,7 @@ class DirectPrimitiveIntent : public Intent
      *
      * @return The Primitive that represents this Intent
      */
-    PrimitiveMsg getDirectPrimitive() const;
+    PrimitiveMsg getPrimitive() const;
 
    private:
     PrimitiveMsg primitive_msg;

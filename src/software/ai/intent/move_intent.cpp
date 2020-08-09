@@ -1,7 +1,5 @@
 #include "software/ai/intent/move_intent.h"
 
-#include "shared/constants.h"
-
 const std::string MoveIntent::INTENT_NAME = "Move Intent";
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &destination,
