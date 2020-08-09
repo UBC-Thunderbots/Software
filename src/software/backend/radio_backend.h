@@ -23,9 +23,9 @@ class RadioBackend : public Backend
      * Convert robot_status to TbotsProto::RobotStatus and send as a SensorProto to
      * observers
      *
-     * @param robot_status The RobotStatus
+     * @param robot_status The RadioRobotStatus
      */
-    void receiveRobotStatus(RobotStatus robot_status);
+    void receiveRobotStatus(RadioRobotStatus robot_status);
 
     const std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config;
 

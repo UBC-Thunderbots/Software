@@ -32,7 +32,9 @@ class ProtoCreatorPrimitiveVisitor : public PrimitiveVisitor
 
     /**
      * Create a TbotsProto::Primitive from the given Primitive
+     *
      * @param primitive The primitive to create the TbotsProto::Primitive from
+     *
      * @return A TbotsProto::Primitive representation of the given primitive
      */
     TbotsProto::Primitive createPrimitive(const Primitive &primitive);

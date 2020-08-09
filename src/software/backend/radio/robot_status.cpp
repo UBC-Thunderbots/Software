@@ -18,7 +18,7 @@ static const std::map<const std::string, TbotsProto::ErrorCode>
         {MRF::PACKET_ABOVE_MAX_SIZE, TbotsProto::ErrorCode::PACKET_ABOVE_MAX_SIZE}};
 
 std::unique_ptr<TbotsProto::RobotStatus> convertRobotStatusToRobotStatusProto(
-    const RobotStatus& robot_status)
+    const RadioRobotStatus& robot_status)
 {
     // Insufficient information to make the RobotStatus fields for
     // ChipperKickerStatus, DriveUnits, and NetworkStatus

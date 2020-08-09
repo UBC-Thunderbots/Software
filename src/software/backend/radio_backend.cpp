@@ -29,7 +29,7 @@ void RadioBackend::onValueReceived(World world)
     radio_output.sendVisionPacket(world.friendlyTeam(), world.ball());
 }
 
-void RadioBackend::receiveRobotStatus(RobotStatus robot_status)
+void RadioBackend::receiveRobotStatus(RadioRobotStatus robot_status)
 {
     Backend::receiveRobotStatus(*convertRobotStatusToRobotStatusProto(robot_status));
 }
