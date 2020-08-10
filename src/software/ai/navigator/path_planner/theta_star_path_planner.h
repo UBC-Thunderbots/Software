@@ -39,11 +39,14 @@ class ThetaStarPathPlanner : public PathPlanner
                                  const Rectangle &navigable_area,
                                  const std::vector<ObstaclePtr> &obstacles) override;
 
-
+   private:
     class Coordinate
     {
        public:
-        Coordinate(unsigned int row, unsigned int col) : row_(row), col_(col) {}
+        Coordinate(unsigned int row, unsigned int col)
+            : row_(row), col_(col), internal_comparison_key_(computeComparisonKey(*this))
+        {
+        }
 
         Coordinate() : row_(0), col_(0) {}
 
@@ -57,47 +60,76 @@ class ThetaStarPathPlanner : public PathPlanner
             return col_;
         }
 
+        bool operator<(const Coordinate &other) const
+        {
+            return internal_comparison_key_ < other.internal_comparison_key_;
+        }
+
+        bool operator==(const Coordinate &other) const
+        {
+            return internal_comparison_key_ == other.internal_comparison_key_;
+        }
+
+        static unsigned long computeComparisonKey(const Coordinate &coord)
+        {
+            return coord.row() + coord.col() * ((1 << 15) + 1);
+        }
+
        private:
         unsigned int row_;
         unsigned int col_;
+        unsigned long internal_comparison_key_;
     };
 
     class CoordinatePair
     {
        public:
         CoordinatePair(const Coordinate &coord1, const Coordinate &coord2)
+            : coord1_(coord1),
+              coord2_(coord2),
+              internal_comparison_key_(computeComparisonKey(coord1, coord2))
         {
-            if (coord1.col() < coord2.col() ||
-                (coord1.col() == coord2.col() && coord1.row() <= coord2.row()))
-            {
-                coord1_ = Coordinate(coord1.row(), coord1.col());
-                coord2_ = Coordinate(coord2.row(), coord2.col());
-            }
-            else
-            {
-                coord1_ = Coordinate(coord2.row(), coord2.col());
-                coord2_ = Coordinate(coord1.row(), coord1.col());
-            }
         }
 
         CoordinatePair() : coord1_(), coord2_() {}
 
-        Coordinate firstCoordinate(void) const
+        const Coordinate &firstCoordinate(void) const
         {
             return coord1_;
         }
 
-        Coordinate secondCoordinate(void) const
+        const Coordinate &secondCoordinate(void) const
         {
             return coord2_;
+        }
+
+        bool operator<(const CoordinatePair &other) const
+        {
+            return internal_comparison_key_ < other.internal_comparison_key_;
+        }
+
+        static unsigned long computeComparisonKey(const Coordinate &coord1,
+                                                  const Coordinate &coord2)
+        {
+            unsigned long key1 = Coordinate::computeComparisonKey(coord1);
+            unsigned long key2 = Coordinate::computeComparisonKey(coord2);
+            if (coord1.row() < coord2.row() ||
+                (coord1.row() == coord2.row() && coord1.col() < coord2.col()))
+            {
+                return key1 + key2 * ((1 << 16) + 1);
+            }
+            else
+            {
+                return key2 + key1 * ((1 << 16) + 1);
+            }
         }
 
        private:
         Coordinate coord1_;
         Coordinate coord2_;
+        unsigned long internal_comparison_key_;
     };
 
-   private:
     class CellHeuristic
     {
        public:
@@ -385,76 +417,3 @@ class ThetaStarPathPlanner : public PathPlanner
     // coordinates to whether those two Coordinates have line of sight between them
     std::map<CoordinatePair, bool> line_of_sight_cache;
 };
-
-bool operator==(const ThetaStarPathPlanner::Coordinate &coord1,
-                const ThetaStarPathPlanner::Coordinate &coord2)
-{
-    return coord1.row() == coord2.row() && coord1.col() == coord2.col();
-}
-
-bool operator<(const ThetaStarPathPlanner::Coordinate &coord1,
-               const ThetaStarPathPlanner::Coordinate &coord2)
-{
-    return coord1.col() < coord2.col() ||
-           (coord1.col() == coord2.col() && coord1.row() < coord2.row());
-}
-
-bool operator>(const ThetaStarPathPlanner::Coordinate &coord1,
-               const ThetaStarPathPlanner::Coordinate &coord2)
-{
-    return !(coord1 < coord2 || coord1 == coord2);
-}
-
-bool operator!=(const ThetaStarPathPlanner::Coordinate &coord1,
-                const ThetaStarPathPlanner::Coordinate &coord2)
-{
-    return !(coord1 == coord2);
-}
-
-bool operator<=(const ThetaStarPathPlanner::Coordinate &coord1,
-                const ThetaStarPathPlanner::Coordinate &coord2)
-{
-    return !(coord1 > coord2);
-}
-
-bool operator>=(const ThetaStarPathPlanner::Coordinate &coord1,
-                const ThetaStarPathPlanner::Coordinate &coord2)
-{
-    return !(coord1 < coord2);
-}
-
-bool operator==(const ThetaStarPathPlanner::CoordinatePair &coord_pair1,
-                const ThetaStarPathPlanner::CoordinatePair &coord_pair2)
-{
-    return coord_pair1.firstCoordinate() == coord_pair2.firstCoordinate() &&
-           coord_pair1.secondCoordinate() == coord_pair2.secondCoordinate();
-}
-
-bool operator<(const ThetaStarPathPlanner::CoordinatePair &coord_pair1,
-               const ThetaStarPathPlanner::CoordinatePair &coord_pair2)
-{
-    return coord_pair1.firstCoordinate() < coord_pair2.firstCoordinate() ||
-           (coord_pair1.firstCoordinate() == coord_pair2.firstCoordinate() &&
-            coord_pair1.secondCoordinate() < coord_pair2.secondCoordinate());
-}
-
-bool operator>(const ThetaStarPathPlanner::CoordinatePair &coord_pair1,
-               const ThetaStarPathPlanner::CoordinatePair &coord_pair2)
-{
-    return !(coord_pair1 < coord_pair2 || coord_pair1 == coord_pair2);
-}
-bool operator!=(const ThetaStarPathPlanner::CoordinatePair &coord_pair1,
-                const ThetaStarPathPlanner::CoordinatePair &coord_pair2)
-{
-    return !(coord_pair1 == coord_pair2);
-}
-bool operator<=(const ThetaStarPathPlanner::CoordinatePair &coord_pair1,
-                const ThetaStarPathPlanner::CoordinatePair &coord_pair2)
-{
-    return !(coord_pair1 > coord_pair2);
-}
-bool operator>=(const ThetaStarPathPlanner::CoordinatePair &coord_pair1,
-                const ThetaStarPathPlanner::CoordinatePair &coord_pair2)
-{
-    return !(coord_pair1 < coord_pair2);
-}
