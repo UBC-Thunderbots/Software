@@ -1,6 +1,21 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "charger",
+    srcs = ["charger.c"],
+    hdrs = ["charger.h"],
+)
+
+cc_test(
+    name = "charger_test",
+    srcs = ["charger_test.cpp"],
+    deps = [
+        ":charger",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "chicker",
     srcs = ["chicker.c"],
     hdrs = ["chicker.h"],
@@ -50,6 +65,7 @@ cc_library(
     srcs = ["firmware_robot.c"],
     hdrs = ["firmware_robot.h"],
     deps = [
+        ":charger",
         ":chicker",
         ":dribbler",
         ":wheel",
