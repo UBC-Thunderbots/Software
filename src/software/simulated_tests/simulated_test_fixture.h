@@ -101,8 +101,8 @@ class SimulatedTestFixture : public ::testing::Test
     /**
      * Sets the Referee command to override for the simulated test
      *
-     * @param current_referee_command The name of the current game state to set
-     * @param previous_referee_command The name of the previous game state to set
+     * @param current_referee_command The name of the current referee command to set
+     * @param previous_referee_command The name of the previous referee command to set
      */
     void setRefereeCommand(const RefereeCommand& current_referee_command,
                            const RefereeCommand& previous_referee_command);

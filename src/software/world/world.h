@@ -60,7 +60,7 @@ class World final
     /**
      * Updates the referee command
      *
-     * @param command the game state sent by the referee
+     * @param command the command sent by the referee
      */
     void updateRefereeCommand(const RefereeCommand& command);
 
