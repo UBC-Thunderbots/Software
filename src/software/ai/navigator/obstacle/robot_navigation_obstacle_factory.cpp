@@ -6,6 +6,9 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
       robot_radius_expansion_amount(config->RobotObstacleInflationFactor()->value() *
                                     ROBOT_MAX_RADIUS_METERS)
 {
+    config->RobotObstacleInflationFactor()->registerCallbackFunction([&](double new_value) {
+        robot_radius_expansion_amount = new_value * ROBOT_MAX_RADIUS_METERS;
+    });
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
@@ -149,7 +152,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromTeam(
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(
     const Point &ball_position) const
 {
-    return createFromShape(Circle(ball_position, BALL_MAX_RADIUS_METERS * 4));
+    return createFromShape(Circle(ball_position, BALL_MAX_RADIUS_METERS));
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(
