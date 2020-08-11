@@ -16,6 +16,6 @@
  *
  * @return A WrapperPacket containing the given data
  */
-std::unique_ptr<SSL_WrapperPacket> createWrapperPacket(
+std::unique_ptr<SSL_WrapperPacket> createSSLWrapperPacket(
     std::unique_ptr<SSL_GeometryData> geometry_data,
     std::unique_ptr<SSL_DetectionFrame> detection_frame);

@@ -13,7 +13,7 @@ typedef struct DirectControlPrimitiveState
 } DirectControlPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(DirectControlPrimitiveState_t)
 
-void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
+void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_msg,
                                         void* void_state_ptr, FirmwareWorld_t* world)
 {
     DirectControlPrimitiveState_t* state = (DirectControlPrimitiveState_t*)void_state_ptr;
@@ -24,9 +24,9 @@ void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
 
     switch (prim_msg.which_wheel_control)
     {
-        case DirectControlPrimitiveMsg_direct_per_wheel_control_tag:
+        case TbotsProto_DirectControlPrimitive_direct_per_wheel_control_tag:
         {
-            DirectControlPrimitiveMsg_DirectPerWheelControlMsg control_msg =
+            TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg =
                 prim_msg.wheel_control.direct_per_wheel_control;
             state->direct_velocity = false;
             // TODO (#1649): Fix passing rpm into an applyForce function
@@ -40,9 +40,9 @@ void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
                                  control_msg.front_right_wheel_rpm);
             break;
         }
-        case DirectControlPrimitiveMsg_direct_velocity_control_tag:
+        case TbotsProto_DirectControlPrimitive_direct_velocity_control_tag:
         {
-            DirectControlPrimitiveMsg_DirectVelocityControlMsg control_msg =
+            TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg =
                 prim_msg.wheel_control.direct_velocity_control;
             state->direct_velocity          = true;
             state->direct_target_velocity_x = control_msg.velocity.x_component_meters;
@@ -62,12 +62,12 @@ void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
 
     switch (prim_msg.charge_mode)
     {
-        case DirectControlPrimitiveMsg_ChargeMode_CHARGE:
+        case TbotsProto_DirectControlPrimitive_ChargeMode_CHARGE:
         {
             app_charger_charge_capacitor(charger);
             break;
         }
-        case DirectControlPrimitiveMsg_ChargeMode_FLOAT:
+        case TbotsProto_DirectControlPrimitive_ChargeMode_FLOAT:
         {
             app_charger_float_capacitor(charger);
             break;
@@ -83,24 +83,24 @@ void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
 
     switch (prim_msg.which_chick_command)
     {
-        case DirectControlPrimitiveMsg_kick_speed_meters_per_second_tag:
+        case TbotsProto_DirectControlPrimitive_kick_speed_meters_per_second_tag:
         {
             app_chicker_kick(chicker,
                              prim_msg.chick_command.kick_speed_meters_per_second);
             break;
         }
-        case DirectControlPrimitiveMsg_chip_distance_meters_tag:
+        case TbotsProto_DirectControlPrimitive_chip_distance_meters_tag:
         {
             app_chicker_chip(chicker, prim_msg.chick_command.chip_distance_meters);
             break;
         }
-        case DirectControlPrimitiveMsg_autokick_speed_meters_per_second_tag:
+        case TbotsProto_DirectControlPrimitive_autokick_speed_meters_per_second_tag:
         {
             app_chicker_enableAutokick(
                 chicker, prim_msg.chick_command.autokick_speed_meters_per_second);
             break;
         }
-        case DirectControlPrimitiveMsg_autochip_distance_meters_tag:
+        case TbotsProto_DirectControlPrimitive_autochip_distance_meters_tag:
         {
             app_chicker_enableAutochip(chicker,
                                        prim_msg.chick_command.autochip_distance_meters);

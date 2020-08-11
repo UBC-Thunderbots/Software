@@ -13,5 +13,5 @@ extern const primitive_t CHIP_PRIMITIVE;
  *                            `create_state` function
  * @param world [in] The world this primitive is running in.
  */
-void app_chip_primitive_start(ChipPrimitiveMsg prim_msg, void* void_state_ptr,
+void app_chip_primitive_start(TbotsProto_ChipPrimitive prim_msg, void* void_state_ptr,
                               FirmwareWorld_t* world);

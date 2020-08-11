@@ -13,5 +13,5 @@ extern const primitive_t KICK_PRIMITIVE;
  *                            `create_state` function
  * @param world [in] The world this primitive is running in.
  */
-void app_kick_primitive_start(KickPrimitiveMsg prim_msg, void* void_state_ptr,
+void app_kick_primitive_start(TbotsProto_KickPrimitive prim_msg, void* void_state_ptr,
                               FirmwareWorld_t* world);

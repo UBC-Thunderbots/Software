@@ -2,7 +2,7 @@
 
 #include "firmware/app/primitives/chick_motion.h"
 
-void app_kick_primitive_start(KickPrimitiveMsg prim_msg, void *void_state_ptr,
+void app_kick_primitive_start(TbotsProto_KickPrimitive prim_msg, void *void_state_ptr,
                               FirmwareWorld_t *world)
 {
     app_chick_motion_start(void_state_ptr, world, prim_msg.kick_origin.x_meters,

@@ -9,7 +9,7 @@
 namespace fs = std::experimental::filesystem;
 
 ReplayLogger::ReplayLogger(const std::string& out_dir_path, int _msgs_per_chunk)
-    : FirstInFirstOutThreadedObserver<SensorMsg>(2000),
+    : FirstInFirstOutThreadedObserver<SensorProto>(2000),
       current_chunk(),
       current_chunk_idx(0),
       output_dir_path(out_dir_path),
@@ -47,7 +47,7 @@ ReplayLogger::~ReplayLogger()
 }
 
 
-void ReplayLogger::onValueReceived(SensorMsg msg)
+void ReplayLogger::onValueReceived(SensorProto msg)
 {
     current_chunk.mutable_replay_msgs()->Add(std::move(msg));
     if (current_chunk.replay_msgs_size() >= msgs_per_chunk)

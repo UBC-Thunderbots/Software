@@ -12,5 +12,5 @@ extern const primitive_t DIRECT_CONTROL_PRIMITIVE;
  *                            `create_state` function
  * @param world [in] The world this primitive is running in.
  */
-void app_direct_control_primitive_start(DirectControlPrimitiveMsg prim_msg,
+void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_msg,
                                         void* void_state_ptr, FirmwareWorld_t* world);

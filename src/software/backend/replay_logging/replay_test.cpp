@@ -13,10 +13,10 @@ constexpr const char* REPLAY_TEST_PATH_SUFFIX =
 namespace fs = std::experimental::filesystem;
 
 // hahaha test subject because it's a subject but also a test subject
-class TestSubject : public Subject<SensorMsg>
+class TestSubject : public Subject<SensorProto>
 {
    public:
-    void sendValue(SensorMsg val)
+    void sendValue(SensorProto val)
     {
         sendValueToObservers(val);
     }
@@ -29,7 +29,7 @@ TEST(ReplayTest, test_read_and_write_replay)
     // write them, and then read them again in the same test
     // TODO: record replay_logging data with refbox running , see #1584
 
-    std::vector<SensorMsg> read_replay_msgs;
+    std::vector<SensorProto> read_replay_msgs;
 
     ReplayReader reader(fs::current_path() / REPLAY_TEST_PATH_SUFFIX);
     while (auto frame = reader.getNextMsg())
@@ -54,7 +54,7 @@ TEST(ReplayTest, test_read_and_write_replay)
 
     // write the read frames to another replay_logging directory
     auto output_path = fs::current_path() / "replaytest";
-    std::shared_ptr<Observer<SensorMsg>> logger_ptr =
+    std::shared_ptr<Observer<SensorProto>> logger_ptr =
         std::make_shared<ReplayLogger>(output_path, 1000);
     TestSubject subject;
     subject.registerObserver(logger_ptr);
@@ -82,7 +82,7 @@ TEST(ReplayTest, test_read_and_write_replay)
     EXPECT_EQ(created_filenames, expected_filenames);
 
     // compare against the messages that we read
-    std::vector<SensorMsg> written_read_replay_msgs;
+    std::vector<SensorProto> written_read_replay_msgs;
     ReplayReader reader2(output_path);
     while (auto frame = reader2.getNextMsg())
     {
