@@ -104,7 +104,6 @@ class SensorFusion
     std::optional<Ball> ball;
     Team friendly_team;
     Team enemy_team;
-    std::mutex game_state_mutex;
     GameState game_state;
     std::optional<RefboxStage> refbox_stage;
 

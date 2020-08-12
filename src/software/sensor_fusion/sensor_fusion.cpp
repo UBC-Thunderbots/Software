@@ -82,7 +82,6 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
 
 void SensorFusion::updateWorld(const SSL_Referee &packet)
 {
-    std::scoped_lock game_state_lock(game_state_mutex);
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())
@@ -189,7 +188,6 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
 
 void SensorFusion::updateBall(TimestampedBallState new_ball_state)
 {
-    std::scoped_lock game_state_lock(game_state_mutex);
     if (!ball_states.empty() &&
         new_ball_state.timestamp() < ball_states.front().timestamp())
     {
