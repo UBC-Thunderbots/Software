@@ -8,7 +8,7 @@ from type_map import C_TYPE_MAP
 class CParameter(object):
 
     DEFINITION = "const {type}_t* {name};"
-    CONSTRUCTOR = "app_dynamic_parameters_create{type}({value});"
+    CONSTRUCTOR = "app_dynamic_parameters_create{type}({value})"
     INITIALIZATION = ".{name} = {constructor},"
     DESTRUCTOR = "app_dynamic_parameters_destroy{type}({ptr});"
 
@@ -24,10 +24,6 @@ class CParameter(object):
         :param param_value: The constant value the parameter should hold
         :param ptr_to_instance: A string representation of where this parameter
             is located (ex: FooConfig->foo_int)
-        :type param_name: str
-        :type param_type: str
-        :type param_value: str
-        :type ptr_to_instance: str
 
         """
 
@@ -48,17 +44,21 @@ class CParameter(object):
         )
 
         self.__initialization = CParameter.INITIALIZATION.format(
-            name=param_name, constructor=self.constructor()
+            name=param_name, constructor=self.constructor
         )
 
+    @property
     def definition(self):
         return self.__definition
 
+    @property
     def constructor(self):
         return self.__constructor
 
+    @property
     def destructor(self):
         return self.__destructor
 
+    @property
     def initialization(self):
         return self.__initialization

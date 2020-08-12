@@ -9,10 +9,12 @@ from typing import List, Set
 class CConfig(object):
 
     DEFINITION = "typedef struct {name}_s {{{contents}}} {name}_t;"
+    FORWARD_DECLERATION = "typedef struct {name}_s {name}_t;"
     MALLOC = "{name}_t* {name}_config = ({name}_t*)malloc(sizeof({name}_t}));"
     INITIALIZATION = "{name}_t {name}_init = {{{contents}}};"
     MEMCPY = "memcpy({name}_config, &{name}_init, sizeof({name}_t));"
     FREE = "free((void*){ptr_to_instance})"
+    INCLUDE_CONFIG = "const {name}_t* {name};"
 
     def __init__(self, config_name: str, ptr_to_instance: str):
         """Initializes a CParameter with the given name. The corresponding
@@ -22,8 +24,6 @@ class CConfig(object):
         :param config_name: The name of the config, the filename of the yaml
         :param ptr_to_instance: A string representation of where this config
             is located (ex: ThunderbotsConfig->FooConfig)
-        :type param_value: str
-        :type ptr_to_instance: str
 
         """
         self.config_name = config_name
@@ -56,13 +56,10 @@ class CConfig(object):
         Joins all the nested configs definitions and the parameter
         definitions.
 
-        :returns: value of the property
-        :rtype: str
-
         """
         definition_contents = "\n".join(
-            [config.definition for config in self.configs]
-        ) + "\n".join([parameter.definition for parameter in self.configs])
+            [CConfig.INCLUDE_CONFIG.format(name=conf) for conf in self.configs]
+        ) + "\n".join([parameter.definition for parameter in self.parameters])
 
         return CConfig.DEFINITION.format(
             name=self.config_name, contents=definition_contents
@@ -74,18 +71,18 @@ class CConfig(object):
         Joins all the nested configs initializations and the parameter
         initializations.
 
-        :returns: value of the property
-        :rtype: str
-
         """
-
-        initialization_contents = "\n".join(
-            [config.initialization for config in self.configs]
-        ) + "\n".join([parameter.initialization for parameter in self.configs])
+        initialization_contents = "\n".join(self.configs) + "\n".join(
+            [parameter.initialization for parameter in self.parameters]
+        )
 
         return CConfig.INITIALIZATION.format(
             name=self.config_name, contents=initialization_contents
         )
+
+    @property
+    def forward_decleration(self):
+        return CConfig.FORWARD_DECLERATION.format(name=self.config_name)
 
     @property
     def malloc(self):

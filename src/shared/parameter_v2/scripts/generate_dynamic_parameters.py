@@ -21,7 +21,8 @@ def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
     yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
 
     config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
-    CWriter.write_config_metadata("ThunderbotsConfig", config_metadata, "TEST")
+
+    CWriter.write_config_metadata("ThunderbotsConfig", config_metadata, ".config")
 
     with open(output_file, "w") as outfile:
         outfile.write("Hello world\n")
@@ -53,15 +54,16 @@ def main():
         "--include_headers",
         nargs="+",
         required=False,
-        help="Filepaths (relative to the bazel WORKSPACE) for any header "
-        "files that should be included at the top of the generated code",
+        help=(
+            "Filepaths (relative to the bazel WORKSPACE) for any header "
+            "files that should be included at the top of the generated code"
+        ),
     )
 
     args = parser.parse_args()
     generate_dynamic_parameters(
         args.output_file, args.include_headers, args.generate_for_cpp
     )
-
 
 #######################################################################
 #                                Main                                 #
