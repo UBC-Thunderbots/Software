@@ -248,9 +248,9 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 
 TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 {
-    SensorMsg sensor_msg;
+    SensorProto sensor_msg;
     auto ssl_wrapper_packet = createSSLWrapperPacket(std::unique_ptr<SSL_GeometryData>(),
-                                                  std::move(detection_frame));
+                                                  initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -260,9 +260,9 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
 {
     config->mutableDefendingPositiveSide()->setValue(true);
-    SensorMsg sensor_msg;
+    SensorProto sensor_msg;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), initDetectionFrame());
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
