@@ -19,7 +19,10 @@ class RobotNavigationObstacleFactoryTest : public testing::Test
           robot_navigation_obstacle_factory(
               DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig())
     {
-        MutableDynamicParameters->getMutableAIConfig()->getMutableRobotNavigationObstacleFactoryConfig()->mutableRobotObstacleInflationFactor()->setValue(1.3);
+        MutableDynamicParameters->getMutableAIConfig()
+            ->getMutableRobotNavigationObstacleFactoryConfig()
+            ->mutableRobotObstacleInflationFactor()
+            ->setValue(1.3);
     }
 
     Timestamp current_time;
