@@ -6,7 +6,7 @@
 
 namespace fs = std::experimental::filesystem;
 
-ReplayMsg ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_path)
+ReplayProto ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_path)
 {
     std::ifstream file_ifstream(file_path, std::ios_base::in | std::ios_base::binary);
     auto file_input =
@@ -14,7 +14,7 @@ ReplayMsg ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_pat
     auto coded_input =
         std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
 
-    ReplayMsg msg;
+    ReplayProto msg;
     bool result = google::protobuf::util::ParseDelimitedFromCodedStream(
         dynamic_cast<google::protobuf::MessageLite*>(&msg), coded_input.get(), nullptr);
     if (!result)
@@ -71,7 +71,7 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
     cur_chunk.CopyFrom(readDelimitedReplayProtobufFile(chunk_path));
 }
 
-std::optional<SensorMsg> ReplayReader::getNextMsg()
+std::optional<SensorProto> ReplayReader::getNextMsg()
 {
     if (!hasNextMsg())
     {

@@ -32,7 +32,7 @@ class FullSystemGUI : public QMainWindow
      * WorldDrawFunctions
      * @param ai_draw_functions_buffer The buffer used to receive new AIDrawFunctions
      * @param play_info_buffer The buffer used to receive new PlayInfo
-     * @param sensor_msg_buffer The buffer used to receive new SensorMsgs
+     * @param sensor_msg_buffer The buffer used to receive new SensorProtos
      * @param view_area_buffer The buffer used to receive Rectangles that specify the area
      * of the world to display in the view
      */
@@ -40,7 +40,7 @@ class FullSystemGUI : public QMainWindow
         std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
-        std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer,
+        std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer,
         std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
         std::shared_ptr<ThunderbotsConfig> config);
 
@@ -64,9 +64,9 @@ class FullSystemGUI : public QMainWindow
     void updatePlayInfo();
 
     /**
-     * Updates and displays the newly provided SensorMsg.
+     * Updates and displays the newly provided SensorProto.
      */
-    void updateSensorMsg();
+    void updateSensorProto();
 
     /**
      * Updates the area of the World being drawn in the FullSystemGUI
@@ -82,7 +82,7 @@ class FullSystemGUI : public QMainWindow
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
-    std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
+    std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
 
     WorldDrawFunction most_recent_world_draw_function;

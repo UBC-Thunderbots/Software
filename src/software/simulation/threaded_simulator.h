@@ -137,8 +137,8 @@ class ThreadedSimulator
      * @param id The id of the robot to set the primitive for
      * @param primitive_msg The primitive to run on the robot
      */
-    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
-    void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Returns the PhysicsRobot at the given position. This function accounts

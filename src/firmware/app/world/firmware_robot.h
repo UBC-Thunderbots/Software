@@ -1,5 +1,6 @@
 #pragma once
 
+#include "firmware/app/world/charger.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/wheel.h"
@@ -42,6 +43,7 @@ typedef struct ControllerState
  * NOTE: Everything here is in the global field reference frame (ie. 0,0 is the center of
  *       the field, 0 degrees is towards the enemy goal) unless otherwise specified.
  *
+ * @param charger The robot charger
  * @param chicker The robot chicker
  * @param dribbler The robot dribbler
  * @param get_robot_position_x A function that can be called to get the x-position of the
@@ -69,13 +71,13 @@ typedef struct ControllerState
  *         given to the caller
  */
 FirmwareRobot_t* app_firmware_robot_create(
-    Chicker_t* chicker, Dribbler_t* dribbler, float (*get_robot_position_x)(void),
-    float (*get_robot_position_y)(void), float (*get_robot_orientation)(void),
-    float (*get_robot_velocity_x)(void), float (*get_robot_velocity_y)(void),
-    float (*get_robot_velocity_angular)(void), float (*get_battery_voltage)(void),
-    Wheel_t* front_right_wheel, Wheel_t* front_left_wheel, Wheel_t* back_right_wheel,
-    Wheel_t* back_left_wheel, ControllerState_t* controller_state,
-    RobotConstants_t robot_constants);
+    Charger_t* charger, Chicker_t* chicker, Dribbler_t* dribbler,
+    float (*get_robot_position_x)(void), float (*get_robot_position_y)(void),
+    float (*get_robot_orientation)(void), float (*get_robot_velocity_x)(void),
+    float (*get_robot_velocity_y)(void), float (*get_robot_velocity_angular)(void),
+    float (*get_battery_voltage)(void), Wheel_t* front_right_wheel,
+    Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel,
+    ControllerState_t* controller_state, RobotConstants_t robot_constants);
 
 /**
  * Destroy the given robot, freeing any memory allocated for it
@@ -86,6 +88,15 @@ FirmwareRobot_t* app_firmware_robot_create(
  * @param robot The robot to destroy
  */
 void app_firmware_robot_destroy(FirmwareRobot_t* robot);
+
+/**
+ * Get the charger from the given robot
+ *
+ * @param robot The robot to get the charger from
+ *
+ * @return The charger from the given robot
+ */
+Charger_t* app_firmware_robot_getCharger(const FirmwareRobot_t* robot);
 
 /**
  * Get the chicker from the given robot

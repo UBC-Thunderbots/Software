@@ -5,7 +5,7 @@ typedef struct StopPrimitiveState
 } StopPrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(StopPrimitiveState_t)
 
-void app_stop_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+void app_stop_primitive_start(TbotsProto_PrimitiveParams params, void* void_state_ptr,
                               FirmwareWorld_t* world)
 {
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
