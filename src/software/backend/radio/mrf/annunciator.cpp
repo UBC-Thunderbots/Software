@@ -75,7 +75,7 @@ namespace
         std::mutex bot_mutex = std::mutex();
 
         // Previously published status for this robot
-        RobotStatus previous_status;
+        RadioRobotStatus previous_status;
 
         // Map of message to timestamp for edge-triggered messages
         std::map<std::string, time_t> et_messages;
@@ -90,7 +90,8 @@ namespace
 
 }  // namespace
 
-Annunciator::Annunciator(std::function<void(RobotStatus)> received_robot_status_callback)
+Annunciator::Annunciator(
+    std::function<void(RadioRobotStatus)> received_robot_status_callback)
     : received_robot_status_callback(received_robot_status_callback)
 {
     // Initialize messages with the correct robot ID
@@ -106,7 +107,7 @@ void Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                        uint8_t lqi, uint8_t rssi)
 {
     std::vector<std::string> new_msgs;
-    RobotStatus robot_status;
+    RadioRobotStatus robot_status;
 
     // Guard robot status state for this bot
     std::lock_guard<std::mutex> lock(
@@ -446,7 +447,7 @@ void Annunciator::update_vision_detections(std::vector<uint8_t> robots)
         if (difftime(time(nullptr), robot_status_states[bot].last_status_update) >
             ROBOT_DEAD_TIME)
         {
-            RobotStatus new_status = robot_status_states[bot].previous_status;
+            RadioRobotStatus new_status = robot_status_states[bot].previous_status;
             new_status.robot_messages.clear();
             new_status.robot_messages.push_back(MRF::ROBOT_DEAD_MESSAGE);
 

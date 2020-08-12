@@ -104,6 +104,15 @@ class StandaloneSimulator
      */
     std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
 
+    /**
+     * Adds a robots to the specified team at the given position. The robot will
+     * automatically be given a valid ID.
+     *
+     * @param position the position at which to add the robot
+     */
+    void addYellowRobot(const Point& position);
+    void addBlueRobot(const Point& position);
+
     // This is a somewhat arbitrary value that results in slow motion
     // simulation looking appropriately / usefully slow
     static constexpr double DEFAULT_SLOW_MOTION_MULTIPLIER = 8.0;
@@ -114,8 +123,8 @@ class StandaloneSimulator
      *
      * @param primitive_set_msg The set of primitives to run on the respective team
      */
-    void setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg);
-    void setBlueRobotPrimitives(PrimitiveSetMsg primitive_set_msg);
+    void setYellowRobotPrimitives(TbotsProto_PrimitiveSet primitive_set_msg);
+    void setBlueRobotPrimitives(TbotsProto_PrimitiveSet primitive_set_msg);
 
     /**
      * A helper function that sets up all networking functionality with

@@ -121,22 +121,24 @@ SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
     return most_recent_ssl_wrapper_packet;
 }
 
-void StandaloneSimulator::setYellowRobotPrimitives(PrimitiveSetMsg primitive_set_msg)
+void StandaloneSimulator::setYellowRobotPrimitives(
+    TbotsProto_PrimitiveSet primitive_set_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        RobotId id                 = primitive_set_msg.robot_primitives[i].key;
-        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
+        RobotId id                         = primitive_set_msg.robot_primitives[i].key;
+        TbotsProto_Primitive primitive_msg = primitive_set_msg.robot_primitives[i].value;
         simulator.setYellowRobotPrimitive(id, primitive_msg);
     }
 }
 
-void StandaloneSimulator::setBlueRobotPrimitives(PrimitiveSetMsg primitive_set_msg)
+void StandaloneSimulator::setBlueRobotPrimitives(
+    TbotsProto_PrimitiveSet primitive_set_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        RobotId id                 = primitive_set_msg.robot_primitives[i].key;
-        PrimitiveMsg primitive_msg = primitive_set_msg.robot_primitives[i].value;
+        RobotId id                         = primitive_set_msg.robot_primitives[i].key;
+        TbotsProto_Primitive primitive_msg = primitive_set_msg.robot_primitives[i].value;
         simulator.setBlueRobotPrimitive(id, primitive_msg);
     }
 }
@@ -169,4 +171,14 @@ void StandaloneSimulator::setBallState(const BallState& state)
 std::weak_ptr<PhysicsRobot> StandaloneSimulator::getRobotAtPosition(const Point& position)
 {
     return simulator.getRobotAtPosition(position);
+}
+
+void StandaloneSimulator::addYellowRobot(const Point& position)
+{
+    simulator.addYellowRobot(position);
+}
+
+void StandaloneSimulator::addBlueRobot(const Point& position)
+{
+    simulator.addBlueRobot(position);
 }

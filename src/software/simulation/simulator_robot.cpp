@@ -428,7 +428,7 @@ void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
 }
 
 void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                                       const PrimitiveMsg &primitive_msg)
+                                       const TbotsProto_Primitive &primitive_msg)
 {
     app_primitive_manager_startNewPrimitive(primitive_manager.get(), firmware_world.get(),
                                             primitive_msg);

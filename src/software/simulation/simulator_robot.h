@@ -225,7 +225,7 @@ class SimulatorRobot
      * @param primitive_msg The primitive to start
      */
     void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                           const PrimitiveMsg& primitive_msg);
+                           const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Runs the current primitive

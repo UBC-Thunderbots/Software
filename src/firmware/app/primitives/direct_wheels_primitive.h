@@ -11,5 +11,5 @@ extern const primitive_t DIRECT_WHEELS_PRIMITIVE;
  *                            `create_state` function
  * @param world [in] The world this primitive is running in.
  */
-void app_direct_wheels_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
-                                       FirmwareWorld_t* world);
+void app_direct_wheels_primitive_start(TbotsProto_PrimitiveParams params,
+                                       void* void_state_ptr, FirmwareWorld_t* world);

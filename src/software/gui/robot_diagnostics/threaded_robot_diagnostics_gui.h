@@ -18,7 +18,7 @@
  * This class wraps our RobotDiagnosticsGUI object which is responsible for allowing users
  * to interact with and debug the robot
  */
-class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<SensorMsg>
+class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<SensorProto>
 {
    public:
     ThreadedRobotDiagnosticsGUI() = delete;
@@ -56,14 +56,14 @@ class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<Senso
      */
     void createAndRunRobotDiagnosticsGUI(int argc, char** argv);
 
-    void onValueReceived(SensorMsg sensor_msg) override;
+    void onValueReceived(SensorProto sensor_msg) override;
 
     std::thread run_robot_diagnostics_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
 
     // Buffers that are shared with the instance of the RobotDiagnosticsGUI so that data
     // can be passed safely
-    std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
+    std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<Primitive>>> primitive_buffer;
 
     // We don't want to miss any updates so we make the buffer larger

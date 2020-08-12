@@ -113,6 +113,15 @@ class ThreadedSimulator
     void addBlueRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
+     * Adds a robots to the specified team at the given position. The robot will
+     * automatically be given a valid ID.
+     *
+     * @param position the position at which to add the robot
+     */
+    void addYellowRobot(const Point& position);
+    void addBlueRobot(const Point& position);
+
+    /**
      * Sets the primitives being simulated by the robots in simulation
      *
      * Note: These functions are threadsafe.
@@ -128,8 +137,8 @@ class ThreadedSimulator
      * @param id The id of the robot to set the primitive for
      * @param primitive_msg The primitive to run on the robot
      */
-    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
-    void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Returns the PhysicsRobot at the given position. This function accounts

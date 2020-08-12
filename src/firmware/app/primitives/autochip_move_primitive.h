@@ -13,5 +13,5 @@ extern const primitive_t AUTOCHIP_MOVE_PRIMITIVE;
  *                            `create_state` function
  * @param world [in] The world this primitive is running in.
  */
-void app_autochip_move_primitive_start(AutochipMovePrimitiveMsg prim_msg,
+void app_autochip_move_primitive_start(TbotsProto_AutochipMovePrimitive prim_msg,
                                        void* void_state_ptr, FirmwareWorld_t* world);
