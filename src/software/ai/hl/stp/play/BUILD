@@ -296,6 +296,7 @@ cc_library(
         ":defense_play",
         ":enemy_freekick_play",
         ":example_play",
+        ":free_kick_play",
         ":halt_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",

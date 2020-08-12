@@ -39,7 +39,7 @@ cc_test(
     srcs = ["stp_refbox_game_state_play_selection_test.cpp"],
     deps = [
         ":stp",
-        "//software/ai/hl/stp/play:halt_play",
+        "//software/ai/hl/stp/play:all_plays",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",

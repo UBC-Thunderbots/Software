@@ -19,7 +19,6 @@ struct PlaySelectionTestParams
     RefboxGameState second_game_state;
 };
 
-
 class STPRefboxGameStatePlaySelectionTestWithPositions
     : public ::testing::Test,
       public ::testing::WithParamInterface<PlaySelectionTestParams>
@@ -40,9 +39,12 @@ TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
        test_play_selection_for_states_and_positions)
 {
     // set up the friendly team
-    ::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
+    auto param1 = GetParam();
+    std::cout << "Name: " << param1.name << std::endl;
+    ::TestUtil::setFriendlyRobotPositions(world, param1.friendly_positions,
                                           Timestamp());
-    ::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions, Timestamp());
+    ::TestUtil::setEnemyRobotPositions(world, param1.enemy_positions, Timestamp());
+    ::TestUtil::setBallPosition(world, param1.ball_position, Timestamp());
     world.updateBallStateWithTimestamp(
         TimestampedBallState(GetParam().ball_position, Vector(), Timestamp()));
 
@@ -177,10 +179,9 @@ std::vector<PlaySelectionTestParams> test_params = {
      .first_game_state   = RefboxGameState::PREPARE_PENALTY_THEM,
      .second_game_state  = RefboxGameState::NORMAL_START}};
 
-// TODO (Issue #1330): Reenable these tests
-// INSTANTIATE_TEST_CASE_P(TestPositions,
-// STPRefboxGameStatePlaySelectionTestWithPositions,
-//                        ::testing::ValuesIn(test_params.begin(), test_params.end()));
+ INSTANTIATE_TEST_CASE_P(TestPositions,
+ STPRefboxGameStatePlaySelectionTestWithPositions,
+                        ::testing::ValuesIn(test_params.begin(), test_params.end()));
 
 class STPRefboxGameStatePlaySelectionTest
     : public ::testing::Test,
@@ -226,9 +227,13 @@ TEST_P(STPRefboxGameStatePlaySelectionTest,
        test_play_selection_for_all_refbox_game_states)
 {
     // TODO (Issue #1330): replace the ball with real parameterized values
-    world.updateRefboxGameState(GetParam());
-    world.updateGameStateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
+//    world.updateRefboxGameState(GetParam());
+//    world.updateGameStateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
+    RefboxGameState game_state  = std::get<0>(GetParam());
+    std::cout << std::get<1>(GetParam()) << std::endl;
 
+    world.updateRefboxGameState(game_state);
+    world.updateGameStateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
     try
     {
         auto play_ptr = stp.calculateNewPlay(world);
@@ -239,9 +244,10 @@ TEST_P(STPRefboxGameStatePlaySelectionTest,
     }
 }
 
-auto all_refbox_game_states = ::TestUtil::getAllRefboxGameStates();
+// TODO (Issue #1665): Use `getAllRefboxGameStates()` instead when ball placement states have plays
+//auto all_refbox_game_states = ::TestUtil::getAllRefboxGameStatesExceptBallPlacement();
 
-// TODO (Issue #1330): Reenable these tests
-// INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,
-//                        ::testing::ValuesIn(all_refbox_game_states.begin(),
-//                                            all_refbox_game_states.end()));
+ INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,
+                         ::testing::Values(
+                                 std::make_tuple(RefboxGameState::HALT, 2),
+                                 std::make_tuple(RefboxGameState::STOP, 5)));
