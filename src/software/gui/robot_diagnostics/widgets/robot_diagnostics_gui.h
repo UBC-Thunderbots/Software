@@ -38,8 +38,8 @@ class RobotDiagnosticsGUI : public QMainWindow
     /**
      * Creates a new RobotDiagnosticsGUI MainWindow
      *
-     * @param sensor_msg_buffer The buffer used to receive new SensorMsgs
-     * @param primitive_buffer The buffer used to send new PrimitiveSetMsgs
+     * @param sensor_msg_buffer The buffer used to receive new SensorProtos
+     * @param primitive_buffer The buffer used to send new Primitives
      * @param parent parent widget
      */
     explicit RobotDiagnosticsGUI(

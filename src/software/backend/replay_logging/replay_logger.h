@@ -6,12 +6,12 @@
 #include "software/proto/sensor_msg.pb.h"
 
 
-class ReplayLogger : public FirstInFirstOutThreadedObserver<SensorMsg>
+class ReplayLogger : public FirstInFirstOutThreadedObserver<SensorProto>
 {
    public:
     /**
      * Constructs a Replay Logger. _msgs_per_chunk is a parameter that sets
-     * how many individual SensorMsg's go into one replay_logging 'chunk' file.
+     * how many individual SensorProto's go into one replay_logging 'chunk' file.
      * We separate replays into files of a certain number of messages to
      * reduce the amount of lost data in the case of a crash.
      *
@@ -29,12 +29,12 @@ class ReplayLogger : public FirstInFirstOutThreadedObserver<SensorMsg>
 
    private:
     /**
-     * Adds a SensorMsg to the current chunk. This will also save it to disk and
+     * Adds a SensorProto to the current chunk. This will also save it to disk and
      * clear the chunk in memory.
      *
-     * @param frame a SensorMsg
+     * @param frame a SensorProto
      */
-    void onValueReceived(SensorMsg msg) override;
+    void onValueReceived(SensorProto msg) override;
 
     /**
      * Increments the chunk index of the file we are writing to.
@@ -49,7 +49,7 @@ class ReplayLogger : public FirstInFirstOutThreadedObserver<SensorMsg>
 
     static constexpr int DEFAULT_MSGS_PER_CHUNK = 1000;
 
-    ReplayMsg current_chunk;
+    ReplayProto current_chunk;
     size_t current_chunk_idx;
     std::experimental::filesystem::path output_dir_path;
     const int msgs_per_chunk;

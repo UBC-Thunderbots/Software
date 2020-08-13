@@ -141,7 +141,7 @@ void SimulatedTestFixture::updateSensorFusion()
     auto ssl_wrapper_packet = simulated_test_simulator->getSSLWrapperPacket();
     assert(ssl_wrapper_packet);
 
-    auto sensor_msg                        = SensorMsg();
+    auto sensor_msg                        = SensorProto();
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
     sensor_fusion.updateWorld(sensor_msg);

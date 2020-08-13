@@ -6,7 +6,7 @@
 
 #include "firmware/app/primitives/move_helper.h"
 
-void app_autokick_move_primitive_start(AutokickMovePrimitiveMsg prim_msg,
+void app_autokick_move_primitive_start(TbotsProto_AutokickMovePrimitive prim_msg,
                                        void* void_state_ptr, FirmwareWorld_t* world)
 {
     app_move_helper_start(void_state_ptr, world, prim_msg.position_params,

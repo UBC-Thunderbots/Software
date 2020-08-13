@@ -134,7 +134,7 @@ int main(int argc, char **argv)
         // Connect observers
         ai->Subject<PrimitiveSetMsg>::registerObserver(backend);
         sensor_fusion->Subject<World>::registerObserver(ai);
-        backend->Subject<SensorMsg>::registerObserver(sensor_fusion);
+        backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         if (!args.headless)
         {
             visualizer = std::make_shared<ThreadedFullSystemGUI>();
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
             sensor_fusion->Subject<World>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
             ai->Subject<PlayInfo>::registerObserver(visualizer);
-            backend->Subject<SensorMsg>::registerObserver(visualizer);
+            backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 
         // Wait for termination

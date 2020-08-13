@@ -1,33 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "convert_primitive_to_nanopb",
-    srcs = [
-        "convert_primitive_to_nanopb.cpp",
-        "serialize_primitive_to_proto.cpp",
-        "serialize_primitive_to_proto.h",
-    ],
-    hdrs = ["convert_primitive_to_nanopb.h"],
-    visibility = ["//visibility:private"],
-    deps = [
-        "//shared/proto:tbots_cc_proto",
-        "//shared/proto:tbots_nanopb_proto",
-        "//software/primitive",
-        "//software/proto/message_translation:proto_creator_primitive_visitor",
-        "@nanopb",
-    ],
-)
-
-cc_test(
-    name = "convert_primitive_to_nanopb_test",
-    srcs = ["convert_primitive_to_nanopb_test.cpp"],
-    deps = [
-        ":convert_primitive_to_nanopb",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "simulator_robot",
     srcs = ["simulator_robot.cpp"],
     hdrs = ["simulator_robot.h"],
@@ -145,7 +118,6 @@ cc_library(
     srcs = ["simulator.cpp"],
     hdrs = ["simulator.h"],
     deps = [
-        ":convert_primitive_to_nanopb",
         ":simulator_ball",
         ":simulator_ball_singleton",
         ":simulator_robot",
@@ -153,6 +125,8 @@ cc_library(
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//software/primitive",
+        "//software/proto/message_translation:primitive_google_to_nanopb_converter",
+        "//software/proto/message_translation:proto_creator_primitive_visitor",
         "//software/proto/message_translation:ssl_detection",
         "//software/proto/message_translation:ssl_geometry",
         "//software/proto/message_translation:ssl_wrapper",

@@ -59,7 +59,7 @@ void plan_shoot_rotation(PhysBot *pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void app_shoot_primitive_start(PrimitiveParamsMsg params, void *void_state_ptr,
+void app_shoot_primitive_start(TbotsProto_PrimitiveParams params, void *void_state_ptr,
                                FirmwareWorld_t *world)
 {
     ShootPrimitiveState_t *state = (ShootPrimitiveState_t *)void_state_ptr;

@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package TbotsProto;
+
 import "shared/proto/geometry.proto";
 
 // This message is used to ensure backwards compatibility with our old format
@@ -7,7 +9,7 @@ import "shared/proto/geometry.proto";
 // has it's own unique proto message
 // TODO: Remove this once it's no longer needed
 //       (https://github.com/UBC-Thunderbots/Software/issues/1578)
-message PrimitiveParamsMsg
+message PrimitiveParams
 {
     // The parameters for the primitive
     float parameter1 = 1;
@@ -22,89 +24,89 @@ message PrimitiveParamsMsg
     bool slow = 6;
 }
 
-message PrimitiveMsg
+message Primitive
 {
     oneof primitive
     {
-        PrimitiveParamsMsg move            = 1;
-        PrimitiveParamsMsg stop            = 2;
-        PrimitiveParamsMsg shoot           = 3;
-        PrimitiveParamsMsg spinning_move   = 4;
-        PrimitiveParamsMsg direct_wheels   = 5;
-        PrimitiveParamsMsg direct_velocity = 6;
+        PrimitiveParams move            = 1;
+        PrimitiveParams stop            = 2;
+        PrimitiveParams shoot           = 3;
+        PrimitiveParams spinning_move   = 4;
+        PrimitiveParams direct_wheels   = 5;
+        PrimitiveParams direct_velocity = 6;
     }
 }
 
-message PrimitiveNewMsg
+message PrimitiveNew
 {
     oneof primitive
     {
-        ChipPrimitiveMsg chip                    = 1;
-        KickPrimitiveMsg kick                    = 2;
-        MovePrimitiveMsg move                    = 3;
-        SpinningMovePrimitiveMsg spinning_move   = 4;
-        AutochipMovePrimitiveMsg autochip_move   = 5;
-        AutokickMovePrimitiveMsg autokick_move   = 6;
-        StopPrimitiveMsg stop                    = 7;
-        DirectControlPrimitiveMsg direct_control = 8;
+        ChipPrimitive chip                    = 1;
+        KickPrimitive kick                    = 2;
+        MovePrimitive move                    = 3;
+        SpinningMovePrimitive spinning_move   = 4;
+        AutochipMovePrimitive autochip_move   = 5;
+        AutokickMovePrimitive autokick_move   = 6;
+        StopPrimitive stop                    = 7;
+        DirectControlPrimitive direct_control = 8;
     }
 }
 
-message ChipPrimitiveMsg
+message ChipPrimitive
 {
-    PointMsg chip_origin       = 1;
-    AngleMsg chip_direction    = 2;
+    Point chip_origin          = 1;
+    Angle chip_direction       = 2;
     float chip_distance_meters = 3;
 }
 
-message KickPrimitiveMsg
+message KickPrimitive
 {
-    PointMsg kick_origin               = 1;
-    AngleMsg kick_direction            = 2;
+    Point kick_origin                  = 1;
+    Angle kick_direction               = 2;
     float kick_speed_meters_per_second = 3;
 }
 
-message MovePrimitiveMsg
+message MovePrimitive
 {
     MovePositionParams position_params = 1;
-    AngleMsg final_angle               = 2;
+    Angle final_angle                  = 2;
     float dribbler_speed_rpm           = 3;
 }
 
-message SpinningMovePrimitiveMsg
-{
-    MovePositionParams position_params  = 1;
-    AngularVelocityMsg angular_velocity = 2;
-    float dribbler_speed_rpm            = 3;
-}
-
-message AutochipMovePrimitiveMsg
+message SpinningMovePrimitive
 {
     MovePositionParams position_params = 1;
-    AngleMsg final_angle               = 2;
+    AngularVelocity angular_velocity   = 2;
+    float dribbler_speed_rpm           = 3;
+}
+
+message AutochipMovePrimitive
+{
+    MovePositionParams position_params = 1;
+    Angle final_angle                  = 2;
     float dribbler_speed_rpm           = 3;
     float chip_distance_meters         = 4;
 }
 
-message AutokickMovePrimitiveMsg
+message AutokickMovePrimitive
 {
     MovePositionParams position_params = 1;
-    AngleMsg final_angle               = 2;
+    Angle final_angle                  = 2;
     float dribbler_speed_rpm           = 3;
     float kick_speed_meters_per_second = 4;
 }
 
-message StopPrimitiveMsg
+message StopPrimitive
 {
-    enum StopTypeMsg
+    enum StopType
     {
         BRAKE = 0;
         COAST = 1;
     }
-    StopTypeMsg stop_type = 1;
+    StopType stop_type = 1;
 }
 
-message DirectControlPrimitiveMsg
+message DirectControlPrimitive
 {
     enum ChargeMode
     {
@@ -113,7 +115,7 @@ message DirectControlPrimitiveMsg
         FLOAT     = 2;
     }
 
-    message DirectPerWheelControlMsg
+    message DirectPerWheelControl
     {
         float front_left_wheel_rpm  = 1;
         float back_left_wheel_rpm   = 2;
@@ -121,16 +123,16 @@ message DirectControlPrimitiveMsg
         float back_right_wheel_rpm  = 4;
     }
 
-    message DirectVelocityControlMsg
+    message DirectVelocityControl
     {
-        VectorMsg velocity                  = 1;
-        AngularVelocityMsg angular_velocity = 2;
+        Vector velocity                  = 1;
+        AngularVelocity angular_velocity = 2;
     }
 
     oneof wheel_control
     {
-        DirectPerWheelControlMsg direct_per_wheel_control = 1;
-        DirectVelocityControlMsg direct_velocity_control  = 2;
+        DirectPerWheelControl direct_per_wheel_control = 1;
+        DirectVelocityControl direct_velocity_control  = 2;
     }
     ChargeMode charge_mode = 3;
     oneof chick_command
@@ -145,7 +147,7 @@ message DirectControlPrimitiveMsg
 
 message MovePositionParams
 {
-    PointMsg destination                = 1;
+    Point destination                   = 1;
     float final_speed_meters_per_second = 2;
     bool slow                           = 3;
 }

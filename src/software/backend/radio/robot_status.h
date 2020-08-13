@@ -7,7 +7,7 @@
 
 // This struct contains various robot diagnostics (e.g. voltages, link quality, etc.)
 // and messages related to robot and dongle condition.
-struct RobotStatus
+struct RadioRobotStatus
 {
     // The robot number.
     int32_t robot;
@@ -88,11 +88,13 @@ struct RobotStatus
 };
 
 /**
- * Converts RobotStatus to RobotStatusMsg
+ * Converts RadioRobotStatus to TbotsProto::RobotStatus
  * Does not convert ChipperKickerStatus,
  * DriveUnits, and NetworkStatus due to insufficient info
  *
- * @param robot_status The RobotStatus
+ * @param robot_status The RadioRobotStatus
+ *
+ * @return the equivalent RobotStatus protobuf
  */
-std::unique_ptr<RobotStatusMsg> convertRobotStatusToRobotStatusMsg(
-    const RobotStatus &robot_status);
+std::unique_ptr<TbotsProto::RobotStatus> convertRobotStatusToRobotStatusProto(
+    const RadioRobotStatus &robot_status);

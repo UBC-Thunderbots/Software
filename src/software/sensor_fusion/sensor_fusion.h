@@ -37,7 +37,7 @@ class SensorFusion
      *
      * @param new data
      */
-    void updateWorld(const SensorMsg &sensor_msg);
+    void updateWorld(const SensorProto &sensor_msg);
 
     /**
      * Returns the most up-to-date world if enough data has been received
@@ -56,8 +56,8 @@ class SensorFusion
      */
     void updateWorld(const SSL_WrapperPacket &packet);
     void updateWorld(const SSL_Referee &packet);
-    void updateWorld(
-        const google::protobuf::RepeatedPtrField<RobotStatusMsg> &robot_status_msgs);
+    void updateWorld(const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>
+                         &robot_status_msgs);
     void updateWorld(const SSL_GeometryData &geometry_packet);
     void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
 

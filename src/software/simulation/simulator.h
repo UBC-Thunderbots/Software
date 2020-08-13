@@ -147,8 +147,8 @@ class Simulator
      * @param id The id of the robot to set the primitive for
      * @param primitive_msg The primitive to run on the robot
      */
-    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
-    void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Sets the primitive being simulated by the robot on the corresponding team
@@ -230,7 +230,7 @@ class Simulator
      * @param simulator_ball The simulator ball to use in the primitives
      */
     static void setRobotPrimitive(
-        RobotId id, const PrimitiveMsg& primitive_msg,
+        RobotId id, const TbotsProto_Primitive& primitive_msg,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
         const std::shared_ptr<SimulatorBall>& simulator_ball);

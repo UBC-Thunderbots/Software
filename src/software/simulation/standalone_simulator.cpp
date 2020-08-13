@@ -121,12 +121,14 @@ SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
     return most_recent_ssl_wrapper_packet;
 }
 
-void StandaloneSimulator::setYellowRobotPrimitiveSet(PrimitiveSetMsg primitive_set_msg)
+void StandaloneSimulator::setYellowRobotPrimitives(
+    TbotsProto_PrimitiveSet primitive_set_msg)
 {
     simulator.setYellowRobotPrimitiveSet(primitive_set_msg);
 }
 
-void StandaloneSimulator::setBlueRobotPrimitiveSet(PrimitiveSetMsg primitive_set_msg)
+void StandaloneSimulator::setBlueRobotPrimitives(
+    TbotsProto_PrimitiveSet primitive_set_msg)
 {
     simulator.setBlueRobotPrimitiveSet(primitive_set_msg);
 }
