@@ -39,12 +39,10 @@ TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
        test_play_selection_for_states_and_positions)
 {
     // set up the friendly team
-    auto param1 = GetParam();
-    std::cout << "Name: " << param1.name << std::endl;
-    ::TestUtil::setFriendlyRobotPositions(world, param1.friendly_positions,
+    ::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
                                           Timestamp());
-    ::TestUtil::setEnemyRobotPositions(world, param1.enemy_positions, Timestamp());
-    ::TestUtil::setBallPosition(world, param1.ball_position, Timestamp());
+    ::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions, Timestamp());
+    ::TestUtil::setBallPosition(world, GetParam().ball_position, Timestamp());
     world.updateBallStateWithTimestamp(
         TimestampedBallState(GetParam().ball_position, Vector(), Timestamp()));
 
@@ -179,13 +177,12 @@ std::vector<PlaySelectionTestParams> test_params = {
      .first_game_state   = RefboxGameState::PREPARE_PENALTY_THEM,
      .second_game_state  = RefboxGameState::NORMAL_START}};
 
- INSTANTIATE_TEST_CASE_P(TestPositions,
- STPRefboxGameStatePlaySelectionTestWithPositions,
+INSTANTIATE_TEST_CASE_P(TestPositions, STPRefboxGameStatePlaySelectionTestWithPositions,
                         ::testing::ValuesIn(test_params.begin(), test_params.end()));
 
 class STPRefboxGameStatePlaySelectionTest
     : public ::testing::Test,
-      public ::testing::WithParamInterface<RefboxGameState>
+      public ::testing::WithParamInterface<std::tuple<RefboxGameState, Ball>>
 {
    public:
     STPRefboxGameStatePlaySelectionTest()
@@ -226,28 +223,55 @@ class STPRefboxGameStatePlaySelectionTest
 TEST_P(STPRefboxGameStatePlaySelectionTest,
        test_play_selection_for_all_refbox_game_states)
 {
-    // TODO (Issue #1330): replace the ball with real parameterized values
-//    world.updateRefboxGameState(GetParam());
-//    world.updateGameStateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
-    RefboxGameState game_state  = std::get<0>(GetParam());
-    std::cout << std::get<1>(GetParam()) << std::endl;
+    RefboxGameState game_state = std::get<0>(GetParam());
+    Ball ball                  = std::get<1>(GetParam());
 
     world.updateRefboxGameState(game_state);
-    world.updateGameStateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
+    world.updateGameStateBall(ball);
     try
     {
         auto play_ptr = stp.calculateNewPlay(world);
     }
     catch (...)
     {
-        FAIL() << "No play for game state " << GetParam();
+        FAIL() << "No play for game state " << std::get<0>(GetParam());
     }
 }
 
-// TODO (Issue #1665): Use `getAllRefboxGameStates()` instead when ball placement states have plays
-//auto all_refbox_game_states = ::TestUtil::getAllRefboxGameStatesExceptBallPlacement();
+// TODO (Issue #1665): Include `BALL_PLACEMENT_US` and `BALL_PLACEMENT_THEM` when ball
+// placement states have plays
 
- INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,
-                         ::testing::Values(
-                                 std::make_tuple(RefboxGameState::HALT, 2),
-                                 std::make_tuple(RefboxGameState::STOP, 5)));
+// NORMAL_START is omitted since there is no preceding PREPARE state
+INSTANTIATE_TEST_CASE_P(
+    AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,
+    ::testing::Values(
+        std::make_tuple(RefboxGameState::HALT,
+                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::STOP,
+                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::FORCE_START,
+                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::PREPARE_KICKOFF_US,
+                        Ball(Point(0, 0), Vector(1, 0), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::PREPARE_KICKOFF_THEM,
+                        Ball(Point(0, 0), Vector(-1, 0), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::PREPARE_PENALTY_US,
+                        Ball(Point(2.7, 0), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::PREPARE_PENALTY_THEM,
+                        Ball(Point(-2.7, 0), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::DIRECT_FREE_US,
+                        Ball(Point(-4.3, -2.8), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::DIRECT_FREE_THEM,
+                        Ball(Point(4.3, 2.8), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::INDIRECT_FREE_US,
+                        Ball(Point(-2, 2.8), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::INDIRECT_FREE_THEM,
+                        Ball(Point(2, -2.8), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::TIMEOUT_US,
+                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::TIMEOUT_THEM,
+                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::GOAL_US,
+                        Ball(Point(4.5, 0), Vector(), Timestamp::fromSeconds(0))),
+        std::make_tuple(RefboxGameState::GOAL_THEM,
+                        Ball(Point(-4.5, 0), Vector(), Timestamp::fromSeconds(0)))));

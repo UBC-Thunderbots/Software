@@ -85,20 +85,6 @@ namespace TestUtil
         return game_states;
     }
 
-    std::vector<RefboxGameState> getAllRefboxGameStatesExceptBallPlacement()
-    {
-        std::vector<RefboxGameState> game_states;
-        for (int i = 0; i < static_cast<int>(RefboxGameState::REFBOX_GAME_STATE_COUNT);
-             i++)
-        {
-            if (static_cast<RefboxGameState>(i) != RefboxGameState::BALL_PLACEMENT_US && static_cast<RefboxGameState>(i) != RefboxGameState::BALL_PLACEMENT_THEM)
-            {
-                game_states.push_back(static_cast<RefboxGameState>(i));
-            }
-        }
-        return game_states;
-    }
-
     Robot createRobotAtPos(const Point &pt)
     {
         static RobotId robot_id_counter = 0;

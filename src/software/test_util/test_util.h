@@ -89,16 +89,6 @@ namespace TestUtil
      */
     std::vector<RefboxGameState> getAllRefboxGameStates();
 
-    // TODO (Issue #1665): Remove when ball placement states have plays
-    /**
-    * Returns a vector containing all Refbox game states except for
-    * LAST_ENUM_ITEM_UNUSED, BALL_PLACEMENT_US, and BALL_PLACEMENT_THEM
-    *
-    * @return A vector containing all Refbox game states except for
-    * LAST_ENUM_ITEM_UNUSED, BALL_PLACEMENT_US, and BALL_PLACEMENT_THEM
-    */
-    std::vector<RefboxGameState> getAllRefboxGameStatesExceptBallPlacement();
-
     /**
      * Returns a robot at the given position with zero velocity,
      * facing zero radians, with zero rad/s of angular velocity,
