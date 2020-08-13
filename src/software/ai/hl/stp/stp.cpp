@@ -317,7 +317,6 @@ std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
         auto play = play_constructor();
         if (play->isApplicable(world))
         {
-            std::cout << "APPLICABLE: " << play->getName() << std::endl;
             applicable_plays.emplace_back(std::move(play));
         }
     }
@@ -327,6 +326,7 @@ std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
         throw std::runtime_error(
             "No new Play could be calculated because no Plays are applicable");
     }
+
     // Create a uniform distribution over the indices of the applicable_plays
     // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
     auto uniform_distribution = std::uniform_int_distribution<std::mt19937::result_type>(

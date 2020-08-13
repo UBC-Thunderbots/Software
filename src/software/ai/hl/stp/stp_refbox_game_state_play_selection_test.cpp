@@ -42,7 +42,6 @@ TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
     ::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
                                           Timestamp());
     ::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions, Timestamp());
-    ::TestUtil::setBallPosition(world, GetParam().ball_position, Timestamp());
     world.updateBallStateWithTimestamp(
         TimestampedBallState(GetParam().ball_position, Vector(), Timestamp()));
 
