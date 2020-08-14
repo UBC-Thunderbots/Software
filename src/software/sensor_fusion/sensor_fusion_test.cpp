@@ -177,7 +177,7 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet = createSSLWrapperPacket(
-        std::move(geom_data), std::unique_ptr<SSL_DetectionFrame>());
+        std::move(geom_data), std::unique_ptr<SSLProto::SSL_DetectionFrame>());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -187,8 +187,8 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 {
     SensorProto sensor_msg;
-    auto ssl_wrapper_packet = createSSLWrapperPacket(std::unique_ptr<SSL_GeometryData>(),
-                                                     std::move(detection_frame));
+    auto ssl_wrapper_packet = createSSLWrapperPacket(
+        std::unique_ptr<SSLProto::SSL_GeometryData>(), std::move(detection_frame));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -274,7 +274,7 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
-    SensorMsg sensor_msg_2;
+    SensorProto sensor_msg_2;
     *(sensor_msg_2.mutable_ssl_referee_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
@@ -301,7 +301,7 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
-    SensorMsg sensor_msg_2;
+    SensorProto sensor_msg_2;
     *(sensor_msg_2.mutable_ssl_referee_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();

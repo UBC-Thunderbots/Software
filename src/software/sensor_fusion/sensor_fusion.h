@@ -16,7 +16,7 @@
 
 /**
  * Sensor Fusion is an abstraction around all filtering operations that our system may
- * need to perform. It produces Worlds that may be used, and consumes SensorMsgs
+ * need to perform. It produces Worlds that may be used, and consumes SensorProtos
  */
 class SensorFusion
 {
