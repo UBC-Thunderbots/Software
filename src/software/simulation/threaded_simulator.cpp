@@ -181,7 +181,8 @@ void ThreadedSimulator::addBlueRobot(const Point &position)
     simulator.addBlueRobot(position);
 }
 
-void ThreadedSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot) {
+void ThreadedSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
     std::scoped_lock lock(simulator_mutex);
     simulator.removeRobot(robot);
 }

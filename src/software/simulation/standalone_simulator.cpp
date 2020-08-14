@@ -183,6 +183,7 @@ void StandaloneSimulator::addBlueRobot(const Point& position)
     simulator.addBlueRobot(position);
 }
 
-void StandaloneSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot) {
+void StandaloneSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
     simulator.removeRobot(robot);
 }

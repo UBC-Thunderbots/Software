@@ -260,6 +260,7 @@ void Simulator::addBlueRobot(const Point& position)
     addBlueRobots({state_with_id});
 }
 
-void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot) {
+void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
     physics_world.removeRobot(robot);
 }
