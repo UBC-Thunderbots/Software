@@ -55,12 +55,17 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseMoveEvent(QMouseEvent* even
 void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent* event)
 {
     Point point_in_scene = createPoint(mapToScene(event->pos()));
+    auto robot_under_cursor = standalone_simulator->getRobotAtPosition(point_in_scene);
 
     QMenu menu(this);
     menu.addAction("Add Yellow Robot Here",
                    [&]() { standalone_simulator->addYellowRobot(point_in_scene); });
     menu.addAction("Add Blue Robot Here",
                    [&]() { standalone_simulator->addBlueRobot(point_in_scene); });
+    if(!robot_under_cursor.expired()) {
+        menu.addAction("Remove Robot",
+                       [&]() { standalone_simulator->removeRobot(robot_under_cursor); });
+    }
 
     menu.exec(event->globalPos());
 }

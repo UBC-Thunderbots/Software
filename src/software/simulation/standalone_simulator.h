@@ -113,6 +113,13 @@ class StandaloneSimulator
     void addYellowRobot(const Point& position);
     void addBlueRobot(const Point& position);
 
+    /**
+     * Removes the given PhysicsRobot from the PhysicsWorld, if it exists.
+     *
+     * @param robot The robot to be removed
+     */
+    void removeRobot(std::weak_ptr<PhysicsRobot> robot);
+
     // This is a somewhat arbitrary value that results in slow motion
     // simulation looking appropriately / usefully slow
     static constexpr double DEFAULT_SLOW_MOTION_MULTIPLIER = 8.0;
