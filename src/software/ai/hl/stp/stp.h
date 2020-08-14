@@ -48,7 +48,7 @@
  *    If the invariant is no longer true, the play is stopped and a new Play whose
  *    applicable condition is true will be chosen and started.
  *
- *    Alltogether it's this constant switching of Plays in reaction to the current
+ *    Altogether it's this constant switching of Plays in reaction to the current
  *    state of the world that makes our AI "play soccer".
  *
  * 2. Run the current Play to get the Tactics should be run at this time.
