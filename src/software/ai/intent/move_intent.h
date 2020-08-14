@@ -43,9 +43,9 @@ class MoveIntent : public NavigatingIntent
     const Angle& getFinalAngle() const;
 
     /**
-     * Gets whether or not auto-kick should be enabled while moving
+     * Gets whether or not auto-kick/auto-chip should be enabled while moving
      *
-     * @return whether or not auto-kick should be enabled while moving
+     * @return whether or not auto-kick/auto-chip should be enabled while moving
      */
     const AutochickType& getAutochickType() const;
 
