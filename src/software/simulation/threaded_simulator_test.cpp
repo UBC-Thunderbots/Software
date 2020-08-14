@@ -4,7 +4,8 @@
 
 #include "software/primitive/move_primitive.h"
 #include "software/primitive/primitive.h"
-#include "software/simulation/convert_primitive_to_nanopb.h"
+#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/test_util/test_util.h"
 
 class ThreadedSimulatorTest : public ::testing::Test
@@ -184,7 +185,8 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
             std::move(blue_robot_primitives));
     for (const auto& primitive_ptr : *blue_primitives_ptr)
     {
-        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         threaded_simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(),
                                                  primitive_msg);
@@ -204,7 +206,8 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
             std::move(yellow_robot_primitives));
     for (const auto& primitive_ptr : *yellow_primitives_ptr)
     {
-        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         threaded_simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(),
                                                    primitive_msg);

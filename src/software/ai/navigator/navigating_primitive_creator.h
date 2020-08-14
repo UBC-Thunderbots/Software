@@ -31,7 +31,7 @@ class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
      *
      * @return Primitive
      */
-    PrimitiveMsg createNavigatingPrimitive(
+    TbotsProto::Primitive createNavigatingPrimitive(
         const NavigatingIntent &intent, const Path &path,
         const std::vector<ObstaclePtr> &enemy_robot_obstacles);
 
@@ -91,7 +91,7 @@ class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
         const std::vector<ObstaclePtr> &enemy_robot_obstacles) const;
 
     std::shared_ptr<const NavigatorConfig> config;
-    std::optional<PrimitiveMsg> current_primitive;
+    std::optional<TbotsProto::Primitive> current_primitive;
     Point new_destination;
     double new_final_speed;
 };

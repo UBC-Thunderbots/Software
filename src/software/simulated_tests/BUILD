@@ -6,28 +6,18 @@ cc_library(
     srcs = ["simulated_test_fixture.cpp"],
     hdrs = ["simulated_test_fixture.h"],
     deps = [
-        ":serialized_to_nano_pb_simulator_adapter",
         "//software/ai",
         "//software/gui/drawing:navigator",
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
+        "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/proto/message_translation:tbots_protobuf",
         "//software/sensor_fusion",
         "//software/simulated_tests/validation:non_terminating_function_validator",
         "//software/simulated_tests/validation:terminating_function_validator",
+        "//software/simulation:simulator",
         "//software/test_util",
         "//software/time:duration",
-        "@gtest",
-    ],
-)
-
-cc_library(
-    name = "serialized_to_nano_pb_simulator_adapter",
-    testonly = True,
-    srcs = ["serialized_to_nano_pb_simulator_adapter.cpp"],
-    hdrs = ["serialized_to_nano_pb_simulator_adapter.h"],
-    deps = [
-        "//software/simulation:simulator",
         "@gtest",
     ],
 )

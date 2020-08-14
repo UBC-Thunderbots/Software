@@ -133,14 +133,6 @@ class Simulator
     void addBlueRobot(const Point& position);
 
     /**
-     * Sets the primitives being simulated by the robots in simulation
-     *
-     * @param primitives The primitives to simulate
-     */
-    void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-    void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-
-    /**
      * Sets the primitive being simulated by the robot on the corresponding team
      * in simulation
      *
@@ -156,8 +148,8 @@ class Simulator
      *
      * @param primitive_set_msg The set of primitives to run on the robot
      */
-    void setYellowRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
-    void setBlueRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg);
+    void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg);
+    void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate

@@ -13,7 +13,7 @@ RadioOutput::RadioOutput(
 {
 }
 
-void RadioOutput::sendPrimitives(const PrimitiveSetMsg &primitives)
+void RadioOutput::sendPrimitives(const TbotsProto::PrimitiveSet &primitives)
 {
     dongle.send_drive_packet(primitives);
 }

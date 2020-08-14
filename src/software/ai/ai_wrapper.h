@@ -14,7 +14,7 @@
  * robots based on the World state, and sending them out.
  */
 class AIWrapper : public FirstInFirstOutThreadedObserver<World>,
-                  public Subject<PrimitiveSetMsg>,
+                  public Subject<TbotsProto::PrimitiveSet>,
                   public Subject<AIDrawFunction>,
                   public Subject<PlayInfo>
 {

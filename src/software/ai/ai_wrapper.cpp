@@ -26,7 +26,7 @@ void AIWrapper::runAIAndSendPrimitives()
         PlayInfo play_info = ai.getPlayInfo();
         Subject<PlayInfo>::sendValueToObservers(play_info);
 
-        Subject<PrimitiveSetMsg>::sendValueToObservers(*new_primitives);
+        Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
     }
     drawAI();
 }

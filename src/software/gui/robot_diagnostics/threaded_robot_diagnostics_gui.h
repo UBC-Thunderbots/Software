@@ -63,8 +63,9 @@ class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<Senso
 
     // Buffers that are shared with the instance of the RobotDiagnosticsGUI so that data
     // can be passed safely
-    std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
-    std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<PrimitiveSetMsg>>> primitive_buffer;
+    std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
+    std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<TbotsProto::PrimitiveSet>>>
+        primitive_buffer;
 
     // We don't want to miss any updates so we make the buffer larger
     static constexpr std::size_t sensor_msg_buffer_size = 60;

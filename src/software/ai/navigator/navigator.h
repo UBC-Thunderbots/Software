@@ -37,7 +37,7 @@ class Navigator : public IntentVisitor
      *
      * @return Primitives
      */
-    std::unique_ptr<PrimitiveSetMsg> getAssignedPrimitives(
+    std::unique_ptr<TbotsProto::PrimitiveSet> getAssignedPrimitives(
         const World &world, const std::vector<std::unique_ptr<Intent>> &intents);
 
     /**
@@ -82,5 +82,5 @@ class Navigator : public IntentVisitor
     // When navigating intents are processed to path plan, we can avoid these
     // non-navigating robots
     std::vector<RobotId> direct_primitive_intent_robots;
-    std::unique_ptr<PrimitiveSetMsg> primitive_set_msg;
+    std::unique_ptr<TbotsProto::PrimitiveSet> primitive_set_msg;
 };

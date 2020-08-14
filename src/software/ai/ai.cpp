@@ -24,7 +24,7 @@ AI::AI(std::shared_ptr<const AIConfig> ai_config,
 {
 }
 
-std::unique_ptr<PrimitiveSetMsg> AI::getPrimitives(const World &world) const
+std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world) const
 {
     std::vector<std::unique_ptr<Intent>> assigned_intents = high_level->getIntents(world);
 

@@ -72,36 +72,6 @@ void Simulator::updateSimulatorRobots(
     }
 }
 
-void Simulator::setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
-{
-    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball);
-}
-
-void Simulator::setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg)
-{
-    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball);
-}
-
-void Simulator::setYellowRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg)
-{
-    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
-    {
-<<<<<<< HEAD
-        setYellowRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
-                                primitive_set_msg.robot_primitives[i].value);
-    }
-}
-
-void Simulator::setBlueRobotPrimitiveSet(const PrimitiveSetMsg& primitive_set_msg)
-=======
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
-                          simulator_ball);
-    }
-}
-
 void Simulator::setYellowRobotPrimitive(RobotId id,
                                         const TbotsProto_Primitive& primitive_msg)
 {
@@ -110,7 +80,21 @@ void Simulator::setYellowRobotPrimitive(RobotId id,
 
 void Simulator::setBlueRobotPrimitive(RobotId id,
                                       const TbotsProto_Primitive& primitive_msg)
->>>>>>> upstream/master
+{
+    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball);
+}
+
+void Simulator::setYellowRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet& primitive_set_msg)
+{
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
+    {
+        setYellowRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                                primitive_set_msg.robot_primitives[i].value);
+    }
+}
+
+void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {

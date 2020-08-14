@@ -61,11 +61,11 @@ void StandaloneSimulator::initNetworking()
     yellow_team_primitive_listener =
         std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             yellow_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setYellowRobotPrimitiveSet, this, _1));
+            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1));
     blue_team_primitive_listener =
         std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             blue_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setBlueRobotPrimitiveSet, this, _1));
+            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
 }
 
 void StandaloneSimulator::setupInitialSimulationState()

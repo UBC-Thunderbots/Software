@@ -32,7 +32,7 @@ class AI final
      * @return the Primitives that should be run by our Robots given the current
      * state of the world.
      */
-    std::unique_ptr<PrimitiveSetMsg> getPrimitives(const World& world) const;
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world) const;
 
     /**
      * Returns information about the currently running plays and tactics, including the

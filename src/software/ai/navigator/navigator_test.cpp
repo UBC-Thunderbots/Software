@@ -77,7 +77,7 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitive(
         ChipPrimitive(0, Point(), Angle::quarter(), 0));
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
@@ -96,7 +96,7 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitive(
         KickPrimitive(0, Point(), Angle::quarter(), 0));
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
@@ -115,7 +115,7 @@ TEST_F(ThetaStarNavigatorTest, convert_spinning_move_intent_to_spinning_move_pri
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitive(
         SpinningMovePrimitive(0, Point(), AngularVelocity::full(), 1));
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
@@ -134,7 +134,7 @@ TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
     auto expected_primitive =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(StopPrimitive(0, false));
+        ProtoCreatorPrimitiveVisitor().createPrimitive(StopPrimitive(0, false));
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -153,12 +153,12 @@ TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 2);
 
     auto expected_stop_primitive_1 =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(StopPrimitive(0, false));
+        ProtoCreatorPrimitiveVisitor().createPrimitive(StopPrimitive(0, false));
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_stop_primitive_1, primitive_set_msg->robot_primitives().at(0)));
 
     auto expected_stop_primitive_2 =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(StopPrimitive(1, false));
+        ProtoCreatorPrimitiveVisitor().createPrimitive(StopPrimitive(1, false));
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_stop_primitive_2, primitive_set_msg->robot_primitives().at(1)));
 }
@@ -216,7 +216,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+    auto expected_primitive = ProtoCreatorPrimitiveVisitor().createPrimitive(
         MovePrimitive(0, poi, Angle::zero(), 0, DribblerEnable::OFF, MoveType::NORMAL,
                       AutochickType::NONE));
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
@@ -257,7 +257,7 @@ TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
     auto expected_primitive =
-        ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(StopPrimitive(0, false));
+        ProtoCreatorPrimitiveVisitor().createPrimitive(StopPrimitive(0, false));
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }

@@ -16,7 +16,7 @@
  */
 class Backend : public Subject<SensorProto>,
                 public FirstInFirstOutThreadedObserver<World>,
-                public FirstInFirstOutThreadedObserver<PrimitiveSetMsg>
+                public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
    public:
     Backend() = default;

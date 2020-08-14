@@ -50,12 +50,12 @@ class MRFDongle final
     ~MRFDongle();
 
     /**
-     * Given a PrimitiveSetMsg, constructs a single drive packet to send over radio
-     * to all robots.
+     * Given a TbotsProto::PrimitiveSet, constructs a single drive packet to send over
+     * radio to all robots.
      *
-     * @param prims PrimitiveSetMsg from HL
+     * @param prims TbotsProto::PrimitiveSet from HL
      */
-    void send_drive_packet(const PrimitiveSetMsg &prims);
+    void send_drive_packet(const TbotsProto::PrimitiveSet &prims);
 
     /**
      * Sends a camera packet over radio to all robots, including vision coordinates of
@@ -134,7 +134,8 @@ class MRFDongle final
      *
      * @return The serialization of the primitive proto
      */
-    std::vector<uint8_t> encode_primitive(unsigned int robot_id, PrimitiveMsg prim_proto);
+    std::vector<uint8_t> encode_primitive(unsigned int robot_id,
+                                          TbotsProto::Primitive prim_proto);
 
     /**
      * Attempt to pack and send the given data over libusb to the radio

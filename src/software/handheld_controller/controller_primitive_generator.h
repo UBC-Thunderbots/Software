@@ -11,7 +11,7 @@
  */
 class ControllerPrimitiveGenerator
     : public FirstInFirstOutThreadedObserver<ControllerInput>,
-      public Subject<PrimitiveSetMsg>
+      public Subject<TbotsProto::PrimitiveSet>
 {
    public:
     /**

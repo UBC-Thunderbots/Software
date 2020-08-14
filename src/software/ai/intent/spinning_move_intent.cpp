@@ -7,7 +7,7 @@ SpinningMoveIntent::SpinningMoveIntent(unsigned int robot_id, const Point &dest,
                                        double final_speed, unsigned int priority)
     : DirectPrimitiveIntent(
           robot_id, priority,
-          ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+          ProtoCreatorPrimitiveVisitor().createPrimitive(
               SpinningMovePrimitive(robot_id, dest, angular_vel, final_speed)))
 {
 }

@@ -3,7 +3,7 @@
 #include <google/protobuf/util/message_differencer.h>
 
 DirectPrimitiveIntent::DirectPrimitiveIntent(unsigned int robot_id, unsigned int priority,
-                                             PrimitiveMsg primitive_msg)
+                                             TbotsProto::Primitive primitive_msg)
     : Intent(robot_id, priority), primitive_msg(primitive_msg)
 {
 }
@@ -25,7 +25,7 @@ bool DirectPrimitiveIntent::operator!=(const DirectPrimitiveIntent &other) const
     return !((*this) == other);
 }
 
-PrimitiveMsg DirectPrimitiveIntent::getPrimitive() const
+TbotsProto::Primitive DirectPrimitiveIntent::getPrimitive() const
 {
     return primitive_msg;
 }

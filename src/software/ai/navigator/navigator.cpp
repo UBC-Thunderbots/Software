@@ -26,15 +26,15 @@ void Navigator::visit(const MoveIntent &intent)
     navigating_intents.push_back(std::make_shared<MoveIntent>(intent));
 }
 
-std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitives(
+std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &intents)
 {
     // Initialize variables
     navigating_intents.clear();
     planned_paths.clear();
     direct_primitive_intent_robots.clear();
-    primitive_set_msg                         = std::make_unique<PrimitiveSetMsg>();
-    *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestampMsg();
+    primitive_set_msg = std::make_unique<TbotsProto::PrimitiveSet>();
+    *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestamp();
 
     // Register all intents
     for (const auto &intent : intents)
@@ -69,7 +69,7 @@ std::unique_ptr<PrimitiveSetMsg> Navigator::getAssignedPrimitives(
                 << "Navigator's path manager could not find a path for RobotId = "
                 << robot_id;
             robot_primitives_map[robot_id] =
-                ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(
+                ProtoCreatorPrimitiveVisitor().createPrimitive(
                     StopPrimitive(robot_id, false));
         }
     }

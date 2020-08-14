@@ -30,7 +30,7 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
     joinMulticastChannel(channel, network_interface);
 }
 
-void WifiBackend::onValueReceived(PrimitiveSetMsg primitives)
+void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
 }

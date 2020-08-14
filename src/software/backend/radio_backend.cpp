@@ -18,7 +18,7 @@ RadioBackend::RadioBackend(
 {
 }
 
-void RadioBackend::onValueReceived(PrimitiveSetMsg primitives)
+void RadioBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     radio_output.sendPrimitives(primitives);
 }

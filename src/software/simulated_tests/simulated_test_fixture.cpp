@@ -2,13 +2,13 @@
 
 #include "software/gui/drawing/navigator.h"
 #include "software/logger/logger.h"
+#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
-    : simulated_test_simulator(std::make_unique<SerializedToNanoPbSimulatorAdapter>(
-          Field::createSSLDivisionBField())),
+    : simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField())),
       sensor_fusion(DynamicParameters->getSensorFusionConfig()),
       ai(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig()),
       run_simulation_in_realtime(false)
@@ -24,11 +24,10 @@ void SimulatedTestFixture::SetUp()
     // until https://github.com/UBC-Thunderbots/Software/issues/1483 is complete
 
     // Re-create all objects for each test so we start from a clean setup
-    // every time. Because the simulated_test_simulator is created initially in the
+    // every time. Because the simulator is created initially in the
     // constructor's initialization list, and before every test in this SetUp function, we
     // can guarantee the pointer will never be null / empty
-    simulated_test_simulator = std::make_unique<SerializedToNanoPbSimulatorAdapter>(
-        Field::createSSLDivisionBField());
+    simulator = std::make_unique<Simulator>(Field::createSSLDivisionBField());
     ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
 
@@ -57,22 +56,22 @@ void SimulatedTestFixture::SetUp()
 
 void SimulatedTestFixture::setBallState(const BallState &ball)
 {
-    simulated_test_simulator->setBallState(ball);
+    simulator->setBallState(ball);
 }
 
 void SimulatedTestFixture::addFriendlyRobots(const std::vector<RobotStateWithId> &robots)
 {
-    simulated_test_simulator->addYellowRobots(robots);
+    simulator->addYellowRobots(robots);
 }
 
 void SimulatedTestFixture::addEnemyRobots(const std::vector<RobotStateWithId> &robots)
 {
-    simulated_test_simulator->addBlueRobots(robots);
+    simulator->addBlueRobots(robots);
 }
 
 Field SimulatedTestFixture::field() const
 {
-    return simulated_test_simulator->getField();
+    return simulator->getField();
 }
 
 void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
@@ -138,7 +137,7 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
 
 void SimulatedTestFixture::updateSensorFusion()
 {
-    auto ssl_wrapper_packet = simulated_test_simulator->getSSLWrapperPacket();
+    auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
     assert(ssl_wrapper_packet);
 
     auto sensor_msg                        = SensorProto();
@@ -192,18 +191,18 @@ void SimulatedTestFixture::runTest(
             NonTerminatingFunctionValidator(validation_function, world));
     }
 
-    const Timestamp timeout_time = simulated_test_simulator->getTimestamp() + timeout;
+    const Timestamp timeout_time = simulator->getTimestamp() + timeout;
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
     const Duration ai_time_step = Duration::fromSeconds(
         simulation_time_step.getSeconds() * CAMERA_FRAMES_PER_AI_TICK);
     bool validation_functions_done = false;
-    while (simulated_test_simulator->getTimestamp() < timeout_time)
+    while (simulator->getTimestamp() < timeout_time)
     {
         auto wall_start_time = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {
-            simulated_test_simulator->stepSimulation(simulation_time_step);
+            simulator->stepSimulation(simulation_time_step);
             updateSensorFusion();
         }
 
@@ -219,12 +218,8 @@ void SimulatedTestFixture::runTest(
             }
 
             auto primitive_set_msg = ai.getPrimitives(*world);
-            std::vector<uint8_t> serialized_proto(primitive_set_msg->ByteSizeLong());
-            primitive_set_msg->SerializeToArray(
-                serialized_proto.data(),
-                static_cast<int>(primitive_set_msg->ByteSizeLong()));
-            simulated_test_simulator->setYellowRobotSerializedPrimitiveSet(
-                serialized_proto);
+            simulator->setYellowRobotPrimitiveSet(
+                createNanoPbPrimitiveSet(*primitive_set_msg));
 
             if (run_simulation_in_realtime)
             {

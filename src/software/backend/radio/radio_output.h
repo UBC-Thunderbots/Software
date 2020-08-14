@@ -26,9 +26,9 @@ class RadioOutput
     /**
      * Sends the given primitives to the backend to control the robots
      *
-     * @param primitives the PrimitiveSetMsg to send
+     * @param primitives the TbotsProto::PrimitiveSet to send
      */
-    void sendPrimitives(const PrimitiveSetMsg& primitives);
+    void sendPrimitives(const TbotsProto::PrimitiveSet& primitives);
 
     /**
      * Sends a camera packet with the detected robots and ball.

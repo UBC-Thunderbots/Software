@@ -17,8 +17,8 @@ void ControllerPrimitiveGenerator::onValueReceived(ControllerInput controller_in
     primitives.emplace_back(createPrimitiveFromControllerInput(controller_input));
     auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
         std::move(primitives));
-    Subject<PrimitiveSetMsg>::sendValueToObservers(
-        *createPrimitiveSetMsg(primitives_ptr));
+    Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(
+        *createPrimitiveSet(primitives_ptr));
 }
 
 std::unique_ptr<Primitive>

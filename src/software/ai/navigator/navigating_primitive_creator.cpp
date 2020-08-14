@@ -10,7 +10,7 @@ NavigatingPrimitiveCreator::NavigatingPrimitiveCreator(
 {
 }
 
-PrimitiveMsg NavigatingPrimitiveCreator::createNavigatingPrimitive(
+TbotsProto::Primitive NavigatingPrimitiveCreator::createNavigatingPrimitive(
     const NavigatingIntent &intent, const Path &path,
     const std::vector<ObstaclePtr> &enemy_robot_obstacles)
 {
@@ -25,7 +25,7 @@ PrimitiveMsg NavigatingPrimitiveCreator::createNavigatingPrimitive(
 
 void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
 {
-    current_primitive = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(MovePrimitive(
+    current_primitive = ProtoCreatorPrimitiveVisitor().createPrimitive(MovePrimitive(
         intent.getRobotId(), new_destination, intent.getFinalAngle(), new_final_speed,
         intent.getDribblerEnable(), intent.getMoveType(), intent.getAutochickType()));
 }

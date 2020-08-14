@@ -413,7 +413,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     annunciator.update_vision_detections(robot_ids);
 };
 
-void MRFDongle::send_drive_packet(const PrimitiveSetMsg &prims)
+void MRFDongle::send_drive_packet(const TbotsProto::PrimitiveSet &prims)
 {
     for (auto &[robot_id, prim_proto] : prims.robot_primitives())
     {
@@ -455,7 +455,7 @@ void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
 }
 
 std::vector<uint8_t> MRFDongle::encode_primitive(unsigned int robot_id,
-                                                 PrimitiveMsg prim_proto)
+                                                 TbotsProto::Primitive prim_proto)
 {
     // Serialize the proto representation
     std::vector<uint8_t> serialized_proto(prim_proto.ByteSizeLong());

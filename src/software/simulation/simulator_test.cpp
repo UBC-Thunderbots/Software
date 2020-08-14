@@ -4,7 +4,8 @@
 
 #include "software/primitive/move_primitive.h"
 #include "software/primitive/primitive.h"
-#include "software/simulation/convert_primitive_to_nanopb.h"
+#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/test_util/test_util.h"
 
 TEST(SimulatorTest, get_field)
@@ -349,7 +350,8 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
             std::move(primitives));
     for (const auto& primitive_ptr : *yellow_primitives_ptr)
     {
-        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
     }
@@ -422,7 +424,8 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
             std::move(primitives));
     for (const auto& primitive_ptr : *blue_primitives_ptr)
     {
-        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
     }
@@ -486,8 +489,8 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
             std::move(blue_robot_primitives));
     for (const auto& primitive_ptr : *blue_primitives_ptr)
     {
-        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
-
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
         simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
     }
 
@@ -505,7 +508,8 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
             std::move(yellow_robot_primitives));
     for (const auto& primitive_ptr : *yellow_primitives_ptr)
     {
-        PrimitiveMsg primitive_msg = createNanoPbPrimitiveMsg(*primitive_ptr);
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
     }
