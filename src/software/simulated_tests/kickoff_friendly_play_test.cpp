@@ -25,8 +25,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
     setAIPlay(KickoffFriendlyPlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START,
-                       RefboxGameState::PREPARE_KICKOFF_US);
+    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

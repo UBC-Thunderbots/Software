@@ -28,8 +28,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_freekick_play)
     }));
     setEnemyGoalie(0);
     setAIPlay(EnemyFreekickPlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START,
-                       RefboxGameState::INDIRECT_FREE_THEM);
+    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 

@@ -534,10 +534,10 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_EQ(2, detection_frame.robots_yellow_size());
     ASSERT_EQ(2, detection_frame.robots_blue_size());
 
-    auto yellow_robots = detection_frame.robots_yellow();
-    auto yellow_robot_1 =
-        std::find_if(yellow_robots.begin(), yellow_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
+    auto yellow_robots  = detection_frame.robots_yellow();
+    auto yellow_robot_1 = std::find_if(
+        yellow_robots.begin(), yellow_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
     ASSERT_NE(yellow_robot_1, yellow_robots.end());
     EXPECT_NEAR(1000.0f, yellow_robot_1->x(), 200);
     EXPECT_NEAR(1000.0f, yellow_robot_1->y(), 200);
@@ -545,9 +545,9 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
         Angle::zero(), Angle::fromRadians(yellow_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
-    auto yellow_robot_2 =
-        std::find_if(yellow_robots.begin(), yellow_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
+    auto yellow_robot_2 = std::find_if(
+        yellow_robots.begin(), yellow_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
     ASSERT_NE(yellow_robot_2, yellow_robots.end());
     EXPECT_NEAR(3000.0f, yellow_robot_2->x(), 200);
     EXPECT_NEAR(-2000.0f, yellow_robot_2->y(), 200);
@@ -555,10 +555,10 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
         Angle::zero(), Angle::fromRadians(yellow_robot_2->orientation()),
         Angle::fromDegrees(10)));
 
-    auto blue_robots = detection_frame.robots_blue();
-    auto blue_robot_1 =
-        std::find_if(blue_robots.begin(), blue_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
+    auto blue_robots  = detection_frame.robots_blue();
+    auto blue_robot_1 = std::find_if(
+        blue_robots.begin(), blue_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
     ASSERT_NE(blue_robot_1, blue_robots.end());
     EXPECT_NEAR(-1000.0f, blue_robot_1->x(), 300);
     EXPECT_NEAR(-1000.0f, blue_robot_1->y(), 300);
@@ -566,9 +566,9 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
         Angle::zero(), Angle::fromRadians(blue_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
-    auto blue_robot_2 =
-        std::find_if(blue_robots.begin(), blue_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
+    auto blue_robot_2 = std::find_if(
+        blue_robots.begin(), blue_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
     ASSERT_NE(blue_robot_2, blue_robots.end());
     EXPECT_NEAR(-3000.0f, blue_robot_2->x(), 300);
     EXPECT_NEAR(0.0f, blue_robot_2->y(), 300);

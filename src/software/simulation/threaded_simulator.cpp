@@ -15,7 +15,7 @@ ThreadedSimulator::~ThreadedSimulator()
 }
 
 void ThreadedSimulator::registerOnSSLWrapperPacketReadyCallback(
-    const std::function<void(SSL_WrapperPacket)> &callback)
+    const std::function<void(SSLProto::SSL_WrapperPacket)> &callback)
 {
     std::scoped_lock lock(callback_mutex);
     ssl_wrapper_packet_callbacks.emplace_back(callback);

@@ -1,9 +1,69 @@
 #pragma once
 
 #include "software/geom/point.h"
-#include "software/sensor_fusion/refbox_data.h"
+#include "software/util/make_enum/make_enum.h"
 #include "software/world/ball.h"
 
+// clang-format off
+MAKE_ENUM(RefereeCommand,
+          // these enums map to the enums in ssl_referee.proto
+          HALT,
+          STOP,
+          NORMAL_START,
+          FORCE_START,
+          PREPARE_KICKOFF_US,
+          PREPARE_KICKOFF_THEM,
+          PREPARE_PENALTY_US,
+          PREPARE_PENALTY_THEM,
+          DIRECT_FREE_US,
+          DIRECT_FREE_THEM,
+          INDIRECT_FREE_US,
+          INDIRECT_FREE_THEM,
+          TIMEOUT_US,
+          TIMEOUT_THEM,
+          GOAL_US,
+          GOAL_THEM,
+          BALL_PLACEMENT_US,
+          BALL_PLACEMENT_THEM);
+// clang-format on
+
+MAKE_ENUM(RefereeStage,
+          // The first half is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          NORMAL_FIRST_HALF_PRE,
+          // The first half of the normal game, before half time.
+          NORMAL_FIRST_HALF,
+          // Half time between first and second halves.
+          NORMAL_HALF_TIME,
+          // The second half is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          NORMAL_SECOND_HALF_PRE,
+          // The second half of the normal game, after half time.
+          NORMAL_SECOND_HALF,
+          // The break before extra time.
+          EXTRA_TIME_BREAK,
+          // The first half of extra time is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          EXTRA_FIRST_HALF_PRE,
+          // The first half of extra time.
+          EXTRA_FIRST_HALF,
+          // Half time between first and second extra halves.
+          EXTRA_HALF_TIME,
+          // The second half of extra time is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          EXTRA_SECOND_HALF_PRE,
+          // The second half of extra time.
+          EXTRA_SECOND_HALF,
+          // The break before penalty shootout.
+          PENALTY_SHOOTOUT_BREAK,
+          // The penalty shootout.
+          PENALTY_SHOOTOUT,
+          // The game is over.
+          POST_GAME);
 
 /**
  * @brief Holds the state of the game according to the referee
@@ -11,7 +71,7 @@
  * @details Contains information on what period of the game it is, what type of
  * play to run, team scores, time remaining, etc.  During normal gameplay, the
  * information in this class is received from the
- * [ssl-refbox](https://github.com/RoboCup-SSL/ssl-refbox)
+ * [ssl-game-controller](https://github.com/RoboCup-SSL/ssl-game-controller)
  * program over the network.
  *
  * Taken from https://github.com/RoboJackets/robocup-software/
@@ -40,9 +100,9 @@ class GameState
     };
 
     GameState()
-        : state_(HALT),
+        : play_state_(HALT),
           restart_reason_(NONE),
-          game_state_(RefboxGameState::HALT),
+          command_(RefereeCommand::HALT),
           ball_state_(std::nullopt),
           our_restart_(false),
           ball_placement_point_(std::nullopt)
@@ -52,9 +112,9 @@ class GameState
     /**
      * Updates the game state with a value from backend_input
      *
-     * @param gameState the RefboxGameState from backend_input
+     * @param gameState the RefereeCommand from backend_input
      */
-    void updateRefboxGameState(RefboxGameState gameState);
+    void updateRefereeCommand(RefereeCommand gameState);
 
     /**
      * Updates the state of the ball used in calculating game state transitions
@@ -71,11 +131,11 @@ class GameState
     void setRestartCompleted();
 
     /**
-     * Returns the current Refbox game state
+     * Returns the current Referee command
      *
-     * @return the current Refbox game state
+     * @return the current Referee command
      */
-    const RefboxGameState& getRefboxGameState() const;
+    const RefereeCommand& getRefereeCommand() const;
 
     /**
      * Returns the current restart reason
@@ -142,7 +202,7 @@ class GameState
      * we get an indirect kick
      * This function will have undefined behaviour if a restart is
      * not being prepared for or occurring, such as after a transition to
-     * HALT or STOP, because of how Refbox state transitions work.
+     * HALT or STOP, because of how GameController state transitions work.
      *
      * @return true if our team is doing the restart
      */
@@ -339,9 +399,9 @@ class GameState
     void setBallPlacementPoint(Point placementPoint);
 
    private:
-    PlayState state_;
+    PlayState play_state_;
     RestartReason restart_reason_;
-    RefboxGameState game_state_;
+    RefereeCommand command_;
     std::optional<Ball> ball_state_;
 
     // True if our team can kick the ball during a restart

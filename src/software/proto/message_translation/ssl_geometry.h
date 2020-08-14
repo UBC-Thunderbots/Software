@@ -112,8 +112,9 @@ MAKE_ENUM(SSLCircularArcs,
  * @return The first line segment with the given name if it exists, otherwise
  * returns std::nullopt
  */
-std::optional<SSL_FieldLineSegment> findLineSegment(
-    const google::protobuf::RepeatedPtrField<SSL_FieldLineSegment>& line_segments,
+std::optional<SSLProto::SSL_FieldLineSegment> findLineSegment(
+    const google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldLineSegment>&
+        line_segments,
     SSLFieldLines line_type);
 
 /**
@@ -126,21 +127,22 @@ std::optional<SSL_FieldLineSegment> findLineSegment(
  * @return The first arc with the given name if it exists, otherwise
  * returns std::nullopt
  */
-std::optional<SSL_FieldCircularArc> findCircularArc(
-    const google::protobuf::RepeatedPtrField<SSL_FieldCircularArc>& circular_arcs,
+std::optional<SSLProto::SSL_FieldCircularArc> findCircularArc(
+    const google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldCircularArc>&
+        circular_arcs,
     SSLCircularArcs arc_type);
 
 /**
- * Creates a Vector2f proto message from the given point
+ * Creates a SSLProto::Vector2f proto message from the given point
  *
- * @param point The point to convert to a Vector2f
+ * @param point The point to convert to a SSLProto::Vector2f
  *
- * @return A Vector2f message with the same coordinates as the given point
+ * @return A SSLProto::Vector2f message with the same coordinates as the given point
  */
-std::unique_ptr<Vector2f> createVector2f(const Point& point);
+std::unique_ptr<SSLProto::Vector2f> createVector2f(const Point& point);
 
 /**
- * Creates an SSL_FieldLineSegment proto message
+ * Creates an SSLProto::SSL_FieldLineSegment proto message
  *
  * @pre thickness must be >= 0
  *
@@ -151,15 +153,15 @@ std::unique_ptr<Vector2f> createVector2f(const Point& point);
  * @param line_type The type of line segment to create
  * @param shape_type The type of field shape this segment represents
  *
- * @return an SSL_FieldLineSegment representing the given segment with the
+ * @return an SSLProto::SSL_FieldLineSegment representing the given segment with the
  * given thickness
  */
-std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(
+std::unique_ptr<SSLProto::SSL_FieldLineSegment> createFieldLineSegment(
     const Segment& segment, float thickness, SSLFieldLines line_type,
-    const SSL_FieldShapeType& shape_type);
+    const SSLProto::SSL_FieldShapeType& shape_type);
 
 /**
- * Creates an SSL_FieldCircularArc proto message
+ * Creates an SSLProto::SSL_FieldCircularArc proto message
  *
  * @pre thickness must be >= 0
  *
@@ -170,15 +172,15 @@ std::unique_ptr<SSL_FieldLineSegment> createFieldLineSegment(
  * @param arc_type The type of arc to create
  * @param shape_type The type of field shape this arc represents
  *
- * @return an SSL_FieldCircularArc representing the given circle with the
+ * @return an SSLProto::SSL_FieldCircularArc representing the given circle with the
  * given thickness
  */
-std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(
+std::unique_ptr<SSLProto::SSL_FieldCircularArc> createFieldCircularArc(
     const Circle& circle, float thickness, SSLCircularArcs arc_type,
-    const SSL_FieldShapeType& shape_type);
+    const SSLProto::SSL_FieldShapeType& shape_type);
 
 /**
- * Creates an SSL_GeometryFieldSize proto message from the given Field
+ * Creates an SSLProto::SSL_GeometryFieldSize proto message from the given Field
  *
  * @pre thickness muct be >= 0
  *
@@ -187,31 +189,32 @@ std::unique_ptr<SSL_FieldCircularArc> createFieldCircularArc(
  * @param field The field to create the message from
  * @param thickness The thickness of the field lines in metres
  *
- * @return an SSL_GeometryFieldSize proto message representing the given field
+ * @return an SSLProto::SSL_GeometryFieldSize proto message representing the given field
  */
-std::unique_ptr<SSL_GeometryFieldSize> createGeometryFieldSize(const Field& field,
+std::unique_ptr<SSLProto::SSL_GeometryFieldSize> createGeometryFieldSize(
+    const Field& field, float thickness);
+
+/**
+ * Creates an SSLProto::SSL_GeometryData proto message from the given field
+ *
+ * @pre thickness muct be >= 0
+ *
+ * @throws std::invalid_argument if thickness < 0
+ *
+ * @param field The field to create the message from
+ * @param thickness The thickness of the field lines in metres
+ *
+ * @return an SSLProto::SSL_GeometryData proto message representing the given field
+ */
+std::unique_ptr<SSLProto::SSL_GeometryData> createGeometryData(const Field& field,
                                                                float thickness);
-
-/**
- * Creates an SSL_GeometryData proto message from the given field
- *
- * @pre thickness muct be >= 0
- *
- * @throws std::invalid_argument if thickness < 0
- *
- * @param field The field to create the message from
- * @param thickness The thickness of the field lines in metres
- *
- * @return an SSL_GeometryData proto message representing the given field
- */
-std::unique_ptr<SSL_GeometryData> createGeometryData(const Field& field, float thickness);
 
 /**
  * Returns a Field object given geometry data from a protobuf packet
  *
- * @param geometry_packet The SSL_GeometryData packet containing new field data
+ * @param geometry_packet The SSLProto::SSL_GeometryData packet containing new field data
  *
  * @return A Field object representing the field specified with the provided geometry
  *      If packet_geometry is not a valid packet, then will return std::nullopt
  */
-std::optional<Field> createField(const SSL_GeometryData& geometry_packet);
+std::optional<Field> createField(const SSLProto::SSL_GeometryData& geometry_packet);

@@ -8,8 +8,9 @@
 #include "software/world/world.h"
 
 /**
- * A Backend is an abstraction around communication with robots, vision, and refbox. It
- * produces SensorProtos, and consumes primitives that can be sent to the robots.
+ * A Backend is an abstraction around communication with robots, vision, and the
+ * gamecontroller (Referee). It produces SensorProtos, and consumes primitives that can be
+ * sent to the robots.
  *
  * This produce/consume pattern is performed by extending both "Observer" and
  * "Subject". Please see the implementation of those classes for details.
@@ -30,6 +31,6 @@ class Backend : public Subject<SensorProto>,
      * @param msg The component of SensorProto
      */
     void receiveRobotStatus(TbotsProto::RobotStatus msg);
-    void receiveSSLWrapperPacket(SSL_WrapperPacket msg);
-    void receiveSSLReferee(SSL_Referee msg);
+    void receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg);
+    void receiveSSLReferee(SSLProto::Referee msg);
 };

@@ -10,7 +10,7 @@ StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config)
     : standalone_simulator_config(standalone_simulator_config),
       simulator(Field::createSSLDivisionBField(), 0.8, 0.2),
-      most_recent_ssl_wrapper_packet(SSL_WrapperPacket())
+      most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket())
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(
         [this](int) { this->initNetworking(); });
@@ -26,7 +26,7 @@ StandaloneSimulator::StandaloneSimulator(
     initNetworking();
 
     simulator.registerOnSSLWrapperPacketReadyCallback(
-        [this](SSL_WrapperPacket wrapper_packet) {
+        [this](SSLProto::SSL_WrapperPacket wrapper_packet) {
             std::scoped_lock lock(this->most_recent_ssl_wrapper_packet_mutex);
             this->most_recent_ssl_wrapper_packet = wrapper_packet;
             this->wrapper_packet_sender->sendProto(wrapper_packet);
@@ -38,7 +38,7 @@ StandaloneSimulator::StandaloneSimulator(
 }
 
 void StandaloneSimulator::registerOnSSLWrapperPacketReadyCallback(
-    const std::function<void(SSL_WrapperPacket)>& callback)
+    const std::function<void(SSLProto::SSL_WrapperPacket)>& callback)
 {
     simulator.registerOnSSLWrapperPacketReadyCallback(callback);
 }
@@ -54,7 +54,7 @@ void StandaloneSimulator::initNetworking()
         std::string(MULTICAST_CHANNELS[blue_team_channel]) + "%" + network_interface;
 
     wrapper_packet_sender =
-        std::make_unique<ThreadedProtoMulticastSender<SSL_WrapperPacket>>(
+        std::make_unique<ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>>(
             standalone_simulator_config->VisionIPv4Address()->value(),
             static_cast<unsigned short>(
                 standalone_simulator_config->VisionPort()->value()));
@@ -115,7 +115,7 @@ void StandaloneSimulator::setupInitialSimulationState()
     simulator.addYellowRobots(yellow_robot_states);
 }
 
-SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
+SSLProto::SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
 {
     std::scoped_lock lock(most_recent_ssl_wrapper_packet_mutex);
     return most_recent_ssl_wrapper_packet;
