@@ -172,6 +172,8 @@ class PhysicsWorld
      */
     std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
 
+    void removeRobot(std::weak_ptr<PhysicsRobot> robot);
+
    private:
     /**
      * Returns the states and IDs of all robots of the specified colour.

@@ -199,6 +199,8 @@ class Simulator
      */
     std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
 
+    void removeRobot(std::weak_ptr<PhysicsRobot> robot);
+
    private:
     /**
      * Updates the given simulator_robots to contain and control the given physics_robots
