@@ -23,8 +23,6 @@ class PasserTactic : public Tactic
      */
     explicit PasserTactic(Pass pass, const Ball& ball, bool loop_forever);
 
-    std::string getName() const override;
-
     /**
      * Updates the world parameters for this PasserTactic.
      *

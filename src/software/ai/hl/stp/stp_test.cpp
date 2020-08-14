@@ -162,8 +162,10 @@ TEST_F(STPTest, test_get_play_info)
     expected_refbox_game_state                                       = "HALT";
     expected_play_name                                               = "Halt Test Play";
     std::unordered_set<std::string> expected_robot_tactic_assignment = {
-        "Robot 0  -  Stop Test Tactic", "Robot 1  -  Stop Test Tactic"};
+        "Robot 0  -  StopTestTactic", "Robot 1  -  StopTestTactic"};
     expected_play_info = PlayInfo(expected_refbox_game_state, expected_play_name,
                                   expected_robot_tactic_assignment);
+    EXPECT_EQ(play_info.getRefboxGameStateName(), expected_refbox_game_state);
+    EXPECT_EQ(play_info.getPlayName(), expected_play_name);
     EXPECT_EQ(play_info, expected_play_info);
 }

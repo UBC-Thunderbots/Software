@@ -22,11 +22,6 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
 {
 }
 
-std::string ShootGoalTactic::getName() const
-{
-    return "Shoot Goal Tactic";
-}
-
 void ShootGoalTactic::updateWorldParams(const Field &field, const Team &friendly_team,
                                         const Team &enemy_team, const Ball &ball)
 {

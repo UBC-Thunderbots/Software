@@ -11,6 +11,7 @@
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/test_util/test_util.h"
+#include "software/util/typename/typename.h"
 #include "software/world/world.h"
 
 // length at which to evaluate the spline value and check
@@ -116,7 +117,7 @@ template <typename PlannerT>
 std::pair<std::string, PathPlannerConstructor> nameAndConstructor()
 {
     return std::pair<std::string, PathPlannerConstructor>(
-        typeid(PlannerT).name(), []() { return std::make_unique<PlannerT>(); });
+        TYPENAME(PlannerT), []() { return std::make_unique<PlannerT>(); });
 }
 
 std::vector<std::pair<std::string, PathPlannerConstructor>>

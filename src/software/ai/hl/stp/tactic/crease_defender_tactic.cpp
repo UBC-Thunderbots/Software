@@ -23,11 +23,6 @@ CreaseDefenderTactic::CreaseDefenderTactic(
 {
 }
 
-std::string CreaseDefenderTactic::getName() const
-{
-    return "Crease Defender Tactic";
-}
-
 void CreaseDefenderTactic::updateWorldParams(const Ball &ball, const Field &field,
                                              const Team &friendly_team,
                                              const Team &enemy_team)

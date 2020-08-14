@@ -114,13 +114,6 @@ class Tactic
     std::shared_ptr<Action> getNextAction(void);
 
     /**
-     * Returns the name of the Tactic
-     *
-     * @return the name of the Tactic
-     */
-    virtual std::string getName() const = 0;
-
-    /**
      * Accepts a Tactic Visitor and calls the visit function on itself
      *
      * @param visitor A Tactic Visitor

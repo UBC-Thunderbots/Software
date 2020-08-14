@@ -16,6 +16,7 @@
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
          std::shared_ptr<const AIControlConfig> control_config, long random_seed)
@@ -389,7 +390,7 @@ PlayInfo STP::getPlayInfo()
                 continue;
             }
             std::string s = "Robot " + std::to_string(tactic->getAssignedRobot()->id()) +
-                            "  -  " + tactic->getName();
+                            "  -  " + TYPENAME(*tactic);
             info.addRobotTacticAssignment(s);
         }
     }
