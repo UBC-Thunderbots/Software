@@ -14,7 +14,8 @@
  * @param final_angle The final angle
  */
 void app_move_helper_start(void *void_state_ptr, FirmwareWorld_t *world,
-                           MovePositionParams move_position_params, float final_angle);
+                           TbotsProto_MovePositionParams move_position_params,
+                           float final_angle);
 
 // The following function definitions mirror those in primitive_t
 void app_move_helper_end(void *void_state_ptr, FirmwareWorld_t *world);

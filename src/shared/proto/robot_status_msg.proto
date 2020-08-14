@@ -1,8 +1,10 @@
 syntax = "proto3";
 
+package TbotsProto;
+
 import "shared/proto/tbots_timestamp_msg.proto";
 
-message RobotStatusMsg
+message RobotStatus
 {
     uint32 robot_id                           = 1;
     repeated ErrorCode error_code             = 2;
@@ -14,7 +16,7 @@ message RobotStatusMsg
     NetworkStatus network_status              = 8;
     PowerStatus power_status                  = 9;
     TemperatureStatus temperature_status      = 10;
-    TimestampMsg time_sent                    = 11;
+    Timestamp time_sent                       = 11;
 }
 
 /* Data about the status of the break beam */

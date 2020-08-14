@@ -1,22 +1,22 @@
 #include "software/backend/backend.h"
 
-void Backend::receiveRobotStatusMsg(RobotStatusMsg msg)
+void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
 {
-    SensorMsg sensor_msg;
+    SensorProto sensor_msg;
     *(sensor_msg.add_robot_status_msgs()) = msg;
-    Subject<SensorMsg>::sendValueToObservers(sensor_msg);
+    Subject<SensorProto>::sendValueToObservers(sensor_msg);
 }
 
 void Backend::receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg)
 {
-    SensorMsg sensor_msg;
+    SensorProto sensor_msg;
     *(sensor_msg.mutable_ssl_vision_msg()) = msg;
-    Subject<SensorMsg>::sendValueToObservers(sensor_msg);
+    Subject<SensorProto>::sendValueToObservers(sensor_msg);
 }
 
 void Backend::receiveSSLReferee(SSLProto::Referee msg)
 {
-    SensorMsg sensor_msg;
-    *(sensor_msg.mutable_ssl_referee_msg()) = msg;
-    Subject<SensorMsg>::sendValueToObservers(sensor_msg);
+    SensorProto sensor_msg;
+    *(sensor_msg.mutable_ssl_refbox_msg()) = msg;
+    Subject<SensorProto>::sendValueToObservers(sensor_msg);
 }

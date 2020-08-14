@@ -18,8 +18,9 @@ class RadioOutput
      * @param received_robot_status_callback The callback function to call with new
      *                                       robot status messages
      */
-    explicit RadioOutput(unsigned int config,
-                         std::function<void(RobotStatus)> received_robot_status_callback);
+    explicit RadioOutput(
+        unsigned int config,
+        std::function<void(RadioRobotStatus)> received_robot_status_callback);
 
     /**
      * Sends the given primitives to the backend to control the robots

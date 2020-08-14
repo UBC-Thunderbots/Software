@@ -1,6 +1,6 @@
 #include "software/proto/message_translation/ssl_wrapper.h"
 
-std::unique_ptr<SSLProto::SSL_WrapperPacket> createWrapperPacket(
+std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
     std::unique_ptr<SSLProto::SSL_GeometryData> geometry_data,
     std::unique_ptr<SSLProto::SSL_DetectionFrame> detection_frame)
 {

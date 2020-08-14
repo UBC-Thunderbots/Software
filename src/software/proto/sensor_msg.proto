@@ -4,7 +4,7 @@ import "shared/proto/robot_status_msg.proto";
 import "software/proto/ssl_gc_referee_message.proto";
 import "software/proto/messages_robocup_ssl_wrapper.proto";
 
-message SensorMsg
+message SensorProto
 {
     SSLProto.Referee ssl_referee_msg          = 1;
     SSLProto.SSL_WrapperPacket ssl_vision_msg = 2;
