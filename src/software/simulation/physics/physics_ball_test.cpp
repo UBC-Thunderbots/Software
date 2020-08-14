@@ -354,7 +354,7 @@ TEST(PhysicsBallTest, test_set_ball_in_flight_without_collisions)
     auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0);
 
     EXPECT_FALSE(physics_ball.isInFlight());
-    physics_ball.setInFlightForDistance(1.0f);
+    physics_ball.setInFlightForDistance(1.0f, Angle::fromDegrees(45));
     EXPECT_TRUE(physics_ball.isInFlight());
 
     for (unsigned int i = 0; i < 120; i++)
@@ -363,6 +363,7 @@ TEST(PhysicsBallTest, test_set_ball_in_flight_without_collisions)
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
         world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        physics_ball.updateIsInFlight();
         auto ball = physics_ball.getBallState();
         if (ball.position().x() < 1.0)
         {
@@ -398,7 +399,7 @@ TEST(PhysicsBallTest, test_set_ball_in_flight_with_collisions)
     obstacle_body->CreateFixture(&obstacle_fixture_def);
 
     EXPECT_FALSE(physics_ball.isInFlight());
-    physics_ball.setInFlightForDistance(2.0f);
+    physics_ball.setInFlightForDistance(2.0f, Angle::fromDegrees(45));
     EXPECT_TRUE(physics_ball.isInFlight());
 
     for (unsigned int i = 0; i < 300; i++)
@@ -407,6 +408,7 @@ TEST(PhysicsBallTest, test_set_ball_in_flight_with_collisions)
         // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
         world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        physics_ball.updateIsInFlight();
 
         // The ball should be in flight until it has passed the obstacle box. Normally
         // the ball would "land" (no longer be in flight) when it reaches the center
@@ -431,4 +433,58 @@ TEST(PhysicsBallTest, test_set_ball_in_flight_with_collisions)
     auto ball = physics_ball.getBallState();
     EXPECT_GT(ball.position().x() - BALL_MAX_RADIUS_METERS, 2.52);
     EXPECT_FALSE(physics_ball.isInFlight());
+}
+
+TEST(PhysicsBall, get_height_when_ball_not_in_flight)
+{
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0);
+
+    EXPECT_DOUBLE_EQ(0.0, physics_ball.getBallState().distanceFromGround());
+}
+
+TEST(PhysicsBall, get_height_when_ball_in_flight)
+{
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+    BallState initial_ball_state(Point(0, 0), Vector(1, 0));
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0);
+
+    EXPECT_FALSE(physics_ball.isInFlight());
+    physics_ball.setInFlightForDistance(2.0f, Angle::fromDegrees(45));
+    EXPECT_TRUE(physics_ball.isInFlight());
+    EXPECT_DOUBLE_EQ(0.0, physics_ball.getBallState().distanceFromGround());
+
+    for (unsigned int i = 0; i < 150; i++)
+    {
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        physics_ball.updateIsInFlight();
+        auto ball                                = physics_ball.getBallState();
+        double expected_max_distance_grom_ground = 0.5;
+        if (ball.position().x() < 0.95)
+        {
+            EXPECT_GT(ball.distanceFromGround(), 0.0);
+            EXPECT_LT(ball.distanceFromGround(), expected_max_distance_grom_ground);
+        }
+        else if (ball.position().x() < 1.05)
+        {
+            EXPECT_NEAR(expected_max_distance_grom_ground, ball.distanceFromGround(),
+                        0.05);
+        }
+        else if (ball.position().x() <= 2.0)
+        {
+            EXPECT_GT(ball.distanceFromGround(), 0.0);
+            EXPECT_LT(ball.distanceFromGround(), expected_max_distance_grom_ground);
+        }
+        else
+        {
+            EXPECT_DOUBLE_EQ(0.0, ball.distanceFromGround());
+        }
+    }
 }

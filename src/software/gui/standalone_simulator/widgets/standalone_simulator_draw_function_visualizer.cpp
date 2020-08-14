@@ -1,5 +1,7 @@
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_draw_function_visualizer.h"
 
+#include <QtWidgets/QMenu>
+
 #include "software/gui/geometry_conversion.h"
 
 StandaloneSimulatorDrawFunctionVisualizer::StandaloneSimulatorDrawFunctionVisualizer(
@@ -48,4 +50,17 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseMoveEvent(QMouseEvent* even
         physics_robot->setPosition(point_in_scene);
     }
     DrawFunctionVisualizer::mouseMoveEvent(event);
+}
+
+void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent* event)
+{
+    Point point_in_scene = createPoint(mapToScene(event->pos()));
+
+    QMenu menu(this);
+    menu.addAction("Add Yellow Robot Here",
+                   [&]() { standalone_simulator->addYellowRobot(point_in_scene); });
+    menu.addAction("Add Blue Robot Here",
+                   [&]() { standalone_simulator->addBlueRobot(point_in_scene); });
+
+    menu.exec(event->globalPos());
 }

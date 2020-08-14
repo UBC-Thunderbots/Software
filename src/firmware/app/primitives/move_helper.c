@@ -151,7 +151,8 @@ void plan_move_rotation(PhysBot* pb, float avel)
 }
 
 void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
-                           MovePositionParams move_position_params, float final_angle)
+                           TbotsProto_MovePositionParams move_position_params,
+                           float final_angle)
 {
     MoveHelperState_t* state = (MoveHelperState_t*)void_state_ptr;
 

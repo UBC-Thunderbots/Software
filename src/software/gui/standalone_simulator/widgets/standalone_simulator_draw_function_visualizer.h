@@ -32,6 +32,7 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
     // The robot currently being placed by the user, if any
     std::weak_ptr<PhysicsRobot> robot;

@@ -10,7 +10,7 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI()
     : FirstInFirstOutThreadedObserver<World>(),
       FirstInFirstOutThreadedObserver<AIDrawFunction>(),
       FirstInFirstOutThreadedObserver<PlayInfo>(),
-      FirstInFirstOutThreadedObserver<SensorMsg>(),
+      FirstInFirstOutThreadedObserver<SensorProto>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
           WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
@@ -19,7 +19,7 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI()
       play_info_buffer(
           std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_BUFFER_SIZE, false)),
       sensor_msg_buffer(
-          std::make_shared<ThreadSafeBuffer<SensorMsg>>(SENSOR_MSG_BUFFER_SIZE)),
+          std::make_shared<ThreadSafeBuffer<SensorProto>>(SENSOR_MSG_BUFFER_SIZE)),
       view_area_buffer(
           std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
       application_shutting_down(false),
@@ -103,7 +103,7 @@ void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info)
     play_info_buffer->push(play_info);
 }
 
-void ThreadedFullSystemGUI::onValueReceived(SensorMsg sensor_msg)
+void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 {
     sensor_msg_buffer->push(sensor_msg);
 }

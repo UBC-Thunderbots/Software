@@ -184,8 +184,8 @@ void receive_tick(log_record_t *record)
         charger_enable(false);
         chicker_discharge(true);
 
-        PrimitiveMsg primitive_msg    = PrimitiveMsg_init_zero;
-        primitive_msg.which_primitive = PrimitiveMsg_stop_tag;
+        TbotsProto_Primitive primitive_msg = TbotsProto_Primitive_init_zero;
+        primitive_msg.which_primitive      = TbotsProto_Primitive_stop_tag;
 
         xSemaphoreTake(drive_mtx, portMAX_DELAY);
         app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive_msg);
@@ -219,11 +219,11 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     timeout_ticks = 1000U / portTICK_PERIOD_MS;
 
     // Figure out what primitive to run
-    PrimitiveMsg prim_msg = PrimitiveMsg_init_zero;
+    TbotsProto_Primitive prim_msg = TbotsProto_Primitive_init_zero;
     if (estop_triggered)
     {
         // Set the primitive to bring the robot to a stop
-        prim_msg.which_primitive     = PrimitiveMsg_stop_tag;
+        prim_msg.which_primitive     = TbotsProto_Primitive_stop_tag;
         prim_msg.primitive.stop.slow = true;
 
         // Disable charging and discharge through chicker
@@ -235,7 +235,7 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
         // Decode the primitive
         pb_istream_t pb_in_stream =
             pb_istream_from_buffer(packet_data + 3, packet_size - 3);
-        if (!pb_decode(&pb_in_stream, PrimitiveMsg_fields, &prim_msg))
+        if (!pb_decode(&pb_in_stream, TbotsProto_Primitive_fields, &prim_msg))
         {
             // If we failed to decode the message, it's likely malformed, so we should not
             // proceed

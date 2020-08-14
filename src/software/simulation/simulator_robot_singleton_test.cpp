@@ -393,39 +393,124 @@ INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonAutochipTest,
                                           Angle::fromDegrees(331)));
 
 TEST_F(SimulatorRobotSingletonTest,
-       test_robot_chips_ball_with_autochip_enabled_and_ball_lands_on_obstacle)
+       test_robot_chips_ball_over_obstacle_and_lands_in_free_space)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball(Point(0.15, 0), Vector(-0.25, 0), Timestamp::fromSeconds(0));
-    // Add an enemy robot right where the ball will land
-    std::vector<Point> enemy_robot_positions = {Point(2.0, 0)};
+    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
+    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
+    // Add an enemy close to the chipping robot, and an enemy a short distance
+    // past where the ball will land
+    std::vector<Point> enemy_robot_positions = {Point(1, 0), Point(3.0, 0)};
     auto [world, firmware_robot, simulator_ball] =
         createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
 
-    EXPECT_LT((simulator_ball->velocity() - Vector(-0.25, 0)).length(), 0.001);
-
-    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
-    app_chicker_enableAutochip(chicker, 2.0);
-
-    // Simulate for 1.5 seconds
-    for (unsigned int i = 0; i < 90; i++)
+    // Simulate for 1/2 second without chipping
+    for (unsigned int i = 0; i < 30; i++)
     {
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    // If the ball lands in an obstacle, collisions should be disabled until the ball
-    // is outside the obstacle
-    //
-    // Check the ball's velocity is in a reasonable range, and still heading in the
-    // same direction is was chipped. Because the ball "lands" in an object we want to
-    // make sure we are simulating the ball "landing on" the object and rolling off it,
-    // rather than having collisions enabled inside a solid object and then getting
-    // ejected in a random direction at high speed.
-    EXPECT_GT(simulator_ball->velocity().x(), 1);
-    EXPECT_LT(simulator_ball->velocity().x(), 3);
-    EXPECT_EQ(simulator_ball->velocity().y(), 0.0);
+    // Make sure we didn't chip
+    EXPECT_LT(simulator_ball->velocity().length(), 0.001);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_chip(chicker, 2.0);
+
+    for (unsigned int i = 0; i < 300; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    // The ball should have made it past the first robot, but been stopped by the second
+    EXPECT_GT(simulator_ball->position().x(), 1.0);
+    EXPECT_LT(simulator_ball->position().x(), 3.0);
+}
+
+TEST_F(SimulatorRobotSingletonTest,
+       test_robot_chips_ball_over_obstacle_and_lands_in_another_obstacle)
+{
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
+    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
+    // Add an enemy close to the chipping robot, an enemy right where
+    // the ball will land, and an enemy past where the ball will land
+    std::vector<Point> enemy_robot_positions = {Point(1, 0), Point(2, 0), Point(3, 0)};
+    auto [world, firmware_robot, simulator_ball] =
+        createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
+
+    // Simulate for 0.5 second without chipping
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    // Make sure we didn't chip
+    EXPECT_LT(simulator_ball->velocity().length(), 0.001);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_chip(chicker, 2.0);
+
+    for (unsigned int i = 0; i < 300; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    // The ball should have made it past the first and second robots, but been stopped by
+    // the third
     EXPECT_GT(simulator_ball->position().x(), 2.0);
+    EXPECT_LT(simulator_ball->position().x(), 3.0);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_ball_maintains_speed_throughout_chipping)
+{
+    // This is a regression test to help catch future issues with chipping speed.
+    // The original bug was that not all collisions were properly disabled while
+    // the ball was "in flight", so when it passed over a robot it would still
+    // be damped by the dribbler and slow down the chip. This test verifies
+    // the speed of the ball does not change for the duration of a chip as the
+    // ball passes over obstacles
+
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
+    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
+    // Add an enemy close to the chipping robot
+    std::vector<Point> enemy_robot_positions = {Point(1, 0)};
+    auto [world, firmware_robot, simulator_ball] =
+        createWorldWithEnemyRobots(robot, ball, enemy_robot_positions);
+
+    // Simulate for 1/2 second without chipping
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    // Make sure we didn't chip
+    EXPECT_LT(simulator_ball->velocity().length(), 0.001);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_chip(chicker, 2.0);
+
+    double initial_chip_speed = 0.0;
+    for (unsigned int i = 0; i < 200; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+        if (i == 0)
+        {
+            initial_chip_speed = simulator_ball->velocity().length();
+        }
+        if (i >= 5)
+        {
+            // Once the ball is chipped its speed should not change until it hits the
+            // obstacle after it lands
+            EXPECT_NEAR(initial_chip_speed, simulator_ball->velocity().length(), 1e-6);
+        }
+    }
 }
 
 TEST_F(SimulatorRobotSingletonTest,

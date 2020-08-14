@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
-TEST(PrimitiveMsgFactoryTest, test_create_chip_primitive)
+TEST(PrimitiveFactoryTest, test_create_chip_primitive)
 {
-    auto chip_primitive = createChipPrimitiveMsg(Point(1, 2), Angle::quarter(), 5.0);
+    auto chip_primitive = createChipPrimitive(Point(1, 2), Angle::quarter(), 5.0);
 
     EXPECT_EQ(chip_primitive->mutable_chip()->chip_origin().x_meters(), 1);
     EXPECT_EQ(chip_primitive->mutable_chip()->chip_origin().y_meters(), 2);
@@ -13,9 +13,9 @@ TEST(PrimitiveMsgFactoryTest, test_create_chip_primitive)
     EXPECT_EQ(chip_primitive->mutable_chip()->chip_distance_meters(), 5.0);
 }
 
-TEST(PrimitiveMsgFactoryTest, test_create_kick_primitive)
+TEST(PrimitiveFactoryTest, test_create_kick_primitive)
 {
-    auto kick_primitive = createKickPrimitiveMsg(Point(3, 5), Angle::half(), 6.5);
+    auto kick_primitive = createKickPrimitive(Point(3, 5), Angle::half(), 6.5);
 
     EXPECT_EQ(kick_primitive->mutable_kick()->kick_origin().x_meters(), 3);
     EXPECT_EQ(kick_primitive->mutable_kick()->kick_origin().y_meters(), 5);
@@ -24,10 +24,10 @@ TEST(PrimitiveMsgFactoryTest, test_create_kick_primitive)
     EXPECT_EQ(kick_primitive->mutable_kick()->kick_speed_meters_per_second(), 6.5);
 }
 
-TEST(PrimitiveMsgFactoryTest, test_create_move_primitive)
+TEST(PrimitiveFactoryTest, test_create_move_primitive)
 {
     auto move_primitive =
-        createMovePrimitiveMsg(Point(-5, 1), 3.0, true, Angle::threeQuarter(), 2.0);
+        createMovePrimitive(Point(-5, 1), 3.0, true, Angle::threeQuarter(), 2.0);
 
     EXPECT_EQ(move_primitive->mutable_move()->position_params().destination().x_meters(),
               -5);
@@ -42,9 +42,9 @@ TEST(PrimitiveMsgFactoryTest, test_create_move_primitive)
     EXPECT_EQ(move_primitive->mutable_move()->dribbler_speed_rpm(), 2.0);
 }
 
-TEST(PrimitiveMsgFactoryTest, test_create_spinning_move_primitive)
+TEST(PrimitiveFactoryTest, test_create_spinning_move_primitive)
 {
-    auto spinning_move_primitive = createSpinningMovePrimitiveMsg(
+    auto spinning_move_primitive = createSpinningMovePrimitive(
         Point(1, -8), -6.0, false, AngularVelocity::full(), -1.0);
 
     EXPECT_EQ(spinning_move_primitive->mutable_spinning_move()
@@ -71,9 +71,9 @@ TEST(PrimitiveMsgFactoryTest, test_create_spinning_move_primitive)
               -1.0);
 }
 
-TEST(PrimitiveMsgFactoryTest, test_create_autochip_move_primitive)
+TEST(PrimitiveFactoryTest, test_create_autochip_move_primitive)
 {
-    auto autochip_move_primitive = createAutochipMovePrimitiveMsg(
+    auto autochip_move_primitive = createAutochipMovePrimitive(
         Point(-4, -10), 6.0, true, Angle::quarter(), 1.0, 2.5);
 
     EXPECT_EQ(autochip_move_primitive->mutable_autochip_move()
@@ -100,10 +100,10 @@ TEST(PrimitiveMsgFactoryTest, test_create_autochip_move_primitive)
               2.5);
 }
 
-TEST(PrimitiveMsgFactoryTest, test_create_autokick_move_primitive)
+TEST(PrimitiveFactoryTest, test_create_autokick_move_primitive)
 {
-    auto autokick_move_primitive = createAutokickMovePrimitiveMsg(
-        Point(5, 12), -2.0, false, Angle::half(), 5.5, 2.0);
+    auto autokick_move_primitive =
+        createAutokickMovePrimitive(Point(5, 12), -2.0, false, Angle::half(), 5.5, 2.0);
 
     EXPECT_EQ(autokick_move_primitive->mutable_autokick_move()
                   ->position_params()
@@ -130,17 +130,17 @@ TEST(PrimitiveMsgFactoryTest, test_create_autokick_move_primitive)
         2.0);
 }
 
-TEST(PrimitiveMsgFactoryTest, test_create_stop_primitive_brake)
+TEST(PrimitiveFactoryTest, test_create_stop_primitive_brake)
 {
-    auto stop_primitive = createStopPrimitiveMsg(StopType::BRAKE);
+    auto stop_primitive = createStopPrimitive(StopType::BRAKE);
 
     EXPECT_EQ(stop_primitive->mutable_stop()->stop_type(),
               stop_primitive->mutable_stop()->BRAKE);
 }
 
-TEST(PrimitiveMsgFactoryTest, test_create_stop_primitive_coast)
+TEST(PrimitiveFactoryTest, test_create_stop_primitive_coast)
 {
-    auto stop_primitive = createStopPrimitiveMsg(StopType::COAST);
+    auto stop_primitive = createStopPrimitive(StopType::COAST);
 
     EXPECT_EQ(stop_primitive->mutable_stop()->stop_type(),
               stop_primitive->mutable_stop()->COAST);

@@ -19,8 +19,8 @@ class SensorFusionTest : public ::testing::Test
           geom_data(initSSLDivBGeomData()),
           detection_frame(initDetectionFrame()),
           test_world(initWorld()),
-          robot_status_msg_id_1(initRobotStatusMsgId1()),
-          robot_status_msg_id_2(initRobotStatusMsgId2()),
+          robot_status_msg_id_1(initRobotStatusId1()),
+          robot_status_msg_id_2(initRobotStatusId2()),
           referee_indirect_yellow(initRefereeIndirectYellow()),
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart())
@@ -36,8 +36,8 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<SSL_DetectionFrame> detection_frame;
     // world associated with geom_data and detection_frame only
     World test_world;
-    std::unique_ptr<RobotStatusMsg> robot_status_msg_id_1;
-    std::unique_ptr<RobotStatusMsg> robot_status_msg_id_2;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
     std::unique_ptr<SSL_Referee> referee_indirect_yellow;
     std::unique_ptr<SSL_Referee> referee_indirect_blue;
     std::unique_ptr<SSL_Referee> referee_normal_start;
@@ -115,17 +115,17 @@ class SensorFusionTest : public ::testing::Test
         return World(field, ball, friendly_team, enemy_team);
     }
 
-    std::unique_ptr<RobotStatusMsg> initRobotStatusMsgId1()
+    std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusId1()
     {
-        auto robot_msg = std::make_unique<RobotStatusMsg>();
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
 
         robot_msg->set_robot_id(1);
 
-        auto break_beam_msg = std::make_unique<BreakBeamStatus>();
+        auto break_beam_msg = std::make_unique<TbotsProto::BreakBeamStatus>();
         break_beam_msg->set_ball_in_beam(false);
         *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
 
-        auto chipper_kicker_status = std::make_unique<ChipperKickerStatus>();
+        auto chipper_kicker_status = std::make_unique<TbotsProto::ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(13);
         chipper_kicker_status->set_ms_since_kicker_fired(9);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
@@ -133,17 +133,17 @@ class SensorFusionTest : public ::testing::Test
         return std::move(robot_msg);
     }
 
-    std::unique_ptr<RobotStatusMsg> initRobotStatusMsgId2()
+    std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusId2()
     {
-        auto robot_msg = std::make_unique<RobotStatusMsg>();
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
 
         robot_msg->set_robot_id(2);
 
-        auto break_beam_msg = std::make_unique<BreakBeamStatus>();
+        auto break_beam_msg = std::make_unique<TbotsProto::BreakBeamStatus>();
         break_beam_msg->set_ball_in_beam(true);
         *(robot_msg->mutable_break_beam_status()) = *break_beam_msg;
 
-        auto chipper_kicker_status = std::make_unique<ChipperKickerStatus>();
+        auto chipper_kicker_status = std::make_unique<TbotsProto::ChipperKickerStatus>();
         chipper_kicker_status->set_ms_since_chipper_fired(11);
         chipper_kicker_status->set_ms_since_kicker_fired(6);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
@@ -175,9 +175,9 @@ class SensorFusionTest : public ::testing::Test
 
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 {
-    SensorMsg sensor_msg;
-    auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::unique_ptr<SSL_DetectionFrame>());
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet = createSSLWrapperPacket(
+        std::move(geom_data), std::unique_ptr<SSL_DetectionFrame>());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -186,9 +186,9 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 
 TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 {
-    SensorMsg sensor_msg;
-    auto ssl_wrapper_packet = createWrapperPacket(std::unique_ptr<SSL_GeometryData>(),
-                                                  std::move(detection_frame));
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet = createSSLWrapperPacket(std::unique_ptr<SSL_GeometryData>(),
+                                                     std::move(detection_frame));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -197,9 +197,9 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 
 TEST_F(SensorFusionTest, test_complete_wrapper_packet)
 {
-    SensorMsg sensor_msg;
+    SensorProto sensor_msg;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -210,7 +210,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_packet)
 
 TEST_F(SensorFusionTest, test_robot_status_msg_packet)
 {
-    SensorMsg sensor_msg;
+    SensorProto sensor_msg;
     *(sensor_msg.add_robot_status_msgs()) = *robot_status_msg_id_1;
     sensor_fusion.updateWorld(sensor_msg);
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
@@ -218,9 +218,9 @@ TEST_F(SensorFusionTest, test_robot_status_msg_packet)
 
 TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_1_at_a_time)
 {
-    SensorMsg sensor_msg_1;
+    SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg_1.add_robot_status_msgs())  = *robot_status_msg_id_1;
     sensor_fusion.updateWorld(sensor_msg_1);
@@ -228,7 +228,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_1_at_a_time
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result_1 = *sensor_fusion.getWorld();
     // TODO (Issue #1276): Add checks on the state of World
-    SensorMsg sensor_msg_2;
+    SensorProto sensor_msg_2;
     *(sensor_msg_2.add_robot_status_msgs()) = *robot_status_msg_id_2;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
@@ -237,16 +237,16 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_1_at_a_time
 
 TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time)
 {
-    SensorMsg sensor_msg_1;
+    SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     sensor_fusion.updateWorld(sensor_msg_1);
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result_1 = *sensor_fusion.getWorld();
     // TODO (Issue #1276): Add checks on the state of World
-    SensorMsg sensor_msg_2;
+    SensorProto sensor_msg_2;
     *(sensor_msg_2.add_robot_status_msgs()) = *robot_status_msg_id_1;
     *(sensor_msg_2.add_robot_status_msgs()) = *robot_status_msg_id_2;
     sensor_fusion.updateWorld(sensor_msg_2);
@@ -264,9 +264,9 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
     GameState expected_2 = expected_1;
     expected_2.updateRefboxGameState(RefboxGameState::NORMAL_START);
 
-    SensorMsg sensor_msg_1;
+    SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_yellow;
@@ -274,7 +274,7 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
-    SensorMsg sensor_msg_2;
+    SensorProto sensor_msg_2;
     *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
@@ -291,9 +291,9 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
     GameState expected_2 = expected_1;
     expected_2.updateRefboxGameState(RefboxGameState::NORMAL_START);
 
-    SensorMsg sensor_msg_1;
+    SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_blue;
@@ -301,7 +301,7 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
-    SensorMsg sensor_msg_2;
+    SensorProto sensor_msg_2;
     *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();

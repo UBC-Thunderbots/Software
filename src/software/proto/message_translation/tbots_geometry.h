@@ -9,10 +9,11 @@
  * Internal geometry types to protobuf msg conversions
  *
  * @param The geom type to convert to proto
- * @return The unique_ptr to the converted GeomMsg
+ *
+ * @return The unique_ptr to the converted Geom proto
  */
-std::unique_ptr<PointMsg> createPointMsg(const Point& point);
-std::unique_ptr<AngleMsg> createAngleMsg(const Angle& angle);
-std::unique_ptr<AngularVelocityMsg> createAngularVelocityMsg(
+std::unique_ptr<TbotsProto::Point> createPointProto(const Point& point);
+std::unique_ptr<TbotsProto::Angle> createAngleProto(const Angle& angle);
+std::unique_ptr<TbotsProto::AngularVelocity> createAngularVelocityProto(
     const AngularVelocity& angular_velocity);
-std::unique_ptr<VectorMsg> createVectorMsg(const Vector& vector);
+std::unique_ptr<TbotsProto::Vector> createVectorProto(const Vector& vector);
