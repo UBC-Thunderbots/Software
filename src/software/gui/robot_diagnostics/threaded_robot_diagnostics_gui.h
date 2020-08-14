@@ -10,6 +10,7 @@
 #include "software/gui/robot_diagnostics/widgets/robot_diagnostics_gui.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/thread_safe_buffer.h"
+#include "software/multithreading/subject.h"
 #include "software/primitive/primitive.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
@@ -18,7 +19,8 @@
  * This class wraps our RobotDiagnosticsGUI object which is responsible for allowing users
  * to interact with and debug the robot
  */
-class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<SensorMsg>
+class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<SensorMsg>,
+                                    public Subject<std::unique_ptr<Primitive>>
 {
    public:
     ThreadedRobotDiagnosticsGUI() = delete;
@@ -59,6 +61,7 @@ class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<Senso
     void onValueReceived(SensorMsg sensor_msg) override;
 
     std::thread run_robot_diagnostics_thread;
+    std::thread run_send_primitives_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
 
     // Buffers that are shared with the instance of the RobotDiagnosticsGUI so that data
@@ -69,6 +72,7 @@ class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<Senso
     // We don't want to miss any updates so we make the buffer larger
     static constexpr std::size_t sensor_msg_buffer_size = 60;
     static constexpr std::size_t primitive_buffer_size  = 60;
+    const unsigned int send_primitive_interval = 50;
 
     std::atomic_bool application_shutting_down;
 };

@@ -61,6 +61,8 @@ class RobotDiagnosticsGUI : public QMainWindow
                                       DirectVelocityMode direct_velocity_mode);
     void onDribblerPowerChanged(double dribbler_power);
 
+    void createAndSendPrimitive();
+
     /**
      * Setup widgets
      */

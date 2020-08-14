@@ -52,6 +52,12 @@ void RobotDiagnosticsGUI::onDribblerPowerChanged(double dribbler_power)
     // TODO (Issue #1420): push primitive to buffer
 }
 
+void RobotDiagnosticsGUI::createAndSendPrimitive()
+{
+    // std::make_unique<DirectControlPrimitive>
+    // primitive_buffer->push(primitive);
+}
+
 void RobotDiagnosticsGUI::setupWidgets()
 {
     setupChicker(main_widget, boost::bind(&RobotDiagnosticsGUI::onChickerStateChanged,
