@@ -22,7 +22,7 @@ TEST_F(ExamplePlayTest, test_example_play)
     // take on non-goalie roles
     setFriendlyGoalie(99);
     setAIPlay(ExamplePlay::name);
-    setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::HALT);
+    setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::HALT);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {

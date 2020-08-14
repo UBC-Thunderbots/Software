@@ -7,16 +7,16 @@ void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
     Subject<SensorProto>::sendValueToObservers(sensor_msg);
 }
 
-void Backend::receiveSSLWrapperPacket(SSL_WrapperPacket msg)
+void Backend::receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg)
 {
     SensorProto sensor_msg;
     *(sensor_msg.mutable_ssl_vision_msg()) = msg;
     Subject<SensorProto>::sendValueToObservers(sensor_msg);
 }
 
-void Backend::receiveSSLReferee(SSL_Referee msg)
+void Backend::receiveSSLReferee(SSLProto::Referee msg)
 {
     SensorProto sensor_msg;
-    *(sensor_msg.mutable_ssl_refbox_msg()) = msg;
+    *(sensor_msg.mutable_ssl_referee_msg()) = msg;
     Subject<SensorProto>::sendValueToObservers(sensor_msg);
 }

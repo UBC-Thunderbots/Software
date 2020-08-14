@@ -211,7 +211,7 @@ World Simulator::getWorld() const
     return world;
 }
 
-std::unique_ptr<SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
+std::unique_ptr<SSLProto::SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
 {
     auto ball_state  = physics_world.getBallState();
     auto ball_states = ball_state.has_value()

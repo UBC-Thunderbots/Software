@@ -40,22 +40,22 @@ SensorFusionConfig:
     default: 0
     description: >-
       The id of the enemy goalie
-  OverrideRefboxDefendingSide:
+  OverrideGameControllerDefendingSide:
     type: "bool"
     default: true
     description: >-
-      Overrides the defending side provided by refbox,
+      Overrides the defending side provided by the referee,
       with defendingPositiveSide parameter
   DefendingPositiveSide:
     type: "bool"
     default: true
     description: >-
       Positive if selected, Negative if unselected
-  OverrideRefboxFriendlyTeamColor:
+  OverrideGameControllerFriendlyTeamColor:
     type: "bool"
     default: true
     description: >-
-      Overrides the team color provided by refbox,
+      Overrides the team color provided by the game controller,
       with friendlyColorYellow parameter
   FriendlyColorYellow:
     type: "bool"
