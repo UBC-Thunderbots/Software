@@ -22,9 +22,18 @@ class IntentVisitor
 
     /**
      * Visits an Intent to perform an operation.
+     * NOTE: Since NavigatingIntent also has a visitor, we need to visit each
+     * individual subclass of NavigatingIntent
      *
-     * @param The Intent to visit
+     * @param intent The Intent to visit
      */
-    virtual void visit(const MoveIntent &intent)            = 0;
+    virtual void visit(const MoveIntent &intent) = 0;
+
+    /**
+     * Visits an DirectPrimitiveIntent to perform an operation.
+     * NOTE: This visit covers all the subclasses of DirectPrimitiveIntent
+     *
+     * @param intent The Intent to visit
+     */
     virtual void visit(const DirectPrimitiveIntent &intent) = 0;
 };
