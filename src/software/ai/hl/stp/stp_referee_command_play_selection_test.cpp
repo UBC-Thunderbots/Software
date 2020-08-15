@@ -240,6 +240,7 @@ TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_c
 // placement states have plays
 
 // NORMAL_START is omitted since there is no preceding PREPARE state
+// GOAL_US and GOAL_THEM are omitted since selecting a play is not applicable
 INSTANTIATE_TEST_CASE_P(
     AllRefboxGameStates, STPRefereeCommandPlaySelectionTest,
     ::testing::Values(
@@ -268,8 +269,4 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(RefereeCommand::TIMEOUT_US,
                         Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
         std::make_tuple(RefereeCommand::TIMEOUT_THEM,
-                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::GOAL_US,
-                        Ball(Point(4.5, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::GOAL_THEM,
-                        Ball(Point(-4.5, 0), Vector(), Timestamp::fromSeconds(0)))));
+                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0)))));
