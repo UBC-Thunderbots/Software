@@ -12,13 +12,19 @@ jobs:
         - cd src
         # Run tests and collect coverage
         - >
-          bazel coverage //...     \
+          bazel coverage -- //... -//software/simulated_tests/...    \
             --compilation_mode=fastbuild    \
             --verbose_test_summary          \
             --instrumentation_filter=//...  \
             --test_output=errors
         # Collect Code Coverage Results
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
+    - name: "Test SimulatedTests"
+      script:
+        - cd src
+        # Run tests and collect coverage
+        - >
+          bazel test //software/simulated_tests/...
     - name: "Build Firmware Targets"
       script:
         - cd src
