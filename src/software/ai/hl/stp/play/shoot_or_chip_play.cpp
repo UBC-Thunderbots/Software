@@ -15,16 +15,7 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
-
-
-const std::string ShootOrChipPlay::name = "ShootOrChip Play";
-
 ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4)) {}
-
-std::string ShootOrChipPlay::getName() const
-{
-    return ShootOrChipPlay::name;
-}
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {

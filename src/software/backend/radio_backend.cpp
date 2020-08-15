@@ -5,8 +5,6 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string RadioBackend::name = "radio";
-
 RadioBackend::RadioBackend(
     std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config)
     : ssl_communication_config(ssl_communication_config),

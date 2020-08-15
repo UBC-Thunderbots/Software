@@ -84,13 +84,6 @@ class Play
      */
     bool done() const;
 
-    /**
-     * Returns the name of this Play
-     *
-     * @return the name of this Play
-     */
-    virtual std::string getName() const = 0;
-
     virtual ~Play() = default;
 
    private:

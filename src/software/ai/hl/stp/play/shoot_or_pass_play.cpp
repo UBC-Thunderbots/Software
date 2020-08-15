@@ -13,14 +13,7 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string ShootOrPassPlay::name = "Shoot Or Pass Play";
-
 ShootOrPassPlay::ShootOrPassPlay() {}
-
-std::string ShootOrPassPlay::getName() const
-{
-    return ShootOrPassPlay::name;
-}
 
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {

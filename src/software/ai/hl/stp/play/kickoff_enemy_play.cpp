@@ -9,14 +9,6 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-
-const std::string KickoffEnemyPlay::name = "KickoffEnemy Play";
-
-std::string KickoffEnemyPlay::getName() const
-{
-    return KickoffEnemyPlay::name;
-}
-
 bool KickoffEnemyPlay::isApplicable(const World &world) const
 {
     return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
