@@ -221,10 +221,10 @@ class STPRefereeCommandPlaySelectionTest
 
 TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_commands)
 {
-    RefereeCommand game_state = std::get<0>(GetParam());
-    Ball ball                 = std::get<1>(GetParam());
+    RefereeCommand ref_cmd = std::get<0>(GetParam());
+    Ball ball              = std::get<1>(GetParam());
 
-    world.updateRefereeCommand(game_state);
+    world.updateRefereeCommand(ref_cmd);
     world.updateGameStateBall(ball);
     try
     {
