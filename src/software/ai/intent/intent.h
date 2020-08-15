@@ -110,7 +110,11 @@ class Intent
     virtual ~Intent() = default;
 
    private:
+    /**
+     * The id of the robot that this intent is meant to be run on
+     */
     unsigned int robot_id;
+
     /**
      * The priority of this intent. Must be in the range [0, 100]
      * higher value => higher priority
