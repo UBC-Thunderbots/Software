@@ -22,7 +22,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_play)
     addEnemyRobots(
         TestUtil::createStationaryRobotStatesWithId({field().enemyGoalCenter()}));
     setEnemyGoalie(0);
-    setAIPlay(PenaltyKickPlay::name);
+    setAIPlay(TYPENAME(PenaltyKickPlay));
     setRefboxGameState(RefboxGameState::NORMAL_START,
                        RefboxGameState::PREPARE_PENALTY_US);
 

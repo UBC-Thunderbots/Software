@@ -28,7 +28,7 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
         Point(3.2, -2.5),
     }));
     setEnemyGoalie(0);
-    setAIPlay(PenaltyKickEnemyPlay::name);
+    setAIPlay(TYPENAME(PenaltyKickEnemyPlay));
     setRefboxGameState(RefboxGameState::NORMAL_START,
                        RefboxGameState::PREPARE_PENALTY_THEM);
 

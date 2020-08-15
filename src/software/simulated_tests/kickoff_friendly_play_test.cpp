@@ -24,7 +24,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(KickoffFriendlyPlay::name);
+    setAIPlay(TYPENAME(KickoffFriendlyPlay));
     setRefboxGameState(RefboxGameState::NORMAL_START,
                        RefboxGameState::PREPARE_KICKOFF_US);
 

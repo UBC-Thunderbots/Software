@@ -29,7 +29,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(ShootOrPassPlay::name);
+    setAIPlay(TYPENAME(ShootOrPassPlay));
     setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

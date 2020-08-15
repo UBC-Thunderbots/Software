@@ -27,7 +27,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_freekick_play)
         Point(-2, -1.25),
     }));
     setEnemyGoalie(0);
-    setAIPlay(EnemyFreekickPlay::name);
+    setAIPlay(TYPENAME(EnemyFreekickPlay));
     setRefboxGameState(RefboxGameState::NORMAL_START,
                        RefboxGameState::INDIRECT_FREE_THEM);
 

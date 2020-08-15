@@ -24,7 +24,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(KickoffEnemyPlay::name);
+    setAIPlay(TYPENAME(KickoffEnemyPlay));
     setRefboxGameState(RefboxGameState::NORMAL_START,
                        RefboxGameState::PREPARE_KICKOFF_THEM);
 

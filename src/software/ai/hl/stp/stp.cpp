@@ -86,7 +86,7 @@ void STP::updateAIPlay(const World& world)
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
                              << "\" specified in the override is not valid." << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "
-                             << default_play->getName() << std::endl;
+                             << TYPENAME(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
         }
@@ -105,7 +105,7 @@ void STP::updateAIPlay(const World& world)
                 LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
                              << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "
-                             << default_play->getName() << std::endl;
+                             << TYPENAME(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
         }
@@ -341,7 +341,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 {
     if (current_play)
     {
-        return std::make_optional(current_play->getName());
+        return std::make_optional(TYPENAME(*current_play));
     }
 
     return std::nullopt;

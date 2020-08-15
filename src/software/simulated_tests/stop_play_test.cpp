@@ -24,7 +24,7 @@ TEST_F(StopPlayTest, test_stop_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(StopPlay::name);
+    setAIPlay(TYPENAME(StopPlay));
     setRefboxGameState(RefboxGameState::STOP, RefboxGameState::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

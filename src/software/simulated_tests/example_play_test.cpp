@@ -21,7 +21,7 @@ TEST_F(ExamplePlayTest, test_example_play)
     // Set the goalie ID to that of a non-existent robot so that all robots
     // take on non-goalie roles
     setFriendlyGoalie(99);
-    setAIPlay(ExamplePlay::name);
+    setAIPlay(TYPENAME(ExamplePlay));
     setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::HALT);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
