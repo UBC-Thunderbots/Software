@@ -15,16 +15,16 @@ struct PlaySelectionTestParams
     std::vector<Point> enemy_positions;
     Point ball_position;
     Vector ball_velocity;
-    RefboxGameState first_game_state;
-    RefboxGameState second_game_state;
+    RefereeCommand first_game_state;
+    RefereeCommand second_game_state;
 };
 
-class STPRefboxGameStatePlaySelectionTestWithPositions
+class STPRefereeCommandPlaySelectionTestWithPositions
     : public ::testing::Test,
       public ::testing::WithParamInterface<PlaySelectionTestParams>
 {
    public:
-    STPRefboxGameStatePlaySelectionTestWithPositions()
+    STPRefereeCommandPlaySelectionTestWithPositions()
         : stp([]() { return std::make_unique<HaltPlay>(); },
               std::make_shared<const AIControlConfig>(), 0)
     {
@@ -35,7 +35,7 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
     World world = ::TestUtil::createBlankTestingWorld();
 };
 
-TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
+TEST_P(STPRefereeCommandPlaySelectionTestWithPositions,
        test_play_selection_for_states_and_positions)
 {
     // set up the friendly team
@@ -46,9 +46,9 @@ TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
         TimestampedBallState(GetParam().ball_position, Vector(), Timestamp()));
 
     // to set restart reason, etc. properly
-    world.updateRefboxGameState(GetParam().first_game_state);
+    world.updateRefereeCommand(GetParam().first_game_state);
     world.updateGameStateBall(world.ball());
-    world.updateRefboxGameState(GetParam().second_game_state);
+    world.updateRefereeCommand(GetParam().second_game_state);
     world.updateGameStateBall(world.ball());
     std::unique_ptr<Play> play;
     try
@@ -67,124 +67,124 @@ std::vector<PlaySelectionTestParams> test_params = {
      .enemy_positions    = {{4.0, 0}, {0.5, 0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(0, 0),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::PREPARE_KICKOFF_US,
-     .second_game_state  = RefboxGameState::PREPARE_KICKOFF_US},
+     .first_game_state   = RefereeCommand::PREPARE_KICKOFF_US,
+     .second_game_state  = RefereeCommand::PREPARE_KICKOFF_US},
     {.name               = "Their Kickoff",
      .friendly_positions = {{-4.0, 0}, {-0.5, 0}, {-2.0, 1.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {0.25, 0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(0, 0),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::PREPARE_KICKOFF_THEM,
-     .second_game_state  = RefboxGameState::PREPARE_KICKOFF_THEM},
+     .first_game_state   = RefereeCommand::PREPARE_KICKOFF_THEM,
+     .second_game_state  = RefereeCommand::PREPARE_KICKOFF_THEM},
     {.name               = "Normal play after our kickoff",
      .friendly_positions = {{-4.0, 0}, {-0.25, 0}, {-2.0, 1.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {0.5, 0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(0, 0),
      .ball_velocity      = Vector(1, 0),
-     .first_game_state   = RefboxGameState::PREPARE_KICKOFF_US,
-     .second_game_state  = RefboxGameState::NORMAL_START},
+     .first_game_state   = RefereeCommand::PREPARE_KICKOFF_US,
+     .second_game_state  = RefereeCommand::NORMAL_START},
     {.name               = "Normal play after their kickoff",
      .friendly_positions = {{-4.0, 0}, {-0.5, 0}, {-2.0, 1.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {0.25, 0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(0, 0),
      .ball_velocity      = Vector(-1, 0),
-     .first_game_state   = RefboxGameState::PREPARE_KICKOFF_THEM,
-     .second_game_state  = RefboxGameState::NORMAL_START},
+     .first_game_state   = RefereeCommand::PREPARE_KICKOFF_THEM,
+     .second_game_state  = RefereeCommand::NORMAL_START},
     {.name               = "Friendly indirect free setup on friendly field side",
      .friendly_positions = {{-4.0, 0}, {-2.0, 3.0}, {-2.0, 0.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {0.25, 0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(-2.0, 2.8),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::INDIRECT_FREE_US,
-     .second_game_state  = RefboxGameState::INDIRECT_FREE_US},
+     .first_game_state   = RefereeCommand::INDIRECT_FREE_US,
+     .second_game_state  = RefereeCommand::INDIRECT_FREE_US},
     {.name               = "Friendly indirect free setup on enemy field side",
      .friendly_positions = {{-4.0, 0}, {2.0, -3.0}, {-2.0, 0.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {0.25, 0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(2.0, -2.8),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::INDIRECT_FREE_US,
-     .second_game_state  = RefboxGameState::INDIRECT_FREE_US},
+     .first_game_state   = RefereeCommand::INDIRECT_FREE_US,
+     .second_game_state  = RefereeCommand::INDIRECT_FREE_US},
     // enemy indirect free on both sides of the field
     {.name               = "Enemy indirect free setup on friendly field side",
      .friendly_positions = {{-4.0, 0}, {0.25, 0}, {-2.0, 0.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {-2.0, 3.0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(-2.0, 2.8),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::INDIRECT_FREE_THEM,
-     .second_game_state  = RefboxGameState::INDIRECT_FREE_THEM},
+     .first_game_state   = RefereeCommand::INDIRECT_FREE_THEM,
+     .second_game_state  = RefereeCommand::INDIRECT_FREE_THEM},
     {.name               = "Enemy indirect free setup on enemy field side",
      .friendly_positions = {{-4.0, 0}, {0.25, 0}, {-2.0, 0.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {2.0, -3.0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(2.0, -2.8),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::INDIRECT_FREE_THEM,
-     .second_game_state  = RefboxGameState::INDIRECT_FREE_THEM},
+     .first_game_state   = RefereeCommand::INDIRECT_FREE_THEM,
+     .second_game_state  = RefereeCommand::INDIRECT_FREE_THEM},
     {.name               = "Friendly direct free setup on friendly field side",
      .friendly_positions = {{-4.0, 0}, {-4.5, -3.0}, {-2.0, 0.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {2.0, -3.0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(-4.3, -2.8),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::DIRECT_FREE_US,
-     .second_game_state  = RefboxGameState::DIRECT_FREE_US},
+     .first_game_state   = RefereeCommand::DIRECT_FREE_US,
+     .second_game_state  = RefereeCommand::DIRECT_FREE_US},
     {.name               = "Friendly direct free setup on enemy field side",
      .friendly_positions = {{-4.0, 0}, {4.5, 3.0}, {-2.0, 0.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {2.0, -3.0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(4.3, 2.8),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::DIRECT_FREE_US,
-     .second_game_state  = RefboxGameState::DIRECT_FREE_US},
+     .first_game_state   = RefereeCommand::DIRECT_FREE_US,
+     .second_game_state  = RefereeCommand::DIRECT_FREE_US},
     {.name               = "Enemy direct free setup on friendly field side",
      .friendly_positions = {{-4.0, 0}, {2.0, -3.0}, {-2.0, 0.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {-4.5, -3.0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(-4.3, -2.8),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::DIRECT_FREE_THEM,
-     .second_game_state  = RefboxGameState::DIRECT_FREE_THEM},
+     .first_game_state   = RefereeCommand::DIRECT_FREE_THEM,
+     .second_game_state  = RefereeCommand::DIRECT_FREE_THEM},
     {.name               = "Enemy direct free setup on enemy field side",
      .friendly_positions = {{-4.0, 0}, {2.0, -3.0}, {-2.0, 0.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {4.5, 3.0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(4.3, 2.8),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::DIRECT_FREE_THEM,
-     .second_game_state  = RefboxGameState::DIRECT_FREE_THEM},
+     .first_game_state   = RefereeCommand::DIRECT_FREE_THEM,
+     .second_game_state  = RefereeCommand::DIRECT_FREE_THEM},
     {.name               = "Friendly penalty kick",
      .friendly_positions = {{-4.0, 0}, {4.5 - 2.0, 0.0}, {0.3, 2.5}, {0.3, -2.5}},
      .enemy_positions    = {{4.5, 0}, {0, 2.5}, {0, 0}, {0, -2.5}},
      .ball_position      = Point(4.5 - 1.8, 0),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::PREPARE_PENALTY_US,
-     .second_game_state  = RefboxGameState::NORMAL_START},
+     .first_game_state   = RefereeCommand::PREPARE_PENALTY_US,
+     .second_game_state  = RefereeCommand::NORMAL_START},
     {.name               = "Enemy penalty kick",
      .friendly_positions = {{-4.5, 0}, {0, 0.0}, {0, 2.5}, {0, -2.5}},
      .enemy_positions    = {{4.5, 0}, {-(4.5 - 2.0), 2.5}, {-0.3, 0}, {-0.3, -2.5}},
      .ball_position      = Point(-(4.5 - 1.8), 0),
      .ball_velocity      = Vector(),
-     .first_game_state   = RefboxGameState::PREPARE_PENALTY_THEM,
-     .second_game_state  = RefboxGameState::NORMAL_START},
+     .first_game_state   = RefereeCommand::PREPARE_PENALTY_THEM,
+     .second_game_state  = RefereeCommand::NORMAL_START},
     {.name               = "Friendly penalty kick post",
      .friendly_positions = {{-4.0, 0}, {4.5 - 2.0, 0.0}, {0.3, 2.5}, {0.3, -2.5}},
      .enemy_positions    = {{4.5, 0}, {0, 2.5}, {0, 0}, {0, -2.5}},
      .ball_position      = Point(4.5 - 1.0, 0),
      .ball_velocity      = Vector(1, 0),
-     .first_game_state   = RefboxGameState::PREPARE_PENALTY_US,
-     .second_game_state  = RefboxGameState::NORMAL_START},
+     .first_game_state   = RefereeCommand::PREPARE_PENALTY_US,
+     .second_game_state  = RefereeCommand::NORMAL_START},
     {.name               = "Enemy penalty kick post",
      .friendly_positions = {{-4.5, 0}, {0, 0.0}, {0, 2.5}, {0, -2.5}},
      .enemy_positions    = {{4.5, 0}, {-(4.5 - 2.0), 2.5}, {-0.3, 0}, {-0.3, -2.5}},
      .ball_position      = Point(-(4.5 - 1.0), 0),
      .ball_velocity      = Vector(-1, 0),
-     .first_game_state   = RefboxGameState::PREPARE_PENALTY_THEM,
-     .second_game_state  = RefboxGameState::NORMAL_START}};
+     .first_game_state   = RefereeCommand::PREPARE_PENALTY_THEM,
+     .second_game_state  = RefereeCommand::NORMAL_START}};
 
-INSTANTIATE_TEST_CASE_P(TestPositions, STPRefboxGameStatePlaySelectionTestWithPositions,
+INSTANTIATE_TEST_CASE_P(TestPositions, STPRefereeCommandPlaySelectionTestWithPositions,
                         ::testing::ValuesIn(test_params.begin(), test_params.end()));
 
-class STPRefboxGameStatePlaySelectionTest
+class STPRefereeCommandPlaySelectionTest
     : public ::testing::Test,
-      public ::testing::WithParamInterface<std::tuple<RefboxGameState, Ball>>
+      public ::testing::WithParamInterface<std::tuple<RefereeCommand, Ball>>
 {
    public:
-    STPRefboxGameStatePlaySelectionTest()
+    STPRefereeCommandPlaySelectionTest()
         : stp([]() { return nullptr; }, std::make_shared<const AIControlConfig>(), 0)
     {
     }
@@ -219,13 +219,12 @@ class STPRefboxGameStatePlaySelectionTest
     World world = ::TestUtil::createBlankTestingWorld();
 };
 
-TEST_P(STPRefboxGameStatePlaySelectionTest,
-       test_play_selection_for_all_refbox_game_states)
+TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_commands)
 {
-    RefboxGameState game_state = std::get<0>(GetParam());
-    Ball ball                  = std::get<1>(GetParam());
+    RefereeCommand game_state = std::get<0>(GetParam());
+    Ball ball                 = std::get<1>(GetParam());
 
-    world.updateRefboxGameState(game_state);
+    world.updateRefereeCommand(game_state);
     world.updateGameStateBall(ball);
     try
     {
@@ -242,35 +241,35 @@ TEST_P(STPRefboxGameStatePlaySelectionTest,
 
 // NORMAL_START is omitted since there is no preceding PREPARE state
 INSTANTIATE_TEST_CASE_P(
-    AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,
+    AllRefboxGameStates, STPRefereeCommandPlaySelectionTest,
     ::testing::Values(
-        std::make_tuple(RefboxGameState::HALT,
+        std::make_tuple(RefereeCommand::HALT,
                         Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::STOP,
+        std::make_tuple(RefereeCommand::STOP,
                         Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::FORCE_START,
+        std::make_tuple(RefereeCommand::FORCE_START,
                         Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::PREPARE_KICKOFF_US,
+        std::make_tuple(RefereeCommand::PREPARE_KICKOFF_US,
                         Ball(Point(0, 0), Vector(1, 0), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::PREPARE_KICKOFF_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_KICKOFF_THEM,
                         Ball(Point(0, 0), Vector(-1, 0), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::PREPARE_PENALTY_US,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_US,
                         Ball(Point(2.7, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::PREPARE_PENALTY_THEM,
+        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM,
                         Ball(Point(-2.7, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::DIRECT_FREE_US,
+        std::make_tuple(RefereeCommand::DIRECT_FREE_US,
                         Ball(Point(-4.3, -2.8), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::DIRECT_FREE_THEM,
+        std::make_tuple(RefereeCommand::DIRECT_FREE_THEM,
                         Ball(Point(4.3, 2.8), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::INDIRECT_FREE_US,
+        std::make_tuple(RefereeCommand::INDIRECT_FREE_US,
                         Ball(Point(-2, 2.8), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::INDIRECT_FREE_THEM,
+        std::make_tuple(RefereeCommand::INDIRECT_FREE_THEM,
                         Ball(Point(2, -2.8), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::TIMEOUT_US,
+        std::make_tuple(RefereeCommand::TIMEOUT_US,
                         Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::TIMEOUT_THEM,
+        std::make_tuple(RefereeCommand::TIMEOUT_THEM,
                         Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::GOAL_US,
+        std::make_tuple(RefereeCommand::GOAL_US,
                         Ball(Point(4.5, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefboxGameState::GOAL_THEM,
+        std::make_tuple(RefereeCommand::GOAL_THEM,
                         Ball(Point(-4.5, 0), Vector(), Timestamp::fromSeconds(0)))));

@@ -9,8 +9,8 @@ class ReplayReader
    public:
     /**
      * Constructs a `ReplayReader` that will read numerically-named files containing
-     * a delimited protobuf message with type `ReplayMsg`, which itself contains multiple
-     * `SensorMsg`s.
+     * a delimited protobuf message with type `ReplayProto`, which itself contains
+     * multiple `SensorProto`s.
      *
      * @param _replay_dir The directory that we want to read replay proto messages from
      */
@@ -22,9 +22,9 @@ class ReplayReader
      * current chunk. Returns std::nullopt if there are no more messages available in
      * the current chunk, and there are no more chunks in the current directory.
      *
-     * @return the next recorded SensorMsg if available, nullopt otherwise.
+     * @return the next recorded SensorProto if available, nullopt otherwise.
      */
-    std::optional<SensorMsg> getNextMsg();
+    std::optional<SensorProto> getNextMsg();
 
    private:
     /**
@@ -43,14 +43,14 @@ class ReplayReader
      * Reads a delimited protobuf file from a file located at the given path.
      *
      * @param file_path the path of the file containing a delimited protobuf file.
-     * @return a ReplayMsg object that has been read from the given path.
+     * @return a ReplayProto object that has been read from the given path.
      */
-    static ReplayMsg readDelimitedReplayProtobufFile(
+    static ReplayProto readDelimitedReplayProtobufFile(
         const std::experimental::filesystem::path& file_path);
 
     size_t max_chunk_idx;
     size_t cur_chunk_idx;
     int cur_msg_idx;
-    ReplayMsg cur_chunk;
+    ReplayProto cur_chunk;
     std::experimental::filesystem::path replay_dir;
 };

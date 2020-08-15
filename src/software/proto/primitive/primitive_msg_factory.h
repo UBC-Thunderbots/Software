@@ -23,9 +23,8 @@ MAKE_ENUM(StopType, BRAKE, COAST)
  *
  * @return Pointer to Chip Primitive Message
  */
-std::unique_ptr<PrimitiveNewMsg> createChipPrimitiveMsg(const Point &chip_origin,
-                                                        const Angle &chip_direction,
-                                                        float chip_distance_meters);
+std::unique_ptr<TbotsProto::PrimitiveNew> createChipPrimitive(
+    const Point &chip_origin, const Angle &chip_direction, double chip_distance_meters);
 
 /**
  * Create a Kick Primitive Message
@@ -37,9 +36,9 @@ std::unique_ptr<PrimitiveNewMsg> createChipPrimitiveMsg(const Point &chip_origin
  *
  * @return Pointer to Kick Primitive Message
  */
-std::unique_ptr<PrimitiveNewMsg> createKickPrimitiveMsg(
+std::unique_ptr<TbotsProto::PrimitiveNew> createKickPrimitive(
     const Point &kick_origin, const Angle &kick_direction,
-    float kick_speed_meters_per_second);
+    double kick_speed_meters_per_second);
 
 /**
  * Create a Move Primitive Message
@@ -53,9 +52,9 @@ std::unique_ptr<PrimitiveNewMsg> createKickPrimitiveMsg(
  *
  * @return Pointer to Move Primitive Message
  */
-std::unique_ptr<PrimitiveNewMsg> createMovePrimitiveMsg(
-    const Point &dest, float final_speed_meters_per_second, bool slow,
-    const Angle &final_angle, float dribbler_speed_rpm);
+std::unique_ptr<TbotsProto::PrimitiveNew> createMovePrimitive(
+    const Point &dest, double final_speed_meters_per_second, bool slow,
+    const Angle &final_angle, double dribbler_speed_rpm);
 
 /**
  * Create a Spinning Move Primitive Message
@@ -69,9 +68,9 @@ std::unique_ptr<PrimitiveNewMsg> createMovePrimitiveMsg(
  *
  * @return Pointer to Spinning Move Primitive Message
  */
-std::unique_ptr<PrimitiveNewMsg> createSpinningMovePrimitiveMsg(
-    const Point &dest, float final_speed_meters_per_second, bool slow,
-    const AngularVelocity &angular_velocity, float dribbler_speed_rpm);
+std::unique_ptr<TbotsProto::PrimitiveNew> createSpinningMovePrimitive(
+    const Point &dest, double final_speed_meters_per_second, bool slow,
+    const AngularVelocity &angular_velocity, double dribbler_speed_rpm);
 
 /**
  * Create an Autochip Move Primitive Message
@@ -87,9 +86,9 @@ std::unique_ptr<PrimitiveNewMsg> createSpinningMovePrimitiveMsg(
  *
  * @return Pointer to Autochip Move Primitive Message
  */
-std::unique_ptr<PrimitiveNewMsg> createAutochipMovePrimitiveMsg(
-    const Point &dest, float final_speed_meters_per_second, bool slow,
-    const Angle &final_angle, float dribbler_speed_rpm, float chip_distance_meters);
+std::unique_ptr<TbotsProto::PrimitiveNew> createAutochipMovePrimitive(
+    const Point &dest, double final_speed_meters_per_second, bool slow,
+    const Angle &final_angle, double dribbler_speed_rpm, double chip_distance_meters);
 
 /**
  * Create an Autokick Move Primitive Message
@@ -105,10 +104,10 @@ std::unique_ptr<PrimitiveNewMsg> createAutochipMovePrimitiveMsg(
  *
  * @return Pointer to Autokick Move Primitive Message
  */
-std::unique_ptr<PrimitiveNewMsg> createAutokickMovePrimitiveMsg(
-    const Point &dest, float final_speed_meters_per_second, bool slow,
-    const Angle &final_angle, float dribbler_speed_rpm,
-    float kick_speed_meters_per_second);
+std::unique_ptr<TbotsProto::PrimitiveNew> createAutokickMovePrimitive(
+    const Point &dest, double final_speed_meters_per_second, bool slow,
+    const Angle &final_angle, double dribbler_speed_rpm,
+    double kick_speed_meters_per_second);
 
 /**
  * Create a Stop Move Primitive Message
@@ -117,4 +116,4 @@ std::unique_ptr<PrimitiveNewMsg> createAutokickMovePrimitiveMsg(
  *
  * @return Pointer to Stop Primitive Message
  */
-std::unique_ptr<PrimitiveNewMsg> createStopPrimitiveMsg(StopType stop_type);
+std::unique_ptr<TbotsProto::PrimitiveNew> createStopPrimitive(StopType stop_type);

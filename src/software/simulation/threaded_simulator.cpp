@@ -15,7 +15,7 @@ ThreadedSimulator::~ThreadedSimulator()
 }
 
 void ThreadedSimulator::registerOnSSLWrapperPacketReadyCallback(
-    const std::function<void(SSL_WrapperPacket)> &callback)
+    const std::function<void(SSLProto::SSL_WrapperPacket)> &callback)
 {
     std::scoped_lock lock(callback_mutex);
     ssl_wrapper_packet_callbacks.emplace_back(callback);
@@ -109,14 +109,14 @@ void ThreadedSimulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitive
 }
 
 void ThreadedSimulator::setYellowRobotPrimitive(RobotId id,
-                                                const PrimitiveMsg &primitive_msg)
+                                                const TbotsProto_Primitive &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);
     simulator.setYellowRobotPrimitive(id, primitive_msg);
 }
 
 void ThreadedSimulator::setBlueRobotPrimitive(RobotId id,
-                                              const PrimitiveMsg &primitive_msg)
+                                              const TbotsProto_Primitive &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);
     simulator.setBlueRobotPrimitive(id, primitive_msg);
@@ -167,4 +167,16 @@ std::weak_ptr<PhysicsRobot> ThreadedSimulator::getRobotAtPosition(const Point &p
 {
     std::scoped_lock lock(simulator_mutex);
     return simulator.getRobotAtPosition(position);
+}
+
+void ThreadedSimulator::addYellowRobot(const Point &position)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.addYellowRobot(position);
+}
+
+void ThreadedSimulator::addBlueRobot(const Point &position)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.addBlueRobot(position);
 }

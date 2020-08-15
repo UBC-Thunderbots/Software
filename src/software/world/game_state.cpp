@@ -4,17 +4,17 @@
 
 bool GameState::isHalted() const
 {
-    return state_ == HALT;
+    return play_state_ == HALT;
 }
 
 bool GameState::isStopped() const
 {
-    return state_ == STOP;
+    return play_state_ == STOP;
 }
 
 bool GameState::isPlaying() const
 {
-    return state_ == PLAYING;
+    return play_state_ == PLAYING;
 }
 
 bool GameState::isKickoff() const
@@ -111,28 +111,28 @@ bool GameState::isTheirBallPlacement() const
 // Robots must be in position for a restart
 bool GameState::isSetupRestart() const
 {
-    return state_ == SETUP || state_ == READY;
+    return play_state_ == SETUP || play_state_ == READY;
 }
 
 bool GameState::isSetupState() const
 {
-    return state_ == SETUP;
+    return play_state_ == SETUP;
 }
 
 bool GameState::isReadyState() const
 {
-    return state_ == READY;
+    return play_state_ == READY;
 }
 
 // One of our robots can kick the ball
 bool GameState::canKick() const
 {
-    return state_ == PLAYING || (our_restart_ && state_ == READY);
+    return play_state_ == PLAYING || (our_restart_ && play_state_ == READY);
 }
 
 bool GameState::stayAwayFromBall() const
 {
-    return state_ != PLAYING && !our_restart_;
+    return play_state_ != PLAYING && !our_restart_;
 }
 
 // Our robots must stay on our half of the field
@@ -153,98 +153,98 @@ void GameState::setBallPlacementPoint(Point placement_point)
 }
 
 // apologies for this monster switch statement
-void GameState::updateRefboxGameState(RefboxGameState game_state)
+void GameState::updateRefereeCommand(RefereeCommand command)
 {
-    if (game_state != game_state_)
+    if (command != command_)
     {
-        game_state_ = game_state;
+        command_ = command;
 
-        switch (game_state)
+        switch (command)
         {
-            case RefboxGameState::HALT:
-                state_          = HALT;
+            case RefereeCommand::HALT:
+                play_state_     = HALT;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::STOP:
-                state_          = STOP;
+            case RefereeCommand::STOP:
+                play_state_     = STOP;
                 restart_reason_ = NONE;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::NORMAL_START:
-                state_ = READY;
+            case RefereeCommand::NORMAL_START:
+                play_state_ = READY;
                 break;
-            case RefboxGameState::FORCE_START:
-                state_          = PLAYING;
+            case RefereeCommand::FORCE_START:
+                play_state_     = PLAYING;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::PREPARE_KICKOFF_US:
-                state_          = SETUP;
+            case RefereeCommand::PREPARE_KICKOFF_US:
+                play_state_     = SETUP;
                 restart_reason_ = KICKOFF;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::PREPARE_KICKOFF_THEM:
-                state_          = SETUP;
+            case RefereeCommand::PREPARE_KICKOFF_THEM:
+                play_state_     = SETUP;
                 restart_reason_ = KICKOFF;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::PREPARE_PENALTY_US:
-                state_          = SETUP;
+            case RefereeCommand::PREPARE_PENALTY_US:
+                play_state_     = SETUP;
                 restart_reason_ = PENALTY;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::PREPARE_PENALTY_THEM:
-                state_          = SETUP;
+            case RefereeCommand::PREPARE_PENALTY_THEM:
+                play_state_     = SETUP;
                 restart_reason_ = PENALTY;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::DIRECT_FREE_US:
-                state_          = READY;
+            case RefereeCommand::DIRECT_FREE_US:
+                play_state_     = READY;
                 restart_reason_ = DIRECT;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::DIRECT_FREE_THEM:
-                state_          = READY;
+            case RefereeCommand::DIRECT_FREE_THEM:
+                play_state_     = READY;
                 restart_reason_ = DIRECT;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::INDIRECT_FREE_US:
-                state_          = READY;
+            case RefereeCommand::INDIRECT_FREE_US:
+                play_state_     = READY;
                 restart_reason_ = INDIRECT;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::INDIRECT_FREE_THEM:
-                state_          = READY;
+            case RefereeCommand::INDIRECT_FREE_THEM:
+                play_state_     = READY;
                 restart_reason_ = INDIRECT;
                 our_restart_    = false;
                 break;
-            case RefboxGameState::TIMEOUT_US:
-                state_          = HALT;
+            case RefereeCommand::TIMEOUT_US:
+                play_state_     = HALT;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::TIMEOUT_THEM:
-                state_          = HALT;
+            case RefereeCommand::TIMEOUT_THEM:
+                play_state_     = HALT;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::GOAL_US:
-                state_          = STOP;
+            case RefereeCommand::GOAL_US:
+                play_state_     = STOP;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::GOAL_THEM:
-                state_          = STOP;
+            case RefereeCommand::GOAL_THEM:
+                play_state_     = STOP;
                 restart_reason_ = NONE;
                 break;
-            case RefboxGameState::BALL_PLACEMENT_US:
-                state_          = SETUP;
+            case RefereeCommand::BALL_PLACEMENT_US:
+                play_state_     = SETUP;
                 restart_reason_ = BALL_PLACEMENT;
                 our_restart_    = true;
                 break;
-            case RefboxGameState::BALL_PLACEMENT_THEM:
-                state_          = SETUP;
+            case RefereeCommand::BALL_PLACEMENT_THEM:
+                play_state_     = SETUP;
                 restart_reason_ = BALL_PLACEMENT;
                 our_restart_    = false;
                 break;
             default:
-                LOG(WARNING) << "Unrecognized RefboxGameState" << std::endl;
+                LOG(WARNING) << "Unrecognized RefereeCommand" << std::endl;
                 break;
         }
     }
@@ -252,11 +252,11 @@ void GameState::updateRefboxGameState(RefboxGameState game_state)
 
 void GameState::updateBall(const Ball& ball)
 {
-    if (state_ == READY && restart_reason_ != PENALTY)
+    if (play_state_ == READY && restart_reason_ != PENALTY)
     {
         if (!ball_state_)
         {
-            // Save the ball state_ so we can tell once it moves
+            // Save the ball play_state_ so we can tell once it moves
             ball_state_ = ball;
         }
         else if ((ball.position() - ball_state_->position()).length() > 0.03)
@@ -273,24 +273,23 @@ GameState::RestartReason GameState::getRestartReason() const
     return restart_reason_;
 }
 
-const RefboxGameState& GameState::getRefboxGameState() const
+const RefereeCommand& GameState::getRefereeCommand() const
 {
-    return game_state_;
+    return command_;
 }
 
 
 void GameState::setRestartCompleted()
 {
-    state_          = PLAYING;
+    play_state_     = PLAYING;
     restart_reason_ = NONE;
 }
 
 bool GameState::operator==(const GameState& other) const
 {
-    return this->state_ == other.state_ &&
+    return this->play_state_ == other.play_state_ &&
            this->restart_reason_ == other.restart_reason_ &&
-           this->game_state_ == other.game_state_ &&
-           this->ball_state_ == other.ball_state_ &&
+           this->command_ == other.command_ && this->ball_state_ == other.ball_state_ &&
            this->our_restart_ == other.our_restart_ &&
            this->ball_placement_point_ == other.ball_placement_point_;
 }

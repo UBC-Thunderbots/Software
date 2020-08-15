@@ -12,5 +12,5 @@ extern const primitive_t SHOOT_PRIMITIVE;
  *                            `create_state` function
  * @param world [in] The world this primitive is running in.
  */
-void app_shoot_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+void app_shoot_primitive_start(TbotsProto_PrimitiveParams params, void* void_state_ptr,
                                FirmwareWorld_t* world);
