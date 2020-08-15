@@ -3,7 +3,6 @@
 
 #include <boost/circular_buffer.hpp>
 
-#include "software/sensor_fusion/refbox_data.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/game_state.h"
@@ -59,27 +58,26 @@ class World final
     void updateEnemyTeamState(const Team& new_enemy_team_data);
 
     /**
-     * Updates the refbox game state
+     * Updates the referee command
      *
-     * @param game_state the game state sent by refbox
+     * @param command the command sent by the referee
      */
-    void updateRefboxGameState(const RefboxGameState& game_state);
+    void updateRefereeCommand(const RefereeCommand& command);
 
     /**
-     * Updates the refbox game state
+     * Updates the referee command
      *
-     * @param game_state the game state sent by refbox
+     * @param command the command sent by the referee
      * @param ball_placement_point ball placement point
      */
-    void updateRefboxGameState(const RefboxGameState& game_state,
-                               Point ball_placement_point);
+    void updateRefereeCommand(const RefereeCommand& command, Point ball_placement_point);
 
     /**
-     * Updates the refbox stage
+     * Updates the referee stage
      *
-     * @param stage the stage sent by refbox
+     * @param stage the stage sent by the referee
      */
-    void updateRefboxStage(const RefboxStage& stage);
+    void updateRefereeStage(const RefereeStage& stage);
 
     /**
      * Returns a const reference to the Field in the world
@@ -131,11 +129,11 @@ class World final
     void updateGameStateBall(const Ball& ball);
 
     /**
-     * Returns the current refbox stage
+     * Returns the current referee stage
      *
-     * @return the current refbox stage
+     * @return the current referee stage
      */
-    const RefboxStage& getRefboxStage() const;
+    const RefereeStage& getRefereeStage() const;
 
     /**
      * Returns the most recent timestamp value of all timestamped member
@@ -187,8 +185,8 @@ class World final
      */
     bool operator!=(const World& other) const;
 
-    // The size of the refbox history buffers to filter out noise with
-    static constexpr unsigned int REFBOX_GAMESTATE_BUFFER_SIZE = 3;
+    // The size of the referee history buffers to filter out noise with
+    static constexpr unsigned int REFEREE_COMMAND_BUFFER_SIZE = 3;
 
    private:
     Field field_;
@@ -196,12 +194,12 @@ class World final
     Team friendly_team_;
     Team enemy_team_;
     GameState current_game_state_;
-    RefboxStage current_refbox_stage_;
+    RefereeStage current_referee_stage_;
     // All previous timestamps of when the world was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
-    // A small buffer that stores previous refbox game state
-    boost::circular_buffer<RefboxGameState> refbox_game_state_history;
-    // A small buffer that stores previous refbox stage
-    boost::circular_buffer<RefboxStage> refbox_stage_history;
+    // A small buffer that stores previous referee command
+    boost::circular_buffer<RefereeCommand> referee_command_history;
+    // A small buffer that stores previous referee stage
+    boost::circular_buffer<RefereeStage> referee_stage_history;
 };

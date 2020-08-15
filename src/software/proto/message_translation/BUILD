@@ -124,7 +124,7 @@ cc_library(
     deps = [
         "//software/geom:point",
         "//software/proto:ssl_cc_proto",
-        "//software/sensor_fusion:refbox_data",
+        "//software/world:game_state",
         "//software/world:team_colour",
     ],
 )

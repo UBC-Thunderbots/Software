@@ -155,18 +155,18 @@ TEST_F(STPTest, test_get_play_info)
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     world = ::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 0)},
                                                   Timestamp::fromSeconds(0));
-    world.updateRefboxGameState(RefboxGameState::HALT);
+    world.updateRefereeCommand(RefereeCommand::HALT);
     stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 
     auto play_info = stp.getPlayInfo();
     PlayInfo expected_play_info;
-    std::string expected_refbox_game_state, expected_play_name;
-    expected_refbox_game_state                                       = "HALT";
+    std::string expected_referee_command, expected_play_name;
+    expected_referee_command                                         = "HALT";
     expected_play_name                                               = "HaltTestPlay";
     std::unordered_set<std::string> expected_robot_tactic_assignment = {
         "Robot 0  -  StopTestTactic", "Robot 1  -  StopTestTactic"};
-    expected_play_info = PlayInfo(expected_refbox_game_state, expected_play_name,
+    expected_play_info = PlayInfo(expected_referee_command, expected_play_name,
                                   expected_robot_tactic_assignment);
     EXPECT_EQ(play_info.getRefboxGameStateName(), expected_refbox_game_state);
     EXPECT_EQ(play_info.getPlayName(), expected_play_name);
