@@ -7,7 +7,7 @@ install:
 
 jobs:
   include:
-    - name: "Build, Test, and Run Coverage"
+    - name: "Build, Test, and Run Coverage on Software"
       script:
         - cd src
         # Run tests and collect coverage
@@ -19,6 +19,9 @@ jobs:
             --test_output=errors
         # Collect Code Coverage Results
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
+    - name: "Build Firmware Targets"
+      script:
+        - cd src
         # Build ARM Targets For Firmware
         - bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
         - bazel build --cpu=stm32f4 //firmware/boards/legacy_robot_stm32f4:bin 
