@@ -7,7 +7,7 @@ install:
 
 jobs:
   include:
-    - name: "Build, Test, and Run Coverage on Software (Except SimulatedTests)"
+    - name: "Build, Test, and Run Coverage (Except SimulatedTests)"
       script:
         - cd src
         # Run tests and collect coverage
