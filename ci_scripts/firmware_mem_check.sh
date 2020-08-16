@@ -13,17 +13,11 @@ echo "=========================================================="
 
 # Run formatting
 cd $CURR_DIR/../src
-bazel test --run_under="valgrind --leak-check=yes" //firmware/... > mem_check.out
+bazel test --run_under="valgrind --leak-check=yes --error-exitcode=1 --undef-value-errors=no" //firmware/...
 if [[ "$?" != 0 ]]; then
-    echo "There was a problem running the mem check script, stopping now."
-    exit 1
-fi
-
-cat mem_check.out | grep "LEAK"
-if [[ "$?" == 0 ]]; then
     printf "\nMemory leaks detected :( - please run \`bazel test --run_under=\"valgrind --leak-check=yes\" //firmware/...\` to find out why\n\n"
     exit 1
 else
-    echo "Firmware mem check passed :D"
+    printf "\nFirmware mem check passed :D\n\n"
     exit 0
 fi
