@@ -62,7 +62,8 @@ void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEve
 
     QMenu menu(this);
     menu.addAction("Place Ball Here", [&]() {
-        standalone_simulator->setBallState(BallState{.position_ = point_in_scene, .velocity_ = Vector(0, 0), .height_ = 0});
+        standalone_simulator->setBallState(BallState{
+            .position_ = point_in_scene, .velocity_ = Vector(0, 0), .height_ = 0});
     });
     menu.addAction("Add Yellow Robot Here",
                    [&]() { standalone_simulator->addYellowRobot(point_in_scene); });
@@ -70,13 +71,9 @@ void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEve
                    [&]() { standalone_simulator->addBlueRobot(point_in_scene); });
     if (auto physics_robot = robot_under_cursor.lock())
     {
-        menu.addAction("Move Robot",
-                       [&](){
-                           robot = robot_under_cursor;
-                       });
+        menu.addAction("Move Robot", [&]() { robot = robot_under_cursor; });
         menu.addAction("Remove Robot",
                        [&]() { standalone_simulator->removeRobot(robot_under_cursor); });
-
     }
 
     menu.exec(event->globalPos());
