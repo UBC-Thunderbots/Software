@@ -73,7 +73,6 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
         {
             // Only other possible key is 2
             ASSERT_EQ(nanopb_primitive_set.robot_primitives[i].key, 2);
-            auto nanopb_primitive = nanopb_primitive_set.robot_primitives[1].value;
             ASSERT_EQ(nanopb_primitive.which_primitive, TbotsProto_Primitive_move_tag);
             EXPECT_EQ(nanopb_primitive.primitive.move.parameter1, 2000.0f);
             EXPECT_EQ(nanopb_primitive.primitive.move.parameter2, 4000.0f);
