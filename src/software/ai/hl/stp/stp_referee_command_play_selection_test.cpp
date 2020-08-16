@@ -181,7 +181,7 @@ INSTANTIATE_TEST_CASE_P(TestPositions, STPRefereeCommandPlaySelectionTestWithPos
 
 class STPRefereeCommandPlaySelectionTest
     : public ::testing::Test,
-      public ::testing::WithParamInterface<std::tuple<RefereeCommand, Ball>>
+      public ::testing::WithParamInterface<RefereeCommand>
 {
    public:
     STPRefereeCommandPlaySelectionTest()
@@ -221,18 +221,18 @@ class STPRefereeCommandPlaySelectionTest
 
 TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_commands)
 {
-    RefereeCommand ref_cmd = std::get<0>(GetParam());
-    Ball ball              = std::get<1>(GetParam());
+    RefereeCommand ref_cmd = GetParam();
 
     world.updateRefereeCommand(ref_cmd);
-    world.updateGameStateBall(ball);
+    world.updateGameStateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
+
     try
     {
         auto play_ptr = stp.calculateNewPlay(world);
     }
     catch (...)
     {
-        FAIL() << "No play for game state " << std::get<0>(GetParam());
+        FAIL() << "No play for game state " << GetParam();
     }
 }
 
@@ -244,29 +244,9 @@ TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_c
 INSTANTIATE_TEST_CASE_P(
     AllRefboxGameStates, STPRefereeCommandPlaySelectionTest,
     ::testing::Values(
-        std::make_tuple(RefereeCommand::HALT,
-                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::STOP,
-                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::FORCE_START,
-                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::PREPARE_KICKOFF_US,
-                        Ball(Point(0, 0), Vector(1, 0), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::PREPARE_KICKOFF_THEM,
-                        Ball(Point(0, 0), Vector(-1, 0), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::PREPARE_PENALTY_US,
-                        Ball(Point(2.7, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM,
-                        Ball(Point(-2.7, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::DIRECT_FREE_US,
-                        Ball(Point(-4.3, -2.8), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::DIRECT_FREE_THEM,
-                        Ball(Point(4.3, 2.8), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_US,
-                        Ball(Point(-2, 2.8), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::INDIRECT_FREE_THEM,
-                        Ball(Point(2, -2.8), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::TIMEOUT_US,
-                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0))),
-        std::make_tuple(RefereeCommand::TIMEOUT_THEM,
-                        Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0)))));
+        RefereeCommand::HALT, RefereeCommand::STOP, RefereeCommand::FORCE_START,
+        RefereeCommand::PREPARE_KICKOFF_US, RefereeCommand::PREPARE_KICKOFF_THEM,
+        RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_THEM,
+        RefereeCommand::DIRECT_FREE_US, RefereeCommand::DIRECT_FREE_THEM,
+        RefereeCommand::INDIRECT_FREE_US, RefereeCommand::INDIRECT_FREE_THEM,
+        RefereeCommand::TIMEOUT_US, RefereeCommand::TIMEOUT_THEM));
