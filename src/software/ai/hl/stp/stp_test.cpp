@@ -168,7 +168,7 @@ TEST_F(STPTest, test_get_play_info)
         "Robot 0  -  StopTestTactic", "Robot 1  -  StopTestTactic"};
     expected_play_info = PlayInfo(expected_referee_command, expected_play_name,
                                   expected_robot_tactic_assignment);
-    EXPECT_EQ(play_info.getRefboxGameStateName(), expected_refbox_game_state);
+    EXPECT_EQ(play_info.getRefereeCommandName(), expected_referee_command);
     EXPECT_EQ(play_info.getPlayName(), expected_play_name);
     EXPECT_EQ(play_info, expected_play_info);
 }
