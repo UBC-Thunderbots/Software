@@ -221,9 +221,7 @@ class STPRefereeCommandPlaySelectionTest
 
 TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_commands)
 {
-    RefereeCommand ref_cmd = GetParam();
-
-    world.updateRefereeCommand(ref_cmd);
+    world.updateRefereeCommand(GetParam());
     world.updateGameStateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
 
     try
