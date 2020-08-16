@@ -6,7 +6,7 @@
 
 /**
  * A lightweight datatype used to input new data into the filter.
- * We do this rather than taking the SSL_DetectionRobot data directly
+ * We do this rather than taking the SSLProto::SSL_DetectionRobot data directly
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */
@@ -26,7 +26,7 @@ struct RobotDetection
 
 /**
  * A lightweight datatype used to input new data into the filter.
- * We do this rather than taking the SSL_DetectionBall directly
+ * We do this rather than taking the SSLProto::SSL_DetectionBall directly
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */

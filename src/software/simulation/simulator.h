@@ -165,13 +165,13 @@ class Simulator
     World getWorld() const;
 
     /**
-     * Returns an SSL_WrapperPacket representing the most recent state
+     * Returns an SSLProto::SSL_WrapperPacket representing the most recent state
      * of the simulation
      *
-     * @return an SSL_WrapperPacket representing the most recent state
+     * @return an SSLProto::SSL_WrapperPacket representing the most recent state
      * of the simulation
      */
-    std::unique_ptr<SSL_WrapperPacket> getSSLWrapperPacket() const;
+    std::unique_ptr<SSLProto::SSL_WrapperPacket> getSSLWrapperPacket() const;
 
     /**
      * Returns the field in the simulation

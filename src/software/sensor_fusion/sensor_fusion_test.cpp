@@ -24,10 +24,10 @@ class SensorFusionTest : public ::testing::Test
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart())
     {
-        config->mutableOverrideRefboxFriendlyTeamColor()->setValue(true);
+        config->mutableOverrideGameControllerFriendlyTeamColor()->setValue(true);
         config->mutableFriendlyColorYellow()->setValue(true);
 
-        config->mutableOverrideRefboxDefendingSide()->setValue(true);
+        config->mutableOverrideGameControllerDefendingSide()->setValue(true);
         config->mutableDefendingPositiveSide()->setValue(false);
     }
 
@@ -37,13 +37,13 @@ class SensorFusionTest : public ::testing::Test
     std::vector<RobotStateWithId> blue_robot_states;
     BallState ball_state;
     Timestamp current_time;
-    std::unique_ptr<SSL_GeometryData> geom_data;
+    std::unique_ptr<SSLProto::SSL_GeometryData> geom_data;
     // world associated with geom_data and detection_frame only
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
-    std::unique_ptr<SSL_Referee> referee_indirect_yellow;
-    std::unique_ptr<SSL_Referee> referee_indirect_blue;
-    std::unique_ptr<SSL_Referee> referee_normal_start;
+    std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
+    std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
+    std::unique_ptr<SSLProto::Referee> referee_normal_start;
 
     BallState initBallState()
     {
@@ -114,7 +114,7 @@ class SensorFusionTest : public ::testing::Test
         };
     }
 
-    std::unique_ptr<SSL_DetectionFrame> initDetectionFrame()
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> initDetectionFrame()
     {
         const uint32_t camera_id    = 0;
         const uint32_t frame_number = 40391;
@@ -124,7 +124,7 @@ class SensorFusionTest : public ::testing::Test
                                        blue_robot_states);
     }
 
-    std::unique_ptr<SSL_GeometryData> initSSLDivBGeomData()
+    std::unique_ptr<SSLProto::SSL_GeometryData> initSSLDivBGeomData()
     {
         Field field           = Field::createSSLDivisionBField();
         const float thickness = 0.005f;
@@ -213,24 +213,24 @@ class SensorFusionTest : public ::testing::Test
         return std::move(robot_msg);
     }
 
-    std::unique_ptr<SSL_Referee> initRefereeIndirectYellow()
+    std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()
     {
-        auto ref_msg = std::make_unique<SSL_Referee>();
-        ref_msg->set_command(SSL_Referee_Command_INDIRECT_FREE_YELLOW);
+        auto ref_msg = std::make_unique<SSLProto::Referee>();
+        ref_msg->set_command(SSLProto::Referee_Command_INDIRECT_FREE_YELLOW);
         return ref_msg;
     }
 
-    std::unique_ptr<SSL_Referee> initRefereeIndirectBlue()
+    std::unique_ptr<SSLProto::Referee> initRefereeIndirectBlue()
     {
-        auto ref_msg = std::make_unique<SSL_Referee>();
-        ref_msg->set_command(SSL_Referee_Command_INDIRECT_FREE_BLUE);
+        auto ref_msg = std::make_unique<SSLProto::Referee>();
+        ref_msg->set_command(SSLProto::Referee_Command_INDIRECT_FREE_BLUE);
         return ref_msg;
     }
 
-    std::unique_ptr<SSL_Referee> initRefereeNormalStart()
+    std::unique_ptr<SSLProto::Referee> initRefereeNormalStart()
     {
-        auto ref_msg = std::make_unique<SSL_Referee>();
-        ref_msg->set_command(SSL_Referee_Command_NORMAL_START);
+        auto ref_msg = std::make_unique<SSLProto::Referee>();
+        ref_msg->set_command(SSLProto::Referee_Command_NORMAL_START);
         return ref_msg;
     }
 };
@@ -239,7 +239,7 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet = createSSLWrapperPacket(
-        std::move(geom_data), std::unique_ptr<SSL_DetectionFrame>());
+        std::move(geom_data), std::unique_ptr<SSLProto::SSL_DetectionFrame>());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -250,7 +250,7 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::unique_ptr<SSL_GeometryData>(), initDetectionFrame());
+        createSSLWrapperPacket(std::unique_ptr<SSLProto::SSL_GeometryData>(), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
@@ -333,23 +333,23 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time
 TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 {
     GameState expected_1;
-    expected_1.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_US);
+    expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
 
     GameState expected_2 = expected_1;
-    expected_2.updateRefboxGameState(RefboxGameState::NORMAL_START);
+    expected_2.updateRefereeCommand(RefereeCommand::NORMAL_START);
 
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
-    *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_yellow;
+    *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
+    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_yellow;
     sensor_fusion.updateWorld(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
     SensorProto sensor_msg_2;
-    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
+    *(sensor_msg_2.mutable_ssl_referee_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_2, result_2.gameState());
@@ -358,23 +358,23 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 TEST_F(SensorFusionTest, test_referee_blue_then_normal)
 {
     GameState expected_1;
-    expected_1.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_THEM);
+    expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_THEM);
 
     GameState expected_2 = expected_1;
-    expected_2.updateRefboxGameState(RefboxGameState::NORMAL_START);
+    expected_2.updateRefereeCommand(RefereeCommand::NORMAL_START);
 
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
-    *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg_1.mutable_ssl_refbox_msg()) = *referee_indirect_blue;
+    *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
+    *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_blue;
     sensor_fusion.updateWorld(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
     SensorProto sensor_msg_2;
-    *(sensor_msg_2.mutable_ssl_refbox_msg()) = *referee_normal_start;
+    *(sensor_msg_2.mutable_ssl_referee_msg()) = *referee_normal_start;
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_2, result_2.gameState());

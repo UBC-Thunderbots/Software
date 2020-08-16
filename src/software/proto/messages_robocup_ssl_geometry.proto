@@ -1,4 +1,7 @@
 syntax = "proto2";
+
+package SSLProto;
+
 // A 2D float vector.
 message Vector2f
 {
