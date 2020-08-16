@@ -263,3 +263,16 @@ std::weak_ptr<PhysicsRobot> PhysicsWorld::getRobotAtPosition(const Point& positi
 
     return result;
 }
+
+void PhysicsWorld::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
+    if (auto r = robot.lock())
+    {
+        yellow_physics_robots.erase(
+            std::remove(yellow_physics_robots.begin(), yellow_physics_robots.end(), r),
+            yellow_physics_robots.end());
+        blue_physics_robots.erase(
+            std::remove(blue_physics_robots.begin(), blue_physics_robots.end(), r),
+            blue_physics_robots.end());
+    }
+}
