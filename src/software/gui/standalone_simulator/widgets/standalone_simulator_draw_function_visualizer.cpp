@@ -8,6 +8,8 @@ StandaloneSimulatorDrawFunctionVisualizer::StandaloneSimulatorDrawFunctionVisual
     QWidget* parent)
     : DrawFunctionVisualizer(parent)
 {
+    // Let mouseMoveEvents be triggered even if a mouse button is not pressed
+    this->setMouseTracking(true);
 }
 
 void StandaloneSimulatorDrawFunctionVisualizer::setStandaloneSimulator(
@@ -31,6 +33,7 @@ void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* eve
     }
     else
     {
+        robot.reset();
         DrawFunctionVisualizer::mousePressEvent(event);
     }
 }
@@ -65,10 +68,15 @@ void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEve
                    [&]() { standalone_simulator->addYellowRobot(point_in_scene); });
     menu.addAction("Add Blue Robot Here",
                    [&]() { standalone_simulator->addBlueRobot(point_in_scene); });
-    if (!robot_under_cursor.expired())
+    if (auto physics_robot = robot_under_cursor.lock())
     {
+        menu.addAction("Move Robot",
+                       [&](){
+                           robot = robot_under_cursor;
+                       });
         menu.addAction("Remove Robot",
                        [&]() { standalone_simulator->removeRobot(robot_under_cursor); });
+
     }
 
     menu.exec(event->globalPos());
