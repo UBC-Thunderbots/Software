@@ -23,6 +23,9 @@ jobs:
         - bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
         - bazel build --cpu=stm32f4 //firmware/boards/legacy_robot_stm32f4:bin 
         - bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin 
+    - name: "Check for Firmware Memory Leaks"
+      script:
+        - ./ci_scripts/check_firmware_memory_leak.sh
     - name: "Check Formatting"
       script:
         - ./formatting_scripts/check_formatting_ci.sh
