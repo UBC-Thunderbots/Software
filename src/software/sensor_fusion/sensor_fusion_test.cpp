@@ -249,8 +249,8 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 {
     SensorProto sensor_msg;
-    auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::unique_ptr<SSLProto::SSL_GeometryData>(), initDetectionFrame());
+    auto ssl_wrapper_packet = createSSLWrapperPacket(
+        std::unique_ptr<SSLProto::SSL_GeometryData>(), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
