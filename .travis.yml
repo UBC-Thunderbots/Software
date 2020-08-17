@@ -22,20 +22,12 @@ jobs:
         # Only print the first 100 lines of the output of the code coverage upload script
         # so we don't overflow the Travis CI logs
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | head -n100
-    - name: "Build, Test, and Run Coverage (SimulatedTests)"
+    - name: "Build and Test (SimulatedTests)"
       script:
         - cd src
         # Run tests and collect coverage
         - >
-          bazel coverage //software/simulated_tests/...   \
-            --compilation_mode=fastbuild                  \
-            --verbose_test_summary                        \
-            --instrumentation_filter=//...                \
-            --test_output=errors
-        # Collect Code Coverage Results
-        # Only print the first 100 lines of the output of the code coverage upload script
-        # so we don't overflow the Travis CI logs
-        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | head -n100
+          bazel test //software/simulated_tests/...
     - name: "Build Firmware Board Targets"
       script:
         - cd src
