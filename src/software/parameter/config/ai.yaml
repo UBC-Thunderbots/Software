@@ -156,7 +156,7 @@ AIConfig:
     RobotObstacleInflationFactor:
       min: 0
       max: 10
-      default: 1.3
+      default: 2.0167
       type: "double"
       description: "Factor for robot obstacle size"
 

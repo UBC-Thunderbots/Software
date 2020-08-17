@@ -19,8 +19,11 @@ ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isPlaying() &&
-           teamHasPossession(world, world.friendlyTeam());
+    // NOTE: We do not currently use this play, as passing is generally superior. However
+    // we keep it around and
+    //       maintain it so as to have a backup if passing become unreliable for whatever
+    //       reason
+    return false;
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const

@@ -39,31 +39,27 @@ class InterceptBallAction : public Action
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     /**
-     * Determines the best place to intercept the ball and move the robot to that
-     * position.
+     * Moves the robot to intercept a slow moving ball by running into
+     * it with the dribbler and bringing it to a stop.
      *
-     * @param yield The coroutine to yield to
-     * @param closest_point_on_ball_trajectory The closest point on the ball's trajectory
-     * to the robot's current position
+     * @param yield The coroutine for the action
      */
-    void moveToInterceptPosition(IntentCoroutine::push_type& yield,
-                                 Point closest_point_on_ball_trajectory);
+    void interceptSlowBall(IntentCoroutine::push_type& yield);
 
     /**
-     * Returns the point at which the ball would leave the field given its current
-     * trajectory. This function assumes the ball's current position is within the field.
-     * If it is not, an std::nullopt is returned.
+     * Moves the robot to intercept a fast moving ball by predicting its future
+     * location and moving there to catch it.
      *
-     * @param field The field
-     * @param ball The ball
-     * @return An optional containing the point at which the ball would leave the field.
-     * If the ball's position is not within the field, std::nullopt is returned
+     * @param yield The coroutine for the action
      */
-    std::optional<Point> getPointBallLeavesField(const Field& field, const Ball& ball);
+    void interceptFastBall(IntentCoroutine::push_type& yield);
 
-    const double BALL_MOVING_SLOW_SPEED_THRESHOLD              = 0.3;
-    const double ROBOT_CLOSE_TO_BALL_TRAJECTORY_LINE_THRESHOLD = 0.02;
-    const double FINAL_SPEED_AT_SLOW_BALL                      = 0.3;
+    const double BALL_MOVING_SLOW_SPEED_THRESHOLD     = 0.3;
+    const double BALL_CLOSE_TO_DRIBBLER_THRESHOLD     = 0.2 + BALL_MAX_RADIUS_METERS;
+    const double SIMILAR_VELOCITY_MAGNITUDE_THRESHOLD = 0.05;
+    const Angle SIMILAR_VELOCITY_ANGLE_THRESHOLD      = Angle::fromDegrees(10);
+    const double ROBOT_STOPPED_SPEED_M_PER_S          = 0.03;
+    const double INTERCEPT_POSITION_SEARCH_INTERVAL   = 0.1;
 
     // Action parameters
     Field field;
