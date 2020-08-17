@@ -8,11 +8,28 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "constructor_arg_generic_factory",
+    hdrs = [
+        "constructor_arg_generic_factory.h",
+        "constructor_arg_generic_factory.tpp",
+    ],
+)
+
 cc_test(
     name = "generic_factory_test",
     srcs = ["generic_factory_test.cpp"],
     deps = [
         ":generic_factory",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "constructor_arg_generic_factory_test",
+    srcs = ["constructor_arg_generic_factory_test.cpp"],
+    deps = [
+        ":constructor_arg_generic_factory",
         "@gtest//:gtest_main",
     ],
 )

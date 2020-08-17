@@ -10,22 +10,22 @@ class testGeneric
 {
 };
 
-class testGenericA : public testGeneric
+class testGenericStringArg : public testGeneric
 {
    public:
     static const std::string name;
 };
-const std::string testGenericA::name = "A";
+const std::string testGenericStringArg::name = "A";
 
-class testGenericB : public testGeneric
+class testGenericIntArg : public testGeneric
 {
    public:
     static const std::string name;
 };
-const std::string testGenericB::name = "B";
+const std::string testGenericIntArg::name = "B";
 
-static TGenericFactory<std::string, testGeneric, testGenericA> testFactoryA;
-static TGenericFactory<std::string, testGeneric, testGenericB> testFactoryB;
+static TGenericFactory<std::string, testGeneric, testGenericStringArg> testFactoryA;
+static TGenericFactory<std::string, testGeneric, testGenericIntArg> testFactoryB;
 
 
 TEST(GenericFactoryTest, test_create_generic_with_invalid_name)

@@ -1,6 +1,6 @@
 #include "replay_backend.h"
 
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/design_patterns/constructor_arg_generic_factory.h"
 
 const std::string ReplayBackend::name = "replay";
 
@@ -43,4 +43,5 @@ void ReplayBackend::continuouslyPullFromReplayFiles()
 }
 
 // Register this backend in the genericFactory
-static TGenericFactory<std::string, Backend, ReplayBackend> factory;
+static TConstructorArgGenericFactory<std::string, Backend, ReplayBackend,
+std::shared_ptr<const ReplayBackendConfig>> factory;
