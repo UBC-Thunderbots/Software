@@ -327,8 +327,12 @@ class PassGenerator
 
     // What type of pass we're trying to generate
     PassType pass_type;
+
     // The mutex for the in_destructor flag
     std::mutex in_destructor_mutex;
+
+    // mutex to protect fields in the pass generator
+    std::mutex pass_generator_mutex;
 
     // This flag is used to indicate that we are in the destructor. We use this to
     // communicate with pass_generation_thread that it is
