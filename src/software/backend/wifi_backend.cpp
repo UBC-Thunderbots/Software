@@ -5,7 +5,7 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/message_translation/defending_side.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/design_patterns/constructor_arg_generic_factory.h"
 
 WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config,
                          std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
@@ -69,4 +69,5 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
 }
 
 // Register this backend in the genericFactory
-static TGenericFactory<std::string, Backend, WifiBackend> factory;
+static TConstructorArgGenericFactory<std::string, Backend, WifiBackend,
+std::shared_ptr<const NetworkConfig>> factory;
