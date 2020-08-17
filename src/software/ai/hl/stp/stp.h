@@ -207,7 +207,7 @@ class STP : public HL
     std::function<std::unique_ptr<Play>()> default_play_constructor;
     // The Play that is currently running
     std::unique_ptr<Play> current_play;
-    std::optional<std::vector<std::shared_ptr<Tactic>>> current_tactics;
+    std::vector<std::shared_ptr<Tactic>> current_tactics;
     // The random number generator
     std::mt19937 random_number_generator;
     std::shared_ptr<const AIControlConfig> control_config;

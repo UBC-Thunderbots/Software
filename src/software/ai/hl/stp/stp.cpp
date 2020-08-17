@@ -116,46 +116,43 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     current_tactics = current_play->getTactics(world);
 
     std::vector<std::unique_ptr<Intent>> intents;
-    if (current_tactics)
+    assignRobotsToTactics(world, current_tactics);
+
+    ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
+    TacticWorldParamsUpdateVisitor tactic_world_params_update_visitor(world);
+
+    for (const std::shared_ptr<Tactic>& tactic : current_tactics)
     {
-        assignRobotsToTactics(world, *current_tactics);
+        tactic->accept(tactic_world_params_update_visitor);
 
-        ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
-        TacticWorldParamsUpdateVisitor tactic_world_params_update_visitor(world);
-
-        for (const std::shared_ptr<Tactic>& tactic : *current_tactics)
+        // Try to get an intent from the tactic
+        std::shared_ptr<Action> action = tactic->getNextAction();
+        std::unique_ptr<Intent> intent;
+        if (action)
         {
-            tactic->accept(tactic_world_params_update_visitor);
+            action->accept(action_world_params_update_visitor);
+            intent = action->getNextIntent();
+        }
 
-            // Try to get an intent from the tactic
-            std::shared_ptr<Action> action = tactic->getNextAction();
-            std::unique_ptr<Intent> intent;
-            if (action)
-            {
-                action->accept(action_world_params_update_visitor);
-                intent = action->getNextIntent();
-            }
+        if (intent)
+        {
+            auto motion_constraints = motion_constraint_manager.getMotionConstraints(
+                current_game_state, *tactic);
+            intent->setMotionConstraints(motion_constraints);
 
-            if (intent)
-            {
-                auto motion_constraints = motion_constraint_manager.getMotionConstraints(
-                    current_game_state, *tactic);
-                intent->setMotionConstraints(motion_constraints);
-
-                intents.emplace_back(std::move(intent));
-            }
-            else if (tactic->getAssignedRobot())
-            {
-                // If we couldn't get an intent, we send the robot a StopIntent so
-                // it doesn't do anything crazy until it starts running a new Tactic
-                intents.emplace_back(std::make_unique<StopIntent>(
-                    tactic->getAssignedRobot()->id(), false, 0));
-            }
-            else
-            {
-                LOG(WARNING) << "Tried to run a tactic that didn't yield an Intent "
-                             << "and did not have a robot assigned!";
-            }
+            intents.emplace_back(std::move(intent));
+        }
+        else if (tactic->getAssignedRobot())
+        {
+            // If we couldn't get an intent, we send the robot a StopIntent so
+            // it doesn't do anything crazy until it starts running a new Tactic
+            intents.emplace_back(
+                std::make_unique<StopIntent>(tactic->getAssignedRobot()->id(), false, 0));
+        }
+        else
+        {
+            LOG(WARNING) << "Tried to run a tactic that didn't yield an Intent "
+                         << "and did not have a robot assigned!";
         }
     }
 
@@ -361,7 +358,7 @@ PlayInfo STP::getPlayInfo()
     // Sort the tactics by the id of the robot they are assigned to, so we can report
     // the tactics in order or robot id. This makes it much easier to read if tactics
     // or robots change, since the order of the robots won't change
-    if (current_play && current_tactics)
+    if (current_play)
     {
         auto compare_tactic_by_robot_id = [](auto t1, auto t2) {
             if (t1->getAssignedRobot() && t2->getAssignedRobot())
@@ -381,7 +378,7 @@ PlayInfo STP::getPlayInfo()
                 return true;
             }
         };
-        auto tactics = *current_tactics;
+        auto tactics = current_tactics;
         std::sort(tactics.begin(), tactics.end(), compare_tactic_by_robot_id);
 
         for (const auto& tactic : tactics)
