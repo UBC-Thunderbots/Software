@@ -50,25 +50,37 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
 
     TbotsProto_PrimitiveSet nanopb_primitive_set =
         createNanoPbPrimitiveSet(*google_primitive_set);
-    auto nanopb_primitive_1 = nanopb_primitive_set.robot_primitives[0].value;
-    EXPECT_EQ(nanopb_primitive_set.robot_primitives[0].key, 0);
-    ASSERT_EQ(nanopb_primitive_1.which_primitive, TbotsProto_Primitive_move_tag);
-    EXPECT_EQ(nanopb_primitive_1.primitive.move.parameter1, 1000.0f);
-    EXPECT_EQ(nanopb_primitive_1.primitive.move.parameter2, 2000.0f);
-    EXPECT_EQ(nanopb_primitive_1.primitive.move.parameter3,
-              static_cast<float>(M_PI * 100));
-    EXPECT_EQ(nanopb_primitive_1.primitive.move.parameter4, 100000.0f);
-    EXPECT_EQ(nanopb_primitive_1.primitive.move.extra_bits, 0x04 | 0x02);
-    EXPECT_EQ(nanopb_primitive_1.primitive.move.slow, true);
 
-    EXPECT_EQ(nanopb_primitive_set.robot_primitives[1].key, 2);
-    auto nanopb_primitive_2 = nanopb_primitive_set.robot_primitives[1].value;
-    ASSERT_EQ(nanopb_primitive_2.which_primitive, TbotsProto_Primitive_move_tag);
-    EXPECT_EQ(nanopb_primitive_2.primitive.move.parameter1, 2000.0f);
-    EXPECT_EQ(nanopb_primitive_2.primitive.move.parameter2, 4000.0f);
-    EXPECT_EQ(nanopb_primitive_2.primitive.move.parameter3,
-              static_cast<float>(M_PI * 100));
-    EXPECT_EQ(nanopb_primitive_2.primitive.move.parameter4, 50000.0f);
-    EXPECT_EQ(nanopb_primitive_2.primitive.move.extra_bits, 0x04 | 0x02);
-    EXPECT_EQ(nanopb_primitive_2.primitive.move.slow, false);
+    // Test below assumes that map is of size 2
+    ASSERT_EQ(2, nanopb_primitive_set.robot_primitives_count);
+
+    for (pb_size_t i = 0; i < nanopb_primitive_set.robot_primitives_count; i++)
+    {
+        auto nanopb_primitive = nanopb_primitive_set.robot_primitives[i].value;
+        if (nanopb_primitive_set.robot_primitives[i].key == 0)
+        {
+            EXPECT_EQ(nanopb_primitive_set.robot_primitives[i].key, 0);
+            ASSERT_EQ(nanopb_primitive.which_primitive, TbotsProto_Primitive_move_tag);
+            EXPECT_EQ(nanopb_primitive.primitive.move.parameter1, 1000.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.parameter2, 2000.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.parameter3,
+                      static_cast<float>(M_PI * 100));
+            EXPECT_EQ(nanopb_primitive.primitive.move.parameter4, 100000.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.extra_bits, 0x04 | 0x02);
+            EXPECT_EQ(nanopb_primitive.primitive.move.slow, true);
+        }
+        else
+        {
+            // Only other possible key is 2
+            ASSERT_EQ(nanopb_primitive_set.robot_primitives[i].key, 2);
+            ASSERT_EQ(nanopb_primitive.which_primitive, TbotsProto_Primitive_move_tag);
+            EXPECT_EQ(nanopb_primitive.primitive.move.parameter1, 2000.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.parameter2, 4000.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.parameter3,
+                      static_cast<float>(M_PI * 100));
+            EXPECT_EQ(nanopb_primitive.primitive.move.parameter4, 50000.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.extra_bits, 0x04 | 0x02);
+            EXPECT_EQ(nanopb_primitive.primitive.move.slow, false);
+        }
+    }
 }
