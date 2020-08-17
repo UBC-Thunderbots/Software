@@ -108,12 +108,14 @@ class STP : public HL
      *
      * @param world The state of the world, which contains the friendly Robots that will
      * be assigned to each tactic
-     * @param tactics The list of tactics that should be assigned a robot
+     * @param [in/out] tactics The list of tactics that should be assigned a robot. Note
+     * that this function modifies non_goalie_tactics to make the correct assignments,
+     * because we can't pass a vector of pointer by value
      *
      * @return The list of tactics that were assigned to the robots
      */
-    std::vector<std::shared_ptr<Tactic>> assignRobotsToTactics(
-        const World &world, std::vector<std::shared_ptr<Tactic>> tactics) const;
+    void assignRobotsToTactics(const World &world,
+                               std::vector<std::shared_ptr<Tactic>> &tactics) const;
 
     /**
      * Given the state of the world, returns a unique_ptr to the Play that should be run
@@ -172,6 +174,33 @@ class STP : public HL
      * @return The vector of intents that should be run right now to execute the play
      */
     std::vector<std::unique_ptr<Intent>> getIntentsFromCurrentPlay(const World &world);
+
+    /**
+     * Assigns non goalie robots to each non goalie tactic
+     *
+     * Some tactics may not be assigned a robot, depending on if there is a robot
+     * capable of performing that tactic
+     *
+     * This will clear all assigned robots from all tactics
+     *
+     * The order of the given tactics determines their priority, with the tactics as the
+     * beginning of the vector being a higher priority than those at the end. The priority
+     * determines which tactics will NOT be assigned if there are not enough robots on the
+     * field to assign them all. For example, if a Play returned 6 Tactics but there were
+     * only 4 robots on the field at the time, only the first 4 Tactics in the vector
+     * would be assigned to robots and run.
+     *
+     * @param world The state of the world for calculating robot costs
+     * @param non_goalie_robots The non goalie robots to assign to tactics
+     * @param [in/out] non_goalie_tactics The list of tactics that should be assigned a
+     * robot. Note that this function modifies non_goalie_tactics to make the correct
+     * assignments, because we can't pass a vector of pointer by value
+     *
+     * @return The list of tactics that were assigned to the robots
+     */
+    void assignNonGoalieRobotsToTactics(
+        const World &world, const std::vector<Robot> &non_goalie_robots,
+        std::vector<std::shared_ptr<Tactic>> &non_goalie_tactics) const;
 
     // A function that constructs a Play that will be used if no other Plays are
     // applicable

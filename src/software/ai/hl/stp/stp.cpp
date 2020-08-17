@@ -118,13 +118,12 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     std::vector<std::unique_ptr<Intent>> intents;
     if (current_tactics)
     {
-        std::vector<std::shared_ptr<Tactic>> assigned_tactics =
-            assignRobotsToTactics(world, *current_tactics);
+        assignRobotsToTactics(world, *current_tactics);
 
         ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
         TacticWorldParamsUpdateVisitor tactic_world_params_update_visitor(world);
 
-        for (const std::shared_ptr<Tactic>& tactic : assigned_tactics)
+        for (const std::shared_ptr<Tactic>& tactic : *current_tactics)
         {
             tactic->accept(tactic_world_params_update_visitor);
 
@@ -169,17 +168,9 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return getIntentsFromCurrentPlay(world);
 }
 
-std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
-    const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
+void STP::assignRobotsToTactics(const World& world,
+                                std::vector<std::shared_ptr<Tactic>>& tactics) const
 {
-    // This functions optimizes the assignment of robots to tactics by minimizing
-    // the total cost of assignment using the Hungarian algorithm
-    // (also known as the Munkres algorithm)
-    // https://en.wikipedia.org/wiki/Hungarian_algorithm
-    //
-    // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
-    // algorithm that we use here
-
     auto friendly_team         = world.friendlyTeam();
     auto& friendly_team_robots = friendly_team.getAllRobots();
 
@@ -206,7 +197,7 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     }
 
     // Store goalie tactics, which will be added at the end
-    std::copy_if(tactics.begin(), tactics.end(), back_inserter(goalie_tactics),
+    std::copy_if(tactics.begin(), tactics.end(), std::back_inserter(goalie_tactics),
                  isGoalieTactic);
 
     // Discard all goalie tactics, since we have already assigned the goalie robot (if
@@ -214,31 +205,49 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     tactics.erase(std::remove_if(tactics.begin(), tactics.end(), isGoalieTactic),
                   tactics.end());
 
-    if (non_goalie_robots.size() < tactics.size())
+    assignNonGoalieRobotsToTactics(world, non_goalie_robots, tactics);
+
+    // Re-insert goalie tactics to returned tactics
+    tactics.insert(tactics.begin(), goalie_tactics.begin(), goalie_tactics.end());
+}
+
+void STP::assignNonGoalieRobotsToTactics(
+    const World& world, const std::vector<Robot>& non_goalie_robots,
+    std::vector<std::shared_ptr<Tactic>>& non_goalie_tactics) const
+{
+    // This functions optimizes the assignment of robots to tactics by minimizing
+    // the total cost of assignment using the Hungarian algorithm
+    // (also known as the Munkres algorithm)
+    // https://en.wikipedia.org/wiki/Hungarian_algorithm
+    //
+    // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
+    // algorithm that we use here
+
+    if (non_goalie_robots.size() < non_goalie_tactics.size())
     {
         // We do not have enough robots to assign all the tactics to. We "drop"
         // (aka don't assign) the tactics at the end of the vector since they are
         // considered lower priority
-        tactics.resize(non_goalie_robots.size());
+        non_goalie_tactics.resize(non_goalie_robots.size());
     }
     else
     {
         // Assign rest of robots with StopTactic
-        for (auto i = tactics.size(); i < non_goalie_robots.size(); i++)
+        for (auto i = non_goalie_tactics.size(); i < non_goalie_robots.size(); i++)
         {
-            tactics.push_back(std::make_shared<StopTactic>(false));
+            non_goalie_tactics.push_back(std::make_shared<StopTactic>(false));
         }
     }
 
     size_t num_rows = non_goalie_robots.size();
-    size_t num_cols = tactics.size();
+    size_t num_cols = non_goalie_tactics.size();
 
     // The Matrix constructor will assert if the rows and columns of the matrix are
     // not >= 1, so we perform that check first and return an empty vector of tactics.
     // This represents the cases where there are either no tactics or no robots
     if (num_rows == 0 || num_cols == 0)
     {
-        return tactics;
+        return;
     }
 
     // The rows of the matrix are the "workers" (the robots) and the columns are the
@@ -251,7 +260,7 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
         for (size_t col = 0; col < num_cols; col++)
         {
             Robot robot                     = non_goalie_robots.at(row);
-            std::shared_ptr<Tactic>& tactic = tactics.at(col);
+            std::shared_ptr<Tactic>& tactic = non_goalie_tactics.at(col);
             double robot_cost_for_tactic    = tactic->calculateRobotCost(robot, world);
 
             std::set<RobotCapability> required_capabilities =
@@ -296,16 +305,11 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
             auto val = matrix(row, col);
             if (val == 0)
             {
-                tactics.at(col)->updateRobot(non_goalie_robots.at(row));
+                non_goalie_tactics.at(col)->updateRobot(non_goalie_robots.at(row));
                 break;
             }
         }
     }
-
-    // Re-insert goalie tactics to returned tactics
-    tactics.insert(tactics.begin(), goalie_tactics.begin(), goalie_tactics.end());
-
-    return tactics;
 }
 
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
