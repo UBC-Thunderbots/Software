@@ -12,12 +12,13 @@ jobs:
         - cd src
         # Run tests and collect coverage
         - >
-          bazel coverage //software/...     \
+          bazel coverage //...     \
             --compilation_mode=fastbuild    \
             --verbose_test_summary          \
             --instrumentation_filter=//...  \
             --test_output=errors
         # Collect Code Coverage Results
+        - bash <(curl -s https://codecov.io/bash) -d -s bazel-testlogs/ | head -n3000
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
         # Build ARM Targets For Firmware
         - bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
