@@ -375,7 +375,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     // the packet
     camera_packet[0] = mask_vec;
 
-    std::lock_guard<std::mutex> lock(cam_mtx);
+    std::scoped_lock lock(cam_mtx);
 
     if (camera_transfers.size() >= 8)
     {
@@ -484,7 +484,7 @@ void MRFDongle::handle_camera_transfer_done(
     AsyncOperation<void> &op,
     std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
 {
-    std::lock_guard<std::mutex> lock(cam_mtx);
+    std::scoped_lock lock(cam_mtx);
     op.result();
     camera_transfers.erase(iter);
 }
