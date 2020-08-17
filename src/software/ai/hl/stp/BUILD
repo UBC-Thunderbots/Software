@@ -2,7 +2,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "stp",
-    srcs = ["stp.cpp"],
+    srcs = [
+        "stp.cpp",
+        "stp_impl.cpp",
+        "stp_impl.h",
+    ],
     hdrs = ["stp.h"],
     deps = [
         "//software/ai/hl",
