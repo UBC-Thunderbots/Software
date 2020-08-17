@@ -1,6 +1,17 @@
+#pragma once
+
 #include <cxxabi.h>
 
 #include <memory>
+
+/**
+ * Demangles typeid name
+ *
+ * @param mangled_name The mangled name to demangle
+ *
+ * @return the demangled string representation
+ */
+std::string demangle_typeid(const char* mangled_name);
 
 /**
  * MACRO to get typename of the object, i.e.
@@ -13,10 +24,4 @@
  *
  * @return the string representation of the object
  */
-template <class T>
-std::string TYPENAME(const T& object)
-{
-    std::unique_ptr<char, void (*)(void*)> demangled_name_ptr{
-        abi::__cxa_demangle(typeid(object).name(), NULL, NULL, NULL), std::free};
-    return std::string(demangled_name_ptr.get());
-}
+#define TYPENAME(object) (demangle_typeid(typeid(object).name()))
