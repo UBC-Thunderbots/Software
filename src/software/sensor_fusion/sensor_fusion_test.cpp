@@ -11,46 +11,69 @@ class SensorFusionTest : public ::testing::Test
 {
    public:
     SensorFusionTest()
-        : sensor_fusion(DynamicParameters->getSensorFusionConfig()),
+        : config(MutableDynamicParameters->getMutableSensorFusionConfig()),
+          sensor_fusion(config),
           yellow_robot_states(initYellowRobotStates()),
           blue_robot_states(initBlueRobotStates()),
           ball_state(Point(-1.2, 0), Vector(0.0, 0.0), 0.2),
           current_time(Timestamp::fromSeconds(8.03)),
           geom_data(initSSLDivBGeomData()),
-          detection_frame(initDetectionFrame()),
-          test_world(initWorld()),
           robot_status_msg_id_1(initRobotStatusId1()),
           robot_status_msg_id_2(initRobotStatusId2()),
           referee_indirect_yellow(initRefereeIndirectYellow()),
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart())
     {
+        config->mutableOverrideGameControllerFriendlyTeamColor()->setValue(true);
+        config->mutableFriendlyColorYellow()->setValue(true);
+
+        config->mutableOverrideGameControllerDefendingSide()->setValue(true);
+        config->mutableDefendingPositiveSide()->setValue(false);
     }
 
+    std::shared_ptr<SensorFusionConfig> config;
     SensorFusion sensor_fusion;
     std::vector<RobotStateWithId> yellow_robot_states;
     std::vector<RobotStateWithId> blue_robot_states;
     BallState ball_state;
     Timestamp current_time;
     std::unique_ptr<SSLProto::SSL_GeometryData> geom_data;
-    std::unique_ptr<SSLProto::SSL_DetectionFrame> detection_frame;
     // world associated with geom_data and detection_frame only
-    World test_world;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
     std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
     std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
 
-   private:
-    /**
-     * All private functions serve to initialize test variables
-     */
+    BallState initBallState()
+    {
+        return BallState(Point(-1.2, 0), Vector(0.0, 0.0), 0.2);
+    }
+
+    BallState initInvertedBallState()
+    {
+        return BallState(Point(1.2, 0), Vector(0.0, 0.0), 0.2);
+    }
+
     std::vector<RobotStateWithId> initYellowRobotStates()
     {
         RobotState yellow_robot_state1(Point(1, 0), Vector(0, 0), Angle::fromRadians(2),
                                        AngularVelocity::zero());
         RobotState yellow_robot_state2(Point(0, 0), Vector(0, 0), Angle::fromRadians(1),
+                                       AngularVelocity::zero());
+        return {
+            RobotStateWithId{.id = 1, .robot_state = yellow_robot_state1},
+            RobotStateWithId{.id = 2, .robot_state = yellow_robot_state2},
+        };
+    }
+
+    std::vector<RobotStateWithId> initInvertedYellowRobotStates()
+    {
+        RobotState yellow_robot_state1(Point(-1, 0), Vector(0, 0),
+                                       Angle::fromRadians(2) + Angle::half(),
+                                       AngularVelocity::zero());
+        RobotState yellow_robot_state2(Point(0, 0), Vector(0, 0),
+                                       Angle::fromRadians(1) + Angle::half(),
                                        AngularVelocity::zero());
         return {
             RobotStateWithId{.id = 1, .robot_state = yellow_robot_state1},
@@ -65,6 +88,24 @@ class SensorFusionTest : public ::testing::Test
         RobotState blue_robot_state2(Point(0, 0), Vector(0, 0), Angle::fromRadians(1.5),
                                      AngularVelocity::zero());
         RobotState blue_robot_state3(Point(-1, -1), Vector(0, 0), Angle::fromRadians(2.5),
+                                     AngularVelocity::zero());
+        return {
+            RobotStateWithId{.id = 1, .robot_state = blue_robot_state1},
+            RobotStateWithId{.id = 2, .robot_state = blue_robot_state2},
+            RobotStateWithId{.id = 3, .robot_state = blue_robot_state3},
+        };
+    }
+
+    std::vector<RobotStateWithId> initInvertedBlueRobotStates()
+    {
+        RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0),
+                                     Angle::fromRadians(0.5) + Angle::half(),
+                                     AngularVelocity::zero());
+        RobotState blue_robot_state2(Point(0, 0), Vector(0, 0),
+                                     Angle::fromRadians(1.5) + Angle::half(),
+                                     AngularVelocity::zero());
+        RobotState blue_robot_state3(Point(1, 1), Vector(0, 0),
+                                     Angle::fromRadians(2.5) + Angle::half(),
                                      AngularVelocity::zero());
         return {
             RobotStateWithId{.id = 1, .robot_state = blue_robot_state1},
@@ -93,12 +134,10 @@ class SensorFusionTest : public ::testing::Test
     World initWorld()
     {
         Field field(Field::createSSLDivisionBField());
-        Ball ball(TimestampedBallState(ball_state, current_time));
-        // TODO (Issue #960): Dependency inject config so that we don't have to implicitly
-        // assume that friendly is yellow
+        Ball ball(TimestampedBallState(initBallState(), current_time));
         Team friendly_team;
         std::vector<Robot> friendly_robots;
-        for (const auto &state : yellow_robot_states)
+        for (const auto &state : initYellowRobotStates())
         {
             friendly_robots.emplace_back(
                 state.id, TimestampedRobotState(state.robot_state, current_time));
@@ -106,7 +145,30 @@ class SensorFusionTest : public ::testing::Test
         friendly_team.updateRobots(friendly_robots);
         Team enemy_team;
         std::vector<Robot> enemy_robots;
-        for (const auto &state : blue_robot_states)
+        for (const auto &state : initBlueRobotStates())
+        {
+            enemy_robots.emplace_back(
+                state.id, TimestampedRobotState(state.robot_state, current_time));
+        }
+        enemy_team.updateRobots(enemy_robots);
+        return World(field, ball, friendly_team, enemy_team);
+    }
+
+    World initInvertedWorld()
+    {
+        Field field(Field::createSSLDivisionBField());
+        Ball ball(TimestampedBallState(initInvertedBallState(), current_time));
+        Team friendly_team;
+        std::vector<Robot> friendly_robots;
+        for (const auto &state : initInvertedYellowRobotStates())
+        {
+            friendly_robots.emplace_back(
+                state.id, TimestampedRobotState(state.robot_state, current_time));
+        }
+        friendly_team.updateRobots(friendly_robots);
+        Team enemy_team;
+        std::vector<Robot> enemy_robots;
+        for (const auto &state : initInvertedBlueRobotStates())
         {
             enemy_robots.emplace_back(
                 state.id, TimestampedRobotState(state.robot_state, current_time));
@@ -188,24 +250,38 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet = createSSLWrapperPacket(
-        std::unique_ptr<SSLProto::SSL_GeometryData>(), std::move(detection_frame));
+        std::unique_ptr<SSLProto::SSL_GeometryData>(), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
 }
 
+TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
+{
+    config->mutableDefendingPositiveSide()->setValue(true);
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
+    sensor_fusion.updateWorld(sensor_msg);
+    auto result = sensor_fusion.getWorld();
+    ASSERT_TRUE(result);
+    EXPECT_EQ(initInvertedWorld(), result);
+}
+
 TEST_F(SensorFusionTest, test_complete_wrapper_packet)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
     sensor_fusion.updateWorld(sensor_msg);
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result = *sensor_fusion.getWorld();
-    EXPECT_EQ(test_world, result);
+    EXPECT_EQ(initWorld(), result);
 }
 
 TEST_F(SensorFusionTest, test_robot_status_msg_packet)
@@ -220,7 +296,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_1_at_a_time
 {
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg_1.add_robot_status_msgs())  = *robot_status_msg_id_1;
     sensor_fusion.updateWorld(sensor_msg_1);
@@ -239,7 +315,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time
 {
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     sensor_fusion.updateWorld(sensor_msg_1);
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
@@ -256,8 +332,6 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time
 
 TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 {
-    // TODO (Issue #960): Dependency inject config so that we don't have to implicitly
-    // assume that friendly is yellow
     GameState expected_1;
     expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
 
@@ -266,7 +340,7 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
     *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_yellow;
@@ -283,8 +357,6 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
 
 TEST_F(SensorFusionTest, test_referee_blue_then_normal)
 {
-    // TODO (Issue #960): Dependency inject config so that we don't have to implicitly
-    // assume that friendly is yellow
     GameState expected_1;
     expected_1.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_THEM);
 
@@ -293,7 +365,7 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
 
     SensorProto sensor_msg_1;
     auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(geom_data), std::move(detection_frame));
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
     *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_blue;

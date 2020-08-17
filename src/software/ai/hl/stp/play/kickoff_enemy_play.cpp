@@ -25,7 +25,8 @@ bool KickoffEnemyPlay::isApplicable(const World &world) const
 
 bool KickoffEnemyPlay::invariantHolds(const World &world) const
 {
-    return !world.gameState().isPlaying();
+    return !world.gameState().isPlaying() &&
+           (!world.gameState().isStopped() || !world.gameState().isHalted());
 }
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,

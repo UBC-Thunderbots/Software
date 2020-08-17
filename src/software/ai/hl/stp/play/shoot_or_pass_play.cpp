@@ -31,7 +31,7 @@ bool ShootOrPassPlay::isApplicable(const World &world) const
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (!teamHasPossession(world, world.enemyTeam()) ||
+           (teamHasPossession(world, world.friendlyTeam()) ||
             teamPassInProgress(world, world.friendlyTeam()));
 }
 
@@ -175,7 +175,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                    << best_pass_and_score_so_far.rating;
 
         // Perform the pass and wait until the receiver is finished
-        auto passer   = std::make_shared<PasserTactic>(pass, world.ball(), false);
+        auto passer =
+            std::make_shared<PasserTactic>(pass, world.ball(), world.field(), false);
         auto receiver = std::make_shared<ReceiverTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
             false);
