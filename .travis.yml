@@ -12,30 +12,36 @@ jobs:
         - cd src
         # Run tests and collect coverage
         - >
-          bazel coverage                    \
-            --compilation_mode=fastbuild    \
-            --verbose_test_summary          \
-            --instrumentation_filter=//...  \
-            --test_output=errors            \
-            -- //... -//software/simulated_tests/...
+          bazel coverage                     \
+            --compilation_mode=fastbuild     \
+            --verbose_test_summary           \
+            --instrumentation_filter=//...   \
+            --test_output=errors             \
+            -- //software/... -//software/simulated_tests/...
         # Collect Code Coverage Results
-        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
+        # Only print the first 100 lines of the output of the code coverage upload script
+        # so we don't overflow the Travis CI logs
+        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | head -n100
     - name: "Build, Test, and Run Coverage on SimulatedTests"
       script:
         - cd src
         # Run tests and collect coverage
         - >
           bazel coverage //software/simulated_tests/...   \
-            --compilation_mode=fastbuild    \
-            --verbose_test_summary          \
-            --instrumentation_filter=//...  \
+            --compilation_mode=fastbuild                  \
+            --verbose_test_summary                        \
+            --instrumentation_filter=//...                \
             --test_output=errors
         # Collect Code Coverage Results
-        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | (head -n100 && tail -n100)
-    - name: "Build Firmware Targets"
+        # Only print the first 100 lines of the output of the code coverage upload script
+        # so we don't overflow the Travis CI logs
+        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | head -n100
+    - name: "Build and Test Firmware Targets"
       script:
         - cd src
         # Build ARM Targets For Firmware
+        - bazel test //firmware/...
+        - bazel test //firmware_new/...
         - bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
         - bazel build --cpu=stm32f4 //firmware/boards/legacy_robot_stm32f4:bin 
         - bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin 
