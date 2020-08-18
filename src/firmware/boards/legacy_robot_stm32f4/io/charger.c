@@ -172,6 +172,22 @@ void charger_mark_fired(void)
 }
 
 /**
+ * \brief Charge the capacitor.
+ */
+void charger_charge(void)
+{
+    charger_enable(true);
+}
+
+/**
+ * \brief Float the capacitor.
+ */
+void charger_float(void)
+{
+    charger_enable(false);
+}
+
+/**
  * \brief Enables or disables the charger.
  *
  * \param[in] enabled whether or not to charge the capacitor

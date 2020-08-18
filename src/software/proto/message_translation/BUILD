@@ -124,7 +124,7 @@ cc_library(
     deps = [
         "//software/geom:point",
         "//software/proto:ssl_cc_proto",
-        "//software/sensor_fusion:refbox_data",
+        "//software/world:game_state",
         "//software/world:team_colour",
     ],
 )
@@ -156,6 +156,30 @@ cc_test(
     srcs = ["proto_creator_primitive_visitor_test.cpp"],
     deps = [
         ":proto_creator_primitive_visitor",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "primitive_google_to_nanopb_converter",
+    srcs = ["primitive_google_to_nanopb_converter.cpp"],
+    hdrs = ["primitive_google_to_nanopb_converter.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//shared:constants",
+        "//shared/proto:tbots_cc_proto",
+        "//shared/proto:tbots_nanopb_proto",
+        "@nanopb",
+    ],
+)
+
+cc_test(
+    name = "primitive_google_to_nanopb_converter_test",
+    srcs = ["primitive_google_to_nanopb_converter_test.cpp"],
+    deps = [
+        "proto_creator_primitive_visitor",
+        ":primitive_google_to_nanopb_converter",
+        "//software/primitive:move_primitive",
         "@gtest//:gtest_main",
     ],
 )

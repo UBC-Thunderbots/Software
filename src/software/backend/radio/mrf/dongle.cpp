@@ -375,7 +375,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     // the packet
     camera_packet[0] = mask_vec;
 
-    std::lock_guard<std::mutex> lock(cam_mtx);
+    std::scoped_lock lock(cam_mtx);
 
     if (camera_transfers.size() >= 8)
     {
@@ -457,7 +457,8 @@ void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
 std::vector<uint8_t> MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
 {
     // Get the proto representation of the primitive
-    PrimitiveMsg prim_proto = ProtoCreatorPrimitiveVisitor().createPrimitiveMsg(*prim);
+    TbotsProto::Primitive prim_proto =
+        ProtoCreatorPrimitiveVisitor().createPrimitive(*prim);
 
     // Serialize the proto representation
     std::vector<uint8_t> serialized_proto(prim_proto.ByteSizeLong());
@@ -483,7 +484,7 @@ void MRFDongle::handle_camera_transfer_done(
     AsyncOperation<void> &op,
     std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
 {
-    std::lock_guard<std::mutex> lock(cam_mtx);
+    std::scoped_lock lock(cam_mtx);
     op.result();
     camera_transfers.erase(iter);
 }

@@ -10,7 +10,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       friendly_team(),
       enemy_team(),
       game_state(),
-      refbox_stage(std::nullopt),
+      referee_stage(std::nullopt),
       ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
@@ -29,9 +29,9 @@ std::optional<World> SensorFusion::getWorld() const
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
-        if (refbox_stage)
+        if (referee_stage)
         {
-            new_world.updateRefboxStage(*refbox_stage);
+            new_world.updateRefereeStage(*referee_stage);
         }
         return new_world;
     }
@@ -41,22 +41,22 @@ std::optional<World> SensorFusion::getWorld() const
     }
 }
 
-void SensorFusion::updateWorld(const SensorMsg &sensor_msg)
+void SensorFusion::updateWorld(const SensorProto &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {
         updateWorld(sensor_msg.ssl_vision_msg());
     }
 
-    if (sensor_msg.has_ssl_refbox_msg())
+    if (sensor_msg.has_ssl_referee_msg())
     {
-        updateWorld(sensor_msg.ssl_refbox_msg());
+        updateWorld(sensor_msg.ssl_referee_msg());
     }
 
     updateWorld(sensor_msg.robot_status_msgs());
 }
 
-void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
+void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 {
     if (packet.has_geometry())
     {
@@ -69,7 +69,7 @@ void SensorFusion::updateWorld(const SSL_WrapperPacket &packet)
     }
 }
 
-void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
+void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet)
 {
     field = createField(geometry_packet);
     if (!field)
@@ -80,19 +80,18 @@ void SensorFusion::updateWorld(const SSL_GeometryData &geometry_packet)
     }
 }
 
-void SensorFusion::updateWorld(const SSL_Referee &packet)
+void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
     std::scoped_lock game_state_lock(game_state_mutex);
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
-        game_state.updateRefboxGameState(
-            createRefboxGameState(packet, TeamColour::YELLOW));
+        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
     }
     else
     {
-        game_state.updateRefboxGameState(createRefboxGameState(packet, TeamColour::BLUE));
+        game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
     }
 
     if (game_state.isOurBallPlacement())
@@ -110,16 +109,16 @@ void SensorFusion::updateWorld(const SSL_Referee &packet)
         }
     }
 
-    refbox_stage = createRefboxStage(packet);
+    referee_stage = createRefereeStage(packet);
 }
 
 void SensorFusion::updateWorld(
-    const google::protobuf::RepeatedPtrField<RobotStatusMsg> &robot_status_msgs)
+    const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    // TODO (issue #1149): incorporate RobotStatusMsg into world and update world
+    // TODO (issue #1149): incorporate RobotStatus into world and update world
 }
 
-void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
+void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
@@ -129,15 +128,15 @@ void SensorFusion::updateWorld(const SSL_DetectionFrame &ssl_detection_frame)
         sensor_fusion_config->IgnoreInvalidCameraData()->value();
 
     // We invert the field side if we explicitly choose to override the values
-    // provided by refbox. The 'defending_positive_side' parameter dictates the side
-    // we are defending if we are overriding the value
+    // provided by the game controller. The 'defending_positive_side' parameter dictates
+    // the side we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
-    const bool override_refbox_defending_side =
-        sensor_fusion_config->OverrideRefboxDefendingSide()->value();
+    const bool override_game_controller_defending_side =
+        sensor_fusion_config->OverrideGameControllerDefendingSide()->value();
     const bool defending_positive_side =
         sensor_fusion_config->DefendingPositiveSide()->value();
     const bool should_invert_field =
-        override_refbox_defending_side && defending_positive_side;
+        override_game_controller_defending_side && defending_positive_side;
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960

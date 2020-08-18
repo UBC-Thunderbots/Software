@@ -25,7 +25,7 @@ TEST_F(StopPlayTest, test_stop_play)
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
     setAIPlay(StopPlay::name);
-    setRefboxGameState(RefboxGameState::STOP, RefboxGameState::STOP);
+    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

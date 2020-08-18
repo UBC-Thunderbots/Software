@@ -19,13 +19,13 @@
  * It is built such that when it is constructed, a thread is immediately started in
  * the background continuously optimizing/pruning/re-generating passes. As such, any
  * modifications to data in this class through a public interface *must* be managed
- * by mutexes. Generally in functions that touch data we use "std::lock_guard" to
- * take ownership of the mutex protecting that data for the duration of the function.
+ * by mutexes. Generally in functions that touch data we use "std::scoped_lock" to
+ * take ownership of the mutex protecting data for the duration of the function.
  *
  * == Making Changes/Additions ==
  * Whenever you change/add a function, you need to ask: "what data is this _directly_
  * touching?". If the function is touching anything internal to the class, you should
- * be getting a lock on the mutex for that data member for the duration of the
+ * be getting a lock on the pass_generator_mutex for the duration of the
  * function (see below for examples). Note the *directly* bit! If you are
  * changing/adding function "A", and you have it call function "B", if B touches
  * data, then B should be responsible for getting a lock on the data. If you acquire
@@ -278,22 +278,13 @@ class PassGenerator
     // background. This thread will run for the entire lifetime of the class
     std::thread pass_generation_thread;
 
-    // The mutex for the updated world
-    std::mutex updated_world_mutex;
-
     // This world is the most recently updated one. We use this variable to "buffer"
     // the most recently updated world so that the world stays the same for the
     // entirety of each optimization loop, which makes things easier to reason about
     World updated_world;
 
-    // The mutex for the world
-    std::mutex world_mutex;
-
     // This world is what is used in the optimization loop
     World world;
-
-    // The mutex for the passer robot ID
-    std::mutex passer_robot_id_mutex;
 
     // The id of the robot that is performing the pass. We want to ignore this robot
     std::optional<unsigned int> passer_robot_id;
@@ -304,20 +295,11 @@ class PassGenerator
     // The optimizer we're using to find passes
     GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
 
-    // The mutex for the passer_point
-    std::mutex passer_point_mutex;
-
     // The point we are passing from
     Point passer_point;
 
-    // The mutex for the passer_point
-    std::mutex best_known_pass_mutex;
-
     // The best pass we currently know about
     Pass best_known_pass;
-
-    // The mutex for the target region
-    std::mutex target_region_mutex;
 
     // The area that we want to pass to
     std::optional<Rectangle> target_region;
@@ -327,8 +309,12 @@ class PassGenerator
 
     // What type of pass we're trying to generate
     PassType pass_type;
+
     // The mutex for the in_destructor flag
     std::mutex in_destructor_mutex;
+
+    // mutex to protect fields in the pass generator
+    std::mutex pass_generator_mutex;
 
     // This flag is used to indicate that we are in the destructor. We use this to
     // communicate with pass_generation_thread that it is

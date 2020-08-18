@@ -75,7 +75,7 @@ namespace
                                     std::nullopt, false),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PasserTactic(pass, world.ball(), false),
+                new PasserTactic(pass, world.ball(), world.field(), false),
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new StopTactic(false), std::set<MotionConstraint>({}))};
@@ -127,43 +127,43 @@ TEST_P(CheckMotionConstraints, CycleStoppageOrThemGameStatesTest)
         correct_motion_constraints.erase(c);
     }
 
-    game_state.updateRefboxGameState(RefboxGameState::HALT);
+    game_state.updateRefereeCommand(RefereeCommand::HALT);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefereeCommand(RefereeCommand::STOP);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+    game_state.updateRefereeCommand(RefereeCommand::NORMAL_START);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::DIRECT_FREE_THEM);
+    game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_THEM);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_THEM);
+    game_state.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_THEM);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::TIMEOUT_US);
+    game_state.updateRefereeCommand(RefereeCommand::TIMEOUT_US);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::TIMEOUT_THEM);
+    game_state.updateRefereeCommand(RefereeCommand::TIMEOUT_THEM);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::GOAL_US);
+    game_state.updateRefereeCommand(RefereeCommand::GOAL_US);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::GOAL_THEM);
+    game_state.updateRefereeCommand(RefereeCommand::GOAL_THEM);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_THEM);
+    game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 }
@@ -177,19 +177,19 @@ TEST_P(CheckMotionConstraints, CycleGameStartOrUsGameStatesTest)
         correct_motion_constraints.erase(c);
     }
 
-    game_state.updateRefboxGameState(RefboxGameState::FORCE_START);
+    game_state.updateRefereeCommand(RefereeCommand::FORCE_START);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::DIRECT_FREE_US);
+    game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_US);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_US);
+    game_state.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_US);
+    game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 }
@@ -203,11 +203,11 @@ TEST_P(CheckMotionConstraints, CycleKickoffGameStatesTest)
         correct_motion_constraints.erase(c);
     }
 
-    game_state.updateRefboxGameState(RefboxGameState::PREPARE_KICKOFF_US);
+    game_state.updateRefereeCommand(RefereeCommand::PREPARE_KICKOFF_US);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 
-    game_state.updateRefboxGameState(RefboxGameState::PREPARE_KICKOFF_THEM);
+    game_state.updateRefereeCommand(RefereeCommand::PREPARE_KICKOFF_THEM);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 }
@@ -221,7 +221,7 @@ TEST_P(CheckMotionConstraints, CycleOurPenaltyGameStatesTest)
         correct_motion_constraints.erase(c);
     }
 
-    game_state.updateRefboxGameState(RefboxGameState::PREPARE_PENALTY_US);
+    game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_US);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 }
@@ -235,7 +235,7 @@ TEST_P(CheckMotionConstraints, CycleThemPenaltyGameStatesTest)
         correct_motion_constraints.erase(c);
     }
 
-    game_state.updateRefboxGameState(RefboxGameState::PREPARE_PENALTY_THEM);
+    game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_THEM);
     EXPECT_EQ(correct_motion_constraints,
               manager.getMotionConstraints(game_state, *GetParam().first));
 }

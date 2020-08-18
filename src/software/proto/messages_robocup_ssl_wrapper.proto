@@ -2,6 +2,8 @@ syntax = "proto2";
 import "software/proto/messages_robocup_ssl_detection.proto";
 import "software/proto/messages_robocup_ssl_geometry.proto";
 
+package SSLProto;
+
 message SSL_WrapperPacket
 {
     optional SSL_DetectionFrame detection = 1;

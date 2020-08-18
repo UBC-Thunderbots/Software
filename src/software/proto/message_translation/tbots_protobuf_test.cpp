@@ -8,41 +8,43 @@
 class TbotsProtobufTest : public ::testing::Test
 {
    public:
-    static void assertPointMessageEqual(const Point& point, const PointMsg& point_msg)
+    static void assertPointMessageEqual(const Point& point,
+                                        const TbotsProto::Point& point_msg)
     {
         EXPECT_NEAR(point_msg.x_meters(), point.x(), 1e-6);
         EXPECT_NEAR(point_msg.y_meters(), point.y(), 1e-6);
     }
 
-    static void assertAngleMessageEqual(const Angle& angle, const AngleMsg& angle_msg)
+    static void assertAngleMessageEqual(const Angle& angle,
+                                        const TbotsProto::Angle& angle_msg)
     {
         EXPECT_NEAR(angle_msg.radians(), angle.toRadians(), 1e-6);
     }
 
     static void assertAngularVelocityMessageEqual(
         const AngularVelocity& angular_velocity,
-        const AngularVelocityMsg& angular_velocity_msg)
+        const TbotsProto::AngularVelocity& angular_velocity_msg)
     {
         EXPECT_NEAR(angular_velocity_msg.radians_per_second(),
                     angular_velocity.toRadians(), 1e-6);
     }
 
     static void assertVectorMessageEqual(const Vector& vector,
-                                         const VectorMsg& vector_msg)
+                                         const TbotsProto::Vector& vector_msg)
     {
         EXPECT_NEAR(vector_msg.x_component_meters(), vector.x(), 1e-6);
         EXPECT_NEAR(vector_msg.y_component_meters(), vector.y(), 1e-6);
     }
 
-    static void assertBallStateMessageFromBall(const Ball& ball,
-                                               const BallStateMsg& ball_state_msg)
+    static void assertBallStateMessageFromBall(
+        const Ball& ball, const TbotsProto::BallState& ball_state_msg)
     {
         assertPointMessageEqual(ball.position(), ball_state_msg.global_position());
         assertVectorMessageEqual(ball.velocity(), ball_state_msg.global_velocity());
     }
 
-    static void assertRobotStateMessageFromRobot(const Robot& robot,
-                                                 const RobotStateMsg& robot_state_msg)
+    static void assertRobotStateMessageFromRobot(
+        const Robot& robot, const TbotsProto::RobotState& robot_state_msg)
     {
         assertPointMessageEqual(robot.position(), robot_state_msg.global_position());
         assertAngleMessageEqual(robot.orientation(),
@@ -52,7 +54,7 @@ class TbotsProtobufTest : public ::testing::Test
                                           robot_state_msg.global_angular_velocity());
     }
 
-    static void assertSaneTimestamp(const TimestampMsg& timestamp)
+    static void assertSaneTimestamp(const TbotsProto::Timestamp& timestamp)
     {
         // time will only move forward
         // we make sure the number that the timestamp is from the past
@@ -68,7 +70,7 @@ class TbotsProtobufTest : public ::testing::Test
 
 TEST(TbotsProtobufTest, timestamp_msg_test)
 {
-    auto timestamp_msg = createCurrentTimestampMsg();
+    auto timestamp_msg = createCurrentTimestamp();
     TbotsProtobufTest::assertSaneTimestamp(*timestamp_msg);
 }
 
@@ -81,7 +83,7 @@ TEST(TbotsProtobufTest, robot_state_msg_test)
 
     Robot robot(0, position, velocity, orientation, angular_velocity,
                 Timestamp::fromSeconds(0));
-    auto robot_state_msg = createRobotStateMsg(robot);
+    auto robot_state_msg = createRobotState(robot);
 
     TbotsProtobufTest::assertRobotStateMessageFromRobot(robot, *robot_state_msg);
 }
@@ -92,7 +94,7 @@ TEST(TbotsProtobufTest, ball_state_msg_test)
     auto velocity = Vector(4.20, 4.20);
 
     Ball ball(position, velocity, Timestamp::fromSeconds(0));
-    auto ball_state_msg = createBallStateMsg(ball);
+    auto ball_state_msg = createBallState(ball);
 
     TbotsProtobufTest::assertBallStateMessageFromBall(ball, *ball_state_msg);
 }
@@ -105,7 +107,7 @@ TEST(TbotsProtobufTest, vision_msg_test)
         {Point(4.20, 4.20), Point(4.20, 4.20), Point(4.20, 4.20), Point(4.20, 4.20)},
         Timestamp::fromSeconds(0));
 
-    auto vision_msg = createVisionMsg(world);
+    auto vision_msg = createVision(world);
 
     TbotsProtobufTest::assertBallStateMessageFromBall(world.ball(),
                                                       vision_msg->ball_state());

@@ -101,7 +101,7 @@ class SimulatorRobotSingleton
      */
     static void startNewPrimitiveOnCurrentSimulatorRobot(
         std::shared_ptr<FirmwareWorld_t> firmware_world,
-        const PrimitiveMsg& primitive_msg);
+        const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Runs the current primitive on the SimulatorRobot currently being controlled by this

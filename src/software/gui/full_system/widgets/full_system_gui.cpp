@@ -7,7 +7,7 @@ FullSystemGUI::FullSystemGUI(
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
-    std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer,
+    std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer,
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
     std::shared_ptr<ThunderbotsConfig> config)
     : QMainWindow(),
@@ -48,7 +48,7 @@ void FullSystemGUI::handleUpdate()
 {
     draw();
     updatePlayInfo();
-    updateSensorMsg();
+    updateSensorProto();
     updateDrawViewArea();
 }
 
@@ -78,13 +78,13 @@ void FullSystemGUI::updatePlayInfo()
     }
 }
 
-void FullSystemGUI::updateSensorMsg()
+void FullSystemGUI::updateSensorProto()
 {
     while (auto sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue())
     {
         for (const auto& robot_msg : sensor_msg->robot_status_msgs())
         {
-            main_widget->robot_status_table_widget->updateRobotStatusMsg(robot_msg);
+            main_widget->robot_status_table_widget->updateRobotStatus(robot_msg);
         }
     }
 }
