@@ -60,10 +60,9 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     boost::program_options::options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
                        "Help screen");
-    desc.add_options()(
-        "backend",
-        boost::program_options::value<std::string>(&args.backend_name)->required(),
-        backend_help_str.c_str());
+    desc.add_options()("backend",
+                       boost::program_options::value<std::string>(&args.backend_name),
+                       backend_help_str.c_str());
     desc.add_options()(
         "interface",
         boost::program_options::value<std::string>(&args.network_interface_name),
@@ -121,6 +120,11 @@ int main(int argc, char **argv)
                 ->setValue(args.network_interface_name);
         }
 
+        if (args.backend_name.empty())
+        {
+            LOG(FATAL) << "The option '--backend' is required but missing";
+        }
+
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend>::create(args.backend_name);
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(sensor_fusion_config);
@@ -130,7 +134,7 @@ int main(int argc, char **argv)
         // Connect observers
         ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
         sensor_fusion->Subject<World>::registerObserver(ai);
-        backend->Subject<SensorMsg>::registerObserver(sensor_fusion);
+        backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         if (!args.headless)
         {
             visualizer = std::make_shared<ThreadedFullSystemGUI>();
@@ -138,7 +142,7 @@ int main(int argc, char **argv)
             sensor_fusion->Subject<World>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
             ai->Subject<PlayInfo>::registerObserver(visualizer);
-            backend->Subject<SensorMsg>::registerObserver(visualizer);
+            backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 
         // Wait for termination

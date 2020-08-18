@@ -1,7 +1,7 @@
 #pragma once
 
 template <typename T>
-Observer<T>::Observer() : buffer(DEFAULT_BUFFER_SIZE, false)
+Observer<T>::Observer(size_t buffer_size) : buffer(buffer_size)
 {
 }
 
@@ -15,4 +15,10 @@ template <typename T>
 std::optional<T> Observer<T>::popMostRecentlyReceivedValue(Duration max_wait_time)
 {
     return buffer.popMostRecentlyAddedValue(max_wait_time);
+}
+
+template <typename T>
+std::optional<T> Observer<T>::popLeastRecentlyReceivedValue(Duration max_wait_time)
+{
+    return buffer.popLeastRecentlyAddedValue(max_wait_time);
 }

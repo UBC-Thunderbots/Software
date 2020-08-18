@@ -4,6 +4,7 @@
 
 extern "C"
 {
+#include "firmware/app/world/charger.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/wheel.h"
@@ -28,6 +29,9 @@ void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> 
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
 SimulatorRobotSingleton::createFirmwareRobot()
 {
+    // Charger does nothing in sim
+    Charger_t* charger = app_charger_create([]() {}, []() {}, []() {});
+
     // TODO: Make sure all objects de-allocated properly
     // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
     Chicker_t* chicker = app_chicker_create(&(SimulatorRobotSingleton::kick),
@@ -82,7 +86,7 @@ SimulatorRobotSingleton::createFirmwareRobot()
         .last_applied_acceleration_angular = 0,
     };
     FirmwareRobot_t* firmware_robot = app_firmware_robot_create(
-        chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
+        charger, chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
         &(SimulatorRobotSingleton::getPositionY),
         &(SimulatorRobotSingleton::getOrientation),
         &(SimulatorRobotSingleton::getVelocityX),
@@ -97,7 +101,8 @@ SimulatorRobotSingleton::createFirmwareRobot()
 }
 
 void SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-    std::shared_ptr<FirmwareWorld_t> firmware_world, const PrimitiveMsg& primitive_msg)
+    std::shared_ptr<FirmwareWorld_t> firmware_world,
+    const TbotsProto_Primitive& primitive_msg)
 {
     checkValidAndExecuteVoid([firmware_world, primitive_msg](auto robot) {
         robot->startNewPrimitive(firmware_world, primitive_msg);

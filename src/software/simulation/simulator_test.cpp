@@ -239,6 +239,42 @@ TEST(SimulatorTest, add_blue_robots_with_ids_that_already_exist_in_the_simulatio
     EXPECT_THROW(simulator.addBlueRobots(states2), std::runtime_error);
 }
 
+TEST(SimulatorTest, add_yellow_robot)
+{
+    Simulator simulator(Field::createSSLDivisionBField());
+
+    auto wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(wrapper_packet->has_detection());
+    EXPECT_EQ(0, wrapper_packet->detection().robots_yellow_size());
+
+    simulator.addYellowRobot(Point(0, 1));
+
+    wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(wrapper_packet->has_detection());
+    EXPECT_EQ(1, wrapper_packet->detection().robots_yellow_size());
+
+    auto robot = simulator.getRobotAtPosition(Point(0, 1));
+    EXPECT_TRUE(robot.lock());
+}
+
+TEST(SimulatorTest, add_blue_robot)
+{
+    Simulator simulator(Field::createSSLDivisionBField());
+
+    auto wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(wrapper_packet->has_detection());
+    EXPECT_EQ(0, wrapper_packet->detection().robots_blue_size());
+
+    simulator.addBlueRobot(Point(-0.5, -2));
+
+    wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(wrapper_packet->has_detection());
+    EXPECT_EQ(1, wrapper_packet->detection().robots_blue_size());
+
+    auto robot = simulator.getRobotAtPosition(Point(-0.5, -2));
+    EXPECT_TRUE(robot.lock());
+}
+
 TEST(SimulatorTest, simulation_step_updates_the_ball)
 {
     // A sanity test to make sure stepping the simulation actually updates
@@ -304,7 +340,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
 
     std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
         1, Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> primitives;
     primitives.emplace_back(std::move(move_primitive));
     auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
@@ -371,7 +407,7 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
 
     std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
         1, Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> primitives;
     primitives.emplace_back(std::move(move_primitive));
     auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
@@ -425,10 +461,10 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
 
     std::unique_ptr<Primitive> blue_move_primitive1 = std::make_unique<MovePrimitive>(
         1, Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::unique_ptr<Primitive> blue_move_primitive2 = std::make_unique<MovePrimitive>(
         2, Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> blue_robot_primitives;
     blue_robot_primitives.emplace_back(std::move(blue_move_primitive1));
     blue_robot_primitives.emplace_back(std::move(blue_move_primitive2));
@@ -439,10 +475,10 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
 
     std::unique_ptr<Primitive> yellow_move_primitive1 = std::make_unique<MovePrimitive>(
         1, Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::unique_ptr<Primitive> yellow_move_primitive2 = std::make_unique<MovePrimitive>(
         2, Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutokickType::NONE);
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> yellow_robot_primitives;
     yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive1));
     yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive2));
@@ -471,10 +507,10 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_EQ(2, detection_frame.robots_yellow_size());
     ASSERT_EQ(2, detection_frame.robots_blue_size());
 
-    auto yellow_robots = detection_frame.robots_yellow();
-    auto yellow_robot_1 =
-        std::find_if(yellow_robots.begin(), yellow_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
+    auto yellow_robots  = detection_frame.robots_yellow();
+    auto yellow_robot_1 = std::find_if(
+        yellow_robots.begin(), yellow_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
     ASSERT_NE(yellow_robot_1, yellow_robots.end());
     EXPECT_NEAR(1000.0f, yellow_robot_1->x(), 200);
     EXPECT_NEAR(1000.0f, yellow_robot_1->y(), 200);
@@ -482,9 +518,9 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
         Angle::zero(), Angle::fromRadians(yellow_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
-    auto yellow_robot_2 =
-        std::find_if(yellow_robots.begin(), yellow_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
+    auto yellow_robot_2 = std::find_if(
+        yellow_robots.begin(), yellow_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
     ASSERT_NE(yellow_robot_2, yellow_robots.end());
     EXPECT_NEAR(3000.0f, yellow_robot_2->x(), 200);
     EXPECT_NEAR(-2000.0f, yellow_robot_2->y(), 200);
@@ -492,10 +528,10 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
         Angle::zero(), Angle::fromRadians(yellow_robot_2->orientation()),
         Angle::fromDegrees(10)));
 
-    auto blue_robots = detection_frame.robots_blue();
-    auto blue_robot_1 =
-        std::find_if(blue_robots.begin(), blue_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
+    auto blue_robots  = detection_frame.robots_blue();
+    auto blue_robot_1 = std::find_if(
+        blue_robots.begin(), blue_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
     ASSERT_NE(blue_robot_1, blue_robots.end());
     EXPECT_NEAR(-1000.0f, blue_robot_1->x(), 300);
     EXPECT_NEAR(-1000.0f, blue_robot_1->y(), 300);
@@ -503,9 +539,9 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
         Angle::zero(), Angle::fromRadians(blue_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
-    auto blue_robot_2 =
-        std::find_if(blue_robots.begin(), blue_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
+    auto blue_robot_2 = std::find_if(
+        blue_robots.begin(), blue_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
     ASSERT_NE(blue_robot_2, blue_robots.end());
     EXPECT_NEAR(-3000.0f, blue_robot_2->x(), 300);
     EXPECT_NEAR(0.0f, blue_robot_2->y(), 300);

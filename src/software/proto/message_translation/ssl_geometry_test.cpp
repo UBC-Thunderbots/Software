@@ -8,7 +8,7 @@ class SSLGeometryTest : public ::testing::Test
 {
    protected:
     ::testing::AssertionResult equalWithinTolerance(const Point& point,
-                                                    const Vector2f& vector,
+                                                    const SSLProto::Vector2f& vector,
                                                     const float tolerance)
     {
         auto result = ::testing::AssertionSuccess();
@@ -28,7 +28,7 @@ class SSLGeometryTest : public ::testing::Test
     }
 
     ::testing::AssertionResult equalWithinTolerance(
-        const SSL_FieldLineSegment& field_segment, const Segment& segment,
+        const SSLProto::SSL_FieldLineSegment& field_segment, const Segment& segment,
         const float thickness, const float tolerance)
     {
         EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
@@ -54,10 +54,9 @@ class SSLGeometryTest : public ::testing::Test
         return ::testing::AssertionSuccess();
     }
 
-    ::testing::AssertionResult equalWithinTolerance(const SSL_FieldCircularArc& field_arc,
-                                                    const Circle& circle,
-                                                    const float thickness,
-                                                    const float tolerance)
+    ::testing::AssertionResult equalWithinTolerance(
+        const SSLProto::SSL_FieldCircularArc& field_arc, const Circle& circle,
+        const float thickness, const float tolerance)
     {
         EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
                         field_arc.thickness());
@@ -103,22 +102,22 @@ class SSLGeometryTest : public ::testing::Test
 
 TEST_F(SSLGeometryTest, test_find_line_segment_with_no_segments)
 {
-    google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+    google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldLineSegment> segments;
     auto result = findLineSegment(segments, SSLFieldLines::NEG_X_DEFENSE_AREA_FRONT_LINE);
     EXPECT_FALSE(result);
 }
 
 TEST_F(SSLGeometryTest, test_find_line_segment_with_nonexistent_name)
 {
-    google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+    google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldLineSegment> segments;
 
-    auto segment_1 = std::make_unique<SSL_FieldLineSegment>();
+    auto segment_1 = std::make_unique<SSLProto::SSL_FieldLineSegment>();
     segment_1->set_name("segment_1");
-    auto segment_1_p1 = std::make_unique<Vector2f>();
+    auto segment_1_p1 = std::make_unique<SSLProto::Vector2f>();
     segment_1_p1->set_x(1.0);
     segment_1_p1->set_y(2.0);
     *(segment_1->mutable_p1()) = *segment_1_p1;
-    auto segment_1_p2          = std::make_unique<Vector2f>();
+    auto segment_1_p2          = std::make_unique<SSLProto::Vector2f>();
     segment_1_p2->set_x(2.0);
     segment_1_p2->set_y(2.5);
     *(segment_1->mutable_p2()) = *segment_1_p2;
@@ -131,28 +130,28 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_nonexistent_name)
 
 TEST_F(SSLGeometryTest, test_find_line_segment_with_valid_name)
 {
-    google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+    google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldLineSegment> segments;
 
-    auto segment_1 = std::make_unique<SSL_FieldLineSegment>();
+    auto segment_1 = std::make_unique<SSLProto::SSL_FieldLineSegment>();
     segment_1->set_name("TopTouchLine");
-    auto segment_1_p1 = std::make_unique<Vector2f>();
+    auto segment_1_p1 = std::make_unique<SSLProto::Vector2f>();
     segment_1_p1->set_x(1.0);
     segment_1_p1->set_y(2.0);
     *(segment_1->mutable_p1()) = *segment_1_p1;
-    auto segment_1_p2          = std::make_unique<Vector2f>();
+    auto segment_1_p2          = std::make_unique<SSLProto::Vector2f>();
     segment_1_p2->set_x(2.0);
     segment_1_p2->set_y(2.5);
     *(segment_1->mutable_p2()) = *segment_1_p2;
     segment_1->set_thickness(0.01f);
     *(segments.Add()) = *segment_1;
 
-    auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
+    auto segment_2 = std::make_unique<SSLProto::SSL_FieldLineSegment>();
     segment_2->set_name("BottomTouchLine");
-    auto segment_2_p1 = std::make_unique<Vector2f>();
+    auto segment_2_p1 = std::make_unique<SSLProto::Vector2f>();
     segment_2_p1->set_x(1.0);
     segment_2_p1->set_y(2.0);
     *(segment_2->mutable_p1()) = *segment_2_p1;
-    auto segment_2_p2          = std::make_unique<Vector2f>();
+    auto segment_2_p2          = std::make_unique<SSLProto::Vector2f>();
     segment_2_p2->set_x(2.0);
     segment_2_p2->set_y(2.5);
     *(segment_2->mutable_p2()) = *segment_2_p2;
@@ -166,28 +165,28 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_valid_name)
 
 TEST_F(SSLGeometryTest, test_find_line_segment_with_duplicate_names)
 {
-    google::protobuf::RepeatedPtrField<SSL_FieldLineSegment> segments;
+    google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldLineSegment> segments;
 
-    auto segment_1 = std::make_unique<SSL_FieldLineSegment>();
+    auto segment_1 = std::make_unique<SSLProto::SSL_FieldLineSegment>();
     segment_1->set_name("TopTouchLine");
-    auto segment_1_p1 = std::make_unique<Vector2f>();
+    auto segment_1_p1 = std::make_unique<SSLProto::Vector2f>();
     segment_1_p1->set_x(1.0);
     segment_1_p1->set_y(2.0);
     *(segment_1->mutable_p1()) = *segment_1_p1;
-    auto segment_1_p2          = std::make_unique<Vector2f>();
+    auto segment_1_p2          = std::make_unique<SSLProto::Vector2f>();
     segment_1_p2->set_x(2.0);
     segment_1_p2->set_y(2.5);
     *(segment_1->mutable_p2()) = *segment_1_p2;
     segment_1->set_thickness(0.01f);
     *(segments.Add()) = *segment_1;
 
-    auto segment_2 = std::make_unique<SSL_FieldLineSegment>();
+    auto segment_2 = std::make_unique<SSLProto::SSL_FieldLineSegment>();
     segment_2->set_name("TopTouchLine");
-    auto segment_2_p1 = std::make_unique<Vector2f>();
+    auto segment_2_p1 = std::make_unique<SSLProto::Vector2f>();
     segment_2_p1->set_x(5.0);
     segment_2_p1->set_y(5.0);
     *(segment_2->mutable_p1()) = *segment_2_p1;
-    auto segment_2_p2          = std::make_unique<Vector2f>();
+    auto segment_2_p2          = std::make_unique<SSLProto::Vector2f>();
     segment_2_p2->set_x(5.0);
     segment_2_p2->set_y(6.0);
     *(segment_2->mutable_p2()) = *segment_2_p2;
@@ -204,18 +203,18 @@ TEST_F(SSLGeometryTest, test_find_line_segment_with_duplicate_names)
 
 TEST_F(SSLGeometryTest, test_find_circular_arc_with_no_arcs)
 {
-    google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
+    google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldCircularArc> arcs;
     auto result = findCircularArc(arcs, SSLCircularArcs::CENTER_CIRCLE);
     EXPECT_FALSE(result);
 }
 
 TEST_F(SSLGeometryTest, test_find_circular_arc_with_nonexistent_name)
 {
-    google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
+    google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldCircularArc> arcs;
 
-    auto arc_1 = std::make_unique<SSL_FieldCircularArc>();
+    auto arc_1 = std::make_unique<SSLProto::SSL_FieldCircularArc>();
     arc_1->set_name("nonexistent_name");
-    auto arc_1_center = std::make_unique<Vector2f>();
+    auto arc_1_center = std::make_unique<SSLProto::Vector2f>();
     arc_1_center->set_x(1.0);
     arc_1_center->set_y(2.0);
     *(arc_1->mutable_center()) = *arc_1_center;
@@ -231,11 +230,11 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_nonexistent_name)
 
 TEST_F(SSLGeometryTest, test_find_circular_arc_with_valid_name)
 {
-    google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
+    google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldCircularArc> arcs;
 
-    auto arc_1 = std::make_unique<SSL_FieldCircularArc>();
+    auto arc_1 = std::make_unique<SSLProto::SSL_FieldCircularArc>();
     arc_1->set_name("SomeNameThatDoesn'tExist");
-    auto arc_1_center = std::make_unique<Vector2f>();
+    auto arc_1_center = std::make_unique<SSLProto::Vector2f>();
     arc_1_center->set_x(1.0);
     arc_1_center->set_y(2.0);
     *(arc_1->mutable_center()) = *arc_1_center;
@@ -245,9 +244,9 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_valid_name)
     arc_1->set_thickness(0.01f);
     *(arcs.Add()) = *arc_1;
 
-    auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
+    auto arc_2 = std::make_unique<SSLProto::SSL_FieldCircularArc>();
     arc_2->set_name("CenterCircle");
-    auto arc_2_center = std::make_unique<Vector2f>();
+    auto arc_2_center = std::make_unique<SSLProto::Vector2f>();
     arc_2_center->set_x(1.0);
     arc_2_center->set_y(2.0);
     *(arc_2->mutable_center()) = *arc_2_center;
@@ -264,11 +263,11 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_valid_name)
 
 TEST_F(SSLGeometryTest, test_find_circular_arc_with_duplicate_names)
 {
-    google::protobuf::RepeatedPtrField<SSL_FieldCircularArc> arcs;
+    google::protobuf::RepeatedPtrField<SSLProto::SSL_FieldCircularArc> arcs;
 
-    auto arc_1 = std::make_unique<SSL_FieldCircularArc>();
+    auto arc_1 = std::make_unique<SSLProto::SSL_FieldCircularArc>();
     arc_1->set_name("CenterCircle");
-    auto arc_1_center = std::make_unique<Vector2f>();
+    auto arc_1_center = std::make_unique<SSLProto::Vector2f>();
     arc_1_center->set_x(1.0);
     arc_1_center->set_y(2.0);
     *(arc_1->mutable_center()) = *arc_1_center;
@@ -278,9 +277,9 @@ TEST_F(SSLGeometryTest, test_find_circular_arc_with_duplicate_names)
     arc_1->set_thickness(0.01f);
     *(arcs.Add()) = *arc_1;
 
-    auto arc_2 = std::make_unique<SSL_FieldCircularArc>();
+    auto arc_2 = std::make_unique<SSLProto::SSL_FieldCircularArc>();
     arc_2->set_name("CenterCircle");
-    auto arc_2_center = std::make_unique<Vector2f>();
+    auto arc_2_center = std::make_unique<SSLProto::Vector2f>();
     arc_2_center->set_x(-2.0);
     arc_2_center->set_y(3.0);
     *(arc_2->mutable_center()) = *arc_2_center;
@@ -313,8 +312,8 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_valid_values)
     const float thickness         = 0.005f;
     const SSLFieldLines line_type = SSLFieldLines::POS_Y_FIELD_LINE;
 
-    auto field_line_msg = createFieldLineSegment(segment, thickness, line_type,
-                                                 SSL_FieldShapeType::CenterLine);
+    auto field_line_msg = createFieldLineSegment(
+        segment, thickness, line_type, SSLProto::SSL_FieldShapeType::CenterLine);
 
     ASSERT_TRUE(field_line_msg);
     EXPECT_EQ("TopTouchLine", field_line_msg->name());
@@ -323,7 +322,7 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_valid_values)
     EXPECT_TRUE(
         equalWithinTolerance(segment.getStart(), field_line_msg->p1(), tolerance));
     EXPECT_TRUE(equalWithinTolerance(segment.getEnd(), field_line_msg->p2(), tolerance));
-    EXPECT_EQ(SSL_FieldShapeType::CenterLine, field_line_msg->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::CenterLine, field_line_msg->type());
 }
 
 TEST_F(SSLGeometryTest, test_create_field_line_segment_with_negative_thickness)
@@ -333,7 +332,7 @@ TEST_F(SSLGeometryTest, test_create_field_line_segment_with_negative_thickness)
     const SSLFieldLines line_type = SSLFieldLines::POS_Y_FIELD_LINE;
 
     EXPECT_THROW(createFieldLineSegment(segment, thickness, line_type,
-                                        SSL_FieldShapeType::Undefined),
+                                        SSLProto::SSL_FieldShapeType::Undefined),
                  std::invalid_argument);
 }
 
@@ -343,8 +342,8 @@ TEST_F(SSLGeometryTest, test_create_field_circular_arc_with_valid_values)
     const float thickness          = 0.005f;
     const SSLCircularArcs arc_type = SSLCircularArcs::CENTER_CIRCLE;
 
-    auto circular_arc_msg = createFieldCircularArc(circle, thickness, arc_type,
-                                                   SSL_FieldShapeType::CenterCircle);
+    auto circular_arc_msg = createFieldCircularArc(
+        circle, thickness, arc_type, SSLProto::SSL_FieldShapeType::CenterCircle);
 
     ASSERT_TRUE(circular_arc_msg);
     EXPECT_EQ("CenterCircle", circular_arc_msg->name());
@@ -354,7 +353,7 @@ TEST_F(SSLGeometryTest, test_create_field_circular_arc_with_valid_values)
         equalWithinTolerance(circle.getOrigin(), circular_arc_msg->center(), tolerance));
     EXPECT_FLOAT_EQ(static_cast<float>(circle.getRadius() * MILLIMETERS_PER_METER),
                     circular_arc_msg->radius());
-    EXPECT_EQ(SSL_FieldShapeType::CenterCircle, circular_arc_msg->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::CenterCircle, circular_arc_msg->type());
 }
 
 TEST_F(SSLGeometryTest, test_create_field_circular_arc_with_negative_thickness)
@@ -364,7 +363,7 @@ TEST_F(SSLGeometryTest, test_create_field_circular_arc_with_negative_thickness)
     const SSLCircularArcs arc_type = SSLCircularArcs::CENTER_CIRCLE;
 
     EXPECT_THROW(createFieldCircularArc(circle, thickness, arc_type,
-                                        SSL_FieldShapeType::Undefined),
+                                        SSLProto::SSL_FieldShapeType::Undefined),
                  std::invalid_argument);
 }
 
@@ -394,7 +393,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-4.5, 3), Point(4.5, 3)), thickness,
                                      tolerance));
     ASSERT_TRUE(pos_y_field_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::TopTouchLine, pos_y_field_line->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::TopTouchLine, pos_y_field_line->type());
 
     auto neg_y_field_line =
         findLineSegment(field_msg->field_lines(), SSLFieldLines::NEG_Y_FIELD_LINE);
@@ -403,7 +402,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-4.5, -3), Point(4.5, -3)), thickness,
                                      tolerance));
     ASSERT_TRUE(neg_y_field_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::BottomTouchLine, neg_y_field_line->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::BottomTouchLine, neg_y_field_line->type());
 
     auto neg_x_field_line =
         findLineSegment(field_msg->field_lines(), SSLFieldLines::NEG_X_FIELD_LINE);
@@ -412,7 +411,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-4.5, 3), Point(-4.5, -3)), thickness,
                                      tolerance));
     ASSERT_TRUE(neg_x_field_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::LeftGoalLine, neg_x_field_line->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::LeftGoalLine, neg_x_field_line->type());
 
     auto pos_x_field_line =
         findLineSegment(field_msg->field_lines(), SSLFieldLines::POS_X_FIELD_LINE);
@@ -421,7 +420,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(4.5, 3), Point(4.5, -3)), thickness,
                                      tolerance));
     ASSERT_TRUE(pos_x_field_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::RightGoalLine, pos_x_field_line->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::RightGoalLine, pos_x_field_line->type());
 
     auto halfway_line =
         findLineSegment(field_msg->field_lines(), SSLFieldLines::HALFWAY_LINE);
@@ -429,7 +428,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_TRUE(equalWithinTolerance(
         halfway_line.value(), Segment(Point(0, 3), Point(0, -3)), thickness, tolerance));
     ASSERT_TRUE(halfway_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::HalfwayLine, halfway_line->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::HalfwayLine, halfway_line->type());
 
     auto center_line =
         findLineSegment(field_msg->field_lines(), SSLFieldLines::CENTER_LINE);
@@ -438,7 +437,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-4.5, 0), Point(4.5, 0)), thickness,
                                      tolerance));
     ASSERT_TRUE(center_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::CenterLine, center_line->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::CenterLine, center_line->type());
 
     auto neg_x_defense_area_front_line = findLineSegment(
         field_msg->field_lines(), SSLFieldLines::NEG_X_DEFENSE_AREA_FRONT_LINE);
@@ -447,7 +446,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-3.5, 1), Point(-3.5, -1)), thickness,
                                      tolerance));
     ASSERT_TRUE(neg_x_defense_area_front_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::LeftPenaltyStretch,
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::LeftPenaltyStretch,
               neg_x_defense_area_front_line->type());
 
     auto pos_x_defense_area_front_line = findLineSegment(
@@ -457,7 +456,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(3.5, 1), Point(3.5, -1)), thickness,
                                      tolerance));
     ASSERT_TRUE(pos_x_defense_area_front_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::RightPenaltyStretch,
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::RightPenaltyStretch,
               pos_x_defense_area_front_line->type());
 
     auto pos_y_line_of_pos_x_goal = findLineSegment(
@@ -467,7 +466,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(4.5, 0.5), Point(4.7, 0.5)), thickness,
                                      tolerance));
     ASSERT_TRUE(pos_y_line_of_pos_x_goal->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::Undefined, pos_y_line_of_pos_x_goal->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::Undefined, pos_y_line_of_pos_x_goal->type());
 
     auto neg_y_line_of_pos_x_goal = findLineSegment(
         field_msg->field_lines(), SSLFieldLines::NEG_Y_LINE_OF_POS_X_GOAL);
@@ -476,7 +475,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(4.5, -0.5), Point(4.7, -0.5)),
                                      thickness, tolerance));
     ASSERT_TRUE(neg_y_line_of_pos_x_goal->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::Undefined, neg_y_line_of_pos_x_goal->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::Undefined, neg_y_line_of_pos_x_goal->type());
 
     auto pos_x_goal_rear_line =
         findLineSegment(field_msg->field_lines(), SSLFieldLines::POS_X_GOAL_REAR_LINE);
@@ -485,7 +484,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(4.7, 0.5), Point(4.7, -0.5)),
                                      thickness, tolerance));
     ASSERT_TRUE(pos_x_goal_rear_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::Undefined, pos_x_goal_rear_line->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::Undefined, pos_x_goal_rear_line->type());
 
     auto pos_y_line_of_neg_x_goal = findLineSegment(
         field_msg->field_lines(), SSLFieldLines::POS_Y_LINE_OF_NEG_X_GOAL);
@@ -494,7 +493,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-4.5, 0.5), Point(-4.7, 0.5)),
                                      thickness, tolerance));
     ASSERT_TRUE(pos_y_line_of_neg_x_goal->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::Undefined, pos_y_line_of_neg_x_goal->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::Undefined, pos_y_line_of_neg_x_goal->type());
 
     auto neg_y_line_of_neg_x_goal = findLineSegment(
         field_msg->field_lines(), SSLFieldLines::NEG_Y_LINE_OF_NEG_X_GOAL);
@@ -503,7 +502,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-4.5, -0.5), Point(-4.7, -0.5)),
                                      thickness, tolerance));
     ASSERT_TRUE(neg_y_line_of_neg_x_goal->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::Undefined, neg_y_line_of_neg_x_goal->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::Undefined, neg_y_line_of_neg_x_goal->type());
 
     auto neg_x_goal_rear_line =
         findLineSegment(field_msg->field_lines(), SSLFieldLines::NEG_X_GOAL_REAR_LINE);
@@ -512,7 +511,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-4.7, 0.5), Point(-4.7, -0.5)),
                                      thickness, tolerance));
     ASSERT_TRUE(neg_x_goal_rear_line->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::Undefined, neg_x_goal_rear_line->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::Undefined, neg_x_goal_rear_line->type());
 
     auto pos_y_line_of_neg_x_defense_area = findLineSegment(
         field_msg->field_lines(), SSLFieldLines::POS_Y_LINE_OF_NEG_X_DEFENSE_AREA);
@@ -521,7 +520,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-4.5, 1), Point(-3.5, 1)), thickness,
                                      tolerance));
     ASSERT_TRUE(pos_y_line_of_neg_x_defense_area->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::LeftFieldLeftPenaltyStretch,
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::LeftFieldLeftPenaltyStretch,
               pos_y_line_of_neg_x_defense_area->type());
 
     auto neg_y_line_of_neg_x_defense_area = findLineSegment(
@@ -531,7 +530,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(-4.5, -1), Point(-3.5, -1)), thickness,
                                      tolerance));
     ASSERT_TRUE(neg_y_line_of_neg_x_defense_area->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::LeftFieldRightPenaltyStretch,
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::LeftFieldRightPenaltyStretch,
               neg_y_line_of_neg_x_defense_area->type());
 
     auto neg_y_line_of_pos_x_defense_area = findLineSegment(
@@ -541,7 +540,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(4.5, -1), Point(3.5, -1)), thickness,
                                      tolerance));
     ASSERT_TRUE(neg_y_line_of_pos_x_defense_area->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::RightFieldLeftPenaltyStretch,
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::RightFieldLeftPenaltyStretch,
               neg_y_line_of_pos_x_defense_area->type());
 
     auto pos_y_line_of_pos_x_defense_area = findLineSegment(
@@ -551,7 +550,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
                                      Segment(Point(4.5, 1), Point(3.5, 1)), thickness,
                                      tolerance));
     ASSERT_TRUE(pos_y_line_of_pos_x_defense_area->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::RightFieldRightPenaltyStretch,
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::RightFieldRightPenaltyStretch,
               pos_y_line_of_pos_x_defense_area->type());
 
     // Field arcs
@@ -562,7 +561,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_valid_values)
     EXPECT_TRUE(equalWithinTolerance(center_circle.value(), Circle(Point(0, 0), 0.5),
                                      thickness, tolerance));
     ASSERT_TRUE(center_circle->has_type());
-    EXPECT_EQ(SSL_FieldShapeType::CenterCircle, center_circle->type());
+    EXPECT_EQ(SSLProto::SSL_FieldShapeType::CenterCircle, center_circle->type());
 }
 
 TEST_F(SSLGeometryTest, test_create_geometry_field_size_with_negative_thickness)
@@ -586,7 +585,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_data_with_valid_values)
 
     // Sanity checks to make sure the right field was constructed and that we
     // don't just have an emtpy / default constructed message. Full validation
-    // of SSL_GeometryFieldSize creation is in other tests
+    // of SSLProto::SSL_GeometryFieldSize creation is in other tests
     EXPECT_EQ(9000, field_size.field_length());
     EXPECT_EQ(6000, field_size.field_width());
     EXPECT_EQ(1000, field_size.goal_width());

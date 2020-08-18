@@ -197,9 +197,7 @@ void FreeKickPlay::chipAtGoalStage(
 
     do
     {
-        double chip_dist = (chip_target - world.ball().position()).length();
-
-        chip_tactic->updateControlParams(world.ball().position(), chip_target, chip_dist);
+        chip_tactic->updateControlParams(world.ball().position(), chip_target);
 
         yield({goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});
@@ -223,7 +221,8 @@ void FreeKickPlay::performPassStage(
     //                    to save CPU cycles
 
     // Perform the pass and wait until the receiver is finished
-    auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
+    auto passer =
+        std::make_shared<PasserTactic>(pass, world.ball(), world.field(), false);
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);

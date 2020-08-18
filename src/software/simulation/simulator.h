@@ -123,6 +123,15 @@ class Simulator
     void addBlueRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
+     * Adds a robots to the specified team at the given position. The robot will
+     * automatically be given a valid ID.
+     *
+     * @param position the position at which to add the robot
+     */
+    void addYellowRobot(const Point& position);
+    void addBlueRobot(const Point& position);
+
+    /**
      * Sets the primitives being simulated by the robots in simulation
      *
      * @param primitives The primitives to simulate
@@ -137,8 +146,8 @@ class Simulator
      * @param id The id of the robot to set the primitive for
      * @param primitive_msg The primitive to run on the robot
      */
-    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
-    void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -156,13 +165,13 @@ class Simulator
     World getWorld() const;
 
     /**
-     * Returns an SSL_WrapperPacket representing the most recent state
+     * Returns an SSLProto::SSL_WrapperPacket representing the most recent state
      * of the simulation
      *
-     * @return an SSL_WrapperPacket representing the most recent state
+     * @return an SSLProto::SSL_WrapperPacket representing the most recent state
      * of the simulation
      */
-    std::unique_ptr<SSL_WrapperPacket> getSSLWrapperPacket() const;
+    std::unique_ptr<SSLProto::SSL_WrapperPacket> getSSLWrapperPacket() const;
 
     /**
      * Returns the field in the simulation
@@ -189,6 +198,13 @@ class Simulator
      * otherwise returns an empty pointer
      */
     std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
+
+    /**
+     * Removes the given PhysicsRobot from the PhysicsWorld, if it exists.
+     *
+     * @param robot The robot to be removed
+     */
+    void removeRobot(std::weak_ptr<PhysicsRobot> robot);
 
    private:
     /**
@@ -224,7 +240,7 @@ class Simulator
      * @param simulator_ball The simulator ball to use in the primitives
      */
     static void setRobotPrimitive(
-        RobotId id, const PrimitiveMsg& primitive_msg,
+        RobotId id, const TbotsProto_Primitive& primitive_msg,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
         const std::shared_ptr<SimulatorBall>& simulator_ball);

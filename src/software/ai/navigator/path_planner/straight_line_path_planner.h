@@ -1,9 +1,11 @@
 #pragma once
+
 #include "software/ai/navigator/path_planner/path_planner.h"
 
 /**
  * StraightLinePathPlanner is a very trivial implementation
- * of the PathPlanner interface.
+ * of the PathPlanner interface,which returns a path consisting of only the start and
+ * destination points.
  */
 
 class StraightLinePathPlanner : public PathPlanner

@@ -87,6 +87,7 @@ cc_library(
         ":primitive",
         "//software/geom:angle",
         "//software/geom:point",
+        "//software/util/make_enum",
     ],
 )
 
@@ -100,9 +101,9 @@ cc_test(
 )
 
 cc_library(
-    name = "movespin_primitive",
-    srcs = ["movespin_primitive.cpp"],
-    hdrs = ["movespin_primitive.h"],
+    name = "spinning_move_primitive",
+    srcs = ["spinning_move_primitive.cpp"],
+    hdrs = ["spinning_move_primitive.h"],
     deps = [
         ":primitive",
         "//software/geom:angular_velocity",
@@ -111,10 +112,10 @@ cc_library(
 )
 
 cc_test(
-    name = "movespin_primitive_test",
-    srcs = ["movespin_primitive_test.cpp"],
+    name = "spinning_move_primitive_test",
+    srcs = ["spinning_move_primitive_test.cpp"],
     deps = [
-        ":movespin_primitive",
+        ":spinning_move_primitive",
         "@gtest//:gtest_main",
     ],
 )
@@ -146,7 +147,7 @@ cc_library(
         ":direct_wheels_primitive",
         ":kick_primitive",
         ":move_primitive",
-        ":movespin_primitive",
+        ":spinning_move_primitive",
         ":stop_primitive",
     ],
 )

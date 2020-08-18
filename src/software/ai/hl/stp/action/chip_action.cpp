@@ -26,10 +26,10 @@ void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
 }
 
 void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
-                                     Point chip_target, double chip_distance_meters)
+                                     Point chip_target)
 {
     updateControlParams(robot, chip_origin, (chip_target - chip_origin).orientation(),
-                        chip_distance_meters);
+                        (chip_target - chip_origin).length());
 }
 
 Ball ChipAction::getBall()
@@ -116,9 +116,9 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // If we're not in position to chip, move into position
     if (!robot_behind_ball)
     {
-        yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, chip_direction,
-                                           0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-                                           AutokickType::NONE, BallCollisionType::ALLOW));
+        yield(std::make_unique<MoveIntent>(
+            robot->id(), point_behind_ball, chip_direction, 0.0, 0, DribblerEnable::OFF,
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
     }
     else
     {

@@ -17,7 +17,8 @@
  *
  * @return A DetectionBall representing the given BallState
  */
-std::unique_ptr<SSL_DetectionBall> createSSLDetectionBall(const BallState& ball);
+std::unique_ptr<SSLProto::SSL_DetectionBall> createSSLDetectionBall(
+    const BallState& ball);
 
 /**
  * Creates a DetectionRobot from the given robot state.
@@ -26,7 +27,7 @@ std::unique_ptr<SSL_DetectionBall> createSSLDetectionBall(const BallState& ball)
  *
  * @return A DetectionRobot representing the given robot state
  */
-std::unique_ptr<SSL_DetectionRobot> createSSLDetectionRobot(
+std::unique_ptr<SSLProto::SSL_DetectionRobot> createSSLDetectionRobot(
     const RobotStateWithId& robot);
 
 /**
@@ -41,7 +42,7 @@ std::unique_ptr<SSL_DetectionRobot> createSSLDetectionRobot(
  *
  * @return A DetectionFrame representing the given data
  */
-std::unique_ptr<SSL_DetectionFrame> createSSLDetectionFrame(
+std::unique_ptr<SSLProto::SSL_DetectionFrame> createSSLDetectionFrame(
     uint32_t camera_id, const Timestamp& t_capture, uint32_t frame_number,
     const std::vector<BallState>& balls,
     const std::vector<RobotStateWithId>& yellow_robots,
@@ -63,7 +64,7 @@ std::unique_ptr<SSL_DetectionFrame> createSSLDetectionFrame(
  * @return all the valid ball detections contained in the ssl detection frames
  */
 std::vector<BallDetection> createBallDetections(
-    const std::vector<SSL_DetectionFrame>& detections,
+    const std::vector<SSLProto::SSL_DetectionFrame>& detections,
     double min_valid_x              = std::numeric_limits<double>::min(),
     double max_valid_x              = std::numeric_limits<double>::max(),
     bool ignore_invalid_camera_data = false);
@@ -87,7 +88,7 @@ std::vector<BallDetection> createBallDetections(
  * DetectionFrame information
  */
 std::vector<RobotDetection> createTeamDetection(
-    const std::vector<SSL_DetectionFrame>& detections, TeamColour team_colour,
+    const std::vector<SSLProto::SSL_DetectionFrame>& detections, TeamColour team_colour,
     double min_valid_x              = std::numeric_limits<double>::min(),
     double max_valid_x              = std::numeric_limits<double>::max(),
     bool ignore_invalid_camera_data = false);

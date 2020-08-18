@@ -73,7 +73,7 @@ include:
       Any string value
 - enum:
     name: example_enum_param
-    enum: RefboxGameState
+    enum: RefereeCommand
     value: HALT
     description: >
       Accepts enum values from the specified enum. For example if there was an enum defined as

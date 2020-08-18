@@ -32,25 +32,25 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
 
 void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
 {
-    primitive_output->sendProto(*createPrimitiveSetMsg(primitives_ptr));
+    primitive_output->sendProto(*createPrimitiveSet(primitives_ptr));
 }
 
 void WifiBackend::onValueReceived(World world)
 {
-    vision_output->sendProto(*createVisionMsg(world));
+    vision_output->sendProto(*createVision(world));
 }
 
 void WifiBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
-    vision_output.reset(new ThreadedProtoMulticastSender<VisionMsg>(
+    vision_output.reset(new ThreadedProtoMulticastSender<TbotsProto::Vision>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT));
 
-    primitive_output.reset(new ThreadedProtoMulticastSender<PrimitiveSetMsg>(
+    primitive_output.reset(new ThreadedProtoMulticastSender<TbotsProto::PrimitiveSet>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, PRIMITIVE_PORT));
 
-    robot_msg_input.reset(new ThreadedProtoMulticastListener<TbotsRobotMsg>(
+    robot_msg_input.reset(new ThreadedProtoMulticastListener<TbotsProto::RobotStatus>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
-        boost::bind(&Backend::receiveTbotsRobotMsg, this, _1)));
+        boost::bind(&Backend::receiveRobotStatus, this, _1)));
 }
 
 // Register this backend in the genericFactory

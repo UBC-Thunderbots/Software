@@ -149,7 +149,7 @@ void plan_move_rotation(PhysBot* pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void app_move_primitive_start(PrimitiveParamsMsg params, void* void_state_ptr,
+void app_move_primitive_start(TbotsProto_PrimitiveParams params, void* void_state_ptr,
                               FirmwareWorld_t* world)
 {
     MovePrimitiveState_t* state = (MovePrimitiveState_t*)void_state_ptr;

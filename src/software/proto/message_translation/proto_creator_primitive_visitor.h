@@ -27,15 +27,17 @@ class ProtoCreatorPrimitiveVisitor : public PrimitiveVisitor
     void visit(const DirectWheelsPrimitive &direct_wheels_primitive) override;
     void visit(const KickPrimitive &kick_primitive) override;
     void visit(const MovePrimitive &move_primitive) override;
-    void visit(const MoveSpinPrimitive &movespin_primitive) override;
+    void visit(const SpinningMovePrimitive &spinning_move_primitive) override;
     void visit(const StopPrimitive &stop_primitive) override;
 
     /**
-     * Create a PrimitiveMsg from the given Primitive
-     * @param primitive The primitive to create the PrimitiveMsg from
-     * @return A PrimitiveMsg representation of the given primitive
+     * Create a TbotsProto::Primitive from the given Primitive
+     *
+     * @param primitive The primitive to create the TbotsProto::Primitive from
+     *
+     * @return A TbotsProto::Primitive representation of the given primitive
      */
-    PrimitiveMsg createPrimitiveMsg(const Primitive &primitive);
+    TbotsProto::Primitive createPrimitive(const Primitive &primitive);
 
    private:
     /**
@@ -45,7 +47,7 @@ class ProtoCreatorPrimitiveVisitor : public PrimitiveVisitor
      *
      * @return The proto representation of the most recently visited primitive
      */
-    PrimitiveMsg getProto();
+    TbotsProto::Primitive getProto();
 
-    std::optional<PrimitiveMsg> prim;
+    std::optional<TbotsProto::Primitive> prim;
 };

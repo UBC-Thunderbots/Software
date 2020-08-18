@@ -1,25 +1,33 @@
 syntax = "proto3";
 
-message PointMsg
+package TbotsProto;
+
+message Point
 {
     // x coordinate
-    double x = 1;
+    float x_meters = 1;
 
     // y coordinate
-    double y = 2;
+    float y_meters = 2;
 }
 
-message VectorMsg
+message Vector
 {
     // x component
-    double x_component = 1;
+    float x_component_meters = 1;
 
     // y component
-    double y_component = 2;
+    float y_component_meters = 2;
 }
 
-message AngleMsg
+message Angle
 {
     // the angle in radians
-    double radians = 1;
+    float radians = 1;
+}
+
+message AngularVelocity
+{
+    // the angular velocity in radians
+    float radians_per_second = 1;
 }

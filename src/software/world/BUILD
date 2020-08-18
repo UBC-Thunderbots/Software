@@ -10,7 +10,8 @@ cc_library(
         "//software/geom:vector",
         "//software/time:timestamp",
         "//software/world:timestamped_ball_state",
-        "@boost//:circular_buffer",
+        "//software/world/ball_model",
+        "//software/world/ball_model:two_stage_linear_ball_model",
     ],
 )
 
@@ -75,7 +76,6 @@ cc_library(
         "//software/geom:rectangle",
         "//software/geom/algorithms",
         "//software/time:timestamp",
-        "@boost//:circular_buffer",
     ],
 )
 
@@ -96,7 +96,7 @@ cc_library(
     deps = [
         ":ball",
         "//software/logger",
-        "//software/sensor_fusion:refbox_data",
+        "//software/util/make_enum",
     ],
 )
 
@@ -126,7 +126,6 @@ cc_library(
         "//software/logger",
         "//software/time:duration",
         "//software/time:timestamp",
-        "@boost//:circular_buffer",
     ],
 )
 
@@ -210,7 +209,7 @@ cc_test(
 cc_library(
     name = "robot_capabilities",
     hdrs = ["robot_capabilities.h"],
-    deps = [],
+    deps = ["//software/util/make_enum"],
 )
 
 cc_test(

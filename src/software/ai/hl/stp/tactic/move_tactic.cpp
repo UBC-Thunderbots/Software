@@ -3,7 +3,9 @@
 #include <algorithm>
 
 
-MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
+MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever, {RobotCapability::Move})
+{
+}
 
 std::string MoveTactic::getName() const
 {
@@ -38,7 +40,7 @@ void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     {
         move_action->updateControlParams(
             *robot, destination, final_orientation, final_speed, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID);
         yield(move_action);
     } while (!move_action->done());
 }

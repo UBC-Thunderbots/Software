@@ -13,8 +13,18 @@ typedef boost::coroutines2::coroutine<std::unique_ptr<Intent>> IntentCoroutine;
 
 /**
  * The Action class is the lowest level of abstraction in our STP architecture.
- * They abstract just above the Intent layer, and typically performs similar behavior
- * to the Intents but while making sure preconditions are met.
+ * Actions are stateful, and represent simple Actions any robot can perform.
+ * Examples of this are
+ * - Moving to a position (without colliding with anything)
+ * - Shooting / kicking at a target
+ * - Intercepting / catching the ball
+ *
+ * Actions use Intents to implement their behaviour. Actions are different than
+ * Intents because Intents are not stateful, and generally do not check if their
+ * preconditions are met when they are run. Actions are responsible for making sure
+ * any preconditions of an Intent are met before running it, which is where the
+ * statefulness comes into play. For example, an Action may need to move a robot
+ * into the correct position / alignment before shooting.
  */
 class Action
 {

@@ -34,20 +34,20 @@ void STP::updateSTPState(const World& world)
 void STP::updateGameState(const World& world)
 {
     current_game_state = world.gameState();
-    if (control_config->OverrideRefboxGameState()->value())
+    if (control_config->OverrideRefereeCommand()->value())
     {
         std::string previous_state_string =
-            control_config->PreviousRefboxGameState()->value();
+            control_config->PreviousRefereeCommand()->value();
         std::string current_state_string =
-            control_config->CurrentRefboxGameState()->value();
+            control_config->CurrentRefereeCommand()->value();
         try
         {
-            RefboxGameState previous_state =
-                fromStringToRefboxGameState(previous_state_string);
-            current_game_state.updateRefboxGameState(previous_state);
-            RefboxGameState current_state =
-                fromStringToRefboxGameState(current_state_string);
-            current_game_state.updateRefboxGameState(current_state);
+            RefereeCommand previous_state =
+                fromStringToRefereeCommand(previous_state_string);
+            current_game_state.updateRefereeCommand(previous_state);
+            RefereeCommand current_state =
+                fromStringToRefereeCommand(current_state_string);
+            current_game_state.updateRefereeCommand(current_state);
         }
         catch (std::invalid_argument e)
         {
@@ -118,12 +118,13 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     std::vector<std::unique_ptr<Intent>> intents;
     if (current_tactics)
     {
-        assignRobotsToTactics(world, *current_tactics);
+        std::vector<std::shared_ptr<Tactic>> assigned_tactics =
+            assignRobotsToTactics(world, *current_tactics);
 
         ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
         TacticWorldParamsUpdateVisitor tactic_world_params_update_visitor(world);
 
-        for (const std::shared_ptr<Tactic>& tactic : *current_tactics)
+        for (const std::shared_ptr<Tactic>& tactic : assigned_tactics)
         {
             tactic->accept(tactic_world_params_update_visitor);
 
@@ -168,8 +169,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return getIntentsFromCurrentPlay(world);
 }
 
-void STP::assignRobotsToTactics(const World& world,
-                                std::vector<std::shared_ptr<Tactic>> tactics) const
+std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
+    const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
 {
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
@@ -189,6 +190,7 @@ void STP::assignRobotsToTactics(const World& world,
     auto isGoalieTactic                  = [](std::shared_ptr<Tactic> tactic) {
         return tactic->isGoalieTactic();
     };
+    std::vector<std::shared_ptr<Tactic>> goalie_tactics;
 
     if (goalie)
     {
@@ -203,6 +205,10 @@ void STP::assignRobotsToTactics(const World& world,
         }
     }
 
+    // Store goalie tactics, which will be added at the end
+    std::copy_if(tactics.begin(), tactics.end(), back_inserter(goalie_tactics),
+                 isGoalieTactic);
+
     // Discard all goalie tactics, since we have already assigned the goalie robot (if
     // there is one) to the first goalie tactic, and there should only ever be one goalie
     tactics.erase(std::remove_if(tactics.begin(), tactics.end(), isGoalieTactic),
@@ -215,6 +221,14 @@ void STP::assignRobotsToTactics(const World& world,
         // considered lower priority
         tactics.resize(non_goalie_robots.size());
     }
+    else
+    {
+        // Assign rest of robots with StopTactic
+        for (auto i = tactics.size(); i < non_goalie_robots.size(); i++)
+        {
+            tactics.push_back(std::make_shared<StopTactic>(false));
+        }
+    }
 
     size_t num_rows = non_goalie_robots.size();
     size_t num_cols = tactics.size();
@@ -224,7 +238,7 @@ void STP::assignRobotsToTactics(const World& world,
     // This represents the cases where there are either no tactics or no robots
     if (num_rows == 0 || num_cols == 0)
     {
-        return;
+        return tactics;
     }
 
     // The rows of the matrix are the "workers" (the robots) and the columns are the
@@ -287,6 +301,11 @@ void STP::assignRobotsToTactics(const World& world,
             }
         }
     }
+
+    // Re-insert goalie tactics to returned tactics
+    tactics.insert(tactics.begin(), goalie_tactics.begin(), goalie_tactics.end());
+
+    return tactics;
 }
 
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
@@ -330,10 +349,10 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    std::string info_refbox_game_state = toString(current_game_state.game_state);
+    std::string info_referee_command = toString(current_game_state.getRefereeCommand());
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
     std::unordered_set<std::string> info_robot_tactic_assignment = {};
-    info = PlayInfo(info_refbox_game_state, info_play_name, info_robot_tactic_assignment);
+    info = PlayInfo(info_referee_command, info_play_name, info_robot_tactic_assignment);
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report
     // the tactics in order or robot id. This makes it much easier to read if tactics

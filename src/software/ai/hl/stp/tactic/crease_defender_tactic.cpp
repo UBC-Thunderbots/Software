@@ -14,7 +14,7 @@
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,
     const Team &enemy_team, CreaseDefenderTactic::LeftOrRight left_or_right)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       field(field),
       ball(ball),
       friendly_team(friendly_team),
@@ -177,7 +177,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
             move_action->updateControlParams(
                 *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
             yield(move_action);
         }
         else

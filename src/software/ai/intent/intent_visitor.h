@@ -6,11 +6,9 @@
 // intent.h. Note: every subclass of this visitor must include all of the classes listed
 // below
 class ChipIntent;
-class DirectVelocityIntent;
-class DirectWheelsIntent;
 class KickIntent;
 class MoveIntent;
-class MoveSpinIntent;
+class SpinningMoveIntent;
 class StopIntent;
 
 /**
@@ -30,11 +28,9 @@ class IntentVisitor
      *
      * @param The Intent to visit
      */
-    virtual void visit(const ChipIntent &chip_intent)                      = 0;
-    virtual void visit(const DirectVelocityIntent &direct_velocity_intent) = 0;
-    virtual void visit(const DirectWheelsIntent &direct_wheels_intent)     = 0;
-    virtual void visit(const KickIntent &kick_intent)                      = 0;
-    virtual void visit(const MoveIntent &move_intent)                      = 0;
-    virtual void visit(const MoveSpinIntent &move_spin_intent)             = 0;
-    virtual void visit(const StopIntent &stop_intent)                      = 0;
+    virtual void visit(const ChipIntent &chip_intent)                  = 0;
+    virtual void visit(const KickIntent &kick_intent)                  = 0;
+    virtual void visit(const MoveIntent &move_intent)                  = 0;
+    virtual void visit(const SpinningMoveIntent &spinning_move_intent) = 0;
+    virtual void visit(const StopIntent &stop_intent)                  = 0;
 };
