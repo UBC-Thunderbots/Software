@@ -2,7 +2,8 @@
 
 std::string demangle_typeid(const char* mangled_name)
 {
-    std::unique_ptr<char, void (*)(void*)> demangled_name_ptr{
-        abi::__cxa_demangle(mangled_name, NULL, NULL, NULL), std::free};
-    return std::string(demangled_name_ptr.get());
+    auto demangled_name_char_ptr = abi::__cxa_demangle(mangled_name, NULL, NULL, NULL);
+    std::string demangled_name(demangled_name_char_ptr);
+    delete demangled_name_char_ptr;
+    return demangled_name;
 }
