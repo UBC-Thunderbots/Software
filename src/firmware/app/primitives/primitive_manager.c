@@ -101,6 +101,13 @@ PrimitiveManager_t *app_primitive_manager_create(void)
 
 void app_primitive_manager_destroy(PrimitiveManager_t *manager)
 {
+    if (manager->current_primitive)
+    {
+        if (manager->current_primitive_state)
+        {
+            manager->current_primitive->destroy_state(manager->current_primitive_state);
+        }
+    }
     free(manager);
 }
 
@@ -111,6 +118,14 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     app_primitive_manager_lockPrimitiveMutex(manager);
 
     app_primitive_manager_endCurrentPrimitive(manager, world);
+
+    if (manager->current_primitive)
+    {
+        if (manager->current_primitive_state)
+        {
+            manager->current_primitive->destroy_state(manager->current_primitive_state);
+        }
+    }
 
     // Figure out which primitive we're running and start it
     switch (primitive_msg.which_primitive)
