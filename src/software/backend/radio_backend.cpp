@@ -18,9 +18,9 @@ RadioBackend::RadioBackend(
 {
 }
 
-void RadioBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
+void RadioBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
-    radio_output.sendPrimitives(*primitives_ptr);
+    radio_output.sendPrimitives(primitives);
 }
 
 void RadioBackend::onValueReceived(World world)
