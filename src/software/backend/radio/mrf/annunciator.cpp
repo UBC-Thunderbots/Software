@@ -110,7 +110,7 @@ void Annunciator::handle_robot_message(int index, const void *data, std::size_t 
     RadioRobotStatus robot_status;
 
     // Guard robot status state for this bot
-    std::lock_guard<std::mutex> lock(
+    std::scoped_lock lock(
         robot_status_states[static_cast<unsigned char>(index)].bot_mutex);
 
     robot_status.link_quality = lqi / 255.0;
