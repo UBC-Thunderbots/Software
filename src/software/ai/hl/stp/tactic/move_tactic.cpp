@@ -7,11 +7,6 @@ MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever, {RobotCapabilit
 {
 }
 
-std::string MoveTactic::getName() const
-{
-    return "Move Tactic";
-}
-
 void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
                                      double final_speed)
 {

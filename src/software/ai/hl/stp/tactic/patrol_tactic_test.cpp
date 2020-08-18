@@ -116,7 +116,6 @@ TEST_F(PatrolTacticTest, patrol_tactic_constructor)
         PatrolTactic(std::vector<Point>({patrol_point1}), at_patrol_point_tolerance,
                      Angle::zero(), speed_at_patrol_points);
     ASSERT_NE(nullptr, &tactic);
-    ASSERT_EQ("Patrol Tactic", tactic.getName());
 }
 
 TEST_F(PatrolTacticTest, patrol_one_point)

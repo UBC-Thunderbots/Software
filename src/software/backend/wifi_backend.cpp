@@ -6,8 +6,6 @@
 #include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string WifiBackend::name = "wifi";
-
 WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
     : network_config(network_config),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),

@@ -21,11 +21,6 @@ PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
 {
 }
 
-std::string PenaltyKickTactic::getName() const
-{
-    return "Penalty Kick Tactic";
-}
-
 void PenaltyKickTactic::updateWorldParams(
     const Ball& updated_ball, const std::optional<Robot>& updated_enemy_goalie,
     const Field& updated_field)

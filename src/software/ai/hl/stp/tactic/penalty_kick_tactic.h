@@ -22,8 +22,6 @@ class PenaltyKickTactic : public Tactic
                                const std::optional<Robot> &enemy_goalie,
                                bool loop_forever);
 
-    std::string getName() const override;
-
     /**
      * Updates the world parameters for this PenaltyKickTactic.
      *

@@ -15,11 +15,6 @@ PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
 {
 }
 
-std::string PasserTactic::getName() const
-{
-    return "Passer Tactic";
-}
-
 void PasserTactic::updateWorldParams(const Ball& updated_ball, const Field& updated_field)
 {
     this->ball  = updated_ball;

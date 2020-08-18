@@ -19,7 +19,5 @@ class KickoffChipTactic : public ChipTactic
      */
     explicit KickoffChipTactic(const Ball& ball, bool loop_forever);
 
-    std::string getName() const override;
-
     void accept(MutableTacticVisitor& visitor) override;
 };
