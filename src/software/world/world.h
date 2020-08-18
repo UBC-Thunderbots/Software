@@ -8,6 +8,7 @@
 #include "software/world/game_state.h"
 #include "software/world/team.h"
 #include "software/world/timestamped_ball_state.h"
+#include "software/world/timestamped_possession_state.h"
 
 /**
  * The world object describes the entire state of the world, which for us is all the
@@ -32,9 +33,13 @@ class World final
      * @param ball the ball for the world
      * @param friendly_team the friendly team for the world
      * @param enemy_team the enemy_team for the world
+     * @param timestamped_possession_state the timestamped possession state
      */
     explicit World(const Field& field, const Ball& ball, const Team& friendly_team,
-                   const Team& enemy_team, unsigned int buffer_size = 20);
+                   const Team& enemy_team,
+                   const TimestampedPossessionState timestamped_possession_state =
+                       TimestampedPossessionState(),
+                   unsigned int buffer_size = 20);
 
     /**
      * Updates the state of the ball in the world with the new ball data
@@ -108,6 +113,13 @@ class World final
     const Team& enemyTeam() const;
 
     /**
+     * Returns a const reference to the Timestamped Possession State in the world
+     *
+     * @return a const reference to the Timestamped Possession State in the world
+     */
+    const TimestampedPossessionState& timestampedPossessionState() const;
+
+    /**
      * Returns a const reference to the Game State
      *
      * @return a const reference to the Game State
@@ -155,6 +167,7 @@ class World final
     /**
      * Searches all member objects of world for the most recent Timestamp value
      *
+     * @return the most recent timestampe from members
      */
     Timestamp getMostRecentTimestampFromMembers();
 
@@ -169,10 +182,11 @@ class World final
 
     /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
-     * friendly_team, enemy_team and game_state are equal. The last update
-     * timestamp and histories are not part of the equality.
+     * friendly_team, enemy_team, timestamped_possession_state and game_state are equal.
+     * The last update timestamp and histories are not part of the equality.
      *
      * @param other The world to compare against for equality
+     *
      * @return True if the other robot is equal to this world, and false otherwise
      */
     bool operator==(const World& other) const;
@@ -181,6 +195,7 @@ class World final
      * Defines the inequality operator for a World.
      *
      * @param other The world to compare against for inequality
+     *
      * @return True if the other world is not equal to this world and false otherwise
      */
     bool operator!=(const World& other) const;
@@ -193,6 +208,7 @@ class World final
     Ball ball_;
     Team friendly_team_;
     Team enemy_team_;
+    TimestampedPossessionState timestamped_possession_state_;
     GameState current_game_state_;
     RefereeStage current_referee_stage_;
     // All previous timestamps of when the world was updated, with the most recent
