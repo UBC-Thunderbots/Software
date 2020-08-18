@@ -106,6 +106,7 @@ void app_primitive_manager_destroy(PrimitiveManager_t *manager)
         if (manager->current_primitive_state)
         {
             manager->current_primitive->destroy_state(manager->current_primitive_state);
+            manager->current_primitive_state = NULL;
         }
     }
     free(manager);
@@ -124,6 +125,7 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
         if (manager->current_primitive_state)
         {
             manager->current_primitive->destroy_state(manager->current_primitive_state);
+            manager->current_primitive_state = NULL;
         }
     }
 
@@ -208,8 +210,8 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
     {
         manager->current_primitive->end(manager->current_primitive_state, world);
         manager->current_primitive->destroy_state(manager->current_primitive_state);
-
-        manager->current_primitive = NULL;
+        manager->current_primitive_state = NULL;
+        manager->current_primitive       = NULL;
     }
 
     app_primitive_manager_makeRobotSafe(manager, world);
