@@ -60,15 +60,11 @@ class Team
     void updateState(const Team& new_team_data);
 
     /**
-     * Updates the possession state
-     *
-     * @throws std::invalid_argument if update_time is older than lastUpdateTimestamp()
+     * Updates which robot has the ball
      *
      * @param robot_id The robot that has possession of the ball at update_time
-     * @param update_time The timestamp to update possession state
      */
-    void updateBallPossession(const std::optional<RobotId>& robot_id,
-                              const Timestamp& update_time);
+    void updateBallPossession(const std::optional<RobotId>& robot_id);
 
     /**
      * Gets the robot on this team that has possession of the ball

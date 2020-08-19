@@ -55,10 +55,8 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
-void Team::updateBallPossession(const std::optional<RobotId>& robot_id,
-                                const Timestamp& update_time)
+void Team::updateBallPossession(const std::optional<RobotId>& robot_id)
 {
-    updateTimestamp(update_time);
     robot_with_possession = robot_id;
     if (robot_id)
     {
@@ -66,7 +64,7 @@ void Team::updateBallPossession(const std::optional<RobotId>& robot_id,
         {
             if (robot.id() == *robot_id)
             {
-                robot.updateLastBallPossessionTime(update_time);
+                robot.updateLastBallPossessionTime(robot.lastUpdateTimestamp());
                 break;
             }
         }

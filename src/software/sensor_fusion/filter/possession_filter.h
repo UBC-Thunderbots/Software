@@ -13,8 +13,8 @@
  * Finds the robot that has possession of the ball. To have possession, the robot needs to
  * be close to the ball and the closest of all robots on the team
  *
- * @param ball The ball detection
- * @param team The team of robot detections
+ * @param ball The ball
+ * @param team The team
  * @param robots_with_breakbeam_triggered The robots that have their breakbeam triggered
  * @param possession_threshold The threshold distance between the ball and robot at which
  * the robot is considered to have possession
@@ -22,7 +22,7 @@
  * @return The robot with possession of the ball
  */
 std::optional<RobotId> getRobotWithPossession(
-    const BallDetection &ball, const std::vector<RobotDetection> &team,
+    const Ball &ball, const Team &team,
     const std::vector<RobotId> &robots_with_breakbeam_triggered = std::vector<RobotId>(),
     double possession_distance_threshold = ROBOT_MAX_RADIUS_METERS + 0.2);
 

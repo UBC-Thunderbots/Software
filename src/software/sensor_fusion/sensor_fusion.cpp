@@ -54,18 +54,13 @@ void SensorFusion::updateWorld(const SensorProto &sensor_msg)
         }
         if (packet.has_detection())
         {
-            updateBallAndTeams(packet.detection());
+            updateBallAndTeams(packet.detection(), sensor_msg.robot_status_msgs());
         }
     }
 
     if (sensor_msg.has_ssl_referee_msg())
     {
         updateRefereeStageAndGameState(sensor_msg.ssl_referee_msg());
-    }
-
-    if (ball_)
-    {
-        updatePossessionState(sensor_msg.robot_status_msgs());
     }
 }
 
@@ -112,34 +107,25 @@ void SensorFusion::updateRefereeStageAndGameState(const SSLProto::Referee &packe
     referee_stage_ = createRefereeStage(packet);
 }
 
-void SensorFusion::updatePossessionState(
+std::vector<RobotId> SensorFusion::getRobotsWithBreakBeamTriggered(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    if (ball_)
+    std::vector<RobotId> friendly_robots_with_breakbeam_triggered;
+    for (const auto &robot_status_msg : robot_status_msgs)
     {
-        std::vector<RobotId> friendly_robots_with_breakbeam_triggered;
-        for (const auto &tbots_robot_msg : robot_status_msgs)
+        if (robot_status_msg.has_break_beam_status() &&
+            robot_status_msg.break_beam_status().ball_in_beam())
         {
-            if (tbots_robot_msg.has_break_beam_status() &&
-                tbots_robot_msg.break_beam_status().ball_in_beam())
-            {
-                friendly_robots_with_breakbeam_triggered.push_back(
-                    tbots_robot_msg.robot_id());
-            }
+            friendly_robots_with_breakbeam_triggered.push_back(
+                robot_status_msg.robot_id());
         }
-
-        Timestamp most_recent_timestamp =
-            std::max<Timestamp>({friendly_team_.getMostRecentTimestamp(),
-                                 enemy_team_.getMostRecentTimestamp()});
-        timestamped_possession_state_.updateState(
-            getRobotsWithPossession(friendly_robots_with_breakbeam_triggered,
-                                    friendly_team_, enemy_team_, *ball_),
-            most_recent_timestamp);
     }
+    return friendly_robots_with_breakbeam_triggered;
 }
 
 void SensorFusion::updateBallAndTeams(
-    const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
+    const SSLProto::SSL_DetectionFrame &ssl_detection_frame,
+    const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
@@ -190,6 +176,12 @@ void SensorFusion::updateBallAndTeams(
     }
 
     new_ball_state = createTimestampedBallState(ball_detections);
+
+    if (new_ball_state)
+    {
+        updateBall(*new_ball_state);
+    }
+
     if (friendly_team_is_yellow)
     {
         friendly_team_ = createFriendlyTeam(yellow_team);
@@ -201,10 +193,9 @@ void SensorFusion::updateBallAndTeams(
         enemy_team_    = createEnemyTeam(yellow_team);
     }
 
-    if (new_ball_state)
-    {
-        updateBall(*new_ball_state);
-    }
+    friendly_team_.updateBallPossession(getRobotWithPossession(
+        *ball_, friendly_team_, getRobotsWithBreakBeamTriggered(robot_status_msgs)));
+    enemy_team_.updateBallPossession(getRobotWithPossession(*ball_, enemy_team_));
 }
 
 void SensorFusion::updateBall(TimestampedBallState new_ball_state)

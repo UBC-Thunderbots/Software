@@ -33,7 +33,7 @@ std::vector<RobotIdWithTeamSide> getRobotsWithPossession(
 }
 
 std::optional<RobotId> getRobotWithPossession(
-    const BallDetection &ball, const std::vector<RobotDetection> &team,
+    const Ball &ball, const Team &team,
     const std::vector<RobotId> &robots_with_breakbeam_triggered,
     double possession_distance_threshold)
 {

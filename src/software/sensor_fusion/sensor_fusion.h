@@ -56,16 +56,9 @@ class SensorFusion final
      */
     void updateRefereeStageAndGameState(const SSLProto::Referee &packet);
 
-    /**
-     * Updates timestamped_possession_state based on new data
-     *
-     * @pre ball, friendly_team, and enemy_team was updated
-     *
-     * @param tbots_robot_msgs New list of TbotsProto::RobotStatus
-     */
-    void updatePossessionState(
+    std::vector<RobotId> getRobotsWithBreakBeamTriggered(
         const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>
-            &tbots_robot_msgs);
+            &robot_status_msgs);
 
     /**
      * Updates field based on new data
@@ -78,8 +71,12 @@ class SensorFusion final
      * Updates ball, friendly_team, and enemy_team based on new data
      *
      * @param ssl_detection_frame The new SSL_DetectionFrame
+     * @param robot_status_msgs New list of TbotsProto::RobotStatus
      */
-    void updateBallAndTeams(const SSLProto::SSL_DetectionFrame &ssl_detection_frame);
+    void updateBallAndTeams(
+        const SSLProto::SSL_DetectionFrame &ssl_detection_frame,
+        const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>
+            &robot_status_msgs);
 
     /**
      * Updates relevant components with a new ball state
