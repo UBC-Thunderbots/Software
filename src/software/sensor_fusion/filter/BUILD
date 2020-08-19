@@ -80,6 +80,7 @@ cc_library(
     srcs = ["possession_filter.cpp"],
     hdrs = ["possession_filter.h"],
     deps = [
+        ":vision_detection",
         "//software:constants",
         "//software/world:ball",
         "//software/world:robot_state",

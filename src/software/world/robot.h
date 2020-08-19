@@ -112,6 +112,23 @@ class Robot
     RobotHistory getPreviousStates() const;
 
     /**
+     * Updates the the last ball possession time
+     *
+     * @throws std::invalid_argument if update_time is older than lastUpdateTimestamp()
+     *
+     * @param possessions The robots that have possession of the ball at update_time
+     * @param update_time The timestamp to update possession state
+     */
+    void updateLastBallPossessionTime(const Timestamp &update_time);
+
+    /**
+     * Returns the last time this robot had possession of the ball
+     *
+     * @return last update time
+     */
+    std::optional<Timestamp> getLastBallPossessionTime() const;
+
+    /**
      * Returns the missing capabilities of the robot
      *
      * @return the missing capabilities of the robot
@@ -124,13 +141,6 @@ class Robot
      * @return Returns all capabilities this robot has
      */
     std::set<RobotCapability> getCapabilitiesWhitelist() const;
-
-    /**
-     * Returns the mutable hardware capabilities of the robot
-     *
-     * @return the mutable hardware capabilities of the robot
-     */
-    std::set<RobotCapability> &getMutableRobotCapabilities();
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
@@ -181,4 +191,6 @@ class Robot
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapability> unavailable_capabilities_;
+    // Last time that this robot had possession of the ball
+    std::optional<Timestamp> last_ball_possession_time_;
 };

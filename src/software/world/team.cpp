@@ -55,6 +55,29 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
+void Team::updateBallPossession(const std::optional<RobotId>& robot_id,
+                                const Timestamp& update_time)
+{
+    updateTimestamp(update_time);
+    robot_with_possession = robot_id;
+    if (robot_id)
+    {
+        for (auto& robot : team_robots)
+        {
+            if (robot.id() == *robot_id)
+            {
+                robot.updateLastBallPossessionTime(update_time);
+                break;
+            }
+        }
+    }
+}
+
+std::optional<RobotId> Team::getRobotWithBallPossession()
+{
+    return robot_with_possession;
+}
+
 void Team::updateState(const Team& new_team_data)
 {
     updateRobots(new_team_data.getAllRobots());

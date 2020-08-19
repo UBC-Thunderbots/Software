@@ -32,6 +32,32 @@ std::vector<RobotIdWithTeamSide> getRobotsWithPossession(
     return possessions;
 }
 
+std::optional<RobotId> getRobotWithPossession(
+    const BallDetection &ball, const std::vector<RobotDetection> &team,
+    const std::vector<RobotId> &robots_with_breakbeam_triggered,
+    double possession_distance_threshold)
+{
+    return std::nullopt;
+}
+
+std::optional<double> getPossessionDistance(Point ball_position, Point robot_position,
+                                            Angle robot_orientation,
+                                            double possession_distance_threshold)
+{
+    double ball_to_robot_distance = (ball_position - robot_position).length();
+    if (ball_to_robot_distance <= possession_distance_threshold)
+    {
+        // check that ball is in a 90-degree cone in front of the robot
+        auto ball_to_robot_angle =
+            robot_orientation.minDiff((ball_position - robot_position).orientation());
+        if (ball_to_robot_angle < Angle::fromDegrees(45.0))
+        {
+            return ball_to_robot_distance;
+        }
+    }
+    return std::nullopt;
+}
+
 bool ballNearDribbler(Point ball_position, Point robot_position, Angle robot_orientation)
 {
     static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + 0.2;

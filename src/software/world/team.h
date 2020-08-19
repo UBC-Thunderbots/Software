@@ -60,6 +60,24 @@ class Team
     void updateState(const Team& new_team_data);
 
     /**
+     * Updates the possession state
+     *
+     * @throws std::invalid_argument if update_time is older than lastUpdateTimestamp()
+     *
+     * @param robot_id The robot that has possession of the ball at update_time
+     * @param update_time The timestamp to update possession state
+     */
+    void updateBallPossession(const std::optional<RobotId>& robot_id,
+                              const Timestamp& update_time);
+
+    /**
+     * Gets the robot on this team that has possession of the ball
+     *
+     * @return the robot with possession of the ball if there is one
+     */
+    std::optional<RobotId> getRobotWithBallPossession();
+
+    /**
      * Removes expired robots from the team. Robots are expired if it has been more than
      * the expiry_buffer time has passed since they were last updated. This would happen
      * if a robot is removed from the field, so that it is no longer seen by the cameras.
@@ -239,4 +257,6 @@ class Team
     // All previous timestamps of when the field was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
+
+    std::optional<RobotId> robot_with_possession;
 };

@@ -83,6 +83,20 @@ RobotHistory Robot::getPreviousStates() const
     return states_;
 }
 
+void Robot::updateLastBallPossessionTime(const Timestamp &update_time)
+{
+    if (update_time < lastUpdateTimestamp())
+    {
+        throw std::invalid_argument("Update time is older than the last update time");
+    }
+    last_ball_possession_time_ = update_time;
+}
+
+std::optional<Timestamp> Robot::getLastBallPossessionTime() const
+{
+    return last_ball_possession_time_;
+}
+
 bool Robot::operator==(const Robot &other) const
 {
     return this->id_ == other.id_ && this->position() == other.position() &&
@@ -113,9 +127,4 @@ std::set<RobotCapability> Robot::getCapabilitiesWhitelist() const
                         std::inserter(robot_capabilities, robot_capabilities.begin()));
 
     return robot_capabilities;
-}
-
-std::set<RobotCapability> &Robot::getMutableRobotCapabilities()
-{
-    return unavailable_capabilities_;
 }
