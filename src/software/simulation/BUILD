@@ -137,6 +137,7 @@ cc_test(
     srcs = ["simulator_test.cpp"],
     deps = [
         ":simulator",
+        "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
@@ -159,6 +160,7 @@ cc_test(
     deps = [
         ":threaded_simulator",
         "//software/proto/message_translation:tbots_protobuf",
+        "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
