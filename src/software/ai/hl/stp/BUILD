@@ -4,8 +4,6 @@ cc_library(
     name = "stp",
     srcs = [
         "stp.cpp",
-        "stp_impl.cpp",
-        "stp_impl.h",
     ],
     hdrs = ["stp.h"],
     deps = [
