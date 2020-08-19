@@ -4,6 +4,8 @@
 
 #include "software/ai/intent/spinning_move_intent.h"
 
+// TODO (Issue #1644): refactor and reenable these tests
+/*
 TEST(SpinningMoveActionTest, getDestination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -69,3 +71,4 @@ TEST(SpinningMoveActionTest, test_action_does_not_prematurely_report_done)
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
 }
+*/

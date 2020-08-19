@@ -96,18 +96,6 @@ void ThreadedSimulator::addBlueRobots(const std::vector<RobotStateWithId> &robot
     updateCallbacks();
 }
 
-void ThreadedSimulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    std::scoped_lock lock(simulator_mutex);
-    simulator.setYellowRobotPrimitives(primitives);
-}
-
-void ThreadedSimulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    std::scoped_lock lock(simulator_mutex);
-    simulator.setBlueRobotPrimitives(primitives);
-}
-
 void ThreadedSimulator::setYellowRobotPrimitive(RobotId id,
                                                 const TbotsProto_Primitive &primitive_msg)
 {
@@ -120,6 +108,20 @@ void ThreadedSimulator::setBlueRobotPrimitive(RobotId id,
 {
     std::scoped_lock lock(simulator_mutex);
     simulator.setBlueRobotPrimitive(id, primitive_msg);
+}
+
+void ThreadedSimulator::setYellowRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet &primitive_set_msg)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.setYellowRobotPrimitiveSet(primitive_set_msg);
+}
+
+void ThreadedSimulator::setBlueRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet &primitive_set_msg)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.setBlueRobotPrimitiveSet(primitive_set_msg);
 }
 
 void ThreadedSimulator::setYellowTeamDefendingSide(

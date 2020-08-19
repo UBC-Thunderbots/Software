@@ -74,39 +74,6 @@ void Simulator::updateSimulatorRobots(
     }
 }
 
-void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball,
-                       yellow_team_defending_side);
-}
-
-void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball,
-                       blue_team_defending_side);
-}
-
-void Simulator::setRobotPrimitives(
-    ConstPrimitiveVectorPtr primitives,
-    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-        simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side)
-{
-    if (!primitives)
-    {
-        return;
-    }
-
-    for (const auto& primitive_ptr : *primitives)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
-                          simulator_ball, defending_side);
-    }
-}
-
 void Simulator::setYellowRobotPrimitive(RobotId id,
                                         const TbotsProto_Primitive& primitive_msg)
 {
@@ -119,6 +86,25 @@ void Simulator::setBlueRobotPrimitive(RobotId id,
 {
     setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball,
                       blue_team_defending_side);
+}
+
+void Simulator::setYellowRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet& primitive_set_msg)
+{
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
+    {
+        setYellowRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                                primitive_set_msg.robot_primitives[i].value);
+    }
+}
+
+void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg)
+{
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
+    {
+        setBlueRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                              primitive_set_msg.robot_primitives[i].value);
+    }
 }
 
 void Simulator::setRobotPrimitive(

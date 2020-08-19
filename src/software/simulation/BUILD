@@ -166,6 +166,7 @@ cc_test(
     srcs = ["threaded_simulator_test.cpp"],
     deps = [
         ":threaded_simulator",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",

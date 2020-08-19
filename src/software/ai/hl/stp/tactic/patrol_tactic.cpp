@@ -18,11 +18,6 @@ PatrolTactic::PatrolTactic(const std::vector<Point> &points,
 {
 }
 
-std::string PatrolTactic::getName() const
-{
-    return "Patrol Tactic";
-}
-
 double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     if (patrol_points.empty())

@@ -19,11 +19,6 @@ ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
 {
 }
 
-std::string ReceiverTactic::getName() const
-{
-    return "Receiver Tactic";
-}
-
 void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
                                        const Team& updated_enemy_team,
                                        const Ball& updated_ball)

@@ -12,14 +12,7 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string FreeKickPlay::name = "Direct Free Kick Play";
-
 FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
-
-std::string FreeKickPlay::getName() const
-{
-    return FreeKickPlay::name;
-}
 
 bool FreeKickPlay::isApplicable(const World &world) const
 {

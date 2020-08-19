@@ -7,8 +7,6 @@
 #include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string WifiBackend::name = "wifi";
-
 WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config,
                          std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : network_config(network_config),
@@ -33,9 +31,9 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config,
     joinMulticastChannel(channel, network_interface);
 }
 
-void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
+void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
-    primitive_output->sendProto(*createPrimitiveSet(primitives_ptr));
+    primitive_output->sendProto(*createPrimitiveSet(primitives));
 
     if (sensor_fusion_config->OverrideGameControllerDefendingSide()->value())
     {
