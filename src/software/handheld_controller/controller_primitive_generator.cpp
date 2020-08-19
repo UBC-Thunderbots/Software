@@ -1,8 +1,5 @@
 #include "software/handheld_controller/controller_primitive_generator.h"
 
-#include "software/primitive/chip_primitive.h"
-#include "software/primitive/direct_velocity_primitive.h"
-#include "software/primitive/kick_primitive.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
 
 ControllerPrimitiveGenerator::ControllerPrimitiveGenerator(

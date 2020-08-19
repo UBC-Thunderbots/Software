@@ -25,7 +25,6 @@ cc_library(
     hdrs = ["chip_intent.h"],
     deps = [
         ":direct_primitive_intent",
-        "//software/primitive:chip_primitive",
     ],
 )
 
@@ -44,7 +43,6 @@ cc_library(
     hdrs = ["kick_intent.h"],
     deps = [
         ":direct_primitive_intent",
-        "//software/primitive:kick_primitive",
     ],
 )
 
@@ -65,7 +63,6 @@ cc_library(
         ":navigating_intent",
         "//software/geom:angle",
         "//software/geom:point",
-        "//software/primitive:move_primitive",
         "//software/util/make_enum",
     ],
 )
@@ -85,7 +82,6 @@ cc_library(
     hdrs = ["spinning_move_intent.h"],
     deps = [
         ":direct_primitive_intent",
-        "//software/primitive:spinning_move_primitive",
     ],
 )
 
@@ -104,7 +100,6 @@ cc_library(
     hdrs = ["stop_intent.h"],
     deps = [
         ":direct_primitive_intent",
-        "//software/primitive:stop_primitive",
     ],
 )
 
@@ -142,7 +137,6 @@ cc_library(
         "//software/geom:angle",
         "//software/geom:point",
         "//software/logger",
-        "//software/primitive",
         "//software/proto/primitive:primitive_msg_factory",
     ],
 )

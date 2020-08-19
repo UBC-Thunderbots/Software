@@ -8,7 +8,6 @@
 #include "software/ai/navigator/path_planner/no_path_test_path_planner.h"
 #include "software/ai/navigator/path_planner/one_point_path_test_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
-#include "software/primitive/all_primitives.h"
 #include "software/test_util/test_util.h"
 
 class NoPathNavigatorTest : public testing::Test
@@ -76,7 +75,7 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = createChipPrimitive(0, Point(), Angle::quarter(), 0);
+    auto expected_primitive = *createChipPrimitive(Point(), Angle::quarter(), 0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -94,7 +93,7 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = createKickPrimitive(0, Point(), Angle::quarter(), 0);
+    auto expected_primitive = *createKickPrimitive(Point(), Angle::quarter(), 0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -113,7 +112,7 @@ TEST_F(ThetaStarNavigatorTest, convert_spinning_move_intent_to_spinning_move_pri
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
     auto expected_primitive =
-        createSpinningMovePrimitive(0, Point(), AngularVelocity::full(), 1);
+        *createSpinningMovePrimitive(Point(), 1, false, AngularVelocity::full(), 0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -130,7 +129,7 @@ TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = createStopPrimitive(0, false);
+    auto expected_primitive = *createStopPrimitive(false);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -148,11 +147,11 @@ TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 2);
 
-    auto expected_stop_primitive_1 = createStopPrimitive(0, false);
+    auto expected_stop_primitive_1 = *createStopPrimitive(false);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_stop_primitive_1, primitive_set_msg->robot_primitives().at(0)));
 
-    auto expected_stop_primitive_2 = createStopPrimitive(1, false);
+    auto expected_stop_primitive_2 = *createStopPrimitive(false);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_stop_primitive_2, primitive_set_msg->robot_primitives().at(1)));
 }
@@ -211,8 +210,8 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
     auto expected_primitive =
-        createMovePrimitive(0, poi, Angle::zero(), 0, DribblerEnable::OFF,
-                            MoveType::NORMAL, AutochickType::NONE);
+        *createLegacyMovePrimitive(poi, Angle::zero(), 0, DribblerEnable::OFF,
+                                   MoveType::NORMAL, AutochickType::NONE);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -250,7 +249,7 @@ TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = createStopPrimitive(0, false);
+    auto expected_primitive = *createStopPrimitive(false);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }

@@ -11,8 +11,6 @@ cc_library(
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
-        "//software/primitive:all_primitives",
-        "//software/primitive:primitive_visitor",
         "//software/world",
     ],
 )
@@ -156,7 +154,6 @@ cc_test(
     srcs = ["primitive_google_to_nanopb_converter_test.cpp"],
     deps = [
         ":primitive_google_to_nanopb_converter",
-        "//software/primitive:move_primitive",
         "@gtest//:gtest_main",
     ],
 )

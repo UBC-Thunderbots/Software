@@ -4,7 +4,6 @@
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
-#include "software/primitive/primitive.h"
 #include "software/util/make_enum/make_enum.h"
 
 MAKE_ENUM(AutochickType, NONE, AUTOKICK, AUTOCHIP);

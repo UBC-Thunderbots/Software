@@ -7,7 +7,6 @@ cc_library(
     deps = [
         "//software/logger",
         "//software/parameter:dynamic_parameters",
-        "//software/primitive",
         "//software/proto:sensor_msg_cc_proto",
         "//software/proto/message_translation:ssl_detection",
         "//software/proto/message_translation:ssl_geometry",

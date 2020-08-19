@@ -25,6 +25,5 @@ cc_library(
         "//software:constants",
         "//software/backend/radio:robot_status",
         "//software/backend/radio/mrf/usb:libusb",
-        "//software/primitive",
     ],
 )

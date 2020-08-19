@@ -4,7 +4,6 @@
 #include "software/handheld_controller/controller.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
-#include "software/primitive/primitive.h"
 
 /**
  * An observer that converts ControllerInputs into Primitives

@@ -25,8 +25,8 @@ TbotsProto::Primitive NavigatingPrimitiveCreator::createNavigatingPrimitive(
 
 void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
 {
-    current_primitive = createMovePrimitive(
-        intent.getRobotId(), new_destination, intent.getFinalAngle(), new_final_speed,
+    current_primitive = *createLegacyMovePrimitive(
+        new_destination, intent.getFinalAngle(), new_final_speed,
         intent.getDribblerEnable(), intent.getMoveType(), intent.getAutochickType());
 }
 

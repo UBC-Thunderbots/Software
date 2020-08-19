@@ -2,7 +2,6 @@
 
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "shared/proto/vision.pb.h"
-#include "software/primitive/primitive.h"
 #include "software/proto/message_translation/tbots_geometry.h"
 #include "software/world/world.h"
 

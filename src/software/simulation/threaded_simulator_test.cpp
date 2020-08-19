@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "software/primitive/move_primitive.h"
-#include "software/primitive/primitive.h"
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/test_util/test_util.h"
 

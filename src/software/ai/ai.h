@@ -3,7 +3,6 @@
 #include "software/ai/hl/hl.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/navigator/navigator.h"
-#include "software/primitive/primitive.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
