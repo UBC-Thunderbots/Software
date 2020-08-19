@@ -24,7 +24,7 @@ Simulator::Simulator(const Field& field, double ball_restitution,
                      double ball_linear_damping, const Duration& physics_time_step)
     : physics_world(field, ball_restitution, ball_linear_damping),
       yellow_team_defending_side(FieldSide::NEG_X),
-      blue_team_defending_side(FieldSide::POS_X),
+      blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),
       physics_time_step(physics_time_step)
 {
