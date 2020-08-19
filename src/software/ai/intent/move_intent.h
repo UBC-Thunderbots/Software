@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/intent/navigating_intent.h"
-#include "software/primitive/move_primitive.h"
 
 class MoveIntent : public NavigatingIntent
 {

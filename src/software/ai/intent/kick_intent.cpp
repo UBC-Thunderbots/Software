@@ -7,8 +7,7 @@ KickIntent::KickIntent(unsigned int robot_id, const Point &kick_origin,
                        unsigned int priority)
     : DirectPrimitiveIntent(
           robot_id, priority,
-          ProtoCreatorPrimitiveVisitor().createPrimitive(KickPrimitive(
-              robot_id, kick_origin, kick_direction, kick_speed_meters_per_second)))
+          *createKickPrimitive(kick_origin, kick_direction, kick_speed_meters_per_second))
 {
 }
 

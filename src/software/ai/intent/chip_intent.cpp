@@ -7,8 +7,7 @@ ChipIntent::ChipIntent(unsigned int robot_id, const Point &chip_origin,
                        unsigned int priority)
     : DirectPrimitiveIntent(
           robot_id, priority,
-          ProtoCreatorPrimitiveVisitor().createPrimitive(
-              ChipPrimitive(robot_id, chip_origin, chip_direction, chip_distance_meters)))
+          *createChipPrimitive(chip_origin, chip_direction, chip_distance_meters))
 {
 }
 

@@ -132,7 +132,7 @@ TEST(PrimitiveFactoryTest, test_create_autokick_move_primitive)
 
 TEST(PrimitiveFactoryTest, test_create_stop_primitive_brake)
 {
-    auto stop_primitive = createStopPrimitive(StopType::BRAKE);
+    auto stop_primitive = createStopPrimitive(false);
 
     EXPECT_EQ(stop_primitive->mutable_stop()->stop_type(),
               stop_primitive->mutable_stop()->BRAKE);
@@ -140,7 +140,7 @@ TEST(PrimitiveFactoryTest, test_create_stop_primitive_brake)
 
 TEST(PrimitiveFactoryTest, test_create_stop_primitive_coast)
 {
-    auto stop_primitive = createStopPrimitive(StopType::COAST);
+    auto stop_primitive = createStopPrimitive(true);
 
     EXPECT_EQ(stop_primitive->mutable_stop()->stop_type(),
               stop_primitive->mutable_stop()->COAST);

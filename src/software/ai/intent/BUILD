@@ -143,6 +143,7 @@ cc_library(
         "//software/geom:point",
         "//software/logger",
         "//software/primitive",
+        "//software/proto/primitive:primitive_msg_factory",
     ],
 )
 

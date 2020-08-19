@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/intent/direct_primitive_intent.h"
-#include "software/primitive/spinning_move_primitive.h"
 
 class SpinningMoveIntent : public DirectPrimitiveIntent
 {

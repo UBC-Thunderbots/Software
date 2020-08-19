@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/intent/direct_primitive_intent.h"
-#include "software/primitive/stop_primitive.h"
 
 class StopIntent : public DirectPrimitiveIntent
 {

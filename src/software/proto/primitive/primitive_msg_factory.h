@@ -7,11 +7,6 @@
 #include "software/primitive/primitive.h"
 #include "software/util/make_enum/make_enum.h"
 
-/**
- * Enum for indicating the stop type for the Stop Primitive
- */
-MAKE_ENUM(StopType, BRAKE, COAST)
-
 MAKE_ENUM(AutochickType, NONE, AUTOKICK, AUTOCHIP);
 
 MAKE_ENUM(MoveType, NORMAL, SLOW);
@@ -138,4 +133,4 @@ std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
  *
  * @return Pointer to Stop Primitive Message
  */
-std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(StopType stop_type);
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);

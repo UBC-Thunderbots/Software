@@ -3,7 +3,6 @@
 #include "software/ai/intent/direct_primitive_intent.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
-#include "software/primitive/chip_primitive.h"
 
 class ChipIntent : public DirectPrimitiveIntent
 {

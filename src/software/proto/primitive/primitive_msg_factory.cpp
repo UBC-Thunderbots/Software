@@ -154,19 +154,19 @@ std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
     return autokick_move_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(StopType stop_type)
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
 {
     auto stop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    if (stop_type == StopType::BRAKE)
+    if (coast)
     {
         stop_primitive_msg->mutable_stop()->set_stop_type(
-            stop_primitive_msg->mutable_stop()->BRAKE);
+            stop_primitive_msg->mutable_stop()->COAST);
     }
     else
     {
         stop_primitive_msg->mutable_stop()->set_stop_type(
-            stop_primitive_msg->mutable_stop()->COAST);
+            stop_primitive_msg->mutable_stop()->BRAKE);
     }
 
     return stop_primitive_msg;
