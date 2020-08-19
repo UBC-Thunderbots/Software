@@ -449,17 +449,17 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positive
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
     std::vector<RobotStateWithId> states = {
-            RobotStateWithId{.id = 1, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
     };
     simulator.addBlueRobots(states);
 
     std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-            1, Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-            AutochickType::NONE);
+        1, Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> primitives;
     primitives.emplace_back(std::move(move_primitive));
     auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(primitives));
+        std::move(primitives));
     simulator.setBlueRobotPrimitives(primitives_ptr);
 
     for (unsigned int i = 0; i < 240; i++)
@@ -494,17 +494,17 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_negati
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
     std::vector<RobotStateWithId> states = {
-            RobotStateWithId{.id = 1, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
     };
     simulator.addYellowRobots(states);
 
     std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-            1, Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-            AutochickType::NONE);
+        1, Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> primitives;
     primitives.emplace_back(std::move(move_primitive));
     auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(primitives));
+        std::move(primitives));
     simulator.setYellowRobotPrimitives(primitives_ptr);
 
     for (unsigned int i = 0; i < 120; i++)
@@ -538,17 +538,17 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_positi
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
     std::vector<RobotStateWithId> states = {
-            RobotStateWithId{.id = 1, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
     };
     simulator.addYellowRobots(states);
 
     std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-            1, Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-            AutochickType::NONE);
+        1, Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+        AutochickType::NONE);
     std::vector<std::unique_ptr<Primitive>> primitives;
     primitives.emplace_back(std::move(move_primitive));
     auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(primitives));
+        std::move(primitives));
     simulator.setYellowRobotPrimitives(primitives_ptr);
 
     for (unsigned int i = 0; i < 240; i++)
