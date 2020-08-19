@@ -60,7 +60,7 @@ void SensorFusion::updateWorld(const SensorProto &sensor_msg)
 
     if (sensor_msg.has_ssl_referee_msg())
     {
-        updateRefboxStageAndGameState(sensor_msg.ssl_referee_msg());
+        updateRefereeStageAndGameState(sensor_msg.ssl_referee_msg());
     }
 
     if (ball_)
@@ -80,7 +80,7 @@ void SensorFusion::updateField(const SSLProto::SSL_GeometryData &geometry_packet
     }
 }
 
-void SensorFusion::updateRefboxStageAndGameState(const SSLProto::Referee &packet)
+void SensorFusion::updateRefereeStageAndGameState(const SSLProto::Referee &packet)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960

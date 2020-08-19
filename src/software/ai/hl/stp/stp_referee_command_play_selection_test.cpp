@@ -240,7 +240,7 @@ TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_c
 // NORMAL_START is omitted since there is no preceding PREPARE state
 // GOAL_US and GOAL_THEM are omitted since selecting a play is not applicable
 INSTANTIATE_TEST_CASE_P(
-    AllRefboxGameStates, STPRefereeCommandPlaySelectionTest,
+    AllRefereeCommands, STPRefereeCommandPlaySelectionTest,
     ::testing::Values(
         RefereeCommand::HALT, RefereeCommand::STOP, RefereeCommand::FORCE_START,
         RefereeCommand::PREPARE_KICKOFF_US, RefereeCommand::PREPARE_KICKOFF_THEM,

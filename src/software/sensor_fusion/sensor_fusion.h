@@ -50,11 +50,11 @@ class SensorFusion final
 
    private:
     /**
-     * Updates refbox_stage and game_state based on new data
+     * Updates referee_stage and game_state based on new data
      *
      * @param packet new SSLProto::Referee proto
      */
-    void updateRefboxStageAndGameState(const SSLProto::Referee &packet);
+    void updateRefereeStageAndGameState(const SSLProto::Referee &packet);
 
     /**
      * Updates timestamped_possession_state based on new data
