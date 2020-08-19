@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
@@ -11,50 +12,6 @@ extern "C"
 #include "shared/proto/primitive.nanopb.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
 }
-
-/**
- * Because the FirmwareWorld_t struct is defined in the .c file (rather than the .h file),
- * C++ considers it an incomplete type and is unable to use it with smart pointers
- * because it doesn't know the size of the object. Therefore we need to create our own
- * "Deleter" class we can provide to the smart pointers to handle that instead.
- *
- * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
- * examples
- */
-struct FirmwareWorldDeleter
-{
-    void operator()(FirmwareWorld_t* firmware_world) const
-    {
-        FirmwareRobot_t* firmware_robot = app_firmware_world_getRobot(firmware_world);
-
-        Wheel_t* firmware_robot_front_left_wheel =
-            app_firmware_robot_getFrontLeftWheel(firmware_robot);
-        app_wheel_destroy(firmware_robot_front_left_wheel);
-        Wheel_t* firmware_robot_back_left_wheel =
-            app_firmware_robot_getBackLeftWheel(firmware_robot);
-        app_wheel_destroy(firmware_robot_back_left_wheel);
-        Wheel_t* firmware_robot_back_right_wheel =
-            app_firmware_robot_getBackRightWheel(firmware_robot);
-        app_wheel_destroy(firmware_robot_back_right_wheel);
-        Wheel_t* firmware_robot_front_right_wheel =
-            app_firmware_robot_getFrontRightWheel(firmware_robot);
-        app_wheel_destroy(firmware_robot_front_right_wheel);
-
-        Chicker_t* firmware_robot_chicker = app_firmware_robot_getChicker(firmware_robot);
-        app_chicker_destroy(firmware_robot_chicker);
-
-        Dribbler_t* firmware_robot_dribbler =
-            app_firmware_robot_getDribbler(firmware_robot);
-        app_dribbler_destroy(firmware_robot_dribbler);
-
-        app_firmware_robot_destroy(firmware_robot);
-
-        FirmwareBall_t* firmware_ball = app_firmware_world_getBall(firmware_world);
-        app_firmware_ball_destroy(firmware_ball);
-
-        app_firmware_world_destroy(firmware_world);
-    };
-};
 
 /**
  * The Simulator abstracts away the physics simulation of all objects in the world,

@@ -188,7 +188,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
                AutochickType::NONE)));
 
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
     threaded_simulator.stopSimulation();
 
     // TODO: These tests are currently very lenient, and don't test final velocities.

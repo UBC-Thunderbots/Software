@@ -30,8 +30,9 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
             });
     }
 
-    primitive_manager = std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>(
-        app_primitive_manager_create(), PrimitiveManagerDeleter());
+    primitive_manager =
+        std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter>(
+            app_primitive_manager_create(), FirmwarePrimitiveManagerDeleter());
 }
 
 void SimulatorRobot::checkValidAndExecuteVoid(

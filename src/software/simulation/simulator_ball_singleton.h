@@ -1,27 +1,12 @@
 #pragma once
 
+#include "software/simulation/firmware_object_deleter.h"
+#include "software/simulation/simulator_ball.h"
+
 extern "C"
 {
 #include "firmware/app/world/firmware_ball.h"
 }
-#include "software/simulation/simulator_ball.h"
-
-/**
- * Because the FirmwareBall_t struct is defined in the .c file (rather than the .h file),
- * C++ considers it an incomplete type and is unable to use it with smart pointers
- * because it doesn't know the size of the object. Therefore we need to create our own
- * "Deleter" class we can provide to the smart pointers to handle that instead.
- *
- * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
- * examples
- */
-struct FirmwareBallDeleter
-{
-    void operator()(FirmwareBall_t* firmware_ball) const
-    {
-        app_firmware_ball_destroy(firmware_ball);
-    };
-};
 
 /**
  * This class acts as a wrapper around a SimulatorBall so that the SimulatorBall
