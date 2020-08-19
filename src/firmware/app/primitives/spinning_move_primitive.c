@@ -23,7 +23,7 @@ typedef struct SpinningMovePrimitiveState
 } SpinningMovePrimitiveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(SpinningMovePrimitiveState_t)
 
-void app_spinning_move_primitive_start(TbotsProto_PrimitiveParams params,
+void app_spinning_move_primitive_start(TbotsProto_SpinningMovePrimitive prim_msg,
                                        void *void_state_ptr, FirmwareWorld_t *world)
 {
     SpinningMovePrimitiveState_t *state = (SpinningMovePrimitiveState_t *)void_state_ptr;
@@ -34,11 +34,11 @@ void app_spinning_move_primitive_start(TbotsProto_PrimitiveParams params,
     //              param[3]: g_end_speed       [millimeter/s]
 
     // Parse the parameters with the standard units
-    state->x_final    = params.parameter1 / 1000.0f;
-    state->y_final    = params.parameter2 / 1000.0f;
-    state->avel_final = params.parameter3 / 100.0f;
-    state->end_speed  = params.parameter4 / 1000.0f;
-    state->slow       = params.slow;
+    state->x_final    = prim_msg.position_params.destination.x_meters;
+    state->y_final    = prim_msg.position_params.destination.y_meters;
+    state->avel_final = prim_msg.angular_velocity.radians_per_second;
+    state->end_speed  = prim_msg.position_params.final_speed_meters_per_second;
+    state->slow       = prim_msg.position_params.slow;
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 
@@ -59,6 +59,9 @@ void app_spinning_move_primitive_start(TbotsProto_PrimitiveParams params,
 
     // major angle - angle relative to global x
     state->major_angle = atan2f(state->major_vec[1], state->major_vec[0]);
+
+    Dribbler_t *dribbler = app_firmware_robot_getDribbler(robot);
+    app_dribbler_setSpeed(dribbler, (uint32_t)prim_msg.dribbler_speed_rpm);
 }
 
 static void spinning_move_end(void *void_state_ptr, FirmwareWorld_t *world) {}
