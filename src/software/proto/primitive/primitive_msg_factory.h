@@ -60,17 +60,21 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  * Create a Move Primitive Message using the arguments of the old MovePrimitive
  *
  * @param dest The final destination of the movement
- * @param final_speed_meters_per_second The speed at final destination
- * @param slow Whether or not to move at a slower speed (1m/s)
  * @param final_angle The final orientation the robot should have at the end
  * of the movement
- * @param dribbler_speed_rpm The speed of how fast the dribbler runs
+ * @param final_speed The final speed the Robot should have when it reaches
+ * its destination at the end of the movement
+ * @param enable_dribbler Whether or not to enable the dribbler
+ * @param slow Whether or not to move at a slower speed (1m/s)
+ * @param autochick A flag indicating if autokick should be enabled while the robot is
+ * moving. This will enable the "break-beam" on the robot that will trigger the kicker
+ * or chipper to fire as soon as the ball is in front of it
  *
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
     const Point &dest, const Angle &final_angle, double final_speed,
-    DribblerEnable enable_dribbler, MoveType move_type, AutochickType autokick);
+    DribblerEnable enable_dribbler, MoveType move_type, AutochickType autochick);
 
 /**
  * Create a Spinning Move Primitive Message

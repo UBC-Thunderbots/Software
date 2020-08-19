@@ -64,11 +64,29 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 
 std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
     const Point &dest, const Angle &final_angle, double final_speed,
-    DribblerEnable enable_dribbler, MoveType move_type, AutochickType autokick)
+    DribblerEnable enable_dribbler, MoveType move_type, AutochickType autochick)
 {
-    return createMovePrimitive(dest, final_speed, move_type == MoveType::SLOW,
-                               final_angle,
-                               enable_dribbler == DribblerEnable::ON ? 16000 : 0);
+    // TODO (#1638): Remove this and use createMovePrimitive, createAutochipMovePrimitive,
+    // or createAutokickMovePrimitive instead
+    if (autochick == AutochickType::AUTOKICK)
+    {
+        return createAutokickMovePrimitive(
+            dest, final_speed, move_type == MoveType::SLOW, final_angle,
+            enable_dribbler == DribblerEnable::ON ? 16000 : 0,
+            BALL_MAX_SPEED_METERS_PER_SECOND - 1);
+    }
+    else if (autochick == AutochickType::AUTOCHIP)
+    {
+        return createAutochipMovePrimitive(
+            dest, final_speed, move_type == MoveType::SLOW, final_angle,
+            enable_dribbler == DribblerEnable::ON ? 16000 : 0, 2);
+    }
+    else
+    {
+        return createMovePrimitive(dest, final_speed, move_type == MoveType::SLOW,
+                                   final_angle,
+                                   enable_dribbler == DribblerEnable::ON ? 16000 : 0);
+    }
 }
 
 std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
@@ -161,12 +179,12 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
     if (coast)
     {
         stop_primitive_msg->mutable_stop()->set_stop_type(
-            stop_primitive_msg->mutable_stop()->COAST);
+            TbotsProto::StopPrimitive::COAST);
     }
     else
     {
         stop_primitive_msg->mutable_stop()->set_stop_type(
-            stop_primitive_msg->mutable_stop()->BRAKE);
+            TbotsProto::StopPrimitive::BRAKE);
     }
 
     return stop_primitive_msg;

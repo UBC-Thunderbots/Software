@@ -17,7 +17,7 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 {
     TbotsProto::Primitive google_primitive =
         *createLegacyMovePrimitive(Point(1, 2), Angle::half(), 100, DribblerEnable::ON,
-                                   MoveType::SLOW, AutochickType::AUTOCHIP);
+                                   MoveType::SLOW, AutochickType::NONE);
 
     TbotsProto_Primitive nanopb_primitive = createNanoPbPrimitive(google_primitive);
 
@@ -36,15 +36,15 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
 {
     *createLegacyMovePrimitive(Point(1, 2), Angle::half(), 100, DribblerEnable::ON,
-                               MoveType::SLOW, AutochickType::AUTOCHIP);
+                               MoveType::SLOW, AutochickType::NONE);
     *createLegacyMovePrimitive(Point(2, 4), Angle::half(), 50, DribblerEnable::ON,
-                               MoveType::NORMAL, AutochickType::AUTOCHIP);
+                               MoveType::NORMAL, AutochickType::NONE);
     TbotsProto::Primitive google_primitive_1 =
         *createLegacyMovePrimitive(Point(1, 2), Angle::half(), 100, DribblerEnable::ON,
-                                   MoveType::SLOW, AutochickType::AUTOCHIP);
+                                   MoveType::SLOW, AutochickType::NONE);
     TbotsProto::Primitive google_primitive_2 =
         *createLegacyMovePrimitive(Point(2, 4), Angle::half(), 50, DribblerEnable::ON,
-                                   MoveType::NORMAL, AutochickType::AUTOCHIP);
+                                   MoveType::NORMAL, AutochickType::NONE);
 
     auto google_primitive_set  = std::make_unique<TbotsProto::PrimitiveSet>();
     auto& robot_primitives_map = *google_primitive_set->mutable_robot_primitives();
