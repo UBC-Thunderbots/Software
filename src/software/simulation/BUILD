@@ -126,7 +126,6 @@ cc_library(
         "//firmware/app/world:firmware_world",
         "//software/primitive",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",
-        "//software/proto/message_translation:proto_creator_primitive_visitor",
         "//software/proto/message_translation:ssl_detection",
         "//software/proto/message_translation:ssl_geometry",
         "//software/proto/message_translation:ssl_wrapper",

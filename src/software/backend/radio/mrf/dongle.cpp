@@ -17,7 +17,6 @@
 #include "shared/constants.h"
 #include "software/backend/radio/mrf/messages.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 namespace
 {
     struct RadioConfig

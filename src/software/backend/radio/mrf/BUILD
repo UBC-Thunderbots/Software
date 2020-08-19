@@ -26,6 +26,5 @@ cc_library(
         "//software/backend/radio:robot_status",
         "//software/backend/radio/mrf/usb:libusb",
         "//software/primitive",
-        "//software/proto/message_translation:proto_creator_primitive_visitor",
     ],
 )

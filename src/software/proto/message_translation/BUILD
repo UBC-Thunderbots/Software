@@ -6,7 +6,6 @@ cc_library(
     hdrs = ["tbots_protobuf.h"],
     visibility = ["//visibility:public"],
     deps = [
-        ":proto_creator_primitive_visitor",
         ":tbots_geometry",
         "//shared/proto:tbots_cc_proto",
         "//software/geom:angle",
@@ -139,28 +138,6 @@ cc_test(
 )
 
 cc_library(
-    name = "proto_creator_primitive_visitor",
-    srcs = ["proto_creator_primitive_visitor.cpp"],
-    hdrs = ["proto_creator_primitive_visitor.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//shared:constants",
-        "//shared/proto:tbots_cc_proto",
-        "//software/primitive:all_primitives",
-        "//software/primitive:primitive_visitor",
-    ],
-)
-
-cc_test(
-    name = "proto_creator_primitive_visitor_test",
-    srcs = ["proto_creator_primitive_visitor_test.cpp"],
-    deps = [
-        ":proto_creator_primitive_visitor",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "primitive_google_to_nanopb_converter",
     srcs = ["primitive_google_to_nanopb_converter.cpp"],
     hdrs = ["primitive_google_to_nanopb_converter.h"],
@@ -169,6 +146,7 @@ cc_library(
         "//shared:constants",
         "//shared/proto:tbots_cc_proto",
         "//shared/proto:tbots_nanopb_proto",
+        "//software/proto/primitive:primitive_msg_factory",
         "@nanopb",
     ],
 )
@@ -177,7 +155,6 @@ cc_test(
     name = "primitive_google_to_nanopb_converter_test",
     srcs = ["primitive_google_to_nanopb_converter_test.cpp"],
     deps = [
-        "proto_creator_primitive_visitor",
         ":primitive_google_to_nanopb_converter",
         "//software/primitive:move_primitive",
         "@gtest//:gtest_main",

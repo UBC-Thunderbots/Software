@@ -9,7 +9,6 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/primitive/primitive.h"
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 
 MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 

@@ -17,16 +17,6 @@
 std::unique_ptr<TbotsProto::Vision> createVision(const World& world);
 
 /**
- * Returns a TbotsProto::Primitive proto given a ConstPrimitiveVectorPtr
- *
- * @param primitives The primitives to include in the TbotsProto::Primitive
- *
- * @returns The unique_ptr to a TbotsProto::Primitive proto containing the primitives
- */
-std::unique_ptr<TbotsProto::PrimitiveSet> createPrimitiveSet(
-    const ConstPrimitiveVectorPtr& primitives);
-
-/**
  * Returns (Robot, Ball)State given a (Robot, Ball)
  *
  * @param The (Robot, Ball) to convert to State proto

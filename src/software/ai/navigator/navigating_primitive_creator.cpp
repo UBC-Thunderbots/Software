@@ -25,9 +25,9 @@ TbotsProto::Primitive NavigatingPrimitiveCreator::createNavigatingPrimitive(
 
 void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
 {
-    current_primitive = ProtoCreatorPrimitiveVisitor().createPrimitive(MovePrimitive(
+    current_primitive = createMovePrimitive(
         intent.getRobotId(), new_destination, intent.getFinalAngle(), new_final_speed,
-        intent.getDribblerEnable(), intent.getMoveType(), intent.getAutochickType()));
+        intent.getDribblerEnable(), intent.getMoveType(), intent.getAutochickType());
 }
 
 std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFinalSpeed(
