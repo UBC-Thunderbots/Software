@@ -209,7 +209,6 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
 {
     if (manager->current_primitive)
     {
-        manager->current_primitive->end(manager->current_primitive_state, world);
         manager->current_primitive->destroy_state(manager->current_primitive_state);
 
         manager->current_primitive = NULL;

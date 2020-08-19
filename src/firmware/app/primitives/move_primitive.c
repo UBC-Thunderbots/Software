@@ -17,19 +17,6 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void *void_stat
     app_dribbler_setSpeed(dribbler, (uint32_t)prim_msg.dribbler_speed_rpm);
 }
 
-static void move_end(void *void_state_ptr, FirmwareWorld_t *world)
-{
-    app_move_helper_end(void_state_ptr, world);
-    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
-
-    Chicker_t *chicker = app_firmware_robot_getChicker(robot);
-    app_chicker_disableAutochip(chicker);
-    app_chicker_disableAutokick(chicker);
-
-    Dribbler_t *dribbler = app_firmware_robot_getDribbler(robot);
-    app_dribbler_setSpeed(dribbler, 0);
-}
-
 static void move_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
     app_move_helper_tick(void_state_ptr, world);
@@ -39,7 +26,6 @@ static void move_tick(void *void_state_ptr, FirmwareWorld_t *world)
  * \brief The move primitive.
  */
 const primitive_t MOVE_PRIMITIVE = {.direct        = false,
-                                    .end           = &move_end,
                                     .tick          = &move_tick,
                                     .create_state  = &createMoveHelperState_t,
                                     .destroy_state = &destroyMoveHelperState_t};

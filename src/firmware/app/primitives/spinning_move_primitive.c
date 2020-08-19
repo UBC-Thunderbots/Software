@@ -64,8 +64,6 @@ void app_spinning_move_primitive_start(TbotsProto_SpinningMovePrimitive prim_msg
     app_dribbler_setSpeed(dribbler, (uint32_t)prim_msg.dribbler_speed_rpm);
 }
 
-static void spinning_move_end(void *void_state_ptr, FirmwareWorld_t *world) {}
-
 static void spinning_move_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
@@ -145,7 +143,6 @@ static void spinning_move_tick(void *void_state_ptr, FirmwareWorld_t *world)
  */
 const primitive_t SPINNING_MOVE_PRIMITIVE = {
     .direct        = false,
-    .end           = &spinning_move_end,
     .tick          = &spinning_move_tick,
     .create_state  = &createSpinningMovePrimitiveState_t,
     .destroy_state = &destroySpinningMovePrimitiveState_t};

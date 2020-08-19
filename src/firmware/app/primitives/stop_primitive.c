@@ -32,15 +32,12 @@ void app_stop_primitive_start(TbotsProto_StopPrimitive prim_msg, void* void_stat
     wheel_op(app_firmware_robot_getBackRightWheel(robot));
 }
 
-static void stop_end(void* void_state_ptr, FirmwareWorld_t* world) {}
-
 static void stop_tick(void* void_state_ptr, FirmwareWorld_t* world) {}
 
 /**
  * \brief The stop movement primitive.
  */
 const primitive_t STOP_PRIMITIVE = {.direct        = false,
-                                    .end           = &stop_end,
                                     .tick          = &stop_tick,
                                     .create_state  = &createStopPrimitiveState_t,
                                     .destroy_state = &destroyStopPrimitiveState_t};
