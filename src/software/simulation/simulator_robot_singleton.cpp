@@ -23,10 +23,11 @@ extern "C"
 std::shared_ptr<SimulatorRobot> SimulatorRobotSingleton::simulator_robot = nullptr;
 FieldSide SimulatorRobotSingleton::field_side_ = FieldSide::NEG_X;
 
-void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot, FieldSide field_side)
+void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot,
+                                                FieldSide field_side)
 {
     simulator_robot = robot;
-    field_side_ = field_side;
+    field_side_     = field_side;
 }
 
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
@@ -164,7 +165,8 @@ unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(
 float SimulatorRobotSingleton::getPositionX()
 {
     return checkValidAndReturnFloat([](auto robot) {
-        switch(field_side_) {
+        switch (field_side_)
+        {
             case FieldSide::NEG_X:
                 return robot->getPositionX();
             case FieldSide::POS_X:
@@ -178,7 +180,8 @@ float SimulatorRobotSingleton::getPositionX()
 float SimulatorRobotSingleton::getPositionY()
 {
     return checkValidAndReturnFloat([](auto robot) {
-        switch(field_side_) {
+        switch (field_side_)
+        {
             case FieldSide::NEG_X:
                 return robot->getPositionY();
             case FieldSide::POS_X:
@@ -192,7 +195,8 @@ float SimulatorRobotSingleton::getPositionY()
 float SimulatorRobotSingleton::getOrientation()
 {
     return checkValidAndReturnFloat([](auto robot) {
-        switch(field_side_) {
+        switch (field_side_)
+        {
             case FieldSide::NEG_X:
                 return robot->getOrientation();
             case FieldSide::POS_X:
@@ -206,7 +210,8 @@ float SimulatorRobotSingleton::getOrientation()
 float SimulatorRobotSingleton::getVelocityX()
 {
     return checkValidAndReturnFloat([](auto robot) {
-        switch(field_side_) {
+        switch (field_side_)
+        {
             case FieldSide::NEG_X:
                 return robot->getVelocityX();
             case FieldSide::POS_X:
@@ -220,7 +225,8 @@ float SimulatorRobotSingleton::getVelocityX()
 float SimulatorRobotSingleton::getVelocityY()
 {
     return checkValidAndReturnFloat([](auto robot) {
-        switch(field_side_) {
+        switch (field_side_)
+        {
             case FieldSide::NEG_X:
                 return robot->getVelocityY();
             case FieldSide::POS_X:

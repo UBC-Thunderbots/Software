@@ -1,9 +1,9 @@
 #pragma once
 
 #include <atomic>
-#include "software/proto/defending_side_msg.pb.h"
 #include <thread>
 
+#include "software/proto/defending_side_msg.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/simulator.h"
 

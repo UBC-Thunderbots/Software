@@ -94,7 +94,8 @@ class SimulatorRobotSingleton
      *
      * @param robot The SimulatorRobot being controlled by this class
      */
-    static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot, FieldSide field_side);
+    static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot,
+                                  FieldSide field_side);
 
     /**
      * Creates a FirmwareRobot_t with functions bound to the static functions in this

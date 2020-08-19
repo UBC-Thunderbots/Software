@@ -12,4 +12,5 @@
  *
  * @return A TeamSideMsg containing the given data
  */
-std::unique_ptr<DefendingSideProto> createDefendingSideProto(bool defending_positive_side);
+std::unique_ptr<DefendingSideProto> createDefendingSideProto(
+    bool defending_positive_side);

@@ -23,7 +23,8 @@ Simulator::Simulator(const Field& field, const Duration& physics_time_step)
 Simulator::Simulator(const Field& field, double ball_restitution,
                      double ball_linear_damping, const Duration& physics_time_step)
     : physics_world(field, ball_restitution, ball_linear_damping),
-      yellow_team_defending_side(FieldSide::NEG_X), blue_team_defending_side(FieldSide::POS_X),
+      yellow_team_defending_side(FieldSide::NEG_X),
+      blue_team_defending_side(FieldSide::POS_X),
       frame_number(0),
       physics_time_step(physics_time_step)
 {
@@ -75,12 +76,14 @@ void Simulator::updateSimulatorRobots(
 
 void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball, yellow_team_defending_side);
+    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball,
+                       yellow_team_defending_side);
 }
 
 void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball, blue_team_defending_side);
+    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball,
+                       blue_team_defending_side);
 }
 
 void Simulator::setRobotPrimitives(
@@ -107,13 +110,15 @@ void Simulator::setRobotPrimitives(
 void Simulator::setYellowRobotPrimitive(RobotId id,
                                         const TbotsProto_Primitive& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball, yellow_team_defending_side);
+    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball,
+                      yellow_team_defending_side);
 }
 
 void Simulator::setBlueRobotPrimitive(RobotId id,
                                       const TbotsProto_Primitive& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball, blue_team_defending_side);
+    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball,
+                      blue_team_defending_side);
 }
 
 void Simulator::setRobotPrimitive(
@@ -139,12 +144,18 @@ void Simulator::setRobotPrimitive(
     }
 }
 
-void Simulator::setYellowTeamDefendingSide(const DefendingSideProto &defending_side_proto) {
-    yellow_team_defending_side = defending_side_proto.defending_positive_side() ? FieldSide::POS_X : FieldSide::NEG_X;
+void Simulator::setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto)
+{
+    yellow_team_defending_side = defending_side_proto.defending_positive_side()
+                                     ? FieldSide::POS_X
+                                     : FieldSide::NEG_X;
 }
 
-void Simulator::setBlueTeamDefendingSide(const DefendingSideProto &defending_side_proto) {
-    blue_team_defending_side = defending_side_proto.defending_positive_side() ? FieldSide::POS_X : FieldSide::NEG_X;
+void Simulator::setBlueTeamDefendingSide(const DefendingSideProto& defending_side_proto)
+{
+    blue_team_defending_side = defending_side_proto.defending_positive_side()
+                                   ? FieldSide::POS_X
+                                   : FieldSide::NEG_X;
 }
 
 void Simulator::stepSimulation(const Duration& time_step)
@@ -160,8 +171,10 @@ void Simulator::stepSimulation(const Duration& time_step)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, blue_team_defending_side);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, blue_team_defending_side);
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
+                                                       blue_team_defending_side);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball,
+                                                     blue_team_defending_side);
             SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
         }
 
@@ -169,8 +182,10 @@ void Simulator::stepSimulation(const Duration& time_step)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, yellow_team_defending_side);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, yellow_team_defending_side);
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
+                                                       yellow_team_defending_side);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball,
+                                                     yellow_team_defending_side);
             SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
         }
 

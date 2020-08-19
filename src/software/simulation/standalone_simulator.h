@@ -4,8 +4,8 @@
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/simulation/threaded_simulator.h"
 #include "software/proto/defending_side_msg.pb.h"
+#include "software/simulation/threaded_simulator.h"
 
 extern "C"
 {
@@ -158,7 +158,8 @@ class StandaloneSimulator
         yellow_team_primitive_listener, blue_team_primitive_listener;
     std::unique_ptr<ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>>
         wrapper_packet_sender;
-    std::unique_ptr<ThreadedProtoMulticastListener<DefendingSideProto>> yellow_team_side_listener, blue_team_side_listener;
+    std::unique_ptr<ThreadedProtoMulticastListener<DefendingSideProto>>
+        yellow_team_side_listener, blue_team_side_listener;
     ThreadedSimulator simulator;
 
     SSLProto::SSL_WrapperPacket most_recent_ssl_wrapper_packet;

@@ -67,13 +67,13 @@ void StandaloneSimulator::initNetworking()
             blue_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
     yellow_team_side_listener =
-            std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
-                    yellow_team_ip, DEFENDING_SIDE_PORT,
-                    boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1));
+        std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
+            yellow_team_ip, DEFENDING_SIDE_PORT,
+            boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1));
     blue_team_side_listener =
-            std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
-                    blue_team_ip, DEFENDING_SIDE_PORT,
-                    boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1));
+        std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
+            blue_team_ip, DEFENDING_SIDE_PORT,
+            boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1));
 }
 
 void StandaloneSimulator::setupInitialSimulationState()
@@ -196,10 +196,14 @@ void StandaloneSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
     simulator.removeRobot(robot);
 }
 
-void StandaloneSimulator::setBlueTeamDefendingSide(const DefendingSideProto& defending_side_proto) {
+void StandaloneSimulator::setBlueTeamDefendingSide(
+    const DefendingSideProto& defending_side_proto)
+{
     simulator.setBlueTeamDefendingSide(defending_side_proto);
 }
 
-void StandaloneSimulator::setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto) {
+void StandaloneSimulator::setYellowTeamDefendingSide(
+    const DefendingSideProto& defending_side_proto)
+{
     simulator.setYellowTeamDefendingSide(defending_side_proto);
 }

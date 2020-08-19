@@ -2,5 +2,5 @@ syntax = "proto3";
 
 message DefendingSideProto
 {
-    bool defending_positive_side              = 1;
+    bool defending_positive_side = 1;
 }

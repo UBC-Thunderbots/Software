@@ -3,12 +3,13 @@
 #include "software/logger/logger.h"
 
 std::shared_ptr<SimulatorBall> SimulatorBallSingleton::simulator_ball = nullptr;
-FieldSide SimulatorBallSingleton::field_side_ = FieldSide::NEG_X;
+FieldSide SimulatorBallSingleton::field_side_                         = FieldSide::NEG_X;
 
-void SimulatorBallSingleton::setSimulatorBall(std::shared_ptr<SimulatorBall> ball, FieldSide field_side)
+void SimulatorBallSingleton::setSimulatorBall(std::shared_ptr<SimulatorBall> ball,
+                                              FieldSide field_side)
 {
     simulator_ball = ball;
-    field_side_ = field_side;
+    field_side_    = field_side;
 }
 
 std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter>
@@ -42,7 +43,8 @@ float SimulatorBallSingleton::checkValidAndReturnFloat(
 float SimulatorBallSingleton::getBallPositionX()
 {
     return checkValidAndReturnFloat([](auto ball) {
-        switch(field_side_) {
+        switch (field_side_)
+        {
             case FieldSide::NEG_X:
                 return ball->position().x();
             case FieldSide::POS_X:
@@ -56,7 +58,8 @@ float SimulatorBallSingleton::getBallPositionX()
 float SimulatorBallSingleton::getBallPositionY()
 {
     return checkValidAndReturnFloat([](auto ball) {
-        switch(field_side_) {
+        switch (field_side_)
+        {
             case FieldSide::NEG_X:
                 return ball->position().y();
             case FieldSide::POS_X:
@@ -70,7 +73,8 @@ float SimulatorBallSingleton::getBallPositionY()
 float SimulatorBallSingleton::getBallVelocityX()
 {
     return checkValidAndReturnFloat([](auto ball) {
-        switch(field_side_) {
+        switch (field_side_)
+        {
             case FieldSide::NEG_X:
                 return ball->velocity().x();
             case FieldSide::POS_X:
@@ -84,7 +88,8 @@ float SimulatorBallSingleton::getBallVelocityX()
 float SimulatorBallSingleton::getBallVelocityY()
 {
     return checkValidAndReturnFloat([](auto ball) {
-        switch(field_side_) {
+        switch (field_side_)
+        {
             case FieldSide::NEG_X:
                 return ball->velocity().y();
             case FieldSide::POS_X:

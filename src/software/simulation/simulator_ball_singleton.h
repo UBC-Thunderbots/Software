@@ -64,7 +64,8 @@ class SimulatorBallSingleton
      * @param field_side The side of the field being defended by the robots using
      * this class
      */
-    static void setSimulatorBall(std::shared_ptr<SimulatorBall> ball, FieldSide field_side);
+    static void setSimulatorBall(std::shared_ptr<SimulatorBall> ball,
+                                 FieldSide field_side);
 
     /**
      * Creates a FirmwareBall_t with functions bound to the static functions in this
