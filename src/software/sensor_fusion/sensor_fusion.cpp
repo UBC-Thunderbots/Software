@@ -174,12 +174,6 @@ void SensorFusion::updateBallAndTeams(
     }
 
     new_ball_state = createTimestampedBallState(ball_detections);
-
-    if (new_ball_state)
-    {
-        updateBall(*new_ball_state);
-    }
-
     if (friendly_team_is_yellow)
     {
         friendly_team_ = createFriendlyTeam(yellow_team);
@@ -191,9 +185,16 @@ void SensorFusion::updateBallAndTeams(
         enemy_team_    = createEnemyTeam(yellow_team);
     }
 
-    friendly_team_.updateBallPossession(getRobotWithPossession(
-        *ball_, friendly_team_, getRobotsWithBreakBeamTriggered(robot_status_msgs)));
-    enemy_team_.updateBallPossession(getRobotWithPossession(*ball_, enemy_team_));
+    if (new_ball_state)
+    {
+        updateBall(*new_ball_state);
+    }
+    if (ball_)
+    {
+        friendly_team_.updateBallPossession(getRobotWithPossession(
+            *ball_, friendly_team_, getRobotsWithBreakBeamTriggered(robot_status_msgs)));
+        enemy_team_.updateBallPossession(getRobotWithPossession(*ball_, enemy_team_));
+    }
 }
 
 void SensorFusion::updateBall(TimestampedBallState new_ball_state)

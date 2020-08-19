@@ -1,43 +1,36 @@
 #include "software/sensor_fusion/filter/possession_filter.h"
 
-std::vector<RobotIdWithTeamSide> getRobotsWithPossession(
-    std::vector<RobotId> friendly_robots_with_breakbeam_triggered, Team friendly_team,
-    Team enemy_team, Ball ball)
-{
-    std::vector<RobotIdWithTeamSide> possessions;
-    for (const auto &robot_id : friendly_robots_with_breakbeam_triggered)
-    {
-        possessions.push_back(
-            RobotIdWithTeamSide{.id = robot_id, .team_side = TeamSide::FRIENDLY});
-    }
-
-    for (const auto &robot : friendly_team.getAllRobots())
-    {
-        if (ballNearDribbler(ball.position(), robot.position(), robot.orientation()))
-        {
-            possessions.push_back(
-                RobotIdWithTeamSide{.id = robot.id(), .team_side = TeamSide::FRIENDLY});
-        }
-    }
-
-    for (const auto &robot : enemy_team.getAllRobots())
-    {
-        if (ballNearDribbler(ball.position(), robot.position(), robot.orientation()))
-        {
-            possessions.push_back(
-                RobotIdWithTeamSide{.id = robot.id(), .team_side = TeamSide::ENEMY});
-        }
-    }
-
-    return possessions;
-}
-
 std::optional<RobotId> getRobotWithPossession(
     const Ball &ball, const Team &team,
     const std::vector<RobotId> &robots_with_breakbeam_triggered,
     double possession_distance_threshold)
 {
-    return std::nullopt;
+    if (robots_with_breakbeam_triggered.size() == 1)
+    {
+        auto breakbeam_robot = team.getRobotById(robots_with_breakbeam_triggered[0]);
+        if (breakbeam_robot &&
+            getPossessionDistance(ball.position(), breakbeam_robot->position(),
+                                  breakbeam_robot->orientation(),
+                                  possession_distance_threshold))
+        {
+            return breakbeam_robot->id();
+        }
+    }
+
+    std::optional<RobotId> robot_with_possession;
+    double min_possession_distance = possession_distance_threshold;
+    for (const auto &robot : team.getAllRobots())
+    {
+        auto possession_distance =
+            getPossessionDistance(ball.position(), robot.position(), robot.orientation(),
+                                  possession_distance_threshold);
+        if (possession_distance && possession_distance < min_possession_distance)
+        {
+            min_possession_distance = *possession_distance;
+            robot_with_possession   = robot.id();
+        }
+    }
+    return robot_with_possession;
 }
 
 std::optional<double> getPossessionDistance(Point ball_position, Point robot_position,
@@ -56,20 +49,4 @@ std::optional<double> getPossessionDistance(Point ball_position, Point robot_pos
         }
     }
     return std::nullopt;
-}
-
-bool ballNearDribbler(Point ball_position, Point robot_position, Angle robot_orientation)
-{
-    static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + 0.2;
-    if ((ball_position - robot_position).length() > POSSESSION_THRESHOLD_METERS)
-    {
-        return false;
-    }
-    else
-    {
-        // check that ball is in a 90-degree cone in front of the robot
-        auto ball_to_robot_angle =
-            robot_orientation.minDiff((ball_position - robot_position).orientation());
-        return (ball_to_robot_angle < Angle::fromDegrees(45.0));
-    }
 }

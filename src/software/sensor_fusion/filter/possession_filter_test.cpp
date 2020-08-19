@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-TEST(PossessionFilterTest, ball_near_dribbler_directly_in_front_of_robot)
+TEST(PossessionFilterTest, get_possession_distance_directly_in_front_of_robot)
 {
     Point ball_position  = Point(0.07, 0);
     Vector ball_velocity = Vector(0, 0);
@@ -14,10 +14,11 @@ TEST(PossessionFilterTest, ball_near_dribbler_directly_in_front_of_robot)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         timestamp);
 
-    EXPECT_TRUE(ballNearDribbler(ball.position(), robot.position(), robot.orientation()));
+    EXPECT_TRUE(
+        getPossessionDistance(ball.position(), robot.position(), robot.orientation()));
 }
 
-TEST(PossessionFilterTest, ball_near_dribbler_ball_to_side_of_robot)
+TEST(PossessionFilterTest, get_possession_distance_ball_to_side_of_robot)
 {
     Point ball_position  = Point(0.07, 0);
     Vector ball_velocity = Vector(0, 0);
@@ -27,10 +28,10 @@ TEST(PossessionFilterTest, ball_near_dribbler_ball_to_side_of_robot)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::half(), AngularVelocity::zero(),
                         timestamp);
     EXPECT_FALSE(
-        ballNearDribbler(ball.position(), robot.position(), robot.orientation()));
+        getPossessionDistance(ball.position(), robot.position(), robot.orientation()));
 }
 
-TEST(PossessionFilterTest, ball_near_dribbler_robot_moving_ball_in_dribbler)
+TEST(PossessionFilterTest, get_possession_distance_robot_moving_ball_in_dribbler)
 {
     Point ball_position  = Point(0.07, 0);
     Vector ball_velocity = Vector(0, 0);
@@ -40,10 +41,11 @@ TEST(PossessionFilterTest, ball_near_dribbler_robot_moving_ball_in_dribbler)
     Robot robot = Robot(0, Point(0, 0), Vector(1, 1), Angle::zero(),
                         AngularVelocity::zero(), timestamp);
 
-    EXPECT_TRUE(ballNearDribbler(ball.position(), robot.position(), robot.orientation()));
+    EXPECT_TRUE(
+        getPossessionDistance(ball.position(), robot.position(), robot.orientation()));
 }
 
-TEST(PossessionFilterTest, ball_near_dribbler_ball_far_away_from_robot)
+TEST(PossessionFilterTest, get_possession_distance_ball_far_away_from_robot)
 {
     Point ball_position  = Point(-1, -2);
     Vector ball_velocity = Vector(0, 0);
@@ -54,11 +56,11 @@ TEST(PossessionFilterTest, ball_near_dribbler_ball_far_away_from_robot)
                         timestamp);
 
     EXPECT_FALSE(
-        ballNearDribbler(ball.position(), robot.position(), robot.orientation()));
+        getPossessionDistance(ball.position(), robot.position(), robot.orientation()));
 }
 
 TEST(PossessionFilterTest,
-     ball_near_dribbler_ball_slightly_off_center_but_still_on_dribbler)
+     get_possession_distance_ball_slightly_off_center_but_still_on_dribbler)
 {
     Point ball_position  = Point(0.07, 0.005);
     Vector ball_velocity = Vector(0, 0);
@@ -68,10 +70,11 @@ TEST(PossessionFilterTest,
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         timestamp);
 
-    EXPECT_TRUE(ballNearDribbler(ball.position(), robot.position(), robot.orientation()));
+    EXPECT_TRUE(
+        getPossessionDistance(ball.position(), robot.position(), robot.orientation()));
 }
 
-TEST(PossessionFilterTest, ball_near_dribbler_robot_on_angle_with_ball_in_dribbler)
+TEST(PossessionFilterTest, get_possession_distance_robot_on_angle_with_ball_in_dribbler)
 {
     Point ball_position  = Point(0.035, 0.06);
     Vector ball_velocity = Vector(0, 0);
@@ -81,7 +84,8 @@ TEST(PossessionFilterTest, ball_near_dribbler_robot_on_angle_with_ball_in_dribbl
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::fromDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
 
-    EXPECT_TRUE(ballNearDribbler(ball.position(), robot.position(), robot.orientation()));
+    EXPECT_TRUE(
+        getPossessionDistance(ball.position(), robot.position(), robot.orientation()));
 }
 
 TEST(PossessionFilterTest, get_robots_with_possession_robot_in_control)
@@ -97,15 +101,12 @@ TEST(PossessionFilterTest, get_robots_with_possession_robot_in_control)
     Robot robot2 = Robot(2, Point(1.5, 2.3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot0, robot1, robot2});
-    EXPECT_EQ(std::vector<RobotIdWithTeamSide>(
-                  {RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::FRIENDLY}}),
-              getRobotsWithPossession({}, friendly_team, enemy_team, ball));
+    EXPECT_EQ(0, getRobotWithPossession(ball, friendly_team));
+    EXPECT_FALSE(getRobotWithPossession(ball, enemy_team));
 
     enemy_team.updateRobots({robot0, robot1, robot2});
-    EXPECT_EQ(std::vector<RobotIdWithTeamSide>(
-                  {RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::FRIENDLY},
-                   RobotIdWithTeamSide{.id = 0, .team_side = TeamSide::ENEMY}}),
-              getRobotsWithPossession({}, friendly_team, enemy_team, ball));
+    EXPECT_EQ(0, getRobotWithPossession(ball, friendly_team));
+    EXPECT_EQ(0, getRobotWithPossession(ball, enemy_team));
 }
 
 TEST(PossessionEvaluationTest, get_robots_with_possession_no_posession)
@@ -124,8 +125,8 @@ TEST(PossessionEvaluationTest, get_robots_with_possession_no_posession)
     friendly_team.updateRobots({robot0, robot1, robot2});
     enemy_team.updateRobots({robot0, robot1, robot2});
 
-    EXPECT_EQ(std::vector<RobotIdWithTeamSide>({}),
-              getRobotsWithPossession({}, friendly_team, enemy_team, ball));
+    EXPECT_FALSE(getRobotWithPossession(ball, friendly_team));
+    EXPECT_FALSE(getRobotWithPossession(ball, enemy_team));
 }
 
 TEST(PossessionEvaluationTest, get_robots_with_possession_breakbeam)
@@ -134,8 +135,6 @@ TEST(PossessionEvaluationTest, get_robots_with_possession_breakbeam)
     Team friendly_team = Team(Duration::fromSeconds(1));
     Team enemy_team    = Team(Duration::fromSeconds(1));
 
-    EXPECT_EQ(std::vector<RobotIdWithTeamSide>(
-                  {RobotIdWithTeamSide{.id = 1, .team_side = TeamSide::FRIENDLY},
-                   RobotIdWithTeamSide{.id = 2, .team_side = TeamSide::FRIENDLY}}),
-              getRobotsWithPossession({1, 2}, friendly_team, enemy_team, ball));
+    EXPECT_FALSE(getRobotWithPossession(ball, friendly_team, {1, 2}));
+    EXPECT_FALSE(getRobotWithPossession(ball, enemy_team));
 }
