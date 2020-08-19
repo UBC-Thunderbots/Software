@@ -45,6 +45,7 @@ cc_library(
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/proto/message_translation:tbots_protobuf",
+        "//software/proto/primitive:primitive_msg_factory",
     ],
 )
 

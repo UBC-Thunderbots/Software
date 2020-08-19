@@ -17,6 +17,7 @@
 #include "shared/constants.h"
 #include "software/backend/radio/mrf/messages.h"
 #include "software/logger/logger.h"
+
 namespace
 {
     struct RadioConfig

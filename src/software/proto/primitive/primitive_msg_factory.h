@@ -133,3 +133,16 @@ std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
  * @return Pointer to Stop Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
+
+/**
+ * Creates a new DirectControl Primitive AI could output this primitive to control the
+ * linear velocity, angular velocity, and dribbler speed of a specific robot
+ *
+ * @param velocity x/y velocity vector
+ * @param angular_velocity The angular velocity
+ * @param dribbler_rpm The dribbler speed in rpm
+ *
+ * @return Pointer to the DirectControl Primitive
+ */
+std::unique_ptr<TbotsProto::Primitive> createDirectVelocityPrimitive(
+    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_rpm);

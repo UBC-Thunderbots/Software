@@ -31,7 +31,7 @@ class ControllerPrimitiveGenerator
      *
      * @return A Primitive that will implement the behavior of the given ControllerInput
      */
-    std::unique_ptr<Primitive> createPrimitiveFromControllerInput(
+    std::unique_ptr<TbotsProto::Primitive> createPrimitiveFromControllerInput(
         const ControllerInput& controller_input);
 
     std::shared_ptr<const HandheldControllerConfig> controller_input_config;
