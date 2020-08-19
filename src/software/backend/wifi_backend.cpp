@@ -4,7 +4,7 @@
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
-#include "software/proto/message_translation/team_side.h"
+#include "software/proto/message_translation/defending_side.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 const std::string WifiBackend::name = "wifi";
@@ -36,10 +36,11 @@ void WifiBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
 {
     primitive_output->sendProto(*createPrimitiveSet(primitives_ptr));
 
-    if(sensor_fusion_config->OverrideRefboxDefendingSide()->value()) {
-        team_side_output->sendProto(*createTeamSideMsg(sensor_fusion_config->DefendingPositiveSide()->value()));
+    if(sensor_fusion_config->OverrideGameControllerDefendingSide()->value()) {
+        defending_side_output->sendProto(*createDefendingSideProto(
+                sensor_fusion_config->DefendingPositiveSide()->value()));
     }else {
-        team_side_output->sendProto(*createTeamSideMsg(false));
+        defending_side_output->sendProto(*createDefendingSideProto(false));
     }
 }
 
@@ -60,8 +61,8 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
         boost::bind(&Backend::receiveRobotStatus, this, _1)));
 
-    team_side_output.reset(new ThreadedProtoMulticastSender<TeamSideMsg>(
-            std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, TEAM_SIDE_PORT));
+    defending_side_output.reset(new ThreadedProtoMulticastSender<DefendingSideProto>(
+            std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, DEFENDING_SIDE_PORT));
 }
 
 // Register this backend in the genericFactory

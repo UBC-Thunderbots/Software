@@ -122,14 +122,14 @@ void ThreadedSimulator::setBlueRobotPrimitive(RobotId id,
     simulator.setBlueRobotPrimitive(id, primitive_msg);
 }
 
-void ThreadedSimulator::setYellowTeamDefendingSide(const TeamSideMsg &team_side_msg) {
+void ThreadedSimulator::setYellowTeamDefendingSide(const DefendingSideProto &defending_side_proto) {
     std::scoped_lock lock(simulator_mutex);
-    simulator.setYellowTeamDefendingSide(team_side_msg);
+    simulator.setYellowTeamDefendingSide(defending_side_proto);
 }
 
-void ThreadedSimulator::setBlueTeamDefendingSide(const TeamSideMsg &team_side_msg) {
+void ThreadedSimulator::setBlueTeamDefendingSide(const DefendingSideProto &defending_side_proto) {
     std::scoped_lock lock(simulator_mutex);
-    simulator.setBlueTeamDefendingSide(team_side_msg);
+    simulator.setBlueTeamDefendingSide(defending_side_proto);
 }
 
 void ThreadedSimulator::runSimulationLoop()

@@ -65,6 +65,7 @@ cc_library(
         "//firmware/app/world:wheel",
         "//firmware/shared:physics",
         "//software/logger",
+        "//software/world:field",
     ],
 )
 
@@ -93,6 +94,7 @@ cc_library(
         ":simulator_ball",
         "//firmware/app/world:firmware_ball",
         "//software/logger",
+        "//software/world:field",
         "@box2d",
     ],
 )
@@ -125,7 +127,7 @@ cc_library(
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//software/primitive",
-        "//software/proto:team_side_msg_cc_proto",
+        "//software/proto:defending_side_msg_cc_proto",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/proto/message_translation:proto_creator_primitive_visitor",
         "//software/proto/message_translation:ssl_detection",
@@ -133,6 +135,7 @@ cc_library(
         "//software/proto/message_translation:ssl_wrapper",
         "//software/simulation/physics:physics_world",
         "//software/world",
+        "//software/world:field",
     ],
 )
 
@@ -153,8 +156,8 @@ cc_library(
     hdrs = ["threaded_simulator.h"],
     deps = [
         ":simulator",
+        "//software/proto:defending_side_msg_cc_proto",
         "//software/proto:ssl_cc_proto",
-        "//software/proto:team_side_msg_cc_proto",
     ],
 )
 
@@ -181,7 +184,7 @@ cc_library(
         "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
         "//software/parameter:dynamic_parameters",
-        "//software/proto:team_side_msg_cc_proto",
+        "//software/proto:defending_side_msg_cc_proto",
         "//software/world:field",
     ],
 )

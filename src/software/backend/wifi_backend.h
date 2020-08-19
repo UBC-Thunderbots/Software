@@ -2,7 +2,7 @@
 
 #include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
-#include "software/proto/team_side_msg.pb.h"
+#include "software/proto/defending_side_msg.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/ssl_proto_client.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
@@ -48,5 +48,5 @@ class WifiBackend : public Backend
         primitive_output;
     std::unique_ptr<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>
         robot_msg_input;
-    std::unique_ptr<ThreadedProtoMulticastSender<TeamSideMsg>> team_side_output;
+    std::unique_ptr<ThreadedProtoMulticastSender<DefendingSideProto>> defending_side_output;
 };

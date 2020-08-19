@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "software/simulation/simulator_robot.h"
+#include "software/world/field.h"
 extern "C"
 {
 #include "firmware/app/world/chicker.h"
@@ -77,9 +78,23 @@ class SimulatorRobotSingleton
     /**
      * Sets the SimulatorRobot being controlled by this class
      *
+     * The attributes of the robot, such as position, will be given for the POV of
+     * a robot defending the specified field side. Eg. If the robot is at (-1, 2)
+     * in real-world coordinates, it's position will be reported as (-1, 2) if
+     * the negative field side is specified. On the other hand if the positive
+     * field side is specified, the robot's position will be reported as (1, -2).
+     *
+     * This different behaviour for either field side exists because our firmware
+     * expects its knowledge of the world to math our coordinate convention, which is
+     * relative to the side of the field the robot is defending. See
+     * https://github.com/UBC-Thunderbots/Software/blob/master/docs/software-architecture-and-design.md#coordinates
+     * for more information about our coordinate conventions. Because we can't actually
+     * change the positions and dynamics of the underlying physics objects, we use this
+     * class to enforce this convention for the firmware.
+     *
      * @param robot The SimulatorRobot being controlled by this class
      */
-    static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot, bool invert);
+    static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot, FieldSide field_side);
 
     /**
      * Creates a FirmwareRobot_t with functions bound to the static functions in this
@@ -275,5 +290,5 @@ class SimulatorRobotSingleton
 
     // The simulator robot being controlled by this class
     static std::shared_ptr<SimulatorRobot> simulator_robot;
-    static bool invert_;
+    static FieldSide field_side_;
 };

@@ -185,19 +185,19 @@ cc_test(
 )
 
 cc_library(
-    name = "team_side",
-    srcs = ["team_side.cpp"],
-    hdrs = ["team_side.h"],
+    name = "defending_side",
+    srcs = ["defending_side.cpp"],
+    hdrs = ["defending_side.h"],
     deps = [
-        "//software/proto:team_side_msg_cc_proto",
+        "//software/proto:defending_side_msg_cc_proto",
     ],
 )
 
 cc_test(
-    name = "team_side_test",
-    srcs = ["team_side_test.cpp"],
+    name = "defending_side_test",
+    srcs = ["defending_side_test.cpp"],
     deps = [
-        ":team_side",
+        ":defending_side",
         "@gtest//:gtest_main",
     ],
 )

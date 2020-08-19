@@ -1,6 +1,7 @@
 #include "software/simulation/simulator_robot_singleton.h"
 
 #include "software/logger/logger.h"
+#include "software/world/field.h"
 
 extern "C"
 {
@@ -20,12 +21,12 @@ extern "C"
 #define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
 
 std::shared_ptr<SimulatorRobot> SimulatorRobotSingleton::simulator_robot = nullptr;
-bool SimulatorRobotSingleton::invert_ = false;
+FieldSide SimulatorRobotSingleton::field_side_ = FieldSide::NEG_X;
 
-void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot, bool invert)
+void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot, FieldSide field_side)
 {
     simulator_robot = robot;
-    invert_ = invert;
+    field_side_ = field_side;
 }
 
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
@@ -162,48 +163,76 @@ unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(
 
 float SimulatorRobotSingleton::getPositionX()
 {
-    if(invert_) {
-        return checkValidAndReturnFloat([](auto robot) { return -robot->getPositionX(); });
-    }
-    return checkValidAndReturnFloat([](auto robot) { return robot->getPositionX(); });
+    return checkValidAndReturnFloat([](auto robot) {
+        switch(field_side_) {
+            case FieldSide::NEG_X:
+                return robot->getPositionX();
+            case FieldSide::POS_X:
+                return -robot->getPositionX();
+            default:
+                throw std::invalid_argument("Unhandled value of FieldSide");
+        }
+    });
 }
 
 float SimulatorRobotSingleton::getPositionY()
 {
-    if(invert_) {
-        return checkValidAndReturnFloat([](auto robot) { return -robot->getPositionY(); });
-    }
-    return checkValidAndReturnFloat([](auto robot) { return robot->getPositionY(); });
+    return checkValidAndReturnFloat([](auto robot) {
+        switch(field_side_) {
+            case FieldSide::NEG_X:
+                return robot->getPositionY();
+            case FieldSide::POS_X:
+                return -robot->getPositionY();
+            default:
+                throw std::invalid_argument("Unhandled value of FieldSide");
+        }
+    });
 }
 
 float SimulatorRobotSingleton::getOrientation()
 {
-    if(invert_) {
-        return checkValidAndReturnFloat([](auto robot) { return robot->getOrientation() + M_PI; });
-    }
-    return checkValidAndReturnFloat([](auto robot) { return robot->getOrientation(); });
+    return checkValidAndReturnFloat([](auto robot) {
+        switch(field_side_) {
+            case FieldSide::NEG_X:
+                return robot->getOrientation();
+            case FieldSide::POS_X:
+                return robot->getOrientation() + static_cast<float>(M_PI);
+            default:
+                throw std::invalid_argument("Unhandled value of FieldSide");
+        }
+    });
 }
 
 float SimulatorRobotSingleton::getVelocityX()
 {
-    if(invert_) {
-        return checkValidAndReturnFloat([](auto robot) { return -robot->getVelocityX(); });
-    }
-    return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityX(); });
+    return checkValidAndReturnFloat([](auto robot) {
+        switch(field_side_) {
+            case FieldSide::NEG_X:
+                return robot->getVelocityX();
+            case FieldSide::POS_X:
+                return -robot->getVelocityX();
+            default:
+                throw std::invalid_argument("Unhandled value of FieldSide");
+        }
+    });
 }
 
 float SimulatorRobotSingleton::getVelocityY()
 {
-    if(invert_) {
-        return checkValidAndReturnFloat([](auto robot) { return -robot->getVelocityY(); });
-    }
-    return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityY(); });
+    return checkValidAndReturnFloat([](auto robot) {
+        switch(field_side_) {
+            case FieldSide::NEG_X:
+                return robot->getVelocityY();
+            case FieldSide::POS_X:
+                return -robot->getVelocityY();
+            default:
+                throw std::invalid_argument("Unhandled value of FieldSide");
+        }
+    });
 }
 
 float SimulatorRobotSingleton::getVelocityAngular()
 {
-//    if(invert_) {
-//    }
     return checkValidAndReturnFloat(
         [](auto robot) { return robot->getVelocityAngular(); });
 }

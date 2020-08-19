@@ -42,9 +42,9 @@ proto_library(
 )
 
 proto_library(
-    name = "team_side_msg_proto",
+    name = "defending_side_msg_proto",
     srcs = [
-        "team_side_msg.proto",
+        "defending_side_msg.proto",
     ],
     visibility = ["//visibility:private"],
 )
@@ -65,6 +65,6 @@ cc_proto_library(
 )
 
 cc_proto_library(
-    name = "team_side_msg_cc_proto",
-    deps = [":team_side_msg_proto"],
+    name = "defending_side_msg_cc_proto",
+    deps = [":defending_side_msg_proto"],
 )

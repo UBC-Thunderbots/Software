@@ -1,7 +1,7 @@
 #pragma once
 
 #include <atomic>
-#include "software/proto/team_side_msg.pb.h"
+#include "software/proto/defending_side_msg.pb.h"
 #include <thread>
 
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
@@ -141,8 +141,18 @@ class ThreadedSimulator
     void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
     void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
 
-    void setYellowTeamDefendingSide(const TeamSideMsg& team_side_msg);
-    void setBlueTeamDefendingSide(const TeamSideMsg& team_side_msg);
+    /**
+     * Sets which side of the field the corresponding team is defending.
+     *
+     * This will flip robot and ball coordinates an applicable in order to present
+     * the firmware being simulated with data that matches our coordinate convention. See
+     * https://github.com/UBC-Thunderbots/Software/blob/master/docs/software-architecture-and-design.md#coordinates
+     * for more information about our coordinate conventions.
+     *
+     * @param defending_side_proto The side to defend
+     */
+    void setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto);
+    void setBlueTeamDefendingSide(const DefendingSideProto& defending_side_proto);
 
     /**
      * Returns the PhysicsRobot at the given position. This function accounts

@@ -67,12 +67,12 @@ void StandaloneSimulator::initNetworking()
             blue_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
     yellow_team_side_listener =
-            std::make_unique<ThreadedProtoMulticastListener<TeamSideMsg>>(
-                    yellow_team_ip, TEAM_SIDE_PORT,
+            std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
+                    yellow_team_ip, DEFENDING_SIDE_PORT,
                     boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1));
     blue_team_side_listener =
-            std::make_unique<ThreadedProtoMulticastListener<TeamSideMsg>>(
-                    blue_team_ip, TEAM_SIDE_PORT,
+            std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
+                    blue_team_ip, DEFENDING_SIDE_PORT,
                     boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1));
 }
 
@@ -130,7 +130,7 @@ SSLProto::SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
 }
 
 void StandaloneSimulator::setYellowRobotPrimitives(
-    TbotsProto_PrimitiveSet primitive_set_msg)
+    const TbotsProto_PrimitiveSet& primitive_set_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
@@ -141,7 +141,7 @@ void StandaloneSimulator::setYellowRobotPrimitives(
 }
 
 void StandaloneSimulator::setBlueRobotPrimitives(
-    TbotsProto_PrimitiveSet primitive_set_msg)
+    const TbotsProto_PrimitiveSet& primitive_set_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
@@ -196,14 +196,10 @@ void StandaloneSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
     simulator.removeRobot(robot);
 }
 
-void StandaloneSimulator::setBlueTeamDefendingSide(TeamSideMsg team_side_msg) {
-    simulator.setBlueTeamDefendingSide(team_side_msg);
-    std::string side = team_side_msg.defending_positive_side() ? "positive" : "negative";
-    std::cout << "Set blue team to defend " << side << " side" << std::endl;
+void StandaloneSimulator::setBlueTeamDefendingSide(const DefendingSideProto& defending_side_proto) {
+    simulator.setBlueTeamDefendingSide(defending_side_proto);
 }
 
-void StandaloneSimulator::setYellowTeamDefendingSide(TeamSideMsg team_side_msg) {
-    simulator.setYellowTeamDefendingSide(team_side_msg);
-    std::string side = team_side_msg.defending_positive_side() ? "positive" : "negative";
-    std::cout << "Set yellow team to defend " << side << " side" << std::endl;
+void StandaloneSimulator::setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto) {
+    simulator.setYellowTeamDefendingSide(defending_side_proto);
 }

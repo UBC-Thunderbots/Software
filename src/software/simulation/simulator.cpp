@@ -23,7 +23,7 @@ Simulator::Simulator(const Field& field, const Duration& physics_time_step)
 Simulator::Simulator(const Field& field, double ball_restitution,
                      double ball_linear_damping, const Duration& physics_time_step)
     : physics_world(field, ball_restitution, ball_linear_damping),
-      invert_yellow_robot_coordinates(false), invert_blue_robot_coordinates(false),
+      yellow_team_defending_side(FieldSide::NEG_X), blue_team_defending_side(FieldSide::POS_X),
       frame_number(0),
       physics_time_step(physics_time_step)
 {
@@ -75,19 +75,19 @@ void Simulator::updateSimulatorRobots(
 
 void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball, invert_yellow_robot_coordinates);
+    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball, yellow_team_defending_side);
 }
 
 void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
 {
-    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball, invert_blue_robot_coordinates);
+    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball, blue_team_defending_side);
 }
 
 void Simulator::setRobotPrimitives(
     ConstPrimitiveVectorPtr primitives,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball, bool invert)
+    const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side)
 {
     if (!primitives)
     {
@@ -100,29 +100,29 @@ void Simulator::setRobotPrimitives(
             ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
-                          simulator_ball, invert);
+                          simulator_ball, defending_side);
     }
 }
 
 void Simulator::setYellowRobotPrimitive(RobotId id,
                                         const TbotsProto_Primitive& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball, invert_yellow_robot_coordinates);
+    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball, yellow_team_defending_side);
 }
 
 void Simulator::setBlueRobotPrimitive(RobotId id,
                                       const TbotsProto_Primitive& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball, invert_blue_robot_coordinates);
+    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball, blue_team_defending_side);
 }
 
 void Simulator::setRobotPrimitive(
     RobotId id, const TbotsProto_Primitive& primitive_msg,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball, bool invert)
+    const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side)
 {
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball, invert);
+    SimulatorBallSingleton::setSimulatorBall(simulator_ball, defending_side);
     auto simulator_robots_iter =
         std::find_if(simulator_robots.begin(), simulator_robots.end(),
                      [id](const auto& robot_world_pair) {
@@ -133,18 +133,18 @@ void Simulator::setRobotPrimitive(
     {
         auto simulator_robot = (*simulator_robots_iter).first;
         auto firmware_world  = (*simulator_robots_iter).second;
-        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, invert);
+        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, defending_side);
         SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(firmware_world,
                                                                           primitive_msg);
     }
 }
 
-void Simulator::setYellowTeamDefendingSide(const TeamSideMsg &team_side_msg) {
-    invert_yellow_robot_coordinates = team_side_msg.defending_positive_side();
+void Simulator::setYellowTeamDefendingSide(const DefendingSideProto &defending_side_proto) {
+    yellow_team_defending_side = defending_side_proto.defending_positive_side() ? FieldSide::POS_X : FieldSide::NEG_X;
 }
 
-void Simulator::setBlueTeamDefendingSide(const TeamSideMsg &team_side_msg) {
-    invert_blue_robot_coordinates = team_side_msg.defending_positive_side();
+void Simulator::setBlueTeamDefendingSide(const DefendingSideProto &defending_side_proto) {
+    blue_team_defending_side = defending_side_proto.defending_positive_side() ? FieldSide::POS_X : FieldSide::NEG_X;
 }
 
 void Simulator::stepSimulation(const Duration& time_step)
@@ -153,7 +153,6 @@ void Simulator::stepSimulation(const Duration& time_step)
     // We only need to do this a single time since all robots
     // can see and interact with the same ball
 
-
     Duration remaining_time = time_step;
     while (remaining_time > Duration::fromSeconds(0))
     {
@@ -161,8 +160,8 @@ void Simulator::stepSimulation(const Duration& time_step)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, invert_blue_robot_coordinates);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, invert_blue_robot_coordinates);
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, blue_team_defending_side);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball, blue_team_defending_side);
             SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
         }
 
@@ -170,8 +169,8 @@ void Simulator::stepSimulation(const Duration& time_step)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, invert_yellow_robot_coordinates);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, invert_yellow_robot_coordinates);
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, yellow_team_defending_side);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball, yellow_team_defending_side);
             SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
         }
 

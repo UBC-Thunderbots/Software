@@ -5,7 +5,7 @@
 #include "software/networking/threaded_proto_multicast_sender.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/simulation/threaded_simulator.h"
-#include "software/proto/team_side_msg.pb.h"
+#include "software/proto/defending_side_msg.pb.h"
 
 extern "C"
 {
@@ -131,11 +131,21 @@ class StandaloneSimulator
      *
      * @param primitive_set_msg The set of primitives to run on the respective team
      */
-    void setYellowRobotPrimitives(TbotsProto_PrimitiveSet primitive_set_msg);
-    void setBlueRobotPrimitives(TbotsProto_PrimitiveSet primitive_set_msg);
+    void setYellowRobotPrimitives(const TbotsProto_PrimitiveSet& primitive_set_msg);
+    void setBlueRobotPrimitives(const TbotsProto_PrimitiveSet& primitive_set_msg);
 
-    void setYellowTeamDefendingSide(TeamSideMsg team_side_msg);
-    void setBlueTeamDefendingSide(TeamSideMsg team_side_msg);
+    /**
+     * Sets which side of the field the corresponding team is defending.
+     *
+     * This will flip robot and ball coordinates an applicable in order to present
+     * the firmware being simulated with data that matches our coordinate convention. See
+     * https://github.com/UBC-Thunderbots/Software/blob/master/docs/software-architecture-and-design.md#coordinates
+     * for more information about our coordinate conventions.
+     *
+     * @param defending_side_proto The side to defend
+     */
+    void setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto);
+    void setBlueTeamDefendingSide(const DefendingSideProto& defending_side_protoj);
 
     /**
      * A helper function that sets up all networking functionality with
@@ -148,7 +158,7 @@ class StandaloneSimulator
         yellow_team_primitive_listener, blue_team_primitive_listener;
     std::unique_ptr<ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>>
         wrapper_packet_sender;
-    std::unique_ptr<ThreadedProtoMulticastListener<TeamSideMsg>> yellow_team_side_listener, blue_team_side_listener;
+    std::unique_ptr<ThreadedProtoMulticastListener<DefendingSideProto>> yellow_team_side_listener, blue_team_side_listener;
     ThreadedSimulator simulator;
 
     SSLProto::SSL_WrapperPacket most_recent_ssl_wrapper_packet;

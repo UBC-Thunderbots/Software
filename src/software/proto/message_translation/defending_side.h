@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "software/proto/team_side_msg.pb.h"
+#include "software/proto/defending_side_msg.pb.h"
 
 /**
  * Creates a TeamSideMsg from the given data
@@ -12,4 +12,4 @@
  *
  * @return A TeamSideMsg containing the given data
  */
-std::unique_ptr<TeamSideMsg> createTeamSideMsg(bool defending_positive_side);
+std::unique_ptr<DefendingSideProto> createDefendingSideProto(bool defending_positive_side);
