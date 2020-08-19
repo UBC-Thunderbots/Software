@@ -223,7 +223,7 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     if (estop_triggered)
     {
         // Set the primitive to bring the robot to a stop
-        prim_msg.which_primitive     = TbotsProto_Primitive_stop_tag;
+        prim_msg.which_primitive = TbotsProto_Primitive_stop_tag;
 
         // Disable charging and discharge through chicker
         charger_enable(false);
