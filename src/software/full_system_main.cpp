@@ -132,7 +132,7 @@ int main(int argc, char **argv)
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers
-        ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
+        ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
         sensor_fusion->Subject<World>::registerObserver(ai);
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         if (!args.headless)

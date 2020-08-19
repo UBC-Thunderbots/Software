@@ -4,13 +4,6 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string HaltTestPlay::name = "Halt Test Play";
-
-std::string HaltTestPlay::getName() const
-{
-    return HaltTestPlay::name;
-}
-
 bool HaltTestPlay::isApplicable(const World &world) const
 {
     return world.ball().position().y() >= 0;

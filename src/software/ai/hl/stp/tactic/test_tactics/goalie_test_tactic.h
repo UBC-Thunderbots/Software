@@ -18,8 +18,6 @@ class GoalieTestTactic : public Tactic
      */
     explicit GoalieTestTactic(bool loop_forever = false);
 
-    std::string getName() const override;
-
     bool isGoalieTactic() const override;
 
     /**

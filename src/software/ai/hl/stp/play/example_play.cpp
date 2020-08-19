@@ -3,13 +3,6 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string ExamplePlay::name = "Example Play";
-
-std::string ExamplePlay::getName() const
-{
-    return ExamplePlay::name;
-}
-
 bool ExamplePlay::isApplicable(const World &world) const
 {
     // This play is never applicable so it will never be chosen during gameplay

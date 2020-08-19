@@ -9,11 +9,6 @@ ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
 {
 }
 
-std::string ChipTactic::getName() const
-{
-    return "Chip Tactic";
-}
-
 void ChipTactic::updateWorldParams(const Ball &ball)
 {
     // update the world parameters stored by this tactic

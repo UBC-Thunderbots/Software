@@ -34,8 +34,6 @@ class ShadowFreekickerTactic : public Tactic
     explicit ShadowFreekickerTactic(FreekickShadower free_kick_shadower, Team enemy_team,
                                     Ball ball, Field field, bool loop_forever);
 
-    std::string getName() const override;
-
     /**
      * Updates the world parameters for this ShadowFreekicker tactic
      *

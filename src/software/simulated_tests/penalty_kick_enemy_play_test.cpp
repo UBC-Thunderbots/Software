@@ -28,7 +28,7 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
         Point(3.2, -2.5),
     }));
     setEnemyGoalie(0);
-    setAIPlay(PenaltyKickEnemyPlay::name);
+    setAIPlay(TYPENAME(PenaltyKickEnemyPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
