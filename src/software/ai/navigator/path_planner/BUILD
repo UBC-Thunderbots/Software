@@ -73,6 +73,7 @@ cc_test(
         ":theta_star_path_planner",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
+        "//software/util/typename",
         "@gtest//:gtest_main",
     ],
 )
@@ -86,6 +87,7 @@ cc_test(
         ":theta_star_path_planner",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
+        "//software/util/typename",
         "@gtest//:gtest_main",
     ],
 )

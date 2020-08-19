@@ -18,6 +18,7 @@ cc_library(
         "//software/ai/motion_constraint:motion_constraint_manager",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
+        "//software/util/typename",
         "@munkres_cpp",
     ],
 )

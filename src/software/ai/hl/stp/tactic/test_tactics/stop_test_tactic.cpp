@@ -4,11 +4,6 @@
 
 StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever, {}) {}
 
-std::string StopTestTactic::getName() const
-{
-    return "Stop Test Tactic";
-}
-
 double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // Prefer all robots equally with a cost of 0.5

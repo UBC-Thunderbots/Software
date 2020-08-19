@@ -2,6 +2,7 @@
 
 #include "software/logger/logger.h"
 #include "software/networking/proto_multicast_listener.h"
+#include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT>
 ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
@@ -25,7 +26,7 @@ void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
     if (!parsing_succeeded)
     {
         LOG(WARNING) << "Failed to parse received network packet into a "
-                     << typeid(ReceiveProtoT).name();
+                     << TYPENAME(ReceiveProtoT);
         return;
     }
     receive_callback(packet_data);

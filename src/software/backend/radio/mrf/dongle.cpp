@@ -375,7 +375,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     // the packet
     camera_packet[0] = mask_vec;
 
-    std::lock_guard<std::mutex> lock(cam_mtx);
+    std::scoped_lock lock(cam_mtx);
 
     if (camera_transfers.size() >= 8)
     {
@@ -413,16 +413,16 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     annunciator.update_vision_detections(robot_ids);
 };
 
-void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
+void MRFDongle::send_drive_packet(const TbotsProto::PrimitiveSet &prims)
 {
-    for (auto &prim : prims)
+    for (auto &[robot_id, prim_proto] : prims.robot_primitives())
     {
-        std::vector<uint8_t> encoded_primitive = encode_primitive(prim);
+        std::vector<uint8_t> encoded_primitive = encode_primitive(robot_id, prim_proto);
         if (encoded_primitive.size() > MAX_RADIO_PACKET_SIZE)
         {
-            LOG(WARNING) << "Failed to send " << prim->getPrimitiveName()
-                         << ", it had an encoded length of" << encoded_primitive.size()
-                         << ", max is  " << MAX_RADIO_PACKET_SIZE;
+            LOG(WARNING)
+                << "Failed to send a primitive, because it had an encoded length of"
+                << encoded_primitive.size() << ", max is  " << MAX_RADIO_PACKET_SIZE;
         }
         else
         {
@@ -454,12 +454,9 @@ void MRFDongle::submit_drive_transfer(std::vector<uint8_t> data)
     }
 }
 
-std::vector<uint8_t> MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim)
+std::vector<uint8_t> MRFDongle::encode_primitive(unsigned int robot_id,
+                                                 TbotsProto::Primitive prim_proto)
 {
-    // Get the proto representation of the primitive
-    TbotsProto::Primitive prim_proto =
-        ProtoCreatorPrimitiveVisitor().createPrimitive(*prim);
-
     // Serialize the proto representation
     std::vector<uint8_t> serialized_proto(prim_proto.ByteSizeLong());
     prim_proto.SerializeToArray(serialized_proto.data(),
@@ -467,8 +464,7 @@ std::vector<uint8_t> MRFDongle::encode_primitive(const std::unique_ptr<Primitive
     // Prepend the robot id
     // We place this outside the proto so that we can check on the robot if the message
     // was intended for that robot with de-serializing the message
-    serialized_proto.insert(serialized_proto.begin(),
-                            static_cast<uint8_t>(prim->getRobotId()));
+    serialized_proto.insert(serialized_proto.begin(), static_cast<uint8_t>(robot_id));
 
 
     return serialized_proto;
@@ -484,7 +480,7 @@ void MRFDongle::handle_camera_transfer_done(
     AsyncOperation<void> &op,
     std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
 {
-    std::lock_guard<std::mutex> lock(cam_mtx);
+    std::scoped_lock lock(cam_mtx);
     op.result();
     camera_transfers.erase(iter);
 }

@@ -6,6 +6,8 @@
 #include "software/ai/intent/move_intent.h"
 #include "software/test_util/test_util.h"
 
+// TODO (Issue #1644): refactor and reenable these tests
+/*
 TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)
 {
     Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
@@ -262,3 +264,4 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_negative_
         ADD_FAILURE() << "Move intent not returned by Chip Action!";
     }
 }
+*/

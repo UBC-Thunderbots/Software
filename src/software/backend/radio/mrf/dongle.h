@@ -15,6 +15,7 @@
 #include <utility>
 #include <vector>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/radio/mrf/annunciator.h"
 #include "software/backend/radio/mrf/send_reliable_message_operation.h"
 #include "software/backend/radio/mrf/usb/libusb.h"
@@ -49,12 +50,12 @@ class MRFDongle final
     ~MRFDongle();
 
     /**
-     * Given a vector of primitives, constructs a single drive packet to send over radio
-     * to all robots.
+     * Given a TbotsProto::PrimitiveSet, constructs a single drive packet to send over
+     * radio to all robots.
      *
-     * @param prims vector of primitives from HL
+     * @param prims TbotsProto::PrimitiveSet from HL
      */
-    void send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims);
+    void send_drive_packet(const TbotsProto::PrimitiveSet &prims);
 
     /**
      * Sends a camera packet over radio to all robots, including vision coordinates of
@@ -126,13 +127,15 @@ class MRFDongle final
     uint16_t pan_;
 
     /**
-     * Encode the given primitive for transmission over radio
+     * Encode the given primitive and robot id for transmission over radio
      *
-     * @param prim The primitive to encode
+     * @param robot_id The robot id to encode for
+     * @param prim_proto The primitive to encode
      *
-     * @return The serialization of the proto equivalent of the primitive
+     * @return The serialization of the primitive proto
      */
-    std::vector<uint8_t> encode_primitive(const std::unique_ptr<Primitive> &prim);
+    std::vector<uint8_t> encode_primitive(unsigned int robot_id,
+                                          TbotsProto::Primitive prim_proto);
 
     /**
      * Attempt to pack and send the given data over libusb to the radio

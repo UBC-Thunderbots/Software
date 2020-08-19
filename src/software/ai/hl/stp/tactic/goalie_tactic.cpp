@@ -103,11 +103,6 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     }
 }
 
-std::string GoalieTactic::getName() const
-{
-    return "Goalie Tactic";
-}
-
 void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
                                      const Team &friendly_team, const Team &enemy_team)
 {

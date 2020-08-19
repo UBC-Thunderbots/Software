@@ -1,11 +1,11 @@
 #pragma once
 
-#include "software/ai/intent/intent.h"
+#include "software/ai/intent/direct_primitive_intent.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/primitive/chip_primitive.h"
 
-class ChipIntent : public ChipPrimitive, public Intent
+class ChipIntent : public DirectPrimitiveIntent
 {
    public:
     static const std::string INTENT_NAME;
@@ -25,23 +25,4 @@ class ChipIntent : public ChipPrimitive, public Intent
                         unsigned int priority);
 
     std::string getIntentName(void) const override;
-
-    void accept(IntentVisitor& visitor) const override;
-
-    /**
-     * Compares ChipIntents for equality. ChipIntents are considered equal if all
-     * their member variables are equal.
-     *
-     * @param other the ChipIntents to compare with for equality
-     * @return true if the ChipIntents are equal and false otherwise
-     */
-    bool operator==(const ChipIntent& other) const;
-
-    /**
-     * Compares ChipIntents for inequality.
-     *
-     * @param other the ChipIntent to compare with for inequality
-     * @return true if the ChipIntents are not equal and false otherwise
-     */
-    bool operator!=(const ChipIntent& other) const;
 };

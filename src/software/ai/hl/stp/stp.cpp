@@ -17,6 +17,7 @@
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
          std::shared_ptr<const AIControlConfig> control_config, long random_seed)
@@ -75,7 +76,7 @@ void STP::updateAIPlay(const World& world)
                 LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
                              << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "
-                             << default_play->getName() << std::endl;
+                             << TYPENAME(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
         }
@@ -168,7 +169,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 {
     if (current_play)
     {
-        return std::make_optional(current_play->getName());
+        return std::make_optional(TYPENAME(*current_play));
     }
 
     return std::nullopt;
@@ -216,7 +217,7 @@ PlayInfo STP::getPlayInfo()
                 continue;
             }
             std::string s = "Robot " + std::to_string(tactic->getAssignedRobot()->id()) +
-                            "  -  " + tactic->getName();
+                            "  -  " + TYPENAME(*tactic);
             info.addRobotTacticAssignment(s);
         }
     }
@@ -253,11 +254,11 @@ bool STP::overrideAIPlayIfApplicable()
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
                              << "\" specified in the override is not valid." << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "
-                             << default_play->getName() << std::endl;
+                             << TYPENAME(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
+            return true;
         }
-        return true;
     }
     return false;
 }

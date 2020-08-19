@@ -16,7 +16,7 @@ int main(int argc, char **argv)
     auto backend = std::make_shared<RadioBackend>();
 
     controller->Subject<ControllerInput>::registerObserver(primitive_generator);
-    primitive_generator->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
+    primitive_generator->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
 
     // This blocks forever without using the CPU
     std::promise<void>().get_future().wait();

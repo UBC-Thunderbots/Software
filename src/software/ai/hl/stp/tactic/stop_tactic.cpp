@@ -6,11 +6,6 @@
 
 StopTactic::StopTactic(bool coast) : Tactic(true, {}), coast(coast) {}
 
-std::string StopTactic::getName() const
-{
-    return "Stop Tactic";
-}
-
 double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // Prefer all robots equally

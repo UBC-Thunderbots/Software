@@ -16,7 +16,7 @@ class RadioBackend : public Backend
    private:
     static const int DEFAULT_RADIO_CONFIG = 0;
 
-    void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
+    void onValueReceived(TbotsProto::PrimitiveSet primitives) override;
     void onValueReceived(World world) override;
 
     /**
@@ -38,6 +38,6 @@ class RadioBackend : public Backend
     std::optional<World> most_recently_received_world;
     std::mutex most_recently_received_world_mutex;
 
-    ConstPrimitiveVectorPtr most_recently_received_primitives;
+    TbotsProto::PrimitiveSet most_recently_received_primitives;
     std::mutex most_recently_received_primitives_mutex;
 };

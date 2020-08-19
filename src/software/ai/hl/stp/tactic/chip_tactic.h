@@ -18,8 +18,6 @@ class ChipTactic : public Tactic
      */
     explicit ChipTactic(const Ball& ball, bool loop_forever);
 
-    std::string getName() const override;
-
     /**
      * Updates the world parameters for this ChipTactic.
      *

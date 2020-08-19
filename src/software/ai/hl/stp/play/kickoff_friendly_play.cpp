@@ -6,14 +6,6 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-
-const std::string KickoffFriendlyPlay::name = "KickoffFriendly Play";
-
-std::string KickoffFriendlyPlay::getName() const
-{
-    return KickoffFriendlyPlay::name;
-}
-
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
     return ((world.gameState().isReadyState() || world.gameState().isSetupState()) &&
