@@ -67,7 +67,9 @@ std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
     DribblerEnable enable_dribbler, MoveType move_type, AutochickType autochick)
 {
     // TODO (#1638): Remove this and use createMovePrimitive, createAutochipMovePrimitive,
-    // or createAutokickMovePrimitive instead
+    // or createAutokickMovePrimitive instead. This should be done after trajectory
+    // planner is integrated in case the arguments for creating createMovePrimitive,
+    // createAutochipMovePrimitive, and createAutokickMovePrimitive changes.
     if (autochick == AutochickType::AUTOKICK)
     {
         return createAutokickMovePrimitive(
