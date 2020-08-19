@@ -85,7 +85,7 @@ cc_library(
         "//software/world:ball",
         "//software/world:robot_state",
         "//software/world:team",
-        "//software/world:timestamped_possession_state",
+        "//software/world:team_types",
     ],
 )
 

@@ -121,7 +121,6 @@ class SensorFusion final
     std::optional<Ball> ball_;
     Team friendly_team_;
     Team enemy_team_;
-    TimestampedPossessionState timestamped_possession_state_;
     GameState game_state_;
     std::optional<RefereeStage> referee_stage_;
 

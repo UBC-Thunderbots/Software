@@ -9,7 +9,6 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       ball_(std::nullopt),
       friendly_team_(),
       enemy_team_(),
-      timestamped_possession_state_(),
       game_state_(),
       referee_stage_(std::nullopt),
       ball_filter_(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
@@ -28,8 +27,7 @@ std::optional<World> SensorFusion::getWorld() const
 {
     if (field_ && ball_)
     {
-        World new_world(*field_, *ball_, friendly_team_, enemy_team_,
-                        timestamped_possession_state_);
+        World new_world(*field_, *ball_, friendly_team_, enemy_team_);
         new_world.updateGameState(game_state_);
         if (referee_stage_)
         {

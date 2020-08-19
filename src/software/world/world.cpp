@@ -4,14 +4,11 @@
 #include "software/parameter/dynamic_parameters.h"
 
 World::World(const Field &field, const Ball &ball, const Team &friendly_team,
-             const Team &enemy_team,
-             const TimestampedPossessionState timestamped_possession_state,
-             unsigned int buffer_size)
+             const Team &enemy_team, unsigned int buffer_size)
     : field_(field),
       ball_(ball),
       friendly_team_(friendly_team),
       enemy_team_(enemy_team),
-      timestamped_possession_state_(timestamped_possession_state),
       current_game_state_(),
       // Store a small buffer of previous referee commands so we can filter out noise
       referee_command_history(REFEREE_COMMAND_BUFFER_SIZE),
@@ -78,11 +75,6 @@ const Team &World::friendlyTeam() const
 const Team &World::enemyTeam() const
 {
     return enemy_team_;
-}
-
-const TimestampedPossessionState &World::timestampedPossessionState() const
-{
-    return timestamped_possession_state_;
 }
 
 void World::updateRefereeCommand(const RefereeCommand &command)
@@ -152,7 +144,6 @@ bool World::operator==(const World &other) const
     return this->field() == other.field() && this->ball() == other.ball() &&
            this->friendlyTeam() == other.friendlyTeam() &&
            this->enemyTeam() == other.enemyTeam() &&
-           this->timestamped_possession_state_ == other.timestamped_possession_state_ &&
            this->gameState() == other.gameState();
 }
 

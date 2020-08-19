@@ -7,7 +7,7 @@
 #include "software/world/ball.h"
 #include "software/world/robot_state.h"
 #include "software/world/team.h"
-#include "software/world/timestamped_possession_state.h"
+#include "software/world/team_types.h"
 
 /**
  * Finds the robot that has possession of the ball. To have possession, the robot needs to
