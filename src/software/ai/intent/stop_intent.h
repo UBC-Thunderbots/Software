@@ -5,7 +5,6 @@
 class StopIntent : public DirectPrimitiveIntent
 {
    public:
-    static const std::string INTENT_NAME;
     /**
      * Creates a new Stop Intent
      *
@@ -17,6 +16,4 @@ class StopIntent : public DirectPrimitiveIntent
      * priority
      */
     explicit StopIntent(unsigned int robot_id, bool coast, unsigned int priority);
-
-    std::string getIntentName(void) const override;
 };

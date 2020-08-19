@@ -7,7 +7,6 @@
 class ChipIntent : public DirectPrimitiveIntent
 {
    public:
-    static const std::string INTENT_NAME;
     /**
      * Creates a new Chip Intent
      *
@@ -22,6 +21,4 @@ class ChipIntent : public DirectPrimitiveIntent
     explicit ChipIntent(unsigned int robot_id, const Point& chip_origin,
                         const Angle& chip_direction, double chip_distance_meters,
                         unsigned int priority);
-
-    std::string getIntentName(void) const override;
 };

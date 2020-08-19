@@ -3,15 +3,6 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(MoveIntentTest, intent_name_test)
-{
-    MoveIntent move_intent =
-        MoveIntent(0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-                   AutochickType::NONE, BallCollisionType::AVOID);
-
-    EXPECT_EQ("Move Intent", move_intent.getIntentName());
-}
-
 // For equality operators, we only check for cases not covered in the Primitive tests,
 // since Intents inherit from Primitives
 TEST(MoveIntentTest, test_equality_operator_intents_equal)
