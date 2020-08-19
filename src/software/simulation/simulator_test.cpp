@@ -479,7 +479,7 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positive
     for (const auto& primitive_ptr : *primitives_ptr)
     {
         TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-                ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
     }
@@ -530,7 +530,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_negati
     for (const auto& primitive_ptr : *primitives_ptr)
     {
         TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-                ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
     }
@@ -580,7 +580,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_positi
     for (const auto& primitive_ptr : *primitives_ptr)
     {
         TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-                ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
 
         simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
     }
