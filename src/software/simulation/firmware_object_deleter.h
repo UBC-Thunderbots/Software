@@ -2,6 +2,7 @@
 
 extern "C"
 {
+#include "firmware/app/primitives/primitive_manager.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/firmware_robot.h"
@@ -9,7 +10,6 @@ extern "C"
 #include "firmware/app/world/wheel.h"
 #include "firmware/shared/physics.h"
 #include "shared/proto/primitive.nanopb.h"
-#include "software/simulation/firmware_object_deleter.h"
 }
 
 /**
@@ -67,5 +67,21 @@ struct FirmwareWorldDeleter
         app_firmware_ball_destroy(firmware_ball);
 
         app_firmware_world_destroy(firmware_world);
+    };
+};
+
+struct FirmwarePrimitiveManagerDeleter
+{
+    void operator()(PrimitiveManager_t* primitive_manager) const
+    {
+        app_primitive_manager_destroy(primitive_manager);
+    };
+};
+
+struct FirmwareBallDeleter
+{
+    void operator()(FirmwareBall_t* firmware_ball) const
+    {
+        app_firmware_ball_destroy(firmware_ball);
     };
 };
