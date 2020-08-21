@@ -11,19 +11,12 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string CornerKickPlay::name = "Corner Kick Play";
-
 CornerKickPlay::CornerKickPlay()
     : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(DynamicParameters->getAIConfig()
                                                            ->getCornerKickPlayConfig()
                                                            ->MaxTimeCommitToPassSeconds()
                                                            ->value()))
 {
-}
-
-std::string CornerKickPlay::getName() const
-{
-    return CornerKickPlay::name;
 }
 
 bool CornerKickPlay::isApplicable(const World &world) const

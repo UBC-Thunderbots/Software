@@ -5,11 +5,6 @@ GoalieTestTactic::GoalieTestTactic(bool loop_forever)
 {
 }
 
-std::string GoalieTestTactic::getName() const
-{
-    return "Goalie Test Tactic";
-}
-
 bool GoalieTestTactic::isGoalieTactic() const
 {
     return true;

@@ -9,7 +9,7 @@ bool Play::done() const
     return !static_cast<bool>(tactic_sequence);
 }
 
-std::optional<std::vector<std::shared_ptr<Tactic>>> Play::getTactics(const World &world)
+std::vector<std::shared_ptr<Tactic>> Play::getTactics(const World &world)
 {
     // Update the member variable that stores the world. This will be used by the
     // getNextTacticsWrapper function (inside the coroutine) to pass the World data to
@@ -30,13 +30,13 @@ std::optional<std::vector<std::shared_ptr<Tactic>>> Play::getTactics(const World
             // Extract the result from the coroutine. This will be whatever value was
             // yielded by the getNextTactics function
             auto next_tactics = tactic_sequence.get();
-            return std::make_optional(next_tactics);
+            return next_tactics;
         }
     }
     // If the coroutine "iterator" is done, the getNextTactics function has completed
-    // and has no more work to do. Therefore, the Play is done so wereturn an empty
-    // optional
-    return std::nullopt;
+    // and has no more work to do. Therefore, the Play is done so we return an empty
+    // vector
+    return std::vector<std::shared_ptr<Tactic>>();
 }
 
 void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)

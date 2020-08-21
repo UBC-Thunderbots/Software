@@ -8,7 +8,6 @@ cc_library(
         "//software/gui/robot_diagnostics/widgets:robot_diagnostics_gui",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",
-        "//software/primitive",
         "//software/proto:sensor_msg_cc_proto",
         "//software/world",
         "@qt//:qt_widgets",

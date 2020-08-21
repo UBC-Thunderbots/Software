@@ -2,7 +2,9 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "stp",
-    srcs = ["stp.cpp"],
+    srcs = [
+        "stp.cpp",
+    ],
     hdrs = ["stp.h"],
     deps = [
         "//software/ai/hl",
@@ -14,6 +16,7 @@ cc_library(
         "//software/ai/motion_constraint:motion_constraint_manager",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
+        "//software/util/typename",
         "@munkres_cpp",
     ],
 )

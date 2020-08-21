@@ -38,8 +38,6 @@ class GoalieTactic : public Tactic
     std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
                                                    Rectangle goalie_restricted_area);
 
-    std::string getName() const override;
-
     /**
      * Updates the world parameters for this GoalieTactic.
      *

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <unordered_set>
-
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
@@ -9,12 +8,10 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/primitive/all_primitives.h"
-#include "software/primitive/primitive.h"
 #include "software/world/world.h"
 
 /**
- * This Navigator converts the given Intents into their respective Primitives
+ * The Navigator converts the given Intents into their respective Primitives
  * and navigate around obstacles
  */
 class Navigator : public IntentVisitor
@@ -33,15 +30,15 @@ class Navigator : public IntentVisitor
                        std::shared_ptr<const NavigatorConfig> config);
 
     /**
-     * Get assigned primitives for given assigned intents
+     * Get Primitives for given assigned intents
      *
-     * @param world World to navigate around
-     * @assignedIntents intents to process into primitives
+     * @param world The World to navigate around
+     * @param intents The intents to process into primitives
      *
-     * @return vector of primitives for the given intents
+     * @return Primitives
      */
-    std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
-        const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents);
+    std::unique_ptr<TbotsProto::PrimitiveSet> getAssignedPrimitives(
+        const World &world, const std::vector<std::unique_ptr<Intent>> &intents);
 
     /**
      * Get the planned paths for navigation
@@ -62,97 +59,28 @@ class Navigator : public IntentVisitor
      *
      * @param The Intent to register
      */
-    void visit(const ChipIntent &chip_intent) override;
-    void visit(const KickIntent &kick_intent) override;
-    void visit(const MoveIntent &move_intent) override;
-    void visit(const SpinningMoveIntent &spinning_move_intent) override;
-    void visit(const StopIntent &stop_intent) override;
-
-    /**
-     * Calculates the transition speed for the robot between two line segments
-     *
-     * Calculates the speed that the robot should be at when it is at the end of a
-     * given line segment in order to smoothly transition to another given line segment,
-     * given a final speed at the end of the two line segments
-     *
-     * This is only public so it is testable.
-     *
-     * @param p1, p2, p3 are 3 points that define two line segments that form a path
-     * @param final_speed is the intended final speed at the end of the path
-     * @return the first segment's final speed after travelling from p1 to p2
-     * for a smooth transition to the p2 to p3 path, scaled by the final speed at the end
-     * of the path
-     */
-    static double calculateTransitionSpeedBetweenSegments(const Point &p1,
-                                                          const Point &p2,
-                                                          const Point &p3,
-                                                          double final_speed);
+    void visit(const DirectPrimitiveIntent &intent) override;
+    void visit(const MoveIntent &intent) override;
 
    private:
     /**
-     * Generates path objectives from move intents
+     * Generates path objectives
      *
-     * @param move_intents intents to make into path objectives
      * @param world World to navigate around
      *
      * @return set of PathObjectives
      */
-    std::unordered_set<PathObjective> getPathObjectivesFromMoveIntents(
-        const std::vector<MoveIntent> &move_intents, const World &world);
-
-    /**
-     * Creates a list primitives for the list of MoveIntents
-     *
-     * @param move_intents intents to make into primitives
-     * @param world World to navigate around
-     *
-     * @return list of primitives
-     */
-    std::vector<std::unique_ptr<Primitive>> getPrimitivesFromMoveIntents(
-        const std::vector<MoveIntent> &move_intents, const World &world);
-
-    /**
-     * Creates a primitive for a given path and move intent
-     *
-     * @param path path to make primitive for
-     * @param intent intent to make primitive
-     * @param world World to navigate around
-     *
-     * @return unique pointer to the primitive
-     */
-    std::unique_ptr<Primitive> getPrimitiveFromPathAndMoveIntent(std::optional<Path> path,
-                                                                 MoveIntent intent,
-                                                                 const World &world);
-
-    /**
-     * Calculates a factor for how close p is to an enemy obstacle.
-     * 0 = touching or inside
-     * 1 = greater than/equal to EnemyRobotProximityLimit (dynamic parameter) away
-     * scaled linearly between these values
-     *
-     * @param p point to evaluate
-     * @param enemy_team enemy team
-     *
-     * @return A factor from 0 to 1 for how close p is to an enemy obstacle
-     */
-    double getEnemyObstacleProximityFactor(const Point &p, const Team &enemy_team);
+    std::unordered_set<PathObjective> createPathObjectives(const World &world) const;
 
     std::shared_ptr<const NavigatorConfig> config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
     std::unique_ptr<PathManager> path_manager;
+
     std::vector<std::vector<Point>> planned_paths;
-
-    // The current Primitive the navigator has created from an Intent.
-    // This variable is set by each `visit` function
-    std::unique_ptr<Primitive> current_primitive;
-    std::optional<RobotId> current_robot_id;
-
-    // These are obstacles that represent robots that aren't
-    // assigned move intents
-    // When move intents are processed to path plan,
-    // we can avoid these non-"moving" robots
-    std::vector<ObstaclePtr> friendly_non_move_intent_robot_obstacles;
-
-    // intents that need path planning
-    std::vector<MoveIntent> move_intents_for_path_planning;
+    std::vector<std::shared_ptr<NavigatingIntent>> navigating_intents;
+    // These are the robots that were assigned direct primitive intents.
+    // When navigating intents are processed to path plan, we can avoid these
+    // non-navigating robots
+    std::vector<RobotId> direct_primitive_intent_robots;
+    std::unique_ptr<TbotsProto::PrimitiveSet> primitive_set_msg;
 };

@@ -4,6 +4,8 @@
 
 #include "software/primitive/move_primitive.h"
 #include "software/primitive/primitive.h"
+#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/test_util/test_util.h"
 
 class ThreadedSimulatorTest : public ::testing::Test
@@ -181,7 +183,14 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     auto blue_primitives_ptr =
         std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
             std::move(blue_robot_primitives));
-    threaded_simulator.setBlueRobotPrimitives(blue_primitives_ptr);
+    for (const auto& primitive_ptr : *blue_primitives_ptr)
+    {
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
+
+        threaded_simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(),
+                                                 primitive_msg);
+    }
 
     std::unique_ptr<Primitive> yellow_move_primitive1 = std::make_unique<MovePrimitive>(
         1, Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
@@ -195,10 +204,17 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     auto yellow_primitives_ptr =
         std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
             std::move(yellow_robot_primitives));
-    threaded_simulator.setYellowRobotPrimitives(yellow_primitives_ptr);
+    for (const auto& primitive_ptr : *yellow_primitives_ptr)
+    {
+        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
+            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
+
+        threaded_simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(),
+                                                   primitive_msg);
+    }
 
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
     threaded_simulator.stopSimulation();
 
     // TODO: These tests are currently very lenient, and don't test final velocities.

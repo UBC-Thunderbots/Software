@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["navigator.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":navigating_primitive_creator",
         "//software/ai/intent",
         "//software/ai/intent:all_intents",
         "//software/ai/intent:intent_visitor",
@@ -15,7 +16,7 @@ cc_library(
         "//software/geom/algorithms",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
-        "//software/primitive:all_primitives",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/world",
     ],
 )
@@ -29,6 +30,35 @@ cc_test(
         "//software/ai/navigator/path_planner:no_path_test_path_planner",
         "//software/ai/navigator/path_planner:one_point_path_test_path_planner",
         "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "navigating_primitive_creator",
+    srcs = ["navigating_primitive_creator.cpp"],
+    hdrs = ["navigating_primitive_creator.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//software/ai/intent:all_intents",
+        "//software/ai/intent:navigating_intent",
+        "//software/ai/intent:navigating_intent_visitor",
+        "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/path_planner",
+        "//software/geom/algorithms",
+        "//software/logger",
+        "//software/parameter:dynamic_parameters",
+        "//software/proto/message_translation:tbots_protobuf",
+        "//software/world",
+    ],
+)
+
+cc_test(
+    name = "navigating_primitive_creator_test",
+    srcs = ["navigating_primitive_creator_test.cpp"],
+    deps = [
+        ":navigating_primitive_creator",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

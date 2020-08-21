@@ -19,8 +19,6 @@ class CherryPickTactic : public Tactic
      */
     explicit CherryPickTactic(const World& world, const Rectangle& target_region);
 
-    std::string getName() const override;
-
     /**
      * Updates the world parameters for this tactic
      *
