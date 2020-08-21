@@ -41,7 +41,8 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // If the ball is moving, we are likely already in a live game scenario and
     // so need to collect the ball before we can pass. If the ball is not moving,
     // we are likely in a set play and so don't need to initially collect the ball
-    if(ball.velocity().length() > INTERCEPT_BALL_SPEED_THRESHOLD) {
+    if (ball.velocity().length() > INTERCEPT_BALL_SPEED_THRESHOLD)
+    {
         auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, false);
         do
         {
