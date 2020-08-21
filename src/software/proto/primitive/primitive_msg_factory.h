@@ -58,6 +58,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 
 /**
  * Create a Move Primitive Message using the arguments of the old MovePrimitive
+ * This is meant to replicate the behaviour of the old move primitive
  *
  * @param dest The final destination of the movement
  * @param final_angle The final orientation the robot should have at the end

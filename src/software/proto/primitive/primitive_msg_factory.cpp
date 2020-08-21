@@ -70,8 +70,12 @@ std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
     // or createAutokickMovePrimitive instead. This should be done after trajectory
     // planner is integrated in case the arguments for creating createMovePrimitive,
     // createAutochipMovePrimitive, and createAutokickMovePrimitive changes.
+
+    // NOTE: 16000 is rpm set for the old move primitive
     if (autochick == AutochickType::AUTOKICK)
     {
+        // The old move primitive hardcoded BALL_MAX_SPEED_METERS_PER_SECOND - 1 as the
+        // kick speed
         return createAutokickMovePrimitive(
             dest, final_speed, move_type == MoveType::SLOW, final_angle,
             enable_dribbler == DribblerEnable::ON ? 16000 : 0,
@@ -79,6 +83,7 @@ std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
     }
     else if (autochick == AutochickType::AUTOCHIP)
     {
+        // The old move primitive hardcoded 2 as the chip distance
         return createAutochipMovePrimitive(
             dest, final_speed, move_type == MoveType::SLOW, final_angle,
             enable_dribbler == DribblerEnable::ON ? 16000 : 0, 2);
