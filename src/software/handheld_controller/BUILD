@@ -49,6 +49,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "controller_primitive_generator_test",
+    srcs = ["controller_primitive_generator_test.cpp"],
+    deps = [
+        ":controller_primitive_generator",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_binary(
     name = "handheld_control",
     srcs = ["handheld_control_main.cpp"],
