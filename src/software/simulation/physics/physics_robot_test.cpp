@@ -863,3 +863,32 @@ TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_moving_and_spinning)
     EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.01);
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0.0, 1);
 }
+
+TEST_F(PhysicsRobotTest, test_apply_angular_acceleration)
+{
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    RobotState initial_robot_state(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
+                                   AngularVelocity::zero());
+    PhysicsRobot physics_robot(0, world, initial_robot_state, 1.0);
+
+    // We have to take lots of small steps because a significant amount of accuracy
+    // is lost if we take a single step of 1 second
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        physics_robot.applyAngularAcceleration(AngularVelocity::fromRadians(1));
+
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
+        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+    }
+
+    auto robot = physics_robot.getRobotState();
+    // Because the robot's center of mass is not perfect we expect it to have drifted a
+    // little bit while spinning
+    EXPECT_LT((robot.position() - Point(0, 0)).length(), 0.05);
+    EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.05);
+    EXPECT_LT(robot.angularVelocity(), AngularVelocity::fromRadians(1));
+}

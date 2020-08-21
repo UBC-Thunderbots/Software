@@ -378,3 +378,13 @@ void PhysicsRobot::runPostPhysicsStep()
         post_physics_step_functions.pop();
     }
 }
+
+void PhysicsRobot::applyForce(const Vector &force) {
+    b2Vec2 force_vector = createVec2(force);
+    robot_body->ApplyForceToCenter(force_vector, true);
+}
+
+void PhysicsRobot::applyAngularAcceleration(const AngularVelocity acceleration) {
+    float torque = static_cast<float>(acceleration.toRadians()) * robot_body->GetInertia();
+    robot_body->ApplyTorque(torque), true);
+}
