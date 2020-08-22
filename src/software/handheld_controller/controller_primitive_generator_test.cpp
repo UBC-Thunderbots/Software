@@ -7,7 +7,7 @@
 TEST(ControllerPrimitiveGeneratorTest, test_create_direct_velocity)
 {
     auto direct_velocity_primitive =
-        ControllerPrimitiveGenerator::createDirectVelocityPrimitive(
+        ControllerPrimitiveGenerator::createDirectControlPrimitive(
             Vector(2, -4), AngularVelocity::fromRadians(0.5), 200);
 
     ASSERT_TRUE(direct_velocity_primitive->has_direct_control());

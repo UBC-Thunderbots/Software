@@ -36,7 +36,7 @@ class ControllerPrimitiveGenerator
      *
      * @return Pointer to the DirectControl Primitive
      */
-    static std::unique_ptr<TbotsProto::Primitive> createDirectVelocityPrimitive(
+    static std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
         const Vector& velocity, AngularVelocity angular_velocity, double dribbler_rpm);
 
    private:
