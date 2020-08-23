@@ -9,9 +9,9 @@ CPP_TYPE_MAP = {
 }
 
 C_TYPE_MAP = {
-    "bool": "BoolParmeter",
+    "bool": "BoolParameter",
     "int": "IntParameter",
     "uint": "UIntParameter",
-    "float": "FloatParmeter",
+    "float": "FloatParameter",
     "string": "StringParameter",
 }

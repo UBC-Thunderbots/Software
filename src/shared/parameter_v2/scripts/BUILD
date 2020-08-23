@@ -5,7 +5,12 @@ package(default_visibility = ["//visibility:private"])
 
 py_binary(
     name = "generate_dynamic_parameters",
-    srcs = [":generate_dynamic_parameters.py"],
+    srcs = [
+        ":c_config.py",
+        ":c_parameter.py",
+        ":c_writer.py",
+        ":generate_dynamic_parameters.py",
+    ],
     data = [
         "//shared/parameter_v2/config:example_configs",
     ],

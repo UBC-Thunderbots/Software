@@ -8,37 +8,37 @@ from type_map import C_TYPE_MAP
 #                              C Writer                               #
 #######################################################################
 
-CONFIG_FILE_NAME = "tbots_c_config"
-TOP_LEVEL_CONFIG_NAME = "ThunderbotsConfig"
-
 CONFIG_H = (
     "#pragma once\n#include <memory.h>\n#include <stdlib.h>\n#include"
-    ' "shared/parameter_v2/c/parameter.h"\nconst {top_level_config_name}_t*'
+    ' "shared/parameter_v2/c/parameter.h"\n{contents}\nconst {top_level_config_name}_t*'
     " app_dynamic_parameters_create(void);\nvoid app_dynamic_parameters_destroy(const"
-    " {top_level_config_name}_t* tbots_config);\n{contents}"
+    " {top_level_config_name}_t* tbots_config);\n"
 )
 
 CONFIG_C = (
-    '#include "shared/parameter_v2/c/tbots_c_config.h" \n'
+    '#include "shared/parameter_v2/c/parameter.h" \n'
+    '#include "shared/parameter_v2/c/{output_file}.h" \n'
     " const {top_level_config_name}_t* app_dynamic_parameters_create(void)"
-    " {{{app_dynamic_parameters_create_impl}}}\n"
-    "void app_dynamic_parameters_destroy(const {top_level_config_name} tbots_config)"
+    " {{{app_dynamic_parameters_create_impl}return {top_level_config_name}_config;}}\n"
+    "void app_dynamic_parameters_destroy(const {top_level_config_name}_t* tbots_config)"
     " {{{app_dynamic_parameters_destroy_impl}}}\n"
 )
 
 
 class CWriter(object):
     @staticmethod
-    def write_config_metadata(top_level_config_name: str, config_metadata: dict):
+    def write_config_metadata(
+        output_file: str, top_level_config_name: str, config_metadata: dict
+    ):
         """
+        :param output_file: The output file name for the .c and .h file
         :param top_level_config_name: The name of the top level config.
             This config contains all the other declared configs.
         :param config_metadata: The dictionary output from config_yaml_loader
-        :param output_file_dir: The location to place the generated files
 
         """
         c_configs = []
-        top_level_config = CConfig(top_level_config_name, top_level_config_name)
+        top_level_config = CConfig(top_level_config_name, "tbots_config")
 
         for config, metadata in config_metadata.items():
 
@@ -46,11 +46,9 @@ class CWriter(object):
             # and store that as the config_name
             config_name = CWriter.to_camel_case(config.split(".")[0])
 
-            config = CConfig(
-                config_name, "{}->{}".format(top_level_config_name, config_name)
-            )
+            config = CConfig(config_name, "tbots_config->{}".format(config_name),)
 
-            top_level_config.include_config(config)
+            top_level_config.include_config(config_name)
 
             # add all the valid CParameters to the CConfig
             if PARAMETER_KEY in metadata:
@@ -92,11 +90,10 @@ class CWriter(object):
                     )
 
             c_configs.append(config)
-
-        c_configs.append(CConfig(top_level_config_name, top_level_config_name))
+        c_configs.append(top_level_config)
 
         # generate c file
-        with open(f"{CONFIG_FILE_NAME}.c", "w") as c_file:
+        with open(f"{output_file}.c", "w") as c_file:
 
             app_dynamic_parameters_create_impl = ""
             app_dynamic_parameters_destroy_impl = ""
@@ -121,6 +118,7 @@ class CWriter(object):
 
             c_file.write(
                 CONFIG_C.format(
+                    output_file=output_file,
                     top_level_config_name=top_level_config_name,
                     app_dynamic_parameters_destroy_impl=app_dynamic_parameters_destroy_impl,
                     app_dynamic_parameters_create_impl=app_dynamic_parameters_create_impl,
@@ -128,7 +126,7 @@ class CWriter(object):
             )
 
         # generate header file
-        with open(f"{CONFIG_FILE_NAME}.h", "w") as header_file:
+        with open(f"{output_file}.h", "w") as header_file:
 
             contents = ""
             contents += "".join([conf.forward_decleration for conf in c_configs])

@@ -27,16 +27,26 @@ class CParameter(object):
 
         """
 
-        self.param_type = param_type
-        self.param_value = param_value
-        self.ptr_to_instance = ptr_to_instance
+        adjusted_value = ""
+
+        if param_type == "BoolParameter":
+            adjusted_value = "true" if param_value else "false"
+
+        elif param_type == "StringParameter":
+            adjusted_value = '"' + param_value + '"'
+
+        elif param_type == "FloatParameter":
+            adjusted_value = str(param_value) + "f"
+
+        else:
+            adjusted_value = param_value
 
         self.__definition = CParameter.DEFINITION.format(
             type=param_type, name=param_name
         )
 
         self.__constructor = CParameter.CONSTRUCTOR.format(
-            type=param_type, value=param_value
+            type=param_type, value=adjusted_value
         )
 
         self.__destructor = CParameter.DESTRUCTOR.format(
