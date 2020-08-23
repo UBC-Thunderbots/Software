@@ -34,6 +34,8 @@ class ConstructorArgGenericFactory
     template <typename U>
     static std::unique_ptr<TypeToCreate> create(const std::string& generic_name, U constructor_arg);
 
+    static std::unique_ptr<TypeToCreate> create(const std::string& generic_name, std::any constructor_arg);
+
     /**
      * Returns a const reference to the generic type registry. The registry is a map of
      * generic names to a "create" function that will create and return a unique_ptr to a

@@ -12,6 +12,7 @@
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
+#include "software/util/design_patterns/constructor_arg_generic_factory.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 struct commandLineArgs
@@ -122,10 +123,21 @@ int main(int argc, char **argv)
             DynamicParameters->getAIControlConfig();
         std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
             DynamicParameters->getSensorFusionConfig();
+        std::shared_ptr<const NetworkConfig> network_config =
+            DynamicParameters->getNetworkConfig();
         std::shared_ptr<const ReplayLoggingConfig> replay_logging_config =
             DynamicParameters->getReplayLoggingConfig();
         std::shared_ptr<const ReplayBackendConfig> replay_backend_config =
             DynamicParameters->getReplayBackendConfig();
+
+        auto all_backend_parameters = {
+            // SSLCommunicationConfig for RadioBackend
+            std::any(network_config->getSSLCommunicationConfig()),
+            // NetworkConfig for WifiBackend
+            std::any(network_config),
+            // ReplayBackendConfig for ReplayBackend
+            std::any(replay_backend_config)
+        };
 
         // TODO remove this when we move to non-generic factories for backends
         // https://github.com/UBC-Thunderbots/Software/issues/1452
@@ -139,6 +151,8 @@ int main(int argc, char **argv)
         // if the replay backend is selected, check that the replay directory is set
         // and set the parameter from the command line option before the ReplayBackend
         // is constructed
+        // TODO: this is still a hack, it might be a better idea to bypass dynamic \
+        //  parameters for this and pass in boost::program_options::variable_map instead
         if (args.backend_name == "replay")
         {
             if (args.replay_path.empty())
@@ -154,8 +168,21 @@ int main(int argc, char **argv)
                 ->setValue(args.replay_path);
         }
 
-        std::shared_ptr<Backend> backend =
-            GenericFactory<std::string, Backend>::create(args.backend_name);
+        std::shared_ptr<Backend> backend;
+
+        for (const auto& param : all_backend_parameters) {
+            try {
+                backend = ConstructorArgGenericFactory<std::string, Backend>::create(
+                    args.backend_name, param);
+            } catch (const std::invalid_argument& e) {
+                LOG(DEBUG) << "Failed to construct " << args.backend_name << " with param type " << typeid(param).name();
+            }
+        }
+
+        if (backend.get() == nullptr) {
+            throw std::invalid_argument(std::string("Failed to construct backend ") + args.backend_name);
+        }
+
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(sensor_fusion_config);
         auto ai            = std::make_shared<AIWrapper>(ai_config, ai_control_config);
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
