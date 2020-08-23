@@ -7,10 +7,10 @@ from type_map import C_TYPE_MAP
 
 class CParameter(object):
 
-    DEFINITION = "const {type}_t* {name};"
+    DEFINITION = "const {type}_t* {name};\n"
     CONSTRUCTOR = "app_dynamic_parameters_create{type}({value})"
-    INITIALIZATION = ".{name} = {constructor},"
-    DESTRUCTOR = "app_dynamic_parameters_destroy{type}({ptr});"
+    INITIALIZATION = ".{name} = {constructor},\n"
+    DESTRUCTOR = "app_dynamic_parameters_destroy{type}({ptr});\n"
 
     def __init__(
         self, param_name: str, param_type: str, param_value: str, ptr_to_instance: str

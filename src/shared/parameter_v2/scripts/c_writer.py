@@ -12,29 +12,24 @@ CONFIG_FILE_NAME = "tbots_c_config"
 TOP_LEVEL_CONFIG_NAME = "ThunderbotsConfig"
 
 CONFIG_H = (
-    "#pragma once\n"
-    "#include <memory.h>\n"
-    "#include <stdlib.h>\n"
-    '#include "shared/parameter_v2/c/parameter.h"\n'
-    "const {top_level_config_name}* app_dynamic_parameters_create(void);\n"
-    "void app_dynamic_parameters_destroy(const ThunderbotsConfig_t* tbots_config);\n"
-    "{contents}"
+    "#pragma once\n#include <memory.h>\n#include <stdlib.h>\n#include"
+    ' "shared/parameter_v2/c/parameter.h"\nconst {top_level_config_name}_t*'
+    " app_dynamic_parameters_create(void);\nvoid app_dynamic_parameters_destroy(const"
+    " {top_level_config_name}_t* tbots_config);\n{contents}"
 )
 
 CONFIG_C = (
-    '#include "shared/parameter_v2/c/tbots_c_config.h" {contents} \nconst'
-    " ThunderbotsConfig_t* app_dynamic_parameters_create(void)"
-    " {{app_dynamic_parameters_create_impl}}\n"
-    "void app_dynamic_parameters_destroy(const ThunderbotsConfig_t* tbots_config)"
-    " {{app_dynamic_parameters_destroy_impl}}\n"
+    '#include "shared/parameter_v2/c/tbots_c_config.h" \n'
+    " const {top_level_config_name}_t* app_dynamic_parameters_create(void)"
+    " {{{app_dynamic_parameters_create_impl}}}\n"
+    "void app_dynamic_parameters_destroy(const {top_level_config_name} tbots_config)"
+    " {{{app_dynamic_parameters_destroy_impl}}}\n"
 )
 
 
 class CWriter(object):
     @staticmethod
-    def write_config_metadata(
-        top_level_config_name: str, config_metadata: dict, output_file_dir: str
-    ):
+    def write_config_metadata(top_level_config_name: str, config_metadata: dict):
         """
         :param top_level_config_name: The name of the top level config.
             This config contains all the other declared configs.
@@ -98,19 +93,52 @@ class CWriter(object):
 
             c_configs.append(config)
 
+        c_configs.append(CConfig(top_level_config_name, top_level_config_name))
+
         # generate c file
         with open(f"{CONFIG_FILE_NAME}.c", "w") as c_file:
-            contents = ""
-            c_file.write(CONFIG_C)
-            pass
+
+            app_dynamic_parameters_create_impl = ""
+            app_dynamic_parameters_destroy_impl = ""
+
+            # malloc all the cofings
+            for config in c_configs:
+                app_dynamic_parameters_create_impl += config.malloc
+
+            # create initialization structs
+            for config in c_configs:
+                app_dynamic_parameters_create_impl += config.initialization
+
+            # memcpy initialization structs into malloced space
+            for config in c_configs:
+                app_dynamic_parameters_create_impl += config.memcpy
+
+            # create destructor
+            for config in c_configs:
+                for param in config.get_parameters():
+                    app_dynamic_parameters_destroy_impl += param.destructor
+                app_dynamic_parameters_destroy_impl += config.free
+
+            c_file.write(
+                CONFIG_C.format(
+                    top_level_config_name=top_level_config_name,
+                    app_dynamic_parameters_destroy_impl=app_dynamic_parameters_destroy_impl,
+                    app_dynamic_parameters_create_impl=app_dynamic_parameters_create_impl,
+                )
+            )
 
         # generate header file
         with open(f"{CONFIG_FILE_NAME}.h", "w") as header_file:
 
-            contents = "\n".join([conf.forward_decleration for conf in c_configs])
-            contents += "\n".join([conf.definition for conf in c_configs])
+            contents = ""
+            contents += "".join([conf.forward_decleration for conf in c_configs])
+            contents += "".join([conf.definition for conf in c_configs])
 
-            header_file.write(CONFIG_H.format(contents=contents))
+            header_file.write(
+                CONFIG_H.format(
+                    contents=contents, top_level_config_name=top_level_config_name
+                )
+            )
 
     @staticmethod
     def to_camel_case(snake_str):

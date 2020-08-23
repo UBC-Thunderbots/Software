@@ -19,13 +19,8 @@ PARAMETER_CONFIG_PATH = Path(os.path.dirname(__file__), "../config")
 def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
     # A temporary implementation used to show we can access the YAML files
     yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
-
     config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
-
-    CWriter.write_config_metadata("ThunderbotsConfig", config_metadata, ".config")
-
-    with open(output_file, "w") as outfile:
-        outfile.write("Hello world\n")
+    CWriter.write_config_metadata("ThunderbotsConfig", config_metadata)
 
 
 def main():
@@ -64,6 +59,7 @@ def main():
     generate_dynamic_parameters(
         args.output_file, args.include_headers, args.generate_for_cpp
     )
+
 
 #######################################################################
 #                                Main                                 #

@@ -8,13 +8,14 @@ from typing import List, Set
 
 class CConfig(object):
 
-    DEFINITION = "typedef struct {name}_s {{{contents}}} {name}_t;"
-    FORWARD_DECLERATION = "typedef struct {name}_s {name}_t;"
-    MALLOC = "{name}_t* {name}_config = ({name}_t*)malloc(sizeof({name}_t}));"
-    INITIALIZATION = "{name}_t {name}_init = {{{contents}}};"
-    MEMCPY = "memcpy({name}_config, &{name}_init, sizeof({name}_t));"
-    FREE = "free((void*){ptr_to_instance})"
-    INCLUDE_CONFIG = "const {name}_t* {name};"
+    DEFINITION = "typedef struct {name}_s {{{contents}}} {name}_t;\n"
+    FORWARD_DECLERATION = "typedef struct {name}_s {name}_t;\n"
+    MALLOC = "{name}_t* {name}_config = ({name}_t*)malloc(sizeof({name}_t));\n"
+    INITIALIZATION = "{name}_t {name}_init = {{{contents}}};\n"
+    INCLUDED_CONFIG_INITIALIZATION = ".{name} = {name}_config,\n"
+    MEMCPY = "memcpy({name}_config, &{name}_init, sizeof({name}_t));\n"
+    FREE = "free((void*){ptr_to_instance});\n"
+    INCLUDE_CONFIG = "const {name}_t* {name};\n"
 
     def __init__(self, config_name: str, ptr_to_instance: str):
         """Initializes a CParameter with the given name. The corresponding
@@ -36,16 +37,18 @@ class CConfig(object):
         """Add a parameter to this config to generate.
 
         :param parameter: The CParameter to add to this config
-        :type parameter: CParameter
 
         """
         self.parameters.add(parameter)
+
+    def get_parameters(self):
+        # TODO
+        return self.parameters
 
     def include_config(self, config: str):
         """Add a config to this config to generate.
 
         :param config: The CConfig to add to this CConfig
-        :type config: CConfig
 
         """
         self.configs.add(config)
@@ -57,9 +60,9 @@ class CConfig(object):
         definitions.
 
         """
-        definition_contents = "\n".join(
+        definition_contents = "".join(
             [CConfig.INCLUDE_CONFIG.format(name=conf) for conf in self.configs]
-        ) + "\n".join([parameter.definition for parameter in self.parameters])
+        ) + "".join([parameter.definition for parameter in self.parameters])
 
         return CConfig.DEFINITION.format(
             name=self.config_name, contents=definition_contents
@@ -72,8 +75,15 @@ class CConfig(object):
         initializations.
 
         """
-        initialization_contents = "\n".join(self.configs) + "\n".join(
+        initialization_contents = "".join(
             [parameter.initialization for parameter in self.parameters]
+        )
+
+        initialization_contents += "".join(
+            [
+                CConfig.INCLUDED_CONFIG_INITIALIZATION.format(name=conf)
+                for conf in self.configs
+            ]
         )
 
         return CConfig.INITIALIZATION.format(
@@ -94,4 +104,4 @@ class CConfig(object):
 
     @property
     def free(self):
-        return CConfig.FREE.format(name=self.ptr_to_instance)
+        return CConfig.FREE.format(ptr_to_instance=self.ptr_to_instance)
