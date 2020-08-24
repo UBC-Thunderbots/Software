@@ -4,16 +4,8 @@ cc_library(
     hdrs = ["parameter.h"],
 )
 
-cc_library(
-    name = "example_config",
-    srcs = ["example_config.c"],
-    hdrs = ["example_config.h"],
-    deps = [":parameter"],
-)
-
 genrule(
     name = "config_c_generate",
-    srcs = [],
     outs = [
         "tbots_c_config.h",
         "tbots_c_config.c",

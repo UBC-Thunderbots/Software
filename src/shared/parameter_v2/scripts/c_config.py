@@ -41,9 +41,13 @@ class CConfig(object):
         """
         self.parameters.add(parameter)
 
-    def get_parameters(self):
-        # TODO
-        return self.parameters
+    def get_parameters(self) -> List[CParameter]:
+        """Returns the list of parameters included in this CConfig
+
+        :returns: List of parameters
+
+        """
+        return self.parameters.copy()
 
     def include_config(self, config: str):
         """Add a config to this config to generate.
@@ -71,6 +75,7 @@ class CConfig(object):
     @property
     def initialization(self):
         """Gets the 'contents' to format the INITIALIZATION string.
+
         Joins all the nested configs initializations and the parameter
         initializations.
 
