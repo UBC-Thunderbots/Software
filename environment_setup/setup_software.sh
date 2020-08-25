@@ -34,28 +34,29 @@ sudo add-apt-repository ppa:maarten-fonville/protobuf -y
 sudo apt-get update
 
 host_software_packages=(
-    curl
     cmake # Needed to build some of our dependencies
-    gcc-7 # we use gcc 7.4.0
-    protobuf-compiler
-    libprotobuf-dev
-    libusb-1.0-0-dev
-    qt5-default # The GUI library for our visualizer
-    libudev-dev
+    codespell # Fixes typos
+    curl
+    gcc-7 # We use gcc 7.4.0
+    kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
-    python3       # Python 3
-    python3-pip   # Required for bazel to install python dependencies for build targets
-    python3-yaml # yaml for cfg generation (Dynamic Parameters)
-    python-minimal # This is required for bazel, we've seen some issues where
-                   # the bazel install hasn't installed it properly
-    python3-protobuf # This is required for the "NanoPb" library, which does not
-                    # properly manage this as a bazel dependency, so we have 
-                    # to manually install it ourselves
+    libprotobuf-dev
+    libudev-dev
+    libusb-1.0-0-dev
+    protobuf-compiler
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have 
                       # to manually install it ourselves
-    kcachegrind # This lets us view the profiles output by callgrind
-    codespell # Fixes typos
+    python-minimal # This is required for bazel, we've seen some issues where
+                   # the bazel install hasn't installed it properly
+    python3       # Python 3
+    python3-pip   # Required for bazel to install python dependencies for build targets
+    python3-protobuf # This is required for the "NanoPb" library, which does not
+                    # properly manage this as a bazel dependency, so we have 
+                    # to manually install it ourselves
+    python3-yaml # yaml for cfg generation (Dynamic Parameters)
+    qt5-default # The GUI library for our visualizer
+    valgrind # Checks for memory leaks
 )
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then

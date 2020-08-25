@@ -5,6 +5,7 @@ cc_library(
     srcs = ["simulator_robot.cpp"],
     hdrs = ["simulator_robot.h"],
     deps = [
+        ":firmware_object_deleter",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//software/geom/algorithms",
@@ -58,6 +59,7 @@ cc_library(
     srcs = ["simulator_robot_singleton.cpp"],
     hdrs = ["simulator_robot_singleton.h"],
     deps = [
+        ":firmware_object_deleter",
         ":simulator_robot",
         "//firmware/app/world:chicker",
         "//firmware/app/world:dribbler",
@@ -91,6 +93,7 @@ cc_library(
     srcs = ["simulator_ball_singleton.cpp"],
     hdrs = ["simulator_ball_singleton.h"],
     deps = [
+        ":firmware_object_deleter",
         ":simulator_ball",
         "//firmware/app/world:firmware_ball",
         "//software/logger",
@@ -120,6 +123,7 @@ cc_library(
     srcs = ["simulator.cpp"],
     hdrs = ["simulator.h"],
     deps = [
+        ":firmware_object_deleter",
         ":simulator_ball",
         ":simulator_ball_singleton",
         ":simulator_robot",
@@ -199,5 +203,20 @@ cc_binary(
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "@boost//:program_options",
+    ],
+)
+
+cc_library(
+    name = "firmware_object_deleter",
+    hdrs = ["firmware_object_deleter.h"],
+    deps = [
+        "//firmware/app/primitives:primitive_manager",
+        "//firmware/app/world:chicker",
+        "//firmware/app/world:dribbler",
+        "//firmware/app/world:firmware_robot",
+        "//firmware/app/world:firmware_world",
+        "//firmware/app/world:wheel",
+        "//firmware/shared:physics",
+        "//software/logger",
     ],
 )
