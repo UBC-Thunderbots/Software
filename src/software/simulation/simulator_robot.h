@@ -275,8 +275,15 @@ class SimulatorRobot
     std::optional<float> autochip_distance_m;
     uint32_t dribbler_rpm;
 
-    // A pointer to all the balls currently being dribbled
-    std::vector<PhysicsBall*> balls_in_dribbler_area;
+    typedef struct DribblerBall_t {
+        PhysicsBall* ball;
+        // We keep track of whether or not the ball can be kicked.
+        // This extra information is used to prevent edge cases like
+        // the ball getting kicked multiple times.
+        bool can_be_kicked;
+    } DribblerBall;
+
+    std::vector<DribblerBall> balls_in_dribbler_area;
 
     std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter> primitive_manager;
 

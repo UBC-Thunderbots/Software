@@ -326,6 +326,39 @@ INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonAutokickTest,
                                           Angle::fromDegrees(200),
                                           Angle::fromDegrees(331)));
 
+TEST_F(SimulatorRobotSingletonTest, autokick_ball_already_in_dribbler)
+{
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
+    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    // Simulate for 1/2 second without kicking
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    // Make sure we didn't kick
+    EXPECT_LT(simulator_ball->velocity().length(), 0.001);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_enableAutokick(chicker, 5.0);
+
+    // Simulate for 1/2 second after kicking
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_LT((simulator_ball->velocity() -
+               Vector::createFromAngle(robot.orientation()).normalize(5))
+                      .length(),
+              0.01);
+}
+
 class SimulatorRobotSingletonAutochipTest : public SimulatorRobotSingletonTest,
                                             public ::testing::WithParamInterface<Angle>
 {
@@ -391,6 +424,38 @@ INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonAutochipTest,
                                           Angle::fromDegrees(110),
                                           Angle::fromDegrees(200),
                                           Angle::fromDegrees(331)));
+
+TEST_F(SimulatorRobotSingletonTest, autochip_ball_already_in_dribbler)
+{
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
+    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    // Simulate for 1/2 second without kicking
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    // Make sure we didn't chip
+    EXPECT_LT(simulator_ball->velocity().length(), 0.001);
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_enableAutochip(chicker, 5.0);
+
+    // Simulate for 1/2 second after kicking
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_LT(simulator_ball->velocity().orientation().minDiff(robot.orientation()),
+              Angle::fromDegrees(1));
+    EXPECT_NEAR(3.53, simulator_ball->velocity().length(), 0.05);
+}
 
 TEST_F(SimulatorRobotSingletonTest,
        test_robot_chips_ball_over_obstacle_and_lands_in_free_space)
