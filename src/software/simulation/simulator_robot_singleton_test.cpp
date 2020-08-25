@@ -355,7 +355,7 @@ TEST_F(SimulatorRobotSingletonTest, autokick_ball_already_in_dribbler)
 
     EXPECT_LT((simulator_ball->velocity() -
                Vector::createFromAngle(robot.orientation()).normalize(5))
-                      .length(),
+                  .length(),
               0.01);
 }
 

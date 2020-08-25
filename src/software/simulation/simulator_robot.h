@@ -275,7 +275,8 @@ class SimulatorRobot
     std::optional<float> autochip_distance_m;
     uint32_t dribbler_rpm;
 
-    typedef struct DribblerBall_t {
+    typedef struct DribblerBall_t
+    {
         PhysicsBall* ball;
         // We keep track of whether or not the ball can be kicked.
         // This extra information is used to prevent edge cases like

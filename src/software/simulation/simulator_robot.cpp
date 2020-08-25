@@ -122,7 +122,8 @@ void SimulatorRobot::kick(float speed_m_per_s)
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
         for (auto dribbler_ball : this->balls_in_dribbler_area)
         {
-            if(!dribbler_ball.can_be_kicked) {
+            if (!dribbler_ball.can_be_kicked)
+            {
                 continue;
             }
 
@@ -178,7 +179,8 @@ void SimulatorRobot::chip(float distance_m)
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         for (auto dribbler_ball : this->balls_in_dribbler_area)
         {
-            if(!dribbler_ball.can_be_kicked) {
+            if (!dribbler_ball.can_be_kicked)
+            {
                 continue;
             }
 
@@ -439,9 +441,10 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
 void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
                                               PhysicsBall *physics_ball)
 {
-    auto iter = std::find_if(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(), [physics_ball](DribblerBall dribbler_ball) {
-        return dribbler_ball.ball == physics_ball;
-    });
+    auto iter = std::find_if(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(),
+                             [physics_ball](DribblerBall dribbler_ball) {
+                                 return dribbler_ball.ball == physics_ball;
+                             });
 
     if (iter != balls_in_dribbler_area.end())
     {
