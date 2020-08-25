@@ -161,7 +161,8 @@ unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(
     return 0;
 }
 
-float SimulatorRobotSingleton::invertValueToMatchFieldSide(float value) {
+float SimulatorRobotSingleton::invertValueToMatchFieldSide(float value)
+{
     switch (field_side_)
     {
         case FieldSide::NEG_X:
@@ -175,16 +176,14 @@ float SimulatorRobotSingleton::invertValueToMatchFieldSide(float value) {
 
 float SimulatorRobotSingleton::getPositionX()
 {
-    return checkValidAndReturnFloat([](auto robot) {
-        return invertValueToMatchFieldSide(robot->getPositionX());
-    });
+    return checkValidAndReturnFloat(
+        [](auto robot) { return invertValueToMatchFieldSide(robot->getPositionX()); });
 }
 
 float SimulatorRobotSingleton::getPositionY()
 {
-    return checkValidAndReturnFloat([](auto robot) {
-        return invertValueToMatchFieldSide(robot->getPositionY());
-    });
+    return checkValidAndReturnFloat(
+        [](auto robot) { return invertValueToMatchFieldSide(robot->getPositionY()); });
 }
 
 float SimulatorRobotSingleton::getOrientation()
@@ -204,16 +203,14 @@ float SimulatorRobotSingleton::getOrientation()
 
 float SimulatorRobotSingleton::getVelocityX()
 {
-    return checkValidAndReturnFloat([](auto robot) {
-        return invertValueToMatchFieldSide(robot->getVelocityX());
-    });
+    return checkValidAndReturnFloat(
+        [](auto robot) { return invertValueToMatchFieldSide(robot->getVelocityX()); });
 }
 
 float SimulatorRobotSingleton::getVelocityY()
 {
-    return checkValidAndReturnFloat([](auto robot) {
-        return invertValueToMatchFieldSide(robot->getVelocityY());
-    });
+    return checkValidAndReturnFloat(
+        [](auto robot) { return invertValueToMatchFieldSide(robot->getVelocityY()); });
 }
 
 float SimulatorRobotSingleton::getVelocityAngular()

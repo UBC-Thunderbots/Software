@@ -40,7 +40,8 @@ float SimulatorBallSingleton::checkValidAndReturnFloat(
     return 0.0f;
 }
 
-float SimulatorBallSingleton::invertValueToMatchFieldSide(double value) {
+float SimulatorBallSingleton::invertValueToMatchFieldSide(double value)
+{
     switch (field_side_)
     {
         case FieldSide::NEG_X:
@@ -54,30 +55,24 @@ float SimulatorBallSingleton::invertValueToMatchFieldSide(double value) {
 
 float SimulatorBallSingleton::getBallPositionX()
 {
-    return checkValidAndReturnFloat([](auto ball) {
-        return invertValueToMatchFieldSide(ball->position().x());
-    });
+    return checkValidAndReturnFloat(
+        [](auto ball) { return invertValueToMatchFieldSide(ball->position().x()); });
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
-    return checkValidAndReturnFloat([](auto ball) {
-        return invertValueToMatchFieldSide(ball->position().y());
-    });
+    return checkValidAndReturnFloat(
+        [](auto ball) { return invertValueToMatchFieldSide(ball->position().y()); });
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
-    return checkValidAndReturnFloat([](auto ball) {
-        return invertValueToMatchFieldSide(ball->velocity().x());
-    });
+    return checkValidAndReturnFloat(
+        [](auto ball) { return invertValueToMatchFieldSide(ball->velocity().x()); });
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
-    return checkValidAndReturnFloat([](auto ball) {
-        return invertValueToMatchFieldSide(ball->velocity().y());
-    });
+    return checkValidAndReturnFloat(
+        [](auto ball) { return invertValueToMatchFieldSide(ball->velocity().y()); });
 }
-
-
