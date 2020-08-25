@@ -120,7 +120,7 @@ float SimulatorRobot::getBatteryVoltage()
 void SimulatorRobot::kick(float speed_m_per_s)
 {
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
-        for (auto dribbler_ball : this->balls_in_dribbler_area)
+        for (auto& dribbler_ball : this->balls_in_dribbler_area)
         {
             if (!dribbler_ball.can_be_kicked)
             {
@@ -177,7 +177,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
 void SimulatorRobot::chip(float distance_m)
 {
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
-        for (auto dribbler_ball : this->balls_in_dribbler_area)
+        for (auto& dribbler_ball : this->balls_in_dribbler_area)
         {
             if (!dribbler_ball.can_be_kicked)
             {
