@@ -4,12 +4,12 @@
 
 TEST(TeamSideMsgTest, create_msg_with_true_value)
 {
-    auto defending_side_msg = createDefendingSideProto(true);
+    auto defending_side_msg = createDefendingSide(true);
     EXPECT_TRUE(defending_side_msg->defending_positive_side());
 }
 
 TEST(TeamSideMsgTest, create_msg_with_false_value)
 {
-    auto defending_side_msg = createDefendingSideProto(false);
+    auto defending_side_msg = createDefendingSide(false);
     EXPECT_FALSE(defending_side_msg->defending_positive_side());
 }

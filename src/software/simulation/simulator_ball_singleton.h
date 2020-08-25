@@ -39,7 +39,7 @@ class SimulatorBallSingleton
      * field side is specified, the ball's position will be reported as (1, -2).
      *
      * This different behaviour for either field side exists because our firmware
-     * expects its knowledge of the world to math our coordinate convention, which is
+     * expects its knowledge of the world to match our coordinate convention, which is
      * relative to the side of the field the robot is defending. See
      * https://github.com/UBC-Thunderbots/Software/blob/master/docs/software-architecture-and-design.md#coordinates
      * for more information about our coordinate conventions. Because we can't actually
@@ -102,6 +102,20 @@ class SimulatorBallSingleton
      */
     static float checkValidAndReturnFloat(
         std::function<float(std::shared_ptr<SimulatorBall>)> func);
+
+    /**
+     * A helper function that will negate the given value if needed
+     * in order for it to match our coordinate convention for the
+     * current value of field_side
+     *
+     * @param value The value to invert
+     *
+     * @throws std::invalid_argument if there is an unhandled value of FieldSide
+     *
+     * @return value if field_side_ is NEG_X, and -value if field_side_
+     * is POS_X
+     */
+    static float invertValueToMatchFieldSide(double value);
 
     // The simulator ball being controlled by this class
     static std::shared_ptr<SimulatorBall> simulator_ball;

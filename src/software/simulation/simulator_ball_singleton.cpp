@@ -40,62 +40,44 @@ float SimulatorBallSingleton::checkValidAndReturnFloat(
     return 0.0f;
 }
 
+float SimulatorBallSingleton::invertValueToMatchFieldSide(double value) {
+    switch (field_side_)
+    {
+        case FieldSide::NEG_X:
+            return static_cast<float>(value);
+        case FieldSide::POS_X:
+            return static_cast<float>(-value);
+        default:
+            throw std::invalid_argument("Unhandled value of FieldSide");
+    }
+}
+
 float SimulatorBallSingleton::getBallPositionX()
 {
     return checkValidAndReturnFloat([](auto ball) {
-        switch (field_side_)
-        {
-            case FieldSide::NEG_X:
-                return ball->position().x();
-            case FieldSide::POS_X:
-                return -ball->position().x();
-            default:
-                throw std::invalid_argument("Unhandled value of FieldSide");
-        }
+        return invertValueToMatchFieldSide(ball->position().x());
     });
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
     return checkValidAndReturnFloat([](auto ball) {
-        switch (field_side_)
-        {
-            case FieldSide::NEG_X:
-                return ball->position().y();
-            case FieldSide::POS_X:
-                return -ball->position().y();
-            default:
-                throw std::invalid_argument("Unhandled value of FieldSide");
-        }
+        return invertValueToMatchFieldSide(ball->position().y());
     });
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
     return checkValidAndReturnFloat([](auto ball) {
-        switch (field_side_)
-        {
-            case FieldSide::NEG_X:
-                return ball->velocity().x();
-            case FieldSide::POS_X:
-                return -ball->velocity().x();
-            default:
-                throw std::invalid_argument("Unhandled value of FieldSide");
-        }
+        return invertValueToMatchFieldSide(ball->velocity().x());
     });
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
     return checkValidAndReturnFloat([](auto ball) {
-        switch (field_side_)
-        {
-            case FieldSide::NEG_X:
-                return ball->velocity().y();
-            case FieldSide::POS_X:
-                return -ball->velocity().y();
-            default:
-                throw std::invalid_argument("Unhandled value of FieldSide");
-        }
+        return invertValueToMatchFieldSide(ball->velocity().y());
     });
 }
+
+

@@ -37,12 +37,12 @@ void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
     if (sensor_fusion_config->OverrideGameControllerDefendingSide()->value())
     {
-        defending_side_output->sendProto(*createDefendingSideProto(
-            sensor_fusion_config->DefendingPositiveSide()->value()));
+        defending_side_output->sendProto(*createDefendingSide(
+                sensor_fusion_config->DefendingPositiveSide()->value()));
     }
     else
     {
-        defending_side_output->sendProto(*createDefendingSideProto(false));
+        defending_side_output->sendProto(*createDefendingSide(false));
     }
 }
 

@@ -161,34 +161,29 @@ unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(
     return 0;
 }
 
+float SimulatorRobotSingleton::invertValueToMatchFieldSide(float value) {
+    switch (field_side_)
+    {
+        case FieldSide::NEG_X:
+            return value;
+        case FieldSide::POS_X:
+            return -value;
+        default:
+            throw std::invalid_argument("Unhandled value of FieldSide");
+    }
+}
 
 float SimulatorRobotSingleton::getPositionX()
 {
     return checkValidAndReturnFloat([](auto robot) {
-        switch (field_side_)
-        {
-            case FieldSide::NEG_X:
-                return robot->getPositionX();
-            case FieldSide::POS_X:
-                return -robot->getPositionX();
-            default:
-                throw std::invalid_argument("Unhandled value of FieldSide");
-        }
+        return invertValueToMatchFieldSide(robot->getPositionX());
     });
 }
 
 float SimulatorRobotSingleton::getPositionY()
 {
     return checkValidAndReturnFloat([](auto robot) {
-        switch (field_side_)
-        {
-            case FieldSide::NEG_X:
-                return robot->getPositionY();
-            case FieldSide::POS_X:
-                return -robot->getPositionY();
-            default:
-                throw std::invalid_argument("Unhandled value of FieldSide");
-        }
+        return invertValueToMatchFieldSide(robot->getPositionY());
     });
 }
 
@@ -210,30 +205,14 @@ float SimulatorRobotSingleton::getOrientation()
 float SimulatorRobotSingleton::getVelocityX()
 {
     return checkValidAndReturnFloat([](auto robot) {
-        switch (field_side_)
-        {
-            case FieldSide::NEG_X:
-                return robot->getVelocityX();
-            case FieldSide::POS_X:
-                return -robot->getVelocityX();
-            default:
-                throw std::invalid_argument("Unhandled value of FieldSide");
-        }
+        return invertValueToMatchFieldSide(robot->getVelocityX());
     });
 }
 
 float SimulatorRobotSingleton::getVelocityY()
 {
     return checkValidAndReturnFloat([](auto robot) {
-        switch (field_side_)
-        {
-            case FieldSide::NEG_X:
-                return robot->getVelocityY();
-            case FieldSide::POS_X:
-                return -robot->getVelocityY();
-            default:
-                throw std::invalid_argument("Unhandled value of FieldSide");
-        }
+        return invertValueToMatchFieldSide(robot->getVelocityY());
     });
 }
 

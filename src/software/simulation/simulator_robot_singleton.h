@@ -53,6 +53,8 @@ class SimulatorRobotSingleton
      * class to enforce this convention for the firmware.
      *
      * @param robot The SimulatorRobot being controlled by this class
+     * @param field_side The side of the field being defended by the robots using
+     * this class
      */
     static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot,
                                   FieldSide field_side);
@@ -248,6 +250,20 @@ class SimulatorRobotSingleton
         std::function<float(std::shared_ptr<SimulatorRobot>)> func);
     static unsigned int checkValidAndReturnUint(
         std::function<unsigned int(std::shared_ptr<SimulatorRobot>)> func);
+
+    /**
+     * A helper function that will negate the given value if needed
+     * in order for it to match our coordinate convention for the
+     * current value of field_side
+     *
+     * @param value The value to invert
+     *
+     * @throws std::invalid_argument if there is an unhandled value of FieldSide
+     *
+     * @return value if field_side_ is NEG_X, and -value if field_side_
+     * is POS_X
+     */
+    static float invertValueToMatchFieldSide(float value);
 
     // The simulator robot being controlled by this class
     static std::shared_ptr<SimulatorRobot> simulator_robot;
