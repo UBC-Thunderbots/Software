@@ -8,8 +8,7 @@
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
-#include "software/primitive/primitive.h"
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
+#include "software/proto/primitive/primitive_msg_factory.h"
 
 MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 
@@ -38,13 +37,6 @@ class Intent
      * @param priority The priority of this Intent
      */
     explicit Intent(unsigned int robot_id, unsigned int priority);
-
-    /**
-     * Returns the name of this Intent
-     *
-     * @return the name of this Intent
-     */
-    virtual std::string getIntentName(void) const = 0;
 
     /**
      * Returns the priority of this Intent. The priority value is an integer in the range

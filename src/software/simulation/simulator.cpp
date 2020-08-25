@@ -1,7 +1,6 @@
 #include "software/simulation/simulator.h"
 
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"

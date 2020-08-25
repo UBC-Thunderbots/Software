@@ -20,19 +20,6 @@ void app_autokick_move_primitive_start(TbotsProto_AutokickMovePrimitive prim_msg
     app_chicker_enableAutokick(chicker, prim_msg.kick_speed_meters_per_second);
 }
 
-static void autokick_move_end(void* void_state_ptr, FirmwareWorld_t* world)
-{
-    app_move_helper_end(void_state_ptr, world);
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-
-    Chicker_t* chicker = app_firmware_robot_getChicker(robot);
-    app_chicker_disableAutochip(chicker);
-    app_chicker_disableAutokick(chicker);
-
-    Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
-    app_dribbler_setSpeed(dribbler, 0);
-}
-
 static void autokick_move_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     app_move_helper_tick(void_state_ptr, world);
@@ -42,7 +29,6 @@ static void autokick_move_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * \brief The autokick move primitive.
  */
 const primitive_t AUTOKICK_MOVE_PRIMITIVE = {.direct        = false,
-                                             .end           = &autokick_move_end,
                                              .tick          = &autokick_move_tick,
                                              .create_state  = &createMoveHelperState_t,
                                              .destroy_state = &destroyMoveHelperState_t};

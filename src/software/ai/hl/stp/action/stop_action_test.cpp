@@ -4,8 +4,6 @@
 
 #include "software/ai/intent/stop_intent.h"
 
-// TODO (Issue #1644): refactor and reenable these tests
-/*
 TEST(StopActionTest, robot_stopping_without_coasting_while_already_moving)
 {
     Robot robot       = Robot(0, Point(10, 10), Vector(1, 3), Angle::zero(),
@@ -23,6 +21,8 @@ TEST(StopActionTest, robot_stopping_without_coasting_while_already_moving)
     {
         StopIntent stop_intent = dynamic_cast<StopIntent &>(*intent_ptr);
         EXPECT_EQ(0, stop_intent.getRobotId());
+        EXPECT_EQ(TbotsProto::StopPrimitive::BRAKE,
+                  stop_intent.getPrimitive().stop().stop_type());
     }
     catch (...)
     {
@@ -45,4 +45,3 @@ TEST(StopAction, robot_stopping_while_already_stopped)
 
     EXPECT_TRUE(action.done());
 }
-*/

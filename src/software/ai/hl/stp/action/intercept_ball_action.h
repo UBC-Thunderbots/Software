@@ -3,7 +3,6 @@
 #include "software/ai/hl/stp/action/action.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
-#include "software/primitive/move_primitive.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 
