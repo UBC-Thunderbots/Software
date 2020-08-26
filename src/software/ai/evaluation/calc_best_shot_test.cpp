@@ -14,8 +14,9 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    auto result = calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
-                                          world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot.position(),
+        TeamType::ENEMY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -34,8 +35,9 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    auto result = calcBestShotOnFriendlyGoal(world.field(), world.friendlyTeam(),
-                                             world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot.position(),
+        TeamType::FRIENDLY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -60,8 +62,9 @@ TEST(CalcBestShotTest,
         world, {world.field().enemyGoalCenter(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
-    auto result = calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
-                                          world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot.position(),
+        TeamType::ENEMY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -87,8 +90,9 @@ TEST(CalcBestShotTest,
         world, {world.field().friendlyGoalCenter(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
-    auto result = calcBestShotOnFriendlyGoal(world.field(), world.friendlyTeam(),
-                                             world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot.position(),
+        TeamType::FRIENDLY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -117,8 +121,9 @@ TEST(CalcBestShotTest,
         world, {world.field().enemyGoalCenter(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
-    auto result = calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
-                                          world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot.position(),
+        TeamType::ENEMY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -147,8 +152,9 @@ TEST(CalcBestShotTest,
         world, {world.field().friendlyGoalCenter(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
-    auto result = calcBestShotOnFriendlyGoal(world.field(), world.friendlyTeam(),
-                                             world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot.position(),
+        TeamType::FRIENDLY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -173,8 +179,9 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_ob
         world, {shooting_robot.position() + Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
         Timestamp::fromSeconds(0));
 
-    auto result = calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
-                                          world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot.position(),
+        TeamType::ENEMY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We should not be able to find a shot
     EXPECT_EQ(result->getOpenAngle().toRadians(), 0);
@@ -195,8 +202,9 @@ TEST(CalcBestShotTest,
         world, {shooting_robot.position() - Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
         Timestamp::fromSeconds(0));
 
-    auto result = calcBestShotOnFriendlyGoal(world.field(), world.friendlyTeam(),
-                                             world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot.position(),
+        TeamType::FRIENDLY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We should not be able to find a shot
     EXPECT_EQ(result->getOpenAngle().toRadians(), 0);
@@ -209,7 +217,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
-    auto result = calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::ENEMY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 1.0, 0.01);
@@ -223,7 +231,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net
     Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
                  Angle::fromDegrees(45)};
 
-    auto result = calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::ENEMY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 0.5, 0.01);
@@ -236,7 +244,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_fully_blocked_net)
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
 
-    auto result = calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::FRIENDLY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 0.0, 0.01);
@@ -249,7 +257,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
     Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
-    auto result = calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::FRIENDLY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 1.0, 0.01);
@@ -263,7 +271,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_
     Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
                  Angle::fromDegrees(45)};
 
-    auto result = calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::FRIENDLY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 0.5, 0.01);
@@ -276,7 +284,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_fully_blocked_net)
     Point shot_origin = world.field().enemyGoalCenter() + Vector(0.5, 0);
     Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
 
-    auto result = calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::ENEMY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 0.0, 0.01);

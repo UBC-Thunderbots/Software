@@ -125,8 +125,8 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
 
         // Find the best shot
         auto best_shot =
-            calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, ball.position(),
-                                       ROBOT_MAX_RADIUS_METERS, {robot});
+            calcBestShotOnGoal(field, friendly_team, enemy_team, ball.position(),
+                               TeamType::FRIENDLY, ROBOT_MAX_RADIUS_METERS, {robot});
         Vector shot_vector = best_shot->getPointToShootAt() - ball.position();
         Ray shot_ray       = Ray(ball.position(), shot_vector);
 

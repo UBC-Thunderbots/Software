@@ -172,8 +172,9 @@ Angle ReceiverTactic::getOneTimeShotDirection(const Ray& shot, const Ball& ball)
 std::optional<Shot> ReceiverTactic::findFeasibleShot()
 {
     // Check if we can shoot on the enemy goal from the receiver position
-    std::optional<Shot> best_shot_opt =
-        calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
+    std::optional<Shot> best_shot_opt = calcBestShotOnGoal(
+        field, friendly_team, enemy_team, robot->position(), TeamType::ENEMY,
+        ROBOT_MAX_RADIUS_METERS, {*this->getAssignedRobot()});
 
     // Vector from the ball to the robot
     Vector robot_to_ball = ball.position() - robot->position();

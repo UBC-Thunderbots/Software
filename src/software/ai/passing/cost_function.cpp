@@ -91,7 +91,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
-    auto shot_opt = calcBestShotOnGoal(field.enemyGoalpostNeg(), field.enemyGoalpostPos(),
+    auto shot_opt = calcBestShotOnGoal(Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos()),
                                        pass.receiverPoint(), enemy_team.getAllRobots());
 
     Angle open_angle_to_goal = Angle::zero();
