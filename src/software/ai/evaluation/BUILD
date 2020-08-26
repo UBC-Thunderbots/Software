@@ -42,8 +42,14 @@ cc_test(
 
 cc_library(
     name = "calc_best_shot",
-    srcs = ["calc_best_shot.cpp"],
-    hdrs = ["calc_best_shot.h"],
+    srcs = [
+        "calc_best_shot.cpp",
+        "calc_best_shot_impl.cpp",
+    ],
+    hdrs = [
+        "calc_best_shot.h",
+        "calc_best_shot_impl.h",
+    ],
     deps = [
         ":shot",
         "//shared:constants",
@@ -55,7 +61,10 @@ cc_library(
 
 cc_test(
     name = "calc_best_shot_test",
-    srcs = ["calc_best_shot_test.cpp"],
+    srcs = [
+        "calc_best_shot_impl.h",
+        "calc_best_shot_test.cpp",
+    ],
     deps = [
         ":calc_best_shot",
         ":shot",
