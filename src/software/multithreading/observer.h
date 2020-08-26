@@ -23,6 +23,10 @@ class Observer
 
     virtual ~Observer() = default;
 
+    virtual int getDataReceivedPerSecond() final;
+
+    static constexpr size_t TIME_BUFFER_SIZE = 5;
+
    protected:
     /**
      * Pops the most recently received value and returns it
@@ -60,6 +64,7 @@ class Observer
 
    private:
     ThreadSafeBuffer<T> buffer;
+    ThreadSafeBuffer<std::chrono::milliseconds> time_buffer;
 };
 
 #include "software/multithreading/observer.tpp"

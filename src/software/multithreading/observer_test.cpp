@@ -46,3 +46,31 @@ TEST(Observer, receiveValue_value_not_yet_available)
     ASSERT_TRUE(result);
     EXPECT_EQ(202, *result);
 }
+
+TEST(Observer, getDataReceivedPerSecond_time_buffer_filled)
+{
+    TestObserver test_observer;
+    for (unsigned int i = 0; i < TestObserver::TIME_BUFFER_SIZE; i++)
+    {
+        test_observer.receiveValue(i);
+        usleep(10000); // 10ms
+    }
+    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 5/0.04, 10);
+}
+
+TEST(Observer, getDataReceivedPerSecond_time_buffer_empty)
+{
+    TestObserver test_observer;
+    EXPECT_EQ(test_observer.getDataReceivedPerSecond(), 0);
+}
+
+TEST(Observer, getDataReceivedPerSecond_time_buffer_partially_empty)
+{
+    TestObserver test_observer;
+    for (unsigned int i = 0; i < TestObserver::TIME_BUFFER_SIZE/2; i++)
+    {
+        test_observer.receiveValue(i);
+        usleep(10000); // 10ms
+    }
+    EXPECT_EQ(test_observer.getDataReceivedPerSecond(), 0);
+}
