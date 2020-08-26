@@ -26,7 +26,6 @@
 #include <unused.h>
 
 #include "firmware/app/primitives/primitive.h"
-#include "firmware/app/primitives/stop_primitive.h"
 #include "firmware/shared/physics.h"
 #include "io/charger.h"
 #include "io/chicker.h"

@@ -23,7 +23,6 @@
 #include "firmware/app/primitives/move_primitive.h"
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/primitives/spinning_move_primitive.h"
-#include "firmware/app/primitives/stop_primitive.h"
 
 struct PrimitiveManager
 {
@@ -70,16 +69,6 @@ void app_primitive_manager_unlockPrimitiveMutex(PrimitiveManager_t *manager)
 #error "Could not determine what CPU this is being compiled for."
 #endif
 }
-
-/**
- * Make the robot in the given world "safe" by disabling potentially dangerous
- * functionality and bringing the robot to a stop
- *
- * @param manager [in/out] The primitive manager controlling the robot
- * @param world [in] The world containing the robot make safe
- */
-void app_primitive_manager_makeRobotSafe(PrimitiveManager_t *manager,
-                                         FirmwareWorld_t *world);
 
 PrimitiveManager_t *app_primitive_manager_create(void)
 {
@@ -134,12 +123,15 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     // Figure out which primitive we're running and start it
     switch (primitive_msg.which_primitive)
     {
+        case TbotsProto_Primitive_estop_tag:
+        {
+            app_primitive_makeRobotSafe(world);
+            break;
+        }
         case TbotsProto_Primitive_stop_tag:
         {
-            manager->current_primitive       = &STOP_PRIMITIVE;
-            manager->current_primitive_state = manager->current_primitive->create_state();
-            app_stop_primitive_start(primitive_msg.primitive.stop,
-                                     manager->current_primitive_state, world);
+            app_primitive_stopRobot(world, primitive_msg.primitive.stop.stop_type ==
+                                               TbotsProto_StopPrimitive_StopType_COAST);
             break;
         }
         case TbotsProto_Primitive_chip_tag:
@@ -200,7 +192,7 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
         }
         default:
         {
-            app_primitive_manager_makeRobotSafe(manager, world);
+            app_primitive_makeRobotSafe(world);
             assert(false);
         }
     }
@@ -231,24 +223,5 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
         manager->current_primitive       = NULL;
     }
 
-    app_primitive_manager_makeRobotSafe(manager, world);
-}
-
-void app_primitive_manager_makeRobotSafe(PrimitiveManager_t *manager,
-                                         FirmwareWorld_t *world)
-{
-    // Disable chipper, kicker, dribbler
-    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
-    Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
-    Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
-
-    app_chicker_disableAutochip(chicker);
-    app_chicker_disableAutokick(chicker);
-    app_dribbler_setSpeed(dribbler, 0);
-
-    // Set the current primitive to STOP to stop the robot moving
-    manager->current_primitive             = &STOP_PRIMITIVE;
-    manager->current_primitive_state       = manager->current_primitive->create_state();
-    TbotsProto_StopPrimitive stop_prim_msg = TbotsProto_StopPrimitive_init_zero;
-    app_stop_primitive_start(stop_prim_msg, manager->current_primitive_state, world);
+    app_primitive_stopRobot(world, false);
 }
