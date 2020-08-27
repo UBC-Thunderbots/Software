@@ -11,19 +11,12 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string CornerKickPlay::name = "Corner Kick Play";
-
 CornerKickPlay::CornerKickPlay()
     : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(DynamicParameters->getAIConfig()
                                                            ->getCornerKickPlayConfig()
                                                            ->MaxTimeCommitToPassSeconds()
                                                            ->value()))
 {
-}
-
-std::string CornerKickPlay::getName() const
-{
-    return CornerKickPlay::name;
 }
 
 bool CornerKickPlay::isApplicable(const World &world) const
@@ -198,7 +191,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
     //                    to save CPU cycles
 
     // Perform the pass and wait until the receiver is finished
-    auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
+    auto passer =
+        std::make_shared<PasserTactic>(pass, world.ball(), world.field(), false);
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);

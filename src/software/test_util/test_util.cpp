@@ -74,17 +74,6 @@ namespace TestUtil
         return world;
     }
 
-    std::vector<RefboxGameState> getAllRefboxGameStates()
-    {
-        std::vector<RefboxGameState> game_states;
-        for (int i = 0; i < static_cast<int>(RefboxGameState::REFBOX_GAME_STATE_COUNT);
-             i++)
-        {
-            game_states.push_back(static_cast<RefboxGameState>(i));
-        }
-        return game_states;
-    }
-
     Robot createRobotAtPos(const Point &pt)
     {
         static RobotId robot_id_counter = 0;

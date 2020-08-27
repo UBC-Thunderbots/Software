@@ -44,10 +44,17 @@ cc_library(
         ":controller",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
-        "//software/primitive",
-        "//software/primitive:chip_primitive",
-        "//software/primitive:direct_velocity_primitive",
-        "//software/primitive:kick_primitive",
+        "//software/proto/message_translation:tbots_protobuf",
+        "//software/proto/primitive:primitive_msg_factory",
+    ],
+)
+
+cc_test(
+    name = "controller_primitive_generator_test",
+    srcs = ["controller_primitive_generator_test.cpp"],
+    deps = [
+        ":controller_primitive_generator",
+        "@gtest//:gtest_main",
     ],
 )
 

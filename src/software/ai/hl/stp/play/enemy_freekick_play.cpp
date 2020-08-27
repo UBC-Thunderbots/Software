@@ -11,14 +11,6 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
-
-const std::string EnemyFreekickPlay::name = "Enemy Freekick Play";
-
-std::string EnemyFreekickPlay::getName() const
-{
-    return EnemyFreekickPlay::name;
-}
-
 bool EnemyFreekickPlay::isApplicable(const World &world) const
 {
     return world.gameState().isTheirFreeKick();

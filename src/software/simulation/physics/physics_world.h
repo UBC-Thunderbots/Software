@@ -172,6 +172,13 @@ class PhysicsWorld
      */
     std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
 
+    /**
+     * Removes the given PhysicsRobot from the PhysicsWorld, if it exists.
+     *
+     * @param robot The robot to be removed
+     */
+    void removeRobot(std::weak_ptr<PhysicsRobot> robot);
+
    private:
     /**
      * Returns the states and IDs of all robots of the specified colour.

@@ -8,8 +8,9 @@ ThreadedRobotDiagnosticsGUI::ThreadedRobotDiagnosticsGUI(int argc, char** argv)
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorProto>>(sensor_msg_buffer_size)),
-      primitive_buffer(std::make_shared<ThreadSafeBuffer<std::unique_ptr<Primitive>>>(
-          primitive_buffer_size)),
+      primitive_buffer(
+          std::make_shared<ThreadSafeBuffer<std::unique_ptr<TbotsProto::PrimitiveSet>>>(
+              primitive_buffer_size)),
       application_shutting_down(false)
 {
     run_robot_diagnostics_thread = std::thread(

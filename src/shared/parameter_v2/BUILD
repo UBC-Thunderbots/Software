@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:private"])
 cpp_dynamic_parameters(
     name = "cpp_params",
     enum_deps = [
-        "//software/sensor_fusion:refbox_data",
+        "//software/world:game_state",
     ],
     generated_parameter_file = "cpp_dynamic_parameters.h",
 )

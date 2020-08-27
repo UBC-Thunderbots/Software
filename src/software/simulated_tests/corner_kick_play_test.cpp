@@ -24,8 +24,8 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(CornerKickPlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START, RefboxGameState::INDIRECT_FREE_US);
+    setAIPlay(TYPENAME(CornerKickPlay));
+    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

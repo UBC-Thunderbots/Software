@@ -5,14 +5,6 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-
-const std::string PenaltyKickEnemyPlay::name = "Penalty Kick Enemy Play";
-
-std::string PenaltyKickEnemyPlay::getName() const
-{
-    return PenaltyKickEnemyPlay::name;
-}
-
 bool PenaltyKickEnemyPlay::isApplicable(const World &world) const
 {
     return world.gameState().isTheirPenalty();

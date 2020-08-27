@@ -17,7 +17,7 @@ class WifiBackend : public Backend
     static const std::string name;
 
    private:
-    void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
+    void onValueReceived(TbotsProto::PrimitiveSet primitives) override;
     void onValueReceived(World world) override;
 
     /**

@@ -22,11 +22,6 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
 {
 }
 
-std::string DefenseShadowEnemyTactic::getName() const
-{
-    return "Defense Shadow Enemy Tactic";
-}
-
 void DefenseShadowEnemyTactic::updateWorldParams(const Field &field,
                                                  const Team &friendly_team,
                                                  const Team &enemy_team, const Ball &ball)

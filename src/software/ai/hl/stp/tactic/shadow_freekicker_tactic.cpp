@@ -17,11 +17,6 @@ ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadow
 {
 }
 
-std::string ShadowFreekickerTactic::getName() const
-{
-    return "Shadow Freekick Tactic";
-}
-
 void ShadowFreekickerTactic::updateWorldParams(Team enemy_team, Ball ball)
 {
     this->enemy_team = enemy_team;

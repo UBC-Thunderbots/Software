@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "software/primitive/move_primitive.h"
-#include "software/primitive/primitive.h"
+#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
 
 TEST(SimulatorTest, get_field)
@@ -338,14 +338,10 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
     };
     simulator.addYellowRobots(states);
 
-    std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-        1, Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> primitives;
-    primitives.emplace_back(std::move(move_primitive));
-    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-        std::move(primitives));
-    simulator.setYellowRobotPrimitives(primitives_ptr);
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -405,14 +401,10 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
     };
     simulator.addBlueRobots(states);
 
-    std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-        1, Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> primitives;
-    primitives.emplace_back(std::move(move_primitive));
-    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-        std::move(primitives));
-    simulator.setBlueRobotPrimitives(primitives_ptr);
+    simulator.setBlueRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -459,33 +451,23 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     };
     simulator.addYellowRobots(yellow_robot_states);
 
-    std::unique_ptr<Primitive> blue_move_primitive1 = std::make_unique<MovePrimitive>(
-        1, Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::unique_ptr<Primitive> blue_move_primitive2 = std::make_unique<MovePrimitive>(
-        2, Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> blue_robot_primitives;
-    blue_robot_primitives.emplace_back(std::move(blue_move_primitive1));
-    blue_robot_primitives.emplace_back(std::move(blue_move_primitive2));
-    auto blue_primitives_ptr =
-        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(blue_robot_primitives));
-    simulator.setBlueRobotPrimitives(blue_primitives_ptr);
+    simulator.setBlueRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+    simulator.setBlueRobotPrimitive(
+        2, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
-    std::unique_ptr<Primitive> yellow_move_primitive1 = std::make_unique<MovePrimitive>(
-        1, Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::unique_ptr<Primitive> yellow_move_primitive2 = std::make_unique<MovePrimitive>(
-        2, Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> yellow_robot_primitives;
-    yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive1));
-    yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive2));
-    auto yellow_primitives_ptr =
-        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(yellow_robot_primitives));
-    simulator.setYellowRobotPrimitives(yellow_primitives_ptr);
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+    simulator.setYellowRobotPrimitive(
+        2, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -507,10 +489,10 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     ASSERT_EQ(2, detection_frame.robots_yellow_size());
     ASSERT_EQ(2, detection_frame.robots_blue_size());
 
-    auto yellow_robots = detection_frame.robots_yellow();
-    auto yellow_robot_1 =
-        std::find_if(yellow_robots.begin(), yellow_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
+    auto yellow_robots  = detection_frame.robots_yellow();
+    auto yellow_robot_1 = std::find_if(
+        yellow_robots.begin(), yellow_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
     ASSERT_NE(yellow_robot_1, yellow_robots.end());
     EXPECT_NEAR(1000.0f, yellow_robot_1->x(), 200);
     EXPECT_NEAR(1000.0f, yellow_robot_1->y(), 200);
@@ -518,9 +500,9 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
         Angle::zero(), Angle::fromRadians(yellow_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
-    auto yellow_robot_2 =
-        std::find_if(yellow_robots.begin(), yellow_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
+    auto yellow_robot_2 = std::find_if(
+        yellow_robots.begin(), yellow_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
     ASSERT_NE(yellow_robot_2, yellow_robots.end());
     EXPECT_NEAR(3000.0f, yellow_robot_2->x(), 200);
     EXPECT_NEAR(-2000.0f, yellow_robot_2->y(), 200);
@@ -528,10 +510,10 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
         Angle::zero(), Angle::fromRadians(yellow_robot_2->orientation()),
         Angle::fromDegrees(10)));
 
-    auto blue_robots = detection_frame.robots_blue();
-    auto blue_robot_1 =
-        std::find_if(blue_robots.begin(), blue_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
+    auto blue_robots  = detection_frame.robots_blue();
+    auto blue_robot_1 = std::find_if(
+        blue_robots.begin(), blue_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 1; });
     ASSERT_NE(blue_robot_1, blue_robots.end());
     EXPECT_NEAR(-1000.0f, blue_robot_1->x(), 300);
     EXPECT_NEAR(-1000.0f, blue_robot_1->y(), 300);
@@ -539,9 +521,9 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
         Angle::zero(), Angle::fromRadians(blue_robot_1->orientation()),
         Angle::fromDegrees(10)));
 
-    auto blue_robot_2 =
-        std::find_if(blue_robots.begin(), blue_robots.end(),
-                     [](SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
+    auto blue_robot_2 = std::find_if(
+        blue_robots.begin(), blue_robots.end(),
+        [](SSLProto::SSL_DetectionRobot robot) { return robot.robot_id() == 2; });
     ASSERT_NE(blue_robot_2, blue_robots.end());
     EXPECT_NEAR(-3000.0f, blue_robot_2->x(), 300);
     EXPECT_NEAR(0.0f, blue_robot_2->y(), 300);

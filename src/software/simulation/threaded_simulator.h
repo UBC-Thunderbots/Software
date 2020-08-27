@@ -31,7 +31,7 @@ class ThreadedSimulator
 
     /**
      * Registers the given callback function. This callback function will be
-     * called each time the simulation updates and a new SSL_WrapperPacket
+     * called each time the simulation updates and a new SSLProto::SSL_WrapperPacket
      * is generated.
      *
      * Note: This function is threadsafe
@@ -39,7 +39,7 @@ class ThreadedSimulator
      * @param callback The callback function to register
      */
     void registerOnSSLWrapperPacketReadyCallback(
-        const std::function<void(SSL_WrapperPacket)>& callback);
+        const std::function<void(SSLProto::SSL_WrapperPacket)>& callback);
 
     /**
      * Starts running the simulator in a new thread. This is a non-blocking call.
@@ -122,16 +122,6 @@ class ThreadedSimulator
     void addBlueRobot(const Point& position);
 
     /**
-     * Sets the primitives being simulated by the robots in simulation
-     *
-     * Note: These functions are threadsafe.
-     *
-     * @param primitives The primitives to simulate
-     */
-    void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-    void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-
-    /**
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
@@ -139,6 +129,15 @@ class ThreadedSimulator
      */
     void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
     void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+
+    /**
+     * Sets the primitive being simulated by the robot on the corresponding team
+     * in simulation
+     *
+     * @param primitive_set_msg The set of primitives to run on the robot
+     */
+    void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg);
+    void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg);
 
     /**
      * Returns the PhysicsRobot at the given position. This function accounts
@@ -151,6 +150,13 @@ class ThreadedSimulator
      * otherwise returns an empty pointer
      */
     std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
+
+    /**
+     * Removes the given PhysicsRobot from the PhysicsWorld, if it exists.
+     *
+     * @param robot The robot to be removed
+     */
+    void removeRobot(std::weak_ptr<PhysicsRobot> robot);
 
    private:
     /**
@@ -171,7 +177,8 @@ class ThreadedSimulator
      */
     void updateCallbacks();
 
-    std::vector<std::function<void(SSL_WrapperPacket)>> ssl_wrapper_packet_callbacks;
+    std::vector<std::function<void(SSLProto::SSL_WrapperPacket)>>
+        ssl_wrapper_packet_callbacks;
     std::mutex callback_mutex;
 
     Simulator simulator;

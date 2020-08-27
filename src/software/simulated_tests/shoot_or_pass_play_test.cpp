@@ -29,8 +29,8 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(ShootOrPassPlay::name);
-    setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::STOP);
+    setAIPlay(TYPENAME(ShootOrPassPlay));
+    setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

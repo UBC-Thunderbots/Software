@@ -54,6 +54,16 @@ PhysicsBall::~PhysicsBall()
     b2World *world = ball_body->GetWorld();
     if (bodyExistsInWorld(ball_body, world))
     {
+        for (b2Fixture *f = ball_body->GetFixtureList(); f != NULL; f = f->GetNext())
+        {
+            if (f->GetUserData() != NULL)
+            {
+                PhysicsObjectUserData *user_data =
+                    static_cast<PhysicsObjectUserData *>(f->GetUserData());
+                delete user_data;
+                f->SetUserData(NULL);
+            }
+        }
         world->DestroyBody(ball_body);
     }
 }

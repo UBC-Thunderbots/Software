@@ -27,8 +27,6 @@ class DefenseShadowEnemyTactic : public Tactic
                                       const Team &enemy_team, const Ball &ball,
                                       bool ignore_goalie, double shadow_distance);
 
-    std::string getName() const override;
-
     /**
      * Updates the world parameters for this Tactic.
      *

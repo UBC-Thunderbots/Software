@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+package SSLProto;
+
 message SSL_DetectionBall
 {
     required float confidence = 1;

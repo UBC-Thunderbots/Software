@@ -1,7 +1,6 @@
 #include "software/simulation/simulator.h"
 
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
@@ -72,37 +71,6 @@ void Simulator::updateSimulatorRobots(
     }
 }
 
-void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball);
-}
-
-void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball);
-}
-
-void Simulator::setRobotPrimitives(
-    ConstPrimitiveVectorPtr primitives,
-    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-        simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball)
-{
-    if (!primitives)
-    {
-        return;
-    }
-
-    for (const auto& primitive_ptr : *primitives)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
-                          simulator_ball);
-    }
-}
-
 void Simulator::setYellowRobotPrimitive(RobotId id,
                                         const TbotsProto_Primitive& primitive_msg)
 {
@@ -113,6 +81,25 @@ void Simulator::setBlueRobotPrimitive(RobotId id,
                                       const TbotsProto_Primitive& primitive_msg)
 {
     setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball);
+}
+
+void Simulator::setYellowRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet& primitive_set_msg)
+{
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
+    {
+        setYellowRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                                primitive_set_msg.robot_primitives[i].value);
+    }
+}
+
+void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg)
+{
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
+    {
+        setBlueRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                              primitive_set_msg.robot_primitives[i].value);
+    }
 }
 
 void Simulator::setRobotPrimitive(
@@ -211,7 +198,7 @@ World Simulator::getWorld() const
     return world;
 }
 
-std::unique_ptr<SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
+std::unique_ptr<SSLProto::SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
 {
     auto ball_state  = physics_world.getBallState();
     auto ball_states = ball_state.has_value()
@@ -258,4 +245,9 @@ void Simulator::addBlueRobot(const Point& position)
         RobotState(position, Vector(0, 0), Angle::zero(), AngularVelocity::zero());
     auto state_with_id = RobotStateWithId{.id = id, .robot_state = state};
     addBlueRobots({state_with_id});
+}
+
+void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
+    physics_world.removeRobot(robot);
 }

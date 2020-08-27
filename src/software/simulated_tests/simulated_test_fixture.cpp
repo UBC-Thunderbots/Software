@@ -2,6 +2,8 @@
 
 #include "software/gui/drawing/navigator.h"
 #include "software/logger/logger.h"
+#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 
@@ -22,19 +24,18 @@ void SimulatedTestFixture::SetUp()
     // until https://github.com/UBC-Thunderbots/Software/issues/1483 is complete
 
     // Re-create all objects for each test so we start from a clean setup
-    // every time. Because the simulator is created initially in the constructor's
-    // initialization list, and before every test in this SetUp function, we can
-    // guarantee the pointer will never be null / empty
+    // every time. Because the simulator is created initially in the
+    // constructor's initialization list, and before every test in this SetUp function, we
+    // can guarantee the pointer will never be null / empty
     simulator = std::make_unique<Simulator>(Field::createSSLDivisionBField());
     ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
-    sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
 
     MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideRefboxDefendingSide()
+        ->mutableOverrideGameControllerDefendingSide()
         ->setValue(true);
     MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableDefendingPositiveSide()
@@ -45,7 +46,7 @@ void SimulatedTestFixture::SetUp()
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideRefboxFriendlyTeamColor()
+        ->mutableOverrideGameControllerFriendlyTeamColor()
         ->setValue(true);
     MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
@@ -96,19 +97,19 @@ void SimulatedTestFixture::setAIPlay(const std::string &ai_play)
         ->setValue(ai_play);
 }
 
-void SimulatedTestFixture::setRefboxGameState(
-    const RefboxGameState &current_refbox_game_state,
-    const RefboxGameState &previous_refbox_game_state)
+void SimulatedTestFixture::setRefereeCommand(
+    const RefereeCommand &current_referee_command,
+    const RefereeCommand &previous_referee_command)
 {
     MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideRefboxGameState()
+        ->mutableOverrideRefereeCommand()
         ->setValue(true);
     MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentRefboxGameState()
-        ->setValue(toString(current_refbox_game_state));
+        ->mutableCurrentRefereeCommand()
+        ->setValue(toString(current_referee_command));
     MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutablePreviousRefboxGameState()
-        ->setValue(toString(previous_refbox_game_state));
+        ->mutablePreviousRefereeCommand()
+        ->setValue(toString(previous_referee_command));
 }
 
 void SimulatedTestFixture::enableVisualizer()
@@ -215,11 +216,9 @@ void SimulatedTestFixture::runTest(
                 break;
             }
 
-            auto primitives = ai.getPrimitives(*world);
-            auto primitives_ptr =
-                std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-                    std::move(primitives));
-            simulator->setYellowRobotPrimitives(primitives_ptr);
+            auto primitive_set_msg = ai.getPrimitives(*world);
+            simulator->setYellowRobotPrimitiveSet(
+                createNanoPbPrimitiveSet(*primitive_set_msg));
 
             if (run_simulation_in_realtime)
             {

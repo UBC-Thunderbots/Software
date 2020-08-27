@@ -173,7 +173,7 @@ TEST(SSLDetectionTest, test_convert_robot_states_to_proto_and_back)
         createSSLDetectionFrame(camera_id, t_capture, frame_number, {ball_state},
                                 yellow_robot_states, blue_robot_states);
     ASSERT_TRUE(detection_frame);
-    std::vector<SSL_DetectionFrame> detection_frames({*detection_frame});
+    std::vector<SSLProto::SSL_DetectionFrame> detection_frames({*detection_frame});
     auto yellow_team_detections =
         createTeamDetection(detection_frames, TeamColour::YELLOW);
     ASSERT_EQ(2, yellow_team_detections.size());
