@@ -3,12 +3,10 @@
 #include "software/ai/intent/direct_primitive_intent.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
-#include "software/primitive/kick_primitive.h"
 
 class KickIntent : public DirectPrimitiveIntent
 {
    public:
-    static const std::string INTENT_NAME;
     /**
      * Creates a new Kick Intent
      *
@@ -23,6 +21,4 @@ class KickIntent : public DirectPrimitiveIntent
     explicit KickIntent(unsigned int robot_id, const Point& dest,
                         const Angle& final_angle, double final_speed,
                         unsigned int priority);
-
-    std::string getIntentName(void) const override;
 };

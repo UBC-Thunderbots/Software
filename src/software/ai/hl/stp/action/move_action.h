@@ -4,7 +4,6 @@
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
-#include "software/primitive/move_primitive.h"
 
 class MoveAction : public Action
 {
