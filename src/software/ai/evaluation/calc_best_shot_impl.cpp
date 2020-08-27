@@ -24,7 +24,8 @@ double calcShotOpenNetPercentage(const Field &field, const Point &shot_origin,
 }
 
 std::optional<Shot> calcMostOpenDirectionFromRobotObstacles(
-    Point origin, Segment segment, std::vector<Robot> robot_obstacles)
+    const Point &origin, const Segment &segment,
+    const std::vector<Robot> &robot_obstacles)
 {
     std::vector<Circle> obstacles;
 
@@ -37,7 +38,7 @@ std::optional<Shot> calcMostOpenDirectionFromRobotObstacles(
 }
 
 std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
-    Point origin, Segment segment, std::vector<Circle> obstacles)
+    const Point &origin, const Segment &segment, const std::vector<Circle> &obstacles)
 {
     std::vector<Segment> obstacle_segment_projections;
 

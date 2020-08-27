@@ -28,21 +28,6 @@ double calcShotOpenNetPercentage(const Field &field, const Point &shot_origin,
  * Function calculates the optimal shot and the corresponding Angle
  * representing the 'open' area of that shot on a given segment to shoot at
  *
- * @param origin : The origin of the shot
- * @param segment : The segment at which shots are being evaluated on
- * @param obstacles : Any obstacle that can block the shot
- *
- * @return Shot : Returns the optimal Shot (Point and Angle) corresponding to the
- * given parameters
- * @return nullopt : A Shot does not exist
- */
-std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
-    Point origin, Segment segment, std::vector<Circle> obstacles);
-
-/**
- * Function calculates the optimal shot and the corresponding Angle
- * representing the 'open' area of that shot on a given segment to shoot at
- *
  *   Open          Blocked Segment        Open
  * *______X---------------------------X___________________*  <-- reference Segment
  *          .                        .
@@ -61,13 +46,29 @@ std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
  *                      X
  *                 Reference Point
  *
- * @param origin : The origin of the shot
- * @param segment : The segment at which shots are being evaluated on
- * @param robot_obstacles : Any Robot (friendly or enemy) that can block the shot
+ * @param origin The origin of the shot
+ * @param segment The segment at which shots are being evaluated on
+ * @param robot_obstacles Any Robot (friendly or enemy) that can block the shot
  *
- * @return Shot : Returns the optimal Shot (Point and Angle) corresponding to the
+ * @return Shot teturns the optimal Shot (Point and Angle) corresponding to the
  * given parameters
- * @return nullopt : A Shot does not exist
+ * @return nullopt if Shot does not exist
  */
 std::optional<Shot> calcMostOpenDirectionFromRobotObstacles(
-    Point origin, Segment segment, std::vector<Robot> robot_obstacles);
+    const Point &origin, const Segment &segment,
+    const std::vector<Robot> &robot_obstacles);
+
+/**
+ * Function calculates the optimal shot and the corresponding Angle
+ * representing the 'open' area of that shot on a given segment to shoot at
+ *
+ * @param origin The origin of the shot
+ * @param segment The segment at which shots are being evaluated on
+ * @param obstacles Any obstacle that can block the shot
+ *
+ * @return the optimal Shot (Point and Angle) corresponding to the
+ * given parameters
+ * @return nullopt if Shot does not exist
+ */
+std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
+    const Point &origin, const Segment &segment, const std::vector<Circle> &obstacles);

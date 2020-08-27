@@ -45,10 +45,10 @@ cc_library(
     srcs = [
         "calc_best_shot.cpp",
         "calc_best_shot_impl.cpp",
+        "calc_best_shot_impl.h",
     ],
     hdrs = [
         "calc_best_shot.h",
-        "calc_best_shot_impl.h",
     ],
     deps = [
         ":shot",

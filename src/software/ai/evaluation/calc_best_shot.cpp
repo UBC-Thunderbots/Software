@@ -50,13 +50,13 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
         best_shot = calcBestShotOnGoal(
             Segment(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos()),
             shot_origin, obstacles);
+        return best_shot;
     }
     else
     {
         best_shot = calcBestShotOnGoal(
             Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos()), shot_origin,
             obstacles);
+        return best_shot;
     }
-
-    return best_shot;
 }
