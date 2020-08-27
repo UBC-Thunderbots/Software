@@ -74,6 +74,7 @@
 class STP : public HL
 {
    public:
+    STP() = delete;
     /**
      * Creates a new High-Level logic module that uses the STP framework for
      * decision-making.
