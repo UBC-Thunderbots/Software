@@ -395,7 +395,7 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_negative
     Simulator simulator(Field::createSSLDivisionBField());
 
     auto defending_side = DefendingSideProto();
-    defending_side.set_defending_positive_side(false);
+    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
     simulator.setBlueTeamDefendingSide(defending_side);
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -435,7 +435,7 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positive
     Simulator simulator(Field::createSSLDivisionBField());
 
     auto defending_side = DefendingSideProto();
-    defending_side.set_defending_positive_side(true);
+    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
     simulator.setBlueTeamDefendingSide(defending_side);
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -476,7 +476,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_negati
     Simulator simulator(Field::createSSLDivisionBField());
 
     auto defending_side = DefendingSideProto();
-    defending_side.set_defending_positive_side(false);
+    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
     simulator.setYellowTeamDefendingSide(defending_side);
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -516,7 +516,7 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_positi
     Simulator simulator(Field::createSSLDivisionBField());
 
     auto defending_side = DefendingSideProto();
-    defending_side.set_defending_positive_side(true);
+    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
     simulator.setYellowTeamDefendingSide(defending_side);
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
