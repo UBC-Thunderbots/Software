@@ -10,7 +10,6 @@ cc_library(
         "//firmware/app/world:firmware_world",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/primitive",
         "//software/simulation/physics:physics_ball",
         "//software/simulation/physics:physics_robot",
     ],
@@ -128,9 +127,7 @@ cc_library(
         ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//software/primitive",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",
-        "//software/proto/message_translation:proto_creator_primitive_visitor",
         "//software/proto/message_translation:ssl_detection",
         "//software/proto/message_translation:ssl_geometry",
         "//software/proto/message_translation:ssl_wrapper",
@@ -144,6 +141,7 @@ cc_test(
     srcs = ["simulator_test.cpp"],
     deps = [
         ":simulator",
+        "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
@@ -166,6 +164,7 @@ cc_test(
     deps = [
         ":threaded_simulator",
         "//software/proto/message_translation:tbots_protobuf",
+        "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",

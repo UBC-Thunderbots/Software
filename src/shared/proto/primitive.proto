@@ -4,40 +4,7 @@ package TbotsProto;
 
 import "shared/proto/geometry.proto";
 
-// This message is used to ensure backwards compatibility with our old format
-// for primitive parameters while we migrate to a new format where each primitive
-// has it's own unique proto message
-// TODO: Remove this once it's no longer needed
-//       (https://github.com/UBC-Thunderbots/Software/issues/1578)
-message PrimitiveParams
-{
-    // The parameters for the primitive
-    float parameter1 = 1;
-    float parameter2 = 2;
-    float parameter3 = 3;
-    float parameter4 = 4;
-
-    // Extra bits used for flags and/or additional information
-    uint32 extra_bits = 5;
-
-    // Indicates whether the robot should move slowly (<1.5 m/s)
-    bool slow = 6;
-}
-
 message Primitive
-{
-    oneof primitive
-    {
-        PrimitiveParams move            = 1;
-        PrimitiveParams stop            = 2;
-        PrimitiveParams shoot           = 3;
-        PrimitiveParams spinning_move   = 4;
-        PrimitiveParams direct_wheels   = 5;
-        PrimitiveParams direct_velocity = 6;
-    }
-}
-
-message PrimitiveNew
 {
     oneof primitive
     {

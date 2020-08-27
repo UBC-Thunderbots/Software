@@ -1,12 +1,10 @@
 #pragma once
 
 #include "software/ai/intent/direct_primitive_intent.h"
-#include "software/primitive/stop_primitive.h"
 
 class StopIntent : public DirectPrimitiveIntent
 {
    public:
-    static const std::string INTENT_NAME;
     /**
      * Creates a new Stop Intent
      *
@@ -18,6 +16,4 @@ class StopIntent : public DirectPrimitiveIntent
      * priority
      */
     explicit StopIntent(unsigned int robot_id, bool coast, unsigned int priority);
-
-    std::string getIntentName(void) const override;
 };

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/primitive/primitive.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_world.h"

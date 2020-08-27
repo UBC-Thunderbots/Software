@@ -4,14 +4,13 @@
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
-#include "software/primitive/primitive.h"
 #include "software/util/make_enum/make_enum.h"
 
-/**
- * Enum for indicating the stop type for the Stop Primitive
- */
-MAKE_ENUM(StopType, BRAKE, COAST)
+MAKE_ENUM(AutochickType, NONE, AUTOKICK, AUTOCHIP);
 
+MAKE_ENUM(MoveType, NORMAL, SLOW);
+
+MAKE_ENUM(DribblerEnable, OFF, ON);
 
 /**
  * Create a Chip Primitive Message
@@ -23,8 +22,9 @@ MAKE_ENUM(StopType, BRAKE, COAST)
  *
  * @return Pointer to Chip Primitive Message
  */
-std::unique_ptr<TbotsProto::PrimitiveNew> createChipPrimitive(
-    const Point &chip_origin, const Angle &chip_direction, double chip_distance_meters);
+std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(const Point &chip_origin,
+                                                           const Angle &chip_direction,
+                                                           double chip_distance_meters);
 
 /**
  * Create a Kick Primitive Message
@@ -36,7 +36,7 @@ std::unique_ptr<TbotsProto::PrimitiveNew> createChipPrimitive(
  *
  * @return Pointer to Kick Primitive Message
  */
-std::unique_ptr<TbotsProto::PrimitiveNew> createKickPrimitive(
+std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
     const Point &kick_origin, const Angle &kick_direction,
     double kick_speed_meters_per_second);
 
@@ -52,9 +52,30 @@ std::unique_ptr<TbotsProto::PrimitiveNew> createKickPrimitive(
  *
  * @return Pointer to Move Primitive Message
  */
-std::unique_ptr<TbotsProto::PrimitiveNew> createMovePrimitive(
+std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, bool slow,
     const Angle &final_angle, double dribbler_speed_rpm);
+
+/**
+ * Create a Move Primitive Message using the arguments of the old MovePrimitive
+ * This is meant to replicate the behaviour of the old move primitive
+ *
+ * @param dest The final destination of the movement
+ * @param final_angle The final orientation the robot should have at the end
+ * of the movement
+ * @param final_speed The final speed the Robot should have when it reaches
+ * its destination at the end of the movement
+ * @param enable_dribbler Whether or not to enable the dribbler
+ * @param slow Whether or not to move at a slower speed (1m/s)
+ * @param autochick A flag indicating if autokick should be enabled while the robot is
+ * moving. This will enable the "break-beam" on the robot that will trigger the kicker
+ * or chipper to fire as soon as the ball is in front of it
+ *
+ * @return Pointer to Move Primitive Message
+ */
+std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
+    const Point &dest, const Angle &final_angle, double final_speed,
+    DribblerEnable enable_dribbler, MoveType move_type, AutochickType autochick);
 
 /**
  * Create a Spinning Move Primitive Message
@@ -68,7 +89,7 @@ std::unique_ptr<TbotsProto::PrimitiveNew> createMovePrimitive(
  *
  * @return Pointer to Spinning Move Primitive Message
  */
-std::unique_ptr<TbotsProto::PrimitiveNew> createSpinningMovePrimitive(
+std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, bool slow,
     const AngularVelocity &angular_velocity, double dribbler_speed_rpm);
 
@@ -86,7 +107,7 @@ std::unique_ptr<TbotsProto::PrimitiveNew> createSpinningMovePrimitive(
  *
  * @return Pointer to Autochip Move Primitive Message
  */
-std::unique_ptr<TbotsProto::PrimitiveNew> createAutochipMovePrimitive(
+std::unique_ptr<TbotsProto::Primitive> createAutochipMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, bool slow,
     const Angle &final_angle, double dribbler_speed_rpm, double chip_distance_meters);
 
@@ -104,7 +125,7 @@ std::unique_ptr<TbotsProto::PrimitiveNew> createAutochipMovePrimitive(
  *
  * @return Pointer to Autokick Move Primitive Message
  */
-std::unique_ptr<TbotsProto::PrimitiveNew> createAutokickMovePrimitive(
+std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, bool slow,
     const Angle &final_angle, double dribbler_speed_rpm,
     double kick_speed_meters_per_second);
@@ -116,4 +137,4 @@ std::unique_ptr<TbotsProto::PrimitiveNew> createAutokickMovePrimitive(
  *
  * @return Pointer to Stop Primitive Message
  */
-std::unique_ptr<TbotsProto::PrimitiveNew> createStopPrimitive(StopType stop_type);
+std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);

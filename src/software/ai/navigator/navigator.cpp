@@ -4,6 +4,7 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
+#include "software/proto/primitive/primitive_msg_factory.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
                      RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
@@ -68,9 +69,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
             LOG(WARNING)
                 << "Navigator's path manager could not find a path for RobotId = "
                 << robot_id;
-            robot_primitives_map[robot_id] =
-                ProtoCreatorPrimitiveVisitor().createPrimitive(
-                    StopPrimitive(robot_id, false));
+            robot_primitives_map[robot_id] = *createStopPrimitive(false);
         }
     }
 
