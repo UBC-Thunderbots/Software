@@ -42,21 +42,17 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
         }
     }
 
-    std::optional<Shot> best_shot;
-
     // Calculate the best_shot based on what goal we're shooting at
     if (goal == TeamType::FRIENDLY)
     {
-        best_shot = calcBestShotOnGoal(
+        return calcBestShotOnGoal(
             Segment(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos()),
             shot_origin, obstacles);
-        return best_shot;
     }
     else
     {
-        best_shot = calcBestShotOnGoal(
+        return calcBestShotOnGoal(
             Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos()), shot_origin,
             obstacles);
-        return best_shot;
     }
 }
