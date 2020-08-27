@@ -47,6 +47,11 @@ class StandaloneSimulatorGUI : public QMainWindow
      */
     void updateDrawViewArea();
 
+    /**
+     * Updates the LCD Display
+     */
+    void updateLCDDisplay();
+
     // The "parent" of each of these widgets is set during construction, meaning that
     // the Qt system takes ownership of the pointer and is responsible for de-allocating
     // it, so we don't have to

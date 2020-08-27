@@ -21,9 +21,9 @@ class Observer
      */
     virtual void receiveValue(T val) final;
 
-    virtual ~Observer() = default;
+    virtual double getDataReceivedPerSecond() final;
 
-    virtual int getDataReceivedPerSecond() final;
+    virtual ~Observer() = default;
 
     static constexpr size_t TIME_BUFFER_SIZE = 5;
 
@@ -64,7 +64,7 @@ class Observer
 
    private:
     ThreadSafeBuffer<T> buffer;
-    ThreadSafeBuffer<std::chrono::milliseconds> time_buffer;
+    boost::circular_buffer<std::chrono::milliseconds> time_buffer;
 };
 
 #include "software/multithreading/observer.tpp"

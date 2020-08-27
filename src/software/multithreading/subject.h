@@ -36,6 +36,11 @@ class Subject
      */
     virtual void sendValueToObservers(T val) final;
 
+    /**
+     *
+     */
+    virtual double getAverageDataReceivedPerSecond() final;
+
    private:
     // The observers that this class provides updates to
     std::vector<std::shared_ptr<Observer<T>>> observers;
