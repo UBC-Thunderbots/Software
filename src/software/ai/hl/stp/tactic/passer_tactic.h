@@ -18,19 +18,20 @@ class PasserTactic : public Tactic
      *
      * @param pass The pass this tactic should try to execute
      * @param ball The ball that we're trying to pass
+     * @param field The field being played on
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PasserTactic(Pass pass, const Ball& ball, bool loop_forever);
-
-    std::string getName() const override;
+    explicit PasserTactic(Pass pass, const Ball& ball, const Field& field,
+                          bool loop_forever);
 
     /**
      * Updates the world parameters for this PasserTactic.
      *
      * @param updated_ball The ball we're passing
+     * @param updated_field The field being played on
      */
-    void updateWorldParams(const Ball& updated_ball);
+    void updateWorldParams(const Ball& updated_ball, const Field& updated_field);
 
     /**
      * Updates the control parameters for this PasserTactic.
@@ -60,4 +61,5 @@ class PasserTactic : public Tactic
     // Tactic parameters
     Pass pass;
     Ball ball;
+    Field field;
 };

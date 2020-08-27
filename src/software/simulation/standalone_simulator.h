@@ -1,10 +1,15 @@
 #pragma once
 
-#include "shared/proto/tbots_software_msgs.pb.h"
+#include "software/networking/threaded_nanopb_primitive_set_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/simulation/threaded_simulator.h"
+
+extern "C"
+{
+#include "shared/proto/tbots_software_msgs.nanopb.h"
+}
 
 /**
  * This class abstracts all simulation and networking operations for
@@ -33,18 +38,20 @@ class StandaloneSimulator
 
     /**
      * Registers the given callback function. This callback function will be
-     * called each time the simulation updates and a new SSL_WrapperPacket
+     * called each time the simulation updates and a new SSLProto::SSL_WrapperPacket
      * is generated.
      *
      * @param callback The callback function to register
      */
     void registerOnSSLWrapperPacketReadyCallback(
-        const std::function<void(SSL_WrapperPacket)>& callback);
+        const std::function<void(SSLProto::SSL_WrapperPacket)>& callback);
 
     /**
      * Adds robots to predefined locations on the field
      */
     void setupInitialSimulationState();
+
+    SSLProto::SSL_WrapperPacket getSSLWrapperPacket() const;
 
     /**
      * Starts the simulation. If the simulator is already running, this
@@ -85,6 +92,34 @@ class StandaloneSimulator
      */
     void setBallState(const BallState& state);
 
+    /**
+     * Returns the PhysicsRobot at the given position. This function accounts
+     * for robot radius, so a robot will be returned if the given position is
+     * within the robot's radius from its position.
+     *
+     * @param position The position at which to check for a robot
+     *
+     * @return a weak_ptr to the PhysicsRobot at the given position if one exists,
+     * otherwise returns an empty pointer
+     */
+    std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
+
+    /**
+     * Adds a robots to the specified team at the given position. The robot will
+     * automatically be given a valid ID.
+     *
+     * @param position the position at which to add the robot
+     */
+    void addYellowRobot(const Point& position);
+    void addBlueRobot(const Point& position);
+
+    /**
+     * Removes the given PhysicsRobot from the PhysicsWorld, if it exists.
+     *
+     * @param robot The robot to be removed
+     */
+    void removeRobot(std::weak_ptr<PhysicsRobot> robot);
+
     // This is a somewhat arbitrary value that results in slow motion
     // simulation looking appropriately / usefully slow
     static constexpr double DEFAULT_SLOW_MOTION_MULTIPLIER = 8.0;
@@ -93,10 +128,10 @@ class StandaloneSimulator
     /**
      * Sets the primitives being simulated by the robots on the respective team
      *
-     * @param msg The primitives to set on the respective team
+     * @param primitive_set_msg The set of primitives to run on the respective team
      */
-    void setYellowRobotPrimitives(PrimitiveSetMsg msg);
-    void setBlueRobotPrimitives(PrimitiveSetMsg msg);
+    void setYellowRobotPrimitives(TbotsProto_PrimitiveSet primitive_set_msg);
+    void setBlueRobotPrimitives(TbotsProto_PrimitiveSet primitive_set_msg);
 
     /**
      * A helper function that sets up all networking functionality with
@@ -104,22 +139,13 @@ class StandaloneSimulator
      */
     void initNetworking();
 
-    /**
-     * Decodes a PrimitiveMsg into its primitive index and parameters
-     *
-     * @param msg The message to decode
-     *
-     * @return The primitive index and parameters for the given PrimitiveMsg
-     */
-    static std::pair<unsigned int, primitive_params_t> decodePrimitiveMsg(
-        const PrimitiveMsg& msg);
-
     std::shared_ptr<const StandaloneSimulatorConfig> standalone_simulator_config;
-    std::unique_ptr<ThreadedProtoMulticastSender<SSL_WrapperPacket>>
+    std::unique_ptr<ThreadedNanoPbPrimitiveSetMulticastListener>
+        yellow_team_primitive_listener, blue_team_primitive_listener;
+    std::unique_ptr<ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>>
         wrapper_packet_sender;
-    std::unique_ptr<ThreadedProtoMulticastListener<PrimitiveSetMsg>>
-        yellow_team_primitive_listener;
-    std::unique_ptr<ThreadedProtoMulticastListener<PrimitiveSetMsg>>
-        blue_team_primitive_listener;
     ThreadedSimulator simulator;
+
+    SSLProto::SSL_WrapperPacket most_recent_ssl_wrapper_packet;
+    mutable std::mutex most_recent_ssl_wrapper_packet_mutex;
 };

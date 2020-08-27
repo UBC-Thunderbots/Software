@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "software/new_geom/point.h"
+#include "software/geom/point.h"
 #include "software/world/robot_state.h"
 
 /**

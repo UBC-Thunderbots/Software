@@ -8,7 +8,7 @@
 #include "software/proto/message_translation/ssl_geometry.h"
 
 void drawSSLWrapperPacket(QGraphicsScene* scene,
-                          const SSL_WrapperPacket& ssl_wrapper_packet)
+                          const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet)
 {
     if (ssl_wrapper_packet.has_geometry())
     {
@@ -46,7 +46,7 @@ void drawSSLWrapperPacket(QGraphicsScene* scene,
 }
 
 WorldDrawFunction getDrawSSLWrapperPacketFunction(
-    const SSL_WrapperPacket& ssl_wrapper_packet)
+    const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet)
 {
     auto draw_function = [ssl_wrapper_packet](QGraphicsScene* scene) {
         drawSSLWrapperPacket(scene, ssl_wrapper_packet);

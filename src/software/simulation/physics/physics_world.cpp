@@ -3,6 +3,7 @@
 #include <limits>
 
 #include "shared/constants.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
 PhysicsWorld::PhysicsWorld(const Field& field, double ball_restitution,
@@ -190,8 +191,21 @@ bool PhysicsWorld::isRobotIdAvailable(RobotId id, TeamColour colour) const
 
 void PhysicsWorld::stepSimulation(const Duration& time_step)
 {
+    if (physics_ball)
+    {
+        physics_ball->updateIsInFlight();
+    }
     b2_world->Step(static_cast<float>(time_step.getSeconds()), velocity_iterations,
                    position_iterations);
+
+    for (const auto& physics_robots : {yellow_physics_robots, blue_physics_robots})
+    {
+        for (auto& robot : physics_robots)
+        {
+            robot->runPostPhysicsStep();
+        }
+    }
+
     current_timestamp = current_timestamp + time_step;
 }
 
@@ -230,4 +244,35 @@ std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getBluePhysicsRobots() co
 std::weak_ptr<PhysicsBall> PhysicsWorld::getPhysicsBall() const
 {
     return std::weak_ptr<PhysicsBall>(physics_ball);
+}
+
+std::weak_ptr<PhysicsRobot> PhysicsWorld::getRobotAtPosition(const Point& position)
+{
+    std::weak_ptr<PhysicsRobot> result;
+
+    for (const auto& physics_robots : {yellow_physics_robots, blue_physics_robots})
+    {
+        for (const auto& robot : physics_robots)
+        {
+            if (distance(position, robot->position()) < ROBOT_MAX_RADIUS_METERS)
+            {
+                result = robot;
+            }
+        }
+    }
+
+    return result;
+}
+
+void PhysicsWorld::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
+    if (auto r = robot.lock())
+    {
+        yellow_physics_robots.erase(
+            std::remove(yellow_physics_robots.begin(), yellow_physics_robots.end(), r),
+            yellow_physics_robots.end());
+        blue_physics_robots.erase(
+            std::remove(blue_physics_robots.begin(), blue_physics_robots.end(), r),
+            blue_physics_robots.end());
+    }
 }

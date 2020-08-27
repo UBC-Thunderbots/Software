@@ -12,7 +12,7 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
                                                    const Team &enemy_team,
                                                    const Ball &ball, bool ignore_goalie,
                                                    double shadow_distance)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -20,11 +20,6 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
       ignore_goalie(ignore_goalie),
       shadow_distance(shadow_distance)
 {
-}
-
-std::string DefenseShadowEnemyTactic::getName() const
-{
-    return "Defense Shadow Enemy Tactic";
 }
 
 void DefenseShadowEnemyTactic::updateWorldParams(const Field &field,
@@ -105,7 +100,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         {
             move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
-                0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                0, DribblerEnable::ON, MoveType::NORMAL, AutochickType::AUTOCHIP,
                 BallCollisionType::AVOID);
             yield(move_action);
         }
@@ -115,7 +110,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
                 (enemy_robot.position() - robot->position()).orientation();
             move_action->updateControlParams(*robot, position_to_block_shot,
                                              facing_enemy_robot, 0, DribblerEnable::OFF,
-                                             MoveType::NORMAL, AutokickType::AUTOCHIP,
+                                             MoveType::NORMAL, AutochickType::AUTOCHIP,
                                              BallCollisionType::AVOID);
             yield(move_action);
         }

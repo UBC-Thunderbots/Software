@@ -5,14 +5,8 @@
 #include "software/ai/hl/stp/action/move_action.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
-    : Tactic(loop_forever,
-             {RobotCapability::Dribble, RobotCapability::Kick, RobotCapability::Chip})
+    : Tactic(loop_forever, allRobotCapabilities())
 {
-}
-
-std::string MoveTestTactic::getName() const
-{
-    return "Move Test Tactic";
 }
 
 void MoveTestTactic::updateControlParams(Point destination_)

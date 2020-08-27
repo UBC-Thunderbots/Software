@@ -1,9 +1,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 
-#include "software/geom/util.h"
-#include "software/new_geom/util/acute_angle.h"
-#include "software/new_geom/util/multiple_segments.h"
-#include "software/new_geom/util/projection.h"
+#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/multiple_segments.h"
+#include "software/geom/algorithms/projection.h"
 
 std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
                                        const Point &goal_post_pos, const Point &p,
@@ -163,10 +162,9 @@ std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
     // If there are no obstacles, return the center of the Segment and the shot angle
     if (obstacles.size() == 0)
     {
-        const Point center_of_segment =
-            getPointsMean({segment.getSegStart(), segment.getEnd()});
+        const Point center_of_segment = segment.midPoint();
         const Angle angle_of_entire_segment =
-            ((segment.getSegStart() - origin)
+            ((segment.getStart() - origin)
                  .orientation()
                  .minDiff((segment.getEnd() - origin).orientation()))
                 .abs();
@@ -187,10 +185,9 @@ std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
     else if (obstacle_segment_projections.size() == 0)
     {
         // If there are no blocking Segments, just shoot at the center of the goal
-        const Point center_of_segment =
-            getPointsMean({segment.getSegStart(), segment.getEnd()});
+        const Point center_of_segment = segment.midPoint();
         const Angle angle_of_entire_segment =
-            ((segment.getSegStart() - origin)
+            ((segment.getStart() - origin)
                  .orientation()
                  .minDiff((segment.getEnd() - origin).orientation()))
                 .abs();
@@ -221,10 +218,10 @@ std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
 
 
     const Point most_open_point =
-        Point((largest_segment.getSegStart().x() + largest_segment.getEnd().x()) / 2,
-              (largest_segment.getSegStart().y() + largest_segment.getEnd().y()) / 2);
+        Point((largest_segment.getStart().x() + largest_segment.getEnd().x()) / 2,
+              (largest_segment.getStart().y() + largest_segment.getEnd().y()) / 2);
     const Angle largest_open_angle =
-        ((largest_segment.getSegStart() - origin)
+        ((largest_segment.getStart() - origin)
              .orientation()
              .minDiff((largest_segment.getEnd() - origin).orientation()))
             .abs();

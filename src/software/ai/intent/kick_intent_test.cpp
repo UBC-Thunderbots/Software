@@ -1,18 +1,7 @@
-/**
- * This file contains unit tests for the Kick Intent class
- */
-
 #include "software/ai/intent/kick_intent.h"
 
 #include <gtest/gtest.h>
 #include <string.h>
-
-TEST(KickIntentTest, intent_name_test)
-{
-    KickIntent kick_intent = KickIntent(0, Point(), Angle::zero(), 0, 0);
-
-    EXPECT_EQ("Kick Intent", kick_intent.getIntentName());
-}
 
 // For equality operators, we only check for cases not covered in the Primitive tests,
 // since Intents inherit from Primitives

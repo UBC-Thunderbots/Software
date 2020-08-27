@@ -8,13 +8,14 @@ proto_library(
     srcs = [
         "geometry.proto",
         "primitive.proto",
-        "robot_component_status.proto",
-        "tbots_robot_msg.proto",
+        "robot_status_msg.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
         "vision.proto",
     ],
-    # Note: this library is public so that proto libraries in firmware or software can build from it
+    deps = [
+        "@nanopb//:nanopb_options_proto",
+    ],
 )
 
 cc_proto_library(

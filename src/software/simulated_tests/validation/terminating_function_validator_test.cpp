@@ -183,7 +183,7 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
 
-    world->mutableGameState().updateRefboxGameState(RefboxGameState::STOP);
+    world->updateRefereeCommand(RefereeCommand::STOP);
     world->updateBallStateWithTimestamp(
         TimestampedBallState(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
 
@@ -193,7 +193,11 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
         EXPECT_FALSE(result);
     }
 
-    world->mutableGameState().updateRefboxGameState(RefboxGameState::HALT);
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE; i++)
+    {
+        world->updateRefereeCommand(RefereeCommand::HALT);
+    }
+
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
 }

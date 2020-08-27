@@ -15,7 +15,7 @@ ThreadedSimulator::~ThreadedSimulator()
 }
 
 void ThreadedSimulator::registerOnSSLWrapperPacketReadyCallback(
-    const std::function<void(SSL_WrapperPacket)> &callback)
+    const std::function<void(SSLProto::SSL_WrapperPacket)> &callback)
 {
     std::scoped_lock lock(callback_mutex);
     ssl_wrapper_packet_callbacks.emplace_back(callback);
@@ -96,30 +96,32 @@ void ThreadedSimulator::addBlueRobots(const std::vector<RobotStateWithId> &robot
     updateCallbacks();
 }
 
-void ThreadedSimulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
+void ThreadedSimulator::setYellowRobotPrimitive(RobotId id,
+                                                const TbotsProto_Primitive &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);
-    simulator.setYellowRobotPrimitives(primitives);
+    simulator.setYellowRobotPrimitive(id, primitive_msg);
 }
 
-void ThreadedSimulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
+void ThreadedSimulator::setBlueRobotPrimitive(RobotId id,
+                                              const TbotsProto_Primitive &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);
-    simulator.setBlueRobotPrimitives(primitives);
+    simulator.setBlueRobotPrimitive(id, primitive_msg);
 }
 
-void ThreadedSimulator::setYellowRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                                const primitive_params_t &params)
+void ThreadedSimulator::setYellowRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet &primitive_set_msg)
 {
     std::scoped_lock lock(simulator_mutex);
-    simulator.setYellowRobotPrimitive(id, primitive_index, params);
+    simulator.setYellowRobotPrimitiveSet(primitive_set_msg);
 }
 
-void ThreadedSimulator::setBlueRobotPrimitive(RobotId id, unsigned int primitive_index,
-                                              const primitive_params_t &params)
+void ThreadedSimulator::setBlueRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet &primitive_set_msg)
 {
     std::scoped_lock lock(simulator_mutex);
-    simulator.setBlueRobotPrimitive(id, primitive_index, params);
+    simulator.setBlueRobotPrimitiveSet(primitive_set_msg);
 }
 
 void ThreadedSimulator::runSimulationLoop()
@@ -161,4 +163,28 @@ void ThreadedSimulator::updateCallbacks()
             callback(*ssl_wrapper_packet_ptr);
         }
     }
+}
+
+std::weak_ptr<PhysicsRobot> ThreadedSimulator::getRobotAtPosition(const Point &position)
+{
+    std::scoped_lock lock(simulator_mutex);
+    return simulator.getRobotAtPosition(position);
+}
+
+void ThreadedSimulator::addYellowRobot(const Point &position)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.addYellowRobot(position);
+}
+
+void ThreadedSimulator::addBlueRobot(const Point &position)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.addBlueRobot(position);
+}
+
+void ThreadedSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.removeRobot(robot);
 }

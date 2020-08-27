@@ -2,8 +2,8 @@
 
 #include <Box2D/Box2D.h>
 
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
 
 /**
  * These functions are utilities and convenience functions to make certain operations

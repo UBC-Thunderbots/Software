@@ -30,8 +30,8 @@
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
 #include "shared/constants.h"
-#include "shared/proto/tbots_robot_msg.pb.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
+#include "shared/proto/robot_status_msg.nanopb.h"
+#include "shared/proto/tbots_software_msgs.nanopb.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,13 +52,13 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
-ProtoMulticastCommunicationProfile_t *tbots_robot_msg_sender_profile;
+ProtoMulticastCommunicationProfile_t *robot_status_msg_sender_profile;
 ProtoMulticastCommunicationProfile_t *vision_msg_listener_profile;
 ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
 
-static VisionMsg vision_msg;
-static TbotsRobotMsg tbots_robot_msg;
-static PrimitiveMsg primitive_msg;
+static TbotsProto_Vision vision_msg;
+static TbotsProto_RobotStatus robot_status_msg;
+static TbotsProto_Primitive primitive_msg;
 
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
@@ -72,10 +72,10 @@ const osThreadAttr_t RobotStatusTask_attributes = {
     .name       = "RobotStatusTask",
     .priority   = (osPriority_t)osPriorityHigh7,
     .stack_size = 1024 * 4};
-/* Definitions for VisionMsgTask */
-osThreadId_t VisionMsgTaskHandle;
-const osThreadAttr_t VisionMsgTask_attributes = {
-    .name       = "VisionMsgTask",
+/* Definitions for TbotsProto_VisionTask */
+osThreadId_t TbotsProto_VisionTaskHandle;
+const osThreadAttr_t TbotsProto_VisionTask_attributes = {
+    .name       = "TbotsProto_VisionTask",
     .priority   = (osPriority_t)osPriorityHigh7,
     .stack_size = 1024 * 4};
 /* Definitions for PrimMsgTask */
@@ -138,12 +138,12 @@ void MX_FREERTOS_Init(void)
     /* creation of RobotStatusTask */
     RobotStatusTaskHandle =
         osThreadNew(io_proto_multicast_sender_task,
-                    (void *)tbots_robot_msg_sender_profile, &RobotStatusTask_attributes);
+                    (void *)robot_status_msg_sender_profile, &RobotStatusTask_attributes);
 
-    /* creation of VisionMsgTask */
-    VisionMsgTaskHandle =
+    /* creation of TbotsProto_VisionTask */
+    TbotsProto_VisionTaskHandle =
         osThreadNew(io_proto_multicast_listener_task, (void *)vision_msg_listener_profile,
-                    &VisionMsgTask_attributes);
+                    &TbotsProto_VisionTask_attributes);
 
     /* creation of PrimMsgTask */
     PrimMsgTaskHandle =
@@ -152,7 +152,7 @@ void MX_FREERTOS_Init(void)
 
     /* creation of testMsgUpdate */
     testMsgUpdateHandle =
-        osThreadNew(test_msg_update, (void *)tbots_robot_msg_sender_profile,
+        osThreadNew(test_msg_update, (void *)robot_status_msg_sender_profile,
                     &testMsgUpdate_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
@@ -204,7 +204,7 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
         // TODO enable SNTP sys_now is currently only time since reset
         // https://github.com/UBC-Thunderbots/Software/issues/1518
-        tbots_robot_msg.time_sent.epoch_timestamp_seconds = sys_now();
+        robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
@@ -226,15 +226,15 @@ void initIoNetworking()
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
-        &primitive_msg, PrimitiveMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &primitive_msg, TbotsProto_Primitive_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
-        &vision_msg, VisionMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &vision_msg, TbotsProto_Vision_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
-    tbots_robot_msg_sender_profile = io_proto_multicast_communication_profile_create(
-        "tbots_robot_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
-        &tbots_robot_msg, TbotsRobotMsg_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+    robot_status_msg_sender_profile = io_proto_multicast_communication_profile_create(
+        "robot_status_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
+        &robot_status_msg, TbotsProto_RobotStatus_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 }
 
 

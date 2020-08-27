@@ -13,8 +13,6 @@ class ShootOrChipPlay : public Play
 
     ShootOrChipPlay();
 
-    std::string getName() const override;
-
     bool isApplicable(const World &world) const override;
 
     bool invariantHolds(const World &world) const override;

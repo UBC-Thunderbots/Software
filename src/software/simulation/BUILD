@@ -5,11 +5,11 @@ cc_library(
     srcs = ["simulator_robot.cpp"],
     hdrs = ["simulator_robot.h"],
     deps = [
+        ":firmware_object_deleter",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//software/geom",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/primitive",
         "//software/simulation/physics:physics_ball",
         "//software/simulation/physics:physics_robot",
     ],
@@ -58,6 +58,7 @@ cc_library(
     srcs = ["simulator_robot_singleton.cpp"],
     hdrs = ["simulator_robot_singleton.h"],
     deps = [
+        ":firmware_object_deleter",
         ":simulator_robot",
         "//firmware/app/world:chicker",
         "//firmware/app/world:dribbler",
@@ -90,6 +91,7 @@ cc_library(
     srcs = ["simulator_ball_singleton.cpp"],
     hdrs = ["simulator_ball_singleton.h"],
     deps = [
+        ":firmware_object_deleter",
         ":simulator_ball",
         "//firmware/app/world:firmware_ball",
         "//software/logger",
@@ -104,8 +106,8 @@ cc_test(
         ":simulator_ball",
         ":simulator_ball_singleton",
         "//firmware/app/world:firmware_ball",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:point",
+        "//software/geom:vector",
         "//software/simulation/physics:physics_world",
         "//software/time:timestamp",
         "//software/world",
@@ -118,14 +120,14 @@ cc_library(
     srcs = ["simulator.cpp"],
     hdrs = ["simulator.h"],
     deps = [
+        ":firmware_object_deleter",
         ":simulator_ball",
         ":simulator_ball_singleton",
         ":simulator_robot",
         ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//software/primitive",
-        "//software/proto/message_translation:proto_creator_primitive_visitor",
+        "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/proto/message_translation:ssl_detection",
         "//software/proto/message_translation:ssl_geometry",
         "//software/proto/message_translation:ssl_wrapper",
@@ -139,6 +141,7 @@ cc_test(
     srcs = ["simulator_test.cpp"],
     deps = [
         ":simulator",
+        "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
@@ -160,6 +163,8 @@ cc_test(
     srcs = ["threaded_simulator_test.cpp"],
     deps = [
         ":threaded_simulator",
+        "//software/proto/message_translation:tbots_protobuf",
+        "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",
@@ -174,6 +179,7 @@ cc_library(
         ":threaded_simulator",
         "//shared/proto:tbots_cc_proto",
         "//software/logger",
+        "//software/networking:threaded_nanopb_primitive_set_multicast_listener",
         "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
         "//software/parameter:dynamic_parameters",
@@ -190,5 +196,20 @@ cc_binary(
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "@boost//:program_options",
+    ],
+)
+
+cc_library(
+    name = "firmware_object_deleter",
+    hdrs = ["firmware_object_deleter.h"],
+    deps = [
+        "//firmware/app/primitives:primitive_manager",
+        "//firmware/app/world:chicker",
+        "//firmware/app/world:dribbler",
+        "//firmware/app/world:firmware_robot",
+        "//firmware/app/world:firmware_world",
+        "//firmware/app/world:wheel",
+        "//firmware/shared:physics",
+        "//software/logger",
     ],
 )

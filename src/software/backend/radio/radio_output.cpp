@@ -5,15 +5,15 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
-RadioOutput::RadioOutput(unsigned int config,
-                         std::function<void(RobotStatus)> received_robot_status_callback)
+RadioOutput::RadioOutput(
+    unsigned int config,
+    std::function<void(RadioRobotStatus)> received_robot_status_callback)
     : annunciator(Annunciator(received_robot_status_callback)),
       dongle(MRFDongle(config, annunciator))
 {
 }
 
-void RadioOutput::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>> &primitives)
+void RadioOutput::sendPrimitives(const TbotsProto::PrimitiveSet &primitives)
 {
     dongle.send_drive_packet(primitives);
 }

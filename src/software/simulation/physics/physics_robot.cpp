@@ -58,20 +58,23 @@ PhysicsRobot::~PhysicsRobot()
     b2World* robot_body_world = robot_body->GetWorld();
     if (bodyExistsInWorld(robot_body, robot_body_world))
     {
+        for (b2Fixture* f = robot_body->GetFixtureList(); f != NULL; f = f->GetNext())
+        {
+            if (f->GetUserData() != NULL)
+            {
+                PhysicsObjectUserData* user_data =
+                    static_cast<PhysicsObjectUserData*>(f->GetUserData());
+                delete user_data;
+                f->SetUserData(NULL);
+            }
+        }
         robot_body_world->DestroyBody(robot_body);
     }
 }
 
-void PhysicsRobot::setupRobotBodyFixtures(const RobotState& robot_state,
-                                          double total_chicker_depth,
+void PhysicsRobot::setupRobotBodyFixtures(const RobotState&, double total_chicker_depth,
                                           const double mass_kg)
 {
-    b2FixtureDef robot_body_fixture_def;
-    robot_body_fixture_def.restitution = static_cast<float>(robot_body_restitution);
-    robot_body_fixture_def.friction    = static_cast<float>(robot_body_friction);
-    robot_body_fixture_def.userData =
-        new PhysicsObjectUserData({PhysicsObjectType::ROBOT_BODY, this});
-
     b2PolygonShape* main_body_shape =
         PhysicsRobotModel::getMainRobotBodyShape(total_chicker_depth);
     b2PolygonShape* front_left_body_shape =
@@ -85,17 +88,30 @@ void PhysicsRobot::setupRobotBodyFixtures(const RobotState& robot_state,
     {
         total_shape_area += polygonArea(*shape);
     }
-    robot_body_fixture_def.density = static_cast<float>(mass_kg / total_shape_area);
+    const float density = static_cast<float>(mass_kg / total_shape_area);
 
     for (const auto shape : body_shapes)
     {
-        robot_body_fixture_def.shape = shape;
-        robot_body->CreateFixture(&robot_body_fixture_def);
+        setupRobotBodyFixture(shape, density);
     }
+    delete main_body_shape;
+    delete front_left_body_shape;
+    delete front_right_body_shape;
 }
 
-void PhysicsRobot::setupDribblerFixture(const RobotState& robot_state,
-                                        double dribbler_depth)
+void PhysicsRobot::setupRobotBodyFixture(const b2PolygonShape* shape, const float density)
+{
+    b2FixtureDef robot_body_fixture_def;
+    robot_body_fixture_def.restitution = static_cast<float>(robot_body_restitution);
+    robot_body_fixture_def.friction    = static_cast<float>(robot_body_friction);
+    robot_body_fixture_def.userData =
+        new PhysicsObjectUserData({PhysicsObjectType::ROBOT_BODY, this});
+    robot_body_fixture_def.density = density;
+    robot_body_fixture_def.shape   = shape;
+    robot_body->CreateFixture(&robot_body_fixture_def);
+}
+
+void PhysicsRobot::setupDribblerFixture(const RobotState&, double dribbler_depth)
 {
     b2FixtureDef robot_dribbler_fixture_def;
     robot_dribbler_fixture_def.density = static_cast<float>(robot_dribbler_density);
@@ -124,10 +140,10 @@ void PhysicsRobot::setupDribblerFixture(const RobotState& robot_state,
     dribbler_shape->Set(dribbler_shape_vertices, num_vertices);
     robot_dribbler_fixture_def.shape = dribbler_shape;
     robot_body->CreateFixture(&robot_dribbler_fixture_def);
+    delete dribbler_shape;
 }
 
-void PhysicsRobot::setupChickerFixture(const RobotState& robot_state,
-                                       double total_chicker_depth,
+void PhysicsRobot::setupChickerFixture(const RobotState&, double total_chicker_depth,
                                        double chicker_thickness)
 {
     b2FixtureDef robot_chicker_fixture_def;
@@ -157,6 +173,7 @@ void PhysicsRobot::setupChickerFixture(const RobotState& robot_state,
     chicker_shape->Set(chicker_shape_vertices, num_vertices);
     robot_chicker_fixture_def.shape = chicker_shape;
     robot_body->CreateFixture(&robot_chicker_fixture_def);
+    delete chicker_shape;
 }
 
 RobotId PhysicsRobot::getRobotId() const
@@ -349,4 +366,32 @@ float PhysicsRobot::getMotorBrakeForce(float motor_speed) const
     // The scaling factor has been tuned to stop the robot in a reasonable
     // amount of time via the unit tests
     return -0.5f * robot_body->GetMass() * motor_speed;
+}
+
+void PhysicsRobot::setPosition(const Point& position)
+{
+    auto func = [=]() {
+        b2World* world = robot_body->GetWorld();
+        if (bodyExistsInWorld(robot_body, world))
+        {
+            robot_body->SetLinearVelocity(createVec2(Vector(0, 0)));
+            robot_body->SetAngularVelocity(0.0);
+            robot_body->SetTransform(createVec2(position), robot_body->GetAngle());
+        }
+    };
+
+    // We can't set the robot body's position immediately because we may be in the middle
+    // of a Box2D world update, so we defer calling this function until after a physics
+    // step
+    post_physics_step_functions.emplace(func);
+}
+
+void PhysicsRobot::runPostPhysicsStep()
+{
+    while (!post_physics_step_functions.empty())
+    {
+        auto post_physics_step_function = post_physics_step_functions.front();
+        post_physics_step_function();
+        post_physics_step_functions.pop();
+    }
 }

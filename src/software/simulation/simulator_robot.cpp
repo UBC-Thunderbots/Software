@@ -1,9 +1,8 @@
 #include "software/simulation/simulator_robot.h"
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
+#include "software/geom/algorithms/acute_angle.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/util/acute_angle.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),
@@ -31,8 +30,9 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
             });
     }
 
-    primitive_manager = std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>(
-        app_primitive_manager_create(), PrimitiveManagerDeleter());
+    primitive_manager =
+        std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter>(
+            app_primitive_manager_create(), FirmwarePrimitiveManagerDeleter());
 }
 
 void SimulatorRobot::checkValidAndExecuteVoid(
@@ -171,14 +171,15 @@ void SimulatorRobot::chip(float distance_m)
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         for (auto ball : this->balls_in_dribbler_area)
         {
-            // Mark the ball as "in flight" so collisions are turned off
-            // until it has travelled the desired chip distance.
-            ball->setInFlightForDistance(distance_m);
-
             // Assume the ball is chipped at a 45 degree angle
             // TODO: Use a robot-specific constant
             // https://github.com/UBC-Thunderbots/Software/issues/1179
             Angle chip_angle = Angle::fromDegrees(45);
+
+            // Mark the ball as "in flight" so collisions are turned off
+            // until it has travelled the desired chip distance.
+            ball->setInFlightForDistance(distance_m, chip_angle);
+
             // Use the formula for the Range of a parabolic projectile
             // Rearrange to solve for the initial velocity.
             // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
@@ -428,11 +429,10 @@ void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
 }
 
 void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                                       unsigned int primitive_index,
-                                       const primitive_params_t &params)
+                                       const TbotsProto_Primitive &primitive_msg)
 {
     app_primitive_manager_startNewPrimitive(primitive_manager.get(), firmware_world.get(),
-                                            primitive_index, &params);
+                                            primitive_msg);
 }
 
 void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world)

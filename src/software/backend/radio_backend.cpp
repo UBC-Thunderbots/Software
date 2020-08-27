@@ -5,8 +5,6 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string RadioBackend::name = "radio";
-
 RadioBackend::RadioBackend(
     std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config)
     : ssl_communication_config(ssl_communication_config),
@@ -18,9 +16,9 @@ RadioBackend::RadioBackend(
 {
 }
 
-void RadioBackend::onValueReceived(ConstPrimitiveVectorPtr primitives_ptr)
+void RadioBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
-    radio_output.sendPrimitives(*primitives_ptr);
+    radio_output.sendPrimitives(primitives);
 }
 
 void RadioBackend::onValueReceived(World world)
@@ -29,9 +27,9 @@ void RadioBackend::onValueReceived(World world)
     radio_output.sendVisionPacket(world.friendlyTeam(), world.ball());
 }
 
-void RadioBackend::receiveRobotStatus(RobotStatus robot_status)
+void RadioBackend::receiveRobotStatus(RadioRobotStatus robot_status)
 {
-    Backend::receiveTbotsRobotMsg(*convertRobotStatusToTbotsRobotMsg(robot_status));
+    Backend::receiveRobotStatus(*convertRobotStatusToRobotStatusProto(robot_status));
 }
 
 // Register this play in the genericFactory

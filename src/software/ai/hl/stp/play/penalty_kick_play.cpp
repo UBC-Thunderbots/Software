@@ -6,14 +6,6 @@
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-
-const std::string PenaltyKickPlay::name = "Penalty Kick Play";
-
-std::string PenaltyKickPlay::getName() const
-{
-    return PenaltyKickPlay::name;
-}
-
 bool PenaltyKickPlay::isApplicable(const World &world) const
 {
     return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&

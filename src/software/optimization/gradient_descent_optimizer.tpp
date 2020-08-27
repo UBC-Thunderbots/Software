@@ -1,6 +1,4 @@
 /**
- * This file contains the declaration for the GradientDescentOptimizer
- *
  * NOTE: We do not use `using namespace ...` here, because this is still a header file,
  *       and as such anything that includes `gradient_descent.h` (which includes this
  *       file), would get any namespaces we use here

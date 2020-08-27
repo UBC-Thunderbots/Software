@@ -263,6 +263,6 @@ void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
  *
  * @return final_speed The final speed at the end of the segment.
  */
-float app_trajectory_planner_impl_modifySpeedToMatchDuration(float initial_speed,
-                                                             float duration,
-                                                             float displacement);
+float app_trajectory_planner_impl_calculateSpeedToMatchDuration(float initial_speed,
+                                                                float duration,
+                                                                float displacement);
