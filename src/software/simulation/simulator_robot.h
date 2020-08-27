@@ -280,8 +280,8 @@ class SimulatorRobot
         PhysicsBall* ball;
         // We keep track of whether or not the ball can be kicked.
         // This extra information is used to prevent edge cases like
-        // the ball getting kicked multiple times.
-        bool can_be_kicked;
+        // the ball getting kicked/chipped multiple times.
+        bool can_be_chicked;
     } DribblerBall;
 
     std::vector<DribblerBall> balls_in_dribbler_area;

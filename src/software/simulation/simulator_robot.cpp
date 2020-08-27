@@ -122,7 +122,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
         for (auto &dribbler_ball : this->balls_in_dribbler_area)
         {
-            if (!dribbler_ball.can_be_kicked)
+            if (!dribbler_ball.can_be_chicked)
             {
                 continue;
             }
@@ -169,7 +169,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
                 robot_orientation_vector.normalize(ball_head_on_momentum.length()));
             ball->applyImpulse(kick_impulse);
 
-            dribbler_ball.can_be_kicked = false;
+            dribbler_ball.can_be_chicked = false;
         }
     });
 }
@@ -179,7 +179,7 @@ void SimulatorRobot::chip(float distance_m)
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         for (auto &dribbler_ball : this->balls_in_dribbler_area)
         {
-            if (!dribbler_ball.can_be_kicked)
+            if (!dribbler_ball.can_be_chicked)
             {
                 continue;
             }
@@ -208,7 +208,7 @@ void SimulatorRobot::chip(float distance_m)
                 initial_velocity * static_cast<float>(chip_angle.cos());
             kick(ground_velocity);
 
-            dribbler_ball.can_be_kicked = false;
+            dribbler_ball.can_be_chicked = false;
         }
     });
 }
@@ -432,7 +432,7 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
     Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
     physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
 
-    auto ball = DribblerBall{.ball = physics_ball, .can_be_kicked = true};
+    auto ball = DribblerBall{.ball = physics_ball, .can_be_chicked = true};
 
     // Keep track of all balls in the dribbler
     balls_in_dribbler_area.emplace_back(ball);
