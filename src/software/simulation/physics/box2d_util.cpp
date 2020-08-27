@@ -1,5 +1,7 @@
 #include "software/simulation/physics/box2d_util.h"
+
 #include <vector>
+
 #include "software/geom/convex_polygon.h"
 
 bool bodyExistsInWorld(b2Body* body, b2World* world)
