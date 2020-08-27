@@ -14,6 +14,8 @@
 class Pass
 {
    public:
+    Pass() = delete;
+
     /**
      * Create a pass with given parameters
      *

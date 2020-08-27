@@ -12,6 +12,7 @@
 class PathObjective
 {
    public:
+    PathObjective() = delete;
     PathObjective(const Point start, const Point end, const double current_speed,
                   const std::vector<ObstaclePtr> &obstacles, RobotId robot_id)
         : robot_id(robot_id),
