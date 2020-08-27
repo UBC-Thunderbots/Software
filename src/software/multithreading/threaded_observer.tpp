@@ -24,7 +24,6 @@ void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
 {
     do
     {
-        in_destructor_mutex.unlock();
         std::optional<T> new_val;
 
         new_val = this->getNextValue(IN_DESTRUCTOR_CHECK_PERIOD);
@@ -33,18 +32,14 @@ void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
         {
             onValueReceived(*new_val);
         }
-
-        in_destructor_mutex.lock();
-    } while (!in_destructor);
+    } while (!in_destructor.load());
 }
 
 
 template <typename T>
 ThreadedObserver<T>::~ThreadedObserver()
 {
-    in_destructor_mutex.lock();
     in_destructor = true;
-    in_destructor_mutex.unlock();
 
     // We must wait for the thread to stop, as if we destroy it while it's still
     // running we will segfault

@@ -326,7 +326,7 @@ class PassGenerator
     // This flag is used to indicate that we are in the destructor. We use this to
     // communicate with pass_generation_thread that it is
     // time to stop
-    std::atomic<bool> in_destructor;
+    std::atomic_bool in_destructor;
 
-    std::atomic<bool> pass_generator_running;
+    std::atomic_bool pass_generator_running;
 };

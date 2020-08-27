@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <boost/bind.hpp>
 #include <thread>
 
@@ -59,8 +60,7 @@ class ThreadedObserver : public Observer<T>
     virtual std::optional<T> getNextValue(const Duration& max_wait_time);
 
     // This indicates if the destructor of this class has been called
-    std::mutex in_destructor_mutex;
-    bool in_destructor;
+    std::atomic_bool in_destructor;
 
     // The period for checking whether or not the destructor for this class has
     // been called
