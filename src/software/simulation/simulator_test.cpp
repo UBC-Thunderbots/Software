@@ -445,20 +445,10 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positive
     };
     simulator.addBlueRobots(states);
 
-    std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-        1, Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> primitives;
-    primitives.emplace_back(std::move(move_primitive));
-    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-        std::move(primitives));
-    for (const auto& primitive_ptr : *primitives_ptr)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
-    }
+    simulator.setBlueRobotPrimitive(
+            1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+                    Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+                    AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 240; i++)
     {
@@ -496,20 +486,10 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_negati
     };
     simulator.addYellowRobots(states);
 
-    std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-        1, Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> primitives;
-    primitives.emplace_back(std::move(move_primitive));
-    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-        std::move(primitives));
-    for (const auto& primitive_ptr : *primitives_ptr)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
-    }
+    simulator.setYellowRobotPrimitive(
+            1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+                    Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+                    AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -546,20 +526,10 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_positi
     };
     simulator.addYellowRobots(states);
 
-    std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-        1, Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> primitives;
-    primitives.emplace_back(std::move(move_primitive));
-    auto primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-        std::move(primitives));
-    for (const auto& primitive_ptr : *primitives_ptr)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
-    }
+    simulator.setYellowRobotPrimitive(
+            1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+                    Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+                    AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 240; i++)
     {
