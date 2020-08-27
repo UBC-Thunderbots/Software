@@ -356,7 +356,7 @@ TEST(NonDeterministicPassGeneratorTest, test_start_stop)
     // pass generator is stopped, so best pass should not change
     auto [converged_pass_1, score_1] = pass_generator->getBestPassSoFar();
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     auto [converged_pass_2, score_2] = pass_generator->getBestPassSoFar();
     EXPECT_EQ(converged_pass_1.receiverPoint(), converged_pass_2.receiverPoint());
     EXPECT_EQ(score_1, score_2);
@@ -365,7 +365,7 @@ TEST(NonDeterministicPassGeneratorTest, test_start_stop)
     pass_generator->start();
     auto [converged_pass_3, score_3] = pass_generator->getBestPassSoFar();
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     auto [converged_pass_4, score_4] = pass_generator->getBestPassSoFar();
     EXPECT_NE(converged_pass_3.receiverPoint(), converged_pass_4.receiverPoint());
     EXPECT_NE(score_3, score_4);
@@ -373,10 +373,10 @@ TEST(NonDeterministicPassGeneratorTest, test_start_stop)
     // pass generator is stopped, so best pass should not change
     pass_generator->stop();
     // give pass generator a chance to stop
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     auto [converged_pass_5, score_5] = pass_generator->getBestPassSoFar();
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     auto [converged_pass_6, score_6] = pass_generator->getBestPassSoFar();
 
