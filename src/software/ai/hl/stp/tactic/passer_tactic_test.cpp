@@ -8,8 +8,9 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
 
-TEST(PasserTacticTest,
-     passer_already_at_pass_start_position_but_oriented_incorrectly_pass_not_yet_started_with_stationary_ball)
+TEST(
+    PasserTacticTest,
+    passer_already_at_pass_start_position_but_oriented_incorrectly_pass_not_yet_started_with_stationary_ball)
 {
     // Robot is sitting at origin facing towards enemy goal
     Robot robot = Robot(13, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -24,15 +25,15 @@ TEST(PasserTacticTest,
     tactic.updateRobot(robot);
 
     // Line up behind the ball
-    auto move_action =
-            std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
     ASSERT_TRUE(move_action);
     EXPECT_TRUE(move_action->getRobot().has_value());
     EXPECT_EQ(13, move_action->getRobot()->id());
 }
 
-TEST(PasserTacticTest,
-     passer_oriented_correctly_but_not_at_pass_start_position_pass_not_yet_started_with_stationary_ball)
+TEST(
+    PasserTacticTest,
+    passer_oriented_correctly_but_not_at_pass_start_position_pass_not_yet_started_with_stationary_ball)
 {
     // Robot is sitting at {1,2} facing towards -y
     Robot robot = Robot(13, Point(1, 2), Vector(), Angle::fromDegrees(-90),
@@ -47,8 +48,7 @@ TEST(PasserTacticTest,
     tactic.updateRobot(robot);
 
     // Line up behind the ball
-    auto move_action =
-            std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
     ASSERT_TRUE(move_action);
     EXPECT_TRUE(move_action->getRobot().has_value());
     EXPECT_EQ(13, move_action->getRobot()->id());
@@ -72,14 +72,14 @@ TEST(
     tactic.updateRobot(robot);
 
     // Line up behind the ball
-    auto move_action =
-            std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
     ASSERT_TRUE(move_action);
     EXPECT_TRUE(move_action->getRobot().has_value());
     EXPECT_EQ(13, move_action->getRobot()->id());
 }
 
-TEST(PasserTacticTest, passer_in_position_to_kick_pass_not_yet_started_with_stationary_ball)
+TEST(PasserTacticTest,
+     passer_in_position_to_kick_pass_not_yet_started_with_stationary_ball)
 {
     // Robot is sitting just behind where we want to pass from, in the perfect
     // position to just move forward a bit and take the kick
@@ -154,9 +154,8 @@ TEST(PasserTacticTest, kick_pass_started_with_moving_ball)
 {
     // Robot is sitting just behind where we want to pass from, in the perfect
     // position to take the kick
-    Robot robot = Robot(13, Point(0, 0), Vector(),
-                        Angle::fromDegrees(-90), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(1));
+    Robot robot = Robot(13, Point(0, 0), Vector(), Angle::fromDegrees(-90),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(1));
 
     // Ball not moving initially
     Ball ball({0, 0.5}, {-2, 0}, Timestamp::fromSeconds(1));
@@ -170,7 +169,7 @@ TEST(PasserTacticTest, kick_pass_started_with_moving_ball)
 
     // Initially try intercept the ball to make sure we have control
     auto intercept_action =
-            std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
+        std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
     ASSERT_TRUE(intercept_action);
     EXPECT_TRUE(intercept_action->getRobot().has_value());
     EXPECT_EQ(13, intercept_action->getRobot()->id());
@@ -180,9 +179,8 @@ TEST(PasserTacticTest, kick_pass_not_yet_started_with_moving_ball)
 {
     // Robot is sitting just behind where we want to pass from, in the perfect
     // position to take the kick
-    Robot robot = Robot(13, Point(0, 0), Vector(),
-                        Angle::fromDegrees(-90), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(1));
+    Robot robot = Robot(13, Point(0, 0), Vector(), Angle::fromDegrees(-90),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(1));
 
     // Ball not moving initially
     Ball ball({0, 0.5}, {-2, 0}, Timestamp::fromSeconds(1));
@@ -196,7 +194,7 @@ TEST(PasserTacticTest, kick_pass_not_yet_started_with_moving_ball)
 
     // Initially try intercept the ball to make sure we have control
     auto intercept_action =
-            std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
+        std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
     ASSERT_TRUE(intercept_action);
     EXPECT_TRUE(intercept_action->getRobot().has_value());
     EXPECT_EQ(13, intercept_action->getRobot()->id());
