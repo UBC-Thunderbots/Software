@@ -1,7 +1,7 @@
 #include "software/simulated_tests/validation_functions/touch_ball_in_enemy_defense_validation.h"
 
-#include "software/new_geom/util/contains.h"
-#include "software/new_geom/util/intersects.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersects.h"
 
 void robotTouchedBallInEnemyDefense(std::shared_ptr<World> world_ptr,
                                     ValidationCoroutine::push_type &yield)

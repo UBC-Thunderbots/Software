@@ -1,6 +1,6 @@
 #include "software/simulated_tests/validation_functions/ball_out_of_bounds_validation.h"
 
-#include "software/new_geom/util/contains.h"
+#include "software/geom/algorithms/contains.h"
 
 void ballOutOfBounds(std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield)

@@ -1,6 +1,6 @@
-#include "software/new_geom/line.h"
-#include "software/new_geom/util/intersects.h"
-#include "software/new_geom/util/projection.h"
+#include "software/geom/line.h"
+#include "software/geom/algorithms/intersects.h"
+#include "software/geom/algorithms/projection.h"
 #include "software/simulated_tests/validation_functions/touch_ball_in_enemy_defense_validation.h"
 
 void robotCollidedTooFast(std::shared_ptr<World> world_ptr,

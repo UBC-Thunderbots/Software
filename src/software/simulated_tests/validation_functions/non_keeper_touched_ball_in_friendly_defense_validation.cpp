@@ -1,5 +1,5 @@
-#include "software/new_geom/util/contains.h"
-#include "software/new_geom/util/intersects.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/simulated_tests/validation_functions/touch_ball_in_enemy_defense_validation.h"
 
 void nonKeeperTouchedBallInFriendlyDefense(std::shared_ptr<World> world_ptr,
