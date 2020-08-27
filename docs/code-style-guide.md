@@ -218,14 +218,16 @@ If you think some ASCII art will help explain something better, go for it! [asci
     ```
     Example 2: visitor functions
     ```cpp
+    // The javadoc comment for all methods here can be read as:
     /**
-     * Serializes the given Primitive into a radio packet
+     * Visits an instance of X to perform an operation
      *
-     * @param The Primitive to serialize
+     * @param tactic The tactic to visit
      */
-    void visit(const CatchPrimitive &catch_primitive) override;
-    void visit(const ChipPrimitive &chip_primitive) override;
-    void visit(const DirectVelocityPrimitive &direct_velocity_primitive) override;
+
+    virtual void visit(CherryPickTactic &tactic)         = 0;
+    virtual void visit(ShadowFreekickerTactic &tactic)   = 0;
+    virtual void visit(GoalieTactic &tactic)             = 0;
     etc...
     ```
 

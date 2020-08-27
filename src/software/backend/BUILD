@@ -7,7 +7,6 @@ cc_library(
     deps = [
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
-        "//software/primitive",
         "//software/proto:sensor_msg_cc_proto",
         "//software/world",
     ],

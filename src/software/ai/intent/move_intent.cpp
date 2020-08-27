@@ -1,7 +1,5 @@
 #include "software/ai/intent/move_intent.h"
 
-const std::string MoveIntent::INTENT_NAME = "Move Intent";
-
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &destination,
                        const Angle &final_angle, double final_speed,
                        unsigned int priority, DribblerEnable enable_dribbler,
@@ -13,11 +11,6 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &destination,
       move_type(move_type),
       autokick(autokick)
 {
-}
-
-std::string MoveIntent::getIntentName(void) const
-{
-    return INTENT_NAME;
 }
 
 void MoveIntent::accept(IntentVisitor &visitor) const
