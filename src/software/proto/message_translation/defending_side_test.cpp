@@ -2,14 +2,14 @@
 
 #include <gtest/gtest.h>
 
-TEST(TeamSideMsgTest, create_msg_with_true_value)
+TEST(TeamSideMsgTest, defending_positive_side)
 {
-    auto defending_side_msg = createDefendingSide(true);
-    EXPECT_TRUE(defending_side_msg->defending_positive_side());
+    auto defending_side_msg = createDefendingSide(FieldSide::POS_X);
+    EXPECT_EQ(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X, defending_side_msg->defending_side());
 }
 
-TEST(TeamSideMsgTest, create_msg_with_false_value)
+TEST(TeamSideMsgTest, defending_negative_side)
 {
-    auto defending_side_msg = createDefendingSide(false);
-    EXPECT_FALSE(defending_side_msg->defending_positive_side());
+    auto defending_side_msg = createDefendingSide(FieldSide::NEG_X);
+    EXPECT_EQ(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X, defending_side_msg->defending_side());
 }

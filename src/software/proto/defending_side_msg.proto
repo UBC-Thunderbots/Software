@@ -2,5 +2,9 @@ syntax = "proto3";
 
 message DefendingSideProto
 {
-    bool defending_positive_side = 1;
+    enum FieldSide {
+        POS_X = 0;
+        NEG_X = 1;
+    }
+    FieldSide defending_side = 1;
 }

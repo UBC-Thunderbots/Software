@@ -164,6 +164,7 @@ cc_library(
     hdrs = ["defending_side.h"],
     deps = [
         "//software/proto:defending_side_msg_cc_proto",
+        "//software/world:field",
     ],
 )
 

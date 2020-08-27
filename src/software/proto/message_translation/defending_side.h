@@ -3,13 +3,13 @@
 #include <memory>
 
 #include "software/proto/defending_side_msg.pb.h"
+#include "software/world/field.h"
 
 /**
  * Creates a DefendingSideProto from the given data
  *
- * @param defending_positive_side Whether or not this team is defending the
- * positive side of the field
+ * @param defending_side The side of the field the team is defending
  *
- * @return A TeamSideMsg containing the given data
+ * @return A DefendingSideProto containing the given data
  */
-std::unique_ptr<DefendingSideProto> createDefendingSide(bool defending_positive_side);
+std::unique_ptr<DefendingSideProto> createDefendingSide(const FieldSide& defending_side);
