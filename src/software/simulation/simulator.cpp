@@ -131,7 +131,8 @@ void Simulator::setRobotPrimitive(
 
 void Simulator::setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto)
 {
-    switch(defending_side_proto.defending_side()) {
+    switch (defending_side_proto.defending_side())
+    {
         case DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X:
             yellow_team_defending_side = FieldSide::NEG_X;
             break;
@@ -139,13 +140,15 @@ void Simulator::setYellowTeamDefendingSide(const DefendingSideProto& defending_s
             yellow_team_defending_side = FieldSide::POS_X;
             break;
         default:
-            throw std::invalid_argument("Unhandled value of DefendingSideProto_FieldSide");
+            throw std::invalid_argument(
+                "Unhandled value of DefendingSideProto_FieldSide");
     }
 }
 
 void Simulator::setBlueTeamDefendingSide(const DefendingSideProto& defending_side_proto)
 {
-    switch(defending_side_proto.defending_side()) {
+    switch (defending_side_proto.defending_side())
+    {
         case DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X:
             blue_team_defending_side = FieldSide::NEG_X;
             break;
@@ -153,7 +156,8 @@ void Simulator::setBlueTeamDefendingSide(const DefendingSideProto& defending_sid
             blue_team_defending_side = FieldSide::POS_X;
             break;
         default:
-            throw std::invalid_argument("Unhandled value of DefendingSideProto_FieldSide");
+            throw std::invalid_argument(
+                "Unhandled value of DefendingSideProto_FieldSide");
     }
 }
 

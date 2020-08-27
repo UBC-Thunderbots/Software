@@ -395,7 +395,8 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_negative
     Simulator simulator(Field::createSSLDivisionBField());
 
     auto defending_side = DefendingSideProto();
-    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
     simulator.setBlueTeamDefendingSide(defending_side);
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -435,7 +436,8 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positive
     Simulator simulator(Field::createSSLDivisionBField());
 
     auto defending_side = DefendingSideProto();
-    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
     simulator.setBlueTeamDefendingSide(defending_side);
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -446,9 +448,9 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positive
     simulator.addBlueRobots(states);
 
     simulator.setBlueRobotPrimitive(
-            1, createNanoPbPrimitive(*createLegacyMovePrimitive(
-                    Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-                    AutochickType::NONE)));
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 240; i++)
     {
@@ -476,7 +478,8 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_negati
     Simulator simulator(Field::createSSLDivisionBField());
 
     auto defending_side = DefendingSideProto();
-    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
     simulator.setYellowTeamDefendingSide(defending_side);
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -487,9 +490,9 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_negati
     simulator.addYellowRobots(states);
 
     simulator.setYellowRobotPrimitive(
-            1, createNanoPbPrimitive(*createLegacyMovePrimitive(
-                    Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-                    AutochickType::NONE)));
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -516,7 +519,8 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_positi
     Simulator simulator(Field::createSSLDivisionBField());
 
     auto defending_side = DefendingSideProto();
-    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
     simulator.setYellowTeamDefendingSide(defending_side);
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -527,9 +531,9 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_positi
     simulator.addYellowRobots(states);
 
     simulator.setYellowRobotPrimitive(
-            1, createNanoPbPrimitive(*createLegacyMovePrimitive(
-                    Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-                    AutochickType::NONE)));
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 240; i++)
     {
