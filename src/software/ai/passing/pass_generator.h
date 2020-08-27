@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <mutex>
 #include <random>
 #include <thread>
@@ -121,10 +122,19 @@ class PassGenerator
     PassWithRating getBestPassSoFar();
 
     /**
+     * Start the pass generator
+     */
+    void start();
+
+    /**
+     * Stop the pass generator
+     */
+    void stop();
+
+    /**
      * Destructs this PassGenerator
      */
     ~PassGenerator();
-
 
    private:
     // The number of parameters (representing a pass) that we optimize
@@ -310,14 +320,13 @@ class PassGenerator
     // What type of pass we're trying to generate
     PassType pass_type;
 
-    // The mutex for the in_destructor flag
-    std::mutex in_destructor_mutex;
-
     // mutex to protect fields in the pass generator
     std::mutex pass_generator_mutex;
 
     // This flag is used to indicate that we are in the destructor. We use this to
     // communicate with pass_generation_thread that it is
     // time to stop
-    bool in_destructor;
+    std::atomic<bool> in_destructor;
+
+    std::atomic<bool> pass_generator_running;
 };

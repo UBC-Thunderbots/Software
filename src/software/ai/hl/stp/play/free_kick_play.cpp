@@ -87,6 +87,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
+    pass_generator.start();
     pass_generator.setTargetRegion(world.field().enemyHalf());
 
     // Wait for a robot to be assigned to aligned to the ball to pass
@@ -153,6 +154,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
         chipAtGoalStage(yield, crease_defender_tactics, goalie_tactic, world);
     }
 
+    pass_generator.stop();
 
     LOG(DEBUG) << "Finished";
 }
@@ -209,9 +211,6 @@ void FreeKickPlay::performPassStage(
 
     LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
-
-    // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
-    //                    to save CPU cycles
 
     // Perform the pass and wait until the receiver is finished
     auto passer =

@@ -92,6 +92,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // of the field
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
+    pass_generator.start();
     pass_generator.setTargetRegion(world.field().enemyHalf());
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
@@ -152,9 +153,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                              1.0 - abs_min_pass_score);
         }
     } while (!ready_to_pass || shoot_tactic->hasShotAvailable());
-
-    // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
-    //                    to save CPU cycles
+    pass_generator.stop();
 
     // If the shoot tactic has not finished, then we need to pass, otherwise we are
     // done this play

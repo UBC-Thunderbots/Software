@@ -21,7 +21,8 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
       // no special meaning.
       random_num_gen(13),
       pass_type(pass_type),
-      in_destructor(false)
+      in_destructor(false),
+      pass_generator_running(false)
 {
     std::scoped_lock(pass_generator_mutex);
 
@@ -88,11 +89,8 @@ void PassGenerator::setTargetRegion(std::optional<Rectangle> area)
 
 PassGenerator::~PassGenerator()
 {
-    // Set this flag so pass_generation_thread knows to end (also making sure to
-    // properly take and give ownership of the flag)
-    in_destructor_mutex.lock();
+    // Set this flag so pass_generation_thread knows to end
     in_destructor = true;
-    in_destructor_mutex.unlock();
 
     // Join to pass_generation_thread so that we wait for it to exit before destructing
     // the thread object. If we do not wait for thread to finish executing, it will
@@ -106,24 +104,16 @@ PassGenerator::~PassGenerator()
 
 void PassGenerator::continuouslyGeneratePasses()
 {
-    // Take ownership of the in_destructor flag so we can use it for the conditional
-    // check
-    in_destructor_mutex.lock();
-    while (!in_destructor)
+    while (!in_destructor.load())
     {
-        // Give up ownership of the in_destructor flag now that we're done the
-        // conditional check
-        in_destructor_mutex.unlock();
-
-        updateAndOptimizeAndPrunePasses();
+        if (pass_generator_running.load())
+        {
+            updateAndOptimizeAndPrunePasses();
+        }
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
         std::this_thread::yield();
-
-        // Take ownership of the `in_destructor` flag so we can use it for the conditional
-        // check
-        in_destructor_mutex.lock();
     }
 }
 
@@ -388,4 +378,14 @@ Pass PassGenerator::convertArrayToPass(
 
     return Pass(passer_point, Point(array.at(0), array.at(1)), array.at(2),
                 Timestamp::fromSeconds(time_offset_seconds));
+}
+
+void PassGenerator::start()
+{
+    pass_generator_running = true;
+}
+
+void PassGenerator::stop()
+{
+    pass_generator_running = false;
 }
