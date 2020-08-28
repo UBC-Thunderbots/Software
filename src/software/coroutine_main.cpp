@@ -221,24 +221,22 @@ void variablesOnStackWithMoveVector() {
     std::vector<NoMemberObject> nmo_vector;
     nmo_vector.push_back(std::move(NoMemberObject(print_data_func, data)));
 
-    // Breaks things really bad. Either triggers std::bad_function_call,
-    // or seems to mess up the program so badly it stops printing anything
-//        fmo_vector.at(0).execute();
-//        dmo_vector.at(0).execute();
+//    fmo_vector.at(0).execute();
+//    dmo_vector.at(0).execute();
     nmo_vector.at(0).execute();
 
     *data = -3;
-//
+
 //    fmo_vector.at(0).execute();
-//        dmo_vector.at(0).execute();
+//    dmo_vector.at(0).execute();
     nmo_vector.at(0).execute();
 
     // Output
-    // std::bad_function_call
-    // garbage / default-constructed data
-    // 8
-    // std::bad_function_call
-    // garbage / default-constructed data
+    // std::bad_function_call / stops all printouts
+    // 0 (seems to be default-constructed data)
+    // 99
+    // std::bad_function_call / stops all printouts
+    // 0 (seems to be default-constructed data)
     // -3
 
     // Why does this not work for the DataMemberObject when it works
@@ -431,6 +429,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
-
-
