@@ -43,7 +43,7 @@ void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
     }
     else
     {
-        defending_side_output->sendProto(*createDefendingSide(false));
+        defending_side_output->sendProto(*createDefendingSide(FieldSide::NEG_X));
     }
 }
 
