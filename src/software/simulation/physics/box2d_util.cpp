@@ -56,7 +56,6 @@ float polygonArea(const b2PolygonShape& polygon)
     {
         vertices.emplace_back(Point(polygon.m_vertices[i].x, polygon.m_vertices[i].y));
     }
-    ConvexPolygon convex_polygon(vertices);
 
-    return static_cast<float>(convex_polygon.area());
+    return static_cast<float>(ConvexPolygon(vertices).area());
 }

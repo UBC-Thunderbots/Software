@@ -17,6 +17,7 @@
 class Navigator : public IntentVisitor
 {
    public:
+    Navigator() = delete;
     /**
      * Create a Navigator
      * @param path_manager The path manager that will be used for path creation for all

@@ -207,7 +207,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
+    Shot shot{world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
     auto result = calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -220,8 +220,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
-                 Angle::fromDegrees(45)};
+    Shot shot{world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
     auto result = calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -234,7 +233,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_fully_blocked_net)
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
+    Shot shot{world.field().enemyGoalCenter(), Angle::zero()};
 
     auto result = calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -247,7 +246,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
+    Shot shot{world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
     auto result = calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -260,8 +259,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
-                 Angle::fromDegrees(45)};
+    Shot shot{world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
     auto result = calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -274,7 +272,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_fully_blocked_net)
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().enemyGoalCenter() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
+    Shot shot{world.field().enemyGoalCenter(), Angle::zero()};
 
     auto result = calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
