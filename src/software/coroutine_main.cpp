@@ -32,8 +32,10 @@ class FunctionMemberObject
         func(data, yield);
     }
 
-    // Member variables are stored in the same memory (stack or heap) as
-    // the allocated instance of this class. This is OUTSIDE the "coroutine stack"
+    // The TestFunction is stored in the same memory (stack or heap) as the allocated
+    // instance of this class. The coroutine accesses this member variable directly
+    // from "inside" the coroutine. On the other hand, the shared_ptr to the data
+    // is passed into the coroutine right at the start.
     VoidCoroutine::pull_type coroutine_sequence;
     TestFunction func;
 };
@@ -64,8 +66,10 @@ class DataMemberObject
         func(data, yield);
     }
 
-    // Member variables are stored in the same memory (stack or heap) as
-    // the allocated instance of this class. This is OUTSIDE the "coroutine stack"
+    // The shared_ptr to the data is stored in the same memory (stack or heap) as the allocated
+    // instance of this class. The coroutine accesses this member variable directly
+    // from "inside" the coroutine. On the other hand, the TestFunction
+    // is passed into the coroutine right at the start.
     VoidCoroutine::pull_type coroutine_sequence;
     std::shared_ptr<int> data;
 };
@@ -96,6 +100,9 @@ class NoMemberObject
         func(data, yield);
     }
 
+    // This class passes the TestFunction and shared_ptr to the data into the
+    // coroutine right at the start, so they are not stored in the same memory
+    // as the allocated object.
     VoidCoroutine::pull_type coroutine_sequence;
 };
 
