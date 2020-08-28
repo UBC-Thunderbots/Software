@@ -236,13 +236,13 @@ int main(int argc, char **argv) {
 
         // Breaks things really bad. Either triggers std::bad_function_call,
         // or seems to mess up the program so badly it stops printing anything
-////    fmo_vector.at(0).execute();
+//        fmo_vector.at(0).execute();
 //        dmo_vector.at(0).execute();
 //        nmo_vector.at(0).execute();
-//
+
 //        *data = -3;
 //
-////    fmo_vector.at(0).execute();
+//    fmo_vector.at(0).execute();
 //        dmo_vector.at(0).execute();
 //        nmo_vector.at(0).execute();
 
@@ -289,42 +289,53 @@ int main(int argc, char **argv) {
         nmo_ptr_move->execute();
     }
 
-//    {
-//        std::cout << std::endl << std::endl;
-//        std::cout << "Test on the stack with moving vectors" << std::endl;
-//
-//        std::vector<FunctionMemberObject> fmo_vector;
-//        fmo_vector.push_back(std::move(FunctionMemberObject(print_data_func, data)));
-//        std::vector<DataMemberObject> dmo_vector;
-//        dmo_vector.push_back(std::move(DataMemberObject(print_data_func, data)));
-//        std::vector<NoMemberObject> nmo_vector;
-//        nmo_vector.push_back(std::move(NoMemberObject(print_data_func, data)));
-//
-//        // Breaks things really bad. Either triggers std::bad_function_call,
-//        // or seems to mess up the program so badly it stops printing anything
-////    fmo_vector.at(0).execute();
-//        dmo_vector.at(0).execute();
-//        nmo_vector.at(0).execute();
-//
-//        *data = -3;
-//
-////    fmo_vector.at(0).execute();
-//        dmo_vector.at(0).execute();
-//        nmo_vector.at(0).execute();
-//
-//        // Output
-//        // std::bad_function_call
-//        // garbage / default-constructed data
-//        // 8
-//        // std::bad_function_call
-//        // garbage / default-constructed data
-//        // -3
-//
-//        // Why does this not work for the DataMemberObject when it works
-//        // just moving variables??? In either case the variable should be
-//        // moved, so why is this different? The vector calling the
-//        // default constructor somewhere I'm not expecting?
-//    }
+    {
+        std::cout << std::endl << std::endl;
+        std::cout << "Test on the heap with moving vectors" << std::endl;
+
+        std::vector<std::unique_ptr<FunctionMemberObject>> fmo_vector;
+        fmo_vector.push_back(std::make_unique<FunctionMemberObject>(print_data_func, data));
+        std::vector<std::unique_ptr<DataMemberObject>> dmo_vector;
+        dmo_vector.push_back(std::make_unique<DataMemberObject>(print_data_func, data));
+        std::vector<std::unique_ptr<NoMemberObject>> nmo_vector;
+        nmo_vector.push_back(std::make_unique<NoMemberObject>(print_data_func, data));
+
+        fmo_vector.at(0)->execute();
+        dmo_vector.at(0)->execute();
+        nmo_vector.at(0)->execute();
+
+        *data = 1;
+
+        fmo_vector.at(0)->execute();
+        dmo_vector.at(0)->execute();
+        nmo_vector.at(0)->execute();
+    }
+
+    {
+        std::cout << std::endl << std::endl;
+        std::cout << "Test on the heap with moving vectors 2" << std::endl;
+
+        std::vector<std::unique_ptr<FunctionMemberObject>> fmo_vector;
+        auto fmo = std::make_unique<FunctionMemberObject>(print_data_func, data);
+        std::vector<std::unique_ptr<DataMemberObject>> dmo_vector;
+        auto dmo = std::make_unique<DataMemberObject>(print_data_func, data);
+        std::vector<std::unique_ptr<NoMemberObject>> nmo_vector;
+        auto nmo = std::make_unique<NoMemberObject>(print_data_func, data);
+
+        fmo->execute();
+        dmo->execute();
+        nmo->execute();
+
+        fmo_vector.push_back(std::move(fmo));
+        dmo_vector.push_back(std::move(dmo));
+        nmo_vector.push_back(std::move(nmo));
+
+        *data = 7;
+
+        fmo_vector.at(0)->execute();
+        dmo_vector.at(0)->execute();
+        nmo_vector.at(0)->execute();
+    }
 
     return 0;
 }
