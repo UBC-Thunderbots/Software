@@ -185,7 +185,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_ob
         TeamType::ENEMY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We should not be able to find a shot
-    EXPECT_EQ(result->getOpenAngle().toRadians(), 0);
+    EXPECT_FALSE(result);
 }
 
 TEST(CalcBestShotTest,
@@ -208,7 +208,7 @@ TEST(CalcBestShotTest,
         TeamType::FRIENDLY, ROBOT_MAX_RADIUS_METERS, {shooting_robot});
 
     // We should not be able to find a shot
-    EXPECT_EQ(result->getOpenAngle().toRadians(), 0);
+    EXPECT_FALSE(result);
 }
 
 TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
