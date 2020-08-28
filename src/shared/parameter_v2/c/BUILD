@@ -7,19 +7,33 @@ cc_library(
 genrule(
     name = "config_c_generate",
     outs = [
-        "tbots_c_config.h",
-        "tbots_c_config.c",
+        "config.h",
+        "config.c",
     ],
     cmd = "$(location //shared/parameter_v2/scripts:generate_dynamic_parameters)" +
-          " --output tbots_c_config -c " +
-          "&& mv tbots_c_config.h $(location tbots_c_config.h)" +
-          "&& mv tbots_c_config.c $(location tbots_c_config.c)",
+          " --output config -c " +
+          "&& mv config.h $(location config.h)" +
+          "&& mv config.c $(location config.c)",
     tools = ["//shared/parameter_v2/scripts:generate_dynamic_parameters"],
 )
 
 cc_library(
     name = "config",
-    srcs = ["tbots_c_config.c"],
-    hdrs = ["tbots_c_config.h"],
+    srcs = ["config.c"],
+    hdrs = ["config.h"],
     deps = [":parameter"],
+)
+
+cc_test(
+    name = "config_test",
+    srcs = ["config_test.cpp"],
+    data = ["//shared/parameter_v2/config:example_configs"],
+    deps = [
+        ":config",
+        ":parameter",
+        "//software/util/variant_visitor",
+        "@boost//:filesystem",
+        "@gtest//:gtest_main",
+        "@yaml-cpp",
+    ],
 )
