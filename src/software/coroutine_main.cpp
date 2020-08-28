@@ -1,55 +1,23 @@
+#include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 #include <functional>
-#include <boost/bind.hpp>
 #include <iostream>
 
 using VoidCoroutine = boost::coroutines2::coroutine<void>;
-using TestFunction =
-std::function<void(std::shared_ptr<int>, VoidCoroutine::push_type&)>;
+using TestFunction = std::function<void(std::shared_ptr<int>, VoidCoroutine::push_type&)>;
 
 class FunctionMemberObject
 {
-    public:
-        explicit FunctionMemberObject(TestFunction func,
-                                      std::shared_ptr<int> data) :
-                func(func),
-                coroutine_sequence(boost::bind(
-                        &FunctionMemberObject::executeWrapper, this, _1, data))
-        {
-        }
-
-        bool execute() {
-            if (coroutine_sequence)
-            {
-                coroutine_sequence();
-            }
-            return !static_cast<bool>(coroutine_sequence);
-        }
-
-        private:
-        void executeWrapper(VoidCoroutine::push_type& yield, std::shared_ptr<int> data) {
-            yield();
-            func(data, yield);
-        }
-
-        // Member variables are stored in the same memory (stack or heap) as
-        // the allocated instance of this class. This is OUTSIDE the "coroutine stack"
-        VoidCoroutine::pull_type coroutine_sequence;
-        TestFunction func;
-};
-
-class DataMemberObject
-{
-public:
-    explicit DataMemberObject(TestFunction func,
-                                  std::shared_ptr<int> data) :
-            data(data),
-            coroutine_sequence(boost::bind(
-                    &DataMemberObject::executeWrapper, this, _1, func))
+   public:
+    explicit FunctionMemberObject(TestFunction func, std::shared_ptr<int> data)
+        : func(func),
+          coroutine_sequence(
+              boost::bind(&FunctionMemberObject::executeWrapper, this, _1, data))
     {
     }
 
-    bool execute() {
+    bool execute()
+    {
         if (coroutine_sequence)
         {
             coroutine_sequence();
@@ -57,8 +25,41 @@ public:
         return !static_cast<bool>(coroutine_sequence);
     }
 
-private:
-    void executeWrapper(VoidCoroutine::push_type& yield, TestFunction func) {
+   private:
+    void executeWrapper(VoidCoroutine::push_type& yield, std::shared_ptr<int> data)
+    {
+        yield();
+        func(data, yield);
+    }
+
+    // Member variables are stored in the same memory (stack or heap) as
+    // the allocated instance of this class. This is OUTSIDE the "coroutine stack"
+    VoidCoroutine::pull_type coroutine_sequence;
+    TestFunction func;
+};
+
+class DataMemberObject
+{
+   public:
+    explicit DataMemberObject(TestFunction func, std::shared_ptr<int> data)
+        : data(data),
+          coroutine_sequence(
+              boost::bind(&DataMemberObject::executeWrapper, this, _1, func))
+    {
+    }
+
+    bool execute()
+    {
+        if (coroutine_sequence)
+        {
+            coroutine_sequence();
+        }
+        return !static_cast<bool>(coroutine_sequence);
+    }
+
+   private:
+    void executeWrapper(VoidCoroutine::push_type& yield, TestFunction func)
+    {
         yield();
         func(data, yield);
     }
@@ -71,16 +72,15 @@ private:
 
 class NoMemberObject
 {
-public:
-
-    explicit NoMemberObject(TestFunction validation_function,
-                                  std::shared_ptr<int> data) :
-            coroutine_sequence(boost::bind(
-                    &NoMemberObject::executeWrapper, this, _1, data, validation_function))
+   public:
+    explicit NoMemberObject(TestFunction validation_function, std::shared_ptr<int> data)
+        : coroutine_sequence(boost::bind(&NoMemberObject::executeWrapper, this, _1, data,
+                                         validation_function))
     {
     }
 
-    bool execute() {
+    bool execute()
+    {
         if (coroutine_sequence)
         {
             coroutine_sequence();
@@ -88,8 +88,10 @@ public:
         return !static_cast<bool>(coroutine_sequence);
     }
 
-private:
-    void executeWrapper(VoidCoroutine::push_type& yield, std::shared_ptr<int> data, TestFunction func) {
+   private:
+    void executeWrapper(VoidCoroutine::push_type& yield, std::shared_ptr<int> data,
+                        TestFunction func)
+    {
         yield();
         func(data, yield);
     }
@@ -98,17 +100,22 @@ private:
 };
 
 auto print_data_func = [](std::shared_ptr<int> data, VoidCoroutine::push_type& yield) {
-    while(true) {
-        if(data) {
+    while (true)
+    {
+        if (data)
+        {
             std::cout << *data << std::endl;
-        }else {
+        }
+        else
+        {
             std::cout << "null" << std::endl;
         }
         yield();
     }
 };
 
-void variablesOnStackNoMove() {
+void variablesOnStackNoMove()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test on the stack with no move" << std::endl;
 
@@ -137,7 +144,8 @@ void variablesOnStackNoMove() {
     // 5
 }
 
-void variablesOnHeapNoMove() {
+void variablesOnHeapNoMove()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test on the heap with no move" << std::endl;
 
@@ -166,7 +174,8 @@ void variablesOnHeapNoMove() {
     // 8
 }
 
-void variablesOnStackWithMove() {
+void variablesOnStackWithMove()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test on the stack with moving variables" << std::endl;
 
@@ -183,8 +192,8 @@ void variablesOnStackWithMove() {
     *data = -14;
 
     FunctionMemberObject fmo_test_move = std::move(fmo_test);
-    DataMemberObject dmo_test_move = std::move(dmo_test);
-    NoMemberObject nmo_test_move = std::move(nmo_test);
+    DataMemberObject dmo_test_move     = std::move(dmo_test);
+    NoMemberObject nmo_test_move       = std::move(nmo_test);
 
     fmo_test_move.execute();
     dmo_test_move.execute();
@@ -208,7 +217,8 @@ void variablesOnStackWithMove() {
     // -15
 }
 
-void variablesOnStackWithMoveVector() {
+void variablesOnStackWithMoveVector()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test on the stack with moving vectors" << std::endl;
 
@@ -221,14 +231,14 @@ void variablesOnStackWithMoveVector() {
     std::vector<NoMemberObject> nmo_vector;
     nmo_vector.push_back(std::move(NoMemberObject(print_data_func, data)));
 
-//    fmo_vector.at(0).execute();
-//    dmo_vector.at(0).execute();
+    //    fmo_vector.at(0).execute();
+    //    dmo_vector.at(0).execute();
     nmo_vector.at(0).execute();
 
     *data = -3;
 
-//    fmo_vector.at(0).execute();
-//    dmo_vector.at(0).execute();
+    //    fmo_vector.at(0).execute();
+    //    dmo_vector.at(0).execute();
     nmo_vector.at(0).execute();
 
     // Output
@@ -245,7 +255,8 @@ void variablesOnStackWithMoveVector() {
     // default constructor somewhere I'm not expecting?
 }
 
-void variablesOnHeapWithMove() {
+void variablesOnHeapWithMove()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test on the heap with moving variables" << std::endl;
 
@@ -287,7 +298,8 @@ void variablesOnHeapWithMove() {
     // 4
 }
 
-void variablesOnHeapWithMoveVectors() {
+void variablesOnHeapWithMoveVectors()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test on the heap with moving vectors" << std::endl;
 
@@ -319,7 +331,8 @@ void variablesOnHeapWithMoveVectors() {
     // 1
 }
 
-void variablesOnHeapWithMoveVectors2() {
+void variablesOnHeapWithMoveVectors2()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test on the heap with moving vectors 2" << std::endl;
 
@@ -355,7 +368,8 @@ void variablesOnHeapWithMoveVectors2() {
     // 7
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
     // ~~~~~~~~~~ Copy and Move semantics ~~~~~~~~~~
     // The copy-constructor is deleted for VoidCoroutine::pull_type, which
     // implicitly deletes it for all classes that use it. The copy constructors
@@ -374,24 +388,24 @@ int main(int argc, char **argv) {
     NoMemberObject nmo(print_data_func, data);
 
     // Won't compile
-//    FunctionMemberObject fmo_copy = fmo;
-//    DataMemberObject dmo_copy = dmo;
-//    NoMemberObject nmo_copy = nmo;
+    //    FunctionMemberObject fmo_copy = fmo;
+    //    DataMemberObject dmo_copy = dmo;
+    //    NoMemberObject nmo_copy = nmo;
 
     // OK
     FunctionMemberObject fmo_move = std::move(fmo);
-    DataMemberObject dmo_move = std::move(dmo);
-    NoMemberObject nmo_move = std::move(nmo);
+    DataMemberObject dmo_move     = std::move(dmo);
+    NoMemberObject nmo_move       = std::move(nmo);
 
 
     // ~~~~~~~~~~ Experiments and Examples ~~~~~~~~~~ //
-    variablesOnStackNoMove();               // OK
-    variablesOnHeapNoMove();                // OK
-    variablesOnStackWithMove();             // OK
-    variablesOnStackWithMoveVector();       // BAD
-    variablesOnHeapWithMove();              // OK
-    variablesOnHeapWithMoveVectors();       // OK
-    variablesOnHeapWithMoveVectors2();      // OK
+    variablesOnStackNoMove();           // OK
+    variablesOnHeapNoMove();            // OK
+    variablesOnStackWithMove();         // OK
+    variablesOnStackWithMoveVector();   // BAD
+    variablesOnHeapWithMove();          // OK
+    variablesOnHeapWithMoveVectors();   // OK
+    variablesOnHeapWithMoveVectors2();  // OK
 
     // ~~~~~~~~~~ Observations and Conclusions ~~~~~~~~~~ //
     /* - The "coroutine stack" seems to be able to read from and interact
