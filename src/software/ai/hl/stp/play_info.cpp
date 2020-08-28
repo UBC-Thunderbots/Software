@@ -1,10 +1,5 @@
 #include "software/ai/hl/stp/play_info.h"
 
-PlayInfo::PlayInfo()
-    : referee_command_name(""), play_name(""), robot_tactic_assignment({})
-{
-}
-
 PlayInfo::PlayInfo(std::string referee_command_name, std::string play_name,
                    std::unordered_set<std::string> robot_tactic_assignment)
     : referee_command_name(referee_command_name),

@@ -11,10 +11,7 @@
 class PlayInfo
 {
    public:
-    /**
-     * Constructs a PlayInfo object.
-     */
-    explicit PlayInfo();
+    PlayInfo() = delete;
 
     /**
      * Constructs a PlayInfo object with given arguments for fields
