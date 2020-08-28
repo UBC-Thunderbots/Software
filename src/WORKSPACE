@@ -41,12 +41,12 @@ load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()
 
-http_archive(
+new_git_repository(
     name = "eigen",
     build_file = "@//external:eigen.BUILD",
-    sha256 = "3a66f9bfce85aff39bc255d5a341f87336ec6f5911e8d816dd4a3fdc500f8acf",
-    strip_prefix = "eigen-eigen-c5e90d9e764e",
-    url = "https://bitbucket.org/eigen/eigen/get/c5e90d9.tar.gz",
+    commit = "21ae2afd4edaa1b69782c67a54182d34efe43f9c",
+    remote = "https://gitlab.com/libeigen/eigen.git",
+    shallow_since = "1544551075 +0100",
 )
 
 # nanopb: lightweight protobuf library used on the STM32. The build file in the
@@ -75,6 +75,7 @@ new_git_repository(
     build_file = "@//external:munkres_cpp.BUILD",
     commit = "61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
     remote = "https://github.com/saebyn/munkres-cpp.git",
+    shallow_since = "1479502661 -0800",
 )
 
 # yaml cpp parser for dynamic parameters test
@@ -90,6 +91,7 @@ git_repository(
     name = "bazel_rules_qt",
     commit = "3f949bf4b5dcae2941ba3b71b3ddeb5d39637907",
     remote = "https://github.com/justbuchanan/bazel_rules_qt.git",
+    shallow_since = "1549966854 -0800",
 )
 
 # Right now qt5 is installed on the system using the setup_software.sh script

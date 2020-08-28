@@ -9,7 +9,8 @@ extern "C"
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField(), 0.8, 0.2)
+      simulator(Field::createSSLDivisionBField(), 0.8, 0.2),
+      most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket())
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(
         [this](int) { this->initNetworking(); });
@@ -25,7 +26,9 @@ StandaloneSimulator::StandaloneSimulator(
     initNetworking();
 
     simulator.registerOnSSLWrapperPacketReadyCallback(
-        [this](SSL_WrapperPacket wrapper_packet) {
+        [this](SSLProto::SSL_WrapperPacket wrapper_packet) {
+            std::scoped_lock lock(this->most_recent_ssl_wrapper_packet_mutex);
+            this->most_recent_ssl_wrapper_packet = wrapper_packet;
             this->wrapper_packet_sender->sendProto(wrapper_packet);
         });
 
@@ -35,7 +38,7 @@ StandaloneSimulator::StandaloneSimulator(
 }
 
 void StandaloneSimulator::registerOnSSLWrapperPacketReadyCallback(
-    const std::function<void(SSL_WrapperPacket)>& callback)
+    const std::function<void(SSLProto::SSL_WrapperPacket)>& callback)
 {
     simulator.registerOnSSLWrapperPacketReadyCallback(callback);
 }
@@ -51,16 +54,16 @@ void StandaloneSimulator::initNetworking()
         std::string(MULTICAST_CHANNELS[blue_team_channel]) + "%" + network_interface;
 
     wrapper_packet_sender =
-        std::make_unique<ThreadedProtoMulticastSender<SSL_WrapperPacket>>(
+        std::make_unique<ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>>(
             standalone_simulator_config->VisionIPv4Address()->value(),
             static_cast<unsigned short>(
                 standalone_simulator_config->VisionPort()->value()));
     yellow_team_primitive_listener =
-        std::make_unique<ThreadedProtoMulticastListener<PrimitiveSetMsg>>(
+        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             yellow_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1));
     blue_team_primitive_listener =
-        std::make_unique<ThreadedProtoMulticastListener<PrimitiveSetMsg>>(
+        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
             blue_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
 }
@@ -112,40 +115,22 @@ void StandaloneSimulator::setupInitialSimulationState()
     simulator.addYellowRobots(yellow_robot_states);
 }
 
-void StandaloneSimulator::setYellowRobotPrimitives(PrimitiveSetMsg msg)
+SSLProto::SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
 {
-    for (const auto& primitive : msg.robot_primitives())
-    {
-        RobotId id                               = primitive.first;
-        auto [primitive_index, primitive_params] = decodePrimitiveMsg(primitive.second);
-        simulator.setYellowRobotPrimitive(id, primitive_index, primitive_params);
-    }
+    std::scoped_lock lock(most_recent_ssl_wrapper_packet_mutex);
+    return most_recent_ssl_wrapper_packet;
 }
 
-void StandaloneSimulator::setBlueRobotPrimitives(PrimitiveSetMsg msg)
+void StandaloneSimulator::setYellowRobotPrimitives(
+    TbotsProto_PrimitiveSet primitive_set_msg)
 {
-    for (const auto& primitive : msg.robot_primitives())
-    {
-        RobotId id                               = primitive.first;
-        auto [primitive_index, primitive_params] = decodePrimitiveMsg(primitive.second);
-        simulator.setBlueRobotPrimitive(id, primitive_index, primitive_params);
-    }
+    simulator.setYellowRobotPrimitiveSet(primitive_set_msg);
 }
 
-std::pair<unsigned int, primitive_params_t> StandaloneSimulator::decodePrimitiveMsg(
-    const PrimitiveMsg& msg)
+void StandaloneSimulator::setBlueRobotPrimitives(
+    TbotsProto_PrimitiveSet primitive_set_msg)
 {
-    auto primitive_index = static_cast<unsigned int>(msg.prim_type());
-
-    primitive_params_t params;
-    params.params[0] = static_cast<uint16_t>(msg.parameter1());
-    params.params[1] = static_cast<uint16_t>(msg.parameter2());
-    params.params[2] = static_cast<uint16_t>(msg.parameter3());
-    params.params[3] = static_cast<uint16_t>(msg.parameter4());
-    params.extra     = static_cast<uint8_t>(msg.extra_bits());
-    params.slow      = msg.slow();
-
-    return std::make_pair(primitive_index, params);
+    simulator.setBlueRobotPrimitiveSet(primitive_set_msg);
 }
 
 void StandaloneSimulator::startSimulation()
@@ -171,4 +156,24 @@ void StandaloneSimulator::resetSlowMotionMultiplier()
 void StandaloneSimulator::setBallState(const BallState& state)
 {
     simulator.setBallState(state);
+}
+
+std::weak_ptr<PhysicsRobot> StandaloneSimulator::getRobotAtPosition(const Point& position)
+{
+    return simulator.getRobotAtPosition(position);
+}
+
+void StandaloneSimulator::addYellowRobot(const Point& position)
+{
+    simulator.addYellowRobot(position);
+}
+
+void StandaloneSimulator::addBlueRobot(const Point& position)
+{
+    simulator.addBlueRobot(position);
+}
+
+void StandaloneSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
+    simulator.removeRobot(robot);
 }

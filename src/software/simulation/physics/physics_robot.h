@@ -4,12 +4,15 @@
 
 #include <functional>
 
-#include "software/new_geom/angle.h"
-#include "software/new_geom/angular_velocity.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
+#include "software/geom/angle.h"
+#include "software/geom/angular_velocity.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
+#include "software/multithreading/thread_safe_buffer.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/world/robot_state.h"
+
+class PhysicsWorld;
 
 /**
  * This class represent a Robot in a Box2D physics simulation. It provides a convenient
@@ -29,6 +32,8 @@ class PhysicsRobot
     // The thickness of the chicker fixture shape.
     static double const chicker_thickness;
     static double const total_chicker_depth;
+
+    friend class PhysicsWorld;
 
     /**
      * Creates a new PhysicsRobot given a Box2D world and a Robot object. A Box2D body
@@ -179,10 +184,29 @@ class PhysicsRobot
     void brakeMotorFrontLeft();
     void brakeMotorFrontRight();
 
+    /**
+     * Sets the position of the PhysicsRobot to the given position. The robot
+     * will maintain its orientation, but will have its linear and angular
+     * velocity set to zero.
+     *
+     * @param position The new position of the robot
+     */
+    void setPosition(const Point &position);
+
+   protected:
+    /**
+     * This functions runs any operations this PhysicsRobot wants to perform
+     * after a physics step has happened. We assume this function will be called
+     * by the PhysicsWorld at the correct time. This exists so that this class
+     * doesn't accidentally make a change to the Box2D world in the middle of
+     * a physics step, which causes the system to crash.
+     */
+    void runPostPhysicsStep();
+
    private:
     /**
      * Creates as many fixtures as necessary to represent the body shape of the given
-     * robot and them to this class' b2Body
+     * robot and add them to this class' b2Body
      *
      * @param robot_state The robot to create fixtures for
      * @param total_chicker_depth The distance from the front face of the robot to the
@@ -191,6 +215,15 @@ class PhysicsRobot
      */
     void setupRobotBodyFixtures(const RobotState &robot_state, double total_chicker_depth,
                                 double mass_kg);
+
+    /**
+     * Creates a robot body fixture with the given shape and density and adds it to this
+     * class' b2Body
+     *
+     * @param shape The shape to make the fixture with
+     * @param density The density of the shape
+     */
+    void setupRobotBodyFixture(const b2PolygonShape *shape, const float density);
 
     /**
      * Creates a fixture to represent the chicker of the robot. It is partially inset into
@@ -256,6 +289,8 @@ class PhysicsRobot
         dribbler_ball_end_contact_callbacks;
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
         chicker_ball_contact_callbacks;
+
+    std::queue<std::function<void()>> post_physics_step_functions;
 
     // This is a somewhat arbitrary value for damping. We keep it relatively low
     // so that robots still coast a ways before stopping, but non-zero so that robots

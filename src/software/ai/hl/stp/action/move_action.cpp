@@ -8,7 +8,7 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
       final_speed(0.0),
       enable_dribbler(DribblerEnable::OFF),
       move_type(MoveType::NORMAL),
-      autokick_type(AutokickType::NONE),
+      autokick_type(AutochickType::NONE),
       ball_collision_type(BallCollisionType::AVOID),
       close_to_dest_threshold(close_to_dest_threshold),
       close_to_orientation_threshold(close_to_orientation_threshold)
@@ -18,7 +18,7 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
 void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      Angle final_orientation, double final_speed,
                                      DribblerEnable enable_dribbler, MoveType move_type,
-                                     AutokickType autokick,
+                                     AutochickType autokick,
                                      BallCollisionType ball_collision_type)
 {
     this->robot               = robot;
@@ -46,7 +46,7 @@ double MoveAction::getFinalSpeed()
     return final_speed;
 }
 
-AutokickType MoveAction::getAutoKickType()
+AutochickType MoveAction::getAutochickType()
 {
     return autokick_type;
 }

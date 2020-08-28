@@ -3,7 +3,7 @@
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
-#include "software/new_geom/ray.h"
+#include "software/geom/ray.h"
 
 /**
  * This tactic is for a robot receiving a pass. It should be used in conjunction with
@@ -29,8 +29,6 @@ class ReceiverTactic : public Tactic
     explicit ReceiverTactic(const Field& field, const Team& friendly_team,
                             const Team& enemy_team, const Pass pass, const Ball& ball,
                             bool loop_forever);
-
-    std::string getName() const override;
 
     /**
      * Updates the world parameters for this ReceiverTactic.

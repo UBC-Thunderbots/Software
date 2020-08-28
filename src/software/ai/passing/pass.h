@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "software/new_geom/point.h"
+#include "software/geom/point.h"
 #include "software/time/timestamp.h"
 
 /**
@@ -14,6 +14,8 @@
 class Pass
 {
    public:
+    Pass() = delete;
+
     /**
      * Create a pass with given parameters
      *

@@ -62,7 +62,7 @@ The vast majority of the things noted in this document will apply to `C` code as
 
 * Functions that take no arguments must be declared as `foo(void)` **not** `foo()`, as the second option allows `foo` to take anything as it's arguments ([reference](https://softwareengineering.stackexchange.com/questions/286490/what-is-the-difference-between-function-and-functionvoid/286494))
 
-* Functions that return values via argument(s) must have all parameters labelled as `[in]`, `[in/out]`, or `[out]` in the javadoc, **in that order**.
+* Functions that return values via argument(s) must have all parameters labelled as `[in]`, `[in/out]`, or `[out]` in the javadoc, **in that order**. The one exception to this is [pseudo-class](/docs/firmware-architecture-and-design.md#pseudo-class) functions, which should take the "class" (which is an `[in/out]` as the first argument).
 
   ``` C
   // Incorrect
@@ -218,14 +218,16 @@ If you think some ASCII art will help explain something better, go for it! [asci
     ```
     Example 2: visitor functions
     ```cpp
+    // The javadoc comment for all methods here can be read as:
     /**
-     * Serializes the given Primitive into a radio packet
+     * Visits an instance of X to perform an operation
      *
-     * @param The Primitive to serialize
+     * @param tactic The tactic to visit
      */
-    void visit(const CatchPrimitive &catch_primitive) override;
-    void visit(const ChipPrimitive &chip_primitive) override;
-    void visit(const DirectVelocityPrimitive &direct_velocity_primitive) override;
+
+    virtual void visit(CherryPickTactic &tactic)         = 0;
+    virtual void visit(ShadowFreekickerTactic &tactic)   = 0;
+    virtual void visit(GoalieTactic &tactic)             = 0;
     etc...
     ```
 

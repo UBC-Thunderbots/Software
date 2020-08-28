@@ -12,14 +12,7 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string FreeKickPlay::name = "Direct Free Kick Play";
-
 FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
-
-std::string FreeKickPlay::getName() const
-{
-    return FreeKickPlay::name;
-}
 
 bool FreeKickPlay::isApplicable(const World &world) const
 {
@@ -73,13 +66,13 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     // on the opposite side of the x-axis to wherever the pass is coming from
     if (world.ball().position().x() > -1)
     {
-        double y_offset =
-            -std::copysign(world.field().xLength() / 2, world.ball().position().y());
-        cherry_pick_1_target_region =
-            Rectangle(Point(0, world.field().xLength() / 4),
-                      Point(world.field().xLength() / 2, y_offset));
+        double cherry_pick_region_y_length =
+            -std::copysign(world.field().yLength() / 2, world.ball().position().y());
+        cherry_pick_1_target_region = Rectangle(
+            Point(0, 0), Point(world.field().xLength() / 4, cherry_pick_region_y_length));
         cherry_pick_2_target_region =
-            Rectangle(Point(0, world.field().xLength() / 4.0), Point(0, y_offset));
+            Rectangle(Point(world.field().xLength() / 4, 0),
+                      Point(world.field().xLength() / 2, cherry_pick_region_y_length));
     }
 
     // These two tactics will set robots to roam around the field, trying to put
@@ -197,9 +190,7 @@ void FreeKickPlay::chipAtGoalStage(
 
     do
     {
-        double chip_dist = (chip_target - world.ball().position()).length();
-
-        chip_tactic->updateControlParams(world.ball().position(), chip_target, chip_dist);
+        chip_tactic->updateControlParams(world.ball().position(), chip_target);
 
         yield({goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});
@@ -223,7 +214,8 @@ void FreeKickPlay::performPassStage(
     //                    to save CPU cycles
 
     // Perform the pass and wait until the receiver is finished
-    auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
+    auto passer =
+        std::make_shared<PasserTactic>(pass, world.ball(), world.field(), false);
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);

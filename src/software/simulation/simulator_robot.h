@@ -3,31 +3,15 @@
 #include <cinttypes>
 #include <memory>
 
-#include "software/primitive/primitive.h"
+#include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_robot.h"
 
 extern "C"
 {
 #include "firmware/app/primitives/primitive_manager.h"
+#include "shared/proto/primitive.nanopb.h"
 }
-
-/**
- * Because the PrimitiveManager_t struct is defined in the .c file (rather than the .h
- * file), C++ considers it an incomplete type and is unable to use it with smart pointers
- * because it doesn't know the size of the object. Therefore we need to create our own
- * "Deleter" class we can provide to the smart pointers to handle that instead.
- *
- * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
- * examples
- */
-struct PrimitiveManagerDeleter
-{
-    void operator()(PrimitiveManager_t* primitive_manager) const
-    {
-        app_primitive_manager_destroy(primitive_manager);
-    };
-};
 
 /**
  * The SimulatorRobot class acts as a wrapper for a PhysicsRobot that deals with more
@@ -222,12 +206,10 @@ class SimulatorRobot
      * Sets the current primitive this robot is running to a new one
      *
      * @param firmware_world The world to run the primitive in
-     * @param primitive_index The index of the primitive to run
-     * @param params The parameters for the primitive
+     * @param primitive_msg The primitive to start
      */
     void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                           unsigned int primitive_index,
-                           const primitive_params_t& params);
+                           const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Runs the current primitive
@@ -293,12 +275,18 @@ class SimulatorRobot
     std::optional<float> autochip_distance_m;
     uint32_t dribbler_rpm;
 
-    // A pointer to all the balls currently being dribbled
-    std::vector<PhysicsBall*> balls_in_dribbler_area;
+    typedef struct DribblerBall_t
+    {
+        PhysicsBall* ball;
+        // We keep track of whether or not the ball can be kicked.
+        // This extra information is used to prevent edge cases like
+        // the ball getting kicked/chipped multiple times.
+        bool can_be_chicked;
+    } DribblerBall;
 
-    std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter> primitive_manager;
-    std::optional<unsigned int> current_primitive_index;
-    std::optional<primitive_params_t> current_primitive_params;
+    std::vector<DribblerBall> balls_in_dribbler_area;
+
+    std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter> primitive_manager;
 
     // How much the dribbler damps the ball when they collide. Each component
     // of the damping can be changed separately so we have the flexibility to tune

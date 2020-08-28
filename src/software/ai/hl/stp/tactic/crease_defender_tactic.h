@@ -2,7 +2,7 @@
 
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/new_geom/segment.h"
+#include "software/geom/segment.h"
 
 /**
  * A crease defender moves around the exterior of our defense box to help shadow
@@ -38,8 +38,6 @@ class CreaseDefenderTactic : public Tactic
     explicit CreaseDefenderTactic(const Field &field, const Ball &ball,
                                   const Team &friendly_team, const Team &enemy_team,
                                   LeftOrRight left_or_right);
-
-    std::string getName() const override;
 
     /**
      * Updates the world parameters for this CreaseDefenderTactic.

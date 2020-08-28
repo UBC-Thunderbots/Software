@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/constants.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/sensor_fusion/filter/robot_filter.h"
 #include "software/world/team.h"
 

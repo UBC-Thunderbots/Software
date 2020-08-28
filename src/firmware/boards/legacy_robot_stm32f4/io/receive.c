@@ -17,6 +17,7 @@
 
 #include <FreeRTOS.h>
 #include <assert.h>
+#include <pb_decode.h>
 #include <rtc.h>
 #include <semphr.h>
 #include <stack.h>
@@ -36,10 +37,9 @@
 #include "io/motor.h"
 #include "io/mrf.h"
 #include "main.h"
-#include "pb_decode.h"
 #include "pb_encode.h"
 #include "priority.h"
-#include "shared/proto/primitive.pb.h"
+#include "shared/proto/primitive.nanopb.h"
 
 /**
  * \brief The number of robots in the drive packet.
@@ -184,10 +184,11 @@ void receive_tick(log_record_t *record)
         charger_enable(false);
         chicker_discharge(true);
 
-        primitive_params_t stop_params;
+        TbotsProto_Primitive primitive_msg = TbotsProto_Primitive_init_zero;
+        primitive_msg.which_primitive      = TbotsProto_Primitive_stop_tag;
+
         xSemaphoreTake(drive_mtx, portMAX_DELAY);
-        app_primitive_manager_startNewPrimitive(primitive_manager, world, 0,
-                                                &stop_params);
+        app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive_msg);
         xSemaphoreGive(drive_mtx);
     }
     else if (timeout_ticks > 1)
@@ -218,18 +219,11 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     timeout_ticks = 1000U / portTICK_PERIOD_MS;
 
     // Figure out what primitive to run
-    primitive_params_t pparams = {0};
-    unsigned int primitive     = 0;
+    TbotsProto_Primitive prim_msg = TbotsProto_Primitive_init_zero;
     if (estop_triggered)
     {
-        // Set the primitive to be a stop primitive
-        primitive         = 0;
-        pparams.params[0] = 0;
-        pparams.params[1] = 0;
-        pparams.params[2] = 0;
-        pparams.params[3] = 0;
-        pparams.slow      = true;
-        pparams.extra     = 0;
+        // Set the primitive to bring the robot to a stop
+        prim_msg.which_primitive = TbotsProto_Primitive_stop_tag;
 
         // Disable charging and discharge through chicker
         charger_enable(false);
@@ -238,23 +232,14 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     else
     {
         // Decode the primitive
-        pb_istream_t pb_in_stream = pb_istream_from_buffer(packet_data, packet_size - 3);
-        PrimitiveMsg prim_msg     = PrimitiveMsg_init_zero;
-        if (!pb_decode(&pb_in_stream, PrimitiveMsg_fields, &prim_msg))
+        pb_istream_t pb_in_stream =
+            pb_istream_from_buffer(packet_data + 3, packet_size - 3);
+        if (!pb_decode(&pb_in_stream, TbotsProto_Primitive_fields, &prim_msg))
         {
             // If we failed to decode the message, it's likely malformed, so we should not
             // proceed
             return;
         }
-
-        pparams.slow      = prim_msg.slow;
-        pparams.extra     = prim_msg.extra_bits;
-        pparams.params[0] = prim_msg.parameter1;
-        pparams.params[1] = prim_msg.parameter2;
-        pparams.params[2] = prim_msg.parameter3;
-        pparams.params[3] = prim_msg.parameter3;
-
-        primitive = prim_msg.prim_type;
 
         // Enable charging
         charger_enable(true);
@@ -264,8 +249,7 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     // Take the drive mutex.
     xSemaphoreTake(drive_mtx, portMAX_DELAY);
 
-    app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive,
-                                            &pparams);
+    app_primitive_manager_startNewPrimitive(primitive_manager, world, prim_msg);
 
     // Release the drive mutex.
     xSemaphoreGive(drive_mtx);

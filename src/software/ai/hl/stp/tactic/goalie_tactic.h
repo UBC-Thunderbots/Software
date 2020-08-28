@@ -2,9 +2,9 @@
 
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/segment.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
@@ -37,8 +37,6 @@ class GoalieTactic : public Tactic
      */
     std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
                                                    Rectangle goalie_restricted_area);
-
-    std::string getName() const override;
 
     /**
      * Updates the world parameters for this GoalieTactic.

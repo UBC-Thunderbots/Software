@@ -10,15 +10,13 @@
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
-#include "software/sensor_fusion/refbox_data.h"
 #include "software/world/ball.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
 
 /**
  * Sensor Fusion is an abstraction around all filtering operations that our system may
- * need to perform. It produces Worlds that may be used, and consumes vision detections,
- * refbox data, and robot statuses
+ * need to perform. It produces Worlds that may be used, and consumes SensorProtos
  */
 class SensorFusion
 {
@@ -37,7 +35,7 @@ class SensorFusion
      *
      * @param new data
      */
-    void updateWorld(const SensorMsg &sensor_msg);
+    void updateWorld(const SensorProto &sensor_msg);
 
     /**
      * Returns the most up-to-date world if enough data has been received
@@ -54,12 +52,12 @@ class SensorFusion
      *
      * @param new data
      */
-    void updateWorld(const SSL_WrapperPacket &packet);
-    void updateWorld(const SSL_Referee &packet);
-    void updateWorld(
-        const google::protobuf::RepeatedPtrField<TbotsRobotMsg> &tbots_robot_msgs);
-    void updateWorld(const SSL_GeometryData &geometry_packet);
-    void updateWorld(const SSL_DetectionFrame &ssl_detection_frame);
+    void updateWorld(const SSLProto::SSL_WrapperPacket &packet);
+    void updateWorld(const SSLProto::Referee &packet);
+    void updateWorld(const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>
+                         &robot_status_msgs);
+    void updateWorld(const SSLProto::SSL_GeometryData &geometry_packet);
+    void updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame);
 
     /**
      * Updates relevant components with a new ball state
@@ -105,7 +103,7 @@ class SensorFusion
     Team friendly_team;
     Team enemy_team;
     GameState game_state;
-    std::optional<RefboxStage> refbox_stage;
+    std::optional<RefereeStage> referee_stage;
 
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
