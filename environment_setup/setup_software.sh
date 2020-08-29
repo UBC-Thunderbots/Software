@@ -37,6 +37,7 @@ host_software_packages=(
     cmake # Needed to build some of our dependencies
     codespell # Fixes typos
     curl
+    default-jdk # Needed for Bazel to run properly
     gcc-7 # We use gcc 7.4.0
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
