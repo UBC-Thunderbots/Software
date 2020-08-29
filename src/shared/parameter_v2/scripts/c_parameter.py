@@ -29,6 +29,8 @@ class CParameter(object):
 
         adjusted_value = ""
 
+        # python capitalizes the first letter of the boolean, so we
+        # convert that to a string that is all lowercase
         if param_type == "BoolParameter":
             adjusted_value = "true" if param_value else "false"
 

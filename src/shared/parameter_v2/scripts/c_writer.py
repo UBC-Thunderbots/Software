@@ -12,21 +12,25 @@ from type_map import C_TYPE_MAP
 class CWriter(object):
 
     CONFIG_H = (
-        "#pragma once\n#include <memory.h>\n#include <stdlib.h>\n#include"
-        ' "shared/parameter_v2/c/parameter.h"\n{contents}\nconst'
-        " {top_level_config_name}_t* app_dynamic_parameters_create(void);\nvoid"
-        " app_dynamic_parameters_destroy(const {top_level_config_name}_t*"
-        " {top_level_config_name}_ptr);\n"
+        "#pragma once\n"
+        "#include <memory.h>\n"
+        "#include <stdlib.h>\n"
+        '#include "shared/parameter_v2/c/parameter.h"\n'
+        "{contents}\n const "
+        "{top_level_config_name}_t* app_dynamic_parameters_create(void);\n"
+        "void app_dynamic_parameters_destroy(const {top_level_config_name}_t*"
+        "{top_level_config_name}_ptr);\n"
     )
 
     CONFIG_C = (
-        '#include "shared/parameter_v2/c/parameter.h" \n#include'
-        ' "shared/parameter_v2/c/{output_file}.h" \n const {top_level_config_name}_t*'
-        " app_dynamic_parameters_create(void)"
-        " {{{app_dynamic_parameters_create_impl}return"
-        " {top_level_config_name}_config;}}\nvoid app_dynamic_parameters_destroy(const"
-        " {top_level_config_name}_t* {top_level_config_name}_ptr)"
-        " {{{app_dynamic_parameters_destroy_impl}}}\n"
+        '#include "shared/parameter_v2/c/parameter.h"\n'
+        '#include "shared/parameter_v2/c/{output_file}.h"\n'
+        "const {top_level_config_name}_t* app_dynamic_parameters_create(void)\n"
+        "{{{app_dynamic_parameters_create_impl} \n"
+        "return {top_level_config_name}_config;}}\n"
+        "void app_dynamic_parameters_destroy(const "
+        "{top_level_config_name}_t* {top_level_config_name}_ptr)"
+        "{{ {app_dynamic_parameters_destroy_impl} }}\n"
     )
 
     @staticmethod

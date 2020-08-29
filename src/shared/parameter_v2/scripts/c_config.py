@@ -18,11 +18,11 @@ class CConfig(object):
     INCLUDE_CONFIG = "const {name}_t* {name};\n"
 
     def __init__(self, config_name: str, ptr_to_instance: str):
-        """Initializes a CParameter with the given name. The corresponding
-        generation strings (definition, malloc, initialization, memcpy, free)
-        are available from read-only properties.
+        """Initializes a CConfig with the given name. The corresponding
+        generation strings (definition, forward_decleration, malloc, initialization,
+        memcpy, free, include_config) are available from read-only properties.
 
-        :param config_name: The name of the config, the filename of the yaml
+        :param config_name: The name of the config (i.e the filename of the yaml)
         :param ptr_to_instance: A string representation of where this config
             is located (ex: ThunderbotsConfig->FooConfig)
 
@@ -34,7 +34,10 @@ class CConfig(object):
         self.configs: Set[str] = set()
 
     def add_parameter(self, parameter: CParameter):
-        """Add a parameter to this config to generate.
+        """Add a parameter to this config. This parameters represent
+        the parameters defined in the yaml file. When generating the Config
+        the properties from these parametesr will be properly formatted
+        into the appropriate properties.
 
         :param parameter: The CParameter to add to this config
 
@@ -63,6 +66,9 @@ class CConfig(object):
         Joins all the nested configs definitions and the parameter
         definitions.
 
+        :returns: The formatted DEFINITION string that provides the definition
+            of this config (struct)
+
         """
         definition_contents = "".join(
             [CConfig.INCLUDE_CONFIG.format(name=conf) for conf in self.configs]
@@ -75,9 +81,12 @@ class CConfig(object):
     @property
     def initialization(self):
         """Gets the 'contents' to format the INITIALIZATION string.
-
         Joins all the nested configs initializations and the parameter
         initializations.
+
+        :returns: The formatted INITIALIZATION string that provides the
+            initialization struct that will be memcpy'ed to initialize
+            the memory that was malloced
 
         """
         initialization_contents = "".join(
