@@ -37,15 +37,21 @@ class YamlLoadFixture : public ::testing::Test
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {
             std::vector<YAML::Node> config = YAML::LoadAllFromFile(entry.path().string());
-
             ASSERT_NE(config.size(), 0);
-
             ConfigMetadata_t metadata;
 
             if (config.size() == 1)
             {
                 try
                 {
+                    // Each yaml file is separated by a --- which indicates the end
+                    // of a yaml document. A new document can start below ---.
+                    // Each config can have 1 or 2 documents, which may contain just
+                    // includes, just parameters (1 document) or includes and parameters
+                    // (2 documents).
+                    //
+                    // We try to load the first document as a parameter definitions, and
+                    // if the conversion doesn't match, we load it as an include list.
                     metadata.parameters = config[0].as<std::vector<YAML::Node>>();
                 }
                 catch (const YAML::BadConversion& e)
@@ -57,6 +63,9 @@ class YamlLoadFixture : public ::testing::Test
 
             if (config.size() == 2)
             {
+                // load both the documents because they exist
+                // we don't need to worry too much about format/checking validity
+                // as the schema check should have done that already.
                 metadata.included_configs =
                     config[0]["include"].as<std::vector<std::string>>();
                 metadata.parameters = config[1].as<std::vector<YAML::Node>>();
@@ -74,14 +83,17 @@ class YamlLoadFixture : public ::testing::Test
 TEST_F(YamlLoadFixture, MemoryInitializationSanityCheck)
 {
     const ThunderbotsConfig_t* config = app_dynamic_parameters_create();
+    ASSERT_EQ(app_dynamic_parameters_getBool(config->Example->example_bool_param), true);
+    ASSERT_EQ(app_dynamic_parameters_getInt(config->Example->example_int_param), 3);
+    ASSERT_EQ(std::string((app_dynamic_parameters_getString(
+                  config->Example->example_string_param))),
+              "Hello World");
     app_dynamic_parameters_destroy(config);
 }
 
 TEST_F(YamlLoadFixture, TestProperGeneration)
 {
     // every file should generate a config
-    const ThunderbotsConfig_t* config = app_dynamic_parameters_create();
-
     std::for_each(config_file_to_metadata_map.begin(), config_file_to_metadata_map.end(),
                   [&](std::pair<std::string, ConfigMetadata_t> config_defn) {
                       std::string file_path     = config_defn.first;

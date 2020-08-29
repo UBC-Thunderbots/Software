@@ -73,7 +73,7 @@ include:
 - string:
     name: example_string_param
     value: "Hello World"
-    const: true
+    constant: true
     description: >
       Any string value
 - enum:
