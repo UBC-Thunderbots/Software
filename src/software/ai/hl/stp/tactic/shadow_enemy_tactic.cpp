@@ -90,7 +90,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             }
             auto best_enemy_shot_opt = calcBestShotOnGoal(
                 field, friendly_team, enemy_team, enemy_robot.position(),
-                TeamType::FRIENDLY, ROBOT_MAX_RADIUS_METERS, robots_to_ignore);
+                TeamType::FRIENDLY, robots_to_ignore);
 
             Vector enemy_shot_vector = Vector(0, 0);
             if (best_enemy_shot_opt)

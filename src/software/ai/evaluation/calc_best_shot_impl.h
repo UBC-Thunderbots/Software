@@ -50,9 +50,8 @@ double calcShotOpenNetPercentage(const Field &field, const Point &shot_origin,
  * @param segment The segment at which shots are being evaluated on
  * @param robot_obstacles Any Robot (friendly or enemy) that can block the shot
  *
- * @return Shot teturns the optimal Shot (Point and Angle) corresponding to the
- * given parameters
- * @return nullopt if Shot does not exist
+ * @return Shot returns the optimal Shot (Point and Angle) corresponding to the
+ * given parameters. Returns nullopt if Shot does not exist
  */
 std::optional<Shot> calcMostOpenDirectionFromRobotObstacles(
     const Point &origin, const Segment &segment,
@@ -66,9 +65,8 @@ std::optional<Shot> calcMostOpenDirectionFromRobotObstacles(
  * @param segment The segment at which shots are being evaluated on
  * @param obstacles Any obstacle that can block the shot
  *
- * @return the optimal Shot (Point and Angle) corresponding to the
- * given parameters
- * @return nullopt if Shot does not exist
+ * @return The optimal Shot (Point and Angle) corresponding to the
+ * given parameters. Returns nullopt if Shot does not exist
  */
 std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
     const Point &origin, const Segment &segment, const std::vector<Circle> &obstacles);

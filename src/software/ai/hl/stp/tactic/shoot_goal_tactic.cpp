@@ -104,9 +104,9 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
                                             std::shared_ptr<ChipAction> chip_action,
                                             ActionCoroutine::push_type &yield) const
 {
-    std::optional<Shot> shot_target = calcBestShotOnGoal(
-        field, friendly_team, enemy_team, ball.position(), TeamType::ENEMY,
-        ROBOT_MAX_RADIUS_METERS, {*this->getAssignedRobot()});
+    std::optional<Shot> shot_target =
+        calcBestShotOnGoal(field, friendly_team, enemy_team, ball.position(),
+                           TeamType::ENEMY, {*this->getAssignedRobot()});
 
     while (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
     {
@@ -127,9 +127,9 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
                                              shot_target->getPointToShootAt());
             yield(chip_action);
         }
-        shot_target = calcBestShotOnGoal(
-            field, friendly_team, enemy_team, ball.position(), TeamType::ENEMY,
-            ROBOT_MAX_RADIUS_METERS, {*this->getAssignedRobot()});
+        shot_target =
+            calcBestShotOnGoal(field, friendly_team, enemy_team, ball.position(),
+                               TeamType::ENEMY, {*this->getAssignedRobot()});
     }
 }
 
@@ -143,9 +143,9 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     std::optional<Shot> shot_target;
     do
     {
-        shot_target = calcBestShotOnGoal(
-            field, friendly_team, enemy_team, ball.position(), TeamType::ENEMY,
-            ROBOT_MAX_RADIUS_METERS, {*this->getAssignedRobot()});
+        shot_target =
+            calcBestShotOnGoal(field, friendly_team, enemy_team, ball.position(),
+                               TeamType::ENEMY, {*this->getAssignedRobot()});
 
         if (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
         {

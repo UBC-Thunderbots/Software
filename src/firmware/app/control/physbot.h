@@ -69,7 +69,7 @@ PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
 void app_physbot_planMove(Component *c, float *p);
 
 /**
- * Uses a rotaion matrix to rotate the acceleration vectors of the given
+ * Uses a rotation matrix to rotate the acceleration vectors of the given
  * PhysBot back to local xy coordinates and store them in a separate array. The
  * given angle should be the bot's angle relative to the global x-axis.
  *

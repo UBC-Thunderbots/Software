@@ -26,7 +26,7 @@
  * vector). If no shot is possible, returns `std::nullopt`
  */
 std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &shot_origin,
-                                       const std::vector<Robot> &obstacles);
+                                       const std::vector<Robot> &robot_obstacles);
 /**
  * Finds the best shot on the specified goal, and returns the best target to shoot at
  * and the largest open angle interval for the shot (this is the total angle between
@@ -51,5 +51,5 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
 std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
                                        const Team &enemy_team, const Point &shot_origin,
                                        TeamType goal,
-                                       double radius = ROBOT_MAX_RADIUS_METERS,
-                                       const std::vector<Robot> &robots_to_ignore = {});
+                                       const std::vector<Robot> &robots_to_ignore = {},
+                                       double radius = ROBOT_MAX_RADIUS_METERS);

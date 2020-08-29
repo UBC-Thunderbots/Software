@@ -247,7 +247,7 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
         std::optional<Point> best_shot_target = std::nullopt;
         auto best_shot_data =
             calcBestShotOnGoal(field, friendly_team, enemy_team, robot.position(),
-                               TeamType::FRIENDLY, ROBOT_MAX_RADIUS_METERS, {robot});
+                               TeamType::FRIENDLY, {robot});
         if (best_shot_data)
         {
             best_shot_angle  = best_shot_data->getOpenAngle();

@@ -19,8 +19,9 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
 
 std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
                                        const Team &enemy_team, const Point &shot_origin,
-                                       TeamType goal, double radius,
-                                       const std::vector<Robot> &robots_to_ignore)
+                                       TeamType goal,
+                                       const std::vector<Robot> &robots_to_ignore,
+                                       double radius)
 {
     std::vector<Robot> obstacles;
     for (const Robot &enemy_robot : enemy_team.getAllRobots())

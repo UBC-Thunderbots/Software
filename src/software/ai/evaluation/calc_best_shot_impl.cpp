@@ -83,16 +83,12 @@ std::optional<Shot> calcMostOpenDirectionFromCircleObstacles(
 
     Segment largest_segment;
 
-    if (open_segs.size() >= 2)
+    if (open_segs.size() >= 1)
     {
         largest_segment = *std::max_element(open_segs.begin(), open_segs.end(),
                                             [](const Segment &s1, const Segment &s2) {
                                                 return s1.length() < s2.length();
                                             });
-    }
-    else if (open_segs.size() == 1)
-    {
-        largest_segment = open_segs.front();
     }
     else
     {
