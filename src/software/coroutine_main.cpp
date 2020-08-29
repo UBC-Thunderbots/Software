@@ -375,6 +375,76 @@ void variablesOnHeapWithMoveVectors2()
     // 7
 }
 
+void moveVariablesFromStackToHeap() {
+    std::cout << std::endl << std::endl;
+    std::cout << "Test moving from stack to heap" << std::endl;
+
+    auto data = std::make_shared<int>(99);
+
+    FunctionMemberObject fmo(print_data_func, data);
+    DataMemberObject dmo(print_data_func, data);
+    NoMemberObject nmo(print_data_func, data);
+
+    fmo.execute();
+    dmo.execute();
+    nmo.execute();
+
+    *data = 45;
+
+    auto fmo_heap = std::unique_ptr<FunctionMemberObject>();
+    auto dmo_heap = std::unique_ptr<DataMemberObject>();
+    auto nmo_heap = std::unique_ptr<NoMemberObject>();
+
+    *fmo_heap = std::move(fmo);
+    *dmo_heap = std::move(dmo);
+    *nmo_heap = std::move(nmo);
+
+    fmo_heap->execute();
+    dmo_heap->execute();
+    nmo_heap->execute();
+
+    *data = 83;
+
+    fmo_heap->execute();
+    dmo_heap->execute();
+    nmo_heap->execute();
+}
+
+void moveVariablesFromHeapToStack() {
+    std::cout << std::endl << std::endl;
+    std::cout << "Test moving from heap to stack" << std::endl;
+
+    auto data = std::make_shared<int>(99);
+
+    auto fmo_heap = std::make_unique<FunctionMemberObject>(print_data_func, data);
+    auto dmo_heap = std::make_unique<DataMemberObject>(print_data_func, data);
+    auto nmo_heap = std::make_unique<NoMemberObject>(print_data_func, data);
+
+    FunctionMemberObject fmo(print_data_func, data);
+    DataMemberObject dmo(print_data_func, data);
+    NoMemberObject nmo(print_data_func, data);
+
+    fmo_heap->execute();
+    dmo_heap->execute();
+    nmo_heap->execute();
+
+    *data = 45;
+
+    fmo = std::move(*fmo_heap);
+    dmo = std::move(*dmo_heap);
+    nmo = std::move(*nmo_heap);
+
+    fmo.execute();
+    dmo.execute();
+    nmo.execute();
+
+    *data = 83;
+
+    fmo.execute();
+    dmo.execute();
+    nmo.execute();
+}
+
 int main(int argc, char** argv)
 {
     // ~~~~~~~~~~ Copy and Move semantics ~~~~~~~~~~
@@ -406,13 +476,15 @@ int main(int argc, char** argv)
 
 
     // ~~~~~~~~~~ Experiments and Examples ~~~~~~~~~~ //
-    variablesOnStackNoMove();           // OK
-    variablesOnHeapNoMove();            // OK
-    variablesOnStackWithMove();         // OK
-    variablesOnStackWithMoveVector();   // BAD
-    variablesOnHeapWithMove();          // OK
-    variablesOnHeapWithMoveVectors();   // OK
-    variablesOnHeapWithMoveVectors2();  // OK
+//    variablesOnStackNoMove();           // OK
+//    variablesOnHeapNoMove();            // OK
+//    variablesOnStackWithMove();         // OK
+//    variablesOnStackWithMoveVector();   // BAD
+//    variablesOnHeapWithMove();          // OK
+//    variablesOnHeapWithMoveVectors();   // OK
+//    variablesOnHeapWithMoveVectors2();  // OK
+//    moveVariablesFromStackToHeap(); // BAD
+moveVariablesFromHeapToStack(); // OK???
 
     // ~~~~~~~~~~ Observations and Conclusions ~~~~~~~~~~ //
     /* - The "coroutine stack" seems to be able to read from and interact
