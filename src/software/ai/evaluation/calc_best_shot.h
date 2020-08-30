@@ -40,8 +40,8 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
  * @param enemy_team The enemy team
  * @param shot_origin The point that the shot will be taken from
  * @param goal The goal to shoot at
- * @param radius The radius for the robot obstacles
  * @param robots_to_ignore The robots to ignore
+ * @param radius The radius for the robot obstacles
  *
  * @return the best target to shoot at and the largest open angle interval for the
  * shot (this is the total angle between the obstacles on either side of the shot
