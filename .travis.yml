@@ -10,7 +10,7 @@ jobs:
     - name: "Build, Test, and Run Coverage (All Except SimulatedTests)"
       script:
         - cd src
-        # Run tests and collect coverage
+        # Run tests and collect coverage on all except simulated tests
         - >
           bazel coverage                     \
             --compilation_mode=fastbuild     \
@@ -21,11 +21,13 @@ jobs:
         # Collect Code Coverage Results
         # Only print the first 100 lines of the output of the code coverage upload script
         # so we don't overflow the Travis CI logs
-        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ | head -n100
+        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ > codecov.log
+        - cat codecov.log | head -n100
+        - cat codecov.log | tail -n100
     - name: "Build and Test (SimulatedTests)"
       script:
         - cd src
-        # Run tests and collect coverage
+        # Run tests on only simulated tests
         - >
           bazel test //software/simulated_tests/...
     - name: "Build Firmware Board Targets"
