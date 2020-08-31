@@ -11,8 +11,8 @@ typedef struct FirmwareWorld FirmwareWorld_t;
 /**
  * Create a world
  *
- * @param robot The robot from the perspective of firmware
- * @param ball The ball from the perspective of firmware
+ * @param robot [in] The robot from the perspective of firmware
+ * @param ball [in] The ball from the perspective of firmware
  *
  * @return A pointer to the created world, ownership is given to the caller
  */
@@ -24,20 +24,22 @@ FirmwareWorld_t* app_firmware_world_create(FirmwareRobot_t* robot, FirmwareBall_
  * NOTE: This will not destroy the values pointed to by any pointers passed to the
  *       `create` function
  *
- * @param world The world to destroy
+ * @param world [in] The world to destroy
  */
 void app_firmware_world_destroy(FirmwareWorld_t* world);
 
 /**
  * Get the robot from the given world
- * @param world The world to get the robot from
+ * @param world [in] The world to get the robot from
+ *
  * @return The robot from the given world
  */
 FirmwareRobot_t* app_firmware_world_getRobot(FirmwareWorld_t* world);
 
 /**
  * Get the ball from the given world
- * @param world The world to get the ball from
+ * @param world [in] The world to get the ball from
+ *
  * @return The ball from the given world
  */
 FirmwareBall_t* app_firmware_world_getBall(FirmwareWorld_t* world);

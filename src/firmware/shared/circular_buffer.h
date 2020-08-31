@@ -20,7 +20,7 @@ CircularBuffer_t *circular_buffer_create(size_t size);
 /**
  * Destroy the circular_buffer, freeing any memory allocated for it
  *
- * @param cbuffer The circular_buffer to destroy
+ * @param cbuffer [in] The circular_buffer to destroy
  */
 void circular_buffer_destroy(CircularBuffer_t *cbuffer);
 
@@ -28,7 +28,7 @@ void circular_buffer_destroy(CircularBuffer_t *cbuffer);
  * Push data into the circular_buffer
  * If full, will overwrite the oldest value
  *
- * @param cbuffer The circular_buffer
+ * @param cbuffer [in/out] The circular_buffer
  * @param data  Value to be inserted into the circular_buffer
  */
 void circular_buffer_push(CircularBuffer_t *cbuffer, float data);
@@ -36,7 +36,7 @@ void circular_buffer_push(CircularBuffer_t *cbuffer, float data);
 /**
  * Retrieve a relative recent value in the circular_buffer
  *
- * @param cbuffer The circular_buffer
+ * @param cbuffer [in] The circular_buffer
  * @param index Index relative to the most recent value in the buffer
  *
  * @pre: `index` must be less than the max_size of the circular_buffer
@@ -50,7 +50,7 @@ float circular_buffer_getAtIndex(CircularBuffer_t *cbuffer, size_t index);
  * Retrieve the most recent value in the circular_buffer
  * Retrieved value is not destroyed or removed from circular_buffer
  *
- * @param cbuffer The circular_buffer
+ * @param cbuffer [in] The circular_buffer
  *
  * @pre: At least one item must be in the circular_buffer
  *
@@ -61,7 +61,7 @@ float circular_buffer_front(CircularBuffer_t *cbuffer);
 /**
  * Return if the circular_buffer is full
  *
- * @param cbuffer The circular_buffer
+ * @param cbuffer [in] The circular_buffer
  *
  * @return A boolean indicating if the circular_buffer is full
  */
@@ -70,7 +70,7 @@ bool circular_buffer_isFull(CircularBuffer_t *cbuffer);
 /**
  * Return if the circular_buffer is empty
  *
- * @param cbuffer The circular_buffer
+ * @param cbuffer [in] The circular_buffer
  *
  * @return A boolean indicating if the circular_buffer is empty
  */

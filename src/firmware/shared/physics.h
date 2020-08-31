@@ -113,10 +113,11 @@ float dot2D(float vec1[2], float vec2[2]);
  *
  * @pre All values are positive
  *
- * @param initial_speed [in] The initial speed in meters/second
- * @param displacement [in] The total displacement accelerated over in meters
- * @param acceleration [in] The constant acceleration over the displacement in
+ * @param initial_speed The initial speed in meters/second
+ * @param displacement The total displacement accelerated over in meters
+ * @param acceleration The constant acceleration over the displacement in
  * meters/second^2
+ *
  * @return The final speed in meters/second
  */
 float shared_physics_getFinalSpeed(float initial_speed, float displacement,
