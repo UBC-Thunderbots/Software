@@ -26,14 +26,20 @@ cc_library(
 
 cc_test(
     name = "config_test",
-    srcs = ["config_test.cpp"],
-    data = ["//shared/parameter_v2/config:example_configs"],
+    srcs = [
+        "config_test.cpp",
+    ],
+    data = [
+        "config.h",
+        "//shared/parameter_v2/config:test_configs",
+    ],
     deps = [
         ":config",
         ":parameter",
         "//software/util/variant_visitor",
         "@boost//:filesystem",
         "@gtest//:gtest_main",
+        "@libclang",
         "@yaml-cpp",
     ],
 )

@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:private"])
 
 filegroup(
-    name = "example_configs",
+    name = "test_configs",
     srcs = glob([
         "test/**/*.yaml",
     ]),

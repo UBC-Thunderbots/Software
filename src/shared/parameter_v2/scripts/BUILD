@@ -12,7 +12,7 @@ py_binary(
         ":generate_dynamic_parameters.py",
     ],
     data = [
-        "//shared/parameter_v2/config:example_configs",
+        "//shared/parameter_v2/config:test_configs",
     ],
     main = ":generate_dynamic_parameters.py",
     python_version = "PY3",

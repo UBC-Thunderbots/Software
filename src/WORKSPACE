@@ -108,6 +108,13 @@ new_local_repository(
     path = "/",
 )
 
+# libclang-dev is installed into the system through setup_software.sh
+new_local_repository(
+    name = "libclang",
+    build_file = "@//external:libclang.BUILD",
+    path = "/usr/lib/llvm-6.0/",
+)
+
 http_archive(
     name = "arm_developer_gcc",
     build_file = "@//external:arm_gcc.BUILD",
