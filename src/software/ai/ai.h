@@ -3,7 +3,6 @@
 #include "software/ai/hl/hl.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/navigator/navigator.h"
-#include "software/primitive/primitive.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
@@ -29,10 +28,10 @@ class AI final
      *
      * @param world The state of the World with which to make the decisions
      *
-     * @return the Primitives that should be run by our Robots given the current state
-     * of the world.
+     * @return the Primitives that should be run by our Robots given the current
+     * state of the world.
      */
-    std::vector<std::unique_ptr<Primitive>> getPrimitives(const World& world) const;
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world) const;
 
     /**
      * Returns information about the currently running plays and tactics, including the

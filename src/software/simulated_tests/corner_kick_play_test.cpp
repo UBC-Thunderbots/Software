@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
@@ -24,16 +25,20 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(CornerKickPlay::name);
+    setAIPlay(TYPENAME(CornerKickPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // This will keep the test running for 9.5 seconds to give everything enough
-        // time to settle into position and be observed with the Visualizer
+        // The ball must enter the enemy net in order for the test to pass. This is to
+        // temporarily
+        // prevent regressions like
+        // https://github.com/UBC-Thunderbots/Software/issues/1690
+        // until we have proper validation functions built up.
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            while (
+                !contains(world_ptr->field().enemyGoal(), world_ptr->ball().position()))
             {
                 yield();
             }

@@ -411,13 +411,12 @@ TEST_F(STPTacticAssignmentTest,
     auto goalie_tactic_2                         = std::make_shared<GoalieTestTactic>();
     std::vector<std::shared_ptr<Tactic>> tactics = {goalie_tactic_1, goalie_tactic_2};
 
-    std::vector<std::shared_ptr<Tactic>> assigned_tactics =
-        stp.assignRobotsToTactics(world, tactics);
+    stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_FALSE(goalie_tactic_1->getAssignedRobot().has_value());
     EXPECT_FALSE(goalie_tactic_2->getAssignedRobot().has_value());
-    ASSERT_FALSE(assigned_tactics[0]->getAssignedRobot().has_value());
-    ASSERT_FALSE(assigned_tactics[1]->getAssignedRobot().has_value());
+    ASSERT_FALSE(tactics[0]->getAssignedRobot().has_value());
+    ASSERT_FALSE(tactics[1]->getAssignedRobot().has_value());
 }
 
 TEST_F(STPTacticAssignmentTest,
@@ -451,13 +450,12 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.assignGoalie(1);
     world.updateFriendlyTeamState(friendly_team);
 
-    std::vector<std::shared_ptr<Tactic>> assigned_tactics =
-        stp.assignRobotsToTactics(world, tactics);
+    stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_TRUE(allTacticsAssigned(tactics));
     ASSERT_TRUE(goalie_tactic_1->getAssignedRobot().has_value());
     EXPECT_EQ(goalie_tactic_1->getAssignedRobot().value(), robot_1);
-    ASSERT_TRUE(assigned_tactics[0]->getAssignedRobot().has_value());
+    ASSERT_TRUE(tactics[0]->getAssignedRobot().has_value());
 }
 
 TEST_F(STPTacticAssignmentTest,
@@ -478,14 +476,13 @@ TEST_F(STPTacticAssignmentTest,
     auto goalie_tactic_2                         = std::make_shared<GoalieTestTactic>();
     std::vector<std::shared_ptr<Tactic>> tactics = {goalie_tactic_1, goalie_tactic_2};
 
-    std::vector<std::shared_ptr<Tactic>> assigned_tactics =
-        stp.assignRobotsToTactics(world, tactics);
+    stp.assignRobotsToTactics(world, tactics);
 
     ASSERT_TRUE(goalie_tactic_1->getAssignedRobot().has_value());
     EXPECT_FALSE(goalie_tactic_2->getAssignedRobot().has_value());
     EXPECT_EQ(goalie_tactic_1->getAssignedRobot().value(), robot_0);
-    ASSERT_TRUE(assigned_tactics[0]->getAssignedRobot().has_value());
-    ASSERT_FALSE(assigned_tactics[1]->getAssignedRobot().has_value());
+    ASSERT_TRUE(tactics[0]->getAssignedRobot().has_value());
+    ASSERT_FALSE(tactics[1]->getAssignedRobot().has_value());
 }
 
 TEST_F(STPTacticAssignmentTest,
@@ -510,18 +507,16 @@ TEST_F(STPTacticAssignmentTest,
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
     std::vector<Robot> expected_robots_assigned  = {robot_0, robot_1, robot_2};
 
-    std::vector<std::shared_ptr<Tactic>> assigned_tactics =
-        stp.assignRobotsToTactics(world, tactics);
+    stp.assignRobotsToTactics(world, tactics);
 
     // Check each tactic is assigned to the intended robot
-    for (unsigned int i = 0; i < assigned_tactics.size(); i++)
+    for (unsigned int i = 0; i < tactics.size(); i++)
     {
-        EXPECT_EQ(assigned_tactics[i]->getAssignedRobot().value(),
-                  expected_robots_assigned[i]);
+        EXPECT_EQ(tactics[i]->getAssignedRobot().value(), expected_robots_assigned[i]);
     }
 
     // Check that StopTactics are added
-    ASSERT_TRUE(dynamic_cast<MoveTestTactic*>(assigned_tactics[0].get()));
-    ASSERT_TRUE(dynamic_cast<StopTactic*>(assigned_tactics[1].get()));
-    ASSERT_TRUE(dynamic_cast<StopTactic*>(assigned_tactics[2].get()));
+    ASSERT_TRUE(dynamic_cast<MoveTestTactic*>(tactics[0].get()));
+    ASSERT_TRUE(dynamic_cast<StopTactic*>(tactics[1].get()));
+    ASSERT_TRUE(dynamic_cast<StopTactic*>(tactics[2].get()));
 }

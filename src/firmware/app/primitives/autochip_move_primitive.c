@@ -20,19 +20,6 @@ void app_autochip_move_primitive_start(TbotsProto_AutochipMovePrimitive prim_msg
     app_chicker_enableAutochip(chicker, prim_msg.chip_distance_meters);
 }
 
-static void autochip_move_end(void* void_state_ptr, FirmwareWorld_t* world)
-{
-    app_move_helper_end(void_state_ptr, world);
-    FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-
-    Chicker_t* chicker = app_firmware_robot_getChicker(robot);
-    app_chicker_disableAutochip(chicker);
-    app_chicker_disableAutokick(chicker);
-
-    Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
-    app_dribbler_setSpeed(dribbler, 0);
-}
-
 static void autochip_move_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     app_move_helper_tick(void_state_ptr, world);
@@ -42,7 +29,6 @@ static void autochip_move_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * \brief The autochip move primitive.
  */
 const primitive_t AUTOCHIP_MOVE_PRIMITIVE = {.direct        = false,
-                                             .end           = &autochip_move_end,
                                              .tick          = &autochip_move_tick,
                                              .create_state  = &createMoveHelperState_t,
                                              .destroy_state = &destroyMoveHelperState_t};

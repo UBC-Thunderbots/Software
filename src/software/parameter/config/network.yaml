@@ -30,7 +30,7 @@ NetworkConfig:
       GameControllerPort:
         min: 1
         max: 65535
-        default: 10020
+        default: 10003
         type: "int"
         description: The port to listen on for gamecontroller data
 

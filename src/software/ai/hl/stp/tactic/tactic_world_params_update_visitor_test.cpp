@@ -101,7 +101,8 @@ TEST(TacticUpdateVisitorTest, update_passer_tactic)
     update_world =
         ::TestUtil::setBallPosition(update_world, Point(1, 0), Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(5));
-    PasserTactic tactic = PasserTactic(pass, initial_world.ball(), false);
+    PasserTactic tactic =
+        PasserTactic(pass, initial_world.ball(), initial_world.field(), false);
     EXPECT_EQ(tactic.getBall(), initial_world.ball());
     TacticWorldParamsUpdateVisitor visitor = TacticWorldParamsUpdateVisitor(update_world);
     tactic.accept(visitor);

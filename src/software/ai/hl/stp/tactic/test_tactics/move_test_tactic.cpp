@@ -9,11 +9,6 @@ MoveTestTactic::MoveTestTactic(bool loop_forever)
 {
 }
 
-std::string MoveTestTactic::getName() const
-{
-    return "Move Test Tactic";
-}
-
 void MoveTestTactic::updateControlParams(Point destination_)
 {
     // Update the parameters stored by this Tactic

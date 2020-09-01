@@ -206,7 +206,7 @@ class PhysicsRobot
    private:
     /**
      * Creates as many fixtures as necessary to represent the body shape of the given
-     * robot and them to this class' b2Body
+     * robot and add them to this class' b2Body
      *
      * @param robot_state The robot to create fixtures for
      * @param total_chicker_depth The distance from the front face of the robot to the
@@ -215,6 +215,15 @@ class PhysicsRobot
      */
     void setupRobotBodyFixtures(const RobotState &robot_state, double total_chicker_depth,
                                 double mass_kg);
+
+    /**
+     * Creates a robot body fixture with the given shape and density and adds it to this
+     * class' b2Body
+     *
+     * @param shape The shape to make the fixture with
+     * @param density The density of the shape
+     */
+    void setupRobotBodyFixture(const b2PolygonShape *shape, const float density);
 
     /**
      * Creates a fixture to represent the chicker of the robot. It is partially inset into

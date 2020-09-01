@@ -12,14 +12,7 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string FreeKickPlay::name = "Direct Free Kick Play";
-
 FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
-
-std::string FreeKickPlay::getName() const
-{
-    return FreeKickPlay::name;
-}
 
 bool FreeKickPlay::isApplicable(const World &world) const
 {
@@ -221,7 +214,8 @@ void FreeKickPlay::performPassStage(
     //                    to save CPU cycles
 
     // Perform the pass and wait until the receiver is finished
-    auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
+    auto passer =
+        std::make_shared<PasserTactic>(pass, world.ball(), world.field(), false);
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);

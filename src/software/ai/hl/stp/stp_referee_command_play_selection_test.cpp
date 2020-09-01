@@ -19,7 +19,6 @@ struct PlaySelectionTestParams
     RefereeCommand second_game_state;
 };
 
-
 class STPRefereeCommandPlaySelectionTestWithPositions
     : public ::testing::Test,
       public ::testing::WithParamInterface<PlaySelectionTestParams>
@@ -177,10 +176,8 @@ std::vector<PlaySelectionTestParams> test_params = {
      .first_game_state   = RefereeCommand::PREPARE_PENALTY_THEM,
      .second_game_state  = RefereeCommand::NORMAL_START}};
 
-// TODO (Issue #1330): Reenable these tests
-// INSTANTIATE_TEST_CASE_P(TestPositions,
-// STPRefereeCommandPlaySelectionTestWithPositions,
-//                        ::testing::ValuesIn(test_params.begin(), test_params.end()));
+INSTANTIATE_TEST_CASE_P(TestPositions, STPRefereeCommandPlaySelectionTestWithPositions,
+                        ::testing::ValuesIn(test_params.begin(), test_params.end()));
 
 class STPRefereeCommandPlaySelectionTest
     : public ::testing::Test,
@@ -224,7 +221,6 @@ class STPRefereeCommandPlaySelectionTest
 
 TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_commands)
 {
-    // TODO (Issue #1330): replace the ball with real parameterized values
     world.updateRefereeCommand(GetParam());
     world.updateGameStateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
 
@@ -238,9 +234,17 @@ TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_c
     }
 }
 
-auto all_referee_commands = allValuesRefereeCommand();
+// TODO (Issue #1665): Include `BALL_PLACEMENT_US` and `BALL_PLACEMENT_THEM` when ball
+// placement states have plays
 
-// TODO (Issue #1330): Reenable these tests
-// INSTANTIATE_TEST_CASE_P(AllRefereeCommands, STPRefereeCommandPlaySelectionTest,
-//                        ::testing::ValuesIn(all_referee_commands.begin(),
-//                                            all_referee_commands.end()));
+// NORMAL_START is omitted since there is no preceding PREPARE state
+// GOAL_US and GOAL_THEM are omitted since selecting a play is not applicable
+INSTANTIATE_TEST_CASE_P(
+    AllRefboxGameStates, STPRefereeCommandPlaySelectionTest,
+    ::testing::Values(
+        RefereeCommand::HALT, RefereeCommand::STOP, RefereeCommand::FORCE_START,
+        RefereeCommand::PREPARE_KICKOFF_US, RefereeCommand::PREPARE_KICKOFF_THEM,
+        RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_THEM,
+        RefereeCommand::DIRECT_FREE_US, RefereeCommand::DIRECT_FREE_THEM,
+        RefereeCommand::INDIRECT_FREE_US, RefereeCommand::INDIRECT_FREE_THEM,
+        RefereeCommand::TIMEOUT_US, RefereeCommand::TIMEOUT_THEM));

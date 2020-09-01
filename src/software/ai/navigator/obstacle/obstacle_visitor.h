@@ -20,6 +20,7 @@ class GeomObstacle;
 class ObstacleVisitor
 {
    public:
+    ObstacleVisitor()          = default;
     virtual ~ObstacleVisitor() = default;
 
     /**

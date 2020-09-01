@@ -155,15 +155,15 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     {
         for (auto &detection : ball_detections)
         {
-            invert(detection);
+            detection = invert(detection);
         }
         for (auto &detection : yellow_team)
         {
-            invert(detection);
+            detection = invert(detection);
         }
         for (auto &detection : blue_team)
         {
-            invert(detection);
+            detection = invert(detection);
         }
     }
 
@@ -204,6 +204,8 @@ void SensorFusion::updateBall(TimestampedBallState new_ball_state)
     {
         ball = Ball(new_ball_state);
     }
+
+    game_state.updateBall(*ball);
 }
 
 std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(

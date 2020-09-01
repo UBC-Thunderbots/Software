@@ -21,14 +21,11 @@ TEST(StopPlayTest, test_stop_play_returns_correct_tactics)
     HaltPlay halt_play;
     auto tactics = halt_play.getTactics(world);
 
-    // Make sure something was returned
-    EXPECT_TRUE(tactics);
-
     // Make sure the expected number of tactics was returned
-    EXPECT_EQ((*tactics).size(), 6);
+    EXPECT_EQ((tactics).size(), 6);
 
     // Make sure each tactic is an ExampleTactic
-    for (const auto &t : *tactics)
+    for (const auto &t : tactics)
     {
         try
         {

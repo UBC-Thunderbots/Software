@@ -1,10 +1,12 @@
 #pragma once
+
 #include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-//#include "software/backend/backend.h" // Should make generic.h
+
+#include "software/util/typename/typename.h"
 
 // A quality of life typedef to make things shorter and more readable
 template <class IndexType, class TypeToCreate>
@@ -115,7 +117,7 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
         auto generic_creator = []() -> std::unique_ptr<TypeToCreate> {
             return std::make_unique<T>();
         };
-        GenericFactory<IndexType, TypeToCreate>::registerCreator(T::name,
+        GenericFactory<IndexType, TypeToCreate>::registerCreator(TYPENAME(T),
                                                                  generic_creator);
     }
 };
