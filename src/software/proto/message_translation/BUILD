@@ -157,3 +157,22 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "defending_side",
+    srcs = ["defending_side.cpp"],
+    hdrs = ["defending_side.h"],
+    deps = [
+        "//software/proto:defending_side_msg_cc_proto",
+        "//software/world:field",
+    ],
+)
+
+cc_test(
+    name = "defending_side_test",
+    srcs = ["defending_side_test.cpp"],
+    deps = [
+        ":defending_side",
+        "@gtest//:gtest_main",
+    ],
+)

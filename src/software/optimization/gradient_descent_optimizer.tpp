@@ -15,29 +15,6 @@
 #include "software/optimization/gradient_descent_optimizer.h"
 
 template <size_t NUM_PARAMS>
-GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer()
-    : GradientDescentOptimizer(GradientDescentOptimizer<NUM_PARAMS>::ParamArray{1})
-{
-}
-
-template <size_t NUM_PARAMS>
-GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
-    std::array<double, NUM_PARAMS> param_weights)
-    : GradientDescentOptimizer(param_weights, DEFAULT_GRADIENT_APPROX_STEP_SIZE)
-{
-}
-
-
-template <size_t NUM_PARAMS>
-GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
-    std::array<double, NUM_PARAMS> param_weights, double gradient_approx_step_size)
-    : GradientDescentOptimizer(param_weights, gradient_approx_step_size,
-                               DEFAULT_PAST_GRADIENT_DECAY_RATE,
-                               DEFAULT_PAST_SQUARED_GRADIENT_DECAY_RATE)
-{
-}
-
-template <size_t NUM_PARAMS>
 GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
     std::array<double, NUM_PARAMS> param_weights, double gradient_approx_step_size,
     double past_gradient_decay_rate, double past_squared_gradient_decay_rate)
