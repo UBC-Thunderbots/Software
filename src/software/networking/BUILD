@@ -34,6 +34,7 @@ cc_library(
     deps = [
         ":multicast_listener",
         "//software/logger",
+        "//software/util/typename",
     ],
 )
 

@@ -4,12 +4,13 @@
 #include <QtWidgets/QApplication>
 
 ThreadedRobotDiagnosticsGUI::ThreadedRobotDiagnosticsGUI(int argc, char** argv)
-    : ThreadedObserver<SensorMsg>(),
+    : FirstInFirstOutThreadedObserver<SensorProto>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       sensor_msg_buffer(
-          std::make_shared<ThreadSafeBuffer<SensorMsg>>(sensor_msg_buffer_size)),
-      primitive_buffer(std::make_shared<ThreadSafeBuffer<std::unique_ptr<Primitive>>>(
-          primitive_buffer_size)),
+          std::make_shared<ThreadSafeBuffer<SensorProto>>(sensor_msg_buffer_size)),
+      primitive_buffer(
+          std::make_shared<ThreadSafeBuffer<std::unique_ptr<TbotsProto::PrimitiveSet>>>(
+              primitive_buffer_size)),
       application_shutting_down(false)
 {
     run_robot_diagnostics_thread = std::thread(
@@ -58,7 +59,7 @@ void ThreadedRobotDiagnosticsGUI::createAndRunRobotDiagnosticsGUI(int argc, char
     termination_promise_ptr->set_value();
 }
 
-void ThreadedRobotDiagnosticsGUI::onValueReceived(SensorMsg sensor_msg)
+void ThreadedRobotDiagnosticsGUI::onValueReceived(SensorProto sensor_msg)
 {
     sensor_msg_buffer->push(sensor_msg);
 }

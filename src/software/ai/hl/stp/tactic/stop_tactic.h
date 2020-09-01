@@ -18,8 +18,6 @@ class StopTactic : public Tactic
      */
     explicit StopTactic(bool coast);
 
-    std::string getName() const override;
-
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally

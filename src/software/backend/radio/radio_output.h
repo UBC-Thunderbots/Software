@@ -2,6 +2,7 @@
 
 #include <limits>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/radio/mrf/dongle.h"
 #include "software/backend/radio/robot_status.h"
 #include "software/world/ball.h"
@@ -18,15 +19,16 @@ class RadioOutput
      * @param received_robot_status_callback The callback function to call with new
      *                                       robot status messages
      */
-    explicit RadioOutput(unsigned int config,
-                         std::function<void(RobotStatus)> received_robot_status_callback);
+    explicit RadioOutput(
+        unsigned int config,
+        std::function<void(RadioRobotStatus)> received_robot_status_callback);
 
     /**
      * Sends the given primitives to the backend to control the robots
      *
-     * @param primitives the list of primitives to send
+     * @param primitives the TbotsProto::PrimitiveSet to send
      */
-    void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives);
+    void sendPrimitives(const TbotsProto::PrimitiveSet& primitives);
 
     /**
      * Sends a camera packet with the detected robots and ball.

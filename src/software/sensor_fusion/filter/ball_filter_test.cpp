@@ -7,10 +7,9 @@
 #include <random>
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
-#include "software/new_geom/ray.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/ray.h"
+#include "software/geom/segment.h"
 
 class BallFilterTest : public ::testing::Test
 {
@@ -102,7 +101,7 @@ class BallFilterTest : public ::testing::Test
                                     double expected_velocity_magnitude_tolerance,
                                     unsigned int num_steps_to_ignore)
     {
-        Point ball_starting_position = ball_path.getSegStart();
+        Point ball_starting_position = ball_path.getStart();
         Vector ball_velocity = ball_path.toVector().normalize(ball_velocity_magnitude);
         // Check for division by 0
         if (ball_velocity_magnitude == 0)

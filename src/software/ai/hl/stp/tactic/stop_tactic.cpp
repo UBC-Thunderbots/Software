@@ -4,12 +4,7 @@
 
 #include "software/ai/hl/stp/action/stop_action.h"
 
-StopTactic::StopTactic(bool coast) : Tactic(true), coast(coast) {}
-
-std::string StopTactic::getName() const
-{
-    return "Stop Tactic";
-}
+StopTactic::StopTactic(bool coast) : Tactic(true, {}), coast(coast) {}
 
 double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
 {

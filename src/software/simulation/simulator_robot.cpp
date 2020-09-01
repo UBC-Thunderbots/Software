@@ -1,9 +1,8 @@
 #include "software/simulation/simulator_robot.h"
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
+#include "software/geom/algorithms/acute_angle.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/util/acute_angle.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),
@@ -31,8 +30,9 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
             });
     }
 
-    primitive_manager = std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>(
-        app_primitive_manager_create(), PrimitiveManagerDeleter());
+    primitive_manager =
+        std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter>(
+            app_primitive_manager_create(), FirmwarePrimitiveManagerDeleter());
 }
 
 void SimulatorRobot::checkValidAndExecuteVoid(
@@ -120,8 +120,14 @@ float SimulatorRobot::getBatteryVoltage()
 void SimulatorRobot::kick(float speed_m_per_s)
 {
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
-        for (auto ball : this->balls_in_dribbler_area)
+        for (auto &dribbler_ball : this->balls_in_dribbler_area)
         {
+            if (!dribbler_ball.can_be_chicked)
+            {
+                continue;
+            }
+
+            auto ball = dribbler_ball.ball;
             Vector robot_orientation_vector =
                 Vector::createFromAngle(robot->getRobotState().orientation());
 
@@ -162,6 +168,8 @@ void SimulatorRobot::kick(float speed_m_per_s)
             ball->applyImpulse(
                 robot_orientation_vector.normalize(ball_head_on_momentum.length()));
             ball->applyImpulse(kick_impulse);
+
+            dribbler_ball.can_be_chicked = false;
         }
     });
 }
@@ -169,16 +177,23 @@ void SimulatorRobot::kick(float speed_m_per_s)
 void SimulatorRobot::chip(float distance_m)
 {
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
-        for (auto ball : this->balls_in_dribbler_area)
+        for (auto &dribbler_ball : this->balls_in_dribbler_area)
         {
-            // Mark the ball as "in flight" so collisions are turned off
-            // until it has travelled the desired chip distance.
-            ball->setInFlightForDistance(distance_m);
+            if (!dribbler_ball.can_be_chicked)
+            {
+                continue;
+            }
 
+            auto ball = dribbler_ball.ball;
             // Assume the ball is chipped at a 45 degree angle
             // TODO: Use a robot-specific constant
             // https://github.com/UBC-Thunderbots/Software/issues/1179
             Angle chip_angle = Angle::fromDegrees(45);
+
+            // Mark the ball as "in flight" so collisions are turned off
+            // until it has travelled the desired chip distance.
+            ball->setInFlightForDistance(distance_m, chip_angle);
+
             // Use the formula for the Range of a parabolic projectile
             // Rearrange to solve for the initial velocity.
             // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
@@ -192,6 +207,8 @@ void SimulatorRobot::chip(float distance_m)
             float ground_velocity =
                 initial_velocity * static_cast<float>(chip_angle.cos());
             kick(ground_velocity);
+
+            dribbler_ball.can_be_chicked = false;
         }
     });
 }
@@ -200,12 +217,16 @@ void SimulatorRobot::enableAutokick(float speed_m_per_s)
 {
     autokick_speed_m_per_s = speed_m_per_s;
     disableAutochip();
+    // Kick any balls already in the chicker
+    kick(speed_m_per_s);
 }
 
 void SimulatorRobot::enableAutochip(float distance_m)
 {
     autochip_distance_m = distance_m;
     disableAutokick();
+    // Chip any balls already in the chicker
+    chip(distance_m);
 }
 
 void SimulatorRobot::disableAutokick()
@@ -411,15 +432,19 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
     Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
     physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
 
+    auto ball = DribblerBall{.ball = physics_ball, .can_be_chicked = true};
+
     // Keep track of all balls in the dribbler
-    balls_in_dribbler_area.emplace_back(physics_ball);
+    balls_in_dribbler_area.emplace_back(ball);
 }
 
 void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
                                               PhysicsBall *physics_ball)
 {
-    auto iter = std::find(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(),
-                          physics_ball);
+    auto iter = std::find_if(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(),
+                             [physics_ball](DribblerBall dribbler_ball) {
+                                 return dribbler_ball.ball == physics_ball;
+                             });
 
     if (iter != balls_in_dribbler_area.end())
     {
@@ -428,7 +453,7 @@ void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
 }
 
 void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                                       const PrimitiveMsg &primitive_msg)
+                                       const TbotsProto_Primitive &primitive_msg)
 {
     app_primitive_manager_startNewPrimitive(primitive_manager.get(), firmware_world.get(),
                                             primitive_msg);

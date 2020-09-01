@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
 #include "software/test_util/test_util.h"
 
 TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
@@ -208,7 +207,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
+    Shot shot{world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
     auto result = calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -221,8 +220,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
-                 Angle::fromDegrees(45)};
+    Shot shot{world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
     auto result = calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -235,7 +233,7 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_fully_blocked_net)
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
+    Shot shot{world.field().enemyGoalCenter(), Angle::zero()};
 
     auto result = calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -248,7 +246,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
+    Shot shot{world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
     auto result = calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -261,8 +259,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter() + Vector(0, 0.25),
-                 Angle::fromDegrees(45)};
+    Shot shot{world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
     auto result = calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
 
@@ -275,7 +272,7 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_fully_blocked_net)
     World world       = ::TestUtil::createBlankTestingWorld();
     Field field       = Field::createSSLDivisionBField();
     Point shot_origin = world.field().enemyGoalCenter() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoalCenter(), Angle::zero()};
+    Shot shot{world.field().enemyGoalCenter(), Angle::zero()};
 
     auto result = calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
 
@@ -291,11 +288,10 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_no_obstacles)
 
     auto open_shot = calcMostOpenDirectionFromCircleObstacles(origin, ref_segment, obs);
 
-    EXPECT_EQ((ref_segment.getSegStart() - origin).orientation() -
+    EXPECT_EQ((ref_segment.getStart() - origin).orientation() -
                   (ref_segment.getEnd() - origin).orientation(),
               open_shot->getOpenAngle());
-    EXPECT_EQ(getPointsMean({ref_segment.getSegStart(), ref_segment.getEnd()}),
-              open_shot->getPointToShootAt());
+    EXPECT_EQ(ref_segment.midPoint(), open_shot->getPointToShootAt());
 }
 
 TEST(CalcBestShotTest, test_calc_most_open_seg_obstacle_center_obstacle)
@@ -425,7 +421,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_obstacles_behind)
 
     auto open_shot = calcMostOpenDirectionFromCircleObstacles(reference, ref_seg, obs);
     EXPECT_EQ(open_shot->getOpenAngle(),
-              (ref_seg.getSegStart() - reference)
+              (ref_seg.getStart() - reference)
                   .orientation()
                   .minDiff((ref_seg.getEnd() - reference).orientation())
                   .abs());

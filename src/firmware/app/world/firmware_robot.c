@@ -6,6 +6,7 @@ struct FirmwareRobot
 {
     // NOTE: Everything here is in the global field reference frame (ie. 0,0 is the center
     // of the field, 0 degrees is towards the enemy goal) unless otherwise specified.
+    Charger_t* charger;
     Chicker_t* chicker;
     Dribbler_t* dribbler;
     float (*get_robot_position_x)(void);
@@ -21,22 +22,20 @@ struct FirmwareRobot
     Wheel_t* back_right_wheel;
     Wheel_t* back_left_wheel;
     RobotConstants_t robot_constants;
-    unsigned int id;
 };
 
 FirmwareRobot_t* app_firmware_robot_create(
-    Chicker_t* chicker, Dribbler_t* dribbler, float (*get_robot_position_x)(void),
-    float (*get_robot_position_y)(void), float (*get_robot_orientation)(void),
-    float (*get_robot_velocity_x)(void), float (*get_robot_velocity_y)(void),
-    float (*get_robot_velocity_angular)(void), float (*get_battery_voltage)(void),
-    Wheel_t* front_right_wheel, Wheel_t* front_left_wheel, Wheel_t* back_right_wheel,
-    Wheel_t* back_left_wheel, ControllerState_t* controller_state,
-    RobotConstants_t robot_constants,
-    unsigned int id
-    )
+    Charger_t* charger, Chicker_t* chicker, Dribbler_t* dribbler,
+    float (*get_robot_position_x)(void), float (*get_robot_position_y)(void),
+    float (*get_robot_orientation)(void), float (*get_robot_velocity_x)(void),
+    float (*get_robot_velocity_y)(void), float (*get_robot_velocity_angular)(void),
+    float (*get_battery_voltage)(void), Wheel_t* front_right_wheel,
+    Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel,
+    ControllerState_t* controller_state, RobotConstants_t robot_constants)
 {
     FirmwareRobot_t* new_robot = malloc(sizeof(FirmwareRobot_t));
 
+    new_robot->charger                    = charger;
     new_robot->chicker                    = chicker;
     new_robot->dribbler                   = dribbler;
     new_robot->get_robot_position_x       = get_robot_position_x;
@@ -52,7 +51,6 @@ FirmwareRobot_t* app_firmware_robot_create(
     new_robot->back_left_wheel            = back_left_wheel;
     new_robot->robot_constants            = robot_constants;
     new_robot->controller_state           = controller_state;
-    new_robot->id           = id;
 
     return new_robot;
 }
@@ -60,6 +58,11 @@ FirmwareRobot_t* app_firmware_robot_create(
 void app_firmware_robot_destroy(FirmwareRobot_t* robot)
 {
     free(robot);
+}
+
+Charger_t* app_firmware_robot_getCharger(const FirmwareRobot_t* robot)
+{
+    return robot->charger;
 }
 
 Chicker_t* app_firmware_robot_getChicker(const FirmwareRobot_t* robot)
@@ -135,8 +138,4 @@ RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* rob
 ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* robot)
 {
     return robot->controller_state;
-}
-
-unsigned int app_firmware_robot_getId(const FirmwareRobot_t* robot){
-    return robot->id;
 }

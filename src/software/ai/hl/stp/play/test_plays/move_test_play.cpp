@@ -3,13 +3,6 @@
 #include "software/ai/hl/stp/tactic/test_tactics/move_test_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string MoveTestPlay::name = "Move Test Play";
-
-std::string MoveTestPlay::getName() const
-{
-    return MoveTestPlay::name;
-}
-
 bool MoveTestPlay::isApplicable(const World &world) const
 {
     return world.ball().position().x() >= 0;

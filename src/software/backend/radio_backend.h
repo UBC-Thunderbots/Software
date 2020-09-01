@@ -16,15 +16,16 @@ class RadioBackend : public Backend
    private:
     static const int DEFAULT_RADIO_CONFIG = 0;
 
-    void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
+    void onValueReceived(TbotsProto::PrimitiveSet primitives) override;
     void onValueReceived(World world) override;
 
     /**
-     * Convert robot_status to TbotsRobotMsg and send as a SensorMsg to observers
+     * Convert robot_status to TbotsProto::RobotStatus and send as a SensorProto to
+     * observers
      *
-     * @param robot_status The RobotStatus
+     * @param robot_status The RadioRobotStatus
      */
-    void receiveRobotStatus(RobotStatus robot_status);
+    void receiveRobotStatus(RadioRobotStatus robot_status);
 
     const std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config;
 
@@ -37,6 +38,6 @@ class RadioBackend : public Backend
     std::optional<World> most_recently_received_world;
     std::mutex most_recently_received_world_mutex;
 
-    ConstPrimitiveVectorPtr most_recently_received_primitives;
+    TbotsProto::PrimitiveSet most_recently_received_primitives;
     std::mutex most_recently_received_primitives_mutex;
 };

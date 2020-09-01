@@ -1,8 +1,14 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+#include <memory>
 
+#include "software/geom/point.h"
 #include "software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h"
+#include "software/simulation/physics/physics_robot.h"
+#include "software/simulation/standalone_simulator.h"
+#include "software/world/robot_state.h"
+#include "software/world/team_colour.h"
 
 /**
  * A custom version of the DrawFunctionVisualizer widget that allows the user to
@@ -13,18 +19,22 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
     Q_OBJECT
 
    public:
-    StandaloneSimulatorDrawFunctionVisualizer(QWidget* parent = 0);
+    explicit StandaloneSimulatorDrawFunctionVisualizer(QWidget* parent = 0);
 
     /**
-     * Register a callback that will be called when the user requests to place the ball
-     * in the GUI.
+     * Sets the StandaloneSimulator that this widget controls
      *
-     * @param callback The callback to register
+     * @param simulator The standalone simulator to control
      */
-    void registerBallPlacementCallback(const std::function<void(Point)>& callback);
+    void setStandaloneSimulator(std::shared_ptr<StandaloneSimulator> simulator);
 
    private:
     void mousePressEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
-    std::vector<std::function<void(Point)>> ball_placement_callbacks;
+    // The robot currently being placed by the user, if any
+    std::weak_ptr<PhysicsRobot> robot;
+    std::shared_ptr<StandaloneSimulator> standalone_simulator;
 };

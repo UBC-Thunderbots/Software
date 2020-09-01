@@ -5,15 +5,6 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-
-
-const std::string StopPlay::name = "Stop Play";
-
-std::string StopPlay::getName() const
-{
-    return StopPlay::name;
-}
-
 bool StopPlay::isApplicable(const World &world) const
 {
     return world.gameState().isStopped();

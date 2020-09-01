@@ -1,6 +1,4 @@
 /**
- * This file contains the declaration for the GradientDescentOptimizer
- *
  * NOTE: We do not use `using namespace ...` here, because this is still a header file,
  *       and as such anything that includes `gradient_descent.h` (which includes this
  *       file), would get any namespaces we use here
@@ -15,29 +13,6 @@
 #include <cmath>
 
 #include "software/optimization/gradient_descent_optimizer.h"
-
-template <size_t NUM_PARAMS>
-GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer()
-    : GradientDescentOptimizer(GradientDescentOptimizer<NUM_PARAMS>::ParamArray{1})
-{
-}
-
-template <size_t NUM_PARAMS>
-GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
-    std::array<double, NUM_PARAMS> param_weights)
-    : GradientDescentOptimizer(param_weights, DEFAULT_GRADIENT_APPROX_STEP_SIZE)
-{
-}
-
-
-template <size_t NUM_PARAMS>
-GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
-    std::array<double, NUM_PARAMS> param_weights, double gradient_approx_step_size)
-    : GradientDescentOptimizer(param_weights, gradient_approx_step_size,
-                               DEFAULT_PAST_GRADIENT_DECAY_RATE,
-                               DEFAULT_PAST_SQUARED_GRADIENT_DECAY_RATE)
-{
-}
 
 template <size_t NUM_PARAMS>
 GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(

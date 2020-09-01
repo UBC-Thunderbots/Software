@@ -1,18 +1,7 @@
-/**
- * This file contains unit tests for the Chip Intent class
- */
-
 #include "software/ai/intent/chip_intent.h"
 
 #include <gtest/gtest.h>
 #include <string.h>
-
-TEST(ChipIntentTest, intent_name_test)
-{
-    ChipIntent chip_intent = ChipIntent(0, Point(), Angle::zero(), 0, 0);
-
-    EXPECT_EQ("Chip Intent", chip_intent.getIntentName());
-}
 
 // For equality operators, we only check for cases not covered in the Primitive tests,
 // since Intents inherit from Primitives

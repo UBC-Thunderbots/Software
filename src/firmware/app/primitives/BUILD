@@ -1,66 +1,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "direct_velocity",
-    srcs = ["direct_velocity_primitive.c"],
-    hdrs = ["direct_velocity_primitive.h"],
+    name = "direct_control",
+    srcs = ["direct_control_primitive.c"],
+    hdrs = ["direct_control_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/app/control",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
-    name = "direct_wheels",
-    srcs = ["direct_wheels_primitive.c"],
-    hdrs = ["direct_wheels_primitive.h"],
-    deps = [
-        ":primitive",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
-    name = "dribble",
-    srcs = ["dribble_primitive.c"],
-    hdrs = ["dribble_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
-    name = "move",
-    srcs = ["move_primitive.c"],
-    hdrs = ["move_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/app/control:physbot",
-        "//firmware/app/control:trajectory_planner",
-        "//firmware/shared:physics",
-        "//firmware/shared:util",
-        "//shared:constants",
-        "//shared:robot_constants",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
-    name = "pivot",
-    srcs = ["pivot_primitive.c"],
-    hdrs = ["pivot_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:util",
         "//shared/proto:tbots_nanopb_proto",
     ],
 )
@@ -86,14 +32,14 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
-        ":direct_velocity",
-        ":direct_wheels",
-        ":dribble",
         ":move",
-        ":pivot",
         ":primitive",
-        ":shoot",
-        ":spin",
+        ":chip",
+        ":autochip_move",
+        ":autokick_move",
+        ":direct_control",
+        ":kick",
+        ":spinning_move",
         ":stop",
         "//firmware/app/world:firmware_world",
     ] + select({
@@ -104,9 +50,61 @@ cc_library(
 )
 
 cc_library(
-    name = "shoot",
-    srcs = ["shoot_primitive.c"],
-    hdrs = ["shoot_primitive.h"],
+    name = "chick_motion",
+    srcs = ["chick_motion.c"],
+    hdrs = ["chick_motion.h"],
+    deps = [
+        ":primitive",
+        "//firmware/app/control",
+        "//firmware/app/control:bangbang",
+        "//firmware/app/control:physbot",
+        "//firmware/app/control:trajectory_planner",
+        "//firmware/shared:physics",
+        "//firmware/shared:util",
+    ],
+)
+
+cc_library(
+    name = "chip",
+    srcs = [
+        "chip_primitive.c",
+    ],
+    hdrs = ["chip_primitive.h"],
+    deps = [
+        "chick_motion",
+        ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "kick",
+    srcs = ["kick_primitive.c"],
+    hdrs = ["kick_primitive.h"],
+    deps = [
+        "chick_motion",
+        ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "spinning_move",
+    srcs = ["spinning_move_primitive.c"],
+    hdrs = ["spinning_move_primitive.h"],
+    deps = [
+        ":primitive",
+        "//firmware/app/control",
+        "//firmware/app/control:bangbang",
+        "//firmware/shared:physics",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "move_helper",
+    srcs = ["move_helper.c"],
+    hdrs = ["move_helper.h"],
     deps = [
         ":primitive",
         "//firmware/app/control",
@@ -114,19 +112,41 @@ cc_library(
         "//firmware/app/control:physbot",
         "//firmware/shared:physics",
         "//firmware/shared:util",
+        "//shared:constants",
+        "//shared:robot_constants",
         "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
 cc_library(
-    name = "spin",
-    srcs = ["spin_primitive.c"],
-    hdrs = ["spin_primitive.h"],
+    name = "move",
+    srcs = ["move_primitive.c"],
+    hdrs = ["move_primitive.h"],
     deps = [
+        "move_helper",
         ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "autokick_move",
+    srcs = ["autokick_move_primitive.c"],
+    hdrs = ["autokick_move_primitive.h"],
+    deps = [
+        "move_helper",
+        ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "autochip_move",
+    srcs = ["autochip_move_primitive.c"],
+    hdrs = ["autochip_move_primitive.h"],
+    deps = [
+        "move_helper",
+        ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],
 )

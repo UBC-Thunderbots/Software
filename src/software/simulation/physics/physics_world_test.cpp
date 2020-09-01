@@ -11,8 +11,8 @@
 // physics library
 MATCHER(RobotStateWithIdEq, "Robot State with Id Equal")
 {
-    return ::TestUtil::equalWithinTolerance(::std::get<0>(arg), ::std::get<1>(arg), 1e-6,
-                                            Angle::fromDegrees(0.1));
+    return TestUtil::equalWithinTolerance(::std::get<0>(arg), ::std::get<1>(arg), 1e-6,
+                                          Angle::fromDegrees(0.1));
 }
 
 TEST(PhysicsWorldTest, default_construct_physics_world)
@@ -241,6 +241,95 @@ TEST(PhysicsWorldTest, test_add_blue_robots_to_physics_world_with_existing_ids)
     EXPECT_THROW(physics_world.addBlueRobots(states2), std::runtime_error);
 }
 
+TEST(PhysicsWorldTest, test_remove_robot_with_invalid_ptr)
+{
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
+
+    EXPECT_TRUE(physics_world.getBluePhysicsRobots().empty());
+    EXPECT_TRUE(physics_world.getYellowPhysicsRobots().empty());
+
+    physics_world.removeRobot(std::weak_ptr<PhysicsRobot>());
+
+    EXPECT_TRUE(physics_world.getBluePhysicsRobots().empty());
+    EXPECT_TRUE(physics_world.getYellowPhysicsRobots().empty());
+}
+
+TEST(PhysicsWorldTest, remove_existing_yellow_team_robot)
+{
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
+
+    EXPECT_TRUE(physics_world.getBluePhysicsRobots().empty());
+    EXPECT_TRUE(physics_world.getYellowPhysicsRobots().empty());
+
+    RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
+                            AngularVelocity::half());
+    std::vector<RobotStateWithId> states1 = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    };
+
+    physics_world.addYellowRobots(states1);
+
+    auto yellow_robots = physics_world.getYellowPhysicsRobots();
+    ASSERT_FALSE(yellow_robots.empty());
+    auto robot_to_remove = yellow_robots.at(0);
+
+    physics_world.removeRobot(robot_to_remove);
+
+    EXPECT_TRUE(physics_world.getBluePhysicsRobots().empty());
+    EXPECT_TRUE(physics_world.getYellowPhysicsRobots().empty());
+}
+
+TEST(PhysicsWorldTest, remove_existing_blue_team_robot)
+{
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
+
+    EXPECT_TRUE(physics_world.getBluePhysicsRobots().empty());
+    EXPECT_TRUE(physics_world.getYellowPhysicsRobots().empty());
+
+    RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
+                            AngularVelocity::half());
+    std::vector<RobotStateWithId> states1 = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    };
+
+    physics_world.addBlueRobots(states1);
+
+    auto blue_robots = physics_world.getBluePhysicsRobots();
+    ASSERT_FALSE(blue_robots.empty());
+    auto robot_to_remove = blue_robots.at(0);
+
+    physics_world.removeRobot(robot_to_remove);
+
+    EXPECT_TRUE(physics_world.getBluePhysicsRobots().empty());
+    EXPECT_TRUE(physics_world.getYellowPhysicsRobots().empty());
+}
+
+TEST(PhysicsWorldTest, remove_existing_robot_twice)
+{
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
+
+    EXPECT_TRUE(physics_world.getBluePhysicsRobots().empty());
+    EXPECT_TRUE(physics_world.getYellowPhysicsRobots().empty());
+
+    RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
+                            AngularVelocity::half());
+    std::vector<RobotStateWithId> states1 = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    };
+
+    physics_world.addBlueRobots(states1);
+
+    auto blue_robots = physics_world.getBluePhysicsRobots();
+    ASSERT_FALSE(blue_robots.empty());
+    auto robot_to_remove = blue_robots.at(0);
+
+    physics_world.removeRobot(robot_to_remove);
+    physics_world.removeRobot(robot_to_remove);
+
+    EXPECT_TRUE(physics_world.getBluePhysicsRobots().empty());
+    EXPECT_TRUE(physics_world.getYellowPhysicsRobots().empty());
+}
+
 TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_no_existing_robots)
 {
     PhysicsWorld physics_world(Field::createSSLDivisionBField());
@@ -322,7 +411,7 @@ TEST(PhysicsSimulatorTest, test_world_does_not_change_if_time_step_is_zero)
     ASSERT_TRUE(updated_ball_state);
 
     EXPECT_TRUE(
-        ::TestUtil::equalWithinTolerance(ball_state, updated_ball_state.value(), 1e-6));
+        TestUtil::equalWithinTolerance(ball_state, updated_ball_state.value(), 1e-6));
     EXPECT_THAT(
         yellow_robot_states,
         ::testing::UnorderedPointwise(RobotStateWithIdEq(), updated_yellow_robot_states));
@@ -378,8 +467,8 @@ TEST(PhysicsSimulatorTest, test_single_small_time_step)
         RobotStateWithId{.id = 0, .robot_state = expected_blue_robot_state},
     };
 
-    EXPECT_TRUE(::TestUtil::equalWithinTolerance(expected_ball_state,
-                                                 updated_ball_state.value(), 1e-4));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_ball_state,
+                                               updated_ball_state.value(), 1e-4));
     EXPECT_THAT(expected_yellow_robot_states,
                 ::testing::Not(::testing::UnorderedPointwise(
                     RobotStateWithIdEq(), updated_yellow_robot_states)));
@@ -387,4 +476,47 @@ TEST(PhysicsSimulatorTest, test_single_small_time_step)
                 ::testing::Not(::testing::UnorderedPointwise(RobotStateWithIdEq(),
                                                              updated_blue_robot_states)));
     EXPECT_EQ(physics_world.getField(), Field::createSSLDivisionBField());
+}
+
+TEST(PhysicsWorldTest, test_get_robot_at_position_without_robot)
+{
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
+
+    auto result = physics_world.getRobotAtPosition(Point(1, 1));
+    EXPECT_FALSE(result.lock());
+}
+
+TEST(PhysicsWorldTest, test_get_robot_at_position_with_exact_robot_position)
+{
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
+
+    RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::quarter(),
+                           AngularVelocity::zero());
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state}};
+    physics_world.addYellowRobots(states);
+
+    auto result = physics_world.getRobotAtPosition(Point(1, 0));
+    ASSERT_TRUE(result.lock());
+    auto physics_robot = result.lock();
+    EXPECT_TRUE(
+        ::TestUtil::equalWithinTolerance(physics_robot->position(), Point(1, 0), 1e-3));
+}
+
+TEST(PhysicsWorldTest, test_get_robot_at_position_near_edge_of_robot)
+{
+    PhysicsWorld physics_world(Field::createSSLDivisionBField());
+
+    RobotState robot_state(Point(1, 2), Vector(0, 0), Angle::zero(),
+                           AngularVelocity::zero());
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state}};
+    physics_world.addBlueRobots(states);
+
+    auto result =
+        physics_world.getRobotAtPosition(Point(1, 2 + ROBOT_MAX_RADIUS_METERS * 0.9));
+    ASSERT_TRUE(result.lock());
+    auto physics_robot = result.lock();
+    EXPECT_TRUE(
+        ::TestUtil::equalWithinTolerance(physics_robot->position(), Point(1, 2), 1e-3));
 }

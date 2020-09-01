@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/new_geom/rectangle.h"
+#include "software/geom/rectangle.h"
 #include "software/world/world.h"
 
 /**
@@ -18,8 +18,6 @@ class CherryPickTactic : public Tactic
      * Creates a new CherryPickTactic
      */
     explicit CherryPickTactic(const World& world, const Rectangle& target_region);
-
-    std::string getName() const override;
 
     /**
      * Updates the world parameters for this tactic

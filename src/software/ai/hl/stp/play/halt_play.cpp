@@ -3,13 +3,6 @@
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string HaltPlay::name = "Halt Play";
-
-std::string HaltPlay::getName() const
-{
-    return HaltPlay::name;
-}
-
 bool HaltPlay::isApplicable(const World &world) const
 {
     return world.gameState().isHalted();

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <typeinfo>
-
 #include "software/logger/logger.h"
+#include "software/util/typename/typename.h"
 
 template <typename T>
 ThreadSafeBuffer<T>::ThreadSafeBuffer(std::size_t buffer_size, bool log_buffer_full)
@@ -48,7 +47,7 @@ void ThreadSafeBuffer<T>::push(const T& value)
     std::scoped_lock<std::mutex> buffer_lock(buffer_mutex);
     if (log_buffer_full && buffer.full())
     {
-        LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: " << typeid(T).name()
+        LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T)
                      << std::endl;
     }
     buffer.push_back(value);

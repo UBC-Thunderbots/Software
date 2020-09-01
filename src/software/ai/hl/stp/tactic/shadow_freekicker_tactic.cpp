@@ -9,17 +9,12 @@
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
                                                Team enemy_team, Ball ball, Field field,
                                                bool loop_forever)
-    : Tactic(loop_forever),
+    : Tactic(loop_forever, {RobotCapability::Move}),
       free_kick_shadower(free_kick_shadower),
       enemy_team(enemy_team),
       ball(ball),
       field(field)
 {
-}
-
-std::string ShadowFreekickerTactic::getName() const
-{
-    return "Shadow Freekick Tactic";
 }
 
 void ShadowFreekickerTactic::updateWorldParams(Team enemy_team, Ball ball)
@@ -81,7 +76,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
 
         move_action->updateControlParams(
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
-            0, DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+            0, DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
             BallCollisionType::AVOID);
         yield(move_action);
     } while (true);

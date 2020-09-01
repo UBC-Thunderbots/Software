@@ -5,10 +5,10 @@
 
 #include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/distance.h"
-#include "software/new_geom/util/intersects.h"
+#include "software/geom/algorithms/distance.h"
+#include "software/geom/algorithms/intersects.h"
+#include "software/geom/point.h"
+#include "software/geom/segment.h"
 
 /**
  * An obstacle is an area to avoid for navigation
@@ -16,6 +16,7 @@
 class Obstacle
 {
    public:
+    Obstacle()          = default;
     virtual ~Obstacle() = default;
 
     /**

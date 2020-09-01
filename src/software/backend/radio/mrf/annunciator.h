@@ -16,7 +16,8 @@ class Annunciator
      * @param received_robot_status_callback The callback function to call with new
      *                                       robot status messages
      */
-    explicit Annunciator(std::function<void(RobotStatus)> received_robot_status_callback);
+    explicit Annunciator(
+        std::function<void(RadioRobotStatus)> received_robot_status_callback);
 
     /**
      * Updates detected robots from vision, used to determine dead bots.
@@ -58,6 +59,6 @@ class Annunciator
    private:
     void checkNewMessages(std::vector<std::string> new_msgs,
                           std::vector<std::string> old_msgs);
-    std::function<void(RobotStatus)> received_robot_status_callback;
+    std::function<void(RadioRobotStatus)> received_robot_status_callback;
     std::vector<std::string> dongle_messages;
 };

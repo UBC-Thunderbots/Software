@@ -6,7 +6,7 @@
 #include "boost/bind.hpp"
 #include "google/protobuf/message.h"
 #include "shared/constants.h"
-#include "shared/proto/tbots_robot_msg.pb.h"
+#include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
@@ -28,7 +28,7 @@ using google::protobuf::Message;
  * bazel run //firmware_new/tools:send_proto_over_udp -- your_interface_here
  *
  */
-void callback(TbotsRobotMsg test)
+void callback(TbotsProto::RobotStatus test)
 {
     if (test.has_time_sent())
     {
@@ -51,21 +51,24 @@ int main(int argc, char* argv[])
 
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-    VisionMsg test_vision_msg;
-    PrimitiveMsg test_primitive_msg;
+    TbotsProto::Vision test_vision_msg;
+    TbotsProto::Primitive test_primitive_msg;
 
     // create an io service and run it in a thread to handle async calls
     boost::asio::io_service io_service;
     auto io_service_thread = std::thread([&]() { io_service.run(); });
 
-    auto vision_sender = std::make_unique<ThreadedProtoMulticastSender<VisionMsg>>(
-        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]), VISION_PORT);
+    auto vision_sender =
+        std::make_unique<ThreadedProtoMulticastSender<TbotsProto::Vision>>(
+            std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]), VISION_PORT);
 
-    auto primitive_sender = std::make_unique<ThreadedProtoMulticastSender<PrimitiveMsg>>(
-        std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]), PRIMITIVE_PORT);
+    auto primitive_sender =
+        std::make_unique<ThreadedProtoMulticastSender<TbotsProto::Primitive>>(
+            std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+            PRIMITIVE_PORT);
 
     auto status_listener =
-        std::make_unique<ThreadedProtoMulticastListener<TbotsRobotMsg>>(
+        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>(
             std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
             ROBOT_STATUS_PORT, std::function(callback));
 
@@ -73,7 +76,7 @@ int main(int argc, char* argv[])
     {
         // primitive and vision sender
         primitive_sender->sendProto(test_primitive_msg);
-        *(test_vision_msg.mutable_time_sent()) = *createCurrentTimestampMsg();
+        *(test_vision_msg.mutable_time_sent()) = *createCurrentTimestamp();
         vision_sender->sendProto(test_vision_msg);
 
         // 100 hz test

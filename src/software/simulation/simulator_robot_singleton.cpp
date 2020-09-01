@@ -1,9 +1,11 @@
 #include "software/simulation/simulator_robot_singleton.h"
 
 #include "software/logger/logger.h"
+#include "software/world/field.h"
 
 extern "C"
 {
+#include "firmware/app/world/charger.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/wheel.h"
@@ -19,16 +21,21 @@ extern "C"
 #define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
 
 std::shared_ptr<SimulatorRobot> SimulatorRobotSingleton::simulator_robot = nullptr;
+FieldSide SimulatorRobotSingleton::field_side_ = FieldSide::NEG_X;
 
-void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot)
+void SimulatorRobotSingleton::setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot,
+                                                FieldSide field_side)
 {
     simulator_robot = robot;
+    field_side_     = field_side;
 }
 
-// TODO: jdoc for arg
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
-SimulatorRobotSingleton::createFirmwareRobot(RobotId robot_id)
+SimulatorRobotSingleton::createFirmwareRobot()
 {
+    // Charger does nothing in sim
+    Charger_t* charger = app_charger_create([]() {}, []() {}, []() {});
+
     // TODO: Make sure all objects de-allocated properly
     // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
     Chicker_t* chicker = app_chicker_create(&(SimulatorRobotSingleton::kick),
@@ -83,7 +90,7 @@ SimulatorRobotSingleton::createFirmwareRobot(RobotId robot_id)
         .last_applied_acceleration_angular = 0,
     };
     FirmwareRobot_t* firmware_robot = app_firmware_robot_create(
-        chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
+        charger, chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
         &(SimulatorRobotSingleton::getPositionY),
         &(SimulatorRobotSingleton::getOrientation),
         &(SimulatorRobotSingleton::getVelocityX),
@@ -91,15 +98,15 @@ SimulatorRobotSingleton::createFirmwareRobot(RobotId robot_id)
         &(SimulatorRobotSingleton::getVelocityAngular),
         &(SimulatorRobotSingleton::getBatteryVoltage), front_right_wheel,
         front_left_wheel, back_right_wheel, back_left_wheel, controller_state,
-        robot_constants,
-        robot_id);
+        robot_constants);
 
     return std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>(firmware_robot,
                                                                   FirmwareRobotDeleter());
 }
 
 void SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-    std::shared_ptr<FirmwareWorld_t> firmware_world, const PrimitiveMsg& primitive_msg)
+    std::shared_ptr<FirmwareWorld_t> firmware_world,
+    const TbotsProto_Primitive& primitive_msg)
 {
     checkValidAndExecuteVoid([firmware_world, primitive_msg](auto robot) {
         robot->startNewPrimitive(firmware_world, primitive_msg);
@@ -154,29 +161,56 @@ unsigned int SimulatorRobotSingleton::checkValidAndReturnUint(
     return 0;
 }
 
+float SimulatorRobotSingleton::invertValueToMatchFieldSide(float value)
+{
+    switch (field_side_)
+    {
+        case FieldSide::NEG_X:
+            return value;
+        case FieldSide::POS_X:
+            return -value;
+        default:
+            throw std::invalid_argument("Unhandled value of FieldSide");
+    }
+}
+
 float SimulatorRobotSingleton::getPositionX()
 {
-    return checkValidAndReturnFloat([](auto robot) { return robot->getPositionX(); });
+    return checkValidAndReturnFloat(
+        [](auto robot) { return invertValueToMatchFieldSide(robot->getPositionX()); });
 }
 
 float SimulatorRobotSingleton::getPositionY()
 {
-    return checkValidAndReturnFloat([](auto robot) { return robot->getPositionY(); });
+    return checkValidAndReturnFloat(
+        [](auto robot) { return invertValueToMatchFieldSide(robot->getPositionY()); });
 }
 
 float SimulatorRobotSingleton::getOrientation()
 {
-    return checkValidAndReturnFloat([](auto robot) { return robot->getOrientation(); });
+    return checkValidAndReturnFloat([](auto robot) {
+        switch (field_side_)
+        {
+            case FieldSide::NEG_X:
+                return robot->getOrientation();
+            case FieldSide::POS_X:
+                return robot->getOrientation() + static_cast<float>(M_PI);
+            default:
+                throw std::invalid_argument("Unhandled value of FieldSide");
+        }
+    });
 }
 
 float SimulatorRobotSingleton::getVelocityX()
 {
-    return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityX(); });
+    return checkValidAndReturnFloat(
+        [](auto robot) { return invertValueToMatchFieldSide(robot->getVelocityX()); });
 }
 
 float SimulatorRobotSingleton::getVelocityY()
 {
-    return checkValidAndReturnFloat([](auto robot) { return robot->getVelocityY(); });
+    return checkValidAndReturnFloat(
+        [](auto robot) { return invertValueToMatchFieldSide(robot->getVelocityY()); });
 }
 
 float SimulatorRobotSingleton::getVelocityAngular()

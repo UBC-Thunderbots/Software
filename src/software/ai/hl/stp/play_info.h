@@ -5,29 +5,26 @@
 #include <vector>
 
 /**
- * A description of the play.  Contains the refbox game state, the name of the current
+ * A description of the play.  Contains the referee command, the name of the current
  * play being run by AI, and the tactic assignments for all the robots on the field.
  */
 class PlayInfo
 {
    public:
-    /**
-     * Constructs a PlayInfo object.
-     */
-    explicit PlayInfo();
+    PlayInfo() = delete;
 
     /**
      * Constructs a PlayInfo object with given arguments for fields
      */
-    explicit PlayInfo(std::string refbox_game_state_name, std::string play_name,
+    explicit PlayInfo(std::string referee_command_name, std::string play_name,
                       std::unordered_set<std::string> robots_tactic_assignment);
 
     /**
-     * Get refbox game state name
+     * Get referee command name
      *
-     * @return refbox game state name
+     * @return referee command name
      */
-    std::string getRefboxGameStateName() const;
+    std::string getRefereeCommandName() const;
 
     /**
      * Get play name
@@ -58,7 +55,7 @@ class PlayInfo
     bool operator==(const PlayInfo &other) const;
 
    private:
-    std::string refbox_game_state_name;
+    std::string referee_command_name;
     std::string play_name;
     std::unordered_set<std::string> robot_tactic_assignment;
 };
