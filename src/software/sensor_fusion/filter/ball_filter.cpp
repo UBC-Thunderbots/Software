@@ -3,34 +3,38 @@
 #include <Eigen/Dense>
 #include <algorithm>
 #include <limits>
+#include <vector>
 
 #include "shared/constants.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/math/math_functions.h"
 
-BallFilter::BallFilter(unsigned int min_buffer_size, unsigned int max_buffer_size)
-    : _min_buffer_size(min_buffer_size),
-      _max_buffer_size(max_buffer_size),
-      ball_detection_buffer(max_buffer_size)
-{
-}
 
-void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
-                                          const Field &field)
+BallFilter::BallFilter(const Rectangle& filter_area, unsigned int min_buffer_size, unsigned int max_buffer_size)
+    :
+
+       _min_buffer_size(min_buffer_size),
+       _max_buffer_size(max_buffer_size),
+      filter_area(filter_area),
+ ball_detection_buffer(max_buffer_size)
+ {
+ }
+
+void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections)
 {
     // Sort the detections in increasing order before processing. This places the oldest
     // detections (with the smallest timestamp) at the front of the buffer, and the most
     // recent detections (largest timestamp) at the end of the buffer.
     std::sort(new_ball_detections.begin(), new_ball_detections.end());
 
+    // Remove any detections outside the filter area
+//    std::erase_if(new_ball_detections, [&](BallDetection detection) {
+//        return !contains(filter_area, detection.position);
+//    });
+
     for (const auto &detection : new_ball_detections)
     {
-        // Ignore any detections that are not anywhere within the field
-        if (!field.pointInEntireField(detection.position))
-        {
-            continue;
-        }
-
         if (!ball_detection_buffer.empty())
         {
             auto detection_with_smallest_timestamp = *std::min_element(
@@ -338,10 +342,10 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
     }
 }
 
-std::optional<TimestampedBallState> BallFilter::getFilteredData(
-    const std::vector<BallDetection> &new_ball_detections, const Field &field)
+std::optional<TimestampedBallState> BallFilter::estimateBallState(
+    const std::vector<BallDetection> &new_ball_detections)
 {
-    addNewDetectionsToBuffer(new_ball_detections, field);
+    addNewDetectionsToBuffer(new_ball_detections);
 
     if (ball_detection_buffer.size() >= 2)
     {

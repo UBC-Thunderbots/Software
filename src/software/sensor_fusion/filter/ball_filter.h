@@ -5,10 +5,10 @@
 
 #include "software/geom/line.h"
 #include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 #include "software/sensor_fusion/filter/vision_detection.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball.h"
-#include "software/world/field.h"
 #include "software/world/timestamped_ball_state.h"
 
 /**
@@ -30,24 +30,17 @@ class BallFilter
     // The extra amount beyond the ball's max speed that we treat ball detections as valid
     static constexpr double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
 
-/**
- * A simple struct to pass around linear regression data
- */
-    struct LinearRegressionResults
-    {
-        Line regression_line;
-        double regression_error;
-    };
-
     /**
      * Creates a new Ball Filter
      *
+     * @param filter_area The area within which the ball filter will work. Any detections
+     * outside of this area will be ignored.
      * @param min_buffer_size The minimum size of the buffer the filter will use to filter
      * the ball. The buffer will shrink to this size as the ball speeds up
      * @param min_buffer_size The maximum size of the buffer the filter will use to filter
      * the ball. The buffer will grow to this size as the ball slows down
      */
-    explicit BallFilter(unsigned int min_buffer_size = DEFAULT_MIN_BUFFER_SIZE,
+    explicit BallFilter(const Rectangle& filter_area, unsigned int min_buffer_size = DEFAULT_MIN_BUFFER_SIZE,
                         unsigned int max_buffer_size = DEFAULT_MAX_BUFFER_SIZE);
 
     /**
@@ -58,29 +51,9 @@ class BallFilter
      *
      * @return The updated state of the ball given the new data
      */
-    std::optional<TimestampedBallState> getFilteredData(
-        const std::vector<BallDetection> &new_ball_detections, const Field &field);
+    std::optional<TimestampedBallState> estimateBallState(
+        const std::vector<BallDetection> &new_ball_detections);
 
-    /**
-     * Adds ball detections to the buffer stored by this filter. This function will ignore
-     * data that is outside of the field, and data that is too far away from the current
-     * known ball position and therefore is likely to be random noise.
-     *
-     * @param new_ball_detections The ball detections to try add to the buffer
-     * @param field The field being played on.
-     */
-    void addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
-                                  const Field &field);
-
-    /**
-     * Given a list of ball detections, use linear regression to find a line of best fit
-     * through the ball positions, and calculate the error of this regression.
-     *
-     * @param ball_detections The ball detections to use in the regression
-     * @return A struct containing the regression line and error of the linear regression
-     */
-    LinearRegressionResults getLinearRegressionLine(
-            boost::circular_buffer<BallDetection> ball_detections);
 
 private:
 /**
@@ -94,7 +67,24 @@ private:
         double min_max_magnitude_average;
     };
 
+/**
+ * A simple struct to pass around linear regression data
+ */
+    struct LinearRegressionResults
+    {
+        Line regression_line;
+        double regression_error;
+    };
 
+    /**
+     * Adds ball detections to the buffer stored by this filter. This function will ignore
+     * data that is outside of the field, and data that is too far away from the current
+     * known ball position and therefore is likely to be random noise.
+     *
+     * @param new_ball_detections The ball detections to try add to the buffer
+     * @param field The field being played on.
+     */
+    void addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's
@@ -108,6 +98,17 @@ private:
      * occurs that prevents the size from being calculated correctly, returns std::nullopt
      */
     std::optional<size_t> getAdjustedBufferSize(
+            boost::circular_buffer<BallDetection> ball_detections);
+
+
+    /**
+     * Given a list of ball detections, use linear regression to find a line of best fit
+     * through the ball positions, and calculate the error of this regression.
+     *
+     * @param ball_detections The ball detections to use in the regression
+     * @return A struct containing the regression line and error of the linear regression
+     */
+    LinearRegressionResults getLinearRegressionLine(
             boost::circular_buffer<BallDetection> ball_detections);
 
     /**
@@ -126,8 +127,6 @@ private:
         boost::circular_buffer<BallDetection> ball_detections,
         const std::optional<Line> &ball_regression_line = std::nullopt);
 
-
-
     /**
      * Uses linear regression to filter the given list of ball detections to fine the
      * current "real" state of the ball.
@@ -141,6 +140,7 @@ private:
 
     unsigned int _min_buffer_size;
     unsigned int _max_buffer_size;
+    Rectangle filter_area;
 
     // A circular buffer used to store previous ball detections, so we can use them
     // in the filter

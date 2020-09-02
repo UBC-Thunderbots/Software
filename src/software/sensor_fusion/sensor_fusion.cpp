@@ -214,7 +214,7 @@ std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(
     if (field)
     {
         std::optional<TimestampedBallState> new_ball =
-            ball_filter.getFilteredData(ball_detections, *field);
+                ball_filter.estimateBallState(ball_detections, *field);
         return new_ball;
     }
     return std::nullopt;

@@ -198,7 +198,7 @@ class BallFilterTest : public ::testing::Test
                               current_timestamp, 0.9}};
 
             // Get the filtered result given the new detection information
-            auto filtered_ball = ball_filter.getFilteredData(ball_detections, field);
+            auto filtered_ball = ball_filter.estimateBallState(ball_detections, field);
 
             if (i < num_steps_to_ignore)
             {
@@ -507,42 +507,40 @@ TEST_F(BallFilterTest,
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest,
-       test_linear_regression_returns_same_results_for_inverted_coordinates)
+TEST_F(BallFilterTest, ball_moving_along_x_axis)
 {
-    boost::circular_buffer<BallDetection> ball_detections(2);
-    Point p1(0, 0);
-    Point p2(1, 0.5);
-    ball_detections.push_front(
-        {p1, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(1), 1.0});
-    ball_detections.push_front(
-        {p2, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(2), 1.0});
-    auto x_vs_y_regression = ball_filter.getLinearRegressionLine(ball_detections);
+    Segment ball_path = Segment(Point(-4, 0), Point(4, 0));
+    double ball_velocity_magnitude               = 5;
+    double ball_position_variance                = 0;
+    double time_step_variance                    = 0;
+    double expected_position_tolerance           = 0.001;
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
+    double expected_velocity_magnitude_tolerance = 0.01;
+    int num_steps_to_ignore                      = 5;
+    Timestamp start_time                         = current_timestamp;
 
-    double d1 = distance(x_vs_y_regression.regression_line, p1);
-    double d2 = distance(x_vs_y_regression.regression_line, p2);
+    testFilterAlongLineSegment(
+            start_time, ball_path, ball_velocity_magnitude, ball_position_variance,
+            time_step_variance, expected_position_tolerance,
+            expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
+            num_steps_to_ignore);
+}
 
-    EXPECT_LT(d1, 0.001);
-    EXPECT_LT(d2, 0.001);
+TEST_F(BallFilterTest, ball_moving_along_y_axis)
+{
+    Segment ball_path = Segment(Point(0, -4), Point(0, 4));
+    double ball_velocity_magnitude               = 5;
+    double ball_position_variance                = 0;
+    double time_step_variance                    = 0;
+    double expected_position_tolerance           = 0.001;
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
+    double expected_velocity_magnitude_tolerance = 0.01;
+    int num_steps_to_ignore                      = 5;
+    Timestamp start_time                         = current_timestamp;
 
-    // test the inverse regression
-    boost::circular_buffer<BallDetection> inv_ball_detections = ball_detections;
-    for (auto& detection : inv_ball_detections)
-    {
-        detection.position = Point(detection.position.y(), detection.position.x());
-    }
-
-    auto y_vs_x_regression = ball_filter.getLinearRegressionLine(inv_ball_detections);
-    y_vs_x_regression.regression_line.swapXY();
-
-    double inv_d1 = distance(y_vs_x_regression.regression_line, p1);
-    double inv_d2 = distance(y_vs_x_regression.regression_line, p2);
-
-    EXPECT_LT(inv_d1, 0.001);
-    EXPECT_LT(inv_d2, 0.001);
-
-    // Check the lines are pointing in the same direction
-    EXPECT_LT(x_vs_y_regression.regression_line.toNormalUnitVector().cross(
-                  y_vs_x_regression.regression_line.toNormalUnitVector()),
-              FIXED_EPSILON);
+    testFilterAlongLineSegment(
+            start_time, ball_path, ball_velocity_magnitude, ball_position_variance,
+            time_step_variance, expected_position_tolerance,
+            expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
+            num_steps_to_ignore);
 }
