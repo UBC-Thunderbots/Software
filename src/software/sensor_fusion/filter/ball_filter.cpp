@@ -11,13 +11,11 @@
 #include "software/math/math_functions.h"
 
 
-BallFilter::BallFilter(const Rectangle& filter_area, unsigned int min_buffer_size, unsigned int max_buffer_size)
+BallFilter::BallFilter(const Rectangle& filter_area)
     :
 
-       _min_buffer_size(min_buffer_size),
-       _max_buffer_size(max_buffer_size),
       filter_area(filter_area),
- ball_detection_buffer(max_buffer_size)
+ ball_detection_buffer(MAX_BUFFER_SIZE)
  {
  }
 
@@ -185,9 +183,9 @@ std::optional<size_t> BallFilter::getAdjustedBufferSize(
         MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE - MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE;
 
     unsigned int max_buffer_size = std::min(
-        this->_max_buffer_size, static_cast<unsigned int>(ball_detections.size()));
+        MAX_BUFFER_SIZE, static_cast<unsigned int>(ball_detections.size()));
     unsigned int min_buffer_size = std::min(
-        this->_min_buffer_size, static_cast<unsigned int>(ball_detections.size()));
+        MIN_BUFFER_SIZE, static_cast<unsigned int>(ball_detections.size()));
     double buffer_size_diff = max_buffer_size - min_buffer_size;
 
     std::optional<BallVelocityEstimate> velocity_estimate =

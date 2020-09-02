@@ -18,9 +18,9 @@
 class BallFilter
 {
    public:
-    // The default min and max sizes of the ball detection buffer
-    static constexpr unsigned int DEFAULT_MIN_BUFFER_SIZE = 4;
-    static constexpr unsigned int DEFAULT_MAX_BUFFER_SIZE = 10;
+    // The min and max sizes of the ball detection buffer
+    static constexpr unsigned int MIN_BUFFER_SIZE = 4;
+    static constexpr unsigned int MAX_BUFFER_SIZE = 10;
     // If the estimated ball speed is less than this value, the largest possible buffer
     // will be used by the filter
     static constexpr double MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE = 0.5;
@@ -35,13 +35,8 @@ class BallFilter
      *
      * @param filter_area The area within which the ball filter will work. Any detections
      * outside of this area will be ignored.
-     * @param min_buffer_size The minimum size of the buffer the filter will use to filter
-     * the ball. The buffer will shrink to this size as the ball speeds up
-     * @param min_buffer_size The maximum size of the buffer the filter will use to filter
-     * the ball. The buffer will grow to this size as the ball slows down
      */
-    explicit BallFilter(const Rectangle& filter_area, unsigned int min_buffer_size = DEFAULT_MIN_BUFFER_SIZE,
-                        unsigned int max_buffer_size = DEFAULT_MAX_BUFFER_SIZE);
+    explicit BallFilter(const Rectangle& filter_area);
 
     /**
      * Filters the new ball detection data, and returns the updated state of the ball
@@ -97,7 +92,7 @@ private:
      * @return The size the buffer should be to perform filtering operations. If an error
      * occurs that prevents the size from being calculated correctly, returns std::nullopt
      */
-    std::optional<size_t> getAdjustedBufferSize(
+    static std::optional<size_t> getAdjustedBufferSize(
             boost::circular_buffer<BallDetection> ball_detections);
 
 
@@ -108,7 +103,7 @@ private:
      * @param ball_detections The ball detections to use in the regression
      * @return A struct containing the regression line and error of the linear regression
      */
-    LinearRegressionResults getLinearRegressionLine(
+    static LinearRegressionResults getLinearRegressionLine(
             boost::circular_buffer<BallDetection> ball_detections);
 
     /**
@@ -123,7 +118,7 @@ private:
      * @return A struct containing various estimates of the ball's velocity based on the
      * given detections. If no velocity can be estimated, std::nullopt is returned
      */
-    std::optional<BallVelocityEstimate> estimateBallVelocity(
+    static std::optional<BallVelocityEstimate> estimateBallVelocity(
         boost::circular_buffer<BallDetection> ball_detections,
         const std::optional<Line> &ball_regression_line = std::nullopt);
 
@@ -135,11 +130,9 @@ private:
      * @return The filtered current state of the ball. If a filtered result cannot be
      * calculated, returns std::nullopt
      */
-    std::optional<TimestampedBallState> estimateBallState(
+    static std::optional<TimestampedBallState> estimateBallState(
         boost::circular_buffer<BallDetection> ball_detections);
 
-    unsigned int _min_buffer_size;
-    unsigned int _max_buffer_size;
     Rectangle filter_area;
 
     // A circular buffer used to store previous ball detections, so we can use them
