@@ -12,8 +12,21 @@
 #include "software/world/timestamped_ball_state.h"
 
 /**
- * Given ball data from SSL Vision, filters for and returns the position/velocity of the
- * "real" ball
+ * Given ball data from SSL Vision, filters and returns the position/velocity of the
+ * "real" ball.
+ *
+ * This ball filter stores a buffer of previous SSL Vision detections, and uses linear
+ * regression to find the path the ball is travelling on and estimate its position
+ * and velocity. This buffer/regression system was chosen because it results in a
+ * very stable output, particularly for the ball velocity. The data we receive isn't
+ * perfect (which is why we have a filter). If we receive a noisy position that is off
+ * the ball's current trajectory, it will only have a minimal impact on the line of
+ * best fit. This means that as the ball is travelling, this filter will return a very
+ * steady velocity vector. This is important because small deviations in
+ * velocity orientation can have large effects when the AI tries to predict
+ * the future position of the ball. For example, reliably receiving a pass
+ * relies on the ball's velocity being very stable, otherwise the robot would
+ * "jiggle" back and forth as the estimated receiver position would keep changing.
  */
 class BallFilter
 {
