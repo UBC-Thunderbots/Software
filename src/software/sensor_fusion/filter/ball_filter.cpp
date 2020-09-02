@@ -1,4 +1,4 @@
-#include "software/sensor_fusion/filter/ball_filter.h"
+ #include "software/sensor_fusion/filter/ball_filter.h"
 
 #include <Eigen/Dense>
 #include <algorithm>
@@ -93,7 +93,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
     }
 }
 
-std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
+std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity(
     boost::circular_buffer<BallDetection> ball_detections,
     const std::optional<Line> &ball_regression_line)
 {
@@ -215,7 +215,7 @@ std::optional<size_t> BallFilter::getAdjustedBufferSize(
     return static_cast<size_t>(buffer_size);
 }
 
-LinearRegressionResults BallFilter::getLinearRegressionLine(
+BallFilter::LinearRegressionResults BallFilter::getLinearRegressionLine(
     boost::circular_buffer<BallDetection> ball_detections)
 {
     // Sort the detections in increasing order before processing. This places the oldest
