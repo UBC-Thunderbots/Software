@@ -12,9 +12,7 @@
 
 
 BallFilter::BallFilter(const Rectangle &filter_area)
-    :
-
-      filter_area(filter_area),
+    : filter_area(filter_area),
       ball_detection_buffer(MAX_BUFFER_SIZE)
 {
 }
@@ -43,6 +41,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
 
         if (!ball_detection_buffer.empty())
         {
+            // Use the smallest timestamp to minimize time_diffs of 0
             auto detection_with_smallest_timestamp = *std::min_element(
                 ball_detection_buffer.begin(), ball_detection_buffer.end());
             Duration time_diff =
@@ -70,7 +69,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
 
             // Make the maximum acceptable velocity a bit larger than the strict limits
             // according to the game rules to account for measurement error, and to be a
-            // bit on the safe side. We don't want to risk discarding real data
+            // bit on the safe side. We don't want to risk discarding real data.
             double maximum_acceptable_velocity_magnitude =
                 BALL_MAX_SPEED_METERS_PER_SECOND + MAX_ACCEPTABLE_BALL_SPEED_BUFFER;
             if (estimated_detection_velocity_magnitude >
@@ -101,6 +100,50 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
             ball_detection_buffer.push_front(detection);
         }
     }
+}
+
+std::optional<TimestampedBallState> BallFilter::estimateBallState(
+        boost::circular_buffer<BallDetection> ball_detections)
+{
+    // Sort the detections in decreasing order before processing. This places the most
+    // recent detections (with the largest timestamp) at the front of the buffer, and the
+    // oldest detections (smallest timestamp) at the end of the buffer
+    std::sort(ball_detections.rbegin(), ball_detections.rend());
+
+    if (ball_detections.empty())
+    {
+        return std::nullopt;
+    }
+    else if (ball_detections.size() == 1)
+    {
+        // If there is only 1 entry in the buffer, we can't fit a regression line
+        // or calculate a velocity so we do our best with just the position
+        BallState ball_state(ball_detections.front().position, Vector(0, 0),
+                             ball_detections.front().distance_from_ground);
+        TimestampedBallState timestamped_ball_state(ball_state,
+                                                    ball_detections.front().timestamp);
+        return timestamped_ball_state;
+    }
+
+    std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
+    if (!adjusted_buffer_size)
+    {
+        return std::nullopt;
+    }
+    ball_detections.resize(*adjusted_buffer_size);
+
+    auto regression_line = calculateLineOfBestFit(ball_detections);
+
+    Point filtered_position = getFilteredPosition(ball_detections, regression_line);
+    auto filtered_velocity  = getFilteredVelocity(ball_detections, regression_line);
+    if (!filtered_velocity)
+    {
+        return std::nullopt;
+    }
+
+    BallState ball_state(filtered_position, filtered_velocity.value(),
+                         ball_detections.front().distance_from_ground);
+    return TimestampedBallState(ball_state, ball_detections.front().timestamp);
 }
 
 std::optional<size_t> BallFilter::getAdjustedBufferSize(
@@ -278,50 +321,6 @@ std::optional<Vector> BallFilter::getFilteredVelocity(
     }
 
     return filtered_velocity;
-}
-
-std::optional<TimestampedBallState> BallFilter::estimateBallState(
-    boost::circular_buffer<BallDetection> ball_detections)
-{
-    // Sort the detections in decreasing order before processing. This places the most
-    // recent detections (with the largest timestamp) at the front of the buffer, and the
-    // oldest detections (smallest timestamp) at the end of the buffer
-    std::sort(ball_detections.rbegin(), ball_detections.rend());
-
-    if (ball_detections.empty())
-    {
-        return std::nullopt;
-    }
-    else if (ball_detections.size() == 1)
-    {
-        // If there is only 1 entry in the buffer, we can't fit a regression line
-        // or calculate a velocity so we do our best with just the position
-        BallState ball_state(ball_detections.front().position, Vector(0, 0),
-                             ball_detections.front().distance_from_ground);
-        TimestampedBallState timestamped_ball_state(ball_state,
-                                                    ball_detections.front().timestamp);
-        return timestamped_ball_state;
-    }
-
-    std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
-    if (!adjusted_buffer_size)
-    {
-        return std::nullopt;
-    }
-    ball_detections.resize(*adjusted_buffer_size);
-
-    auto regression_line = calculateLineOfBestFit(ball_detections);
-
-    Point filtered_position = getFilteredPosition(ball_detections, regression_line);
-    auto filtered_velocity  = getFilteredVelocity(ball_detections, regression_line);
-    if (!filtered_velocity)
-    {
-        return std::nullopt;
-    }
-
-    BallState ball_state(filtered_position, filtered_velocity.value(),
-                         ball_detections.front().distance_from_ground);
-    return TimestampedBallState(ball_state, ball_detections.front().timestamp);
 }
 
 std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity(

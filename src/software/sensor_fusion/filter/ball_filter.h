@@ -93,6 +93,18 @@ class BallFilter
     void addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections);
 
     /**
+     * Uses linear regression to filter the given list of ball detections to fine the
+     * current "real" state of the ball.
+     *
+     * @param ball_detections The detections to filter
+     *
+     * @return The filtered current state of the ball. If a filtered result cannot be
+     * calculated, returns std::nullopt
+     */
+    static std::optional<TimestampedBallState> estimateBallState(
+            boost::circular_buffer<BallDetection> ball_detections);
+
+    /**
      * Returns how large the buffer of ball detections should be based on the ball's
      * estimated velocity. A slower moving ball will result in a larger buffer size, and a
      * faster ball will result in a smaller buffer size. This is because with a slow
@@ -177,23 +189,13 @@ class BallFilter
      * @param ball_detections The ball detections to use to calculate
      * @param ball_regression_line The ball_regression_line to snap detections to before
      * calculating velocities.
+     *
      * @return A struct containing various estimates of the ball's velocity based on the
      * given detections. If no velocity can be estimated, std::nullopt is returned
      */
     static std::optional<BallVelocityEstimate> estimateBallVelocity(
         boost::circular_buffer<BallDetection> ball_detections,
         const std::optional<Line>& ball_regression_line = std::nullopt);
-
-    /**
-     * Uses linear regression to filter the given list of ball detections to fine the
-     * current "real" state of the ball.
-     *
-     * @param ball_detections The detections to filter
-     * @return The filtered current state of the ball. If a filtered result cannot be
-     * calculated, returns std::nullopt
-     */
-    static std::optional<TimestampedBallState> estimateBallState(
-        boost::circular_buffer<BallDetection> ball_detections);
 
     Rectangle filter_area;
     boost::circular_buffer<BallDetection> ball_detection_buffer;
