@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["threaded_robot_diagnostics_gui.h"],
     deps = [
         "//software/gui/robot_diagnostics/widgets:robot_diagnostics_gui",
+        "//software/multithreading:subject",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",
         "//software/proto:sensor_msg_cc_proto",
@@ -19,6 +20,7 @@ cc_binary(
     srcs = ["robot_diagnostics_main.cpp"],
     deps = [
         ":threaded_robot_diagnostics_gui",
+        "//software/backend:radio_backend",
         "//software/logger",
         "@boost//:program_options",
     ],

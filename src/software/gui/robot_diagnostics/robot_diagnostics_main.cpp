@@ -8,8 +8,8 @@ int main(int argc, char *argv[])
     threaded_robot_diagnostics_gui =
         std::make_shared<ThreadedRobotDiagnosticsGUI>(argc, argv);
 
-    auto backend = std::make_shared<RadioBackend>();
-    threaded_robot_diagnostics_gui->registerObserver(backend);
+    //auto backend = std::make_shared<RadioBackend>();
+    //threaded_robot_diagnostics_gui->registerObserver(backend);
 
     // This blocks forever without using the CPU
     // Wait for the GUI to shut down before shutting

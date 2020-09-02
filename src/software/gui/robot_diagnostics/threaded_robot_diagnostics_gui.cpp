@@ -9,7 +9,7 @@ ThreadedRobotDiagnosticsGUI::ThreadedRobotDiagnosticsGUI(int argc, char** argv)
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorProto>>(sensor_msg_buffer_size)),
       primitive_buffer(
-          std::make_shared<ThreadSafeBuffer<std::unique_ptr<TbotsProto::PrimitiveSet>>>(
+          std::make_shared<ThreadSafeBuffer<TbotsProto::PrimitiveSet>>(
               primitive_buffer_size)),
       application_shutting_down(false)
 {
@@ -22,6 +22,8 @@ ThreadedRobotDiagnosticsGUI::ThreadedRobotDiagnosticsGUI(int argc, char** argv)
             if (primitive)
             {
                 this->sendValueToObservers(std::move(primitive.value()));
+                std::cout << "sent out primitive" << std::endl;
+                std::cout << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << std::endl;
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(send_primitive_interval));

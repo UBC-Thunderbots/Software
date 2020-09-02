@@ -17,6 +17,8 @@ qt_cc_library(
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/multithreading:thread_safe_buffer",
         "//software/proto:sensor_msg_cc_proto",
+        "//software/proto/message_translation:tbots_geometry",
+        "//software/proto/message_translation:tbots_protobuf",
         "@boost//:bind",
         "@qt//:qt_widgets",
     ],
