@@ -60,12 +60,12 @@ class BallFilter
      * @return The updated state of the ball given the new data
      */
     std::optional<TimestampedBallState> estimateBallState(
-        const std::vector<BallDetection> &new_ball_detections);
+        const std::vector<BallDetection>& new_ball_detections);
 
-private:
-/**
- * A simple struct we use to pass around velocity estimate data
- */
+   private:
+    /**
+     * A simple struct we use to pass around velocity estimate data
+     */
     struct BallVelocityEstimate
     {
         Vector average_velocity;
@@ -74,9 +74,9 @@ private:
         double min_max_magnitude_average;
     };
 
-/**
- * A simple struct to pass around linear regression data
- */
+    /**
+     * A simple struct to pass around linear regression data
+     */
     struct LinearRegressionResults
     {
         Line regression_line;
@@ -85,8 +85,8 @@ private:
 
     /**
      * Adds ball detections to the buffer stored by this filter. This function will ignore
-     * data that is outside of the filter_area, and data that is too far away from the current
-     * known ball position (since it is likely to be random noise).
+     * data that is outside of the filter_area, and data that is too far away from the
+     * current known ball position (since it is likely to be random noise).
      *
      * @param new_ball_detections The ball detections to try add to the buffer
      */
@@ -105,7 +105,7 @@ private:
      * occurs that prevents the size from being calculated correctly, returns std::nullopt
      */
     static std::optional<size_t> getAdjustedBufferSize(
-            boost::circular_buffer<BallDetection> ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections);
 
     /**
      * Given a buffer of ball detections, returns the line of best fit through
@@ -119,7 +119,8 @@ private:
      *
      * @return The line of best fir through the given ball detection positions
      */
-    static Line calculateLineOfBestFit(boost::circular_buffer<BallDetection> ball_detections);
+    static Line calculateLineOfBestFit(
+        boost::circular_buffer<BallDetection> ball_detections);
 
     /**
      * Given a list of ball detections, use linear regression to find a line of best fit
@@ -134,7 +135,7 @@ private:
      * @return A struct containing the regression line and error of the linear regression
      */
     static LinearRegressionResults calculateLinearRegression(
-            boost::circular_buffer<BallDetection> ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections);
 
     /**
      * Returns the filtered position of the ball given a buffer of ball detections
@@ -149,7 +150,9 @@ private:
      *
      * @return The filtered position of the ball
      */
-    static Point getFilteredPosition(boost::circular_buffer<BallDetection> ball_detections, const Line& regression_line);
+    static Point getFilteredPosition(
+        boost::circular_buffer<BallDetection> ball_detections,
+        const Line& regression_line);
 
     /**
      * Returns the filtered velocity of the ball given a buffer of ball detections
@@ -161,7 +164,9 @@ private:
      * @return The filtered velocity of the ball. If an error occurs that prevents
      * the velocity from being calculated properly, std::nullopt is returned.
      */
-    static std::optional<Vector> getFilteredVelocity(boost::circular_buffer<BallDetection> ball_detections, const Line& regression_line);
+    static std::optional<Vector> getFilteredVelocity(
+        boost::circular_buffer<BallDetection> ball_detections,
+        const Line& regression_line);
 
     /**
      * Estimates the ball's velocity based on the current detections in the given buffer.
@@ -177,7 +182,7 @@ private:
      */
     static std::optional<BallVelocityEstimate> estimateBallVelocity(
         boost::circular_buffer<BallDetection> ball_detections,
-        const std::optional<Line> &ball_regression_line = std::nullopt);
+        const std::optional<Line>& ball_regression_line = std::nullopt);
 
     /**
      * Uses linear regression to filter the given list of ball detections to fine the

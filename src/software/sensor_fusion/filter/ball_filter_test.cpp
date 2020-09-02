@@ -509,7 +509,7 @@ TEST_F(BallFilterTest,
 
 TEST_F(BallFilterTest, ball_moving_along_x_axis)
 {
-    Segment ball_path = Segment(Point(-4, 0), Point(4, 0));
+    Segment ball_path                            = Segment(Point(-4, 0), Point(4, 0));
     double ball_velocity_magnitude               = 5;
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
@@ -520,15 +520,15 @@ TEST_F(BallFilterTest, ball_moving_along_x_axis)
     Timestamp start_time                         = current_timestamp;
 
     testFilterAlongLineSegment(
-            start_time, ball_path, ball_velocity_magnitude, ball_position_variance,
-            time_step_variance, expected_position_tolerance,
-            expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
-            num_steps_to_ignore);
+        start_time, ball_path, ball_velocity_magnitude, ball_position_variance,
+        time_step_variance, expected_position_tolerance,
+        expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
+        num_steps_to_ignore);
 }
 
 TEST_F(BallFilterTest, ball_moving_along_y_axis)
 {
-    Segment ball_path = Segment(Point(0, -4), Point(0, 4));
+    Segment ball_path                            = Segment(Point(0, -4), Point(0, 4));
     double ball_velocity_magnitude               = 5;
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
@@ -539,8 +539,8 @@ TEST_F(BallFilterTest, ball_moving_along_y_axis)
     Timestamp start_time                         = current_timestamp;
 
     testFilterAlongLineSegment(
-            start_time, ball_path, ball_velocity_magnitude, ball_position_variance,
-            time_step_variance, expected_position_tolerance,
-            expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
-            num_steps_to_ignore);
+        start_time, ball_path, ball_velocity_magnitude, ball_position_variance,
+        time_step_variance, expected_position_tolerance,
+        expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
+        num_steps_to_ignore);
 }
