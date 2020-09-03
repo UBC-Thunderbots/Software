@@ -95,7 +95,6 @@ Vector operator-(const Point &p, const Point &q)
 
 std::ostream &operator<<(std::ostream &os, const Point &p)
 {
-    os.precision(4);
     os << "(" << p.x() << ", " << p.y() << ")";
     return os;
 }
