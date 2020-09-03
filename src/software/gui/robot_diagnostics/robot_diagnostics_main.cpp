@@ -1,9 +1,12 @@
 #include <boost/program_options.hpp>
+#include <iostream>
+#include <numeric>
 
-#include "software/gui/robot_diagnostics/threaded_robot_diagnostics_gui.h"
 #include "software/backend/backend.h"
+#include "software/gui/robot_diagnostics/threaded_robot_diagnostics_gui.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/logger/logger.h"
 
 struct commandLineArgs
 {
@@ -31,7 +34,6 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     std::string all_backend_names =
             std::accumulate(std::begin(backend_names), std::end(backend_names), std::string(),
                             [](std::string &ss, std::string &s) { return ss + s + ", "; });
-
     std::string backend_help_str =
             "The backend that you would like to use, one of: " + all_backend_names;
 
@@ -70,12 +72,8 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     return args;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
-    std::shared_ptr<ThreadedRobotDiagnosticsGUI> threaded_robot_diagnostics_gui;
-    threaded_robot_diagnostics_gui =
-        std::make_shared<ThreadedRobotDiagnosticsGUI>(argc, argv);
-
     LoggerSingleton::initializeLogger();
 
     commandLineArgs args = parseCommandLineArgs(argc, argv);
@@ -99,14 +97,16 @@ int main(int argc, char *argv[])
         std::shared_ptr<Backend> backend =
                 GenericFactory<std::string, Backend>::create(args.backend_name);
 
+        std::shared_ptr<ThreadedRobotDiagnosticsGUI> threaded_robot_diagnostics_gui;
+        threaded_robot_diagnostics_gui =
+                std::make_shared<ThreadedRobotDiagnosticsGUI>(argc, argv);
         threaded_robot_diagnostics_gui->registerObserver(backend);
-
-
+        backend->Subject<SensorProto>::registerObserver(threaded_robot_diagnostics_gui);
+        // This blocks forever without using the CPU
+        // Wait for the GUI to shut down before shutting
+        // down the rest of the system
+        threaded_robot_diagnostics_gui->getTerminationPromise()->get_future().wait();
     }
-    // This blocks forever without using the CPU
-    // Wait for the GUI to shut down before shutting
-    // down the rest of the system
-    threaded_robot_diagnostics_gui->getTerminationPromise()->get_future().wait();
 
     return 0;
 }

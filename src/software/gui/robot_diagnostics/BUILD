@@ -21,6 +21,7 @@ cc_binary(
     deps = [
         ":threaded_robot_diagnostics_gui",
         "//software/backend",
+        "//software/backend:all_backends",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
