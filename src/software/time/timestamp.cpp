@@ -72,7 +72,7 @@ Duration Timestamp::operator-(const Timestamp &timestamp) const
 
 std::ostream &operator<<(std::ostream &output_stream, const Timestamp &time)
 {
-    output_stream << std::setprecision(2) << std::fixed << time.getSeconds() << "s";
+    output_stream << std::setprecision(4) << std::fixed << time.getSeconds() << "s";
 
     return output_stream;
 }
