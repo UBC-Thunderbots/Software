@@ -11,19 +11,17 @@
 #include "software/math/math_functions.h"
 
 
-BallFilter::BallFilter()
-    : ball_detection_buffer(MAX_BUFFER_SIZE)
-{
-}
+BallFilter::BallFilter() : ball_detection_buffer(MAX_BUFFER_SIZE) {}
 
 std::optional<TimestampedBallState> BallFilter::estimateBallState(
-    const std::vector<BallDetection> &new_ball_detections, const Rectangle& filter_area)
+    const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area)
 {
     addNewDetectionsToBuffer(new_ball_detections, filter_area);
     return estimateBallState(ball_detection_buffer);
 }
 
-void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections, const Rectangle& filter_area)
+void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
+                                          const Rectangle &filter_area)
 {
     // Sort the detections in increasing order before processing. This places the oldest
     // detections (with the smallest timestamp) at the front of the buffer, and the most

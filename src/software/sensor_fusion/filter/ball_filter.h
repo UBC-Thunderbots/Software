@@ -59,7 +59,8 @@ class BallFilter
      * @return The updated state of the ball given the new data
      */
     std::optional<TimestampedBallState> estimateBallState(
-        const std::vector<BallDetection>& new_ball_detections, const Rectangle& filter_area);
+        const std::vector<BallDetection>& new_ball_detections,
+        const Rectangle& filter_area);
 
    private:
     /**
@@ -91,7 +92,8 @@ class BallFilter
      * @param filter_area The area within which the ball filter will work. Any detections
      * outside of this area will be ignored.
      */
-    void addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections, const Rectangle& filter_area);
+    void addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
+                                  const Rectangle& filter_area);
 
     /**
      * Uses linear regression to filter the given list of ball detections to fine the
