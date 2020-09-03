@@ -20,8 +20,10 @@ cc_binary(
     srcs = ["robot_diagnostics_main.cpp"],
     deps = [
         ":threaded_robot_diagnostics_gui",
-        "//software/backend:radio_backend",
+        "//software/backend",
         "//software/logger",
+        "//software/parameter:dynamic_parameters",
+        "//software/util/design_patterns:generic_factory",
         "@boost//:program_options",
     ],
 )
