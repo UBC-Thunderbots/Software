@@ -110,8 +110,6 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
     // oldest detections (smallest timestamp) at the end of the buffer
     std::sort(ball_detections.rbegin(), ball_detections.rend());
 
-    std::cout << ball_detections.size() << "\t";
-
     if (ball_detections.empty())
     {
         std::cout << std::endl;
@@ -127,6 +125,8 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
                                                     ball_detections.front().timestamp);
         return timestamped_ball_state;
     }
+
+    std::cout << ball_detections.size() << "\t";
 
     std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
     if (!adjusted_buffer_size)
