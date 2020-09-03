@@ -11,7 +11,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       enemy_team(),
       game_state(),
       referee_stage(std::nullopt),
-      ball_filter(BallFilter::MIN_BUFFER_SIZE, BallFilter::MAX_BUFFER_SIZE),
+      ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
       ball_states(history_size)

@@ -45,22 +45,21 @@ class BallFilter
 
     /**
      * Creates a new Ball Filter
-     *
-     * @param filter_area The area within which the ball filter will work. Any detections
-     * outside of this area will be ignored.
      */
-    explicit BallFilter(const Rectangle& filter_area);
+    explicit BallFilter();
 
     /**
      * Filters the new ball detection data, and returns the updated state of the ball
-     * given the new data *
-     * @param current_ball_state The current state of the Ball
+     * given the new data
+     *
      * @param new_ball_detections A list of new Ball detections
+     * @param filter_area The area within which the ball filter will work. Any detections
+     * outside of this area will be ignored.
      *
      * @return The updated state of the ball given the new data
      */
     std::optional<TimestampedBallState> estimateBallState(
-        const std::vector<BallDetection>& new_ball_detections);
+        const std::vector<BallDetection>& new_ball_detections, const Rectangle& filter_area);
 
    private:
     /**
@@ -89,8 +88,10 @@ class BallFilter
      * current known ball position (since it is likely to be random noise).
      *
      * @param new_ball_detections The ball detections to try add to the buffer
+     * @param filter_area The area within which the ball filter will work. Any detections
+     * outside of this area will be ignored.
      */
-    void addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections);
+    void addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections, const Rectangle& filter_area);
 
     /**
      * Uses linear regression to filter the given list of ball detections to fine the
@@ -102,7 +103,7 @@ class BallFilter
      * calculated, returns std::nullopt
      */
     static std::optional<TimestampedBallState> estimateBallState(
-            boost::circular_buffer<BallDetection> ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's
@@ -197,6 +198,5 @@ class BallFilter
         boost::circular_buffer<BallDetection> ball_detections,
         const std::optional<Line>& ball_regression_line = std::nullopt);
 
-    Rectangle filter_area;
     boost::circular_buffer<BallDetection> ball_detection_buffer;
 };

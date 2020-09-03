@@ -10,11 +10,18 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
+#include "software/world/field.h"
 
 class BallFilterTest : public ::testing::Test
 {
    protected:
-    BallFilterTest() : filter_area(Rectangle(Point(-4.8, -3.3), Point(4.8, 3.3))), ball_filter(filter_area), current_timestamp(Timestamp::fromSeconds(123)), time_step(Duration::fromSeconds(1.0 / 60.0)) {}
+    BallFilterTest()
+        : field(Field::createSSLDivisionBField()),
+          ball_filter(),
+          current_timestamp(Timestamp::fromSeconds(123)),
+          time_step(Duration::fromSeconds(1.0 / 60.0))
+    {
+    }
 
     void SetUp() override
     {
@@ -193,7 +200,7 @@ class BallFilterTest : public ::testing::Test
                               current_timestamp, 0.9}};
 
             // Get the filtered result given the new detection information
-            auto filtered_ball = ball_filter.estimateBallState(ball_detections);
+            auto filtered_ball = ball_filter.estimateBallState(ball_detections, field.fieldBoundary());
             if (i < num_steps_to_ignore)
             {
                 continue;
@@ -229,7 +236,7 @@ class BallFilterTest : public ::testing::Test
         }
     }
 
-    Rectangle filter_area;
+    Field field;
     BallFilter ball_filter;
     Timestamp current_timestamp;
     Duration time_step;
@@ -287,12 +294,12 @@ TEST_F(BallFilterTest, ball_sitting_still_with_moderate_noise)
 
 TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_no_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
-    double ball_velocity_magnitude               = 0.31;
-    double ball_position_variance                = 0;
-    double time_step_variance                    = 0;
-    double expected_position_tolerance           = 0.001;
-    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
+    Segment ball_path                       = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
+    double ball_velocity_magnitude          = 0.31;
+    double ball_position_variance           = 0;
+    double time_step_variance               = 0;
+    double expected_position_tolerance      = 0.001;
+    Angle expected_velocity_angle_tolernace = Angle::fromDegrees(0.01);
     double expected_velocity_magnitude_tolerance = 0.01;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -306,12 +313,12 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_no_noise_in_data
 
 TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
-    double ball_velocity_magnitude               = 0.3;
-    double ball_position_variance                = 0.001;
-    double time_step_variance                    = 0.001;
-    double expected_position_tolerance           = 0.004;
-    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(5.5);
+    Segment ball_path                       = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
+    double ball_velocity_magnitude          = 0.3;
+    double ball_position_variance           = 0.001;
+    double time_step_variance               = 0.001;
+    double expected_position_tolerance      = 0.004;
+    Angle expected_velocity_angle_tolernace = Angle::fromDegrees(5.5);
     double expected_velocity_magnitude_tolerance = 0.04;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -325,12 +332,12 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_d
 
 TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_medium_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
-    double ball_velocity_magnitude               = 0.3;
-    double ball_position_variance                = 0.003;
-    double time_step_variance                    = 0.001;
-    double expected_position_tolerance           = 0.011;
-    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(16);
+    Segment ball_path                       = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
+    double ball_velocity_magnitude          = 0.3;
+    double ball_position_variance           = 0.003;
+    double time_step_variance               = 0.001;
+    double expected_position_tolerance      = 0.011;
+    Angle expected_velocity_angle_tolernace = Angle::fromDegrees(16);
     double expected_velocity_magnitude_tolerance = 0.11;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -344,12 +351,12 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_medium_noise_in_
 
 TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
-    double ball_velocity_magnitude               = 6.2;
-    double ball_position_variance                = 0;
-    double time_step_variance                    = 0;
-    double expected_position_tolerance           = 0.001;
-    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
+    Segment ball_path                       = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
+    double ball_velocity_magnitude          = 6.2;
+    double ball_position_variance           = 0;
+    double time_step_variance               = 0;
+    double expected_position_tolerance      = 0.001;
+    Angle expected_velocity_angle_tolernace = Angle::fromDegrees(0.01);
     double expected_velocity_magnitude_tolerance = 0.01;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -363,12 +370,12 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data
 
 TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
-    double ball_velocity_magnitude               = 5.72;
-    double ball_position_variance                = 0.001;
-    double time_step_variance                    = 0.001;
-    double expected_position_tolerance           = 0.003;
-    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.9);
+    Segment ball_path                       = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
+    double ball_velocity_magnitude          = 5.72;
+    double ball_position_variance           = 0.001;
+    double time_step_variance               = 0.001;
+    double expected_position_tolerance      = 0.003;
+    Angle expected_velocity_angle_tolernace = Angle::fromDegrees(0.9);
     double expected_velocity_magnitude_tolerance = 0.07;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -382,12 +389,12 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_d
 
 TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
-    double ball_velocity_magnitude               = 5.04;
-    double ball_position_variance                = 0.003;
-    double time_step_variance                    = 0.001;
-    double expected_position_tolerance           = 0.008;
-    Angle expected_velocity_angle_tolerance      = Angle::fromDegrees(3.0);
+    Segment ball_path                       = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
+    double ball_velocity_magnitude          = 5.04;
+    double ball_position_variance           = 0.003;
+    double time_step_variance               = 0.001;
+    double expected_position_tolerance      = 0.008;
+    Angle expected_velocity_angle_tolerance = Angle::fromDegrees(3.0);
     double expected_velocity_magnitude_tolerance = 0.21;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -402,12 +409,12 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_
 TEST_F(BallFilterTest,
        ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
-    double ball_velocity_magnitude               = 5.04;
-    double ball_position_variance                = 0;
-    double time_step_variance                    = 0;
-    double expected_position_tolerance           = 0.0001;
-    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
+    Segment ball_path                       = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
+    double ball_velocity_magnitude          = 5.04;
+    double ball_position_variance           = 0;
+    double time_step_variance               = 0;
+    double expected_position_tolerance      = 0.0001;
+    Angle expected_velocity_angle_tolernace = Angle::fromDegrees(0.01);
     double expected_velocity_magnitude_tolerance = 0.01;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -418,9 +425,9 @@ TEST_F(BallFilterTest,
         expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
         num_steps_to_ignore);
 
-    ball_path = Segment(Point(4.5, 3), Point(4.5, -3));
-    ball_velocity_magnitude     = 4.8;
-    expected_position_tolerance = 0.0001;
+    ball_path                             = Segment(field.enemyCornerPos(), field.enemyCornerNeg());
+    ball_velocity_magnitude               = 4.8;
+    expected_position_tolerance           = 0.0001;
     expected_velocity_angle_tolernace     = Angle::fromDegrees(0.01);
     expected_velocity_magnitude_tolerance = 0.01;
     num_steps_to_ignore                   = 5;
@@ -436,11 +443,11 @@ TEST_F(BallFilterTest,
 TEST_F(BallFilterTest,
        ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data_2)
 {
-    Segment ball_path                  = Segment(Point(-4.5, -3), Point(0, 3));
-    double ball_velocity_magnitude     = 5.04;
-    double ball_position_variance      = 0;
-    double time_step_variance          = 0;
-    double expected_position_tolerance = 0.0001;
+    Segment ball_path                            = Segment(field.friendlyCornerNeg(), field.friendlyHalf().posXPosYCorner());
+    double ball_velocity_magnitude               = 5.04;
+    double ball_position_variance                = 0;
+    double time_step_variance                    = 0;
+    double expected_position_tolerance           = 0.0001;
     Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.1);
     double expected_velocity_magnitude_tolerance = 0.1;
     int num_steps_to_ignore                      = 5;
@@ -452,7 +459,7 @@ TEST_F(BallFilterTest,
         expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
         num_steps_to_ignore);
 
-    ball_path                             = Segment(Point(0, 3), Point(4.5, -3));
+    ball_path                             = Segment(field.friendlyHalf().posXPosYCorner(), field.enemyCornerNeg());
     ball_velocity_magnitude               = 4.8;
     expected_position_tolerance           = 0.0001;
     expected_velocity_angle_tolernace     = Angle::fromDegrees(0.1);
@@ -503,7 +510,8 @@ TEST_F(BallFilterTest,
 
 TEST_F(BallFilterTest, ball_moving_along_x_axis)
 {
-    Segment ball_path                            = Segment(Point(filter_area.xMin(), 0), Point(filter_area.xMax(), 0));
+    Segment ball_path =
+        Segment(field.friendlyGoalCenter(), field.enemyGoalCenter());
     double ball_velocity_magnitude               = 5;
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
@@ -522,7 +530,7 @@ TEST_F(BallFilterTest, ball_moving_along_x_axis)
 
 TEST_F(BallFilterTest, ball_moving_along_y_axis)
 {
-    Segment ball_path                            = Segment(Point(0, filter_area.yMin()), Point(0, filter_area.yMax()));
+    Segment ball_path = field.halfwayLine();
     double ball_velocity_magnitude               = 5;
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
