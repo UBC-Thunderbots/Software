@@ -22,8 +22,6 @@ ThreadedRobotDiagnosticsGUI::ThreadedRobotDiagnosticsGUI(int argc, char** argv)
             if (primitive)
             {
                 this->sendValueToObservers(std::move(primitive.value()));
-                std::cout << "sent out primitive" << std::endl;
-                std::cout << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << std::endl;
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(send_primitive_interval));
