@@ -24,27 +24,27 @@ Charger_t* app_charger_create(void (*charge_capacitor)(void),
  * NOTE: This will not destroy the values pointed to by any pointers passed to the
  *       `create` function
  *
- * @param charger [in] The charger to destroy
+ * @param charger The charger to destroy
  */
 void app_charger_destroy(Charger_t* charger);
 
 /**
  * Charge the capacitor on the given charger
  *
- * @param charger [in/out] The charger
+ * @param charger The charger
  */
 void app_charger_charge_capacitor(Charger_t* charger);
 
 /**
  * Discharge the capacitor on the given charger
  *
- * @param charger [in/out] The charger
+ * @param charger The charger
  */
 void app_charger_discharge_capacitor(Charger_t* charger);
 
 /**
  * Set capacitor to float on the given charger
  *
- * @param charger [in/out] The charger
+ * @param charger The charger
  */
 void app_charger_float_capacitor(Charger_t* charger);

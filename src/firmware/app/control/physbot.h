@@ -47,7 +47,7 @@ typedef struct
  * as well as data about the bot on the global axis. Details about what
  * can go in the PhysBot are in the physbot.h file.
  *
- * @param robot [in] The current state of the robot
+ * @param robot The current state of the robot
  * @param destination a 3 length array of {x, y, rotation} destination values
  * on the global axis
  * @param major_vec the major vector components on the global axis
