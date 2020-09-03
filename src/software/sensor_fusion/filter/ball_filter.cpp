@@ -112,7 +112,6 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
 
     if (ball_detections.empty())
     {
-        std::cout << std::endl;
         return std::nullopt;
     }
     else if (ball_detections.size() == 1)
@@ -126,30 +125,21 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
         return timestamped_ball_state;
     }
 
-    std::cout << ball_detections.size() << "\t";
-
     std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
     if (!adjusted_buffer_size)
     {
-        std::cout << std::endl;
         return std::nullopt;
     }
     ball_detections.resize(*adjusted_buffer_size);
-    std::cout << adjusted_buffer_size.value() << "\t";
 
     auto regression_line = calculateLineOfBestFit(ball_detections);
-    std::cout << regression_line.toNormalUnitVector() << "\t";
 
     Point filtered_position = getFilteredPosition(ball_detections, regression_line);
-    std::cout << filtered_position << "\t";
     auto filtered_velocity  = getFilteredVelocity(ball_detections, regression_line);
     if (!filtered_velocity)
     {
-        std::cout << std::endl;
         return std::nullopt;
     }
-    std::cout << filtered_velocity.value() << "\t";
-    std::cout << std::endl;
 
     BallState ball_state(filtered_position, filtered_velocity.value(),
                          ball_detections.front().distance_from_ground);

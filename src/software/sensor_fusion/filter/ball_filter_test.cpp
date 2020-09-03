@@ -164,11 +164,8 @@ class BallFilterTest : public ::testing::Test
             // simulate imperfect data
             Vector position_noise(position_noise_distribution(random_generator),
                                   position_noise_distribution(random_generator));
-            std::cout << position_noise << "\t";
             Duration time_step_noise =
                 Duration::fromSeconds(time_step_noise_distribution(random_generator));
-            std::cout << time_step_noise << "\t";
-
 
             // Calculate the current time and add noise
             // We make sure the applied noise doesn't cause the timestamp to be larger
@@ -177,25 +174,19 @@ class BallFilterTest : public ::testing::Test
             Timestamp current_timestamp_with_noise =
                 start_time + Duration::fromSeconds(i * time_step.getSeconds() +
                                                    time_step_noise.getSeconds());
-            std::cout << current_timestamp_with_noise << "\t";
             this->current_timestamp = std::min(current_timestamp_with_noise,
                                                start_time + max_ball_travel_duration);
-            std::cout << this->current_timestamp << "\t";
 
             // Take the time difference from the start time and calculate the ball's
             // current position based on it's velocity and the elapsed time
             Duration time_diff = current_timestamp - start_time;
-            std::cout << time_diff << "\t";
             Point current_ball_position =
                 ball_starting_position +
                 ball_velocity.normalize(ball_velocity.length() * time_diff.getSeconds());
-            std::cout << current_ball_position << "\t";
 
             // Apply noise to the ball's position to simulate measurement noise
             Point ball_position_with_noise = current_ball_position + position_noise;
-            std::cout << ball_position_with_noise << std::endl;
 
-//            continue;
             // Create the detection that would have been seen by the vision system
             std::vector<BallDetection> ball_detections = {
                 BallDetection{ball_position_with_noise, BALL_DISTANCE_FROM_GROUND,
@@ -209,10 +200,6 @@ class BallFilterTest : public ::testing::Test
             }
 
             ASSERT_TRUE(filtered_ball);
-//            if(!filtered_ball) {
-//                std::cout << "bad" << std::endl;
-//                continue;
-//            }
             double ball_position_difference =
                 (filtered_ball->state().position() - current_ball_position).length();
             EXPECT_LT(ball_position_difference, expected_position_tolerance);
