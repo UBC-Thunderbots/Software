@@ -115,7 +115,6 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
         direct_control_primitive_msg->mutable_direct_control()->set_charge_mode(
             TbotsProto::DirectControlPrimitive::ChargeMode::
                 DirectControlPrimitive_ChargeMode_CHARGE);
-        z
     }
     else if (main_widget->buttonGroup_charge_state->checkedButton() ==
              main_widget->radioButton_discharge)
