@@ -164,10 +164,10 @@ class BallFilterTest : public ::testing::Test
             // simulate imperfect data
             Vector position_noise(position_noise_distribution(random_generator),
                                   position_noise_distribution(random_generator));
-//            std::cout << position_noise << "\t";
+            std::cout << position_noise << "\t";
             Duration time_step_noise =
                 Duration::fromSeconds(time_step_noise_distribution(random_generator));
-//            std::cout << time_step_noise << "\t";
+            std::cout << time_step_noise << "\t";
 
 
             // Calculate the current time and add noise
@@ -177,23 +177,23 @@ class BallFilterTest : public ::testing::Test
             Timestamp current_timestamp_with_noise =
                 start_time + Duration::fromSeconds(i * time_step.getSeconds() +
                                                    time_step_noise.getSeconds());
-//            std::cout << current_timestamp_with_noise << "\t";
+            std::cout << current_timestamp_with_noise << "\t";
             this->current_timestamp = std::min(current_timestamp_with_noise,
                                                start_time + max_ball_travel_duration);
-//            std::cout << this->current_timestamp << "\t";
+            std::cout << this->current_timestamp << "\t";
 
             // Take the time difference from the start time and calculate the ball's
             // current position based on it's velocity and the elapsed time
             Duration time_diff = current_timestamp - start_time;
-//            std::cout << time_diff << "\t";
+            std::cout << time_diff << "\t";
             Point current_ball_position =
                 ball_starting_position +
                 ball_velocity.normalize(ball_velocity.length() * time_diff.getSeconds());
-//            std::cout << current_ball_position << "\t";
+            std::cout << current_ball_position << "\t";
 
             // Apply noise to the ball's position to simulate measurement noise
             Point ball_position_with_noise = current_ball_position + position_noise;
-//            std::cout << ball_position_with_noise << std::endl;
+            std::cout << ball_position_with_noise << std::endl;
 
 //            continue;
             // Create the detection that would have been seen by the vision system
@@ -357,7 +357,7 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_medium_noise_in_
 
 TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4, -3), Point(4, 3));
+    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
     double ball_velocity_magnitude               = 6.2;
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
@@ -376,7 +376,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data
 
 TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4, -3), Point(4, 3));
+    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
     double ball_velocity_magnitude               = 5.72;
     double ball_position_variance                = 0.001;
     double time_step_variance                    = 0.001;
@@ -395,7 +395,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_d
 
 TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4, -3), Point(4, 3));
+    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
     double ball_velocity_magnitude               = 5.04;
     double ball_position_variance                = 0.003;
     double time_step_variance                    = 0.001;
@@ -415,7 +415,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_
 TEST_F(BallFilterTest,
        ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4, -3), Point(4, 3));
+    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
     double ball_velocity_magnitude               = 5.04;
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
@@ -431,7 +431,7 @@ TEST_F(BallFilterTest,
         expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
         num_steps_to_ignore);
 
-    ball_path = Segment(Point(4, 3), Point(4, -3));
+    ball_path = Segment(Point(4.5, 3), Point(4.5, -3));
     ball_velocity_magnitude     = 4.8;
     expected_position_tolerance = 0.0001;
     expected_velocity_angle_tolernace     = Angle::fromDegrees(0.01);
@@ -449,7 +449,7 @@ TEST_F(BallFilterTest,
 TEST_F(BallFilterTest,
        ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data_2)
 {
-    Segment ball_path                  = Segment(Point(-4, -3), Point(0, 3));
+    Segment ball_path                  = Segment(Point(-4.5, -3), Point(0, 3));
     double ball_velocity_magnitude     = 5.04;
     double ball_position_variance      = 0;
     double time_step_variance          = 0;
@@ -465,7 +465,7 @@ TEST_F(BallFilterTest,
         expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
         num_steps_to_ignore);
 
-    ball_path                             = Segment(Point(0, 3), Point(4, -3));
+    ball_path                             = Segment(Point(0, 3), Point(4.5, -3));
     ball_velocity_magnitude               = 4.8;
     expected_position_tolerance           = 0.0001;
     expected_velocity_angle_tolernace     = Angle::fromDegrees(0.1);
