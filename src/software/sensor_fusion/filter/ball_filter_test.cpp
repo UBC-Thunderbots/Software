@@ -287,7 +287,7 @@ TEST_F(BallFilterTest, ball_sitting_still_with_moderate_noise)
 
 TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_no_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4, -3), Point(4, 3));
+    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
     double ball_velocity_magnitude               = 0.31;
     double ball_position_variance                = 0;
     double time_step_variance                    = 0;
@@ -306,7 +306,7 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_no_noise_in_data
 
 TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_data)
 {
-    Segment ball_path = Segment(Point(-4, -3), Point(4, 3));
+    Segment ball_path = Segment(Point(-4.5, -3), Point(4.5, 3));
     double ball_velocity_magnitude               = 0.3;
     double ball_position_variance                = 0.001;
     double time_step_variance                    = 0.001;
