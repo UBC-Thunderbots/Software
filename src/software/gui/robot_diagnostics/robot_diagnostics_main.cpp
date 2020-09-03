@@ -4,9 +4,9 @@
 
 #include "software/backend/backend.h"
 #include "software/gui/robot_diagnostics/threaded_robot_diagnostics_gui.h"
-#include "software/util/design_patterns/generic_factory.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/logger/logger.h"
+#include "software/parameter/dynamic_parameters.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 struct commandLineArgs
 {
@@ -29,16 +29,16 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     commandLineArgs args;
     // Build one string with all the backend_names
     std::vector<std::string> backend_names =
-            GenericFactory<std::string, Backend>::getRegisteredNames();
+        GenericFactory<std::string, Backend>::getRegisteredNames();
 
     std::string all_backend_names =
-            std::accumulate(std::begin(backend_names), std::end(backend_names), std::string(),
-                            [](std::string &ss, std::string &s) { return ss + s + ", "; });
+        std::accumulate(std::begin(backend_names), std::end(backend_names), std::string(),
+                        [](std::string &ss, std::string &s) { return ss + s + ", "; });
     std::string backend_help_str =
-            "The backend that you would like to use, one of: " + all_backend_names;
+        "The backend that you would like to use, one of: " + all_backend_names;
 
     std::string interface_help_str =
-            "The interface to send and receive packets over (can be found through ifconfig)";
+        "The interface to send and receive packets over (can be found through ifconfig)";
 
     boost::program_options::options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
@@ -47,9 +47,9 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
                        boost::program_options::value<std::string>(&args.backend_name),
                        backend_help_str.c_str());
     desc.add_options()(
-            "interface",
-            boost::program_options::value<std::string>(&args.network_interface_name),
-            interface_help_str.c_str());
+        "interface",
+        boost::program_options::value<std::string>(&args.network_interface_name),
+        interface_help_str.c_str());
 
     boost::program_options::variables_map vm;
     try
@@ -85,8 +85,8 @@ int main(int argc, char **argv)
         if (!args.network_interface_name.empty())
         {
             MutableDynamicParameters->getMutableNetworkConfig()
-                    ->mutableNetworkInterface()
-                    ->setValue(args.network_interface_name);
+                ->mutableNetworkInterface()
+                ->setValue(args.network_interface_name);
         }
 
         if (args.backend_name.empty())
@@ -95,11 +95,11 @@ int main(int argc, char **argv)
         }
 
         std::shared_ptr<Backend> backend =
-                GenericFactory<std::string, Backend>::create(args.backend_name);
+            GenericFactory<std::string, Backend>::create(args.backend_name);
 
         std::shared_ptr<ThreadedRobotDiagnosticsGUI> threaded_robot_diagnostics_gui;
         threaded_robot_diagnostics_gui =
-                std::make_shared<ThreadedRobotDiagnosticsGUI>(argc, argv);
+            std::make_shared<ThreadedRobotDiagnosticsGUI>(argc, argv);
         threaded_robot_diagnostics_gui->registerObserver(backend);
         backend->Subject<SensorProto>::registerObserver(threaded_robot_diagnostics_gui);
         // This blocks forever without using the CPU
