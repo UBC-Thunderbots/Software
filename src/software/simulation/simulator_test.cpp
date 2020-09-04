@@ -385,7 +385,7 @@ TEST(SimulatorTest, simulate_blue_robots_with_no_primitives)
     EXPECT_FLOAT_EQ(0.0f, blue_robot.y());
 }
 
-TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
+TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_negative_side)
 {
     // Simulate a robot with a primitive to sanity check that everything is connected
     // properly and we can properly simulate robot firmware. We use the MovePrimitve
@@ -393,6 +393,11 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
     // or removed, and its behaviour is easy to validate
 
     Simulator simulator(Field::createSSLDivisionBField());
+
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
+    simulator.setBlueTeamDefendingSide(defending_side);
 
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
@@ -419,6 +424,131 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
     auto blue_robot = detection_frame.robots_blue(0);
     EXPECT_NEAR(1000.0f, blue_robot.x(), 200);
     EXPECT_NEAR(0.0f, blue_robot.y(), 200);
+}
+
+TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positive_side)
+{
+    // Simulate a robot with a primitive to sanity check that everything is connected
+    // properly and we can properly simulate robot firmware. We use the MovePrimitve
+    // because it is very commonly used and so unlikely to be significantly changed
+    // or removed, and its behaviour is easy to validate
+
+    Simulator simulator(Field::createSSLDivisionBField());
+
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
+    simulator.setBlueTeamDefendingSide(defending_side);
+
+    RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    };
+    simulator.addBlueRobots(states);
+
+    simulator.setBlueRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+
+    for (unsigned int i = 0; i < 240; i++)
+    {
+        simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_blue_size());
+    auto blue_robot = detection_frame.robots_blue(0);
+    EXPECT_NEAR(-1000.0f, blue_robot.x(), 200);
+    EXPECT_NEAR(500.0f, blue_robot.y(), 100);
+    EXPECT_NEAR(M_PI, blue_robot.orientation(), 0.2);
+}
+
+TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_negative_side)
+{
+    // Simulate a robot with a primitive to sanity check that everything is connected
+    // properly and we can properly simulate robot firmware. We use the MovePrimitve
+    // because it is very commonly used and so unlikely to be significantly changed
+    // or removed, and its behaviour is easy to validate
+
+    Simulator simulator(Field::createSSLDivisionBField());
+
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
+    simulator.setYellowTeamDefendingSide(defending_side);
+
+    RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    };
+    simulator.addYellowRobots(states);
+
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+
+    for (unsigned int i = 0; i < 120; i++)
+    {
+        simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_yellow_size());
+    auto yellow_robot = detection_frame.robots_yellow(0);
+    EXPECT_NEAR(1000.0f, yellow_robot.x(), 200);
+    EXPECT_NEAR(0.0f, yellow_robot.y(), 200);
+}
+
+TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_positive_side)
+{
+    // Simulate a robot with a primitive to sanity check that everything is connected
+    // properly and we can properly simulate robot firmware. We use the MovePrimitve
+    // because it is very commonly used and so unlikely to be significantly changed
+    // or removed, and its behaviour is easy to validate
+
+    Simulator simulator(Field::createSSLDivisionBField());
+
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
+    simulator.setYellowTeamDefendingSide(defending_side);
+
+    RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    };
+    simulator.addYellowRobots(states);
+
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+
+    for (unsigned int i = 0; i < 240; i++)
+    {
+        simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_yellow_size());
+    auto yellow_robot = detection_frame.robots_yellow(0);
+    EXPECT_NEAR(-1000.0f, yellow_robot.x(), 200);
+    EXPECT_NEAR(500.0f, yellow_robot.y(), 100);
+    EXPECT_NEAR(M_PI, yellow_robot.orientation(), 0.2);
 }
 
 TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)

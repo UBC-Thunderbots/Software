@@ -160,14 +160,13 @@ TEST_F(STPTest, test_get_play_info)
     EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 
     auto play_info = stp.getPlayInfo();
-    PlayInfo expected_play_info;
     std::string expected_referee_command, expected_play_name;
     expected_referee_command                                         = "HALT";
     expected_play_name                                               = "HaltTestPlay";
     std::unordered_set<std::string> expected_robot_tactic_assignment = {
         "Robot 0  -  StopTestTactic", "Robot 1  -  StopTestTactic"};
-    expected_play_info = PlayInfo(expected_referee_command, expected_play_name,
-                                  expected_robot_tactic_assignment);
+    PlayInfo expected_play_info = PlayInfo(expected_referee_command, expected_play_name,
+                                           expected_robot_tactic_assignment);
     EXPECT_EQ(play_info.getRefereeCommandName(), expected_referee_command);
     EXPECT_EQ(play_info.getPlayName(), expected_play_name);
     EXPECT_EQ(play_info, expected_play_info);

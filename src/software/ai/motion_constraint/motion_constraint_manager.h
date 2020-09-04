@@ -10,7 +10,7 @@
 class MotionConstraintManager : public MutableTacticVisitor
 {
    public:
-    explicit MotionConstraintManager(){};
+    explicit MotionConstraintManager() = default;
 
     /**
      * Gets Motion Constraint based on gamestate and tactic

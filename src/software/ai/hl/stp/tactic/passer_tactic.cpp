@@ -38,13 +38,18 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
 
 void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    // Collect the ball
-    auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, false);
-    do
+    // If the ball is moving, we are likely already in a live game scenario and
+    // so we need to collect the ball before we can pass. If the ball is not moving,
+    // we are likely in a set play and so we don't need to initially collect the ball
+    if (ball.velocity().length() > INTERCEPT_BALL_SPEED_THRESHOLD)
     {
-        intercept_action->updateControlParams(*robot);
-        yield(intercept_action);
-    } while (!intercept_action->done());
+        auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, false);
+        do
+        {
+            intercept_action->updateControlParams(*robot);
+            yield(intercept_action);
+        } while (!intercept_action->done());
+    }
 
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass

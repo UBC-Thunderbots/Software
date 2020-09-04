@@ -1,10 +1,12 @@
 #pragma once
 
+#include "software/proto/defending_side_msg.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
+#include "software/world/field.h"
 #include "software/world/world.h"
 
 extern "C"
@@ -108,6 +110,19 @@ class Simulator
     void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg);
 
     /**
+     * Sets which side of the field the corresponding team is defending.
+     *
+     * This will flip robot and ball coordinates an applicable in order to present
+     * the firmware being simulated with data that matches our coordinate convention. See
+     * https://github.com/UBC-Thunderbots/Software/blob/master/docs/software-architecture-and-design.md#coordinates
+     * for more information about our coordinate conventions.
+     *
+     * @param defending_side_proto The side to defend
+     */
+    void setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto);
+    void setBlueTeamDefendingSide(const DefendingSideProto& defending_side_proto);
+
+    /**
      * Advances the simulation by the given time step. This will simulate
      * one "camera frame" of data and increase the camera_frame value by 1.
      *
@@ -183,12 +198,13 @@ class Simulator
      * @param primitive_msg The primitive to run on the robot
      * @param simulator_robots The robots to set the primitives on
      * @param simulator_ball The simulator ball to use in the primitives
+     * @param defending_side The side of the field the robot is defending
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto_Primitive& primitive_msg,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
-        const std::shared_ptr<SimulatorBall>& simulator_ball);
+        const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side);
 
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;
@@ -196,6 +212,8 @@ class Simulator
         yellow_simulator_robots;
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         blue_simulator_robots;
+    FieldSide yellow_team_defending_side;
+    FieldSide blue_team_defending_side;
 
     unsigned int frame_number;
 

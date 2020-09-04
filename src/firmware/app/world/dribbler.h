@@ -33,6 +33,7 @@ void app_dribbler_destroy(Dribbler_t* dribbler);
 
 /**
  * Set the speed of the given dribbler
+ *
  * @param dribbler The dribbler to set the speed of
  * @param rpm The rpm to set the dribbler to
  */
@@ -40,13 +41,16 @@ void app_dribbler_setSpeed(Dribbler_t* dribbler, uint32_t rpm);
 
 /**
  * Sets the given dribbler to coast until another operation is applied to it
+ *
  * @param dribbler The dribbler to coast
  */
 void app_dribbler_coast(Dribbler_t* dribbler);
 
 /**
  * Get the temperature of the given dribbler
+ *
  * @param dribbler The dribbler to get the temperature of
+ *
  * @return The temperature of the dribbler, in degrees celsius
  */
 unsigned int app_dribbler_getTemperature(Dribbler_t* dribbler);

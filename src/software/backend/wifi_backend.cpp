@@ -3,11 +3,14 @@
 #include "shared/constants.h"
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/proto/message_translation/defending_side.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
+WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config,
+                         std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : network_config(network_config),
+      sensor_fusion_config(sensor_fusion_config),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->getSSLCommunicationConfig())
@@ -31,6 +34,17 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config)
 void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
+
+    if (sensor_fusion_config->OverrideGameControllerDefendingSide()->value())
+    {
+        defending_side_output->sendProto(*createDefendingSide(
+            sensor_fusion_config->DefendingPositiveSide()->value() ? FieldSide::POS_X
+                                                                   : FieldSide::NEG_X));
+    }
+    else
+    {
+        defending_side_output->sendProto(*createDefendingSide(FieldSide::NEG_X));
+    }
 }
 
 void WifiBackend::onValueReceived(World world)
@@ -49,6 +63,9 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
     robot_msg_input.reset(new ThreadedProtoMulticastListener<TbotsProto::RobotStatus>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
         boost::bind(&Backend::receiveRobotStatus, this, _1)));
+
+    defending_side_output.reset(new ThreadedProtoMulticastSender<DefendingSideProto>(
+        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, DEFENDING_SIDE_PORT));
 }
 
 // Register this backend in the genericFactory
