@@ -114,7 +114,8 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
 
 
     direct_control_primitive_msg->mutable_direct_control()->set_charge_mode(
-        static_cast<TbotsProto::DirectControlPrimitive_ChargeMode>(getChargeModeFromUI()));
+        static_cast<TbotsProto::DirectControlPrimitive_ChargeMode>(
+            getChargeModeFromUI()));
 
     // Uses the autochick buttonGroup to decide which primitive to make
     if (main_widget->buttonGroup_autochick->checkedButton() ==
@@ -171,15 +172,18 @@ void RobotDiagnosticsGUI::pushPrimitiveSetToBuffer(
 
 ChargeMode RobotDiagnosticsGUI::getChargeModeFromUI()
 {
-    if (main_widget->buttonGroup_charge_state->checkedButton() == main_widget->radioButton_charge)
+    if (main_widget->buttonGroup_charge_state->checkedButton() ==
+        main_widget->radioButton_charge)
     {
         return ChargeMode::CHARGE;
     }
-    else if (main_widget->buttonGroup_charge_state->checkedButton() == main_widget->radioButton_discharge)
+    else if (main_widget->buttonGroup_charge_state->checkedButton() ==
+             main_widget->radioButton_discharge)
     {
         return ChargeMode::DISCHARGE;
     }
-    else if (main_widget->buttonGroup_charge_state->checkedButton() == main_widget->radioButton_float)
+    else if (main_widget->buttonGroup_charge_state->checkedButton() ==
+             main_widget->radioButton_float)
     {
         return ChargeMode::FLOAT;
     }
