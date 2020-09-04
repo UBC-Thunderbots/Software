@@ -81,6 +81,13 @@ class RobotDiagnosticsGUI : public QMainWindow
     void pushPrimitiveSetToBuffer(std::unique_ptr<TbotsProto::Primitive> primitive_msg);
 
     /**
+     * Uses the UI state to get the current charge mode
+     *
+     * @return the charge mode based on the UI state
+     */
+    ChargeMode getChargeModeFromUI();
+
+    /**
      * Setup widgets
      */
     void setupWidgets();
@@ -93,7 +100,6 @@ class RobotDiagnosticsGUI : public QMainWindow
     // Indicates which robot we're communicating with
     unsigned int robot_selection;
     std::string led_mode;
-    ChargeMode charge_mode_ = ChargeMode::FLOAT;
     bool chip_pressed;
     bool kick_pressed;
     // The "parent" of each of these widgets is set during construction; meaning that
