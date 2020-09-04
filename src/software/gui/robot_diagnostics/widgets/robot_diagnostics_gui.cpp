@@ -39,7 +39,7 @@ void RobotDiagnosticsGUI::onChickerStateChanged(double chicker_power,
     {
         kick_pressed = true;
     }
-    charge_mode_ = charge_mode;
+    charge_mode_                  = charge_mode;
     auto direct_control_primitive = createDirectControlPrimitiveFromUI();
     pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
 }
@@ -113,7 +113,7 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
 
 
     direct_control_primitive_msg->mutable_direct_control()->set_charge_mode(
-            static_cast<TbotsProto::DirectControlPrimitive_ChargeMode>(charge_mode_));
+        static_cast<TbotsProto::DirectControlPrimitive_ChargeMode>(charge_mode_));
 
     // Uses the autochick buttonGroup to decide which primitive to make
     if (main_widget->buttonGroup_autochick->checkedButton() ==
