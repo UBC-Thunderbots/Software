@@ -347,7 +347,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
                 continue;
             }
 
-            // Snap the detection positions to the regression line if it was provided
+            // Project the detection positions onto the regression line if it was provided
             Point current_position =
                 ball_regression_line
                     ? closestPoint(current_detection.position, *ball_regression_line)

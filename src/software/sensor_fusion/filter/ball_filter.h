@@ -20,13 +20,13 @@
  * and velocity. This buffer/regression system was chosen because it results in a
  * very stable output, particularly for the ball velocity. The data we receive isn't
  * perfect (which is why we have a filter). If we receive a noisy position that is off
- * the ball's current trajectory, it will only have a minimal impact on the line of
- * best fit. This means that as the ball is travelling, this filter will return a very
- * steady velocity vector. This is important because small deviations in
- * velocity orientation can have large effects when the AI tries to predict
- * the future position of the ball. For example, reliably receiving a pass
- * relies on the ball's velocity being very stable, otherwise the robot would
- * "jiggle" back and forth as the estimated receiver position would keep changing.
+ * the ball's current trajectory, it will have minimal impact. This means that as
+ * the ball is travelling, this filter will return a very steady velocity vector.
+ * This is important because small deviations in velocity orientation can have large
+ * effects when the AI tries to predict the future position of the ball. For example,
+ * consistently receiving a pass relies on the ball's velocity being very stable,
+ * otherwise the robot would "jiggle" back and forth as the estimated receiver position
+ * would keep changing.
  */
 class BallFilter
 {
@@ -96,7 +96,7 @@ class BallFilter
                                   const Rectangle& filter_area);
 
     /**
-     * Uses linear regression to filter the given list of ball detections to fine the
+     * Uses linear regression to filter the given list of ball detections to find the
      * current "real" state of the ball.
      *
      * @param ball_detections The detections to filter
@@ -132,7 +132,7 @@ class BallFilter
      *
      * @param ball_detections The ball detections to fit
      *
-     * @return The line of best fir through the given ball detection positions
+     * @return The line of best fit through the given ball detection positions
      */
     static Line calculateLineOfBestFit(
         boost::circular_buffer<BallDetection> ball_detections);
