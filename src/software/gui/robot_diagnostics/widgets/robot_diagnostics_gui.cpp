@@ -39,28 +39,29 @@ void RobotDiagnosticsGUI::onChickerStateChanged(double chicker_power,
     {
         kick_pressed = true;
     }
+    charge_mode_ = charge_mode;
     auto direct_control_primitive = createDirectControlPrimitiveFromUI();
-    sendPrimitiveSet(std::move(direct_control_primitive));
+    pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
 }
 
 void RobotDiagnosticsGUI::onDirectVelocityPowerChanged(
     double direct_per_wheel_power, DirectVelocityMode direct_velocity_mode)
 {
     auto direct_control_primitive = createDirectControlPrimitiveFromUI();
-    sendPrimitiveSet(std::move(direct_control_primitive));
+    pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
 }
 
 void RobotDiagnosticsGUI::onDirectPerWheelPowerChanged(
     double direct_per_wheel_power, DirectPerWheelMode direct_per_wheel_mode)
 {
     auto direct_control_primitive = createDirectControlPrimitiveFromUI();
-    sendPrimitiveSet(std::move(direct_control_primitive));
+    pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
 }
 
 void RobotDiagnosticsGUI::onDribblerPowerChanged(double dribbler_power)
 {
     auto direct_control_primitive = createDirectControlPrimitiveFromUI();
-    sendPrimitiveSet(std::move(direct_control_primitive));
+    pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
 }
 
 std::unique_ptr<TbotsProto::Primitive>
@@ -68,9 +69,10 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
 {
     auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
+    // Uses currently selected tabWidget to decide which wheel control Primitive to make
     switch (main_widget->tabWidget->currentIndex())
     {
-        case WheelControlTab::DIRECT_PER_WHEEL:
+        case static_cast<int>(WheelControlTab::DIRECT_PER_WHEEL):
             direct_control_primitive_msg->mutable_direct_control()
                 ->mutable_direct_per_wheel_control()
                 ->set_front_left_wheel_rpm(
@@ -88,7 +90,7 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
                 ->set_back_right_wheel_rpm(
                     main_widget->lineEdit_direct_per_wheel_br->text().toFloat());
             break;
-        case WheelControlTab::DIRECT_VELOCITY:
+        case static_cast<int>(WheelControlTab::DIRECT_VELOCITY):
             direct_control_primitive_msg->mutable_direct_control()
                 ->mutable_direct_velocity_control()
                 ->mutable_velocity()
@@ -109,31 +111,15 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
             break;
     }
 
-    if (main_widget->buttonGroup_charge_state->checkedButton() ==
-        main_widget->radioButton_charge)
-    {
-        direct_control_primitive_msg->mutable_direct_control()->set_charge_mode(
-            TbotsProto::DirectControlPrimitive::ChargeMode::
-                DirectControlPrimitive_ChargeMode_CHARGE);
-    }
-    else if (main_widget->buttonGroup_charge_state->checkedButton() ==
-             main_widget->radioButton_discharge)
-    {
-        direct_control_primitive_msg->mutable_direct_control()->set_charge_mode(
-            TbotsProto::DirectControlPrimitive::ChargeMode::
-                DirectControlPrimitive_ChargeMode_DISCHARGE);
-    }
-    else if (main_widget->buttonGroup_charge_state->checkedButton() ==
-             main_widget->radioButton_float)
-    {
-        direct_control_primitive_msg->mutable_direct_control()->set_charge_mode(
-            TbotsProto::DirectControlPrimitive::ChargeMode::
-                DirectControlPrimitive_ChargeMode_FLOAT);
-    }
 
+    direct_control_primitive_msg->mutable_direct_control()->set_charge_mode(
+            static_cast<TbotsProto::DirectControlPrimitive_ChargeMode>(charge_mode_));
+
+    // Uses the autochick buttonGroup to decide which primitive to make
     if (main_widget->buttonGroup_autochick->checkedButton() ==
         main_widget->radioButton_autochick_none)
     {
+        // Checks if chip/kick radio buttons were pressed
         if (chip_pressed)
         {
             direct_control_primitive_msg->mutable_direct_control()
@@ -170,7 +156,7 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
     return direct_control_primitive_msg;
 }
 
-void RobotDiagnosticsGUI::sendPrimitiveSet(
+void RobotDiagnosticsGUI::pushPrimitiveSetToBuffer(
     std::unique_ptr<TbotsProto::Primitive> primitive_msg)
 {
     auto primitive_set_msg = std::make_unique<TbotsProto::PrimitiveSet>();
