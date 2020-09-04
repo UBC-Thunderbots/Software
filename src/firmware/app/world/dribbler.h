@@ -10,12 +10,11 @@ typedef struct Dribbler Dribbler_t;
 /**
  * Create a dribbler with functions for interacting with it
  *
- * @param set_speed A function that can be called to set the current speed of the
- * dribbler
- * @param coast A function that can be called to make the dribbler coast until
- * another operation is applied to it
- * @param get_temperature_deg_c A function that can be called to get the temperature
- * of the dribbler, in degrees celsius
+ * @param set_speed A function that can be called to set the current speed of the dribbler
+ * @param coast A function that can be called to make the dribbler coast until another
+ *              operation is applied to it
+ * @param get_temperature_deg_c A function that can be called to get the temperature of
+ *                              the dribbler, in degrees celsius
  *
  * @return A pointer to the created dribbler, ownership is given to the caller
  */

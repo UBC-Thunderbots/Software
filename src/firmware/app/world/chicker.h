@@ -9,16 +9,18 @@ typedef struct Chicker Chicker_t;
 /**
  * Create a chicker with the given functions for interacting with it
  *
- * @param kick A function that we can call to kick with the chicker with a given
- * speed, in meters per second
- * @param chip A function that we can call to chip a given distance, in meters, with
- * the chicker. The distance parameter is the distance to the first bounce.
- * @param enable_autokick A function that we can call to enable autokick on the
- * chicker (ie. the chicker will kick the ball as soon as the ball is close enough to the
- * front of the chicker to be kicked), with a kick speed in meters per second
- * @param enable_autochip A function that we can call to enable autochip on the
- * chicker (ie. the chicker will chip the ball as soon as the ball is close enough to the
- * front of the chicker to be chipped), with a chip distance in meters
+ * @param kick A function that we can call to kick with the chicker with a given speed,
+ *             in meters per second
+ * @param chip A function that we can call to chip a given distance, in meters, with the
+ *             chicker. The distance parameter is the distance to the first bounce.
+ * @param enable_autokick A function that we can call to enable autokick on the chicker
+ *                        (ie. the chicker will kick the ball as soon as the ball is close
+ *                        enough to the front of the chicker to be kicked), with a kick
+ *                        speed in meters per second
+ * @param enable_autochip A function that we can call to enable autochip on the chicker
+ *                        (ie. the chicker will chip the ball as soon as the ball is close
+ *                        enough to the front of the chicker to be chipped), with a chip
+ *                        distance in meters
  * @param disable_autokick A function that we can call to disable autokick
  * @param disable_autochip A function that we can call to disable autochip
  *

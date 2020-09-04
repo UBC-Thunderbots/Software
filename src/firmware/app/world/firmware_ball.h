@@ -11,14 +11,14 @@ typedef struct FirmwareBall FirmwareBall_t;
  * NOTE: All positions are in global field coordinates (ie. 0,0 is the center of the
  *       field)
  *
- * @param get_ball_position_x A function that can be called to get the x-position of
- * the ball, in meters
- * @param get_ball_position_y A function that can be called to get the y-position of
- * the ball, in meters
- * @param get_ball_velocity_x A function that can be called to get the x-position of
- * the ball, in meters per second
- * @param get_ball_velocity_y A function that can be called to get the y-position of
- * the ball, in meters per second
+ * @param get_ball_position_x A function that can be called to get the x-position of the
+ *                            ball, in meters
+ * @param get_ball_position_y A function that can be called to get the y-position of the
+ *                            ball, in meters
+ * @param get_ball_velocity_x A function that can be called to get the x-position of the
+ *                            ball, in meters per second
+ * @param get_ball_velocity_y A function that can be called to get the y-position of the
+ *                            ball, in meters per second
  *
  * @return A pointer to a ball that will use the given methods to get the ball state,
  *         ownership of the ball is given to the caller

@@ -8,9 +8,9 @@ typedef struct Charger Charger_t;
 /**
  * Create a charger with the given functions for interacting with it
  *
- * @param charge_capacitor [in] Charge the capacitor of the robot
- * @param discharge_capacitor [in] Discharge the capacitor of the robot
- * @param float_capacitor [in] Set capacitor to float
+ * @param charge_capacitor Charge the capacitor of the robot
+ * @param discharge_capacitor Discharge the capacitor of the robot
+ * @param float_capacitor Set capacitor to float
  *
  * @return A pointer to the created charger, ownership is given to the caller
  */

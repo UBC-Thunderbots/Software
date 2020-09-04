@@ -46,26 +46,26 @@ typedef struct ControllerState
  * @param charger The robot charger
  * @param chicker The robot chicker
  * @param dribbler The robot dribbler
- * @param get_robot_position_x A function that can be called to get the x-position of
- * the robot, in meters
- * @param get_robot_position_y A function that can be called to get the y-position of
- * the robot, in meters
- * @param get_robot_orientation A function that can be called to get the orientation
- * of the robot, in radians
- * @param get_robot_velocity_x A function that can be called to get the x-velocity of
- * the robot, in m/s
- * @param get_robot_velocity_y A function that can be called to get the y-velocity of
- * the robot, in m/s
+ * @param get_robot_position_x A function that can be called to get the x-position of the
+ *                             robot, in meters
+ * @param get_robot_position_y A function that can be called to get the y-position of the
+ *                             robot, in meters
+ * @param get_robot_orientation A function that can be called to get the orientation of
+ *                              the robot, in radians
+ * @param get_robot_velocity_x A function that can be called to get the x-velocity of the
+ *                             robot, in m/s
+ * @param get_robot_velocity_y A function that can be called to get the y-velocity of the
+ *                             robot, in m/s
  * @param get_robot_velocity_angular A function that can be called to get the angular
  *                                   velocity of the robot, in rad/s
  * @param get_battery_voltage A function that can be called to the batter voltage, in
  *                            volts
- * @param front_right_wheel [in] The front right wheel of the robot
- * @param front_left_wheel [in] The front left wheel of the robot
- * @param back_right_wheel [in] The back right wheel of the robot
- * @param back_left_wheel [in] The back left wheel of the robot
- * @param controller_state [in] The controller state
- * @param robot_constants [in] Set of constants particular to this robot
+ * @param front_right_wheel The front right wheel of the robot
+ * @param front_left_wheel The front left wheel of the robot
+ * @param back_right_wheel The back right wheel of the robot
+ * @param back_left_wheel The back left wheel of the robot
+ * @param controller_state The controller state
+ * @param robot_constants Set of constants particular to this robot
  *
  * @return A pointer to a robot with the given hardware, ownership of the robot is
  *         given to the caller

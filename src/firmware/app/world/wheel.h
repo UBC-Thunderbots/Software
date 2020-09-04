@@ -34,11 +34,11 @@ typedef struct WheelConstants
 /**
  * Create a wheel object with functions for interacting with it
  *
- * @param apply_wheel_force A function that we can call to apply a force to this
- * wheel, in newtons
- * @param get_motor_speed_rpm A function that we can call to get the speed of this
- * wheel, in RPM
- * @param wheel_constants [in] Constants for this wheel
+ * @param apply_wheel_force A function that we can call to apply a force to this wheel,
+ *                          in newtons
+ * @param get_motor_speed_rpm A function that we can call to get the speed of this wheel,
+ *                            in RPM
+ * @param wheel_constants Constants for this wheel
  *
  * @return A pointer to the created wheel, ownership is given to the caller
  */
