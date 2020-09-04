@@ -11,13 +11,13 @@
  *
  * @pre All arrays must be pre-allocated up to TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
- * @param t_start [in] The starting parameterization value
+ * @param t_start The starting parameterization value
  *
- * @param t_end  [in] The ending parameterization value
+ * @param t_end The ending parameterization value
  *
- * @param path_1d  [in] The 1d polynomial representing the path along the trajectory
+ * @param path_1d The 1d polynomial representing the path along the trajectory
  *
- * @param num_elements [in] The number of elements (nodes) to be in the trajectory
+ * @param num_elements The number of elements (nodes) to be in the trajectory
  *
  * @param node_values [out] The evaluation of the polynomial at each value of the constant
  * parameterization. This array is of length num_elements
@@ -41,13 +41,13 @@ void app_trajectory_planner_impl_generate1dSegmentNodesAndLengths(
  * @pre All arrays must be pre-allocated up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
- * @param t_start [in] The starting value of polynomial parameterization
+ * @param t_start The starting value of polynomial parameterization
  *
- * @param t_end [in] The final value of polynomial parameterization
+ * @param t_end The final value of polynomial parameterization
  *
- * @param path_2d [in] The polynomial representing the trajectory in space
+ * @param path_2d The polynomial representing the trajectory in space
  *
- * @param num_elements [in] The number of nodes(elements) of the generated trajectory
+ * @param num_elements The number of nodes(elements) of the generated trajectory
  *
  * @param x_values [out] The x value of each trajectory node. This array is of length
  * num_elements.
@@ -77,10 +77,10 @@ void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
  * @param segment_lengths [in] The length of each segment in the trajectory.  Units of
  * parameters must be in consistent magnitudes, Ex: distances in mm and speed in mm/s.
  *
- * @param max_allowable_acceleration [in] The maximum acceleration that can occur anywhere
+ * @param max_allowable_acceleration The maximum acceleration that can occur anywhere
  * on the trajectory
  *
- * @param num_segments [in] The number of nodes(elements) in the trajectory
+ * @param num_segments The number of nodes(elements) in the trajectory
  *
  * @param speeds [in/out] The existing speed profile to be modified in-place to be
  * backwards continuous. This array is of length num_elements. The units of output are
@@ -102,24 +102,24 @@ app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
  * @pre All arrays must be pre-allocated up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
  *
- * @param final_speed  [in] The final speed at the last element of the profile.  Units of
+ * @param final_speed  The final speed at the last element of the profile.  Units of
  * parameters must be in consistent magnitudes, Ex: distances in mm and speed in mm/s.
  *
  * @param segment_lengths [in] The length of each segment between data points on the speed
  * profile. In meters.
  *
- * @param max_allowable_speed_profile [in] An array that limits the max speed at each
+ * @param max_allowable_speed_profile An array that limits the max speed at each
  * point on the profile. Units of parameters must be in consistent magnitudes, Ex:
  * distances in mm and speed in mm/s.
  *
- * @param max_allowable_acceleration [in] The maximum allowable acceleration along any
+ * @param max_allowable_acceleration The maximum allowable acceleration along any
  * segment in the profile. Units of parameters must be in consistent magnitudes, Ex:
  * distances in mm and acceleration in mm/s^2.
  *
- * @param initial_speed [in] The initial speed at the first element of the profile.  Units
+ * @param initial_speed The initial speed at the first element of the profile.  Units
  * of parameters must be in consistent magnitudes, Ex: distances in mm and speed in mm/s.
  *
- * @param num_elements [in] The number of elements in the speed profile
+ * @param num_elements The number of elements in the speed profile
  *
  * @param speeds [out] The pre-allocated array that will be modified to contain a forwards
  * continuous speed profile that obeys the initial and final speeds and the
@@ -143,19 +143,19 @@ app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
  * @pre All arrays must be pre-allocated up to at least
  * TRAJECTORY_PLANNER_MAX_NUM_SEGMENTS
  *
- * @param path [in] The 2d polynomial that defines the path in 2d space.
+ * @param path The 2d polynomial that defines the path in 2d space.
  *
- * @param num_elements [in] The number of elements that will make up the trajectory
+ * @param num_elements The number of elements that will make up the trajectory
  *
- * @param t_start [in] The starting value of the parameterization
+ * @param t_start The starting value of the parameterization
  *
- * @param t_end [in] The ending value of the parameterization
+ * @param t_end The ending value of the parameterization
  *
- * @param max_allowable_acceleration [in] The maximum allowable acceleration along the
+ * @param max_allowable_acceleration The maximum allowable acceleration along the
  * trajectory. Units of parameters must be in consistent magnitudes, Ex: distances in mm
  * and acceleration in mm/s^2.
  *
- * @param speed_cap [in] The maximum allowable speed at any point on the trajectory. This
+ * @param speed_cap The maximum allowable speed at any point on the trajectory. This
  * value is defined by the user and this speed limit will not be exceeded even if possible
  * given the physical possibility. Units of parameters must be in consistent magnitudes,
  * Ex: distances in mm and speed in mm/s.
@@ -184,7 +184,7 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
  * @param speeds [in] The speed profile defining the speed at each element.  Units of
  * parameters must be in consistent magnitudes, Ex: distances in mm and speed in mm/s.
  *
- * @param num_elements [in] The number of elements in the speed profile.
+ * @param num_elements The number of elements in the speed profile.
  *
  * @param trajectory_durations [out] The duration between successive speed elements in the
  * profile. In seconds. This array is of length num_elements-1
@@ -224,7 +224,7 @@ void app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
  * successive speed points in trajectory 2. In seconds. This array is of length
  * num_elements-1.
  *
- * @param num_elements [in] The number of elements in both trajectory 1 and 2.
+ * @param num_elements The number of elements in both trajectory 1 and 2.
  *
  * @param speeds1 [in/out] The speed profile corresponding to trajectory 1. Speed must
  * have a denominator value of seconds. This array is of length num_elements.
@@ -254,12 +254,12 @@ void app_trajectory_planner_impl_modifySpeedsToMatchLongestSegmentDuration(
  * Note: The magnitude of units have to be consistent. Ex. Distances in mm and speeds in
  * mm/s. The output will be in the same units magnitude.
  *
- * @param initial_speed [in] The initial speed at the start of a segment.
+ * @param initial_speed The initial speed at the start of a segment.
  *
- * @param duration [in] The duration of time between the initial and final speed points.
+ * @param duration The duration of time between the initial and final speed points.
  * This is also the time required to traverse the displacement parameter.
  *
- * @param displacement [in] The distance between the initial and final velocity points.
+ * @param displacement The distance between the initial and final velocity points.
  *
  * @return final_speed The final speed at the end of the segment.
  */
