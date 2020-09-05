@@ -60,14 +60,14 @@ typedef struct WheelController WheelController_t;
  * These are the coefficients relating to how previous input effects the controller
  * output.
  *
- * @param num_command_coefficients [in] The number of elements in the command_coefficients
+ * @param num_command_coefficients The number of elements in the command_coefficients
  * array
  *
  * @param output_sample_coefficients [in] The coefficients for the controller sampled
  * output. These are the coefficients relating to how the sampled output(wheel state)
  * effects the controller output.
  *
- * @param num_sample_coefficient [in] The number of elements in the
+ * @param num_output_sample_coefficients The number of elements in the
  * sampled_output coefficients array.
  *
  * @return Pointer to the newly created WheelController_t
@@ -84,7 +84,7 @@ WheelController_t* app_wheel_controller_create(
  * @param wheel_controller [in] The WheelController that is the target of the new command
  * value.
  *
- * @param command [in] The value of the commanded state requested. This is the desired
+ * @param command The value of the commanded state requested. This is the desired
  * state of the wheel. The units are the same as the desired output. Ex, m/s.
  */
 void app_wheel_controller_pushNewCommand(WheelController_t* wheel_controller,
@@ -98,7 +98,7 @@ void app_wheel_controller_pushNewCommand(WheelController_t* wheel_controller,
  * @param wheel_controller [in] The WheelController that will receive the new output
  * sample.
  *
- * @param output_sample [in] Measured value of the current wheel state.
+ * @param output_sample Measured value of the current wheel state.
  */
 void app_wheel_controller_pushNewSampleOutput(WheelController_t* wheel_controller,
                                               float output_sample);
