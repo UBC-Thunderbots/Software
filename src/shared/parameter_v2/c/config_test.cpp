@@ -1,9 +1,7 @@
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
 #include <regex>
-#include <typeinfo>
 
 #include "clang-c/Index.h"
 
@@ -16,35 +14,36 @@ extern "C"
 
 #include <cstring>
 
-#include "software/util/variant_visitor/variant_visitor.h"
 #include "yaml-cpp/yaml.h"
 
-std::ostream& operator<<(std::ostream& stream, const CXString& str)
-{
-    stream << clang_getCString(str);
-    clang_disposeString(str);
-    return stream;
-}
-
-std::string toCamelCase(const std::string& input)
+/**
+ * This function is needed to turn config file names into config struct names.
+ *
+ * For example, a config file name maybe "example_config" gets converted
+ * to "ExampleConfig"
+ *
+ * @param The snake_case string to convert to CamelCase
+ * @return Converted string to CamelCase
+ */
+std::string toCamelCase(const std::string& snake_case_input)
 {
     std::string ret_str = "";
-    ret_str += (char)toupper(input[0]);
+    ret_str += (char)toupper(snake_case_input[0]);
 
-    for (unsigned i = 1; i < input.length() - 1; i++)
+    for (unsigned i = 1; i < snake_case_input.length() - 1; i++)
     {
-        if (input[i] == '_')
+        if (snake_case_input[i] == '_')
         {
-            ret_str += (char)toupper(input[i + 1]);
+            ret_str += (char)toupper(snake_case_input[i + 1]);
             i++;
         }
         else
         {
-            ret_str += input[i];
+            ret_str += snake_case_input[i];
         }
     }
 
-    ret_str += input[input.length() - 1];
+    ret_str += snake_case_input[snake_case_input.length() - 1];
     return ret_str;
 }
 
@@ -54,9 +53,15 @@ class YamlLoadFixture : public ::testing::Test
    protected:
     typedef struct ConfigMetadata
     {
+        // the name of the config in snake_case
         std::string config_name;
+
+        // the included configs in snake_case
         std::vector<std::string> included_configs;
+
+        // the parameters defined by this config metadata
         std::vector<YAML::Node> parameters;
+
     } ConfigMetadata_t;
 
     /*
@@ -135,14 +140,16 @@ TEST_F(YamlLoadFixture, MemoryInitializationSanityCheck)
 
 TEST_F(YamlLoadFixture, TestProperGeneration)
 {
-    // every file should generate a config
+    // every file should generate a config, we iterate over all the config_metadata
+    // structs for each file, and use lib-clang to iterate over config.h to make sure the
+    // config was generated as expected
     std::for_each(
         config_file_to_metadata_map.begin(), config_file_to_metadata_map.end(),
         [&](std::pair<std::string, ConfigMetadata_t> config_defn) {
             std::string file_path     = config_defn.first;
             ConfigMetadata_t metadata = config_defn.second;
 
-            // From the libclang docs: https://clang.llvm.org/doxygen/group__CINDEX.html
+            // From the lib-clang docs: https://clang.llvm.org/doxygen/group__CINDEX.html
             CXIndex index = clang_createIndex(0, 0);
 
             // Parse the translation unit
@@ -152,22 +159,100 @@ TEST_F(YamlLoadFixture, TestProperGeneration)
 
             CXCursor cursor = clang_getTranslationUnitCursor(unit);
 
+            // We visit over all the "stuff" in the config.h file. The cursor allows us to
+            // traverse the file and get information about the structs and typedefs (among
+            // other things)
+            //
+            // For example: in example_test_config.yaml, we may have
+            //
+            // include:
+            //  - foo_config.yaml
+            //  - bar_config.yaml
+            //
+            // - bool:
+            //      name: example_bool_param
+            //      value: true
+            //      constant: true
+            //      description: >
+            //      Can be true or false
+            //
+            // This data will be available in the ConfigMetadata struct. We pass that
+            // struct into a recursive visitor that goes down the entire file and
+            // validates that.
+            //
+            // 1. There is a config struct that was generated with the proper name
+            // 2. That config struct has the params defined in the yaml file
+            // 3. The config struct includes the configs that are defined in the include
+            //
+            // NOTE: This test assumes the yaml files passed the schema checks
             clang_visitChildren(
                 cursor,
                 [](CXCursor c, CXCursor parent, CXClientData client_data) {
                     std::string config_name =
                         toCamelCase(((ConfigMetadata_t*)client_data)->config_name);
 
-                    if (config_name + "_s" ==
-                        std::string(clang_getCString(clang_getCursorSpelling(parent))))
-                    {
-                        std::cout << "Cursor '" << clang_getCursorSpelling(c)
-                                  << "' of kind '"
-                                  << clang_getCursorKindSpelling(clang_getCursorKind(c))
-                                  << " with parent " << clang_getCursorSpelling(parent)
-                                  << std::endl;
-                    }
+                    std::string generated_struct_name =
+                        std::string(clang_getCString(clang_getCursorSpelling(parent)));
 
+                    // the struct member can be an included config or another parameter
+                    // we make sure that it was generated correctly by finding it in the
+                    // metadata
+                    std::string generated_struct_member_name =
+                        std::string(clang_getCString(clang_getCursorSpelling(c)));
+
+                    if (config_name + "_s" == generated_struct_name)
+                    {
+                        // We found the generated config in the config.h file. We now
+                        // iterate over all the parameters and the included configs in the
+                        // yaml metadata to match the struct member, if there is no match,
+                        // then we generated garbage
+                        bool parameter_found      = false;
+                        bool include_config_found = false;
+
+                        // We do a linear search over all the parameter yaml definitions,
+                        // and check if the generated_struct_member is a valid parameter
+                        for (auto& param_defn :
+                             ((ConfigMetadata_t*)client_data)->parameters)
+                        {
+                            // This is the best way to access YAML nodes, the iterator
+                            // lets us look at the definition of the parameter, without
+                            // explicitly knowing the type of the parameter.
+                            //
+                            // bool:
+                            //   name: example_param
+                            //   ...
+                            for (YAML::iterator it = param_defn.begin();
+                                 it != param_defn.end(); ++it)
+                            {
+                                if (it->second["name"].as<std::string>() ==
+                                    generated_struct_member_name)
+                                {
+                                    parameter_found = true;
+                                }
+                            }
+                        }
+
+                        // do a linear search over all the included configs, and check if
+                        // the struct member is a defined included config
+                        for (auto& included_config :
+                             ((ConfigMetadata_t*)client_data)->included_configs)
+                        {
+                            // we are converting example_config.yaml to example_config and
+                            // then to ExampleConfig, to compare against the generated
+                            // struct member
+                            std::string yaml_config_name = toCamelCase(
+                                included_config.substr(0, included_config.find(".")));
+
+                            if (yaml_config_name == generated_struct_member_name)
+                            {
+                                include_config_found = true;
+                            }
+                        }
+
+                        EXPECT_TRUE(parameter_found | include_config_found)
+                            << config_name << " config was not generated correctly "
+                            << generated_struct_member_name << " not found in yaml";
+                    }
                     return CXChildVisit_Recurse;
                 },
                 &metadata);
