@@ -66,7 +66,7 @@ PassWithRating PassGenerator::getBestPassSoFar()
 {
     // If we're running deterministically, then we need to manually optimize the
     // passes rather then assuming the optimization thread has done the work for us
-    if (running_deterministically)
+    if (running_deterministically && pass_generator_running)
     {
         for (size_t i = 0; i < NUM_ITERS_PER_DETERMINISTIC_CALL; i++)
         {

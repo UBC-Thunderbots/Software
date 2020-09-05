@@ -44,6 +44,12 @@
  * computers could be unable to converge. It is recommended that all testing of things
  * involving the PassGenerator be done with executables built in "Release" in order to
  * maximize performance ("Release" can be 2-10x faster then "Debug").
+ *
+ * == Deterministic vs non-deterministic mode ==
+ * Deterministic mode disables all threading so that the same sequence of calls to this
+ * function always returns the same values, no matter how much time passes between calls.
+ * It also means that start and stop and guaranteed to immediately cause pass generation
+ * to start or stop
  */
 class PassGenerator
 {
@@ -61,16 +67,14 @@ class PassGenerator
     /**
      * Create a PassGenerator with given parameters
      *
-     * @param world The world we're passing int
+     * @param world The world we're passing in
      * @param passer_point The point we're passing from
      * @param pass_type The type of pass we would like to perform.
      *                  NOTE: this will _try_ to generate a pass of the type given,
      *                  but it is not guaranteed, and can change during pass
      *                  execution because of Passer/Receiver decisions
-     * @param run_deterministically If true, this disables all threading so that
-     *                              the same sequence of calls to this function always
-     *                              returns the same values, no matter how much time
-     *                              passes between calls
+     * @param run_deterministically Whether pass generator should run deterministically
+     * (see class comment)
      */
     explicit PassGenerator(const World& world, const Point& passer_point,
                            const PassType& pass_type,
@@ -110,24 +114,23 @@ class PassGenerator
     void setTargetRegion(std::optional<Rectangle> area);
 
     /**
-     * Gets the best pass we know of so far
-     *
-     * This only returns what we know so far. For example, if called directly after
-     * the world state is updated, it is unlikely to return good results (if any).
-     * Gradient descent must be allowed to run for some number of iterations before
-     * this can be used to get a reasonable value.
+     * Gets the best pass that the PassGenerator has generated so far. If the
+     * PassGenerator is running, then the pass generator may do some work between calls,
+     * and getBestPassSoFar will eventually return better passes over multiple calls.  The
+     * best strategy for getting good passes is to call getBestPassSoFar multiple times,
+     * until the pass rated high enough.
      *
      * @return The best currently known pass and the rating of that pass (in [0-1])
      */
     PassWithRating getBestPassSoFar();
 
     /**
-     * Start the pass generator
+     * Attempts to start the pass generator
      */
     void start();
 
     /**
-     * Stop the pass generator
+     * Attempts to stop the pass generator
      */
     void stop();
 
@@ -321,7 +324,7 @@ class PassGenerator
     PassType pass_type;
 
     // mutex to protect fields in the pass generator
-    std::mutex pass_generator_mutex;
+    mutable std::mutex pass_generator_mutex;
 
     // This flag is used to indicate that we are in the destructor. We use this to
     // communicate with pass_generation_thread that it is

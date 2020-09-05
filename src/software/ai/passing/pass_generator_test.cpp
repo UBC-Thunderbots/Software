@@ -14,6 +14,7 @@ class PassGeneratorTest : public testing::Test
     {
         pass_generator = std::make_shared<PassGenerator>(world, Point(0, 0),
                                                          PassType::ONE_TOUCH_SHOT, true);
+        pass_generator->start();
     }
 
     /**
@@ -322,6 +323,60 @@ TEST_F(PassGeneratorTest, test_receiver_point_converges_to_point_in_target_regio
     auto [converged_pass, score] = pass_generator->getBestPassSoFar();
     EXPECT_TRUE(contains(target_region, converged_pass.receiverPoint()));
     UNUSED(score);
+}
+
+TEST(DeterministicPassGeneratorTest, test_start_stop)
+{
+    // Test that when given a target region, the pass generator returns a pass
+    // with the receiver point in that target region only when the pass generator is
+    // started
+    World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<PassGenerator> pass_generator;
+    pass_generator = std::make_shared<PassGenerator>(world, Point(0, 0),
+                                                     PassType::ONE_TOUCH_SHOT, true);
+
+    pass_generator->setPasserPoint({3, 3});
+    Rectangle target_region({0.5, 0.5}, {1.5, -0.5});
+    pass_generator->setTargetRegion(target_region);
+
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+        Robot(0, {1, -1.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.updateFriendlyTeamState(friendly_team);
+
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+        Robot(0, {0, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.updateEnemyTeamState(enemy_team);
+    pass_generator->setWorld(world);
+
+    // pass generator is stopped, so best pass should not change
+    auto [converged_pass_1, score_1] = pass_generator->getBestPassSoFar();
+    auto [converged_pass_2, score_2] = pass_generator->getBestPassSoFar();
+    EXPECT_EQ(converged_pass_1.receiverPoint(), converged_pass_2.receiverPoint());
+    EXPECT_EQ(score_1, score_2);
+
+    // pass generator is running, so best pass should change
+    pass_generator->start();
+    auto [converged_pass_3, score_3] = pass_generator->getBestPassSoFar();
+    auto [converged_pass_4, score_4] = pass_generator->getBestPassSoFar();
+    EXPECT_NE(converged_pass_3.receiverPoint(), converged_pass_4.receiverPoint());
+    EXPECT_NE(score_3, score_4);
+
+    // pass generator is stopped, so best pass should not change
+    pass_generator->stop();
+    // expect pass generator to immediately stop
+    auto [converged_pass_5, score_5] = pass_generator->getBestPassSoFar();
+
+    auto [converged_pass_6, score_6] = pass_generator->getBestPassSoFar();
+
+    // expect no change to passes since pass generation is stopped
+    EXPECT_EQ(converged_pass_5.receiverPoint(), converged_pass_6.receiverPoint());
+    EXPECT_EQ(score_5, score_6);
 }
 
 TEST(NonDeterministicPassGeneratorTest, test_start_stop)
