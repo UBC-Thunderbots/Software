@@ -267,39 +267,82 @@ void moveFromHeapToHeap()
     // 4
 }
 
-void moveFromStackToHeap() {
+void moveFromStackToHeapFMO() {
     std::cout << std::endl << std::endl;
-    std::cout << "Test moving from stack to heap" << std::endl;
+    std::cout << "Test moving from stack to heap - FunctionMemberObject" << std::endl;
 
     auto data = std::make_shared<int>(99);
 
     FunctionMemberObject fmo(print_data_func, data);
-    DataMemberObject dmo(print_data_func, data);
-    NoMemberObject nmo(print_data_func, data);
 
     fmo.execute();
-    dmo.execute();
-    nmo.execute();
 
     *data = 45;
 
     auto fmo_heap = std::unique_ptr<FunctionMemberObject>();
-    auto dmo_heap = std::unique_ptr<DataMemberObject>();
-    auto nmo_heap = std::unique_ptr<NoMemberObject>();
 
     *fmo_heap = std::move(fmo);
-    *dmo_heap = std::move(dmo);
-    *nmo_heap = std::move(nmo);
 
     fmo_heap->execute();
-    dmo_heap->execute();
-    nmo_heap->execute();
 
     *data = 83;
 
     fmo_heap->execute();
+
+    // Output
+    // 99
+}
+
+void moveFromStackToHeapDMO() {
+    std::cout << std::endl << std::endl;
+    std::cout << "Test moving from stack to heap - DataMemberObject" << std::endl;
+
+    auto data = std::make_shared<int>(99);
+
+    DataMemberObject dmo(print_data_func, data);
+
+    dmo.execute();
+
+    *data = 45;
+
+    auto dmo_heap = std::unique_ptr<DataMemberObject>();
+
+    *dmo_heap = std::move(dmo);
+
     dmo_heap->execute();
+
+    *data = 83;
+
+    dmo_heap->execute();
+
+    // Output
+    // 99
+}
+
+void moveFromStackToHeapNMO() {
+    std::cout << std::endl << std::endl;
+    std::cout << "Test moving from stack to heap - NoMemberObject" << std::endl;
+
+    auto data = std::make_shared<int>(99);
+
+    NoMemberObject nmo(print_data_func, data);
+
+    nmo.execute();
+
+    *data = 45;
+
+    auto nmo_heap = std::unique_ptr<NoMemberObject>();
+
+    *nmo_heap = std::move(nmo);
+
     nmo_heap->execute();
+
+    *data = 83;
+
+    nmo_heap->execute();
+
+    // Output
+    // 99
 }
 
 void moveFromHeapToStack() {
@@ -335,44 +378,80 @@ void moveFromHeapToStack() {
     fmo->execute();
     dmo->execute();
     nmo->execute();
+
+    // Output'
+    // 99
+    // 99
+    // 99
+    // 45
+    // 45
+    // 45
+    // 83
+    // 83
+    // 83
 }
 
-void moveStackToVector()
+void moveStackToVectorFMO()
 {
     std::cout << std::endl << std::endl;
-    std::cout << "Test move stack variables into vector" << std::endl;
+    std::cout << "Test move stack variables into vector - FunctionMemberObject" << std::endl;
 
     auto data = std::make_shared<int>(99);
 
     std::vector<FunctionMemberObject> fmo_vector;
     fmo_vector.push_back(std::move(FunctionMemberObject(print_data_func, data)));
+
+    fmo_vector.at(0).execute();
+
+    *data = -3;
+
+    fmo_vector.at(0).execute();
+
+    // Output
+    // std::bad_function_call / stops all printouts
+    // std::bad_function_call / stops all printouts
+}
+
+void moveStackToVectorDMO()
+{
+    std::cout << std::endl << std::endl;
+    std::cout << "Test move stack variables into vector - DataMemberObject" << std::endl;
+
+    auto data = std::make_shared<int>(99);
+
     std::vector<DataMemberObject> dmo_vector;
     dmo_vector.push_back(std::move(DataMemberObject(print_data_func, data)));
+
+    dmo_vector.at(0).execute();
+
+    *data = -3;
+
+    dmo_vector.at(0).execute();
+
+    // Output
+    // null
+    // null
+}
+
+void moveStackToVectorNMO()
+{
+    std::cout << std::endl << std::endl;
+    std::cout << "Test move stack variables into vector - NoMemberObject" << std::endl;
+
+    auto data = std::make_shared<int>(99);
+
     std::vector<NoMemberObject> nmo_vector;
     nmo_vector.push_back(std::move(NoMemberObject(print_data_func, data)));
 
-//    fmo_vector.at(0).execute(); // BAD
-//    dmo_vector.at(0).execute(); // BAD
     nmo_vector.at(0).execute();
 
     *data = -3;
 
-//    fmo_vector.at(0).execute(); // BAD
-//    dmo_vector.at(0).execute(); // BAD
     nmo_vector.at(0).execute();
 
     // Output
-    // std::bad_function_call / stops all printouts
-    // 0 (seems to be default-constructed data)
     // 99
-    // std::bad_function_call / stops all printouts
-    // 0 (seems to be default-constructed data)
     // -3
-
-    // Why does this not work for the DataMemberObject when it works
-    // just moving variables??? In either case the variable should be
-    // moved, so why is this different? The vector calling the
-    // default constructor somewhere I'm not expecting?
 }
 
 void moveHeapToVector()
@@ -462,7 +541,9 @@ int main(int argc, char** argv)
      * why moving from the stack to the heap causes issues, while
      * moving from the heap to the stack does not.
      */
-//    moveFromStackToHeap(); // BAD
+//    moveFromStackToHeapFMO(); // BAD
+//    moveFromStackToHeapDMO(); // BAD
+//    moveFromStackToHeapNMO(); // BAD
 //    moveFromHeapToStack(); // OK
 
     /* Because vectors (and other resizeable containers) actually store
@@ -477,7 +558,9 @@ int main(int argc, char** argv)
      * without vectors. Specifically, it fails with the FunctionMemberObject
      * and DataMemberObject, but works fine with NoMemberObject.
      */
-//    moveStackToVector();   // BAD
+//    moveStackToVectorFMO();   // BAD
+//    moveStackToVectorDMO();   // BAD
+//    moveStackToVectorNMO();   // OK
 //    moveHeapToVector();   // OK
 
 
