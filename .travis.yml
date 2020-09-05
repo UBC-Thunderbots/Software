@@ -11,9 +11,8 @@ jobs:
       script:
         - cd src
         # Run tests on only the simulated tests
-        - >
-            bazel test //software/simulated_tests:shoot_or_pass_play_test
-            bazel test //software/simulated_tests:free_kick_play_test
+        - bazel test //software/simulated_tests:shoot_or_pass_play_test
+        - bazel test //software/simulated_tests:free_kick_play_test
     - name: "Build and Test all SimulatedTests"
       script:
         - cd src
