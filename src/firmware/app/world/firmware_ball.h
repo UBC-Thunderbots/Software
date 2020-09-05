@@ -40,21 +40,27 @@ void app_firmware_ball_destroy(FirmwareBall_t* ball);
 
 /**
  * Get the x-position of the given ball
+ *
  * @param ball The ball to get the x-position for
+ *
  * @return The x-position of the given ball, in meters, in global field coordinates
  */
 float app_firmware_ball_getPositionX(const FirmwareBall_t* ball);
 
 /**
  * Get the y-position of the given ball
+ *
  * @param ball The ball to get the y-position for
+ *
  * @return The y-position of the given ball, in meters, in global field coordinates
  */
 float app_firmware_ball_getPositionY(const FirmwareBall_t* ball);
 
 /**
  * Get the x component of velocity of the given ball
+ *
  * @param ball The ball to get the x component of velocity for
+ *
  * @return The x component of velocity of the given ball, in meters per second,
  *         in global field coordinates
  */
@@ -62,7 +68,9 @@ float app_firmware_ball_getVelocityX(const FirmwareBall_t* ball);
 
 /**
  * Get the y component of velocity of the given ball
+ *
  * @param ball The ball to get the y component of velocity for
+ *
  * @return The y component of velocity of the given ball, in meters per second,
  *         in global field coordinates
  */

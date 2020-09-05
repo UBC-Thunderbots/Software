@@ -21,11 +21,6 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
 {
 }
 
-std::string ShadowEnemyTactic::getName() const
-{
-    return "Shadow Enemy Tactic";
-}
-
 void ShadowEnemyTactic::updateWorldParams(const Field &field, const Team &friendly_team,
                                           const Team &enemy_team, const Ball &ball)
 {
@@ -93,9 +88,10 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             {
                 robots_to_ignore.emplace_back(*friendly_team.goalie());
             }
-            auto best_enemy_shot_opt =
-                calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, enemy_robot,
-                                           ROBOT_MAX_RADIUS_METERS, robots_to_ignore);
+            auto best_enemy_shot_opt = calcBestShotOnGoal(
+                field, friendly_team, enemy_team, enemy_robot.position(),
+                TeamType::FRIENDLY, robots_to_ignore);
+
             Vector enemy_shot_vector = Vector(0, 0);
             if (best_enemy_shot_opt)
             {

@@ -22,9 +22,8 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_play)
     addEnemyRobots(
         TestUtil::createStationaryRobotStatesWithId({field().enemyGoalCenter()}));
     setEnemyGoalie(0);
-    setAIPlay(PenaltyKickPlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START,
-                       RefboxGameState::PREPARE_PENALTY_US);
+    setAIPlay(TYPENAME(PenaltyKickPlay));
+    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

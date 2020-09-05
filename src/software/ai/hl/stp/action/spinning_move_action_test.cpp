@@ -1,8 +1,10 @@
 #include "software/ai/hl/stp/action/spinning_move_action.h"
 
+#include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/spinning_move_intent.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 
 TEST(SpinningMoveActionTest, getDestination)
 {
@@ -31,9 +33,20 @@ TEST(SpinningMoveActionTest, robot_far_from_destination)
     SpinningMoveIntent spinning_move_intent =
         dynamic_cast<SpinningMoveIntent &>(*intent_ptr);
     EXPECT_EQ(0, spinning_move_intent.getRobotId());
-    EXPECT_EQ(Point(1, 0), spinning_move_intent.getDestination());
-    EXPECT_EQ(AngularVelocity::quarter(), spinning_move_intent.getAngularVelocity());
-    EXPECT_DOUBLE_EQ(1.0, spinning_move_intent.getFinalSpeed());
+
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        spinning_move_intent.getPrimitive()
+            .spinning_move()
+            .position_params()
+            .destination(),
+        *createPointProto(Point(1, 0))));
+    EXPECT_EQ(1.0, spinning_move_intent.getPrimitive()
+                       .spinning_move()
+                       .position_params()
+                       .final_speed_meters_per_second());
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+        spinning_move_intent.getPrimitive().spinning_move().angular_velocity(),
+        *createAngularVelocityProto(AngularVelocity::quarter())));
 }
 
 TEST(SpinningMoveActionTest, robot_at_destination)

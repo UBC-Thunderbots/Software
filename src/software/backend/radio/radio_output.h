@@ -2,6 +2,7 @@
 
 #include <limits>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/radio/mrf/dongle.h"
 #include "software/backend/radio/robot_status.h"
 #include "software/world/ball.h"
@@ -25,9 +26,9 @@ class RadioOutput
     /**
      * Sends the given primitives to the backend to control the robots
      *
-     * @param primitives the list of primitives to send
+     * @param primitives the TbotsProto::PrimitiveSet to send
      */
-    void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives);
+    void sendPrimitives(const TbotsProto::PrimitiveSet& primitives);
 
     /**
      * Sends a camera packet with the detected robots and ball.

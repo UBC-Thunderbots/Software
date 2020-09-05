@@ -99,13 +99,13 @@ class SimulatedTestFixture : public ::testing::Test
     void setAIPlay(const std::string& ai_play);
 
     /**
-     * Sets the Refbox game state to override for the simulated test
+     * Sets the Referee command to override for the simulated test
      *
-     * @param current_refbox_game_state The name of the current game state to set
-     * @param previous_refbox_game_state The name of the previous game state to set
+     * @param current_referee_command The name of the current referee command to set
+     * @param previous_referee_command The name of the previous referee command to set
      */
-    void setRefboxGameState(const RefboxGameState& current_refbox_game_state,
-                            const RefboxGameState& previous_refbox_game_state);
+    void setRefereeCommand(const RefereeCommand& current_referee_command,
+                           const RefereeCommand& previous_referee_command);
 
     /**
      * Returns the field in the simulated test

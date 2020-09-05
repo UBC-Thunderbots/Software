@@ -15,7 +15,7 @@ ThreadedSimulator::~ThreadedSimulator()
 }
 
 void ThreadedSimulator::registerOnSSLWrapperPacketReadyCallback(
-    const std::function<void(SSL_WrapperPacket)> &callback)
+    const std::function<void(SSLProto::SSL_WrapperPacket)> &callback)
 {
     std::scoped_lock lock(callback_mutex);
     ssl_wrapper_packet_callbacks.emplace_back(callback);
@@ -96,18 +96,6 @@ void ThreadedSimulator::addBlueRobots(const std::vector<RobotStateWithId> &robot
     updateCallbacks();
 }
 
-void ThreadedSimulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    std::scoped_lock lock(simulator_mutex);
-    simulator.setYellowRobotPrimitives(primitives);
-}
-
-void ThreadedSimulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    std::scoped_lock lock(simulator_mutex);
-    simulator.setBlueRobotPrimitives(primitives);
-}
-
 void ThreadedSimulator::setYellowRobotPrimitive(RobotId id,
                                                 const TbotsProto_Primitive &primitive_msg)
 {
@@ -120,6 +108,34 @@ void ThreadedSimulator::setBlueRobotPrimitive(RobotId id,
 {
     std::scoped_lock lock(simulator_mutex);
     simulator.setBlueRobotPrimitive(id, primitive_msg);
+}
+
+void ThreadedSimulator::setYellowRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet &primitive_set_msg)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.setYellowRobotPrimitiveSet(primitive_set_msg);
+}
+
+void ThreadedSimulator::setBlueRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet &primitive_set_msg)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.setBlueRobotPrimitiveSet(primitive_set_msg);
+}
+
+void ThreadedSimulator::setYellowTeamDefendingSide(
+    const DefendingSideProto &defending_side_proto)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.setYellowTeamDefendingSide(defending_side_proto);
+}
+
+void ThreadedSimulator::setBlueTeamDefendingSide(
+    const DefendingSideProto &defending_side_proto)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.setBlueTeamDefendingSide(defending_side_proto);
 }
 
 void ThreadedSimulator::runSimulationLoop()
@@ -179,4 +195,10 @@ void ThreadedSimulator::addBlueRobot(const Point &position)
 {
     std::scoped_lock lock(simulator_mutex);
     simulator.addBlueRobot(position);
+}
+
+void ThreadedSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
+    std::scoped_lock lock(simulator_mutex);
+    simulator.removeRobot(robot);
 }

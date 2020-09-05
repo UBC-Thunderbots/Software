@@ -29,6 +29,7 @@ cc_library(
     deps = [
         "//software/logger",
         "//software/time:duration",
+        "//software/util/typename",
         "@boost//:circular_buffer",
     ],
 )

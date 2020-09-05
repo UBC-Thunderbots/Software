@@ -31,8 +31,6 @@ class ShootGoalTactic : public Tactic
                              Angle min_net_open_angle, std::optional<Point> chip_target,
                              bool loop_forever);
 
-    std::string getName() const override;
-
     /**
      * Updates the world parameters for this ShootGoalTactic
      *

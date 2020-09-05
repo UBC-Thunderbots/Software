@@ -23,6 +23,8 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
       pass_type(pass_type),
       in_destructor(false)
 {
+    std::scoped_lock(pass_generator_mutex);
+
     // Generate the initial set of passes
     passes_to_optimize = generatePasses(getNumPassesToOptimize());
 
@@ -38,8 +40,7 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
 
 void PassGenerator::setWorld(World world)
 {
-    // Take ownership of the updated world for the duration of this function
-    std::lock_guard<std::mutex> updated_world_lock(updated_world_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     // Update the world
     this->updated_world = std::move(world);
@@ -47,8 +48,7 @@ void PassGenerator::setWorld(World world)
 
 void PassGenerator::setPasserPoint(Point passer_point)
 {
-    // Take ownership of the passer_point for the duration of this function
-    std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     // Update the passer point
     this->passer_point = passer_point;
@@ -56,8 +56,7 @@ void PassGenerator::setPasserPoint(Point passer_point)
 
 void PassGenerator::setPasserRobotId(unsigned int robot_id)
 {
-    // Take ownershp of the passer robot id for the duration of this function
-    std::lock_guard<std::mutex> passer_robot_id_lock(passer_robot_id_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     this->passer_robot_id = robot_id;
 }
@@ -74,8 +73,7 @@ PassWithRating PassGenerator::getBestPassSoFar()
         }
     }
 
-    // Take ownership of the best_known_pass for the rest of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     Pass best_known_pass_copy = best_known_pass;
     return PassWithRating{std::move(best_known_pass_copy), ratePass(best_known_pass)};
@@ -83,8 +81,7 @@ PassWithRating PassGenerator::getBestPassSoFar()
 
 void PassGenerator::setTargetRegion(std::optional<Rectangle> area)
 {
-    // Take ownership of the target_region for the duration of this function
-    std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     this->target_region = std::move(area);
 }
@@ -132,19 +129,13 @@ void PassGenerator::continuouslyGeneratePasses()
 
 void PassGenerator::updateAndOptimizeAndPrunePasses()
 {
-    // Copy over the updated world and remove the passer robot
-    world_mutex.lock();
-    updated_world_mutex.lock();
+    std::scoped_lock(pass_generator_mutex);
 
+    // Copy over the updated world and remove the passer robot
     world = updated_world;
 
     // Update the passer point for all the passes
-    updated_world_mutex.unlock();
-    world_mutex.unlock();
-
-    passer_point_mutex.lock();
     updatePasserPointOfAllPasses(passer_point);
-    passer_point_mutex.unlock();
     optimizePasses();
     pruneAndReplacePasses();
     saveBestPass();
@@ -189,11 +180,13 @@ void PassGenerator::optimizePasses()
             // so, we can just ignore it and carry on
         }
     }
+    std::scoped_lock(pass_generator_mutex);
     passes_to_optimize = updated_passes;
 }
 
 void PassGenerator::pruneAndReplacePasses()
 {
+    std::scoped_lock(pass_generator_mutex);
     // Sort the passes by decreasing quality
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
               [this](Pass p1, Pass p2) { return comparePassQuality(p1, p2); });
@@ -234,8 +227,7 @@ void PassGenerator::pruneAndReplacePasses()
 
 void PassGenerator::saveBestPass()
 {
-    // Take ownership of the best_known_pass for the duration of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     // Sort the passes by decreasing quality
     std::sort(
@@ -282,11 +274,7 @@ void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
 
 double PassGenerator::ratePass(const Pass& pass)
 {
-    // Take ownership of world, target_region, passer_robot_id for the duration of this
-    // function
-    std::lock_guard<std::mutex> world_lock(world_mutex);
-    std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
-    std::lock_guard<std::mutex> passer_robot_id_lock(passer_robot_id_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     double rating = 0;
     try
@@ -304,8 +292,7 @@ double PassGenerator::ratePass(const Pass& pass)
 
 std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
 {
-    // Take ownership of world for the duration of this function
-    std::lock_guard<std::mutex> world_lock(world_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     std::uniform_real_distribution x_distribution(-world.field().xLength() / 2,
                                                   world.field().xLength() / 2);
@@ -385,8 +372,7 @@ bool PassGenerator::passesEqual(Pass pass1, Pass pass2)
 std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>
 PassGenerator::convertPassToArray(const Pass& pass)
 {
-    // Take ownership of the world for the duration of this function
-    std::lock_guard<std::mutex> world_lock(world_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     return {pass.receiverPoint().x(), pass.receiverPoint().y(), pass.speed(),
             pass.startTime().getSeconds()};
@@ -395,9 +381,7 @@ PassGenerator::convertPassToArray(const Pass& pass)
 Pass PassGenerator::convertArrayToPass(
     const std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>& array)
 {
-    // Take ownership of the passer_point and world for the duration of this function
-    std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
-    std::lock_guard<std::mutex> world_lock(world_mutex);
+    std::scoped_lock(pass_generator_mutex);
 
     // Clamp the time to be >= 0, otherwise the TimeStamp will throw an exception
     double time_offset_seconds = std::max(0.0, array.at(3));

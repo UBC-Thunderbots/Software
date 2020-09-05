@@ -13,8 +13,7 @@ RadioOutput::RadioOutput(
 {
 }
 
-void RadioOutput::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>> &primitives)
+void RadioOutput::sendPrimitives(const TbotsProto::PrimitiveSet &primitives)
 {
     dongle.send_drive_packet(primitives);
 }

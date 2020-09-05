@@ -5,7 +5,9 @@ cc_library(
     srcs = ["box2d_util.cpp"],
     hdrs = ["box2d_util.h"],
     deps = [
+        "//software/geom:convex_polygon",
         "//software/geom:point",
+        "//software/geom:vector",
         "@box2d",
     ],
 )

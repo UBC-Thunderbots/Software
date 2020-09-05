@@ -18,8 +18,6 @@ class MoveTactic : public Tactic
      */
     explicit MoveTactic(bool loop_forever);
 
-    std::string getName() const override;
-
     /**
      * Updates the control parameters for this MoveTactic.
      *

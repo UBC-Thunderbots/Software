@@ -28,8 +28,8 @@ TEST_F(DefensePlayTest, test_defense_play)
         Point(-2, -1.25),
     }));
     setEnemyGoalie(0);
-    setAIPlay(DefensePlay::name);
-    setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::NORMAL_START);
+    setAIPlay(TYPENAME(DefensePlay));
+    setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::NORMAL_START);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/ai.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/gui/drawing/draw_functions.h"
@@ -13,7 +14,7 @@
  * robots based on the World state, and sending them out.
  */
 class AIWrapper : public FirstInFirstOutThreadedObserver<World>,
-                  public Subject<ConstPrimitiveVectorPtr>,
+                  public Subject<TbotsProto::PrimitiveSet>,
                   public Subject<AIDrawFunction>,
                   public Subject<PlayInfo>
 {

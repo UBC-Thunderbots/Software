@@ -22,11 +22,6 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
 {
 }
 
-std::string DefenseShadowEnemyTactic::getName() const
-{
-    return "Defense Shadow Enemy Tactic";
-}
-
 void DefenseShadowEnemyTactic::updateWorldParams(const Field &field,
                                                  const Team &friendly_team,
                                                  const Team &enemy_team, const Ball &ball)
@@ -80,8 +75,8 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         }
 
         auto best_enemy_shot_opt =
-            calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, enemy_robot,
-                                       ROBOT_MAX_RADIUS_METERS, robots_to_ignore);
+            calcBestShotOnGoal(field, friendly_team, enemy_team, enemy_robot.position(),
+                               TeamType::FRIENDLY, robots_to_ignore);
 
         Vector enemy_shot_vector = field.friendlyGoalCenter() - enemy_robot.position();
         Point position_to_block_shot =

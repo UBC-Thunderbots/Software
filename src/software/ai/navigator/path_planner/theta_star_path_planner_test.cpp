@@ -154,7 +154,7 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
-    Rectangle bounding_box({-3.1, 1.2}, {3.1, -1.2});
+    Rectangle bounding_box({-3.1, 1.3}, {3.1, -1.3});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     checkPathDoesNotIntersectObstacle(path_points, obstacles);
@@ -185,7 +185,7 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
-    Rectangle bounding_box({-3.1, 0}, {3.1, -1.0});
+    Rectangle bounding_box({-3.1, 0.05}, {3.1, -1.0});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     checkPathDoesNotIntersectObstacle(path_points, obstacles);
@@ -216,7 +216,7 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
-    Rectangle bounding_box({-0.1, 1.2}, {3.1, -1.2});
+    Rectangle bounding_box({-0.1, 1.3}, {3.1, -1.3});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     checkPathDoesNotIntersectObstacle(path_points, obstacles);

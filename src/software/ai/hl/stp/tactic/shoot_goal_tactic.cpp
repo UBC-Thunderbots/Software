@@ -2,6 +2,7 @@
 
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
+#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/rectangle.h"
@@ -20,11 +21,6 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
       chip_target(chip_target),
       has_shot_available(false)
 {
-}
-
-std::string ShootGoalTactic::getName() const
-{
-    return "Shoot Goal Tactic";
 }
 
 void ShootGoalTactic::updateWorldParams(const Field &field, const Team &friendly_team,
@@ -109,8 +105,8 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
                                             ActionCoroutine::push_type &yield) const
 {
     std::optional<Shot> shot_target =
-        calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, ball.position(),
-                                ROBOT_MAX_RADIUS_METERS, {*this->getAssignedRobot()});
+        calcBestShotOnGoal(field, friendly_team, enemy_team, ball.position(),
+                           TeamType::ENEMY, {*this->getAssignedRobot()});
 
     while (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
     {
@@ -131,10 +127,9 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
                                              shot_target->getPointToShootAt());
             yield(chip_action);
         }
-
         shot_target =
-            calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, ball.position(),
-                                    ROBOT_MAX_RADIUS_METERS, {*this->getAssignedRobot()});
+            calcBestShotOnGoal(field, friendly_team, enemy_team, ball.position(),
+                               TeamType::ENEMY, {*this->getAssignedRobot()});
     }
 }
 
@@ -144,12 +139,13 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
+    auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, true);
     std::optional<Shot> shot_target;
     do
     {
         shot_target =
-            calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, ball.position(),
-                                    ROBOT_MAX_RADIUS_METERS, {*this->getAssignedRobot()});
+            calcBestShotOnGoal(field, friendly_team, enemy_team, ball.position(),
+                               TeamType::ENEMY, {*this->getAssignedRobot()});
 
         if (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
         {
@@ -172,20 +168,8 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         }
         else
         {
-            Vector behind_ball_vector = (ball.position() - field.enemyGoalCenter());
-            // A point behind the ball that leaves 5cm between the ball and kicker of the
-            // robot
-            Point behind_ball =
-                ball.position() + behind_ball_vector.normalize(
-                                      BALL_MAX_RADIUS_METERS +
-                                      DIST_TO_FRONT_OF_ROBOT_METERS + TRACK_BALL_DIST);
-
-            // The default behaviour is to move behind the ball and face the net
-            move_action->updateControlParams(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
-                BallCollisionType::ALLOW);
-            yield(move_action);
+            intercept_action->updateControlParams(*robot);
+            yield(intercept_action);
         }
     } while (!(kick_action->done() || chip_action->done()));
 }
