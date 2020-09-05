@@ -204,6 +204,13 @@ void SimulatedTestFixture::runTest(
             simulator->stepSimulation(simulation_time_step);
             updateSensorFusion();
         }
+        LOG(DEBUG) << "Physics simulation took "
+                   << static_cast<double>(
+                          std::chrono::duration_cast<std::chrono::microseconds>(
+                              std::chrono::steady_clock::now() - wall_start_time)
+                              .count()) /
+                          1000
+                   << " milliseconds";
 
         if (auto world_opt = sensor_fusion.getWorld())
         {
@@ -236,6 +243,7 @@ void SimulatedTestFixture::runTest(
         {
             LOG(WARNING) << "SensorFusion did not output a valid World";
         }
+        LOG(DEBUG) << "Simulator time is " << simulator->getTimestamp() << " seconds";
     }
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
