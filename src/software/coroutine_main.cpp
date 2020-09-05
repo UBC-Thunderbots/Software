@@ -66,10 +66,10 @@ class DataMemberObject
         func(data, yield);
     }
 
-    // The shared_ptr to the data is stored in the same memory (stack or heap) as the allocated
-    // instance of this class. The coroutine accesses this member variable directly
-    // from "inside" the coroutine. On the other hand, the TestFunction
-    // is passed into the coroutine right at the start.
+    // The shared_ptr to the data is stored in the same memory (stack or heap) as the
+    // allocated instance of this class. The coroutine accesses this member variable
+    // directly from "inside" the coroutine. On the other hand, the TestFunction is passed
+    // into the coroutine right at the start.
     VoidCoroutine::pull_type coroutine_sequence;
     std::shared_ptr<int> data;
 };
@@ -267,7 +267,8 @@ void moveFromHeapToHeap()
     // 4
 }
 
-void moveFromStackToHeapFMO() {
+void moveFromStackToHeapFMO()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test moving from stack to heap - FunctionMemberObject" << std::endl;
 
@@ -293,7 +294,8 @@ void moveFromStackToHeapFMO() {
     // 99
 }
 
-void moveFromStackToHeapDMO() {
+void moveFromStackToHeapDMO()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test moving from stack to heap - DataMemberObject" << std::endl;
 
@@ -319,7 +321,8 @@ void moveFromStackToHeapDMO() {
     // 99
 }
 
-void moveFromStackToHeapNMO() {
+void moveFromStackToHeapNMO()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test moving from stack to heap - NoMemberObject" << std::endl;
 
@@ -345,7 +348,8 @@ void moveFromStackToHeapNMO() {
     // 99
 }
 
-void moveFromHeapToStack() {
+void moveFromHeapToStack()
+{
     std::cout << std::endl << std::endl;
     std::cout << "Test moving from heap to stack" << std::endl;
 
@@ -394,7 +398,8 @@ void moveFromHeapToStack() {
 void moveStackToVectorFMO()
 {
     std::cout << std::endl << std::endl;
-    std::cout << "Test move stack variables into vector - FunctionMemberObject" << std::endl;
+    std::cout << "Test move stack variables into vector - FunctionMemberObject"
+              << std::endl;
 
     auto data = std::make_shared<int>(99);
 
@@ -526,25 +531,25 @@ int main(int argc, char** argv)
      * since this is just a basic usage of coroutines, and is a
      * case we really expect to work.
      */
-//    variablesOnStackNoMove();           // OK
-//    variablesOnHeapNoMove();            // OK
+    //    variablesOnStackNoMove();           // OK
+    //    variablesOnHeapNoMove();            // OK
 
     /* Moving coroutines works fine as long as the memory
      * is moved from the stack to the stack, of from the
      * heap to the heap
      */
-//    moveFromStackToStack();         // OK
-//    moveFromHeapToHeap();          // OK
+    //    moveFromStackToStack();         // OK
+    //    moveFromHeapToHeap();          // OK
 
     /* For some reason, moving coroutines from the stack to the heap
      * does not work in both directions. We don't have any ideas
      * why moving from the stack to the heap causes issues, while
      * moving from the heap to the stack does not.
      */
-//    moveFromStackToHeapFMO(); // BAD
-//    moveFromStackToHeapDMO(); // BAD
-//    moveFromStackToHeapNMO(); // BAD
-//    moveFromHeapToStack(); // OK
+    //    moveFromStackToHeapFMO(); // BAD
+    //    moveFromStackToHeapDMO(); // BAD
+    //    moveFromStackToHeapNMO(); // BAD
+    //    moveFromHeapToStack(); // OK
 
     /* Because vectors (and other resizeable containers) actually store
      * data on the heap, moving coroutines into vectors only works
@@ -558,10 +563,10 @@ int main(int argc, char** argv)
      * without vectors. Specifically, it fails with the FunctionMemberObject
      * and DataMemberObject, but works fine with NoMemberObject.
      */
-//    moveStackToVectorFMO();   // BAD
-//    moveStackToVectorDMO();   // BAD
-//    moveStackToVectorNMO();   // OK
-//    moveHeapToVector();   // OK
+    //    moveStackToVectorFMO();   // BAD
+    //    moveStackToVectorDMO();   // BAD
+    //    moveStackToVectorNMO();   // OK
+    //    moveHeapToVector();   // OK
 
 
     // ~~~~~~~~~~ Conclusions ~~~~~~~~~~ //
