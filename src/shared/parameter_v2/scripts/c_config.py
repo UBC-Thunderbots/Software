@@ -36,7 +36,7 @@ class CConfig(object):
     def add_parameter(self, parameter: CParameter):
         """Add a parameter to this config. This parameters represent
         the parameters defined in the yaml file. When generating the Config
-        the properties from these parametesr will be properly formatted
+        the properties from these parameters will be properly formatted
         into the appropriate properties.
 
         :param parameter: The CParameter to add to this config

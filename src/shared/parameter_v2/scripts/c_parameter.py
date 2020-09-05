@@ -20,7 +20,7 @@ class CParameter(object):
         are available through read-only properties.
 
         :param param_name: The name of the parameter, as defined in the yaml
-        :param param_type: The psudo-class type of the parameter (without "_t")
+        :param param_type: The psuedo-class type of the parameter (without "_t")
         :param param_value: The constant value the parameter should hold
         :param ptr_to_instance: A string representation of where this parameter
             is located (ex: FooConfig->foo_int)

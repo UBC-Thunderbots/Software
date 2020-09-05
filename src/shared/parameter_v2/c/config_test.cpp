@@ -17,7 +17,7 @@ extern "C"
 #include "yaml-cpp/yaml.h"
 
 /**
- * This function is needed to turn config file names into config struct names.
+ * This function converts a config file names into config struct names.
  *
  * For example, a config file name maybe "example_config" gets converted
  * to "ExampleConfig"
@@ -94,8 +94,9 @@ class YamlLoadFixture : public ::testing::Test
                     // Each yaml file is separated by a --- which indicates the end
                     // of a yaml document. A new document can start below ---.
                     // Each config can have 1 or 2 documents, which may contain just
-                    // includes, just parameters (1 document) or includes and parameters
-                    // (2 documents).
+                    // a list of included configs (1 document), just parameters (1
+                    // document) or both includes and parameters (2 documents).  See a
+                    // yaml config for an example
                     //
                     // We try to load the first document as a parameter definitions, and
                     // if the conversion doesn't match, we load it as an include list.
