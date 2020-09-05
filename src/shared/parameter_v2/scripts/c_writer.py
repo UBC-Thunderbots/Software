@@ -131,7 +131,7 @@ class CWriter(object):
             app_dynamic_parameters_create_impl = ""
             app_dynamic_parameters_destroy_impl = ""
 
-            # malloc all the cofings
+            # malloc all the configs
             for config in c_configs:
                 app_dynamic_parameters_create_impl += config.malloc
 
@@ -161,7 +161,7 @@ class CWriter(object):
         # generate header file
         with open(f"{output_file}.h", "w") as header_file:
 
-            contents = "".join([conf.forward_decleration for conf in c_configs])
+            contents = "".join([conf.forward_declaration for conf in c_configs])
             contents += "".join([conf.definition for conf in c_configs])
 
             header_file.write(

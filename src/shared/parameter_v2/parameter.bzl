@@ -40,7 +40,7 @@ generate_dynamic_parameters = rule(
 def c_dynamic_parameters(name, generated_parameter_file):
     generate_dynamic_parameters(
         name = name,
-        generated_parameter_file = generated_parameter_file,
+        generated_parameter_header = generated_parameter_file,
         output_language = "c",
     )
 

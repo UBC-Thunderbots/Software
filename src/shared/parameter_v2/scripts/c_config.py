@@ -105,7 +105,7 @@ class CConfig(object):
         )
 
     @property
-    def forward_decleration(self):
+    def forward_declaration(self):
         return CConfig.FORWARD_DECLERATION.format(name=self.config_name)
 
     @property

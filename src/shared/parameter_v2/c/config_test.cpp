@@ -22,6 +22,7 @@ extern "C"
  * For example, a config file name maybe "example_config" gets converted
  * to "ExampleConfig"
  *
+ * @pre The snake_case_input must be valid snake_case
  * @param The snake_case string to convert to CamelCase
  * @return Converted string to CamelCase
  */
@@ -30,7 +31,7 @@ std::string toCamelCase(const std::string& snake_case_input)
     std::string ret_str = "";
     ret_str += (char)toupper(snake_case_input[0]);
 
-    for (unsigned i = 1; i < snake_case_input.length() - 1; i++)
+    for (unsigned i = 1; i < snake_case_input.length(); i++)
     {
         if (snake_case_input[i] == '_')
         {
@@ -43,7 +44,6 @@ std::string toCamelCase(const std::string& snake_case_input)
         }
     }
 
-    ret_str += snake_case_input[snake_case_input.length() - 1];
     return ret_str;
 }
 
