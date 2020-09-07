@@ -29,6 +29,7 @@
 /* USER CODE BEGIN Includes */
 #include "firmware_new/boards/frankie_v1/io/networking/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/networking/proto_multicast_communication_tasks.h"
+#include "firmware_new/boards/frankie_v1/io/logging/network_logger.h"
 #include "shared/constants.h"
 #include "shared/proto/robot_status_msg.nanopb.h"
 #include "shared/proto/tbots_log.nanopb.h"
@@ -56,10 +57,12 @@
 ProtoMulticastCommunicationProfile_t *robot_status_msg_sender_profile;
 ProtoMulticastCommunicationProfile_t *vision_msg_listener_profile;
 ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
+ProtoMulticastCommunicationProfile_t *tbots_log_sender_profile;
 
 static TbotsProto_Vision vision_msg;
 static TbotsProto_RobotStatus robot_status_msg;
 static TbotsProto_Primitive primitive_msg;
+static TbotsProto_TbotsLog tbots_log_msg;
 
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
@@ -67,21 +70,21 @@ osThreadId_t NetStartTaskHandle;
 const osThreadAttr_t NetStartTask_attributes = {.name     = "NetStartTask",
                                                 .priority = (osPriority_t)osPriorityHigh7,
                                                 .stack_size = 1024 * 4};
-/* Definitions for RobotStatusTask */
-osThreadId_t RobotStatusTaskHandle;
-const osThreadAttr_t RobotStatusTask_attributes = {
-    .name       = "RobotStatusTask",
+/* Definitions for RobotStatusNetS */
+osThreadId_t RobotStatusNetSHandle;
+const osThreadAttr_t RobotStatusNetS_attributes = {
+    .name       = "RobotStatusNetS",
     .priority   = (osPriority_t)osPriorityHigh7,
     .stack_size = 1024 * 4};
-/* Definitions for VisionMsgTask */
-osThreadId_t VisionMsgTaskHandle;
-const osThreadAttr_t VisionMsgTask_attributes = {
-    .name       = "VisionMsgTask",
+/* Definitions for VisionMsgNetL */
+osThreadId_t VisionMsgNetLHandle;
+const osThreadAttr_t VisionMsgNetL_attributes = {
+    .name       = "VisionMsgNetL",
     .priority   = (osPriority_t)osPriorityHigh7,
     .stack_size = 1024 * 4};
-/* Definitions for PrimMsgTask */
-osThreadId_t PrimMsgTaskHandle;
-const osThreadAttr_t PrimMsgTask_attributes = {.name     = "PrimMsgTask",
+/* Definitions for PrimMsgNetL */
+osThreadId_t PrimMsgNetLHandle;
+const osThreadAttr_t PrimMsgNetL_attributes = {.name     = "PrimMsgNetL",
                                                .priority = (osPriority_t)osPriorityHigh7,
                                                .stack_size = 1024 * 4};
 /* Definitions for testMsgUpdate */
@@ -90,18 +93,20 @@ const osThreadAttr_t testMsgUpdate_attributes = {
     .name       = "testMsgUpdate",
     .priority   = (osPriority_t)osPriorityNormal1,
     .stack_size = 1024 * 4};
+/* Definitions for TbotsLogNetS */
+osThreadId_t TbotsLogNetSHandle;
+const osThreadAttr_t TbotsLogNetS_attributes = {
+    .name       = "TbotsLogNetS",
+    .priority   = (osPriority_t)osPriorityNormal1,
+    .stack_size = 1024 * 4};
+/* Definitions for NetworkLogger */
+osThreadId_t NetworkLoggerHandle;
+const osThreadAttr_t NetworkLogger_attributes = {.name     = "NetworkLogger",
+                                                 .priority = (osPriority_t)osPriorityLow,
+                                                 .stack_size = 1024 * 4};
 /* Definitions for TbotsLogQ */
 osMessageQueueId_t TbotsLogQHandle;
 const osMessageQueueAttr_t TbotsLogQ_attributes = {.name = "TbotsLogQ"};
-/* Definitions for RobotStatusQ */
-osMessageQueueId_t RobotStatusQHandle;
-const osMessageQueueAttr_t RobotStatusQ_attributes = {.name = "RobotStatusQ"};
-/* Definitions for VisionQ */
-osMessageQueueId_t VisionQHandle;
-const osMessageQueueAttr_t VisionQ_attributes = {.name = "VisionQ"};
-/* Definitions for PrimitiveQ */
-osMessageQueueId_t PrimitiveQHandle;
-const osMessageQueueAttr_t PrimitiveQ_attributes = {.name = "PrimitiveQ"};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -112,6 +117,7 @@ void io_proto_multicast_startNetworkingTask(void *argument);
 extern void io_proto_multicast_sender_task(void *argument);
 extern void io_proto_multicast_listener_task(void *argument);
 void test_msg_update(void *argument);
+extern void io_logging_network_logger_task(void *argument);
 
 extern void MX_LWIP_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -144,17 +150,6 @@ void MX_FREERTOS_Init(void)
     TbotsLogQHandle =
         osMessageQueueNew(16, sizeof(TbotsProto_TbotsLog), &TbotsLogQ_attributes);
 
-    /* creation of RobotStatusQ */
-    RobotStatusQHandle =
-        osMessageQueueNew(1, sizeof(TbotsProto_RobotStatus), &RobotStatusQ_attributes);
-
-    /* creation of VisionQ */
-    VisionQHandle = osMessageQueueNew(1, sizeof(TbotsProto_Vision), &VisionQ_attributes);
-
-    /* creation of PrimitiveQ */
-    PrimitiveQHandle =
-        osMessageQueueNew(1, sizeof(TbotsProto_Primitive), &PrimitiveQ_attributes);
-
     /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
     /* USER CODE END RTOS_QUEUES */
@@ -164,25 +159,35 @@ void MX_FREERTOS_Init(void)
     NetStartTaskHandle = osThreadNew(io_proto_multicast_startNetworkingTask, NULL,
                                      &NetStartTask_attributes);
 
-    /* creation of RobotStatusTask */
-    RobotStatusTaskHandle =
+    /* creation of RobotStatusNetS */
+    RobotStatusNetSHandle =
         osThreadNew(io_proto_multicast_sender_task,
-                    (void *)robot_status_msg_sender_profile, &RobotStatusTask_attributes);
+                    (void *)robot_status_msg_sender_profile, &RobotStatusNetS_attributes);
 
-    /* creation of VisionMsgTask */
-    VisionMsgTaskHandle =
+    /* creation of VisionMsgNetL */
+    VisionMsgNetLHandle =
         osThreadNew(io_proto_multicast_listener_task, (void *)vision_msg_listener_profile,
-                    &VisionMsgTask_attributes);
+                    &VisionMsgNetL_attributes);
 
-    /* creation of PrimMsgTask */
-    PrimMsgTaskHandle =
+    /* creation of PrimMsgNetL */
+    PrimMsgNetLHandle =
         osThreadNew(io_proto_multicast_listener_task,
-                    (void *)primitive_msg_listener_profile, &PrimMsgTask_attributes);
+                    (void *)primitive_msg_listener_profile, &PrimMsgNetL_attributes);
 
     /* creation of testMsgUpdate */
     testMsgUpdateHandle =
         osThreadNew(test_msg_update, (void *)robot_status_msg_sender_profile,
                     &testMsgUpdate_attributes);
+
+    /* creation of TbotsLogNetS */
+    TbotsLogNetSHandle =
+        osThreadNew(io_proto_multicast_sender_task, (void *)tbots_log_sender_profile,
+                    &TbotsLogNetS_attributes);
+
+    /* creation of NetworkLogger */
+    NetworkLoggerHandle =
+        osThreadNew(io_logging_network_logger_task, (void *)tbots_log_sender_profile,
+                    &NetworkLogger_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
@@ -254,16 +259,20 @@ void initIoNetworking()
     io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
-        "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
+        "primitive_msg_listener", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
         &primitive_msg, TbotsProto_Primitive_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
-        "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
-        &vision_msg, TbotsProto_Vision_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        "vision_msg_listener", MULTICAST_CHANNELS[channel], VISION_PORT, &vision_msg,
+        TbotsProto_Vision_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     robot_status_msg_sender_profile = io_proto_multicast_communication_profile_create(
         "robot_status_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
         &robot_status_msg, TbotsProto_RobotStatus_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+
+    tbots_log_sender_profile = io_proto_multicast_communication_profile_create(
+        "tbots_log_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
+        &tbots_log_msg, TbotsProto_TbotsLog_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 }
 
 

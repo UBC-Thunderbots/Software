@@ -65,6 +65,7 @@ cc_library(
         ":hal",
         ":lwip",
         "//firmware_new/boards/frankie_v1/io/networking:proto_multicast_communication",
+        "//firmware_new/boards/frankie_v1/io/logging:network_logger",
         "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
