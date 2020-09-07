@@ -118,7 +118,7 @@ class PassGenerator
      * PassGenerator is running, then the pass generator may do some work between calls,
      * and getBestPassSoFar will eventually return better passes over multiple calls.  The
      * best strategy for getting good passes is to call getBestPassSoFar multiple times,
-     * until the pass rated high enough.
+     * until the pass is rated high enough.
      *
      * @return The best currently known pass and the rating of that pass (in [0-1])
      */
