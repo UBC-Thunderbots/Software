@@ -1,16 +1,16 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QProgressBar>
+#include <QtWidgets/QWidget>
 
 /**
- * A custom QProgressBar designed to display values up to 2 decimal points. This class manages
- * the displayed value and format of the progress bar
+ * A custom QProgressBar designed to display values up to 2 decimal points. This class
+ * manages the displayed value and format of the progress bar
  */
 class DecimalProgressBar : public QProgressBar
 {
-Q_OBJECT
-public:
+    Q_OBJECT
+   public:
     /**
      * Creates a new DecimalProgressBar
      *
@@ -33,6 +33,6 @@ public:
      */
     void updateProgressBar(float value);
 
-private:
+   private:
     QString format_;
 };

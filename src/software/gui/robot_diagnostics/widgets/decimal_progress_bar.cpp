@@ -1,9 +1,6 @@
 #include "decimal_progress_bar.h"
 
-DecimalProgressBar::DecimalProgressBar(QWidget *parent):
-        QProgressBar(parent)
-{
-}
+DecimalProgressBar::DecimalProgressBar(QWidget *parent) : QProgressBar(parent) {}
 
 void DecimalProgressBar::setupProgressBar(int max, QString format)
 {
