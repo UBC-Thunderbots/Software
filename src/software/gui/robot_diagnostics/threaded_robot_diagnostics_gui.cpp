@@ -17,14 +17,14 @@ ThreadedRobotDiagnosticsGUI::ThreadedRobotDiagnosticsGUI(int argc, char** argv)
     run_send_primitives_thread = std::thread([this]() {
         while (true)
         {
-            auto primitive = primitive_buffer->popMostRecentlyAddedValue();
+            auto primitive = primitive_buffer->popLeastRecentlyAddedValue();
             if (primitive)
             {
                 this->sendValueToObservers(std::move(primitive.value()));
             }
 
             std::this_thread::sleep_for(
-                std::chrono::milliseconds(send_primitive_interval));
+                std::chrono::milliseconds(send_primitive_interval_ms));
         }
     });
 }

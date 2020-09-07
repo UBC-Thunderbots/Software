@@ -109,5 +109,7 @@ class RobotDiagnosticsGUI : public QMainWindow
     std::shared_ptr<ThreadSafeBuffer<TbotsProto::PrimitiveSet>> primitive_buffer;
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     QTimer* update_timer;
+    QTimer* push_primitive_timer;
     const Duration update_timer_interval;
+    const Duration push_primitive_timer_interval;
 };
