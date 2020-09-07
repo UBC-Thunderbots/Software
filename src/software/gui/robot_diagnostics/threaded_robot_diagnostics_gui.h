@@ -72,8 +72,7 @@ class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<Senso
     // We don't want to miss any updates so we make the buffer larger
     static constexpr std::size_t sensor_msg_buffer_size = 60;
     static constexpr std::size_t primitive_buffer_size  = 60;
-    const unsigned int send_primitive_interval_ms =
-        static_cast<int>(1.0 / 60.0 * 1000);
+    const unsigned int send_primitive_interval_ms = static_cast<int>(1.0 / 60.0 * 1000);
 
     std::atomic_bool application_shutting_down;
 };
