@@ -14,12 +14,6 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-// TODO: implement this properly
-static float current_time = 0;
-static float getCurrentTime() {
-    return current_time;
-}
-
 Simulator::Simulator(const Field& field, const Duration& physics_time_step)
     : Simulator(field, 1.0, 0.0, physics_time_step)
 {
@@ -71,7 +65,8 @@ void Simulator::updateSimulatorRobots(
         auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
         auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
         FirmwareWorld_t* firmware_world_raw =
-            app_firmware_world_create(firmware_robot.release(), firmware_ball.release(), &getCurrentTime);
+            app_firmware_world_create(firmware_robot.release(), firmware_ball.release(),
+                                      &(Simulator::getCurrentFirmwareTimeSeconds));
         auto firmware_world =
             std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 
@@ -176,6 +171,9 @@ void Simulator::stepSimulation(const Duration& time_step)
     Duration remaining_time = time_step;
     while (remaining_time > Duration::fromSeconds(0))
     {
+        current_firmware_time =
+            physics_world.getTimestamp();
+
         for (auto& iter : blue_simulator_robots)
         {
             auto simulator_robot = iter.first;
@@ -298,3 +296,12 @@ void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
 {
     physics_world.removeRobot(robot);
 }
+
+float Simulator::getCurrentFirmwareTimeSeconds()
+{
+    return static_cast<float>(current_firmware_time.getSeconds());
+}
+
+// We must give this variable a value here, as non-const static variables must be
+// initialized out-of-line
+Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);

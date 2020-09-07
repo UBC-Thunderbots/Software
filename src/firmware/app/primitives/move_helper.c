@@ -76,9 +76,7 @@ void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
     const float current_x           = app_firmware_robot_getPositionX(robot);
     const float current_y           = app_firmware_robot_getPositionY(robot);
     const float current_orientation = app_firmware_robot_getOrientation(robot);
-    // TODO: make this a function in the `FirmwareRobot` class?
-    const float current_speed = sqrtf(powf(app_firmware_robot_getVelocityX(robot), 2) +
-                                      powf(app_firmware_robot_getVelocityY(robot), 2));
+    const float current_speed = app_firmware_robot_getSpeedLinear(robot);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {
@@ -91,7 +89,7 @@ void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
                                                  current_orientation}},
         .t_start             = 0,
         .t_end               = 1.0f,
-        .num_elements        = 5,
+        .num_elements        = 10,
         .max_allowable_linear_acceleration =
             (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
         .max_allowable_linear_speed = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND,
@@ -147,8 +145,6 @@ void app_move_helper_tick(void* void_state_ptr, FirmwareWorld_t* world)
 
     const float dest_speed = state->position_trajectory.linear_speed[trajectory_index];
 
-    // TODO: why the heck aren't we using the constants for max a/v in lin/ang here?
-    //       (note lower values used for minor axis)
     // plan major axis movement
     float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
     float max_major_v     = state->move_slow ? 1.25f : (float)ROBOT_MAX_SPEED_METERS_PER_SECOND;

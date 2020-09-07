@@ -1,6 +1,7 @@
 #include "firmware/app/world/firmware_robot.h"
 
 #include <stdlib.h>
+#include <math.h>
 
 struct FirmwareRobot
 {
@@ -103,6 +104,13 @@ float app_firmware_robot_getVelocityY(const FirmwareRobot_t* robot)
 float app_firmware_robot_getVelocityAngular(const FirmwareRobot_t* robot)
 {
     return robot->get_robot_velocity_angular();
+}
+
+float app_firmware_robot_getSpeedLinear(const FirmwareRobot_t* robot){
+    const float vx = app_firmware_robot_getVelocityX(robot);
+    const float vy = app_firmware_robot_getVelocityY(robot);
+
+    return sqrtf(powf(vx, 2.0f) + powf(vy, 2.0f));
 }
 
 float app_firmware_robot_getBatteryVoltage(const FirmwareRobot_t* robot)
