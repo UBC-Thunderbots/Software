@@ -71,7 +71,7 @@ void Simulator::updateSimulatorRobots(
         auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
         auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
         FirmwareWorld_t* firmware_world_raw =
-            app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
+            app_firmware_world_create(firmware_robot.release(), firmware_ball.release(), &getCurrentTime);
         auto firmware_world =
             std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 

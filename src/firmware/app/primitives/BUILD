@@ -110,6 +110,7 @@ cc_library(
         "//firmware/app/control",
         "//firmware/app/control:bangbang",
         "//firmware/app/control:physbot",
+        "//firmware/app/control:trajectory_planner",
         "//firmware/shared:physics",
         "//firmware/shared:util",
         "//shared:constants",

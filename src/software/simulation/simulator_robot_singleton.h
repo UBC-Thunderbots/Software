@@ -68,7 +68,7 @@ class SimulatorRobotSingleton
      * @return a FirmwareRobot_t that is bound to whatever SimulatorRobot this Singleton
      * is controlling
      */
-    static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot(RobotId robot_id);
+    static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot();
 
     /**
      * Starts a new primitive on the SimulatorRobot currently being controlled by this
