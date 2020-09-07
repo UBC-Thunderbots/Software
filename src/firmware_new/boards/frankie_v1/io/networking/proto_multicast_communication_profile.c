@@ -1,4 +1,4 @@
-#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
+#include "firmware_new/boards/frankie_v1/io/networking/proto_multicast_communication_profile.h"
 
 #include <stdlib.h>
 

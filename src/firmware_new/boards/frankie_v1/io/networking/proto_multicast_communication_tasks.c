@@ -1,8 +1,8 @@
-#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
+#include "firmware_new/boards/frankie_v1/io/networking/proto_multicast_communication_tasks.h"
 
 #include <stdlib.h>
 
-#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
+#include "firmware_new/boards/frankie_v1/io/networking/proto_multicast_communication_profile.h"
 #include "lwip.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
@@ -69,7 +69,7 @@ void io_proto_multicast_sender_task(void* communication_profile)
         // serialize proto into buffer
         io_proto_multicast_communication_profile_acquireLock(profile);
 
-        // we ingore the error returned by pb_encode, it is up to the receiver to handle
+        // we ignore the error returned by pb_encode, it is up to the receiver to handle
         // malformed proto, so we send the buffer regardless
         pb_encode(&stream,
                   io_proto_multicast_communication_profile_getProtoFields(profile),
@@ -78,7 +78,7 @@ void io_proto_multicast_sender_task(void* communication_profile)
         io_proto_multicast_communication_profile_releaseLock(profile);
 
         // Max uint16 is 65535, which is significantly over the theoretical max
-        // tranfser unit that can be configured at 9000 bytes. We can safely cast
+        // transfer unit that can be configured at 9000 bytes. We can safely cast
         // stream.bytes_written to a (u16_t)
         netbuf_alloc(tx_buf, (u16_t)stream.bytes_written);
 

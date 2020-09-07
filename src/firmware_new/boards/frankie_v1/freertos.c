@@ -27,10 +27,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
-#include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
+#include "firmware_new/boards/frankie_v1/io/networking/proto_multicast_communication_profile.h"
+#include "firmware_new/boards/frankie_v1/io/networking/proto_multicast_communication_tasks.h"
 #include "shared/constants.h"
 #include "shared/proto/robot_status_msg.nanopb.h"
+#include "shared/proto/tbots_log.nanopb.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
 /* USER CODE END Includes */
 
@@ -72,10 +73,10 @@ const osThreadAttr_t RobotStatusTask_attributes = {
     .name       = "RobotStatusTask",
     .priority   = (osPriority_t)osPriorityHigh7,
     .stack_size = 1024 * 4};
-/* Definitions for TbotsProto_VisionTask */
-osThreadId_t TbotsProto_VisionTaskHandle;
-const osThreadAttr_t TbotsProto_VisionTask_attributes = {
-    .name       = "TbotsProto_VisionTask",
+/* Definitions for VisionMsgTask */
+osThreadId_t VisionMsgTaskHandle;
+const osThreadAttr_t VisionMsgTask_attributes = {
+    .name       = "VisionMsgTask",
     .priority   = (osPriority_t)osPriorityHigh7,
     .stack_size = 1024 * 4};
 /* Definitions for PrimMsgTask */
@@ -89,6 +90,18 @@ const osThreadAttr_t testMsgUpdate_attributes = {
     .name       = "testMsgUpdate",
     .priority   = (osPriority_t)osPriorityNormal1,
     .stack_size = 1024 * 4};
+/* Definitions for TbotsLogQ */
+osMessageQueueId_t TbotsLogQHandle;
+const osMessageQueueAttr_t TbotsLogQ_attributes = {.name = "TbotsLogQ"};
+/* Definitions for RobotStatusQ */
+osMessageQueueId_t RobotStatusQHandle;
+const osMessageQueueAttr_t RobotStatusQ_attributes = {.name = "RobotStatusQ"};
+/* Definitions for VisionQ */
+osMessageQueueId_t VisionQHandle;
+const osMessageQueueAttr_t VisionQ_attributes = {.name = "VisionQ"};
+/* Definitions for PrimitiveQ */
+osMessageQueueId_t PrimitiveQHandle;
+const osMessageQueueAttr_t PrimitiveQ_attributes = {.name = "PrimitiveQ"};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -126,6 +139,22 @@ void MX_FREERTOS_Init(void)
     /* start timers, add new ones, ... */
     /* USER CODE END RTOS_TIMERS */
 
+    /* Create the queue(s) */
+    /* creation of TbotsLogQ */
+    TbotsLogQHandle =
+        osMessageQueueNew(16, sizeof(TbotsProto_TbotsLog), &TbotsLogQ_attributes);
+
+    /* creation of RobotStatusQ */
+    RobotStatusQHandle =
+        osMessageQueueNew(1, sizeof(TbotsProto_RobotStatus), &RobotStatusQ_attributes);
+
+    /* creation of VisionQ */
+    VisionQHandle = osMessageQueueNew(1, sizeof(TbotsProto_Vision), &VisionQ_attributes);
+
+    /* creation of PrimitiveQ */
+    PrimitiveQHandle =
+        osMessageQueueNew(1, sizeof(TbotsProto_Primitive), &PrimitiveQ_attributes);
+
     /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
     /* USER CODE END RTOS_QUEUES */
@@ -140,10 +169,10 @@ void MX_FREERTOS_Init(void)
         osThreadNew(io_proto_multicast_sender_task,
                     (void *)robot_status_msg_sender_profile, &RobotStatusTask_attributes);
 
-    /* creation of TbotsProto_VisionTask */
-    TbotsProto_VisionTaskHandle =
+    /* creation of VisionMsgTask */
+    VisionMsgTaskHandle =
         osThreadNew(io_proto_multicast_listener_task, (void *)vision_msg_listener_profile,
-                    &TbotsProto_VisionTask_attributes);
+                    &VisionMsgTask_attributes);
 
     /* creation of PrimMsgTask */
     PrimMsgTaskHandle =
