@@ -213,12 +213,11 @@ Line BallFilter::calculateLineOfBestFit(
     y_vs_x_regression.regression_line.swapXY();
 
     // We use the regression from above with the least error
-    Line regression_line =
-        x_vs_y_regression.regression_error < y_vs_x_regression.regression_error
-            ? x_vs_y_regression.regression_line
-            : y_vs_x_regression.regression_line;
-
-    return regression_line;
+    if(x_vs_y_regression.regression_error < y_vs_x_regression.regression_error) {
+        return x_vs_y_regression.regression_line;
+    }else {
+        return y_vs_x_regression.regression_line;
+    }
 }
 
 BallFilter::LinearRegressionResults BallFilter::calculateLinearRegression(
@@ -348,14 +347,15 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
             }
 
             // Project the detection positions onto the regression line if it was provided
-            Point current_position =
-                ball_regression_line
-                    ? closestPoint(current_detection.position, *ball_regression_line)
-                    : current_detection.position;
-            Point previous_position =
-                ball_regression_line
-                    ? closestPoint(previous_detection.position, *ball_regression_line)
-                    : previous_detection.position;
+            Point current_position;
+            Point previous_position;
+            if(ball_regression_line) {
+                current_position = closestPoint(current_detection.position, ball_regression_line.value());
+                previous_position = closestPoint(previous_detection.position, ball_regression_line.value());
+            }else {
+                current_position = current_detection.position;
+                previous_position = previous_detection.position;
+            }
             Vector velocity_vector    = current_position - previous_position;
             double velocity_magnitude = velocity_vector.length() / time_diff.getSeconds();
             Vector velocity           = velocity_vector.normalize(velocity_magnitude);

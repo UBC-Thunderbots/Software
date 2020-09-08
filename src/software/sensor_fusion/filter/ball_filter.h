@@ -126,8 +126,6 @@ class BallFilter
      * Given a buffer of ball detections, returns the line of best fit through
      * the detection positions.
      *
-     * @pre ball_detections must have at least 2 elements
-     *
      * @throws std::invalid_argument if ball_detections has less than 2 elements
      *
      * @param ball_detections The ball detections to fit
@@ -141,8 +139,6 @@ class BallFilter
      * Given a list of ball detections, use linear regression to find a line of best fit
      * through the ball positions, and calculate the error of this regression.
      *
-     * @pre ball_detections must have at least 2 elements
-     *
      * @throws std::invalid_argument if ball_detections has less than 2 elements
      *
      * @param ball_detections The ball detections to use in the regression
@@ -155,8 +151,6 @@ class BallFilter
     /**
      * Returns the filtered position of the ball given a buffer of ball detections
      * and the line of best fit through them.
-     *
-     * @pre ball_detections must be non-empty
      *
      * @throws std::invalid_argument if ball_detections has less than 2 elements
      *
