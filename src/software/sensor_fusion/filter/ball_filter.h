@@ -56,7 +56,8 @@ class BallFilter
      * @param filter_area The area within which the ball filter will work. Any detections
      * outside of this area will be ignored.
      *
-     * @return The updated state of the ball given the new data
+     * @return The updated state of the ball given the new data. If a filtered result cannot be
+     * calculated, returns std::nullopt
      */
     std::optional<TimestampedBallState> estimateBallState(
         const std::vector<BallDetection>& new_ball_detections,
@@ -85,8 +86,10 @@ class BallFilter
 
     /**
      * Adds ball detections to the buffer stored by this filter. This function will ignore
-     * data that is outside of the filter_area, and data that is too far away from the
-     * current known ball position (since it is likely to be random noise).
+     * data if:
+     * - the is outside of the filter_area, or
+     * - the data is too far away from the current known ball position
+     *   (since it is likely to be random noise).
      *
      * @param new_ball_detections The ball detections to try add to the buffer
      * @param filter_area The area within which the ball filter will work. Any detections
@@ -101,7 +104,7 @@ class BallFilter
      *
      * @param ball_detections The detections to filter
      *
-     * @return The filtered current state of the ball. If a filtered result cannot be
+     * @return The filtered current state of the ball. if a filtered result cannot be
      * calculated, returns std::nullopt
      */
     static std::optional<TimestampedBallState> estimateBallState(
