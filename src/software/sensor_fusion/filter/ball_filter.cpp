@@ -132,13 +132,13 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
     auto regression_line = calculateLineOfBestFit(ball_detections);
 
     Point filtered_position = getFilteredPosition(ball_detections, regression_line);
-    auto filtered_velocity  = getFilteredVelocity(ball_detections, regression_line);
-    if (!filtered_velocity)
+    auto estimated_velocity  = estimateBallVelocity(ball_detections, regression_line);
+    if (!estimated_velocity)
     {
         return std::nullopt;
     }
 
-    BallState ball_state(filtered_position, filtered_velocity.value(),
+    BallState ball_state(filtered_position, estimated_velocity->average_velocity,
                          ball_detections.front().distance_from_ground);
     return TimestampedBallState(ball_state, ball_detections.front().timestamp);
 }
@@ -295,28 +295,6 @@ Point BallFilter::getFilteredPosition(
     // position of a ball detection
     BallDetection latest_ball_detection = ball_detections.front();
     return closestPoint(latest_ball_detection.position, regression_line);
-}
-
-std::optional<Vector> BallFilter::getFilteredVelocity(
-    boost::circular_buffer<BallDetection> ball_detections, const Line &regression_line)
-{
-    auto filtered_velocity = std::optional<Vector>();
-    std::optional<BallVelocityEstimate> velocity_estimate =
-        estimateBallVelocity(ball_detections, regression_line);
-    if (velocity_estimate)
-    {
-        // Project the velocity so it also lies along the line of best fit calculated
-        // above. Again, this gives more stable values because the line of best fit is
-        // more robust to fluctuations in ball position, so will not vary as much as using
-        // the "raw" ball velocity
-        auto velocity_direction_along_regression_line =
-            velocity_estimate->average_velocity.project(
-                regression_line.toNormalUnitVector().perpendicular());
-        filtered_velocity = velocity_direction_along_regression_line.normalize(
-            velocity_estimate->average_velocity_magnitude);
-    }
-
-    return filtered_velocity;
 }
 
 std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity(

@@ -164,20 +164,6 @@ class BallFilter
         const Line& regression_line);
 
     /**
-     * Returns the filtered velocity of the ball given a buffer of ball detections
-     * and the line of best fit through them.
-     *
-     * @param ball_detections The ball detections
-     * @param regression_line The line of best fit through the ball positions
-     *
-     * @return The filtered velocity of the ball. If an error occurs that prevents
-     * the velocity from being calculated properly, std::nullopt is returned.
-     */
-    static std::optional<Vector> getFilteredVelocity(
-        boost::circular_buffer<BallDetection> ball_detections,
-        const Line& regression_line);
-
-    /**
      * Estimates the ball's velocity based on the current detections in the given buffer.
      * If the ball_regression_line is provided, the detection positions are projected onto
      * the line before the velocities are calculated. If no velocity can be estimated,
