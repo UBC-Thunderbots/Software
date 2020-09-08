@@ -10,5 +10,6 @@ int main(int argc, char *argv[])
     // Wait for the GUI to shut down before shutting
     // down the rest of the system
     threaded_robot_diagnostics_gui->getTerminationPromise()->get_future().wait();
+
     return 0;
 }
