@@ -56,8 +56,8 @@ class BallFilter
      * @param filter_area The area within which the ball filter will work. Any detections
      * outside of this area will be ignored.
      *
-     * @return The updated state of the ball given the new data. If a filtered result cannot be
-     * calculated, returns std::nullopt
+     * @return The updated state of the ball given the new data. If a filtered result
+     * cannot be calculated, returns std::nullopt
      */
     std::optional<TimestampedBallState> estimateBallState(
         const std::vector<BallDetection>& new_ball_detections,

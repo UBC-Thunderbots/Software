@@ -132,7 +132,7 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
     auto regression_line = calculateLineOfBestFit(ball_detections);
 
     Point filtered_position = getFilteredPosition(ball_detections, regression_line);
-    auto estimated_velocity  = estimateBallVelocity(ball_detections, regression_line);
+    auto estimated_velocity = estimateBallVelocity(ball_detections, regression_line);
     if (!estimated_velocity)
     {
         return std::nullopt;
@@ -213,9 +213,12 @@ Line BallFilter::calculateLineOfBestFit(
     y_vs_x_regression.regression_line.swapXY();
 
     // We use the regression from above with the least error
-    if(x_vs_y_regression.regression_error < y_vs_x_regression.regression_error) {
+    if (x_vs_y_regression.regression_error < y_vs_x_regression.regression_error)
+    {
         return x_vs_y_regression.regression_line;
-    }else {
+    }
+    else
+    {
         return y_vs_x_regression.regression_line;
     }
 }
@@ -327,11 +330,16 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
             // Project the detection positions onto the regression line if it was provided
             Point current_position;
             Point previous_position;
-            if(ball_regression_line) {
-                current_position = closestPoint(current_detection.position, ball_regression_line.value());
-                previous_position = closestPoint(previous_detection.position, ball_regression_line.value());
-            }else {
-                current_position = current_detection.position;
+            if (ball_regression_line)
+            {
+                current_position  = closestPoint(current_detection.position,
+                                                ball_regression_line.value());
+                previous_position = closestPoint(previous_detection.position,
+                                                 ball_regression_line.value());
+            }
+            else
+            {
+                current_position  = current_detection.position;
                 previous_position = previous_detection.position;
             }
             Vector velocity_vector    = current_position - previous_position;
