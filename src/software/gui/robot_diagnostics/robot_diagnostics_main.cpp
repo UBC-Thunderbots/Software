@@ -45,7 +45,7 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
                        "Help screen");
     desc.add_options()(
         "backend",
-        boost::program_options::value<std::string>(&args.backend_name)->required(),
+        boost::program_options::value<std::string>(&args.backend_name),
         backend_help_str.c_str());
     desc.add_options()(
         "interface",
@@ -88,6 +88,11 @@ int main(int argc, char **argv)
             MutableDynamicParameters->getMutableNetworkConfig()
                 ->mutableNetworkInterface()
                 ->setValue(args.network_interface_name);
+        }
+
+        if (args.backend_name.empty())
+        {
+            LOG(FATAL) << "The option '--backend' is required but missing";
         }
 
         std::shared_ptr<Backend> backend =
