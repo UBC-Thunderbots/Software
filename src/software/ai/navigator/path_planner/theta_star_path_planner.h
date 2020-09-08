@@ -2,6 +2,7 @@
 
 #include <map>
 #include <set>
+#include <cassert>
 
 #include "software/ai/navigator/path_planner/path_planner.h"
 
@@ -46,6 +47,8 @@ class ThetaStarPathPlanner : public PathPlanner
         Coordinate(unsigned int row, unsigned int col)
             : row_(row), col_(col), internal_comparison_key_(computeComparisonKey(*this))
         {
+            assert(row<(1<<16));
+            assert(col<(1<<16));
         }
 
         Coordinate() : row_(0), col_(0) {}
@@ -72,7 +75,7 @@ class ThetaStarPathPlanner : public PathPlanner
 
         static unsigned long computeComparisonKey(const Coordinate &coord)
         {
-            return coord.row() + coord.col() * ((1 << 15) + 1);
+            return coord.row() + coord.col() * (1 << 16);
         }
 
        private:
@@ -116,11 +119,11 @@ class ThetaStarPathPlanner : public PathPlanner
             if (coord1.row() < coord2.row() ||
                 (coord1.row() == coord2.row() && coord1.col() < coord2.col()))
             {
-                return key1 + key2 * ((1 << 16) + 1);
+                return key1 + key2 * (((unsigned long )1) << 32);
             }
             else
             {
-                return key2 + key1 * ((1 << 16) + 1);
+                return key2 + key1 * (((unsigned long) 1) << 32);
             }
         }
 
