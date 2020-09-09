@@ -270,6 +270,15 @@ class SimulatorRobot
     unsigned int checkValidAndReturnUint(
         std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
 
+    /**
+     * Applies force to the physics ball to simulate it being dribbled by the
+     * physics robot.
+     *
+     * @param physics_robot The robot that shoudl dribble the ball
+     * @param physics_ball The ball to be dribbled
+     */
+    void applyDribblerForce(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
+
     std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<float> autokick_speed_m_per_s;
     std::optional<float> autochip_distance_m;
