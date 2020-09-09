@@ -13,7 +13,7 @@ RobotDiagnosticsGUI::RobotDiagnosticsGUI(
       update_timer(new QTimer(this)),
       push_primitive_timer(new QTimer(this)),
       update_timer_interval(Duration::fromSeconds(1.0 / 60.0)),
-      push_primitive_timer_interval(Duration::fromSeconds(1.0 / 60.0))
+      push_primitive_timer_interval(Duration::fromSeconds(1.0 / 30.0))
 {
     // Handles all the setup of the generated UI components and adds the components
     // to this widget
@@ -31,6 +31,7 @@ RobotDiagnosticsGUI::RobotDiagnosticsGUI(
         pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
     });
     update_timer->start(static_cast<int>(update_timer_interval.getMilliseconds()));
+    push_primitive_timer->start(static_cast<int>(push_primitive_timer_interval.getMilliseconds()));
 
     setupWidgets();
 }
