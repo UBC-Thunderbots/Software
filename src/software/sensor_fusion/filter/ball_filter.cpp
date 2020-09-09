@@ -17,7 +17,7 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area)
 {
     addNewDetectionsToBuffer(new_ball_detections, filter_area);
-    return estimateBallState(ball_detection_buffer);
+    return estimateBallStateFromBuffer(ball_detection_buffer);
 }
 
 void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
@@ -99,7 +99,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
     }
 }
 
-std::optional<TimestampedBallState> BallFilter::estimateBallState(
+std::optional<TimestampedBallState> BallFilter::estimateBallStateFromBuffer(
     boost::circular_buffer<BallDetection> ball_detections)
 {
     // Sort the detections in decreasing order before processing. This places the most

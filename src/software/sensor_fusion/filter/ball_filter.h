@@ -49,14 +49,14 @@ class BallFilter
     explicit BallFilter();
 
     /**
-     * Filters the new ball detection data, and returns the updated state of the ball
-     * given the new data
+     * Update the filter with the new ball detection data, and returns the new
+     * estimated state of the ball given the new data
      *
      * @param new_ball_detections A list of new Ball detections
      * @param filter_area The area within which the ball filter will work. Any detections
      * outside of this area will be ignored.
      *
-     * @return The updated state of the ball given the new data. If a filtered result
+     * @return The new estimated state of the ball given the new data. If a filtered result
      * cannot be calculated, returns std::nullopt
      */
     std::optional<TimestampedBallState> estimateBallState(
@@ -107,7 +107,7 @@ class BallFilter
      * @return The filtered current state of the ball. if a filtered result cannot be
      * calculated, returns std::nullopt
      */
-    static std::optional<TimestampedBallState> estimateBallState(
+    static std::optional<TimestampedBallState> estimateBallStateFromBuffer(
         boost::circular_buffer<BallDetection> ball_detections);
 
     /**
