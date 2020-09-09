@@ -38,12 +38,12 @@ void World::updateEnemyTeamState(const Team &new_enemy_team_data)
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
-void World::updateTimestamp(Timestamp time_stamp)
+void World::updateTimestamp(Timestamp timestamp)
 {
     // Check if the timestamp buffer is empty
     if (last_update_timestamps.empty())
     {
-        last_update_timestamps.push_front(time_stamp);
+        last_update_timestamps.push_front(timestamp);
     }
     // Check that the new timestamp is not older than the most recent timestamp
     else if (timestamp < getMostRecentTimestamp())
@@ -53,7 +53,7 @@ void World::updateTimestamp(Timestamp time_stamp)
     }
     else
     {
-        last_update_timestamps.push_front(time_stamp);
+        last_update_timestamps.push_front(timestamp);
     }
 }
 

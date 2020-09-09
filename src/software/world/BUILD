@@ -112,7 +112,7 @@ cc_test(
 
 cc_library(
     name = "team_colour",
-    hdrs = ["team_colour.h"],
+    hdrs = ["team_types.h"],
     deps = ["//software/util/make_enum"],
 )
 

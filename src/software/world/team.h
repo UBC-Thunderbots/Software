@@ -217,7 +217,7 @@ class Team
      *
      * @param timestamp The timestamp at which the Field object was updated
      */
-    void updateTimestamp(Timestamp time_stamp);
+    void updateTimestamp(Timestamp timestamp);
 
     /**
      * Returns the most recent Timestamp from all robots in a Team

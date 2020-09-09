@@ -212,12 +212,12 @@ Timestamp Team::getMostRecentTimestampFromRobots()
     return most_recent_timestamp;
 }
 
-void Team::updateTimestamp(Timestamp time_stamp)
+void Team::updateTimestamp(Timestamp timestamp)
 {
     // Check if the timestamp buffer is empty
     if (last_update_timestamps.empty())
     {
-        last_update_timestamps.push_front(time_stamp);
+        last_update_timestamps.push_front(timestamp);
     }
     // Check that the new timestamp is not older than the most recent timestamp
     else if (timestamp < Team::getMostRecentTimestamp())
@@ -233,7 +233,7 @@ void Team::updateTimestamp(Timestamp time_stamp)
     }
     else
     {
-        last_update_timestamps.push_front(time_stamp);
+        last_update_timestamps.push_front(timestamp);
     }
 }
 
