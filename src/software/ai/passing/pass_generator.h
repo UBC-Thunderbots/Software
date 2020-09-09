@@ -109,12 +109,10 @@ class PassGenerator
     void setTargetRegion(std::optional<Rectangle> area);
 
     /**
-     * Gets the best pass we know of so far
-     *
-     * This only returns what we know so far. For example, if called directly after
-     * the world state is updated, it is unlikely to return good results (if any).
-     * Gradient descent must be allowed to run for some number of iterations before
-     * this can be used to get a reasonable value.
+     * Gets the best pass that the PassGenerator has generated so far. The pass generator
+     * may do some work between calls, and getBestPassSoFar will eventually return better
+     * passes over multiple calls.  The best strategy for getting good passes is to call
+     * getBestPassSoFar multiple times, until the pass is rated high enough.
      *
      * @return The best currently known pass and the rating of that pass (in [0-1])
      */
@@ -327,6 +325,7 @@ class PassGenerator
 
     // What type of pass we're trying to generate
     PassType pass_type;
+
     // The mutex for the in_destructor flag
     std::mutex in_destructor_mutex;
 

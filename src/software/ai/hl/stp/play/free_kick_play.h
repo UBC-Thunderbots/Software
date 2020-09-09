@@ -65,24 +65,16 @@ class FreeKickPlay : public Play
      * we aren't finding passes that are good enough.
      *
      * @param yield The coroutine to yield to
-     * @param align_to_ball_tactic The align to ball tactic
-     * @param cherry_pick_tactic_1 A cherry pick tactic
-     * @param cherry_pick_tactic_2 A cherry pick tactic
      * @param crease_defender_tactics The crease defender tactics
      * @param goalie_tactic The goalie tactic
-     * @param pass_generator The pass generator that will generate passes
-     * @param best_pass_and_score_so_far The best pass and score so far
      * @param world The current state of the world
+     *
+     * @return the pass that was found
      */
-    void shootOrFindPassStage(
-        TacticCoroutine::push_type &yield,
-        std::shared_ptr<MoveTactic> align_to_ball_tactic,
-        std::shared_ptr<ShootGoalTactic> shoot_tactic,
-        std::shared_ptr<CherryPickTactic> cherry_pick_tactic_1,
-        std::shared_ptr<CherryPickTactic> cherry_pick_tactic_2,
+    PassWithRating shootOrFindPassStage(
+        TacticCoroutine::push_type &yield, std::shared_ptr<ShootGoalTactic> shoot_tactic,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        std::shared_ptr<GoalieTactic> goalie_tactic, PassGenerator &pass_generator,
-        PassWithRating &best_pass_and_score_so_far, const World &world);
+        std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
 
     /**
      * Update the tactic that aligns the robot to the ball in preparation to pass
