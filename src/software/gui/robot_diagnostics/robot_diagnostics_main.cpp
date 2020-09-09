@@ -43,10 +43,9 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
     boost::program_options::options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
                        "Help screen");
-    desc.add_options()(
-        "backend",
-        boost::program_options::value<std::string>(&args.backend_name),
-        backend_help_str.c_str());
+    desc.add_options()("backend",
+                       boost::program_options::value<std::string>(&args.backend_name),
+                       backend_help_str.c_str());
     desc.add_options()(
         "interface",
         boost::program_options::value<std::string>(&args.network_interface_name),
