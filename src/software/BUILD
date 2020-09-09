@@ -22,11 +22,3 @@ cc_library(
     name = "constants",
     hdrs = ["constants.h"],
 )
-
-cc_binary(
-    name = "coroutine_main",
-    srcs = ["coroutine_main.cpp"],
-    deps = [
-        "@boost//:coroutine2",
-    ],
-)

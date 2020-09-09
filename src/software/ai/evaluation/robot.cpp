@@ -81,7 +81,7 @@ std::optional<bool> robotHasPossession(const BallHistory& ball_states,
     }
 }
 
-std::optional<boorobotBeingPassedTo(const BallHistory& ball_states,
+std::optional<bool> robotBeingPassedTo(const BallHistory& ball_states,
                                        const RobotHistory& robot_states,
                                        std::optional<Timestamp> timestamp)
 {
