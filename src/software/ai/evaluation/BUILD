@@ -24,9 +24,10 @@ cc_library(
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
-        ":shot",
         "//shared:constants",
-        "//software/world",
+        "//software/geom/algorithms",
+        "//software/world:ball",
+        "//software/world:field",
     ],
 )
 
@@ -170,6 +171,7 @@ cc_library(
         ":shot",
         "//shared:constants",
         "//software/ai/evaluation:pass",
+        "//software/geom/algorithms",
         "//software/optimization:gradient_descent",
         "//software/world:ball",
         "//software/world:field",

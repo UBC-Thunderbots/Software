@@ -3,6 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/optimization/gradient_descent_optimizer.h"
+#include "software/geom/algorithms/contains.h"
 
 std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &ball,
                                                                    const Field &field,
@@ -86,7 +87,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     }
 
     // Check that the best intercept position is actually on the field
-    if (!field.pointInFieldLines(best_ball_intercept_pos))
+    if (!contains(field.fieldLines(), best_ball_intercept_pos))
     {
         return std::nullopt;
     }
