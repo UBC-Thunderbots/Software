@@ -131,7 +131,7 @@ std::optional<TimestampedBallState> BallFilter::estimateBallState(
 
     auto regression_line = calculateLineOfBestFit(ball_detections);
 
-    Point filtered_position = getFilteredPosition(ball_detections, regression_line);
+    Point filtered_position = estimateBallPosition(ball_detections, regression_line);
     auto estimated_velocity = estimateBallVelocity(ball_detections, regression_line);
     if (!estimated_velocity)
     {
@@ -282,7 +282,7 @@ BallFilter::LinearRegressionResults BallFilter::calculateLinearRegression(
     return results;
 }
 
-Point BallFilter::getFilteredPosition(
+Point BallFilter::estimateBallPosition(
     boost::circular_buffer<BallDetection> ball_detections, const Line &regression_line)
 {
     if (ball_detections.empty())

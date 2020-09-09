@@ -152,7 +152,7 @@ class BallFilter
         boost::circular_buffer<BallDetection> ball_detections);
 
     /**
-     * Returns the filtered position of the ball given a buffer of ball detections
+     * Estimates the current position of the ball given a buffer of ball detections
      * and the line of best fit through them.
      *
      * @throws std::invalid_argument if ball_detections has less than 2 elements
@@ -160,9 +160,9 @@ class BallFilter
      * @param ball_detections The ball detections
      * @param regression_line The line of best fit through the ball positions
      *
-     * @return The filtered position of the ball
+     * @return The estimated position of the ball
      */
-    static Point getFilteredPosition(
+    static Point estimateBallPosition(
         boost::circular_buffer<BallDetection> ball_detections,
         const Line& regression_line);
 
