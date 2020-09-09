@@ -215,7 +215,7 @@ class Team
     /**
      * Updates the timestamp history for the Field object
      *
-     * @param time_stamp : The timestamp at which the Field object was updated
+     * @param timestamp The timestamp at which the Field object was updated
      */
     void updateTimestamp(Timestamp time_stamp);
 

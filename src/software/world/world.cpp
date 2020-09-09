@@ -46,7 +46,7 @@ void World::updateTimestamp(Timestamp time_stamp)
         last_update_timestamps.push_front(time_stamp);
     }
     // Check that the new timestamp is not older than the most recent timestamp
-    else if (time_stamp < getMostRecentTimestamp())
+    else if (timestamp < getMostRecentTimestamp())
     {
         throw std::invalid_argument(
             "Error: Attempt tp update World state with old Timestamp");

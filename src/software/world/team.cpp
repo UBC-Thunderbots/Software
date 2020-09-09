@@ -220,12 +220,12 @@ void Team::updateTimestamp(Timestamp time_stamp)
         last_update_timestamps.push_front(time_stamp);
     }
     // Check that the new timestamp is not older than the most recent timestamp
-    else if (time_stamp < Team::getMostRecentTimestamp())
+    else if (timestamp < Team::getMostRecentTimestamp())
     {
         throw std::invalid_argument(
             "Error: Attempt tp update Team state with old Timestamp");
     }
-    else if (time_stamp == Team::getMostRecentTimestamp())
+    else if (timestamp == Team::getMostRecentTimestamp())
     {
         // Don't update if the timestamp is the same as the most recent already assigned
         // to Team
