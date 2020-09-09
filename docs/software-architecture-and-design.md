@@ -26,6 +26,7 @@
   * [What Are Coroutines?](#what-are-coroutines)
   * [What Coroutines Do We Use?](#what-coroutines-do-we-use)
   * [How Do We Use Coroutines?](#how-do-we-use-coroutines)
+  * [Best Practices](#couroutine-best-practices)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
   * [Angles](#angles)
@@ -278,6 +279,14 @@ In this example, each `do while()` loop is a "stage". When the function is first
 Once it is time to start the pass, the condition for the loop will become false and we will exit the loop. Then we enter the second loop / stage. The second stage tells the robot to kick the ball, and this continues until the ball has been kicked. Once the ball has been kicked, the loop will terminate and the function will end because the execution reaches the end of the function.
 
 Once we have entered the second stage, we know we don't have to look at the first stage again. Because the coroutine "remembers" where the execution is each time the function is called, we will resume inside the second stage and therefore never execute the first stage again! This makes it much easier to write and read this strategy code, because we can clearly see the 2 stages of the strategy, and we know they will be executed in order.
+
+## Couroutine Best Practices
+Coroutines are a complex feature, and the boost coroutines we use don't always behave in was we expect. We have done extensive testing on how coroutines are safe (or not safe) to us, and derived some best practices from these examples. See [coroutine_test_exmaples.cpp](coroutine_test_examples.cpp) for the full code and more detailed explanantions.
+
+To summarize, the best practices are as follows:
+1. Avoid moving coroutines. If the absolutely must be moved, make sure they are not moved between the stack and heap.
+2. Avoid using coroutines with resizeable containers. If they must be used, make sure that the coroutines are allocated on the heap.
+3. Pass data to the coroutine on creation as much as possible, avoid using member variables.
 
 
 # Conventions
