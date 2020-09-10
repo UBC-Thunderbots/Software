@@ -168,6 +168,20 @@ class World final
     void updateTimestamp(Timestamp timestamp);
 
     /**
+     * Sets the team with possession
+     *
+     * @param team_with_possesion The team with possession
+     */
+    void setTeamWithPossession(TeamSide team_with_possesion);
+
+    /**
+     * Gets the team with possession
+     *
+     * @return The team with possession
+     */
+    TeamSide getTeamWithPossession();
+
+    /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
      * friendly_team, enemy_team and game_state are equal. The last update
      * timestamp and histories are not part of the equality.
@@ -197,9 +211,11 @@ class World final
     RefereeStage current_referee_stage_;
     // All previous timestamps of when the world was updated, with the most recent
     // timestamp at the front of the queue,
-    boost::circular_buffer<Timestamp> last_update_timestamps;
+    boost::circular_buffer<Timestamp> last_update_timestamps_;
     // A small buffer that stores previous referee command
-    boost::circular_buffer<RefereeCommand> referee_command_history;
+    boost::circular_buffer<RefereeCommand> referee_command_history_;
     // A small buffer that stores previous referee stage
-    boost::circular_buffer<RefereeStage> referee_stage_history;
+    boost::circular_buffer<RefereeStage> referee_stage_history_;
+    // which team has possession of the ball
+    TeamSide team_with_possesion_;
 };
