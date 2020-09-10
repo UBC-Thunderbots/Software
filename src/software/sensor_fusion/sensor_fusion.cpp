@@ -15,7 +15,8 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
                   BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
       enemy_team_filter(),
-      ball_states(history_size)
+      ball_states(history_size),
+      team_with_possession(TeamSide::ENEMY)
 {
     if (!sensor_fusion_config)
     {
@@ -29,6 +30,7 @@ std::optional<World> SensorFusion::getWorld() const
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
+        new_world.setTeamWithPossession(team_with_possession);
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
@@ -183,6 +185,22 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     {
         updateBall(*new_ball_state);
     }
+
+    if (ball)
+    {
+        bool friendly_team_has_ball = teamHasBall(friendly_team, *ball);
+        bool enemy_team_has_ball    = teamHasBall(enemy_team, *ball);
+
+        if (friendly_team_has_ball && !enemy_team_has_ball)
+        {
+            team_with_possession = TeamSide::FRIENDLY;
+        }
+
+        if (!friendly_team_has_ball && enemy_team_has_ball)
+        {
+            team_with_possession = TeamSide::ENEMY;
+        }
+    }
 }
 
 void SensorFusion::updateBall(TimestampedBallState new_ball_state)
@@ -250,4 +268,34 @@ BallDetection SensorFusion::invert(BallDetection ball_detection) const
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());
     return ball_detection;
+}
+
+bool SensorFusion::ballNearDribbler(const Point &ball_position,
+                                    const Point &robot_position,
+                                    const Angle &robot_orientation)
+{
+    static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + 0.2;
+    if ((ball_position - robot_position).length() > POSSESSION_THRESHOLD_METERS)
+    {
+        return false;
+    }
+    else
+    {
+        // check that ball is in a 90-degree cone in front of the robot
+        auto ball_to_robot_angle =
+            robot_orientation.minDiff((ball_position - robot_position).orientation());
+        return (ball_to_robot_angle < Angle::fromDegrees(45.0));
+    }
+}
+
+bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
+{
+    for (const auto &robot : team.getAllRobots())
+    {
+        if (ballNearDribbler(ball.position(), robot.position(), robot.orientation()))
+        {
+            return true;
+        }
+    }
+    return false;
 }

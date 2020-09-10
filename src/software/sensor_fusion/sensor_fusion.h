@@ -96,6 +96,28 @@ class SensorFusion
     RobotDetection invert(RobotDetection robot_detection) const;
     BallDetection invert(BallDetection ball_detection) const;
 
+    /**
+     * Decides if the ball is near the dribbler of the robot
+     *
+     * @param ball_position The position of the ball
+     * @param robot_position The position of the robot
+     * @param robot_orientation The orientation the robot
+     *
+     * @return whether the ball is near the dribbler of the robot
+     */
+    static bool ballNearDribbler(const Point &ball_position, const Point &robot_position,
+                                 const Angle &robot_orientation);
+
+    /**
+     * Determines if the team has control over the given ball
+     *
+     * @param team The team to check
+     * @param ball The ball to check
+     *
+     * @return whether the team has control over the ball
+     */
+    static bool teamHasBall(const Team &team, const Ball &ball);
+
     std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
     unsigned int history_size;
     std::optional<Field> field;
@@ -110,4 +132,5 @@ class SensorFusion
     RobotTeamFilter enemy_team_filter;
 
     BallHistory ball_states;
+    TeamSide team_with_possession;
 };
