@@ -183,18 +183,11 @@ class PhysicsRobot
     void setPosition(const Point &position);
 
     /**
-     * Applies the given force vector to the ball at its center of mass
+     * Applies the given force vector to the robot at its center of mass
      *
      * @param force The force to apply
      */
-    void applyForce(const Vector& force);
-
-    /**
-     * Applies angular acceleration to the robot.
-     *
-     * @param acceleration The Angle to accelerate by per second
-     */
-    void applyAngularAcceleration(const Angle acceleration);
+    void applyForceToCenter(const Vector& force);
 
    protected:
     /**

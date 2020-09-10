@@ -9,6 +9,7 @@
 #include "software/simulation/physics/physics_ball.h"
 #include "software/time/duration.h"
 #include "software/world/robot_state.h"
+#include "software/test_util/equal_within_tolerance.h"
 
 class PhysicsRobotTest : public testing::Test
 {
@@ -841,7 +842,7 @@ TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_moving_and_spinning)
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0.0, 1);
 }
 
-TEST_F(PhysicsRobotTest, test_apply_angular_acceleration)
+TEST_F(PhysicsRobotTest, test_apply_force_to_center)
 {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
@@ -854,7 +855,7 @@ TEST_F(PhysicsRobotTest, test_apply_angular_acceleration)
     // is lost if we take a single step of 1 second
     for (unsigned int i = 0; i < 60; i++)
     {
-        physics_robot.applyAngularAcceleration(AngularVelocity::fromRadians(1));
+        physics_robot.applyForceToCenter(Vector(1, 1));
 
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
         // iterations but are the recommended defaults from
@@ -863,9 +864,8 @@ TEST_F(PhysicsRobotTest, test_apply_angular_acceleration)
     }
 
     auto robot = physics_robot.getRobotState();
-    // Because the robot's center of mass is not perfect we expect it to have drifted a
-    // little bit while spinning
-    EXPECT_LT((robot.position() - Point(0, 0)).length(), 0.05);
-    EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.05);
-    EXPECT_LT(robot.angularVelocity(), AngularVelocity::fromRadians(1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot.velocity().orientation(), Vector(1, 1).orientation(), Angle::fromDegrees(2)));
+    // Damping and other factors mean we can't assert the robot's exact speed, so
+    // we just check it got moving beyond a low threshold
+    EXPECT_GT(robot.velocity().length(), 0.2);
 }

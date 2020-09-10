@@ -128,6 +128,7 @@ cc_test(
     deps = [
         ":physics_ball",
         ":physics_robot",
+        "//software/test_util",
         "//software/time:duration",
         "//software/world:robot",
         "@box2d",
