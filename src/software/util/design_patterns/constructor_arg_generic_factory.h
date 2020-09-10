@@ -6,6 +6,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
+#include "software/util/typename/typename.h"
 //#include "software/backend/backend.h" // Should make generic.h
 
 // A quality of life typedef to make things shorter and more readable
@@ -17,6 +18,32 @@ std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>(std::a
  * Factories to follow. This makes it easy to maintain a list of factories and get the
  * corresponding generic types through the generic interface.
  */
+
+// had to roll our own function_traits class to get function arg types as a tuple
+template <typename Function> class fn_traits;
+
+template <typename ResultType, typename... ArgTypes>
+class fn_traits<ResultType(ArgTypes...)>
+{
+   public:
+    using args_tuple_type = std::tuple<ArgTypes...>;
+    using result_type = ResultType;
+};
+
+
+// modified from std::make_from_tuple in libstdc++ with names de-uglified
+template <typename CreatedType, typename Tuple, size_t... Idx>
+std::unique_ptr<CreatedType> make_unique_from_tuple_impl(Tuple&& tup, std::index_sequence<Idx...>)
+{ return std::unique_ptr<CreatedType>(new CreatedType(std::get<Idx>(std::forward<Tuple>(tup))...)); }
+
+template <typename CreatedType, typename Tuple>
+std::unique_ptr<CreatedType> make_unique_from_tuple(Tuple&& tup)
+{
+    return make_unique_from_tuple_impl<CreatedType>(
+        std::forward<Tuple>(tup),
+        std::make_index_sequence<std::tuple_size_v<std::decay_t<Tuple>>>{});
+}
+
 template <class IndexType, class TypeToCreate>
 class ConstructorArgGenericFactory
 {
@@ -35,6 +62,9 @@ class ConstructorArgGenericFactory
     static std::unique_ptr<TypeToCreate> create(const std::string& generic_name, U constructor_arg);
 
     static std::unique_ptr<TypeToCreate> create(const std::string& generic_name, std::any constructor_arg);
+
+    template <typename ... ArgTypes>
+    static std::unique_ptr<TypeToCreate> create(const std::string& generic_name, ArgTypes... args);
 
     /**
      * Returns a const reference to the generic type registry. The registry is a map of
@@ -114,8 +144,42 @@ class TConstructorArgGenericFactory : public ConstructorArgGenericFactory<IndexT
 
             return std::make_unique<T>(*constructor_arg_or_null);
         };
-        ConstructorArgGenericFactory<IndexType, TypeToCreate>::registerCreator(T::name,
+        ConstructorArgGenericFactory<IndexType, TypeToCreate>::registerCreator(TYPENAME(T),
                                                                  generic_creator);
+    }
+};
+
+
+template <class IndexType, typename TypeToCreate, typename ConstructorFunctionTraits>
+class TMultipleConstructorArgGenericFactory : public ConstructorArgGenericFactory<IndexType, TypeToCreate>
+{
+    // compile time type checking that T is derived class of Generic
+    static_assert(std::is_base_of<TypeToCreate, typename ConstructorFunctionTraits::result_type>::value,
+                  "T must be derived class of TypeToCreate!");
+
+    using args_tuple_type = typename ConstructorFunctionTraits::args_tuple_type;
+
+   public:
+    TMultipleConstructorArgGenericFactory()
+    {
+        auto generic_creator = [](std::any arg) -> std::unique_ptr<TypeToCreate> {
+          std::optional<args_tuple_type> constructor_args_or_null;
+
+          try {
+              constructor_args_or_null = std::any_cast<args_tuple_type>(arg);
+          } catch (const std::bad_any_cast& error) {
+              std::stringstream error_ss;
+              error_ss << "Argument type is wrong! Could not any_cast "
+                       << demangle_typeid(arg.type().name()) << " to tuple of argument types "
+                       << TYPENAME(args_tuple_type);
+              throw std::invalid_argument(error_ss.str());
+          }
+
+          return make_unique_from_tuple<typename ConstructorFunctionTraits::result_type>(*constructor_args_or_null);
+        };
+        ConstructorArgGenericFactory<IndexType, TypeToCreate>::registerCreator(
+            TYPENAME(typename ConstructorFunctionTraits::result_type),
+            generic_creator);
     }
 };
 #include "software/util/design_patterns/constructor_arg_generic_factory.tpp"

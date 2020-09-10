@@ -17,6 +17,9 @@ cc_library(
         "constructor_arg_generic_factory.h",
         "constructor_arg_generic_factory.tpp",
     ],
+    deps = [
+        "//software/util/typename",
+    ],
 )
 
 cc_test(

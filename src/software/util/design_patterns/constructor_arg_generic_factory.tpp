@@ -88,3 +88,24 @@ ConstructorArgGenericFactory<IndexType, TypeToCreate>::create(
         throw std::invalid_argument(msg);
     }
 }
+
+
+template <class IndexType, class TypeToCreate>
+template <typename... ArgTypes>
+std::unique_ptr<TypeToCreate>
+ConstructorArgGenericFactory<IndexType, TypeToCreate>::create(
+    const std::string& generic_name, ArgTypes... args)
+{
+    auto registry = ConstructorArgGenericFactory<IndexType, TypeToCreate>::getRegistry();
+    auto iter     = registry.find(generic_name);
+    if (iter != registry.end())
+    {
+        return iter->second(std::any(std::tuple<ArgTypes...>(args...)));
+    }
+    else
+    {
+        std::string msg = std::string("No constructor for '" + generic_name +
+                                      "' found in the ConstructorArgGenericFactory");
+        throw std::invalid_argument(msg);
+    }
+}
