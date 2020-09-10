@@ -438,7 +438,7 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
         robot.position() +
         Vector::createFromAngle(robot.orientation())
             .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS -
-                       PhysicsRobot::dribbler_depth);
+                       PhysicsRobot::DRIBBLER_DEPTH);
     Vector dribble_force_vector = dribble_point - ball.position();
     // convert to cm so we operate on a small scale
     double dist_from_dribble_point_cm =

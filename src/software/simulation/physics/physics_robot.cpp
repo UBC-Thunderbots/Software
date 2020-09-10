@@ -14,14 +14,14 @@ extern "C"
 // We are only allowed to cover a fraction of the ball according to the rules, so we use
 // this to calculate the depth. We assume the ball can be dribbled as long as it is
 // anywhere within this small area.
-const double PhysicsRobot::dribbler_depth =
+const double PhysicsRobot::DRIBBLER_DEPTH =
     BALL_MAX_RADIUS_METERS * 2 * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
 // We can use a very small value for the dribbler damper thickness since the
 // damper just needs to be large enough to collide with the ball and detect collisions
 // without letting the ball tunnel and collide with the robot body
-const double PhysicsRobot::dribbler_damper_thickness = 0.005;
-const double PhysicsRobot::total_dribbler_depth =
-    PhysicsRobot::dribbler_depth + PhysicsRobot::dribbler_damper_thickness;
+const double PhysicsRobot::DRIBBLER_DAMPER_THICKNESS = 0.005;
+const double PhysicsRobot::TOTAL_DRIBBLER_DEPTH =
+        PhysicsRobot::DRIBBLER_DEPTH + PhysicsRobot::DRIBBLER_DAMPER_THICKNESS;
 
 PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
                            const RobotState& robot_state, const double mass_kg)
@@ -74,11 +74,11 @@ PhysicsRobot::~PhysicsRobot()
 void PhysicsRobot::setupRobotBodyFixtures(const RobotState&, const double mass_kg)
 {
     b2PolygonShape* main_body_shape =
-        PhysicsRobotModel::getMainRobotBodyShape(total_dribbler_depth);
+        PhysicsRobotModel::getMainRobotBodyShape(TOTAL_DRIBBLER_DEPTH);
     b2PolygonShape* front_left_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontLeft(total_dribbler_depth);
+        PhysicsRobotModel::getRobotBodyShapeFrontLeft(TOTAL_DRIBBLER_DEPTH);
     b2PolygonShape* front_right_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontRight(total_dribbler_depth);
+        PhysicsRobotModel::getRobotBodyShapeFrontRight(TOTAL_DRIBBLER_DEPTH);
 
     auto body_shapes = {main_body_shape, front_left_body_shape, front_right_body_shape};
     double total_shape_area = 0.0;
@@ -128,9 +128,9 @@ void PhysicsRobot::setupDribblerFixture(const RobotState&)
     const unsigned int num_vertices              = 4;
     b2Vec2 dribbler_shape_vertices[num_vertices] = {
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - DRIBBLER_DEPTH,
                          DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - DRIBBLER_DEPTH,
                          -DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, -DRIBBLER_WIDTH_METERS / 2.0))};
     b2PolygonShape* dribbler_shape = new b2PolygonShape();
@@ -155,15 +155,15 @@ void PhysicsRobot::setupDribblerDamperFixture(const RobotState& robot_state)
     // so we do not need to rotate the points to match the orientation of the robot.
     const unsigned int num_vertices                     = 4;
     b2Vec2 dribbler_damper_shape_vertices[num_vertices] = {
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth +
-                             dribbler_damper_thickness,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH +
+                         DRIBBLER_DAMPER_THICKNESS,
                          DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH,
                          DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH,
                          -DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth +
-                             dribbler_damper_thickness,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH +
+                         DRIBBLER_DAMPER_THICKNESS,
                          -DRIBBLER_WIDTH_METERS / 2.0))};
 
     b2PolygonShape* dribbler_damper_shape = new b2PolygonShape();

@@ -28,10 +28,10 @@ class PhysicsRobot
     // The depth of the dribbling area at the front of the robot.
     // We assume the ball can be dribbled as long as it is anywhere within this small
     // area.
-    static double const dribbler_depth;
+    static double const DRIBBLER_DEPTH;
     // The thickness of the dribbler damper fixture shape.
-    static double const dribbler_damper_thickness;
-    static double const total_dribbler_depth;
+    static double const DRIBBLER_DAMPER_THICKNESS;
+    static double const TOTAL_DRIBBLER_DEPTH;
 
     friend class PhysicsWorld;
 

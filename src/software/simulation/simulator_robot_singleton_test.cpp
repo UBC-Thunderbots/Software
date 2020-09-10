@@ -98,7 +98,7 @@ class SimulatorRobotSingletonTest : public testing::Test
 
     Point getDribblingPoint(const Point& robot_position, const Angle& robot_orientation)
     {
-        double dribbler_depth = PhysicsRobot::dribbler_depth;
+        double dribbler_depth = PhysicsRobot::DRIBBLER_DEPTH;
         Point dribbling_point =
             robot_position + Vector::createFromAngle(robot_orientation)
                                  .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
