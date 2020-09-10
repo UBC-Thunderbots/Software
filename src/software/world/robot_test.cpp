@@ -336,3 +336,57 @@ TEST_F(RobotTest, get_capabilities_whitelist)
 
     EXPECT_EQ(expected_whitelist, robot.getCapabilitiesWhitelist());
 }
+
+TEST(RobotIsNearDribblerTest, ball_near_dribbler_directly_in_front_of_robot)
+{
+    Point ball_position = Point(0.07, 0);
+    Timestamp timestamp = Timestamp::fromSeconds(0);
+
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        timestamp);
+
+    EXPECT_TRUE(robot.isNearDribbler(ball_position));
+}
+
+TEST(RobotIsNearDribblerTest, ball_near_dribbler_ball_to_side_of_robot)
+{
+    Point ball_position = Point(0.07, 0);
+    Timestamp timestamp = Timestamp::fromSeconds(0);
+
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::half(), AngularVelocity::zero(),
+                        timestamp);
+    EXPECT_FALSE(robot.isNearDribbler(ball_position));
+}
+
+TEST(RobotIsNearDribblerTest, ball_near_dribbler_robot_moving_ball_in_dribbler)
+{
+    Point ball_position = Point(0.07, 0);
+    Timestamp timestamp = Timestamp::fromSeconds(1);
+
+    Robot robot = Robot(0, Point(0, 0), Vector(1, 1), Angle::zero(),
+                        AngularVelocity::zero(), timestamp);
+
+    EXPECT_TRUE(robot.isNearDribbler(ball_position));
+}
+
+TEST(RobotIsNearDribblerTest, ball_near_dribbler_ball_far_away_from_robot)
+{
+    Point ball_position = Point(-1, -2);
+    Timestamp timestamp = Timestamp::fromSeconds(0);
+
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        timestamp);
+
+    EXPECT_FALSE(robot.isNearDribbler(ball_position));
+}
+
+TEST(RobotIsNearDribblerTest, ball_near_dribbler_robot_on_angle_with_ball_in_dribbler)
+{
+    Point ball_position = Point(0.035, 0.06);
+    Timestamp timestamp = Timestamp::fromSeconds(0);
+
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::fromDegrees(59.74356),
+                        AngularVelocity::zero(), timestamp);
+
+    EXPECT_TRUE(robot.isNearDribbler(ball_position));
+}

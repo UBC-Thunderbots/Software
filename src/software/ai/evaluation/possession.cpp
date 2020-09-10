@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/intercept.h"
-#include "software/ai/evaluation/robot.h"
 #include "software/ai/evaluation/team.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"

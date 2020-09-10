@@ -131,7 +131,6 @@ cc_library(
         ":calc_best_shot",
         ":intercept",
         ":possession",
-        ":robot",
         ":shot",
         ":team",
         "//shared:constants",
@@ -193,7 +192,6 @@ cc_library(
     hdrs = ["possession.h"],
     deps = [
         ":intercept",
-        ":robot",
         ":shot",
         ":team",
         "//software/world:ball",
@@ -208,27 +206,6 @@ cc_test(
     deps = [
         ":possession",
         "//shared:constants",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "robot",
-    srcs = ["robot.cpp"],
-    hdrs = ["robot.h"],
-    deps = [
-        ":shot",
-        "//shared:constants",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "robot_test",
-    srcs = ["robot_test.cpp"],
-    deps = [
-        ":robot",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
