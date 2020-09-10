@@ -188,121 +188,6 @@ TEST_F(RobotTest, equality_operator_robots_with_different_timestamp)
     EXPECT_EQ(robot, robot_other);
 }
 
-TEST_F(RobotTest, get_position_history)
-{
-    std::vector prevPositions = {Point(-1.3, 3), Point(-1.2, 3), Point(3, 1.2)};
-
-    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(
-        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(
-        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.1), half_second_future));
-
-    RobotHistory previous_states = robot.getPreviousStates();
-    std::vector<Point> previous_positions{};
-    for (size_t i = 0; i < previous_states.size(); i++)
-    {
-        previous_positions.push_back(previous_states.at(i).state().position());
-    }
-    EXPECT_EQ(prevPositions, previous_positions);
-}
-
-TEST_F(RobotTest, get_velocity_history)
-{
-    std::vector prevVelocities = {Vector(2.3, -0.05), Vector(2.2, -0.05), Vector(-3, 1)};
-
-    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(
-        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(
-        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.1), half_second_future));
-
-    RobotHistory previous_states = robot.getPreviousStates();
-    std::vector<Vector> previous_velocities{};
-    for (size_t i = 0; i < previous_states.size(); i++)
-    {
-        previous_velocities.push_back(previous_states.at(i).state().velocity());
-    }
-    EXPECT_EQ(prevVelocities, previous_velocities);
-}
-
-TEST_F(RobotTest, get_orientation_history)
-{
-    std::vector prevOrientations = {Angle::quarter(), Angle::quarter(),
-                                    Angle::fromDegrees(0)};
-
-    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(
-        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(
-        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.1), half_second_future));
-
-    RobotHistory previous_states = robot.getPreviousStates();
-    std::vector<Angle> previous_orientations{};
-    for (size_t i = 0; i < previous_states.size(); i++)
-    {
-        previous_orientations.push_back(previous_states.at(i).state().orientation());
-    }
-    EXPECT_EQ(prevOrientations, previous_orientations);
-}
-
-TEST_F(RobotTest, get_angular_velocity_history)
-{
-    std::vector prevAngularVelocities = {
-        AngularVelocity::fromRadians(1.2),
-        AngularVelocity::fromRadians(1.1),
-        AngularVelocity::fromDegrees(25),
-    };
-
-    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(
-        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(
-        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.2), half_second_future));
-
-    RobotHistory previous_states = robot.getPreviousStates();
-    std::vector<AngularVelocity> previous_angular_velocities{};
-    for (size_t i = 0; i < previous_states.size(); i++)
-    {
-        previous_angular_velocities.push_back(
-            previous_states.at(i).state().angularVelocity());
-    }
-    EXPECT_EQ(prevAngularVelocities, previous_angular_velocities);
-}
-
-TEST_F(RobotTest, get_timestamp_history)
-{
-    std::vector prevTimestamps = {half_second_future, half_second_future, current_time};
-
-    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, 3);
-    robot.updateState(
-        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.1), half_second_future));
-    robot.updateState(
-        TimestampedRobotState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.2), half_second_future));
-
-    RobotHistory previous_states = robot.getPreviousStates();
-    std::vector<Timestamp> previous_timestamps{};
-    for (size_t i = 0; i < previous_states.size(); i++)
-    {
-        previous_timestamps.push_back(previous_states.at(i).timestamp());
-    }
-    EXPECT_EQ(prevTimestamps, previous_timestamps);
-}
 
 TEST_F(RobotTest, get_capabilities_blacklist)
 {
@@ -312,7 +197,7 @@ TEST_F(RobotTest, get_capabilities_blacklist)
     };
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, 3, blacklist);
+                        AngularVelocity::fromDegrees(25), current_time, blacklist);
 
     EXPECT_EQ(blacklist, robot.getCapabilitiesBlacklist());
 }
@@ -325,7 +210,7 @@ TEST_F(RobotTest, get_capabilities_whitelist)
     };
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, 3, blacklist);
+                        AngularVelocity::fromDegrees(25), current_time, blacklist);
 
     // whitelist = all capabilities - blacklist
     std::set<RobotCapability> all_capabilities = allRobotCapabilities();

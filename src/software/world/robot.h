@@ -27,13 +27,11 @@ class Robot
      * per second
      * @param timestamp The timestamp at which the robot was observed to be in the given
      * state
-     * @param history_size The number of previous robot states that should be stored. Must
-     * be > 0
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      */
     explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp, unsigned int history_size = 20,
+                   const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>());
 
@@ -42,12 +40,9 @@ class Robot
      *
      * @param id The id of the robot to create
      * @param initial_state The initial state of the robot
-     * @param history_size The number of previous robot states that should be stored. Must
-     * be > 0
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      */
     explicit Robot(RobotId id, const TimestampedRobotState &initial_state,
-                   unsigned int history_size = 20,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>());
 
@@ -102,14 +97,6 @@ class Robot
      * @return the current angular velocity of the robot
      */
     AngularVelocity angularVelocity() const;
-
-    /**
-     * Gets the buffer which holds all of the previous states
-     *
-     * @return circular_buffer containing all previous states up to the history_size field
-     * cap
-     */
-    RobotHistory getPreviousStates() const;
 
     /**
      * Returns the missing capabilities of the robot
@@ -182,11 +169,7 @@ class Robot
    private:
     // The id of this robot
     RobotId id_;
-    // All previous states of the robot, with the most recent state at the front of the
-    // queue, This buffer will never be empty as it's initialized with a RobotState on
-    // creation
-    // The buffer size (history_size) must be > 0
-    RobotHistory states_;
+    TimestampedRobotState current_state;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapability> unavailable_capabilities_;
