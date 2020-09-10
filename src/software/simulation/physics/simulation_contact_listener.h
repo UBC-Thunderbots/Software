@@ -62,7 +62,8 @@ class SimulationContactListener : public b2ContactListener
      * @param user_data_b The user data for the second object in the contact
      *
      * @return A pointers to the PhysicsBall involved in the contact if there was
-     * a contact point between a ball and any other object, and returns std::nullopt otherwise
+     * a contact point between a ball and any other object, and returns std::nullopt
+     * otherwise
      */
     static PhysicsBall* isBallContact(PhysicsObjectUserData* user_data_a,
                                       PhysicsObjectUserData* user_data_b);
