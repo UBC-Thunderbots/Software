@@ -405,29 +405,6 @@ TEST_F(PhysicsRobotTest, test_dribbler_ball_end_contact_callbacks)
     EXPECT_TRUE(callback_called);
 }
 
-TEST_F(PhysicsRobotTest, test_dribbler_damper_ball_start_contact_callbacks)
-{
-    b2Vec2 gravity(0, 0);
-    auto world = std::make_shared<b2World>(gravity);
-
-    RobotState initial_robot_state(Point(0, 0), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    PhysicsRobot physics_robot(0, world, initial_robot_state, 1.0);
-
-    EXPECT_TRUE(physics_robot.getDribblerDamperBallStartContactCallbacks().empty());
-
-    bool callback_called = false;
-    auto callback        = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
-        callback_called = true;
-    };
-
-    physics_robot.registerDribblerDamperBallStartContactCallback(callback);
-
-    ASSERT_EQ(physics_robot.getDribblerDamperBallStartContactCallbacks().size(), 1);
-    physics_robot.getDribblerDamperBallStartContactCallbacks().at(0)(nullptr, nullptr);
-    EXPECT_TRUE(callback_called);
-}
-
 enum class RobotWheel
 {
     FRONT_LEFT,
