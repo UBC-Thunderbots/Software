@@ -108,7 +108,7 @@ class BallFilter
      * calculated, returns std::nullopt
      */
     static std::optional<TimestampedBallState> estimateBallStateFromBuffer(
-        const boost::circular_buffer<BallDetection> &ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's
