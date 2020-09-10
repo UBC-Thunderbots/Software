@@ -8,8 +8,6 @@
 #include "software/test_util/test_util.h"
 #include "software/world/ball.h"
 
-// TODO (Issue #1644): refactor and reenable these tests
-/*
 TEST(InterceptBallActionTest, intercept_fast_moving_ball)
 {
     Field field = Field::createSSLDivisionBField();
@@ -107,4 +105,3 @@ TEST(InterceptBallActionTest, intercept_slow_moving_ball)
         ADD_FAILURE() << "MoveIntent was not returned by the InterceptBallAction";
     }
 }
-*/

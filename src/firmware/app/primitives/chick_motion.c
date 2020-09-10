@@ -79,8 +79,6 @@ void app_chick_motion_start(void *void_state_ptr, FirmwareWorld_t *world,
         min_angle_delta(state->destination[2], app_firmware_robot_getOrientation(robot));
 }
 
-void app_chick_motion_end(void *void_state_ptr, FirmwareWorld_t *world) {}
-
 void app_chick_motion_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);

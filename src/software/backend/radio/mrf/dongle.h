@@ -23,7 +23,6 @@
 #include "software/backend/radio/mrf/util/noncopyable.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
-#include "software/primitive/primitive.h"
 
 /**
  * An operation to send a reliable message.

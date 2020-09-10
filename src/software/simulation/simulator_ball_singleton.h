@@ -1,27 +1,14 @@
 #pragma once
 
+#include "software/simulation/firmware_object_deleter.h"
+#include "software/simulation/simulator_ball.h"
+
 extern "C"
 {
 #include "firmware/app/world/firmware_ball.h"
 }
 #include "software/simulation/simulator_ball.h"
-
-/**
- * Because the FirmwareBall_t struct is defined in the .c file (rather than the .h file),
- * C++ considers it an incomplete type and is unable to use it with smart pointers
- * because it doesn't know the size of the object. Therefore we need to create our own
- * "Deleter" class we can provide to the smart pointers to handle that instead.
- *
- * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
- * examples
- */
-struct FirmwareBallDeleter
-{
-    void operator()(FirmwareBall_t* firmware_ball) const
-    {
-        app_firmware_ball_destroy(firmware_ball);
-    };
-};
+#include "software/world/field.h"
 
 /**
  * This class acts as a wrapper around a SimulatorBall so that the SimulatorBall
@@ -43,11 +30,28 @@ class SimulatorBallSingleton
 {
    public:
     /**
-     * Sets the SimulatorBall being controlled by this class
+     * Sets the SimulatorBall being controlled by this class.
+     *
+     * The attributes of the ball, such as position, will be given for the POV of
+     * a robot defending the specified field side. Eg. If the ball is at (-1, 2)
+     * in real-world coordinates, it's position will be reported as (-1, 2) if
+     * the negative field side is specified. On the other hand if the positive
+     * field side is specified, the ball's position will be reported as (1, -2).
+     *
+     * This different behaviour for either field side exists because our firmware
+     * expects its knowledge of the world to match our coordinate convention, which is
+     * relative to the side of the field the robot is defending. See
+     * https://github.com/UBC-Thunderbots/Software/blob/master/docs/software-architecture-and-design.md#coordinates
+     * for more information about our coordinate conventions. Because we can't actually
+     * change the positions and dynamics of the underlying physics objects, we use this
+     * class to enforce this convention for the firmware.
      *
      * @param ball The SimulatorBall to control with this class. Must not be null
+     * @param field_side The side of the field being defended by the robots using
+     * this class
      */
-    static void setSimulatorBall(std::shared_ptr<SimulatorBall> ball);
+    static void setSimulatorBall(std::shared_ptr<SimulatorBall> ball,
+                                 FieldSide field_side);
 
     /**
      * Creates a FirmwareBall_t with functions bound to the static functions in this
@@ -99,6 +103,21 @@ class SimulatorBallSingleton
     static float checkValidAndReturnFloat(
         std::function<float(std::shared_ptr<SimulatorBall>)> func);
 
+    /**
+     * A helper function that will negate the given value if needed
+     * in order for it to match our coordinate convention for the
+     * current value of field_side
+     *
+     * @param value The value to invert
+     *
+     * @throws std::invalid_argument if there is an unhandled value of FieldSide
+     *
+     * @return value if field_side_ is NEG_X, and -value if field_side_
+     * is POS_X
+     */
+    static float invertValueToMatchFieldSide(double value);
+
     // The simulator ball being controlled by this class
     static std::shared_ptr<SimulatorBall> simulator_ball;
+    static FieldSide field_side_;
 };

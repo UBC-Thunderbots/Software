@@ -16,6 +16,7 @@
 class Obstacle
 {
    public:
+    Obstacle()          = default;
     virtual ~Obstacle() = default;
 
     /**

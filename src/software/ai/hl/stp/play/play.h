@@ -81,7 +81,7 @@ class Play
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    std::optional<std::vector<std::shared_ptr<Tactic>>> getTactics(const World& world);
+    std::vector<std::shared_ptr<Tactic>> getTactics(const World& world);
 
     /**
      * Returns true if the Play is done and false otherwise. The Play is considered

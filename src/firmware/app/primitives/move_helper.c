@@ -180,8 +180,6 @@ void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
         dx, dy, app_firmware_robot_getOrientation(robot), state->destination[2]);
 }
 
-void app_move_helper_end(void* void_state_ptr, FirmwareWorld_t* world) {}
-
 void app_move_helper_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     MoveHelperState_t* state = (MoveHelperState_t*)(void_state_ptr);

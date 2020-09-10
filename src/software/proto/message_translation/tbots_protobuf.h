@@ -2,7 +2,6 @@
 
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "shared/proto/vision.pb.h"
-#include "software/primitive/primitive.h"
 #include "software/proto/message_translation/tbots_geometry.h"
 #include "software/world/world.h"
 
@@ -15,16 +14,6 @@
  * ball information
  */
 std::unique_ptr<TbotsProto::Vision> createVision(const World& world);
-
-/**
- * Returns a TbotsProto::Primitive proto given a ConstPrimitiveVectorPtr
- *
- * @param primitives The primitives to include in the TbotsProto::Primitive
- *
- * @returns The unique_ptr to a TbotsProto::Primitive proto containing the primitives
- */
-std::unique_ptr<TbotsProto::PrimitiveSet> createPrimitiveSet(
-    const ConstPrimitiveVectorPtr& primitives);
 
 /**
  * Returns (Robot, Ball)State given a (Robot, Ball)

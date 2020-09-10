@@ -2,10 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "software/primitive/move_primitive.h"
-#include "software/primitive/primitive.h"
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
+#include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
 
 TEST(SimulatorTest, get_field)
@@ -340,21 +338,10 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
     };
     simulator.addYellowRobots(states);
 
-    std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-        1, Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> primitives;
-    primitives.emplace_back(std::move(move_primitive));
-    auto yellow_primitives_ptr =
-        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(primitives));
-    for (const auto& primitive_ptr : *yellow_primitives_ptr)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
-    }
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -398,7 +385,7 @@ TEST(SimulatorTest, simulate_blue_robots_with_no_primitives)
     EXPECT_FLOAT_EQ(0.0f, blue_robot.y());
 }
 
-TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
+TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_negative_side)
 {
     // Simulate a robot with a primitive to sanity check that everything is connected
     // properly and we can properly simulate robot firmware. We use the MovePrimitve
@@ -407,6 +394,11 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
 
     Simulator simulator(Field::createSSLDivisionBField());
 
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
+    simulator.setBlueTeamDefendingSide(defending_side);
+
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
     std::vector<RobotStateWithId> states = {
@@ -414,21 +406,10 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
     };
     simulator.addBlueRobots(states);
 
-    std::unique_ptr<Primitive> move_primitive = std::make_unique<MovePrimitive>(
-        1, Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> primitives;
-    primitives.emplace_back(std::move(move_primitive));
-    auto blue_primitives_ptr =
-        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(primitives));
-    for (const auto& primitive_ptr : *blue_primitives_ptr)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
-    }
+    simulator.setBlueRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -443,6 +424,131 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive)
     auto blue_robot = detection_frame.robots_blue(0);
     EXPECT_NEAR(1000.0f, blue_robot.x(), 200);
     EXPECT_NEAR(0.0f, blue_robot.y(), 200);
+}
+
+TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positive_side)
+{
+    // Simulate a robot with a primitive to sanity check that everything is connected
+    // properly and we can properly simulate robot firmware. We use the MovePrimitve
+    // because it is very commonly used and so unlikely to be significantly changed
+    // or removed, and its behaviour is easy to validate
+
+    Simulator simulator(Field::createSSLDivisionBField());
+
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
+    simulator.setBlueTeamDefendingSide(defending_side);
+
+    RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    };
+    simulator.addBlueRobots(states);
+
+    simulator.setBlueRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+
+    for (unsigned int i = 0; i < 240; i++)
+    {
+        simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_blue_size());
+    auto blue_robot = detection_frame.robots_blue(0);
+    EXPECT_NEAR(-1000.0f, blue_robot.x(), 200);
+    EXPECT_NEAR(500.0f, blue_robot.y(), 100);
+    EXPECT_NEAR(M_PI, blue_robot.orientation(), 0.2);
+}
+
+TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_negative_side)
+{
+    // Simulate a robot with a primitive to sanity check that everything is connected
+    // properly and we can properly simulate robot firmware. We use the MovePrimitve
+    // because it is very commonly used and so unlikely to be significantly changed
+    // or removed, and its behaviour is easy to validate
+
+    Simulator simulator(Field::createSSLDivisionBField());
+
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
+    simulator.setYellowTeamDefendingSide(defending_side);
+
+    RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    };
+    simulator.addYellowRobots(states);
+
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 0), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+
+    for (unsigned int i = 0; i < 120; i++)
+    {
+        simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_yellow_size());
+    auto yellow_robot = detection_frame.robots_yellow(0);
+    EXPECT_NEAR(1000.0f, yellow_robot.x(), 200);
+    EXPECT_NEAR(0.0f, yellow_robot.y(), 200);
+}
+
+TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_positive_side)
+{
+    // Simulate a robot with a primitive to sanity check that everything is connected
+    // properly and we can properly simulate robot firmware. We use the MovePrimitve
+    // because it is very commonly used and so unlikely to be significantly changed
+    // or removed, and its behaviour is easy to validate
+
+    Simulator simulator(Field::createSSLDivisionBField());
+
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
+    simulator.setYellowTeamDefendingSide(defending_side);
+
+    RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 1, .robot_state = robot_state1},
+    };
+    simulator.addYellowRobots(states);
+
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, -0.5), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+
+    for (unsigned int i = 0; i < 240; i++)
+    {
+        simulator.stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    auto ssl_wrapper_packet = simulator.getSSLWrapperPacket();
+    ASSERT_TRUE(ssl_wrapper_packet);
+    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
+    auto detection_frame = ssl_wrapper_packet->detection();
+    ASSERT_EQ(1, detection_frame.robots_yellow_size());
+    auto yellow_robot = detection_frame.robots_yellow(0);
+    EXPECT_NEAR(-1000.0f, yellow_robot.x(), 200);
+    EXPECT_NEAR(500.0f, yellow_robot.y(), 100);
+    EXPECT_NEAR(M_PI, yellow_robot.orientation(), 0.2);
 }
 
 TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
@@ -475,44 +581,23 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     };
     simulator.addYellowRobots(yellow_robot_states);
 
-    std::unique_ptr<Primitive> blue_move_primitive1 = std::make_unique<MovePrimitive>(
-        1, Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::unique_ptr<Primitive> blue_move_primitive2 = std::make_unique<MovePrimitive>(
-        2, Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> blue_robot_primitives;
-    blue_robot_primitives.emplace_back(std::move(blue_move_primitive1));
-    blue_robot_primitives.emplace_back(std::move(blue_move_primitive2));
-    auto blue_primitives_ptr =
-        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(blue_robot_primitives));
-    for (const auto& primitive_ptr : *blue_primitives_ptr)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-        simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
-    }
+    simulator.setBlueRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+    simulator.setBlueRobotPrimitive(
+        2, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
-    std::unique_ptr<Primitive> yellow_move_primitive1 = std::make_unique<MovePrimitive>(
-        1, Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::unique_ptr<Primitive> yellow_move_primitive2 = std::make_unique<MovePrimitive>(
-        2, Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> yellow_robot_primitives;
-    yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive1));
-    yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive2));
-    auto yellow_primitives_ptr =
-        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(yellow_robot_primitives));
-    for (const auto& primitive_ptr : *yellow_primitives_ptr)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg);
-    }
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+    simulator.setYellowRobotPrimitive(
+        2, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     for (unsigned int i = 0; i < 120; i++)
     {

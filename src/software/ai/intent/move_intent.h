@@ -1,13 +1,10 @@
 #pragma once
 
 #include "software/ai/intent/navigating_intent.h"
-#include "software/primitive/move_primitive.h"
 
 class MoveIntent : public NavigatingIntent
 {
    public:
-    static const std::string INTENT_NAME;
-
     /**
      * Creates a new Move Intent
      *
@@ -31,7 +28,6 @@ class MoveIntent : public NavigatingIntent
                         MoveType move_type, AutochickType autokick,
                         BallCollisionType ball_collision_type);
 
-    std::string getIntentName(void) const override;
     void accept(IntentVisitor& visitor) const override;
     void accept(NavigatingIntentVisitor& visitor) const override;
 

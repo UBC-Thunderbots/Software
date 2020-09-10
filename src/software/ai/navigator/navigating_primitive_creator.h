@@ -15,6 +15,8 @@
 class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
 {
    public:
+    NavigatingPrimitiveCreator() = delete;
+
     /**
      * Create a NavigatingPrimitiveCreator
      *

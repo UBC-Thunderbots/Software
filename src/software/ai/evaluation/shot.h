@@ -5,6 +5,8 @@
 class Shot
 {
    public:
+    Shot() = delete;
+
     /**
      * Creates a shot with the given target and angle
      *
@@ -13,21 +15,23 @@ class Shot
      * obstacles closest to the shot path
      *
      */
-    Shot(Point point, Angle angle);
+    explicit Shot(Point point, Angle angle);
 
     /**
      * Returns a point, the target to shoot at.
+     *
      * @return a point, representing the target to shoot at.
      */
-    Point getPointToShootAt() const;
+    const Point &getPointToShootAt() const;
 
     /**
      * Returns the angle formed by the shot origin, and the edges of the two obstacles
      * closest to the shot path
+     *
      * @return the angle formed by the shot origin, and the edges of the two obstacles
      * closest to the shot path
      */
-    Angle getOpenAngle() const;
+    const Angle &getOpenAngle() const;
 
    private:
     /**

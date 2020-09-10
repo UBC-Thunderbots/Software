@@ -2,10 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "software/primitive/move_primitive.h"
-#include "software/primitive/primitive.h"
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
+#include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
 
 class ThreadedSimulatorTest : public ::testing::Test
@@ -144,7 +142,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     threaded_simulator.startSimulation();
     // yield and sleep to give the simulation thread the best chance of running
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 
     // Simulate multiple robots with primitives to sanity check that everything is
     // connected properly and we can properly simulate multiple instances of the robot
@@ -171,50 +169,26 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     };
     threaded_simulator.addYellowRobots(yellow_robot_states);
 
-    std::unique_ptr<Primitive> blue_move_primitive1 = std::make_unique<MovePrimitive>(
-        1, Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::unique_ptr<Primitive> blue_move_primitive2 = std::make_unique<MovePrimitive>(
-        2, Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> blue_robot_primitives;
-    blue_robot_primitives.emplace_back(std::move(blue_move_primitive1));
-    blue_robot_primitives.emplace_back(std::move(blue_move_primitive2));
-    auto blue_primitives_ptr =
-        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(blue_robot_primitives));
-    for (const auto& primitive_ptr : *blue_primitives_ptr)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
+    threaded_simulator.setBlueRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+    threaded_simulator.setBlueRobotPrimitive(
+        2, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
-        threaded_simulator.setBlueRobotPrimitive(primitive_ptr->getRobotId(),
-                                                 primitive_msg);
-    }
-
-    std::unique_ptr<Primitive> yellow_move_primitive1 = std::make_unique<MovePrimitive>(
-        1, Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::unique_ptr<Primitive> yellow_move_primitive2 = std::make_unique<MovePrimitive>(
-        2, Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE);
-    std::vector<std::unique_ptr<Primitive>> yellow_robot_primitives;
-    yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive1));
-    yellow_robot_primitives.emplace_back(std::move(yellow_move_primitive2));
-    auto yellow_primitives_ptr =
-        std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-            std::move(yellow_robot_primitives));
-    for (const auto& primitive_ptr : *yellow_primitives_ptr)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        threaded_simulator.setYellowRobotPrimitive(primitive_ptr->getRobotId(),
-                                                   primitive_msg);
-    }
+    threaded_simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
+    threaded_simulator.setYellowRobotPrimitive(
+        2, createNanoPbPrimitive(*createLegacyMovePrimitive(
+               Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               AutochickType::NONE)));
 
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
     threaded_simulator.stopSimulation();
 
     // TODO: These tests are currently very lenient, and don't test final velocities.
