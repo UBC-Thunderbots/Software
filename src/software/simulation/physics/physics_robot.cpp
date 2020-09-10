@@ -16,12 +16,12 @@ extern "C"
 // anywhere within this small area.
 const double PhysicsRobot::dribbler_depth =
     BALL_MAX_RADIUS_METERS * 2 * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT;
-// We can use a very small value for the chicker thickness since the
-// chicker just needs to be large enough to collide with the ball and detect collisions
+// We can use a very small value for the dribbler damper thickness since the
+// damper just needs to be large enough to collide with the ball and detect collisions
 // without letting the ball tunnel and collide with the robot body
-const double PhysicsRobot::chicker_thickness = 0.005;
-const double PhysicsRobot::total_chicker_depth =
-    PhysicsRobot::dribbler_depth + PhysicsRobot::chicker_thickness;
+const double PhysicsRobot::dribbler_damper_thickness = 0.005;
+const double PhysicsRobot::total_dribbler_depth =
+    PhysicsRobot::dribbler_depth + PhysicsRobot::dribbler_damper_thickness;
 
 PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
                            const RobotState& robot_state, const double mass_kg)
@@ -36,15 +36,14 @@ PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
     robot_body_def.angle = static_cast<float>(robot_state.orientation().toRadians());
     robot_body_def.angularVelocity =
         static_cast<float>(robot_state.angularVelocity().toRadians());
-    robot_body_def.linearDamping  = static_cast<float>(robot_linear_damping);
-    robot_body_def.angularDamping = static_cast<float>(robot_angular_damping);
+    robot_body_def.linearDamping  = static_cast<float>(ROBOT_LINEAR_DAMPING);
+    robot_body_def.angularDamping = static_cast<float>(ROBOT_ANGULAR_DAMPING);
 
     robot_body = world->CreateBody(&robot_body_def);
 
-    setupRobotBodyFixtures(robot_state, PhysicsRobot::total_chicker_depth, mass_kg);
-    setupDribblerFixture(robot_state, PhysicsRobot::dribbler_depth);
-    setupChickerFixture(robot_state, PhysicsRobot::total_chicker_depth,
-                        PhysicsRobot::chicker_thickness);
+    setupRobotBodyFixtures(robot_state, mass_kg);
+    setupDribblerFixture(robot_state);
+    setupChickerFixture(robot_state);
 
     // For some reason adding fixtures with mass slightly changes the linear velocity
     // of the body, so we make sure to reset it to the desired value at the end
@@ -72,15 +71,14 @@ PhysicsRobot::~PhysicsRobot()
     }
 }
 
-void PhysicsRobot::setupRobotBodyFixtures(const RobotState&, double total_chicker_depth,
-                                          const double mass_kg)
+void PhysicsRobot::setupRobotBodyFixtures(const RobotState&, const double mass_kg)
 {
     b2PolygonShape* main_body_shape =
-        PhysicsRobotModel::getMainRobotBodyShape(total_chicker_depth);
+        PhysicsRobotModel::getMainRobotBodyShape(total_dribbler_depth);
     b2PolygonShape* front_left_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontLeft(total_chicker_depth);
+        PhysicsRobotModel::getRobotBodyShapeFrontLeft(total_dribbler_depth);
     b2PolygonShape* front_right_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontRight(total_chicker_depth);
+        PhysicsRobotModel::getRobotBodyShapeFrontRight(total_dribbler_depth);
 
     auto body_shapes = {main_body_shape, front_left_body_shape, front_right_body_shape};
     double total_shape_area = 0.0;
@@ -102,8 +100,8 @@ void PhysicsRobot::setupRobotBodyFixtures(const RobotState&, double total_chicke
 void PhysicsRobot::setupRobotBodyFixture(const b2PolygonShape* shape, const float density)
 {
     b2FixtureDef robot_body_fixture_def;
-    robot_body_fixture_def.restitution = static_cast<float>(robot_body_restitution);
-    robot_body_fixture_def.friction    = static_cast<float>(robot_body_friction);
+    robot_body_fixture_def.restitution = static_cast<float>(ROBOT_BODY_RESTITUTION);
+    robot_body_fixture_def.friction    = static_cast<float>(ROBOT_BODY_FRICTION);
     robot_body_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_BODY, this});
     robot_body_fixture_def.density = density;
@@ -111,17 +109,17 @@ void PhysicsRobot::setupRobotBodyFixture(const b2PolygonShape* shape, const floa
     robot_body->CreateFixture(&robot_body_fixture_def);
 }
 
-void PhysicsRobot::setupDribblerFixture(const RobotState&, double dribbler_depth)
+void PhysicsRobot::setupDribblerFixture(const RobotState&)
 {
     b2FixtureDef robot_dribbler_fixture_def;
-    robot_dribbler_fixture_def.density = static_cast<float>(robot_dribbler_density);
+    robot_dribbler_fixture_def.density = static_cast<float>(DRIBBLER_DENSITY);
     // We explicitly choose to make the dribbler NOT a sensor, because sensor fixtures do
     // not trigger PreSolve contact callbacks, which we rely on to apply dribbling force
     // at every physics step
     robot_dribbler_fixture_def.isSensor = false;
     robot_dribbler_fixture_def.restitution =
-        static_cast<float>(robot_dribbler_restitution);
-    robot_dribbler_fixture_def.friction = static_cast<float>(robot_dribbler_friction);
+        static_cast<float>(DRIBBLER_RESTITUTION);
+    robot_dribbler_fixture_def.friction = static_cast<float>(DRIBBLER_FRICTION);
     robot_dribbler_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_DRIBBLER, this});
 
@@ -143,37 +141,36 @@ void PhysicsRobot::setupDribblerFixture(const RobotState&, double dribbler_depth
     delete dribbler_shape;
 }
 
-void PhysicsRobot::setupChickerFixture(const RobotState&, double total_chicker_depth,
-                                       double chicker_thickness)
+void PhysicsRobot::setupChickerFixture(const RobotState&)
 {
-    b2FixtureDef robot_chicker_fixture_def;
-    robot_chicker_fixture_def.restitution = static_cast<float>(robot_chicker_restitution);
-    robot_chicker_fixture_def.friction    = static_cast<float>(robot_chicker_friction);
-    robot_chicker_fixture_def.density     = static_cast<float>(robot_chicker_density);
-    robot_chicker_fixture_def.userData =
+    b2FixtureDef dribbler_damper_fixture_def;
+    dribbler_damper_fixture_def.restitution = static_cast<float>(DRIBBLER_DAMPER_RESTITUTION);
+    dribbler_damper_fixture_def.friction    = static_cast<float>(DRIBBLER_DAMPER_FRICTION);
+    dribbler_damper_fixture_def.density     = static_cast<float>(DRIBBLER_DAMPER_DENSITY);
+    dribbler_damper_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_CHICKER, this});
 
     // Box2D requires that polygon vertices are specified in counter-clockwise order.
     // The fixture shape is added relative to the body in its local coordinate frame,
     // so we do not need to rotate the points to match the orientation of the robot.
     const unsigned int num_vertices             = 4;
-    b2Vec2 chicker_shape_vertices[num_vertices] = {
+    b2Vec2 dribbler_damper_shape_vertices[num_vertices] = {
         createVec2(
-            Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth + chicker_thickness,
+            Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth + dribbler_damper_thickness,
                   DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth,
                          DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth,
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth,
                          -DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(
-            Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_chicker_depth + chicker_thickness,
+            Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth + dribbler_damper_thickness,
                   -DRIBBLER_WIDTH_METERS / 2.0))};
 
-    b2PolygonShape* chicker_shape = new b2PolygonShape();
-    chicker_shape->Set(chicker_shape_vertices, num_vertices);
-    robot_chicker_fixture_def.shape = chicker_shape;
-    robot_body->CreateFixture(&robot_chicker_fixture_def);
-    delete chicker_shape;
+    b2PolygonShape* dribbler_damper_shape = new b2PolygonShape();
+    dribbler_damper_shape->Set(dribbler_damper_shape_vertices, num_vertices);
+    dribbler_damper_fixture_def.shape = dribbler_damper_shape;
+    robot_body->CreateFixture(&dribbler_damper_fixture_def);
+    delete dribbler_damper_shape;
 }
 
 RobotId PhysicsRobot::getRobotId() const
@@ -199,10 +196,10 @@ void PhysicsRobot::registerDribblerBallEndContactCallback(
     dribbler_ball_end_contact_callbacks.emplace_back(callback);
 }
 
-void PhysicsRobot::registerChickerBallStartContactCallback(
+void PhysicsRobot::registerDribblerDamperBallStartContactCallback(
     std::function<void(PhysicsRobot*, PhysicsBall*)> callback)
 {
-    chicker_ball_contact_callbacks.emplace_back(callback);
+    dribbler_damper_ball_contact_callbacks.emplace_back(callback);
 }
 
 std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
@@ -226,7 +223,7 @@ PhysicsRobot::getDribblerBallEndContactCallbacks() const
 std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
 PhysicsRobot::getChickerBallStartContactCallbacks() const
 {
-    return chicker_ball_contact_callbacks;
+    return dribbler_damper_ball_contact_callbacks;
 }
 
 RobotState PhysicsRobot::getRobotState() const

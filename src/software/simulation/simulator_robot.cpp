@@ -12,10 +12,10 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
 {
     if (auto robot = this->physics_robot.lock())
     {
-        robot->registerChickerBallStartContactCallback(
-            [this](PhysicsRobot *robot, PhysicsBall *ball) {
-                this->onChickerBallContact(robot, ball);
-            });
+        robot->registerDribblerDamperBallStartContactCallback(
+                [this](PhysicsRobot *robot, PhysicsBall *ball) {
+                    this->onChickerBallContact(robot, ball);
+                });
         robot->registerDribblerBallContactCallback(
             [this](PhysicsRobot *robot, PhysicsBall *ball) {
                 this->onDribblerBallContact(robot, ball);

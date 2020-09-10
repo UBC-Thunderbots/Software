@@ -421,7 +421,7 @@ TEST_F(PhysicsRobotTest, test_chicker_ball_start_contact_callbacks)
         callback_called = true;
     };
 
-    physics_robot.registerChickerBallStartContactCallback(callback);
+    physics_robot.registerDribblerDamperBallStartContactCallback(callback);
 
     ASSERT_EQ(physics_robot.getChickerBallStartContactCallbacks().size(), 1);
     physics_robot.getChickerBallStartContactCallbacks().at(0)(nullptr, nullptr);
