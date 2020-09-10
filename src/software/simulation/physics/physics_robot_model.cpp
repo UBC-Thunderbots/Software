@@ -6,7 +6,7 @@
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 
-b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(double dribbler_depth)
+b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(double total_dribbler_depth)
 {
     const unsigned int num_shape_vertices = b2_maxPolygonVertices;
     b2Vec2 robot_body_vertices[num_shape_vertices];
@@ -16,9 +16,9 @@ b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(double dribbler_depth)
     // y^2 = ROBOT_RADIUS^2
     double y =
         std::sqrt(std::pow(ROBOT_MAX_RADIUS_METERS, 2) -
-                  std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth, 2));
+                  std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, 2));
 
-    Vector starting_vector(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth, y);
+    Vector starting_vector(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, y);
     Angle starting_angle        = starting_vector.orientation();
     Angle angle_to_sweep_across = Angle::full() - (2 * starting_angle);
     // The angle increment is positive, so we rotate counter-clockwise and add points
@@ -40,12 +40,12 @@ b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(double dribbler_depth)
     return body_shape;
 }
 
-b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(double dribbler_depth)
+b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(double total_dribbler_depth)
 {
     // These points are already give in counter-clockwise order, so we can directly create
     // a polygon (Box2D requires that polygon vertices are given in counter-clockwise
     // order)
-    auto shape_points = getRobotFrontLeftShapePoints(dribbler_depth);
+    auto shape_points = getRobotFrontLeftShapePoints(total_dribbler_depth);
 
     // The shape is added relative to the body, so we do not need to rotate these points
     // to match the robot's orientation
@@ -62,9 +62,9 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(double dribbler_de
     return shape;
 }
 
-b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(double dribbler_depth)
+b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(double total_dribbler_depth)
 {
-    auto shape_points = getRobotFrontLeftShapePoints(dribbler_depth);
+    auto shape_points = getRobotFrontLeftShapePoints(total_dribbler_depth);
 
     // Mirror the points over the x-axis to get the points for the front-right shape
     std::transform(shape_points.begin(), shape_points.end(), shape_points.begin(),
@@ -90,18 +90,18 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(double dribbler_d
     return shape;
 }
 
-std::vector<Point> PhysicsRobotModel::getRobotFrontLeftShapePoints(double dribbler_depth)
+std::vector<Point> PhysicsRobotModel::getRobotFrontLeftShapePoints(double total_dribbler_depth)
 {
     // Assuming the robot is at (0, 0) and facing the +x axis (aka has an orientation of
     // 0) First find the y-coordinate of the front-left edge of the body by solving x^2 +
     // y^2 = ROBOT_RADIUS^2
     double y = std::sqrt(std::pow(ROBOT_MAX_RADIUS_METERS, 2) -
-                         std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth, 2));
+                         std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, 2));
 
     // Box2D requires polygon vertices are provided in counter-clockwise order
     std::vector<Point> vertices{
-        Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth, y),
-        Point(DIST_TO_FRONT_OF_ROBOT_METERS - dribbler_depth, DRIBBLER_WIDTH_METERS / 2.0),
+        Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, y),
+        Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, DRIBBLER_WIDTH_METERS / 2.0),
         Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0),
         Point(DIST_TO_FRONT_OF_ROBOT_METERS, FRONT_OF_ROBOT_WIDTH_METERS / 2.0)};
 

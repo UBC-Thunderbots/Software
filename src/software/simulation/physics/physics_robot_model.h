@@ -45,11 +45,11 @@ class PhysicsRobotModel
      *       x                                                x+   +  <--- Front left part
      *       x                                                x+   +       (indicated by '+')
      *       x                                                x+++++
-     *       x                                                x| |d|
-     *       x                                                x|d|r|
-     *       x                                                x|a|i|
-     *       x                                                x|m|b|
-     *       x                                                x|p|b|
+     *       x                                                x|c|d|
+     *       x                                                x|h|r|
+     *       x                                                x|i|i|
+     *       x                                                x|c|b|
+     *       x                                                x|k|b|
      *       x                                                x|e|l|
      *       x                                                x|r|e|
      *       x                                                x+++++
@@ -65,14 +65,14 @@ class PhysicsRobotModel
      */
     /* clang-format on */
     /**
-     * @param dribbler_depth The distance from the front face of the robot to the
+     * @param total_dribbler_depth The distance from the front face of the robot to the
      * back of the dribbler
      *
      * @return A b2PolygonShape for the corresponding part of the robot body
      */
-    static b2PolygonShape *getMainRobotBodyShape(double dribbler_depth);
-    static b2PolygonShape *getRobotBodyShapeFrontLeft(double dribbler_depth);
-    static b2PolygonShape *getRobotBodyShapeFrontRight(double dribbler_depth);
+    static b2PolygonShape *getMainRobotBodyShape(double total_dribbler_depth);
+    static b2PolygonShape *getRobotBodyShapeFrontLeft(double total_dribbler_depth);
+    static b2PolygonShape *getRobotBodyShapeFrontRight(double total_dribbler_depth);
 
    private:
     /**
@@ -82,9 +82,10 @@ class PhysicsRobotModel
      * in counter-clockwise order.
      *
      * @param robot_state The robot to create
-     * @param dribbler_depth The depth of the dribbler
+     * @param total_dribbler_depth The distance from the front face of the robot to the
+     * back of the dribbler
      *
      * @return The points that make up the front-left shape for the robot body
      */
-    static std::vector<Point> getRobotFrontLeftShapePoints(double dribbler_depth);
+    static std::vector<Point> getRobotFrontLeftShapePoints(double total_dribbler_depth);
 };
