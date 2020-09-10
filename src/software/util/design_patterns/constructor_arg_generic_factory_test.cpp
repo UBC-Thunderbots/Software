@@ -42,7 +42,7 @@ class TestGenericTwoArgs : public TestGeneric
 static TConstructorArgGenericFactory<std::string, TestGeneric, TestGenericStringArg, std::string> testFactoryA;
 static TConstructorArgGenericFactory<std::string, TestGeneric, TestGenericIntArg, int> testFactoryB;
 static TMultipleConstructorArgGenericFactory<std::string, TestGeneric,
-fn_traits<TestGenericTwoArgs(int, std::string)>> testFactoryC;
+TestGenericTwoArgs(int, std::string)> testFactoryC;
 
 
 

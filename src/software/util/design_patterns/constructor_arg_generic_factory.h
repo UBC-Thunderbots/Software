@@ -150,9 +150,11 @@ class TConstructorArgGenericFactory : public ConstructorArgGenericFactory<IndexT
 };
 
 
-template <class IndexType, typename TypeToCreate, typename ConstructorFunctionTraits>
+template <class IndexType, typename TypeToCreate, typename ConstructorType>
 class TMultipleConstructorArgGenericFactory : public ConstructorArgGenericFactory<IndexType, TypeToCreate>
 {
+    using ConstructorFunctionTraits = fn_traits<ConstructorType>;
+
     // compile time type checking that T is derived class of Generic
     static_assert(std::is_base_of<TypeToCreate, typename ConstructorFunctionTraits::result_type>::value,
                   "T must be derived class of TypeToCreate!");
