@@ -360,17 +360,19 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
 {
     if (dribbler_rpm > 0)
     {
-        auto iter = std::find_if(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(),
-                                 [physics_ball](DribblerBall dribbler_ball) {
-                                     return dribbler_ball.ball == physics_ball;
-                                 });
+        auto iter =
+            std::find_if(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(),
+                         [physics_ball](DribblerBall dribbler_ball) {
+                             return dribbler_ball.ball == physics_ball;
+                         });
 
         if (iter == balls_in_dribbler_area.end())
         {
             throw std::runtime_error("Trying to dribble ball not in the dribbler area");
         }
 
-        if(iter->can_be_controlled) {
+        if (iter->can_be_controlled)
+        {
             applyDribblerForce(physics_robot, physics_ball);
         }
     }
@@ -447,12 +449,13 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     Vector robot_facing_vector = Vector::createFromAngle(physics_robot->orientation());
     Vector robot_perp_vector   = robot_facing_vector.perpendicular();
 
-    Vector ball_momentum       = physics_ball->momentum();
-//    Vector dribbler_head_on_momentum = ball_momentum.project(robot_facing_vector);
-//        physics_ball->applyImpulse(-dribbler_head_on_momentum * DRIBBLER_HEAD_ON_DAMPING);
+    Vector ball_momentum = physics_ball->momentum();
+    //    Vector dribbler_head_on_momentum = ball_momentum.project(robot_facing_vector);
+    //        physics_ball->applyImpulse(-dribbler_head_on_momentum *
+    //        DRIBBLER_HEAD_ON_DAMPING);
 
-        Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
-        physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
+    Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
+    physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
 
     // To dribble, we apply a force towards the center and back of the dribbling area,
     // closest to the chicker. We vary the magnitude of the force by how far the ball
@@ -462,24 +465,24 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     // applied (it is only applied as long as the ball is in the dribbler area).
 
     Point dribble_point =
-            robot.position() +
-            Vector::createFromAngle(robot.orientation())
-                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS -
-                               PhysicsRobot::DRIBBLER_DEPTH);
+        robot.position() +
+        Vector::createFromAngle(robot.orientation())
+            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS -
+                       PhysicsRobot::DRIBBLER_DEPTH);
     Vector dribble_force_vector = dribble_point - ball.position();
-    Vector head_on_force = dribble_force_vector.project(robot_facing_vector);
-    Vector perp_force = dribble_force_vector.project(robot_perp_vector);
-    double head_on_dist_cm = head_on_force.length() * 100;
-    double perp_dist_cm = perp_force.length() * 100;
+    Vector head_on_force        = dribble_force_vector.project(robot_facing_vector);
+    Vector perp_force           = dribble_force_vector.project(robot_perp_vector);
+    double head_on_dist_cm      = head_on_force.length() * 100;
+    double perp_dist_cm         = perp_force.length() * 100;
 
-    double perp_force_magnitude = 0.5*std::pow(perp_dist_cm, 2);
+    double perp_force_magnitude = 0.5 * std::pow(perp_dist_cm, 2);
     physics_ball->applyForce(perp_force.normalize(perp_force_magnitude));
 
     double head_on_magnitude = sigmoid(head_on_dist_cm, 0.15, 0.2);
     physics_ball->applyForce(head_on_force.normalize(head_on_magnitude));
 
-    // Counteract the force pushing the ball into the robot so there is approximately 0 net force,
-    // so that the robot won't move due to dribbling
+    // Counteract the force pushing the ball into the robot so there is approximately 0
+    // net force, so that the robot won't move due to dribbling
     physics_robot->applyForceToCenter(-(head_on_force.normalize(head_on_magnitude)));
 
 
@@ -493,12 +496,13 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     // The constants in this equation have been tuned manually so that the dribbling
     // scenarios in the unit tests pass, which represent reasonable dribbling
     // behaviour.
-//        double polynomial_component = 0.1 * std::pow(dist_from_dribble_point_cm, 3);
-//        double linear_component     = ((1.0 / 10.0) * (dist_from_dribble_point_cm - 0.5));
-//        double dribble_force_magnitude = polynomial_component + linear_component;
-//        dribble_force_magnitude =
-//            std::clamp<double>(dribble_force_magnitude, 0, dribble_force_magnitude);
-//        dribble_force_vector = dribble_force_vector.normalize(dribble_force_magnitude);
-//
-//        physics_ball->applyForce(dribble_force_vector);
+    //        double polynomial_component = 0.1 * std::pow(dist_from_dribble_point_cm, 3);
+    //        double linear_component     = ((1.0 / 10.0) * (dist_from_dribble_point_cm -
+    //        0.5)); double dribble_force_magnitude = polynomial_component +
+    //        linear_component; dribble_force_magnitude =
+    //            std::clamp<double>(dribble_force_magnitude, 0, dribble_force_magnitude);
+    //        dribble_force_vector =
+    //        dribble_force_vector.normalize(dribble_force_magnitude);
+    //
+    //        physics_ball->applyForce(dribble_force_vector);
 }

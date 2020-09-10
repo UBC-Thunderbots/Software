@@ -7,9 +7,9 @@
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_ball.h"
+#include "software/test_util/equal_within_tolerance.h"
 #include "software/time/duration.h"
 #include "software/world/robot_state.h"
-#include "software/test_util/equal_within_tolerance.h"
 
 class PhysicsRobotTest : public testing::Test
 {
@@ -864,7 +864,9 @@ TEST_F(PhysicsRobotTest, test_apply_force_to_center)
     }
 
     auto robot = physics_robot.getRobotState();
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot.velocity().orientation(), Vector(1, 1).orientation(), Angle::fromDegrees(2)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot.velocity().orientation(),
+                                               Vector(1, 1).orientation(),
+                                               Angle::fromDegrees(2)));
     // Damping and other factors mean we can't assert the robot's exact speed, so
     // we just check it got moving beyond a low threshold
     EXPECT_GT(robot.velocity().length(), 0.2);

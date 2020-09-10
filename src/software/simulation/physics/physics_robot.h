@@ -187,7 +187,7 @@ class PhysicsRobot
      *
      * @param force The force to apply
      */
-    void applyForceToCenter(const Vector& force);
+    void applyForceToCenter(const Vector &force);
 
    protected:
     /**

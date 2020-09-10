@@ -381,7 +381,8 @@ void PhysicsRobot::runPostPhysicsStep()
     }
 }
 
-void PhysicsRobot::applyForceToCenter(const Vector &force) {
+void PhysicsRobot::applyForceToCenter(const Vector& force)
+{
     b2Vec2 force_vector = createVec2(force);
     robot_body->ApplyForceToCenter(force_vector, true);
 }

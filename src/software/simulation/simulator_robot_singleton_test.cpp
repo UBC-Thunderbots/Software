@@ -723,7 +723,7 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_backwards)
 {
     Robot robot(0, Point(0, 0), Vector(-0.5, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Point dribbling_point   = getDribblingPoint(robot.position(), robot.orientation());
+    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
     Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
@@ -798,18 +798,19 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
 
     // Accelerate the robot up to an angular velocity of 4*pi rad/s (ie. 2 rpm)
     float wheel_force = 0.3f;
-    while(app_firmware_robot_getVelocityAngular(firmware_robot.get()) < 4 * M_PI) {
+    while (app_firmware_robot_getVelocityAngular(firmware_robot.get()) < 4 * M_PI)
+    {
         Wheel_t* front_left_wheel =
-                app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
         app_wheel_applyForce(front_left_wheel, wheel_force);
         Wheel_t* back_left_wheel =
-                app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
         app_wheel_applyForce(back_left_wheel, wheel_force);
         Wheel_t* back_right_wheel =
-                app_firmware_robot_getBackRightWheel(firmware_robot.get());
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
         app_wheel_applyForce(back_right_wheel, wheel_force);
         Wheel_t* front_right_wheel =
-                app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
         app_wheel_applyForce(front_right_wheel, wheel_force);
 
         world->stepSimulation(Duration::fromSeconds(1.0 / 120.0));
@@ -824,16 +825,16 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
     for (unsigned int i = 0; i < 120; i++)
     {
         Wheel_t* front_left_wheel =
-                app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
         app_wheel_applyForce(front_left_wheel, wheel_force);
         Wheel_t* back_left_wheel =
-                app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
         app_wheel_applyForce(back_left_wheel, wheel_force);
         Wheel_t* back_right_wheel =
-                app_firmware_robot_getBackRightWheel(firmware_robot.get());
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
         app_wheel_applyForce(back_right_wheel, wheel_force);
         Wheel_t* front_right_wheel =
-                app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
         app_wheel_applyForce(front_right_wheel, wheel_force);
 
         world->stepSimulation(Duration::fromSeconds(1.0 / 120.0));
@@ -867,14 +868,19 @@ TEST_F(SimulatorRobotSingletonTest, test_dribbler_coast)
     EXPECT_GT((simulator_ball->position() - dribbling_point).length(), 0.1);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_dribbler_centers_the_ball) {
+TEST_F(SimulatorRobotSingletonTest, test_dribbler_centers_the_ball)
+{
     Point robot_position    = Point(0, 0);
     Angle robot_orientation = Angle::zero();
     Point dribbling_point   = getDribblingPoint(robot_position, robot_orientation);
     Robot robot(0, robot_position, Vector(0, 0), robot_orientation,
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    // Start the ball at the side of the dribbler so that self-centering forces will be applied
-    Point ball_position = dribbling_point + Vector::createFromAngle(robot.orientation()).perpendicular().normalize(DRIBBLER_WIDTH_METERS / 2.1 - BALL_MAX_RADIUS_METERS);
+    // Start the ball at the side of the dribbler so that self-centering forces will be
+    // applied
+    Point ball_position = dribbling_point + Vector::createFromAngle(robot.orientation())
+                                                .perpendicular()
+                                                .normalize(DRIBBLER_WIDTH_METERS / 2.1 -
+                                                           BALL_MAX_RADIUS_METERS);
     Ball ball(ball_position, Vector(0, 0), Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
@@ -890,7 +896,8 @@ TEST_F(SimulatorRobotSingletonTest, test_dribbler_centers_the_ball) {
     EXPECT_LT(simulator_ball->velocity().length(), 0.01);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_kick_while_dribbler_on) {
+TEST_F(SimulatorRobotSingletonTest, test_kick_while_dribbler_on)
+{
     Point robot_position    = Point(0, 0);
     Angle robot_orientation = Angle::zero();
     Point dribbling_point   = getDribblingPoint(robot_position, robot_orientation);
@@ -923,14 +930,15 @@ TEST_F(SimulatorRobotSingletonTest, test_kick_while_dribbler_on) {
     EXPECT_LT((simulator_ball->velocity() - Vector(5, 0)).length(), 0.1);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_angled_one_time_kick_while_dribbler_on) {
+TEST_F(SimulatorRobotSingletonTest, test_angled_one_time_kick_while_dribbler_on)
+{
     Point robot_position    = Point(0, -DIST_TO_FRONT_OF_ROBOT_METERS);
     Angle robot_orientation = Angle::zero();
     Point dribbling_point   = getDribblingPoint(robot_position, robot_orientation);
     Robot robot(0, robot_position, Vector(0, 0), robot_orientation,
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Point ball_position = Point(1, 1);
-    Vector ball_vector = (dribbling_point - ball_position).normalize(4);
+    Vector ball_vector  = (dribbling_point - ball_position).normalize(4);
     Ball ball(ball_position, ball_vector, Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
@@ -944,8 +952,8 @@ TEST_F(SimulatorRobotSingletonTest, test_angled_one_time_kick_while_dribbler_on)
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
-    // After the kick we expect the ball to be travelling in the x-direction at about the speed
-    // it was kicked. We don't verify the y-component of the velocity since we don't
+    // After the kick we expect the ball to be travelling in the x-direction at about the
+    // speed it was kicked. We don't verify the y-component of the velocity since we don't
     // know exactly what angle the ball will be kicked at due to the damping
     EXPECT_NEAR(simulator_ball->velocity().x(), 5.0, 0.2);
 }
