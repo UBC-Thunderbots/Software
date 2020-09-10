@@ -96,7 +96,8 @@ TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact)
                                             physics_robot.get()};
 
     SimulationContactListener listener;
-    auto result = listener.isDribblerDamperBallContact(&user_data_chicker, &user_data_ball);
+    auto result =
+        listener.isDribblerDamperBallContact(&user_data_chicker, &user_data_ball);
 
     ASSERT_TRUE(result);
     ASSERT_TRUE(result->first);
@@ -119,7 +120,8 @@ TEST_F(SimulationContactListenerTest, test_is_ball_chicker_contact_with_reversed
                                             physics_robot.get()};
 
     SimulationContactListener listener;
-    auto result = listener.isDribblerDamperBallContact(&user_data_ball, &user_data_chicker);
+    auto result =
+        listener.isDribblerDamperBallContact(&user_data_ball, &user_data_chicker);
 
     ASSERT_TRUE(result);
     ASSERT_TRUE(result->first);

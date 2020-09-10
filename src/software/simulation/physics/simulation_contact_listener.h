@@ -34,8 +34,9 @@ class SimulationContactListener : public b2ContactListener
      * was a contact between a ball and dribbler damper, and returns std::nullopt
      * otherwise
      */
-    static std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> isDribblerDamperBallContact(
-        PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
+    static std::optional<std::pair<PhysicsBall*, PhysicsRobot*>>
+    isDribblerDamperBallContact(PhysicsObjectUserData* user_data_a,
+                                PhysicsObjectUserData* user_data_b);
 
     /**
      * Given the user data of 2 objects involved in a contact, returns a pair of
@@ -64,5 +65,5 @@ class SimulationContactListener : public b2ContactListener
      * a contact between a ball and any other object, and returns std::nullopt otherwise
      */
     static PhysicsBall* isBallContact(PhysicsObjectUserData* user_data_a,
-                               PhysicsObjectUserData* user_data_b);
+                                      PhysicsObjectUserData* user_data_b);
 };

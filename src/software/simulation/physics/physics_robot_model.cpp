@@ -62,7 +62,8 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontLeft(double total_dribb
     return shape;
 }
 
-b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(double total_dribbler_depth)
+b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(
+    double total_dribbler_depth)
 {
     auto shape_points = getRobotFrontLeftShapePoints(total_dribbler_depth);
 
@@ -90,18 +91,21 @@ b2PolygonShape* PhysicsRobotModel::getRobotBodyShapeFrontRight(double total_drib
     return shape;
 }
 
-std::vector<Point> PhysicsRobotModel::getRobotFrontLeftShapePoints(double total_dribbler_depth)
+std::vector<Point> PhysicsRobotModel::getRobotFrontLeftShapePoints(
+    double total_dribbler_depth)
 {
     // Assuming the robot is at (0, 0) and facing the +x axis (aka has an orientation of
     // 0) First find the y-coordinate of the front-left edge of the body by solving x^2 +
     // y^2 = ROBOT_RADIUS^2
-    double y = std::sqrt(std::pow(ROBOT_MAX_RADIUS_METERS, 2) -
-                         std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, 2));
+    double y =
+        std::sqrt(std::pow(ROBOT_MAX_RADIUS_METERS, 2) -
+                  std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, 2));
 
     // Box2D requires polygon vertices are provided in counter-clockwise order
     std::vector<Point> vertices{
         Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, y),
-        Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, DRIBBLER_WIDTH_METERS / 2.0),
+        Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth,
+              DRIBBLER_WIDTH_METERS / 2.0),
         Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0),
         Point(DIST_TO_FRONT_OF_ROBOT_METERS, FRONT_OF_ROBOT_WIDTH_METERS / 2.0)};
 

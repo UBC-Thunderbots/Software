@@ -20,8 +20,8 @@ class PhysicsRobotModel
      * - The main body, which is everything behind the dribbler
      * - The front-left part, which is the bit that is to the front-left of the dribbler,
      * partially enclosing it
-     * - The front-right part, which is the bit that is to the front-right of the dribbler,
-     * partially enclosing it
+     * - The front-right part, which is the bit that is to the front-right of the
+     * dribbler, partially enclosing it
      *
      * These polygons are all created assuming the robot is at (0, 0) and facing along the
      * positive x-axis (ie. has an orientation of 0). This is fine because when these

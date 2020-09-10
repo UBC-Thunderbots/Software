@@ -75,10 +75,11 @@ void SimulationContactListener::PreSolve(b2Contact *contact,
                 contact_callback(robot, ball);
             }
         }
-        if (auto ball_dribbler_damper_pair = isDribblerDamperBallContact(user_data_a, user_data_b))
+        if (auto ball_dribbler_damper_pair =
+                isDribblerDamperBallContact(user_data_a, user_data_b))
         {
-            // Ensure that the ball is perfectly damped if it collides with the dribbler damper.
-            // This helps the robot keep the ball while dribbling.
+            // Ensure that the ball is perfectly damped if it collides with the dribbler
+            // damper. This helps the robot keep the ball while dribbling.
             contact->SetRestitution(0.0);
         }
     }

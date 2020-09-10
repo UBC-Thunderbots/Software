@@ -116,10 +116,9 @@ void PhysicsRobot::setupDribblerFixture(const RobotState&)
     // We explicitly choose to make the dribbler NOT a sensor, because sensor fixtures do
     // not trigger PreSolve contact callbacks, which we rely on to apply dribbling force
     // at every physics step
-    robot_dribbler_fixture_def.isSensor = false;
-    robot_dribbler_fixture_def.restitution =
-        static_cast<float>(DRIBBLER_RESTITUTION);
-    robot_dribbler_fixture_def.friction = static_cast<float>(DRIBBLER_FRICTION);
+    robot_dribbler_fixture_def.isSensor    = false;
+    robot_dribbler_fixture_def.restitution = static_cast<float>(DRIBBLER_RESTITUTION);
+    robot_dribbler_fixture_def.friction    = static_cast<float>(DRIBBLER_FRICTION);
     robot_dribbler_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_DRIBBLER, this});
 
@@ -141,30 +140,31 @@ void PhysicsRobot::setupDribblerFixture(const RobotState&)
     delete dribbler_shape;
 }
 
-void PhysicsRobot::setupDribblerDamperFixture(const RobotState &robot_state)
+void PhysicsRobot::setupDribblerDamperFixture(const RobotState& robot_state)
 {
     b2FixtureDef dribbler_damper_fixture_def;
-    dribbler_damper_fixture_def.restitution = static_cast<float>(DRIBBLER_DAMPER_RESTITUTION);
-    dribbler_damper_fixture_def.friction    = static_cast<float>(DRIBBLER_DAMPER_FRICTION);
-    dribbler_damper_fixture_def.density     = static_cast<float>(DRIBBLER_DAMPER_DENSITY);
+    dribbler_damper_fixture_def.restitution =
+        static_cast<float>(DRIBBLER_DAMPER_RESTITUTION);
+    dribbler_damper_fixture_def.friction = static_cast<float>(DRIBBLER_DAMPER_FRICTION);
+    dribbler_damper_fixture_def.density  = static_cast<float>(DRIBBLER_DAMPER_DENSITY);
     dribbler_damper_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::ROBOT_CHICKER, this});
 
     // Box2D requires that polygon vertices are specified in counter-clockwise order.
     // The fixture shape is added relative to the body in its local coordinate frame,
     // so we do not need to rotate the points to match the orientation of the robot.
-    const unsigned int num_vertices             = 4;
+    const unsigned int num_vertices                     = 4;
     b2Vec2 dribbler_damper_shape_vertices[num_vertices] = {
-        createVec2(
-            Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth + dribbler_damper_thickness,
-                  DRIBBLER_WIDTH_METERS / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth +
+                             dribbler_damper_thickness,
+                         DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth,
                          DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth,
                          -DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(
-            Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth + dribbler_damper_thickness,
-                  -DRIBBLER_WIDTH_METERS / 2.0))};
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth +
+                             dribbler_damper_thickness,
+                         -DRIBBLER_WIDTH_METERS / 2.0))};
 
     b2PolygonShape* dribbler_damper_shape = new b2PolygonShape();
     dribbler_damper_shape->Set(dribbler_damper_shape_vertices, num_vertices);

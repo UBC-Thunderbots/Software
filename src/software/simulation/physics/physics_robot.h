@@ -212,8 +212,8 @@ class PhysicsRobot
     void setupRobotBodyFixture(const b2PolygonShape *shape, const float density);
 
     /**
-     * Creates a fixture to represent the dribbler damper of the robot. It is partially inset into
-     * the front of the robot.
+     * Creates a fixture to represent the dribbler damper of the robot. It is partially
+     * inset into the front of the robot.
      *
      * @param robot_state The robot to create the fixture for
      */
@@ -305,7 +305,7 @@ class PhysicsRobot
     static constexpr double DRIBBLER_DAMPER_RESTITUTION = 0.0;
     // We want lots of friction for when the ball is being dribbled so it stays controlled
     static constexpr double DRIBBLER_DAMPER_FRICTION = 1.0;
-    // The dribbler damper has no mass in simulation. Mass is already accounted for by the robot
-    // body
+    // The dribbler damper has no mass in simulation. Mass is already accounted for by the
+    // robot body
     static constexpr double DRIBBLER_DAMPER_DENSITY = 0.0;
 };
