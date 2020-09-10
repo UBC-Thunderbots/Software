@@ -175,7 +175,7 @@ void World::setTeamWithPossession(TeamSide team_with_possesion)
     team_with_possesion_ = team_with_possesion;
 }
 
-TeamSide World::getTeamWithPossession()
+TeamSide World::getTeamWithPossession() const
 {
     return team_with_possesion_;
 }

@@ -179,7 +179,7 @@ class World final
      *
      * @return The team with possession
      */
-    TeamSide getTeamWithPossession();
+    TeamSide getTeamWithPossession() const;
 
     /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
