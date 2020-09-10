@@ -119,7 +119,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
         for (auto &dribbler_ball : this->balls_in_dribbler_area)
         {
-            if (!dribbler_ball.can_be_chicked)
+            if (!dribbler_ball.can_be_controlled)
             {
                 continue;
             }
@@ -166,7 +166,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
                 robot_orientation_vector.normalize(ball_head_on_momentum.length()));
             ball->applyImpulse(kick_impulse);
 
-            dribbler_ball.can_be_chicked = false;
+            dribbler_ball.can_be_controlled = false;
         }
     });
 }
@@ -176,7 +176,7 @@ void SimulatorRobot::chip(float distance_m)
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         for (auto &dribbler_ball : this->balls_in_dribbler_area)
         {
-            if (!dribbler_ball.can_be_chicked)
+            if (!dribbler_ball.can_be_controlled)
             {
                 continue;
             }
@@ -205,7 +205,7 @@ void SimulatorRobot::chip(float distance_m)
                 initial_velocity * static_cast<float>(chip_angle.cos());
             kick(ground_velocity);
 
-            dribbler_ball.can_be_chicked = false;
+            dribbler_ball.can_be_controlled = false;
         }
     });
 }
@@ -370,7 +370,7 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
             throw std::runtime_error("Trying to dribble ball not in the dribbler area");
         }
 
-        if(iter->can_be_chicked) {
+        if(iter->can_be_controlled) {
             applyDribblerForce(physics_robot, physics_ball);
         }
     }
@@ -392,7 +392,7 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
     Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
     physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
 
-    auto ball = DribblerBall{.ball = physics_ball, .can_be_chicked = true};
+    auto ball = DribblerBall{.ball = physics_ball, .can_be_controlled = true};
 
     // Keep track of all balls in the dribbler
     balls_in_dribbler_area.emplace_back(ball);

@@ -884,7 +884,6 @@ TEST_F(SimulatorRobotSingletonTest, test_dribbler_centers_the_ball) {
     for (unsigned int i = 0; i < 120; i++)
     {
         world->stepSimulation(Duration::fromSeconds(1.0 / 120.0));
-        std::cout  << simulator_ball->position() << "         " << simulator_ball->velocity() << "         " << app_firmware_robot_getPositionX(firmware_robot.get()) << std::endl;
     }
 
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
@@ -943,7 +942,6 @@ TEST_F(SimulatorRobotSingletonTest, test_angled_one_time_kick_while_dribbler_on)
     for (unsigned int i = 0; i < 60; i++)
     {
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-        std::cout << simulator_ball->velocity() << std::endl;
     }
 
     // After the kick we expect the ball to be travelling in the x-direction at about the speed
