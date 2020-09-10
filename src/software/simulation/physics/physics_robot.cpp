@@ -386,7 +386,7 @@ void PhysicsRobot::applyForce(const Vector &force) {
     robot_body->ApplyForceToCenter(force_vector, true);
 }
 
-void PhysicsRobot::applyAngularAcceleration(const AngularVelocity acceleration) {
+void PhysicsRobot::applyAngularAcceleration(const Angle acceleration) {
     float torque = static_cast<float>(acceleration.toRadians()) * robot_body->GetInertia();
     robot_body->ApplyTorque(torque, true);
 }

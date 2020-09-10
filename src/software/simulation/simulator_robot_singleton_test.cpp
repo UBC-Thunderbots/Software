@@ -797,31 +797,23 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 
     // Accelerate the robot up to an angular velocity of 4*pi rad/s (ie. 2 rpm)
-    // The iteration limit is a safety so we don't loop forever if applyForce is broken
-    while(app_firmware_robot_getVelocityAngular(firmware_robot.get()) < 3 * M_PI) {
-        // TODO: you are here. Trying to make a better test for this. Trying to apply
-        // acceleration rather than force so the damping doesn't matter?
-    }
-    for (unsigned int i = 0; i < 5000 && app_firmware_robot_getVelocityAngular(
-                                            firmware_robot.get()) < 3 * M_PI;
-         i++)
-    {
+    float wheel_force = 0.3f;
+    while(app_firmware_robot_getVelocityAngular(firmware_robot.get()) < 4 * M_PI) {
         Wheel_t* front_left_wheel =
-            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-        app_wheel_applyForce(front_left_wheel, 0.3f);
+                app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(front_left_wheel, wheel_force);
         Wheel_t* back_left_wheel =
-            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-        app_wheel_applyForce(back_left_wheel, 0.3f);
+                app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(back_left_wheel, wheel_force);
         Wheel_t* back_right_wheel =
-            app_firmware_robot_getBackRightWheel(firmware_robot.get());
-        app_wheel_applyForce(back_right_wheel, 0.3f);
+                app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_applyForce(back_right_wheel, wheel_force);
         Wheel_t* front_right_wheel =
-            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-        app_wheel_applyForce(front_right_wheel, 0.3f);
+                app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_applyForce(front_right_wheel, wheel_force);
 
-        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-        std::cout  << i << ":       " << app_firmware_robot_getVelocityAngular(
-                firmware_robot.get()) <<  "         " << (simulator_ball->position() - getDribblingPoint(firmware_robot)).length() << std::endl;
+        world->stepSimulation(Duration::fromSeconds(1.0 / 120.0));
+        wheel_force += 0.0001f;
     }
 
     // Check the ball has stuck to the dribbler
@@ -831,7 +823,20 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
     // Simulate a bit long to check the ball remains stuck to the dribbler
     for (unsigned int i = 0; i < 120; i++)
     {
-        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+        Wheel_t* front_left_wheel =
+                app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(front_left_wheel, wheel_force);
+        Wheel_t* back_left_wheel =
+                app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(back_left_wheel, wheel_force);
+        Wheel_t* back_right_wheel =
+                app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_applyForce(back_right_wheel, wheel_force);
+        Wheel_t* front_right_wheel =
+                app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_applyForce(front_right_wheel, wheel_force);
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 120.0));
     }
 
     dribbling_point = getDribblingPoint(firmware_robot);
@@ -876,10 +881,10 @@ TEST_F(SimulatorRobotSingletonTest, test_dribbler_centers_the_ball) {
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
     app_dribbler_setSpeed(dribbler, 10000);
 
-    for (unsigned int i = 0; i < 60; i++)
+    for (unsigned int i = 0; i < 120; i++)
     {
-        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-        std::cout  << simulator_ball->position() << "         " << simulator_ball->velocity() << std::endl;
+        world->stepSimulation(Duration::fromSeconds(1.0 / 120.0));
+        std::cout  << simulator_ball->position() << "         " << simulator_ball->velocity() << "         " << app_firmware_robot_getPositionX(firmware_robot.get()) << std::endl;
     }
 
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
@@ -892,9 +897,7 @@ TEST_F(SimulatorRobotSingletonTest, test_kick_while_dribbler_on) {
     Point dribbling_point   = getDribblingPoint(robot_position, robot_orientation);
     Robot robot(0, robot_position, Vector(0, 0), robot_orientation,
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    // Start the ball at the side of the dribbler so that self-centering forces will be applied
-    Point ball_position = dribbling_point + Vector::createFromAngle(robot.orientation()).perpendicular().normalize(DRIBBLER_WIDTH_METERS / 2.1 - BALL_MAX_RADIUS_METERS);
-    Ball ball(ball_position, Vector(0, 0), Timestamp::fromSeconds(0));
+    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
@@ -904,484 +907,503 @@ TEST_F(SimulatorRobotSingletonTest, test_kick_while_dribbler_on) {
     for (unsigned int i = 0; i < 60; i++)
     {
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-        std::cout  << simulator_ball->position() << std::endl;
     }
 
+    // Makes sure the robot has the ball
+    EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
+
     Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
-    app_dribbler_setSpeed(dribbler, 0);
     app_chicker_kick(chicker, 5.0);
-    std::cout << "KICK\n\n\n" << std::endl;
+
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_GT((simulator_ball->position() - dribbling_point).length(), 0.1);
+    EXPECT_LT((simulator_ball->velocity() - Vector(5, 0)).length(), 0.1);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_angled_one_time_kick_while_dribbler_on) {
+    Point robot_position    = Point(0, -DIST_TO_FRONT_OF_ROBOT_METERS);
+    Angle robot_orientation = Angle::zero();
+    Point dribbling_point   = getDribblingPoint(robot_position, robot_orientation);
+    Robot robot(0, robot_position, Vector(0, 0), robot_orientation,
+                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Point ball_position = Point(1, 1);
+    Vector ball_vector = (dribbling_point - ball_position).normalize(4);
+    Ball ball(ball_position, ball_vector, Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
+    app_dribbler_setSpeed(dribbler, 10000);
+    Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot.get());
+    app_chicker_enableAutokick(chicker, 5.0);
 
     for (unsigned int i = 0; i < 60; i++)
     {
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-        std::cout  << simulator_ball->position() << std::endl;
+        std::cout << simulator_ball->velocity() << std::endl;
     }
 
-    EXPECT_GT((simulator_ball->position() - dribbling_point).length(), 0.1);
+    // After the kick we expect the ball to be travelling in the x-direction at about the speed
+    // it was kicked. We don't verify the y-component of the velocity since we don't
+    // know exactly what angle the ball will be kicked at due to the damping
+    EXPECT_NEAR(simulator_ball->velocity().x(), 5.0, 0.2);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_angled_one_time_kick_while_dribbler_on) {
+TEST_F(SimulatorRobotSingletonTest, test_robot_drive_forward)
+{
+    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::quarter(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        Wheel_t* front_left_wheel =
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(front_left_wheel, -0.5);
+        Wheel_t* back_left_wheel =
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(back_left_wheel, -0.5);
+        Wheel_t* back_right_wheel =
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_applyForce(back_right_wheel, 0.5);
+        Wheel_t* front_right_wheel =
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_applyForce(front_right_wheel, 0.5);
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_NEAR(app_firmware_robot_getVelocityX(firmware_robot.get()), 0, 1e-5);
+    EXPECT_GT(app_firmware_robot_getVelocityY(firmware_robot.get()), 0.25);
+    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0,
+                1 * M_PI / 180.0);
+
+    EXPECT_NEAR(app_firmware_robot_getPositionX(firmware_robot.get()), 0, 1e-5);
+    EXPECT_GT(app_firmware_robot_getPositionY(firmware_robot.get()), 0.15);
+    EXPECT_NEAR(app_firmware_robot_getOrientation(firmware_robot.get()), M_PI_2,
+                1 * M_PI / 180.0);
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_kicking_while_spinning_with_dribbler_on) {
+TEST_F(SimulatorRobotSingletonTest, test_robot_drive_backwards)
+{
+    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        Wheel_t* front_left_wheel =
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(front_left_wheel, 0.5);
+        Wheel_t* back_left_wheel =
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(back_left_wheel, 0.5);
+        Wheel_t* back_right_wheel =
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_applyForce(back_right_wheel, -0.5);
+        Wheel_t* front_right_wheel =
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_applyForce(front_right_wheel, -0.5);
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_LT(app_firmware_robot_getVelocityX(firmware_robot.get()), -0.25);
+    EXPECT_NEAR(app_firmware_robot_getVelocityY(firmware_robot.get()), 0, 1e-5);
+    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0,
+                1 * M_PI / 180.0);
+
+    EXPECT_LT(app_firmware_robot_getPositionX(firmware_robot.get()), -0.15);
+    EXPECT_NEAR(app_firmware_robot_getPositionY(firmware_robot.get()), 0, 1e-5);
+    EXPECT_NEAR(app_firmware_robot_getOrientation(firmware_robot.get()), 0,
+                1 * M_PI / 180.0);
+    UNUSED(world);
+    UNUSED(simulator_ball);
 }
 
-//
-//TEST_F(SimulatorRobotSingletonTest, test_robot_drive_forward)
-//{
-//    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::quarter(), AngularVelocity::zero(),
-//                Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    for (unsigned int i = 0; i < 60; i++)
-//    {
-//        Wheel_t* front_left_wheel =
-//            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//        app_wheel_applyForce(front_left_wheel, -0.5);
-//        Wheel_t* back_left_wheel =
-//            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//        app_wheel_applyForce(back_left_wheel, -0.5);
-//        Wheel_t* back_right_wheel =
-//            app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//        app_wheel_applyForce(back_right_wheel, 0.5);
-//        Wheel_t* front_right_wheel =
-//            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//        app_wheel_applyForce(front_right_wheel, 0.5);
-//
-//        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-//    }
-//
-//    EXPECT_NEAR(app_firmware_robot_getVelocityX(firmware_robot.get()), 0, 1e-5);
-//    EXPECT_GT(app_firmware_robot_getVelocityY(firmware_robot.get()), 0.25);
-//    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0,
-//                1 * M_PI / 180.0);
-//
-//    EXPECT_NEAR(app_firmware_robot_getPositionX(firmware_robot.get()), 0, 1e-5);
-//    EXPECT_GT(app_firmware_robot_getPositionY(firmware_robot.get()), 0.15);
-//    EXPECT_NEAR(app_firmware_robot_getOrientation(firmware_robot.get()), M_PI_2,
-//                1 * M_PI / 180.0);
-//    UNUSED(world);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest, test_robot_drive_backwards)
-//{
-//    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
-//                Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    for (unsigned int i = 0; i < 60; i++)
-//    {
-//        Wheel_t* front_left_wheel =
-//            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//        app_wheel_applyForce(front_left_wheel, 0.5);
-//        Wheel_t* back_left_wheel =
-//            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//        app_wheel_applyForce(back_left_wheel, 0.5);
-//        Wheel_t* back_right_wheel =
-//            app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//        app_wheel_applyForce(back_right_wheel, -0.5);
-//        Wheel_t* front_right_wheel =
-//            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//        app_wheel_applyForce(front_right_wheel, -0.5);
-//
-//        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-//    }
-//
-//    EXPECT_LT(app_firmware_robot_getVelocityX(firmware_robot.get()), -0.25);
-//    EXPECT_NEAR(app_firmware_robot_getVelocityY(firmware_robot.get()), 0, 1e-5);
-//    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0,
-//                1 * M_PI / 180.0);
-//
-//    EXPECT_LT(app_firmware_robot_getPositionX(firmware_robot.get()), -0.15);
-//    EXPECT_NEAR(app_firmware_robot_getPositionY(firmware_robot.get()), 0, 1e-5);
-//    EXPECT_NEAR(app_firmware_robot_getOrientation(firmware_robot.get()), 0,
-//                1 * M_PI / 180.0);
-//    UNUSED(world);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest, test_robot_spin_clockwise)
-//{
-//    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
-//                Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    for (unsigned int i = 0; i < 60; i++)
-//    {
-//        Wheel_t* front_left_wheel =
-//            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//        app_wheel_applyForce(front_left_wheel, -0.5);
-//        Wheel_t* back_left_wheel =
-//            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//        app_wheel_applyForce(back_left_wheel, -0.5);
-//        Wheel_t* back_right_wheel =
-//            app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//        app_wheel_applyForce(back_right_wheel, -0.5);
-//        Wheel_t* front_right_wheel =
-//            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//        app_wheel_applyForce(front_right_wheel, -0.5);
-//
-//        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-//    }
-//
-//    float robot_position_x = app_firmware_robot_getPositionX(firmware_robot.get());
-//    float robot_position_y = app_firmware_robot_getPositionY(firmware_robot.get());
-//    Point robot_position   = Point(static_cast<double>(robot_position_x),
-//                                 static_cast<double>(robot_position_y));
-//    EXPECT_LT((robot_position - Point(0, 0)).length(), 0.05);
-//    float robot_velocity_x = app_firmware_robot_getVelocityX(firmware_robot.get());
-//    float robot_velocity_y = app_firmware_robot_getVelocityY(firmware_robot.get());
-//    Vector robot_velocity  = Vector(static_cast<double>(robot_velocity_x),
-//                                   static_cast<double>(robot_velocity_y));
-//    EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.05);
-//    EXPECT_LT(app_firmware_robot_getVelocityAngular(firmware_robot.get()), -8);
-//    UNUSED(world);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest, test_robot_spin_counterclockwise)
-//{
-//    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
-//                Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    for (unsigned int i = 0; i < 60; i++)
-//    {
-//        Wheel_t* front_left_wheel =
-//            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//        app_wheel_applyForce(front_left_wheel, 0.5);
-//        Wheel_t* back_left_wheel =
-//            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//        app_wheel_applyForce(back_left_wheel, 0.5);
-//        Wheel_t* back_right_wheel =
-//            app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//        app_wheel_applyForce(back_right_wheel, 0.5);
-//        Wheel_t* front_right_wheel =
-//            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//        app_wheel_applyForce(front_right_wheel, 0.5);
-//
-//        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-//    }
-//
-//    float robot_position_x = app_firmware_robot_getPositionX(firmware_robot.get());
-//    float robot_position_y = app_firmware_robot_getPositionY(firmware_robot.get());
-//    Point robot_position   = Point(static_cast<double>(robot_position_x),
-//                                 static_cast<double>(robot_position_y));
-//    EXPECT_LT((robot_position - Point(0, 0)).length(), 0.05);
-//    float robot_velocity_x = app_firmware_robot_getVelocityX(firmware_robot.get());
-//    float robot_velocity_y = app_firmware_robot_getVelocityY(firmware_robot.get());
-//    Vector robot_velocity  = Vector(static_cast<double>(robot_velocity_x),
-//                                   static_cast<double>(robot_velocity_y));
-//    EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.05);
-//    EXPECT_GT(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 8);
-//    UNUSED(world);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_not_moving)
-//{
-//    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
-//                Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    Wheel_t* front_left_wheel =
-//        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
-//    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
-//    Wheel_t* back_right_wheel =
-//        app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
-//    Wheel_t* front_right_wheel =
-//        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
-//    EXPECT_EQ(motor_speed_front_left, 0.0);
-//    EXPECT_EQ(motor_speed_back_left, 0.0);
-//    EXPECT_EQ(motor_speed_back_right, 0.0);
-//    EXPECT_EQ(motor_speed_front_right, 0.0);
-//    UNUSED(world);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_moving_forwards)
-//{
-//    Robot robot(0, Point(0, 0), Vector(1, 0), Angle::zero(), AngularVelocity::zero(),
-//                Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    Wheel_t* front_left_wheel =
-//        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
-//    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
-//    Wheel_t* back_right_wheel =
-//        app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
-//    Wheel_t* front_right_wheel =
-//        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
-//
-//    EXPECT_LT(motor_speed_front_left, -1.0);
-//    EXPECT_LT(motor_speed_back_left, -1.0);
-//    EXPECT_GT(motor_speed_back_right, 1.0);
-//    EXPECT_GT(motor_speed_front_right, 1.0);
-//    EXPECT_LT(motor_speed_front_left, motor_speed_back_left);
-//    EXPECT_GT(motor_speed_front_right, motor_speed_back_right);
-//    EXPECT_FLOAT_EQ(motor_speed_front_left, -motor_speed_front_right);
-//    EXPECT_FLOAT_EQ(motor_speed_back_left, -motor_speed_back_right);
-//    UNUSED(world);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest,
-//       test_get_motor_speeds_when_robot_moving_along_wheel_axis)
-//{
-//    // Move along the axis of the front-left wheel. This means the front-left wheel is
-//    // perpendicular to the direction of motion, and we don't expect it to be spinning
-//    Vector robot_velocity =
-//        Vector::createFromAngle(Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG));
-//    Robot robot(0, Point(0, 0), robot_velocity, Angle::zero(), AngularVelocity::zero(),
-//                Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    Wheel_t* front_left_wheel =
-//        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
-//    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
-//    Wheel_t* back_right_wheel =
-//        app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
-//    Wheel_t* front_right_wheel =
-//        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
-//
-//    EXPECT_NEAR(motor_speed_front_left, 0.0, 0.1);
-//    EXPECT_LT(motor_speed_back_left, -1.0);
-//    EXPECT_LT(motor_speed_back_right, -0.1);
-//    EXPECT_GT(motor_speed_front_right, 1.0);
-//    UNUSED(world);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_spinning)
-//{
-//    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-//                AngularVelocity::threeQuarter(), Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    Wheel_t* front_left_wheel =
-//        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
-//    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
-//    Wheel_t* back_right_wheel =
-//        app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
-//    Wheel_t* front_right_wheel =
-//        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
-//
-//    EXPECT_GT(motor_speed_front_left, 1.0);
-//    EXPECT_GT(motor_speed_back_left, 1.0);
-//    EXPECT_GT(motor_speed_back_right, 1.0);
-//    EXPECT_GT(motor_speed_front_right, 1.0);
-//    UNUSED(world);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest,
-//       test_brake_motors_when_robot_spinning_with_positive_angular_velocity)
-//{
-//    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-//                AngularVelocity::threeQuarter(), Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    for (unsigned int i = 0; i < 60; i++)
-//    {
-//        Wheel_t* front_left_wheel =
-//            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//        app_wheel_brake(front_left_wheel);
-//        Wheel_t* back_left_wheel =
-//            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//        app_wheel_brake(back_left_wheel);
-//        Wheel_t* back_right_wheel =
-//            app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//        app_wheel_brake(back_right_wheel);
-//        Wheel_t* front_right_wheel =
-//            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//        app_wheel_brake(front_right_wheel);
-//
-//        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-//    }
-//
-//    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
-//                1.0 * M_PI / 180.0);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest,
-//       test_brake_motors_when_robot_spinning_with_negative_angular_velocity)
-//{
-//    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-//                AngularVelocity::fromDegrees(-2 * 360), Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    for (unsigned int i = 0; i < 60; i++)
-//    {
-//        Wheel_t* front_left_wheel =
-//            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//        app_wheel_brake(front_left_wheel);
-//        Wheel_t* back_left_wheel =
-//            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//        app_wheel_brake(back_left_wheel);
-//        Wheel_t* back_right_wheel =
-//            app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//        app_wheel_brake(back_right_wheel);
-//        Wheel_t* front_right_wheel =
-//            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//        app_wheel_brake(front_right_wheel);
-//
-//        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-//    }
-//
-//    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
-//                1.0 * M_PI / 180.0);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_linearly)
-//{
-//    Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(),
-//                AngularVelocity::zero(), Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    for (unsigned int i = 0; i < 240; i++)
-//    {
-//        Wheel_t* front_left_wheel =
-//            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//        app_wheel_brake(front_left_wheel);
-//        Wheel_t* back_left_wheel =
-//            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//        app_wheel_brake(back_left_wheel);
-//        Wheel_t* back_right_wheel =
-//            app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//        app_wheel_brake(back_right_wheel);
-//        Wheel_t* front_right_wheel =
-//            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//        app_wheel_brake(front_right_wheel);
-//
-//        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-//    }
-//
-//    float robot_velocity_x = app_firmware_robot_getVelocityX(firmware_robot.get());
-//    float robot_velocity_y = app_firmware_robot_getVelocityY(firmware_robot.get());
-//    Vector robot_velocity  = Vector(static_cast<double>(robot_velocity_x),
-//                                   static_cast<double>(robot_velocity_y));
-//    EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.01);
-//    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
-//                1.0 * M_PI / 180.0);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spinning)
-//{
-//    Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(),
-//                AngularVelocity::full(), Timestamp::fromSeconds(0));
-//    // Put the ball very far away so it does not interfere
-//    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
-//    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
-//
-//    for (unsigned int i = 0; i < 240; i++)
-//    {
-//        Wheel_t* front_left_wheel =
-//            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-//        app_wheel_brake(front_left_wheel);
-//        Wheel_t* back_left_wheel =
-//            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-//        app_wheel_brake(back_left_wheel);
-//        Wheel_t* back_right_wheel =
-//            app_firmware_robot_getBackRightWheel(firmware_robot.get());
-//        app_wheel_brake(back_right_wheel);
-//        Wheel_t* front_right_wheel =
-//            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-//        app_wheel_brake(front_right_wheel);
-//
-//        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
-//    }
-//
-//    float robot_velocity_x = app_firmware_robot_getVelocityX(firmware_robot.get());
-//    float robot_velocity_y = app_firmware_robot_getVelocityY(firmware_robot.get());
-//    Vector robot_velocity  = Vector(static_cast<double>(robot_velocity_x),
-//                                   static_cast<double>(robot_velocity_y));
-//    EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.01);
-//    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
-//                1.0 * M_PI / 180.0);
-//    UNUSED(simulator_ball);
-//}
-//
-//TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
-//{
-//    auto physics_world = std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
-//    auto robot_states  = std::vector<RobotStateWithId>{
-//        RobotStateWithId{.id          = 7,
-//                         .robot_state = RobotState(Point(1.2, 0), Vector(-2.3, 0.2),
-//                                                   Angle::fromRadians(-1.2),
-//                                                   AngularVelocity::quarter())},
-//        RobotStateWithId{
-//            .id          = 2,
-//            .robot_state = RobotState(Point(0, -4.03), Vector(0, 1),
-//                                      Angle::fromRadians(0.3), AngularVelocity::half())}};
-//    physics_world->addYellowRobots(robot_states);
-//
-//    auto friendly_physics_robots = physics_world->getYellowPhysicsRobots();
-//    ASSERT_EQ(2, friendly_physics_robots.size());
-//    auto simulator_robot_7 =
-//        std::make_shared<SimulatorRobot>(friendly_physics_robots.at(0));
-//
-//    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_7);
-//    auto firmware_robot_7 = SimulatorRobotSingleton::createFirmwareRobot();
-//    EXPECT_FLOAT_EQ(1.2f, app_firmware_robot_getPositionX(firmware_robot_7.get()));
-//    EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionY(firmware_robot_7.get()));
-//    EXPECT_FLOAT_EQ(-2.3f, app_firmware_robot_getVelocityX(firmware_robot_7.get()));
-//    EXPECT_FLOAT_EQ(0.2f, app_firmware_robot_getVelocityY(firmware_robot_7.get()));
-//    EXPECT_FLOAT_EQ(-1.2f, app_firmware_robot_getOrientation(firmware_robot_7.get()));
-//
-//    // The firmware functions should now return the data for simulator_robot_2, even
-//    // though we didn't need to create a new FirmwareRobot_t
-//    auto simulator_robot_2 =
-//        std::make_shared<SimulatorRobot>(friendly_physics_robots.at(1));
-//    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_2);
-//    auto firmware_robot_2 = SimulatorRobotSingleton::createFirmwareRobot();
-//    EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionX(firmware_robot_2.get()));
-//    EXPECT_FLOAT_EQ(-4.03f, app_firmware_robot_getPositionY(firmware_robot_2.get()));
-//    EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getVelocityX(firmware_robot_2.get()));
-//    EXPECT_FLOAT_EQ(1.0f, app_firmware_robot_getVelocityY(firmware_robot_2.get()));
-//    EXPECT_FLOAT_EQ(0.3f, app_firmware_robot_getOrientation(firmware_robot_2.get()));
-//}
+TEST_F(SimulatorRobotSingletonTest, test_robot_spin_clockwise)
+{
+    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        Wheel_t* front_left_wheel =
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(front_left_wheel, -0.5);
+        Wheel_t* back_left_wheel =
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(back_left_wheel, -0.5);
+        Wheel_t* back_right_wheel =
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_applyForce(back_right_wheel, -0.5);
+        Wheel_t* front_right_wheel =
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_applyForce(front_right_wheel, -0.5);
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    float robot_position_x = app_firmware_robot_getPositionX(firmware_robot.get());
+    float robot_position_y = app_firmware_robot_getPositionY(firmware_robot.get());
+    Point robot_position   = Point(static_cast<double>(robot_position_x),
+                                 static_cast<double>(robot_position_y));
+    EXPECT_LT((robot_position - Point(0, 0)).length(), 0.05);
+    float robot_velocity_x = app_firmware_robot_getVelocityX(firmware_robot.get());
+    float robot_velocity_y = app_firmware_robot_getVelocityY(firmware_robot.get());
+    Vector robot_velocity  = Vector(static_cast<double>(robot_velocity_x),
+                                   static_cast<double>(robot_velocity_y));
+    EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.05);
+    EXPECT_LT(app_firmware_robot_getVelocityAngular(firmware_robot.get()), -8);
+    UNUSED(world);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_robot_spin_counterclockwise)
+{
+    Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        Wheel_t* front_left_wheel =
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(front_left_wheel, 0.5);
+        Wheel_t* back_left_wheel =
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_applyForce(back_left_wheel, 0.5);
+        Wheel_t* back_right_wheel =
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_applyForce(back_right_wheel, 0.5);
+        Wheel_t* front_right_wheel =
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_applyForce(front_right_wheel, 0.5);
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    float robot_position_x = app_firmware_robot_getPositionX(firmware_robot.get());
+    float robot_position_y = app_firmware_robot_getPositionY(firmware_robot.get());
+    Point robot_position   = Point(static_cast<double>(robot_position_x),
+                                 static_cast<double>(robot_position_y));
+    EXPECT_LT((robot_position - Point(0, 0)).length(), 0.05);
+    float robot_velocity_x = app_firmware_robot_getVelocityX(firmware_robot.get());
+    float robot_velocity_y = app_firmware_robot_getVelocityY(firmware_robot.get());
+    Vector robot_velocity  = Vector(static_cast<double>(robot_velocity_x),
+                                   static_cast<double>(robot_velocity_y));
+    EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.05);
+    EXPECT_GT(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 8);
+    UNUSED(world);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_not_moving)
+{
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    Wheel_t* front_left_wheel =
+        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
+    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
+    Wheel_t* back_right_wheel =
+        app_firmware_robot_getBackRightWheel(firmware_robot.get());
+    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
+    Wheel_t* front_right_wheel =
+        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
+    EXPECT_EQ(motor_speed_front_left, 0.0);
+    EXPECT_EQ(motor_speed_back_left, 0.0);
+    EXPECT_EQ(motor_speed_back_right, 0.0);
+    EXPECT_EQ(motor_speed_front_right, 0.0);
+    UNUSED(world);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_moving_forwards)
+{
+    Robot robot(0, Point(0, 0), Vector(1, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    Wheel_t* front_left_wheel =
+        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
+    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
+    Wheel_t* back_right_wheel =
+        app_firmware_robot_getBackRightWheel(firmware_robot.get());
+    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
+    Wheel_t* front_right_wheel =
+        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
+
+    EXPECT_LT(motor_speed_front_left, -1.0);
+    EXPECT_LT(motor_speed_back_left, -1.0);
+    EXPECT_GT(motor_speed_back_right, 1.0);
+    EXPECT_GT(motor_speed_front_right, 1.0);
+    EXPECT_LT(motor_speed_front_left, motor_speed_back_left);
+    EXPECT_GT(motor_speed_front_right, motor_speed_back_right);
+    EXPECT_FLOAT_EQ(motor_speed_front_left, -motor_speed_front_right);
+    EXPECT_FLOAT_EQ(motor_speed_back_left, -motor_speed_back_right);
+    UNUSED(world);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest,
+       test_get_motor_speeds_when_robot_moving_along_wheel_axis)
+{
+    // Move along the axis of the front-left wheel. This means the front-left wheel is
+    // perpendicular to the direction of motion, and we don't expect it to be spinning
+    Vector robot_velocity =
+        Vector::createFromAngle(Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG));
+    Robot robot(0, Point(0, 0), robot_velocity, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    Wheel_t* front_left_wheel =
+        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
+    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
+    Wheel_t* back_right_wheel =
+        app_firmware_robot_getBackRightWheel(firmware_robot.get());
+    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
+    Wheel_t* front_right_wheel =
+        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
+
+    EXPECT_NEAR(motor_speed_front_left, 0.0, 0.1);
+    EXPECT_LT(motor_speed_back_left, -1.0);
+    EXPECT_LT(motor_speed_back_right, -0.1);
+    EXPECT_GT(motor_speed_front_right, 1.0);
+    UNUSED(world);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_spinning)
+{
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                AngularVelocity::threeQuarter(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    Wheel_t* front_left_wheel =
+        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
+    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
+    Wheel_t* back_right_wheel =
+        app_firmware_robot_getBackRightWheel(firmware_robot.get());
+    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
+    Wheel_t* front_right_wheel =
+        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
+
+    EXPECT_GT(motor_speed_front_left, 1.0);
+    EXPECT_GT(motor_speed_back_left, 1.0);
+    EXPECT_GT(motor_speed_back_right, 1.0);
+    EXPECT_GT(motor_speed_front_right, 1.0);
+    UNUSED(world);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest,
+       test_brake_motors_when_robot_spinning_with_positive_angular_velocity)
+{
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                AngularVelocity::threeQuarter(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        Wheel_t* front_left_wheel =
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_brake(front_left_wheel);
+        Wheel_t* back_left_wheel =
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_brake(back_left_wheel);
+        Wheel_t* back_right_wheel =
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_brake(back_right_wheel);
+        Wheel_t* front_right_wheel =
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_brake(front_right_wheel);
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
+                1.0 * M_PI / 180.0);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest,
+       test_brake_motors_when_robot_spinning_with_negative_angular_velocity)
+{
+    Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                AngularVelocity::fromDegrees(-2 * 360), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        Wheel_t* front_left_wheel =
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_brake(front_left_wheel);
+        Wheel_t* back_left_wheel =
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_brake(back_left_wheel);
+        Wheel_t* back_right_wheel =
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_brake(back_right_wheel);
+        Wheel_t* front_right_wheel =
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_brake(front_right_wheel);
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
+                1.0 * M_PI / 180.0);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_linearly)
+{
+    Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(),
+                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 240; i++)
+    {
+        Wheel_t* front_left_wheel =
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_brake(front_left_wheel);
+        Wheel_t* back_left_wheel =
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_brake(back_left_wheel);
+        Wheel_t* back_right_wheel =
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_brake(back_right_wheel);
+        Wheel_t* front_right_wheel =
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_brake(front_right_wheel);
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    float robot_velocity_x = app_firmware_robot_getVelocityX(firmware_robot.get());
+    float robot_velocity_y = app_firmware_robot_getVelocityY(firmware_robot.get());
+    Vector robot_velocity  = Vector(static_cast<double>(robot_velocity_x),
+                                   static_cast<double>(robot_velocity_y));
+    EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.01);
+    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
+                1.0 * M_PI / 180.0);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spinning)
+{
+    Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(),
+                AngularVelocity::full(), Timestamp::fromSeconds(0));
+    // Put the ball very far away so it does not interfere
+    Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    for (unsigned int i = 0; i < 240; i++)
+    {
+        Wheel_t* front_left_wheel =
+            app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
+        app_wheel_brake(front_left_wheel);
+        Wheel_t* back_left_wheel =
+            app_firmware_robot_getBackLeftWheel(firmware_robot.get());
+        app_wheel_brake(back_left_wheel);
+        Wheel_t* back_right_wheel =
+            app_firmware_robot_getBackRightWheel(firmware_robot.get());
+        app_wheel_brake(back_right_wheel);
+        Wheel_t* front_right_wheel =
+            app_firmware_robot_getFrontRightWheel(firmware_robot.get());
+        app_wheel_brake(front_right_wheel);
+
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    float robot_velocity_x = app_firmware_robot_getVelocityX(firmware_robot.get());
+    float robot_velocity_y = app_firmware_robot_getVelocityY(firmware_robot.get());
+    Vector robot_velocity  = Vector(static_cast<double>(robot_velocity_x),
+                                   static_cast<double>(robot_velocity_y));
+    EXPECT_LT((robot_velocity - Vector(0, 0)).length(), 0.01);
+    EXPECT_NEAR(app_firmware_robot_getVelocityAngular(firmware_robot.get()), 0.0,
+                1.0 * M_PI / 180.0);
+    UNUSED(simulator_ball);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
+{
+    auto physics_world = std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
+    auto robot_states  = std::vector<RobotStateWithId>{
+        RobotStateWithId{.id          = 7,
+                         .robot_state = RobotState(Point(1.2, 0), Vector(-2.3, 0.2),
+                                                   Angle::fromRadians(-1.2),
+                                                   AngularVelocity::quarter())},
+        RobotStateWithId{
+            .id          = 2,
+            .robot_state = RobotState(Point(0, -4.03), Vector(0, 1),
+                                      Angle::fromRadians(0.3), AngularVelocity::half())}};
+    physics_world->addYellowRobots(robot_states);
+
+    auto friendly_physics_robots = physics_world->getYellowPhysicsRobots();
+    ASSERT_EQ(2, friendly_physics_robots.size());
+    auto simulator_robot_7 =
+        std::make_shared<SimulatorRobot>(friendly_physics_robots.at(0));
+
+    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_7, FieldSide::NEG_X);
+    auto firmware_robot_7 = SimulatorRobotSingleton::createFirmwareRobot();
+    EXPECT_FLOAT_EQ(1.2f, app_firmware_robot_getPositionX(firmware_robot_7.get()));
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionY(firmware_robot_7.get()));
+    EXPECT_FLOAT_EQ(-2.3f, app_firmware_robot_getVelocityX(firmware_robot_7.get()));
+    EXPECT_FLOAT_EQ(0.2f, app_firmware_robot_getVelocityY(firmware_robot_7.get()));
+    EXPECT_FLOAT_EQ(-1.2f, app_firmware_robot_getOrientation(firmware_robot_7.get()));
+
+    // The firmware functions should now return the data for simulator_robot_2, even
+    // though we didn't need to create a new FirmwareRobot_t
+    auto simulator_robot_2 =
+        std::make_shared<SimulatorRobot>(friendly_physics_robots.at(1));
+    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_2, FieldSide::NEG_X);
+    auto firmware_robot_2 = SimulatorRobotSingleton::createFirmwareRobot();
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionX(firmware_robot_2.get()));
+    EXPECT_FLOAT_EQ(-4.03f, app_firmware_robot_getPositionY(firmware_robot_2.get()));
+    EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getVelocityX(firmware_robot_2.get()));
+    EXPECT_FLOAT_EQ(1.0f, app_firmware_robot_getVelocityY(firmware_robot_2.get()));
+    EXPECT_FLOAT_EQ(0.3f, app_firmware_robot_getOrientation(firmware_robot_2.get()));
+}

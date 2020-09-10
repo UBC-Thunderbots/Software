@@ -189,7 +189,12 @@ class PhysicsRobot
      */
     void applyForce(const Vector& force);
 
-    void applyAngularAcceleration(const AngularVelocity acceleration);
+    /**
+     * Applies angular acceleration to the robot.
+     *
+     * @param acceleration The Angle to accelerate by per second
+     */
+    void applyAngularAcceleration(const Angle acceleration);
 
    protected:
     /**
