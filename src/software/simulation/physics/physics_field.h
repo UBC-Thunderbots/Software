@@ -97,7 +97,7 @@ class PhysicsField
     // We set the field restitution to 0 so that behaviour of bouncing off walls is
     // completely determined by the ball's restitution
     static constexpr float FIELD_WALL_RESTITUTION = 0.0f;
-    static constexpr float FIELD_WALL_FRICTION = 0.0f;
+    static constexpr float FIELD_WALL_FRICTION    = 0.0f;
 
     // Since the field never changes during simulation, we store the initial field
     // used during construction to make it easy to return Field objects when requested

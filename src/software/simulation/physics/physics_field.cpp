@@ -47,7 +47,7 @@ void PhysicsField::setupFieldBoundary(const Field &field)
         createVec2(field.fieldBoundary().negXPosYCorner()),
     };
     field_boundary_shape.CreateLoop(field_boundary_vertices, num_field_boundary_vertices);
-    field_boundary_fixture_def.shape = &field_boundary_shape;
+    field_boundary_fixture_def.shape       = &field_boundary_shape;
     field_boundary_fixture_def.restitution = FIELD_WALL_RESTITUTION;
     field_boundary_fixture_def.friction    = FIELD_WALL_FRICTION;
     field_body->CreateFixture(&field_boundary_fixture_def);
@@ -62,7 +62,7 @@ void PhysicsField::setupEnemyGoal(const Field &field)
         createVec2(field.enemyGoalpostPos() + Vector(field.goalXLength(), 0)),
         createVec2(field.enemyGoalpostPos())};
     enemy_goal_shape.CreateChain(enemy_goal_vertices, num_enemy_goal_vertices);
-    enemy_goal_fixture_def.shape = &enemy_goal_shape;
+    enemy_goal_fixture_def.shape       = &enemy_goal_shape;
     enemy_goal_fixture_def.restitution = FIELD_WALL_RESTITUTION;
     enemy_goal_fixture_def.friction    = FIELD_WALL_FRICTION;
     field_body->CreateFixture(&enemy_goal_fixture_def);
@@ -77,7 +77,7 @@ void PhysicsField::setupFriendlyGoal(const Field &field)
         createVec2(field.friendlyGoalpostPos() - Vector(field.goalXLength(), 0)),
         createVec2(field.friendlyGoalpostPos())};
     friendly_goal_shape.CreateChain(friendly_goal_vertices, num_friendly_goal_vertices);
-    friendly_goal_fixture_def.shape = &friendly_goal_shape;
+    friendly_goal_fixture_def.shape       = &friendly_goal_shape;
     friendly_goal_fixture_def.restitution = FIELD_WALL_RESTITUTION;
     friendly_goal_fixture_def.friction    = FIELD_WALL_FRICTION;
     field_body->CreateFixture(&friendly_goal_fixture_def);
