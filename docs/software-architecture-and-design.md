@@ -457,7 +457,7 @@ Ultimately, we want a test suite that validates our [Plays](#plays) are generall
 The primary design goals of this test system are:
 1. **Determinism:** We need tests to pass or fail consistently
 2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
-3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and understand what they are testing.
+3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and to understand what they are testing.
 
 ## Simulated Integration Tests Architecture
 The system consists of three main components:
