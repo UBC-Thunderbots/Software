@@ -443,6 +443,7 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     // convert to cm so we operate on a small scale
     double dist_from_dribble_point_cm =
         dribble_force_vector.length() * CENTIMETERS_PER_METER;
+
     // Combine a polynomial with a slightly offset linear function. This shifts the
     // intercept with the x-axis to a small positive x-value, so that there is a small
     // region when the ball is extremely close to the back of the dribbler area (and

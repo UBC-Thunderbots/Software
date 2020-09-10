@@ -18,9 +18,9 @@ class PhysicsRobotModel
      * robot. It is broken up this way because Box2D can only have convex polygons. We
      * split the body into 3 parts:
      * - The main body, which is everything behind the dribbler
-     * - The front-left part, which is the bit that is to the front-left of the dribbler,
+     * - The front-left part, which is the bit to the front-left of the dribbler,
      * partially enclosing it
-     * - The front-right part, which is the bit that is to the front-right of the
+     * - The front-right part, which is the bit to the front-right of the
      * dribbler, partially enclosing it
      *
      * These polygons are all created assuming the robot is at (0, 0) and facing along the

@@ -25,13 +25,13 @@ class SimulationContactListener : public b2ContactListener
     /**
      * Given the user data of 2 objects involved in a contact, returns a pair of
      * pointers to the physics objects involved in the contact if there was a contact
-     * between a ball and dribbler damper. Otherwise returns std::nullopt
+     * point between a ball and dribbler damper. Otherwise returns std::nullopt
      *
      * @param user_data_a The user data for the first object in the contact
      * @param user_data_b The user data for the second object in the contact
      *
      * @return A pair of pointers to the physics objects involved in the constact if there
-     * was a contact between a ball and dribbler damper, and returns std::nullopt
+     * was a contact point between a ball and dribbler damper, and returns std::nullopt
      * otherwise
      */
     static std::optional<std::pair<PhysicsBall*, PhysicsRobot*>>
@@ -41,13 +41,13 @@ class SimulationContactListener : public b2ContactListener
     /**
      * Given the user data of 2 objects involved in a contact, returns a pair of
      * pointers to the physics objects involved in the contact if there was a contact
-     * between a ball and robot dribbler. Otherwise returns std::nullopt
+     * point between a ball and robot dribbler. Otherwise returns std::nullopt
      *
      * @param user_data_a The user data for the first object in the contact
      * @param user_data_b The user data for the second object in the contact
      *
      * @return A pair of pointers to the physics objects involved in the contact if there
-     * was a contact between a ball and robot dribbler, and returns std::nullopt
+     * was a contact point between a ball and robot dribbler, and returns std::nullopt
      * otherwise
      */
     static std::optional<std::pair<PhysicsBall*, PhysicsRobot*>> isDribblerBallContact(
@@ -55,14 +55,14 @@ class SimulationContactListener : public b2ContactListener
 
     /**
      * Given the user data of 2 objects involved in a contact, returns a pointer
-     * to the PhysicsBall involved in the contact if there was a contact between
+     * to the PhysicsBall involved in the contact if there was a contact point between
      * a ball and any other object. Otherwise returns std::nullopt
      *
      * @param user_data_a The user data for the first object in the contact
      * @param user_data_b The user data for the second object in the contact
      *
      * @return A pointers to the PhysicsBall involved in the contact if there was
-     * a contact between a ball and any other object, and returns std::nullopt otherwise
+     * a contact point between a ball and any other object, and returns std::nullopt otherwise
      */
     static PhysicsBall* isBallContact(PhysicsObjectUserData* user_data_a,
                                       PhysicsObjectUserData* user_data_b);
