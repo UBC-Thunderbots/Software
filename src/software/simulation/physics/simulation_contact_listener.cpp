@@ -28,7 +28,7 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
         {
             PhysicsBall *ball   = ball_chicker_pair->first;
             PhysicsRobot *robot = ball_chicker_pair->second;
-            for (auto contact_callback : robot->getChickerBallStartContactCallbacks())
+            for (auto contact_callback : robot->getDribblerDamperBallStartContactCallbacks())
             {
                 contact_callback(robot, ball);
             }

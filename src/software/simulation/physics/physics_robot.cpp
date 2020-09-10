@@ -43,7 +43,7 @@ PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
 
     setupRobotBodyFixtures(robot_state, mass_kg);
     setupDribblerFixture(robot_state);
-    setupChickerFixture(robot_state);
+    setupDribblerDamperFixture(robot_state);
 
     // For some reason adding fixtures with mass slightly changes the linear velocity
     // of the body, so we make sure to reset it to the desired value at the end
@@ -141,7 +141,7 @@ void PhysicsRobot::setupDribblerFixture(const RobotState&)
     delete dribbler_shape;
 }
 
-void PhysicsRobot::setupChickerFixture(const RobotState&)
+void PhysicsRobot::setupDribblerDamperFixture(const RobotState &robot_state)
 {
     b2FixtureDef dribbler_damper_fixture_def;
     dribbler_damper_fixture_def.restitution = static_cast<float>(DRIBBLER_DAMPER_RESTITUTION);
@@ -221,7 +221,7 @@ PhysicsRobot::getDribblerBallEndContactCallbacks() const
 }
 
 std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
-PhysicsRobot::getChickerBallStartContactCallbacks() const
+PhysicsRobot::getDribblerDamperBallStartContactCallbacks() const
 {
     return dribbler_damper_ball_contact_callbacks;
 }

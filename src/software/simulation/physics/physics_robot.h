@@ -118,7 +118,7 @@ class PhysicsRobot
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
     getDribblerBallEndContactCallbacks() const;
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
-    getChickerBallStartContactCallbacks() const;
+    getDribblerDamperBallStartContactCallbacks() const;
 
     /**
      * Returns the current robot state
@@ -228,7 +228,7 @@ class PhysicsRobot
      *
      * @param robot_state The robot to create the fixture for
      */
-    void setupChickerFixture(const RobotState &robot_state);
+    void setupDribblerDamperFixture(const RobotState &robot_state);
 
     /**
      * Creates a fixture to represent the dribbler of the robot. It does not interact
