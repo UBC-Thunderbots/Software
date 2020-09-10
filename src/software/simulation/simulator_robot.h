@@ -221,15 +221,6 @@ class SimulatorRobot
    private:
     /**
      * A function that is called during every physics step for as long as the ball
-     * is touching this robot's chicker
-     *
-     * @param physics_robot The robot involved in the contact
-     * @param physics_ball The ball invovled in the contact
-     */
-    void onChickerBallContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
-
-    /**
-     * A function that is called during every physics step for as long as the ball
      * is touching this robot's dribbler
      *
      * @param physics_robot The robot involved in the contact

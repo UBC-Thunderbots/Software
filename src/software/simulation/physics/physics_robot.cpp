@@ -196,12 +196,6 @@ void PhysicsRobot::registerDribblerBallEndContactCallback(
     dribbler_ball_end_contact_callbacks.emplace_back(callback);
 }
 
-void PhysicsRobot::registerDribblerDamperBallStartContactCallback(
-    std::function<void(PhysicsRobot*, PhysicsBall*)> callback)
-{
-    dribbler_damper_ball_contact_callbacks.emplace_back(callback);
-}
-
 std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
 PhysicsRobot::getDribblerBallContactCallbacks() const
 {
@@ -218,12 +212,6 @@ std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
 PhysicsRobot::getDribblerBallEndContactCallbacks() const
 {
     return dribbler_ball_end_contact_callbacks;
-}
-
-std::vector<std::function<void(PhysicsRobot*, PhysicsBall*)>>
-PhysicsRobot::getDribblerDamperBallStartContactCallbacks() const
-{
-    return dribbler_damper_ball_contact_callbacks;
 }
 
 RobotState PhysicsRobot::getRobotState() const

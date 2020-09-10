@@ -12,10 +12,6 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
 {
     if (auto robot = this->physics_robot.lock())
     {
-        robot->registerDribblerDamperBallStartContactCallback(
-                [this](PhysicsRobot *robot, PhysicsBall *ball) {
-                    this->onChickerBallContact(robot, ball);
-                });
         robot->registerDribblerBallContactCallback(
             [this](PhysicsRobot *robot, PhysicsBall *ball) {
                 this->onDribblerBallContact(robot, ball);
@@ -217,7 +213,7 @@ void SimulatorRobot::enableAutokick(float speed_m_per_s)
 {
     autokick_speed_m_per_s = speed_m_per_s;
     disableAutochip();
-    // Kick any balls already in the chicker
+    // Kick any balls already in the dribbler
     kick(speed_m_per_s);
 }
 
@@ -225,7 +221,7 @@ void SimulatorRobot::enableAutochip(float distance_m)
 {
     autochip_distance_m = distance_m;
     disableAutokick();
-    // Chip any balls already in the chicker
+    // Chip any balls already in the dribbler
     chip(distance_m);
 }
 
@@ -358,19 +354,6 @@ void SimulatorRobot::brakeMotorFrontRight()
     checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontRight(); });
 }
 
-void SimulatorRobot::onChickerBallContact(PhysicsRobot *physics_robot,
-                                          PhysicsBall *physics_ball)
-{
-    if (isAutokickEnabled())
-    {
-        kick(autokick_speed_m_per_s.value());
-    }
-    else if (isAutochipEnabled())
-    {
-        chip(autochip_distance_m.value());
-    }
-}
-
 void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
                                            PhysicsBall *physics_ball)
 {
@@ -400,6 +383,15 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
 
     // Keep track of all balls in the dribbler
     balls_in_dribbler_area.emplace_back(ball);
+
+    if (isAutokickEnabled())
+    {
+        kick(autokick_speed_m_per_s.value());
+    }
+    else if (isAutochipEnabled())
+    {
+        chip(autochip_distance_m.value());
+    }
 }
 
 void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
@@ -434,7 +426,7 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot, PhysicsBall
     auto ball  = physics_ball->getBallState();
 
     // To dribble, we apply a force towards the center and back of the dribbling area,
-    // closest to the chicker. We vary the magnitude of the force by how far the ball
+    // closest to the dribbler damper. We vary the magnitude of the force by how far the ball
     // is from this "dribbling point". This more-or-less acts like a tiny gravity well
     // that sucks the ball into place, except with more force the further away the
     // ball is. Once the ball is no longer in the dribbler area this force is not
@@ -452,7 +444,7 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot, PhysicsBall
     // Combine a polynomial with a slightly offset linear function. This shifts the
     // intercept with the x-axis to a small positive x-value, so that there is a small
     // region when the ball is extremely close to the back of the dribbler area (and
-    // close to the chicker) where a tiny amount of force will be applied away from
+    // close to the dribbler damper) where a tiny amount of force will be applied away from
     // the robot. This helps prevent us from applying a force into the robot while the
     // ball is touching it and creating a net force that moves the robot.
     //

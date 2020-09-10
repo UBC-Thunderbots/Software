@@ -98,15 +98,6 @@ class PhysicsRobot
         std::function<void(PhysicsRobot *, PhysicsBall *)> callback);
 
     /**
-     * Adds the given function to this PhysicsRobot's list of dribbler damper-ball contact
-     * callbacks. These callbacks will be called once at the start of the contact.
-     *
-     * @param callback The function to register
-     */
-    void registerDribblerDamperBallStartContactCallback(
-        std::function<void(PhysicsRobot *, PhysicsBall *)> callback);
-
-    /**
      * Returns a list of contact callbacks for this class
      *
      * @return a list of contact callbacks for this class
@@ -117,8 +108,6 @@ class PhysicsRobot
     getDribblerBallStartContactCallbacks() const;
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
     getDribblerBallEndContactCallbacks() const;
-    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
-    getDribblerDamperBallStartContactCallbacks() const;
 
     /**
      * Returns the current robot state
