@@ -47,13 +47,17 @@ class Robot
                        std::set<RobotCapability>());
 
     /**
-     * Updates the robot with new data, updating the current state as well as the
-     * predictive model
+     * Updates the robot with new data
      *
      * @param new_robot_state A robot state containing new robot data
      */
     void updateState(const TimestampedRobotState &new_robot_state);
 
+    /**
+     * Gets the current state of the robot
+     *
+     * @return current state of the robot
+     */
     TimestampedRobotState currentState() const;
 
     /**

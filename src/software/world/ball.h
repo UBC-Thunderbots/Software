@@ -20,21 +20,16 @@ class Ball final
      * @param velocity The velocity of the ball, in metres per second
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
-     * @param history_size The number of previous ball states that should be stored. Must
-     * be > 0
      */
     explicit Ball(const Point &position, const Vector &velocity,
-                  const Timestamp &timestamp, unsigned int history_size = 20);
+                  const Timestamp &timestamp);
 
     /**
      * Creates a new ball with the given initial state
      *
      * @param initial_state The initial state of the ball
-     * @param history_size The number of previous ball states that should be stored. Must
-     * be > 0
      */
-    explicit Ball(const TimestampedBallState &initial_state,
-                  unsigned int history_size = 20);
+    explicit Ball(const TimestampedBallState &initial_state);
 
     /**
      * Returns the current state of the ball
@@ -51,8 +46,7 @@ class Ball final
     const std::shared_ptr<BallModel> &ballModel() const;
 
     /**
-     * Updates the ball with new data, updating the current data as well as the predictive
-     * model
+     * Updates the ball with new data
      *
      * @param new_state the new state of the ball
      */
@@ -80,14 +74,6 @@ class Ball final
     Vector velocity() const;
 
     /**
-     * Gets the previous states stored in states_
-     *
-     * @return The circular buffer containing the state history starting with the newest
-     * available data at index 0
-     */
-    BallHistory getPreviousStates() const;
-
-    /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
      * velocities are the same
      *
@@ -105,11 +91,6 @@ class Ball final
     bool operator!=(const Ball &other) const;
 
    private:
-    // All previous states of the ball, with the most recent state at the front of the
-    // queue, This buffer will never be empty as it's initialized with a BallState on
-    // creation
-    // The buffer size (history_size) must be > 0
-    BallHistory states_;
-
+    TimestampedBallState current_state_;
     std::shared_ptr<BallModel> ball_model_;
 };

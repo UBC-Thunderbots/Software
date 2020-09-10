@@ -120,7 +120,7 @@ Timestamp World::getMostRecentTimestampFromMembers()
     // Add all member timestamps to a list
     std::initializer_list<Timestamp> member_timestamps = {
         friendly_team_.getMostRecentTimestamp(), enemy_team_.getMostRecentTimestamp(),
-        ball_.getPreviousStates().front().timestamp()};
+        ball_.lastUpdateTimestamp()};
     // Return the max
 
     return std::max(member_timestamps);
