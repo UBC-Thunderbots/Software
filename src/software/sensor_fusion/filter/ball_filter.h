@@ -123,7 +123,7 @@ class BallFilter
      * occurs that prevents the size from being calculated correctly, returns std::nullopt
      */
     static std::optional<size_t> getAdjustedBufferSize(
-        boost::circular_buffer<BallDetection> ball_detections);
+        const boost::circular_buffer<BallDetection> &ball_detections);
 
     /**
      * Given a buffer of ball detections, returns the line of best fit through
