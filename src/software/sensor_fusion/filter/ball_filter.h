@@ -87,7 +87,7 @@ class BallFilter
     /**
      * Adds ball detections to the buffer stored by this filter. This function will ignore
      * data if:
-     * - the is outside of the filter_area, or
+     * - the data is outside of the filter_area, or
      * - the data is too far away from the current known ball position
      *   (since it is likely to be random noise).
      *
