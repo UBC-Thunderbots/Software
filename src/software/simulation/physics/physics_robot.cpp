@@ -21,7 +21,7 @@ const double PhysicsRobot::DRIBBLER_DEPTH =
 // without letting the ball tunnel and collide with the robot body
 const double PhysicsRobot::DRIBBLER_DAMPER_THICKNESS = 0.005;
 const double PhysicsRobot::TOTAL_DRIBBLER_DEPTH =
-        PhysicsRobot::DRIBBLER_DEPTH + PhysicsRobot::DRIBBLER_DAMPER_THICKNESS;
+    PhysicsRobot::DRIBBLER_DEPTH + PhysicsRobot::DRIBBLER_DAMPER_THICKNESS;
 
 PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
                            const RobotState& robot_state, const double mass_kg)
@@ -156,14 +156,14 @@ void PhysicsRobot::setupDribblerDamperFixture(const RobotState& robot_state)
     const unsigned int num_vertices                     = 4;
     b2Vec2 dribbler_damper_shape_vertices[num_vertices] = {
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH +
-                         DRIBBLER_DAMPER_THICKNESS,
+                             DRIBBLER_DAMPER_THICKNESS,
                          DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH,
                          DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH,
                          -DRIBBLER_WIDTH_METERS / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH +
-                         DRIBBLER_DAMPER_THICKNESS,
+                             DRIBBLER_DAMPER_THICKNESS,
                          -DRIBBLER_WIDTH_METERS / 2.0))};
 
     b2PolygonShape* dribbler_damper_shape = new b2PolygonShape();
