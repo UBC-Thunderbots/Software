@@ -97,18 +97,6 @@ class SensorFusion
     BallDetection invert(BallDetection ball_detection) const;
 
     /**
-     * Decides if the ball is near the dribbler of the robot
-     *
-     * @param ball_position The position of the ball
-     * @param robot_position The position of the robot
-     * @param robot_orientation The orientation the robot
-     *
-     * @return whether the ball is near the dribbler of the robot
-     */
-    static bool ballNearDribbler(const Point &ball_position, const Point &robot_position,
-                                 const Angle &robot_orientation);
-
-    /**
      * Determines if the team has control over the given ball
      *
      * @param team The team to check

@@ -133,6 +133,15 @@ class Robot
     std::set<RobotCapability> &getMutableRobotCapabilities();
 
     /**
+     * Decides if a point is near the dribbler of the robot
+     *
+     * @param test_point The point to check
+     *
+     * @return whether the test_point is near the dribbler of the robot
+     */
+    bool isNearDribbler(const Point &test_point) const;
+
+    /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
      * all other parameters (position, orientation, etc) are equal. The last update
      * timestamp is not part of the equality.

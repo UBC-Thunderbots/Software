@@ -270,29 +270,11 @@ BallDetection SensorFusion::invert(BallDetection ball_detection) const
     return ball_detection;
 }
 
-bool SensorFusion::ballNearDribbler(const Point &ball_position,
-                                    const Point &robot_position,
-                                    const Angle &robot_orientation)
-{
-    static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + 0.2;
-    if ((ball_position - robot_position).length() > POSSESSION_THRESHOLD_METERS)
-    {
-        return false;
-    }
-    else
-    {
-        // check that ball is in a 90-degree cone in front of the robot
-        auto ball_to_robot_angle =
-            robot_orientation.minDiff((ball_position - robot_position).orientation());
-        return (ball_to_robot_angle < Angle::fromDegrees(45.0));
-    }
-}
-
 bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
 {
     for (const auto &robot : team.getAllRobots())
     {
-        if (ballNearDribbler(ball.position(), robot.position(), robot.orientation()))
+        if (robot.isNearDribbler(ball.position()))
         {
             return true;
         }

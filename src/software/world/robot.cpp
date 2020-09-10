@@ -83,6 +83,23 @@ RobotHistory Robot::getPreviousStates() const
     return states_;
 }
 
+bool Robot::isNearDribbler(const Point &test_point) const
+{
+    Vector vector_to_test_point                     = test_point - position();
+    static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + 0.2;
+    if (vector_to_test_point.length() > POSSESSION_THRESHOLD_METERS)
+    {
+        return false;
+    }
+    else
+    {
+        // check that ball is in a 90-degree cone in front of the robot
+        auto ball_to_robot_angle =
+            orientation().minDiff(vector_to_test_point.orientation());
+        return (ball_to_robot_angle < Angle::fromDegrees(45.0));
+    }
+}
+
 bool Robot::operator==(const Robot &other) const
 {
     return this->id_ == other.id_ && this->position() == other.position() &&
