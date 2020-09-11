@@ -30,7 +30,7 @@ class ProtoMulticastListener
 
     virtual ~ProtoMulticastListener();
 
-private:
+   private:
     /**
      * This function is setup as the callback to handle packets received over the network.
      *
