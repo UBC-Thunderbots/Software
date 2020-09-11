@@ -12,10 +12,10 @@ cc_library(
 )
 
 cc_library(
-    name = "constructor_arg_generic_factory",
+    name = "constructor_args_generic_factory",
     hdrs = [
-        "constructor_arg_generic_factory.h",
-        "constructor_arg_generic_factory.tpp",
+        "constructor_args_generic_factory.h",
+        "constructor_args_generic_factory.tpp",
     ],
     deps = [
         "//software/util/typename",
@@ -32,10 +32,10 @@ cc_test(
 )
 
 cc_test(
-    name = "constructor_arg_generic_factory_test",
-    srcs = ["constructor_arg_generic_factory_test.cpp"],
+    name = "constructor_args_generic_factory_test",
+    srcs = ["constructor_args_generic_factory_test.cpp"],
     deps = [
-        ":constructor_arg_generic_factory",
+        ":constructor_args_generic_factory",
         "@gtest//:gtest_main",
     ],
 )

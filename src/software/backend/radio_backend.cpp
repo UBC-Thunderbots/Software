@@ -3,7 +3,8 @@
 #include "software/backend/radio/robot_status.h"
 #include "software/constants.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/util/design_patterns/constructor_arg_generic_factory.h"
+#include "software/util/design_patterns/constructor_args_generic_factory.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 RadioBackend::RadioBackend(
     std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config)
@@ -33,5 +34,7 @@ void RadioBackend::receiveRobotStatus(RadioRobotStatus robot_status)
 }
 
 // Register this play in the genericFactory
-static TConstructorArgGenericFactory<std::string, Backend, RadioBackend,
-std::shared_ptr<const SSLCommunicationConfig>> factory;
+static TConstructorArgsGenericFactory<
+    std::string, Backend, RadioBackend(std::shared_ptr<const SSLCommunicationConfig>)>
+    factory;
+static TGenericFactory<std::string, Backend, RadioBackend> factory2;

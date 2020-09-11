@@ -20,6 +20,7 @@ cc_library(
         ":backend",
         ":ssl_proto_client",
         "//software/backend/radio:radio_output",
+        "//software/util/design_patterns:constructor_args_generic_factory",
         "//software/util/design_patterns:generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
@@ -42,6 +43,7 @@ cc_library(
         "//software/proto:defending_side_msg_cc_proto",
         "//software/proto/message_translation:defending_side",
         "//software/proto/message_translation:tbots_protobuf",
+        "//software/util/design_patterns:constructor_args_generic_factory",
         "//software/util/design_patterns:generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
