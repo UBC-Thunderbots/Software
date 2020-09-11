@@ -28,17 +28,25 @@ class ProtoMulticastListener
                            const std::string& ip_address, unsigned short port,
                            std::function<void(ReceiveProtoT&)> receive_callback);
 
-   private:
+    virtual ~ProtoMulticastListener();
+
+private:
     /**
      * This function is setup as the callback to handle packets received over the network.
      *
      * @param data The packet received over the network
+     * TODO fix this
      */
-    void handleDataReception(std::vector<uint8_t>& data);
+    void handleDataReception(const boost::system::error_code& error,
+                             size_t num_bytes_received);
 
-    // The multicast listener that receives the data and passes it to us via
-    // `handleDataReception`
-    MulticastListener multicast_listener;
+    // A UDP socket that we listen on for ReceiveProto messages from the network
+    boost::asio::ip::udp::socket socket_;
+    // The endpoint for the sender
+    boost::asio::ip::udp::endpoint sender_endpoint_;
+
+    static constexpr unsigned int max_buffer_length = 9000;
+    std::array<char, max_buffer_length> raw_received_data_;
 
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&)> receive_callback;
