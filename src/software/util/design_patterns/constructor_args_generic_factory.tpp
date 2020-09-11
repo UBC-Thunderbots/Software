@@ -36,10 +36,11 @@ ConstructorArgsGenericFactory<IndexType, TypeToCreate>::getRegisteredConstructor
 {
     std::vector<std::function<std::unique_ptr<TypeToCreate>(std::any)>> constructors;
 
-    for (auto iter = ConstructorArgsGenericFactory::getRegistry().begin();
-         iter != ConstructorArgsGenericFactory::getRegistry().end(); iter++)
+    for (const auto& [name, creator_fn] : getRegistry())
     {
-        constructors.emplace_back(iter->second);
+        // shut up the compiler
+        (void)name;
+        constructors.emplace_back(creator_fn);
     }
     return constructors;
 }

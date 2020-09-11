@@ -196,7 +196,25 @@ class ConstructorArgsGenericFactory
     static ConstructorArgsGenericRegistry<IndexType, TypeToCreate>& getMutableRegistry();
 };
 
-
+/**
+ * This templated generic factory class is used by generic types that are derived from the
+ * Abstract TypeToCreate template class. Its purpose is to create a Factory for the
+ * implemented generic type and automatically register the Generic type in the
+ * ConstructorArgsGenericFactory registry.
+ *
+ * Declaring the static variable will also cause it to be initialized at the start of the
+ * program (because it's static). This will immediately call the constructor, which adds
+ * the backend T to the ConstructorArgsGenericFactory registry. From then on, the rest of
+ * the program can use the registry to find all the `TypeToCreate` that are available (and
+ * register with this templated class).
+ *
+ * @tparam T The class of the generic type to be added to the registry. For example,
+ * to add a new class called MoveBackend that inherits from Backend with a constructor
+ * that accepts an `int` and an `std::string`, the following line should be added to the
+ * end of the .cpp file (without the quotations):
+ * "static TConstructorArgsGenericFactory<std::string, Backend,
+ *                                        MoveBackend(int, std::string)> factory;"
+ */
 template <class IndexType, typename TypeToCreate, typename ConstructorType>
 class TConstructorArgsGenericFactory
     : public ConstructorArgsGenericFactory<IndexType, TypeToCreate>
@@ -204,9 +222,10 @@ class TConstructorArgsGenericFactory
     using ConstructorFunctionTraits = fn_traits<ConstructorType>;
 
     // compile time type checking that T is derived class of Generic
-    static_assert(std::is_base_of<TypeToCreate,
-                                  typename ConstructorFunctionTraits::result_type>::value,
-                  "T must be derived class of TypeToCreate!");
+    static_assert(
+        std::is_base_of<TypeToCreate,
+                        typename ConstructorFunctionTraits::result_type>::value,
+        "ConstructorFunctionTraits::result_type must be derived class of TypeToCreate!");
 
     using args_tuple_type = typename ConstructorFunctionTraits::args_tuple_type;
 
