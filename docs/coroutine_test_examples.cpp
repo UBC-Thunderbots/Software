@@ -292,6 +292,7 @@ void moveFromStackToHeapFMO()
 
     // Output
     // 99
+    // (printouts stop working after this point)
 }
 
 void moveFromStackToHeapDMO()
@@ -319,6 +320,7 @@ void moveFromStackToHeapDMO()
 
     // Output
     // 99
+    // (printouts stop working after this point)
 }
 
 void moveFromStackToHeapNMO()
@@ -346,6 +348,7 @@ void moveFromStackToHeapNMO()
 
     // Output
     // 99
+    // (printouts stop working after this point)
 }
 
 void moveFromHeapToStack()
