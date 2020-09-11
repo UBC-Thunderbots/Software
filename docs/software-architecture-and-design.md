@@ -292,7 +292,6 @@ To summarize, the best practices are as follows:
 # Conventions
 Various conventions we use and follow that you need to know.
 
-
 ## Coordinates
 We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularily important for any code handling gameplay logic and positions on the field.
 
