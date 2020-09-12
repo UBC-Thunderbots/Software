@@ -1,21 +1,16 @@
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
+#include <cstring>
 #include <regex>
 
 #include "clang-c/Index.h"
-
+#include "yaml-cpp/yaml.h"
 
 extern "C"
 {
-#include "shared/parameter_v2/c/config.h"
-#include "shared/parameter_v2/c/parameter.h"
+#include "shared/parameter_v2/c_parameters.h"
 }
-
-#include <cstring>
-
-#include "yaml-cpp/yaml.h"
-
 /**
  * This function converts a config file names into config struct names.
  *
@@ -73,7 +68,7 @@ class YamlLoadFixture : public ::testing::Test
     void SetUp() override
     {
         // this is loaded from bazel data
-        boost::filesystem::path path("./shared/parameter_v2/config/test");
+        boost::filesystem::path path("./shared/parameter_v2/config_definitions/test");
 
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {
@@ -131,11 +126,9 @@ class YamlLoadFixture : public ::testing::Test
 TEST_F(YamlLoadFixture, MemoryInitializationSanityCheck)
 {
     const ThunderbotsConfig_t* config = app_dynamic_parameters_create();
-    ASSERT_EQ(app_dynamic_parameters_getBool(config->Example->example_bool_param), true);
-    ASSERT_EQ(app_dynamic_parameters_getInt(config->Example->example_int_param), 3);
-    ASSERT_EQ(std::string((app_dynamic_parameters_getString(
-                  config->Example->example_string_param))),
-              "Hello World");
+    ASSERT_EQ(config->Example->example_bool_param, true);
+    ASSERT_EQ(config->Example->example_int_param, 3);
+    ASSERT_EQ(std::string(config->Example->example_string_param), "Hello World");
     app_dynamic_parameters_destroy(config);
 }
 

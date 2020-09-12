@@ -71,9 +71,8 @@ class CConfig(object):
 
         """
         definition_contents = "".join(
-            [CConfig.INCLUDE_CONFIG.format(name=conf) for conf in self.configs]
-        ) + "".join([parameter.definition for parameter in self.parameters])
-
+            [parameter.definition for parameter in self.parameters]
+        ) + "".join([CConfig.INCLUDE_CONFIG.format(name=conf) for conf in self.configs])
         return CConfig.DEFINITION.format(
             name=self.config_name, contents=definition_contents
         )

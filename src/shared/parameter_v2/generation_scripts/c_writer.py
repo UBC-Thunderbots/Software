@@ -15,16 +15,10 @@ class CWriter(object):
         "#pragma once\n"
         "#include <memory.h>\n"
         "#include <stdlib.h>\n"
-        '#include "shared/parameter_v2/c/parameter.h"\n'
         "{contents}\n const "
         "{top_level_config_name}_t* app_dynamic_parameters_create(void);\n"
         "void app_dynamic_parameters_destroy(const {top_level_config_name}_t*"
         "{top_level_config_name}_ptr);\n"
-    )
-
-    CONFIG_C = (
-        '#include "shared/parameter_v2/c/parameter.h"\n'
-        '#include "shared/parameter_v2/c/{output_file}.h"\n'
         "const {top_level_config_name}_t* app_dynamic_parameters_create(void)\n"
         "{{{app_dynamic_parameters_create_impl} \n"
         "return {top_level_config_name}_config;}}\n"
@@ -63,8 +57,7 @@ class CWriter(object):
             config = CConfig(
                 config_name, "{}_ptr->{}".format(top_level_config_name, config_name)
             )
-
-            top_level_config.include_config(config_name)
+            config_empty = True
 
             # add all the valid CParameters to the CConfig
             if PARAMETER_KEY in metadata:
@@ -88,13 +81,11 @@ class CWriter(object):
                         )
 
                         c_param = CParameter(
-                            param_metadata["name"],
-                            param_type,
-                            param_metadata["value"],
-                            ptr_to_instance,
+                            param_metadata["name"], param_type, param_metadata["value"],
                         )
 
                         config.add_parameter(c_param)
+                        config_empty = False
 
             if INCLUDE_KEY in metadata:
                 for included_yaml in metadata["include"]:
@@ -102,8 +93,11 @@ class CWriter(object):
                     config.include_config(
                         CWriter.to_camel_case(included_yaml.split(".")[0])
                     )
+                    config_empty = False
 
-            c_configs.append(config)
+            if not config_empty:
+                top_level_config.include_config(config_name)
+                c_configs.append(config)
 
         c_configs.append(top_level_config)
 
@@ -125,8 +119,12 @@ class CWriter(object):
             top_level_config_name, config_metadata
         )
 
-        # generate c file
-        with open(f"{output_file}.c", "w") as c_file:
+        # generate header file
+        with open(f"{output_file}", "w") as header_file:
+
+            # forward declerations and definitions
+            contents = "".join([conf.forward_declaration for conf in c_configs])
+            contents += "".join([conf.definition for conf in c_configs])
 
             app_dynamic_parameters_create_impl = ""
             app_dynamic_parameters_destroy_impl = ""
@@ -145,28 +143,15 @@ class CWriter(object):
 
             # create destructor
             for config in c_configs:
-                for param in config.get_parameters():
-                    app_dynamic_parameters_destroy_impl += param.destructor
                 app_dynamic_parameters_destroy_impl += config.free
-
-            c_file.write(
-                CWriter.CONFIG_C.format(
-                    output_file=output_file,
-                    top_level_config_name=top_level_config_name,
-                    app_dynamic_parameters_destroy_impl=app_dynamic_parameters_destroy_impl,
-                    app_dynamic_parameters_create_impl=app_dynamic_parameters_create_impl,
-                )
-            )
-
-        # generate header file
-        with open(f"{output_file}.h", "w") as header_file:
-
-            contents = "".join([conf.forward_declaration for conf in c_configs])
-            contents += "".join([conf.definition for conf in c_configs])
 
             header_file.write(
                 CWriter.CONFIG_H.format(
-                    contents=contents, top_level_config_name=top_level_config_name
+                    contents=contents,
+                    output_file=output_file,
+                    top_level_config_name=top_level_config_name,
+                    app_dynamic_parameters_create_impl=app_dynamic_parameters_create_impl,
+                    app_dynamic_parameters_destroy_impl=app_dynamic_parameters_destroy_impl,
                 )
             )
 

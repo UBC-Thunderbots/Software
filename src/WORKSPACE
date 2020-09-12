@@ -209,7 +209,7 @@ pip_install()
 
 pip3_import(
     name = "dynamic_parameter_deps",
-    requirements = "//shared/parameter_v2/scripts:requirements.txt",
+    requirements = "//shared/parameter_v2/generation_scripts:requirements.txt",
 )
 
 load("@dynamic_parameter_deps//:requirements.bzl", "pip_install")
