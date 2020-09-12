@@ -78,9 +78,9 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
 {
     auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    setWheelControlPrimitive(std::move(direct_control_primitive_msg));
+    setWheelControlPrimitiveFromUI(std::move(direct_control_primitive_msg));
     setChargeModeFromUI(std::move(direct_control_primitive_msg));
-    setChickCommandPrimitive(std::move(direct_control_primitive_msg));
+    setChickCommandPrimitiveFromUI(std::move(direct_control_primitive_msg));
 
     direct_control_primitive_msg->mutable_direct_control()->set_dribbler_speed_rpm(
         main_widget->lineEdit_dribbler_power->text().toFloat());
@@ -126,7 +126,7 @@ void RobotDiagnosticsGUI::setChargeModeFromUI(
 void RobotDiagnosticsGUI::setWheelControlPrimitiveFromUI(
     std::unique_ptr<TbotsProto::Primitive> primitive_msg)
 {
-    // Uses currently selected tabWidget to decide which wheel control Primitive to make
+    // Uses currently selected tab widget to decide which wheel control primitive to make
     switch (main_widget->tabWidget->currentIndex())
     {
         case static_cast<int>(WheelControlTab::DIRECT_PER_WHEEL):
@@ -172,7 +172,7 @@ void RobotDiagnosticsGUI::setWheelControlPrimitiveFromUI(
 void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
     std::unique_ptr<TbotsProto::Primitive> primitive_msg)
 {
-    // Uses the autochick buttonGroup to decide which primitive to make
+    // Uses the auto chick button group to decide which chick command primitive to make
     if (main_widget->buttonGroup_autochick->checkedButton() ==
         main_widget->radioButton_autochick_none)
     {
