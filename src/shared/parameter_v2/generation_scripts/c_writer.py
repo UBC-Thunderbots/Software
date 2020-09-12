@@ -57,6 +57,11 @@ class CWriter(object):
             config = CConfig(
                 config_name, "{}_ptr->{}".format(top_level_config_name, config_name)
             )
+
+            # a config can be empty if it has NO constant parameters
+            # an empty config will get generated as an empty struct which is
+            # NOT allowed in C, this flag will make sure we don't generate empty_configs
+            # which is a config that has neither parameters nor includes
             config_empty = True
 
             # add all the valid CParameters to the CConfig
@@ -87,9 +92,9 @@ class CWriter(object):
                         config.add_parameter(c_param)
                         config_empty = False
 
+            # add all the valid included configs to the CConfig
             if INCLUDE_KEY in metadata:
                 for included_yaml in metadata["include"]:
-
                     config.include_config(
                         CWriter.to_camel_case(included_yaml.split(".")[0])
                     )
