@@ -450,10 +450,6 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     Vector robot_perp_vector   = robot_facing_vector.perpendicular();
 
     Vector ball_momentum = physics_ball->momentum();
-    //    Vector dribbler_head_on_momentum = ball_momentum.project(robot_facing_vector);
-    //        physics_ball->applyImpulse(-dribbler_head_on_momentum *
-    //        DRIBBLER_HEAD_ON_DAMPING);
-
     Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
     physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
 
