@@ -221,15 +221,6 @@ class SimulatorRobot
    private:
     /**
      * A function that is called during every physics step for as long as the ball
-     * is touching this robot's chicker
-     *
-     * @param physics_robot The robot involved in the contact
-     * @param physics_ball The ball invovled in the contact
-     */
-    void onChickerBallContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
-
-    /**
-     * A function that is called during every physics step for as long as the ball
      * is touching this robot's dribbler
      *
      * @param physics_robot The robot involved in the contact
@@ -269,6 +260,15 @@ class SimulatorRobot
         std::function<float(std::shared_ptr<PhysicsRobot>)> func);
     unsigned int checkValidAndReturnUint(
         std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
+
+    /**
+     * Applies force to the physics ball to simulate it being dribbled by the
+     * physics robot.
+     *
+     * @param physics_robot The robot that should dribble the ball
+     * @param physics_ball The ball to be dribbled
+     */
+    void applyDribblerForce(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
 
     std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<float> autokick_speed_m_per_s;
