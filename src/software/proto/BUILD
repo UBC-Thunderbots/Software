@@ -41,6 +41,14 @@ proto_library(
     ],
 )
 
+proto_library(
+    name = "defending_side_msg_proto",
+    srcs = [
+        "defending_side_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
+)
+
 cc_proto_library(
     name = "ssl_cc_proto",
     deps = [":ssl_proto"],
@@ -54,4 +62,9 @@ cc_proto_library(
 cc_proto_library(
     name = "replay_msg_cc_proto",
     deps = [":replay_msg_proto"],
+)
+
+cc_proto_library(
+    name = "defending_side_msg_cc_proto",
+    deps = [":defending_side_msg_proto"],
 )

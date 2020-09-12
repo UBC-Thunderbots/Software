@@ -173,7 +173,8 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
 {
     // Check if we can shoot on the enemy goal from the receiver position
     std::optional<Shot> best_shot_opt =
-        calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
+        calcBestShotOnGoal(field, friendly_team, enemy_team, robot->position(),
+                           TeamType::ENEMY, {*this->getAssignedRobot()});
 
     // Vector from the ball to the robot
     Vector robot_to_ball = ball.position() - robot->position();

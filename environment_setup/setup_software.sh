@@ -33,11 +33,14 @@ sudo add-apt-repository ppa:maarten-fonville/protobuf -y
 
 sudo apt-get update
 
+# (sorted alphabetically)
 host_software_packages=(
     cmake # Needed to build some of our dependencies
     codespell # Fixes typos
     curl
+    default-jdk # Needed for Bazel to run properly
     gcc-7 # We use gcc 7.4.0
+    git # required for build
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
     libprotobuf-dev
@@ -45,14 +48,14 @@ host_software_packages=(
     libusb-1.0-0-dev
     protobuf-compiler
     protobuf-compiler # This is required for the "NanoPb" library, which does not
-                      # properly manage this as a bazel dependency, so we have 
+                      # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
     python-minimal # This is required for bazel, we've seen some issues where
                    # the bazel install hasn't installed it properly
     python3       # Python 3
     python3-pip   # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
-                    # properly manage this as a bazel dependency, so we have 
+                    # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
     python3-yaml # Load dynamic parameter configuration files
     qt5-default # The GUI library for our visualizer
@@ -72,7 +75,7 @@ echo "Done Installing Newer Valgrind Version"
 echo "================================================================"
 
 # Install Bazel
-echo "================================================================" 
+echo "================================================================"
 echo "Installing Bazel"
 echo "================================================================"
 

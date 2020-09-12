@@ -48,7 +48,7 @@ class SimulatorRobotSingletonTest : public testing::Test
         if (physics_robot.lock())
         {
             simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, FieldSide::NEG_X);
         }
         else
         {
@@ -1292,7 +1292,7 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
     auto simulator_robot_7 =
         std::make_shared<SimulatorRobot>(friendly_physics_robots.at(0));
 
-    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_7);
+    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_7, FieldSide::NEG_X);
     auto firmware_robot_7 = SimulatorRobotSingleton::createFirmwareRobot();
     EXPECT_FLOAT_EQ(1.2f, app_firmware_robot_getPositionX(firmware_robot_7.get()));
     EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionY(firmware_robot_7.get()));
@@ -1304,7 +1304,7 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
     // though we didn't need to create a new FirmwareRobot_t
     auto simulator_robot_2 =
         std::make_shared<SimulatorRobot>(friendly_physics_robots.at(1));
-    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_2);
+    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_2, FieldSide::NEG_X);
     auto firmware_robot_2 = SimulatorRobotSingleton::createFirmwareRobot();
     EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionX(firmware_robot_2.get()));
     EXPECT_FLOAT_EQ(-4.03f, app_firmware_robot_getPositionY(firmware_robot_2.get()));

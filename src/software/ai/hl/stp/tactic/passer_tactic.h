@@ -62,4 +62,10 @@ class PasserTactic : public Tactic
     Pass pass;
     Ball ball;
     Field field;
+
+    // How fast the ball must be moving for the passer to try intercept it
+    // before passing. This is primarily used to detect if we are passing in
+    // a set play or not, like a corner kick. The value is non-zero to account
+    // for any noise in the ball's velocity from the camera and filter.
+    static constexpr double INTERCEPT_BALL_SPEED_THRESHOLD = 0.1;
 };

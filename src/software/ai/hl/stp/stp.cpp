@@ -256,10 +256,9 @@ bool STP::overrideAIPlayIfApplicable()
                              << TYPENAME(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
-            return true;
         }
     }
-    return false;
+    return override_play;
 }
 
 void STP::assignRobotsToTactics(const World& world,
