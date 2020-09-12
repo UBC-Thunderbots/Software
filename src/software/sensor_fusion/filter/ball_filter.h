@@ -31,7 +31,9 @@
 class BallFilter
 {
    public:
-    // The min and max sizes of the ball detection buffer
+    // The min and max sizes of the ball detection buffer.
+    // As the ball slows down, the buffer size will approach the MAX_BUFFER_SIZE.
+    // As the ball speeds up, the buffer size will approach the MIN_BUFFER_SIZE.
     static constexpr unsigned int MIN_BUFFER_SIZE = 4;
     static constexpr unsigned int MAX_BUFFER_SIZE = 10;
     // If the estimated ball speed is less than this value, the largest possible buffer
