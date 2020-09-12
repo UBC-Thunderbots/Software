@@ -484,25 +484,4 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     // Counteract the force pushing the ball into the robot so there is approximately 0
     // net force, so that the robot won't move due to dribbling
     physics_robot->applyForceToCenter(-(head_on_force.normalize(head_on_magnitude)));
-
-
-    // Combine a polynomial with a slightly offset linear function. This shifts the
-    // intercept with the x-axis to a small positive x-value, so that there is a small
-    // region when the ball is extremely close to the back of the dribbler area (and
-    // close to the chicker) where a tiny amount of force will be applied away from
-    // the robot. This helps prevent us from applying a force into the robot while the
-    // ball is touching it and creating a net force that moves the robot.
-    //
-    // The constants in this equation have been tuned manually so that the dribbling
-    // scenarios in the unit tests pass, which represent reasonable dribbling
-    // behaviour.
-    //        double polynomial_component = 0.1 * std::pow(dist_from_dribble_point_cm, 3);
-    //        double linear_component     = ((1.0 / 10.0) * (dist_from_dribble_point_cm -
-    //        0.5)); double dribble_force_magnitude = polynomial_component +
-    //        linear_component; dribble_force_magnitude =
-    //            std::clamp<double>(dribble_force_magnitude, 0, dribble_force_magnitude);
-    //        dribble_force_vector =
-    //        dribble_force_vector.normalize(dribble_force_magnitude);
-    //
-    //        physics_ball->applyForce(dribble_force_vector);
 }
