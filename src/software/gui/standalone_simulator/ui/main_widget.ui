@@ -54,7 +54,7 @@
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
+       <spacer name="simulation_controls_horizontal_spacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>

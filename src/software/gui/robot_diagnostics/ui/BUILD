@@ -7,6 +7,7 @@ qt_ui_library(
     ui = "main_widget.ui",
     deps = [
         "//software/gui/generic_widgets/robot_status:robot_status_table",
+        "//software/gui/robot_diagnostics/widgets:decimal_progress_bar",
         "@qt//:qt_widgets",
     ],
 )
