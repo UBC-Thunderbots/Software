@@ -78,87 +78,9 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
 {
     auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    // Uses currently selected tabWidget to decide which wheel control Primitive to make
-    switch (main_widget->tabWidget->currentIndex())
-    {
-        case static_cast<int>(WheelControlTab::DIRECT_PER_WHEEL):
-            direct_control_primitive_msg->mutable_direct_control()
-                ->mutable_direct_per_wheel_control()
-                ->set_front_left_wheel_rpm(
-                    main_widget->lineEdit_direct_per_wheel_fl->text().toFloat());
-            direct_control_primitive_msg->mutable_direct_control()
-                ->mutable_direct_per_wheel_control()
-                ->set_front_right_wheel_rpm(
-                    main_widget->lineEdit_direct_per_wheel_fr->text().toFloat());
-            direct_control_primitive_msg->mutable_direct_control()
-                ->mutable_direct_per_wheel_control()
-                ->set_back_left_wheel_rpm(
-                    main_widget->lineEdit_direct_per_wheel_bl->text().toFloat());
-            direct_control_primitive_msg->mutable_direct_control()
-                ->mutable_direct_per_wheel_control()
-                ->set_back_right_wheel_rpm(
-                    main_widget->lineEdit_direct_per_wheel_br->text().toFloat());
-            break;
-        case static_cast<int>(WheelControlTab::DIRECT_VELOCITY):
-            direct_control_primitive_msg->mutable_direct_control()
-                ->mutable_direct_velocity_control()
-                ->mutable_velocity()
-                ->set_x_component_meters(
-                    main_widget->lineEdit_direct_velocity_x->text().toFloat());
-            direct_control_primitive_msg->mutable_direct_control()
-                ->mutable_direct_velocity_control()
-                ->mutable_velocity()
-                ->set_y_component_meters(
-                    main_widget->lineEdit_direct_velocity_y->text().toFloat());
-
-            auto angular_velocity_msg =
-                createAngularVelocityProto(AngularVelocity::fromDegrees(
-                    main_widget->lineEdit_direct_velocity_theta->text().toDouble()));
-            *(direct_control_primitive_msg->mutable_direct_control()
-                  ->mutable_direct_velocity_control()
-                  ->mutable_angular_velocity()) = *angular_velocity_msg;
-            break;
-    }
-
-
-    direct_control_primitive_msg->mutable_direct_control()->set_charge_mode(
-        static_cast<TbotsProto::DirectControlPrimitive_ChargeMode>(
-            getChargeModeFromUI()));
-
-    // Uses the autochick buttonGroup to decide which primitive to make
-    if (main_widget->buttonGroup_autochick->checkedButton() ==
-        main_widget->radioButton_autochick_none)
-    {
-        // Checks if chip/kick radio buttons were pressed
-        if (chip_pressed)
-        {
-            direct_control_primitive_msg->mutable_direct_control()
-                ->set_chip_distance_meters(
-                    main_widget->lineEdit_chicker_power->text().toFloat());
-            chip_pressed = false;
-        }
-        else if (kick_pressed)
-        {
-            direct_control_primitive_msg->mutable_direct_control()
-                ->set_kick_speed_meters_per_second(
-                    main_widget->lineEdit_chicker_power->text().toFloat());
-            kick_pressed = false;
-        }
-    }
-    else if (main_widget->buttonGroup_autochick->checkedButton() ==
-             main_widget->radioButton_autochip)
-    {
-        direct_control_primitive_msg->mutable_direct_control()
-            ->set_autochip_distance_meters(
-                main_widget->lineEdit_chicker_power->text().toFloat());
-    }
-    else if (main_widget->buttonGroup_autochick->checkedButton() ==
-             main_widget->radioButton_autokick)
-    {
-        direct_control_primitive_msg->mutable_direct_control()
-            ->set_autokick_speed_meters_per_second(
-                main_widget->lineEdit_chicker_power->text().toFloat());
-    }
+    setWheelControlPrimitive(std::move(direct_control_primitive_msg));
+    setChargeModeFromUI(std::move(direct_control_primitive_msg));
+    setChickCommandPrimitive(std::move(direct_control_primitive_msg));
 
     direct_control_primitive_msg->mutable_direct_control()->set_dribbler_speed_rpm(
         main_widget->lineEdit_dribbler_power->text().toFloat());
@@ -178,25 +100,108 @@ void RobotDiagnosticsGUI::pushPrimitiveSetToBuffer(
     primitive_buffer->push(*primitive_set_msg);
 }
 
-ChargeMode RobotDiagnosticsGUI::getChargeModeFromUI()
+void RobotDiagnosticsGUI::setChargeModeFromUI(
+    std::unique_ptr<TbotsProto::Primitive> primitive_msg)
 {
     if (main_widget->buttonGroup_charge_state->checkedButton() ==
         main_widget->radioButton_charge)
     {
-        return ChargeMode::CHARGE;
+        primitive_msg->mutable_direct_control()->set_charge_mode(
+            TbotsProto::DirectControlPrimitive_ChargeMode_CHARGE);
     }
     else if (main_widget->buttonGroup_charge_state->checkedButton() ==
              main_widget->radioButton_discharge)
     {
-        return ChargeMode::DISCHARGE;
+        primitive_msg->mutable_direct_control()->set_charge_mode(
+            TbotsProto::DirectControlPrimitive_ChargeMode_DISCHARGE);
     }
     else if (main_widget->buttonGroup_charge_state->checkedButton() ==
              main_widget->radioButton_float)
     {
-        return ChargeMode::FLOAT;
+        primitive_msg->mutable_direct_control()->set_charge_mode(
+            TbotsProto::DirectControlPrimitive_ChargeMode_FLOAT);
     }
+}
 
-    return ChargeMode::DISCHARGE;
+void RobotDiagnosticsGUI::setWheelControlPrimitiveFromUI(
+    std::unique_ptr<TbotsProto::Primitive> primitive_msg)
+{
+    // Uses currently selected tabWidget to decide which wheel control Primitive to make
+    switch (main_widget->tabWidget->currentIndex())
+    {
+        case static_cast<int>(WheelControlTab::DIRECT_PER_WHEEL):
+            primitive_msg->mutable_direct_control()
+                ->mutable_direct_per_wheel_control()
+                ->set_front_left_wheel_rpm(
+                    main_widget->lineEdit_direct_per_wheel_fl->text().toFloat());
+            primitive_msg->mutable_direct_control()
+                ->mutable_direct_per_wheel_control()
+                ->set_front_right_wheel_rpm(
+                    main_widget->lineEdit_direct_per_wheel_fr->text().toFloat());
+            primitive_msg->mutable_direct_control()
+                ->mutable_direct_per_wheel_control()
+                ->set_back_left_wheel_rpm(
+                    main_widget->lineEdit_direct_per_wheel_bl->text().toFloat());
+            primitive_msg->mutable_direct_control()
+                ->mutable_direct_per_wheel_control()
+                ->set_back_right_wheel_rpm(
+                    main_widget->lineEdit_direct_per_wheel_br->text().toFloat());
+            break;
+        case static_cast<int>(WheelControlTab::DIRECT_VELOCITY):
+            primitive_msg->mutable_direct_control()
+                ->mutable_direct_velocity_control()
+                ->mutable_velocity()
+                ->set_x_component_meters(
+                    main_widget->lineEdit_direct_velocity_x->text().toFloat());
+            primitive_msg->mutable_direct_control()
+                ->mutable_direct_velocity_control()
+                ->mutable_velocity()
+                ->set_y_component_meters(
+                    main_widget->lineEdit_direct_velocity_y->text().toFloat());
+
+            auto angular_velocity_msg =
+                createAngularVelocityProto(AngularVelocity::fromDegrees(
+                    main_widget->lineEdit_direct_velocity_theta->text().toDouble()));
+            *(primitive_msg->mutable_direct_control()
+                  ->mutable_direct_velocity_control()
+                  ->mutable_angular_velocity()) = *angular_velocity_msg;
+            break;
+    }
+}
+
+void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
+    std::unique_ptr<TbotsProto::Primitive> primitive_msg)
+{
+    // Uses the autochick buttonGroup to decide which primitive to make
+    if (main_widget->buttonGroup_autochick->checkedButton() ==
+        main_widget->radioButton_autochick_none)
+    {
+        // Checks if chip/kick radio buttons were pressed
+        if (chip_pressed)
+        {
+            primitive_msg->mutable_direct_control()->set_chip_distance_meters(
+                main_widget->lineEdit_chicker_power->text().toFloat());
+            chip_pressed = false;
+        }
+        else if (kick_pressed)
+        {
+            primitive_msg->mutable_direct_control()->set_kick_speed_meters_per_second(
+                main_widget->lineEdit_chicker_power->text().toFloat());
+            kick_pressed = false;
+        }
+    }
+    else if (main_widget->buttonGroup_autochick->checkedButton() ==
+             main_widget->radioButton_autochip)
+    {
+        primitive_msg->mutable_direct_control()->set_autochip_distance_meters(
+            main_widget->lineEdit_chicker_power->text().toFloat());
+    }
+    else if (main_widget->buttonGroup_autochick->checkedButton() ==
+             main_widget->radioButton_autokick)
+    {
+        primitive_msg->mutable_direct_control()->set_autokick_speed_meters_per_second(
+            main_widget->lineEdit_chicker_power->text().toFloat());
+    }
 }
 
 void RobotDiagnosticsGUI::setupWidgets()
