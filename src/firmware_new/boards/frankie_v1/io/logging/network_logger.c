@@ -18,7 +18,7 @@ void io_logging_network_logger_task(void* communication_profile)
         (ProtoMulticastCommunicationProfile_t*)communication_profile;
 
     // holds the msg that was just dequeued
-    void* ptr_to_tbots_log_proto;
+    void* ptr_to_tbots_log_proto = NULL;
 
     /* Infinite loop */
     while (osMessageQueueGet(log_message_queue_id, ptr_to_tbots_log_proto, NULL, 0))
@@ -30,7 +30,9 @@ void io_logging_network_logger_task(void* communication_profile)
                 comm_profile);
 
         // copy the data to send into the proto tracked in the profile
-        *log_msg_to_send = *(TbotsProto_TbotsLog*)ptr_to_tbots_log_proto;
+        if (ptr_to_tbots_log_proto != NULL) {
+            *log_msg_to_send = *(TbotsProto_TbotsLog*)ptr_to_tbots_log_proto;
+        }
 
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
