@@ -56,7 +56,7 @@ jobs:
         - >
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
-            //shared/parameter_v2/c/...
+            //shared/parameter_v2/...
     - name: "Check Formatting"
       script:
         - ./formatting_scripts/check_formatting_ci.sh
