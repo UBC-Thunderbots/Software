@@ -78,14 +78,14 @@ class RobotDiagnosticsGUI : public QMainWindow
      *
      * @param primitive_msg The msg to send
      */
-    void pushPrimitiveSetToBuffer(std::unique_ptr<TbotsProto::Primitive> primitive_msg);
+    void pushPrimitiveSetToBuffer(TbotsProto::Primitive& primitive_msg);
 
     /**
      * Uses the UI state to set the charge mode for a direct control primitive
      *
      * @param primitive_msg The primitive msg to set the charge mode for
      */
-    void setChargeModeFromUI(std::unique_ptr<TbotsProto::Primitive> primitive_msg);
+    void setChargeModeFromUI(TbotsProto::Primitive& primitive_msg);
 
     /**
      * Sets the wheel control primitive for a direct control primitive
@@ -93,7 +93,7 @@ class RobotDiagnosticsGUI : public QMainWindow
      * @param primitive_msg The primitive msg to set the wheel control primitive for
      */
     void setWheelControlPrimitiveFromUI(
-        std::unique_ptr<TbotsProto::Primitive> primitive_msg);
+            TbotsProto::Primitive& primitive_msg);
 
     /**
      * Sets the chick command primitive for a direct control primitive
@@ -101,7 +101,7 @@ class RobotDiagnosticsGUI : public QMainWindow
      * @param primitive_msg The primitive msg to set the chick command primitive for
      */
     void setChickCommandPrimitiveFromUI(
-        std::unique_ptr<TbotsProto::Primitive> primitive_msg);
+            TbotsProto::Primitive& primitive_msg);
 
     /**
      * Setup widgets

@@ -28,7 +28,7 @@ RobotDiagnosticsGUI::RobotDiagnosticsGUI(
             &RobotDiagnosticsGUI::updateRobotDiagnostics);
     connect(push_primitive_timer, &QTimer::timeout, this, [this]() {
         auto direct_control_primitive = createDirectControlPrimitiveFromUI();
-        pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
+        pushPrimitiveSetToBuffer(*direct_control_primitive);
     });
     update_timer->start(static_cast<int>(update_timer_interval.getMilliseconds()));
     push_primitive_timer->start(
@@ -50,27 +50,27 @@ void RobotDiagnosticsGUI::onChickerStateChanged(double chicker_power,
         kick_pressed = true;
     }
     auto direct_control_primitive = createDirectControlPrimitiveFromUI();
-    pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
+    pushPrimitiveSetToBuffer(*direct_control_primitive);
 }
 
 void RobotDiagnosticsGUI::onDirectVelocityPowerChanged(
     double direct_per_wheel_power, DirectVelocityMode direct_velocity_mode)
 {
     auto direct_control_primitive = createDirectControlPrimitiveFromUI();
-    pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
+    pushPrimitiveSetToBuffer(*direct_control_primitive);
 }
 
 void RobotDiagnosticsGUI::onDirectPerWheelPowerChanged(
     double direct_per_wheel_power, DirectPerWheelMode direct_per_wheel_mode)
 {
     auto direct_control_primitive = createDirectControlPrimitiveFromUI();
-    pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
+    pushPrimitiveSetToBuffer(*direct_control_primitive);
 }
 
 void RobotDiagnosticsGUI::onDribblerPowerChanged(double dribbler_power)
 {
     auto direct_control_primitive = createDirectControlPrimitiveFromUI();
-    pushPrimitiveSetToBuffer(std::move(direct_control_primitive));
+    pushPrimitiveSetToBuffer(*direct_control_primitive);
 }
 
 std::unique_ptr<TbotsProto::Primitive>
@@ -78,9 +78,9 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
 {
     auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    setWheelControlPrimitiveFromUI(std::move(direct_control_primitive_msg));
-    setChargeModeFromUI(std::move(direct_control_primitive_msg));
-    setChickCommandPrimitiveFromUI(std::move(direct_control_primitive_msg));
+    setWheelControlPrimitiveFromUI(*direct_control_primitive_msg);
+    setChargeModeFromUI(*direct_control_primitive_msg);
+    setChickCommandPrimitiveFromUI(*direct_control_primitive_msg);
 
     direct_control_primitive_msg->mutable_direct_control()->set_dribbler_speed_rpm(
         main_widget->lineEdit_dribbler_power->text().toFloat());
@@ -89,71 +89,71 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
 }
 
 void RobotDiagnosticsGUI::pushPrimitiveSetToBuffer(
-    std::unique_ptr<TbotsProto::Primitive> primitive_msg)
+    TbotsProto::Primitive& primitive_msg)
 {
     auto primitive_set_msg = std::make_unique<TbotsProto::PrimitiveSet>();
     *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestamp();
 
     auto& robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
-    robot_primitives_map[robot_selection] = *primitive_msg;
+    robot_primitives_map[robot_selection] = primitive_msg;
 
     primitive_buffer->push(*primitive_set_msg);
 }
 
 void RobotDiagnosticsGUI::setChargeModeFromUI(
-    std::unique_ptr<TbotsProto::Primitive> primitive_msg)
+        TbotsProto::Primitive& primitive_msg)
 {
     if (main_widget->buttonGroup_charge_state->checkedButton() ==
         main_widget->radioButton_charge)
     {
-        primitive_msg->mutable_direct_control()->set_charge_mode(
+        primitive_msg.mutable_direct_control()->set_charge_mode(
             TbotsProto::DirectControlPrimitive_ChargeMode_CHARGE);
     }
     else if (main_widget->buttonGroup_charge_state->checkedButton() ==
              main_widget->radioButton_discharge)
     {
-        primitive_msg->mutable_direct_control()->set_charge_mode(
+        primitive_msg.mutable_direct_control()->set_charge_mode(
             TbotsProto::DirectControlPrimitive_ChargeMode_DISCHARGE);
     }
     else if (main_widget->buttonGroup_charge_state->checkedButton() ==
              main_widget->radioButton_float)
     {
-        primitive_msg->mutable_direct_control()->set_charge_mode(
+        primitive_msg.mutable_direct_control()->set_charge_mode(
             TbotsProto::DirectControlPrimitive_ChargeMode_FLOAT);
     }
 }
 
 void RobotDiagnosticsGUI::setWheelControlPrimitiveFromUI(
-    std::unique_ptr<TbotsProto::Primitive> primitive_msg)
+        TbotsProto::Primitive& primitive_msg)
 {
     // Uses currently selected tab widget to decide which wheel control primitive to make
     switch (main_widget->tabWidget->currentIndex())
     {
         case static_cast<int>(WheelControlTab::DIRECT_PER_WHEEL):
-            primitive_msg->mutable_direct_control()
+            primitive_msg.mutable_direct_control()
                 ->mutable_direct_per_wheel_control()
                 ->set_front_left_wheel_rpm(
                     main_widget->lineEdit_direct_per_wheel_fl->text().toFloat());
-            primitive_msg->mutable_direct_control()
+            primitive_msg.mutable_direct_control()
                 ->mutable_direct_per_wheel_control()
                 ->set_front_right_wheel_rpm(
                     main_widget->lineEdit_direct_per_wheel_fr->text().toFloat());
-            primitive_msg->mutable_direct_control()
+            primitive_msg.mutable_direct_control()
                 ->mutable_direct_per_wheel_control()
                 ->set_back_left_wheel_rpm(
                     main_widget->lineEdit_direct_per_wheel_bl->text().toFloat());
-            primitive_msg->mutable_direct_control()
+            primitive_msg.mutable_direct_control()
                 ->mutable_direct_per_wheel_control()
                 ->set_back_right_wheel_rpm(
                     main_widget->lineEdit_direct_per_wheel_br->text().toFloat());
             break;
         case static_cast<int>(WheelControlTab::DIRECT_VELOCITY):
-            primitive_msg->mutable_direct_control()
+            primitive_msg.mutable_direct_control()
                 ->mutable_direct_velocity_control()
                 ->mutable_velocity()
                 ->set_x_component_meters(
                     main_widget->lineEdit_direct_velocity_x->text().toFloat());
-            primitive_msg->mutable_direct_control()
+            primitive_msg.mutable_direct_control()
                 ->mutable_direct_velocity_control()
                 ->mutable_velocity()
                 ->set_y_component_meters(
@@ -162,7 +162,7 @@ void RobotDiagnosticsGUI::setWheelControlPrimitiveFromUI(
             auto angular_velocity_msg =
                 createAngularVelocityProto(AngularVelocity::fromDegrees(
                     main_widget->lineEdit_direct_velocity_theta->text().toDouble()));
-            *(primitive_msg->mutable_direct_control()
+            *(primitive_msg.mutable_direct_control()
                   ->mutable_direct_velocity_control()
                   ->mutable_angular_velocity()) = *angular_velocity_msg;
             break;
@@ -170,7 +170,7 @@ void RobotDiagnosticsGUI::setWheelControlPrimitiveFromUI(
 }
 
 void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
-    std::unique_ptr<TbotsProto::Primitive> primitive_msg)
+        TbotsProto::Primitive& primitive_msg)
 {
     // Uses the auto chick button group to decide which chick command primitive to make
     if (main_widget->buttonGroup_autochick->checkedButton() ==
@@ -179,13 +179,13 @@ void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
         // Checks if chip/kick radio buttons were pressed
         if (chip_pressed)
         {
-            primitive_msg->mutable_direct_control()->set_chip_distance_meters(
+            primitive_msg.mutable_direct_control()->set_chip_distance_meters(
                 main_widget->lineEdit_chicker_power->text().toFloat());
             chip_pressed = false;
         }
         else if (kick_pressed)
         {
-            primitive_msg->mutable_direct_control()->set_kick_speed_meters_per_second(
+            primitive_msg.mutable_direct_control()->set_kick_speed_meters_per_second(
                 main_widget->lineEdit_chicker_power->text().toFloat());
             kick_pressed = false;
         }
@@ -193,13 +193,13 @@ void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
     else if (main_widget->buttonGroup_autochick->checkedButton() ==
              main_widget->radioButton_autochip)
     {
-        primitive_msg->mutable_direct_control()->set_autochip_distance_meters(
+        primitive_msg.mutable_direct_control()->set_autochip_distance_meters(
             main_widget->lineEdit_chicker_power->text().toFloat());
     }
     else if (main_widget->buttonGroup_autochick->checkedButton() ==
              main_widget->radioButton_autokick)
     {
-        primitive_msg->mutable_direct_control()->set_autokick_speed_meters_per_second(
+        primitive_msg.mutable_direct_control()->set_autokick_speed_meters_per_second(
             main_widget->lineEdit_chicker_power->text().toFloat());
     }
 }
