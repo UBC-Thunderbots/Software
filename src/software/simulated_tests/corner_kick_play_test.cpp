@@ -5,6 +5,8 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
+#include "software/simulated_tests/validation_functions/friendly_scored_validation.h"
+#include "software/simulated_tests/validation_functions/robot_received_ball_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -15,6 +17,7 @@ class CornerKickPlayTest : public SimulatedTestFixture
 
 TEST_F(CornerKickPlayTest, test_corner_kick_play)
 {
+    enableVisualizer();
     setBallState(BallState(Point(4.5, -3), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
