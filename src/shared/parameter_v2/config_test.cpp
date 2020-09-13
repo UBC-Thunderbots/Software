@@ -23,6 +23,12 @@ extern "C"
  */
 std::string toCamelCase(const std::string& snake_case_input)
 {
+    if (snake_case_input == "" || snake_case_input.back() == '_')
+    {
+        throw std::invalid_argument("toCamelCase called with invalid snake_case input: " +
+                                    snake_case_input);
+    }
+
     std::string ret_str = "";
     ret_str += (char)toupper(snake_case_input[0]);
 
