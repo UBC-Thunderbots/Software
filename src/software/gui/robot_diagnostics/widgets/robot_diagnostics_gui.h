@@ -92,16 +92,14 @@ class RobotDiagnosticsGUI : public QMainWindow
      *
      * @param primitive_msg The primitive msg to set the wheel control primitive for
      */
-    void setWheelControlPrimitiveFromUI(
-            TbotsProto::Primitive& primitive_msg);
+    void setWheelControlPrimitiveFromUI(TbotsProto::Primitive& primitive_msg);
 
     /**
      * Sets the chick command primitive for a direct control primitive
      *
      * @param primitive_msg The primitive msg to set the chick command primitive for
      */
-    void setChickCommandPrimitiveFromUI(
-            TbotsProto::Primitive& primitive_msg);
+    void setChickCommandPrimitiveFromUI(TbotsProto::Primitive& primitive_msg);
 
     /**
      * Setup widgets

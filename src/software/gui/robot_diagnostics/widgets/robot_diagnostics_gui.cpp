@@ -88,8 +88,7 @@ RobotDiagnosticsGUI::createDirectControlPrimitiveFromUI()
     return direct_control_primitive_msg;
 }
 
-void RobotDiagnosticsGUI::pushPrimitiveSetToBuffer(
-    TbotsProto::Primitive& primitive_msg)
+void RobotDiagnosticsGUI::pushPrimitiveSetToBuffer(TbotsProto::Primitive& primitive_msg)
 {
     auto primitive_set_msg = std::make_unique<TbotsProto::PrimitiveSet>();
     *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestamp();
@@ -100,8 +99,7 @@ void RobotDiagnosticsGUI::pushPrimitiveSetToBuffer(
     primitive_buffer->push(*primitive_set_msg);
 }
 
-void RobotDiagnosticsGUI::setChargeModeFromUI(
-        TbotsProto::Primitive& primitive_msg)
+void RobotDiagnosticsGUI::setChargeModeFromUI(TbotsProto::Primitive& primitive_msg)
 {
     if (main_widget->buttonGroup_charge_state->checkedButton() ==
         main_widget->radioButton_charge)
@@ -124,7 +122,7 @@ void RobotDiagnosticsGUI::setChargeModeFromUI(
 }
 
 void RobotDiagnosticsGUI::setWheelControlPrimitiveFromUI(
-        TbotsProto::Primitive& primitive_msg)
+    TbotsProto::Primitive& primitive_msg)
 {
     // Uses currently selected tab widget to decide which wheel control primitive to make
     switch (main_widget->tabWidget->currentIndex())
@@ -170,7 +168,7 @@ void RobotDiagnosticsGUI::setWheelControlPrimitiveFromUI(
 }
 
 void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
-        TbotsProto::Primitive& primitive_msg)
+    TbotsProto::Primitive& primitive_msg)
 {
     // Uses the auto chick button group to decide which chick command primitive to make
     if (main_widget->buttonGroup_autochick->checkedButton() ==
