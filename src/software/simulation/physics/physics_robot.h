@@ -28,10 +28,10 @@ class PhysicsRobot
     // The depth of the dribbling area at the front of the robot.
     // We assume the ball can be dribbled as long as it is anywhere within this small
     // area.
-    static double const dribbler_depth;
-    // The thickness of the chicker fixture shape.
-    static double const chicker_thickness;
-    static double const total_chicker_depth;
+    static double const DRIBBLER_DEPTH;
+    // The thickness of the dribbler damper fixture shape.
+    static double const DRIBBLER_DAMPER_THICKNESS;
+    static double const TOTAL_DRIBBLER_DEPTH;
 
     friend class PhysicsWorld;
 
@@ -98,15 +98,6 @@ class PhysicsRobot
         std::function<void(PhysicsRobot *, PhysicsBall *)> callback);
 
     /**
-     * Adds the given function to this PhysicsRobot's list of chicker-ball contact
-     * callbacks. These callbacks will be called once at the start of the contact.
-     *
-     * @param callback The function to register
-     */
-    void registerChickerBallStartContactCallback(
-        std::function<void(PhysicsRobot *, PhysicsBall *)> callback);
-
-    /**
      * Returns a list of contact callbacks for this class
      *
      * @return a list of contact callbacks for this class
@@ -117,8 +108,6 @@ class PhysicsRobot
     getDribblerBallStartContactCallbacks() const;
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
     getDribblerBallEndContactCallbacks() const;
-    std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
-    getChickerBallStartContactCallbacks() const;
 
     /**
      * Returns the current robot state
@@ -209,12 +198,9 @@ class PhysicsRobot
      * robot and add them to this class' b2Body
      *
      * @param robot_state The robot to create fixtures for
-     * @param total_chicker_depth The distance from the front face of the robot to the
-     * back of the chicker, ie. how far inset into the front of the robot the chicker is
      * @param mass_kg The mass of the robot in kg
      */
-    void setupRobotBodyFixtures(const RobotState &robot_state, double total_chicker_depth,
-                                double mass_kg);
+    void setupRobotBodyFixtures(const RobotState &robot_state, double mass_kg);
 
     /**
      * Creates a robot body fixture with the given shape and density and adds it to this
@@ -226,16 +212,12 @@ class PhysicsRobot
     void setupRobotBodyFixture(const b2PolygonShape *shape, const float density);
 
     /**
-     * Creates a fixture to represent the chicker of the robot. It is partially inset into
-     * the front of the robot.
+     * Creates a fixture to represent the dribbler damper of the robot. It is partially
+     * inset into the front of the robot.
      *
      * @param robot_state The robot to create the fixture for
-     * @param total_chicker_depth The distance from the front face of the robot to the
-     * back of the chicker, ie. how far inset into the front of the robot the chicker is
-     * @param chicker_thickness How thick the chicker fixture shape is
      */
-    void setupChickerFixture(const RobotState &robot_state, double total_chicker_depth,
-                             double chicker_thickness);
+    void setupDribblerDamperFixture(const RobotState &robot_state);
 
     /**
      * Creates a fixture to represent the dribbler of the robot. It does not interact
@@ -244,9 +226,9 @@ class PhysicsRobot
      * robot.
      *
      * @param robot_state The robot to create the fixture for
-     * @param dribbler_depth How far inset into the front of the robot the chicker is
+     * @param dribbler_depth How far inset into the front of the robot the dribbler is
      */
-    void setupDribblerFixture(const RobotState &robot_state, double dribbler_depth);
+    void setupDribblerFixture(const RobotState &robot_state);
 
     /**
      * A helper function that applies force to the robot body as if there was a wheel
@@ -288,7 +270,7 @@ class PhysicsRobot
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
         dribbler_ball_end_contact_callbacks;
     std::vector<std::function<void(PhysicsRobot *, PhysicsBall *)>>
-        chicker_ball_contact_callbacks;
+        dribbler_damper_ball_contact_callbacks;
 
     std::queue<std::function<void()>> post_physics_step_functions;
 
@@ -301,29 +283,29 @@ class PhysicsRobot
     // simulated in the robot firmware to behave reasonably. These values should be
     // changed back to something around 0.2
     // https://github.com/UBC-Thunderbots/Software/issues/1187
-    const double robot_linear_damping  = 2.0;
-    const double robot_angular_damping = 2.0;
+    static constexpr double ROBOT_LINEAR_DAMPING  = 2.0;
+    static constexpr double ROBOT_ANGULAR_DAMPING = 2.0;
 
     // This is a somewhat arbitrary value. Collisions with robots are not perfectly
     // elastic. However because this is an "ideal" simulation and we generally don't care
     // about the exact behaviour of collisions, getting this value to perfectly match
     // reality isn't too important.
-    const double robot_body_restitution = 0.5;
-    const double robot_body_friction    = 0.0;
+    static constexpr double ROBOT_BODY_RESTITUTION = 0.5;
+    static constexpr double ROBOT_BODY_FRICTION    = 0.0;
 
     // The dribbler has no mass in simulation. Mass is already accounted for by the robot
     // body
-    const double robot_dribbler_density = 0.0;
+    static constexpr double DRIBBLER_DENSITY = 0.0;
     // We assume the ContactListener for the world will disable collisions with the
     // dribbler so the restitution and friction don't matter
-    const double robot_dribbler_restitution = 0.0;
-    const double robot_dribbler_friction    = 0.0;
+    static constexpr double DRIBBLER_RESTITUTION = 0.0;
+    static constexpr double DRIBBLER_FRICTION    = 0.0;
 
     // We want perfect damping to help us keep the ball when dribbling
-    const double robot_chicker_restitution = 0.0;
+    static constexpr double DRIBBLER_DAMPER_RESTITUTION = 0.0;
     // We want lots of friction for when the ball is being dribbled so it stays controlled
-    const double robot_chicker_friction = 1.0;
-    // The chicker has no mass in simulation. Mass is already accounted for by the robot
-    // body
-    const double robot_chicker_density = 0.0;
+    static constexpr double DRIBBLER_DAMPER_FRICTION = 1.0;
+    // The dribbler damper has no mass in simulation. Mass is already accounted for by the
+    // robot body
+    static constexpr double DRIBBLER_DAMPER_DENSITY = 0.0;
 };
