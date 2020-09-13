@@ -87,9 +87,3 @@ void StandaloneSimulatorGUI::updateDrawViewArea()
         remaining_attempts_to_set_view_area--;
     }
 }
-
-void StandaloneSimulatorGUI::updateLCDDisplay()
-{
-    main_widget->lcd_number->display(10);
-
-}

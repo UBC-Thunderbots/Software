@@ -192,6 +192,20 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
+          <layout class="QHBoxLayout" name="data_per_second_layout">
+           <item>
+            <widget class="QLabel" name="data_per_second_hz_label">
+             <property name="text">
+              <string>Data Per Second (Hz)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLCDNumber" name="lcd_number"/>
+           </item>
+          </layout>
+         </item>
+         <item>
           <spacer name="ai_tab_vertical_spacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>

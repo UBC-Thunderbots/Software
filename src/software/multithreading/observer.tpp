@@ -29,5 +29,5 @@ double Observer<T>::getDataReceivedPerSecond()
 {
     auto time = (time_buffer.back() - time_buffer.front());
     double seconds = (double)(time.count())/1000;
-    return seconds > 0 ? time_buffer.size()/seconds : 0;
+    return seconds > 0 ? (double)time_buffer.size()/seconds : 0;
 }
