@@ -44,7 +44,6 @@ class CornerKickPlay : public Play
      * @param yield The coroutine to yield
      * @param goalie_tactic The goalie tactic to use
      * @param bait_move_tactic_1, bait_move_tactic_2 The bait move tactics
-     * @param kick_from_pos_corner Whether the kick is from the +y corner
      * @param world The current state of the world
      *
      * @return the pass that was committed to
@@ -52,8 +51,7 @@ class CornerKickPlay : public Play
     Pass setupPass(TacticCoroutine::push_type &yield,
                    std::shared_ptr<MoveTactic> bait_move_tactic_1,
                    std::shared_ptr<MoveTactic> bait_move_tactic_2,
-                   std::shared_ptr<GoalieTactic> goalie_tactic, bool kick_from_pos_corner,
-                   const World &world);
+                   std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
 
     /**
      * Updates the pass generator

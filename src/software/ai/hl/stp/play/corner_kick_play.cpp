@@ -60,16 +60,15 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
      *
      */
 
-    // Figure out if we're taking the kick from the +y or -y corner
-    bool kick_from_pos_corner = world.ball().position().y() > 0;
-
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
     // Setup two bait robots on the opposite side of the field to where the corner kick
     // is taking place to pull enemies away from the goal
-    Point opposite_corner_to_kick = kick_from_pos_corner ? world.field().enemyCornerNeg()
-                                                         : world.field().enemyCornerPos();
+    Point opposite_corner_to_kick = (world.ball().position().y() > 0)
+                                        ? world.field().enemyCornerNeg()
+                                        : world.field().enemyCornerPos();
+
     Point bait_move_tactic_1_pos =
         opposite_corner_to_kick - Vector(world.field().enemyDefenseArea().yLength() * 0.5,
                                          copysign(0.5, opposite_corner_to_kick.y()));
@@ -85,8 +84,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
         bait_move_tactic_2_pos,
         (world.field().enemyGoalCenter() - bait_move_tactic_2_pos).orientation(), 0.0);
 
-    Pass pass = setupPass(yield, bait_move_tactic_1, bait_move_tactic_2, goalie_tactic,
-                          kick_from_pos_corner, world);
+    Pass pass =
+        setupPass(yield, bait_move_tactic_1, bait_move_tactic_2, goalie_tactic, world);
 
     // Perform the pass and wait until the receiver is finished
     auto passer =
@@ -109,14 +108,14 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
                                std::shared_ptr<MoveTactic> bait_move_tactic_1,
                                std::shared_ptr<MoveTactic> bait_move_tactic_2,
                                std::shared_ptr<GoalieTactic> goalie_tactic,
-                               bool kick_from_pos_corner, const World &world)
+                               const World &world)
 {
     // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
     // field in the +x half. We also further offset the rectangle from the goal line
     // for the cherry-picker closer to where we're taking the corner kick from
     Vector pos_y_goalline_x_offset(world.field().enemyDefenseArea().yLength(), 0);
     Vector neg_y_goalline_x_offset(world.field().enemyDefenseArea().yLength(), 0);
-    if (kick_from_pos_corner)
+    if (world.ball().position().y() > 0)
     {
         pos_y_goalline_x_offset += {world.field().enemyDefenseArea().yLength(), 0};
     }
