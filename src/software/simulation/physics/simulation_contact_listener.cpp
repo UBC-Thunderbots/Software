@@ -24,16 +24,7 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
             }
         }
 
-        if (auto ball_chicker_pair = isBallChickerContact(user_data_a, user_data_b))
-        {
-            PhysicsBall *ball   = ball_chicker_pair->first;
-            PhysicsRobot *robot = ball_chicker_pair->second;
-            for (auto contact_callback : robot->getChickerBallStartContactCallbacks())
-            {
-                contact_callback(robot, ball);
-            }
-        }
-        if (auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
+        if (auto ball_dribbler_pair = isDribblerBallContact(user_data_a, user_data_b))
         {
             PhysicsBall *ball   = ball_dribbler_pair->first;
             PhysicsRobot *robot = ball_dribbler_pair->second;
@@ -70,12 +61,12 @@ void SimulationContactListener::PreSolve(b2Contact *contact,
             }
         }
 
-        if (auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
+        if (auto ball_dribbler_pair = isDribblerBallContact(user_data_a, user_data_b))
         {
             // We always disable contacts between the ball and the dribbler so that the
             // ball can pass through the dribbler area. This is needed so that the ball
             // can exist inside the dribbling "zone", as well as pass through the dribbler
-            // to make contact with the robot chicker
+            // to make contact with the dribbler damper
             contact->SetEnabled(false);
             PhysicsBall *ball   = ball_dribbler_pair->first;
             PhysicsRobot *robot = ball_dribbler_pair->second;
@@ -84,10 +75,11 @@ void SimulationContactListener::PreSolve(b2Contact *contact,
                 contact_callback(robot, ball);
             }
         }
-        if (auto ball_chicker_pair = isBallChickerContact(user_data_a, user_data_b))
+        if (auto ball_dribbler_damper_pair =
+                isDribblerDamperBallContact(user_data_a, user_data_b))
         {
-            // Ensure that the ball is perfectly damped if it collides with the chicker.
-            // This helps the robot keep the ball while dribbling.
+            // Ensure that the ball is perfectly damped if it collides with the dribbler
+            // damper. This helps the robot keep the ball while dribbling.
             contact->SetRestitution(0.0);
         }
     }
@@ -115,7 +107,7 @@ void SimulationContactListener::EndContact(b2Contact *contact)
         }
     }
 
-    if (auto ball_dribbler_pair = isBallDribblerContact(user_data_a, user_data_b))
+    if (auto ball_dribbler_pair = isDribblerBallContact(user_data_a, user_data_b))
     {
         PhysicsBall *ball   = ball_dribbler_pair->first;
         PhysicsRobot *robot = ball_dribbler_pair->second;
@@ -127,8 +119,8 @@ void SimulationContactListener::EndContact(b2Contact *contact)
 }
 
 std::optional<std::pair<PhysicsBall *, PhysicsRobot *>>
-SimulationContactListener::isBallChickerContact(PhysicsObjectUserData *user_data_a,
-                                                PhysicsObjectUserData *user_data_b)
+SimulationContactListener::isDribblerDamperBallContact(PhysicsObjectUserData *user_data_a,
+                                                       PhysicsObjectUserData *user_data_b)
 {
     if (!user_data_a || !user_data_b)
     {
@@ -168,7 +160,7 @@ SimulationContactListener::isBallChickerContact(PhysicsObjectUserData *user_data
 }
 
 std::optional<std::pair<PhysicsBall *, PhysicsRobot *>>
-SimulationContactListener::isBallDribblerContact(PhysicsObjectUserData *user_data_a,
+SimulationContactListener::isDribblerBallContact(PhysicsObjectUserData *user_data_a,
                                                  PhysicsObjectUserData *user_data_b)
 {
     if (!user_data_a || !user_data_b)
