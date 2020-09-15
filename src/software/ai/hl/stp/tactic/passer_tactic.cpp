@@ -87,10 +87,8 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // vector with sufficient velocity
         Angle passer_to_receiver_angle =
             (pass.receiverPoint() - pass.passerPoint()).orientation();
-        ball_velocity_to_pass_orientation =
-            ball.velocity().orientation().minDiff(passer_to_receiver_angle);
-    } while (ball_velocity_to_pass_orientation.abs() > Angle::fromDegrees(20) ||
-             ball.velocity().length() < 0.5);
+
+    } while (~successfulKickDetected(ball, passer_to_receiver_angle));
 }
 
 void PasserTactic::accept(MutableTacticVisitor& visitor)
