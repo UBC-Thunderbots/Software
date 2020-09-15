@@ -9,14 +9,14 @@
 
 class PhysicsBallTest : public testing::Test
 {
-public:
+   public:
     // 5 and 8 here are somewhat arbitrary values for the velocity and position
     // iterations but are the recommended defaults from
     // https://www.iforce2d.net/b2dtut/worlds
     static constexpr int BOX2D_STEP_VELOCITY_ITERATIONS = 5;
     static constexpr int BOX2D_STEP_POSITION_ITERATIONS = 8;
 
-protected:
+   protected:
     virtual void SetUp()
     {
         b2Vec2 gravity(0, 0);
@@ -27,7 +27,7 @@ protected:
     {
         double step_size_seconds = 1.0 / 60.0;
         unsigned int num_steps =
-                static_cast<unsigned int>(duration.getSeconds() / step_size_seconds);
+            static_cast<unsigned int>(duration.getSeconds() / step_size_seconds);
 
         // We have to take lots of small steps because a significant amount of accuracy
         // is lost if we take a single step of 1 second
@@ -124,7 +124,8 @@ TEST_F(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulatio
     EXPECT_LT((Vector(1, -2) - ball.velocity()).length(), 1e-5);
 }
 
-TEST_F(PhysicsBallTest, test_ball_acceleration_and_velocity_updates_during_simulation_step)
+TEST_F(PhysicsBallTest,
+       test_ball_acceleration_and_velocity_updates_during_simulation_step)
 {
     b2Vec2 gravity(3, -0.5);
     auto world = std::make_shared<b2World>(gravity);
@@ -132,8 +133,10 @@ TEST_F(PhysicsBallTest, test_ball_acceleration_and_velocity_updates_during_simul
     BallState initial_ball_state(Point(0, 0), Vector(0, 0));
     auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0);
 
-    for(unsigned int i = 0; i < 60; i++) {
-        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto ball = physics_ball.getBallState();
@@ -210,7 +213,8 @@ TEST_F(PhysicsBallTest, test_apply_force_to_stationary_ball)
     for (unsigned int i = 0; i < 60; i++)
     {
         physics_ball.applyForce(Vector(1, 2));
-        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto ball = physics_ball.getBallState();
@@ -229,7 +233,8 @@ TEST_F(PhysicsBallTest, test_apply_force_to_reverse_direction_of_moving_ball)
     for (unsigned int i = 0; i < 60; i++)
     {
         physics_ball.applyForce(Vector(-2, 4));
-        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto ball = physics_ball.getBallState();
@@ -248,7 +253,8 @@ TEST_F(PhysicsBallTest, test_apply_force_to_change_direction_of_moving_ball)
     for (unsigned int i = 0; i < 60; i++)
     {
         physics_ball.applyForce(Vector(0, -1));
-        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto ball = physics_ball.getBallState();
@@ -261,7 +267,8 @@ TEST_F(PhysicsBallTest, test_apply_impulse_to_stationary_ball)
     auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0);
 
     physics_ball.applyImpulse(Vector(1, 2));
-    world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+    world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                BOX2D_STEP_POSITION_ITERATIONS);
 
     auto ball = physics_ball.getBallState();
     EXPECT_LT((ball.velocity() - Vector(1, 2)).length(), 0.05);
@@ -273,7 +280,8 @@ TEST_F(PhysicsBallTest, test_apply_impulse_to_stop_moving_ball)
     auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0);
 
     physics_ball.applyImpulse(Vector(-2, 1));
-    world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+    world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                BOX2D_STEP_POSITION_ITERATIONS);
 
     auto ball = physics_ball.getBallState();
     EXPECT_LT((ball.velocity() - Vector(0, 0)).length(), 0.05);
@@ -285,7 +293,8 @@ TEST_F(PhysicsBallTest, test_apply_impulse_to_change_direction_of_moving_ball)
     auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0);
 
     physics_ball.applyImpulse(Vector(2, 0.5));
-    world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+    world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                BOX2D_STEP_POSITION_ITERATIONS);
 
     auto ball = physics_ball.getBallState();
     EXPECT_LT((ball.velocity() - Vector(-1, 0)).length(), 0.05);
@@ -302,7 +311,8 @@ TEST_F(PhysicsBallTest, test_set_ball_in_flight_without_collisions)
 
     for (unsigned int i = 0; i < 120; i++)
     {
-        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
         physics_ball.updateIsInFlight();
         auto ball = physics_ball.getBallState();
         if (ball.position().x() < 1.0)
@@ -342,7 +352,8 @@ TEST_F(PhysicsBallTest, test_set_ball_in_flight_with_collisions)
 
     for (unsigned int i = 0; i < 300; i++)
     {
-        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
         physics_ball.updateIsInFlight();
 
         // The ball should be in flight until it has passed the obstacle box. Normally
@@ -390,7 +401,8 @@ TEST_F(PhysicsBallTest, get_height_when_ball_in_flight)
 
     for (unsigned int i = 0; i < 150; i++)
     {
-        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
         physics_ball.updateIsInFlight();
         auto ball                                = physics_ball.getBallState();
         double expected_max_distance_grom_ground = 0.5;

@@ -5,19 +5,19 @@
 #include <math.h>
 
 #include "software/simulation/physics/physics_ball.h"
-#include "software/world/field.h"
 #include "software/time/duration.h"
+#include "software/world/field.h"
 
 class PhysicsFieldTest : public testing::Test
 {
-public:
+   public:
     // 5 and 8 here are somewhat arbitrary values for the velocity and position
     // iterations but are the recommended defaults from
     // https://www.iforce2d.net/b2dtut/worlds
     static constexpr int BOX2D_STEP_VELOCITY_ITERATIONS = 5;
     static constexpr int BOX2D_STEP_POSITION_ITERATIONS = 8;
 
-protected:
+   protected:
     virtual void SetUp()
     {
         b2Vec2 gravity(0, 0);
@@ -28,7 +28,7 @@ protected:
     {
         double step_size_seconds = 1.0 / 60.0;
         unsigned int num_steps =
-                static_cast<unsigned int>(duration.getSeconds() / step_size_seconds);
+            static_cast<unsigned int>(duration.getSeconds() / step_size_seconds);
 
         // We have to take lots of small steps because a significant amount of accuracy
         // is lost if we take a single step of 1 second
