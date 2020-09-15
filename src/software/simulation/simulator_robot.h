@@ -279,7 +279,8 @@ class SimulatorRobot
     {
         PhysicsBall* ball;
         // We keep track of whether or not the ball can be controlled
-        // in any way by the robot. This extra information is used to
+        // in any way by the robot. This includes kicking, chipping,
+        // and dribbling. This extra information is used to
         // prevent edge cases like the ball getting kicked/chipped
         // multiple times, and to prevent the dribbler from affecting
         // kicking

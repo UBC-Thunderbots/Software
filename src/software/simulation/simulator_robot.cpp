@@ -479,5 +479,5 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
 
     // Counteract the force pushing the ball into the robot so there is approximately 0
     // net force, so that the robot won't move due to dribbling
-    physics_robot->applyForceToCenter(-(head_on_force.normalize(head_on_magnitude)));
+    physics_robot->applyForceToCenterOfMass(-(head_on_force.normalize(head_on_magnitude)));
 }
