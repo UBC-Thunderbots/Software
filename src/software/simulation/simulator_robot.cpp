@@ -399,6 +399,16 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
     // Keep track of all balls in the dribbler
     balls_in_dribbler_area.emplace_back(ball);
 
+    // Even if the dribbler is on, we are guaranteed to apply kicking force
+    // and disable ball control before the dribbler checks to apply dribbling force.
+    // (So that the kick doesn't get messed up by dribbling).
+    // This is because the "StartContact" callbacks are called before the
+    // "PreSolve" contacts in the contact listener
+    // 1.     onDribblerBallStartContactCallback is called
+    // 2.     damping force is applied
+    // 3.     autokick is triggered if it's on
+    // 4.     the onDribblerBallContact callback is called
+    // 5.     Dribbling force would be applied here if the ball was not kicked
     if (isAutokickEnabled())
     {
         kick(autokick_speed_m_per_s.value());
