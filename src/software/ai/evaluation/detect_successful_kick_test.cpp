@@ -7,7 +7,6 @@ TEST(DetectSuccessfulKickTest, ball_over_speed_threshold_and_no_direction_differ
 {
     Ball ball({0, 0}, {5, 5}, Timestamp::fromSeconds(0));
 
-
     Vector expected_direction(4, 4);
 
     EXPECT_TRUE(successfulKickDetected(ball, expected_direction));
