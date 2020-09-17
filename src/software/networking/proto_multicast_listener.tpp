@@ -4,10 +4,10 @@
 #include "software/networking/proto_multicast_listener.h"
 #include "software/util/typename/typename.h"
 
-template <class ReceiveProto>
-ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
+template <class ReceiveProtoT>
+ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
-    const unsigned short port, std::function<void(ReceiveProto&)> receive_callback)
+    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback)
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
@@ -42,13 +42,13 @@ ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
                                            boost::asio::placeholders::bytes_transferred));
 }
 
-template <class ReceiveProto>
-void ProtoMulticastListener<ReceiveProto>::handleDataReception(
+template <class ReceiveProtoT>
+void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
     if (!error)
     {
-        auto packet_data = ReceiveProto();
+        auto packet_data = ReceiveProtoT();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
         receive_callback(packet_data);
@@ -70,7 +70,7 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
                         boost::asio::placeholders::bytes_transferred));
 
         LOG(WARNING)
-            << "An unknown network error occurred when attempting to receive ReceiveProto Data. The boost system error code is "
+            << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "
             << error << std::endl;
     }
 
@@ -83,8 +83,8 @@ void ProtoMulticastListener<ReceiveProto>::handleDataReception(
     }
 }
 
-template <class ReceiveProto>
-ProtoMulticastListener<ReceiveProto>::~ProtoMulticastListener()
+template <class ReceiveProtoT>
+ProtoMulticastListener<ReceiveProtoT>::~ProtoMulticastListener()
 {
     socket_.close();
 }
