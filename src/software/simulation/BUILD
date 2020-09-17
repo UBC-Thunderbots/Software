@@ -184,11 +184,11 @@ cc_library(
         ":threaded_simulator",
         "//shared/proto:tbots_cc_proto",
         "//software/logger",
-        "//software/networking:threaded_nanopb_primitive_set_multicast_listener",
         "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
         "//software/parameter:dynamic_parameters",
         "//software/proto:defending_side_msg_cc_proto",
+        "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/world:field",
     ],
 )

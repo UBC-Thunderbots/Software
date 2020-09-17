@@ -4,10 +4,10 @@
 #include "software/networking/proto_multicast_listener.h"
 #include "software/util/typename/typename.h"
 
-template <class ReceiveProtoT>
-ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
+template <class ReceiveProto>
+ProtoMulticastListener<ReceiveProto>::ProtoMulticastListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
-    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback)
+    const unsigned short port, std::function<void(ReceiveProto&)> receive_callback)
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
@@ -42,13 +42,13 @@ ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
                                            boost::asio::placeholders::bytes_transferred));
 }
 
-template <class ReceiveProtoT>
-void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
+template <class ReceiveProto>
+void ProtoMulticastListener<ReceiveProto>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
     if (!error)
     {
-        auto packet_data = ReceiveProtoT();
+        auto packet_data = ReceiveProto();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
         receive_callback(packet_data);
@@ -57,8 +57,8 @@ void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
         socket_.async_receive_from(
             boost::asio::buffer(raw_received_data_, max_buffer_length), sender_endpoint_,
             boost::bind(&ProtoMulticastListener::handleDataReception, this,
-                        boost::asio::placeholders
-                        : error, boost::asio::placeholders::bytes_transferred))
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::bytes_transferred));
     }
     else
     {
@@ -83,8 +83,8 @@ void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
     }
 }
 
-template <class ReceiveProtoT>
-ProtoMulticastListener<ReceiveProtoT>::~ProtoMulticastListener()
+template <class ReceiveProto>
+ProtoMulticastListener<ReceiveProto>::~ProtoMulticastListener()
 {
     socket_.close();
 }
