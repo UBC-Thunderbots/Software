@@ -32,8 +32,8 @@ class ProtoMulticastListener
     /**
      * This function is setup as the callback to handle packets received over the network.
      *
-     * @param data The packet received over the network
-     * TODO fix this
+     * @param error The error code obtained when receiving the incoming data
+     * @param num_bytes_received How many bytes of data were received
      */
     void handleDataReception(const boost::system::error_code& error,
                              size_t num_bytes_received);
