@@ -272,7 +272,7 @@ cc_library(
 
 cc_test(
     name = "detect_successful_kick_test",
-    srcs = ["detect_successful_kick.cpp"],
+    srcs = ["detect_successful_kick_test.cpp"],
     deps = [
         ":detect_successful_kick",
         "@gtest//:gtest_main",
