@@ -1,8 +1,13 @@
 #pragma once
 
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
+#include "software/geom/vector.h"
 #include "software/world/ball.h"
 
-
-bool successfulKickDetected(const Ball& ball,const Point& kick_origin, const Angle& kick_direction);
+/**
+ * Software approximation that finds if a ball has been kicked, regardless of whether the kick
+ * was a pass, shot, or chip.
+ *
+ * @param ball The ball that can be kicked
+ * @param kick_direction
+ */
+bool successfulKickDetected(const Ball& ball, const Vector& kick_direction);
