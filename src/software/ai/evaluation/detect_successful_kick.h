@@ -8,6 +8,8 @@
  * was a pass, shot, or chip.
  *
  * @param ball The ball that can be kicked
- * @param kick_direction
+ * @param kick_direction The direction that we expect the ball to be kicked towards
+ *
+ * @return True if ball was kicked in the approximate direction we expect, false otherwise
  */
 bool successfulKickDetected(const Ball& ball, const Vector& kick_direction);
