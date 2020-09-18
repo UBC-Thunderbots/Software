@@ -43,8 +43,8 @@ class ProtoMulticastListener
     // The endpoint for the sender
     boost::asio::ip::udp::endpoint sender_endpoint_;
 
-    static constexpr unsigned int max_buffer_length = 9000;
-    std::array<char, max_buffer_length> raw_received_data_;
+    static constexpr unsigned int MAX_BUFFER_LENGTH = 9000;
+    std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
 
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&)> receive_callback;

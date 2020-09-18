@@ -133,15 +133,13 @@ SSLProto::SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
 void StandaloneSimulator::setYellowRobotPrimitives(
     const TbotsProto::PrimitiveSet& primitive_set_msg)
 {
-    auto nano_pb_primitive_set_msg = createNanoPbPrimitiveSet(primitive_set_msg);
-    simulator.setYellowRobotPrimitiveSet(nano_pb_primitive_set_msg);
+    simulator.setYellowRobotPrimitiveSet(createNanoPbPrimitiveSet(primitive_set_msg));
 }
 
 void StandaloneSimulator::setBlueRobotPrimitives(
     const TbotsProto::PrimitiveSet& primitive_set_msg)
 {
-    auto nano_pb_primitive_set_msg = createNanoPbPrimitiveSet(primitive_set_msg);
-    simulator.setBlueRobotPrimitiveSet(nano_pb_primitive_set_msg);
+    simulator.setBlueRobotPrimitiveSet(createNanoPbPrimitiveSet(primitive_set_msg));
 }
 
 void StandaloneSimulator::startSimulation()

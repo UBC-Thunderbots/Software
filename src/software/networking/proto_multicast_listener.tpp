@@ -35,7 +35,7 @@ ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
     // Start listening for data asynchronously
     // See here for a great explanation about asynchronous operations:
     // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
-    socket_.async_receive_from(boost::asio::buffer(raw_received_data_, max_buffer_length),
+    socket_.async_receive_from(boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH),
                                sender_endpoint_,
                                boost::bind(&ProtoMulticastListener::handleDataReception,
                                            this, boost::asio::placeholders::error,
@@ -55,7 +55,7 @@ void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
 
         // Once we've handled the data, start listening again
         socket_.async_receive_from(
-            boost::asio::buffer(raw_received_data_, max_buffer_length), sender_endpoint_,
+            boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH), sender_endpoint_,
             boost::bind(&ProtoMulticastListener::handleDataReception, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
@@ -64,7 +64,7 @@ void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
     {
         // Start listening again to receive the next data
         socket_.async_receive_from(
-            boost::asio::buffer(raw_received_data_, max_buffer_length), sender_endpoint_,
+            boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH), sender_endpoint_,
             boost::bind(&ProtoMulticastListener::handleDataReception, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
@@ -74,12 +74,12 @@ void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
             << error << std::endl;
     }
 
-    if (num_bytes_received <= max_buffer_length)
+    if (num_bytes_received > MAX_BUFFER_LENGTH)
     {
         LOG(WARNING)
-            << "num_bytes_received <= max_buffer_length, "
+            << "num_bytes_received > MAX_BUFFER_LENGTH, "
             << "which means that the receive buffer is full and data loss has potentially occurred. "
-            << "Consider increasing max_buffer_length";
+            << "Consider increasing MAX_BUFFER_LENGTH";
     }
 }
 

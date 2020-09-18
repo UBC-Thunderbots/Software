@@ -1,7 +1,6 @@
 #pragma once
 
 template <class ReceiveProtoT>
-
 ThreadedProtoMulticastListener<ReceiveProtoT>::ThreadedProtoMulticastListener(
     const std::string& ip_address, const unsigned short port,
     std::function<void(ReceiveProtoT)> receive_callback)
@@ -12,7 +11,6 @@ ThreadedProtoMulticastListener<ReceiveProtoT>::ThreadedProtoMulticastListener(
 }
 
 template <class ReceiveProtoT>
-
 ThreadedProtoMulticastListener<ReceiveProtoT>::~ThreadedProtoMulticastListener()
 {
     // Stop the io_service. This is safe to call from another thread.
