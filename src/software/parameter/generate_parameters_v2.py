@@ -276,7 +276,7 @@ class Config(object):
             config.get_private_entries() for config in self.configs
         )
 
-        # command line parsing method of the config class
+        # command line parser method of the config class
         command_line_arg_struct_contents = ""
         parse_command_line_args_function_contents = ""
         load_command_line_args_into_config_contents = ""
@@ -323,7 +323,7 @@ class Config(object):
             public_entries=public_parameter_entries + public_config_entries,
             # private members of the config class
             private_entries=private_parameter_entries + private_config_entries,
-            # load command_line parser
+            # command line parser
             parse_command_line_args_function_contents=parse_command_line_args_function_contents,
             command_line_arg_struct_contents=command_line_arg_struct_contents,
             load_command_line_args_into_config_contents=load_command_line_args_into_config_contents,
