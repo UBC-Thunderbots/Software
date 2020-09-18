@@ -284,14 +284,14 @@ class Config(object):
         for parameter in self.parameters:
 
             command_line_arg_struct_contents += parameter.get_boost_command_line_entry()
+            load_command_line_args_into_config_contents += constants.LOAD_COMMAND_LINE_ARG_INTO_CONFIG.format(
+                param_name=parameter.param_name
+            )
 
             if parameter.ptype == "bool":
                 parse_command_line_args_function_contents += constants.PARAMETER_COMMAND_LINE_BOOL_SWITCH_ENTRY.format(
                     param_name=parameter.param_name,
                     param_desc=parameter.parameter_description["description"],
-                )
-                load_command_line_args_into_config_contents += constants.LOAD_COMMAND_LINE_ARG_INTO_CONFIG.format(
-                    param_name=parameter.param_name
                 )
             else:
                 parse_command_line_args_function_contents += constants.PARAMETER_COMMAND_LINE_ENTRY.format(
@@ -299,13 +299,7 @@ class Config(object):
                     param_type=parameter.ptype,
                     param_desc=parameter.parameter_description["description"],
                 )
-                load_command_line_args_into_config_contents += constants.LOAD_COMMAND_LINE_ARG_INTO_CONFIG.format(
-                    param_name=parameter.param_name
-                )
 
-        print(command_line_arg_struct_contents)
-        print(load_command_line_args_into_config_contents)
-        print(parse_command_line_args_function_contents)
         ##################
         # Generate Class #
         ##################

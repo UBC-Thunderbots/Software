@@ -8,8 +8,8 @@ filegroup(
 genrule(
     name = "config_cc_generate",
     srcs = [
-        "generate_parameters_v2.py",
-        "constants.py",
+        ":generate_parameters_v2.py",
+        ":constants.py",
         "//software/parameter:yaml_config_descriptions",
     ],
     outs = [

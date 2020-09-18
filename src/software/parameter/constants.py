@@ -94,7 +94,7 @@ CONFIG_CLASS = """class {config_name} : public Config
         return "{config_name}";
     }}
 
-    void loadFromCommandLineArguments(int argc, char **argv) {{
+    bool loadFromCommandLineArguments(int argc, char **argv) {{
 
         struct commandLineArgs {{
             bool help = false;
@@ -120,6 +120,7 @@ CONFIG_CLASS = """class {config_name} : public Config
             std::cout << desc << std::endl;
         }}
 
+        return args.help;
     }}
 
     const MutableParameterList& getMutableParameterList()
