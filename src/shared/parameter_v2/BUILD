@@ -31,7 +31,6 @@ cc_test(
     ],
     deps = [
         "//shared/parameter_v2:c_configs",
-        "//software/util/variant_visitor",
         "@boost//:filesystem",
         "@gtest//:gtest_main",
         "@libclang",

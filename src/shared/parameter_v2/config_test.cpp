@@ -17,13 +17,14 @@ extern "C"
  * For example, a config file name maybe "example_config" gets converted
  * to "ExampleConfig"
  *
+ * @throws invalid_argument If input is empty or there is a _ at the end of the input
  * @pre The snake_case_input must be valid snake_case
  * @param The snake_case string to convert to CamelCase
  * @return Converted string to CamelCase
  */
 std::string toCamelCase(const std::string& snake_case_input)
 {
-    if (snake_case_input == "" || snake_case_input.back() == '_')
+    if (snake_case_input.empty() || snake_case_input.back() == '_')
     {
         throw std::invalid_argument("toCamelCase called with invalid snake_case input: " +
                                     snake_case_input);
