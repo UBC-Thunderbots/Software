@@ -304,3 +304,28 @@ TEST_F(TestThetaStarPathPlanner, no_navigable_area)
 
     EXPECT_EQ(std::nullopt, path);
 }
+
+TEST_F(TestThetaStarPathPlanner,
+       test_theta_star_path_planner_navigable_area_not_centred_at_origin)
+{
+    Point start{0.5, 0.5}, dest{2.5, 2.5};
+
+    std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
+
+    Rectangle navigable_area{{0.0, 0.0}, {3.0, 3.0}};
+
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
+
+    // The path should start at exactly the start point and end at exactly the dest
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+
+    // Make sure the path does not exceed the navigable area
+    checkPathDoesNotExceedBoundingBox(path_points, navigable_area);
+
+    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+}

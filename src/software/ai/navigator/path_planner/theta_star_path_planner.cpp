@@ -167,6 +167,17 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     const Point &start, const Point &end, const Rectangle &navigable_area,
     const std::vector<ObstaclePtr> &obstacles)
 {
+    bool navigable_area_contain_start =
+        (start.x() >= navigable_area.xMin()) && (start.x() <= navigable_area.xMax()) &&
+        (start.y() >= navigable_area.yMin()) && (start.y() <= navigable_area.yMax());
+    bool navigable_area_contain_end =
+        (end.x() >= navigable_area.xMin()) && (end.x() <= navigable_area.xMax()) &&
+        (end.y() >= navigable_area.yMin()) && (end.y() <= navigable_area.yMax());
+    if (!navigable_area_contain_start || !navigable_area_contain_end)
+    {
+        return std::nullopt;
+    }
+
     resetAndInitializeMemberVariables(navigable_area, obstacles);
 
     Point closest_end      = findClosestFreePoint(end);
@@ -465,25 +476,29 @@ bool ThetaStarPathPlanner::isPointNavigableAndFreeOfObstacles(const Point &p)
 
 bool ThetaStarPathPlanner::isPointNavigable(const Point &p) const
 {
-    return ((p.x() > -max_navigable_x_coord) && (p.x() < max_navigable_x_coord) &&
-            (p.y() > -max_navigable_y_coord) && (p.y() < max_navigable_y_coord));
+    return ((p.x() > -max_navigable_x_coord + centre.x()) &&
+            (p.x() < max_navigable_x_coord + centre.x()) &&
+            (p.y() > -max_navigable_y_coord + centre.y()) &&
+            (p.y() < max_navigable_y_coord + centre.y()));
 }
 
 
 Point ThetaStarPathPlanner::convertCoordToPoint(const Coordinate &coord) const
 {
     // account for robot radius
-    return Point((coord.row() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_x_coord,
-                 (coord.col() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_y_coord);
+    return Point(
+        (coord.row() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_x_coord + centre.x(),
+        (coord.col() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_y_coord + centre.y());
 }
 
 ThetaStarPathPlanner::Coordinate ThetaStarPathPlanner::convertPointToCoord(
     const Point &p) const
 {
     // account for robot radius
-    return Coordinate(
-        static_cast<int>((p.x() + max_navigable_x_coord) / SIZE_OF_GRID_CELL_IN_METERS),
-        static_cast<int>((p.y() + max_navigable_y_coord) / SIZE_OF_GRID_CELL_IN_METERS));
+    return Coordinate(static_cast<int>((p.x() + max_navigable_x_coord - centre.x()) /
+                                       SIZE_OF_GRID_CELL_IN_METERS),
+                      static_cast<int>((p.y() + max_navigable_y_coord - centre.y()) /
+                                       SIZE_OF_GRID_CELL_IN_METERS));
 }
 
 void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
@@ -491,6 +506,7 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
 {
     // Initialize member variables
     this->obstacles = obstacles;
+    centre          = navigable_area.centre();
     max_navigable_x_coord =
         std::max(navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS, 0.0);
     max_navigable_y_coord =
