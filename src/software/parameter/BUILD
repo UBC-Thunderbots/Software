@@ -42,7 +42,9 @@ cc_library(
 cc_library(
     name = "config",
     hdrs = ["config.h"],
-    deps = [],
+    deps = [
+        "@boost//:program_options",
+    ],
 )
 
 cc_library(

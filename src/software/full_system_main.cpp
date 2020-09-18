@@ -44,18 +44,18 @@ std::string BANNER =
 commandLineArgs parseCommandLineArgs(int argc, char **argv)
 {
     commandLineArgs args;
-    // Build one string with all the backend_names
-    std::vector<std::string> backend_names =
-        GenericFactory<std::string, Backend>::getRegisteredNames();
+    //// Build one string with all the backend_names
+    // std::vector<std::string> backend_names =
+    // GenericFactory<std::string, Backend>::getRegisteredNames();
 
-    std::string all_backend_names =
-        std::accumulate(std::begin(backend_names), std::end(backend_names), std::string(),
-                        [](std::string &ss, std::string &s) { return ss + s + ", "; });
-    std::string backend_help_str =
-        "The backend that you would like to use, one of: " + all_backend_names;
+    // std::string all_backend_names =
+    // std::accumulate(std::begin(backend_names), std::end(backend_names), std::string(),
+    //[](std::string &ss, std::string &s) { return ss + s + ", "; });
+    // std::string backend_help_str =
+    //"The backend that you would like to use, one of: " + all_backend_names;
 
-    std::string interface_help_str =
-        "The interface to send and receive packets over (can be found through ifconfig)";
+    // std::string interface_help_str =
+    //"The interface to send and receive packets over (can be found through ifconfig)";
 
     boost::program_options::options_description desc{"Options"};
     desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
