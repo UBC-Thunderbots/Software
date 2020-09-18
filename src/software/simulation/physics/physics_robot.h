@@ -182,6 +182,13 @@ class PhysicsRobot
      */
     void setPosition(const Point &position);
 
+    /**
+     * Applies the given force vector to the robot at its center of mass
+     *
+     * @param force The force to apply
+     */
+    void applyForceToCenterOfMass(const Vector &force);
+
    protected:
     /**
      * This functions runs any operations this PhysicsRobot wants to perform

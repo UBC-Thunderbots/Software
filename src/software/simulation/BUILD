@@ -10,6 +10,7 @@ cc_library(
         "//firmware/app/world:firmware_world",
         "//software/geom/algorithms",
         "//software/logger",
+        "//software/math:math_functions",
         "//software/simulation/physics:physics_ball",
         "//software/simulation/physics:physics_robot",
     ],
