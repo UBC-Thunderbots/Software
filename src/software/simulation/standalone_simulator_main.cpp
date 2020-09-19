@@ -20,7 +20,7 @@ int main(int argc, char **argv)
         // https://github.com/UBC-Thunderbots/Software/issues/1298
         if (!args->interface()->value().empty())
         {
-            MutableDynamicParameters->getMutableNetworkConfig()
+            MutableDynamicParameters->getMutableStandaloneSimulatorConfig()
                 ->mutableNetworkInterface()
                 ->setValue(args->interface()->value());
         }
