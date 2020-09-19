@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <utility>
+
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -32,19 +34,10 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // The ball must enter the enemy net in order for the test to pass. This is to
-        // temporarily
-        // prevent regressions like
-        // https://github.com/UBC-Thunderbots/Software/issues/1690
-        // until we have proper validation functions built up.
-        // TODO: Implement proper validation
-        // https://github.com/UBC-Thunderbots/Software/issues/1396
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (
-                !contains(world_ptr->field().enemyGoal(), world_ptr->ball().position()))
-            {
-                yield();
-            }
+            robotReceivedBall(world_ptr->friendlyTeam().getAllRobots()[0], world_ptr, yield);
+            robotReceivedBall(world_ptr->friendlyTeam().getAllRobots()[1], world_ptr, yield);
+            friendlyScored(world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
