@@ -26,7 +26,7 @@ TEST(DetectSuccessfulKickTest,
 {
     Ball ball({0, 1}, {3, 0}, Timestamp::fromSeconds(0));
 
-    Angle expected_direction               = Angle::fromDegrees(-15);
+    Angle expected_direction = Angle::fromDegrees(-15);
 
     EXPECT_TRUE(hasBallBeenKicked(ball, expected_direction));
 }
@@ -36,7 +36,7 @@ TEST(DetectSuccessfulKickTest,
 {
     Ball ball({0, 1}, {3, 0}, Timestamp::fromSeconds(0));
 
-    Angle expected_direction               = Angle::fromDegrees(15);
+    Angle expected_direction = Angle::fromDegrees(15);
 
     EXPECT_TRUE(hasBallBeenKicked(ball, expected_direction));
 }
@@ -45,7 +45,7 @@ TEST(DetectSuccessfulKickTest, ball_over_speed_threshold_and_exceeds_direction_t
 {
     Ball ball({-5, 2}, {-3, 0}, Timestamp::fromSeconds(0));
 
-    Angle expected_direction               = Angle::fromRadians(0);
+    Angle expected_direction = Angle::fromRadians(0);
 
     EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction));
 }

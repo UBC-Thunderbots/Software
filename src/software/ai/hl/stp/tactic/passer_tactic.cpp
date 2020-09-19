@@ -86,7 +86,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // We want to keep trying to kick until the ball is moving along the pass
         // vector with sufficient velocity
         Angle kick_direction = (pass.receiverPoint() - ball.position()).orientation());
-        hasKickedBall = hasBallBeenKicked(ball, kick_direction);
+        hasKickedBall        = hasBallBeenKicked(ball, kick_direction);
 
     } while (!hasKickedBall);
 }

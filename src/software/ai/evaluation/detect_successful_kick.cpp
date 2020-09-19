@@ -1,6 +1,7 @@
 #include "detect_successful_kick.h"
 
-bool hasBallBeenKicked(const Ball& ball, const Angle& expected_kick_direction, double min_kick_speed)
+bool hasBallBeenKicked(const Ball& ball, const Angle& expected_kick_direction,
+                       double min_kick_speed)
 {
     static constexpr double MAX_ANGLE_DIFFERENCE = 20;
 
