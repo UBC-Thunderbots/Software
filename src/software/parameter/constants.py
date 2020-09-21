@@ -42,6 +42,17 @@ IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY = (
     "std::const_pointer_cast<const Parameter<{type}>>({param_variable_name})"
 )
 
+PARAMETER_COMMAND_LINE_BOOL_SWITCH_ENTRY = 'desc.add_options()("{param_name}", boost::program_options::bool_switch(&args.{param_name}), "{param_desc}");\n'
+
+PARAMETER_COMMAND_LINE_ENTRY = 'desc.add_options()("{param_name}", boost::program_options::value<{param_type}>(&args.{param_name}), "{param_desc}");\n'
+
+COMMAND_LINE_ARG_ENTRY = "{param_type} {param_name} = {quote}{default_value}{quote};\n"
+
+LOAD_COMMAND_LINE_ARG_INTO_CONFIG = (
+    "this->mutable{param_name}()->setValue(args.{param_name});\n"
+)
+
+
 #######################################################################
 #                               Config                                #
 #######################################################################
@@ -83,6 +94,35 @@ CONFIG_CLASS = """class {config_name} : public Config
         return "{config_name}";
     }}
 
+    bool loadFromCommandLineArguments(int argc, char **argv) {{
+
+        struct commandLineArgs {{
+            bool help = false;
+            {command_line_arg_struct_contents}
+        }};
+
+        commandLineArgs args;
+        boost::program_options::options_description desc{{"Options"}};
+
+        desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                       "Help screen");
+
+        {parse_command_line_args_function_contents}
+
+        boost::program_options::variables_map vm;
+        boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+        boost::program_options::notify(vm);
+
+        {load_command_line_args_into_config_contents}
+
+        if (args.help)
+        {{
+            std::cout << desc << std::endl;
+        }}
+
+        return args.help;
+    }}
+
     const MutableParameterList& getMutableParameterList()
     {{
         return mutable_internal_param_list;
@@ -113,6 +153,7 @@ AUTOGEN_WARNING = """
 H_HEADER = """{}
 #pragma once
 #include <iostream>
+#include <boost/program_options.hpp>
 #include \"software/parameter/config.h\"
 """.format(
     AUTOGEN_WARNING

@@ -205,7 +205,7 @@ AIConfig:
         type: "double"
         default: 0.18
         description: >-
-            The total width ("sideways" of the robot) of the rectangle starting
+            The total width ('sideways' of the robot) of the rectangle starting
             from the friendly robot inside which we think an enemy is about to
     EnemyAboutToStealBallRectangleExtensionLength:
         min: 0.0
