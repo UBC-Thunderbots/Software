@@ -70,6 +70,7 @@ function run_code_spell(){
     cd $CURR_DIR/../src/firmware_new && codespell -w
     cd $CURR_DIR/../src/firmware/app && codespell -w
     cd $CURR_DIR/../src/shared && codespell -w
+    cd $CURR_DIR/../docs && codespell -w
 }
 
 # Run formatting
