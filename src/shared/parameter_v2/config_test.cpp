@@ -18,7 +18,9 @@ extern "C"
  * to "ExampleConfig"
  *
  * @throws invalid_argument If input is empty or there is a _ at the end of the input
+ *
  * @pre The snake_case_input must be valid snake_case
+ *
  * @param The snake_case string to convert to CamelCase
  * @return Converted string to CamelCase
  */
