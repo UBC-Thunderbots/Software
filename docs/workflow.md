@@ -108,10 +108,10 @@ The Pull Request process usually looks like the following:
 9. Click "Create pull request"
 10. Now the code can be reviewed. Respond to feedback given by your team members and make changes as necessary by pushing additional commits to your branch.
     1. **If you are a reviewer:**
-       1. Look over the code, keeping an eye out for typos or bugs
+       1. Look over the code, keeping an eye out for typos, bugs, or improper [code style](code-style-guide.md)
        2. If you are having trouble understanding what a certain part of the code is doing, that's a great place to suggest adding additional comments!
        3. Remember you are critiquing someone's work. Give useful, constructive feedback and justify your thoughts, and don't be mean or degrading. Try to provide a suggested solution where possible.
-       4. During re-reviews (Pull Requests typically involve several rounds of changes and review), **it is your responsability to check that previously requested changes were made and mark the relevant discussions as "resolved"**. "Unresolved" discussions make a great checklist of things to check during a re-review.
+       4. During re-reviews (Pull Requests typically involve several rounds of changes and review), **it is your responsibility to check that previously requested changes were made and mark the relevant discussions as "resolved"**. "Unresolved" discussions make a great checklist of things to check during a re-review.
        5. Mark the Pull Request as "Approved" when you think it looks good
     2. **If you are the recipient of the review (the PR creator):**
        1. **Make sure to reply to the PR comments as you address / fix issues**. This helps the reviewers know you have made a change without having to go check the code diffs to see if you made a change.
