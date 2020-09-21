@@ -17,7 +17,7 @@ ReplayBackend::ReplayBackend(
 
 // do nothing
 // TODO: perhaps we want to encode the output primitives to proto and log them?
-void ReplayBackend::onValueReceived(ConstPrimitiveVectorPtr primitives) {}
+void ReplayBackend::onValueReceived(TbotsProto::PrimitiveSet primitives) {}
 
 // do nothing
 void ReplayBackend::onValueReceived(World world) {}

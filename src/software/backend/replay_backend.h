@@ -1,5 +1,5 @@
 #pragma once
-#include "shared/proto/tbots_robot_msg.pb.h"
+#include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/replay_logging/replay_reader.h"
@@ -18,7 +18,7 @@ class ReplayBackend : public Backend
     static const std::string name;
 
    private:
-    void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
+    void onValueReceived(TbotsProto::PrimitiveSet primitives) override;
     void onValueReceived(World world) override;
     void continuouslyPullFromReplayFiles();
 
