@@ -65,3 +65,21 @@ typedef struct
     {                                                                                    \
         free((STATE_TYPE*)state);                                                        \
     }
+
+/**
+ * Stop the robot by disabling all motors and disabling autokicking and autochipping
+ *
+ * NOTE: stop robot does not discharge capacitors
+ *
+ * @param world [in] The world containing the robot to stop
+ * @param coast Whether the robot should coast when stopping (instead of braking)
+ */
+void app_primitive_stopRobot(FirmwareWorld_t* world, bool coast);
+
+/**
+ * Make the robot in the given world "safe" by disabling potentially dangerous
+ * functionality and bringing the robot to a stop, including discharging capacitors
+ *
+ * @param world [in] The world containing the robot to make safe
+ */
+void app_primitive_makeRobotSafe(FirmwareWorld_t* world);
