@@ -5,11 +5,11 @@
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
+#include "software/backend/replay_logging/replay_logger.h"
 #include "software/constants.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/backend/replay_logging/replay_logger.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -92,9 +92,10 @@ int main(int argc, char **argv)
             backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 
-        if (!args->replay_output_dir()->value().empty()) {
-            auto replay_logger = std::make_shared<ReplayLogger>(
-                args->replay_output_dir()->value());
+        if (!args->replay_output_dir()->value().empty())
+        {
+            auto replay_logger =
+                std::make_shared<ReplayLogger>(args->replay_output_dir()->value());
             backend->Subject<SensorProto>::registerObserver(replay_logger);
         }
 

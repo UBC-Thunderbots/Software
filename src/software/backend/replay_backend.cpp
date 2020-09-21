@@ -2,12 +2,9 @@
 
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string ReplayBackend::name = "replay";
-
-ReplayBackend::ReplayBackend(
-    std::shared_ptr<const ReplayBackendConfig> replay_backend_config)
+ReplayBackend::ReplayBackend(const std::string& replay_input_dir)
     : Backend(),
-      replay_reader(replay_backend_config->ReplayPath()->value()),
+      replay_reader(replay_input_dir),
       pull_from_replay_thread(
           boost::bind(&ReplayBackend::continuouslyPullFromReplayFiles, this)),
       last_msg_received_time(std::nullopt),
