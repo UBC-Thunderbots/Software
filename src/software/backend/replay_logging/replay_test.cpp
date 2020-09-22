@@ -39,17 +39,20 @@ TEST(ReplayTest, test_read_and_write_replay)
     // do a quick sanity check here to assert that the timestamps are monotonically
     // increasing
     double max_timestamp = 0.f;
+    size_t idx           = 0;
     for (const auto& msg : read_replay_msgs)
     {
-        auto ts = msg.ssl_vision_msg().detection().t_sent();
+        auto ts = msg.time_received().epoch_timestamp_seconds();
         if (ts < max_timestamp)
         {
-            FAIL() << "t_sent " << ts << " should have appeared after " << max_timestamp;
+            FAIL() << "msg idx=" << idx << " with time_received=" << ts
+                   << " should have appeared after " << max_timestamp;
         }
         else
         {
             max_timestamp = ts;
         }
+        idx++;
     }
 
     // write the read frames to another replay_logging directory
