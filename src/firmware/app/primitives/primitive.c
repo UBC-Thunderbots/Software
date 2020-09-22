@@ -9,8 +9,6 @@ void app_primitive_stopRobot(FirmwareWorld_t *world, bool coast)
     // Disable chipper, kicker, dribbler
     app_chicker_disableAutochip(chicker);
     app_chicker_disableAutokick(chicker);
-
-    // Stop motors
     void (*wheel_op)(const Wheel_t *wheel);
     if (coast)
     {
@@ -22,6 +20,8 @@ void app_primitive_stopRobot(FirmwareWorld_t *world, bool coast)
         wheel_op = app_wheel_brake;
         app_dribbler_setSpeed(dribbler, 0);
     }
+
+    // Stop motors
     wheel_op(app_firmware_robot_getFrontLeftWheel(robot));
     wheel_op(app_firmware_robot_getFrontRightWheel(robot));
     wheel_op(app_firmware_robot_getBackLeftWheel(robot));
