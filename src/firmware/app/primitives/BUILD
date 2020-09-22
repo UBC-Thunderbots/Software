@@ -41,6 +41,8 @@ cc_library(
         ":direct_control",
         ":kick",
         ":spinning_move",
+        ":stop",
+        ":estop",
         "//firmware/app/world:firmware_world",
     ] + select({
         # TODO: this should not be dependent on freertos at all
@@ -145,6 +147,26 @@ cc_library(
     hdrs = ["autochip_move_primitive.h"],
     deps = [
         "move_helper",
+        ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "stop",
+    srcs = ["stop_primitive.c"],
+    hdrs = ["stop_primitive.h"],
+    deps = [
+        ":primitive",
+        "//shared/proto:tbots_nanopb_proto",
+    ],
+)
+
+cc_library(
+    name = "estop",
+    srcs = ["estop_primitive.c"],
+    hdrs = ["estop_primitive.h"],
+    deps = [
         ":primitive",
         "//shared/proto:tbots_nanopb_proto",
     ],

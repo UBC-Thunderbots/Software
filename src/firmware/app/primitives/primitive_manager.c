@@ -5,6 +5,7 @@
 #ifdef __arm__
 #include <FreeRTOS.h>
 #include <semphr.h>
+#define static_assert _Static_assert
 #elif __unix__
 #include <pthread.h>
 #else
@@ -19,10 +20,12 @@
 #include "firmware/app/primitives/autokick_move_primitive.h"
 #include "firmware/app/primitives/chip_primitive.h"
 #include "firmware/app/primitives/direct_control_primitive.h"
+#include "firmware/app/primitives/estop_primitive.h"
 #include "firmware/app/primitives/kick_primitive.h"
 #include "firmware/app/primitives/move_primitive.h"
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/primitives/spinning_move_primitive.h"
+#include "firmware/app/primitives/stop_primitive.h"
 
 struct PrimitiveManager
 {
@@ -107,6 +110,9 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
                                              TbotsProto_Primitive primitive_msg)
 {
+    static_assert(TbotsProto_Primitive_estop_tag == 1,
+                  "E-Stop primitive not assigned tag of 1");
+
     app_primitive_manager_lockPrimitiveMutex(manager);
 
     app_primitive_manager_endCurrentPrimitive(manager, world);
@@ -125,13 +131,18 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     {
         case TbotsProto_Primitive_estop_tag:
         {
-            app_primitive_makeRobotSafe(world);
+            manager->current_primitive       = &ESTOP_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_estop_primitive_start(primitive_msg.primitive.estop,
+                                      manager->current_primitive_state, world);
             break;
         }
         case TbotsProto_Primitive_stop_tag:
         {
-            app_primitive_stopRobot(world, primitive_msg.primitive.stop.stop_type ==
-                                               TbotsProto_StopPrimitive_StopType_COAST);
+            manager->current_primitive       = &STOP_PRIMITIVE;
+            manager->current_primitive_state = manager->current_primitive->create_state();
+            app_stop_primitive_start(primitive_msg.primitive.stop,
+                                     manager->current_primitive_state, world);
             break;
         }
         case TbotsProto_Primitive_chip_tag:
@@ -195,6 +206,14 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
             app_primitive_makeRobotSafe(world);
             assert(false);
         }
+    }
+
+    if (!manager->current_primitive->direct)
+    {
+        // Charge capacitor during gameplay
+        const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+        Charger_t *charger           = app_firmware_robot_getCharger(robot);
+        app_charger_charge_capacitor(charger);
     }
 
     app_primitive_manager_unlockPrimitiveMutex(manager);

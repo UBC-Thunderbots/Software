@@ -239,10 +239,7 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
             // proceed
             return;
         }
-
-        // Enable charging
-        charger_enable(true);
-        chicker_discharge(false);
+        // We rely on the primitive manager to set the charger to the right state
     }
 
     // Take the drive mutex.
