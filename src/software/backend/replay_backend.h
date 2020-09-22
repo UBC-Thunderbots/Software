@@ -22,6 +22,8 @@ class ReplayBackend : public Backend
     void continuouslyPullFromReplayFiles();
 
     ReplayReader replay_reader;
+    // a thread that continuously pulls from replay data files and emits them to the
+    // observers of this class
     std::thread pull_from_replay_thread;
     std::optional<std::chrono::duration<double>> last_msg_received_time;
     std::optional<std::chrono::time_point<std::chrono::steady_clock>>
