@@ -53,3 +53,12 @@ TEST(RobotFilterTest, two_match_robot_data_robot_state_not_expired_test)
                            Timestamp::fromSeconds(9)));
     EXPECT_EQ(op_robot.value(), robot_filter.getFilteredData(new_robot_data).value());
 }
+
+TEST(RobotFilterTest, empty_new_robot_data_test)
+{
+    Robot robot(1, Point(0, 0), Vector(0, 0), Angle::fromRadians(0),
+                AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0));
+    RobotFilter robot_filter(robot, Duration::fromSeconds(10));
+    std::vector<RobotDetection> new_robot_data;
+    EXPECT_EQ(std::nullopt, robot_filter.getFilteredData(new_robot_data));
+}

@@ -57,8 +57,9 @@ std::optional<Robot> RobotFilter::getFilteredData(
         // if there is no data the duration of expiry_buffer_duration after previously
         // recorded robot state, return null. Otherwise remain the same state
         if (latest_timestamp.getMilliseconds() >
-            this->expiry_buffer_duration.getMilliseconds() +
-                current_robot_state.lastUpdateTimestamp().getMilliseconds())
+                this->expiry_buffer_duration.getMilliseconds() +
+                    current_robot_state.lastUpdateTimestamp().getMilliseconds() ||
+            new_robot_data.empty())
         {
             return std::nullopt;
         }
