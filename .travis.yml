@@ -40,7 +40,7 @@ jobs:
     - name: "Test for Memory Leaks"
       script:
         - cd src
-        # Test simulation, firmware and firmware_new
+        # Test simulation, firmware and firmware_new, c_dynamic_parameters
         - >
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
@@ -53,6 +53,10 @@ jobs:
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             //firmware_new/...
+        - >
+          bazel test -c dbg  \
+            --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
+            //shared/parameter_v2/...
     - name: "Check Formatting"
       script:
         - ./formatting_scripts/check_formatting_ci.sh
