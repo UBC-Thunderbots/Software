@@ -64,8 +64,7 @@ cc_library(
     deps = [
         ":hal",
         ":lwip",
-        "//firmware_new/boards/frankie_v1/io/networking:proto_multicast_communication",
-        "//firmware_new/boards/frankie_v1/io/logging:network_logger",
+        "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
         "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
