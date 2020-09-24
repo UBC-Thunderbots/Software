@@ -4,8 +4,6 @@
 #include <boost/bind.hpp>
 #include <string>
 
-#include "software/networking/multicast_listener.h"
-
 template <class ReceiveProtoT>
 class ProtoMulticastListener
 {
@@ -28,17 +26,25 @@ class ProtoMulticastListener
                            const std::string& ip_address, unsigned short port,
                            std::function<void(ReceiveProtoT&)> receive_callback);
 
+    virtual ~ProtoMulticastListener();
+
    private:
     /**
      * This function is setup as the callback to handle packets received over the network.
      *
-     * @param data The packet received over the network
+     * @param error The error code obtained when receiving the incoming data
+     * @param num_bytes_received How many bytes of data were received
      */
-    void handleDataReception(std::vector<uint8_t>& data);
+    void handleDataReception(const boost::system::error_code& error,
+                             size_t num_bytes_received);
 
-    // The multicast listener that receives the data and passes it to us via
-    // `handleDataReception`
-    MulticastListener multicast_listener;
+    // A UDP socket that we listen on for ReceiveProtoT messages from the network
+    boost::asio::ip::udp::socket socket_;
+    // The endpoint for the sender
+    boost::asio::ip::udp::endpoint sender_endpoint_;
+
+    static constexpr unsigned int MAX_BUFFER_LENGTH = 9000;
+    std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
 
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT&)> receive_callback;

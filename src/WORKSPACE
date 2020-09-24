@@ -41,12 +41,12 @@ load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()
 
-http_archive(
+new_git_repository(
     name = "eigen",
     build_file = "@//external:eigen.BUILD",
-    sha256 = "3a66f9bfce85aff39bc255d5a341f87336ec6f5911e8d816dd4a3fdc500f8acf",
-    strip_prefix = "eigen-eigen-c5e90d9e764e",
-    url = "https://bitbucket.org/eigen/eigen/get/c5e90d9.tar.gz",
+    commit = "21ae2afd4edaa1b69782c67a54182d34efe43f9c",
+    remote = "https://gitlab.com/libeigen/eigen.git",
+    shallow_since = "1544551075 +0100",
 )
 
 # nanopb: lightweight protobuf library used on the STM32. The build file in the
@@ -106,6 +106,13 @@ new_local_repository(
     name = "linux_gcc",
     build_file = "@//external:linux_gcc.BUILD",
     path = "/",
+)
+
+# libclang-dev is installed into the system through setup_software.sh
+new_local_repository(
+    name = "libclang",
+    build_file = "@//external:libclang.BUILD",
+    path = "/usr/lib/llvm-6.0/",
 )
 
 http_archive(
@@ -202,7 +209,7 @@ pip_install()
 
 pip3_import(
     name = "dynamic_parameter_deps",
-    requirements = "//shared/parameter_v2/scripts:requirements.txt",
+    requirements = "//shared/parameter_v2/generation_scripts:requirements.txt",
 )
 
 load("@dynamic_parameter_deps//:requirements.bzl", "pip_install")

@@ -15,13 +15,6 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
-const std::string DefensePlay::name = "Defense Play";
-
-std::string DefensePlay::getName() const
-{
-    return DefensePlay::name;
-}
-
 bool DefensePlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&

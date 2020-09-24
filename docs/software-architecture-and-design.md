@@ -10,7 +10,7 @@
     * [Robot](#robot)
     * [Ball](#ball)
     * [Field](#field)
-    * [Refbox and Gamestate](#refbox--gamestate)
+    * [Gamestate](#gamestate)
   * [Primitives](#primitives)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
@@ -26,6 +26,7 @@
   * [What Are Coroutines?](#what-are-coroutines)
   * [What Coroutines Do We Use?](#what-coroutines-do-we-use)
   * [How Do We Use Coroutines?](#how-do-we-use-coroutines)
+  * [Best Practices](#couroutine-best-practices)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
   * [Angles](#angles)
@@ -49,19 +50,21 @@
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
     * [Draw Functions](#draw-functions)
-    * [Editing the Visualizer](#editing-the-visualizer)
-      * [Editing ui files](#editing-ui-files)
-      * [Promoting Widgets](#promoting-widgets)
-    * [Qt Best Practices](#qt-best-practices)
-      * [Build A Hierarchy](#build-a-hierarchy)
-      * [Create Reusable Widgets](#create-reusable-widgets)
-      * [Miscellaneous Qt Tips](#miscellaneous-qt-tips)
 * [Simulated Integration Tests](#simulated-integration-tests)
   * [Architecture](#simulated-integration-tests-architecture)
     * [Simulator Backend](#simulator-backend)
     * [World State Validator](#world-state-validator)
   * [Component Connections and Determinism](#component-connections-and-determinism)
   * [Diagram](#simulated-integration-tests-diagram)
+* [GUI](#gui)
+  * [Naming](#naming)
+  * [Editing the GUIs](#editing-the-guis)
+    * [Editing ui files](#editing-ui-files)
+    * [Promoting Widgets](#promoting-widgets)'
+  * [Qt Best Practices](#qt-best-practices)
+    * [Build A Hierarchy](#build-a-hierarchy)
+    * [Create Reusable Widgets](#create-reusable-widgets)
+    * [Miscellaneous Qt Tips](#miscellaneous-qt-tips)
 
 
 # Tools
@@ -70,7 +73,7 @@ A few commonly-used terms and tools to be familiar with:
   * This is the shared vision system used by the Small Size League. It is what connects to the cameras above the field, does the vision processing, and transmits the positional data of everything on the field to our AI computers.
   * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-vision)
 #### SSL-Gamecontroller
-  * Sometimes referred to as the "Refbox", this is another shared piece of Small Size League software that is used to send gamecontroller and referee commands to the teams. A human controls this application during the games to send the appropriate commands to the robots. For example, some of these commands are what stage the gameplay is in, such as `HALT`, `STOP`, `READY`, or `PLAY`.
+  * Sometimes referred to as the "Referee", this is another shared piece of Small Size League software that is used to send gamecontroller and referee commands to the teams. A human controls this application during the games to send the appropriate commands to the robots. For example, some of these commands are what stage the gameplay is in, such as `HALT`, `STOP`, `READY`, or `PLAY`.
   * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-game-controller)
 
 
@@ -78,7 +81,7 @@ A few commonly-used terms and tools to be familiar with:
 These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [AI](#ai), and [Visualizer](#visualizer).
 
 ## World
-The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current refbox commands. Altogether, it's the information we have at any given time that we can use to make decisions.
+The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current referee commands. Altogether, it's the information we have at any given time that we can use to make decisions.
 
 ### Team
 A team is a collection of [Robots](#robot)
@@ -92,7 +95,7 @@ The Ball class represents the state of the ball. This includes its position and 
 ### Field
 The Field class represents the state of the physical field being played on, which is primarily its physical dimensions. The Field class provides many functions that make it easy to get points of interest on the field, such as the enemy net, friendly corner, or center circle. Also see the [coordinate convention](#coordinates) we use for the field (and all things on it).
 
-### Refbox / GameState
+### GameState
 These represent the current state of the game as dictated by the Gamecontroller. These provide functions like `isPlaying()`, `isHalted()` which tell the rest of the system what game state we are in, and make decisions accordingly. We need to obey the rules!
 
 
@@ -168,7 +171,7 @@ Because the Factory needs to know about what objects are available to be created
 
 Read [http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/] for more information.
 
-The auto-registering factory is particularily useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
+The auto-registering factory is particularly useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
 
 The Factory pattern is also used to create different [Backends](#backend)
 
@@ -279,13 +282,20 @@ Once it is time to start the pass, the condition for the loop will become false 
 
 Once we have entered the second stage, we know we don't have to look at the first stage again. Because the coroutine "remembers" where the execution is each time the function is called, we will resume inside the second stage and therefore never execute the first stage again! This makes it much easier to write and read this strategy code, because we can clearly see the 2 stages of the strategy, and we know they will be executed in order.
 
+## Couroutine Best Practices
+Coroutines are a complex feature, and the boost coroutines we use don't always behave in was we expect. We have done extensive testing on how coroutines are safe (or not safe) to us, and derived some best practices from these examples. See [coroutine_test_exmaples.cpp](coroutine_test_examples.cpp) for the full code and more detailed explanantions.
+
+To summarize, the best practices are as follows:
+1. Avoid moving coroutines. If the absolutely must be moved, make sure they are not moved between the stack and heap.
+2. Avoid using coroutines with resizeable containers. If they must be used, make sure that the coroutines are allocated on the heap.
+3. Pass data to the coroutine on creation as much as possible, avoid using member variables.
+
 
 # Conventions
 Various conventions we use and follow that you need to know.
 
-
 ## Coordinates
-We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularily important for any code handling gameplay logic and positions on the field.
+We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularly important for any code handling gameplay logic and positions on the field.
 
 The coordinate system is a simple 2D x-y plane. The x-dimension runs between the friendly and enemy goals, along the longer dimension of the field. The y-dimension runs perpendicular to the x-dimension, along the short dimension of the field.
 
@@ -446,7 +456,78 @@ Although we want to display information about the [AI](#ai) in the [Visualizer](
 
 A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
 
-## Editing the Visualizer
+
+# Simulated Integration Tests
+When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
+
+Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behaviour.
+
+The primary design goals of this test system are:
+1. **Determinism:** We need tests to pass or fail consistently
+2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
+3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and to understand what they are testing.
+
+## Simulated Integration Tests Architecture
+The system consists of three main components:
+1. A [Backend](#backend) that performs the simulation
+2. A [World State Validator](#world-state-validator) Observer that will handle the "validation"
+3. The [AI](#ai) under test
+
+### Simulator Backend
+The `SimulatorBackend` is simply another implementation of the [Backend](#backend) interface. It uses a physics library to simulate the various components of the [World](#world), like the [Ball](#ball) and [Robots](#robot). Like any [Backend](#backend), the `SimulatorBackend` publishes the state of the [World](#world) periodically.
+
+In order to achieve determinism, the `SimulatorBackend` publishes new [World](#world)'s with a fixed time increment (in [World](#world) time), and will wait to receive [Primitives](#primitives) before simulating and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
+
+### World State Validator
+The `WorldStateValidator` is an Observer whose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
+
+There are generally 2 "types" of conditions we want to validate.
+1. Some sequence of states or actions occur **in a given order**. (*Eg. A robot moves to point A, then point B, then kicks the  ball*)
+2. Some condition is met for the duration of the test, or for "all time". (*Eg. The ball never leaves the field, or robots never collide*)
+
+We use `ValidationFunctions` to validate both types of conditions. `ValidationFunctions` are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. This lets us write individual functions that can be continuously run to validate both types of conditions above.
+
+Benefits of `ValidationFunctions`:
+1. They are reuseable. We can write a function that validates the ball never leaves the field, and use it for multiple tests.
+2. They can represent assertions for more complex behavior. For example, we can build up simpler `ValidationFunctions` until we have a single `Validation` function for a specific [Tactic](#tactics).
+3. They let us validate independent sequences of behaviour. For example, we can give the `WorldStateValidator` a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
+
+The `WorldStateValidator` accepts lists of `ValidationFunctions` that it will run against each [World](#world) it receives. Once all `ValidationFunctions` have been run, the `WorldStateValidator` publishes the [World](#world) again. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
+
+## Component Connections and Determinism
+When testing, determinism is extremely important. With large integration tests with many components, there are all kinds of timings and execution speed differences that can change the behaviour and results. We make use of a few assumptions and connect our components in such a way that prevents these timing issues.
+
+Most importantly, the [WorldStateValidator](#world-state-validator) acts as a "middleman" between the [Backend](#backend) and [AI](#ai). The [WorldStateValidator](#world-state-validator) observes the [World](#world) from the [Backend](#backend), and the [AI](#ai) observes the [World](#world) from the [WorldStateValidator](#world-state-validator). **The [AI](#ai) does not observe the [World](#world) directly from the [Backend](#backend) in this case.** See the [diagram](#simulated-integration-tests-diagram).
+
+Now we have a nice loop from the `Backend -> WorldStateValidator -> AI -> Backend ...`. As mentioned in their own sections, the [Simulator Backend](#simulator-backend) waits to receive [Primitives](#primitives) from the [AI](#ai) before publishing a new [World](#world), and the [WorldStateValidator](#world-state-validator) waits to receive and validate a [World](#world) before re-publishing the [World](#world). **The final assumption we make to complete this loop is that the [AI](#ai) waits to receive a new [World](#world) before publishing new [Primitives](#primitives).**
+
+**What this means is that each component in the loop waits for the previous one to finish its task and publish new data before executing.** As a result, no matter how fast each component is able to run, we will not have any issues related to speed or timing because each component is blocked by the previous one. As a result, we can have deterministic behaviour because every component is running at the same speed relative to one another.
+
+## Simulated Integration Tests Diagram
+Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the only real difference being the [World State Validator](#world-state-validator) being added between the [Backend](#backend) and [AI](#ai).
+
+The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and generally not run during the tests (unless debugging).
+
+![Simulated Testing High-level Architecture Diagram](images/simulated_integration_test_high_level_architecture.svg)
+
+
+# GUI
+
+## Naming
+
+### Variables
+When creating widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), all widgets should be given a descriptive name. This is because the `.ui` file will eventually be generated into code that we interact with, so we want the variable names to be descriptive and consistent with our naming conventions.
+
+Names should follow our [reglar naming conventions for variables](code-style-guide.md#names-and-variables). Furthermore, they should be named in the form `<purpose>_<widget>`. The purpose is essentially the "normal" variable name that should describe what the variable is. The widget component should be the name of the widget.
+
+For example, a `QLabel` for team colour should be named `team_colour_label`. Similarly, the button that starts the AI should be named `start_ai_button`.
+
+![Good Qt Widget Naming](images/qt_widget_naming_example.png)
+
+### Classes
+Only the top-level class for a given GUI should be suffixed with `GUI`. These top-level classes should just aggregate top-level widgets (typically generated from a `.ui` file) and connect callbacks. They should not define additional widgets or features themselves. For example, `FullSystemGUI` connects incoming buffers of data to the `main_widget` generated by a `.ui` file.
+
+## Editing the GUIs
 Qt provides [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), an IDE used for visually creating GUIs and laying out widgets. We use this editor as much as possible since it is easy to learn and use, and saves us having to define the entire GUI in code (which is more complex and makes things generally harder to understand and modify).
 
 Our rule of thumb is that [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) should be used to define all the widgets in the [Visualizer](#visualizer), and define the layout for everything. All logic (including connecting signals and slots, receiving data from buffers, etc.) should be implemented in the code ourselves.
@@ -493,7 +574,7 @@ The main point to remember is to use [layouts](https://doc.qt.io/qt-5/layout.htm
 ### Create Reusable Widgets
 Much like how we create functions in order to reuse code, [widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) should be created so that they are reusable.
 
-For example, if you create a few widgets that work together to gather user input with a slider and display the current value next to it, you should combine all of this into its own `SliderWithValue` widget. This will make it very easy to make several copies of this widget, or use it somewhere else in a completely different application.
+For example, if you create a few widgets that work together to gather user input with a slider and display the current value next to it, you should combine all of this into its own `SliderWithValue` widget. This will make it very easy to make several copies of this widget, or use it somewhere else in a completely different application. Similarly, if you need specialized functionality from any widget (for example, our `ZoomableQGraphicsView`), this should also be implemented as a custom reusable widget.
 
 ![Reusable Widget Example](images/qt_reusable_widget_example.png)
 
@@ -502,58 +583,3 @@ Creating widgets that are slightly more generic and reusable are very useful and
 ### Miscellaneous Qt Tips
 * Define minimum and maximum sizes (if it makes sense) to help enforce the correct sizing of elements
     * Eg. define a minimum width for a textbox based on what it's expected to contain
-
-
-# Simulated Integration Tests
-When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
-
-Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behaviour.
-
-The primary design goals of this test system are:
-1. **Determinism:** We need tests to pass or fail consistently
-2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
-3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and understand what they are testing.
-
-## Simulated Integration Tests Architecture
-The system consists of three main components:
-1. A [Backend](#backend) that performs the simulation
-2. A [World State Validator](#world-state-validator) Observer that will handle the "validation"
-3. The [AI](#ai) under test
-
-### Simulator Backend
-The `SimulatorBackend` is simply another implementation of the [Backend](#backend) interface. It uses a physics library to simulate the various components of the [World](#world), like the [Ball](#ball) and [Robots](#robot). Like any [Backend](#backend), the `SimulatorBackend` publishes the state of the [World](#world) periodically.
-
-In order to achieve determinism, the `SimulatorBackend` publishes new [World](#world)'s with a fixed time increment (in [World](#world) time), and will wait to receive [Primitives](#primitives) before simulating and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
-
-### World State Validator
-The `WorldStateValidator` is an Observer whose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
-
-There are generally 2 "types" of conditions we want to validate.
-1. Some sequence of states or actions occur **in a given order**. (*Eg. A robot moves to point A, then point B, then kicks the  ball*)
-2. Some condition is met for the duration of the test, or for "all time". (*Eg. The ball never leaves the field, or robots never collide*)
-
-We use `ValidationFunctions` to validate both types of conditions. `ValidationFunctions` are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. This lets us write individual functions that can be continuously run to validate both types of conditions above.
-
-Benefits of `ValidationFunctions`:
-1. They are reuseable. We can write a function that validates the ball never leaves the field, and use it for multiple tests.
-2. They can represent assertions for more complex behavior. For example, we can build up simpler `ValidationFunctions` until we have a single `Validation` function for a specific [Tactic](#tactics).
-3. They let us validate independent sequences of behaviour. For example, we can give the `WorldStateValidator` a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
-
-The `WorldStateValidator` accepts lists of `ValidationFunctions` that it will run against each [World](#world) it receives. Once all `ValidationFunctions` have been run, the `WorldStateValidator` publishes the [World](#world) again. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
-
-## Component Connections and Determinism
-When testing, determinism is extremely important. With large integration tests with many components, there are all kinds of timings and execution speed differences that can change the behaviour and results. We make use of a few assumptions and connect our components in such a way that prevents these timing issues.
-
-Most importantly, the [WorldStateValidator](#world-state-validator) acts as a "middleman" between the [Backend](#backend) and [AI](#ai). The [WorldStateValidator](#world-state-validator) observes the [World](#world) from the [Backend](#backend), and the [AI](#ai) observes the [World](#world) from the [WorldStateValidator](#world-state-validator). **The [AI](#ai) does not observe the [World](#world) directly from the [Backend](#backend) in this case.** See the [diagram](#simulated-integration-tests-diagram).
-
-Now we have a nice loop from the `Backend -> WorldStateValidator -> AI -> Backend ...`. As mentioned in their own sections, the [Simulator Backend](#simulator-backend) waits to receive [Primitives](#primitives) from the [AI](#ai) before publishing a new [World](#world), and the [WorldStateValidator](#world-state-validator) waits to receive and validate a [World](#world) before re-publishing the [World](#world). **The final assumption we make to complete this loop is that the [AI](#ai) waits to receive a new [World](#world) before publishing new [Primitives](#primitives).**
-
-**What this means is that each component in the loop waits for the previous one to finish its task and publish new data before executing.** As a result, no matter how fast each component is able to run, we will not have any issues related to speed or timing because each component is blocked by the previous one. As a result, we can have deterministic behaviour because every component is running at the same speed relative to one another.
-
-## Simulated Integration Tests Diagram
-Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the only real difference being the [World State Validator](#world-state-validator) being added between the [Backend](#backend) and [AI](#ai).
-
-The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and generally not run during the tests (unless debugging).
-
-![Simulated Testing High-level Architecture Diagram](images/simulated_integration_test_high_level_architecture.svg)
-

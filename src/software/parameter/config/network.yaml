@@ -23,14 +23,14 @@ NetworkConfig:
         default: 10020
         type: "int"
         description: The port to listen on for vision data
-      GamecontrollerIPv4Address:
+      GameControllerIPv4Address:
         default: "224.5.23.1"
         type: "std::string"
         description: The IPv4 address to listen on for gamecontroller data
-      GamecontrollerPort:
+      GameControllerPort:
         min: 1
         max: 65535
-        default: 10020
+        default: 10003
         type: "int"
         description: The port to listen on for gamecontroller data
 

@@ -7,11 +7,19 @@
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_ball.h"
+#include "software/test_util/equal_within_tolerance.h"
 #include "software/time/duration.h"
 #include "software/world/robot_state.h"
 
 class PhysicsRobotTest : public testing::Test
 {
+   public:
+    // 5 and 8 here are somewhat arbitrary values for the velocity and position
+    // iterations but are the recommended defaults from
+    // https://www.iforce2d.net/b2dtut/worlds
+    static constexpr int BOX2D_STEP_VELOCITY_ITERATIONS = 5;
+    static constexpr int BOX2D_STEP_POSITION_ITERATIONS = 8;
+
    protected:
     virtual void SetUp()
     {
@@ -46,10 +54,8 @@ class PhysicsRobotTest : public testing::Test
         // is lost if we take a single step of 1 second
         for (unsigned int i = 0; i < num_steps; i++)
         {
-            // 5 and 8 here are somewhat arbitrary values for the velocity and position
-            // iterations but are the recommended defaults from
-            // https://www.iforce2d.net/b2dtut/worlds
-            world->Step(static_cast<float>(step_size_seconds), 5, 8);
+            world->Step(static_cast<float>(step_size_seconds),
+                        BOX2D_STEP_VELOCITY_ITERATIONS, BOX2D_STEP_POSITION_ITERATIONS);
         }
     }
 
@@ -280,10 +286,8 @@ TEST_F(PhysicsRobotTest,
     // is lost if we take a single step of 1 second
     for (unsigned int i = 0; i < 60; i++)
     {
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
 
         // Once the ball has passed y=0 we expect it to have collided with the front of
         // the robot
@@ -313,10 +317,8 @@ TEST_F(PhysicsRobotTest,
     // is lost if we take a single step of 1 second
     for (unsigned int i = 0; i < 60; i++)
     {
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
 
         // Once the ball has passed y=0 we expect it to have collided with the front of
         // the robot
@@ -405,29 +407,6 @@ TEST_F(PhysicsRobotTest, test_dribbler_ball_end_contact_callbacks)
     EXPECT_TRUE(callback_called);
 }
 
-TEST_F(PhysicsRobotTest, test_chicker_ball_start_contact_callbacks)
-{
-    b2Vec2 gravity(0, 0);
-    auto world = std::make_shared<b2World>(gravity);
-
-    RobotState initial_robot_state(Point(0, 0), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    PhysicsRobot physics_robot(0, world, initial_robot_state, 1.0);
-
-    EXPECT_TRUE(physics_robot.getChickerBallStartContactCallbacks().empty());
-
-    bool callback_called = false;
-    auto callback        = [&callback_called](PhysicsRobot* robot, PhysicsBall* ball) {
-        callback_called = true;
-    };
-
-    physics_robot.registerChickerBallStartContactCallback(callback);
-
-    ASSERT_EQ(physics_robot.getChickerBallStartContactCallbacks().size(), 1);
-    physics_robot.getChickerBallStartContactCallbacks().at(0)(nullptr, nullptr);
-    EXPECT_TRUE(callback_called);
-}
-
 enum class RobotWheel
 {
     FRONT_LEFT,
@@ -475,10 +454,9 @@ TEST_P(PhysicsRobotWheelForceTest, test_wheel_force_creates_angular_velocity)
             break;
     }
 
-    // 5 and 8 here are somewhat arbitrary values for the velocity and position
-    // iterations but are the recommended defaults from
-    // https://www.iforce2d.net/b2dtut/worlds
-    world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+    world->Step(static_cast<float>(1.0 / 60.0),
+                PhysicsRobotTest::BOX2D_STEP_VELOCITY_ITERATIONS,
+                PhysicsRobotTest::BOX2D_STEP_POSITION_ITERATIONS);
 
     auto robot = physics_robot.getRobotState();
 
@@ -526,10 +504,8 @@ TEST_F(PhysicsRobotTest, test_robot_drive_forward_at_angle)
         physics_robot.applyWheelForceFrontLeft(-0.5);
         physics_robot.applyWheelForceBackLeft(-0.5);
 
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto robot = physics_robot.getRobotState();
@@ -560,10 +536,8 @@ TEST_F(PhysicsRobotTest, test_robot_drive_forward)
         physics_robot.applyWheelForceBackRight(0.5);
         physics_robot.applyWheelForceFrontRight(0.5);
 
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto robot = physics_robot.getRobotState();
@@ -594,10 +568,8 @@ TEST_F(PhysicsRobotTest, test_robot_drive_backwards)
         physics_robot.applyWheelForceBackRight(-0.5);
         physics_robot.applyWheelForceFrontRight(-0.5);
 
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto robot = physics_robot.getRobotState();
@@ -628,10 +600,8 @@ TEST_F(PhysicsRobotTest, test_robot_spin_clockwise)
         physics_robot.applyWheelForceBackRight(-0.5);
         physics_robot.applyWheelForceFrontRight(-0.5);
 
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto robot = physics_robot.getRobotState();
@@ -660,10 +630,8 @@ TEST_F(PhysicsRobotTest, test_robot_spin_counterclockwise)
         physics_robot.applyWheelForceBackRight(0.5);
         physics_robot.applyWheelForceFrontRight(0.5);
 
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto robot = physics_robot.getRobotState();
@@ -767,10 +735,8 @@ TEST_F(PhysicsRobotTest,
         physics_robot.brakeMotorBackRight();
         physics_robot.brakeMotorFrontRight();
 
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto robot = physics_robot.getRobotState();
@@ -796,10 +762,8 @@ TEST_F(PhysicsRobotTest,
         physics_robot.brakeMotorBackRight();
         physics_robot.brakeMotorFrontRight();
 
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto robot = physics_robot.getRobotState();
@@ -824,10 +788,8 @@ TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_moving_linearly)
         physics_robot.brakeMotorBackRight();
         physics_robot.brakeMotorFrontRight();
 
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto robot = physics_robot.getRobotState();
@@ -853,13 +815,39 @@ TEST_F(PhysicsRobotTest, test_brake_motors_when_robot_moving_and_spinning)
         physics_robot.brakeMotorBackRight();
         physics_robot.brakeMotorFrontRight();
 
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are the recommended defaults from
-        // https://www.iforce2d.net/b2dtut/worlds
-        world->Step(static_cast<float>(1.0 / 60.0), 5, 8);
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
     }
 
     auto robot = physics_robot.getRobotState();
     EXPECT_LT((robot.velocity() - Vector(0, 0)).length(), 0.01);
     EXPECT_NEAR(robot.angularVelocity().toDegrees(), 0.0, 1);
+}
+
+TEST_F(PhysicsRobotTest, test_apply_force_to_center)
+{
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    RobotState initial_robot_state(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
+                                   AngularVelocity::zero());
+    PhysicsRobot physics_robot(0, world, initial_robot_state, 1.0);
+
+    // We have to take lots of small steps because a significant amount of accuracy
+    // is lost if we take a single step of 1 second
+    for (unsigned int i = 0; i < 60; i++)
+    {
+        physics_robot.applyForceToCenterOfMass(Vector(1, 1));
+
+        world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
+                    BOX2D_STEP_POSITION_ITERATIONS);
+    }
+
+    auto robot = physics_robot.getRobotState();
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot.velocity().orientation(),
+                                               Vector(1, 1).orientation(),
+                                               Angle::fromDegrees(2)));
+    // Damping and other factors mean we can't assert the robot's exact speed, so
+    // we just check it got moving beyond a low threshold
+    EXPECT_GT(robot.velocity().length(), 0.2);
 }

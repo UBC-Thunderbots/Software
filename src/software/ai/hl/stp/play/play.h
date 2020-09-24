@@ -15,18 +15,26 @@ typedef boost::coroutines2::coroutine<std::vector<std::shared_ptr<Tactic>>>
 
 /**
  * In the STP framework, a Play is a collection of tactics that represent some
- * "team-wide" goal. It can be thought of like a traditional play in soccer, such as an
- * offensive play, defensive play, or a specific play used for corner kicks.
+ * "team-wide" goal. It can be thought of like a traditional play in soccer.
+ * Some examples are:
+ * - A defense play
+ * - An offense play
+ * - A corner-kick of free-kick play
  *
- * When we are running autonomously, different Plays are selected at different times
- * based on the state of the world, and this switching of Plays is what allows our AI to
- * play a full game of soccer, as long a we provide a Play for any given scenario.
+ * Plays are stateful, and use Tactics to implement their behaviour.
+ * For the most part, this statefulness is used to created "stages" for each Play.
+ * For example, a corner-kick play be broken down into 2 stages:
+ * - First, get the robots into position and find a good robot to pass to
+ * - Execute the pass and attempt a one-touch shot on net
  *
- * Plays must define what conditions must be met for them to start (with the isApplicable
+ * These stages are useful in order for us to create more complex behaviour and write
+ * it in a more understandable way.
+ *
+ * Plays define what conditions must be met for them to start (with the isApplicable
  * function), and what conditions must be continuously met for the Play to continue
  * running (with the invariantHolds function). These are very important to get right,
  * so that we can always run at least 1 Play in every scenario, and that Plays don't
- * unexpectedly stop.
+ * unexpectedly stop during gameplay. See the documentation in stp.h for more info.
  */
 class Play
 {
@@ -73,7 +81,7 @@ class Play
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    std::optional<std::vector<std::shared_ptr<Tactic>>> getTactics(const World& world);
+    std::vector<std::shared_ptr<Tactic>> getTactics(const World& world);
 
     /**
      * Returns true if the Play is done and false otherwise. The Play is considered
@@ -83,13 +91,6 @@ class Play
      * @return true if the Play is done and false otherwise
      */
     bool done() const;
-
-    /**
-     * Returns the name of this Play
-     *
-     * @return the name of this Play
-     */
-    virtual std::string getName() const = 0;
 
     virtual ~Play() = default;
 

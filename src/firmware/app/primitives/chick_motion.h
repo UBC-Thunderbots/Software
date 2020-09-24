@@ -34,7 +34,6 @@ void app_chick_motion_start(void *void_state_ptr, FirmwareWorld_t *world,
 
 
 // The following function definitions mirror those in primitive_t
-void app_chick_motion_end(void *void_state_ptr, FirmwareWorld_t *world);
 void app_chick_motion_tick(void *void_state_ptr, FirmwareWorld_t *world);
 void *createChickMotionState_t(void);
 void destroyChickMotionState_t(void *state);

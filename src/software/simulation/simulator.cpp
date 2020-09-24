@@ -1,7 +1,6 @@
 #include "software/simulation/simulator.h"
 
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/proto_creator_primitive_visitor.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
@@ -23,6 +22,8 @@ Simulator::Simulator(const Field& field, const Duration& physics_time_step)
 Simulator::Simulator(const Field& field, double ball_restitution,
                      double ball_linear_damping, const Duration& physics_time_step)
     : physics_world(field, ball_restitution, ball_linear_damping),
+      yellow_team_defending_side(FieldSide::NEG_X),
+      blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),
       physics_time_step(physics_time_step)
 {
@@ -72,56 +73,46 @@ void Simulator::updateSimulatorRobots(
     }
 }
 
-void Simulator::setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    setRobotPrimitives(primitives, yellow_simulator_robots, simulator_ball);
-}
-
-void Simulator::setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives)
-{
-    setRobotPrimitives(primitives, blue_simulator_robots, simulator_ball);
-}
-
-void Simulator::setRobotPrimitives(
-    ConstPrimitiveVectorPtr primitives,
-    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-        simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball)
-{
-    if (!primitives)
-    {
-        return;
-    }
-
-    for (const auto& primitive_ptr : *primitives)
-    {
-        TbotsProto_Primitive primitive_msg = createNanoPbPrimitive(
-            ProtoCreatorPrimitiveVisitor().createPrimitive(*primitive_ptr));
-
-        setRobotPrimitive(primitive_ptr->getRobotId(), primitive_msg, simulator_robots,
-                          simulator_ball);
-    }
-}
-
 void Simulator::setYellowRobotPrimitive(RobotId id,
                                         const TbotsProto_Primitive& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball);
+    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball,
+                      yellow_team_defending_side);
 }
 
 void Simulator::setBlueRobotPrimitive(RobotId id,
                                       const TbotsProto_Primitive& primitive_msg)
 {
-    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball);
+    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball,
+                      blue_team_defending_side);
+}
+
+void Simulator::setYellowRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet& primitive_set_msg)
+{
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
+    {
+        setYellowRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                                primitive_set_msg.robot_primitives[i].value);
+    }
+}
+
+void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg)
+{
+    for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
+    {
+        setBlueRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                              primitive_set_msg.robot_primitives[i].value);
+    }
 }
 
 void Simulator::setRobotPrimitive(
     RobotId id, const TbotsProto_Primitive& primitive_msg,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball)
+    const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side)
 {
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
+    SimulatorBallSingleton::setSimulatorBall(simulator_ball, defending_side);
     auto simulator_robots_iter =
         std::find_if(simulator_robots.begin(), simulator_robots.end(),
                      [id](const auto& robot_world_pair) {
@@ -132,9 +123,41 @@ void Simulator::setRobotPrimitive(
     {
         auto simulator_robot = (*simulator_robots_iter).first;
         auto firmware_world  = (*simulator_robots_iter).second;
-        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, defending_side);
         SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(firmware_world,
                                                                           primitive_msg);
+    }
+}
+
+void Simulator::setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto)
+{
+    switch (defending_side_proto.defending_side())
+    {
+        case DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X:
+            yellow_team_defending_side = FieldSide::NEG_X;
+            break;
+        case DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X:
+            yellow_team_defending_side = FieldSide::POS_X;
+            break;
+        default:
+            throw std::invalid_argument(
+                "Unhandled value of DefendingSideProto_FieldSide");
+    }
+}
+
+void Simulator::setBlueTeamDefendingSide(const DefendingSideProto& defending_side_proto)
+{
+    switch (defending_side_proto.defending_side())
+    {
+        case DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X:
+            blue_team_defending_side = FieldSide::NEG_X;
+            break;
+        case DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X:
+            blue_team_defending_side = FieldSide::POS_X;
+            break;
+        default:
+            throw std::invalid_argument(
+                "Unhandled value of DefendingSideProto_FieldSide");
     }
 }
 
@@ -143,24 +166,29 @@ void Simulator::stepSimulation(const Duration& time_step)
     // Set the ball being referenced in each firmware_world.
     // We only need to do this a single time since all robots
     // can see and interact with the same ball
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
 
     Duration remaining_time = time_step;
     while (remaining_time > Duration::fromSeconds(0))
     {
-        for (auto& iter : yellow_simulator_robots)
-        {
-            auto simulator_robot = iter.first;
-            auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
-        }
-
         for (auto& iter : blue_simulator_robots)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
+                                                       blue_team_defending_side);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball,
+                                                     blue_team_defending_side);
+            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
+        }
+
+        for (auto& iter : yellow_simulator_robots)
+        {
+            auto simulator_robot = iter.first;
+            auto firmware_world  = iter.second;
+            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
+                                                       yellow_team_defending_side);
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball,
+                                                     yellow_team_defending_side);
             SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
         }
 
@@ -211,7 +239,7 @@ World Simulator::getWorld() const
     return world;
 }
 
-std::unique_ptr<SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
+std::unique_ptr<SSLProto::SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
 {
     auto ball_state  = physics_world.getBallState();
     auto ball_states = ball_state.has_value()
@@ -258,4 +286,9 @@ void Simulator::addBlueRobot(const Point& position)
         RobotState(position, Vector(0, 0), Angle::zero(), AngularVelocity::zero());
     auto state_with_id = RobotStateWithId{.id = id, .robot_state = state};
     addBlueRobots({state_with_id});
+}
+
+void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+{
+    physics_world.removeRobot(robot);
 }

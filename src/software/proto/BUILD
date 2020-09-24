@@ -8,9 +8,10 @@ proto_library(
         "messages_robocup_ssl_detection.proto",
         "messages_robocup_ssl_geometry.proto",
         "messages_robocup_ssl_wrapper.proto",
-        "ssl_game_controller_common.proto",
-        "ssl_game_event.proto",
-        "ssl_referee.proto",
+        "ssl_gc_common.proto",
+        "ssl_gc_game_event.proto",
+        "ssl_gc_geometry.proto",
+        "ssl_gc_referee_message.proto",
     ],
     visibility = ["//visibility:private"],
 )
@@ -40,6 +41,14 @@ proto_library(
     ],
 )
 
+proto_library(
+    name = "defending_side_msg_proto",
+    srcs = [
+        "defending_side_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
+)
+
 cc_proto_library(
     name = "ssl_cc_proto",
     deps = [":ssl_proto"],
@@ -53,4 +62,9 @@ cc_proto_library(
 cc_proto_library(
     name = "replay_msg_cc_proto",
     deps = [":replay_msg_proto"],
+)
+
+cc_proto_library(
+    name = "defending_side_msg_cc_proto",
+    deps = [":defending_side_msg_proto"],
 )

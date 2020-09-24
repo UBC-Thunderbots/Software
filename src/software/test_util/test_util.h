@@ -81,15 +81,6 @@ namespace TestUtil
     World setBallVelocity(World world, Vector ball_velocity, Timestamp timestamp);
 
     /**
-     * Returns a vector containing all Refbox game states except for
-     * LAST_ENUM_ITEM_UNUSED
-     *
-     * @return A vector containing all Refbox game states except for
-     * LAST_ENUM_ITEM_UNUSED
-     */
-    std::vector<RefboxGameState> getAllRefboxGameStates();
-
-    /**
      * Returns a robot at the given position with zero velocity,
      * facing zero radians, with zero rad/s of angular velocity,
      * and an id monotonically increasing at each call of this

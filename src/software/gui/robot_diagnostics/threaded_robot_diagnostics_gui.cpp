@@ -8,12 +8,25 @@ ThreadedRobotDiagnosticsGUI::ThreadedRobotDiagnosticsGUI(int argc, char** argv)
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorProto>>(sensor_msg_buffer_size)),
-      primitive_buffer(std::make_shared<ThreadSafeBuffer<std::unique_ptr<Primitive>>>(
+      primitive_buffer(std::make_shared<ThreadSafeBuffer<TbotsProto::PrimitiveSet>>(
           primitive_buffer_size)),
       application_shutting_down(false)
 {
     run_robot_diagnostics_thread = std::thread(
         &ThreadedRobotDiagnosticsGUI::createAndRunRobotDiagnosticsGUI, this, argc, argv);
+    run_send_primitives_thread = std::thread([this]() {
+        while (true)
+        {
+            auto primitive = primitive_buffer->popLeastRecentlyAddedValue();
+            if (primitive)
+            {
+                this->sendValueToObservers(std::move(primitive.value()));
+            }
+
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(send_primitive_interval_ms));
+        }
+    });
 }
 
 ThreadedRobotDiagnosticsGUI::~ThreadedRobotDiagnosticsGUI()
@@ -28,6 +41,7 @@ ThreadedRobotDiagnosticsGUI::~ThreadedRobotDiagnosticsGUI()
     }
 
     run_robot_diagnostics_thread.join();
+    run_send_primitives_thread.join();
 }
 
 void ThreadedRobotDiagnosticsGUI::createAndRunRobotDiagnosticsGUI(int argc, char** argv)

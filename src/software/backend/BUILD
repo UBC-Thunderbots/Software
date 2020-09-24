@@ -7,7 +7,6 @@ cc_library(
     deps = [
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
-        "//software/primitive",
         "//software/proto:sensor_msg_cc_proto",
         "//software/world",
     ],
@@ -40,6 +39,8 @@ cc_library(
         "//software:constants",
         "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
+        "//software/proto:defending_side_msg_cc_proto",
+        "//software/proto/message_translation:defending_side",
         "//software/proto/message_translation:tbots_protobuf",
         "//software/util/design_patterns:generic_factory",
     ],

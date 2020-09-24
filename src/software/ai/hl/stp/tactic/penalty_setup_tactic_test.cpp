@@ -7,6 +7,4 @@
 TEST(PenaltySetupTacticTest, constructor_test)
 {
     PenaltySetupTactic tactic = PenaltySetupTactic(true);
-
-    EXPECT_TRUE("Penalty Setup Tactic" == tactic.getName());
 }

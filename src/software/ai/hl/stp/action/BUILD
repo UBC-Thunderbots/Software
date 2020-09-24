@@ -31,6 +31,7 @@ cc_library(
     hdrs = ["intercept_ball_action.h"],
     deps = [
         ":action",
+        ":move_action",
         "//shared:constants",
         "//software/ai/evaluation:intercept",
         "//software/ai/evaluation:robot",
@@ -48,6 +49,8 @@ cc_test(
     deps = [
         ":intercept_ball_action",
         "//software/ai/intent:move_intent",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
         "//software/test_util",
         "//software/world:ball",
         "@gtest//:gtest_main",

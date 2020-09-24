@@ -1,12 +1,30 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "direct_primitive_intent",
+    srcs = ["direct_primitive_intent.cpp"],
+    hdrs = ["direct_primitive_intent.h"],
+    deps = [
+        ":intent",
+    ],
+)
+
+cc_library(
+    name = "navigating_intent",
+    srcs = ["navigating_intent.cpp"],
+    hdrs = ["navigating_intent.h"],
+    deps = [
+        "navigating_intent_visitor",
+        ":intent",
+    ],
+)
+
+cc_library(
     name = "chip_intent",
     srcs = ["chip_intent.cpp"],
     hdrs = ["chip_intent.h"],
     deps = [
-        ":intent",
-        "//software/primitive:chip_primitive",
+        ":direct_primitive_intent",
     ],
 )
 
@@ -24,8 +42,7 @@ cc_library(
     srcs = ["kick_intent.cpp"],
     hdrs = ["kick_intent.h"],
     deps = [
-        ":intent",
-        "//software/primitive:kick_primitive",
+        ":direct_primitive_intent",
     ],
 )
 
@@ -43,10 +60,9 @@ cc_library(
     srcs = ["move_intent.cpp"],
     hdrs = ["move_intent.h"],
     deps = [
-        ":intent",
+        ":navigating_intent",
         "//software/geom:angle",
         "//software/geom:point",
-        "//software/primitive:move_primitive",
         "//software/util/make_enum",
     ],
 )
@@ -65,8 +81,7 @@ cc_library(
     srcs = ["spinning_move_intent.cpp"],
     hdrs = ["spinning_move_intent.h"],
     deps = [
-        ":intent",
-        "//software/primitive:spinning_move_primitive",
+        ":direct_primitive_intent",
     ],
 )
 
@@ -84,8 +99,7 @@ cc_library(
     srcs = ["stop_intent.cpp"],
     hdrs = ["stop_intent.h"],
     deps = [
-        ":intent",
-        "//software/primitive:stop_primitive",
+        ":direct_primitive_intent",
     ],
 )
 
@@ -103,8 +117,10 @@ cc_library(
     hdrs = ["all_intents.h"],
     deps = [
         ":chip_intent",
+        ":direct_primitive_intent",
         ":kick_intent",
         ":move_intent",
+        ":navigating_intent",
         ":spinning_move_intent",
         ":stop_intent",
     ],
@@ -116,8 +132,12 @@ cc_library(
     hdrs = ["intent.h"],
     deps = [
         "intent_visitor",
+        "//shared/proto:tbots_cc_proto",
         "//software/ai/motion_constraint",
+        "//software/geom:angle",
+        "//software/geom:point",
         "//software/logger",
+        "//software/proto/primitive:primitive_msg_factory",
     ],
 )
 
@@ -126,7 +146,7 @@ cc_test(
     srcs = ["intent_test.cpp"],
     deps = [
         ":intent",
-        ":move_intent",
+        ":stop_intent",
         "@gtest//:gtest_main",
     ],
 )
@@ -134,4 +154,9 @@ cc_test(
 cc_library(
     name = "intent_visitor",
     hdrs = ["intent_visitor.h"],
+)
+
+cc_library(
+    name = "navigating_intent_visitor",
+    hdrs = ["navigating_intent_visitor.h"],
 )

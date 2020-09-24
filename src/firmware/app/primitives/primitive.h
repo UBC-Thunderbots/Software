@@ -22,18 +22,6 @@ typedef struct
     bool direct;
 
     /**
-     * \brief Ends a movement using the primitive.
-     *
-     * This is invoked every time a new movement begins after a primitive has
-     * been in use, regardless of whether the new movement is of the same or a
-     * different type.
-     * \param[in] state_void_ptr A pointer to the state object for this primitive, as
-     *                           created by the `create_state` function
-     * \param[in] world The world to perform the primitive in
-     */
-    void (*end)(void* state_void_ptr, FirmwareWorld_t* world);
-
-    /**
      * \brief Advances time in the primitive.
      *
      * This is invoked at the system tick rate, and must drive the robot’s

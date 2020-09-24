@@ -24,8 +24,8 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_enemy_half)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(FreeKickPlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START, RefboxGameState::INDIRECT_FREE_US);
+    setAIPlay(TYPENAME(FreeKickPlay));
+    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
@@ -57,8 +57,8 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_friendly_half)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(FreeKickPlay::name);
-    setRefboxGameState(RefboxGameState::NORMAL_START, RefboxGameState::INDIRECT_FREE_US);
+    setAIPlay(TYPENAME(FreeKickPlay));
+    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

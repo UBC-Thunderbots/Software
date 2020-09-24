@@ -19,11 +19,6 @@ ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
 {
 }
 
-std::string ReceiverTactic::getName() const
-{
-    return "Receiver Tactic";
-}
-
 void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
                                        const Team& updated_enemy_team,
                                        const Ball& updated_ball)
@@ -127,9 +122,13 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         while ((ball.position() - robot->position()).length() >
                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
-            Point ball_receive_pos =
-                closestPoint(robot->position(),
-                             Line(ball.position(), ball.position() + ball.velocity()));
+            Point ball_receive_pos = ball.position();
+            if (ball.velocity().length() != 0)
+            {
+                ball_receive_pos = closestPoint(
+                    robot->position(),
+                    Line(ball.position(), ball.position() + ball.velocity()));
+            }
             Angle ball_receive_orientation =
                 (ball.position() - robot->position()).orientation();
 
@@ -174,7 +173,8 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
 {
     // Check if we can shoot on the enemy goal from the receiver position
     std::optional<Shot> best_shot_opt =
-        calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
+        calcBestShotOnGoal(field, friendly_team, enemy_team, robot->position(),
+                           TeamType::ENEMY, {*this->getAssignedRobot()});
 
     // Vector from the ball to the robot
     Vector robot_to_ball = ball.position() - robot->position();
@@ -220,8 +220,12 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
         Vector::createFromAngle(robot.orientation()).normalize(dist_to_ball_in_dribbler);
 
     // Find the closest point to the ball contact point on the ball's trajectory
-    Point closest_ball_pos = closestPoint(
-        ball_contact_point, Line(ball.position(), ball.position() + ball.velocity()));
+    Point closest_ball_pos = ball.position();
+    if (ball.velocity().length() != 0)
+    {
+        closest_ball_pos = closestPoint(
+            ball_contact_point, Line(ball.position(), ball.position() + ball.velocity()));
+    }
     Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
 
     Angle ideal_orientation      = getOneTimeShotDirection(shot, ball);

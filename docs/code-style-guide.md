@@ -62,7 +62,7 @@ The vast majority of the things noted in this document will apply to `C` code as
 
 * Functions that take no arguments must be declared as `foo(void)` **not** `foo()`, as the second option allows `foo` to take anything as it's arguments ([reference](https://softwareengineering.stackexchange.com/questions/286490/what-is-the-difference-between-function-and-functionvoid/286494))
 
-* Functions that return values via argument(s) must have all parameters labelled as `[in]`, `[in/out]`, or `[out]` in the javadoc, **in that order**. The one exception to this is [pseudo-class](/docs/firmware-architecture-and-design.md#pseudo-class) functions, which should take the "class" (which is an `[in/out]` as the first argument).
+* Functions that return values via argument(s) must have all pointer parameters labelled as `[in]`, `[in/out]`, or `[out]` in the javadoc, **in that order**. The exceptions to this are [pseudo-class](/docs/firmware-architecture-and-design.md#pseudo-class) functions, which should take the "class" (which is an `[in/out]` as the first argument) and function pointers.
 
   ``` C
   // Incorrect
@@ -76,6 +76,7 @@ The vast majority of the things noted in this document will apply to `C` code as
    *                           created trajectory.
    * @param max_speed The maximum speed on the trajectory permitted on the 
    *                  trajectory.
+   *
    * @return true if the trajectory was generated successfully, false otherwise
    */
   bool generateTrajectory(float* max_acceleration, 
@@ -86,13 +87,14 @@ The vast majority of the things noted in this document will apply to `C` code as
   /**
    * Create a trajectory with given max speed
    * 
-   * @param max_speed [in] The maximum speed on the trajectory permitted on the 
+   * @param max_speed The maximum speed on the trajectory permitted on the 
    *                       trajectory.
    * @param max_acceleration [in/out] The maximum acceleration permitted. This 
    *                                  will be updated to the maximum acceleration 
    *                                  actually seen on the generated trajectory.
    * @param created_trajectory [out] A pointer that will be set to the created 
    *                                 created trajectory.
+   *
    * @return true if the trajectory was generated successfully, false otherwise
    */
   bool generateTrajectory(float max_speed, 
@@ -218,14 +220,16 @@ If you think some ASCII art will help explain something better, go for it! [asci
     ```
     Example 2: visitor functions
     ```cpp
+    // The javadoc comment for all methods here can be read as:
     /**
-     * Serializes the given Primitive into a radio packet
+     * Visits an instance of X to perform an operation
      *
-     * @param The Primitive to serialize
+     * @param tactic The tactic to visit
      */
-    void visit(const CatchPrimitive &catch_primitive) override;
-    void visit(const ChipPrimitive &chip_primitive) override;
-    void visit(const DirectVelocityPrimitive &direct_velocity_primitive) override;
+
+    virtual void visit(CherryPickTactic &tactic)         = 0;
+    virtual void visit(ShadowFreekickerTactic &tactic)   = 0;
+    virtual void visit(GoalieTactic &tactic)             = 0;
     etc...
     ```
 
@@ -278,7 +282,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
 ### Exceptions
 
 * Throwing an exception indicates that the AI has entered an unrecoverable state.
-* In almost all cases, it is preferable to return a `std::optional` type, so the caller has to handle the case of the called function "failing", perhaps alongside some logging that the error occured.
+* In almost all cases, it is preferable to return a `std::optional` type, so the caller has to handle the case of the called function "failing", perhaps alongside some logging that the error occurred.
 
 
 ### Tests

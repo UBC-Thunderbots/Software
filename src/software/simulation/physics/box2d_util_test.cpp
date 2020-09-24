@@ -24,6 +24,7 @@ TEST(Box2DUtilTest, test_existence_of_null_body)
 
     auto result = bodyExistsInWorld(body, world);
     EXPECT_FALSE(result);
+    delete world;
 }
 
 TEST(Box2DUtilTest, test_existence_of_random_body_in_empty_world)
@@ -40,6 +41,8 @@ TEST(Box2DUtilTest, test_existence_of_random_body_in_empty_world)
 
     auto result = bodyExistsInWorld(body, world);
     EXPECT_FALSE(result);
+    delete world;
+    delete other_world;
 }
 
 TEST(Box2DUtilTest, test_existence_of_body_in_world_with_one_body)
@@ -55,6 +58,7 @@ TEST(Box2DUtilTest, test_existence_of_body_in_world_with_one_body)
 
     auto result = bodyExistsInWorld(body, world);
     EXPECT_TRUE(result);
+    delete world;
 }
 
 TEST(Box2DUtilTest, test_existence_of_body_in_world_with_multiple_bodies)
@@ -97,6 +101,8 @@ TEST(Box2DUtilTest, test_existence_of_body_in_world_with_multiple_bodies)
 
     auto result_4 = bodyExistsInWorld(body_4, world);
     EXPECT_FALSE(result_4);
+    delete world;
+    delete other_world;
 }
 
 TEST(Box2DUtilTest, test_create_b2Vec2_from_point)

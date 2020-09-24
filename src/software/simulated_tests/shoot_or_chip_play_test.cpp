@@ -38,8 +38,8 @@ TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
                                       AngularVelocity::zero())},
     });
     setEnemyGoalie(0);
-    setAIPlay(ShootOrChipPlay::name);
-    setRefboxGameState(RefboxGameState::FORCE_START, RefboxGameState::STOP);
+    setAIPlay(TYPENAME(ShootOrChipPlay));
+    setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough

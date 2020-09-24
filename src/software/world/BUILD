@@ -96,7 +96,7 @@ cc_library(
     deps = [
         ":ball",
         "//software/logger",
-        "//software/sensor_fusion:refbox_data",
+        "//software/util/make_enum",
     ],
 )
 

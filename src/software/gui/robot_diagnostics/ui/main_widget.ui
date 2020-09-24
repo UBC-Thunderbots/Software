@@ -213,52 +213,19 @@
                  <number>2</number>
                 </property>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_battery">
-                  <property name="maximum">
-                   <number>20</number>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 V</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_battery">
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_capacitor">
-                  <property name="maximum">
-                   <number>200</number>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 V</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_capacitor">
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_dribbler_speed">
-                  <property name="maximum">
-                   <number>6000</number>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 RPM</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_dribbler_speed">
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_break_beam">
-                  <property name="value">
-                   <number>24</number>
-                  </property>
-                  <property name="format">
-                   <string>%1%</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_break_beam">
                  </widget>
                 </item>
                </layout>
@@ -352,26 +319,11 @@
                  <number>2</number>
                 </property>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_dribbler_temp">
-                  <property name="maximum">
-                   <number>100</number>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 °C</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_dribbler_temp">
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_board_temp">
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 °C</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_board_temp">
                  </widget>
                 </item>
                </layout>
@@ -1017,26 +969,26 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_15">
             <item>
-             <widget class="QLabel" name="label_dribbler_power">
+             <widget class="QLabel" name="label_dribbler_rpm">
               <property name="font">
                <font>
                 <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
-               <string>Power</string>
+               <string>RPM</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSlider" name="slider_dribbler_power">
+             <widget class="QSlider" name="slider_dribbler_rpm">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_dribbler_power">
+             <widget class="QLineEdit" name="lineEdit_dribbler_rpm">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1106,6 +1058,11 @@
    <class>RobotStatusTable</class>
    <extends>QTableWidget</extends>
    <header>software/gui/generic_widgets/robot_status/robot_status_table.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DecimalProgressBar</class>
+   <extends>QProgressBar</extends>
+   <header>software/gui/robot_diagnostics/widgets/decimal_progress_bar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

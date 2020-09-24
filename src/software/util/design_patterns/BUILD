@@ -6,6 +6,9 @@ cc_library(
         "generic_factory.h",
         "generic_factory.tpp",
     ],
+    deps = [
+        "//software/util/typename",
+    ],
 )
 
 cc_test(

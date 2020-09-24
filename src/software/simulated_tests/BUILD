@@ -10,6 +10,8 @@ cc_library(
         "//software/gui/drawing:navigator",
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
+        "//software/proto/message_translation:primitive_google_to_nanopb_converter",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/sensor_fusion",
         "//software/simulated_tests/validation:non_terminating_function_validator",
         "//software/simulated_tests/validation:terminating_function_validator",

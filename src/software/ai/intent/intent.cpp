@@ -4,9 +4,8 @@
 
 #include "software/logger/logger.h"
 
-// Implement concrete functions shared by all intents
-
-Intent::Intent(unsigned int priority)
+Intent::Intent(unsigned int robot_id, unsigned int priority)
+    : robot_id(robot_id), motion_constraints()
 {
     setPriority(priority);
 }
@@ -14,6 +13,11 @@ Intent::Intent(unsigned int priority)
 unsigned int Intent::getPriority(void) const
 {
     return priority;
+}
+
+unsigned int Intent::getRobotId() const
+{
+    return robot_id;
 }
 
 void Intent::setPriority(unsigned int new_priority)
@@ -29,7 +33,8 @@ void Intent::setPriority(unsigned int new_priority)
 
 bool Intent::operator==(const Intent &other) const
 {
-    return this->priority == other.priority;
+    return this->priority == other.priority && this->robot_id == other.robot_id &&
+           motion_constraints == other.motion_constraints;
 }
 
 bool Intent::operator!=(const Intent &other) const

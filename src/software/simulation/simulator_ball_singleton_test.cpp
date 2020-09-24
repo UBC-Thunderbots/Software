@@ -21,7 +21,7 @@ TEST(SimulatorBallSingletonTest, test_create_firmware_ball_with_single_simulator
     auto simulator_ball =
         std::make_shared<SimulatorBall>(physics_world->getPhysicsBall());
 
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball);
+    SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
     auto firmware_ball = SimulatorBallSingleton::createFirmwareBall();
     EXPECT_FLOAT_EQ(0.4f, app_firmware_ball_getPositionX(firmware_ball.get()));
     EXPECT_FLOAT_EQ(0.0f, app_firmware_ball_getPositionY(firmware_ball.get()));
@@ -44,7 +44,7 @@ TEST(SimulatorBallSingletonTest, test_change_simulator_ball)
     auto simulator_ball_2 =
         std::make_shared<SimulatorBall>(physics_world_2->getPhysicsBall());
 
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball_1);
+    SimulatorBallSingleton::setSimulatorBall(simulator_ball_1, FieldSide::NEG_X);
     auto firmware_ball = SimulatorBallSingleton::createFirmwareBall();
     EXPECT_FLOAT_EQ(0.4f, app_firmware_ball_getPositionX(firmware_ball.get()));
     EXPECT_FLOAT_EQ(0.0f, app_firmware_ball_getPositionY(firmware_ball.get()));
@@ -53,7 +53,7 @@ TEST(SimulatorBallSingletonTest, test_change_simulator_ball)
 
     // The firmware functions should now return the data for simulator_ball_2, even though
     // we didn't need to create a new FirmwareBall_t
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball_2);
+    SimulatorBallSingleton::setSimulatorBall(simulator_ball_2, FieldSide::NEG_X);
     firmware_ball = SimulatorBallSingleton::createFirmwareBall();
     EXPECT_FLOAT_EQ(0.0f, app_firmware_ball_getPositionX(firmware_ball.get()));
     EXPECT_FLOAT_EQ(-3.0f, app_firmware_ball_getPositionY(firmware_ball.get()));
