@@ -14,15 +14,3 @@ void Subject<T>::sendValueToObservers(T val)
         observer->receiveValue(val);
     }
 }
-
-template <typename T>
-double Subject<T>::getAverageDataReceivedPerSecond()
-{
-    double sum = 0;
-    for (std::shared_ptr<Observer<T>>& observer : observers)
-    {
-        sum += observer->getDataReceivedPerSecond();
-    }
-
-    return sum / (double)observers.size();
-}

@@ -29,7 +29,7 @@ std::optional<T> Observer<T>::popLeastRecentlyReceivedValue(Duration max_wait_ti
 template <typename T>
 double Observer<T>::getDataReceivedPerSecond()
 {
-    auto time      = (time_buffer.back() - time_buffer.front());
-    double seconds = (double)(time.count()) / 1000;
-    return seconds > 0 ? (double)time_buffer.size() / seconds : 0;
+    auto time_ms  = (time_buffer.back() - time_buffer.front());
+    double time_s = (double)(time_ms.count()) / 1000;
+    return time_s > 0 ? (double)time_buffer.size() / time_s : 0;
 }
