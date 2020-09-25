@@ -21,6 +21,11 @@ class ReplayBackend : public Backend
     void onValueReceived(World world) override;
     void continuouslyPullFromReplayFiles();
 
+    static constexpr std::chrono::duration<double> CHECK_LAST_PRIMITIVE_TIME_DURATION =
+        std::chrono::duration<double>(0.1);
+    static constexpr std::chrono::duration<double> LAST_PRIMITIVE_TO_SHUTDOWN_DURATION =
+        std::chrono::duration<double>(1.0);
+
     ReplayReader replay_reader;
     // a thread that continuously pulls from replay data files and emits them to the
     // observers of this class
@@ -28,4 +33,8 @@ class ReplayBackend : public Backend
     std::optional<std::chrono::duration<double>> last_msg_received_time;
     std::optional<std::chrono::time_point<std::chrono::steady_clock>>
         last_msg_replayed_time;
+
+    std::optional<std::chrono::time_point<std::chrono::steady_clock>>
+        last_primitive_received_time;
+    std::mutex last_primitive_received_time_mutex;
 };

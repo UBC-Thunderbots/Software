@@ -1,5 +1,7 @@
 #include "replay_backend.h"
 
+#include <cstdlib>
+
 #include "software/util/design_patterns/generic_factory.h"
 
 ReplayBackend::ReplayBackend(const std::string& replay_input_dir)
@@ -13,8 +15,14 @@ ReplayBackend::ReplayBackend(const std::string& replay_input_dir)
 }
 
 // do nothing
-// TODO: perhaps we want to encode the output primitives to proto and log them?
-void ReplayBackend::onValueReceived(TbotsProto::PrimitiveSet primitives) {}
+// TODO: #1745 perhaps we want to encode the output primitives to proto and log them?
+void ReplayBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
+{
+    // update the time when the backend received the last primitive message. this is
+    // used to check when we should exit.
+    std::scoped_lock lock(last_primitive_received_time_mutex);
+    last_primitive_received_time = std::chrono::steady_clock::now();
+}
 
 // do nothing
 void ReplayBackend::onValueReceived(World world) {}
@@ -36,7 +44,26 @@ void ReplayBackend::continuouslyPullFromReplayFiles()
         last_msg_replayed_time = std::chrono::steady_clock::now();
         last_msg_received_time = this_msg_received_time;
     }
-    throw std::out_of_range("Reached end of replay!");
+
+    // wait 1 second until the last primitive is received by the backend
+    // to exit
+    while (true)
+    {
+        // wait until it has been LAST_PRIMITIVE_TO_SHUTDOWN_DURATION since the last
+        // primitive was received by the backend to shutdown, to allow for downstream
+        // components to fully finish processing data
+        std::scoped_lock lock(last_primitive_received_time_mutex);
+        if (!last_primitive_received_time ||
+            std::chrono::steady_clock::now() - *last_primitive_received_time >=
+                LAST_PRIMITIVE_TO_SHUTDOWN_DURATION)
+        {
+            LOG(INFO) << "Reached end of replay, exiting";
+            std::exit(0);
+        }
+        // wait for CHECK_LAST_PRIMITIVE_TIME_DURATION before checking the above
+        // condition again
+        std::this_thread::sleep_for(CHECK_LAST_PRIMITIVE_TIME_DURATION);
+    }
 }
 
 // Register this backend in the genericFactory
