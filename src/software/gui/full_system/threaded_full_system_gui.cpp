@@ -22,6 +22,8 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI()
           std::make_shared<ThreadSafeBuffer<SensorProto>>(SENSOR_MSG_BUFFER_SIZE)),
       view_area_buffer(
           std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
+      data_per_second_buffer(
+          std::make_shared<ThreadSafeBuffer<double>>(DATA_PER_SECOND_BUFFER_SIZE, false)),
       application_shutting_down(false),
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
@@ -57,9 +59,10 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    FullSystemGUI* full_system_gui = new FullSystemGUI(
-        world_draw_functions_buffer, ai_draw_functions_buffer, play_info_buffer,
-        sensor_msg_buffer, view_area_buffer, MutableDynamicParameters);
+    FullSystemGUI* full_system_gui =
+        new FullSystemGUI(world_draw_functions_buffer, ai_draw_functions_buffer,
+                          play_info_buffer, sensor_msg_buffer, view_area_buffer,
+                          data_per_second_buffer, MutableDynamicParameters);
     full_system_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -91,21 +94,53 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         remaining_attempts_to_set_view_area--;
         view_area_buffer->push(world.field().fieldBoundary());
     }
+    data_per_second_buffer->push(getAverageDataPerSecond());
 }
 
 void ThreadedFullSystemGUI::onValueReceived(AIDrawFunction draw_function)
 {
     ai_draw_functions_buffer->push(draw_function);
+    data_per_second_buffer->push(getAverageDataPerSecond());
 }
 
 void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info)
 {
     play_info_buffer->push(play_info);
+    data_per_second_buffer->push(getAverageDataPerSecond());
 }
 
 void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 {
     sensor_msg_buffer->push(sensor_msg);
+    data_per_second_buffer->push(getAverageDataPerSecond());
+}
+
+double ThreadedFullSystemGUI::getAverageDataPerSecond()
+{
+    int total = 0;
+
+    if (FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond() > 0)
+    {
+        total++;
+    }
+    if (FirstInFirstOutThreadedObserver<AIDrawFunction>::getDataReceivedPerSecond() > 0)
+    {
+        total++;
+    }
+    if (FirstInFirstOutThreadedObserver<PlayInfo>::getDataReceivedPerSecond() > 0)
+    {
+        total++;
+    }
+    if (FirstInFirstOutThreadedObserver<SensorProto>::getDataReceivedPerSecond() > 0)
+    {
+        total++;
+    }
+
+    return (FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond() +
+            FirstInFirstOutThreadedObserver<AIDrawFunction>::getDataReceivedPerSecond() +
+            FirstInFirstOutThreadedObserver<PlayInfo>::getDataReceivedPerSecond() +
+            FirstInFirstOutThreadedObserver<SensorProto>::getDataReceivedPerSecond()) /
+           (double)total;
 }
 
 std::shared_ptr<std::promise<void>> ThreadedFullSystemGUI::getTerminationPromise()

@@ -21,6 +21,11 @@ class Observer
      */
     virtual void receiveValue(T val) final;
 
+    /**
+     * Calculate the data received per second using the internal time buffer
+     *
+     * @return the data received per second
+     */
     virtual double getDataReceivedPerSecond() final;
 
     virtual ~Observer() = default;

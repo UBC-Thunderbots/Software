@@ -201,7 +201,14 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item>
-            <widget class="QLCDNumber" name="lcd_number"/>
+            <widget class="QLCDNumber" name="data_per_second_lcd">
+             <property name="smallDecimalPoint">
+              <bool>true</bool>
+             </property>
+             <property name="segmentStyle">
+              <enum>QLCDNumber::Flat</enum>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
