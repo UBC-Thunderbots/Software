@@ -568,7 +568,6 @@ TEST_F(TeamTest, get_all_robots_except_goalie)
 
     team.updateRobots({robot_0, robot_1, robot_2});
     team.assignGoalie(0);
-
     teamWithoutGoalie.updateRobots({robot_1, robot_2});
 
     EXPECT_EQ(teamWithoutGoalie.getAllRobots(), team.getAllRobotsExceptGoalie());
@@ -592,7 +591,6 @@ TEST_F(TeamTest, get_all_robots_except_goalie_1)
 
     team.updateRobots({robot_0, robot_1, robot_2, robot_3});
     team.assignGoalie(2);
-
     teamWithoutGoalie.updateRobots({robot_0, robot_1, robot_3});
 
     EXPECT_EQ(teamWithoutGoalie.getAllRobots(), team.getAllRobotsExceptGoalie());
