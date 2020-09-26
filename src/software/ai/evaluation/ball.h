@@ -54,5 +54,5 @@ bool ballInEnemyCorner(const Field &field, const Ball &ball, double radius);
  *
  * @return True if ball was kicked in the approximate direction we expect, false otherwise
  */
-bool hasBallBeenKicked(const Ball& ball, const Angle& expected_kick_direction,
+bool hasBallBeenKicked(const Ball &ball, const Angle &expected_kick_direction,
                        double min_kick_speed = 0.5);
