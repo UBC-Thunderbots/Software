@@ -14,8 +14,8 @@ ReplayBackend::ReplayBackend(const std::string& replay_input_dir)
 {
 }
 
-// do nothing
-// TODO: #1745 perhaps we want to encode the output primitives to proto and log them?
+// TODO: https://github.com/UBC-Thunderbots/Software/issues/1745
+//       perhaps we want to encode the output primitives to proto and log them?
 void ReplayBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     // update the time when the backend received the last primitive message. this is
