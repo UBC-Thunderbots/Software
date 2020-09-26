@@ -311,30 +311,30 @@ TEST_F(RobotTest, get_unavailable_capabilities)
         RobotCapability::Chip,
     };
 
-    Robot robot =
-        Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-              AngularVelocity::fromDegrees(25), current_time, 3, unavailable_capabilities);
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+                        AngularVelocity::fromDegrees(25), current_time, 3,
+                        unavailable_capabilities);
 
     EXPECT_EQ(unavailable_capabilities, robot.getUnavailableCapabilities());
 }
 
 TEST_F(RobotTest, get_available_capabilities)
 {
-    std::set<RobotCapability> unavailableCapabilities = {
+    std::set<RobotCapability> unavailable_capabilities = {
         RobotCapability::Dribble,
         RobotCapability::Chip,
     };
 
-    Robot robot =
-        Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-              AngularVelocity::fromDegrees(25), current_time, 3, unavailableCapabilities);
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+                        AngularVelocity::fromDegrees(25), current_time, 3,
+                        unavailable_capabilities);
 
-    // available capabilities = all capabilities - unavailableCapabilities
+    // available capabilities = all capabilities - unavailable capabilities
     std::set<RobotCapability> all_capabilities = allRobotCapabilities();
     std::set<RobotCapability> expected_capabilities;
     std::set_difference(
-        all_capabilities.begin(), all_capabilities.end(), unavailableCapabilities.begin(),
-        unavailableCapabilities.end(),
+        all_capabilities.begin(), all_capabilities.end(),
+        unavailable_capabilities.begin(), unavailable_capabilities.end(),
         std::inserter(expected_capabilities, expected_capabilities.begin()));
 
     EXPECT_EQ(expected_capabilities, robot.getAvailableCapabilities());
