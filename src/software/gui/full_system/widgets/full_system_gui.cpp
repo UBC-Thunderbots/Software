@@ -111,7 +111,7 @@ void FullSystemGUI::updateDataPerSecondLCD()
     if (auto data_per_second = data_per_second_buffer->popLeastRecentlyAddedValue())
     {
         int data_per_second_int = (int)data_per_second.value();
-        // fancy code for displaying fixed format
+        // Formatting code to display fixed format Ex. 60.00
         main_widget->data_per_second_lcd->display(
             QString("%1").arg(data_per_second_int, 2, 10, QChar(' ')) + "." +
             QString("%1").arg(
