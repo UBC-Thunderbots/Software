@@ -306,16 +306,16 @@ TEST_F(RobotTest, get_timestamp_history)
 
 TEST_F(RobotTest, get_unavailable_capabilities)
 {
-    std::set<RobotCapability> unavailableCapabilities = {
+    std::set<RobotCapability> unavailable_capabilities = {
         RobotCapability::Dribble,
         RobotCapability::Chip,
     };
 
     Robot robot =
         Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-              AngularVelocity::fromDegrees(25), current_time, 3, unavailableCapabilities);
+              AngularVelocity::fromDegrees(25), current_time, 3, unavailable_capabilities);
 
-    EXPECT_EQ(unavailableCapabilities, robot.getUnavailableCapabilities());
+    EXPECT_EQ(unavailable_capabilities, robot.getUnavailableCapabilities());
 }
 
 TEST_F(RobotTest, get_available_capabilities)
