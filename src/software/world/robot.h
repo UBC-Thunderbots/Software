@@ -119,9 +119,9 @@ class Robot
     const std::set<RobotCapability> &getUnavailableCapabilities() const;
 
     /**
-     * Returns all capabilities this robot has
+     * Returns all available capabilities this robot has
      *
-     * @return Returns all capabilities this robot has
+     * @return Returns all available capabilities this robot has
      */
     std::set<RobotCapability> getAvailableCapabilities() const;
 

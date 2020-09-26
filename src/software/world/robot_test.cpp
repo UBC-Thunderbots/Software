@@ -329,7 +329,7 @@ TEST_F(RobotTest, get_available_capabilities)
         Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
               AngularVelocity::fromDegrees(25), current_time, 3, unavailableCapabilities);
 
-    // possible capabilities = all capabilities - unavailableCapabilities
+    // available capabilities = all capabilities - unavailableCapabilities
     std::set<RobotCapability> all_capabilities = allRobotCapabilities();
     std::set<RobotCapability> expected_capabilities;
     std::set_difference(
