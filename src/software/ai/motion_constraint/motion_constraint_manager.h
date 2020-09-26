@@ -28,7 +28,7 @@ class MotionConstraintManager : public MutableTacticVisitor
      *
      * @param The tactic to register
      *
-     * @modifies current_whitelisted_constraints
+     * @modifies current_allowed_constraints
      */
     void visit(CherryPickTactic &tactic) override;
     void visit(ShadowFreekickerTactic &tactic) override;
@@ -51,7 +51,7 @@ class MotionConstraintManager : public MutableTacticVisitor
     void visit(GoalieTestTactic &tactic) override;
 
    private:
-    std::set<MotionConstraint> current_whitelisted_constraints;
+    std::set<MotionConstraint> current_allowed_constraints;
 
     /**
      * Adds move constraints determined from gamestate to current_motion_constraints

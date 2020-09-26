@@ -304,35 +304,38 @@ TEST_F(RobotTest, get_timestamp_history)
     EXPECT_EQ(prevTimestamps, previous_timestamps);
 }
 
-TEST_F(RobotTest, get_capabilities_blacklist)
+TEST_F(RobotTest, get_unavailable_capabilities)
 {
-    std::set<RobotCapability> blacklist = {
+    std::set<RobotCapability> unavailableCapabilities = {
         RobotCapability::Dribble,
         RobotCapability::Chip,
     };
 
-    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, 3, blacklist);
+    Robot robot =
+        Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+              AngularVelocity::fromDegrees(25), current_time, 3, unavailableCapabilities);
 
-    EXPECT_EQ(blacklist, robot.getCapabilitiesBlacklist());
+    EXPECT_EQ(unavailableCapabilities, robot.getUnavailableCapabilities());
 }
 
-TEST_F(RobotTest, get_capabilities_whitelist)
+TEST_F(RobotTest, get_available_capabilities)
 {
-    std::set<RobotCapability> blacklist = {
+    std::set<RobotCapability> unavailableCapabilities = {
         RobotCapability::Dribble,
         RobotCapability::Chip,
     };
 
-    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, 3, blacklist);
+    Robot robot =
+        Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+              AngularVelocity::fromDegrees(25), current_time, 3, unavailableCapabilities);
 
-    // whitelist = all capabilities - blacklist
+    // possible capabilities = all capabilities - unavailableCapabilities
     std::set<RobotCapability> all_capabilities = allRobotCapabilities();
-    std::set<RobotCapability> expected_whitelist;
-    std::set_difference(all_capabilities.begin(), all_capabilities.end(),
-                        blacklist.begin(), blacklist.end(),
-                        std::inserter(expected_whitelist, expected_whitelist.begin()));
+    std::set<RobotCapability> expected_capabilities;
+    std::set_difference(
+        all_capabilities.begin(), all_capabilities.end(), unavailableCapabilities.begin(),
+        unavailableCapabilities.end(),
+        std::inserter(expected_capabilities, expected_capabilities.begin()));
 
-    EXPECT_EQ(expected_whitelist, robot.getCapabilitiesWhitelist());
+    EXPECT_EQ(expected_capabilities, robot.getAvailableCapabilities());
 }
