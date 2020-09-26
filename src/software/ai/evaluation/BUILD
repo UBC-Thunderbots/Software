@@ -259,22 +259,3 @@ cc_library(
     hdrs = ["shot.h"],
     deps = ["//software/geom:point"],
 )
-
-cc_library(
-    name = "detect_successful_kick",
-    srcs = ["detect_successful_kick.cpp"],
-    hdrs = ["detect_successful_kick.h"],
-    deps = [
-        "//software/geom:point",
-        "//software/world:ball",
-    ],
-)
-
-cc_test(
-    name = "detect_successful_kick_test",
-    srcs = ["detect_successful_kick_test.cpp"],
-    deps = [
-        ":detect_successful_kick",
-        "@gtest//:gtest_main",
-    ],
-)
