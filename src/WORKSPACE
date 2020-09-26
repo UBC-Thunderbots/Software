@@ -108,6 +108,13 @@ new_local_repository(
     path = "/",
 )
 
+# libclang-dev is installed into the system through setup_software.sh
+new_local_repository(
+    name = "libclang",
+    build_file = "@//external:libclang.BUILD",
+    path = "/usr/lib/llvm-6.0/",
+)
+
 http_archive(
     name = "arm_developer_gcc",
     build_file = "@//external:arm_gcc.BUILD",
@@ -202,7 +209,7 @@ pip_install()
 
 pip3_import(
     name = "dynamic_parameter_deps",
-    requirements = "//shared/parameter_v2/scripts:requirements.txt",
+    requirements = "//shared/parameter_v2/generation_scripts:requirements.txt",
 )
 
 load("@dynamic_parameter_deps//:requirements.bzl", "pip_install")

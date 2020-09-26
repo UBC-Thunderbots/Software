@@ -57,9 +57,10 @@ host_software_packages=(
     python3-protobuf # This is required for the "NanoPb" library, which does not
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
-    python3-yaml # yaml for cfg generation (Dynamic Parameters)
+    python3-yaml # Load dynamic parameter configuration files
     qt5-default # The GUI library for our visualizer
     valgrind # Checks for memory leaks
+    libclang-dev # Used to verify code-generation
 )
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
