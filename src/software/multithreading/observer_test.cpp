@@ -56,7 +56,6 @@ TEST(Observer, getDataReceivedPerSecond_time_buffer_filled)
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     std::cout << test_observer.getDataReceivedPerSecond() << std::endl;
-    std::cout << test_observer.getDataReceivedPerSecond() << std::endl;
     EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 5 / (4 * 0.01), 10);
 }
 
@@ -74,5 +73,5 @@ TEST(Observer, getDataReceivedPerSecond_time_buffer_partially_empty)
         test_observer.receiveValue(i);
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-    EXPECT_EQ(test_observer.getDataReceivedPerSecond(), 0);
+    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 5 / (2 * 0.01), 5);
 }

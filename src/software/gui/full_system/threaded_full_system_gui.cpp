@@ -94,56 +94,20 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         remaining_attempts_to_set_view_area--;
         view_area_buffer->push(world.field().fieldBoundary());
     }
-    data_per_second_buffer->push(getAverageDataPerSecond());
+    data_per_second_buffer->push(FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
 }
 
 void ThreadedFullSystemGUI::onValueReceived(AIDrawFunction draw_function)
 {
     ai_draw_functions_buffer->push(draw_function);
-    data_per_second_buffer->push(getAverageDataPerSecond());
 }
 
 void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info)
 {
     play_info_buffer->push(play_info);
-    data_per_second_buffer->push(getAverageDataPerSecond());
 }
 
 void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 {
     sensor_msg_buffer->push(sensor_msg);
-    data_per_second_buffer->push(getAverageDataPerSecond());
-}
-
-double ThreadedFullSystemGUI::getAverageDataPerSecond()
-{
-    int total = 0;
-
-    if (FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond() > 0)
-    {
-        total++;
-    }
-    if (FirstInFirstOutThreadedObserver<AIDrawFunction>::getDataReceivedPerSecond() > 0)
-    {
-        total++;
-    }
-    if (FirstInFirstOutThreadedObserver<PlayInfo>::getDataReceivedPerSecond() > 0)
-    {
-        total++;
-    }
-    if (FirstInFirstOutThreadedObserver<SensorProto>::getDataReceivedPerSecond() > 0)
-    {
-        total++;
-    }
-
-    return (FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond() +
-            FirstInFirstOutThreadedObserver<AIDrawFunction>::getDataReceivedPerSecond() +
-            FirstInFirstOutThreadedObserver<PlayInfo>::getDataReceivedPerSecond() +
-            FirstInFirstOutThreadedObserver<SensorProto>::getDataReceivedPerSecond()) /
-           (double)total;
-}
-
-std::shared_ptr<std::promise<void>> ThreadedFullSystemGUI::getTerminationPromise()
-{
-    return termination_promise_ptr;
 }

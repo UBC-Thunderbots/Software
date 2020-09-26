@@ -53,14 +53,6 @@ class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
      */
     void createAndRunFullSystemGUI();
 
-    /**
-     * Computes and returns the average data received per second across all observers.
-     * Note: this ignores observers who have not yet received any data
-     *
-     * @return the average data received per second of all observers
-     */
-    double getAverageDataPerSecond();
-
     std::thread run_full_system_gui_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
 
