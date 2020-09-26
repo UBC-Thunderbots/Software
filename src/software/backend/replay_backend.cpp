@@ -10,7 +10,9 @@ ReplayBackend::ReplayBackend(const std::string& replay_input_dir)
       pull_from_replay_thread(
           boost::bind(&ReplayBackend::continuouslyPullFromReplayFiles, this)),
       last_msg_received_time(std::nullopt),
-      last_msg_replayed_time(std::nullopt)
+      last_msg_replayed_time(std::nullopt),
+      last_primitive_received_time(std::nullopt),
+      last_primitive_received_time_mutex()
 {
 }
 
@@ -47,23 +49,28 @@ void ReplayBackend::continuouslyPullFromReplayFiles()
 
     // wait 1 second until the last primitive is received by the backend
     // to exit
-    while (true)
+    bool exit = false;
+    while (!exit)
     {
         // wait until it has been LAST_PRIMITIVE_TO_SHUTDOWN_DURATION since the last
         // primitive was received by the backend to shutdown, to allow for downstream
         // components to fully finish processing data
-        std::scoped_lock lock(last_primitive_received_time_mutex);
-        if (!last_primitive_received_time ||
-            std::chrono::steady_clock::now() - *last_primitive_received_time >=
-                LAST_PRIMITIVE_TO_SHUTDOWN_DURATION)
         {
-            LOG(INFO) << "Reached end of replay, exiting";
-            std::exit(0);
+            // create another scope in which to hold the lock
+            std::scoped_lock lock(last_primitive_received_time_mutex);
+            if (!last_primitive_received_time ||
+                std::chrono::steady_clock::now() - *last_primitive_received_time >=
+                    LAST_PRIMITIVE_TO_SHUTDOWN_DURATION)
+            {
+                LOG(INFO) << "Reached end of replay, exiting";
+                exit = true;
+            }
         }
         // wait for CHECK_LAST_PRIMITIVE_TIME_DURATION before checking the above
         // condition again
         std::this_thread::sleep_for(CHECK_LAST_PRIMITIVE_TIME_DURATION);
     }
+    std::exit(0);
 }
 
 // Register this backend in the genericFactory
