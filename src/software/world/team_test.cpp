@@ -551,3 +551,49 @@ TEST_F(TeamTest, update_timestamp_history_from_team_update)
     EXPECT_EQ(three_seconds_future, team.getTimestampHistory()[0]);
     EXPECT_EQ(4, team.getTimestampHistory().size());
 }
+
+TEST_F(TeamTest, get_all_robots_except_goalie)
+{
+    Team team = Team(Duration::fromMilliseconds(2000));
+    Team teamWithoutGoalie = Team(Duration::fromMilliseconds(2000));
+
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    Robot robot_2 = Robot(2, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    team.updateRobots({robot_0, robot_1, robot_2});
+    team.assignGoalie(0);
+
+    teamWithoutGoalie.updateRobots({robot_1, robot_2});
+
+    EXPECT_EQ(teamWithoutGoalie.getAllRobots(), team.getAllRobotsExceptGoalie());
+}
+
+TEST_F(TeamTest, get_all_robots_except_goalie_1)
+{
+    Team team = Team(Duration::fromMilliseconds(2000));
+    Team teamWithoutGoalie = Team(Duration::fromMilliseconds(2000));
+
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    Robot robot_2 = Robot(2, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+    Robot robot_3 = Robot(3, Point(2, 4), Vector(), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    team.updateRobots({robot_0, robot_1, robot_2, robot_3});
+    team.assignGoalie(2);
+
+    teamWithoutGoalie.updateRobots({robot_0, robot_1, robot_3});
+
+    EXPECT_EQ(teamWithoutGoalie.getAllRobots(), team.getAllRobotsExceptGoalie());
+}
