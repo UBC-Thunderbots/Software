@@ -67,6 +67,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(python-is-python3)
 
     # This is to setup the toolchain for bazel to run 
+    host_software_packages+=(clang)
     host_software_packages+=(llvm-6.0)
     sudo apt -y install gcc-7 g++-7
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
