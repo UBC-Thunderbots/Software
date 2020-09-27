@@ -118,3 +118,6 @@ const unsigned NETWORK_TIMEOUT_MS = 1000;
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
 const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+
+// makes the battery max voltage a constant now that we are simulating firmware
+const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
