@@ -39,10 +39,12 @@ TEST(ReplayTest, test_read_and_write_replay)
     // do a quick sanity check here to assert that the timestamps are monotonically
     // increasing
     double max_timestamp = 0.f;
-    size_t idx           = 0;
+    // idx is not used for testing of any sort but it will be useful if the test below
+    // fails and you need to debug it using e.g. python protobuf
+    size_t idx = 0;
     for (const auto& msg : read_replay_msgs)
     {
-        auto ts = msg.time_received().epoch_timestamp_seconds();
+        auto ts = msg.backend_received_time().epoch_timestamp_seconds();
         if (ts < max_timestamp)
         {
             FAIL() << "msg idx=" << idx << " with time_received=" << ts

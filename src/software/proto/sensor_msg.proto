@@ -11,5 +11,5 @@ message SensorProto
     SSLProto.SSL_WrapperPacket ssl_vision_msg         = 2;
     repeated TbotsProto.RobotStatus robot_status_msgs = 3;
     // this is only used for replay at the moment
-    TbotsProto.Timestamp time_received = 4;
+    TbotsProto.Timestamp backend_received_time = 4;
 }

@@ -72,8 +72,8 @@ void ReplayLogger::saveCurrentChunk()
     std::sort(current_chunk.mutable_replay_msgs()->begin(),
               current_chunk.mutable_replay_msgs()->end(),
               [](const auto& lhs, const auto& rhs) {
-                  return lhs.time_received().epoch_timestamp_seconds() <
-                         rhs.time_received().epoch_timestamp_seconds();
+                  return lhs.backend_received_time().epoch_timestamp_seconds() <
+                         rhs.backend_received_time().epoch_timestamp_seconds();
               });
 
     fs::path chunk_path = output_dir_path / std::to_string(current_chunk_idx);

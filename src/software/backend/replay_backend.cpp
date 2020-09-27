@@ -5,14 +5,9 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 ReplayBackend::ReplayBackend(const std::string& replay_input_dir)
-    : Backend(),
-      replay_reader(replay_input_dir),
+    : replay_reader(replay_input_dir),
       pull_from_replay_thread(
-          boost::bind(&ReplayBackend::continuouslyPullFromReplayFiles, this)),
-      last_msg_received_time(std::nullopt),
-      last_msg_replayed_time(std::nullopt),
-      last_primitive_received_time(std::nullopt),
-      last_primitive_received_time_mutex()
+          boost::bind(&ReplayBackend::continuouslyPullFromReplayFiles, this))
 {
 }
 
@@ -34,21 +29,28 @@ void ReplayBackend::continuouslyPullFromReplayFiles()
     while (auto sensor_msg_or_null = replay_reader.getNextMsg())
     {
         auto this_msg_received_time = std::chrono::duration<double>(
-            sensor_msg_or_null->time_received().epoch_timestamp_seconds());
+            sensor_msg_or_null->backend_received_time().epoch_timestamp_seconds());
 
         if (last_msg_received_time && last_msg_replayed_time)
         {
-            std::this_thread::sleep_until(
-                *last_msg_replayed_time +
-                (this_msg_received_time - *last_msg_received_time));
+            // replicate the timing of messages by sleeping until a time such that
+            // the *total* time between the last message sent and the current message sent
+            // is equal to the duration between the last message's backend_received_time
+            // and the current message's backend_received_time
+            auto time_between_last_and_cur_msg =
+                (this_msg_received_time - *last_msg_received_time);
+            if (time_between_last_and_cur_msg > std::chrono::duration<double>(0))
+            {
+                std::this_thread::sleep_until(
+                    *last_msg_replayed_time +
+                    (this_msg_received_time - *last_msg_received_time));
+            }
         }
         this->sendValueToObservers(*sensor_msg_or_null);
         last_msg_replayed_time = std::chrono::steady_clock::now();
         last_msg_received_time = this_msg_received_time;
     }
 
-    // wait 1 second until the last primitive is received by the backend
-    // to exit
     bool exit = false;
     while (!exit)
     {
