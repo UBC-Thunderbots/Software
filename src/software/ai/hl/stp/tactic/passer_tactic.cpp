@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/evaluation/ball.h"
 #include "software/logger/logger.h"
 
 PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
