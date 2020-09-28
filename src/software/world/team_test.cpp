@@ -555,7 +555,6 @@ TEST_F(TeamTest, update_timestamp_history_from_team_update)
 TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_3)
 {
     Team team = Team(Duration::fromMilliseconds(2000));
-    Team team_without_goalie = Team(Duration::fromMilliseconds(2000));
 
     Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
                           AngularVelocity::threeQuarter(), current_time);
@@ -568,15 +567,12 @@ TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_3)
 
     team.updateRobots({robot_0, robot_1, robot_2});
     team.assignGoalie(0);
-    team_without_goalie.updateRobots({robot_1, robot_2});
 
-    EXPECT_EQ(team_without_goalie.getAllRobots(), team.getAllRobotsExceptGoalie());
-}
+    EXPECT_EQ(std::vector<Robot>({robot_1, robot_2}), team.getAllRobotsExceptGoalie());}
 
 TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_4)
 {
     Team team = Team(Duration::fromMilliseconds(2000));
-    Team team_without_goalie = Team(Duration::fromMilliseconds(2000));
 
     Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
                           AngularVelocity::threeQuarter(), current_time);
@@ -591,7 +587,6 @@ TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_4)
 
     team.updateRobots({robot_0, robot_1, robot_2, robot_3});
     team.assignGoalie(2);
-    team_without_goalie.updateRobots({robot_0, robot_1, robot_3});
 
-    EXPECT_EQ(team_without_goalie.getAllRobots(), team.getAllRobotsExceptGoalie());
+    EXPECT_EQ(std::vector<Robot>({robot_0, robot_1, robot_3}), team.getAllRobotsExceptGoalie());
 }
