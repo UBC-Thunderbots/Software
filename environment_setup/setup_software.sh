@@ -73,7 +73,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
     
-    # This adds missing c headers
+    # This fixes missing headers by notifying the linker
     ldconfig
 fi
 
