@@ -14,7 +14,7 @@ void app_kick_primitive_start(TbotsProto_KickPrimitive prim_msg, void *void_stat
     app_chicker_enableAutokick(chicker, prim_msg.kick_speed_meters_per_second);
 }
 
-static void kick_tick(void *void_state_ptr, FirmwareWorld_t *world)
+static void app_kick_primitive_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
     app_chick_motion_tick(void_state_ptr, world);
 }
@@ -23,6 +23,6 @@ static void kick_tick(void *void_state_ptr, FirmwareWorld_t *world)
  * \brief The kick primitive.
  */
 const primitive_t KICK_PRIMITIVE = {.direct        = false,
-                                    .tick          = &kick_tick,
+                                    .tick          = &app_kick_primitive_tick,
                                     .create_state  = createChickMotionState_t,
                                     .destroy_state = destroyChickMotionState_t};
