@@ -202,6 +202,12 @@ p, li { white-space: pre-wrap; }
            </item>
            <item row="2" column="3">
             <widget class="QLCDNumber" name="data_received_lcd">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>30</height>
+              </size>
+             </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
@@ -219,6 +225,17 @@ p, li { white-space: pre-wrap; }
            </item>
            <item row="1" column="3">
             <widget class="QLCDNumber" name="data_sent_lcd">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
