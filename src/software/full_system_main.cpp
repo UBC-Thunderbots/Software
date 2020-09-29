@@ -94,7 +94,7 @@ int main(int argc, char **argv)
         }
 
         // Wait for termination
-        if (!args->headless())
+        if (!args->headless()->value())
         {
             // This blocks forever without using the CPU
             // Wait for the full_system to shut down before shutting
