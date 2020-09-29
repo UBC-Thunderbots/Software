@@ -192,16 +192,33 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="data_per_second_layout">
-           <item>
-            <widget class="QLabel" name="data_per_second_hz_label">
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="2" column="2">
+            <widget class="QLabel" name="data_received_label">
              <property name="text">
-              <string>Data Per Second (Hz)</string>
+              <string>Data Received(Hz)</string>
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QLCDNumber" name="data_per_second_lcd">
+           <item row="2" column="3">
+            <widget class="QLCDNumber" name="data_received_lcd">
+             <property name="smallDecimalPoint">
+              <bool>true</bool>
+             </property>
+             <property name="segmentStyle">
+              <enum>QLCDNumber::Flat</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLabel" name="data_sent_label">
+             <property name="text">
+              <string>Data Sent(Hz)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QLCDNumber" name="data_sent_lcd">
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>

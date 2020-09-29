@@ -14,6 +14,7 @@
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
+#include "shared/proto/tbots_software_msgs.pb.h"
 
 /**
  * This class wraps our FullSystemGUI object which is responsible for
@@ -22,7 +23,8 @@
 class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
                               public FirstInFirstOutThreadedObserver<AIDrawFunction>,
                               public FirstInFirstOutThreadedObserver<PlayInfo>,
-                              public FirstInFirstOutThreadedObserver<SensorProto>
+                              public FirstInFirstOutThreadedObserver<SensorProto>,
+                              public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
    public:
     explicit ThreadedFullSystemGUI();
@@ -33,6 +35,7 @@ class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
     void onValueReceived(AIDrawFunction draw_function) override;
     void onValueReceived(PlayInfo play_info) override;
     void onValueReceived(SensorProto sensor_msg) override;
+    void onValueReceived(TbotsProto::PrimitiveSet primitive_msg) override;
 
     /**
      * Returns a shared_ptr to a promise that can be waited on, and that will
@@ -63,7 +66,8 @@ class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
-    std::shared_ptr<ThreadSafeBuffer<double>> data_per_second_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> data_received_per_second_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> data_sent_per_second_buffer;
 
     // We want to show the most recent world and AI data, but also want things to look
     // smooth if the stream of data isn't perfectly consistent, so we use a very small

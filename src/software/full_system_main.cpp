@@ -11,6 +11,7 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "shared/proto/tbots_software_msgs.pb.h"
 
 struct commandLineArgs
 {
@@ -89,6 +90,7 @@ int main(int argc, char **argv)
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
             ai->Subject<PlayInfo>::registerObserver(visualizer);
             backend->Subject<SensorProto>::registerObserver(visualizer);
+            backend->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
         }
 
         // Wait for termination

@@ -15,6 +15,7 @@
  * "Subject". Please see the implementation of those classes for details.
  */
 class Backend : public Subject<SensorProto>,
+                public Subject<TbotsProto::PrimitiveSet>,
                 public FirstInFirstOutThreadedObserver<World>,
                 public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {

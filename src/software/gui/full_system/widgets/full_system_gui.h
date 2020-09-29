@@ -42,7 +42,8 @@ class FullSystemGUI : public QMainWindow
         std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
         std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer,
         std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
-        std::shared_ptr<ThreadSafeBuffer<double>> data_per_second_buffer,
+        std::shared_ptr<ThreadSafeBuffer<double>> data_received_per_second_buffer,
+        std::shared_ptr<ThreadSafeBuffer<double>> data_sent_per_second_buffer,
         std::shared_ptr<ThunderbotsConfig> config);
 
    private:
@@ -91,7 +92,8 @@ class FullSystemGUI : public QMainWindow
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
-    std::shared_ptr<ThreadSafeBuffer<double>> data_per_second_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> data_received_per_second_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> data_sent_per_second_buffer;
 
     WorldDrawFunction most_recent_world_draw_function;
     AIDrawFunction most_recent_ai_draw_function;
