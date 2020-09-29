@@ -6,6 +6,7 @@
 #include <future>
 #include <thread>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/geom/rectangle.h"
 #include "software/gui/drawing/draw_functions.h"
@@ -14,17 +15,17 @@
 #include "software/multithreading/thread_safe_buffer.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 
 /**
  * This class wraps our FullSystemGUI object which is responsible for
  * visualizing information about our AI, and allowing users to control it.
  */
-class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
-                              public FirstInFirstOutThreadedObserver<AIDrawFunction>,
-                              public FirstInFirstOutThreadedObserver<PlayInfo>,
-                              public FirstInFirstOutThreadedObserver<SensorProto>,
-                              public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
+class ThreadedFullSystemGUI
+    : public FirstInFirstOutThreadedObserver<World>,
+      public FirstInFirstOutThreadedObserver<AIDrawFunction>,
+      public FirstInFirstOutThreadedObserver<PlayInfo>,
+      public FirstInFirstOutThreadedObserver<SensorProto>,
+      public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
    public:
     explicit ThreadedFullSystemGUI();

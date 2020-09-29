@@ -110,24 +110,26 @@ void FullSystemGUI::updateDrawViewArea()
 
 void FullSystemGUI::updateDataPerSecondLCD()
 {
-    if (auto data_received_per_second = data_received_per_second_buffer->popLeastRecentlyAddedValue())
+    if (auto data_received_per_second =
+            data_received_per_second_buffer->popLeastRecentlyAddedValue())
     {
         int data_received_int = (int)data_received_per_second.value();
         // Formatting code to display fixed format Ex. 60.00
         main_widget->data_received_lcd->display(
             QString("%1").arg(data_received_int, 2, 10, QChar(' ')) + "." +
             QString("%1").arg(
-                qRound((data_received_per_second.value() - data_received_int) * 100), 2, 10,
-                QChar('0')));
+                qRound((data_received_per_second.value() - data_received_int) * 100), 2,
+                10, QChar('0')));
     }
-    if (auto data_sent_per_second = data_sent_per_second_buffer->popLeastRecentlyAddedValue())
+    if (auto data_sent_per_second =
+            data_sent_per_second_buffer->popLeastRecentlyAddedValue())
     {
         int data_sent_int = (int)data_sent_per_second.value();
         // Formatting code to display fixed format Ex. 60.00
         main_widget->data_sent_lcd->display(
-                QString("%1").arg(data_sent_int, 2, 10, QChar(' ')) + "." +
-                QString("%1").arg(
-                        qRound((data_sent_per_second.value() - data_sent_int) * 100), 2, 10,
-                        QChar('0')));
+            QString("%1").arg(data_sent_int, 2, 10, QChar(' ')) + "." +
+            QString("%1").arg(
+                qRound((data_sent_per_second.value() - data_sent_int) * 100), 2, 10,
+                QChar('0')));
     }
 }

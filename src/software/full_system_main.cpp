@@ -2,6 +2,7 @@
 #include <iostream>
 #include <numeric>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
@@ -11,7 +12,6 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 
 struct commandLineArgs
 {

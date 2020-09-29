@@ -61,10 +61,10 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
     QApplication* application = new QApplication(argc, argv);
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
-    FullSystemGUI* full_system_gui =
-        new FullSystemGUI(world_draw_functions_buffer, ai_draw_functions_buffer,
-                          play_info_buffer, sensor_msg_buffer, view_area_buffer,
-                          data_received_per_second_buffer, data_sent_per_second_buffer, MutableDynamicParameters);
+    FullSystemGUI* full_system_gui = new FullSystemGUI(
+        world_draw_functions_buffer, ai_draw_functions_buffer, play_info_buffer,
+        sensor_msg_buffer, view_area_buffer, data_received_per_second_buffer,
+        data_sent_per_second_buffer, MutableDynamicParameters);
     full_system_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -96,7 +96,8 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         remaining_attempts_to_set_view_area--;
         view_area_buffer->push(world.field().fieldBoundary());
     }
-    data_received_per_second_buffer->push(FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
+    data_received_per_second_buffer->push(
+        FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
 }
 
 void ThreadedFullSystemGUI::onValueReceived(AIDrawFunction draw_function)
@@ -116,7 +117,9 @@ void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 
 void ThreadedFullSystemGUI::onValueReceived(TbotsProto::PrimitiveSet primitive_msg)
 {
-    data_sent_per_second_buffer->push(FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>::getDataReceivedPerSecond());
+    data_sent_per_second_buffer->push(
+        FirstInFirstOutThreadedObserver<
+            TbotsProto::PrimitiveSet>::getDataReceivedPerSecond());
 }
 
 std::shared_ptr<std::promise<void>> ThreadedFullSystemGUI::getTerminationPromise()
