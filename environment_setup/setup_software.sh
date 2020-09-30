@@ -58,7 +58,7 @@ host_software_packages=(
     python3-yaml # Load dynamic parameter configuration files
     qt5-default # The GUI library for our visualizer
     valgrind # Checks for memory leaks
-    libclang-dev # Used to verify code-generation
+    libclang-6.0-dev # Used to verify code-generation
 )
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
