@@ -1,0 +1,351 @@
+#pragma once
+#include <iostream>
+#include <boost/program_options.hpp>
+#include "software/parameter/config.h"
+#include "software/parameter/numeric_parameter.h"
+#include "software/parameter/enumerated_parameter.h"
+
+class foo;
+class example;
+
+class foo : public Config
+{
+   public:
+    foo()
+    {
+        foo_bool = std::make_shared<Parameter<bool>>("foo_bool", true);
+        foo_int = std::make_shared<NumericParameter<int>>("foo_int", 3, 0, 5);
+        mutable_internal_param_list = {
+            foo_bool,
+            foo_int,
+        };
+        immutable_internal_param_list = {
+            std::const_pointer_cast<const Parameter<bool>>(foo_bool),
+            std::const_pointer_cast<const NumericParameter<int>>(foo_int),
+        };
+    }
+    
+    const std::shared_ptr<const Parameter<bool>> fooBool() const
+    {
+        return std::const_pointer_cast<const Parameter<bool>>(foo_bool);
+    }
+
+    const std::shared_ptr<Parameter<bool>> mutableFooBool()
+    {
+        return foo_bool;
+    }
+
+    const std::shared_ptr<const NumericParameter<int>> fooInt() const
+    {
+        return std::const_pointer_cast<const NumericParameter<int>>(foo_int);
+    }
+
+    const std::shared_ptr<NumericParameter<int>> mutableFooInt()
+    {
+        return foo_int;
+    }
+
+    const std::string name() const
+    {
+        return "foo"
+    }
+
+    bool loadFromCommandLineArguments(int argc, char **argv) {
+        struct commandLineArgs {
+            bool help = false;
+            bool foo_bool = true;
+            int foo_int = 3;
+        }
+
+        commandLineArgs args;
+        boost::program_options::options_description desc{"Options"};
+
+        desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                        "help screen");
+
+        desc.add_options()("foo_bool", boost::program_options::value<bool>(&args.foo_bool), "foo bool");
+        desc.add_options()("foo_int", boost::program_options::value<int>(&args.foo_int), "foo int");
+        
+        boost::program_options::variables_map vm;
+        boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+        boost::program_options::notify(vm);
+
+        this->mutableFooBool()->setValue(args.foo_bool);
+        this->mutableFooInt()->setValue(args.foo_int);
+
+        if (args.help)
+        {
+            std::cout << desc << std::endl;
+        }
+
+        return args.help;
+    }
+
+    const MutableParameterList& getMutableParameterList()
+    {
+        return mutable_internal_param_list;
+    }
+
+    const ParameterList& getParameterList() const
+    {
+        return immutable_internal_param_list;
+    }
+
+   private:
+    MutableParameterList mutable_internal_param_list;
+    ParameterList immutable_internal_param_list;
+    std::shared_ptr<Parameter<bool>> foo_bool;
+    std::shared_ptr<NumericParameter<int>> foo_int;
+}
+
+class example : public Config
+{
+   public:
+    example(std::shared_ptr<foo> foo_config) : foo_config(foo_config)
+    {
+        example_bool_param = std::make_shared<Parameter<bool>>("example_bool_param", true);
+        example_int_param = std::make_shared<NumericParameter<int>>("example_int_param", 3, 0, 5);
+        example_unsigned_int_param = std::make_shared<NumericParameter<uint>>("example_unsigned_int_param", 3, 0, 5);
+        example_float_param = std::make_shared<NumericParameter<float>>("example_float_param", 4.04, 1.1, 9.01);
+        example_string_param = std::make_shared<Parameter<std::string>>("example_string_param", "Hello World");
+        example_enum_param = std::make_shared<EnumeratedParameter<RefereeCommand>>("example_enum_param", RefereeCommand.HALT, {RefereeCommand.HALT, RefereeCommand.START});
+        mutable_internal_param_list = {
+            example_bool_param,
+            example_int_param,
+            example_unsigned_int_param,
+            example_float_param,
+            example_string_param,
+            example_enum_param,
+            foo_config,
+        };
+        immutable_internal_param_list = {
+            std::const_pointer_cast<const Parameter<bool>>(example_bool_param),
+            std::const_pointer_cast<const NumericParameter<int>>(example_int_param),
+            std::const_pointer_cast<const NumericParameter<uint>>(example_unsigned_int_param),
+            std::const_pointer_cast<const NumericParameter<float>>(example_float_param),
+            std::const_pointer_cast<const Parameter<std::string>>(example_string_param),
+            std::const_pointer_cast<const EnumeratedParameter<RefereeCommand>>(example_enum_param),
+            std::const_pointer_cast<const foo>(foo_config),
+        };
+    }
+
+    const std::shared_ptr<const Parameter<bool>> exampleBoolParam() const
+    {
+        return std::const_pointer_cast<const Parameter<bool>>(example_bool_param);
+    }
+
+    const std::shared_ptr<Parameter<bool>> mutableExampleBoolParam()
+    {
+        return example_bool_param;
+    }
+
+    const std::shared_ptr<const NumericParameter<int>> exampleIntParam() const
+    {
+        return std::const_pointer_cast<const NumericParameter<int>>(example_int_param);
+    }
+
+    const std::shared_ptr<NumericParameter<int>> mutableExampleIntParam()
+    {
+        return example_int_param;
+    }
+
+    const std::shared_ptr<const NumericParameter<uint>> exampleUintParam() const
+    {
+        return std::const_pointer_cast<const NumericParameter<int>>(example_int_param);
+    }
+
+    const std::shared_ptr<NumericParameter<uint>> mutableExampleUintParam()
+    {
+        return example_uint_param;
+    }
+
+    const std::shared_ptr<const NumericParameter<float>> exampleFloatParam() const
+    {
+        return std::const_pointer_cast<const NumericParameter<float>>(example_int_param);
+    }
+
+    const std::shared_ptr<NumericParameter<float>> mutableExampleFloatParam()
+    {
+        return example_float_param;
+    }
+
+    const std::shared_ptr<const Parameter<std::string>> exampleStringParam() const
+    {
+        return std::const_pointer_cast<const NumericParameter<std::string>>(example_string_param);
+    }
+
+    const std::shared_ptr<Parameter<std::string>> mutableExampleStringParam()
+    {
+        return example_string_param;
+    }
+
+    const std::shared_ptr<const EnumeratedParameter<RefereeCommand>> exampleEnumParam() const
+    {
+        return std::const_pointer_cast<const EnumeratedParameter<RefereeCommand>>(example_enum_param);
+    }
+
+    const std::shared_ptr<EnumeratedParameter<RefereeCommand>> mutableExampleEnumParam()
+    {
+        return example_enum_param;
+    }
+
+    const std::shared_ptr<const foo> fooConfig()
+    {
+        return std::const_pointer_cast<const foo>(foo_config);
+    }
+
+    const std::shared_ptr<foo> mutableFooConfig()
+    {
+        return foo_config;
+    }
+
+    const std::string name() const
+    {
+        return "example"
+    }
+
+    bool loadFromCommandLineArguments(int argc, char **argv) {
+        struct commandLineArgs {
+            bool help = false;
+            bool example_bool_param = true;
+            int example_int_param = 3;
+            uint example_uint_param = 3;
+            float example_float_param = 4.04;
+            std::string example_string_param = "Hello World";
+            RefereeCommand example_enum_param = RefereeCommand.HALT;
+        }
+
+        commandLineArgs args;
+        boost::program_options::options_description desc{"Options"};
+
+        desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                        "help screen");
+
+        desc.add_options()("example_bool_param", boost::program_options::value<bool>(&args.example_bool_param), "Can be true or false");
+        desc.add_options()("example_int_param", boost::program_options::value<int>(&args.example_int_param), "Can be any integer value in the range [min, max]");
+        desc.add_options()("example_uint_param", boost::program_options::value<uint>(&args.example_uint_param), "Can be any integer value in the range [min, max]. The minimum value must be >= 0");
+        desc.add_options()("example_float_param", boost::program_options::value<float>(&args.example_float_param), "Can be any value in the range [min, max] For C code, this will be generated as a float. For C++ code, this will be generated as a double.");
+        desc.add_options()("example_string_param", boost::program_options::value<std::string>(&args.example_string_param), "Any string value");
+        desc.add_options()("example_enum_param", boost::program_options::value<RefereeCommand>(&args.example_enum_param), "Accepts enum values from the specified enum.");
+        
+        boost::program_options::variables_map vm;
+        boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+        boost::program_options::notify(vm);
+
+        this->mutableExampleBoolParam()->setValue(args.example_bool_param);
+        this->mutableExampleIntParam()->setValue(args.example_int_param);
+        this->mutableExampleUintParam()->setValue(args.example_uint_param);
+        this->mutableExampleFloatParam()->setValue(args.example_float_param);
+        this->mutableExampleStringParam()->setValue(args.example_string_param);
+        this->mutableExampleEnumParam()->setValue(args.example_enum_param);
+
+        if (args.help)
+        {
+            std::cout << desc << std::endl;
+        }
+
+        return args.help;
+    }
+
+    const MutableParameterList& getMutableParameterList()
+    {
+        return mutable_internal_param_list;
+    }
+
+    const ParameterList& getParameterList() const
+    {
+        return immutable_internal_param_list;
+    }
+
+   private:
+        MutableParameterList mutable_internal_param_list;
+        ParameterList immutable_internal_param_list;
+        std::shared_ptr<Parameter<bool>> example_bool_param;
+        std::shared_ptr<NumericParameter<int>> example_int_param;
+        std::shared_ptr<NumericParameter<uint>> example_unsigned_int_param;
+        std::shared_ptr<NumericParameter<float>> example_float_param;
+        std::shared_ptr<Parameter<std::string>> example_string_param;
+        std::shared_ptr<EnumeratedParameter<RefereeCommand>> example_enum_param;
+        std::shared_ptr<foo> foo_config;
+}
+
+class ThunderbotsConfig : public Config
+{
+   public:
+    ThunderbotsConfig()
+    {
+        foo_config = std::make_shared<foo>();
+        example_config = std::make_shared<example>(foo_config);
+        mutable_internal_param_list = {
+            foo_config,
+            example_config
+        };
+        immutable_internal_param_list = {
+            std::const_pointer_cast<const foo>(foo_config),
+            std::const_pointer_cast<const example>(example_config)
+        };
+    }
+
+    const std::shared_ptr<const foo> fooConfig() const
+    {
+        return std::const_pointer_cast<const foo>(foo_config);
+    }
+
+    const std::shared_ptr<foo> mutableFooConfig()
+    {
+        return foo_config;
+    }
+        
+    const std::shared_ptr<const example> exampleConfig() const
+    {
+        return std::const_pointer_cast<const example>(example_config);
+    }
+
+    const std::shared_ptr<AIControlConfig> mutableExampleConfig()
+    {
+        return example_config;
+    }
+
+    const std::string name() const
+    {
+        return "ThunderbotsConfig";
+    }
+
+    bool loadFromCommandLineArguments(int argc, char **argv) {
+        struct commandLineArgs {
+            bool help = false;
+        };
+
+        commandLineArgs args;
+        boost::program_options::options_description desc{"Options"};
+
+        desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                       "Help screen");
+
+        boost::program_options::variables_map vm;
+        boost::program_options::store(parse_command_line(argc, argv, desc), vm);
+        boost::program_options::notify(vm);
+
+        if (args.help)
+        {
+            std::cout << desc << std::endl;
+        }
+
+        return args.help;
+    }
+
+    const MutableParameterList& getMutableParameterList()
+    {
+        return mutable_internal_param_list;
+    }
+
+    const ParameterList& getParameterList() const
+    {
+        return immutable_internal_param_list;
+    }
+    private:
+        MutableParameterList mutable_internal_param_list;
+        ParameterList immutable_internal_param_list;
+        std::shared_ptr<example> example_config;
+        std::shared_ptr<foo> foo_config;
+}
