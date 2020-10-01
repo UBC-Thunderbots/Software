@@ -194,14 +194,14 @@ p, li { white-space: pre-wrap; }
          <item>
           <layout class="QGridLayout" name="gridLayout">
            <item row="2" column="2">
-            <widget class="QLabel" name="data_received_label">
+            <widget class="QLabel" name="worlds_received_label">
              <property name="text">
-              <string>Data Received(Hz)</string>
+              <string>Worlds Received(Hz)</string>
              </property>
             </widget>
            </item>
            <item row="2" column="3">
-            <widget class="QLCDNumber" name="data_received_lcd">
+            <widget class="QLCDNumber" name="worlds_received_lcd">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -209,7 +209,7 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
              <property name="smallDecimalPoint">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>
@@ -217,14 +217,14 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QLabel" name="data_sent_label">
+            <widget class="QLabel" name="primitives_sent_label">
              <property name="text">
-              <string>Data Sent(Hz)</string>
+              <string>Primitives Sent(Hz)</string>
              </property>
             </widget>
            </item>
            <item row="1" column="3">
-            <widget class="QLCDNumber" name="data_sent_lcd">
+            <widget class="QLCDNumber" name="primitives_sent_lcd">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -237,7 +237,7 @@ p, li { white-space: pre-wrap; }
               </font>
              </property>
              <property name="smallDecimalPoint">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>

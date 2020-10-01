@@ -67,8 +67,8 @@ class ThreadedFullSystemGUI
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
-    std::shared_ptr<ThreadSafeBuffer<double>> data_received_per_second_buffer;
-    std::shared_ptr<ThreadSafeBuffer<double>> data_sent_per_second_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> worlds_received_per_second_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> primitives_sent_per_second_buffer;
 
     // We want to show the most recent world and AI data, but also want things to look
     // smooth if the stream of data isn't perfectly consistent, so we use a very small
@@ -85,7 +85,7 @@ class ThreadedFullSystemGUI
     // We only care about the most recent view area that was requested, so the
     // buffer is of size 1
     static constexpr std::size_t VIEW_AREA_BUFFER_SIZE = 1;
-    // We only care about the most recent data per second values
+    // We only care about the most recent "data" per second values
     static constexpr std::size_t DATA_PER_SECOND_BUFFER_SIZE = 1;
     // When the application starts up we want to set the initial view area
     // to show all the contents nicely. For some reason doing this only

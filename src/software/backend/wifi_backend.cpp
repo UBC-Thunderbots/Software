@@ -34,7 +34,6 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config,
 void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
-    Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(primitives);
 
     if (sensor_fusion_config->OverrideGameControllerDefendingSide()->value())
     {

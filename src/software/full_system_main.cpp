@@ -88,10 +88,10 @@ int main(int argc, char **argv)
             visualizer = std::make_shared<ThreadedFullSystemGUI>();
 
             sensor_fusion->Subject<World>::registerObserver(visualizer);
+            ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
             ai->Subject<PlayInfo>::registerObserver(visualizer);
             backend->Subject<SensorProto>::registerObserver(visualizer);
-            backend->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
         }
 
         if (!args->replay_output_dir()->value().empty())
