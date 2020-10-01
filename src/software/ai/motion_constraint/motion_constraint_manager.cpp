@@ -5,12 +5,12 @@
 std::set<MotionConstraint> MotionConstraintManager::getMotionConstraints(
     const GameState &game_state, Tactic &tactic)
 {
-    current_whitelisted_constraints.clear();
+    current_allowed_constraints.clear();
     std::set<MotionConstraint> current_motion_constraints =
         getMotionConstraintsFromGameState(game_state);
     try
     {
-        // updates current_whitelisted_constraints
+        // updates current_allowed_constraints
         tactic.accept(*this);
     }
     catch (std::invalid_argument)
@@ -18,7 +18,7 @@ std::set<MotionConstraint> MotionConstraintManager::getMotionConstraints(
         // Tactic didn't implement accept so don't add any more motion constraints
     }
 
-    for (const auto &constraint : current_whitelisted_constraints)
+    for (const auto &constraint : current_allowed_constraints)
     {
         current_motion_constraints.erase(constraint);
     }
@@ -35,7 +35,7 @@ void MotionConstraintManager::visit(ShadowFreekickerTactic &tactic) {}
 
 void MotionConstraintManager::visit(GoalieTactic &tactic)
 {
-    current_whitelisted_constraints = std::set<MotionConstraint>({
+    current_allowed_constraints = std::set<MotionConstraint>({
        MotionConstraint::FRIENDLY_DEFENSE_AREA,
        MotionConstraint::FRIENDLY_DEFENSE_AREA,
        MotionConstraint::HALF_METER_AROUND_BALL,
@@ -53,7 +53,7 @@ void MotionConstraintManager::visit(ChipTactic &tactic) {}
 
 void MotionConstraintManager::visit(KickoffChipTactic &tactic)
 {
-    current_whitelisted_constraints = std::set<MotionConstraint>({
+    current_allowed_constraints = std::set<MotionConstraint>({
        MotionConstraint::CENTER_CIRCLE,
        MotionConstraint::HALF_METER_AROUND_BALL
        });
@@ -65,7 +65,7 @@ void MotionConstraintManager::visit(PatrolTactic &tactic) {}
 
 void MotionConstraintManager::visit(PenaltyKickTactic &tactic)
 {
-    current_whitelisted_constraints = std::set<MotionConstraint>({
+    current_allowed_constraints = std::set<MotionConstraint>({
         MotionConstraint::HALF_METER_AROUND_BALL,
         MotionConstraint::ENEMY_DEFENSE_AREA,
         MotionConstraint::ENEMY_HALF
@@ -74,7 +74,7 @@ void MotionConstraintManager::visit(PenaltyKickTactic &tactic)
 
 void MotionConstraintManager::visit(PenaltySetupTactic &tactic)
 {
-    current_whitelisted_constraints = std::set<MotionConstraint>({
+    current_allowed_constraints = std::set<MotionConstraint>({
         MotionConstraint::ENEMY_HALF,
         MotionConstraint::ENEMY_DEFENSE_AREA,
         MotionConstraint::FRIENDLY_HALF,
@@ -86,7 +86,7 @@ void MotionConstraintManager::visit(ReceiverTactic &tactic) {}
 
 void MotionConstraintManager::visit(ShootGoalTactic &tactic)
 {
-    current_whitelisted_constraints = std::set<MotionConstraint>({
+    current_allowed_constraints = std::set<MotionConstraint>({
         MotionConstraint::HALF_METER_AROUND_BALL
         });
 }
