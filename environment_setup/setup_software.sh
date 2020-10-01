@@ -58,7 +58,6 @@ host_software_packages=(
     python3-yaml # Load dynamic parameter configuration files
     qt5-default # The GUI library for our visualizer
     valgrind # Checks for memory leaks
-    libclang-6.0-dev # Used to verify code-generation
 )
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
@@ -69,6 +68,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     # This is to setup the toolchain for bazel to run 
     host_software_packages+=(clang)
     host_software_packages+=(llvm-6.0)
+    host_software_packages+=(libclang-6.0-dev)
     sudo apt -y install gcc-7 g++-7
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
@@ -81,6 +81,7 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     # This is required for bazel, we've seen some issues where
     # the bazel install hasn't installed it properly
     host_software_packages+=(python-minimal)
+    host_software_packages+=(libclang-dev)
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
