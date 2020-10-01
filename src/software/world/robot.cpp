@@ -96,20 +96,20 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const std::set<RobotCapability> &Robot::getCapabilitiesBlacklist() const
+const std::set<RobotCapability> &Robot::getUnavailableCapabilities() const
 {
     return unavailable_capabilities_;
 }
 
-std::set<RobotCapability> Robot::getCapabilitiesWhitelist() const
+std::set<RobotCapability> Robot::getAvailableCapabilities() const
 {
     // robot capabilities = all possible capabilities - unavailable capabilities
 
     std::set<RobotCapability> all_capabilities = allRobotCapabilities();
     std::set<RobotCapability> robot_capabilities;
     std::set_difference(all_capabilities.begin(), all_capabilities.end(),
-                        getCapabilitiesBlacklist().begin(),
-                        getCapabilitiesBlacklist().end(),
+                        getUnavailableCapabilities().begin(),
+                        getUnavailableCapabilities().end(),
                         std::inserter(robot_capabilities, robot_capabilities.begin()));
 
     return robot_capabilities;
