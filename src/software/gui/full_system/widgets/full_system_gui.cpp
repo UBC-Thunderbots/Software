@@ -115,13 +115,13 @@ void FullSystemGUI::updateDataPerSecondLCD()
     {
         int worlds_received_int = static_cast<int>(worlds_received_per_second.value());
 
-        main_widget->worlds_received_lcd->display(worlds_received_int.value());
+        main_widget->worlds_received_lcd->display(worlds_received_int);
     }
     if (auto primitives_sent_per_second =
             primitives_sent_per_second_buffer->popLeastRecentlyAddedValue())
     {
         int primitives_sent_int = static_cast<int>(primitives_sent_per_second.value());
 
-        main_widget->primitives_sent_lcd->display(primitives_sent_int.value());
+        main_widget->primitives_sent_lcd->display(primitives_sent_int);
     }
 }
