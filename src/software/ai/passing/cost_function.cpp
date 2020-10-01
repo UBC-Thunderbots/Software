@@ -41,11 +41,11 @@ double ratePass(const World& world, const Pass& pass,
                                       ->MaxTimeOffsetForPassSeconds()
                                       ->value();
     double pass_time_offset_quality =
-        sigmoid(pass.startTime().getSeconds(),
-                min_pass_time_offset + world.getMostRecentTimestamp().getSeconds(), 0.5) *
-        (1 -
-         sigmoid(pass.startTime().getSeconds(),
-                 max_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(),
+            sigmoid(pass.startTime().toSeconds(),
+                min_pass_time_offset + world.getMostRecentTimestamp().toSeconds(), 0.5) *
+            (1 -
+         sigmoid(pass.startTime().toSeconds(),
+                 max_pass_time_offset + world.ball().lastUpdateTimestamp().toSeconds(),
                  0.5));
 
     // Place strict limits on the ball speed
@@ -214,13 +214,13 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
                                                              ->value());
 
     double robot_ball_time_diff_at_closest_pass_point =
-        ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
-         (ball_time_to_closest_pass_point + time_until_pass))
-            .getSeconds();
+            ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
+             (ball_time_to_closest_pass_point + time_until_pass))
+                    .toSeconds();
     double robot_ball_time_diff_at_pass_receive_point =
-        ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
-         (ball_time_to_pass_receive_position + time_until_pass))
-            .getSeconds();
+            ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
+             (ball_time_to_pass_receive_position + time_until_pass))
+                    .toSeconds();
 
     double min_time_diff = std::min(robot_ball_time_diff_at_closest_pass_point,
                                     robot_ball_time_diff_at_pass_receive_point);
@@ -294,8 +294,8 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
-    return sigmoid(receive_time.getSeconds(),
-                   latest_time_to_reciever_state.getSeconds() + 0.25, 0.5);
+    return sigmoid(receive_time.toSeconds(),
+                   latest_time_to_reciever_state.toSeconds() + 0.25, 0.5);
 }
 
 double getStaticPositionQuality(const Field& field, const Point& position)

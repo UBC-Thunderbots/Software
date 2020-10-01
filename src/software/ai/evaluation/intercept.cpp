@@ -29,7 +29,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
         if (ball_state.timestamp() < robot.lastUpdateTimestamp())
         {
             duration +=
-                (robot.lastUpdateTimestamp() - ball_state.timestamp()).getSeconds();
+                    (robot.lastUpdateTimestamp() - ball_state.timestamp()).toSeconds();
         }
 
         // Estimate the ball position
@@ -43,7 +43,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
 
         // Figure out when the robot will reach the new ball position relative to the
         // time that the ball will get there (ie. will we get there in time?)
-        double ball_robot_time_diff = duration - time_to_ball_pos.getSeconds();
+        double ball_robot_time_diff = duration - time_to_ball_pos.toSeconds();
 
         // We want to get to the ball at the earliest opportunity possible, so
         // aim for a time diff of zero. We use a smooth approximation of
@@ -81,7 +81,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
     // check isn't relevant in that case
     if (ball_state.state().velocity().length() != 0 &&
-        std::abs(ball_robot_time_diff.getSeconds()) > descent_weight)
+        std::abs(ball_robot_time_diff.toSeconds()) > descent_weight)
     {
         return std::nullopt;
     }

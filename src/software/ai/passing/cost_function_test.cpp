@@ -98,7 +98,7 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
     std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
                                                   world.field().yLength() / 2);
 
-    double curr_time             = world.getMostRecentTimestamp().getSeconds();
+    double curr_time             = world.getMostRecentTimestamp().toSeconds();
     double min_start_time_offset = DynamicParameters->getAIConfig()
                                        ->getPassingConfig()
                                        ->MinTimeOffsetForPassSeconds()

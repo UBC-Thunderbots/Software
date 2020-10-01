@@ -63,8 +63,8 @@ std::unique_ptr<SSLProto::SSL_DetectionFrame> createSSLDetectionFrame(
 
     detection_frame->set_frame_number(frame_number);
     // Assume the frame was sent instantly after it was captured
-    detection_frame->set_t_capture(t_capture.getSeconds());
-    detection_frame->set_t_sent(t_capture.getSeconds());
+    detection_frame->set_t_capture(t_capture.toSeconds());
+    detection_frame->set_t_sent(t_capture.toSeconds());
     detection_frame->set_camera_id(camera_id);
 
     for (const auto& ball_state : balls)

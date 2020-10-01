@@ -41,7 +41,7 @@ FullSystemGUI::FullSystemGUI(
 
     connect(update_timer, &QTimer::timeout, this, &FullSystemGUI::handleUpdate);
     update_timer->start(static_cast<int>(
-        Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
+                                Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).toMilliseconds()));
 }
 
 void FullSystemGUI::handleUpdate()

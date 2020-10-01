@@ -5,13 +5,13 @@
 TEST(TimestampTest, default_constructor)
 {
     Timestamp t;
-    EXPECT_DOUBLE_EQ(t.getSeconds(), 0);
+    EXPECT_DOUBLE_EQ(t.toSeconds(), 0);
 }
 
 TEST(TimestampTest, create_timestamp_from_positive_seconds)
 {
     Timestamp timestamp = Timestamp::fromSeconds(1.0);
-    EXPECT_DOUBLE_EQ(timestamp.getSeconds(), 1.0);
+    EXPECT_DOUBLE_EQ(timestamp.toSeconds(), 1.0);
 }
 
 TEST(TimestampTest, create_timestamp_from_negative_seconds)
@@ -22,7 +22,7 @@ TEST(TimestampTest, create_timestamp_from_negative_seconds)
 TEST(TimestampTest, create_timestamp_from_zero_milliseconds)
 {
     Timestamp timestamp = Timestamp::fromMilliseconds(0);
-    EXPECT_DOUBLE_EQ(timestamp.getMilliseconds(), 0);
+    EXPECT_DOUBLE_EQ(timestamp.toMilliseconds(), 0);
 }
 
 TEST(TimestampTest, create_timestamp_from_negative_milliseconds)
@@ -33,13 +33,13 @@ TEST(TimestampTest, create_timestamp_from_negative_milliseconds)
 TEST(TimestampTest, get_seconds_timestamp_in_milliseconds)
 {
     Timestamp timestamp = Timestamp::fromSeconds(5);
-    EXPECT_DOUBLE_EQ(timestamp.getMilliseconds(), 5000);
+    EXPECT_DOUBLE_EQ(timestamp.toMilliseconds(), 5000);
 }
 
 TEST(TimestampTest, create_millisecond_timestamp_in_seconds)
 {
     Timestamp timestamp = Timestamp::fromMilliseconds(300);
-    EXPECT_DOUBLE_EQ(timestamp.getSeconds(), 0.3);
+    EXPECT_DOUBLE_EQ(timestamp.toSeconds(), 0.3);
 }
 
 TEST(TimestampTest, test_equality_operator)

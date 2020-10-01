@@ -26,8 +26,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_3
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_LE(1.5, intercept_pos.x());
     EXPECT_GE(2.25, intercept_pos.x());
-    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_LE(2 / 3, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_LE(2 / 3, robot_time_to_move_to_intercept.toSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_6_m_per_s)
@@ -52,8 +52,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_6
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_LE(1.75, intercept_pos.x());
     EXPECT_GE(2.25, intercept_pos.x());
-    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_LE(2 / 3, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_LE(2 / 3, robot_time_to_move_to_intercept.toSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_path)
@@ -77,8 +77,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_p
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_LE(0, intercept_pos.x());
     EXPECT_GE(2.25, intercept_pos.x());
-    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_GE(2, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_GE(2, robot_time_to_move_to_intercept.toSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_chasing_ball)
@@ -100,8 +100,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_chasing_ball)
     EXPECT_DOUBLE_EQ(0, intercept_pos.x());
     EXPECT_GE(3, intercept_pos.y());
     EXPECT_LE(1, intercept_pos.y());
-    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_GE(3, robot_time_to_move_to_intercept.toSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajectory)
@@ -123,8 +123,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajecto
     EXPECT_GE(2, intercept_pos.x());
     EXPECT_LE(1, intercept_pos.y());
     EXPECT_GE(2, intercept_pos.y());
-    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_GE(3, robot_time_to_move_to_intercept.toSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_not_moving)
@@ -146,8 +146,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_not_moving)
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
     EXPECT_DOUBLE_EQ(-2, intercept_pos.x());
     EXPECT_DOUBLE_EQ(-1, intercept_pos.y());
-    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_GE(5, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_GE(5, robot_time_to_move_to_intercept.toSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_very_slowly)
@@ -169,8 +169,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_very_slowly)
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
     EXPECT_NEAR(-2, intercept_pos.x(), 0.02);
     EXPECT_NEAR(-1, intercept_pos.y(), 0.02);
-    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_GE(5, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_GE(5, robot_time_to_move_to_intercept.toSeconds());
 }
 
 
@@ -192,8 +192,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_DOUBLE_EQ(0, intercept_pos.x());
-    EXPECT_LE(1, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(1, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_GE(3, robot_time_to_move_to_intercept.toSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_robot)
@@ -214,8 +214,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_r
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_DOUBLE_EQ(0, intercept_pos.x());
-    EXPECT_LE(1, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(1, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_GE(3, robot_time_to_move_to_intercept.toSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_timestamp)
@@ -236,8 +236,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_t
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
     EXPECT_DOUBLE_EQ(0, intercept_pos.y());
     EXPECT_DOUBLE_EQ(0, intercept_pos.x());
-    EXPECT_LE(1, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(1, robot_time_to_move_to_intercept.toSeconds());
+    EXPECT_GE(3, robot_time_to_move_to_intercept.toSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_too_fast_to_intercept)
