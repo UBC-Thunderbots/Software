@@ -50,7 +50,7 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    #python-minimal # This is required for bazel, we've seen some issues where
+    python-minimal # This is required for bazel, we've seen some issues where
                    # the bazel install hasn't installed it properly
     python3       # Python 3
     python3-pip   # Required for bazel to install python dependencies for build targets
