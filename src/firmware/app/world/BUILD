@@ -114,3 +114,8 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "test",
+    srcs = ["test.c"],
+)

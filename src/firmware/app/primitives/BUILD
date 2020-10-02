@@ -151,6 +151,15 @@ cc_library(
 )
 
 cc_library(
+    name = "autochip_move_test",
+    srcs = ["autochip_move_primitive_test.c"],
+    hdrs = ["autochip_move_primitive.h"],
+    deps = [
+        "autochip_move_primitive.h",
+    ],
+)
+
+cc_library(
     name = "stop",
     srcs = ["stop_primitive.c"],
     hdrs = ["stop_primitive.h"],
