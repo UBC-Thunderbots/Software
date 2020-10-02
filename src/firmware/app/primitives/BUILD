@@ -155,7 +155,8 @@ cc_library(
     srcs = ["autochip_move_primitive_test.c"],
     hdrs = ["autochip_move_primitive.h"],
     deps = [
-        "autochip_move_primitive.h",
+        "autochip_move",
+        "@fff",
     ],
 )
 
