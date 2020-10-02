@@ -8,7 +8,7 @@ def _nanopb_proto_library_impl(ctx):
     # for this library, including all the transitive dependencies, we would like to
     # generate these in the same folder as each proto file. However bazel will not
     # permit us to modify/produce files outside the folder that this rule is called from.
-    # We get around this be reproducing the folder structer under a generation folder
+    # We get around this be reproducing the folder structure under a generation folder
     # and adding the root of this directory as an include path.
     #
     generation_folder_name = ctx.attr.name + "_nanopb_gen/"

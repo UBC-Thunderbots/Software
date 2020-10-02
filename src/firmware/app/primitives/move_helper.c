@@ -22,7 +22,7 @@
 // are going to rotate the bot onto its wheel axis
 // 2 * P_PI * ROBOT_RADIUS = robot circumference, which is approximately
 // how far the bot would have to turn for one full rotation, so we
-// set it a litle larger than that.
+// set it a little larger than that.
 const float APPROACH_LIMIT = 3 * P_PI * ROBOT_RADIUS;
 
 const float PI_2 = P_PI / 2.0f;
