@@ -26,6 +26,7 @@
   * [What Are Coroutines?](#what-are-coroutines)
   * [What Coroutines Do We Use?](#what-coroutines-do-we-use)
   * [How Do We Use Coroutines?](#how-do-we-use-coroutines)
+  * [Best Practices](#couroutine-best-practices)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
   * [Angles](#angles)
@@ -170,7 +171,7 @@ Because the Factory needs to know about what objects are available to be created
 
 Read [http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/] for more information.
 
-The auto-registering factory is particularily useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
+The auto-registering factory is particularly useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
 
 The Factory pattern is also used to create different [Backends](#backend)
 
@@ -281,13 +282,20 @@ Once it is time to start the pass, the condition for the loop will become false 
 
 Once we have entered the second stage, we know we don't have to look at the first stage again. Because the coroutine "remembers" where the execution is each time the function is called, we will resume inside the second stage and therefore never execute the first stage again! This makes it much easier to write and read this strategy code, because we can clearly see the 2 stages of the strategy, and we know they will be executed in order.
 
+## Couroutine Best Practices
+Coroutines are a complex feature, and the boost coroutines we use don't always behave in was we expect. We have done extensive testing on how coroutines are safe (or not safe) to us, and derived some best practices from these examples. See [coroutine_test_exmaples.cpp](coroutine_test_examples.cpp) for the full code and more detailed explanantions.
+
+To summarize, the best practices are as follows:
+1. Avoid moving coroutines. If the absolutely must be moved, make sure they are not moved between the stack and heap.
+2. Avoid using coroutines with resizeable containers. If they must be used, make sure that the coroutines are allocated on the heap.
+3. Pass data to the coroutine on creation as much as possible, avoid using member variables.
+
 
 # Conventions
 Various conventions we use and follow that you need to know.
 
-
 ## Coordinates
-We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularily important for any code handling gameplay logic and positions on the field.
+We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularly important for any code handling gameplay logic and positions on the field.
 
 The coordinate system is a simple 2D x-y plane. The x-dimension runs between the friendly and enemy goals, along the longer dimension of the field. The y-dimension runs perpendicular to the x-dimension, along the short dimension of the field.
 

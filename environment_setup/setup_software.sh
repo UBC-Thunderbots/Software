@@ -50,17 +50,39 @@ host_software_packages=(
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
-    python-minimal # This is required for bazel, we've seen some issues where
-                   # the bazel install hasn't installed it properly
     python3       # Python 3
     python3-pip   # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
                     # properly manage this as a bazel dependency, so we have
                     # to manually install it ourselves
-    python3-yaml # yaml for cfg generation (Dynamic Parameters)
+    python3-yaml # Load dynamic parameter configuration files
     qt5-default # The GUI library for our visualizer
     valgrind # Checks for memory leaks
 )
+
+if [[ $(lsb_release -rs) == "20.04" ]]; then
+    # This is required for bazel, we've seen some issues where
+    # the bazel install hasn't installed it properly
+    host_software_packages+=(python-is-python3)
+
+    # This is to setup the toolchain for bazel to run 
+    host_software_packages+=(clang)
+    host_software_packages+=(llvm-6.0)
+    host_software_packages+=(libclang-6.0-dev)
+    sudo apt -y install gcc-7 g++-7
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
+    
+    # This fixes missing headers by notifying the linker
+    ldconfig
+fi
+
+if [[ $(lsb_release -rs) == "18.04" ]]; then
+    # This is required for bazel, we've seen some issues where
+    # the bazel install hasn't installed it properly
+    host_software_packages+=(python-minimal)
+    host_software_packages+=(libclang-dev)
+fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     echo "##############################################################"

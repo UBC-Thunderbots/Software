@@ -1,5 +1,7 @@
 INCLUDE_KEY = "include"
 PARAMETER_KEY = "parameters"
+CONSTANT_KEY = "constant"
+OPTIONAL_KEY = "optional"
 
 SUPPORTED_TYPES = [
     "bool",
@@ -32,6 +34,8 @@ PARAM_DEF_SCHEMA = {
                         "name": {"type": "string"},
                         "value": {"type": "boolean"},
                         "description": {"type": "string"},
+                        CONSTANT_KEY: {"type": "boolean"},
+                        OPTIONAL_KEY: {"type": "boolean"},
                     },
                     "required": ["name", "value", "description"],
                     "additionalProperties": False,
@@ -49,6 +53,8 @@ PARAM_DEF_SCHEMA = {
                         "max": {"type": "integer"},
                         "value": {"type": "integer"},
                         "description": {"type": "string"},
+                        CONSTANT_KEY: {"type": "boolean"},
+                        OPTIONAL_KEY: {"type": "boolean"},
                     },
                     "required": ["name", "min", "max", "value", "description"],
                     "additionalProperties": False,
@@ -66,6 +72,8 @@ PARAM_DEF_SCHEMA = {
                         "max": {"type": "integer", "minimum": 0},
                         "value": {"type": "integer", "minimum": 0},
                         "description": {"type": "string"},
+                        CONSTANT_KEY: {"type": "boolean"},
+                        OPTIONAL_KEY: {"type": "boolean"},
                     },
                     "required": ["name", "min", "max", "value", "description"],
                     "additionalProperties": False,
@@ -83,6 +91,8 @@ PARAM_DEF_SCHEMA = {
                         "max": {"type": "number"},
                         "value": {"type": "number"},
                         "description": {"type": "string"},
+                        CONSTANT_KEY: {"type": "boolean"},
+                        OPTIONAL_KEY: {"type": "boolean"},
                     },
                     "required": ["name", "min", "max", "value", "description"],
                     "additionalProperties": False,
@@ -98,6 +108,8 @@ PARAM_DEF_SCHEMA = {
                         "name": {"type": "string"},
                         "value": {"type": "string"},
                         "description": {"type": "string"},
+                        CONSTANT_KEY: {"type": "boolean"},
+                        OPTIONAL_KEY: {"type": "boolean"},
                     },
                     "required": ["name", "value", "description"],
                     "additionalProperties": False,
@@ -114,6 +126,8 @@ PARAM_DEF_SCHEMA = {
                         "enum": {"type": "string"},
                         "value": {"type": "string"},
                         "description": {"type": "string"},
+                        CONSTANT_KEY: {"type": "boolean"},
+                        OPTIONAL_KEY: {"type": "boolean"},
                     },
                     "required": ["name", "enum", "value", "description"],
                     "additionalProperties": False,
@@ -131,6 +145,8 @@ PARAM_DEF_SCHEMA = {
                         "type_to_create": {"type": "string"},
                         "value": {"type": "string"},
                         "description": {"type": "string"},
+                        CONSTANT_KEY: {"type": "boolean"},
+                        OPTIONAL_KEY: {"type": "boolean"},
                     },
                     "required": [
                         "name",

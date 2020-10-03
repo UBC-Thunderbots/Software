@@ -278,10 +278,13 @@ class SimulatorRobot
     typedef struct DribblerBall_t
     {
         PhysicsBall* ball;
-        // We keep track of whether or not the ball can be kicked.
-        // This extra information is used to prevent edge cases like
-        // the ball getting kicked/chipped multiple times.
-        bool can_be_chicked;
+        // We keep track of whether or not the ball can be controlled
+        // in any way by the robot. This includes kicking, chipping,
+        // and dribbling. This extra information is used to
+        // prevent edge cases like the ball getting kicked/chipped
+        // multiple times, and to prevent the dribbler from affecting
+        // kicking
+        bool can_be_controlled;
     } DribblerBall;
 
     std::vector<DribblerBall> balls_in_dribbler_area;

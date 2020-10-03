@@ -247,18 +247,6 @@ bool Field::pointInEnemyDefenseArea(const Point &p) const
     return contains(enemyDefenseArea(), p);
 }
 
-bool Field::pointInFieldLines(const Point &p) const
-{
-    return contains(fieldLines(), p);
-}
-
-bool Field::pointInEntireField(const Point &p) const
-{
-    Rectangle entire_field = Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
-                                       Point(totalXLength() / 2, totalYLength() / 2));
-    return contains(entire_field, p);
-}
-
 bool Field::operator==(const Field &other) const
 {
     return this->field_y_length_ == other.field_y_length_ &&

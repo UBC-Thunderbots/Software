@@ -282,7 +282,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
 ### Exceptions
 
 * Throwing an exception indicates that the AI has entered an unrecoverable state.
-* In almost all cases, it is preferable to return a `std::optional` type, so the caller has to handle the case of the called function "failing", perhaps alongside some logging that the error occured.
+* In almost all cases, it is preferable to return a `std::optional` type, so the caller has to handle the case of the called function "failing", perhaps alongside some logging that the error occurred.
 
 
 ### Tests
