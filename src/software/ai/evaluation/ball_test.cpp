@@ -207,7 +207,7 @@ TEST(HasBallBeenKickedTest, ball_under_speed_threshold_and_large_direction_diffe
 {
     Ball ball({2, 2}, {0.2, 0.2}, Timestamp::fromSeconds(0));
 
-    Angle expected_direction = Angle::fromDegrees(40);
+    Angle expected_direction = Angle::fromDegrees(90);
 
     EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction));
 }
