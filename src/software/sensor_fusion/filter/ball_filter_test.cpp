@@ -10,19 +10,21 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
+#include "software/world/field.h"
 
 class BallFilterTest : public ::testing::Test
 {
    protected:
-    BallFilterTest() {}
+    BallFilterTest()
+        : field(Field::createSSLDivisionBField()),
+          ball_filter(),
+          current_timestamp(Timestamp::fromSeconds(123)),
+          time_step(Duration::fromSeconds(1.0 / 60.0))
+    {
+    }
 
     void SetUp() override
     {
-        // Initialize the time
-        current_timestamp = Timestamp::fromSeconds(123);
-        field             = Field::createSSLDivisionBField();
-        ball_filter       = BallFilter(4, 10);
-        time_step         = Duration::fromSeconds(1.0 / 60.0);
         // Use a constant seed to results are deterministic
         random_generator.seed(1);
     }
@@ -198,8 +200,8 @@ class BallFilterTest : public ::testing::Test
                               current_timestamp, 0.9}};
 
             // Get the filtered result given the new detection information
-            auto filtered_ball = ball_filter.getFilteredData(ball_detections, field);
-
+            auto filtered_ball =
+                ball_filter.estimateBallState(ball_detections, field.fieldBoundary());
             if (i < num_steps_to_ignore)
             {
                 continue;
@@ -235,11 +237,11 @@ class BallFilterTest : public ::testing::Test
         }
     }
 
-    Field field = Field::createSSLDivisionBField();
+    Field field;
     BallFilter ball_filter;
+    Timestamp current_timestamp;
     Duration time_step;
     std::mt19937 random_generator;
-    Timestamp current_timestamp;
     // For these tests, the ball is always on the ground. The filters
     // are not designed for filtering balls in the air
     static constexpr double BALL_DISTANCE_FROM_GROUND = 0.0;
@@ -442,11 +444,12 @@ TEST_F(BallFilterTest,
 TEST_F(BallFilterTest,
        ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data_2)
 {
-    Segment ball_path                  = Segment(field.friendlyCornerNeg(), Point(0, 3));
-    double ball_velocity_magnitude     = 5.04;
-    double ball_position_variance      = 0;
-    double time_step_variance          = 0;
-    double expected_position_tolerance = 0.0001;
+    Segment ball_path =
+        Segment(field.friendlyCornerNeg(), field.friendlyHalf().posXPosYCorner());
+    double ball_velocity_magnitude               = 5.04;
+    double ball_position_variance                = 0;
+    double time_step_variance                    = 0;
+    double expected_position_tolerance           = 0.0001;
     Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.1);
     double expected_velocity_magnitude_tolerance = 0.1;
     int num_steps_to_ignore                      = 5;
@@ -458,7 +461,7 @@ TEST_F(BallFilterTest,
         expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
         num_steps_to_ignore);
 
-    ball_path                             = Segment(Point(0, 3), field.enemyCornerNeg());
+    ball_path = Segment(field.friendlyHalf().posXPosYCorner(), field.enemyCornerNeg());
     ball_velocity_magnitude               = 4.8;
     expected_position_tolerance           = 0.0001;
     expected_velocity_angle_tolernace     = Angle::fromDegrees(0.1);
@@ -507,42 +510,40 @@ TEST_F(BallFilterTest,
         num_steps_to_ignore);
 }
 
-TEST_F(BallFilterTest,
-       test_linear_regression_returns_same_results_for_inverted_coordinates)
+TEST_F(BallFilterTest, ball_moving_along_x_axis)
 {
-    boost::circular_buffer<BallDetection> ball_detections(2);
-    Point p1(0, 0);
-    Point p2(1, 0.5);
-    ball_detections.push_front(
-        {p1, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(1), 1.0});
-    ball_detections.push_front(
-        {p2, BALL_DISTANCE_FROM_GROUND, Timestamp::fromSeconds(2), 1.0});
-    auto x_vs_y_regression = ball_filter.getLinearRegressionLine(ball_detections);
+    Segment ball_path = Segment(field.friendlyGoalCenter(), field.enemyGoalCenter());
+    double ball_velocity_magnitude               = 5;
+    double ball_position_variance                = 0;
+    double time_step_variance                    = 0;
+    double expected_position_tolerance           = 0.001;
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
+    double expected_velocity_magnitude_tolerance = 0.01;
+    int num_steps_to_ignore                      = 5;
+    Timestamp start_time                         = current_timestamp;
 
-    double d1 = distance(x_vs_y_regression.regression_line, p1);
-    double d2 = distance(x_vs_y_regression.regression_line, p2);
+    testFilterAlongLineSegment(
+        start_time, ball_path, ball_velocity_magnitude, ball_position_variance,
+        time_step_variance, expected_position_tolerance,
+        expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
+        num_steps_to_ignore);
+}
 
-    EXPECT_LT(d1, 0.001);
-    EXPECT_LT(d2, 0.001);
+TEST_F(BallFilterTest, ball_moving_along_y_axis)
+{
+    Segment ball_path                            = field.halfwayLine();
+    double ball_velocity_magnitude               = 5;
+    double ball_position_variance                = 0;
+    double time_step_variance                    = 0;
+    double expected_position_tolerance           = 0.001;
+    Angle expected_velocity_angle_tolernace      = Angle::fromDegrees(0.01);
+    double expected_velocity_magnitude_tolerance = 0.01;
+    int num_steps_to_ignore                      = 5;
+    Timestamp start_time                         = current_timestamp;
 
-    // test the inverse regression
-    boost::circular_buffer<BallDetection> inv_ball_detections = ball_detections;
-    for (auto& detection : inv_ball_detections)
-    {
-        detection.position = Point(detection.position.y(), detection.position.x());
-    }
-
-    auto y_vs_x_regression = ball_filter.getLinearRegressionLine(inv_ball_detections);
-    y_vs_x_regression.regression_line.swapXY();
-
-    double inv_d1 = distance(y_vs_x_regression.regression_line, p1);
-    double inv_d2 = distance(y_vs_x_regression.regression_line, p2);
-
-    EXPECT_LT(inv_d1, 0.001);
-    EXPECT_LT(inv_d2, 0.001);
-
-    // Check the lines are pointing in the same direction
-    EXPECT_LT(x_vs_y_regression.regression_line.toNormalUnitVector().cross(
-                  y_vs_x_regression.regression_line.toNormalUnitVector()),
-              FIXED_EPSILON);
+    testFilterAlongLineSegment(
+        start_time, ball_path, ball_velocity_magnitude, ball_position_variance,
+        time_step_variance, expected_position_tolerance,
+        expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
+        num_steps_to_ignore);
 }

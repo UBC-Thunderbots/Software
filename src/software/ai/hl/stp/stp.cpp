@@ -256,10 +256,9 @@ bool STP::overrideAIPlayIfApplicable()
                              << TYPENAME(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
-            return true;
         }
     }
-    return false;
+    return override_play;
 }
 
 void STP::assignRobotsToTactics(const World& world,
@@ -360,7 +359,7 @@ void STP::assignNonGoalieRobotsToTactics(
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
             std::set<RobotCapability> robot_capabilities =
-                robot.getCapabilitiesWhitelist();
+                robot.getAvailableCapabilities();
             std::set<RobotCapability> missing_capabilities;
             std::set_difference(
                 required_capabilities.begin(), required_capabilities.end(),

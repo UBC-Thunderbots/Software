@@ -1,5 +1,6 @@
 #include "software/simulation/standalone_simulator.h"
 
+#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/world/field.h"
 extern "C"
 {
@@ -59,13 +60,21 @@ void StandaloneSimulator::initNetworking()
             static_cast<unsigned short>(
                 standalone_simulator_config->VisionPort()->value()));
     yellow_team_primitive_listener =
-        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
+        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>>(
             yellow_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1));
     blue_team_primitive_listener =
-        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
+        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>>(
             blue_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
+    yellow_team_side_listener =
+        std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
+            yellow_team_ip, DEFENDING_SIDE_PORT,
+            boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1));
+    blue_team_side_listener =
+        std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
+            blue_team_ip, DEFENDING_SIDE_PORT,
+            boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1));
 }
 
 void StandaloneSimulator::setupInitialSimulationState()
@@ -122,15 +131,15 @@ SSLProto::SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
 }
 
 void StandaloneSimulator::setYellowRobotPrimitives(
-    TbotsProto_PrimitiveSet primitive_set_msg)
+    const TbotsProto::PrimitiveSet& primitive_set_msg)
 {
-    simulator.setYellowRobotPrimitiveSet(primitive_set_msg);
+    simulator.setYellowRobotPrimitiveSet(createNanoPbPrimitiveSet(primitive_set_msg));
 }
 
 void StandaloneSimulator::setBlueRobotPrimitives(
-    TbotsProto_PrimitiveSet primitive_set_msg)
+    const TbotsProto::PrimitiveSet& primitive_set_msg)
 {
-    simulator.setBlueRobotPrimitiveSet(primitive_set_msg);
+    simulator.setBlueRobotPrimitiveSet(createNanoPbPrimitiveSet(primitive_set_msg));
 }
 
 void StandaloneSimulator::startSimulation()
@@ -176,4 +185,16 @@ void StandaloneSimulator::addBlueRobot(const Point& position)
 void StandaloneSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
 {
     simulator.removeRobot(robot);
+}
+
+void StandaloneSimulator::setBlueTeamDefendingSide(
+    const DefendingSideProto& defending_side_proto)
+{
+    simulator.setBlueTeamDefendingSide(defending_side_proto);
+}
+
+void StandaloneSimulator::setYellowTeamDefendingSide(
+    const DefendingSideProto& defending_side_proto)
+{
+    simulator.setYellowTeamDefendingSide(defending_side_proto);
 }

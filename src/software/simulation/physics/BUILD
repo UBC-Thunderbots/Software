@@ -5,7 +5,9 @@ cc_library(
     srcs = ["box2d_util.cpp"],
     hdrs = ["box2d_util.h"],
     deps = [
+        "//software/geom:convex_polygon",
         "//software/geom:point",
+        "//software/geom:vector",
         "@box2d",
     ],
 )
@@ -126,6 +128,7 @@ cc_test(
     deps = [
         ":physics_ball",
         ":physics_robot",
+        "//software/test_util",
         "//software/time:duration",
         "//software/world:robot",
         "@box2d",

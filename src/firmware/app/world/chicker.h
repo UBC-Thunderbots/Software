@@ -45,6 +45,7 @@ void app_chicker_destroy(Chicker_t* chicker);
 
 /**
  * Kick with the given chicker at the given speed
+ *
  * @param chicker The chicker to kick with
  * @param speed_m_per_s  The speed to kick at, in meters per second
  */
@@ -52,6 +53,7 @@ void app_chicker_kick(Chicker_t* chicker, float speed_m_per_s);
 
 /**
  * Chip with the given chicker at the given speed
+ *
  * @param chicker The chicker to chip with
  * @param distance_m  The distance to chip, in meters. This distance is the distance to
  * the first bounce.
@@ -60,6 +62,7 @@ void app_chicker_chip(Chicker_t* chicker, float distance_m);
 
 /**
  * Enable autokick on the given chicker
+ *
  * @param chicker The chicker to enable autokick on
  * @param speed_m_per_s The speed of the kick, in meters per second
  */
@@ -67,6 +70,7 @@ void app_chicker_enableAutokick(Chicker_t* chicker, float speed_m_per_s);
 
 /**
  * Enable autochip on the given chicker
+ *
  * @param chicker The chicker to enable autochip on
  * @param distance_m The distance to chip, in meters
  */
@@ -74,12 +78,14 @@ void app_chicker_enableAutochip(Chicker_t* chicker, float distance_m);
 
 /**
  * Disable autokick on the given chicker
+ *
  * @param chicker The chicker to disable autokick on
  */
 void app_chicker_disableAutokick(Chicker_t* chicker);
 
 /**
  * Disable autochip on the given chicker
+ *
  * @param chicker The chicker to disable autochip on
  */
 void app_chicker_disableAutochip(Chicker_t* chicker);

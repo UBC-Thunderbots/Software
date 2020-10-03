@@ -9,19 +9,23 @@ from config_yaml_loader import (
     ConfigYamlMalformed,
 )
 
+from c_writer import CWriter
+
 # Path relative to the bazel WORKSPACE root
 # This path is included in the data for the py_binary bazel target
-PARAMETER_CONFIG_PATH = Path(os.path.dirname(__file__), "../config")
+PARAMETER_CONFIG_PATH = Path(os.path.dirname(__file__), "../config_definitions")
 
 
 def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
+
     # A temporary implementation used to show we can access the YAML files
-    yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
-
-    ConfigYamlLoader.get_config_metadata(yamls)
-
-    with open(output_file, "w") as outfile:
-        outfile.write("Hello world\n")
+    if generate_for_cpp:
+        with open(output_file, "w") as temp_file:
+            temp_file.write("Hello World")
+    else:
+        yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
+        config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
+        CWriter.write_config_metadata(output_file, "ThunderbotsConfig", config_metadata)
 
 
 def main():
@@ -50,8 +54,10 @@ def main():
         "--include_headers",
         nargs="+",
         required=False,
-        help="Filepaths (relative to the bazel WORKSPACE) for any header "
-        "files that should be included at the top of the generated code",
+        help=(
+            "Filepaths (relative to the bazel WORKSPACE) for any header "
+            "files that should be included at the top of the generated code"
+        ),
     )
 
     args = parser.parse_args()
