@@ -250,7 +250,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
         min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
-                                 MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
+                                     MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
                                  1.0);
     } while (best_pass_and_score_so_far.rating < min_score ||
              shoot_tactic->hasShotAvailable());

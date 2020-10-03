@@ -41,9 +41,9 @@ double ratePass(const World& world, const Pass& pass,
                                       ->MaxTimeOffsetForPassSeconds()
                                       ->value();
     double pass_time_offset_quality =
-            sigmoid(pass.startTime().toSeconds(),
+        sigmoid(pass.startTime().toSeconds(),
                 min_pass_time_offset + world.getMostRecentTimestamp().toSeconds(), 0.5) *
-            (1 -
+        (1 -
          sigmoid(pass.startTime().toSeconds(),
                  max_pass_time_offset + world.ball().lastUpdateTimestamp().toSeconds(),
                  0.5));
@@ -214,13 +214,13 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
                                                              ->value());
 
     double robot_ball_time_diff_at_closest_pass_point =
-            ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
-             (ball_time_to_closest_pass_point + time_until_pass))
-                    .toSeconds();
+        ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
+         (ball_time_to_closest_pass_point + time_until_pass))
+            .toSeconds();
     double robot_ball_time_diff_at_pass_receive_point =
-            ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
-             (ball_time_to_pass_receive_position + time_until_pass))
-                    .toSeconds();
+        ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
+         (ball_time_to_pass_receive_position + time_until_pass))
+            .toSeconds();
 
     double min_time_diff = std::min(robot_ball_time_diff_at_closest_pass_point,
                                     robot_ball_time_diff_at_pass_receive_point);

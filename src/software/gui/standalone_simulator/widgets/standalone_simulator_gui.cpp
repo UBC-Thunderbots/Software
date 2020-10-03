@@ -54,7 +54,7 @@ StandaloneSimulatorGUI::StandaloneSimulatorGUI(
 
     connect(update_timer, &QTimer::timeout, this, &StandaloneSimulatorGUI::handleUpdate);
     update_timer->start(static_cast<int>(
-                                Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).toMilliseconds()));
+        Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).toMilliseconds()));
 }
 
 void StandaloneSimulatorGUI::handleUpdate()

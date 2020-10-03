@@ -39,8 +39,8 @@ std::optional<Robot> RobotFilter::getFilteredData(
                 filtered_data.orientation + robot_data.orientation;
 
             filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
-                    filtered_data.timestamp.toMilliseconds() +
-                    robot_data.timestamp.toMilliseconds());
+                filtered_data.timestamp.toMilliseconds() +
+                robot_data.timestamp.toMilliseconds());
             data_num++;
         }
 
@@ -57,7 +57,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
         // if there is no data the duration of expiry_buffer_duration after previously
         // recorded robot state, return null. Otherwise remain the same state
         if (latest_timestamp.toMilliseconds() >
-                this->expiry_buffer_duration.toMilliseconds() +
+            this->expiry_buffer_duration.toMilliseconds() +
                 current_robot_state.lastUpdateTimestamp().toMilliseconds())
         {
             return std::nullopt;
@@ -74,7 +74,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
         filtered_data.orientation = filtered_data.orientation / data_num;
 
         filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
-                filtered_data.timestamp.toMilliseconds() / data_num);
+            filtered_data.timestamp.toMilliseconds() / data_num);
 
         // velocity = position difference / time difference
         filtered_data.velocity =

@@ -193,8 +193,8 @@ void SimulatedTestFixture::runTest(
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
-    const Duration ai_time_step = Duration::fromSeconds(
-            simulation_time_step.toSeconds() * CAMERA_FRAMES_PER_AI_TICK);
+    const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
+                                                        CAMERA_FRAMES_PER_AI_TICK);
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {

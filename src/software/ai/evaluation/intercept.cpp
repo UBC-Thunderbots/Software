@@ -29,7 +29,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
         if (ball_state.timestamp() < robot.lastUpdateTimestamp())
         {
             duration +=
-                    (robot.lastUpdateTimestamp() - ball_state.timestamp()).toSeconds();
+                (robot.lastUpdateTimestamp() - ball_state.timestamp()).toSeconds();
         }
 
         // Estimate the ball position
