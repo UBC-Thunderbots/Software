@@ -68,7 +68,7 @@ class SendReliableMessageOperation::NotAssociatedError final : public std::runti
 {
    public:
     /**
-     * Constructs a NotAssociatedError.
+     * Contructs a NotAssociatedError.
      */
     explicit NotAssociatedError();
 };
@@ -77,7 +77,7 @@ class SendReliableMessageOperation::NotAcknowledgedError final : public std::run
 {
    public:
     /**
-     * Constructs a NotAcknowledgedError.
+     * Contructs a NotAcknowledgedError.
      */
     explicit NotAcknowledgedError();
 };
@@ -86,7 +86,7 @@ class SendReliableMessageOperation::ClearChannelError final : public std::runtim
 {
    public:
     /**
-     * Constructs a ClearChannelError.
+     * Contructs a ClearChannelError.
      */
     explicit ClearChannelError();
 };

@@ -127,7 +127,7 @@ class CWriter(object):
         # generate header file
         with open(f"{output_file}", "w") as header_file:
 
-            # forward declarations and definitions
+            # forward declerations and definitions
             contents = "".join([conf.forward_declaration for conf in c_configs])
             contents += "".join([conf.definition for conf in c_configs])
 
