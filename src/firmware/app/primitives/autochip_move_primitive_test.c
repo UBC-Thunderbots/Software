@@ -1,4 +1,4 @@
-#include <fff/fff.h>
+#include <fff.h>
 #include "firmware/app/primitives/autochip_move_primitive.h"
 
 DEFINE_FFF_GLOBALS;
