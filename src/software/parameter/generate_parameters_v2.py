@@ -122,6 +122,25 @@ class Parameter(object):
             value=self.default_value,
         )
 
+    def get_boost_command_line_entry(self):
+        """Returns the line required to expose this parameter as a command line option
+
+        :returns: string that goes into loadFromCommandLineArguments
+        :rtype: str
+
+        """
+        return constants.COMMAND_LINE_ARG_ENTRY.format(
+            # the type of the parameter
+            param_type=self.ptype,
+            # the variable name
+            param_name=self.param_name,
+            # we need to add additional quotes around the value if it is a string
+            # so the quotes are formatted here
+            quote='"' if self.ptype == "std::string" else "",
+            # default value
+            default_value=self.default_value,
+        )
+
     def get_private_entries(self):
         """Returns the public members of the parent Config class
         that are required for this parameter
@@ -257,6 +276,30 @@ class Config(object):
             config.get_private_entries() for config in self.configs
         )
 
+        # command line parser method of the config class
+        command_line_arg_struct_contents = ""
+        parse_command_line_args_function_contents = ""
+        load_command_line_args_into_config_contents = ""
+
+        for parameter in self.parameters:
+
+            command_line_arg_struct_contents += parameter.get_boost_command_line_entry()
+            load_command_line_args_into_config_contents += constants.LOAD_COMMAND_LINE_ARG_INTO_CONFIG.format(
+                param_name=parameter.param_name
+            )
+
+            if parameter.ptype == "bool":
+                parse_command_line_args_function_contents += constants.PARAMETER_COMMAND_LINE_BOOL_SWITCH_ENTRY.format(
+                    param_name=parameter.param_name,
+                    param_desc=parameter.parameter_description["description"],
+                )
+            else:
+                parse_command_line_args_function_contents += constants.PARAMETER_COMMAND_LINE_ENTRY.format(
+                    param_name=parameter.param_name,
+                    param_type=parameter.ptype,
+                    param_desc=parameter.parameter_description["description"],
+                )
+
         ##################
         # Generate Class #
         ##################
@@ -280,6 +323,10 @@ class Config(object):
             public_entries=public_parameter_entries + public_config_entries,
             # private members of the config class
             private_entries=private_parameter_entries + private_config_entries,
+            # command line parser
+            parse_command_line_args_function_contents=parse_command_line_args_function_contents,
+            command_line_arg_struct_contents=command_line_arg_struct_contents,
+            load_command_line_args_into_config_contents=load_command_line_args_into_config_contents,
         )
 
     def get_constructor_entries(self):

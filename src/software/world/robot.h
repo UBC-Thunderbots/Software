@@ -107,14 +107,14 @@ class Robot
      *
      * @return the missing capabilities of the robot
      */
-    const std::set<RobotCapability> &getCapabilitiesBlacklist() const;
+    const std::set<RobotCapability> &getUnavailableCapabilities() const;
 
     /**
-     * Returns all capabilities this robot has
+     * Returns all available capabilities this robot has
      *
-     * @return Returns all capabilities this robot has
+     * @return Returns all available capabilities this robot has
      */
-    std::set<RobotCapability> getCapabilitiesWhitelist() const;
+    std::set<RobotCapability> getAvailableCapabilities() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot

@@ -15,7 +15,7 @@ namespace
     Pass pass({1, 1}, {0.5, 0}, 2.29, Timestamp::fromSeconds(5));
 
 
-    // vector of pairs of Tactic and whitelists
+    // vector of pairs of Tactic and allowed MotionConstraints
     std::vector<std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>>
         test_vector = {
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(

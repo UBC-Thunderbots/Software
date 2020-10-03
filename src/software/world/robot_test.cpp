@@ -188,40 +188,6 @@ TEST_F(RobotTest, equality_operator_robots_with_different_timestamp)
     EXPECT_EQ(robot, robot_other);
 }
 
-
-TEST_F(RobotTest, get_capabilities_blacklist)
-{
-    std::set<RobotCapability> blacklist = {
-        RobotCapability::Dribble,
-        RobotCapability::Chip,
-    };
-
-    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, blacklist);
-
-    EXPECT_EQ(blacklist, robot.getCapabilitiesBlacklist());
-}
-
-TEST_F(RobotTest, get_capabilities_whitelist)
-{
-    std::set<RobotCapability> blacklist = {
-        RobotCapability::Dribble,
-        RobotCapability::Chip,
-    };
-
-    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
-                        AngularVelocity::fromDegrees(25), current_time, blacklist);
-
-    // whitelist = all capabilities - blacklist
-    std::set<RobotCapability> all_capabilities = allRobotCapabilities();
-    std::set<RobotCapability> expected_whitelist;
-    std::set_difference(all_capabilities.begin(), all_capabilities.end(),
-                        blacklist.begin(), blacklist.end(),
-                        std::inserter(expected_whitelist, expected_whitelist.begin()));
-
-    EXPECT_EQ(expected_whitelist, robot.getCapabilitiesWhitelist());
-}
-
 TEST(RobotIsNearDribblerTest, ball_near_dribbler_directly_in_front_of_robot)
 {
     Point ball_position = Point(0.07, 0);
@@ -274,4 +240,40 @@ TEST(RobotIsNearDribblerTest, ball_near_dribbler_robot_on_angle_with_ball_in_dri
                         AngularVelocity::zero(), timestamp);
 
     EXPECT_TRUE(robot.isNearDribbler(ball_position));
+}
+
+TEST_F(RobotTest, get_unavailable_capabilities)
+{
+    std::set<RobotCapability> unavailable_capabilities = {
+        RobotCapability::Dribble,
+        RobotCapability::Chip,
+    };
+
+    Robot robot =
+        Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+              AngularVelocity::fromDegrees(25), current_time, unavailable_capabilities);
+
+    EXPECT_EQ(unavailable_capabilities, robot.getUnavailableCapabilities());
+}
+
+TEST_F(RobotTest, get_available_capabilities)
+{
+    std::set<RobotCapability> unavailable_capabilities = {
+        RobotCapability::Dribble,
+        RobotCapability::Chip,
+    };
+
+    Robot robot =
+        Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::fromDegrees(0),
+              AngularVelocity::fromDegrees(25), current_time, unavailable_capabilities);
+
+    // available capabilities = all capabilities - unavailable capabilities
+    std::set<RobotCapability> all_capabilities = allRobotCapabilities();
+    std::set<RobotCapability> expected_capabilities;
+    std::set_difference(
+        all_capabilities.begin(), all_capabilities.end(),
+        unavailable_capabilities.begin(), unavailable_capabilities.end(),
+        std::inserter(expected_capabilities, expected_capabilities.begin()));
+
+    EXPECT_EQ(expected_capabilities, robot.getAvailableCapabilities());
 }

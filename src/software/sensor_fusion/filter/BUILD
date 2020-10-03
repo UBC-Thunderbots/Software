@@ -32,6 +32,7 @@ cc_test(
     srcs = ["ball_filter_test.cpp"],
     deps = [
         ":ball_filter",
+        "//software/world:field",
         "@gtest//:gtest_main",
     ],
 )
