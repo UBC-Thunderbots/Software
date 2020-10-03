@@ -71,8 +71,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         yield(move_action);
     }
 
-
-    bool hasKickedBall = false;
+    Angle kick_direction;
 
     auto kick_action = std::make_shared<KickAction>();
     do
@@ -85,10 +84,9 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
         // We want to keep trying to kick until the ball is moving along the pass
         // vector with sufficient velocity
-        Angle kick_direction = (pass.receiverPoint() - ball.position()).orientation();
-        hasKickedBall        = hasBallBeenKicked(ball, kick_direction);
+        kick_direction = (pass.receiverPoint() - ball.position()).orientation();
 
-    } while (!hasKickedBall);
+    } while (!hasBallBeenKicked(ball, kick_direction));
 }
 
 void PasserTactic::accept(MutableTacticVisitor& visitor)

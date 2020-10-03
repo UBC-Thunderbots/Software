@@ -147,7 +147,7 @@ INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInEnemyCornerOffField,
                         ::testing::Values(Point(4.6, 3), Point(4.6, -3), Point(5.0, 3),
                                           Point(5.0, -3), Point(4.5, -3.1),
                                           Point(4.0, -3.1)));
-TEST(DetectSuccessfulKickTest, ball_over_speed_threshold_and_no_direction_difference)
+TEST(HasBallBeenKickedTest, ball_over_speed_threshold_and_no_direction_difference)
 {
     Ball ball({0, 0}, {5, 5}, Timestamp::fromSeconds(0));
 
@@ -156,7 +156,7 @@ TEST(DetectSuccessfulKickTest, ball_over_speed_threshold_and_no_direction_differ
     EXPECT_TRUE(hasBallBeenKicked(ball, expected_direction.orientation()));
 }
 
-TEST(DetectSuccessfulKickTest, ball_under_speed_threshold_and_no_direction_difference)
+TEST(HasBallBeenKickedTest, ball_under_speed_threshold_and_no_direction_difference)
 {
     Ball ball({5, 2}, {0, 0.2}, Timestamp::fromSeconds(0));
 
@@ -165,7 +165,7 @@ TEST(DetectSuccessfulKickTest, ball_under_speed_threshold_and_no_direction_diffe
     EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction));
 }
 
-TEST(DetectSuccessfulKickTest,
+TEST(HasBallBeenKickedTest,
      ball_over_speed_threshold_and_small_negative_direction_difference)
 {
     Ball ball({0, 1}, {3, 0}, Timestamp::fromSeconds(0));
@@ -175,7 +175,7 @@ TEST(DetectSuccessfulKickTest,
     EXPECT_TRUE(hasBallBeenKicked(ball, expected_direction));
 }
 
-TEST(DetectSuccessfulKickTest,
+TEST(HasBallBeenKickedTest,
      ball_over_speed_threshold_and_small_positive_direction_difference)
 {
     Ball ball({0, 1}, {3, 0}, Timestamp::fromSeconds(0));
@@ -185,7 +185,7 @@ TEST(DetectSuccessfulKickTest,
     EXPECT_TRUE(hasBallBeenKicked(ball, expected_direction));
 }
 
-TEST(DetectSuccessfulKickTest, ball_over_speed_threshold_and_exceeds_direction_threshold)
+TEST(HasBallBeenKickedTest, ball_over_speed_threshold_and_large_direction_difference)
 {
     Ball ball({-5, 2}, {-3, 0}, Timestamp::fromSeconds(0));
 
@@ -193,3 +193,13 @@ TEST(DetectSuccessfulKickTest, ball_over_speed_threshold_and_exceeds_direction_t
 
     EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction));
 }
+
+TEST(HasBallBeenKickedTest, ball_under_optional_speed_threshold_and_small_direction_difference)
+{
+    Ball ball({0, 0}, {3, 0}, Timestamp::fromSeconds(0));
+
+    Angle expected_direction = Angle::fromRadians(0);
+
+    EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction, 5));
+}
+
