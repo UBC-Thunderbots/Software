@@ -165,6 +165,15 @@ TEST(HasBallBeenKickedTest, ball_under_speed_threshold_and_no_direction_differen
     EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction));
 }
 
+TEST(HasBallBeenKickedTest, ball_under_optional_speed_threshold_and_small_direction_difference)
+{
+    Ball ball({0, 0}, {3, 0}, Timestamp::fromSeconds(0));
+
+    Angle expected_direction = Angle::fromRadians(0);
+
+    EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction, 5));
+}
+
 TEST(HasBallBeenKickedTest,
      ball_over_speed_threshold_and_small_negative_direction_difference)
 {
@@ -194,12 +203,11 @@ TEST(HasBallBeenKickedTest, ball_over_speed_threshold_and_large_direction_differ
     EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction));
 }
 
-TEST(HasBallBeenKickedTest, ball_under_optional_speed_threshold_and_small_direction_difference)
+TEST(HasBallBeenKickedTest, ball_under_speed_threshold_and_large_direction_difference)
 {
-    Ball ball({0, 0}, {3, 0}, Timestamp::fromSeconds(0));
+    Ball ball({2, 2}, {0.2, 0.2}, Timestamp::fromSeconds(0));
 
-    Angle expected_direction = Angle::fromRadians(0);
+    Angle expected_direction = Angle::fromDegrees(40);
 
-    EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction, 5));
+    EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction));
 }
-
