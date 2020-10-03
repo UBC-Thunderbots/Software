@@ -107,8 +107,6 @@ float SimulatorRobot::getVelocityAngular()
 
 float SimulatorRobot::getBatteryVoltage()
 {
-    // We currently have 4s batteries on the robot that charge up to a little over
-    // 16V, so we use 16 here to approximate a fully-charged battery
     return ROBOT_MAX_BATTERY_VOLTAGE;
 }
 

@@ -119,5 +119,7 @@ const unsigned NETWORK_TIMEOUT_MS = 1000;
 // this is an int to avoid Wconversion with lwip
 const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 
-// makes the battery max voltage a constant now that we are simulating firmware
+// We currently have 4s batteries on the robot that charge up to a little over
+// 16V, so we use 16 here to approximate a fully-charged battery
+// Makes the battery max voltage a constant now that we are simulating firmware
 const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
