@@ -110,6 +110,8 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
                                              TbotsProto_Primitive primitive_msg)
 {
+    // For safety, we want to make sure that the estop primitive is assigned to the
+    // default primitive enum tag
     static_assert(TbotsProto_Primitive_estop_tag == 1,
                   "E-Stop primitive not assigned tag of 1");
 
