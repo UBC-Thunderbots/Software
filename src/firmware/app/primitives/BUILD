@@ -150,13 +150,13 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_test(
     name = "autochip_move_test",
-    srcs = ["autochip_move_primitive_test.c"],
-    hdrs = ["autochip_move_primitive.h"],
+    srcs = ["autochip_move_primitive_test.cpp"],
     deps = [
-        "autochip_move",
+        ":autochip_move",
         "@fff",
+        "@gtest//:gtest_main",
     ],
 )
 

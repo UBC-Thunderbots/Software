@@ -3,4 +3,3 @@
 
 DEFINE_FFF_GLOBALS;
 FAKE_VOID_FUNC(app_autochip_move_primitive_start);
-
