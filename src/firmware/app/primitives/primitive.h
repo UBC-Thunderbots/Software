@@ -69,7 +69,7 @@ typedef struct
 /**
  * Stop the robot by disabling all motors and disabling autokicking and autochipping
  *
- * NOTE: stop robot does not discharge capacitors
+ * NOTE: this primitive does *NOT* discharge capacitors
  *
  * @param world [in] The world containing the robot to stop
  * @param coast Whether the robot should coast when stopping (instead of braking)
