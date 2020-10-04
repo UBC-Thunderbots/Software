@@ -11,7 +11,7 @@ void app_estop_primitive_start(TbotsProto_EstopPrimitive prim_msg, void* void_st
     app_primitive_makeRobotSafe(world);
 }
 
-static void estop_tick(void* void_state_ptr, FirmwareWorld_t* world)
+static void app_estop_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     app_primitive_makeRobotSafe(world);
 }
@@ -20,6 +20,6 @@ static void estop_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * \brief The estop movement primitive.
  */
 const primitive_t ESTOP_PRIMITIVE = {.direct        = true,
-                                     .tick          = &estop_tick,
+                                     .tick          = &app_estop_primitive_tick,
                                      .create_state  = &createEstopPrimitiveState_t,
                                      .destroy_state = &destroyEstopPrimitiveState_t};

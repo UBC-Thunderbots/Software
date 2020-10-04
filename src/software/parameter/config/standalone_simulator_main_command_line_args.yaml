@@ -1,0 +1,6 @@
+StandaloneSimulatorMainCommandLineArgs:
+    interface:
+        type: "std::string"
+        default: ""
+        description: >-
+            The interface to send and receive packets over (can be found through ifconfig)

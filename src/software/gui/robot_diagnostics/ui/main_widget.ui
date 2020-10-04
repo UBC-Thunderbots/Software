@@ -969,26 +969,26 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_15">
             <item>
-             <widget class="QLabel" name="label_dribbler_power">
+             <widget class="QLabel" name="label_dribbler_rpm">
               <property name="font">
                <font>
                 <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
-               <string>Power</string>
+               <string>RPM</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSlider" name="slider_dribbler_power">
+             <widget class="QSlider" name="slider_dribbler_rpm">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_dribbler_power">
+             <widget class="QLineEdit" name="lineEdit_dribbler_rpm">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>

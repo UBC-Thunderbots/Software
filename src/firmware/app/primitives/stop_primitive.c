@@ -15,7 +15,7 @@ void app_stop_primitive_start(TbotsProto_StopPrimitive prim_msg, void* void_stat
     state->stop_type = prim_msg.stop_type;
 }
 
-static void stop_tick(void* void_state_ptr, FirmwareWorld_t* world)
+static void app_stop_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     StopPrimitiveState_t* state = (StopPrimitiveState_t*)void_state_ptr;
     app_primitive_stopRobot(world,
@@ -26,6 +26,6 @@ static void stop_tick(void* void_state_ptr, FirmwareWorld_t* world)
  * \brief The stop movement primitive.
  */
 const primitive_t STOP_PRIMITIVE = {.direct        = false,
-                                    .tick          = &stop_tick,
+                                    .tick          = &app_stop_primitive_tick,
                                     .create_state  = &createStopPrimitiveState_t,
                                     .destroy_state = &destroyStopPrimitiveState_t};

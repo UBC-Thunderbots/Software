@@ -39,6 +39,7 @@ include:
 - bool:
     name: example_bool_param
     value: true
+    constant: true
     description: >
       Can be true or false
 - int:
@@ -46,6 +47,7 @@ include:
     min: 0
     max: 5
     value: 3
+    constant: true
     description: >
       Can be any integer value in the range [min, max]
 - uint:
@@ -53,6 +55,7 @@ include:
     min: 0 # Must be >= 0
     max: 5
     value: 3
+    constant: true
     description: >
       Can be any integer value in the range [min, max].
       The minimum value must be >= 0
@@ -61,6 +64,7 @@ include:
     min: 1.1
     max: 9.01
     value: 4.04
+    constant: true
     description: >
       Can be any value in the range [min, max]
 
@@ -69,6 +73,7 @@ include:
 - string:
     name: example_string_param
     value: "Hello World"
+    constant: true
     description: >
       Any string value
 - enum:
@@ -130,11 +135,11 @@ include:
     min: 0
     max: 255
     value: 50
-    const: true
+    constant: true
     description: >
-      Parameters with the const attribute do not generate with an API to change their values.
-      They are constants. If const is not specified, it is assumed to be false.
+      Parameters with the constant attribute do not generate with an API to change their values.
+      They are constant. If constant is not specified, it is assumed to be false.
 
-      Only parameters that are marked as const will be generated for C code. We assume
+      Only parameters that are marked as constant will be generated for C code. We assume
       that C code is firmware that we cannot change at runtime because it is running
       on the robots (not the main AI computer).

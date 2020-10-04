@@ -71,7 +71,7 @@ class RobotDiagnosticsGUI : public QMainWindow
                                       DirectPerWheelMode direct_per_wheel_mode);
     void onDirectVelocityPowerChanged(double direct_per_wheel_power,
                                       DirectVelocityMode direct_velocity_mode);
-    void onDribblerPowerChanged(double dribbler_power);
+    void onDribblerRPMChanged(double dribbler_rpm);
 
     /**
      * Sends a primitive set msg to the primitive_buffer
