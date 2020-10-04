@@ -61,7 +61,7 @@ std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
     output_stream << "Receiver: " << pass.receiver_point
                   << ", Passer: " << pass.passer_point
                   << " Speed (m/s): " << pass.pass_speed_m_per_s
-                  << " Start Time (s): " << pass.pass_start_time.getSeconds();
+                  << " Start Time (s): " << pass.pass_start_time.toSeconds();
 
     return output_stream;
 }

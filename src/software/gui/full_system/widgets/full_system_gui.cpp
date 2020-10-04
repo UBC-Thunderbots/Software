@@ -49,10 +49,9 @@ FullSystemGUI::FullSystemGUI(
     connect(data_per_second_timer, &QTimer::timeout, this,
             &FullSystemGUI::updateDataPerSecondLCD);
     update_timer->start(static_cast<int>(
-        Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
-    data_per_second_timer->start(
-        static_cast<int>(Duration::fromSeconds(DATA_PER_SECOND_UPDATE_INTERVAL_SECONDS)
-                             .getMilliseconds()));
+        Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).toMilliseconds()));
+    data_per_second_timer->start(static_cast<int>(
+        Duration::fromSeconds(DATA_PER_SECOND_UPDATE_INTERVAL_SECONDS).toMilliseconds()));
 }
 
 void FullSystemGUI::handleUpdate()

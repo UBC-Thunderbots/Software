@@ -30,9 +30,9 @@ RobotDiagnosticsGUI::RobotDiagnosticsGUI(
         auto direct_control_primitive = createDirectControlPrimitiveFromUI();
         pushPrimitiveSetToBuffer(*direct_control_primitive);
     });
-    update_timer->start(static_cast<int>(update_timer_interval.getMilliseconds()));
+    update_timer->start(static_cast<int>(update_timer_interval.toMilliseconds()));
     push_primitive_timer->start(
-        static_cast<int>(push_primitive_timer_interval.getMilliseconds()));
+        static_cast<int>(push_primitive_timer_interval.toMilliseconds()));
 
     setupWidgets();
 }
