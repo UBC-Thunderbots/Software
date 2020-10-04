@@ -2,6 +2,7 @@
 #include <iostream>
 #include <numeric>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
@@ -87,6 +88,7 @@ int main(int argc, char **argv)
             visualizer = std::make_shared<ThreadedFullSystemGUI>();
 
             sensor_fusion->Subject<World>::registerObserver(visualizer);
+            ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
             ai->Subject<PlayInfo>::registerObserver(visualizer);
             backend->Subject<SensorProto>::registerObserver(visualizer);
@@ -100,7 +102,7 @@ int main(int argc, char **argv)
         }
 
         // Wait for termination
-        if (!args->headless())
+        if (!args->headless()->value())
         {
             // This blocks forever without using the CPU
             // Wait for the full_system to shut down before shutting

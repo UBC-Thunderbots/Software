@@ -70,7 +70,7 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
     for (auto it = team_robots.begin(); it != team_robots.end();)
     {
         Duration time_diff = timestamp - it->lastUpdateTimestamp();
-        if (time_diff.getSeconds() < 0)
+        if (time_diff.toSeconds() < 0)
         {
             LOG(WARNING) << "Warning: tried to remove a robot at a negative time";
             it++;
