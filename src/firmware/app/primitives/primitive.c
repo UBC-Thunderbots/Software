@@ -30,6 +30,8 @@ void app_primitive_stopRobot(FirmwareWorld_t *world, bool coast)
 
 void app_primitive_makeRobotSafe(FirmwareWorld_t *world)
 {
+    // NOTE: this code is important for the safety of estop, especially discharging
+    // capacitors. Do not make changes without testing that estop continues to work
     app_primitive_stopRobot(world, false);
 
     // Discharge capacitors
