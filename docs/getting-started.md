@@ -142,13 +142,12 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 ### Running our AI, Simulator or Robot Diagnostics
 
 1. Open your terminal and run `ifconfig`.
-2. Locate the network interfaces available on your computer. `eth0`, `wlan0`, and `wlp3s0` are common interfaces.
-3. Pick the network interface you would like to use:
+2. Pick the network interface you would like to use:
     1. If you are running things locally, you can pick any interface that is not `lo`
     2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
-4. Run AI: `bazel run //software:full_system -- --interface=interface_here --backend=WifiBackend`
-5. Run Simulator: `bazel run //software/simulation:standalone_simulator_main -- --interface=interface_here`
-6. Run Robot Diagnostics: `bazel run //software/gui/robot_diagnostics:robot_diagnostics_main -- --interface=interface_here --backend=WifiBackend`
+3. Run AI: `bazel run //software:full_system -- --interface=interface_here --backend=WifiBackend`
+4. Run Simulator: `bazel run //software/simulation:standalone_simulator_main -- --interface=interface_here`
+5. Run Robot Diagnostics: `bazel run //software/gui/robot_diagnostics:robot_diagnostics_main -- --interface=interface_here --backend=WifiBackend`
 
 
 ## Debugging
