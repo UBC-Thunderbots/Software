@@ -5,55 +5,55 @@
 TEST(DurationTest, default_constructor)
 {
     Duration d;
-    EXPECT_DOUBLE_EQ(d.getSeconds(), 0);
+    EXPECT_DOUBLE_EQ(d.toSeconds(), 0);
 }
 
 TEST(DurationTest, create_duration_from_positive_seconds)
 {
     Duration duration = Duration::fromSeconds(1.0);
-    EXPECT_DOUBLE_EQ(duration.getSeconds(), 1.0);
+    EXPECT_DOUBLE_EQ(duration.toSeconds(), 1.0);
 }
 
 TEST(DurationTest, create_duration_from_negative_seconds)
 {
     Duration duration = Duration::fromSeconds(-0.2);
-    EXPECT_DOUBLE_EQ(duration.getSeconds(), -0.2);
+    EXPECT_DOUBLE_EQ(duration.toSeconds(), -0.2);
 }
 
 TEST(DurationTest, create_duration_from_zero_milliseconds)
 {
     Duration duration = Duration::fromMilliseconds(0);
-    EXPECT_DOUBLE_EQ(duration.getMilliseconds(), 0);
+    EXPECT_DOUBLE_EQ(duration.toMilliseconds(), 0);
 }
 
 TEST(DurationTest, create_duration_from_negative_milliseconds)
 {
     Duration duration = Duration::fromMilliseconds(-125);
-    EXPECT_DOUBLE_EQ(duration.getMilliseconds(), -125);
+    EXPECT_DOUBLE_EQ(duration.toMilliseconds(), -125);
 }
 
 TEST(DurationTest, create_duration_from_positive_milliseconds)
 {
     Duration duration = Duration::fromMilliseconds(125);
-    EXPECT_DOUBLE_EQ(duration.getMilliseconds(), 125);
+    EXPECT_DOUBLE_EQ(duration.toMilliseconds(), 125);
 }
 
 TEST(DurationTest, get_seconds_duration_in_milliseconds)
 {
     Duration duration = Duration::fromSeconds(5);
-    EXPECT_DOUBLE_EQ(duration.getMilliseconds(), 5000);
+    EXPECT_DOUBLE_EQ(duration.toMilliseconds(), 5000);
 }
 
 TEST(DurationTest, get_seconds_duration_in_seconds)
 {
     Duration duration = Duration::fromSeconds(5);
-    EXPECT_DOUBLE_EQ(duration.getSeconds(), 5);
+    EXPECT_DOUBLE_EQ(duration.toSeconds(), 5);
 }
 
 TEST(DurationTest, create_millisecond_duration_in_seconds)
 {
     Duration duration = Duration::fromMilliseconds(300);
-    EXPECT_DOUBLE_EQ(duration.getSeconds(), 0.3);
+    EXPECT_DOUBLE_EQ(duration.toSeconds(), 0.3);
 }
 
 TEST(DurationTest, test_equality_operator)

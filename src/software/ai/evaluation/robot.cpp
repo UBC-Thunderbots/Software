@@ -132,7 +132,7 @@ std::optional<STATE_TYPE> findState(boost::circular_buffer<STATE_TYPE> states,
     for (const auto& state : states)
     {
         double timestamp_diff =
-            std::abs((timestamp - state.timestamp()).getMilliseconds());
+            std::abs((timestamp - state.timestamp()).toMilliseconds());
 
         // If timestamp is close to desired timestamp, return the index.
         if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
