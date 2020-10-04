@@ -143,15 +143,19 @@ std::optional<STATE_TYPE> findState(boost::circular_buffer<STATE_TYPE> states,
     return std::nullopt;
 }
 
-bool pointNearRobot(Point point, Robot robot) {
-    Vector vector_to_test_point = point - robot.position();
+bool pointNearRobot(Point point, Robot robot)
+{
+    Vector vector_to_test_point                     = point - robot.position();
     static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + 0.2;
-    if (vector_to_test_point.length() > POSSESSION_THRESHOLD_METERS) {
+    if (vector_to_test_point.length() > POSSESSION_THRESHOLD_METERS)
+    {
         return false;
-    } else {
+    }
+    else
+    {
         // check that ball is in a 90-degree cone in front of the robot
         auto ball_to_robot_angle =
-                robot.orientation().minDiff(vector_to_test_point.orientation());
+            robot.orientation().minDiff(vector_to_test_point.orientation());
         return (ball_to_robot_angle < Angle::fromDegrees(45.0));
     }
 }
