@@ -20,7 +20,6 @@
 #include "firmware/app/primitives/autokick_move_primitive.h"
 #include "firmware/app/primitives/chip_primitive.h"
 #include "firmware/app/primitives/direct_control_primitive.h"
-#include "firmware/app/primitives/estop_primitive.h"
 #include "firmware/app/primitives/kick_primitive.h"
 #include "firmware/app/primitives/move_primitive.h"
 #include "firmware/app/primitives/primitive.h"
@@ -131,14 +130,6 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     // Figure out which primitive we're running and start it
     switch (primitive_msg.which_primitive)
     {
-        case TbotsProto_Primitive_estop_tag:
-        {
-            manager->current_primitive       = &ESTOP_PRIMITIVE;
-            manager->current_primitive_state = manager->current_primitive->create_state();
-            app_estop_primitive_start(primitive_msg.primitive.estop,
-                                      manager->current_primitive_state, world);
-            break;
-        }
         case TbotsProto_Primitive_stop_tag:
         {
             manager->current_primitive       = &STOP_PRIMITIVE;
@@ -205,8 +196,9 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
         }
         default:
         {
+            // the estop case is handled here
             app_primitive_makeRobotSafe(world);
-            assert(false);
+            return;
         }
     }
 
