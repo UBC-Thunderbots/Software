@@ -82,6 +82,7 @@ cc_test(
     srcs = ["corner_kick_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        "//software/ai/evaluation:robot",
         "//software/ai/hl/stp/play:corner_kick_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/simulated_tests/validation_functions",

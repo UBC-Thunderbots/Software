@@ -68,3 +68,5 @@ std::optional<bool> robotBeingPassedTo(const BallHistory& ball_states,
 template <typename STATE_TYPE>
 std::optional<STATE_TYPE> findState(boost::circular_buffer<STATE_TYPE> states,
                                     Timestamp& timestamp);
+
+bool pointNearRobot(Point point, Robot robot);
