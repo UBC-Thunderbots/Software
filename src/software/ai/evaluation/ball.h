@@ -50,7 +50,8 @@ bool ballInEnemyCorner(const Field &field, const Ball &ball, double radius);
  * @param ball The ball that can be kicked
  * @param expected_kick_direction The direction that we expect the ball to be kicked
  * towards
- * @param min_kick_speed The minimum speed of the ball to be considered a kick, in metres per second
+ * @param min_kick_speed The minimum speed of the ball to be considered a kick, in metres
+ * per second
  *
  * @return True if ball was kicked in the approximate direction we expect, false otherwise
  */

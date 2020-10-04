@@ -34,7 +34,6 @@ bool hasBallBeenKicked(const Ball &ball, const Angle &expected_kick_direction,
     Angle kick_orientation_difference =
         ball.velocity().orientation().minDiff(expected_kick_direction);
 
-    return (kick_orientation_difference.abs() <
-                MAX_ANGLE_DIFFERENCE &&
+    return (kick_orientation_difference.abs() < MAX_ANGLE_DIFFERENCE &&
             ball.velocity().length() > min_kick_speed);
 }

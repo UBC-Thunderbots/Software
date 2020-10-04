@@ -165,7 +165,8 @@ TEST(HasBallBeenKickedTest, ball_under_speed_threshold_and_no_direction_differen
     EXPECT_FALSE(hasBallBeenKicked(ball, expected_direction));
 }
 
-TEST(HasBallBeenKickedTest, ball_under_optional_speed_threshold_and_small_direction_difference)
+TEST(HasBallBeenKickedTest,
+     ball_under_optional_speed_threshold_and_small_direction_difference)
 {
     Ball ball({0, 0}, {3, 0}, Timestamp::fromSeconds(0));
 
