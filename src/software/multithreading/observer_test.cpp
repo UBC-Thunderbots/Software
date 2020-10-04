@@ -58,6 +58,17 @@ TEST(Observer, getDataReceivedPerSecond_time_buffer_filled)
     EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 5 / (4 * 0.01), 10);
 }
 
+TEST(Observer, getDataReceivedPerSecond_time_buffer_filled_twice_over)
+{
+    TestObserver test_observer;
+    for (unsigned int i = 0; i < TestObserver::TIME_BUFFER_SIZE * 2; i++)
+    {
+        test_observer.receiveValue(i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 5 / (4 * 0.005), 10);
+}
+
 TEST(Observer, getDataReceivedPerSecond_time_buffer_empty)
 {
     TestObserver test_observer;
@@ -72,6 +83,9 @@ TEST(Observer, getDataReceivedPerSecond_time_buffer_partially_empty)
         test_observer.receiveValue(i);
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+
+    // the data received value is noisy when the buffer is partially empty, so we allow a
+    // large margin of error
     EXPECT_NEAR(test_observer.getDataReceivedPerSecond(),
-                (TestObserver::TIME_BUFFER_SIZE / 2) / (1 * 0.01), 35);
+                (TestObserver::TIME_BUFFER_SIZE / 2) / (1 * 0.01), 100);
 }
