@@ -11,9 +11,10 @@
     * [Ball](#ball)
     * [Field](#field)
     * [Gamestate](#gamestate)
-  * [Primitives](#primitives)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
+* [Important Protobuf Messages](#important-protobuf-messages)
+  * [Primitives](#primitives)
   * [Robot Status](#robot-status)
 * [Design Patterns](#design-patterns)
   * [Abstract Classes and Inheritance](#abstract-classes-and-inheritance)
@@ -98,16 +99,6 @@ The Field class represents the state of the physical field being played on, whic
 ### GameState
 These represent the current state of the game as dictated by the Gamecontroller. These provide functions like `isPlaying()`, `isHalted()` which tell the rest of the system what game state we are in, and make decisions accordingly. We need to obey the rules!
 
-
-## Primitives
-Primitives are very simple actions of things a robot can do. It does not represent or include _how_ these things are done. Some examples are:
-* Moving in a straight line to a position
-* Pivoting around a point
-* Kicking the ball at a certain direction
-
-Primitives act as the abstraction between our AI, and our robot firmware. It's much easier for our AI to send a `Primitive` to a robot telling it what it wants it to do, and have the robot responsible for making sure it does what it's told. For every `Primitive` in our `AI` software, there is an equivalent `Primitive` implementation in our robot firmware. When robots receive a `Primitive` command, they perform their own logic and control in order to perform the task specified by the `Primitive`.
-
-
 ## Intents
 An `Intent` represents a simple thing the `AI` wants (or intends for) a robot to do. It does not represent or include _how_ these things are achieved. Some examples are:
 * Moving to a position (without colliding with anything on its way)
@@ -115,7 +106,6 @@ An `Intent` represents a simple thing the `AI` wants (or intends for) a robot to
 * Kicking the ball at a certain direction or at a target
 
 Intents are very similar to Primitives, but include slightly more logic. `Intents` can include extra parameters or data that `Primitives` do not, such as how much to avoid the ball by while moving. In this way, `Intents` are more "context-aware" than `Primitives`, and represent slightly higher-level commands.
-
 
 ## Dynamic Parameters
 `Dynamic Parameters` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! Using `Dynamic Parameters` saves us from having to stop the [AI](#ai), change a constant, recompile the code, and restart the [AI](#ai).
@@ -127,15 +117,25 @@ Here's a slightly more relevant example of how we used `Dynamic Parameters` duri
 It is worth noting that constants are still useful, and should still be used whenever possible. If a value realistically doesn't need to be changed, it should be a constant (with a nice descriptive name) rather than a `Dynamic Parameter`. Having too many `Dynamic Parameters` is overwhelming because there are too many values to understand and change, and this can make it hard to tune values to get the desired behaviour while under pressure during a game.
 
 
+# Protobuf Messages
+These are protobuf messages that we define that are important for understanding how the AI works.
+
+## Primitives
+`TbotsProto::Primitive`s represent simple actions that a robot can do. It does not represent or include _how_ these things are done. Some examples are:
+* Moving in a straight line to a position
+* Pivoting around a point
+* Kicking the ball at a certain direction
+
+Primitives act as the abstraction between our AI and our robot firmware. It splits the responsibility such that the AI is responsible for sending a `Primitive` to a robot telling it what it wants it to do, and the robot is responsible for making sure it does what it's told. For every `Primitive` protobuf message, there is an equivalent `Primitive` implementation in our robot firmware. When robots receive a `Primitive` command, they perform their own logic and control in order to perform the task specified by the `Primitive`.
+
 ## Robot Status
-The `Robot Status` class contains information about the status of a single robot. Examples of the information they include are:
+The `TbotsProto::RobotStatus` protobuf message contains information about the status of a single robot. Examples of the information they include are:
 * Robot battery voltage
 * Whether or not the robot senses the ball in the breakbeam
 * The capacitor charge on the robot
 * The temperature of the dribbler motor
 
-Information received from the robots is stored in `Robot Status` objects so that the rest of the system can easily access and make sense of the information if necessary. For example, we monitor incoming `Robot Status` and display warnings in the [Visualizer](#visualizer) if anything looks wrong so we can be alerted. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
-
+Information about the robot status is communicated and stored as `RobotStatus` protobuf messages. For example, we monitor incoming `RobotStatus` and display warnings in the [Visualizer](#visualizer) if anything looks wrong so we can be alerted. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
 
 # Design Patterns
 Below are the main design patterns we use in our code, and what they are used for.
@@ -150,7 +150,6 @@ Examples of this can be found in many places, including:
 * [Tactics](#tactics)
 * [Actions](#skills--actions)
 * [Intents](#intents)
-* [Primitives](#primitives)
 * Different implementations of the [Backend](#backend)
 
 
@@ -177,13 +176,12 @@ The Factory pattern is also used to create different [Backends](#backend)
 
 
 ## Visitor Design Pattern
-The `Visitor Design Pattern` is arguably the most "advanced" design pattern we use. It is used when we need to perform different operations on a group of "similar" objects, for example a bunch of objects that inherit from the same parent class (eg. [Primitives](#primitives) or [Intents](#intents)). We might only know all these objects are an [Intent](#intent), but we don't know specifically which type each one is (eg. `MoveIntent` vs `KickIntent`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
+The `Visitor Design Pattern` is arguably the most "advanced" design pattern we use. It is used when we need to perform different operations on a group of "similar" objects, for example a bunch of objects that inherit from the same parent class ([Intents](#intents)). We might only know all these objects are an [Intent](#intent), but we don't know specifically which type each one is (eg. `MoveIntent` vs `KickIntent`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
 
 Read [https://www.geeksforgeeks.org/visitor-design-pattern/] for more information.
 
 Examples of the Visitor Pattern can be found with the following classes:
 * [Intents](#intents)
-* [Primitives](#primitives)
 * [Tactics](#tactics)
 
 
@@ -345,7 +343,7 @@ The `Backend` is responsible for all communication with the "outside world". The
 ### Output Responsibilities
 1. Sending robot primitives to the robots
 
-In practice, the `Backend` is just a simple interface that specifies [World](#world) and [Robot Status](#robot-status) objects must be produced, and [Primitves](#primitives) may be consumed. The interface is very generic so that different implementations may be swapped out in order to communicate with different hardware / protocols / programs. For example, we have multiple implementations of the "output" part of the backend: one that lets us send data to our real robots using the radio, and one that sends commands to simulated robots in the simulator.
+In practice, the `Backend` is just a simple interface that specifies [World](#world) and [Robot Status](#robot-status) objects must be produced, and [Primitives](#primitives) may be consumed. The interface is very generic so that different implementations may be swapped out in order to communicate with different hardware / protocols / programs. For example, we have multiple implementations of the "output" part of the backend: one that lets us send data to our real robots using the radio, and one that sends commands to simulated robots in the simulator.
 
 
 #### Backend Diagram
@@ -400,15 +398,17 @@ Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics
 
 Furthermore, every play specifies an `Applicable` and `Invariant` condition. These are used to determine what plays should be run at what time, and when a Play should terminate.
 
-`Applicable` indicates when a `Play` can be started. For example, we would not want to start a `Defense Play` if our team is in possession of the ball. The `Invariant` condition is a condition that must always be met for the `Play` to continue running. If this condition ever becomes false, the current `Play` will stop running and a new one will be chosen. For example, once we start running a friendly `Corner Kick` play, we want the `Play` to continue running as long as the enemy team does not have possession of the bali.
+`Applicable` indicates when a `Play` can be started. For example, we would not want to start a `Defense Play` if our team is in possession of the ball. The `Invariant` condition is a condition that must always be met for the `Play` to continue running. If this condition ever becomes false, the current `Play` will stop running and a new one will be chosen. For example, once we start running a friendly `Corner Kick` play, we want the `Play` to continue running as long as the enemy team does not have possession of the ball.
 
 
 ## Navigation
 The `Navigator` is responsible for path planning and navigation. Once our strategy has decided what it wants to do, it passes the resulting [Intents](#intents) to the `Navigator`. The `Navigator` is then responsible for breaking down the [Intents](#intents) and turning them into [Primitives](#primitives).
 
-Most [Intents](#intents) are easy to break down into  [Primitives](#primitives), and can typically just be converted directly without having to do any extra work. However, some [Intents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behaviour like obstacle avoidance. This is where the "Navigation" part of the `Navigator` comes in.
+Most [Intents](#intents) are easy to break down into [Primitives](#primitives), and can be converted directly without having to do any extra work. These are called `DirectPrimitiveIntent`s and are directed converted by the `Navigator`.
 
-In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
+However, some [Intents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behaviour like obstacle avoidance. These are called `NavigatingIntent`s and the `Navigator` passes these into the `NavigatingPrimitiveCreator` to do "Navigation"
+
+In order for a robot to move to the desired destination of a `NavigatingIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `NavigatingIntent`. The `NavigatingPrimitiveCreator` then translates this path into a series of `Primitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
 
 ### Path Manager
 The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of [Path Objective](#path-objective)s and [Path Planner](#path-planner), and it will generate paths using the given path planner and arbitrate between paths to prevent collisions.
