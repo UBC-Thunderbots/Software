@@ -10,7 +10,7 @@
     * [Robot](#robot)
     * [Ball](#ball)
     * [Field](#field)
-    * [Gamestate](#gamestate)
+    * [GameState](#gamestate)
   * [Primitives](#primitives)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
@@ -34,9 +34,9 @@
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
   * [Backend](#backend)
-    * [Input](#input-responsibilities)
-    * [Output](#output-responsibilities)
     * [Diagram](#backend-diagram)
+  * [Sensor Fusion](#sensor-fusion)
+    * [Filters](#filters)
   * [AI](#ai)
     * [Strategy](#strategy)
       * [Skills / Actions](#skills--actions)
@@ -78,7 +78,7 @@ A few commonly-used terms and tools to be familiar with:
 
 
 # Important Classes
-These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [AI](#ai), and [Visualizer](#visualizer).
+These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [Sensor Fusion](#sensor-fusion), [AI](#ai), and [Visualizer](#visualizer).
 
 ## World
 The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current referee commands. Altogether, it's the information we have at any given time that we can use to make decisions.
@@ -198,7 +198,7 @@ In our system, we need to be able to do multiple things (receive camera data, ru
 **WARNING:** If a class extends multiple `ThreadedObserver`s (for example, `AI` could extend `ThreadedObserver<World>` and `ThreadedObserver<RobotStatus>`), then there will be two threads running, one for each observer. We **do not check** for data race conditions between observers, so it's entirely possible that one `ThreadedObserver` thread could read/write from data at the same time as the other `ThreadedObserver` is reading/writing the same data. Please make sure any data read/written to/from multiple `ThreadedObserver`s is thread-safe.
 
 ### Example
-One example of this is the `Backend`, which extends `Subject<World>` and the `AI`, which extends `ThreadedObserver<World>`. The backend runs in one thread and sends data to the AI, which receives and processes it another thread.
+One example of this is the `SensorFusion`, which extends `Subject<World>` and the `AI`, which extends `ThreadedObserver<World>`. The backend runs in one thread and sends data to the AI, which receives and processes it another thread.
 
 ## C++ Templating
 While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
@@ -308,7 +308,7 @@ In order to overcome this, our convention is that:
 
 This is easiest to understand in the [diagram](#convention-diagram) below.
 
-Based on what side we are defending, the [Backend](#backend) will transform all the coordinates of incoming data so that it will match our convention. This means that from the perspective of the rest of the system, the friendly half of the field is always negative x and the enemy half is always positive x. Now when we want to tell a robot to move to the friendly goal, we can simply tell it so move to `(-4.5, 0)` and we know this will _always_ be the friendly side. All of our code is written with the assumption in mind.
+Based on what side we are defending, [Sensor Fusion](#sensor-fusion) will transform all the coordinates of incoming data so that it will match our convention. This means that from the perspective of the rest of the system, the friendly half of the field is always negative x and the enemy half is always positive x. Now when we want to tell a robot to move to the friendly goal, we can simply tell it so move to `(-4.5, 0)` and we know this will _always_ be the friendly side. All of our code is written with the assumption in mind.
 
 ## Angles
 Going along with our coordinate convention, we have a convention for angles as well. An Angle of `0` is along the positive x-axis (facing the enemy goal), and positive rotation is counter-clockwise (from a perspective above the field, looking at it like a regular x-y plane where +y is "up"). See the [diagram](#convention-diagram) below.
@@ -320,9 +320,9 @@ Because of our [Coordinate Conventions](#coordinates), this means that an angle 
 
 
 # Architecture Overview
-At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern). Together, they are what make up our AI.
+At a high-level our system is made of 3 main components: The [Backend](#backend), the [Sensor Fusion](#sensor-fusion), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern). Together, they are what make up our AI.
 
-The Backend is responsible for communicating with the outside world (network and radio), the AI is what makes the actual gameplay decisions, and the Visualizer shows us what's happening and lets us control the AI.
+The `Backend` is responsible for communicating with the outside world (network and radio), `Sensor Fusion` is responsible for processing and filtering raw data, the `AI` makes the actual gameplay decisions, and the `Visualizer` shows us what's happening and lets us control the `AI`.
 
 Each component is described in more detail in their own sections.
 
@@ -331,29 +331,33 @@ Each component is described in more detail in their own sections.
 
 
 # Backend
-The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into Input and Output.
+The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication with `SensorProto` and [Primitives](#primitives) messages:
 
-### Input Responsibilities
-1. Receiving robot status messages
-2. Receiving vision data about where the robots and ball are (typically provided by [SSL-Vision](#ssl-vision))
-2. Receiving referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
-3. Filtering the received data
-    * **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
-4. Storing the filtered data into the [World](#world) datastructures understood by our system
-5. Sending the filtered data to the rest of the system
+* Upon receiving the following messages, the `Backend` will store it in a `SensorProto` message and send it to [Sensor Fusion](sensor-fusion):
+  * Robot status messages
+  * Vision data about where the robots and ball are (typically from [SSL-Vision](#ssl-vision))
+  * Referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
 
-### Output Responsibilities
-1. Sending robot primitives to the robots
+* Upon receiving [Primitives](#primitives) from the [AI](#ai), `Backend` will send the primitives to the robots or the [Simulator](#simulator).
 
-In practice, the `Backend` is just a simple interface that specifies [World](#world) and [Robot Status](#robot-status) objects must be produced, and [Primitves](#primitives) may be consumed. The interface is very generic so that different implementations may be swapped out in order to communicate with different hardware / protocols / programs. For example, we have multiple implementations of the "output" part of the backend: one that lets us send data to our real robots using the radio, and one that sends commands to simulated robots in the simulator.
+The `Backend` was designed to be a simple interface that handles all communication with the "outside world", allowing for different implementations that can be swapped out in order to communicate with different hardware / protocols / programs.
 
 
 #### Backend Diagram
 ![Backend Diagram](images/backend_diagram.svg)
 
+# Sensor Fusion
+`Sensor Fusion` is responsible for processing the raw data contained in SensorProto into a coherent snapshot of the [World](#world) that the [AI](#ai) can use. It invokes filters to update components of [World](#world), and then combines the components to send out the most up-to-date version.
+
+## Filters
+Filters take the raw data from SensorProto and returns an updated version of a component of the [World](#world). For example, the `BallFilter` takes `BallDetection`s and returns an updated `Ball`.
+    * **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
+
+Filters provide a flexible way to modularize the processing of raw data, making it easy to update filters and add new ones. Filters are sometimes stateful. For example, the `BallFilter` "remembers" previous locations of the ball in order to estimate the ball's current velocity.
+
 
 # AI
-The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from the [Backend](#backend) to make decisions, and sends [Primitives](#primitives) back to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
+The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from [Sensor Fusion](#sensor-fusion) to make decisions, and sends [Primitives](#primitives) to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
 
 The 2 main components of the AI are strategy and navigation.
 
