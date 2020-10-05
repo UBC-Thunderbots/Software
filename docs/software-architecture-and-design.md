@@ -105,7 +105,7 @@ An `Intent` represents a simple thing the [AI](#ai) wants (or intends for) a rob
 * Pivoting around a point
 * Kicking the ball at a certain direction or at a target
 
-There are two types of `Intent`s: `DirectPrimitiveIntent`s and `NavigatingIntent`s. `DirectPrimitiveIntent`s directly represent the [Primitives](#primitives) that the AI is trying to send to the the robots. `NavigatingIntent`s are intents that require moving while avoiding obstacles, so they contain extra parameters to help with [Navigation](#navigation).
+There are two types of `Intent`s: `DirectPrimitiveIntent`s and `NavigatingIntent`s. `DirectPrimitiveIntent`s directly represent the [Primitives](#primitives) that the AI is trying to send to the robots. `NavigatingIntent`s are intents that require moving while avoiding obstacles, so they contain extra parameters to help with [Navigation](#navigation).
 
 ## Dynamic Parameters
 `Dynamic Parameters` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! Using `Dynamic Parameters` saves us from having to stop the [AI](#ai), change a constant, recompile the code, and restart the [AI](#ai).
@@ -118,7 +118,7 @@ It is worth noting that constants are still useful, and should still be used whe
 
 
 # Important Protobuf Messages
-These are protobuf messages that we define and that are important for understanding how the [AI](#ai) works.
+These are [protobuf](https://developers.google.com/protocol-buffers/docs/cpptutorial) messages that we define and that are important for understanding how the [AI](#ai) works.
 
 ## Primitives
 `TbotsProto::Primitive`s represent simple actions that a robot can do. It does not represent or include _how_ these things are done. Some examples are:
