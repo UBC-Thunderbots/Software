@@ -192,6 +192,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//software/ai/evaluation:ball",
         "//software/ai/hl/stp/action:intercept_ball_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
