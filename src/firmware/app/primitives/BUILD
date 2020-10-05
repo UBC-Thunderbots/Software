@@ -1,22 +1,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "direct_control",
-    srcs = ["direct_control_primitive.c"],
-    hdrs = ["direct_control_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//shared/proto:tbots_nanopb_proto",
-    ],
-)
-
-cc_library(
     name = "primitive",
     srcs = ["primitive.c"],
     hdrs = ["primitive.h"],
     deps = [
         "//firmware/app/world:firmware_world",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -51,6 +41,16 @@ cc_library(
 )
 
 cc_library(
+    name = "direct_control",
+    srcs = ["direct_control_primitive.c"],
+    hdrs = ["direct_control_primitive.h"],
+    deps = [
+        ":primitive",
+        "//firmware/app/control",
+    ],
+)
+
+cc_library(
     name = "chick_motion",
     srcs = ["chick_motion.c"],
     hdrs = ["chick_motion.h"],
@@ -73,7 +73,6 @@ cc_library(
     deps = [
         "chick_motion",
         ":primitive",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -84,7 +83,6 @@ cc_library(
     deps = [
         "chick_motion",
         ":primitive",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -97,7 +95,6 @@ cc_library(
         "//firmware/app/control",
         "//firmware/app/control:bangbang",
         "//firmware/shared:physics",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -114,7 +111,6 @@ cc_library(
         "//firmware/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -125,7 +121,6 @@ cc_library(
     deps = [
         "move_helper",
         ":primitive",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -136,7 +131,6 @@ cc_library(
     deps = [
         "move_helper",
         ":primitive",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -147,7 +141,6 @@ cc_library(
     deps = [
         "move_helper",
         ":primitive",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -157,6 +150,5 @@ cc_library(
     hdrs = ["stop_primitive.h"],
     deps = [
         ":primitive",
-        "//shared/proto:tbots_nanopb_proto",
     ],
 )

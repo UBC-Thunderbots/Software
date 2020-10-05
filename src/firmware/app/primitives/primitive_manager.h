@@ -2,7 +2,6 @@
 
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/world/firmware_world.h"
-#include "shared/proto/primitive.nanopb.h"
 
 typedef struct PrimitiveManager PrimitiveManager_t;
 

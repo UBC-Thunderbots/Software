@@ -1,6 +1,7 @@
 #include "firmware/app/primitives/primitive.h"
 
-void app_primitive_stopRobot(FirmwareWorld_t *world, bool coast)
+void app_primitive_stopRobot(FirmwareWorld_t *world,
+                             TbotsProto_StopPrimitive_StopType stop_type)
 {
     FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
     Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
@@ -10,7 +11,7 @@ void app_primitive_stopRobot(FirmwareWorld_t *world, bool coast)
     app_chicker_disableAutochip(chicker);
     app_chicker_disableAutokick(chicker);
     void (*wheel_op)(const Wheel_t *wheel);
-    if (coast)
+    if (stop_type == TbotsProto_StopPrimitive_StopType_COAST)
     {
         wheel_op = app_wheel_coast;
         app_dribbler_coast(dribbler);

@@ -10,16 +10,14 @@ void app_stop_primitive_start(TbotsProto_StopPrimitive prim_msg, void* void_stat
                               FirmwareWorld_t* world)
 {
     StopPrimitiveState_t* state = (StopPrimitiveState_t*)void_state_ptr;
-    app_primitive_stopRobot(
-        world, prim_msg.stop_type == TbotsProto_StopPrimitive_StopType_COAST);
+    app_primitive_stopRobot(world, prim_msg.stop_type);
     state->stop_type = prim_msg.stop_type;
 }
 
 static void app_stop_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     StopPrimitiveState_t* state = (StopPrimitiveState_t*)void_state_ptr;
-    app_primitive_stopRobot(world,
-                            state->stop_type == TbotsProto_StopPrimitive_StopType_COAST);
+    app_primitive_stopRobot(world, state->stop_type);
 }
 
 /**
