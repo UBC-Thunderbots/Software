@@ -4,6 +4,8 @@
 
 #include <stdexcept>
 
+#include <unordered_set>
+
 class TeamTest : public ::testing::Test
 {
    protected:
@@ -568,8 +570,13 @@ TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_3)
     team.updateRobots({robot_0, robot_1, robot_2});
     team.assignGoalie(0);
 
-    EXPECT_EQ(std::vector<Robot>({robot_1, robot_2}), team.getAllRobotsExceptGoalie());
-}
+    std::unordered_set<int> returned_robot_ids;
+    for (const auto& robot : team.getAllRobotsExceptGoalie()) {
+        returned_robot_ids.emplace(robot.id());
+    }
+    EXPECT_EQ(returned_robot_ids.find(0), returned_robot_ids.end());
+    EXPECT_NE(returned_robot_ids.find(1), returned_robot_ids.end());
+    EXPECT_NE(returned_robot_ids.find(2), returned_robot_ids.end());}
 
 TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_4)
 {
@@ -589,6 +596,13 @@ TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_4)
     team.updateRobots({robot_0, robot_1, robot_2, robot_3});
     team.assignGoalie(2);
 
-    EXPECT_EQ(std::vector<Robot>({robot_0, robot_1, robot_3}),
-              team.getAllRobotsExceptGoalie());
+    std::unordered_set<int> returned_robot_ids;
+    for (const auto& robot : team.getAllRobotsExceptGoalie()) {
+        returned_robot_ids.emplace(robot.id());
+    }
+    EXPECT_EQ(returned_robot_ids.find(2), returned_robot_ids.end());
+    EXPECT_NE(returned_robot_ids.find(0), returned_robot_ids.end());
+    EXPECT_NE(returned_robot_ids.find(1), returned_robot_ids.end());
+    EXPECT_NE(returned_robot_ids.find(3), returned_robot_ids.end());
+
 }
