@@ -117,8 +117,8 @@ Here's a slightly more relevant example of how we used `Dynamic Parameters` duri
 It is worth noting that constants are still useful, and should still be used whenever possible. If a value realistically doesn't need to be changed, it should be a constant (with a nice descriptive name) rather than a `Dynamic Parameter`. Having too many `Dynamic Parameters` is overwhelming because there are too many values to understand and change, and this can make it hard to tune values to get the desired behaviour while under pressure during a game.
 
 
-# Protobuf Messages
-These are protobuf messages that we define that are important for understanding how the AI works.
+# Important Protobuf Messages
+These are protobuf messages that we define and that are important for understanding how the AI works.
 
 ## Primitives
 `TbotsProto::Primitive`s represent simple actions that a robot can do. It does not represent or include _how_ these things are done. Some examples are:
