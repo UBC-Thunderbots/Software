@@ -38,7 +38,6 @@
 #include "main.h"
 #include "pb_encode.h"
 #include "priority.h"
-#include "shared/proto/primitive.nanopb.h"
 
 /**
  * \brief The number of robots in the drive packet.
