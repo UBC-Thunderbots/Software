@@ -576,7 +576,8 @@ TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_3)
     }
     EXPECT_EQ(returned_robot_ids.find(0), returned_robot_ids.end());
     EXPECT_NE(returned_robot_ids.find(1), returned_robot_ids.end());
-    EXPECT_NE(returned_robot_ids.find(2), returned_robot_ids.end());}
+    EXPECT_NE(returned_robot_ids.find(2), returned_robot_ids.end());
+}
 
 TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_4)
 {
