@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <stdexcept>
-
 #include <unordered_set>
 
 class TeamTest : public ::testing::Test
@@ -571,7 +570,8 @@ TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_3)
     team.assignGoalie(0);
 
     std::unordered_set<int> returned_robot_ids;
-    for (const auto& robot : team.getAllRobotsExceptGoalie()) {
+    for (const auto& robot : team.getAllRobotsExceptGoalie())
+    {
         returned_robot_ids.emplace(robot.id());
     }
     EXPECT_EQ(returned_robot_ids.find(0), returned_robot_ids.end());
@@ -598,12 +598,12 @@ TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_4)
     team.assignGoalie(2);
 
     std::unordered_set<int> returned_robot_ids;
-    for (const auto& robot : team.getAllRobotsExceptGoalie()) {
+    for (const auto& robot : team.getAllRobotsExceptGoalie())
+    {
         returned_robot_ids.emplace(robot.id());
     }
     EXPECT_EQ(returned_robot_ids.find(2), returned_robot_ids.end());
     EXPECT_NE(returned_robot_ids.find(0), returned_robot_ids.end());
     EXPECT_NE(returned_robot_ids.find(1), returned_robot_ids.end());
     EXPECT_NE(returned_robot_ids.find(3), returned_robot_ids.end());
-
 }
