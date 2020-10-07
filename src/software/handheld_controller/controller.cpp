@@ -3,11 +3,11 @@
 #include <exception>
 #include <limits>
 
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/math/math_functions.h"
 
 Controller::Controller(
-    std::shared_ptr<const HandheldControllerInputConfig> controller_input_config)
+    std::shared_ptr<const HandheldControllerConfig> controller_input_config)
     : controller_input_config(controller_input_config), in_destructor(false)
 {
     event_loop_thread = std::thread([this]() { this->eventLoop(); });

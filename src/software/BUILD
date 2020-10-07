@@ -9,12 +9,13 @@ cc_binary(
         "//software/ai/hl/stp:play_info",
         "//software/backend",
         "//software/backend:all_backends",
+        "//software/backend/replay_logging:replay_logger",
+        "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
+        "//software/sensor_fusion:threaded_sensor_fusion",
         "//software/util/design_patterns:generic_factory",
-        "//software/visualizer:visualizer_wrapper",
         "@boost//:program_options",
-        "@g3log",
     ],
 )
 

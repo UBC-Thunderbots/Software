@@ -4,14 +4,13 @@
 * [Tools](#tools)
   * [SSL-Vision](#ssl-vision)
   * [SSL-Gamecontroller](#ssl-gamecontroller)
-  * [grSim](#grsim)
 * [Important Classes](#important-classes)
   * [World](#world)
     * [Team](#team)
     * [Robot](#robot)
     * [Ball](#ball)
     * [Field](#field)
-    * [Refbox and Gamestate](#refbox--gamestate)
+    * [Gamestate](#gamestate)
   * [Primitives](#primitives)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
@@ -27,6 +26,7 @@
   * [What Are Coroutines?](#what-are-coroutines)
   * [What Coroutines Do We Use?](#what-coroutines-do-we-use)
   * [How Do We Use Coroutines?](#how-do-we-use-coroutines)
+  * [Best Practices](#couroutine-best-practices)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
   * [Angles](#angles)
@@ -50,15 +50,21 @@
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
     * [Draw Functions](#draw-functions)
-    * [Editing the Visualizer](#editing-the-visualizer)
-      * [Editing ui files](#editing-ui-files)
-      * [Promoting Widgets](#promoting-widgets)
 * [Simulated Integration Tests](#simulated-integration-tests)
   * [Architecture](#simulated-integration-tests-architecture)
     * [Simulator Backend](#simulator-backend)
     * [World State Validator](#world-state-validator)
   * [Component Connections and Determinism](#component-connections-and-determinism)
   * [Diagram](#simulated-integration-tests-diagram)
+* [GUI](#gui)
+  * [Naming](#naming)
+  * [Editing the GUIs](#editing-the-guis)
+    * [Editing ui files](#editing-ui-files)
+    * [Promoting Widgets](#promoting-widgets)'
+  * [Qt Best Practices](#qt-best-practices)
+    * [Build A Hierarchy](#build-a-hierarchy)
+    * [Create Reusable Widgets](#create-reusable-widgets)
+    * [Miscellaneous Qt Tips](#miscellaneous-qt-tips)
 
 
 # Tools
@@ -67,18 +73,15 @@ A few commonly-used terms and tools to be familiar with:
   * This is the shared vision system used by the Small Size League. It is what connects to the cameras above the field, does the vision processing, and transmits the positional data of everything on the field to our AI computers.
   * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-vision)
 #### SSL-Gamecontroller
-  * Sometimes referred to as the "Refbox", this is another shared piece of Small Size League software that is used to send gamecontroller and referee commands to the teams. A human controls this application during the games to send the appropriate commands to the robots. For example, some of these commands are what stage the gameplay is in, such as `HALT`, `STOP`, `READY`, or `PLAY`.
+  * Sometimes referred to as the "Referee", this is another shared piece of Small Size League software that is used to send gamecontroller and referee commands to the teams. A human controls this application during the games to send the appropriate commands to the robots. For example, some of these commands are what stage the gameplay is in, such as `HALT`, `STOP`, `READY`, or `PLAY`.
   * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-game-controller)
-#### grSim
-  * The general robot simulator used by the Small-Size-League. We use this to manually test strategy since it is easy to place the robots and ball in desired locations, run a strategy, and see what the robots do. It is not perfectly accurate, but is useful for testing high-level logic.
-  * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/grSim)
 
 
 # Important Classes
 These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [AI](#ai), and [Visualizer](#visualizer).
 
 ## World
-The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current refbox commands. Altogether, it's the information we have at any given time that we can use to make decisions.
+The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current referee commands. Altogether, it's the information we have at any given time that we can use to make decisions.
 
 ### Team
 A team is a collection of [Robots](#robot)
@@ -92,7 +95,7 @@ The Ball class represents the state of the ball. This includes its position and 
 ### Field
 The Field class represents the state of the physical field being played on, which is primarily its physical dimensions. The Field class provides many functions that make it easy to get points of interest on the field, such as the enemy net, friendly corner, or center circle. Also see the [coordinate convention](#coordinates) we use for the field (and all things on it).
 
-### Refbox / GameState
+### GameState
 These represent the current state of the game as dictated by the Gamecontroller. These provide functions like `isPlaying()`, `isHalted()` which tell the rest of the system what game state we are in, and make decisions accordingly. We need to obey the rules!
 
 
@@ -168,7 +171,7 @@ Because the Factory needs to know about what objects are available to be created
 
 Read [http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/] for more information.
 
-The auto-registering factory is particularily useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
+The auto-registering factory is particularly useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
 
 The Factory pattern is also used to create different [Backends](#backend)
 
@@ -279,13 +282,20 @@ Once it is time to start the pass, the condition for the loop will become false 
 
 Once we have entered the second stage, we know we don't have to look at the first stage again. Because the coroutine "remembers" where the execution is each time the function is called, we will resume inside the second stage and therefore never execute the first stage again! This makes it much easier to write and read this strategy code, because we can clearly see the 2 stages of the strategy, and we know they will be executed in order.
 
+## Couroutine Best Practices
+Coroutines are a complex feature, and the boost coroutines we use don't always behave in was we expect. We have done extensive testing on how coroutines are safe (or not safe) to us, and derived some best practices from these examples. See [coroutine_test_exmaples.cpp](coroutine_test_examples.cpp) for the full code and more detailed explanantions.
+
+To summarize, the best practices are as follows:
+1. Avoid moving coroutines. If the absolutely must be moved, make sure they are not moved between the stack and heap.
+2. Avoid using coroutines with resizeable containers. If they must be used, make sure that the coroutines are allocated on the heap.
+3. Pass data to the coroutine on creation as much as possible, avoid using member variables.
+
 
 # Conventions
 Various conventions we use and follow that you need to know.
 
-
 ## Coordinates
-We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularily important for any code handling gameplay logic and positions on the field.
+We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularly important for any code handling gameplay logic and positions on the field.
 
 The coordinate system is a simple 2D x-y plane. The x-dimension runs between the friendly and enemy goals, along the longer dimension of the field. The y-dimension runs perpendicular to the x-dimension, along the short dimension of the field.
 
@@ -325,7 +335,7 @@ The `Backend` is responsible for all communication with the "outside world". The
 
 ### Input Responsibilities
 1. Receiving robot status messages
-2. Receiving vision data about where the robots and ball are (typically provided by [SSL-Vision](#ssl-vision) or [grSim](#grsim))
+2. Receiving vision data about where the robots and ball are (typically provided by [SSL-Vision](#ssl-vision))
 2. Receiving referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
 3. Filtering the received data
     * **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
@@ -335,7 +345,7 @@ The `Backend` is responsible for all communication with the "outside world". The
 ### Output Responsibilities
 1. Sending robot primitives to the robots
 
-In practice, the `Backend` is just a simple interface that specifies [World](#world) and [Robot Status](#robot-status) objects must be produced, and [Primitves](#primitives) may be consumed. The interface is very generic so that different implementations may be swapped out in order to communicate with different hardware / protocols / programs. For example, we have multiple implementations of the "output" part of the backend: one that lets us send data to our real robots using the radio, and one that sends commands to simulated robots in [grSim](#grsim).
+In practice, the `Backend` is just a simple interface that specifies [World](#world) and [Robot Status](#robot-status) objects must be produced, and [Primitves](#primitives) may be consumed. The interface is very generic so that different implementations may be swapped out in order to communicate with different hardware / protocols / programs. For example, we have multiple implementations of the "output" part of the backend: one that lets us send data to our real robots using the radio, and one that sends commands to simulated robots in the simulator.
 
 
 #### Backend Diagram
@@ -446,32 +456,6 @@ Although we want to display information about the [AI](#ai) in the [Visualizer](
 
 A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
 
-## Editing the Visualizer
-Qt provides [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), an IDE used for visually creating GUIs and laying out widgets. We use this editor as much as possible since it is easy to learn and use, and saves us having to define the entire GUI in code (which is more complex and makes things generally harder to understand and modify).
-
-Our rule of thumb is that [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) should be used to define all the widgets in the [Visualizer](#visualizer), and define the layout for everything. All logic (including connecting signals and slots, receiving data from buffers, etc.) should be implemented in the code ourselves.
-
-For a very quick tutorial on how to use QtCreator, see [this video](https://www.youtube.com/watch?v=R6zWLfHIYJw)
-
-To summarize, [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) creates and modifies a `.ui` file, which is more-or-less an `XML` describing the GUI application (what components exist, how they are positioned relative to one another, and their attributes). During compilation, this `.ui` file gets generated into code which handles all the setup and layout of the GUI components that have been defined in the `.ui` file. We include the autogenerated code in our [Visualizer](#visualizer) code where we are then able to connect the autogenerated widgets to various functions, and implement the logic we need to.
-
-### Editing `.ui` files
-1. Open QtCreator
-2. Click `File -> Open File or Project`
-3. Select the `.ui` file.
-4. Make your changes (*Don't forget to save. You must save the file for changes to be picked up in compilation*)
-
-### Promoting Widgets
-The most important thing to know about editing the [Visualizer](#visualizer) in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), is how to promote generic widgets to custom widgets. If we want to extend a QtWidget with custom behavior, we need to create our own class that extends the Widget we want to customize. However, we would still prefer to use [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) to declare this widget and how it fits in the GUI layout.
-
-"Promoting" a widget in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) allows us to place a "generic" widget in the layout, and then tell [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) we actually want that widget to be our custom class. To promote a widget:
-1. Right-click the widget you want to promote
-2. Click `Promote To` or `Promoted Widgets`
-3. Choose the custom widget this widget should be promoted to. Create a new promoted class if necessary.
-    1. When creating new promoted classes, make sure to provide the path to the header file relative to the bazel `WORKSPACE` file. This will make the `#include` statements in the generated code use the full path, which is required by `bazel`.
-
-More information about defining custom widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) can be found [here](https://doc.qt.io/qt-5/designer-using-custom-widgets.html).
-
 
 # Simulated Integration Tests
 When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
@@ -481,7 +465,7 @@ Ultimately, we want a test suite that validates our [Plays](#plays) are generall
 The primary design goals of this test system are:
 1. **Determinism:** We need tests to pass or fail consistently
 2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
-3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and understand what they are testing.
+3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and to understand what they are testing.
 
 ## Simulated Integration Tests Architecture
 The system consists of three main components:
@@ -526,3 +510,76 @@ The [Visualizer](#visualizer) and connections to it are marked with dashed lines
 
 ![Simulated Testing High-level Architecture Diagram](images/simulated_integration_test_high_level_architecture.svg)
 
+
+# GUI
+
+## Naming
+
+### Variables
+When creating widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), all widgets should be given a descriptive name. This is because the `.ui` file will eventually be generated into code that we interact with, so we want the variable names to be descriptive and consistent with our naming conventions.
+
+Names should follow our [reglar naming conventions for variables](code-style-guide.md#names-and-variables). Furthermore, they should be named in the form `<purpose>_<widget>`. The purpose is essentially the "normal" variable name that should describe what the variable is. The widget component should be the name of the widget.
+
+For example, a `QLabel` for team colour should be named `team_colour_label`. Similarly, the button that starts the AI should be named `start_ai_button`.
+
+![Good Qt Widget Naming](images/qt_widget_naming_example.png)
+
+### Classes
+Only the top-level class for a given GUI should be suffixed with `GUI`. These top-level classes should just aggregate top-level widgets (typically generated from a `.ui` file) and connect callbacks. They should not define additional widgets or features themselves. For example, `FullSystemGUI` connects incoming buffers of data to the `main_widget` generated by a `.ui` file.
+
+## Editing the GUIs
+Qt provides [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), an IDE used for visually creating GUIs and laying out widgets. We use this editor as much as possible since it is easy to learn and use, and saves us having to define the entire GUI in code (which is more complex and makes things generally harder to understand and modify).
+
+Our rule of thumb is that [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) should be used to define all the widgets in the [Visualizer](#visualizer), and define the layout for everything. All logic (including connecting signals and slots, receiving data from buffers, etc.) should be implemented in the code ourselves.
+
+For a very quick tutorial on how to use QtCreator, see [this video](https://www.youtube.com/watch?v=R6zWLfHIYJw)
+
+To summarize, [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) creates and modifies a `.ui` file, which is more-or-less an `XML` describing the GUI application (what components exist, how they are positioned relative to one another, and their attributes). During compilation, this `.ui` file gets generated into code which handles all the setup and layout of the GUI components that have been defined in the `.ui` file. We include the autogenerated code in our [Visualizer](#visualizer) code where we are then able to connect the autogenerated widgets to various functions, and implement the logic we need to.
+
+### Editing `.ui` files
+1. Open QtCreator
+2. Click `File -> Open File or Project`
+3. Select the `.ui` file.
+4. Make your changes (*Don't forget to save. You must save the file for changes to be picked up in compilation*)
+
+### Promoting Widgets
+The most important thing to know about editing the [Visualizer](#visualizer) in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), is how to promote generic widgets to custom widgets. If we want to extend a QtWidget with custom behavior, we need to create our own class that extends the Widget we want to customize. However, we would still prefer to use [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) to declare this widget and how it fits in the GUI layout.
+
+"Promoting" a widget in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) allows us to place a "generic" widget in the layout, and then tell [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) we actually want that widget to be our custom class. To promote a widget:
+1. Right-click the widget you want to promote
+2. Click `Promote To` or `Promoted Widgets`
+3. Choose the custom widget this widget should be promoted to. Create a new promoted class if necessary.
+    1. When creating new promoted classes, make sure to provide the path to the header file relative to the bazel `WORKSPACE` file. This will make the `#include` statements in the generated code use the full path, which is required by `bazel`.
+
+More information about defining custom widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) can be found [here](https://doc.qt.io/qt-5/designer-using-custom-widgets.html).
+
+## Qt Best Practices
+Although this will focus on Qt-specific examples, these principles generally apply to all GUI design and implementation. They are really just Software Engineering principles applied to GUIs.
+
+### Build A Hierarchy
+Qt is designed to handle hierarchy. It has [an extensive and robust system for maintaining Object Trees and parent/child relationships between components](https://doc.qt.io/qt-5/objecttrees.html). Much like regular code, GUIs should be created in a logical hierarchy to make organization and re-use easier.
+
+Make sure to use layouts, and group widgets in a logical way. For example, several widgets that work together to collect a user's mailing address should be grouped. This group may then be part of a larger group of widgets in a popup dialog asking for billing information.
+
+Here is a good example of laying out widgets in a hierarchy:
+
+![Good Qt Widget Layout](images/qt_layout_good_example.png)
+
+Do **not** lay out all your widgets in a single layer like this:
+
+![Bad Qt Widget Layout](images/qt_layout_bad_example.png)
+
+The main point to remember is to use [layouts](https://doc.qt.io/qt-5/layout.html) to group and manage widgets, and to create these groups in a logical way that can be built into a hierarchy. This will make it significantly easier to replace parts of the GUI later, or move components around.
+
+### Create Reusable Widgets
+Much like how we create functions in order to reuse code, [widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) should be created so that they are reusable.
+
+For example, if you create a few widgets that work together to gather user input with a slider and display the current value next to it, you should combine all of this into its own `SliderWithValue` widget. This will make it very easy to make several copies of this widget, or use it somewhere else in a completely different application. Similarly, if you need specialized functionality from any widget (for example, our `ZoomableQGraphicsView`), this should also be implemented as a custom reusable widget.
+
+![Reusable Widget Example](images/qt_reusable_widget_example.png)
+
+Creating widgets that are slightly more generic and reusable are very useful and allow code and graphical modules to be shared and reused between multiple applications.
+
+### Miscellaneous Qt Tips
+* Define minimum and maximum sizes (if it makes sense) to help enforce the correct sizing of elements
+    * Eg. define a minimum width for a textbox based on what it's expected to contain

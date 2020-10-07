@@ -153,7 +153,7 @@ void move_test_init(void)
  * via analyzing the layout of the robot and the possible choices
  * it could have for a wheel axis when moving in a certin direction.
  */
-void run_move_test()
+void run_move_test(void)
 {
     // Put the name of the suite of tests in here
     Suite *s = suite_create("Move Test");

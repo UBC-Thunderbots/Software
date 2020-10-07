@@ -13,7 +13,7 @@ class PatrolTactic : public Tactic
      * Creates a new PatrolTactic
      *
      * @param points The sequence of points to patrol, in order
-     * @param at_patrol_point_tolerance How from from the current point in the
+     * @param at_patrol_point_tolerance How from the current point in the
      * patrol sequence the robot must be before it moves on to the next point
      * @param linear_speed_at_patrol_points The desired linear speed
      * of the robot at each patrol point
@@ -24,8 +24,6 @@ class PatrolTactic : public Tactic
                           double at_patrol_point_tolerance,
                           Angle orientation_at_patrol_points,
                           double linear_speed_at_patrol_points);
-
-    std::string getName() const override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. If a robot is

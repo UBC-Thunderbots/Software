@@ -132,8 +132,8 @@ void init_chip(const init_specs_t *specs)
             "msr msp, %[stack]\n\t"
             "mov pc, %[vector]"
             :
-            : [control] "r"(0), [stack] "r"(*(const volatile uint32_t *)0x1FFF0000),
-              [vector] "r"(*(const volatile uint32_t *)0x1FFF0004));
+            : [ control ] "r"(0), [ stack ] "r"(*(const volatile uint32_t *)0x1FFF0000),
+              [ vector ] "r"(*(const volatile uint32_t *)0x1FFF0004));
         __builtin_unreachable();
     }
     bootload_flag = 0;
@@ -485,7 +485,7 @@ void init_chip(const init_specs_t *specs)
         CPACR                   = cpacr;
     }
 
-    // If we will be running at at most 144 MHz, switch to the lower-power voltage
+    // If we will be running at most 144 MHz, switch to the lower-power voltage
     // regulator mode.
     if (specs->cpu_frequency <= 144)
     {

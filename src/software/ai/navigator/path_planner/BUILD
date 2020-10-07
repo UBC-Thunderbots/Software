@@ -5,8 +5,7 @@ cc_library(
     hdrs = ["path_planner.h"],
     deps = [
         "//software/ai/navigator/obstacle",
-        "//software/geom",
-        "//software/new_geom/util:distance",
+        "//software/geom:linear_spline2d",
     ],
 )
 
@@ -32,6 +31,7 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
+        "//software/geom/algorithms",
     ],
 )
 
@@ -58,7 +58,7 @@ cc_test(
     srcs = ["theta_star_path_planner_test.cpp"],
     deps = [
         ":theta_star_path_planner",
-        "//software/test_util",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/world:field",
         "@gtest//:gtest_main",
     ],
@@ -71,7 +71,23 @@ cc_test(
         ":path_planner",
         ":straight_line_path_planner",
         ":theta_star_path_planner",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
+        "//software/util/typename",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "path_planner_performance_test",
+    srcs = ["path_planner_performance_test.cpp"],
+    deps = [
+        ":path_planner",
+        ":straight_line_path_planner",
+        ":theta_star_path_planner",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/test_util",
+        "//software/util/typename",
         "@gtest//:gtest_main",
     ],
 )

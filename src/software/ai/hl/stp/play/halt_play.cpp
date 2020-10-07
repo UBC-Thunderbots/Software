@@ -3,13 +3,6 @@
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-const std::string HaltPlay::name = "Halt Play";
-
-std::string HaltPlay::getName() const
-{
-    return HaltPlay::name;
-}
-
 bool HaltPlay::isApplicable(const World &world) const
 {
     return world.gameState().isHalted();
@@ -20,7 +13,7 @@ bool HaltPlay::invariantHolds(const World &world) const
     return world.gameState().isHalted();
 }
 
-void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     // Create Stop Tactics that will loop forever
     auto stop_tactic_1 = std::make_shared<StopTactic>(false);

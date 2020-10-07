@@ -2,7 +2,7 @@
 
 #include <ostream>
 
-#include "software/util/printable_enum_macro/printable_enum_macro.h"
+#include "software/util/make_enum/make_enum.h"
 
 /**
  * This enum describes the constraints robot movement. They are
@@ -15,7 +15,7 @@ MAKE_ENUM(MotionConstraint,
           FRIENDLY_DEFENSE_AREA,
           // The box around the enemy goal
           ENEMY_DEFENSE_AREA,
-          // The box around the enemy goal, inflated by 0.2 meters for certain situations
+          // The inflated box around the enemy defense area
           INFLATED_ENEMY_DEFENSE_AREA,
           // The center circle
           CENTER_CIRCLE,

@@ -1,9 +1,8 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/mutable_action_visitor.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 #include "software/world/ball.h"
 
 /**
@@ -50,11 +49,8 @@ class ChipAction : public Action
      * @param robot The robot that should perform the chip
      * @param chip_origin The location where the chip will be taken
      * @param chip_target The target to chip at
-     * @param chip_distance_meters The distance between the starting location
-     * of the chip and the location of the first bounce
      */
-    void updateControlParams(const Robot& robot, Point chip_origin, Point chip_target,
-                             double chip_distance_meters);
+    void updateControlParams(const Robot& robot, Point chip_origin, Point chip_target);
 
     /**
      * Get the state of the ball

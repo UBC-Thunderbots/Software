@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+message Timestamp
+{
+    // Total seconds of UTC time since Unix epoch
+    double epoch_timestamp_seconds = 1;
+}

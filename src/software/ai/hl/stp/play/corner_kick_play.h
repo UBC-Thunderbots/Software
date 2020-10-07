@@ -14,13 +14,11 @@ class CornerKickPlay : public Play
 
     CornerKickPlay();
 
-    std::string getName() const override;
-
     bool isApplicable(const World &world) const override;
 
     bool invariantHolds(const World &world) const override;
 
-    void getNextTactics(TacticCoroutine::push_type &yield) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
     // The maximum distance from the corner that the ball can be for it to be
     // considered a corner kick
@@ -31,16 +29,35 @@ class CornerKickPlay : public Play
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 
     /**
-     * Update the tactic that aligns the robot to the ball in preperation to pass
+     * Update the tactic that aligns the robot to the ball in preparation to pass
      *
      * @param align_to_ball_tactic
+     * @param world The current state of the world
      */
-    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic);
+    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
+                                 const World &world);
+
+    /**
+     * Sets up the pass for the corner kick: aligns the passer and positions the cherry
+     * pickers
+     *
+     * @param yield The coroutine to yield
+     * @param goalie_tactic The goalie tactic to use
+     * @param bait_move_tactic_1, bait_move_tactic_2 The bait move tactics
+     * @param world The current state of the world
+     *
+     * @return the pass that was committed to
+     */
+    Pass setupPass(TacticCoroutine::push_type &yield,
+                   std::shared_ptr<MoveTactic> bait_move_tactic_1,
+                   std::shared_ptr<MoveTactic> bait_move_tactic_2,
+                   std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
 
     /**
      * Updates the pass generator
      *
      * @param pass_generator
+     * @param world The current state of the world
      */
-    void updatePassGenerator(Passing::PassGenerator &pass_generator);
+    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
 };

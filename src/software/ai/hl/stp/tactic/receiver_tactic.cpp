@@ -1,32 +1,22 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/util.h"
-#include "software/new_geom/util/closest_point.h"
-
-using namespace Passing;
-using namespace Evaluation;
+#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/closest_point.h"
+#include "software/logger/logger.h"
 
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
-                               const Team& enemy_team, const Passing::Pass pass,
-                               const Ball& ball, bool loop_forever)
-    : Tactic(loop_forever),
+                               const Team& enemy_team, const Pass pass, const Ball& ball,
+                               bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Move}),
       field(field),
       pass(pass),
       ball(ball),
       friendly_team(friendly_team),
       enemy_team(enemy_team)
 {
-}
-
-std::string ReceiverTactic::getName() const
-{
-    return "Receiver Tactic";
 }
 
 void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
@@ -38,7 +28,7 @@ void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
     this->ball          = updated_ball;
 }
 
-void ReceiverTactic::updateControlParams(const Passing::Pass& updated_pass)
+void ReceiverTactic::updateControlParams(const Pass& updated_pass)
 {
     this->pass = updated_pass;
 }
@@ -75,7 +65,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
             Angle shot_angle = (target_position - robot->position()).orientation();
 
-            // If we do have a valid shot on net, orient the robot to face in between
+            // If we do have a valid shot on net, orient the robot to face in-between
             // the pass vector and shot vector, so the robot can quickly orient itself
             // to either receive the pass, or take the shot. Also, not directly facing
             // where we plan on kicking may throw off the enemy AI
@@ -85,7 +75,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // rotate to the correct orientation
         move_action->updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
                                          DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutokickType::NONE, BallCollisionType::ALLOW);
+                                         AutochickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
@@ -113,9 +103,9 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             Point ideal_position    = shot.getPointToShootAt();
             Angle ideal_orientation = shot.getOpenAngle();
 
-            move_action->updateControlParams(*robot, ideal_position, ideal_orientation, 0,
-                                             DribblerEnable::OFF, MoveType::NORMAL,
-                                             AUTOKICK, BallCollisionType::ALLOW);
+            move_action->updateControlParams(
+                *robot, ideal_position, ideal_orientation, 0, DribblerEnable::OFF,
+                MoveType::NORMAL, AutochickType::AUTOKICK, BallCollisionType::ALLOW);
             yield(move_action);
 
             // Calculations to check for termination conditions
@@ -132,16 +122,20 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         while ((ball.position() - robot->position()).length() >
                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
-            Point ball_receive_pos = closestPointOnLine(
-                robot->position(),
-                Line(ball.position(), ball.position() + ball.velocity()));
+            Point ball_receive_pos = ball.position();
+            if (ball.velocity().length() != 0)
+            {
+                ball_receive_pos = closestPoint(
+                    robot->position(),
+                    Line(ball.position(), ball.position() + ball.velocity()));
+            }
             Angle ball_receive_orientation =
                 (ball.position() - robot->position()).orientation();
 
             // Move into position with the dribbler on
             move_action->updateControlParams(
                 *robot, ball_receive_pos, ball_receive_orientation, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW);
             yield(move_action);
         }
     }
@@ -179,7 +173,8 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
 {
     // Check if we can shoot on the enemy goal from the receiver position
     std::optional<Shot> best_shot_opt =
-        calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
+        calcBestShotOnGoal(field, friendly_team, enemy_team, robot->position(),
+                           TeamType::ENEMY, {*this->getAssignedRobot()});
 
     // Vector from the ball to the robot
     Vector robot_to_ball = ball.position() - robot->position();
@@ -194,13 +189,12 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
             best_shot_opt->getPointToShootAt() - robot->position();
         abs_angle_between_pass_and_shot_vectors =
             (robot_to_ball.orientation() - robot_to_shot_target.orientation())
-                .angleMod()
+                .clamp()
                 .abs();
 
-        Angle goal_angle =
-            acuteVertexAngle(field.friendlyGoalpostPos(), robot->position(),
-                             field.friendlyGoalpostNeg())
-                .abs();
+        Angle goal_angle = acuteAngle(field.friendlyGoalpostPos(), robot->position(),
+                                      field.friendlyGoalpostNeg())
+                               .abs();
         net_percent_open =
             best_shot_opt->getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }
@@ -226,8 +220,12 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
         Vector::createFromAngle(robot.orientation()).normalize(dist_to_ball_in_dribbler);
 
     // Find the closest point to the ball contact point on the ball's trajectory
-    Point closest_ball_pos = closestPointOnLine(
-        ball_contact_point, Line(ball.position(), ball.position() + ball.velocity()));
+    Point closest_ball_pos = ball.position();
+    if (ball.velocity().length() != 0)
+    {
+        closest_ball_pos = closestPoint(
+            ball_contact_point, Line(ball.position(), ball.position() + ball.velocity()));
+    }
     Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
 
     Angle ideal_orientation      = getOneTimeShotDirection(shot, ball);

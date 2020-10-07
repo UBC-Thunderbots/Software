@@ -1,14 +1,6 @@
-/**
- * Tests for the pass evaluation functions
- */
-
 #include "software/ai/evaluation/pass.h"
 
 #include <gtest/gtest.h>
-
-#include "software/../shared/constants.h"
-
-using namespace AI::Evaluation;
 
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
 {
@@ -16,14 +8,15 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
     Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::fromDegrees(0),
                 Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(Duration::fromSeconds(0),
-              getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10.0));
+    EXPECT_EQ(
+        Duration::fromSeconds(0),
+        getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10.0));
 }
 
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desired_angle)
 {
     // Because we can't guarantee that the robot angular acceleration isn't going to
-    // increase to the point where we can't reach the the max angular speed within
+    // increase to the point where we can't reach the max angular speed within
     // a half rotation, this is just a more loose test that checks if we got there
     // within roughly the expected time. Any more strict test would have to
     // basically re-write the function, which would be a bit pointless
@@ -41,20 +34,20 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desir
     // For the upper bound, just choose a time that's much greater then we would expect
     double max_time_to_rotate = 4.0;
 
-    Duration t = getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10);
-    EXPECT_LE(Duration::fromSeconds(min_time_to_rotate),
-              getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10));
-    EXPECT_GE(Duration::fromSeconds(max_time_to_rotate),
-              getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10));
+    Duration t =
+        getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10);
+    EXPECT_LE(
+        Duration::fromSeconds(min_time_to_rotate),
+        getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10));
+    EXPECT_GE(
+        Duration::fromSeconds(max_time_to_rotate),
+        getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10));
 }
 
 TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest)
 {
     Point dest(1, 1);
-    Robot robot(0, dest, Vector(0, 0), Angle::fromDegrees(0),
-                AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
-
-    EXPECT_EQ(Duration::fromSeconds(0), getTimeToPositionForRobot(robot, dest, 2.0, 3.0));
+    EXPECT_EQ(Duration::fromSeconds(0), getTimeToPositionForRobot(dest, dest, 2.0, 3.0));
 }
 
 TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
@@ -66,8 +59,6 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
 
     Point dest(1, 1);
     Point robot_location(40, 40);
-    Robot robot(0, robot_location, Vector(0, 0), Angle::fromDegrees(0),
-                AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
 
     double distance_to_dest = (robot_location - dest).length();
 
@@ -83,7 +74,7 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
     double travel_time = 2 * acceleration_time + time_at_max_vel;
 
     EXPECT_EQ(Duration::fromSeconds(travel_time),
-              getTimeToPositionForRobot(robot, dest, 2.0, 3.0));
+              getTimeToPositionForRobot(robot_location, dest, 2.0, 3.0));
 }
 
 TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity_with_tolerance)
@@ -101,9 +92,6 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity_with_
 
     Point robot_location(0, 40);
 
-    Robot robot(0, robot_location, Vector(0, 0), Angle::fromDegrees(0),
-                AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
-
     double distance_to_dest = (robot_location - first_point_in_tolerance).length();
 
     double acceleration_time = ROBOT_MAX_SPEED_METERS_PER_SECOND /
@@ -118,5 +106,5 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity_with_
     double travel_time = 2 * acceleration_time + time_at_max_vel;
 
     EXPECT_EQ(Duration::fromSeconds(travel_time),
-              getTimeToPositionForRobot(robot, target_location, 2.0, 3.0, 0.5));
+              getTimeToPositionForRobot(robot_location, target_location, 2.0, 3.0, 0.5));
 }

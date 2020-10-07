@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+import "shared/proto/geometry.proto";
+
+message Primitive
+{
+    oneof primitive
+    {
+        ChipPrimitive chip                    = 1;
+        KickPrimitive kick                    = 2;
+        MovePrimitive move                    = 3;
+        SpinningMovePrimitive spinning_move   = 4;
+        AutochipMovePrimitive autochip_move   = 5;
+        AutokickMovePrimitive autokick_move   = 6;
+        StopPrimitive stop                    = 7;
+        DirectControlPrimitive direct_control = 8;
+    }
+}
+
+message ChipPrimitive
+{
+    Point chip_origin          = 1;
+    Angle chip_direction       = 2;
+    float chip_distance_meters = 3;
+}
+
+message KickPrimitive
+{
+    Point kick_origin                  = 1;
+    Angle kick_direction               = 2;
+    float kick_speed_meters_per_second = 3;
+}
+
+message MovePrimitive
+{
+    MovePositionParams position_params = 1;
+    Angle final_angle                  = 2;
+    float dribbler_speed_rpm           = 3;
+}
+
+message SpinningMovePrimitive
+{
+    MovePositionParams position_params = 1;
+    AngularVelocity angular_velocity   = 2;
+    float dribbler_speed_rpm           = 3;
+}
+
+message AutochipMovePrimitive
+{
+    MovePositionParams position_params = 1;
+    Angle final_angle                  = 2;
+    float dribbler_speed_rpm           = 3;
+    float chip_distance_meters         = 4;
+}
+
+message AutokickMovePrimitive
+{
+    MovePositionParams position_params = 1;
+    Angle final_angle                  = 2;
+    float dribbler_speed_rpm           = 3;
+    float kick_speed_meters_per_second = 4;
+}
+
+message StopPrimitive
+{
+    enum StopType
+    {
+        BRAKE = 0;
+        COAST = 1;
+    }
+    StopType stop_type = 1;
+}
+
+message DirectControlPrimitive
+{
+    enum ChargeMode
+    {
+        DISCHARGE = 0;
+        CHARGE    = 1;
+        FLOAT     = 2;
+    }
+
+    message DirectPerWheelControl
+    {
+        float front_left_wheel_rpm  = 1;
+        float back_left_wheel_rpm   = 2;
+        float front_right_wheel_rpm = 3;
+        float back_right_wheel_rpm  = 4;
+    }
+
+    message DirectVelocityControl
+    {
+        Vector velocity                  = 1;
+        AngularVelocity angular_velocity = 2;
+    }
+
+    oneof wheel_control
+    {
+        DirectPerWheelControl direct_per_wheel_control = 1;
+        DirectVelocityControl direct_velocity_control  = 2;
+    }
+    ChargeMode charge_mode = 3;
+    oneof chick_command
+    {
+        float kick_speed_meters_per_second     = 4;
+        float chip_distance_meters             = 5;
+        float autokick_speed_meters_per_second = 6;
+        float autochip_distance_meters         = 7;
+    }
+    float dribbler_speed_rpm = 8;
+}
+
+message MovePositionParams
+{
+    Point destination                   = 1;
+    float final_speed_meters_per_second = 2;
+    bool slow                           = 3;
+}

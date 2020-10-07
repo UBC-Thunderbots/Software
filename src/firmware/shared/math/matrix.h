@@ -29,7 +29,6 @@ Matrix create_matrix(int n_rows, int n_cols);
  * Frees the memory used up by a matrix.
  *
  * @param matrix the matrix to free
- * @return void
  */
 void free_matrix(Matrix matrix);
 
@@ -51,7 +50,6 @@ Matrix matmul(Matrix A, Matrix B);
  *
  * @param vector the vector to rotate
  * @param unit_vector {cos(theta), sin(theta)} of the angle you want to rotate the axis by
- * @return void
  */
 void rotate_axis_2D(float vector[2], const float unit_vector[2]);
 
@@ -63,7 +61,6 @@ void rotate_axis_2D(float vector[2], const float unit_vector[2]);
  * @param vector the vector to rotate
  * @param unit_vector {cos(theta), sin(theta)} of the angle you want to rotate the vector
  * by
- * @return void
  */
 void rotate_vector_2D(float vector[2], const float unit_vector[2]);
 

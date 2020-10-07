@@ -2,8 +2,8 @@
 
 #include <boost/bind.hpp>
 
+#include "software/gui/drawing/navigator.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/visualizer/drawing/navigator.h"
 
 AIWrapper::AIWrapper(std::shared_ptr<const AIConfig> ai_config,
                      std::shared_ptr<const AIControlConfig> control_config)
@@ -19,18 +19,14 @@ void AIWrapper::onValueReceived(World world)
 
 void AIWrapper::runAIAndSendPrimitives()
 {
-    if (control_config->RunAI()->value())
+    if (most_recent_world && control_config->RunAI()->value())
     {
-        std::vector<std::unique_ptr<Primitive>> new_primitives =
-            ai.getPrimitives(most_recent_world);
+        auto new_primitives = ai.getPrimitives(*most_recent_world);
 
         PlayInfo play_info = ai.getPlayInfo();
         Subject<PlayInfo>::sendValueToObservers(play_info);
 
-        auto new_primitives_ptr =
-            std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
-                std::move(new_primitives));
-        Subject<ConstPrimitiveVectorPtr>::sendValueToObservers(new_primitives_ptr);
+        Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
     }
     drawAI();
 }

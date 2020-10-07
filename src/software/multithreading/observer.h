@@ -12,7 +12,7 @@ template <typename T>
 class Observer
 {
    public:
-    Observer();
+    Observer(size_t buffer_size = DEFAULT_BUFFER_SIZE);
 
     /**
      * Add the given value to the internal buffer
@@ -21,7 +21,16 @@ class Observer
      */
     virtual void receiveValue(T val) final;
 
+    /**
+     * Calculate the data received per second using the internal time buffer
+     *
+     * @return the data received per second
+     */
+    virtual double getDataReceivedPerSecond() final;
+
     virtual ~Observer() = default;
+
+    static constexpr size_t TIME_BUFFER_SIZE = 5;
 
    protected:
     /**
@@ -40,25 +49,27 @@ class Observer
      */
     virtual std::optional<T> popMostRecentlyReceivedValue(Duration max_wait_time) final;
 
-   private:
-    const size_t DEFAULT_BUFFER_SIZE = 1;
+    /**
+     * Pops the least recently received value and returns it
+     *
+     * If no value is available, this will block until:
+     * - a value becomes available
+     * - the given amount of time is exceeded
+     * - the destructor of this class is called
+     *
+     * @param max_wait_time The maximum duration to wait for a new value before
+     *                      returning
+     *
+     * @return The value least recently added to the buffer or std::nullopt if none is
+     *         available
+     */
+    virtual std::optional<T> popLeastRecentlyReceivedValue(Duration max_wait_time) final;
 
+    static constexpr size_t DEFAULT_BUFFER_SIZE = 1;
+
+   private:
     ThreadSafeBuffer<T> buffer;
+    boost::circular_buffer<std::chrono::milliseconds> time_buffer;
 };
 
-template <typename T>
-Observer<T>::Observer() : buffer(DEFAULT_BUFFER_SIZE)
-{
-}
-
-template <typename T>
-void Observer<T>::receiveValue(T val)
-{
-    buffer.push(std::move(val));
-}
-
-template <typename T>
-std::optional<T> Observer<T>::popMostRecentlyReceivedValue(Duration max_wait_time)
-{
-    return buffer.popMostRecentlyAddedValue(max_wait_time);
-}
+#include "software/multithreading/observer.tpp"

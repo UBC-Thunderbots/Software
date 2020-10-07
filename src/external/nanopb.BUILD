@@ -4,6 +4,13 @@ exports_files(["LICENSE.txt"])
 
 package(default_visibility = ["//visibility:public"])
 
+common_defines = [
+    # By default, NanoPb only supports 8-bit tags. This define changes the tag type to
+    # one that supports 16-bit tags.
+    # (https://jpa.kapsi.fi/nanopb/docs/reference.html)
+    "PB_FIELD_16BIT",
+]
+
 cc_library(
     name = "nanopb",
     srcs = [
@@ -17,18 +24,27 @@ cc_library(
         "pb_decode.h",
         "pb_encode.h",
     ],
+    defines = common_defines,
+    # NOTE: Even an empty `strip_include_prefix` is prepended with the external project
+    # path (ex. "external/nanopb") so that other targets can include headers by a path
+    # relative to this project root. Note that if `strip_include_prefix` is not specified
+    # *at all*, then all other libraries may *only* access headers from this lib via the
+    # full project path (ex. `external/nanopb/pb.h`).
+    strip_include_prefix = "",
     visibility = ["//visibility:public"],
 )
-
-# this library is linked with all c_proto_libraries
-# the generated h and c files access pb.h relatively, so
-# we strip external/nanopb to comply
 
 cc_library(
     name = "nanopb_header",
     hdrs = [
         "pb.h",
     ],
+    defines = common_defines,
+    # NOTE: Even an empty `strip_include_prefix` is prepended with the external project
+    # path (ex. "external/nanopb") so that other targets can include headers by a path
+    # relative to this project root. Note that if `strip_include_prefix` is not specified
+    # *at all*, then all other libraries may *only* access headers from this lib via the
+    # full project path (ex. `external/nanopb/pb.h`).
     strip_include_prefix = "",
     visibility = ["//visibility:public"],
 )
@@ -37,4 +53,13 @@ py_binary(
     name = "nanopb_generator",
     srcs = ["generator/nanopb_generator.py"],
     imports = ["proto"],
+)
+
+proto_library(
+    name = "nanopb_options_proto",
+    srcs = ["generator/nanopb/options.proto"],
+    strip_import_prefix = "generator/",
+    deps = [
+        "@com_google_protobuf//:descriptor_proto",
+    ],
 )

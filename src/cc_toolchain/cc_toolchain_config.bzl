@@ -109,7 +109,6 @@ def _make_common_features(ctx):
 
     result["static_link_cpp_runtimes"] = feature(
         name = "static_link_cpp_runtimes",
-        implies = ["no-unused-command-line-argument"],
     )
 
     result["unfiltered_compile_flags_feature"] = feature(
@@ -185,15 +184,32 @@ def _make_common_features(ctx):
         enabled = True,
     )
 
-    result["warnings_feature"] = feature(
-        name = "warnings",
+    result["warnings_as_errors_feature"] = feature(
+        name = "warnings_as_errors",
         flag_sets = [
             flag_set(
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wconversion"] +
+                        # -Werror can be overridden by copts argument in cc_binary
+                        # Warnings are added in .bazelrc
+                        flags = ["-Werror"] +
                                 ctx.attr.host_compiler_warnings,
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    result["colour_feature"] = feature(
+        name = "colour",
+        # the compiler will highlight warnings and errors with colour
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(
+                        flags = ["-fdiagnostics-color=always"],
                     ),
                 ],
             ),
@@ -364,16 +380,6 @@ def _make_common_features(ctx):
         ],
     )
 
-    result["no-unused-command-line-argument"] = feature(
-        name = "no-unused-command-line-argument",
-        flag_sets = [
-            flag_set(
-                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = ["-Wno-unused-command-line-argument"])],
-            ),
-        ],
-    )
-
     return result
 
 def _linux_gcc_impl(ctx):
@@ -444,6 +450,7 @@ def _linux_gcc_impl(ctx):
                     "-lpthread",
                     "-ldl",
                     "-lrt",
+                    "-lstdc++fs",
                 ])],
             ),
         ],
@@ -539,8 +546,9 @@ def _linux_gcc_impl(ctx):
         implies = [
             "builtin_include_directories",
             "c++17",
+            "colour",
             "determinism",
-            "warnings",
+            "warnings_as_errors",
             "hardening",
             "build-id",
             "no-canonical-prefixes",
@@ -715,8 +723,9 @@ def _stm32_impl(ctx):
         implies = [
             "stdlib",
             "c++17",
+            "colour",
+            "warnings_as_errors",
             "determinism",
-            "warnings",
             "no-canonical-prefixes",
         ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
             "stm32f4",

@@ -401,7 +401,7 @@ int32_t lYieldRequired;
 
 /*
  * When a task is deleted, it is yielded permanently until the IDLE task
- * has an opportunity to reclaim the memory that that task was using.
+ * has an opportunity to reclaim the memory that task was using.
  * Typically, the memory used by a task is the TCB and Stack but in the
  * TriCore this includes the CSAs that were consumed as part of the Call
  * Stack. These CSAs can only be returned to the Globally Free Pool when

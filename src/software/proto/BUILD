@@ -8,23 +8,45 @@ proto_library(
         "messages_robocup_ssl_detection.proto",
         "messages_robocup_ssl_geometry.proto",
         "messages_robocup_ssl_wrapper.proto",
-        "ssl_game_controller_common.proto",
-        "ssl_game_event.proto",
-        "ssl_game_event_2019.proto",
-        "ssl_referee.proto",
+        "ssl_gc_common.proto",
+        "ssl_gc_game_event.proto",
+        "ssl_gc_geometry.proto",
+        "ssl_gc_referee_message.proto",
     ],
     visibility = ["//visibility:private"],
 )
 
 proto_library(
-    name = "grsim_proto",
+    name = "sensor_msg_proto",
     srcs = [
-        "grSim_Commands.proto",
-        "grSim_Packet.proto",
-        "grSim_Replacement.proto",
+        "sensor_msg.proto",
     ],
     visibility = ["//visibility:private"],
-    deps = [],
+    deps = [
+        ":ssl_proto",
+        "//shared/proto:tbots_proto",
+    ],
+)
+
+proto_library(
+    name = "replay_msg_proto",
+    srcs = [
+        "replay_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":sensor_msg_proto",
+        ":ssl_proto",
+        "//shared/proto:tbots_proto",
+    ],
+)
+
+proto_library(
+    name = "defending_side_msg_proto",
+    srcs = [
+        "defending_side_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
 )
 
 cc_proto_library(
@@ -33,6 +55,16 @@ cc_proto_library(
 )
 
 cc_proto_library(
-    name = "grsim_cc_proto",
-    deps = [":grsim_proto"],
+    name = "sensor_msg_cc_proto",
+    deps = [":sensor_msg_proto"],
+)
+
+cc_proto_library(
+    name = "replay_msg_cc_proto",
+    deps = [":replay_msg_proto"],
+)
+
+cc_proto_library(
+    name = "defending_side_msg_cc_proto",
+    deps = [":defending_side_msg_proto"],
 )

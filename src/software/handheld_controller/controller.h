@@ -26,7 +26,7 @@ class Controller : public Subject<ControllerInput>
      * @param controller_input_config The config for this controller
      */
     explicit Controller(
-        std::shared_ptr<const HandheldControllerInputConfig> controller_input_config);
+        std::shared_ptr<const HandheldControllerConfig> controller_input_config);
     ~Controller() override;
 
    protected:
@@ -121,7 +121,7 @@ class Controller : public Subject<ControllerInput>
     size_t getNumButtons(int fd) const;
 
     std::thread event_loop_thread;
+    std::shared_ptr<const HandheldControllerConfig> controller_input_config;
     std::atomic_bool in_destructor;
-    std::shared_ptr<const HandheldControllerInputConfig> controller_input_config;
     static constexpr double axis_deadzone = 0.05;
 };

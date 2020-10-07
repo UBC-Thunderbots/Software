@@ -3,8 +3,9 @@
 #include "shared/constants.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/util.h"
-#include "software/new_geom/polygon.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/polygon.h"
+#include "software/geom/triangle.h"
 
 ChipAction::ChipAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
 {
@@ -25,10 +26,10 @@ void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
 }
 
 void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
-                                     Point chip_target, double chip_distance_meters)
+                                     Point chip_target)
 {
     updateControlParams(robot, chip_origin, (chip_target - chip_origin).orientation(),
-                        chip_distance_meters);
+                        (chip_target - chip_origin).length());
 }
 
 Ball ChipAction::getBall()
@@ -107,7 +108,7 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     Triangle behind_ball_region =
         Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
 
-    bool robot_behind_ball = behind_ball_region.contains(robot->position());
+    bool robot_behind_ball = contains(behind_ball_region, robot->position());
     // The point in the middle of the region behind the ball
     Point point_behind_ball =
         chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
@@ -115,9 +116,9 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // If we're not in position to chip, move into position
     if (!robot_behind_ball)
     {
-        yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, chip_direction,
-                                           0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-                                           AutokickType::NONE, BallCollisionType::ALLOW));
+        yield(std::make_unique<MoveIntent>(
+            robot->id(), point_behind_ball, chip_direction, 0.0, 0, DribblerEnable::OFF,
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
     }
     else
     {

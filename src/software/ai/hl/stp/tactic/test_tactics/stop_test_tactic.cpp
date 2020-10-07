@@ -1,14 +1,8 @@
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
 
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 
-StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever) {}
-
-std::string StopTestTactic::getName() const
-{
-    return "Stop Test Tactic";
-}
+StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever, {}) {}
 
 double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world)
 {

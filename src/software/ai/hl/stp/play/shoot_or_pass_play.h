@@ -18,13 +18,11 @@ class ShootOrPassPlay : public Play
 
     ShootOrPassPlay();
 
-    std::string getName() const override;
-
     bool isApplicable(const World &world) const override;
 
     bool invariantHolds(const World &world) const override;
 
-    void getNextTactics(TacticCoroutine::push_type &yield) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
    private:
     // How close each of our patrol tactics must be to each of the points in their
@@ -38,6 +36,24 @@ class ShootOrPassPlay : public Play
      * Updates the pass generator
      *
      * @param pass_generator
+     * @param world The current state of the world
      */
-    void updatePassGenerator(Passing::PassGenerator &pass_generator);
+    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
+
+    /**
+     * Sets up the pass for the corner kick: aligns the passer and positions the cherry
+     * pickers
+     *
+     * @param yield The coroutine to yield
+     * @param goalie_tactic The goalie tactic to use
+     * @param crease_defender_tactics The crease defender tactics
+     * @param shoot_tactic The shoot tactic
+     * @param world The current state of the world
+     *
+     * @return the best pass found
+     */
+    PassWithRating attemptToShootWhileLookingForAPass(
+        TacticCoroutine::push_type &yield, std::shared_ptr<GoalieTactic> goalie_tactic,
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+        std::shared_ptr<ShootGoalTactic> shoot_tactic, const World &world);
 };

@@ -7,7 +7,7 @@
 
 TEST(ExamplePlayTest, test_example_play_never_applicable)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     ExamplePlay example_play;
     EXPECT_FALSE(example_play.isApplicable(world));
@@ -15,7 +15,7 @@ TEST(ExamplePlayTest, test_example_play_never_applicable)
 
 TEST(ExamplePlayTest, test_example_play_invariant_always_holds)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     ExamplePlay example_play;
     EXPECT_TRUE(example_play.invariantHolds(world));
@@ -23,19 +23,16 @@ TEST(ExamplePlayTest, test_example_play_invariant_always_holds)
 
 TEST(ExamplePlayTest, test_example_play_returns_correct_tactics)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     ExamplePlay example_play;
     auto tactics = example_play.getTactics(world);
 
-    // Make sure something was returned
-    EXPECT_TRUE(tactics);
-
     // Make sure the expected number of tactics was returned
-    EXPECT_EQ((*tactics).size(), 6);
+    EXPECT_EQ((tactics).size(), 6);
 
     // Make sure each tactic is an ExampleTactic
-    for (const auto& t : *tactics)
+    for (const auto& t : tactics)
     {
         // The result of the dynamic_cast will be a nullptr if the pointer does not
         // actually point to a conrete type of MoveTactic

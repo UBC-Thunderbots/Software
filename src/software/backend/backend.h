@@ -1,31 +1,35 @@
 #pragma once
 
-#include "software/ai/primitive/primitive.h"
-#include "software/backend/robot_status.h"
+#include "shared/proto/tbots_software_msgs.pb.h"
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
-#include "software/multithreading/threaded_observer.h"
+#include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
 
 /**
- * A Backend is an abstraction around all I/O operations that our system may need
- * to perform. It produces Worlds that may be used, and consumes primitives that
- * need to be sent out (generally to the robots).
+ * A Backend is an abstraction around communication with robots, vision, and the
+ * gamecontroller (Referee). It produces SensorProtos, and consumes primitives that can be
+ * sent to the robots.
  *
  * This produce/consume pattern is performed by extending both "Observer" and
- * "Subject". Please see the the implementation of those classes for details.
+ * "Subject". Please see the implementation of those classes for details.
  */
-class Backend : public Subject<World>,
-                public Subject<RobotStatus>,
-                public ThreadedObserver<ConstPrimitiveVectorPtr>
+class Backend : public Subject<SensorProto>,
+                public FirstInFirstOutThreadedObserver<World>,
+                public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
    public:
     Backend() = default;
 
     virtual ~Backend() = default;
 
-    // Delete the copy and assignment operators because this class really shouldn't need
-    // them and we don't want to risk doing anything nasty with the internal
-    // multithreading this class potentially uses
-    Backend& operator=(const Backend&) = delete;
-    Backend(const Backend&)            = delete;
+    /**
+     * Callback function to send components of SensorProto via Subject<SensorProto>
+     * Immediately makes a SensorProto from msg and sends it to Observers
+     *
+     * @param msg The component of SensorProto
+     */
+    void receiveRobotStatus(TbotsProto::RobotStatus msg);
+    void receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg);
+    void receiveSSLReferee(SSLProto::Referee msg);
 };

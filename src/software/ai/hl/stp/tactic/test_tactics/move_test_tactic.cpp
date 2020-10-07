@@ -3,18 +3,10 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
-    : Tactic(loop_forever,
-             {RobotCapabilities::Capability::Dribble, RobotCapabilities::Capability::Kick,
-              RobotCapabilities::Capability::Chip})
+    : Tactic(loop_forever, allRobotCapabilities())
 {
-}
-
-std::string MoveTestTactic::getName() const
-{
-    return "Move Test Tactic";
 }
 
 void MoveTestTactic::updateControlParams(Point destination_)

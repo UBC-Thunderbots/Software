@@ -1,9 +1,8 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/action/mutable_action_visitor.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 /**
  * The StopAction makes the robot stop with the option to coast

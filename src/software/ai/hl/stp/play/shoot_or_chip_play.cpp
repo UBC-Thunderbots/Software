@@ -1,11 +1,8 @@
 #include "software/ai/hl/stp/play/shoot_or_chip_play.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
-#include "software/ai/evaluation/indirect_chip.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
@@ -14,35 +11,29 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
-
-using namespace Evaluation;
-
-const std::string ShootOrChipPlay::name = "ShootOrChip Play";
-
 ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4)) {}
-
-std::string ShootOrChipPlay::getName() const
-{
-    return ShootOrChipPlay::name;
-}
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
+    // NOTE: We do not currently use this play, as passing is generally superior. However
+    // we keep it around and
+    //       maintain it so as to have a backup if passing become unreliable for whatever
+    //       reason
+    return false;
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
+           teamHasPossession(world, world.friendlyTeam());
 }
 
-void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                     const World &world)
 {
     /**
      * Our general strategy here is:
@@ -66,34 +57,15 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
-    std::array<std::shared_ptr<PatrolTactic>, 2> patrol_tactics = {
-        std::make_shared<PatrolTactic>(
-            std::vector<Point>(
-                {Point(world.field().enemyCornerPos().x() - 3 * ROBOT_MAX_RADIUS_METERS,
-                       world.field().enemyCornerPos().y() - 3 * ROBOT_MAX_RADIUS_METERS),
-                 Point(3 * ROBOT_MAX_RADIUS_METERS,
-                       world.field().yLength() / 2 - 3 * ROBOT_MAX_RADIUS_METERS)}),
-            .03, Angle::half(), 0),
-        std::make_shared<PatrolTactic>(
-            std::vector<Point>(
-                {Point(3 * ROBOT_MAX_RADIUS_METERS,
-                       -world.field().yLength() / 2 + 3 * ROBOT_MAX_RADIUS_METERS),
-                 Point(
-                     world.field().enemyCornerNeg().x() - 3 * ROBOT_MAX_RADIUS_METERS,
-                     world.field().enemyCornerNeg().y() + 3 * ROBOT_MAX_RADIUS_METERS)}),
-            .03, Angle::half(), 0)};
-
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
 
     // Figure out where the fallback chip target is
-    double fallback_chip_target_x_offset = Util::DynamicParameters->getAIConfig()
-                                               ->getShootOrChipPlayConfig()
-                                               ->FallbackChipTargetEnemyGoalOffset()
-                                               ->value();
+    // Experimentally determined to be a reasonable value
+    double fallback_chip_target_x_offset = 1.5;
 
     Point fallback_chip_target =
-        world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
+        world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
     auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
@@ -153,12 +125,6 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // We want this second in priority only to the goalie
         result.insert(result.begin() + 1, shoot_or_chip_tactic);
-
-        // If we can't do anything else then patrol?
-        for (auto &patrol_tactic : patrol_tactics)
-        {
-            result.emplace_back(patrol_tactic);
-        }
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);

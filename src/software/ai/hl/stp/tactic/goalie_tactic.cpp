@@ -5,19 +5,19 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/util.h"
-#include "software/new_geom/line.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/ray.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/intersection.h"
+#include "software/geom/algorithms/calculate_block_cone.h"
+#include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/line.h"
+#include "software/geom/point.h"
+#include "software/geom/ray.h"
+#include "software/geom/segment.h"
 #include "software/parameter/dynamic_parameters.h"
-
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       ball(ball),
       field(field),
       friendly_team(friendly_team),
@@ -51,21 +51,22 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // first find the 3 intersections with each side of the restricted area
     // (width, pos_side, neg_side) and the line from the desired position to the
     // center of the friendly goal
-    auto width_x_goal = intersection(Line(goalie_desired_position, field.friendlyGoal()),
-                                     Line(goalie_restricted_area.posXPosYCorner(),
-                                          goalie_restricted_area.posXNegYCorner()));
+    auto width_x_goal =
+        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
+                     Line(goalie_restricted_area.posXPosYCorner(),
+                          goalie_restricted_area.posXNegYCorner()));
     auto pos_side_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoal()),
+        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
                      Line(goalie_restricted_area.posXPosYCorner(),
                           goalie_restricted_area.negXPosYCorner()));
     auto neg_side_x_goal =
-        intersection(Line(goalie_desired_position, field.friendlyGoal()),
+        intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
                      Line(goalie_restricted_area.posXNegYCorner(),
                           goalie_restricted_area.negXNegYCorner()));
 
     // if the goalie restricted area already contains the point, then we are
     // safe to move there.
-    if (goalie_restricted_area.contains(goalie_desired_position))
+    if (contains(goalie_restricted_area, goalie_desired_position))
     {
         return std::make_optional<Point>(goalie_desired_position);
     }
@@ -76,7 +77,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     else if (width_x_goal &&
              width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
              width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y() &&
-             field.friendlyGoal().x() <= goalie_desired_position.x())
+             field.friendlyGoalCenter().x() <= goalie_desired_position.x())
     {
         return std::make_optional<Point>(*width_x_goal);
     }
@@ -100,11 +101,6 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     {
         return std::nullopt;
     }
-}
-
-std::string GoalieTactic::getName() const
-{
-    return "Goalie Tactic";
 }
 
 void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
@@ -176,23 +172,23 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
         // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
-        auto ball_speed_panic = Util::DynamicParameters->getAIConfig()
+        auto ball_speed_panic = DynamicParameters->getAIConfig()
                                     ->getGoalieTacticConfig()
                                     ->BallSpeedPanic()
                                     ->value();
         // what should the final goalie speed be, so that the goalie accelerates faster
-        auto goalie_final_speed = Util::DynamicParameters->getAIConfig()
+        auto goalie_final_speed = DynamicParameters->getAIConfig()
                                       ->getGoalieTacticConfig()
                                       ->GoalieFinalSpeed()
                                       ->value();
         // how far in should the goalie wedge itself into the block cone, to block balls
-        auto block_cone_radius = Util::DynamicParameters->getAIConfig()
+        auto block_cone_radius = DynamicParameters->getAIConfig()
                                      ->getGoalieTacticConfig()
                                      ->BlockConeRadius()
                                      ->value();
         // by how much should the defense area be decreased so the goalie stays close
         // towards the net
-        auto defense_area_deflation = Util::DynamicParameters->getAIConfig()
+        auto defense_area_deflation = DynamicParameters->getAIConfig()
                                           ->getGoalieTacticConfig()
                                           ->DefenseAreaDeflation()
                                           ->value();
@@ -212,13 +208,13 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // the final speed is a dynamic parameter so that if the goalie needs
             // to dive for the shot instead of stop when reaching the intersection
             // point it can do so.
-            Point goalie_pos = closestPointOnSeg(
-                (*robot).position(), Segment(ball.position(), intersections[0]));
+            Point goalie_pos         = closestPoint((*robot).position(),
+                                            Segment(ball.position(), intersections[0]));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             move_action->updateControlParams(
                 *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
             next_action = move_action;
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
@@ -229,7 +225,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // if the ball is slow but its not safe to chip it out, don't.
             // TODO finesse the ball out of the goal using the dribbler.
             // for now we just stop https://github.com/UBC-Thunderbots/Software/issues/744
-            if (dont_chip_rectangle.contains(ball.position()) == true)
+            if (contains(dont_chip_rectangle, ball.position()) == true)
             {
                 stop_action->updateControlParams(*robot, false);
                 next_action = stop_action;
@@ -240,7 +236,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             {
                 chip_action->updateControlParams(
                     *robot, ball.position(),
-                    (ball.position() - field.friendlyGoal()).orientation(), 2);
+                    (ball.position() - field.friendlyGoalCenter()).orientation(), 2);
                 next_action = chip_action;
             }
         }
@@ -258,14 +254,14 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
             // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
             // either side
-            Point goalie_pos = calcBlockCone(
+            Point goalie_pos = calculateBlockCone(
                 field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
                 block_cone_radius * block_cone_angle.toRadians());
 
             // we want to restrict the block cone to the friendly crease, also potentially
             // scaled by a defense_area_deflation_parameter
             Rectangle deflated_defense_area = field.friendlyDefenseArea();
-            deflated_defense_area.expand(-defense_area_deflation);
+            deflated_defense_area.inflate(-defense_area_deflation);
 
             // restrain the goalie in the deflated defense area, if the goalie cannot be
             // restrained or if there is no proper intersection, then we safely default to
@@ -298,7 +294,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
             move_action->updateControlParams(*robot, goalie_pos, goalie_orientation,
                                              goalie_final_speed, DribblerEnable::OFF,
-                                             MoveType::NORMAL, AUTOCHIP,
+                                             MoveType::NORMAL, AutochickType::AUTOCHIP,
                                              BallCollisionType::ALLOW);
             next_action = move_action;
         }

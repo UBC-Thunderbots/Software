@@ -1,28 +1,21 @@
 #include "software/ai/hl/stp/tactic/patrol_tactic.h"
 
-#include <g3log/g3log.hpp>
-
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/logger/logger.h"
 
 
 PatrolTactic::PatrolTactic(const std::vector<Point> &points,
                            double at_patrol_point_tolerance,
                            Angle orientation_at_patrol_points,
                            double linear_speed_at_patrol_points)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       patrol_points(points),
       at_patrol_point_tolerance(at_patrol_point_tolerance),
       orientation_at_patrol_points(orientation_at_patrol_points),
       linear_speed_at_patrol_points(linear_speed_at_patrol_points),
       patrol_point_index(0)
 {
-}
-
-std::string PatrolTactic::getName() const
-{
-    return "Patrol Tactic";
 }
 
 double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -74,15 +67,16 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         move_action->updateControlParams(
             *robot, patrol_points.at(patrol_point_index), orientation_at_patrol_points,
             linear_speed_at_patrol_points, DribblerEnable::OFF, MoveType::NORMAL,
-            AutokickType::NONE, BallCollisionType::AVOID);
+            AutochickType::NONE, BallCollisionType::AVOID);
         if (move_action->done())
         {
             move_action->restart();
-            patrol_point_index = (patrol_point_index + 1) % patrol_points.size();
+            patrol_point_index = (patrol_point_index + 1) %
+                                 static_cast<unsigned int>(patrol_points.size());
             move_action->updateControlParams(
                 *robot, patrol_points.at(patrol_point_index),
                 orientation_at_patrol_points, linear_speed_at_patrol_points,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::AVOID);
         }
         yield(move_action);

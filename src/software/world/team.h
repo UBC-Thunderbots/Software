@@ -23,18 +23,20 @@ class Team
      * @param buffer_size The number of elements in the Timestamp history buffer of the
      * Team object
      */
-    explicit Team(const Duration& robot_expiry_buffer_duration,
-                  unsigned int buffer_size = 20);
+    explicit Team(
+        const Duration& robot_expiry_buffer_duration = Duration::fromMilliseconds(50),
+        unsigned int buffer_size                     = 20);
 
     /**
      * Create a new team
      *
+     * @param team_robots The robots on the team
      * @param robot_expiry_buffer_duration The Duration for which a robot must not
      * have been updated for before it is removed from the team
-     * @param team_robots The robots on the team
      */
-    explicit Team(const Duration& robot_expiry_buffer_duration,
-                  const std::vector<Robot>& team_robots);
+    explicit Team(
+        const std::vector<Robot>& team_robots,
+        const Duration& robot_expiry_buffer_duration = Duration::fromMilliseconds(50));
 
     /**
      * Updates this team with new robots.
@@ -48,24 +50,14 @@ class Team
      * Updates this team with new data from the given team object. This is different from
      * a copy constructor because the team object is only used to store data, we don't
      * take the entire state of the new_team_data. For example, the robots on this team
-     * may have complex internal state for predicting movement. In most cases the
-     * new_team_data we get will be constructed from a ROS message, and not contain this
-     * complex state. The "simple" robot data such as position, velocity... from the
-     * new_team_data is used to update the state of the robots on this team, rather than
-     * the robots simply being copied over (because if we copied we would lose our state).
+     * may have complex internal state for predicting movement. The "simple" robot data
+     * such as position, velocity... from the new_team_data is used to update the state of
+     * the robots on this team, rather than the robots simply being copied over
+     * (because if we copied we would lose our state).
      *
      * @param new_team_data A team with the new team data
      */
     void updateState(const Team& new_team_data);
-
-    /**
-     * Updates the Team's state to be its predicted state at the given timestamp.
-     * The timestamp must be >= the last update timestamp of the robots on the team
-     *
-     * @param timestamp The timestamp at which to update the team's state to. Must
-     * be >= the last update timestamp of the robots on the team
-     */
-    void updateStateToPredictedState(const Timestamp& timestamp);
 
     /**
      * Removes expired robots from the team. Robots are expired if it has been more than
@@ -97,7 +89,7 @@ class Team
      * @param new_goalie_id The id of the new goalie for this team
      *
      */
-    void assignGoalie(unsigned int new_goalie_id);
+    void assignGoalie(RobotId new_goalie_id);
 
     /**
      * Clears the goalie for this team. There will be no goalie assigned after
@@ -111,7 +103,7 @@ class Team
      *
      * @return the number of robots on this team
      */
-    std::size_t numRobots() const;
+    size_t numRobots() const;
 
     /**
      * Returns the Duration for which a Robot must not have been updated for before

@@ -1,17 +1,12 @@
 #include "software/test_util/test_util.h"
 
-namespace Test
-{
-    Field TestUtil::createSSLDivBField()
-    {
-        // Using the dimensions of a standard Division B SSL field
-        Field field = Field(9.0, 6.0, 1.0, 2.0, 1.0, 0.3, 0.5, Timestamp::fromSeconds(0));
-        return field;
-    }
+#include "software/geom/algorithms/distance.h"
 
-    World TestUtil::createBlankTestingWorld()
+namespace TestUtil
+{
+    World createBlankTestingWorld()
     {
-        Field field        = createSSLDivBField();
+        Field field        = Field::createSSLDivisionBField();
         Team friendly_team = Team(Duration::fromMilliseconds(1000));
         Team enemy_team    = Team(Duration::fromMilliseconds(1000));
         Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
@@ -21,9 +16,8 @@ namespace Test
         return world;
     }
 
-    Team TestUtil::setRobotPositionsHelper(Team team,
-                                           const std::vector<Point> &robot_positions,
-                                           const Timestamp &timestamp)
+    Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,
+                                 const Timestamp &timestamp)
     {
         std::vector<Robot> robots;
         unsigned int robot_id_index = 0;
@@ -42,64 +36,77 @@ namespace Test
         return team;
     }
 
-    World TestUtil::setFriendlyRobotPositions(World world,
-                                              std::vector<Point> robot_positions,
-                                              const Timestamp &timestamp)
+    World setFriendlyRobotPositions(World world, std::vector<Point> robot_positions,
+                                    const Timestamp &timestamp)
     {
         Team new_friendly_team =
             setRobotPositionsHelper(world.friendlyTeam(), robot_positions, timestamp);
-        world.mutableFriendlyTeam().clearAllRobots();
         world.updateFriendlyTeamState(new_friendly_team);
 
         return world;
     }
 
-    World TestUtil::setEnemyRobotPositions(World world,
-                                           std::vector<Point> robot_positions,
-                                           const Timestamp &timestamp)
+    World setEnemyRobotPositions(World world, std::vector<Point> robot_positions,
+                                 const Timestamp &timestamp)
     {
         Team new_enemy_team =
             setRobotPositionsHelper(world.enemyTeam(), robot_positions, timestamp);
-        world.mutableEnemyTeam().clearAllRobots();
         world.updateEnemyTeamState(new_enemy_team);
 
         return world;
     }
 
-    World TestUtil::setBallPosition(World world, Point ball_position, Timestamp timestamp)
+    World setBallPosition(World world, Point ball_position, Timestamp timestamp)
     {
-        BallState ballState =
-            BallState(ball_position, world.ball().velocity(), timestamp);
-        world.updateBallState(ballState);
+        TimestampedBallState ballState =
+            TimestampedBallState(ball_position, world.ball().velocity(), timestamp);
+        world.updateBallStateWithTimestamp(ballState);
 
         return world;
     }
 
-    World TestUtil::setBallVelocity(World world, Vector ball_velocity,
-                                    Timestamp timestamp)
+    World setBallVelocity(World world, Vector ball_velocity, Timestamp timestamp)
     {
-        BallState ballState =
-            BallState(world.ball().position(), ball_velocity, timestamp);
-        world.updateBallState(ballState);
+        TimestampedBallState ballState =
+            TimestampedBallState(world.ball().position(), ball_velocity, timestamp);
+        world.updateBallStateWithTimestamp(ballState);
 
         return world;
     }
 
-    std::vector<RefboxGameState> TestUtil::getAllRefboxGameStates()
-    {
-        std::vector<RefboxGameState> game_states;
-        for (int i = 0; i < static_cast<int>(RefboxGameState::REFBOX_GAME_STATE_COUNT);
-             i++)
-        {
-            game_states.push_back(static_cast<RefboxGameState>(i));
-        }
-        return game_states;
-    }
-
-    Robot TestUtil::createRobotAtPos(const Point &pt)
+    Robot createRobotAtPos(const Point &pt)
     {
         static RobotId robot_id_counter = 0;
         return Robot(robot_id_counter++, pt, Vector(), Angle(), AngularVelocity(),
                      Timestamp());
     }
-}  // namespace Test
+
+    double secondsSince(std::chrono::time_point<std::chrono::system_clock> start_time)
+    {
+        return millisecondsSince(start_time) / MILLISECONDS_PER_SECOND;
+    }
+
+    double millisecondsSince(
+        std::chrono::time_point<std::chrono::system_clock> start_time)
+    {
+        const auto end_time = std::chrono::system_clock::now();
+        return static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                       end_time - start_time)
+                                       .count()) /
+               NANOSECONDS_PER_MILLISECOND;
+    }
+
+    std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
+        const std::vector<Point> &positions)
+    {
+        std::vector<RobotStateWithId> states;
+        for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
+        {
+            states.push_back(RobotStateWithId{
+                .id          = id,
+                .robot_state = RobotState(positions[id], Vector(0, 0), Angle::zero(),
+                                          AngularVelocity::zero())});
+        }
+        return states;
+    }
+};  // namespace TestUtil

@@ -1,58 +1,57 @@
-/**
- * This file contains the unit tests for evaluation functions
- * in calc_best_shot.cpp
- */
-
 #include "software/ai/evaluation/calc_best_shot.h"
 
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
+#include "software/ai/evaluation/calc_best_shot_impl.h"
 #include "software/test_util/test_util.h"
 
 TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
 {
-    World world          = ::Test::TestUtil::createBlankTestingWorld();
+    World world          = ::TestUtil::createBlankTestingWorld();
     Team team            = Team(Duration::fromSeconds(1));
     Robot shooting_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
-                                                      world.enemyTeam(), shooting_robot);
+    auto result =
+        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                           shooting_robot.position(), TeamType::ENEMY, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(world.field().enemyGoal(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(result->getPointToShootAt(),
+                                               world.field().enemyGoalCenter(), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 12, 5);
 }
 
 TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
 {
-    World world          = ::Test::TestUtil::createBlankTestingWorld();
+    World world          = ::TestUtil::createBlankTestingWorld();
     Team team            = Team(Duration::fromSeconds(1));
     Robot shooting_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    auto result = Evaluation::calcBestShotOnFriendlyGoal(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(world.field(), world.friendlyTeam(),
+                                     world.enemyTeam(), shooting_robot.position(),
+                                     TeamType::FRIENDLY, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(world.field().friendlyGoal(), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(result->getPointToShootAt(),
+                                               world.field().friendlyGoalCenter(), 0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 12, 5);
 }
 
 TEST(CalcBestShotTest,
      calc_best_shot_on_enemy_goal_with_obstacles_and_no_obstacles_being_ignored)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
@@ -60,25 +59,27 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(
-        world, {world.field().enemyGoal(), Point(2.5, 0.7), Point(-1, -1)},
+    world = ::TestUtil::setEnemyRobotPositions(
+        world, {world.field().enemyGoalCenter(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
-                                                      world.enemyTeam(), shooting_robot);
+    auto result =
+        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                           shooting_robot.position(), TeamType::ENEMY, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(
-        Point(world.field().enemyGoal().x(), -0.3), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        result->getPointToShootAt(), Point(world.field().enemyGoalCenter().x(), -0.3),
+        0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
 }
 
 TEST(CalcBestShotTest,
      calc_best_shot_on_friendly_goal_with_obstacles_and_no_obstacles_being_ignored)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(-1, world.field().friendlyGoalpostNeg().y()), Vector(0, 0),
@@ -86,25 +87,27 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateEnemyTeamState(team);
 
-    world = ::Test::TestUtil::setFriendlyRobotPositions(
-        world, {world.field().friendlyGoal(), Point(-2.5, -0.7), Point(1, 1)},
+    world = ::TestUtil::setFriendlyRobotPositions(
+        world, {world.field().friendlyGoalCenter(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnFriendlyGoal(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(world.field(), world.friendlyTeam(),
+                                     world.enemyTeam(), shooting_robot.position(),
+                                     TeamType::FRIENDLY, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(
-        Point(world.field().friendlyGoal().x(), -0.3), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        result->getPointToShootAt(), Point(world.field().friendlyGoalCenter().x(), -0.3),
+        0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
 }
 
 TEST(CalcBestShotTest,
      calc_best_shot_on_enemy_goal_with_obstacles_and_some_obstacles_being_ignored)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
@@ -115,25 +118,27 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(
-        world, {world.field().enemyGoal(), Point(2.5, 0.7), Point(-1, -1)},
+    world = ::TestUtil::setEnemyRobotPositions(
+        world, {world.field().enemyGoalCenter(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
-                                                      world.enemyTeam(), shooting_robot);
+    auto result =
+        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                           shooting_robot.position(), TeamType::ENEMY, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(
-        Point(world.field().enemyGoal().x(), -0.3), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        result->getPointToShootAt(), Point(world.field().enemyGoalCenter().x(), -0.3),
+        0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
 }
 
 TEST(CalcBestShotTest,
      calc_best_shot_on_friendly_goal_with_obstacles_and_some_obstacles_being_ignored)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(-1, world.field().friendlyGoalpostNeg().y()), Vector(0, 0),
@@ -144,24 +149,26 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateEnemyTeamState(team);
 
-    world = ::Test::TestUtil::setFriendlyRobotPositions(
-        world, {world.field().friendlyGoal(), Point(-2.5, -0.7), Point(1, 1)},
+    world = ::TestUtil::setFriendlyRobotPositions(
+        world, {world.field().friendlyGoalCenter(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnFriendlyGoal(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(world.field(), world.friendlyTeam(),
+                                     world.enemyTeam(), shooting_robot.position(),
+                                     TeamType::FRIENDLY, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->getPointToShootAt().isClose(
-        Point(world.field().friendlyGoal().x(), -0.3), 0.05));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        result->getPointToShootAt(), Point(world.field().friendlyGoalCenter().x(), -0.3),
+        0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 6, 5);
 }
 
 TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_obstacles)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
@@ -169,21 +176,22 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_ob
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(
+    world = ::TestUtil::setEnemyRobotPositions(
         world, {shooting_robot.position() + Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(),
-                                                      world.enemyTeam(), shooting_robot);
+    auto result =
+        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                           shooting_robot.position(), TeamType::ENEMY, {shooting_robot});
 
     // We should not be able to find a shot
-    EXPECT_EQ(result->getOpenAngle().toRadians(), 0);
+    EXPECT_FALSE(result);
 }
 
 TEST(CalcBestShotTest,
      calc_best_shot_on_friendly_goal_with_all_shots_blocked_by_obstacles)
 {
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
     Team team   = Team(Duration::fromSeconds(1));
     Robot shooting_robot =
         Robot(0, Point(-1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
@@ -191,25 +199,26 @@ TEST(CalcBestShotTest,
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(
+    world = ::TestUtil::setEnemyRobotPositions(
         world, {shooting_robot.position() - Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnFriendlyGoal(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
+    auto result = calcBestShotOnGoal(world.field(), world.friendlyTeam(),
+                                     world.enemyTeam(), shooting_robot.position(),
+                                     TeamType::FRIENDLY, {shooting_robot});
 
     // We should not be able to find a shot
-    EXPECT_EQ(result->getOpenAngle().toRadians(), 0);
+    EXPECT_FALSE(result);
 }
 
 TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().enemyGoal() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::fromDegrees(90)};
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = Field::createSSLDivisionBField();
+    Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
+    Shot shot{world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
-    auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::ENEMY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 1.0, 0.01);
@@ -217,12 +226,12 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
 
 TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().enemyGoal() - Vector(0.5, 0);
-    Shot shot = {world.field().enemyGoal() + Vector(0, 0.25), Angle::fromDegrees(45)};
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = Field::createSSLDivisionBField();
+    Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
+    Shot shot{world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
-    auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::ENEMY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 0.5, 0.01);
@@ -230,12 +239,12 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net
 
 TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_fully_blocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().enemyGoal() - Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::zero()};
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = Field::createSSLDivisionBField();
+    Point shot_origin = world.field().enemyGoalCenter() - Vector(0.5, 0);
+    Shot shot{world.field().enemyGoalCenter(), Angle::zero()};
 
-    auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::FRIENDLY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 0.0, 0.01);
@@ -243,12 +252,12 @@ TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_fully_blocked_net)
 
 TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().friendlyGoal() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::fromDegrees(90)};
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = Field::createSSLDivisionBField();
+    Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
+    Shot shot{world.field().enemyGoalCenter(), Angle::fromDegrees(90)};
 
-    auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::FRIENDLY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 1.0, 0.01);
@@ -256,12 +265,12 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
 
 TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().friendlyGoal() + Vector(0.5, 0);
-    Shot shot = {world.field().enemyGoal() + Vector(0, 0.25), Angle::fromDegrees(45)};
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = Field::createSSLDivisionBField();
+    Point shot_origin = world.field().friendlyGoalCenter() + Vector(0.5, 0);
+    Shot shot{world.field().enemyGoalCenter() + Vector(0, 0.25), Angle::fromDegrees(45)};
 
-    auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::FRIENDLY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 0.5, 0.01);
@@ -269,12 +278,12 @@ TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_
 
 TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_fully_blocked_net)
 {
-    World world       = ::Test::TestUtil::createBlankTestingWorld();
-    Field field       = ::Test::TestUtil::createSSLDivBField();
-    Point shot_origin = world.field().enemyGoal() + Vector(0.5, 0);
-    Shot shot         = {world.field().enemyGoal(), Angle::zero()};
+    World world       = ::TestUtil::createBlankTestingWorld();
+    Field field       = Field::createSSLDivisionBField();
+    Point shot_origin = world.field().enemyGoalCenter() + Vector(0.5, 0);
+    Shot shot{world.field().enemyGoalCenter(), Angle::zero()};
 
-    auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
+    auto result = calcShotOpenNetPercentage(field, shot_origin, shot, TeamType::ENEMY);
 
     // We should not be able to find a shot
     EXPECT_NEAR(result, 0.0, 0.01);
@@ -286,14 +295,12 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_no_obstacles)
     Segment ref_segment     = Segment(Point(202, 15), Point(202, -15));
     Point origin            = Point(0, 0);
 
-    auto open_shot =
-        Evaluation::calcMostOpenDirectionFromCircleObstacles(origin, ref_segment, obs);
+    auto open_shot = calcMostOpenDirectionFromCircleObstacles(origin, ref_segment, obs);
 
-    EXPECT_EQ((ref_segment.getSegStart() - origin).orientation() -
+    EXPECT_EQ((ref_segment.getStart() - origin).orientation() -
                   (ref_segment.getEnd() - origin).orientation(),
               open_shot->getOpenAngle());
-    EXPECT_EQ(getPointsMean({ref_segment.getSegStart(), ref_segment.getEnd()}),
-              open_shot->getPointToShootAt());
+    EXPECT_EQ(ref_segment.midPoint(), open_shot->getPointToShootAt());
 }
 
 TEST(CalcBestShotTest, test_calc_most_open_seg_obstacle_center_obstacle)
@@ -301,7 +308,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_obstacle_center_obstacle)
     Circle obst1 = Circle(Point(100, 0), 0.5);
 
     std::vector<Circle> obs = {obst1};
-    auto open_shot          = Evaluation::calcMostOpenDirectionFromCircleObstacles(
+    auto open_shot          = calcMostOpenDirectionFromCircleObstacles(
         Point(0, 0), Segment(Point(202, 15), Point(202, -15)), obs);
     EXPECT_NEAR(open_shot->getOpenAngle().toRadians(), 0.069121, 0.001);
     EXPECT_NEAR(open_shot->getPointToShootAt().x(), Point(202, 8.00501).x(), 0.001);
@@ -317,7 +324,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg)
     Circle obst5 = Circle(Point(200, 10), 0.5);
 
     std::vector<Circle> obs = {obst1, obst2, obst3, obst4, obst5};
-    auto open_shot          = Evaluation::calcMostOpenDirectionFromCircleObstacles(
+    auto open_shot          = calcMostOpenDirectionFromCircleObstacles(
         Point(0, 0), Segment(Point(202, 15), Point(202, -15)), obs);
     EXPECT_NEAR(open_shot->getOpenAngle().toRadians(), 0.038961, 0.0001);
     EXPECT_NEAR(open_shot->getPointToShootAt().x(), Point(202, 5.65572).x(), 0.001);
@@ -336,8 +343,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_line_of_obstacles_half_blocked)
         obs.push_back(Circle(Point(5, i), 0.5));
     }
 
-    auto open_shot =
-        Evaluation::calcMostOpenDirectionFromCircleObstacles(Point(0, 0), ref_seg, obs);
+    auto open_shot = calcMostOpenDirectionFromCircleObstacles(Point(0, 0), ref_seg, obs);
     EXPECT_NEAR(open_shot->getOpenAngle().toRadians(), 0.884578, 0.001);
     EXPECT_NEAR(open_shot->getPointToShootAt().x(), 10.0, 0.001);
     EXPECT_NEAR(open_shot->getPointToShootAt().y(), 4.5024, 0.001);
@@ -355,8 +361,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_line_of_obstacles_complete_blocke
         obs.push_back(Circle(Point(5, i), 0.5));
     }
 
-    auto open_shot =
-        Evaluation::calcMostOpenDirectionFromCircleObstacles(Point(0, 0), ref_seg, obs);
+    auto open_shot = calcMostOpenDirectionFromCircleObstacles(Point(0, 0), ref_seg, obs);
     EXPECT_FALSE(open_shot.has_value());
 }
 
@@ -369,8 +374,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_touching_blocking_obstacle)
 
     obs.push_back(Circle(Point(0.5, 0), 0.5));
 
-    auto open_shot =
-        Evaluation::calcMostOpenDirectionFromCircleObstacles(Point(0, 0), ref_seg, obs);
+    auto open_shot = calcMostOpenDirectionFromCircleObstacles(Point(0, 0), ref_seg, obs);
     EXPECT_FALSE(open_shot.has_value());
 }
 
@@ -383,8 +387,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_close_blocking_obstacle)
 
     obs.push_back(Circle(Point(0.55, 0), 0.5));
 
-    auto open_shot =
-        Evaluation::calcMostOpenDirectionFromCircleObstacles(Point(0, 0), ref_seg, obs);
+    auto open_shot = calcMostOpenDirectionFromCircleObstacles(Point(0, 0), ref_seg, obs);
     EXPECT_FALSE(open_shot.has_value());
 }
 
@@ -395,7 +398,7 @@ TEST(CalcBestShotTest, test_open_shot_with_a_dense_wall_of_obstacles)
     obs.push_back(Circle(Point(3, 0), 0.09));
     obs.push_back(Circle(Point(3, 0.09), 0.09));
     // Using an obstacle radius of 0.1 passes, but 0.09 fails. Interesting...
-    auto testpair_opt = Evaluation::calcMostOpenDirectionFromCircleObstacles(
+    auto testpair_opt = calcMostOpenDirectionFromCircleObstacles(
         Point(0, 0), Segment(Point(4.5, -0.15), Point(4.5, 0.15)), obs);
     // We do not expect to get a result
     EXPECT_FALSE(testpair_opt.has_value());
@@ -407,7 +410,7 @@ TEST(CalcBestShotTest, test_calc_open_shot_with_a_dense_wall_of_obstacles_2)
     obs.push_back(Circle(Point(3, 0.05), 0.1));
     obs.push_back(Circle(Point(3, -0.05), 0.1));
 
-    auto testpair_opt = Evaluation::calcMostOpenDirectionFromCircleObstacles(
+    auto testpair_opt = calcMostOpenDirectionFromCircleObstacles(
         Point(0, 0), Segment(Point(4.5, -0.15), Point(4.5, 0.15)), obs);
     // We do not expect to get a result
     EXPECT_FALSE(testpair_opt.has_value());
@@ -425,10 +428,9 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_obstacles_behind)
         obs.push_back(Circle(Point(-5, i), 0.5));
     }
 
-    auto open_shot =
-        Evaluation::calcMostOpenDirectionFromCircleObstacles(reference, ref_seg, obs);
+    auto open_shot = calcMostOpenDirectionFromCircleObstacles(reference, ref_seg, obs);
     EXPECT_EQ(open_shot->getOpenAngle(),
-              (ref_seg.getSegStart() - reference)
+              (ref_seg.getStart() - reference)
                   .orientation()
                   .minDiff((ref_seg.getEnd() - reference).orientation())
                   .abs());
@@ -448,8 +450,7 @@ TEST(CalcBestShotTest,
     // Blocking obstacles-
     obs.push_back(Circle(Point(8, 0), 1));
     obs.push_back(Circle(Point(8, 1), 1));
-    auto open_shot =
-        Evaluation::calcMostOpenDirectionFromCircleObstacles(reference, ref_seg, obs);
+    auto open_shot = calcMostOpenDirectionFromCircleObstacles(reference, ref_seg, obs);
     EXPECT_EQ(open_shot->getOpenAngle(), Angle::fromRadians(0.66007033222938283));
     EXPECT_NEAR(open_shot->getPointToShootAt().x(), Point(10, -5.629940788).x(), 0.001);
     EXPECT_NEAR(open_shot->getPointToShootAt().y(), Point(10, -5.629940788).y(), 0.001);
@@ -472,8 +473,7 @@ TEST(CalcBestShotTest, test_calc_most_open_seg_robot_parameter_version)
                            AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0)));
     robots.push_back(Robot(14, Point(8, 0), Vector(0, 0), Angle::fromRadians(0),
                            AngularVelocity::fromRadians(0), Timestamp::fromSeconds(0)));
-    auto open_shot =
-        Evaluation::calcMostOpenDirectionFromRobotObstacles(reference, ref_seg, robots);
+    auto open_shot = calcMostOpenDirectionFromRobotObstacles(reference, ref_seg, robots);
     EXPECT_NEAR(open_shot->getOpenAngle().toRadians(), 0.774148, 0.001);
     EXPECT_NEAR(open_shot->getPointToShootAt().x(), Point(10, -5.05625).x(), 0.001);
     EXPECT_NEAR(open_shot->getPointToShootAt().y(), Point(10, -5.05625).y(), 0.001);
@@ -485,7 +485,7 @@ TEST(CalcBestShotTest, test_calc_open_shot_circles)
     obs.push_back(Circle(Point(-9, 10), 1.0));
     obs.push_back(Circle(Point(9, 10), 1.0));
 
-    auto testshot = Evaluation::calcMostOpenDirectionFromCircleObstacles(
+    auto testshot = calcMostOpenDirectionFromCircleObstacles(
         Point(0, 0), Segment(Point(10, 10), Point(-10, 10)), obs);
 
     // We expect to get a result
@@ -501,7 +501,7 @@ TEST(CalcBestShotTest, test_calc_open_shot_circles)
     obs.push_back(Circle(Point(6, 8), 1.0));
     obs.push_back(Circle(Point(4, 10), 1.0));
 
-    testshot = Evaluation::calcMostOpenDirectionFromCircleObstacles(
+    testshot = calcMostOpenDirectionFromCircleObstacles(
         Point(0, 0), Segment(Point(10, 10), Point(-10, 10)), obs);
 
     // We expect to get a result

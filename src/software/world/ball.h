@@ -1,18 +1,20 @@
 #pragma once
 
-#include <boost/circular_buffer.hpp>
 #include <optional>
-#include <vector>
 
-#include "software/new_geom/point.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
 #include "software/time/timestamp.h"
-#include "software/world/ball_state.h"
+#include "software/world/ball_model/ball_model.h"
+#include "software/world/timestamped_ball_state.h"
 
 class Ball final
 {
    public:
+    Ball() = delete;
+
     /**
-     * Creates a new ball with a new state given by the position and velocity
+     * Creates a new ball with the given initial state
      *
      * @param position The position of the ball, with coordinates in metres
      * @param velocity The velocity of the ball, in metres per second
@@ -20,24 +22,33 @@ class Ball final
      * given position and velocity
      * @param history_size The number of previous ball states that should be stored. Must
      * be > 0
-     *
      */
-    explicit Ball(Point position, Vector velocity, const Timestamp &timestamp,
-                  unsigned int history_size = 20);
-
+    explicit Ball(const Point &position, const Vector &velocity,
+                  const Timestamp &timestamp, unsigned int history_size = 20);
 
     /**
-     * Creates a new ball with the given BallState
+     * Creates a new ball with the given initial state
      *
-     * @param ball_state the state of the ball
-     * @param history_size the number of previous ball states that should be stored
+     * @param initial_state The initial state of the ball
+     * @param history_size The number of previous ball states that should be stored. Must
+     * be > 0
      */
-    explicit Ball(BallState &ball_state, unsigned int history_size = 20);
+    explicit Ball(const TimestampedBallState &initial_state,
+                  unsigned int history_size = 20);
 
     /**
      * Returns the current state of the ball
+     *
+     * @return TimestampedBallState
      */
-    BallState currentState() const;
+    TimestampedBallState currentState() const;
+
+    /**
+     * Returns the ball model to predict future states
+     *
+     * @return ball model
+     */
+    const std::shared_ptr<BallModel> &ballModel() const;
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
@@ -45,17 +56,7 @@ class Ball final
      *
      * @param new_state the new state of the ball
      */
-    void updateState(const BallState &new_state);
-
-    /**
-     * Updates the ball's state to be its predicted state at the given timestamp.
-     * The timestamp must be >= the ball's last update timestamp
-     *
-     * @throws std::invalid_argument if the ball is updated with a time from the past
-     * @param timestamp The timestamp at which to update the ball's state to. Must
-     * be >= the ball's last update timestamp
-     */
-    void updateStateToPredictedState(const Timestamp &timestamp);
+    void updateState(const TimestampedBallState &new_state);
 
     /**
      * Returns the timestamp for when this ball's data was last updated
@@ -72,22 +73,6 @@ class Ball final
     Point position() const;
 
     /**
-     * Returns the estimated position of the ball at a future time, relative to when the
-     * ball was last updated.
-     *
-     * @param duration_in_future The relative amount of time in the future
-     * at which to predict the ball's position. Value must be >= 0.
-     * For example, a value of 1.5 seconds would return the estimated position of the ball
-     * 1.5 seconds in the future.
-     *
-     * @throws std::invalid_argument if the ball is estimating the position with a time
-     * from the past
-     * @return the estimated position of the ball at the given number of milliseconds
-     * in the future. Coordinates are in metres.
-     */
-    Point estimatePositionAtFutureTime(const Duration &duration_in_future) const;
-
-    /**
      * Returns the current velocity of the ball
      *
      * @return the current velocity of the ball
@@ -95,38 +80,12 @@ class Ball final
     Vector velocity() const;
 
     /**
-     * Returns the estimated velocity of the ball at a future time, relative to when the
-     * ball was last updated
-     *
-     * @param duration_in_future The relative amount of time in the future
-     * at which to predict the ball's velocity. Value must be >= 0.
-     * For example, a value of 1.5 seconds would return the estimated velocity of the ball
-     * 1.5 seconds in the future.
-     *
-     * @throws std::invalid_argument if the ball is estimating the velocity with a time
-     * from the past
-     * @return the estimated velocity of the ball at the given number of milliseconds
-     * in the future. Coordinates are in metres.
-     */
-    Vector estimateVelocityAtFutureTime(const Duration &duration_in_future) const;
-
-    /**
      * Gets the previous states stored in states_
      *
      * @return The circular buffer containing the state history starting with the newest
      * available data at index 0
      */
-    boost::circular_buffer<BallState> getPreviousStates() const;
-
-    /**
-     * Finds an update timestamp that is close to the provided timestamp and returns the
-     * index of the timestamp in the history buffer.
-     *
-     * @param timestamp timestamp of the update state index we wish to fetch
-     * @return Index of the ball's update timestamp closest to the desired time or a
-     * std::nullopt if there is not matching timestamp.
-     */
-    std::optional<int> getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
+    BallHistory getPreviousStates() const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
@@ -150,5 +109,7 @@ class Ball final
     // queue, This buffer will never be empty as it's initialized with a BallState on
     // creation
     // The buffer size (history_size) must be > 0
-    boost::circular_buffer<BallState> states_;
+    BallHistory states_;
+
+    std::shared_ptr<BallModel> ball_model_;
 };

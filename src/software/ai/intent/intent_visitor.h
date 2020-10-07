@@ -1,19 +1,12 @@
 #pragma once
 
-// We forward-declare all the intents because if we include them we induce a
-// circular dependency between the Individual library for each intent and this
-// visitor. Ex: `CatchIntent` includes `IntentVisitor`, but `IntentVisitor`
-// also includes `CatchIntent`
-class CatchIntent;
-class ChipIntent;
-class DirectVelocityIntent;
-class DirectWheelsIntent;
-class DribbleIntent;
-class KickIntent;
+// We forward-declare all the intents because if we include them we induce a circular
+// dependency between the individual library for each intent and this visitor. This is
+// because intent.h includes intent_visitor.h, and each individual library includes
+// intent.h. Note: every subclass of this visitor must include all of the classes listed
+// below
 class MoveIntent;
-class MoveSpinIntent;
-class PivotIntent;
-class StopIntent;
+class DirectPrimitiveIntent;
 
 /**
  * This class provides an interface for all Intent Visitors. The Visitor design pattern
@@ -28,72 +21,19 @@ class IntentVisitor
     virtual ~IntentVisitor() = default;
 
     /**
-     * Visits a CatchIntent to perform an operation.
+     * Visits an Intent to perform an operation.
+     * NOTE: Since NavigatingIntent also has a visitor, we need to visit each
+     * individual subclass of NavigatingIntent
      *
-     * @param catch_intent The CatchIntent to visit
+     * @param intent The Intent to visit
      */
-    virtual void visit(const CatchIntent &catch_intent) = 0;
+    virtual void visit(const MoveIntent &intent) = 0;
 
     /**
-     * Visits a ChipIntent to perform an operation.
+     * Visits an DirectPrimitiveIntent to perform an operation.
+     * NOTE: This visit covers all the subclasses of DirectPrimitiveIntent
      *
-     * @param chip_intent The ChipIntent to visit
+     * @param intent The Intent to visit
      */
-    virtual void visit(const ChipIntent &chip_intent) = 0;
-
-    /**
-     * Visits a DirectVelocityIntent to perform an operation.
-     *
-     * @param direct_velocity_intent The DirectVelocityIntent to visit
-     */
-    virtual void visit(const DirectVelocityIntent &direct_velocity_intent) = 0;
-
-    /**
-     * Visits a DirectWheelsIntent to perform an operation.
-     *
-     * @param direct_wheels_intent The DirectWheelsIntent to visit
-     */
-    virtual void visit(const DirectWheelsIntent &direct_wheels_intent) = 0;
-
-    /**
-     * Visits a DribbleIntent to perform an operation.
-     *
-     * @param direct_wheels_intent The DribbleIntent to visit
-     */
-    virtual void visit(const DribbleIntent &direct_wheels_intent) = 0;
-
-    /**
-     * Visits a KickIntent to perform an operation.
-     *
-     * @param kick_intent The KickIntent to visit
-     */
-    virtual void visit(const KickIntent &kick_intent) = 0;
-
-    /**
-     * Visits a MoveIntent to perform an operation.
-     *
-     * @param move_intent The MoveIntent to visit
-     */
-    virtual void visit(const MoveIntent &move_intent) = 0;
-
-    /**
-     * Visits a MoveSpinIntent to perform an operation.
-     *
-     * @param move_spin_intent The MoveSpinIntent to visit
-     */
-    virtual void visit(const MoveSpinIntent &move_spin_intent) = 0;
-
-    /**
-     * Visits a PivotIntent to perform an operation.
-     *
-     * @param pivot_intent The PivotIntent to visit
-     */
-    virtual void visit(const PivotIntent &pivot_intent) = 0;
-
-    /**
-     * Visits a StopIntent to perform an operation.
-     *
-     * @param stop_intent The StopIntent to visit
-     */
-    virtual void visit(const StopIntent &stop_intent) = 0;
+    virtual void visit(const DirectPrimitiveIntent &intent) = 0;
 };

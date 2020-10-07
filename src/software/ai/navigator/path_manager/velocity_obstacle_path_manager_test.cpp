@@ -3,16 +3,16 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
-#include "software/new_geom/point.h"
+#include "software/geom/point.h"
 
 TEST(TestVelocityObstaclePathManager, test_no_obstacles)
 {
     Point start{0, 0}, dest{1, 1};
     auto path_manager = std::make_unique<VelocityObstaclePathManager>(
         std::make_unique<StraightLinePathPlanner>(),
-        ObstacleFactory(std::make_shared<ObstacleFactoryConfig>()),
-        std::make_shared<VelocityObstaclePathManagerConfig>());
-    std::vector<Obstacle> obstacles;
+        RobotNavigationObstacleFactory(
+            std::make_shared<RobotNavigationObstacleFactoryConfig>()));
+    std::vector<ObstaclePtr> obstacles;
 
     Rectangle navigable_area = Rectangle(Point(0, 0), Point(1, 1));
     std::unordered_set<PathObjective> path_objectives;

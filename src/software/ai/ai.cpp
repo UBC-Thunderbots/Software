@@ -12,9 +12,10 @@ AI::AI(std::shared_ptr<const AIConfig> ai_config,
     : navigator(std::make_shared<Navigator>(
           std::make_unique<VelocityObstaclePathManager>(
               std::make_unique<ThetaStarPathPlanner>(),
-              ObstacleFactory(ai_config->getObstacleFactoryConfig()),
-              ai_config->getVelocityObstaclePathManagerConfig()),
-          ObstacleFactory(ai_config->getObstacleFactoryConfig()),
+              RobotNavigationObstacleFactory(
+                  ai_config->getRobotNavigationObstacleFactoryConfig())),
+          RobotNavigationObstacleFactory(
+              ai_config->getRobotNavigationObstacleFactoryConfig()),
           ai_config->getNavigatorConfig())),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
@@ -23,14 +24,11 @@ AI::AI(std::shared_ptr<const AIConfig> ai_config,
 {
 }
 
-std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(const World &world) const
+std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world) const
 {
-    std::vector<std::unique_ptr<Intent>> assignedIntents = high_level->getIntents(world);
+    std::vector<std::unique_ptr<Intent>> assigned_intents = high_level->getIntents(world);
 
-    std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
-        navigator->getAssignedPrimitives(world, assignedIntents);
-
-    return assignedPrimitives;
+    return navigator->getAssignedPrimitives(world, assigned_intents);
 }
 
 PlayInfo AI::getPlayInfo() const

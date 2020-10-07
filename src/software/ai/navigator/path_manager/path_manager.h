@@ -5,9 +5,9 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/path_manager/path_objective.h"
 #include "software/ai/navigator/path_planner/path_planner.h"
-#include "software/geom/spline.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
+#include "software/geom/linear_spline2d.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 
 /**
  * PathManager is an interface for a path manager that,
@@ -35,4 +35,11 @@ class PathManager
         const Rectangle &navigable_area) = 0;
 
     virtual ~PathManager() = default;
+
+    /**
+     * Get the obstacles being used for path planning
+     *
+     * @return obstacles
+     */
+    virtual const std::vector<ObstaclePtr> getObstacles(void) const = 0;
 };

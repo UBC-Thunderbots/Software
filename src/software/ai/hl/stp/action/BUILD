@@ -6,10 +6,12 @@ cc_library(
     hdrs = ["chip_action.h"],
     deps = [
         ":action",
-        ":action_visitor",
         "//shared:constants",
         "//software/ai/intent:chip_intent",
         "//software/ai/intent:move_intent",
+        "//software/geom:polygon",
+        "//software/geom:triangle",
+        "//software/geom/algorithms",
     ],
 )
 
@@ -18,26 +20,7 @@ cc_test(
     srcs = ["chip_action_test.cpp"],
     deps = [
         ":chip_action",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "dribble_action",
-    srcs = ["dribble_action.cpp"],
-    hdrs = ["dribble_action.h"],
-    deps = [
-        ":action",
-        ":action_visitor",
-        "//software/ai/intent:dribble_intent",
-    ],
-)
-
-cc_test(
-    name = "dribble_action_test",
-    srcs = ["dribble_action_test.cpp"],
-    deps = [
-        ":dribble_action",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -48,16 +31,13 @@ cc_library(
     hdrs = ["intercept_ball_action.h"],
     deps = [
         ":action",
-        ":action_visitor",
+        ":move_action",
         "//shared:constants",
         "//software/ai/evaluation:intercept",
         "//software/ai/evaluation:robot",
         "//software/ai/intent:move_intent",
-        "//software/geom",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/new_geom/util:closest_point",
-        "//software/new_geom/util:distance",
-        "//software/new_geom/util:intersection",
         "//software/world:ball",
         "//software/world:field",
     ],
@@ -69,6 +49,8 @@ cc_test(
     deps = [
         ":intercept_ball_action",
         "//software/ai/intent:move_intent",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
         "//software/test_util",
         "//software/world:ball",
         "@gtest//:gtest_main",
@@ -81,10 +63,11 @@ cc_library(
     hdrs = ["kick_action.h"],
     deps = [
         ":action",
-        ":action_visitor",
         "//shared:constants",
         "//software/ai/intent:kick_intent",
         "//software/ai/intent:move_intent",
+        "//software/geom:polygon",
+        "//software/geom/algorithms",
         "//software/world:ball",
     ],
 )
@@ -94,6 +77,7 @@ cc_test(
     srcs = ["kick_action_test.cpp"],
     deps = [
         ":kick_action",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -104,7 +88,6 @@ cc_library(
     hdrs = ["move_action.h"],
     deps = [
         ":action",
-        ":action_visitor",
         "//software/ai/intent:move_intent",
     ],
 )
@@ -119,45 +102,20 @@ cc_test(
 )
 
 cc_library(
-    name = "movespin_action",
-    srcs = ["movespin_action.cpp"],
-    hdrs = ["movespin_action.h"],
+    name = "spinning_move_action",
+    srcs = ["spinning_move_action.cpp"],
+    hdrs = ["spinning_move_action.h"],
     deps = [
         ":action",
-        ":action_visitor",
-        "//software/ai/intent:movespin_intent",
+        "//software/ai/intent:spinning_move_intent",
     ],
 )
 
 cc_test(
-    name = "movespin_action_test",
-    srcs = ["movespin_action_test.cpp"],
+    name = "spinning_move_action_test",
+    srcs = ["spinning_move_action_test.cpp"],
     deps = [
-        ":movespin_action",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "pivot_action",
-    srcs = ["pivot_action.cpp"],
-    hdrs = ["pivot_action.h"],
-    deps = [
-        ":action",
-        ":action_visitor",
-        "//shared:constants",
-        "//software/ai/intent:move_intent",
-        "//software/ai/intent:pivot_intent",
-        "//software/parameter:dynamic_parameters",
-        "@g3log",
-    ],
-)
-
-cc_test(
-    name = "pivot_action_test",
-    srcs = ["pivot_action_test.cpp"],
-    deps = [
-        ":pivot_action",
+        ":spinning_move_action",
         "@gtest//:gtest_main",
     ],
 )
@@ -168,7 +126,6 @@ cc_library(
     hdrs = ["stop_action.h"],
     deps = [
         ":action",
-        ":action_visitor",
         "//software/ai/intent:stop_intent",
     ],
 )
@@ -187,12 +144,10 @@ cc_library(
     srcs = ["all_actions.h"],
     deps = [
         ":chip_action",
-        ":dribble_action",
         ":intercept_ball_action",
         ":kick_action",
         ":move_action",
-        ":movespin_action",
-        ":pivot_action",
+        ":spinning_move_action",
         ":stop_action",
     ],
 )
@@ -202,6 +157,7 @@ cc_library(
     srcs = ["action.cpp"],
     hdrs = ["action.h"],
     deps = [
+        ":mutable_action_visitor",
         "//software/ai/intent",
         "//software/world:ball",
         "//software/world:robot",
@@ -221,9 +177,8 @@ cc_test(
 )
 
 cc_library(
-    name = "action_visitor",
+    name = "mutable_action_visitor",
     hdrs = ["mutable_action_visitor.h"],
-    deps = [":action"],
 )
 
 cc_library(
@@ -231,8 +186,8 @@ cc_library(
     srcs = ["action_world_params_update_visitor.cpp"],
     hdrs = ["action_world_params_update_visitor.h"],
     deps = [
-        ":action_visitor",
         ":all_actions",
+        ":mutable_action_visitor",
         "//software/world",
     ],
 )

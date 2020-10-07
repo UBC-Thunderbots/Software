@@ -3,8 +3,8 @@
 #include "shared/constants.h"
 #include "software/ai/intent/kick_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/geom/util.h"
-#include "software/new_geom/polygon.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/polygon.h"
 #include "software/world/ball.h"
 
 KickAction::KickAction() : Action(true), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
@@ -105,7 +105,7 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
     Polygon behind_ball_region =
         Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
 
-    bool robot_behind_ball = behind_ball_region.contains(robot->position());
+    bool robot_behind_ball = contains(behind_ball_region, robot->position());
     // The point in the middle of the region behind the ball
     Point point_behind_ball =
         kick_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
@@ -113,9 +113,10 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
     // If we're not in position to kick, move into position
     if (!robot_behind_ball)
     {
-        yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball, kick_direction,
-                                           0.0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-                                           AutokickType::NONE, BallCollisionType::ALLOW));
+
+        yield(std::make_unique<MoveIntent>(
+            robot->id(), point_behind_ball, kick_direction, 0.0, 0, DribblerEnable::OFF,
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID));
     }
     else
     {

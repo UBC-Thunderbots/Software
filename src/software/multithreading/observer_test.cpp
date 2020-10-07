@@ -28,7 +28,7 @@ TEST(Observer, receiveValue_value_not_yet_available)
 {
     TestObserver test_observer;
 
-    // Create a seperate thread to grab the value for us
+    // Create a separate thread to grab the value for us
     std::optional<int> result = std::nullopt;
     std::thread receive_value_thread([&]() {
         while (!result)
@@ -45,4 +45,33 @@ TEST(Observer, receiveValue_value_not_yet_available)
 
     ASSERT_TRUE(result);
     EXPECT_EQ(202, *result);
+}
+
+TEST(Observer, getDataReceivedPerSecond_time_buffer_filled)
+{
+    TestObserver test_observer;
+    for (unsigned int i = 0; i < TestObserver::TIME_BUFFER_SIZE; i++)
+    {
+        test_observer.receiveValue(i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 5 / (4 * 0.01), 10);
+}
+
+TEST(Observer, getDataReceivedPerSecond_time_buffer_empty)
+{
+    TestObserver test_observer;
+    EXPECT_EQ(test_observer.getDataReceivedPerSecond(), 0);
+}
+
+TEST(Observer, getDataReceivedPerSecond_time_buffer_partially_empty)
+{
+    TestObserver test_observer;
+    for (unsigned int i = 0; i < TestObserver::TIME_BUFFER_SIZE / 2; i++)
+    {
+        test_observer.receiveValue(i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(),
+                (TestObserver::TIME_BUFFER_SIZE / 2) / (1 * 0.01), 35);
 }

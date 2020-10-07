@@ -1,6 +1,4 @@
 /**
- * This file contains the declaration for the GradientDescentOptimizer
- *
  * NOTE: We do not use `using namespace ...` here, because this is still a header file,
  *       and as such anything that includes `gradient_descent.h` (which includes this
  *       file), would get any namespaces we use here
@@ -17,30 +15,7 @@
 #include "software/optimization/gradient_descent_optimizer.h"
 
 template <size_t NUM_PARAMS>
-Util::GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer()
-    : GradientDescentOptimizer(GradientDescentOptimizer<NUM_PARAMS>::ParamArray{1})
-{
-}
-
-template <size_t NUM_PARAMS>
-Util::GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
-    std::array<double, NUM_PARAMS> param_weights)
-    : GradientDescentOptimizer(param_weights, DEFAULT_GRADIENT_APPROX_STEP_SIZE)
-{
-}
-
-
-template <size_t NUM_PARAMS>
-Util::GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
-    std::array<double, NUM_PARAMS> param_weights, double gradient_approx_step_size)
-    : GradientDescentOptimizer(param_weights, gradient_approx_step_size,
-                               DEFAULT_PAST_GRADIENT_DECAY_RATE,
-                               DEFAULT_PAST_SQUARED_GRADIENT_DECAY_RATE)
-{
-}
-
-template <size_t NUM_PARAMS>
-Util::GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
+GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
     std::array<double, NUM_PARAMS> param_weights, double gradient_approx_step_size,
     double past_gradient_decay_rate, double past_squared_gradient_decay_rate)
     : param_weights(param_weights),
@@ -51,7 +26,7 @@ Util::GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
 }
 
 template <size_t NUM_PARAMS>
-std::array<double, NUM_PARAMS> Util::GradientDescentOptimizer<NUM_PARAMS>::maximize(
+std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::maximize(
     std::function<double(std::array<double, NUM_PARAMS>)> objective_function,
     std::array<double, NUM_PARAMS> initial_value, unsigned int num_iters)
 {
@@ -61,7 +36,7 @@ std::array<double, NUM_PARAMS> Util::GradientDescentOptimizer<NUM_PARAMS>::maxim
 }
 
 template <size_t NUM_PARAMS>
-std::array<double, NUM_PARAMS> Util::GradientDescentOptimizer<NUM_PARAMS>::minimize(
+std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::minimize(
     std::function<double(std::array<double, NUM_PARAMS>)> objective_function,
     std::array<double, NUM_PARAMS> initial_value, unsigned int num_iters)
 {
@@ -71,7 +46,7 @@ std::array<double, NUM_PARAMS> Util::GradientDescentOptimizer<NUM_PARAMS>::minim
 }
 
 template <size_t NUM_PARAMS>
-std::array<double, NUM_PARAMS> Util::GradientDescentOptimizer<NUM_PARAMS>::followGradient(
+std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::followGradient(
     std::function<double(std::array<double, NUM_PARAMS>)> objective_function,
     std::array<double, NUM_PARAMS> initial_value, unsigned int num_iters,
     std::function<double(double, double)> gradient_movement_func)
@@ -137,8 +112,7 @@ std::array<double, NUM_PARAMS> Util::GradientDescentOptimizer<NUM_PARAMS>::follo
 }
 
 template <size_t NUM_PARAMS>
-std::array<double, NUM_PARAMS>
-Util::GradientDescentOptimizer<NUM_PARAMS>::approximateGradient(
+std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::approximateGradient(
     std::array<double, NUM_PARAMS> params,
     std::function<double(std::array<double, NUM_PARAMS>)> objective_function)
 {

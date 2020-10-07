@@ -1,24 +1,12 @@
-#include "software/parameter/config.hpp"
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
 
+#include "software/parameter/dynamic_parameters.h"
 #include "software/parameter/parameter.h"
+#include "software/util/variant_visitor/variant_visitor.h"
 #include "yaml-cpp/yaml.h"
-
-
-// More info on why this is needed here
-// https://en.cppreference.com/w/cpp/utility/variant/visit
-template <class... Ts>
-struct overloaded : Ts...
-{
-    using Ts::operator()...;
-};
-template <class... Ts>
-overloaded(Ts...)->overloaded<Ts...>;
-
 
 class YamlLoadFixture : public ::testing::Test
 {
@@ -71,24 +59,24 @@ class TestAutogenParameterList : public YamlLoadFixture
      */
     void visit_parameters(ParameterVariant paramvar, const YAML::Node& current_config)
     {
-        std::visit(overloaded{[&](std::shared_ptr<const Parameter<int>> param) {
-                                  assert_parameter<int>(param, current_config);
-                              },
-                              [&](std::shared_ptr<const Parameter<bool>> param) {
-                                  assert_parameter<bool>(param, current_config);
-                              },
-                              [&](std::shared_ptr<const Parameter<std::string>> param) {
-                                  assert_parameter<std::string>(param, current_config);
-                              },
-                              [&](std::shared_ptr<const Parameter<double>> param) {
-                                  assert_parameter<double>(param, current_config);
-                              },
-                              [&](std::shared_ptr<const Config> param) {
-                                  for (auto& v : param->getParameterList())
-                                  {
-                                      visit_parameters(v, current_config[param->name()]);
-                                  }
-                              }},
+        std::visit(overload{[&](std::shared_ptr<const Parameter<int>> param) {
+                                assert_parameter<int>(param, current_config);
+                            },
+                            [&](std::shared_ptr<const Parameter<bool>> param) {
+                                assert_parameter<bool>(param, current_config);
+                            },
+                            [&](std::shared_ptr<const Parameter<std::string>> param) {
+                                assert_parameter<std::string>(param, current_config);
+                            },
+                            [&](std::shared_ptr<const Parameter<double>> param) {
+                                assert_parameter<double>(param, current_config);
+                            },
+                            [&](std::shared_ptr<const Config> param) {
+                                for (auto& v : param->getParameterList())
+                                {
+                                    visit_parameters(v, current_config[param->name()]);
+                                }
+                            }},
                    paramvar);
     }
 
@@ -109,27 +97,6 @@ class TestAutogenParameterList : public YamlLoadFixture
             // invalid key will fail the test by default
             ASSERT_EQ(param_description[param->name()]["default"].template as<T>(),
                       param->value());
-
-            // check to see if the options have been loaded correctly if they exist
-            if (param_description[param->name()]["options"])
-            {
-                std::vector<T> options = param_description[param->name()]["options"]
-                                             .template as<std::vector<T>>();
-                ASSERT_THAT(param->getOptions(),
-                            ::testing::ElementsAreArray(options.begin(), options.end()));
-            }
-
-            if (param_description[param->name()]["min"])
-            {
-                ASSERT_EQ(*param->getMin(),
-                          param_description[param->name()]["min"].template as<T>());
-            }
-
-            if (param_description[param->name()]["max"])
-            {
-                ASSERT_EQ(*param->getMax(),
-                          param_description[param->name()]["max"].template as<T>());
-            }
         }
         catch (...)
         {
@@ -167,24 +134,24 @@ class TestParameterMutation : public YamlLoadFixture
      */
     void mutate_all_parameters(MutableParameterVariant paramvar)
     {
-        std::visit(overloaded{[&](std::shared_ptr<Parameter<int>> param) {
-                                  param->setValue(param->value() + 4);
-                              },
-                              [&](std::shared_ptr<Parameter<bool>> param) {
-                                  param->setValue(!param->value());
-                              },
-                              [&](std::shared_ptr<Parameter<std::string>> param) {
-                                  param->setValue(param->value() + "test");
-                              },
-                              [&](std::shared_ptr<Parameter<double>> param) {
-                                  param->setValue(param->value() - 2.0);
-                              },
-                              [&](std::shared_ptr<Config> param) {
-                                  for (auto& v : param->getMutableParameterList())
-                                  {
-                                      mutate_all_parameters(v);
-                                  }
-                              }},
+        std::visit(overload{[&](std::shared_ptr<Parameter<int>> param) {
+                                param->setValue(param->value() + 4);
+                            },
+                            [&](std::shared_ptr<Parameter<bool>> param) {
+                                param->setValue(!param->value());
+                            },
+                            [&](std::shared_ptr<Parameter<std::string>> param) {
+                                param->setValue(param->value() + "test");
+                            },
+                            [&](std::shared_ptr<Parameter<double>> param) {
+                                param->setValue(param->value() - 2.0);
+                            },
+                            [&](std::shared_ptr<Config> param) {
+                                for (auto& v : param->getMutableParameterList())
+                                {
+                                    mutate_all_parameters(v);
+                                }
+                            }},
                    paramvar);
     }
 
@@ -198,7 +165,7 @@ class TestParameterMutation : public YamlLoadFixture
     void assert_mutation(ParameterVariant paramvar, const YAML::Node& current_config)
     {
         std::visit(
-            overloaded{
+            overload{
                 [&](std::shared_ptr<const Parameter<int>> param) {
                     ASSERT_EQ(current_config[param->name()]["default"].as<int>(),
                               param->value() - 4);

@@ -1,14 +1,26 @@
 package(default_visibility = ["//software/sensor_fusion:__subpackages__"])
 
 cc_library(
+    name = "vision_detection",
+    hdrs = [
+        "vision_detection.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//software/geom:angle",
+        "//software/geom:point",
+        "//software/time:timestamp",
+    ],
+)
+
+cc_library(
     name = "ball_filter",
     srcs = ["ball_filter.cpp"],
     hdrs = ["ball_filter.h"],
     deps = [
-        "//software/geom",
+        ":vision_detection",
+        "//software/geom/algorithms",
         "//software/math:math_functions",
-        "//software/new_geom/util",
-        "//software/sensor_fusion:vision_detection",
         "//software/world:ball",
         "//software/world:field",
         "@eigen",
@@ -20,7 +32,7 @@ cc_test(
     srcs = ["ball_filter_test.cpp"],
     deps = [
         ":ball_filter",
-        "//software/test_util",
+        "//software/world:field",
         "@gtest//:gtest_main",
     ],
 )
@@ -30,8 +42,7 @@ cc_library(
     srcs = ["robot_filter.cpp"],
     hdrs = ["robot_filter.h"],
     deps = [
-        "//software/geom",
-        "//software/sensor_fusion:vision_detection",
+        ":vision_detection",
         "//software/world:robot",
     ],
 )

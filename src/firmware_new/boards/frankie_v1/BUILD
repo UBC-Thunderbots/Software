@@ -24,7 +24,8 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":frankie_v1_main_lib",
-        "//firmware_new/boards/frankie_v1/io:allegro_a3931_motor_driver",
+        "//firmware_new/boards/frankie_v1/io:drivetrain",
+        "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
         "//firmware_new/boards/frankie_v1/io:gpio_pin",
         "//firmware_new/boards/frankie_v1/io:pwm_pin",
     ],
@@ -32,14 +33,28 @@ cc_binary(
 
 cc_library(
     name = "frankie_v1_main_lib",
-    srcs = glob(
-        [
-            "*.c",
-            "*.s",
-        ],
-        exclude = ["main.c"],
-    ),
-    hdrs = glob(["*.h"]),
+    srcs = [
+        "crc.c",
+        "freertos.c",
+        "gpio.c",
+        "startup_stm32h743xx.s",
+        "stm32h7xx_hal_msp.c",
+        "stm32h7xx_it.c",
+        "system_stm32h7xx.c",
+        "tim.c",
+        "usart.c",
+        "usb_otg.c",
+    ],
+    hdrs = [
+        "FreeRTOSConfig.h",
+        "crc.h",
+        "gpio.h",
+        "stm32h7xx_hal_conf.h",
+        "stm32h7xx_it.h",
+        "tim.h",
+        "usart.h",
+        "usb_otg.h",
+    ],
     copts = [
         "-DSTM32H743xx",
         # We don't want to mark warnings as errors for 3rd party code
@@ -49,7 +64,9 @@ cc_library(
     deps = [
         ":hal",
         ":lwip",
-        "//firmware_new/proto:fw_c_proto",
+        "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
+        "//shared:constants",
+        "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
@@ -59,8 +76,31 @@ cc_library(
 )
 
 cc_library(
-    name = "constants",
-    hdrs = ["constants.h"],
+    name = "frankie_v1_lwip",
+    srcs = [
+        "ethernetif.c",
+        "lwip.c",
+    ],
+    hdrs = [
+        "FreeRTOSConfig.h",
+        "ethernetif.h",
+        "lwip.h",
+        "lwipopts.h",
+    ],
+    copts = [
+        "-DSTM32H743xx",
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":hal",
+        ":lwip",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
 )
 
 stm32h7_hal_library_files_genrule("hal_library_files")
@@ -491,6 +531,7 @@ cc_library(
         "Middlewares/Third_Party/LwIP/system/arch/lib.h",
         "Middlewares/Third_Party/LwIP/system/arch/perf.h",
         "Middlewares/Third_Party/LwIP/system/arch/sys_arch.h",
+        "ethernetif.h",
         "lwip.h",
         "lwipopts.h",
         "main.h",

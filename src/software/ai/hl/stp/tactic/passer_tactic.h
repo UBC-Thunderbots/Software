@@ -1,6 +1,3 @@
-/**
- * Interface of the PasserTactic
- */
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -21,26 +18,27 @@ class PasserTactic : public Tactic
      *
      * @param pass The pass this tactic should try to execute
      * @param ball The ball that we're trying to pass
+     * @param field The field being played on
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forever);
-
-    std::string getName() const override;
+    explicit PasserTactic(Pass pass, const Ball& ball, const Field& field,
+                          bool loop_forever);
 
     /**
      * Updates the world parameters for this PasserTactic.
      *
      * @param updated_ball The ball we're passing
+     * @param updated_field The field being played on
      */
-    void updateWorldParams(const Ball& updated_ball);
+    void updateWorldParams(const Ball& updated_ball, const Field& updated_field);
 
     /**
      * Updates the control parameters for this PasserTactic.
      *
      * @param updated_pass The pass to perform
      */
-    void updateControlParams(const Passing::Pass& updated_pass);
+    void updateControlParams(const Pass& updated_pass);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -61,6 +59,13 @@ class PasserTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
     // Tactic parameters
-    Passing::Pass pass;
+    Pass pass;
     Ball ball;
+    Field field;
+
+    // How fast the ball must be moving for the passer to try intercept it
+    // before passing. This is primarily used to detect if we are passing in
+    // a set play or not, like a corner kick. The value is non-zero to account
+    // for any noise in the ball's velocity from the camera and filter.
+    static constexpr double INTERCEPT_BALL_SPEED_THRESHOLD = 0.1;
 };

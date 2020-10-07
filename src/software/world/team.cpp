@@ -1,9 +1,9 @@
 #include "software/world/team.h"
 
-#include <g3log/g3log.hpp>
 #include <set>
 
 #include "shared/constants.h"
+#include "software/logger/logger.h"
 
 Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_size)
     : team_robots(),
@@ -15,8 +15,8 @@ Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_siz
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
-Team::Team(const Duration& robot_expiry_buffer_duration,
-           const std::vector<Robot>& team_robots)
+Team::Team(const std::vector<Robot>& team_robots,
+           const Duration& robot_expiry_buffer_duration)
     : Team(robot_expiry_buffer_duration)
 {
     updateRobots(team_robots);
@@ -63,17 +63,6 @@ void Team::updateState(const Team& new_team_data)
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
-void Team::updateStateToPredictedState(const Timestamp& timestamp)
-{
-    // Update the state of all robots to their predicted state
-    for (auto it = team_robots.begin(); it != team_robots.end(); it++)
-    {
-        it->updateStateToPredictedState(timestamp);
-    }
-
-    updateTimestamp(timestamp);
-}
-
 void Team::removeExpiredRobots(const Timestamp& timestamp)
 {
     // Check to see if any Robots have "expired". If it more time than the expiry_buffer
@@ -81,7 +70,7 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
     for (auto it = team_robots.begin(); it != team_robots.end();)
     {
         Duration time_diff = timestamp - it->lastUpdateTimestamp();
-        if (time_diff.getSeconds() < 0)
+        if (time_diff.toSeconds() < 0)
         {
             LOG(WARNING) << "Warning: tried to remove a robot at a negative time";
             it++;

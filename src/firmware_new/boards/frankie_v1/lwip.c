@@ -25,10 +25,9 @@
 #if defined(__CC_ARM) /* MDK ARM Compiler */
 #include "lwip/sio.h"
 #endif /* MDK ARM Compiler */
+#include <string.h>
 
 /* USER CODE BEGIN 0 */
-#include "firmware_new/boards/frankie_v1/constants.h"
-#include "firmware_new/boards/frankie_v1/udp_multicast.h"
 
 /* USER CODE END 0 */
 /* Private function prototypes -----------------------------------------------*/
@@ -78,8 +77,6 @@ void MX_LWIP_Init(void)
     }
 
     /* USER CODE BEGIN 3 */
-    udp_multicast_init(AI_MULTICAST_ADDRESS, ROBOT_MULTICAST_LISTEN_PORT,
-                       ROBOT_UNICAST_SEND_PORT);
     /* USER CODE END 3 */
 }
 

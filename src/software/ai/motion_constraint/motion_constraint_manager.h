@@ -10,7 +10,7 @@
 class MotionConstraintManager : public MutableTacticVisitor
 {
    public:
-    explicit MotionConstraintManager(){};
+    explicit MotionConstraintManager() = default;
 
     /**
      * Gets Motion Constraint based on gamestate and tactic
@@ -24,11 +24,11 @@ class MotionConstraintManager : public MutableTacticVisitor
                                                     Tactic &tactic);
 
     /**
-     * Visits a tactic to perform an operation.
+     * Visits a tactic to register the associated motion constraint
      *
-     * @param tactic The tactic to visit
+     * @param The tactic to register
      *
-     * @modifies current_whitelisted_constraints
+     * @modifies current_allowed_constraints
      */
     void visit(CherryPickTactic &tactic) override;
     void visit(ShadowFreekickerTactic &tactic) override;
@@ -51,7 +51,7 @@ class MotionConstraintManager : public MutableTacticVisitor
     void visit(GoalieTestTactic &tactic) override;
 
    private:
-    std::set<MotionConstraint> current_whitelisted_constraints;
+    std::set<MotionConstraint> current_allowed_constraints;
 
     /**
      * Adds move constraints determined from gamestate to current_motion_constraints

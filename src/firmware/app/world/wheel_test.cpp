@@ -8,24 +8,24 @@ extern "C"
 class WheelTest : public testing::Test
 {
    protected:
-    virtual void SetUp()
+    virtual void SetUp(void)
     {
         requested_wheel_force = 0;
         brake_called          = true;
         coast_called          = true;
 
-        WheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1,
-                                            .motor_phase_resistance              = 1.2,
-                                            .motor_back_emf_per_rpm              = 1.3,
-                                            .motor_max_voltage_before_wheel_slip = 1.4,
-                                            .wheel_radius                        = 1.5,
-                                            .wheel_rotations_per_motor_rotation  = 0.5};
+        WheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
+                                            .motor_phase_resistance              = 1.2f,
+                                            .motor_back_emf_per_rpm              = 1.3f,
+                                            .motor_max_voltage_before_wheel_slip = 1.4f,
+                                            .wheel_radius                        = 1.5f,
+                                            .wheel_rotations_per_motor_rotation  = 0.5f};
 
         wheel = app_wheel_create(&(this->request_wheel_force), &(this->get_motor_speed),
                                  brake, coast, wheel_constants);
     }
 
-    virtual void TearDown()
+    virtual void TearDown(void)
     {
         app_wheel_destroy(wheel);
     }
@@ -35,17 +35,17 @@ class WheelTest : public testing::Test
         requested_wheel_force = force;
     }
 
-    static float get_motor_speed()
+    static float get_motor_speed(void)
     {
-        return 17.2;
+        return 17.2f;
     }
 
-    static void brake()
+    static void brake(void)
     {
         brake_called = true;
     }
 
-    static void coast()
+    static void coast(void)
     {
         coast_called = true;
     }

@@ -1,9 +1,69 @@
 #pragma once
 
-#include "software/new_geom/point.h"
-#include "software/sensor_fusion/refbox_data.h"
+#include "software/geom/point.h"
+#include "software/util/make_enum/make_enum.h"
 #include "software/world/ball.h"
 
+// clang-format off
+MAKE_ENUM(RefereeCommand,
+          // these enums map to the enums in ssl_referee.proto
+          HALT,
+          STOP,
+          NORMAL_START,
+          FORCE_START,
+          PREPARE_KICKOFF_US,
+          PREPARE_KICKOFF_THEM,
+          PREPARE_PENALTY_US,
+          PREPARE_PENALTY_THEM,
+          DIRECT_FREE_US,
+          DIRECT_FREE_THEM,
+          INDIRECT_FREE_US,
+          INDIRECT_FREE_THEM,
+          TIMEOUT_US,
+          TIMEOUT_THEM,
+          GOAL_US,
+          GOAL_THEM,
+          BALL_PLACEMENT_US,
+          BALL_PLACEMENT_THEM);
+// clang-format on
+
+MAKE_ENUM(RefereeStage,
+          // The first half is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          NORMAL_FIRST_HALF_PRE,
+          // The first half of the normal game, before half time.
+          NORMAL_FIRST_HALF,
+          // Half time between first and second halves.
+          NORMAL_HALF_TIME,
+          // The second half is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          NORMAL_SECOND_HALF_PRE,
+          // The second half of the normal game, after half time.
+          NORMAL_SECOND_HALF,
+          // The break before extra time.
+          EXTRA_TIME_BREAK,
+          // The first half of extra time is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          EXTRA_FIRST_HALF_PRE,
+          // The first half of extra time.
+          EXTRA_FIRST_HALF,
+          // Half time between first and second extra halves.
+          EXTRA_HALF_TIME,
+          // The second half of extra time is about to start.
+          // A kickoff is called within this stage.
+          // This stage ends with the NORMAL_START.
+          EXTRA_SECOND_HALF_PRE,
+          // The second half of extra time.
+          EXTRA_SECOND_HALF,
+          // The break before penalty shootout.
+          PENALTY_SHOOTOUT_BREAK,
+          // The penalty shootout.
+          PENALTY_SHOOTOUT,
+          // The game is over.
+          POST_GAME);
 
 /**
  * @brief Holds the state of the game according to the referee
@@ -11,7 +71,7 @@
  * @details Contains information on what period of the game it is, what type of
  * play to run, team scores, time remaining, etc.  During normal gameplay, the
  * information in this class is received from the
- * [ssl-refbox](https://github.com/RoboCup-SSL/ssl-refbox)
+ * [ssl-game-controller](https://github.com/RoboCup-SSL/ssl-game-controller)
  * program over the network.
  *
  * Taken from https://github.com/RoboJackets/robocup-software/
@@ -19,7 +79,7 @@
 class GameState
 {
    public:
-    enum State
+    enum PlayState
     {
         HALT,    // Robots must not move
         STOP,    // Robots must stay a set distance away from ball
@@ -39,32 +99,22 @@ class GameState
         BALL_PLACEMENT
     };
 
-    State state;
-    RestartReason restart_reason;
-    RefboxGameState game_state;
-    std::optional<Ball> ball_state;
-
-    // True if our team can kick the ball during a restart
-    bool our_restart;
-
-    // The point at which the ball should be placed by robots before a restart. See
-    // Robocup SSL Rules 9.2.
-    Point ball_placement_point;
-
     GameState()
-        : state(HALT),
-          restart_reason(NONE),
-          game_state(RefboxGameState::HALT),
-          our_restart(false)
+        : play_state_(HALT),
+          restart_reason_(NONE),
+          command_(RefereeCommand::HALT),
+          ball_state_(std::nullopt),
+          our_restart_(false),
+          ball_placement_point_(std::nullopt)
     {
     }
 
     /**
      * Updates the game state with a value from backend_input
      *
-     * @param gameState the RefboxGameState from backend_input
+     * @param gameState the RefereeCommand from backend_input
      */
-    void updateRefboxGameState(RefboxGameState gameState);
+    void updateRefereeCommand(RefereeCommand gameState);
 
     /**
      * Updates the state of the ball used in calculating game state transitions
@@ -81,11 +131,11 @@ class GameState
     void setRestartCompleted();
 
     /**
-     * Returns the current Refbox game state
+     * Returns the current Referee command
      *
-     * @return the current Refbox game state
+     * @return the current Referee command
      */
-    RefboxGameState getRefboxGameState() const;
+    const RefereeCommand& getRefereeCommand() const;
 
     /**
      * Returns the current restart reason
@@ -124,26 +174,26 @@ class GameState
     bool isPlaying() const;
 
     /**
-     * Returns true if a kickoff is occuring.
+     * Returns true if a kickoff is occurring.
      * See Robocup SSL Rules Law 8.2.
      *
-     * @return true if a kickoff is occuring.
+     * @return true if a kickoff is occurring.
      */
     bool isKickoff() const;
 
     /**
-     * Returns true if a penalty is occuring.
+     * Returns true if a penalty is occurring.
      * See Robocup SSL Rules Law 14.
      *
-     * @return true if a penalty is occuring.
+     * @return true if a penalty is occurring.
      */
     bool isPenalty() const;
 
     /**
-     * Returns true if ball placement is occuring.
+     * Returns true if ball placement is occurring.
      * See Robocup SSL Rules Law 9.2.
      *
-     * @return true if ball placement is occuring.
+     * @return true if ball placement is occurring.
      */
     bool isBallPlacement() const;
 
@@ -151,28 +201,28 @@ class GameState
      * Returns true if our team is doing the restart, e.g. when
      * we get an indirect kick
      * This function will have undefined behaviour if a restart is
-     * not being prepared for or occuring, such as after a transition to
-     * HALT or STOP, because of how Refbox state transitions work.
+     * not being prepared for or occurring, such as after a transition to
+     * HALT or STOP, because of how GameController state transitions work.
      *
      * @return true if our team is doing the restart
      */
     bool isOurRestart() const;
 
     /**
-     * Returns true if a direct free kick is occuring.
+     * Returns true if a direct free kick is occurring.
      * See Robocup SSL Rules Law 13.
      *
      *
-     * @return true if a direct free kick is occuring
+     * @return true if a direct free kick is occurring
      */
     bool isDirectFree() const;
 
     /**
-     * Returns true if an indirect free kick is occuring.
+     * Returns true if an indirect free kick is occurring.
      * See Robocup SSL Rules Law 13.
      *
      *
-     * @return true if a direct free kick is occuring
+     * @return true if a direct free kick is occurring
      */
     bool isIndirectFree() const;
 
@@ -348,11 +398,16 @@ class GameState
      */
     void setBallPlacementPoint(Point placementPoint);
 
-    /**
-     * Returns the point where the ball should be placed
-     *
-     * @return the point where the ball should be placed, or std::nullopt if we are not
-     *         in a state of play where the ball needs to be placed
-     */
-    std::optional<Point> getBallPlacementPoint() const;
+   private:
+    PlayState play_state_;
+    RestartReason restart_reason_;
+    RefereeCommand command_;
+    std::optional<Ball> ball_state_;
+
+    // True if our team can kick the ball during a restart
+    bool our_restart_;
+
+    // The point at which the ball should be placed by robots before a restart. See
+    // Robocup SSL Rules 9.2.
+    std::optional<Point> ball_placement_point_;
 };

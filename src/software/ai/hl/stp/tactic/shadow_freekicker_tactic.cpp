@@ -4,23 +4,17 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
 #include "software/parameter/dynamic_parameters.h"
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
                                                Team enemy_team, Ball ball, Field field,
                                                bool loop_forever)
-    : Tactic(loop_forever),
+    : Tactic(loop_forever, {RobotCapability::Move}),
       free_kick_shadower(free_kick_shadower),
       enemy_team(enemy_team),
       ball(ball),
       field(field)
 {
-}
-
-std::string ShadowFreekickerTactic::getName() const
-{
-    return "Shadow Freekick Tactic";
 }
 
 void ShadowFreekickerTactic::updateWorldParams(Team enemy_team, Ball ball)
@@ -39,15 +33,13 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
 {
     auto move_action      = std::make_shared<MoveAction>(false);
     Point defend_position = robot->position();
+    // Experimentally determined to be a reasonable value
+    double robot_separation_scaling_factor = 1.1;
 
     do
     {
         std::optional<Robot> enemy_with_ball =
-            Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
-        double robot_separation_scaling_factor = Util::DynamicParameters->getAIConfig()
-                                                     ->getShadowFreekickerTacticConfig()
-                                                     ->RobotSeparationScalingFactor()
-                                                     ->value();
+            getRobotWithEffectiveBallPossession(enemy_team, ball, field);
 
         if (enemy_with_ball.has_value())
         {
@@ -68,7 +60,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
         else
         {
             const Vector ball_to_net_direction =
-                (field.friendlyGoal() - ball.position())
+                (field.friendlyGoalCenter() - ball.position())
                     .normalize(FREE_KICK_MAX_PROXIMITY + ROBOT_MAX_RADIUS_METERS);
 
             Vector perpendicular_to_ball_direction =
@@ -84,7 +76,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
 
         move_action->updateControlParams(
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
-            0, DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+            0, DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
             BallCollisionType::AVOID);
         yield(move_action);
     } while (true);

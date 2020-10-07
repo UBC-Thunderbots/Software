@@ -8,13 +8,11 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/evaluation/robot.h"
 #include "software/ai/evaluation/team.h"
-#include "software/geom/util.h"
-#include "software/new_geom/util/intersects.h"
+#include "software/geom/algorithms/intersects.h"
 
-std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID>
-Evaluation::findAllReceiverPasserPairs(const std::vector<Robot> &possible_passers,
-                                       const std::vector<Robot> &possible_receivers,
-                                       const std::vector<Robot> &all_robots)
+std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPairs(
+    const std::vector<Robot> &possible_passers,
+    const std::vector<Robot> &possible_receivers, const std::vector<Robot> &all_robots)
 {
     // Store a map of robots that can receive the ball, and the list of all robots
     // that could pass to them. The custom comparator is necessary to use the Robot
@@ -67,7 +65,7 @@ Evaluation::findAllReceiverPasserPairs(const std::vector<Robot> &possible_passer
     return receiver_passer_pairs;
 }
 
-std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRobot(
+std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
     const Robot &initial_passer, const Robot &final_receiver, const Team &passing_team,
     const Team &other_team)
 {
@@ -130,8 +128,8 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
             // If there are multiple robots that can pass to the robot, we assume
             // it will receive the ball from the closest one since this is more
             // likely
-            auto closest_passer = Evaluation::nearestRobot(
-                receiver_passer_pairs.at(final_receiver), final_receiver.position());
+            auto closest_passer = nearestRobot(receiver_passer_pairs.at(final_receiver),
+                                               final_receiver.position());
             return std::make_pair(pass_num, closest_passer);
         }
 
@@ -163,8 +161,7 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
     return std::nullopt;
 }
 
-void Evaluation::sortThreatsInDecreasingOrder(
-    std::vector<Evaluation::EnemyThreat> &threats)
+void sortThreatsInDecreasingOrder(std::vector<EnemyThreat> &threats)
 {
     // A lambda function that implements the '<' operator for the EnemyThreat struct
     // so it can be sorted. Lower threats are "less than" higher threats.
@@ -222,20 +219,21 @@ void Evaluation::sortThreatsInDecreasingOrder(
     std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
 }
 
-std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
-    const Field &field, const Team &friendly_team, Team enemy_team, const Ball &ball,
-    bool include_goalie)
+std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &friendly_team,
+                                            Team enemy_team, const Ball &ball,
+                                            bool include_goalie)
 {
     if (!include_goalie && enemy_team.getGoalieID())
     {
         enemy_team.removeRobotWithId(*enemy_team.getGoalieID());
     }
 
-    std::vector<Evaluation::EnemyThreat> threats;
+    std::vector<EnemyThreat> threats;
 
     for (const auto &robot : enemy_team.getAllRobots())
     {
-        bool has_ball = *Evaluation::robotHasPossession(ball, robot);
+        bool has_ball =
+            *robotHasPossession(ball.getPreviousStates(), robot.getPreviousStates());
 
         // Get the angle from the robot to each friendly goalpost, then find the
         // difference between these angles to get the goal_angle for the robot
@@ -247,8 +245,9 @@ std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
 
         std::optional<Angle> best_shot_angle  = std::nullopt;
         std::optional<Point> best_shot_target = std::nullopt;
-        auto best_shot_data = Evaluation::calcBestShotOnFriendlyGoal(field, friendly_team,
-                                                                     enemy_team, robot);
+        auto best_shot_data =
+            calcBestShotOnGoal(field, friendly_team, enemy_team, robot.position(),
+                               TeamType::FRIENDLY, {robot});
         if (best_shot_data)
         {
             best_shot_angle  = best_shot_data->getOpenAngle();
@@ -258,15 +257,14 @@ std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
         // Set default values. If the robot can't be passed to we set the number of passes
         // to the size of the enemy team so it is the largest reasonable value, and the
         // passer to be an empty optional
-        int num_passes              = enemy_team.numRobots();
+        int num_passes              = static_cast<int>(enemy_team.numRobots());
         std::optional<Robot> passer = std::nullopt;
         auto robot_with_effective_possession =
-            Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
+            getRobotWithEffectiveBallPossession(enemy_team, ball, field);
         if (robot_with_effective_possession)
         {
-            auto pass_data =
-                Evaluation::getNumPassesToRobot(robot_with_effective_possession.value(),
-                                                robot, enemy_team, friendly_team);
+            auto pass_data = getNumPassesToRobot(robot_with_effective_possession.value(),
+                                                 robot, enemy_team, friendly_team);
             if (pass_data)
             {
                 num_passes = pass_data->first;
@@ -274,9 +272,9 @@ std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
             }
         }
 
-        Evaluation::EnemyThreat threat{robot,           has_ball,         goal_angle,
-                                       best_shot_angle, best_shot_target, num_passes,
-                                       passer};
+        EnemyThreat threat{robot,           has_ball,         goal_angle,
+                           best_shot_angle, best_shot_target, num_passes,
+                           passer};
 
         threats.emplace_back(threat);
     }

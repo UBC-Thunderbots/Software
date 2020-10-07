@@ -17,10 +17,8 @@ Team RobotTeamFilter::getFilteredData(
         {
             robot_filters.insert(
                 {detection.id,
-                 RobotFilter(
-                     detection,
-                     Duration::fromMilliseconds(
-                         Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS))});
+                 RobotFilter(detection, Duration::fromMilliseconds(
+                                            ROBOT_DEBOUNCE_DURATION_MILLISECONDS))});
         }
     }
 

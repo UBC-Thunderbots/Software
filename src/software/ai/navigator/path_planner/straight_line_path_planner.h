@@ -1,9 +1,11 @@
 #pragma once
+
 #include "software/ai/navigator/path_planner/path_planner.h"
 
 /**
  * StraightLinePathPlanner is a very trivial implementation
- * of the PathPlanner interface.
+ * of the PathPlanner interface,which returns a path consisting of only the start and
+ * destination points.
  */
 
 class StraightLinePathPlanner : public PathPlanner
@@ -22,5 +24,5 @@ class StraightLinePathPlanner : public PathPlanner
      */
     std::optional<Path> findPath(const Point &start, const Point &destination,
                                  const Rectangle &navigable_area,
-                                 const std::vector<Obstacle> &obstacles) override;
+                                 const std::vector<ObstaclePtr> &obstacles) override;
 };

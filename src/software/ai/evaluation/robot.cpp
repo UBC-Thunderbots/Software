@@ -4,10 +4,9 @@
 #include "software/parameter/dynamic_parameters.h"
 
 
-bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point position,
-                                                              const Angle orientation,
-                                                              const Point target,
-                                                              Angle threshold)
+bool robotOrientationWithinAngleThresholdOfTarget(const Point position,
+                                                  const Angle orientation,
+                                                  const Point target, Angle threshold)
 {
     // Calculate the target orientation, then calculate the difference between facing
     // orientation and target orientation. The difference in angle will be in the range of
@@ -17,8 +16,9 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
-                                                   std::optional<Timestamp> timestamp)
+std::optional<bool> robotHasPossession(const BallHistory& ball_states,
+                                       const RobotHistory& robot_states,
+                                       std::optional<Timestamp> timestamp)
 {
     Point robot_pos_at_time;
     Angle robot_ori_at_time;
@@ -26,50 +26,48 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
 
     if (!timestamp.has_value())
     {
-        robot_pos_at_time = robot.position();
-        robot_ori_at_time = robot.orientation();
-    }
-    else if (robot.getHistoryIndexFromTimestamp(*timestamp))
-    {
-        robot_pos_at_time = robot.getPreviousStates()
-                                .at(*robot.getHistoryIndexFromTimestamp(*timestamp))
-                                .position();
-        robot_ori_at_time = robot.getPreviousStates()
-                                .at(*robot.getHistoryIndexFromTimestamp(*timestamp))
-                                .orientation();
+        robot_pos_at_time = robot_states.front().state().position();
+        robot_ori_at_time = robot_states.front().state().orientation();
     }
     else
     {
-        // we have no information about the robot at this time because it is too far back.
-        // return nullopt
-        return std::nullopt;
+        auto robot_state = findState<TimestampedRobotState>(robot_states, *timestamp);
+        if (robot_state)
+        {
+            robot_pos_at_time = robot_state->state().position();
+            robot_ori_at_time = robot_state->state().orientation();
+        }
+        else
+        {
+            // we have no information about the robot at this time because it is too far
+            // back. return nullopt
+            return std::nullopt;
+        }
     }
 
     if (!timestamp.has_value())
     {
-        ball_pos_at_time = ball.position();
-    }
-    else if (ball.getHistoryIndexFromTimestamp(*timestamp))
-    {
-        ball_pos_at_time = ball.getPreviousStates()
-                               .at(*ball.getHistoryIndexFromTimestamp(*timestamp))
-                               .position();
+        ball_pos_at_time = ball_states.front().state().position();
     }
     else
     {
-        // we have no information about the ball at this time because it is too far back.
-        // return nullopt
-        return std::nullopt;
+        auto ball_state = findState<TimestampedBallState>(ball_states, *timestamp);
+        if (ball_state)
+        {
+            ball_pos_at_time = ball_state->state().position();
+        }
+        else
+        {
+            // we have no information about the ball at this time because it is too far
+            // back. return nullopt
+            return std::nullopt;
+        }
     }
 
 
     // check if the ball is within a certain distance of the robot
-    auto max_dist_to_robot =
-        ROBOT_MAX_RADIUS_METERS + Util::DynamicParameters->getAIConfig()
-                                      ->getEvaluationConfig()
-                                      ->getPossessionConfig()
-                                      ->PossessionDist()
-                                      ->value();
+    // this is experimentally determined to be a reasonable value
+    auto max_dist_to_robot = ROBOT_MAX_RADIUS_METERS + 0.2;
     if ((ball_pos_at_time - robot_pos_at_time).length() > max_dist_to_robot)
     {
         return false;
@@ -83,37 +81,35 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
     }
 }
 
-std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Robot& robot,
-                                                   std::optional<Timestamp> timestamp)
+std::optional<bool> robotBeingPassedTo(const BallHistory& ball_states,
+                                       const RobotHistory& robot_states,
+                                       std::optional<Timestamp> timestamp)
 {
     Point robot_pos, ball_pos;
     Vector ball_velocity;
     if (!timestamp.has_value())
     {
-        robot_pos     = robot.position();
-        ball_pos      = world.ball().position();
-        ball_velocity = world.ball().velocity();
-    }
-    else if (robot.getHistoryIndexFromTimestamp(*timestamp) &&
-             world.ball().getHistoryIndexFromTimestamp(*timestamp))
-    {
-        robot_pos = robot.getPreviousStates()
-                        .at(*robot.getHistoryIndexFromTimestamp(*timestamp))
-                        .position();
-        ball_pos = world.ball()
-                       .getPreviousStates()
-                       .at(*world.ball().getHistoryIndexFromTimestamp(*timestamp))
-                       .position();
-        ball_velocity = world.ball()
-                            .getPreviousStates()
-                            .at(*world.ball().getHistoryIndexFromTimestamp(*timestamp))
-                            .velocity();
+        robot_pos     = robot_states.front().state().position();
+        ball_pos      = ball_states.front().state().position();
+        ball_velocity = ball_states.front().state().velocity();
     }
     else
     {
-        // we don't have information about the state of the robot and/or ball
-        // at the given timestamp, return nullopt
-        return std::nullopt;
+        auto robot_state = findState<TimestampedRobotState>(robot_states, *timestamp);
+        auto ball_state  = findState<TimestampedBallState>(ball_states, *timestamp);
+
+        if (robot_state && ball_state)
+        {
+            robot_pos     = robot_state->state().position();
+            ball_pos      = ball_state->state().position();
+            ball_velocity = ball_state->state().velocity();
+        }
+        else
+        {
+            // we don't have information about the state of the robot and/or ball
+            // at the given timestamp, return nullopt
+            return std::nullopt;
+        }
     }
 
     auto ball_to_robot_vector = robot_pos - ball_pos;
@@ -123,15 +119,26 @@ std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Rob
     // pass axis velocity
     double pass_axis_speed =
         ball_velocity.project(ball_to_robot_vector.normalize()).length();
-    return std::make_optional<bool>(
-        (ball_angle_deviation < Angle::fromDegrees(Util::DynamicParameters->getAIConfig()
-                                                       ->getEvaluationConfig()
-                                                       ->getPossessionConfig()
-                                                       ->PassedToAngleTolerance()
-                                                       ->value())) &&
-        pass_axis_speed > Util::DynamicParameters->getAIConfig()
-                              ->getEvaluationConfig()
-                              ->getPossessionConfig()
-                              ->MinPassSpeed()
-                              ->value());
+    Angle pass_angle_tolerance = Angle::fromDegrees(15);
+    double min_pass_speed_m_s  = 1.0;
+    return std::make_optional<bool>(ball_angle_deviation < pass_angle_tolerance &&
+                                    pass_axis_speed > min_pass_speed_m_s);
 };
+
+template <typename STATE_TYPE>
+std::optional<STATE_TYPE> findState(boost::circular_buffer<STATE_TYPE> states,
+                                    Timestamp& timestamp)
+{
+    for (const auto& state : states)
+    {
+        double timestamp_diff =
+            std::abs((timestamp - state.timestamp()).toMilliseconds());
+
+        // If timestamp is close to desired timestamp, return the index.
+        if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
+        {
+            return state;
+        }
+    }
+    return std::nullopt;
+}

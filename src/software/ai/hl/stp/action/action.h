@@ -3,15 +3,9 @@
 #include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 
+#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/robot.h"
-
-// We forward-declare the MutableActionVisitor interface (pure virtual class) because we
-// need to know about the existence of this class in order to accept visitors with the
-// accept() function. We cannot use an #include statement because this creates a cyclic
-// dependency
-//
-class MutableActionVisitor;
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
@@ -19,8 +13,18 @@ typedef boost::coroutines2::coroutine<std::unique_ptr<Intent>> IntentCoroutine;
 
 /**
  * The Action class is the lowest level of abstraction in our STP architecture.
- * They abstract just above the Intent layer, and typically performs similar behavior
- * to the Intents but while making sure preconditions are met.
+ * Actions are stateful, and represent simple Actions any robot can perform.
+ * Examples of this are
+ * - Moving to a position (without colliding with anything)
+ * - Shooting / kicking at a target
+ * - Intercepting / catching the ball
+ *
+ * Actions use Intents to implement their behaviour. Actions are different than
+ * Intents because Intents are not stateful, and generally do not check if their
+ * preconditions are met when they are run. Actions are responsible for making sure
+ * any preconditions of an Intent are met before running it, which is where the
+ * statefulness comes into play. For example, an Action may need to move a robot
+ * into the correct position / alignment before shooting.
  */
 class Action
 {

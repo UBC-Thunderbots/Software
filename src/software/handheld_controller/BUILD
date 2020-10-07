@@ -42,12 +42,19 @@ cc_library(
     hdrs = ["controller_primitive_generator.h"],
     deps = [
         ":controller",
-        "//software/ai/primitive",
-        "//software/ai/primitive:chip_primitive",
-        "//software/ai/primitive:direct_velocity_primitive",
-        "//software/ai/primitive:kick_primitive",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "//software/proto/message_translation:tbots_protobuf",
+        "//software/proto/primitive:primitive_msg_factory",
+    ],
+)
+
+cc_test(
+    name = "controller_primitive_generator_test",
+    srcs = ["controller_primitive_generator_test.cpp"],
+    deps = [
+        ":controller_primitive_generator",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -57,7 +64,7 @@ cc_binary(
     deps = [
         ":controller_primitive_generator",
         ":xbox_360_controller",
-        "//software/backend:handheld_controller_backend",
+        "//software/backend:radio_backend",
         "//software/parameter:dynamic_parameters",
     ],
 )

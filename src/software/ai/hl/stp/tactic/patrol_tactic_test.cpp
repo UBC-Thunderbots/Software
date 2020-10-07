@@ -8,7 +8,7 @@
 class PatrolTacticTest : public testing::Test
 {
    protected:
-    std::vector<RobotState> robot_state_to_complete_actions;
+    std::vector<TimestampedRobotState> robot_state_to_complete_actions;
     std::vector<std::shared_ptr<MoveAction>> expected_actions;
     const double COST_OF_ASSIGNED_ROBOT                      = 0.0;
     const double COST_OF_NONASSIGNED_ROBOT_UNASSIGNED_TACTIC = 1.0;
@@ -24,12 +24,12 @@ class PatrolTacticTest : public testing::Test
     void generateExpectedActions(Robot robot, std::vector<Point> patrol_points,
                                  Angle angle, double speed_at_patrol_points)
     {
-        for (int i = 0; i < patrol_points.size(); i++)
+        for (size_t i = 0; i < patrol_points.size(); i++)
         {
             auto expected_action = std::make_shared<MoveAction>(false);
             expected_action->updateControlParams(
                 robot, patrol_points[i], angle, speed_at_patrol_points,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::AVOID);
             expected_actions.push_back(expected_action);
         }
@@ -44,11 +44,11 @@ class PatrolTacticTest : public testing::Test
     void generateRobotStatesToCompleteAction(std::vector<Point> patrol_points,
                                              Vector velocity)
     {
-        for (int i = 0; i < patrol_points.size(); i++)
+        for (size_t i = 0; i < patrol_points.size(); i++)
         {
-            RobotState robotState = RobotState(
+            TimestampedRobotState robotState = TimestampedRobotState(
                 patrol_points[i], velocity, Angle::zero(), AngularVelocity::zero(),
-                Timestamp::fromSeconds(std::time(nullptr)));
+                Timestamp::fromSeconds(static_cast<double>(std::time(nullptr))));
             robot_state_to_complete_actions.push_back(robotState);
         }
     }
@@ -58,7 +58,7 @@ class PatrolTacticTest : public testing::Test
      * to move on to the next point
      * @param robot: robot that is assigned the tactic
      * @param new_robot_state: A state that satisfies the patrol tactics's conditions of
-     * moving on on to the next point
+     * moving on to the next point
      * @param action_ptr: the last action returned by the tactic
      * @param tactic: the patrol tactic
      */
@@ -69,8 +69,8 @@ class PatrolTacticTest : public testing::Test
         EXPECT_EQ(expected_move_action->getFinalOrientation(),
                   move_action->getFinalOrientation());
         EXPECT_EQ(expected_move_action->getFinalSpeed(), move_action->getFinalSpeed());
-        EXPECT_EQ(expected_move_action->getAutoKickType(),
-                  move_action->getAutoKickType());
+        EXPECT_EQ(expected_move_action->getAutochickType(),
+                  move_action->getAutochickType());
         EXPECT_EQ(expected_move_action->getDribblerEnabled(),
                   move_action->getDribblerEnabled());
     }
@@ -80,11 +80,11 @@ class PatrolTacticTest : public testing::Test
      * to move on to the next point
      * @param robot: robot that is assigned the tactic
      * @param new_robot_state: A state that satisfies the patrol tactics's conditions of
-     * moving on on to the next point
+     * moving on to the next point
      * @param action_ptr: the last action returned by the tactic
      * @param tactic: the patrol tactic
      */
-    void simulateActionToCompletion(Robot &robot, RobotState new_robot_state,
+    void simulateActionToCompletion(Robot &robot, TimestampedRobotState new_robot_state,
                                     std::shared_ptr<Action> action_ptr,
                                     PatrolTactic &tactic)
     {
@@ -116,7 +116,6 @@ TEST_F(PatrolTacticTest, patrol_tactic_constructor)
         PatrolTactic(std::vector<Point>({patrol_point1}), at_patrol_point_tolerance,
                      Angle::zero(), speed_at_patrol_points);
     ASSERT_NE(nullptr, &tactic);
-    ASSERT_EQ("Patrol Tactic", tactic.getName());
 }
 
 TEST_F(PatrolTacticTest, patrol_one_point)
@@ -179,7 +178,7 @@ TEST_F(PatrolTacticTest, patrol_three_points)
 
     // Act and Assert
 
-    for (int i = 0; i < patrol_points.size(); i++)
+    for (size_t i = 0; i < patrol_points.size(); i++)
     {
         std::shared_ptr<Action> action_ptr = tactic.getNextAction();
         ASSERT_NE(nullptr, action_ptr);
@@ -222,7 +221,7 @@ TEST_F(PatrolTacticTest, patrol_two_points_and_restart)
 
     for (int j = 0; j < 2; j++)
     {
-        for (int i = 0; i < patrol_points.size(); i++)
+        for (size_t i = 0; i < patrol_points.size(); i++)
         {
             std::shared_ptr<Action> action_ptr = tactic.getNextAction();
             ASSERT_NE(nullptr, action_ptr);
@@ -251,7 +250,7 @@ TEST_F(PatrolTacticTest, cost_of_non_assigned_robot_when_tactic_is_assigned)
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     std::vector<Point> patrol_points{Point(2, 3), Point(4, 3)};
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     PatrolTactic tactic = PatrolTactic(patrol_points, 1.0, Angle::zero(), 2.0);
 
@@ -273,7 +272,7 @@ TEST_F(PatrolTacticTest, cost_of_non_assigned_robot_when_tactic_is_not_assigned)
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     std::vector<Point> patrol_points{Point(2, 2), Point(4, 3)};
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     PatrolTactic tactic = PatrolTactic(patrol_points, 1.0, Angle::zero(), 2.0);
 
@@ -294,7 +293,7 @@ TEST_F(PatrolTacticTest, cost_of_already_assigned_robot)
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     std::vector<Point> patrol_points{Point(2, 3), Point(4, 3)};
-    World world = ::Test::TestUtil::createBlankTestingWorld();
+    World world = ::TestUtil::createBlankTestingWorld();
 
     PatrolTactic tactic = PatrolTactic(patrol_points, 1.0, Angle::zero(), 2.0);
 

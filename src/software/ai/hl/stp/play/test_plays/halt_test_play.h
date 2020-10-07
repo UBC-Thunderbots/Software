@@ -20,11 +20,9 @@ class HaltTestPlay : public Play
 
     HaltTestPlay() = default;
 
-    std::string getName() const override;
-
     bool isApplicable(const World &world) const override;
 
     bool invariantHolds(const World &world) const override;
 
-    void getNextTactics(TacticCoroutine::push_type &yield) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

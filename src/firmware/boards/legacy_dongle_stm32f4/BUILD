@@ -1,7 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//firmware/boards/shared:rules.bzl", "legacy_freertos_and_stm32_lib")
-load("//firmware/boards/shared/legacy_usb:rules.bzl", "legacy_usb_lib")
+load("//firmware/boards/shared:rules.bzl", "legacy_shared_libs")
 
 cc_binary(
     name = "elf",
@@ -38,10 +37,10 @@ cc_binary(
         # https://docs.bazel.build/versions/master/be/c-cpp.html#cc_binary.includes
         "-isystem firmware/boards/shared/legacy_freertos/include",
         "-isystem firmware/boards/shared/legacy_stm32lib/include",
+        "-isystem firmware/boards/shared/legacy_cdcacm/include",
         "-isystem firmware/boards/shared/legacy_usb/include",
-    ],
-    includes = [
-        "cdcacm/include",
+        # We don't want to mark warnings as errors for legacy code
+        "-Wno-error",
     ],
     linkopts = [
         "-T$(location :legacy_stm32f405.ld)",
@@ -52,8 +51,8 @@ cc_binary(
     linkstatic = True,
     restricted_to = ["//cc_toolchain:stm32f4"],
     deps = [
+        ":legacy_shared_libs",
         ":legacy_stm32f405.ld",
-        ":usb",
     ],
 )
 
@@ -77,15 +76,10 @@ filegroup(
     ],
 )
 
-legacy_freertos_and_stm32_lib(
-    name = "freertos",
+legacy_shared_libs(
+    name = "legacy_shared_libs",
     freertos_config_headers = ":freertos_config_headers",
     includes = [
         ".",
     ],
-)
-
-legacy_usb_lib(
-    name = "usb",
-    freertos_lib = ":freertos",
 )

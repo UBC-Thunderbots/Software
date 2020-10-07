@@ -1,26 +1,15 @@
-/**
- * Definition for the CherryPickTactic class
- */
-
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/util.h"
-#include "software/new_geom/util/distance.h"
+#include "software/geom/algorithms/distance.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
-    : Tactic(true),
-      pass_generator(world, world.ball().position(), Passing::PassType::ONE_TOUCH_SHOT),
+    : Tactic(true, {RobotCapability::Move}),
+      pass_generator(world, world.ball().position(), PassType::ONE_TOUCH_SHOT),
       world(world),
       target_region(target_region)
 {
     pass_generator.setTargetRegion(target_region);
-}
-
-std::string CherryPickTactic::getName() const
-{
-    return "Cherry Pick Tactic";
 }
 
 void CherryPickTactic::updateWorldParams(const World& world)
@@ -48,7 +37,7 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         move_action->updateControlParams(*robot, pass.receiverPoint(),
                                          pass.receiverOrientation(), 0,
                                          DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutokickType::NONE, BallCollisionType::AVOID);
+                                         AutochickType::NONE, BallCollisionType::AVOID);
         yield(move_action);
     } while (true);
 }

@@ -8,78 +8,77 @@ extern "C"
 class FirmwareRobotTest : public testing::Test
 {
    protected:
-    virtual void SetUp()
+    virtual void SetUp(void)
     {
-        RobotConstants_t robot_constants = {.mass              = 1.1,
-                                            .moment_of_inertia = 1.2,
-                                            .robot_radius      = 1.3,
-                                            .jerk_limit        = 1.4};
+        RobotConstants_t robot_constants = {.mass              = 1.1f,
+                                            .moment_of_inertia = 1.2f,
+                                            .robot_radius      = 1.3f,
+                                            .jerk_limit        = 1.4f};
 
-        controller_state = (ControllerState_t*)malloc(sizeof(ControllerState_t));
-        controller_state->last_applied_acceleration_x       = 2.33f;
-        controller_state->last_applied_acceleration_y       = 1.22f;
-        controller_state->last_applied_acceleration_angular = 3.22f;
+        controller_state.last_applied_acceleration_x       = 2.33f;
+        controller_state.last_applied_acceleration_y       = 1.22f;
+        controller_state.last_applied_acceleration_angular = 3.22f;
 
         firmware_robot = app_firmware_robot_create(
-            chicker, dribbler, &(this->returnEight), &(this->returnNine),
+            charger, chicker, dribbler, &(this->returnEight), &(this->returnNine),
             &(this->returnTen), &(this->returnEleven), &(this->returnTwelve),
             &(this->returnThirteen), &(this->returnFourteen), front_right_wheel,
-            front_left_wheel, back_right_wheel, back_left_wheel, controller_state,
+            front_left_wheel, back_right_wheel, back_left_wheel, &controller_state,
             robot_constants);
     }
 
-    virtual void TearDown()
+    virtual void TearDown(void)
     {
         app_firmware_robot_destroy(firmware_robot);
     }
+
+    Charger* charger = (Charger*)6;
 
     Chicker* chicker = (Chicker*)7;
 
     Dribbler* dribbler = (Dribbler*)8;
 
-    ControllerState_t* controller_state;
-
-    static float returnEight()
+    static float returnEight(void)
     {
         return 8;
     }
 
-    static float returnNine()
+    static float returnNine(void)
     {
         return 9;
     }
 
-    static float returnTen()
+    static float returnTen(void)
     {
         return 10;
     }
 
-    static float returnEleven()
+    static float returnEleven(void)
     {
         return 11;
     }
 
-    static float returnTwelve()
+    static float returnTwelve(void)
     {
         return 12;
     }
 
-    static float returnThirteen()
+    static float returnThirteen(void)
     {
         return 13;
     }
 
-    static float returnFourteen()
+    static float returnFourteen(void)
     {
         return 14;
     }
 
-    static float returnFifteen()
+    static float returnFifteen(void)
     {
         return 15;
     }
 
-    static float returnSixteen()
+    static float returnSixteen(void)
     {
         return 16;
     }
@@ -90,7 +89,13 @@ class FirmwareRobotTest : public testing::Test
     Wheel* back_right_wheel  = (Wheel*)14;
 
     FirmwareRobot_t* firmware_robot;
+    ControllerState_t controller_state;
 };
+
+TEST_F(FirmwareRobotTest, getCharger)
+{
+    EXPECT_EQ(charger, app_firmware_robot_getCharger(firmware_robot));
+}
 
 TEST_F(FirmwareRobotTest, getChicker)
 {
@@ -178,9 +183,9 @@ TEST_F(FirmwareRobotTest, getAndModifyControllerState)
     EXPECT_NEAR(3.22, controller_state->last_applied_acceleration_angular, 1e-6);
 
     // Modify the values
-    controller_state->last_applied_acceleration_x       = 3.4;
-    controller_state->last_applied_acceleration_y       = 3.55;
-    controller_state->last_applied_acceleration_angular = 3.88;
+    controller_state->last_applied_acceleration_x       = 3.4f;
+    controller_state->last_applied_acceleration_y       = 3.55f;
+    controller_state->last_applied_acceleration_angular = 3.88f;
 
     // Check that the modified values are reflected when we get the ControllerState
     // from the robot again

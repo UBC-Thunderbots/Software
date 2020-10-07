@@ -107,21 +107,26 @@ Makefile
 *.out
 *.app
 
-#vim
+# vim
 *~
 
-#bazel
+# bazel
 **/bazel-*
 
-#cscope
+# cscope
 cscope*
 
 # Explicitly un-ignore the .bazelproject file
 !/src/.bazelproject
 
-#kcachegrind
+# kcachegrind
 src/callgrind*
 src/core*
 
 # CubeMX
 *.mxproject
+
+# Python
+*./__py_cache__
+*./.mypy_cache
+

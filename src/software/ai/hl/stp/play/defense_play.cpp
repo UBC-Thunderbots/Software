@@ -10,35 +10,27 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/geom/util.h"
-#include "software/logger/init.h"
+#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
-const std::string DefensePlay::name = "Defense Play";
-
-std::string DefensePlay::getName() const
-{
-    return DefensePlay::name;
-}
-
 bool DefensePlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           !Evaluation::teamHasPossession(world, world.friendlyTeam());
+           !teamHasPossession(world, world.friendlyTeam());
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           !Evaluation::teamHasPossession(world, world.friendlyTeam());
+           !teamHasPossession(world, world.friendlyTeam());
 }
 
-void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
+void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     bool enemy_team_can_pass =
-        Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
+        DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
@@ -73,8 +65,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block
@@ -107,7 +99,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
         else
         {
-            auto swarm_ball_tactics = moveRobotsToSwarmEnemyWithBall(move_tactics);
+            auto swarm_ball_tactics = moveRobotsToSwarmEnemyWithBall(move_tactics, world);
             result.insert(result.end(), swarm_ball_tactics.begin(),
                           swarm_ball_tactics.end());
         }
@@ -121,7 +113,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         else
         {
             auto nearest_enemy_robot =
-                Evaluation::nearestRobot(world.enemyTeam(), world.ball().position());
+                nearestRobot(world.enemyTeam(), world.ball().position());
             if (nearest_enemy_robot)
             {
                 Point block_point =
@@ -145,10 +137,9 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWithBall(
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics)
+    std::vector<std::shared_ptr<MoveTactic>> move_tactics, const World &world)
 {
-    auto nearest_enemy_robot =
-        Evaluation::nearestRobot(world.enemyTeam(), world.ball().position());
+    auto nearest_enemy_robot = nearestRobot(world.enemyTeam(), world.ball().position());
     if (nearest_enemy_robot)
     {
         Point block_point = nearest_enemy_robot->position() +

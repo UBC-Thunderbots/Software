@@ -1,12 +1,8 @@
 #include "software/ai/hl/stp/tactic/test_tactics/goalie_test_tactic.h"
 
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-
-GoalieTestTactic::GoalieTestTactic(bool loop_forever) : Tactic(loop_forever) {}
-
-std::string GoalieTestTactic::getName() const
+GoalieTestTactic::GoalieTestTactic(bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Move})
 {
-    return "Goalie Test Tactic";
 }
 
 bool GoalieTestTactic::isGoalieTactic() const

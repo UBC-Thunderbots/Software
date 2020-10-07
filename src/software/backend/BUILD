@@ -2,30 +2,15 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "backend",
+    srcs = ["backend.cpp"],
     hdrs = ["backend.h"],
     deps = [
-        ":robot_status",
-        "//software/ai/primitive",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "//software/proto:sensor_msg_cc_proto",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/world",
     ],
-)
-
-cc_library(
-    name = "grsim_backend",
-    srcs = ["grsim_backend.cpp"],
-    hdrs = ["grsim_backend.h"],
-    deps = [
-        ":backend",
-        "//software/backend/input/network/networking:network_client",
-        "//software/backend/output/grsim:grsim_output",
-        "//software/util/design_patterns:generic_factory",
-    ],
-    # We force linking so that the static variables required for the "factory"
-    # design pattern to work are linked in
-    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
-    alwayslink = True,
 )
 
 cc_library(
@@ -34,8 +19,8 @@ cc_library(
     hdrs = ["radio_backend.h"],
     deps = [
         ":backend",
-        "//software/backend/input/network/networking:network_client",
-        "//software/backend/output/radio:radio_output",
+        ":ssl_proto_client",
+        "//software/backend/radio:radio_output",
         "//software/util/design_patterns:generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
@@ -45,13 +30,19 @@ cc_library(
 )
 
 cc_library(
-    name = "handheld_controller_backend",
-    srcs = ["handheld_controller_backend.cpp"],
-    hdrs = ["handheld_controller_backend.h"],
+    name = "wifi_backend",
+    srcs = ["wifi_backend.cpp"],
+    hdrs = ["wifi_backend.h"],
     deps = [
         ":backend",
-        "//software/backend/output/radio:radio_output",
-        "//software/time:timestamp",
+        ":ssl_proto_client",
+        "//shared:constants",
+        "//software:constants",
+        "//software/networking:threaded_proto_multicast_listener",
+        "//software/networking:threaded_proto_multicast_sender",
+        "//software/proto:defending_side_msg_cc_proto",
+        "//software/proto/message_translation:defending_side",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/util/design_patterns:generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
@@ -61,38 +52,43 @@ cc_library(
 )
 
 cc_library(
-    name = "simulator_backend",
-    srcs = ["simulator_backend.cpp"],
-    hdrs = ["simulator_backend.h"],
+    name = "replay_backend",
+    srcs = ["replay_backend.cpp"],
+    hdrs = ["replay_backend.h"],
     deps = [
         ":backend",
-        "//software/backend/simulation:simulator",
-        "//software/logger",
-        "//software/multithreading:thread_safe_buffer",
+        ":ssl_proto_client",
+        "//shared:constants",
+        "//software:constants",
+        "//software/backend/replay_logging:replay_reader",
+        "//software/networking:threaded_proto_multicast_listener",
+        "//software/networking:threaded_proto_multicast_sender",
+        "//software/proto/message_translation:tbots_protobuf",
         "//software/util/design_patterns:generic_factory",
-        "//software/world",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in
     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
     alwayslink = True,
-)
-
-cc_library(
-    name = "robot_status",
-    hdrs = ["robot_status.h"],
-    deps = [],
 )
 
 cc_library(
     name = "all_backends",
-    hdrs = [
-        "all_backends.h",
-    ],
     deps = [
-        ":grsim_backend",
-        ":handheld_controller_backend",
         ":radio_backend",
-        ":simulator_backend",
+        ":replay_backend",
+        ":wifi_backend",
+    ],
+)
+
+cc_library(
+    name = "ssl_proto_client",
+    srcs = ["ssl_proto_client.cpp"],
+    hdrs = ["ssl_proto_client.h"],
+    deps = [
+        "//software:constants",
+        "//software/networking:threaded_proto_multicast_listener",
+        "//software/parameter:dynamic_parameters",
+        "//software/proto:ssl_cc_proto",
     ],
 )

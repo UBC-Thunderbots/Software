@@ -3,28 +3,22 @@
  */
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
 
-#include <g3log/g3log.hpp>
-
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/dribble_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
-#include "software/geom/util.h"
-#include "software/new_geom/util/intersection.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/logger/logger.h"
 
 
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
                                      const std::optional<Robot>& enemy_goalie,
                                      bool loop_forever)
-    : Tactic(loop_forever), ball(ball), field(field), enemy_goalie(enemy_goalie)
+    : Tactic(loop_forever, {RobotCapability::Move}),
+      ball(ball),
+      field(field),
+      enemy_goalie(enemy_goalie)
 {
-}
-
-std::string PenaltyKickTactic::getName() const
-{
-    return "Penalty Kick Tactic";
 }
 
 void PenaltyKickTactic::updateWorldParams(
@@ -80,14 +74,14 @@ bool PenaltyKickTactic::evaluate_penalty_shot()
 
         // Based on constant acceleration -> // dX = init_vel*t + 0.5*a*t^2
         //          dX - init_vel - (0.5*a*t)t
-        const double max_enemy_movement_x = robot.value().velocity().x() * time_to_score +
-                                            0.5 * sign(goalie_to_goal_distance.x()) *
-                                                PENALTY_KICK_GOALIE_MAX_ACC *
-                                                pow(time_to_score, 2);
-        const double max_enemy_movement_y = robot.value().velocity().y() * time_to_score +
-                                            0.5 * sign(goalie_to_goal_distance.y()) *
-                                                PENALTY_KICK_GOALIE_MAX_ACC *
-                                                pow(time_to_score, 2);
+        const double max_enemy_movement_x =
+            robot.value().velocity().x() * time_to_score +
+            0.5 * -std::signbit(goalie_to_goal_distance.x()) *
+                PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_score, 2);
+        const double max_enemy_movement_y =
+            robot.value().velocity().y() * time_to_score +
+            0.5 * -std::signbit(goalie_to_goal_distance.y()) *
+                PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_score, 2);
 
         // If the position to block the ball is further than the enemy goalie can reach in
         // the time required to score
@@ -146,7 +140,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
     do
     {
-        Vector behind_ball_vector = (ball.position() - field.enemyGoal());
+        Vector behind_ball_vector = (ball.position() - field.enemyGoalCenter());
         // A point behind the ball that leaves 5cm between the ball and kicker of the
         // robot
         Point behind_ball = ball.position() + behind_ball_vector.normalize(
@@ -174,7 +168,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         {
             approach_ball_move_act->updateControlParams(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::ALLOW);
             yield(approach_ball_move_act);
         }
@@ -184,7 +178,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
             rotate_with_ball_move_act->updateControlParams(
                 *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW);
             yield(rotate_with_ball_move_act);
         }
 

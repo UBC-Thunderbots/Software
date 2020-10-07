@@ -2,6 +2,7 @@
 #
 # This script allows the user to automatically generate cubemx
 # code into our filestructure
+CUBE_VERSION=5.6.1
 
 # The directory this script is in
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
@@ -12,7 +13,7 @@ WORKSPACE_DIR="$CURR_DIR/../../"
 THIS_SCRIPT_FILENAME=$(basename "$0")
 
 TEMP_DIR="/tmp/tbots_autogen"
-CUBE_EXECUTABLE="/opt/STM32CubeMX_5.4.0/STM32CubeMX"
+CUBE_EXECUTABLE="/opt/STM32CubeMX_$CUBE_VERSION/STM32CubeMX"
 
 # cleanup temp dir and create Src/Inc folder, the way Cube expects this output
 mkdir -p $TEMP_DIR/Src
@@ -58,8 +59,8 @@ CUBE_SCRIPT='''
 # Load the project-specific config file (.ioc)
 config load %s
 
-# Generate the peripheral initializations in main.c
-project couplefilesbyip 0
+# Generate the peripheral initializations in separated files
+project couplefilesbyip 1
 
 # Generate code in the project directory
 generate code %s

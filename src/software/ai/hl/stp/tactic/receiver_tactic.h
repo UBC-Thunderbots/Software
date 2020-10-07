@@ -1,12 +1,9 @@
-/**
- * Interface of the ReceiverTactic
- */
 #pragma once
 
+#include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
-#include "software/geom/shot.h"
-#include "software/new_geom/ray.h"
+#include "software/geom/ray.h"
 
 /**
  * This tactic is for a robot receiving a pass. It should be used in conjunction with
@@ -30,10 +27,8 @@ class ReceiverTactic : public Tactic
      *                     the tactic will be restarted every time it completes
      */
     explicit ReceiverTactic(const Field& field, const Team& friendly_team,
-                            const Team& enemy_team, const Passing::Pass pass,
-                            const Ball& ball, bool loop_forever);
-
-    std::string getName() const override;
+                            const Team& enemy_team, const Pass pass, const Ball& ball,
+                            bool loop_forever);
 
     /**
      * Updates the world parameters for this ReceiverTactic.
@@ -50,7 +45,7 @@ class ReceiverTactic : public Tactic
      *
      * @param updated_pass The pass this tactic should try to receive
      */
-    void updateControlParams(const Passing::Pass& updated_pass);
+    void updateControlParams(const Pass& updated_pass);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -116,11 +111,11 @@ class ReceiverTactic : public Tactic
      */
     std::optional<Shot> findFeasibleShot();
 
-    // The field the pass is occuring on
+    // The field the pass is occurring on
     Field field;
 
     // The pass this tactic is executing
-    Passing::Pass pass;
+    Pass pass;
 
     // The ball being passed
     Ball ball;

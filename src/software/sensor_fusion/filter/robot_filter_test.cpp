@@ -1,7 +1,3 @@
-/**
- * This file contains the unit tests for the implementation of RobotFilter class
- */
-
 #include "software/sensor_fusion/filter/robot_filter.h"
 
 #include <gtest/gtest.h>

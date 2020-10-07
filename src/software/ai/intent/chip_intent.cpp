@@ -1,31 +1,10 @@
 #include "software/ai/intent/chip_intent.h"
 
-#include "software/ai/intent/intent_visitor.h"
-
-const std::string ChipIntent::INTENT_NAME = "Chip Intent";
-
-ChipIntent::ChipIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed, unsigned int priority)
-    : ChipPrimitive(robot_id, dest, final_angle, final_speed), Intent(priority)
+ChipIntent::ChipIntent(unsigned int robot_id, const Point &chip_origin,
+                       const Angle &chip_direction, double chip_distance_meters,
+                       unsigned int priority)
+    : DirectPrimitiveIntent(
+          robot_id, priority,
+          *createChipPrimitive(chip_origin, chip_direction, chip_distance_meters))
 {
-}
-
-std::string ChipIntent::getIntentName(void) const
-{
-    return INTENT_NAME;
-}
-
-void ChipIntent::accept(IntentVisitor &visitor) const
-{
-    visitor.visit(*this);
-}
-
-bool ChipIntent::operator==(const ChipIntent &other) const
-{
-    return ChipPrimitive::operator==(other) && Intent::operator==(other);
-}
-
-bool ChipIntent::operator!=(const ChipIntent &other) const
-{
-    return !((*this) == other);
 }

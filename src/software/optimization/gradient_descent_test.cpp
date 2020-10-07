@@ -1,14 +1,8 @@
-/**
- * Tests for the `GradientDescentOptimizer`
- */
-
 #include <gtest/gtest.h>
 
 #include <cmath>
 
 #include "software/optimization/gradient_descent_optimizer.h"
-
-using namespace Util;
 
 TEST(GradientDescentOptimizerTest, minimize_single_valued_function)
 {
@@ -103,10 +97,4 @@ TEST(GradientDescentOptimizer, maximize_sigmoid_performance_test)
     // We expect that the gradient descent will make it over the main part of
     // the "S" in the sigmoid within the given number of iterations
     EXPECT_GE(min.at(0), 3);
-}
-
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

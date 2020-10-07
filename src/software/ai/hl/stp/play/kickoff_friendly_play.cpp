@@ -6,14 +6,6 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-
-const std::string KickoffFriendlyPlay::name = "KickoffFriendly Play";
-
-std::string KickoffFriendlyPlay::getName() const
-{
-    return KickoffFriendlyPlay::name;
-}
-
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
     return ((world.gameState().isReadyState() || world.gameState().isSetupState()) &&
@@ -27,7 +19,8 @@ bool KickoffFriendlyPlay::invariantHolds(const World &world) const
             world.gameState().isStopped());
 }
 
-void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                         const World &world)
 {
     // Since we only have 6 robots at the maximum, the number one priority
     // is the robot doing the kickoff up front. The goalie is the second most
@@ -95,14 +88,14 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
     {
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // set the requirement that Robot 1 must be able to kick and chip
         move_tactics.at(0)->mutableRobotCapabilityRequirements() = {
-            RobotCapabilities::Capability::Kick, RobotCapabilities::Capability::Chip};
+            RobotCapability::Kick, RobotCapability::Chip};
 
         // setup 5 kickoff positions in order of priority
         for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
@@ -119,8 +112,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Part 2: not normal play, currently ready state (chip the ball)
     while (!world.gameState().isPlaying())
     {
-        auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball(), false);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
@@ -128,8 +121,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // in the middle of the enemy field
         kickoff_chip_tactic->updateControlParams(
             world.ball().position(),
-            world.field().centerPoint() + Vector(world.field().xLength() / 6, 0),
-            world.field().xLength() / 2);
+            world.field().centerPoint() + Vector(world.field().xLength() / 6, 0));
         result.emplace_back(kickoff_chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from

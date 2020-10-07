@@ -1,16 +1,13 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 
-#include <g3log/g3log.hpp>
+#include "software/logger/logger.h"
 
-Tactic::Tactic(bool loop_forever,
-               const std::set<RobotCapabilities::Capability> &capability_reqs_)
+Tactic::Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_)
     : action_sequence(boost::bind(&Tactic::calculateNextActionWrapper, this, _1)),
       done_(false),
       loop_forever(loop_forever),
       capability_reqs(capability_reqs_)
 {
-    // require movement capability by default
-    capability_reqs.emplace(RobotCapabilities::Capability::Move);
 }
 
 bool Tactic::done() const
@@ -101,12 +98,12 @@ std::shared_ptr<Action> Tactic::getNextActionHelper()
     return next_action;
 }
 
-const std::set<RobotCapabilities::Capability> &Tactic::robotCapabilityRequirements() const
+const std::set<RobotCapability> &Tactic::robotCapabilityRequirements() const
 {
     return capability_reqs;
 }
 
-std::set<RobotCapabilities::Capability> &Tactic::mutableRobotCapabilityRequirements()
+std::set<RobotCapability> &Tactic::mutableRobotCapabilityRequirements()
 {
     return capability_reqs;
 }

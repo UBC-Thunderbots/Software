@@ -7,27 +7,6 @@
 #include "firmware/app/world/firmware_world.h"
 
 /**
- * \brief The information about a movement sent from the host computer.
- */
-typedef struct
-{
-    /**
-     * \brief The four primary data parameters.
-     */
-    int16_t params[4];
-
-    /**
-     * \brief Whether the robot has been ordered to drive slowly.
-     */
-    bool slow;
-
-    /**
-     * \brief The extra data byte.
-     */
-    uint8_t extra;
-} primitive_params_t;
-
-/**
  * \brief The definition of a movement primitive.
  *
  * The movement primitive framework ensures that, even in the face of multiple
@@ -41,33 +20,6 @@ typedef struct
      * \brief Whether or not the primitive is a type of direct-mode operation.
      */
     bool direct;
-
-    /**
-     * \brief Starts performing a movement using the primitive.
-     *
-     * This is invoked every time a new movement begins using the primitive.
-     *
-     * \param[in] params the parameters to the primitive, which are only valid
-     * until this function returns and must be copied into primitive-local
-     * storage if needed subsequently
-     * \param[in] state_void_ptr A pointer to the state object for this primitive, as
-     *                           created by the `create_state` function
-     * \param[in] world The world to perform the primitive in
-     */
-    void (*start)(const primitive_params_t* params, void* state_void_ptr,
-                  FirmwareWorld_t* world);
-
-    /**
-     * \brief Ends a movement using the primitive.
-     *
-     * This is invoked every time a new movement begins after a primitive has
-     * been in use, regardless of whether the new movement is of the same or a
-     * different type.
-     * \param[in] state_void_ptr A pointer to the state object for this primitive, as
-     *                           created by the `create_state` function
-     * \param[in] world The world to perform the primitive in
-     */
-    void (*end)(void* state_void_ptr, FirmwareWorld_t* world);
 
     /**
      * \brief Advances time in the primitive.
@@ -86,7 +38,7 @@ typedef struct
      * @return A pointer to a "state" object, ie. whatever this primitive wants to store
      *         in terms of stateful information.
      */
-    void* (*create_state)();
+    void* (*create_state)(void);
 
     /**
      * Destroy an instance of the "state" object for this primitive
@@ -105,7 +57,7 @@ typedef struct
  * @param STATE_TYPE The type of the state object
  */
 #define DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(STATE_TYPE)                  \
-    void* create##STATE_TYPE()                                                           \
+    void* create##STATE_TYPE(void)                                                       \
     {                                                                                    \
         return malloc(sizeof(STATE_TYPE));                                               \
     }                                                                                    \
@@ -113,12 +65,3 @@ typedef struct
     {                                                                                    \
         free((STATE_TYPE*)state);                                                        \
     }
-
-/**
- * Checks if the given parameters are equivalent
- * @param params1
- * @param params2
- * @return True if the params are equivalent, false otherwise
- */
-bool primitive_params_are_equal(const primitive_params_t* params1,
-                                const primitive_params_t* params2);

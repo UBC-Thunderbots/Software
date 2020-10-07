@@ -30,3 +30,54 @@ cc_library(
         ":pwm_pin",
     ],
 )
+
+cc_library(
+    name = "infineon_TLE009_E1000_angle_sensor",
+    srcs = ["infineon_TLE5009_E1000_angle_sensor.c"],
+    hdrs = ["infineon_TLE5009_E1000_angle_sensor.h"],
+)
+
+cc_test(
+    name = "infineon_TLE009_E1000_angle_sensor_test",
+    srcs = ["infineon_TLE5009_E1000_angle_sensor_test.cpp"],
+    deps = [
+        "//firmware_new/boards/frankie_v1/io:infineon_TLE009_E1000_angle_sensor",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "drivetrain",
+    srcs = ["drivetrain.c"],
+    hdrs = ["drivetrain.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [":drivetrain_unit"],
+)
+
+cc_library(
+    name = "drivetrain_unit",
+    srcs = ["drivetrain_unit.c"],
+    hdrs = ["drivetrain_unit.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [":allegro_a3931_motor_driver"],
+)
+
+cc_library(
+    name = "proto_multicast_communication",
+    srcs = [
+        "proto_multicast_communication_profile.c",
+        "proto_multicast_communication_tasks.c",
+    ],
+    hdrs = [
+        "proto_multicast_communication_profile.h",
+        "proto_multicast_communication_tasks.h",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware_new/boards/frankie_v1:frankie_v1_lwip",
+        "//firmware_new/boards/frankie_v1:hal",
+        "//firmware_new/boards/frankie_v1:lwip",
+        "//shared/proto:tbots_nanopb_proto",
+        "@nanopb",
+    ],
+)

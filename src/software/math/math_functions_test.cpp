@@ -4,91 +4,91 @@
 
 TEST(LinearUtilFunctionTest, testZeroCase)
 {
-    double out = Util::linear(0, 0, 2);
+    double out = linear(0, 0, 2);
     EXPECT_EQ(out, 0.5);
 }
 
 TEST(LinearUtilFunctionTest, testOneQuarter)
 {
-    double out = Util::linear(-1, 0, 4);
+    double out = linear(-1, 0, 4);
     EXPECT_EQ(out, 0.25);
 }
 
 TEST(LinearUtilFunctionTest, testTwoThirds)
 {
-    double out = Util::linear(0.75, 0, 4.5);
+    double out = linear(0.75, 0, 4.5);
     EXPECT_EQ(out, 2.0 / 3.0);
 }
 
 TEST(LinearUtilFunctionTest, testMinimumNoOffset)
 {
-    double out = Util::linear(-1.5, 0, 3);
+    double out = linear(-1.5, 0, 3);
     EXPECT_EQ(out, 0.0);
 }
 
 TEST(LinearUtilFunctionTest, testMaximumNoOffset)
 {
-    double out = Util::linear(2.5, 0, 5.0);
+    double out = linear(2.5, 0, 5.0);
     EXPECT_EQ(out, 1.0);
 }
 
 TEST(LinearUtilFunctionTest, testClampBelowNoOffset)
 {
-    double out = Util::linear(-2, 0, 1);
+    double out = linear(-2, 0, 1);
     EXPECT_EQ(out, 0.0);
 }
 
 TEST(LinearUtilFunctionTest, testClampAboveNoOffset)
 {
-    double out = Util::linear(4.2, 0, 6);
+    double out = linear(4.2, 0, 6);
     EXPECT_EQ(out, 1.0);
 }
 
 TEST(LinearUtilFunctionTest, testMinimumNegativeOffset)
 {
-    double out = Util::linear(-4, -2, 4);
+    double out = linear(-4, -2, 4);
     EXPECT_EQ(out, 0.0);
 }
 
 TEST(LinearUtilFunctionTest, testMaximumNegativeOffset)
 {
-    double out = Util::linear(1.5, -1, 5.0);
+    double out = linear(1.5, -1, 5.0);
     EXPECT_EQ(out, 1.0);
 }
 
 TEST(LinearUtilFunctionTest, testMinimumPositiveOffset)
 {
-    double out = Util::linear(0, 3, 6);
+    double out = linear(0, 3, 6);
     EXPECT_EQ(out, 0.0);
 }
 
 TEST(LinearUtilFunctionTest, testMaximumPositiveOffset)
 {
-    double out = Util::linear(6, 1.5, 9);
+    double out = linear(6, 1.5, 9);
     EXPECT_EQ(out, 1.0);
 }
 
 TEST(LinearUtilFunctionTest, testClampBelowNegativeOffset)
 {
-    double out = Util::linear(-1.8, -0.2, 0.7);
+    double out = linear(-1.8, -0.2, 0.7);
     EXPECT_EQ(out, 0.0);
 }
 
 TEST(LinearUtilFunctionTest, testClampAboveNegativeOffset)
 {
-    double out = Util::linear(0.18, -0.05, 0.24);
+    double out = linear(0.18, -0.05, 0.24);
     EXPECT_EQ(out, 1.0);
 }
 
 TEST(LinearUtilFunctionTest, testClampBelowPositiveOffset)
 {
-    double out = Util::linear(-0.3, 0.6, 1.3);
+    double out = linear(-0.3, 0.6, 1.3);
     EXPECT_EQ(out, 0.0);
 }
 
 TEST(LinearUtilFunctionTest, testClampAbovePositiveOffset)
 {
-    double out = Util::linear(0.35, 0.15, 0.18);
+    double out = linear(0.35, 0.15, 0.18);
     EXPECT_EQ(out, 1.0);
 }
 
@@ -215,14 +215,14 @@ TEST(NormalizeToRangeTest, test_integral_type_initial_value_out_of_range)
 
 TEST(NormalizeToRangeTest, test_floating_point_type_normalize_to_same_range)
 {
-    float result = normalizeValueToRange<float>(39.05, 0.0, 50.0, 0.0, 50.0);
-    EXPECT_FLOAT_EQ(39.05, result);
+    float result = normalizeValueToRange<float>(39.05f, 0.0f, 50.0f, 0.0f, 50.0f);
+    EXPECT_FLOAT_EQ(39.05f, result);
 }
 
 TEST(NormalizeToRangeTest, test_floating_point_type_normalize_to_different_range)
 {
-    float result = normalizeValueToRange<float>(39.05, 0.0, 50.0, 0.0, 1.0);
-    EXPECT_FLOAT_EQ(0.781, result);
+    float result = normalizeValueToRange<float>(39.05f, 0.0f, 50.0f, 0.0f, 1.0f);
+    EXPECT_FLOAT_EQ(0.781f, result);
 }
 
 TEST(NormalizeToRangeTest, test_floating_point_type_initial_value_out_of_range)

@@ -13,13 +13,6 @@ class ExamplePlay : public Play
     ExamplePlay() = default;
 
     /**
-     * This function returns name of the play
-     *
-     * @return name The name of the play (which is is initialized in example_play.cpp)
-     */
-    std::string getName() const override;
-
-    /**
      * This function returns whether the play is applicable
      * Applicable describes the conditions that must be met for the play to start
      * For instance, the play should start when it is kick-off
@@ -39,5 +32,5 @@ class ExamplePlay : public Play
      */
     bool invariantHolds(const World &world) const override;
 
-    void getNextTactics(TacticCoroutine::push_type &yield) override;
+    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };
