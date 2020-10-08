@@ -6,6 +6,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/polygon.h"
 #include "software/world/ball.h"
+#include "software/ai/evaluation/ball.h"
 
 KickAction::KickAction() : Action(false), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
 {
@@ -122,5 +123,5 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
             yield(std::make_unique<KickIntent>(robot->id(), kick_origin, kick_direction,
                                                kick_speed_meters_per_second, 0));
         }
-    } while(!hasBallBeenKicked(ball,kick_direction))
+    } while(!hasBallBeenKicked(ball,kick_direction));
 }
