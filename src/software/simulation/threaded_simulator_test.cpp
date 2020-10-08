@@ -29,7 +29,7 @@ class ThreadedSimulatorTest : public ::testing::Test
         // yield and sleep to give the simulation thread the best chance of running
         std::this_thread::yield();
         std::this_thread::sleep_for(std::chrono::milliseconds(
-            static_cast<unsigned int>(duration.getMilliseconds())));
+            static_cast<unsigned int>(duration.toMilliseconds())));
         threaded_simulator.stopSimulation();
     }
 

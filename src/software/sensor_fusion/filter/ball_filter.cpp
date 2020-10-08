@@ -47,7 +47,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
             // Ignore any data from the past, and any data that is as old as the oldest
             // data in the buffer since it provides no additional value. This also
             // prevents division by 0 when calculating the estimated velocity
-            if (time_diff.getSeconds() <= 0)
+            if (time_diff.toSeconds() <= 0)
             {
                 continue;
             }
@@ -62,7 +62,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
                 (detection.position - detection_with_smallest_timestamp.position)
                     .length();
             double estimated_detection_velocity_magnitude =
-                detection_distance / time_diff.getSeconds();
+                detection_distance / time_diff.toSeconds();
 
             // Make the maximum acceptable velocity a bit larger than the strict limits
             // according to the game rules to account for measurement error, and to be a
@@ -322,7 +322,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
                 current_detection.timestamp - previous_detection.timestamp;
             // Avoid division by 0. If we have adjacent detections with the same timestamp
             // the velocity cannot be calculated
-            if (time_diff.getSeconds() == 0)
+            if (time_diff.toSeconds() == 0)
             {
                 continue;
             }
@@ -343,7 +343,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
                 previous_position = previous_detection.position;
             }
             Vector velocity_vector    = current_position - previous_position;
-            double velocity_magnitude = velocity_vector.length() / time_diff.getSeconds();
+            double velocity_magnitude = velocity_vector.length() / time_diff.toSeconds();
             Vector velocity           = velocity_vector.normalize(velocity_magnitude);
 
             ball_velocity_magnitudes.emplace_back(velocity_magnitude);
