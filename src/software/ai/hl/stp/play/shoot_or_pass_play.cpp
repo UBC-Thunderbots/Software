@@ -185,7 +185,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
             Duration time_since_commit_stage_start =
                 world.getMostRecentTimestamp() - pass_optimization_start_time;
             min_pass_score_threshold =
-                1 - std::min(time_since_commit_stage_start.getSeconds() /
+                1 - std::min(time_since_commit_stage_start.toSeconds() /
                                  pass_score_ramp_down_duration,
                              1.0 - abs_min_pass_score);
         }

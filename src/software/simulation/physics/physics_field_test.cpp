@@ -28,7 +28,7 @@ class PhysicsFieldTest : public testing::Test
     {
         double step_size_seconds = 1.0 / 60.0;
         unsigned int num_steps =
-            static_cast<unsigned int>(duration.getSeconds() / step_size_seconds);
+            static_cast<unsigned int>(duration.toSeconds() / step_size_seconds);
 
         // We have to take lots of small steps because a significant amount of accuracy
         // is lost if we take a single step of 1 second

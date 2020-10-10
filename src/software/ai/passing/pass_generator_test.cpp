@@ -111,7 +111,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).length(), 0.3);
         EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.3);
-        EXPECT_LE(abs((converged_pass.startTime() - pass.startTime()).getSeconds()), 0.2);
+        EXPECT_LE(abs((converged_pass.startTime() - pass.startTime()).toSeconds()), 0.2);
         UNUSED(score);
     }
     UNUSED(converged_score);

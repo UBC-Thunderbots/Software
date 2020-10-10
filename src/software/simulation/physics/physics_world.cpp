@@ -195,7 +195,7 @@ void PhysicsWorld::stepSimulation(const Duration& time_step)
     {
         physics_ball->updateIsInFlight();
     }
-    b2_world->Step(static_cast<float>(time_step.getSeconds()), velocity_iterations,
+    b2_world->Step(static_cast<float>(time_step.toSeconds()), velocity_iterations,
                    position_iterations);
 
     for (const auto& physics_robots : {yellow_physics_robots, blue_physics_robots})
