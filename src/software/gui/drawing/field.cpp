@@ -93,10 +93,10 @@ void drawTeamGoalText(QGraphicsScene* scene, const Field& field)
     // coordinate system matches ours and we can draw things without changing our
     // convention. Unfortunately this flips all text by default, so we need to flip it
     // back here.
-    QTransform friendly_scale_and_invert_y_transform(friendly_text_scaling_factor, 0, 0,
-                                                     -friendly_text_scaling_factor, 0, 0);
-    QTransform enemy_scale_and_invert_y_transform(enemy_text_scaling_factor, 0, 0,
-                                                  -enemy_text_scaling_factor, 0, 0);
+    QTransform friendly_scale_and_invert_y_transform(friendly_text_scaling_factor, nullptr, nullptr,
+                                                     -friendly_text_scaling_factor, nullptr, nullptr);
+    QTransform enemy_scale_and_invert_y_transform(enemy_text_scaling_factor, nullptr, nullptr,
+                                                  -enemy_text_scaling_factor, nullptr, nullptr);
 
     const double text_dist_from_boundary = 0.1;
 
