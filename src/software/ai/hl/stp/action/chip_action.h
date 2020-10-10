@@ -15,7 +15,7 @@ class ChipAction : public Action
     /**
      * Creates a new ChipAction
      */
-    explicit ChipAction();
+    explicit ChipAction() = delete;
 
     /**
      * Updates the params that can be derived from the world for this action

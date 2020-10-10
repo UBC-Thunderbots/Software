@@ -15,7 +15,7 @@ class KickAction : public Action
     /**
      * Creates a new KickAction
      */
-    explicit KickAction();
+    explicit KickAction() = delete;
 
     /**
      * Updates the params that can be derived from the world for this action

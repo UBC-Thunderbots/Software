@@ -23,7 +23,7 @@ class Time
     /**
      * The default constructor for a Time. Creates a Time at time 0
      */
-    Time();
+    Time() = delete;
 
     /**
      * Returns the value of the Time in seconds
