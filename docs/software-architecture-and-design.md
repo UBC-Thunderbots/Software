@@ -51,11 +51,12 @@
     * [Diagram](#visualizer-diagram)
     * [Draw Functions](#draw-functions)
 * [Simulator](#simulator)
-* [Simulated Tests](#simulated-tests)
-  * [Architecture](#simulated-tests-architecture)
-    * [Validation Functions](#validation-functions)
-  * [Component Connections and Determinism](#component-connections-and-determinism)
-  * [Diagram](#simulated-tests-diagram)
+  * [Standalone Simulator](#standalone-simulator)
+  * [Simulated Tests](#simulated-tests)
+    * [Architecture](#simulated-tests-architecture)
+      * [Validation Functions](#validation-functions)
+    * [Component Connections and Determinism](#component-connections-and-determinism)
+    * [Diagram](#simulated-tests-diagram)
 * [GUI](#gui)
   * [Naming](#naming)
   * [Editing the GUIs](#editing-the-guis)
@@ -462,8 +463,14 @@ A [DrawFunction](#draw_functions) is essentially a function that tells the [Visu
 
 
 # Simulator
+The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` performs the functions of (1) [SSL-Vision](#ssl-vision) by publishing new vision data and (2) the robots by accepting new [Primitives](#primitives). Using the current state of the simulated world, the `Simulator` simulates the new [Primitives](#primitives) over some time step and publishes new ssl vision data based on the updated simulated world. The `Simulator` is designed to be "perfect", which means that (1) the vision data it publishes exactly reflects the state of the simulated world and (2) the simulation perfectly reflects our best understanding of the physics (e.g. friction) with no randomness.
 
-# Simulated Tests
+The `Simulator` uses `Box2D`, which provides 2D physics simulation for free. While this simplifies the simulator greatly, it means that we manually implement the physics for "3D effects", such as dribbling and chipping.
+
+## Standalone Simulator
+The `Standalone Simulator` is a wrapper around the `Simulator` so that we can run it as a standlone application that publishes and receives data over the network. The `Standalone Simulator` is designed to interface with the [WifiBackend](#backend) over the network, and so it is essentially indistinguishible from robots receiving [Primitives](#primitives) and an [SSL-Vision](#ssl-vision) client publishing data over the network. The `Standalone Simulator` also has a [GUI](#gui) that provides user-friendly features, such as moving the ball around.
+
+## Simulated Tests
 
 When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
 
@@ -474,7 +481,7 @@ The primary design goals of this test system are:
 2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
 3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and to understand what they are testing.
 
-## Simulated Tests Architecture
+### Simulated Tests Architecture
 The `SimulatedTestFixture` consists of three components:
 1. A [Simulator](#simulator) that does physics simulations based on the [Primitives](#primitives) it receives
 2. A [Sensor Fusion](#sensor-fusion) that processed raw data for the [AI](#ai)
@@ -482,7 +489,7 @@ The `SimulatedTestFixture` consists of three components:
 
 The components of this system are run in a big loop. The [Simulator](#simulator) publishes new vision data with a fixed increment and that data is passed through [Sensor Fusion](#sensor-fusion) to produced an updated [World](#world) for the [AI](#ai). The `SimulatedTestFixture` will wait to receive [Primitives](#primitives) before triggering simulation and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
 
-### Validation Functions
+#### Validation Functions
 `Validation Functions` are the way we check that the behaviour of the AI is as we expect. They are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. We can create a list of `Validation Functions` that are run every time `SimulatedTestFixture` produces an updated [World](#world), so that we can continuously check that the behaviour of the [AI](#ai) is as we expected. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
 
 A `Validation Function` comes in two types:
@@ -494,7 +501,7 @@ Benefits of `Validation Functions`:
 2. They can represent assertions for more complex behaviour. For example, we can build up simpler `Validation Functions` until we have a single `Validation` function for a specific [Tactic](#tactics).
 3. They let us validate independent sequences of behaviour. For example, we create a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
 
-## Component Connections and Determinism
+### Component Connections and Determinism
 When testing, determinism is extremely important. With large integration tests with many components, there are all kinds of timings and execution speed differences that can change the behaviour and results. We make use of a few assumptions and connect our components in such a way that prevents these timing issues.
 
 The [Validation Functions](#validation-functions) are run before updating [AI](#ai) with a new [World](#world) and getting new primitives so that we stop as soon as we know that there's incorrect behaviour. See the [diagram](#simulated-tests-diagram).
@@ -503,8 +510,8 @@ Now we have a nice loop from the `Simulator -> Sensor Fusion -> Validation Funct
 
 **What this means is that each component in the loop waits for the previous one to finish its task and publish new data before executing.** As a result, no matter how fast each component is able to run, we will not have any issues related to speed or timing because each component is blocked by the previous one. As a result, we can have deterministic behaviour because every component is running at the same speed relative to one another.
 
-## Simulated Tests Diagram
-Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the only real difference being the [World State Validator](#world-state-validator) being added between the [Backend](#backend) and [AI](#ai).
+### Simulated Tests Diagram
+Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the [Backend](#backend) replaced by the [Simulator](#simulator) and with [Validation Functions](#validation-functions) in the loop between [Sensor Fusion](#sensor-fusion) and [AI](#ai).
 
 The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and are not run during the tests unless we are debugging.
 
