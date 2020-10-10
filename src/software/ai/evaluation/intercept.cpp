@@ -9,7 +9,6 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
                                                                    const Field &field,
                                                                    const Robot &robot)
 {
-    TimestampedBallState ball_state               = ball.currentState();
     auto ball_model                               = ball.ballModel();
     static const double gradient_approx_step_size = 0.000001;
 
@@ -26,9 +25,9 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
         // If the ball timestamp is less then the robot timestamp, add the difference
         // here so that we're optimizing to a duration that is after the robot
         // timestamp
-        if (ball_state.timestamp() < robot.timestamp())
+        if (ball.timestamp() < robot.timestamp())
         {
-            duration += (robot.timestamp() - ball_state.timestamp()).toSeconds();
+            duration += (robot.timestamp() - ball.timestamp()).toSeconds();
         }
 
         // Estimate the ball position
@@ -54,7 +53,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     // the ball position as a function of it's travel time
     // We make the weight here an inverse of the ball speed, so that the gradient
     // descent takes smaller steps when the ball is moving faster
-    double descent_weight = 1 / (std::exp(ball_state.state().velocity().length() * 0.5));
+    double descent_weight = 1 / (std::exp(ball.currentState().velocity().length() * 0.5));
     GradientDescentOptimizer<1> optimizer({descent_weight}, gradient_approx_step_size);
     Duration best_ball_travel_duration = Duration::fromSeconds(
         std::abs(optimizer.minimize(objective_function, {0}, 50).at(0)));
@@ -62,10 +61,10 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     // In the objective function above, if the robot timestamp > ball timestamp, we
     // add on the difference so we get a intercept time after the robot timestamp, so
     // we need to do the same here to get the duration we actually optimized on
-    if (robot.timestamp() > ball_state.timestamp())
+    if (robot.timestamp() > ball.timestamp())
     {
         best_ball_travel_duration =
-            best_ball_travel_duration + (robot.timestamp() - ball_state.timestamp());
+            best_ball_travel_duration + (robot.timestamp() - ball.timestamp());
     }
 
     Point best_ball_intercept_pos =
@@ -78,7 +77,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
     // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
     // check isn't relevant in that case
-    if (ball_state.state().velocity().length() != 0 &&
+    if (ball.currentState().velocity().length() != 0 &&
         std::abs(ball_robot_time_diff.toSeconds()) > descent_weight)
     {
         return std::nullopt;

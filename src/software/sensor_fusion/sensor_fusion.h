@@ -60,21 +60,20 @@ class SensorFusion
     void updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame);
 
     /**
-     * Updates relevant components with a new ball state
+     * Updates relevant components with a new ball
      *
-     * @param new_ball_state new TimestampedBallState
+     * @param new_ball_state new Ball
      */
-    void updateBall(TimestampedBallState new_ball_state);
+    void updateBall(Ball new_ball);
 
     /**
      * Create state of the ball from a list of ball detections
      *
      * @param ball_detections list of ball detections to filter
      *
-     * @return TimestampedBallState if filtered from ball detections
+     * @return Ball if filtered from ball detections
      */
-    std::optional<TimestampedBallState> createTimestampedBallState(
-        const std::vector<BallDetection> &ball_detections);
+    std::optional<Ball> createBall(const std::vector<BallDetection> &ball_detections);
 
     /**
      * Create team from a list of robot detections

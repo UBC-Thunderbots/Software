@@ -140,7 +140,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     // https://github.com/UBC-Thunderbots/Software/issues/960
     bool friendly_team_is_yellow = sensor_fusion_config->FriendlyColorYellow()->value();
 
-    std::optional<TimestampedBallState> new_ball_state;
+    std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
                                                 max_valid_x, ignore_invalid_camera_data);
     auto yellow_team =
@@ -166,7 +166,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         }
     }
 
-    new_ball_state = createTimestampedBallState(ball_detections);
     if (friendly_team_is_yellow)
     {
         friendly_team = createFriendlyTeam(yellow_team);
@@ -178,9 +177,10 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         enemy_team    = createEnemyTeam(yellow_team);
     }
 
-    if (new_ball_state)
+    new_ball = createBall(ball_detections);
+    if (new_ball)
     {
-        updateBall(*new_ball_state);
+        updateBall(*new_ball);
     }
 
     if (ball)
@@ -200,26 +200,18 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     }
 }
 
-void SensorFusion::updateBall(TimestampedBallState new_ball_state)
+void SensorFusion::updateBall(Ball new_ball)
 {
-    if (ball)
-    {
-        ball->updateState(new_ball_state);
-    }
-    else
-    {
-        ball = Ball(new_ball_state);
-    }
-
+    ball = new_ball;
     game_state.updateBall(*ball);
 }
 
-std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(
+std::optional<Ball> SensorFusion::createBall(
     const std::vector<BallDetection> &ball_detections)
 {
     if (field)
     {
-        std::optional<TimestampedBallState> new_ball =
+        std::optional<Ball> new_ball =
             ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary());
         return new_ball;
     }

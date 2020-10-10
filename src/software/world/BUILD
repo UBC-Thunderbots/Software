@@ -9,7 +9,7 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//software/time:timestamp",
-        "//software/world:timestamped_ball_state",
+        "//software/world:ball_state",
         "//software/world/ball_model",
         "//software/world/ball_model:two_stage_linear_ball_model",
     ],
@@ -20,29 +20,6 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
-        ":timestamped_ball_state",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "timestamped_ball_state",
-    srcs = ["timestamped_ball_state.cpp"],
-    hdrs = ["timestamped_ball_state.h"],
-    deps = [
-        ":ball_state",
-        "//software/geom:point",
-        "//software/geom:vector",
-        "//software/time:timestamp",
-        "@boost//:circular_buffer",
-    ],
-)
-
-cc_test(
-    name = "timestamped_ball_state_test",
-    srcs = ["timestamped_ball_state_test.cpp"],
-    deps = [
-        ":timestamped_ball_state",
         "@gtest//:gtest_main",
     ],
 )
@@ -207,6 +184,7 @@ cc_library(
         ":robot",
         ":team",
         "//software/parameter:dynamic_parameters",
+        "@boost//:circular_buffer",
     ],
 )
 

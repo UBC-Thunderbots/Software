@@ -210,8 +210,7 @@ World Simulator::getWorld() const
     Ball ball = Ball(Point(0, 0), Vector(0, 0), timestamp);
     if (physics_world.getBallState())
     {
-        ball =
-            Ball(TimestampedBallState(physics_world.getBallState().value(), timestamp));
+        ball = Ball(BallState(physics_world.getBallState().value()), timestamp);
     }
 
     // Note: The simulator currently makes the invariant that friendly robots

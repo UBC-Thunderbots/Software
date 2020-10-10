@@ -20,9 +20,10 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
-void World::updateBallStateWithTimestamp(const TimestampedBallState &new_ball_state)
+void World::updateBallStateWithTimestamp(const BallState &new_ball_state,
+                                         const Timestamp &new_timestamp)
 {
-    ball_.updateState(new_ball_state);
+    ball_.updateState(new_ball_state, new_timestamp);
     updateTimestamp(getMostRecentTimestampFromMembers());
     current_game_state_.updateBall(ball_);
 }

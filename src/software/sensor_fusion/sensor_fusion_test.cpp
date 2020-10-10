@@ -134,7 +134,7 @@ class SensorFusionTest : public ::testing::Test
     World initWorld()
     {
         Field field(Field::createSSLDivisionBField());
-        Ball ball(TimestampedBallState(initBallState(), current_time));
+        Ball ball(initBallState(), current_time);
         Team friendly_team;
         std::vector<Robot> friendly_robots;
         for (const auto &state : initYellowRobotStates())
@@ -155,7 +155,7 @@ class SensorFusionTest : public ::testing::Test
     World initInvertedWorld()
     {
         Field field(Field::createSSLDivisionBField());
-        Ball ball(TimestampedBallState(initInvertedBallState(), current_time));
+        Ball ball(initInvertedBallState(), current_time);
         Team friendly_team;
         std::vector<Robot> friendly_robots;
         for (const auto &state : initInvertedYellowRobotStates())

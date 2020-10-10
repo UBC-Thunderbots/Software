@@ -7,7 +7,6 @@
 #include "software/world/field.h"
 #include "software/world/game_state.h"
 #include "software/world/team.h"
-#include "software/world/timestamped_ball_state.h"
 
 /**
  * The world object describes the entire state of the world, which for us is all the
@@ -40,8 +39,10 @@ class World final
      * Updates the state of the ball in the world with the new ball data
      *
      * @param new_ball_data A BallState containing new ball information
+     * @param new_timestamp New Timestamp
      */
-    void updateBallStateWithTimestamp(const TimestampedBallState& new_ball_state);
+    void updateBallStateWithTimestamp(const BallState& new_ball_state,
+                                      const Timestamp& new_timestamp);
 
     /**
      * Updates the state of the friendly team in the world with the new team data

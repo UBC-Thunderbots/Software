@@ -1,12 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <optional>
 
-#include "software/geom/point.h"
-#include "software/geom/vector.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball_model/ball_model.h"
-#include "software/world/timestamped_ball_state.h"
+#include "software/world/ball_state.h"
 
 class Ball final
 {
@@ -28,15 +27,16 @@ class Ball final
      * Creates a new ball with the given initial state
      *
      * @param initial_state The initial state of the ball
+     * @param timestamp the initial timestamp
      */
-    explicit Ball(const TimestampedBallState &initial_state);
+    explicit Ball(const BallState &initial_state, const Timestamp &timestamp);
 
     /**
      * Returns the current state of the ball
      *
-     * @return TimestampedBallState
+     * @return BallState
      */
-    TimestampedBallState currentState() const;
+    BallState currentState() const;
 
     /**
      * Returns the ball model to predict future states
@@ -49,8 +49,9 @@ class Ball final
      * Updates the ball with new data
      *
      * @param new_state the new state of the ball
+     * @param new_timestamp the new timestamp
      */
-    void updateState(const TimestampedBallState &new_state);
+    void updateState(const BallState &new_state, const Timestamp &new_timestamp);
 
     /**
      * Returns the current timestamp for when this ball
@@ -91,6 +92,7 @@ class Ball final
     bool operator!=(const Ball &other) const;
 
    private:
-    TimestampedBallState current_state_;
+    BallState current_state_;
+    Timestamp timestamp_;
     std::shared_ptr<BallModel> ball_model_;
 };
