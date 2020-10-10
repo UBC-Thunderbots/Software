@@ -321,7 +321,7 @@ Because of our [Coordinate Conventions](#coordinates), this means that an angle 
 
 
 # Architecture Overview
-At a high-level our system is made of 3 main components: The [Backend](#backend), the [Sensor Fusion](#sensor-fusion), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern). Together, they are what make up our AI.
+At a high-level our system is made of 4 main components: The [Backend](#backend), the [Sensor Fusion](#sensor-fusion), the [AI](#ai), and the [Visualizer](#visualizer). These 4 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern). Together, they are what make up our AI.
 
 The `Backend` is responsible for communicating with the outside world (network and radio), `Sensor Fusion` is responsible for processing and filtering raw data, the `AI` makes the actual gameplay decisions, and the `Visualizer` shows us what's happening and lets us control the `AI`.
 
@@ -440,7 +440,7 @@ The [Visualizer](#visualizer) is implemented using [Qt](https://www.qt.io/), a C
 * [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) (specifically for Widget-based applications)
 * [Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
 
-The [Visualizer](#visualizer) is made up of 3 major components:
+The [Visualizer](#visualizer) is made up of the following components:
 * Qt Components
   * The [QApplication](https://doc.qt.io/qt-5/qapplication.html). This is the Qt component that manages the event loop and all the widgets in the GUI.
   * The `Visualizer Widget`. This contains all of the graphical components used in the [Visualizer](#visualizer).
