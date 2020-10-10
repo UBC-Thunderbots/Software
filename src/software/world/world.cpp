@@ -10,13 +10,13 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       friendly_team_(friendly_team),
       enemy_team_(enemy_team),
       current_game_state_(),
+      current_referee_stage_(),
+      last_update_timestamp_(),
       // Store a small buffer of previous referee commands so we can filter out noise
       referee_command_history_(REFEREE_COMMAND_BUFFER_SIZE),
       referee_stage_history_(REFEREE_COMMAND_BUFFER_SIZE),
       team_with_possesion_(TeamSide::ENEMY)
 {
-    // Grab the most recent timestamp from all of the members used to update the world
-    last_update_timestamps_.set_capacity(buffer_size);
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
@@ -41,20 +41,14 @@ void World::updateEnemyTeamState(const Team &new_enemy_team_data)
 
 void World::updateTimestamp(Timestamp timestamp)
 {
-    // Check if the timestamp buffer is empty
-    if (last_update_timestamps_.empty())
-    {
-        last_update_timestamps_.push_front(timestamp);
-    }
-    // Check that the new timestamp is not older than the most recent timestamp
-    else if (timestamp < getMostRecentTimestamp())
+    if (timestamp < getMostRecentTimestamp())
     {
         throw std::invalid_argument(
             "Error: Attempt tp update World state with old Timestamp");
     }
     else
     {
-        last_update_timestamps_.push_front(timestamp);
+        last_update_timestamp_ = timestamp;
     }
 }
 
@@ -128,12 +122,7 @@ Timestamp World::getMostRecentTimestampFromMembers()
 
 const Timestamp World::getMostRecentTimestamp() const
 {
-    return last_update_timestamps_.front();
-}
-
-boost::circular_buffer<Timestamp> World::getTimestampHistory()
-{
-    return last_update_timestamps_;
+    return last_update_timestamp_;
 }
 
 const GameState &World::gameState() const

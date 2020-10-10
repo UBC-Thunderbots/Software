@@ -79,6 +79,3 @@ class TimestampedRobotState
     RobotState robot_state_;
     Timestamp timestamp_;
 };
-
-using RobotHistory   = boost::circular_buffer<TimestampedRobotState>;
-using TeamHistoryMap = std::map<RobotId, RobotHistory>;

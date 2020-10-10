@@ -72,5 +72,3 @@ class TimestampedBallState
     BallState ball_state_;
     Timestamp timestamp_;
 };
-
-using BallHistory = boost::circular_buffer<TimestampedBallState>;

@@ -5,13 +5,12 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
-Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_size)
+Team::Team(const Duration& robot_expiry_buffer_duration)
     : team_robots(),
       goalie_id(),
-      robot_expiry_buffer_duration(robot_expiry_buffer_duration)
+      robot_expiry_buffer_duration(robot_expiry_buffer_duration),
+      last_update_timestamp()
 {
-    // Set the size of the Timestamp history buffer
-    last_update_timestamps.set_capacity(buffer_size);
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
@@ -120,7 +119,7 @@ std::size_t Team::numRobots() const
     return team_robots.size();
 }
 
-Duration Team::getRobotExpiryBufferDuration() const
+const Duration& Team::getRobotExpiryBufferDuration() const
 {
     return robot_expiry_buffer_duration;
 }
@@ -185,14 +184,9 @@ void Team::clearAllRobots()
     team_robots.clear();
 }
 
-boost::circular_buffer<Timestamp> Team::getTimestampHistory() const
-{
-    return last_update_timestamps;
-}
-
 Timestamp Team::getMostRecentTimestamp() const
 {
-    return last_update_timestamps.front();
+    return last_update_timestamp;
 }
 
 Timestamp Team::getMostRecentTimestampFromRobots()
@@ -214,26 +208,15 @@ Timestamp Team::getMostRecentTimestampFromRobots()
 
 void Team::updateTimestamp(Timestamp timestamp)
 {
-    // Check if the timestamp buffer is empty
-    if (last_update_timestamps.empty())
-    {
-        last_update_timestamps.push_front(timestamp);
-    }
     // Check that the new timestamp is not older than the most recent timestamp
-    else if (timestamp < Team::getMostRecentTimestamp())
+    if (timestamp < Team::getMostRecentTimestamp())
     {
         throw std::invalid_argument(
             "Error: Attempt tp update Team state with old Timestamp");
     }
-    else if (timestamp == Team::getMostRecentTimestamp())
-    {
-        // Don't update if the timestamp is the same as the most recent already assigned
-        // to Team
-        return;
-    }
     else
     {
-        last_update_timestamps.push_front(timestamp);
+        last_update_timestamp = timestamp;
     }
 }
 

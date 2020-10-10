@@ -4,7 +4,6 @@
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : sensor_fusion_config(sensor_fusion_config),
-      history_size(20),
       field(std::nullopt),
       ball(std::nullopt),
       friendly_team(),
@@ -14,7 +13,6 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
-      ball_states(history_size),
       team_with_possession(TeamSide::ENEMY)
 {
     if (!sensor_fusion_config)
@@ -204,15 +202,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
 void SensorFusion::updateBall(TimestampedBallState new_ball_state)
 {
-    if (!ball_states.empty() &&
-        new_ball_state.timestamp() < ball_states.front().timestamp())
-    {
-        throw std::invalid_argument(
-            "Error: Trying to update ball state using a state older then the current state");
-    }
-
-    ball_states.push_front(new_ball_state);
-
     if (ball)
     {
         ball->updateState(new_ball_state);

@@ -145,25 +145,12 @@ class World final
     const Timestamp getMostRecentTimestamp() const;
 
     /**
-     * Gets the update Timestamp history stored World
+     * Updates the last update timestamp
      *
-     * @return returns circular_buffer<Timestamp> : The Timestamp history stored in the
-     * World
-     */
-    boost::circular_buffer<Timestamp> getTimestampHistory();
-
-    /**
-     * Searches all member objects of world for the most recent Timestamp value
+     * @param timestamp The last time this World was updated
      *
-     */
-    Timestamp getMostRecentTimestampFromMembers();
-
-    /**
-     * Updates the timestamp history for World to include a new timestamp (On the
-     * condition that the parameter Timestamp is newer than any Timestamp already in the
-     * history)
-     *
-     * @param Timestamp corresponding to when the World was last updated
+     * @throws std::invalid_argument if timestamp is older than the current last update
+     * timestamp
      */
     void updateTimestamp(Timestamp timestamp);
 
@@ -203,15 +190,19 @@ class World final
     static constexpr unsigned int REFEREE_COMMAND_BUFFER_SIZE = 3;
 
    private:
+    /**
+     * Searches all member objects of world for the most recent Timestamp value
+     *
+     */
+    Timestamp getMostRecentTimestampFromMembers();
+
     Field field_;
     Ball ball_;
     Team friendly_team_;
     Team enemy_team_;
     GameState current_game_state_;
     RefereeStage current_referee_stage_;
-    // All previous timestamps of when the world was updated, with the most recent
-    // timestamp at the front of the queue,
-    boost::circular_buffer<Timestamp> last_update_timestamps_;
+    Timestamp last_update_timestamp_;
     // A small buffer that stores previous referee command
     boost::circular_buffer<RefereeCommand> referee_command_history_;
     // A small buffer that stores previous referee stage

@@ -107,7 +107,6 @@ class SensorFusion
     static bool teamHasBall(const Team &team, const Ball &ball);
 
     std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
-    unsigned int history_size;
     std::optional<Field> field;
     std::optional<Ball> ball;
     Team friendly_team;
@@ -119,6 +118,5 @@ class SensorFusion
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
 
-    BallHistory ball_states;
     TeamSide team_with_possession;
 };
