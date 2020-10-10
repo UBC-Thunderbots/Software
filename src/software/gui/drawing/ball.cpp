@@ -15,7 +15,7 @@ void drawBallVelocity(QGraphicsScene *scene, const Point &position,
     QGradient gradient = QLinearGradient(
         createQPointF(position),
         createQPointF(position + velocity.normalize(MAX_VELOCITY_LINE_LENGTH)));
-    gradient.setColorAt(nullptr, slow_colour);
+    gradient.setColorAt(0, slow_colour);
     gradient.setColorAt(1, fast_colour);
 
     auto pen = QPen(gradient, 1);
@@ -27,7 +27,7 @@ void drawBallVelocity(QGraphicsScene *scene, const Point &position,
 
     double speed     = velocity.length();
     auto line_length = normalizeValueToRange<double>(
-        speed, nullptr, BALL_MAX_SPEED_METERS_PER_SECOND, 0.0, MAX_VELOCITY_LINE_LENGTH);
+        speed, 0 , BALL_MAX_SPEED_METERS_PER_SECOND, 0.0, MAX_VELOCITY_LINE_LENGTH);
 
     drawSegment(scene, Segment(position, position + velocity.normalize(line_length)),
                 pen);
@@ -41,7 +41,7 @@ void drawBallPosition(QGraphicsScene *scene, const Point &position,
     static const double BALL_MAX_DISTANCE_FROM_GROUND = 1.25;
 
     // Decrease the alpha value as the ball moves further from the ground
-    double alpha = normalizeValueToRange<double>(distance_from_ground, nullptr,
+    double alpha = normalizeValueToRange<double>(distance_from_ground, 0,
                                                  BALL_MAX_DISTANCE_FROM_GROUND, 1.0, 0.4);
     color.setAlphaF(alpha);
 
