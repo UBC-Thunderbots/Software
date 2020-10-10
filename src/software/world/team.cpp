@@ -42,7 +42,7 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
         if (it != team_robots.end())
         {
             // The robot already exists on the team. Find and update the robot
-            it->updateState(robot.currentState());
+            it->updateState(robot.currentState(), robot.timestamp());
         }
         else
         {
@@ -68,7 +68,7 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
     // has passed, then remove the robot from the team
     for (auto it = team_robots.begin(); it != team_robots.end();)
     {
-        Duration time_diff = timestamp - it->lastUpdateTimestamp();
+        Duration time_diff = timestamp - it->timestamp();
         if (time_diff.toSeconds() < 0)
         {
             LOG(WARNING) << "Warning: tried to remove a robot at a negative time";
@@ -197,9 +197,9 @@ Timestamp Team::getMostRecentTimestampFromRobots()
 
     for (Robot robot : robots)
     {
-        if (robot.lastUpdateTimestamp() > most_recent_timestamp)
+        if (robot.timestamp() > most_recent_timestamp)
         {
-            most_recent_timestamp = robot.lastUpdateTimestamp();
+            most_recent_timestamp = robot.timestamp();
         }
     }
 
@@ -220,14 +220,14 @@ void Team::updateTimestamp(Timestamp timestamp)
     }
 }
 
-std::optional<Timestamp> Team::lastUpdateTimestamp() const
+std::optional<Timestamp> Team::timestamp() const
 {
     std::optional<Timestamp> most_recent_timestamp = std::nullopt;
     for (const Robot& robot : getAllRobots())
     {
-        if (!most_recent_timestamp || robot.lastUpdateTimestamp() > most_recent_timestamp)
+        if (!most_recent_timestamp || robot.timestamp() > most_recent_timestamp)
         {
-            most_recent_timestamp = robot.lastUpdateTimestamp();
+            most_recent_timestamp = robot.timestamp();
         }
     }
     return most_recent_timestamp;

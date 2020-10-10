@@ -33,7 +33,7 @@ TEST_F(BallTest, construct_with_no_params)
 
     EXPECT_EQ(Point(), ball.position());
     EXPECT_EQ(Vector(), ball.velocity());
-    EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
+    EXPECT_EQ(current_time, ball.timestamp());
 }
 
 TEST_F(BallTest, construct_with_params)
@@ -42,7 +42,7 @@ TEST_F(BallTest, construct_with_params)
 
     EXPECT_EQ(Point(1, 2.3), ball.position());
     EXPECT_EQ(Vector(-0.04, 0.0), ball.velocity());
-    EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
+    EXPECT_EQ(current_time, ball.timestamp());
 }
 
 TEST_F(BallTest, construct_with_initial_state)
@@ -52,7 +52,7 @@ TEST_F(BallTest, construct_with_initial_state)
 
     EXPECT_EQ(Point(1, 2.3), ball.position());
     EXPECT_EQ(Vector(-0.04, 0.0), ball.velocity());
-    EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
+    EXPECT_EQ(current_time, ball.timestamp());
 }
 
 TEST_F(BallTest, update_state_with_all_params)

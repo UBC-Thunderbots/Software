@@ -2,40 +2,41 @@
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"
-#include "software/world/timestamped_robot_state.h"
 
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities)
     : id_(id),
-      current_state(TimestampedRobotState(position, velocity, orientation,
-                                          angular_velocity, timestamp)),
+      current_state_(position, velocity, orientation, angular_velocity),
+      timestamp_(timestamp),
       unavailable_capabilities_(unavailable_capabilities)
 {
 }
 
-Robot::Robot(RobotId id, const TimestampedRobotState &initial_state,
+Robot::Robot(RobotId id, const RobotState &initial_state, const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities)
     : id_(id),
-      current_state(initial_state),
+      current_state_(initial_state),
+      timestamp_(timestamp),
       unavailable_capabilities_(unavailable_capabilities)
 {
 }
 
-void Robot::updateState(const TimestampedRobotState &new_state)
+void Robot::updateState(const RobotState &state, const Timestamp &timestamp)
 {
-    current_state = new_state;
+    current_state_ = state;
+    timestamp_     = timestamp;
 }
 
-TimestampedRobotState Robot::currentState() const
+RobotState Robot::currentState() const
 {
-    return current_state;
+    return current_state_;
 }
 
-Timestamp Robot::lastUpdateTimestamp() const
+Timestamp Robot::timestamp() const
 {
-    return current_state.timestamp();
+    return timestamp_;
 }
 
 RobotId Robot::id() const
@@ -45,22 +46,22 @@ RobotId Robot::id() const
 
 Point Robot::position() const
 {
-    return current_state.state().position();
+    return current_state_.position();
 }
 
 Vector Robot::velocity() const
 {
-    return current_state.state().velocity();
+    return current_state_.velocity();
 }
 
 Angle Robot::orientation() const
 {
-    return current_state.state().orientation();
+    return current_state_.orientation();
 }
 
 AngularVelocity Robot::angularVelocity() const
 {
-    return current_state.state().angularVelocity();
+    return current_state_.angularVelocity();
 }
 
 bool Robot::isNearDribbler(const Point &test_point) const

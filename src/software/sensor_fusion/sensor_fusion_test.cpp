@@ -139,16 +139,14 @@ class SensorFusionTest : public ::testing::Test
         std::vector<Robot> friendly_robots;
         for (const auto &state : initYellowRobotStates())
         {
-            friendly_robots.emplace_back(
-                state.id, TimestampedRobotState(state.robot_state, current_time));
+            friendly_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         friendly_team.updateRobots(friendly_robots);
         Team enemy_team;
         std::vector<Robot> enemy_robots;
         for (const auto &state : initBlueRobotStates())
         {
-            enemy_robots.emplace_back(
-                state.id, TimestampedRobotState(state.robot_state, current_time));
+            enemy_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         enemy_team.updateRobots(enemy_robots);
         return World(field, ball, friendly_team, enemy_team);
@@ -162,16 +160,14 @@ class SensorFusionTest : public ::testing::Test
         std::vector<Robot> friendly_robots;
         for (const auto &state : initInvertedYellowRobotStates())
         {
-            friendly_robots.emplace_back(
-                state.id, TimestampedRobotState(state.robot_state, current_time));
+            friendly_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         friendly_team.updateRobots(friendly_robots);
         Team enemy_team;
         std::vector<Robot> enemy_robots;
         for (const auto &state : initInvertedBlueRobotStates())
         {
-            enemy_robots.emplace_back(
-                state.id, TimestampedRobotState(state.robot_state, current_time));
+            enemy_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         enemy_team.updateRobots(enemy_robots);
         return World(field, ball, friendly_team, enemy_team);

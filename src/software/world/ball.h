@@ -53,11 +53,11 @@ class Ball final
     void updateState(const TimestampedBallState &new_state);
 
     /**
-     * Returns the timestamp for when this ball's data was last updated
+     * Returns the current timestamp for when this ball
      *
-     * @return the timestamp for when this ball's data was last updated
+     * @return the current timestamp
      */
-    Timestamp lastUpdateTimestamp() const;
+    Timestamp timestamp() const;
 
     /**
      * Returns the current position of the ball

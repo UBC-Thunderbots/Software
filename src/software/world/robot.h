@@ -2,13 +2,9 @@
 
 #include <optional>
 
-#include "software/geom/angle.h"
-#include "software/geom/angular_velocity.h"
-#include "software/geom/point.h"
-#include "software/geom/vector.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
-#include "software/world/timestamped_robot_state.h"
+#include "software/world/robot_state.h"
 
 /**
  * Defines an SSL robot
@@ -40,32 +36,36 @@ class Robot
      *
      * @param id The id of the robot to create
      * @param initial_state The initial state of the robot
+     * @param timestamp The timestamp at which the robot was observed to be in the given
+     * state
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      */
-    explicit Robot(RobotId id, const TimestampedRobotState &initial_state,
+    explicit Robot(RobotId id, const RobotState &initial_state,
+                   const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>());
 
     /**
      * Updates the robot with new data
      *
-     * @param new_robot_state A robot state containing new robot data
+     * @param robot_state A robot state containing new robot data
+     * @param timestamp New timestamp
      */
-    void updateState(const TimestampedRobotState &new_robot_state);
+    void updateState(const RobotState &state, const Timestamp &timestamp);
 
     /**
      * Gets the current state of the robot
      *
      * @return current state of the robot
      */
-    TimestampedRobotState currentState() const;
+    RobotState currentState() const;
 
     /**
-     * Returns the timestamp for when this robot's data was last updated
+     * Returns the current timestamp of this robot
      *
-     * @return the timestamp for when this robot's data was last updated
+     * @return the current timestamp
      */
-    Timestamp lastUpdateTimestamp() const;
+    Timestamp timestamp() const;
 
     /**
      * Returns the id of the robot
@@ -173,7 +173,8 @@ class Robot
    private:
     // The id of this robot
     RobotId id_;
-    TimestampedRobotState current_state;
+    RobotState current_state_;
+    Timestamp timestamp_;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapability> unavailable_capabilities_;

@@ -26,10 +26,9 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
         // If the ball timestamp is less then the robot timestamp, add the difference
         // here so that we're optimizing to a duration that is after the robot
         // timestamp
-        if (ball_state.timestamp() < robot.lastUpdateTimestamp())
+        if (ball_state.timestamp() < robot.timestamp())
         {
-            duration +=
-                (robot.lastUpdateTimestamp() - ball_state.timestamp()).toSeconds();
+            duration += (robot.timestamp() - ball_state.timestamp()).toSeconds();
         }
 
         // Estimate the ball position
@@ -63,11 +62,10 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     // In the objective function above, if the robot timestamp > ball timestamp, we
     // add on the difference so we get a intercept time after the robot timestamp, so
     // we need to do the same here to get the duration we actually optimized on
-    if (robot.lastUpdateTimestamp() > ball_state.timestamp())
+    if (robot.timestamp() > ball_state.timestamp())
     {
         best_ball_travel_duration =
-            best_ball_travel_duration +
-            (robot.lastUpdateTimestamp() - ball_state.timestamp());
+            best_ball_travel_duration + (robot.timestamp() - ball_state.timestamp());
     }
 
     Point best_ball_intercept_pos =

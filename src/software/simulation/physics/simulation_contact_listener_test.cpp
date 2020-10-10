@@ -22,7 +22,7 @@ class SimulationContactListenerTest : public testing::Test
         physics_ball  = std::make_shared<PhysicsBall>(physics_world,
                                                      ball.currentState().state(), 1.0);
         physics_robot = std::make_shared<PhysicsRobot>(robot.id(), physics_world,
-                                                       robot.currentState().state(), 1.0);
+                                                       robot.currentState(), 1.0);
 
         return std::make_tuple(physics_world, physics_robot, physics_ball);
     }

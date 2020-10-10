@@ -27,7 +27,7 @@ const std::shared_ptr<BallModel> &Ball::ballModel() const
 
 void Ball::updateState(const TimestampedBallState &new_state)
 {
-    if (new_state.timestamp() < lastUpdateTimestamp())
+    if (new_state.timestamp() < timestamp())
     {
         throw std::invalid_argument(
             "Error: Trying to update ball state using a state older then the current state");
@@ -37,7 +37,7 @@ void Ball::updateState(const TimestampedBallState &new_state)
     current_state_ = new_state;
 }
 
-Timestamp Ball::lastUpdateTimestamp() const
+Timestamp Ball::timestamp() const
 {
     return current_state_.timestamp();
 }

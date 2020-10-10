@@ -31,7 +31,7 @@ class SimulatorRobotSingletonTest : public testing::Test
             std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField());
         physics_world->setBallState(ball.currentState().state());
         RobotStateWithId robot_state{.id          = robot.id(),
-                                     .robot_state = robot.currentState().state()};
+                                     .robot_state = robot.currentState()};
         physics_world->addYellowRobots({robot_state});
 
         for (const auto& pos : enemy_robot_positions)

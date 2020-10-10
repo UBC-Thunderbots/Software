@@ -122,7 +122,7 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         ":robot_capabilities",
-        ":timestamped_robot_state",
+        ":robot_state",
         "//software/logger",
         "//software/time:duration",
         "//software/time:timestamp",
@@ -134,30 +134,6 @@ cc_test(
     srcs = ["robot_test.cpp"],
     deps = [
         ":robot",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "timestamped_robot_state",
-    srcs = ["timestamped_robot_state.cpp"],
-    hdrs = ["timestamped_robot_state.h"],
-    deps = [
-        ":robot_state",
-        "//software/geom:angle",
-        "//software/geom:angular_velocity",
-        "//software/geom:point",
-        "//software/geom:vector",
-        "//software/time:timestamp",
-        "@boost//:circular_buffer",
-    ],
-)
-
-cc_test(
-    name = "timestamped_robot_state_test",
-    srcs = ["timestamped_robot_state_test.cpp"],
-    deps = [
-        ":timestamped_robot_state",
         "@gtest//:gtest_main",
     ],
 )

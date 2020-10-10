@@ -33,21 +33,22 @@ TEST_F(RobotTest, construct_with_all_params)
     EXPECT_EQ(Vector(-0.3, 0), robot.velocity());
     EXPECT_EQ(Angle::fromRadians(2.2), robot.orientation());
     EXPECT_EQ(AngularVelocity::fromRadians(-0.6), robot.angularVelocity());
-    EXPECT_EQ(current_time, robot.lastUpdateTimestamp());
+    EXPECT_EQ(current_time, robot.timestamp());
 }
 
 TEST_F(RobotTest, construct_with_initial_state)
 {
-    Robot robot = Robot(
-        3, TimestampedRobotState(Point(1, 1), Vector(-0.3, 0), Angle::fromRadians(2.2),
-                                 AngularVelocity::fromRadians(-0.6), current_time));
+    Robot robot = Robot(3,
+                        RobotState(Point(1, 1), Vector(-0.3, 0), Angle::fromRadians(2.2),
+                                   AngularVelocity::fromRadians(-0.6)),
+                        current_time);
 
     EXPECT_EQ(3, robot.id());
     EXPECT_EQ(Point(1, 1), robot.position());
     EXPECT_EQ(Vector(-0.3, 0), robot.velocity());
     EXPECT_EQ(Angle::fromRadians(2.2), robot.orientation());
     EXPECT_EQ(AngularVelocity::fromRadians(-0.6), robot.angularVelocity());
-    EXPECT_EQ(current_time, robot.lastUpdateTimestamp());
+    EXPECT_EQ(current_time, robot.timestamp());
 }
 
 TEST_F(RobotTest, update_state_with_all_params)
@@ -55,16 +56,16 @@ TEST_F(RobotTest, update_state_with_all_params)
     Robot robot =
         Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
 
-    robot.updateState(
-        TimestampedRobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
-                              AngularVelocity::fromRadians(1.1), half_second_future));
+    robot.updateState(RobotState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                                 AngularVelocity::fromRadians(1.1)),
+                      half_second_future);
 
     EXPECT_EQ(0, robot.id());
     EXPECT_EQ(Point(-1.2, 3), robot.position());
     EXPECT_EQ(Vector(2.2, -0.05), robot.velocity());
     EXPECT_EQ(Angle::quarter(), robot.orientation());
     EXPECT_EQ(AngularVelocity::fromRadians(1.1), robot.angularVelocity());
-    EXPECT_EQ(half_second_future, robot.lastUpdateTimestamp());
+    EXPECT_EQ(half_second_future, robot.timestamp());
 }
 
 TEST_F(RobotTest, update_state_with_new_robot)
@@ -72,13 +73,13 @@ TEST_F(RobotTest, update_state_with_new_robot)
     Robot robot =
         Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
 
-    TimestampedRobotState update_robot =
-        TimestampedRobotState(Point(-1.2, 3), robot.velocity(), Angle::quarter(),
-                              robot.angularVelocity(), current_time);
+    RobotState update_robot(Point(-1.2, 3), robot.velocity(), Angle::quarter(),
+                            robot.angularVelocity());
 
-    robot.updateState(update_robot);
+    robot.updateState(update_robot, current_time);
 
     EXPECT_EQ(robot.currentState(), update_robot);
+    EXPECT_EQ(robot.timestamp(), current_time);
 }
 
 TEST_F(RobotTest, get_position_at_current_time)
