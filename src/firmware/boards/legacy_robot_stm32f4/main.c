@@ -360,9 +360,31 @@ static void stm32_main(void)
     __builtin_unreachable();
 }
 
+/**
+ * Charge the capacitor.
+ */
+void charger_charge(void)
+{
+    charger_enable(true);
+    chicker_discharge(false);
+}
+
+/**
+ * Discharge the capacitor.
+ */
 static void charger_discharge(void)
 {
+    charger_enable(false);
     chicker_discharge(true);
+}
+
+/**
+ * Float the capacitor.
+ */
+void charger_float(void)
+{
+    charger_enable(false);
+    chicker_discharge(false);
 }
 
 static void run_normal(void)

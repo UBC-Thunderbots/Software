@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/ball.h"
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
@@ -70,9 +71,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         yield(move_action);
     }
 
-    // The angle between the ball velocity vector and a vector from the passer
-    // point to the receiver point
-    Angle ball_velocity_to_pass_orientation;
+    Angle kick_direction;
 
     auto kick_action = std::make_shared<KickAction>();
     do
@@ -85,12 +84,9 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
         // We want to keep trying to kick until the ball is moving along the pass
         // vector with sufficient velocity
-        Angle passer_to_receiver_angle =
-            (pass.receiverPoint() - pass.passerPoint()).orientation();
-        ball_velocity_to_pass_orientation =
-            ball.velocity().orientation().minDiff(passer_to_receiver_angle);
-    } while (ball_velocity_to_pass_orientation.abs() > Angle::fromDegrees(20) ||
-             ball.velocity().length() < 0.5);
+        kick_direction = (pass.receiverPoint() - ball.position()).orientation();
+
+    } while (!hasBallBeenKicked(ball, kick_direction));
 }
 
 void PasserTactic::accept(MutableTacticVisitor& visitor)
