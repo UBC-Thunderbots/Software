@@ -1,6 +1,9 @@
 #include "software/handheld_controller/controller_primitive_generator.h"
 
 #include <gtest/gtest.h>
+#include "software/parameter/dynamic_parameters.h"
+#include <google/protobuf/util/message_differencer.h>
+#include "software/proto/primitive/primitive_msg_factory.h"
 
 #include "shared/constants.h"
 
@@ -27,4 +30,18 @@ TEST(ControllerPrimitiveGeneratorTest, test_create_direct_velocity)
                   .radians_per_second(),
               0.5);
     EXPECT_EQ(direct_velocity_primitive->direct_control().dribbler_speed_rpm(), 200);
+}
+
+TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
+{
+    ControllerInput input = ControllerInput();
+    input.setKickButtonPressed(true);
+    auto actual_primitive = *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(input, DynamicParameters->getHandheldControllerConfig());
+
+    double kick_speed = DynamicParameters->getHandheldControllerConfig()->KickSpeedMetersPerSecond()->value();
+    auto expected_primitive = *createKickPrimitive(Point(), Angle::zero(), kick_speed);
+
+    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(expected_primitive, actual_primitive));
+
+
 }
