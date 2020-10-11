@@ -11,6 +11,7 @@
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/proto/proto_logger/proto_logger.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -96,8 +97,8 @@ int main(int argc, char **argv)
 
         if (!args->replay_output_dir()->value().empty())
         {
-            auto replay_logger =
-                std::make_shared<ReplayLogger>(args->replay_output_dir()->value());
+            auto replay_logger = std::make_shared<ProtoLogger<SensorProto>>(
+                args->replay_output_dir()->value());
             backend->Subject<SensorProto>::registerObserver(replay_logger);
         }
 
