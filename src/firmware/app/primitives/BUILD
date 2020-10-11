@@ -155,6 +155,7 @@ cc_test(
     srcs = ["autochip_move_primitive_test.cpp"],
     deps = [
         ":autochip_move",
+        ":primitive_manager",
         "@fff",
         "@gtest//:gtest_main",
     ],

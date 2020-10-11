@@ -3,7 +3,8 @@ DEFINE_FFF_GLOBALS;
 
 extern "C"
 {
-    #include "firmware/app/primitives/autochip_move_primitive.h"
+#include "firmware/app/primitives/autochip_move_primitive.h"
+#include "firmware/app/primitives/primitive_manager.h"
 }
 
 #include <gtest/gtest.h>
@@ -100,6 +101,9 @@ protected:
 
 TEST_F(FirmwareWorldTest, app_autochip_move_primitive_test)
 {
-    // How do we call app_autochip_move_primitive_start?
+    TbotsProto_AutochipMovePrimitive prim_msg;
+    PrimitiveManager_t* manager = app_primitive_manager_create();
+
+    app_autochip_move_primitive_start(prim_msg, manager->current_primitive_state, firmware_world);
     EXPECT_EQ(0, 0);
 }
