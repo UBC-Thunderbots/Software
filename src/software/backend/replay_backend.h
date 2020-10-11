@@ -2,7 +2,7 @@
 #include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
-#include "software/backend/replay_logging/replay_reader.h"
+#include "software/proto/proto_logger/proto_log_reader.h"
 #include "software/backend/ssl_proto_client.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
@@ -26,7 +26,7 @@ class ReplayBackend : public Backend
     static constexpr std::chrono::duration<double> LAST_PRIMITIVE_TO_SHUTDOWN_DURATION =
         std::chrono::duration<double>(1.0);
 
-    ReplayReader replay_reader;
+    ProtoLogReader replay_reader;
     // a thread that continuously pulls from replay data files and emits them to the
     // observers of this class
     std::thread pull_from_replay_thread;

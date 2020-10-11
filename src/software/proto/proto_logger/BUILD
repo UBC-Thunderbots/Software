@@ -15,3 +15,20 @@ cc_library(
         "@com_google_protobuf//:protobuf",
     ],
 )
+
+cc_library(
+    name = "proto_log_reader",
+    srcs = [
+        "proto_log_reader.cpp",
+    ],
+    hdrs = [
+        "proto_log_reader.h",
+    ],
+    deps = [
+        "//software/logger",
+        "//software/proto:repeated_any_msg_cc_proto",
+        "//software/time:timestamp",
+        "//software/util/typename",
+        "@com_google_protobuf//:protobuf",
+    ],
+)

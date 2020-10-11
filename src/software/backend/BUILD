@@ -60,10 +60,10 @@ cc_library(
         ":ssl_proto_client",
         "//shared:constants",
         "//software:constants",
-        "//software/backend/replay_logging:replay_reader",
         "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
         "//software/proto/message_translation:tbots_protobuf",
+        "//software/proto/proto_logger:proto_log_reader",
         "//software/util/design_patterns:generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
