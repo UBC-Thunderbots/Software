@@ -330,9 +330,9 @@ Each component is described in more detail in their own sections.
 
 
 # Backend
-The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication with `SensorProto` and [Primitives](#primitives) messages:
+The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication using `SensorProto` and [Primitives](#primitives) messages:
 
-* Upon receiving the following messages, the `Backend` will store it in a `SensorProto` message and send it to [Sensor Fusion](sensor-fusion):
+* Upon receiving the following messages from the network (outside world), the `Backend` will store it in a `SensorProto` message and send it to [Sensor Fusion](sensor-fusion):
   * Robot status messages
   * Vision data about where the robots and ball are (typically from [SSL-Vision](#ssl-vision))
   * Referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
@@ -459,7 +459,13 @@ A [DrawFunction](#draw_functions) is essentially a function that tells the [Visu
 
 
 # Simulator
-The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` performs the functions of (1) [SSL-Vision](#ssl-vision) by publishing new vision data and (2) the robots by accepting new [Primitives](#primitives). Using the current state of the simulated world, the `Simulator` simulates the new [Primitives](#primitives) over some time step and publishes new ssl vision data based on the updated simulated world. The `Simulator` is designed to be "perfect", which means that (1) the vision data it publishes exactly reflects the state of the simulated world and (2) the simulation perfectly reflects our best understanding of the physics (e.g. friction) with no randomness.
+The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:
+* [SSL-Vision](#ssl-vision) by publishing new vision data
+* the robots by accepting new [Primitives](#primitives)
+
+Using the current state of the simulated world, the `Simulator` simulates the new [Primitives](#primitives) over some time step and publishes new ssl vision data based on the updated simulated world. The `Simulator` is designed to be "perfect", which means that
+* the vision data it publishes exactly reflects the state of the simulated world
+* the simulation perfectly reflects our best understanding of the physics (e.g. friction) with no randomness.
 
 The `Simulator` uses `Box2D`, which provides 2D physics simulation for free. While this simplifies the simulator greatly, it means that we manually implement the physics for "3D effects", such as dribbling and chipping.
 
