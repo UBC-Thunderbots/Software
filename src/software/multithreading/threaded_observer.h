@@ -69,7 +69,6 @@ class ThreadedObserver : public Observer<T>
     // This is the thread that will continuously pull values from the buffer
     // and pass them into the `onValueReceived`
     std::thread pull_from_buffer_thread;
-    size_t fuck;
 };
 
 #include "software/multithreading/threaded_observer.tpp"

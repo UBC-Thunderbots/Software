@@ -1,4 +1,5 @@
 #include <boost/program_options.hpp>
+#include <experimental/filesystem>
 #include <iostream>
 #include <numeric>
 
@@ -94,16 +95,29 @@ int main(int argc, char** argv)
             backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 
-        if (!args->replay_output_dir()->value().empty())
+        // TODO: manage this mess better and don't log SensorMsg when we are replaying
+        // TODO: make a shim between SensorFusion and ProtoLogger to log filtered world
+        //       as a proto
+        if (!args->proto_log_output_dir()->value().empty())
         {
-            auto replay_logger = std::make_shared<ProtoLogger<SensorProto>>(
-                args->replay_output_dir()->value(),
+            namespace fs = std::experimental::filesystem;
+            // we want to log protos, make the parent directory and pass the
+            // subdirectories to the ProtoLoggers for each message type
+            fs::path proto_log_output_dir(args->proto_log_output_dir()->value());
+            fs::create_directory(proto_log_output_dir);
+
+            auto sensor_msg_logger = std::make_shared<ProtoLogger<SensorProto>>(
+                proto_log_output_dir / "SensorProto",
                 ProtoLogger<SensorProto>::DEFAULT_MSGS_PER_CHUNK,
                 [](const SensorProto& lhs, const SensorProto& rhs) {
                     return lhs.backend_received_time().epoch_timestamp_seconds() <
                            rhs.backend_received_time().epoch_timestamp_seconds();
                 });
-            backend->Subject<SensorProto>::registerObserver(replay_logger);
+            auto primitive_set_logger =
+                std::make_shared<ProtoLogger<TbotsProto::PrimitiveSet>>(
+                    proto_log_output_dir / "PrimitiveSet");
+            backend->Subject<SensorProto>::registerObserver(sensor_msg_logger);
+            ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(primitive_set_logger);
         }
 
         // Wait for termination

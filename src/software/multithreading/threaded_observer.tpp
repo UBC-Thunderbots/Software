@@ -7,8 +7,7 @@ template <typename T>
 ThreadedObserver<T>::ThreadedObserver(size_t buffer_size)
     : Observer<T>(buffer_size),
       in_destructor(false),
-      IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1)),
-      fuck(buffer_size)
+      IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {
     pull_from_buffer_thread = std::thread(
         boost::bind(&ThreadedObserver::continuouslyPullValuesFromBuffer, this));

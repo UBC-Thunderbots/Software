@@ -79,8 +79,9 @@ void ProtoLogger<Msg>::saveCurrentChunk()
         std::sort(current_chunk.mutable_messages()->begin(),
                   current_chunk.mutable_messages()->end(),
                   [this](const google::protobuf::Any& l, const google::protobuf::Any& r) {
-                        // we have to convert the Any's back into Msg here in order to sort them
-                        // and this also provides a cleaner interface externally for the sort comparator
+                      // we have to convert the Any's back into Msg here in order to sort
+                      // them and this also provides a cleaner interface externally for
+                      // the sort comparator
                       Msg lhs;
                       l.UnpackTo(&lhs);
                       Msg rhs;
