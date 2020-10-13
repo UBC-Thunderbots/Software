@@ -3,7 +3,7 @@
 #include "software/util/make_enum/make_enum.h"
 
 /**
- * The possible team side of SSL robots
+ * The possible team sides of SSL robots
  */
 MAKE_ENUM(TeamSide, FRIENDLY, ENEMY);
 
