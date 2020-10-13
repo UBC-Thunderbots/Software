@@ -6,7 +6,6 @@
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
-#include "software/backend/replay_logging/replay_logger.h"
 #include "software/constants.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
@@ -38,7 +37,7 @@ std::string BANNER =
 // clang-format on
 
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     std::cout << BANNER << std::endl;
 
@@ -98,7 +97,12 @@ int main(int argc, char **argv)
         if (!args->replay_output_dir()->value().empty())
         {
             auto replay_logger = std::make_shared<ProtoLogger<SensorProto>>(
-                args->replay_output_dir()->value());
+                args->replay_output_dir()->value(),
+                ProtoLogger<SensorProto>::DEFAULT_MSGS_PER_CHUNK,
+                [](const SensorProto& lhs, const SensorProto& rhs) {
+                    return lhs.backend_received_time().epoch_timestamp_seconds() <
+                           rhs.backend_received_time().epoch_timestamp_seconds();
+                });
             backend->Subject<SensorProto>::registerObserver(replay_logger);
         }
 

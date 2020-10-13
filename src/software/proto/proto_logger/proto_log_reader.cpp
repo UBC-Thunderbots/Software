@@ -6,7 +6,7 @@
 
 namespace fs = std::experimental::filesystem;
 
-RepeatedAnyMsg ProtoLogReader::readDelimitedReplayProtobufFile(const fs::path& file_path)
+RepeatedAnyMsg ProtoLogReader::readDelimitedRepeatedAnyMsgFile(const fs::path& file_path)
 {
     std::ifstream file_ifstream(file_path, std::ios_base::in | std::ios_base::binary);
     auto file_input =
@@ -68,14 +68,13 @@ ProtoLogReader::ProtoLogReader(const std::string& _replay_dir)
     max_chunk_idx   = *chunk_indices.rbegin();
     auto chunk_path = replay_dir / std::to_string(cur_chunk_idx);
 
-    cur_chunk.CopyFrom(readDelimitedReplayProtobufFile(chunk_path));
+    cur_chunk.CopyFrom(readDelimitedRepeatedAnyMsgFile(chunk_path));
 }
 
 
 bool ProtoLogReader::hasNextMsg() const
 {
-    return !(cur_chunk_idx == max_chunk_idx &&
-             cur_msg_idx == cur_chunk.messages_size());
+    return !(cur_chunk_idx == max_chunk_idx && cur_msg_idx == cur_chunk.messages_size());
 }
 
 void ProtoLogReader::nextChunk()
@@ -88,6 +87,6 @@ void ProtoLogReader::nextChunk()
         throw std::out_of_range("Reached end of replay_logging!");
     }
 
-    cur_chunk   = readDelimitedReplayProtobufFile(chunk_path);
+    cur_chunk   = readDelimitedRepeatedAnyMsgFile(chunk_path);
     cur_msg_idx = 0;
 }

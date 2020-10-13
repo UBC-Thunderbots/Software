@@ -10,7 +10,6 @@ cc_library(
         "//software/logger",
         "//software/multithreading:threaded_observer",
         "//software/proto:repeated_any_msg_cc_proto",
-        "//software/time:timestamp",
         "//software/util/typename",
         "@com_google_protobuf//:protobuf",
     ],
@@ -30,5 +29,19 @@ cc_library(
         "//software/time:timestamp",
         "//software/util/typename",
         "@com_google_protobuf//:protobuf",
+    ],
+)
+
+cc_test(
+    name = "proto_logger_log_reader_test",
+    srcs = ["proto_logger_log_reader_test.cpp"],
+    data = [":test_logs"],
+    deps = [
+        ":proto_log_reader",
+        ":proto_logger",
+        "//software/multithreading:subject",
+        "//software/proto:repeated_any_msg_cc_proto",
+        "//software/proto:sensor_msg_cc_proto",
+        "@gtest//:gtest_main",
     ],
 )

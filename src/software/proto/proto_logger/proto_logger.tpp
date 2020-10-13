@@ -6,12 +6,15 @@
 #include "software/proto/proto_logger/proto_logger.h"
 
 template <typename Msg>
-ProtoLogger<Msg>::ProtoLogger(const std::string& output_directory, int _msgs_per_chunk)
+ProtoLogger<Msg>::ProtoLogger(
+    const std::string& output_directory, int _msgs_per_chunk,
+    std::optional<std::function<bool(const Msg&, const Msg&)>> message_sort_comparator)
     : FirstInFirstOutThreadedObserver<Msg>(2000),
       current_chunk(),
       current_chunk_idx(0),
       output_dir_path(output_directory),
-      msgs_per_chunk(_msgs_per_chunk)
+      msgs_per_chunk(_msgs_per_chunk),
+      sort_comparator(message_sort_comparator)
 {
     // check if directory exists, if not make a directory
     if (std::experimental::filesystem::exists(output_dir_path))
@@ -69,6 +72,23 @@ void ProtoLogger<Msg>::nextChunk()
 template <typename Msg>
 void ProtoLogger<Msg>::saveCurrentChunk()
 {
+    if (sort_comparator)
+    {
+        // if a function is passed in to compare the chunks to sort them, use it
+        // to sort the outgoing chunk
+        std::sort(current_chunk.mutable_messages()->begin(),
+                  current_chunk.mutable_messages()->end(),
+                  [this](const google::protobuf::Any& l, const google::protobuf::Any& r) {
+                        // we have to convert the Any's back into Msg here in order to sort them
+                        // and this also provides a cleaner interface externally for the sort comparator
+                      Msg lhs;
+                      l.UnpackTo(&lhs);
+                      Msg rhs;
+                      r.UnpackTo(&rhs);
+                      return (*sort_comparator)(lhs, rhs);
+                  });
+    }
+
     std::experimental::filesystem::path chunk_path =
         output_dir_path / std::to_string(current_chunk_idx);
     std::ofstream chunk_ofstream(chunk_path);

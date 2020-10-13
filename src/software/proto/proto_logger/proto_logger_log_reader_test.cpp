@@ -1,14 +1,14 @@
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
-#include "software/backend/replay_logging/replay_logger.h"
-#include "software/backend/replay_logging/replay_reader.h"
 #include "software/multithreading/subject.h"
+#include "software/proto/proto_logger/proto_log_reader.h"
+#include "software/proto/proto_logger/proto_logger.h"
+#include "software/proto/sensor_msg.pb.h"
 
 // the working directory of tests are the bazel WORKSPACE root (in this case, src)
 // this path is relative to the current working directory, i.e. the bazel root
-constexpr const char* REPLAY_TEST_PATH_SUFFIX =
-    "software/backend/replay_logging/test_replay";
+constexpr const char* REPLAY_TEST_PATH_SUFFIX = "software/proto/proto_logger/test_logs";
 
 namespace fs = std::experimental::filesystem;
 
@@ -22,17 +22,16 @@ class TestSubject : public Subject<SensorProto>
     }
 };
 
-TEST(ReplayTest, test_read_and_write_replay)
+TEST(ProtoLoggerLogReaderTest, test_read_and_write_proto_log)
 {
     // unfortunately due to the unavailablity of ordering tests and functions that
     // generate test files that actually work, we have to read recorded replays back,
     // write them, and then read them again in the same test
-    // TODO: record replay_logging data with the game controller running , see #1584
 
     std::vector<SensorProto> read_replay_msgs;
 
-    ReplayReader reader(fs::current_path() / REPLAY_TEST_PATH_SUFFIX);
-    while (auto frame = reader.getNextMsg())
+    ProtoLogReader reader(fs::current_path() / REPLAY_TEST_PATH_SUFFIX);
+    while (auto frame = reader.getNextMsg<SensorProto>())
     {
         read_replay_msgs.emplace_back(*frame);
     }
@@ -60,7 +59,11 @@ TEST(ReplayTest, test_read_and_write_replay)
     // write the read frames to another replay_logging directory
     auto output_path = fs::current_path() / "replaytest";
     std::shared_ptr<Observer<SensorProto>> logger_ptr =
-        std::make_shared<ReplayLogger>(output_path, 1000);
+        std::make_shared<ProtoLogger<SensorProto>>(
+            output_path, 1000, [](const SensorProto& lhs, const SensorProto& rhs) {
+                return lhs.backend_received_time().epoch_timestamp_seconds() <
+                       rhs.backend_received_time().epoch_timestamp_seconds();
+            });
     TestSubject subject;
     subject.registerObserver(logger_ptr);
     for (const auto msg : read_replay_msgs)
@@ -77,7 +80,7 @@ TEST(ReplayTest, test_read_and_write_replay)
 
     // test that 3 files named "0", "1", and "2" are created in the output directory
     std::unordered_set<std::string> created_filenames;
-    const std::unordered_set<std::string> expected_filenames = {"0", "1", "2"};
+    const std::unordered_set<std::string> expected_filenames = {"0", "1", "2", "3"};
 
     for (const auto& dir_entry : fs::directory_iterator(output_path))
     {
@@ -88,8 +91,8 @@ TEST(ReplayTest, test_read_and_write_replay)
 
     // compare against the messages that we read
     std::vector<SensorProto> written_read_replay_msgs;
-    ReplayReader reader2(output_path);
-    while (auto frame = reader2.getNextMsg())
+    ProtoLogReader reader2(output_path);
+    while (auto frame = reader2.getNextMsg<SensorProto>())
     {
         written_read_replay_msgs.emplace_back(*frame);
     }

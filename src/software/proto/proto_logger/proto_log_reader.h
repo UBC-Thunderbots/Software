@@ -2,30 +2,28 @@
 #include <experimental/filesystem>
 
 #include "software/proto/repeated_any_msg.pb.h"
+#include "software/util/typename/typename.h"
 
-// TODO: fix the comments
 
 class ProtoLogReader
 {
    public:
     /**
      * Constructs a `ProtoLogReader` that will read numerically-named files containing
-     * a delimited protobuf message with type `ReplayProto`, which itself contains
-     * multiple `SensorProto`s.
+     * a delimited protobuf message with type `RepeatedAnyMsg`, which itself contains
+     * multiple `Any`s, each of which can contain a Protobuf message of any type.
      *
      * @param _replay_dir The directory that we want to read replay proto messages from
      */
     explicit ProtoLogReader(const std::string& _replay_dir);
 
     /**
-     * Returns the next recorded message from the replay chunk files in the replay
-     * directory. This will increment the chunk index if we have reached the end of the
-     * current chunk. Returns std::nullopt if there are no more messages available in
-     * the current chunk, and there are no more chunks in the current directory.
+     * Returns the next `Any` message from the current `RepeatedAnyMsg` message, unpacked
+     * into the desired type `Msg`. Throws std::invalid_argument if unsuccessful.
      *
      * @return the next recorded SensorProto if available, nullopt otherwise.
      */
-     template <typename Msg>
+    template <typename Msg>
     std::optional<Msg> getNextMsg();
 
    private:
@@ -42,12 +40,13 @@ class ProtoLogReader
     void nextChunk();
 
     /**
-     * Reads a delimited protobuf file from a file located at the given path.
+     * Reads a delimited RepeatedAnyMsg protobuf message from a file located at the given
+     * path.
      *
      * @param file_path the path of the file containing a delimited protobuf file.
-     * @return a ReplayProto object that has been read from the given path.
+     * @return a RepeatedAnyMsg object that has been read from the given path.
      */
-    static RepeatedAnyMsg readDelimitedReplayProtobufFile(
+    static RepeatedAnyMsg readDelimitedRepeatedAnyMsgFile(
         const std::experimental::filesystem::path& file_path);
 
     size_t max_chunk_idx;
@@ -61,7 +60,7 @@ template <typename Msg>
 std::optional<Msg> ProtoLogReader::getNextMsg()
 {
     static_assert(std::is_base_of_v<google::protobuf::Message, Msg>,
-        "Msg must be a derived class of google::protobuf::Messsage!");
+                  "Msg must be a derived class of google::protobuf::Messsage!");
 
     if (!hasNextMsg())
     {
@@ -74,7 +73,14 @@ std::optional<Msg> ProtoLogReader::getNextMsg()
     }
 
     Msg ret;
-    cur_chunk.messages(cur_msg_idx).UnpackTo(&ret);
+    bool success = cur_chunk.messages(cur_msg_idx).UnpackTo(&ret);
+
+    if (!success)
+    {
+        throw std::invalid_argument("Failed to parse " + TYPENAME(Msg) + " into " +
+                                    cur_chunk.messages(cur_msg_idx).type_url());
+    }
+
     cur_msg_idx++;
     return ret;
 }
