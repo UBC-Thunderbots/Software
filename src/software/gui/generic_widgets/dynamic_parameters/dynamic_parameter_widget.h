@@ -16,7 +16,7 @@ class DynamicParameterWidget : public QScrollArea
     Q_OBJECT
 
    public:
-    explicit DynamicParameterWidget(QWidget* parent = 0);
+    explicit DynamicParameterWidget(QWidget* parent = nullptr);
 
    private:
     /**

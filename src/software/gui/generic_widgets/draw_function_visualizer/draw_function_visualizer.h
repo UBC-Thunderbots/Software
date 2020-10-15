@@ -17,7 +17,7 @@ class DrawFunctionVisualizer : public ZoomableQGraphicsView
     Q_OBJECT
 
    public:
-    explicit DrawFunctionVisualizer(QWidget* parent = 0);
+    explicit DrawFunctionVisualizer(QWidget* parent = nullptr);
 
     /**
      * Clears the scene and draws each of the provided DrawFunctions in order

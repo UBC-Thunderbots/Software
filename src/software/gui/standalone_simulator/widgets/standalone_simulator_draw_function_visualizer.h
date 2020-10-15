@@ -19,7 +19,7 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
     Q_OBJECT
 
    public:
-    explicit StandaloneSimulatorDrawFunctionVisualizer(QWidget* parent = 0);
+    explicit StandaloneSimulatorDrawFunctionVisualizer(QWidget* parent = nullptr);
 
     /**
      * Sets the StandaloneSimulator that this widget controls
