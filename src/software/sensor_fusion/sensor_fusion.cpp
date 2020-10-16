@@ -190,9 +190,11 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
         if (friendly_team_has_ball && !enemy_team_has_ball)
         {
+            // take defensive view of exclusive possession for friendly possession
             team_with_possession = TeamSide::FRIENDLY;
         }
-        else
+
+        if (enemy_team_has_ball)
         {
             team_with_possession = TeamSide::ENEMY;
         }
