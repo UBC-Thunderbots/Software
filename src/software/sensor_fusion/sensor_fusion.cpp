@@ -192,8 +192,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         {
             team_with_possession = TeamSide::FRIENDLY;
         }
-
-        if (!friendly_team_has_ball && enemy_team_has_ball)
+        else
         {
             team_with_possession = TeamSide::ENEMY;
         }

@@ -54,7 +54,7 @@ class Ball final
     void updateState(const BallState &new_state, const Timestamp &new_timestamp);
 
     /**
-     * Returns the current timestamp for when this ball
+     * Returns the current timestamp for this ball
      *
      * @return the current timestamp
      */

@@ -185,3 +185,11 @@ TEST_F(WorldTest, update_referee_stage)
         EXPECT_EQ(world.getRefereeStage(), RefereeStage::NORMAL_SECOND_HALF_PRE);
     }
 }
+
+TEST_F(WorldTest, set_team_with_possession)
+{
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
+    EXPECT_EQ(world.getTeamWithPossession(), TeamSide::FRIENDLY);
+    world.setTeamWithPossession(TeamSide::ENEMY);
+    EXPECT_EQ(world.getTeamWithPossession(), TeamSide::ENEMY);
+}
