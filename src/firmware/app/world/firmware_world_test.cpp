@@ -22,7 +22,8 @@ class FirmwareWorldTest : public testing::Test
     FirmwareRobot_t* robot = (FirmwareRobot*)8;
     FirmwareBall_t* ball   = (FirmwareBall*)9;
 
-    static float getCurrentTimeMock() {
+    static float getCurrentTimeMock()
+    {
         return 13;
     }
 };
@@ -37,6 +38,7 @@ TEST_F(FirmwareWorldTest, getBall)
     EXPECT_EQ(ball, app_firmware_world_getBall(firmware_world));
 }
 
-TEST_F(FirmwareWorldTest, getTime){
+TEST_F(FirmwareWorldTest, getTime)
+{
     EXPECT_EQ(13, app_firmware_world_getCurrentTime(firmware_world));
 }

@@ -14,8 +14,8 @@ FirmwareWorld_t* app_firmware_world_create(FirmwareRobot_t* robot, FirmwareBall_
 {
     FirmwareWorld_t* new_world = malloc(sizeof(FirmwareWorld_t));
 
-    new_world->robot = robot;
-    new_world->ball  = ball;
+    new_world->robot                    = robot;
+    new_world->ball                     = ball;
     new_world->get_current_time_seconds = get_current_time_seconds;
 
     return new_world;
@@ -36,6 +36,7 @@ FirmwareBall_t* app_firmware_world_getBall(FirmwareWorld_t* world)
     return world->ball;
 }
 
-float app_firmware_world_getCurrentTime(FirmwareWorld_t* world){
+float app_firmware_world_getCurrentTime(FirmwareWorld_t* world)
+{
     return world->get_current_time_seconds();
 }

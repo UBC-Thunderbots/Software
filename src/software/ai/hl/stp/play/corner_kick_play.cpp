@@ -157,11 +157,6 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
 
     LOG(DEBUG) << "Finished aligning to ball";
 
-    // Restart the align to ball tactic, but now loop forever so that
-    // the robot holds position until it's ready to kick
-    align_to_ball_tactic =
-         std::make_shared<MoveTactic>(true);
-
     // Align the kicker to take the corner kick and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time

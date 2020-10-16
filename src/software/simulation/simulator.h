@@ -180,15 +180,6 @@ class Simulator
     void removeRobot(std::weak_ptr<PhysicsRobot> robot);
 
    private:
-
-    /**
-     * Get the current simulator time, in seconds
-     *
-     * This must be static so that we may pass it into the `FirmwareWorld` constructor
-     *
-     * @return The current simulator time, in seconds
-     */
-
     /**
      * Get the current time.
      *

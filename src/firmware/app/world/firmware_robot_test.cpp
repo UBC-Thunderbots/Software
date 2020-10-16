@@ -134,7 +134,8 @@ TEST_F(FirmwareRobotTest, getVelocityY)
 
 TEST_F(FirmwareRobotTest, getSpeedLinear)
 {
-EXPECT_FLOAT_EQ(16.278820596099706f, app_firmware_robot_getSpeedLinear(firmware_robot));
+    EXPECT_FLOAT_EQ(16.278820596099706f,
+                    app_firmware_robot_getSpeedLinear(firmware_robot));
 }
 
 TEST_F(FirmwareRobotTest, getVelocityAngular)

@@ -4,10 +4,10 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "firmware/app/primitives/primitive.h"
 #include "firmware/app/control/control.h"
 #include "firmware/app/control/physbot.h"
 #include "firmware/app/control/trajectory_planner.h"
+#include "firmware/app/primitives/primitive.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
 #include "shared/constants.h"
@@ -76,7 +76,7 @@ void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
     const float current_x           = app_firmware_robot_getPositionX(robot);
     const float current_y           = app_firmware_robot_getPositionY(robot);
     const float current_orientation = app_firmware_robot_getOrientation(robot);
-    const float current_speed = app_firmware_robot_getSpeedLinear(robot);
+    const float current_speed       = app_firmware_robot_getSpeedLinear(robot);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {
@@ -111,7 +111,7 @@ void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
 
 void app_move_helper_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
-    MoveHelperState_t* state  = (MoveHelperState_t*)(void_state_ptr);
+    MoveHelperState_t* state     = (MoveHelperState_t*)(void_state_ptr);
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
     // Figure out the index of the trajectory element we should be executing
@@ -135,7 +135,7 @@ void app_move_helper_tick(void* void_state_ptr, FirmwareWorld_t* world)
     const float dx = dest_x - curr_x;
     const float dy = dest_y - curr_y;
 
-    float total_disp   = sqrtf(dx * dx + dy * dy);
+    float total_disp = sqrtf(dx * dx + dy * dy);
     // Add a small number to avoid division by zero
     float major_vec[2] = {dx / total_disp, dy / (total_disp + 1e-6f)};
     float minor_vec[2] = {major_vec[0], major_vec[1]};
@@ -146,14 +146,15 @@ void app_move_helper_tick(void* void_state_ptr, FirmwareWorld_t* world)
     const float dest_speed = state->position_trajectory.linear_speed[trajectory_index];
 
     // plan major axis movement
-    float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    float max_major_v     = state->move_slow ? 1.25f : (float)ROBOT_MAX_SPEED_METERS_PER_SECOND;
+    float max_major_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    float max_major_v =
+        state->move_slow ? 1.25f : (float)ROBOT_MAX_SPEED_METERS_PER_SECOND;
     float major_params[3] = {dest_speed, max_major_a, max_major_v};
     app_physbot_planMove(&pb.maj, major_params);
 
     // plan minor axis movement
-    float max_minor_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f;
-    float max_minor_v     = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND / 2.0f;
+    float max_minor_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f;
+    float max_minor_v = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND / 2.0f;
     float minor_params[3] = {0, max_minor_a, max_minor_v};
     app_physbot_planMove(&pb.min, minor_params);
 

@@ -171,8 +171,7 @@ void Simulator::stepSimulation(const Duration& time_step)
     Duration remaining_time = time_step;
     while (remaining_time > Duration::fromSeconds(0))
     {
-        current_firmware_time =
-            physics_world.getTimestamp();
+        current_firmware_time = physics_world.getTimestamp();
 
         for (auto& iter : blue_simulator_robots)
         {
