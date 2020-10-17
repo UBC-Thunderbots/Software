@@ -8,16 +8,19 @@ message Primitive
 {
     oneof primitive
     {
-        ChipPrimitive chip                    = 1;
-        KickPrimitive kick                    = 2;
-        MovePrimitive move                    = 3;
-        SpinningMovePrimitive spinning_move   = 4;
-        AutochipMovePrimitive autochip_move   = 5;
-        AutokickMovePrimitive autokick_move   = 6;
-        StopPrimitive stop                    = 7;
-        DirectControlPrimitive direct_control = 8;
+        EstopPrimitive estop                  = 1;
+        ChipPrimitive chip                    = 2;
+        KickPrimitive kick                    = 3;
+        MovePrimitive move                    = 4;
+        SpinningMovePrimitive spinning_move   = 5;
+        AutochipMovePrimitive autochip_move   = 6;
+        AutokickMovePrimitive autokick_move   = 7;
+        StopPrimitive stop                    = 8;
+        DirectControlPrimitive direct_control = 9;
     }
 }
+
+message EstopPrimitive {}
 
 message ChipPrimitive
 {

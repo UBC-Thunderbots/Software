@@ -2,9 +2,11 @@
 #include <iostream>
 #include <numeric>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
+#include "software/backend/replay_logging/replay_logger.h"
 #include "software/constants.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
@@ -86,13 +88,21 @@ int main(int argc, char **argv)
             visualizer = std::make_shared<ThreadedFullSystemGUI>();
 
             sensor_fusion->Subject<World>::registerObserver(visualizer);
+            ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
             ai->Subject<PlayInfo>::registerObserver(visualizer);
             backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 
+        if (!args->replay_output_dir()->value().empty())
+        {
+            auto replay_logger =
+                std::make_shared<ReplayLogger>(args->replay_output_dir()->value());
+            backend->Subject<SensorProto>::registerObserver(replay_logger);
+        }
+
         // Wait for termination
-        if (!args->headless())
+        if (!args->headless()->value())
         {
             // This blocks forever without using the CPU
             // Wait for the full_system to shut down before shutting
