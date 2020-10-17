@@ -112,7 +112,7 @@ class exampleConfig : public Config
         example_unsigned_int_param = std::make_shared<NumericParameter<uint>>("example_unsigned_int_param", 3, 0, 5);
         example_float_param = std::make_shared<NumericParameter<float>>("example_float_param", 4.04, 1.1, 9.01);
         example_string_param = std::make_shared<Parameter<std::string>>("example_string_param", "Hello World");
-        example_enum_param = std::make_shared<EnumeratedParameter<RefereeCommand>>("example_enum_param", RefereeCommand.HALT, {RefereeCommand.HALT, RefereeCommand.START});
+        example_enum_param = std::make_shared<EnumeratedParameter<RefereeCommand>>("example_enum_param", RefereeCommand.HALT, allValuesRefereeCommand());
         example_factory_param = std::make_shared<EnumeratedParameter<std::string>>("example_factory_param", "HaltPlay", GenericFactory<std::string, Play>::getRegisteredNames());
         example_optional_param = std::make_shared<Parameter<std::optional<bool>>>("example_optional_param", false);
         mutable_internal_param_list = {
