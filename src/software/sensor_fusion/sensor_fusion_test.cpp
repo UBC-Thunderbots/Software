@@ -22,7 +22,9 @@ class SensorFusionTest : public ::testing::Test
           robot_status_msg_id_2(initRobotStatusId2()),
           referee_indirect_yellow(initRefereeIndirectYellow()),
           referee_indirect_blue(initRefereeIndirectBlue()),
-          referee_normal_start(initRefereeNormalStart())
+          referee_normal_start(initRefereeNormalStart()),
+	  referee_ball_placement_yellow(initRefereeBallPlacementYellow()),
+	  referee_ball_placement_blue(initRefereeBallPlacementBlue())
     {
         config->mutableOverrideGameControllerFriendlyTeamColor()->setValue(true);
         config->mutableFriendlyColorYellow()->setValue(true);
@@ -44,6 +46,8 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
     std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
+    std::unique_ptr<SSLProto::Referee> referee_ball_placement_yellow;
+    std::unique_ptr<SSLProto::Referee> referee_ball_placement_blue;
 
     BallState initBallState()
     {
@@ -233,6 +237,30 @@ class SensorFusionTest : public ::testing::Test
         ref_msg->set_command(SSLProto::Referee_Command_NORMAL_START);
         return ref_msg;
     }
+
+    std::unique_ptr<SSLProto::Referee> initRefereeBallPlacementYellow()
+    {
+      auto ref_msg = std::make_unique<SSLProto::Referee>();
+      auto ref_point = std::make_unique<SSLProto::Referee_Point>();
+      ref_point->set_x(50);
+      ref_point->set_y(75);
+      *(ref_msg->mutable_designated_position()) = *ref_point;
+      ref_msg->set_command(SSLProto::Referee_Command_BALL_PLACEMENT_YELLOW);
+
+      return ref_msg;
+    }
+
+    std::unique_ptr<SSLProto::Referee> initRefereeBallPlacementBlue()
+    {
+      auto ref_msg = std::make_unique<SSLProto::Referee>();
+      auto ref_point = std::make_unique<SSLProto::Referee_Point>();
+      ref_point->set_x(20);
+      ref_point->set_y(35);
+      *(ref_msg->mutable_designated_position()) = *ref_point;
+      ref_msg->set_command(SSLProto::Referee_Command_BALL_PLACEMENT_BLUE);
+
+      return ref_msg;
+    }
 };
 
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
@@ -378,4 +406,43 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
     sensor_fusion.updateWorld(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_2, result_2.gameState());
+}
+
+TEST_F(SensorFusionTest, ball_placement_friendly_set_by_referee)
+{
+    SensorProto sensor_msg;
+
+    //send Point(50, 75) to Referee message
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_yellow;    
+	
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
+
+    sensor_fusion.updateWorld(sensor_msg);
+    World result = *sensor_fusion.getWorld();
+    
+    Point returned_point = result.gameState().getBallPlacementPoint().value();
+    EXPECT_EQ(Point(50, 75), returned_point);
+}
+
+TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
+{
+    SensorProto sensor_msg;
+
+    //send Point(20, 35) to Referee message
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_blue;    
+	
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
+
+    sensor_fusion.updateWorld(sensor_msg);
+    World result = *sensor_fusion.getWorld();
+    
+    std::optional<Point> returned_point =
+      result.gameState().getBallPlacementPoint();
+    EXPECT_EQ(std::nullopt, returned_point);
 }
