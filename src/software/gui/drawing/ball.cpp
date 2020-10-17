@@ -27,7 +27,7 @@ void drawBallVelocity(QGraphicsScene *scene, const Point &position,
 
     double speed     = velocity.length();
     auto line_length = normalizeValueToRange<double>(
-        speed, 0 , BALL_MAX_SPEED_METERS_PER_SECOND, 0.0, MAX_VELOCITY_LINE_LENGTH);
+        speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, 0.0, MAX_VELOCITY_LINE_LENGTH);
 
     drawSegment(scene, Segment(position, position + velocity.normalize(line_length)),
                 pen);
