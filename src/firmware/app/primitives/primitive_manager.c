@@ -5,7 +5,6 @@
 #ifdef __arm__
 #include <FreeRTOS.h>
 #include <semphr.h>
-#define static_assert _Static_assert
 #elif __unix__
 #include <pthread.h>
 #else
@@ -72,6 +71,16 @@ void app_primitive_manager_unlockPrimitiveMutex(PrimitiveManager_t *manager)
 #endif
 }
 
+/**
+ * Make the robot in the given world "safe" by disabling potentially dangerous
+ * functionality and bringing the robot to a stop
+ *
+ * @param manager [in/out] The primitive manager controlling the robot
+ * @param world [in] The world containing the robot make safe
+ */
+void app_primitive_manager_makeRobotSafe(PrimitiveManager_t *manager,
+                                         FirmwareWorld_t *world);
+
 PrimitiveManager_t *app_primitive_manager_create(void)
 {
     PrimitiveManager_t *manager =
@@ -109,11 +118,6 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
                                              TbotsProto_Primitive primitive_msg)
 {
-    // For safety, we want to make sure that the estop primitive is assigned to the
-    // default primitive enum tag
-    static_assert(TbotsProto_Primitive_estop_tag == 1,
-                  "E-Stop primitive not assigned tag of 1");
-
     app_primitive_manager_lockPrimitiveMutex(manager);
 
     app_primitive_manager_endCurrentPrimitive(manager, world);
@@ -196,18 +200,9 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
         }
         default:
         {
-            // the estop case is handled here
-            app_primitive_makeRobotSafe(world);
-            return;
+            app_primitive_manager_makeRobotSafe(manager, world);
+            assert(false);
         }
-    }
-
-    if (!manager->current_primitive->direct)
-    {
-        // Charge capacitor during gameplay
-        const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
-        Charger_t *charger           = app_firmware_robot_getCharger(robot);
-        app_charger_charge_capacitor(charger);
     }
 
     app_primitive_manager_unlockPrimitiveMutex(manager);
@@ -236,5 +231,24 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
         manager->current_primitive       = NULL;
     }
 
-    app_primitive_stopRobot(world, false);
+    app_primitive_manager_makeRobotSafe(manager, world);
+}
+
+void app_primitive_manager_makeRobotSafe(PrimitiveManager_t *manager,
+                                         FirmwareWorld_t *world)
+{
+    // Disable chipper, kicker, dribbler
+    FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
+    Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
+
+    app_chicker_disableAutochip(chicker);
+    app_chicker_disableAutokick(chicker);
+    app_dribbler_setSpeed(dribbler, 0);
+
+    // Set the current primitive to STOP to stop the robot moving
+    manager->current_primitive             = &STOP_PRIMITIVE;
+    manager->current_primitive_state       = manager->current_primitive->create_state();
+    TbotsProto_StopPrimitive stop_prim_msg = TbotsProto_StopPrimitive_init_zero;
+    app_stop_primitive_start(stop_prim_msg, manager->current_primitive_state, world);
 }

@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <stdexcept>
-#include <unordered_set>
 
 class TeamTest : public ::testing::Test
 {
@@ -551,59 +550,4 @@ TEST_F(TeamTest, update_timestamp_history_from_team_update)
     EXPECT_EQ(two_seconds_future, team.getTimestampHistory()[1]);
     EXPECT_EQ(three_seconds_future, team.getTimestampHistory()[0]);
     EXPECT_EQ(4, team.getTimestampHistory().size());
-}
-
-TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_3)
-{
-    Team team = Team(Duration::fromMilliseconds(2000));
-
-    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
-                          AngularVelocity::threeQuarter(), current_time);
-
-    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
-                          AngularVelocity::zero(), current_time);
-
-    Robot robot_2 = Robot(2, Point(3, -1), Vector(), Angle::zero(),
-                          AngularVelocity::zero(), current_time);
-
-    team.updateRobots({robot_0, robot_1, robot_2});
-    team.assignGoalie(0);
-
-    std::unordered_set<int> returned_robot_ids;
-    for (const auto& robot : team.getAllRobotsExceptGoalie())
-    {
-        returned_robot_ids.emplace(robot.id());
-    }
-    EXPECT_EQ(returned_robot_ids.find(0), returned_robot_ids.end());
-    EXPECT_NE(returned_robot_ids.find(1), returned_robot_ids.end());
-    EXPECT_NE(returned_robot_ids.find(2), returned_robot_ids.end());
-}
-
-TEST_F(TeamTest, get_all_robots_except_goalie_in_team_of_4)
-{
-    Team team = Team(Duration::fromMilliseconds(2000));
-
-    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
-                          AngularVelocity::threeQuarter(), current_time);
-
-    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
-                          AngularVelocity::zero(), current_time);
-
-    Robot robot_2 = Robot(2, Point(3, -1), Vector(), Angle::zero(),
-                          AngularVelocity::zero(), current_time);
-    Robot robot_3 = Robot(3, Point(2, 4), Vector(), Angle::half(),
-                          AngularVelocity::threeQuarter(), current_time);
-
-    team.updateRobots({robot_0, robot_1, robot_2, robot_3});
-    team.assignGoalie(2);
-
-    std::unordered_set<int> returned_robot_ids;
-    for (const auto& robot : team.getAllRobotsExceptGoalie())
-    {
-        returned_robot_ids.emplace(robot.id());
-    }
-    EXPECT_EQ(returned_robot_ids.find(2), returned_robot_ids.end());
-    EXPECT_NE(returned_robot_ids.find(0), returned_robot_ids.end());
-    EXPECT_NE(returned_robot_ids.find(1), returned_robot_ids.end());
-    EXPECT_NE(returned_robot_ids.find(3), returned_robot_ids.end());
 }

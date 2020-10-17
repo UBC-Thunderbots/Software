@@ -567,7 +567,7 @@ void chicker_kick(float speed_m_per_s)
  */
 void chicker_chip(float distance_m)
 {
-    chicker_fire_with_power(CHICKER_CHIP, distance_m);
+    chicker_fire_with_power(CHICKER_KICK, distance_m);
 }
 
 /**

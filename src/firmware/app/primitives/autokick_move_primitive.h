@@ -1,6 +1,7 @@
 #pragma once
 
 #include "firmware/app/primitives/primitive.h"
+#include "shared/proto/primitive.nanopb.h"
 
 extern const primitive_t AUTOKICK_MOVE_PRIMITIVE;
 
