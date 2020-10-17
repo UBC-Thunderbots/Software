@@ -23,7 +23,8 @@ void ControllerPrimitiveGenerator::onValueReceived(ControllerInput controller_in
 
 std::unique_ptr<TbotsProto::Primitive>
 ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
-    const ControllerInput &controller_input, std::shared_ptr<const HandheldControllerConfig> controller_input_config)
+    const ControllerInput &controller_input,
+    std::shared_ptr<const HandheldControllerConfig> controller_input_config)
 {
     if (controller_input.isKickButtonPressed())
     {
