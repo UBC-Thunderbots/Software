@@ -142,12 +142,12 @@ TEST(GetBallPlacementTest, get_ball_placement_no_ball_set)
 TEST(GetBallPlacementTest, get_ball_placement_set)
 {
     GameState game_state;
-  
-	game_state.setBallPlacementPoint(Point(15, 36));
-	EXPECT_EQ(game_state.getBallPlacementPoint().value(), Point(15, 36));
 
-	game_state.setBallPlacementPoint(Point(-3, -45));
-	EXPECT_EQ(game_state.getBallPlacementPoint().value(), Point(-3, -45));
+    game_state.setBallPlacementPoint(Point(15, 36));
+    EXPECT_EQ(game_state.getBallPlacementPoint().value(), Point(15, 36));
+
+    game_state.setBallPlacementPoint(Point(-3, -45));
+    EXPECT_EQ(game_state.getBallPlacementPoint().value(), Point(-3, -45));
 }
 
 TEST_P(GameStateTransitionTest, test_state_transitions)

@@ -392,12 +392,12 @@ class GameState
 
     /**
      * Returns the point on the field where the ball should be placed if one is specified.
-     * 
-     * @return the requested ball placement position on the field if one is specified, otherwise
-     *         std::nullptr
-    */
+     *
+     * @return the requested ball placement position on the field if one is specified,
+     * otherwise std::nullptr
+     */
     std::optional<Point> getBallPlacementPoint(void) const;
- 
+
     /**
      * Sets the point on the field where the ball should be placed.
      * See Robocup SSL Rules Law 9.2.
@@ -405,7 +405,7 @@ class GameState
      * @param placementPoint the point where the ball should be placed.
      */
     void setBallPlacementPoint(Point placementPoint);
-  
+
    private:
     PlayState play_state_;
     RestartReason restart_reason_;
