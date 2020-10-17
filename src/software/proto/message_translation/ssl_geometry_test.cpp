@@ -584,7 +584,7 @@ TEST_F(SSLGeometryTest, test_create_geometry_data_with_valid_values)
     auto field_size = geometry_data->field();
 
     // Sanity checks to make sure the right field was constructed and that we
-    // don't just have an emtpy / default constructed message. Full validation
+    // don't just have an empty / default constructed message. Full validation
     // of SSLProto::SSL_GeometryFieldSize creation is in other tests
     EXPECT_EQ(9000, field_size.field_length());
     EXPECT_EQ(6000, field_size.field_width());

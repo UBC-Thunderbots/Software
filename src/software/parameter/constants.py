@@ -2,8 +2,8 @@
 #                              Constants                              #
 #######################################################################
 
-# the weird espace charecters at the front change the color to red when
-# printed in a terminal, the espace charecter at the end clears and resets
+# the weird escape characters at the front change the color to red when
+# printed in a terminal, the escape character at the end clears and resets
 # back to the original color. More info can be found here:
 # https://stackoverflow.com/questions/287871/print-in-terminal-with-colors
 AUTOGEN_FAILURE_MSG = """\033[91m====================================================\033[0m

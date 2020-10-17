@@ -31,7 +31,7 @@ TEST(GradientDescentOptimizerTest, maximize_single_valued_function)
 TEST(GradientDescentOptimizerTest, minimize_multi_valued_function)
 {
     // Note that we halve the weight for "y" here to make sure
-    // gradient descent can see the function in a more homogenous way.
+    // gradient descent can see the function in a more homogeneous way.
     // See the GradientDescentOptimizer class javadoc comment for more details.
     GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.05});
 
@@ -49,7 +49,7 @@ TEST(GradientDescentOptimizerTest, minimize_multi_valued_function)
 TEST(GradientDescentOptimizerTest, minimize_multi_valued_function_with_offsets)
 {
     // Note that we halve the weight for "y" here to make sure
-    // gradient descent can see the function in a more homogenous way.
+    // gradient descent can see the function in a more homogeneous way.
     // See the GradientDescentOptimizer class javadoc comment for more details.
     GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.05});
 

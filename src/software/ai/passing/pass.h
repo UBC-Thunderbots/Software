@@ -107,6 +107,6 @@ class Pass
     // The speed of the pass in meters/second
     double pass_speed_m_per_s;
 
-    // The time to preform the pass at
+    // The time to perform the pass at
     Timestamp pass_start_time;
 };

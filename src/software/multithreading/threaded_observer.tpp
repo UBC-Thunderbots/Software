@@ -15,7 +15,7 @@ ThreadedObserver<T>::ThreadedObserver(size_t buffer_size)
 template <typename T>
 void ThreadedObserver<T>::onValueReceived(T val)
 {
-    // Do nothing, this function should be overriden to enable custom behavior on
+    // Do nothing, this function should be overridden to enable custom behavior on
     // message reception.
 }
 
@@ -54,7 +54,7 @@ ThreadedObserver<T>::~ThreadedObserver()
 template <typename T>
 std::optional<T> ThreadedObserver<T>::getNextValue(const Duration& max_wait_time)
 {
-    // Do nothing, this function should be overriden to enable custom behavior on
+    // Do nothing, this function should be overridden to enable custom behavior on
     // message reception.
     // We *must* provide an implementation here instead of making it pure virtual because
     // this function may be called from the `pull_from_buffer_thread` *before* the

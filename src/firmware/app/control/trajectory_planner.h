@@ -115,7 +115,7 @@ typedef struct VelocityTrajectory
  *      - The generator will assume maximum acceleration for the robot between each
  * segment on the path. If using max acceleration breaches either the speed limit of the
  * robot, or the centripetal acceleration limit defined by the curvature and robot speed -
- * the planner will assume the max acceleration that will remain bellow this limit.
+ * the planner will assume the max acceleration that will remain below this limit.
  *
  *     - To ensure the robot is capable of decelerating to react to any sudden changes in
  *       the path, the trajectory is checked for backwards continuity

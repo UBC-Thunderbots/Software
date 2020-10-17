@@ -104,7 +104,7 @@ void BBPositivePlan(BBProfile *b)
     // sub in that Vm + a3*t3 = Vf = 0
     // and apply the assumption that a1 = -a3
     // a1/2*(t1^2 + t3^2) + vi*t1 = d
-    // then sub in t3 = t1 - dt, some rearrangment and subbng in the definition of dt =
+    // then sub in t3 = t1 - dt, some rearrangement and subbng in the definition of dt =
     // -Vi/a1 and we have a1*t1^2 + 2*Vi*t1 + (dT*dT/2*a1 -d) = 0 which is quadratic
     float A = b->a1;
     float B = 2.0f * b->Vinitial;
@@ -181,7 +181,7 @@ void BBPositivePlan(BBProfile *b)
     }
 
     // if we hit here then we are in the velocity limited case
-    // so clamp velocity to the maximium
+    // so clamp velocity to the maximum
     b->Vmid = (vm < 0.0f) ? (-b->MaxV) : (b->MaxV);
 
     // here we recompute the times based on new maximum velocity

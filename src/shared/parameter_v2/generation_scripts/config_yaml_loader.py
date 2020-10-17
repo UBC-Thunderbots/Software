@@ -55,7 +55,7 @@ class ConfigYamlLoader(object):
 
         :raises ConfigYamlMalformed: when the yaml is malformed
         :raises ConfigSchemaViolation: When the shema is violated
-        :raises ConfigYamlCycleDetected: When a cycle is detected in the incldues
+        :raises ConfigYamlCycleDetected: When a cycle is detected in the includes
 
         :param yaml_paths: the path to all the config yamls
         :type yaml_paths: list of str
@@ -243,7 +243,7 @@ class ConfigYamlLoader(object):
         """Creates a DiGraph from all the included configs and checks if there
         are cycles. Raises to the main thread if a cycle is detected
 
-        :raises ConfigYamlCycleDetected: When a cycle is detected in the incldues
+        :raises ConfigYamlCycleDetected: When a cycle is detected in the includes
         :param config_metadata: Metadata describing params and config includes
         :type config_metadata: dict
 

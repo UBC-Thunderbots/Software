@@ -261,7 +261,7 @@ void SystemInit(void)
  *           constant and the selected clock source:
  *
  *           - If SYSCLK source is CSI, SystemCoreClock will contain the CSI_VALUE(*)
- *           - If SYSCLK source is HSI, SystemCoreClock will contain the HSI_VALUE(**)
+ *           - If SYSCLK source is HIS, SystemCoreClock will contain the HSI_VALUE(**)
  *           - If SYSCLK source is HSE, SystemCoreClock will contain the HSE_VALUE(***)
  *           - If SYSCLK source is PLL, SystemCoreClock will contain the CSI_VALUE(*),
  *             HSI_VALUE(**) or HSE_VALUE(***) multiplied/divided by the PLL factors.
@@ -292,7 +292,7 @@ void SystemCoreClockUpdate(void)
 
     switch (RCC->CFGR & RCC_CFGR_SWS)
     {
-        case RCC_CFGR_SWS_HSI: /* HSI used as system clock source */
+        case RCC_CFGR_SWS_HSI: /* HIS used as system clock source */
             SystemCoreClock = (uint32_t)(HSI_VALUE >> ((RCC->CR & RCC_CR_HSIDIV) >> 3));
             break;
 
@@ -320,7 +320,7 @@ void SystemCoreClockUpdate(void)
             {
                 switch (pllsource)
                 {
-                    case RCC_PLLCKSELR_PLLSRC_HSI: /* HSI used as PLL clock source */
+                    case RCC_PLLCKSELR_PLLSRC_HSI: /* HIS used as PLL clock source */
 
                         hsivalue = (HSI_VALUE >> ((RCC->CR & RCC_CR_HSIDIV) >> 3));
                         pllvco   = ((float_t)hsivalue / (float_t)pllm) *

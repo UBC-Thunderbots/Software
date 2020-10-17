@@ -35,9 +35,9 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
+/* USER CODE BEGIN PDF */
 
-/* USER CODE END PTD */
+/* USER CODE END PDF */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
