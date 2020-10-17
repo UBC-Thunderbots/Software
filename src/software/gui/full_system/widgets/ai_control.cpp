@@ -223,7 +223,39 @@ void setupFriendlyGoalieIDComboBox(
         std::shared_ptr<Parameter<bool>> override_friendly_goalie_id_parameter,
         std::shared_ptr<Parameter<int>> friendly_goalie_id_parameter)
 {
+    widget->friendly_goalie_id_combo_box->insertItem(0, "Use GameController");
+    int index = 1;
+    for (int id = 0; id < MAX_ROBOT_IDS; id++)
+    {
+        widget->friendly_goalie_id_combo_box->insertItem(index, toString(id));
+        index++;
+    }
 
+    auto on_friendly_goalie_id_changed =
+            [override_friendly_goalie_id_parameter,
+                    friendly_goalie_id_parameter](const QString &text) {
+                if (text == "Yellow")
+                {
+                    override_friendly_goalie_id_parameter->setValue(true);
+                    friendly_goalie_id_parameter->setValue(true);
+                }
+                else if (text == "Blue")
+                {
+                    override_friendly_goalie_id_parameter->setValue(true);
+                    friendly_goalie_id_parameter->setValue(false);
+                }
+                else if (text == "Use GameController")
+                {
+                    override_friendly_goalie_id_parameter->setValue(false);
+                }
+                else
+                {
+                    LOG(FATAL) << "Tried to set the team colour with an invalid value: '"
+                               << text.toStdString() << "'" << std::endl;
+                }
+            };
+    QWidget::connect(widget->friendly_goalie_id_combo_box, &QComboBox::currentTextChanged,
+                     on_friendly_goalie_id_changed);
 }
 
 void setupEnemyGoalieIDComboBox(
@@ -232,6 +264,8 @@ void setupEnemyGoalieIDComboBox(
         std::shared_ptr<Parameter<int>> enemy_goalie_id_parameter)
 {
 
+    QWidget::connect(widget->enemy_goalie_id_combo_box, &QComboBox::currentTextChanged,
+                     on_play_changed);
 }
 
 
