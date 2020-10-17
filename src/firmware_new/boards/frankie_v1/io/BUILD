@@ -88,7 +88,6 @@ cc_library(
     hdrs = ["network_logger.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:frankie_v1_lwip",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:lwip",
         "//firmware_new/boards/frankie_v1:rtos",
@@ -96,4 +95,5 @@ cc_library(
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],
+    alwayslink = True,
 )

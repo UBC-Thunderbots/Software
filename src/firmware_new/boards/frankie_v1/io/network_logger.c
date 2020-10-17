@@ -1,15 +1,19 @@
 #include "firmware_new/boards/frankie_v1/io/network_logger.h"
 
+#include "FreeRTOS.h"
 #include "cmsis_os.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
+#include "main.h"
 #include "pb.h"
 #include "pb_common.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
+#include "task.h"
 
 // the id of the queue that contains tbots log protos
-static osMessageQueueId_t log_message_queue_id;
+static osMessageQueueId_t log_message_queue_id_;
+static uint8_t robot_id_;
 
 void io_network_logger_task(void* communication_profile)
 {
@@ -20,7 +24,7 @@ void io_network_logger_task(void* communication_profile)
         (ProtoMulticastCommunicationProfile_t*)communication_profile;
 
     /* Infinite loop */
-    while (osMessageQueueGet(log_message_queue_id, ptr_to_tbots_log_proto, NULL, 0))
+    while (osMessageQueueGet(log_message_queue_id_, ptr_to_tbots_log_proto, NULL, 0))
     {
         if (ptr_to_tbots_log_proto != NULL)
         {
@@ -33,7 +37,17 @@ void io_network_logger_task(void* communication_profile)
     }
 }
 
-void io_network_logger_init(osMessageQueueId_t message_queue_id)
+void io_network_logger_init(osMessageQueueId_t message_queue_id, uint8_t robot_id)
 {
-    log_message_queue_id = message_queue_id;
+    robot_id_             = robot_id;
+    log_message_queue_id_ = message_queue_id;
+}
+
+void io_network_logger_handle_robot_log_msg(TbotsProto_RobotLog log_msg)
+{
+    // NOTE: we pass in a ptr to the log_msg on the stack, normally this can lead
+    // to disasters, but osMessageQueuePut gaurantees that the msg is copied, and
+    // the memory at this pointer location does _not_ need to be preserved after
+    // calling this function.
+    osMessageQueuePut(log_message_queue_id_, &log_msg, 0, 0);
 }

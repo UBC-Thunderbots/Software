@@ -6,6 +6,7 @@
 #include "boost/bind.hpp"
 #include "google/protobuf/message.h"
 #include "shared/constants.h"
+#include "shared/proto/robot_log_msg.pb.h"
 #include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
@@ -28,7 +29,7 @@ using google::protobuf::Message;
  * bazel run //firmware_new/tools:send_proto_over_udp -- your_interface_here
  *
  */
-void callback(TbotsProto::RobotStatus test)
+void status_callback(TbotsProto::RobotStatus test)
 {
     if (test.has_time_sent())
     {
@@ -39,6 +40,11 @@ void callback(TbotsProto::RobotStatus test)
     {
         std::cout << "robot status received: but no time set" << std::endl;
     }
+}
+
+void log_callback(TbotsProto::RobotLog test)
+{
+    std::cout << test.log_msg() << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -70,7 +76,12 @@ int main(int argc, char* argv[])
     auto status_listener =
         std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>(
             std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
-            ROBOT_STATUS_PORT, std::function(callback));
+            ROBOT_STATUS_PORT, std::function(status_callback));
+
+    auto log_listener =
+        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotLog>>(
+            std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+            ROBOT_LOGS_PORT, std::function(log_callback));
 
     while (1)
     {

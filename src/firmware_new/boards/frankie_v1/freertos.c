@@ -91,10 +91,9 @@ const osThreadAttr_t PrimMsgTask_attributes = {.name     = "PrimMsgTask",
                                                .stack_size = 1024 * 4};
 /* Definitions for testMsgUpdate */
 osThreadId_t testMsgUpdateHandle;
-const osThreadAttr_t testMsgUpdate_attributes = {
-    .name       = "testMsgUpdate",
-    .priority   = (osPriority_t)osPriorityNormal1,
-    .stack_size = 1024 * 4};
+const osThreadAttr_t testMsgUpdate_attributes = {.name     = "testMsgUpdate",
+                                                 .priority = (osPriority_t)osPriorityHigh,
+                                                 .stack_size = 1024 * 4};
 /* Definitions for RobotLogSender */
 osThreadId_t RobotLogSenderHandle;
 const osThreadAttr_t RobotLogSender_attributes = {
@@ -242,6 +241,8 @@ void test_msg_update(void *argument)
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
+    /*Logger_t* logger = app_logger_create(&io_network_logger_handle_robot_log_msg);*/
+
     /* Infinite loop */
     for (;;)
     {
@@ -252,6 +253,10 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
+
+        /*TbotsProto_RobotLog test;*/
+        /*app_logger_log(logger, test);*/
+
         // run loop at 100hz
         osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
     }
@@ -262,9 +267,10 @@ void test_msg_update(void *argument)
 /* USER CODE BEGIN Application */
 void initIoNetworking()
 {
-    // TODO this needs to be hooked up to the channel dial on the robot, when available
-    // https://github.com/UBC-Thunderbots/Software/issues/1517
-    unsigned channel = 0;
+    // TODO channel and robot_id need to be hooked up to the dials on the robot, when
+    // available https://github.com/UBC-Thunderbots/Software/issues/1517
+    unsigned channel  = 0;
+    unsigned robot_id = 0;
 
     io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
 
@@ -284,7 +290,7 @@ void initIoNetworking()
         "robot_log_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_LOGS_PORT,
         &robot_log_msg, TbotsProto_RobotLog_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
-    io_network_logger_init(TbotsLogProtoQHandle);
+    io_network_logger_init(TbotsLogProtoQHandle, robot_id);
 }
 
 
