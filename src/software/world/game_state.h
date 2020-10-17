@@ -394,7 +394,7 @@ class GameState
      * Returns the point on the field where the ball should be placed if one is specified.
      * 
      * @return the requested ball placement position on the field if one is specified, otherwise
-	 *         std::nullptr
+     *         std::nullptr
     */
     std::optional<Point> getBallPlacementPoint(void) const;
  
