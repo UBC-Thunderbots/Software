@@ -14,20 +14,24 @@ enum LogLevel
     FATAL = 3;
 };
 
-message TbotsLog
+message RobotLog
 {
     // the id of the robot that is logging
     uint32 robot_id = 1;
 
     // the timestamp of when the log was generated
-    Timestamp timestamp = 2;
+    Timestamp created_timestamp = 2;
 
     // the severity level of the log
     LogLevel log_level = 3;
 
+    // metadata of log
+    uint32 line_number = 4;
+    uint32 file_name   = 5;
+
     // NOTE: we limit maximum size of the log_msg to 100 bytes to know the size
     // of the msg before hand (necessary for freertos queues)
     //
-    // it is arbitrary and can be easily increased
-    string log_msg = 4 [(nanopb.fieldopt).max_size = 100];
+    // 100 bytes is arbitrary and can be easily increased
+    string log_msg = 6 [(nanopb.fieldopt).max_size = 100];
 }
