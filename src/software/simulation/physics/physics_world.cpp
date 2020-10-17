@@ -194,6 +194,10 @@ void PhysicsWorld::stepSimulation(const Duration& time_step)
     if (physics_ball)
     {
         physics_ball->updateIsInFlight();
+        if (!physics_ball->isInFlight())
+        {
+            physics_ball->applyBallFrictionModel();
+        }
     }
     b2_world->Step(static_cast<float>(time_step.toSeconds()), velocity_iterations,
                    position_iterations);

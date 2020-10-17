@@ -101,6 +101,11 @@ class PhysicsBall
     void updateIsInFlight() const;
 
     /**
+     * Applies the ball friction model to appropriately slow down the ball
+     */
+    void applyBallFrictionModel();
+
+    /**
      * Applies the given force vector to the ball at its center of mass
      *
      * @param force The force to apply

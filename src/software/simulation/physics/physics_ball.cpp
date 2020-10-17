@@ -189,6 +189,8 @@ void PhysicsBall::updateIsInFlight() const
     }
 }
 
+void PhysicsBall::applyBallFrictionModel() {}
+
 bool PhysicsBall::isInFlight() const
 {
     updateIsInFlight();
