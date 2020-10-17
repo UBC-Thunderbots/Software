@@ -96,7 +96,8 @@ function run_git_diff_check(){
 function run_eof_new_line(){
     printf "Adding missing new lines to end of files...\n\n"
 
-    cd $CURR_DIR/../src/ && git ls-files -z --exclude="firmware/boards/**" | while IFS= read -rd '' f; do tail -c1 < "$f" | read -r _ || echo >> "$f"; done
+    # adds missing new lines to the end of non-binary files
+    cd $CURR_DIR/../ && git grep -zIl '' | while IFS= read -rd '' f; do tail -c1 < "$f" | read -r _ || echo >> "$f"; done
     if [[ "$?" != 0 ]]; then
         printf "***Failed to add missing new lines!***\n\n"
         exit 1
