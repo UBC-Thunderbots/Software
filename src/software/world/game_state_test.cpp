@@ -149,6 +149,41 @@ TEST(GetBallPlacementTest, get_ball_placement_set)
 	game_state.setBallPlacementPoint(Point(-3, -45));
 	EXPECT_EQ(game_state.getBallPlacementPoint().value(), Point(-3, -45));
 }
+/**
+TEST(GetBallPlacementTest, get_ball_placement_set_by_referee)
+{
+  SensorFusion sensor_fusion;
+  SensorProto sensor_msg;
+  
+  World result *sensor_fusion.getWorld();
+  EXPECT_EQ(result.gameState.getBallDisplacementPoint, std::nullopt);
+  
+  SSLProto::Referee ref;
+  auto ref_point = std::make_unique<SSLProto::Referee_Point<>();
+  ref_point->set_x(50);
+  ref_point->set_y(75);
+  (*ref.mutable_designated_position()) = *ref_point;
+
+  *(sensor_msg.mutable_ssl_referee_msg()) = *ref;
+  sensor_fusion.updateWorld(sensor_msg1);
+  
+}
+TEST(GetBallPlacementTest, get_ball_placement_balls_set)
+{
+    GameState game_state;
+
+	const Point p1{};
+    Ball ball1(p1, Vector(), Timestamp::fromSeconds(0));
+	game_state.updateBall(ball1);
+	Point returned_p1{game_state.getBallPlacementPoint().value()};
+	EXPECT_EQ(returned_p1, p1);
+
+	const Point p2{30, -20};
+	Ball ball2(p2, Vector(10, -10), Timestamp::fromSeconds(1));
+	game_state.updateBall(ball2);
+	Point returned_p2{game_state.getBallPlacementPoint().value()};
+	EXPECT_EQ(returned_p2, p2);
+	}*/
 
 TEST_P(GameStateTransitionTest, test_state_transitions)
 {
