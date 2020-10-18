@@ -8,7 +8,7 @@ install:
 jobs:
   include:
     - name: "Build, Test, and Run Coverage (All Except SimulatedTests)"
-      before_install: if ! .travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "software\|firmware\|environment_setup"; then travis_terminate 0; fi
+      before_install: if .travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware\|software\|environment_setup"; then echo "There are relevant changes. Running tests..."; else echo "No relevant changes. Skipping tests." && travis_terminate 0; fi
       script:
         - cd src
         # Run tests and collect coverage on all except simulated tests
@@ -26,14 +26,14 @@ jobs:
         - cat codecov.log | head -n100
         - cat codecov.log | tail -n100
     - name: "Build and Test (SimulatedTests)"
-      before_install: if ! .travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "software\|firmware\|environment_setup"; then travis_terminate 0; fi
+      before_install: if .travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware\|software\|environment_setup"; then echo "There are relevant changes. Running tests..."; else echo "No relevant changes. Skipping tests." && travis_terminate 0; fi
       script:
         - cd src
         # Run tests on only the simulated tests
         - >
           bazel test //software/simulated_tests/...
     - name: "Build Firmware Board Targets"
-      before_install: if ! .travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware_new/boards\|firmware/boards\|environment_setup"; then travis_terminate 0; fi
+      before_install: if .travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware_new/boards\|firmware/boards\|environment_setup"; then echo "There are relevant changes. Running tests..."; else echo "No relevant changes. Skipping tests." && travis_terminate 0; fi
       script:
         - cd src
         # Build ARM Targets For Firmware
@@ -41,7 +41,7 @@ jobs:
         - bazel build --cpu=stm32f4 //firmware/boards/legacy_robot_stm32f4:bin 
         - bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin 
     - name: "Test for Memory Leaks"
-      before_install: if ! .travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware\|software\|environment_setup"; then travis_terminate 0; fi
+      before_install: if .travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware\|software\|environment_setup"; then echo "There are relevant changes. Running tests..."; else echo "No relevant changes. Skipping tests." && travis_terminate 0; fi
       script:
         - cd src
         # Test simulation, firmware and firmware_new, c_dynamic_parameters
