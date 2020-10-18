@@ -8,8 +8,6 @@
 class PenaltyKickPlay : public Play
 {
    public:
-    static const std::string name;
-
     PenaltyKickPlay() = default;
 
     bool isApplicable(const World &world) const override;
