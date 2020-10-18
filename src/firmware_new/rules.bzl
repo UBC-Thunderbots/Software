@@ -10,9 +10,9 @@ def stm32h7_hal_library_files_genrule(name):
         cmd = "\n".join([
             # Download the drivers and middlewares. We got the original URL by running wireshark and
             # watching where STM32CubeMX tried to download files from when generating code
-            # 
+            #
             # original url: http://sw-center.st.com/packs/resource/firmware/stm32cube_fw_h7_v170.zip
-            # 
+            #
             # Unfortunately, the server hosting this file is not reliable, and sometimes the zip file takes
             # too long to download, or fails to download. This download has a lot of other cruft (like videos of tropical fish)
             # that we don't need. So we remove all the useless files, and re-host the zip file.
