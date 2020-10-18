@@ -1,3 +1,5 @@
+# We run 5 jobs in parallel and exit early depending on the relevance of the changes for performance
+
 os: linux
 dist: bionic
 language: generic
