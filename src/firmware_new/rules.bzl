@@ -17,6 +17,7 @@ def stm32h7_hal_library_files_genrule(name):
             # too long to download, or fails to download. This download has a lot of other cruft (like videos of tropical fish)
             # that we don't need. So we remove all the useless files, and re-host the zip file.
             "curl -L https://github.com/UBC-Thunderbots/Software-External-Dependencies/raw/main/STM32Cube_FW_H7_v1.7.0.zip -o fw.zip",
+            "if [ $$? -ne 0 ]; then curl -L http://sw-center.st.com/packs/resource/firmware/stm32cube_fw_h7_v170.zip -o fw.zip; fi",
             "mv fw.zip $@",
         ]),
     )
