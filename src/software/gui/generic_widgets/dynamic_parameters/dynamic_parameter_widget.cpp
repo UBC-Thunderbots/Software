@@ -10,9 +10,9 @@
 #include <QtWidgets/QWidget>
 #include <limits>
 
+#include "software/gui/shared/parameters_spinbox.h"
 #include "software/logger/logger.h"
 #include "software/util/variant_visitor/variant_visitor.h"
-#include "software/gui/shared/parameters_spinbox.h"
 
 DynamicParameterWidget::DynamicParameterWidget(QWidget* parent) : QScrollArea(parent)
 {
@@ -129,7 +129,7 @@ QWidget* DynamicParameterWidget::createIntegerParameter(
                      static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                      on_spinbox_value_changed);
 
-    setup__SpinBox(spinbox, parameter);
+    setupSpinBox(spinbox, parameter);
 
     widget->setLayout(layout);
 

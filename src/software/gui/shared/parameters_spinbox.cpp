@@ -1,9 +1,10 @@
-#include "software/parameter/parameter.h"
 #include <QtWidgets/QSpinBox>
 #include <memory>
 
-void setup__SpinBox(QSpinBox* spin_box, std::shared_ptr<Parameter<int>> &parameter) {
+#include "software/parameter/parameter.h"
 
+void setupSpinBox(QSpinBox* spin_box, std::shared_ptr<Parameter<int>>& parameter)
+{
     auto on_parameter_value_changed = [spin_box](int new_value) {
         // We block signals while setting the value of the spinbox so that we don't
         // trigger the `on_spinbox_value_changed` function, which would set the
