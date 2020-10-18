@@ -224,33 +224,36 @@ void setupFriendlyGoalieIDComboBox(
         std::shared_ptr<Parameter<int>> friendly_goalie_id_parameter)
 {
     widget->friendly_goalie_id_combo_box->insertItem(0, "Use GameController");
-    int index = 1;
+    std::list<int> robot_ids;
     for (int id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        widget->friendly_goalie_id_combo_box->insertItem(index, toString(id));
-        index++;
+        robot_ids.emplace_back(id);
     }
+        widget->friendly_goalie_id_combo_box->insertItems(1, toString(robot_ids));
 
     auto on_friendly_goalie_id_changed =
             [override_friendly_goalie_id_parameter,
                     friendly_goalie_id_parameter](const QString &text) {
-                if (text == "Yellow")
+                if (text == "0")
                 {
                     override_friendly_goalie_id_parameter->setValue(true);
-                    friendly_goalie_id_parameter->setValue(true);
+                    friendly_goalie_id_parameter->setValue(0);
                 }
-                else if (text == "Blue")
+                else if (text == "1")
                 {
                     override_friendly_goalie_id_parameter->setValue(true);
-                    friendly_goalie_id_parameter->setValue(false);
+                    friendly_goalie_id_parameter->setValue(1);
                 }
+                // add more cases here for ids 2-15, or figure out how to loop through it (loop is ideal)
+                // figure out why QWidget file can't be found
+
                 else if (text == "Use GameController")
                 {
                     override_friendly_goalie_id_parameter->setValue(false);
                 }
                 else
                 {
-                    LOG(FATAL) << "Tried to set the team colour with an invalid value: '"
+                    LOG(FATAL) << "Tried to set the friendly goalie ID with an invalid value: '"
                                << text.toStdString() << "'" << std::endl;
                 }
             };
