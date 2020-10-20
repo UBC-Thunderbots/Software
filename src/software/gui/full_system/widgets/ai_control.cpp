@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QPushButton>
+#include <QList>
 
 #include "software/ai/hl/stp/play/play.h"
 #include "software/logger/logger.h"
@@ -224,29 +225,40 @@ void setupFriendlyGoalieIDComboBox(
         std::shared_ptr<Parameter<int>> friendly_goalie_id_parameter)
 {
     widget->friendly_goalie_id_combo_box->insertItem(0, "Use GameController");
-    std::list<int> robot_ids;
+
+    QList <QString> robot_ids;
     for (int id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        robot_ids.emplace_back(id);
+        QString str = QString::number(id);
+        robot_ids.emplace_back(str);
     }
-        widget->friendly_goalie_id_combo_box->insertItems(1, toString(robot_ids));
+    widget->friendly_goalie_id_combo_box->insertItems(1, robot_ids);
 
     auto on_friendly_goalie_id_changed =
             [override_friendly_goalie_id_parameter,
                     friendly_goalie_id_parameter](const QString &text) {
-                if (text == "0")
-                {
-                    override_friendly_goalie_id_parameter->setValue(true);
-                    friendly_goalie_id_parameter->setValue(0);
-                }
-                else if (text == "1")
-                {
-                    override_friendly_goalie_id_parameter->setValue(true);
-                    friendly_goalie_id_parameter->setValue(1);
-                }
-                // add more cases here for ids 2-15, or figure out how to loop through it (loop is ideal)
-                // figure out why QWidget file can't be found
 
+                bool override = false;
+                int goalie_id;
+                for (QString id : robot_ids)
+                {
+                    if (text == id)
+                    {
+                        override = true;
+                        bool ok;
+                        goalie_id = id.toInt(&ok);
+                        if (!ok)
+                        {
+                            std::cout << "Conversion failed. Repeat conversion" << std::endl;
+                        }
+                    }
+                }
+
+                if (override)
+                {
+                    override_friendly_goalie_id_parameter->setValue(true);
+                    friendly_goalie_id_parameter->setValue(goalie_id);
+                }
                 else if (text == "Use GameController")
                 {
                     override_friendly_goalie_id_parameter->setValue(false);
@@ -256,7 +268,7 @@ void setupFriendlyGoalieIDComboBox(
                     LOG(FATAL) << "Tried to set the friendly goalie ID with an invalid value: '"
                                << text.toStdString() << "'" << std::endl;
                 }
-            };
+    };
     QWidget::connect(widget->friendly_goalie_id_combo_box, &QComboBox::currentTextChanged,
                      on_friendly_goalie_id_changed);
 }
