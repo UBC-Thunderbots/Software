@@ -38,8 +38,6 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
-typedef StaticTask_t osStaticThreadDef_t;
-typedef StaticQueue_t osStaticMessageQDef_t;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -70,98 +68,48 @@ static TbotsProto_Primitive primitive_msg;
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
 osThreadId_t NetStartTaskHandle;
-uint32_t NetStartTaskBuffer[1024];
-osStaticThreadDef_t NetStartTaskControlBlock;
 const osThreadAttr_t NetStartTask_attributes = {
     .name       = "NetStartTask",
-    .stack_mem  = &NetStartTaskBuffer[0],
-    .stack_size = sizeof(NetStartTaskBuffer),
-    .cb_mem     = &NetStartTaskControlBlock,
-    .cb_size    = sizeof(NetStartTaskControlBlock),
-    .priority   = (osPriority_t)osPriorityHigh7,
-};
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for RobotStatusTask */
 osThreadId_t RobotStatusTaskHandle;
-uint32_t RobotStatusTaskBuffer[1024];
-osStaticThreadDef_t RobotStatusTaskControlBlock;
 const osThreadAttr_t RobotStatusTask_attributes = {
     .name       = "RobotStatusTask",
-    .stack_mem  = &RobotStatusTaskBuffer[0],
-    .stack_size = sizeof(RobotStatusTaskBuffer),
-    .cb_mem     = &RobotStatusTaskControlBlock,
-    .cb_size    = sizeof(RobotStatusTaskControlBlock),
-    .priority   = (osPriority_t)osPriorityHigh7,
-};
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for VisionMsgTask */
 osThreadId_t VisionMsgTaskHandle;
-uint32_t VisionMsgTaskBuffer[1024];
-osStaticThreadDef_t VisionMsgTaskControlBlock;
 const osThreadAttr_t VisionMsgTask_attributes = {
     .name       = "VisionMsgTask",
-    .stack_mem  = &VisionMsgTaskBuffer[0],
-    .stack_size = sizeof(VisionMsgTaskBuffer),
-    .cb_mem     = &VisionMsgTaskControlBlock,
-    .cb_size    = sizeof(VisionMsgTaskControlBlock),
-    .priority   = (osPriority_t)osPriorityHigh7,
-};
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for PrimMsgTask */
 osThreadId_t PrimMsgTaskHandle;
-uint32_t PrimMsgTaskBuffer[1024];
-osStaticThreadDef_t PrimMsgTaskControlBlock;
-const osThreadAttr_t PrimMsgTask_attributes = {
-    .name       = "PrimMsgTask",
-    .stack_mem  = &PrimMsgTaskBuffer[0],
-    .stack_size = sizeof(PrimMsgTaskBuffer),
-    .cb_mem     = &PrimMsgTaskControlBlock,
-    .cb_size    = sizeof(PrimMsgTaskControlBlock),
-    .priority   = (osPriority_t)osPriorityHigh7,
-};
+const osThreadAttr_t PrimMsgTask_attributes = {.name     = "PrimMsgTask",
+                                               .priority = (osPriority_t)osPriorityNormal,
+                                               .stack_size = 1024 * 4};
 /* Definitions for testMsgUpdate */
 osThreadId_t testMsgUpdateHandle;
-uint32_t testMsgUpdateBuffer[1024];
-osStaticThreadDef_t testMsgUpdateControlBlock;
 const osThreadAttr_t testMsgUpdate_attributes = {
     .name       = "testMsgUpdate",
-    .stack_mem  = &testMsgUpdateBuffer[0],
-    .stack_size = sizeof(testMsgUpdateBuffer),
-    .cb_mem     = &testMsgUpdateControlBlock,
-    .cb_size    = sizeof(testMsgUpdateControlBlock),
-    .priority   = (osPriority_t)osPriorityHigh7,
-};
-/* Definitions for RobotLogSender */
-osThreadId_t RobotLogSenderHandle;
-uint32_t RobotLogSenderBuffer[1024];
-osStaticThreadDef_t RobotLogSenderControlBlock;
-const osThreadAttr_t RobotLogSender_attributes = {
-    .name       = "RobotLogSender",
-    .stack_mem  = &RobotLogSenderBuffer[0],
-    .stack_size = sizeof(RobotLogSenderBuffer),
-    .cb_mem     = &RobotLogSenderControlBlock,
-    .cb_size    = sizeof(RobotLogSenderControlBlock),
-    .priority   = (osPriority_t)osPriorityHigh7,
-};
-/* Definitions for NetworkLoggerTa */
-osThreadId_t NetworkLoggerTaHandle;
-uint32_t NetworkLoggerTaBuffer[1024];
-osStaticThreadDef_t NetworkLoggerTaControlBlock;
-const osThreadAttr_t NetworkLoggerTa_attributes = {
-    .name       = "NetworkLoggerTa",
-    .stack_mem  = &NetworkLoggerTaBuffer[0],
-    .stack_size = sizeof(NetworkLoggerTaBuffer),
-    .cb_mem     = &NetworkLoggerTaControlBlock,
-    .cb_size    = sizeof(NetworkLoggerTaControlBlock),
-    .priority   = (osPriority_t)osPriorityHigh7,
-};
-/* Definitions for TbotsLogProtoQ */
-osMessageQueueId_t TbotsLogProtoQHandle;
-uint8_t TbotsLogProtoQBuffer[32 * sizeof(TbotsProto_RobotLog)];
-osStaticMessageQDef_t TbotsLogProtoQControlBlock;
-const osMessageQueueAttr_t TbotsLogProtoQ_attributes = {
-    .name    = "TbotsLogProtoQ",
-    .cb_mem  = &TbotsLogProtoQControlBlock,
-    .cb_size = sizeof(TbotsLogProtoQControlBlock),
-    .mq_mem  = &TbotsLogProtoQBuffer,
-    .mq_size = sizeof(TbotsLogProtoQBuffer)};
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
+/* Definitions for RobotLogMsgSend */
+osThreadId_t RobotLogMsgSendHandle;
+const osThreadAttr_t RobotLogMsgSend_attributes = {
+    .name       = "RobotLogMsgSend",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
+/* Definitions for NetworkRobotLog */
+osThreadId_t NetworkRobotLogHandle;
+const osThreadAttr_t NetworkRobotLog_attributes = {
+    .name       = "NetworkRobotLog",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
+/* Definitions for RobotLogProtoQ */
+osMessageQueueId_t RobotLogProtoQHandle;
+const osMessageQueueAttr_t RobotLogProtoQ_attributes = {.name = "RobotLogProtoQ"};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -201,9 +149,9 @@ void MX_FREERTOS_Init(void)
     /* USER CODE END RTOS_TIMERS */
 
     /* Create the queue(s) */
-    /* creation of TbotsLogProtoQ */
-    TbotsLogProtoQHandle =
-        osMessageQueueNew(32, sizeof(TbotsProto_RobotLog), &TbotsLogProtoQ_attributes);
+    /* creation of RobotLogProtoQ */
+    RobotLogProtoQHandle =
+        osMessageQueueNew(16, sizeof(TbotsProto_RobotLog), &RobotLogProtoQ_attributes);
 
     /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
@@ -234,18 +182,18 @@ void MX_FREERTOS_Init(void)
         osThreadNew(test_msg_update, (void *)robot_status_msg_sender_profile,
                     &testMsgUpdate_attributes);
 
-    /* creation of RobotLogSender */
-    RobotLogSenderHandle =
+    /* creation of RobotLogMsgSend */
+    RobotLogMsgSendHandle =
         osThreadNew(io_proto_multicast_sender_task, (void *)robot_log_msg_sender_profile,
-                    &RobotLogSender_attributes);
+                    &RobotLogMsgSend_attributes);
 
-    /* creation of NetworkLoggerTa */
-    NetworkLoggerTaHandle =
+    /* creation of NetworkRobotLog */
+    NetworkRobotLogHandle =
         osThreadNew(io_network_logger_task, (void *)robot_log_msg_sender_profile,
-                    &NetworkLoggerTa_attributes);
+                    &NetworkRobotLog_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
-    io_network_logger_init(TbotsLogProtoQHandle);
+    io_network_logger_init(RobotLogProtoQHandle);
     /* USER CODE END RTOS_THREADS */
 }
 
@@ -287,7 +235,7 @@ void test_msg_update(void *argument)
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
-    /*app_logger_init(0, &io_network_logger_handle_robot_log_msg);*/
+    app_logger_init(0, &io_network_logger_handle_robot_log_msg);
 
     /* Infinite loop */
     for (;;)
@@ -299,12 +247,10 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
+        TLOG_DEBUG("hows it %d", 100);
 
-        /*TbotsProto_RobotLog test;*/
-        TLOG_DEBUG("hows it goin");
-
-        // run loop at 100hz
-        osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
+        // run loop at 10hz
+        osDelay(1 / 10 * MILLISECONDS_PER_SECOND);
     }
     /* USER CODE END test_msg_update */
 }

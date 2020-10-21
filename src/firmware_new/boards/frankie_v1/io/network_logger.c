@@ -17,14 +17,14 @@ static osMessageQueueId_t log_message_queue_id_;
 void io_network_logger_task(void* communication_profile)
 {
     // holds the msg that was just dequeued
-    void* ptr_to_tbots_log_proto = NULL;
+    void* ptr_to_tbots_log_proto = malloc(sizeof(TbotsProto_RobotLog));
 
     ProtoMulticastCommunicationProfile_t* profile =
         (ProtoMulticastCommunicationProfile_t*)communication_profile;
 
     /* Infinite loop */
     while (osMessageQueueGet(log_message_queue_id_, ptr_to_tbots_log_proto, NULL,
-                             osWaitForever))
+                             osWaitForever) == osOK)
     {
         if (ptr_to_tbots_log_proto != NULL)
         {
