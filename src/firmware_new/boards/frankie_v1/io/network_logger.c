@@ -13,7 +13,6 @@
 
 // the id of the queue that contains tbots log protos
 static osMessageQueueId_t log_message_queue_id_;
-static uint8_t robot_id_;
 
 void io_network_logger_task(void* communication_profile)
 {
@@ -24,7 +23,8 @@ void io_network_logger_task(void* communication_profile)
         (ProtoMulticastCommunicationProfile_t*)communication_profile;
 
     /* Infinite loop */
-    while (osMessageQueueGet(log_message_queue_id_, ptr_to_tbots_log_proto, NULL, 0))
+    while (osMessageQueueGet(log_message_queue_id_, ptr_to_tbots_log_proto, NULL,
+                             osWaitForever))
     {
         if (ptr_to_tbots_log_proto != NULL)
         {
@@ -37,9 +37,8 @@ void io_network_logger_task(void* communication_profile)
     }
 }
 
-void io_network_logger_init(osMessageQueueId_t message_queue_id, uint8_t robot_id)
+void io_network_logger_init(osMessageQueueId_t message_queue_id)
 {
-    robot_id_             = robot_id;
     log_message_queue_id_ = message_queue_id;
 }
 

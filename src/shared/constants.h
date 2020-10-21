@@ -113,7 +113,7 @@ const unsigned ROBOT_STATUS_PORT = 42071;
 const unsigned ROBOT_LOGS_PORT   = 42072;
 
 // the port to listen to for what side of the field to defend
-const unsigned DEFENDING_SIDE_PORT = 42072;
+const unsigned DEFENDING_SIDE_PORT = 42073;
 
 // the timeout to recv a network packet
 const unsigned NETWORK_TIMEOUT_MS = 1000;

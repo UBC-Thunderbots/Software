@@ -17,11 +17,10 @@ void io_network_logger_task(void* network_profile);
  * Initialize network logger with the queue id of the log msg queue
  *
  * @param log_message_queue_id The queue id of the log msg queue
- * @param robot_id The Robot ID of the robot initializing the network logger
  */
-void io_network_logger_init(osMessageQueueId_t log_message_queue_id, uint8_t robot_id);
+void io_network_logger_init(osMessageQueueId_t log_message_queue_id);
 
 /**
- *
+ * TODO
  */
 void io_network_logger_handle_robot_log_msg(TbotsProto_RobotLog log_msg);

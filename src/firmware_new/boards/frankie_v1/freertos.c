@@ -27,10 +27,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "firmware/app/logger/logger.h"
 #include "firmware_new/boards/frankie_v1/io/network_logger.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
-#include "firmware_new/logger/logger.h"
 #include "shared/constants.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 #include "shared/proto/robot_status_msg.nanopb.h"
@@ -38,6 +38,7 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+typedef StaticTask_t osStaticThreadDef_t;
 typedef StaticQueue_t osStaticMessageQDef_t;
 /* USER CODE BEGIN PTD */
 
@@ -69,43 +70,88 @@ static TbotsProto_Primitive primitive_msg;
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
 osThreadId_t NetStartTaskHandle;
-const osThreadAttr_t NetStartTask_attributes = {.name     = "NetStartTask",
-                                                .priority = (osPriority_t)osPriorityHigh7,
-                                                .stack_size = 1024 * 4};
+uint32_t NetStartTaskBuffer[1024];
+osStaticThreadDef_t NetStartTaskControlBlock;
+const osThreadAttr_t NetStartTask_attributes = {
+    .name       = "NetStartTask",
+    .stack_mem  = &NetStartTaskBuffer[0],
+    .stack_size = sizeof(NetStartTaskBuffer),
+    .cb_mem     = &NetStartTaskControlBlock,
+    .cb_size    = sizeof(NetStartTaskControlBlock),
+    .priority   = (osPriority_t)osPriorityHigh7,
+};
 /* Definitions for RobotStatusTask */
 osThreadId_t RobotStatusTaskHandle;
+uint32_t RobotStatusTaskBuffer[1024];
+osStaticThreadDef_t RobotStatusTaskControlBlock;
 const osThreadAttr_t RobotStatusTask_attributes = {
     .name       = "RobotStatusTask",
+    .stack_mem  = &RobotStatusTaskBuffer[0],
+    .stack_size = sizeof(RobotStatusTaskBuffer),
+    .cb_mem     = &RobotStatusTaskControlBlock,
+    .cb_size    = sizeof(RobotStatusTaskControlBlock),
     .priority   = (osPriority_t)osPriorityHigh7,
-    .stack_size = 1024 * 4};
+};
 /* Definitions for VisionMsgTask */
 osThreadId_t VisionMsgTaskHandle;
+uint32_t VisionMsgTaskBuffer[1024];
+osStaticThreadDef_t VisionMsgTaskControlBlock;
 const osThreadAttr_t VisionMsgTask_attributes = {
     .name       = "VisionMsgTask",
+    .stack_mem  = &VisionMsgTaskBuffer[0],
+    .stack_size = sizeof(VisionMsgTaskBuffer),
+    .cb_mem     = &VisionMsgTaskControlBlock,
+    .cb_size    = sizeof(VisionMsgTaskControlBlock),
     .priority   = (osPriority_t)osPriorityHigh7,
-    .stack_size = 1024 * 4};
+};
 /* Definitions for PrimMsgTask */
 osThreadId_t PrimMsgTaskHandle;
-const osThreadAttr_t PrimMsgTask_attributes = {.name     = "PrimMsgTask",
-                                               .priority = (osPriority_t)osPriorityHigh7,
-                                               .stack_size = 1024 * 4};
+uint32_t PrimMsgTaskBuffer[1024];
+osStaticThreadDef_t PrimMsgTaskControlBlock;
+const osThreadAttr_t PrimMsgTask_attributes = {
+    .name       = "PrimMsgTask",
+    .stack_mem  = &PrimMsgTaskBuffer[0],
+    .stack_size = sizeof(PrimMsgTaskBuffer),
+    .cb_mem     = &PrimMsgTaskControlBlock,
+    .cb_size    = sizeof(PrimMsgTaskControlBlock),
+    .priority   = (osPriority_t)osPriorityHigh7,
+};
 /* Definitions for testMsgUpdate */
 osThreadId_t testMsgUpdateHandle;
-const osThreadAttr_t testMsgUpdate_attributes = {.name     = "testMsgUpdate",
-                                                 .priority = (osPriority_t)osPriorityHigh,
-                                                 .stack_size = 1024 * 4};
+uint32_t testMsgUpdateBuffer[1024];
+osStaticThreadDef_t testMsgUpdateControlBlock;
+const osThreadAttr_t testMsgUpdate_attributes = {
+    .name       = "testMsgUpdate",
+    .stack_mem  = &testMsgUpdateBuffer[0],
+    .stack_size = sizeof(testMsgUpdateBuffer),
+    .cb_mem     = &testMsgUpdateControlBlock,
+    .cb_size    = sizeof(testMsgUpdateControlBlock),
+    .priority   = (osPriority_t)osPriorityHigh7,
+};
 /* Definitions for RobotLogSender */
 osThreadId_t RobotLogSenderHandle;
+uint32_t RobotLogSenderBuffer[1024];
+osStaticThreadDef_t RobotLogSenderControlBlock;
 const osThreadAttr_t RobotLogSender_attributes = {
     .name       = "RobotLogSender",
-    .priority   = (osPriority_t)osPriorityHigh,
-    .stack_size = 1024 * 4};
+    .stack_mem  = &RobotLogSenderBuffer[0],
+    .stack_size = sizeof(RobotLogSenderBuffer),
+    .cb_mem     = &RobotLogSenderControlBlock,
+    .cb_size    = sizeof(RobotLogSenderControlBlock),
+    .priority   = (osPriority_t)osPriorityHigh7,
+};
 /* Definitions for NetworkLoggerTa */
 osThreadId_t NetworkLoggerTaHandle;
+uint32_t NetworkLoggerTaBuffer[1024];
+osStaticThreadDef_t NetworkLoggerTaControlBlock;
 const osThreadAttr_t NetworkLoggerTa_attributes = {
     .name       = "NetworkLoggerTa",
-    .priority   = (osPriority_t)osPriorityHigh,
-    .stack_size = 1024 * 4};
+    .stack_mem  = &NetworkLoggerTaBuffer[0],
+    .stack_size = sizeof(NetworkLoggerTaBuffer),
+    .cb_mem     = &NetworkLoggerTaControlBlock,
+    .cb_size    = sizeof(NetworkLoggerTaControlBlock),
+    .priority   = (osPriority_t)osPriorityHigh7,
+};
 /* Definitions for TbotsLogProtoQ */
 osMessageQueueId_t TbotsLogProtoQHandle;
 uint8_t TbotsLogProtoQBuffer[32 * sizeof(TbotsProto_RobotLog)];
@@ -199,7 +245,7 @@ void MX_FREERTOS_Init(void)
                     &NetworkLoggerTa_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
-    /* add threads, ... */
+    io_network_logger_init(TbotsLogProtoQHandle);
     /* USER CODE END RTOS_THREADS */
 }
 
@@ -241,7 +287,7 @@ void test_msg_update(void *argument)
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
-    /*Logger_t* logger = app_logger_create(&io_network_logger_handle_robot_log_msg);*/
+    /*app_logger_init(0, &io_network_logger_handle_robot_log_msg);*/
 
     /* Infinite loop */
     for (;;)
@@ -249,13 +295,13 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
         // TODO enable SNTP sys_now is currently only time since reset
         // https://github.com/UBC-Thunderbots/Software/issues/1518
-        robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();
+        /*robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();*/
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
 
         /*TbotsProto_RobotLog test;*/
-        /*app_logger_log(logger, test);*/
+        TLOG_DEBUG("hows it goin");
 
         // run loop at 100hz
         osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
@@ -289,8 +335,6 @@ void initIoNetworking()
     robot_log_msg_sender_profile = io_proto_multicast_communication_profile_create(
         "robot_log_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_LOGS_PORT,
         &robot_log_msg, TbotsProto_RobotLog_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
-
-    io_network_logger_init(TbotsLogProtoQHandle, robot_id);
 }
 
 

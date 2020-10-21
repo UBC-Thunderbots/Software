@@ -25,13 +25,14 @@ message RobotLog
     // the severity level of the log
     LogLevel log_level = 3;
 
-    // metadata of log
+    // the line number of where the log was generated
     uint32 line_number = 4;
-    uint32 file_name   = 5;
 
-    // NOTE: we limit maximum size of the log_msg to 100 bytes to know the size
-    // of the msg before hand (necessary for freertos queues)
+    // NOTE: we limit maximum size of the log_msg and file_name to know the
+    // size of the msg before hand (necessary for freertos queues)
     //
-    // 100 bytes is arbitrary and can be easily increased
-    string log_msg = 6 [(nanopb.fieldopt).max_size = 100];
+    // The numbers are arbitrary, but ideally the size of a RobotLog should
+    // be less than the MTU
+    string file_name = 5 [(nanopb.fieldopt).max_size = 50];
+    string log_msg   = 6 [(nanopb.fieldopt).max_size = 100];
 }
