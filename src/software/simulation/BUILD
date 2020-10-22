@@ -61,6 +61,7 @@ cc_library(
     deps = [
         ":firmware_object_deleter",
         ":simulator_robot",
+        "//firmware/app/logger",
         "//firmware/app/world:chicker",
         "//firmware/app/world:dribbler",
         "//firmware/app/world:firmware_robot",

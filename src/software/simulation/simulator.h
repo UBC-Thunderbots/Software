@@ -7,6 +7,7 @@
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
 #include "software/world/field.h"
+#include "software/world/team_colour.h"
 #include "software/world/world.h"
 
 extern "C"
@@ -189,7 +190,8 @@ class Simulator
     static void updateSimulatorRobots(
         const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-            simulator_robots);
+            simulator_robots,
+        TeamColour team_colour);
 
     /**
      * Sets the primitive being simulated by the robot in simulation

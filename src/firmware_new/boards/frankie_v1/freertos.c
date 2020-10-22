@@ -105,7 +105,7 @@ const osThreadAttr_t RobotLogMsgSend_attributes = {
 osThreadId_t NetworkRobotLogHandle;
 const osThreadAttr_t NetworkRobotLog_attributes = {
     .name       = "NetworkRobotLog",
-    .priority   = (osPriority_t)osPriorityNormal,
+    .priority   = (osPriority_t)osPriorityNormal1,
     .stack_size = 1024 * 4};
 /* Definitions for RobotLogProtoQ */
 osMessageQueueId_t RobotLogProtoQHandle;
@@ -243,14 +243,17 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
         // TODO enable SNTP sys_now is currently only time since reset
         // https://github.com/UBC-Thunderbots/Software/issues/1518
-        /*robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();*/
+        robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
-        TLOG_DEBUG("hows it %d", 100);
+        TLOG_DEBUG("logging debug level message %d", sys_now());
+        TLOG_INFO("logging info level message %l", sys_now());
+        TLOG_WARN("logging warn level message %x", sys_now());
+        TLOG_FATAL("logging error level message %d", sys_now());
 
-        // run loop at 10hz
-        osDelay(1 / 10 * MILLISECONDS_PER_SECOND);
+        // run loop at 100hz
+        osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
     }
     /* USER CODE END test_msg_update */
 }

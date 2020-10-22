@@ -8,7 +8,7 @@
 
 typedef struct Logger
 {
-    uint8_t robot_id;
+    unsigned robot_id;
     void (*robot_log_msg_handler)(TbotsProto_RobotLog log_msg);
 } Logger_t;
 
@@ -20,14 +20,14 @@ typedef struct Logger
 // we cannot have useful log macros like TLOG_WARN(...), TLOG_ERROR(...), etc...
 static Logger_t logger;
 
-void app_logger_init(uint8_t robot_id,
+void app_logger_init(unsigned robot_id,
                      void (*robot_log_msg_handler)(TbotsProto_RobotLog log_msg))
 {
     logger.robot_id              = robot_id;
     logger.robot_log_msg_handler = robot_log_msg_handler;
 }
 
-void app_logger_log(const char *file_name, uint32_t line_number,
+void app_logger_log(const char *file_name, unsigned line_number,
                     TbotsProto_LogLevel log_level, const char *format, ...)
 {
     // TODO update timestamp: https://github.com/UBC-Thunderbots/Software/issues/1518
@@ -42,8 +42,7 @@ void app_logger_log(const char *file_name, uint32_t line_number,
     va_list variable_argument_list;
     va_start(variable_argument_list, format);
 
-    snprintf(robot_log.log_msg, sizeof(robot_log.log_msg), format,
-             variable_argument_list);
+    vsprintf(robot_log.log_msg, format, variable_argument_list);
 
     va_end(variable_argument_list);
 

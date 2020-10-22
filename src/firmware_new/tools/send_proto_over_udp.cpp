@@ -52,7 +52,7 @@ void log_callback(TbotsProto::RobotLog log)
             log_level = "DEBUG";
             break;
         case TbotsProto::LogLevel::INFO:
-            log_level = "DEBUG";
+            log_level = "INFO";
             break;
         case TbotsProto::LogLevel::WARN:
             log_level = "WARN";
@@ -97,10 +97,10 @@ int main(int argc, char* argv[])
             std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
             PRIMITIVE_PORT);
 
-    auto status_listener =
-        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>(
-            std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
-            ROBOT_STATUS_PORT, std::function(status_callback));
+    // auto status_listener =
+    // std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>(
+    // std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+    // ROBOT_STATUS_PORT, std::function(status_callback));
 
     auto log_listener =
         std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotLog>>(

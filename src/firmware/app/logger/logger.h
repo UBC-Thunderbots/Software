@@ -7,7 +7,7 @@
  * @param robot_id The robot id the logs are coming from
  * @param robot_log_msg_handler The function to handle RobotLog protos
  */
-void app_logger_init(uint8_t robot_id,
+void app_logger_init(unsigned robot_id,
                      void (*robot_log_msg_handler)(TbotsProto_RobotLog log_msg));
 
 /**
@@ -21,7 +21,7 @@ void app_logger_init(uint8_t robot_id,
  * @param log_level The severity level of this log
  * @param format The format string followed by printf style args
  */
-void app_logger_log(const char *file_name, uint32_t line_number,
+void app_logger_log(const char *file_name, unsigned line_number,
                     TbotsProto_LogLevel log_level, const char *format, ...);
 
 #define TLOG_DEBUG(...)                                                                  \
@@ -30,5 +30,5 @@ void app_logger_log(const char *file_name, uint32_t line_number,
     app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_INFO, __VA_ARGS__)
 #define TLOG_WARN(...)                                                                   \
     app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_WARN, __VA_ARGS__)
-#define TLOG_ERROR(...)                                                                  \
-    app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_ERROR, __VA_ARGS__)
+#define TLOG_FATAL(...)                                                                  \
+    app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_FATAL, __VA_ARGS__)

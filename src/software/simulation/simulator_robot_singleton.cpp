@@ -5,6 +5,7 @@
 
 extern "C"
 {
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/world/charger.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
@@ -118,6 +119,16 @@ void SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
 {
     checkValidAndExecuteVoid(
         [firmware_world](auto robot) { robot->runCurrentPrimitive(firmware_world); });
+}
+
+void SimulatorRobotSingleton::handleBlueRobotLogProto(TbotsProto_RobotLog log)
+{
+    SimulatorRobotSingleton::handleRobotLogProto(log, "Blue");
+}
+
+void SimulatorRobotSingleton::handleYellowRobotLogProto(TbotsProto_RobotLog log)
+{
+    SimulatorRobotSingleton::handleRobotLogProto(log, "Yellow");
 }
 
 void SimulatorRobotSingleton::checkValidAndExecuteVoid(
@@ -363,4 +374,34 @@ void SimulatorRobotSingleton::brakeMotorBackRight()
 void SimulatorRobotSingleton::brakeMotorFrontRight()
 {
     checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontRight(); });
+}
+
+void SimulatorRobotSingleton::handleRobotLogProto(TbotsProto_RobotLog log,
+                                                  const std::string& robot_colour)
+{
+    std::string log_level = "";
+
+    switch (log.log_level)
+    {
+        case TbotsProto_LogLevel_DEBUG:
+            log_level = "DEBUG";
+            break;
+        case TbotsProto_LogLevel_INFO:
+            log_level = "INFO";
+            break;
+        case TbotsProto_LogLevel_WARN:
+            log_level = "WARN";
+            break;
+        case TbotsProto_LogLevel_FATAL:
+            log_level = "FATAL";
+            break;
+        default:
+            log_level = "UNKNOWN";
+            break;
+    }
+
+    std::cout << "[" << log_level << "]"
+              << "[" << robot_colour << " Robot " << log.robot_id << "]"
+              << "[" << log.file_name << ":" << log.line_number << "]" << log.log_msg
+              << std::endl;
 }

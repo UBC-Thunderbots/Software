@@ -69,6 +69,7 @@ cc_library(
         ":chicker",
         ":dribbler",
         ":wheel",
+        "//firmware/app/logger",
     ],
 )
 

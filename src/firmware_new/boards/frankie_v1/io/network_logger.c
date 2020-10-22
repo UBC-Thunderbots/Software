@@ -17,20 +17,23 @@ static osMessageQueueId_t log_message_queue_id_;
 void io_network_logger_task(void* communication_profile)
 {
     // holds the msg that was just dequeued
-    void* ptr_to_tbots_log_proto = malloc(sizeof(TbotsProto_RobotLog));
+    TbotsProto_RobotLog dequeued_robot_log_proto;
 
     ProtoMulticastCommunicationProfile_t* profile =
         (ProtoMulticastCommunicationProfile_t*)communication_profile;
 
-    /* Infinite loop */
-    while (osMessageQueueGet(log_message_queue_id_, ptr_to_tbots_log_proto, NULL,
-                             osWaitForever) == osOK)
+    osStatus_t status;
+
+    for (;;)
     {
-        if (ptr_to_tbots_log_proto != NULL)
+        status = osMessageQueueGet(log_message_queue_id_, &dequeued_robot_log_proto, NULL,
+                                   osWaitForever);
+
+        if (status == osOK)
         {
             io_proto_multicast_communication_profile_acquireLock(profile);
             memcpy(io_proto_multicast_communication_profile_getProtoStruct(profile),
-                   ptr_to_tbots_log_proto, sizeof(TbotsProto_RobotLog));
+                   &dequeued_robot_log_proto, sizeof(TbotsProto_RobotLog));
             io_proto_multicast_communication_profile_releaseLock(profile);
             io_proto_multicast_communication_profile_notifyEvents(profile, PROTO_UPDATED);
         }
