@@ -101,9 +101,17 @@ protected:
 
 TEST_F(FirmwareWorldTest, app_autochip_move_primitive_test)
 {
-    TbotsProto_AutochipMovePrimitive prim_msg;
+    TbotsProto_Primitive primitive_msg;
+    primitive_msg.which_primitive = TbotsProto_Primitive_autochip_move_tag;
+    TbotsProto_AutochipMovePrimitive autochip_primitive_msg;
+    autochip_primitive_msg.dribbler_speed_rpm = 1.0;
+    autochip_primitive_msg.chip_distance_meters = 2.0;
+    primitive_msg.primitive.autochip_move = autochip_primitive_msg;
+
     PrimitiveManager_t* manager = app_primitive_manager_create();
 
-    app_autochip_move_primitive_start(prim_msg, manager->current_primitive_state, firmware_world);
+    app_primitive_manager_startNewPrimitive(manager,
+                                            firmware_world,
+                                            primitive_msg);
     EXPECT_EQ(0, 0);
 }
