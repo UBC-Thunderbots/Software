@@ -11,7 +11,7 @@ void app_logger_init(unsigned robot_id,
                      void (*robot_log_msg_handler)(TbotsProto_RobotLog log_msg));
 
 /**
- * Creates a new RobotLog proto and calls the the robot_log_msg_handler
+ * Creates a new RobotLog proto and calls the robot_log_msg_handler
  *
  * NOTE: If the log msg is longer than the max_size defined in the proto
  * the log will be truncated.
@@ -24,6 +24,9 @@ void app_logger_init(unsigned robot_id,
 void app_logger_log(const char *file_name, unsigned line_number,
                     TbotsProto_LogLevel log_level, const char *format, ...);
 
+
+// `__LINE__` and `__FILE__` are predefined macros that the preprocessor will replace
+// with the line number and file name of where the log is located.
 #define TLOG_DEBUG(...)                                                                  \
     app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_DEBUG, __VA_ARGS__)
 #define TLOG_INFO(...)                                                                   \
