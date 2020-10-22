@@ -186,6 +186,7 @@ class Simulator
      *
      * @param physics_robots The physics robots to add to the simulator robots
      * @param simulator_robots The simulator robots to add the physics robots to
+     * @param team_colour The color of the team this robot is on
      */
     static void updateSimulatorRobots(
         const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,

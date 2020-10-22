@@ -2,8 +2,6 @@
 
 #include <stdlib.h>
 
-#include "firmware/app/logger/logger.h"
-
 struct FirmwareBall
 {
     float (*get_ball_position_x)(void);
@@ -24,7 +22,6 @@ FirmwareBall_t* app_firmware_ball_create(float (*get_ball_position_x)(void),
     new_ball->get_ball_velocity_x = get_ball_velocity_x;
     new_ball->get_ball_velocity_y = get_ball_velocity_y;
 
-    TLOG_DEBUG("creating new ball");
     return new_ball;
 }
 

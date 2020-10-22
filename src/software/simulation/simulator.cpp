@@ -67,6 +67,9 @@ void Simulator::updateSimulatorRobots(
     {
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
 
+        // we initialize the logger with the appropriate logging function based
+        // on the team color and the robot id to propagate any logs when creating
+        // the firmware_robot and firmware_ball
         if (team_colour == TeamColour::BLUE)
         {
             app_logger_init(simulator_robot->getRobotId(),
@@ -194,6 +197,7 @@ void Simulator::stepSimulation(const Duration& time_step)
 
             app_logger_init(simulator_robot->getRobotId(),
                             &SimulatorRobotSingleton::handleBlueRobotLogProto);
+
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
                                                        blue_team_defending_side);
             SimulatorBallSingleton::setSimulatorBall(simulator_ball,
@@ -208,6 +212,7 @@ void Simulator::stepSimulation(const Duration& time_step)
 
             app_logger_init(simulator_robot->getRobotId(),
                             &SimulatorRobotSingleton::handleYellowRobotLogProto);
+
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
                                                        yellow_team_defending_side);
             SimulatorBallSingleton::setSimulatorBall(simulator_ball,
