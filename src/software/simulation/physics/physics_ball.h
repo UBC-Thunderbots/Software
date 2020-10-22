@@ -6,6 +6,7 @@
 
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
+#include "software/time/duration.h"
 #include "software/world/ball_state.h"
 
 /**
@@ -29,7 +30,6 @@ class PhysicsBall
     explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
                          const double mass_kg, double restitution = 1.0,
                          double linear_damping = 0.0);
-
     PhysicsBall() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
@@ -102,8 +102,12 @@ class PhysicsBall
 
     /**
      * Applies the ball friction model to appropriately slow down the ball
+     *
+     * @param time_step duration over which to apply friction
      */
-    void applyBallFrictionModel();
+    void applyBallFrictionModel(const Duration& time_step);
+
+    void setInitialKickSpeed(double speed);
 
     /**
      * Applies the given force vector to the ball at its center of mass
@@ -127,6 +131,8 @@ class PhysicsBall
      * and false otherwise
      */
     bool isTouchingOtherObject() const;
+
+    Vector calculateVelocityDelta(const Duration& time_step);
 
     /**
      * Calculates and returns the ball's distance from the ground, in metres
@@ -156,4 +162,9 @@ class PhysicsBall
     // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
     const double ball_restitution;
     const double ball_linear_damping;
+
+    // initial speed a ball is kicked to model friction behaviour
+    std::optional<double> initial_kick_speed;    // m/s
+    const double sliding_friction_acceleration;  // m/s^2
+    const double rolling_friction_acceleration;  // m/s^2
 };

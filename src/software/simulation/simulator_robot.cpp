@@ -161,6 +161,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
             ball->applyImpulse(
                 robot_orientation_vector.normalize(ball_head_on_momentum.length()));
             ball->applyImpulse(kick_impulse);
+            ball->setInitialKickSpeed(speed_m_per_s);
 
             dribbler_ball.can_be_controlled = false;
         }

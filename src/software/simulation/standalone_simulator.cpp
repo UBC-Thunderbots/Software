@@ -10,7 +10,7 @@ extern "C"
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField(), 0.8, 0.2),
+      simulator(Field::createSSLDivisionBField(), 0.8),
       most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket())
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(

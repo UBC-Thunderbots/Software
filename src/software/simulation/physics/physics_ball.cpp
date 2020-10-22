@@ -4,6 +4,7 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_object_user_data.h"
+#include "software/world/ball_model/two_stage_linear_ball_model.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_state,
                          const double mass_kg, double restitution, double linear_damping)
@@ -11,7 +12,10 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
       in_flight_distance_meters(0.0),
       flight_angle_of_departure(Angle::zero()),
       ball_restitution(restitution),
-      ball_linear_damping(linear_damping)
+      ball_linear_damping(linear_damping),
+      initial_kick_speed(std::nullopt),
+      sliding_friction_acceleration(6.9),
+      rolling_friction_acceleration(0.5)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -189,7 +193,45 @@ void PhysicsBall::updateIsInFlight() const
     }
 }
 
-void PhysicsBall::applyBallFrictionModel() {}
+void PhysicsBall::setInitialKickSpeed(double speed)
+{
+    initial_kick_speed = speed;
+}
+
+void PhysicsBall::applyBallFrictionModel(const Duration &time_step)
+{
+    Vector velocity_delta = calculateVelocityDelta(time_step);
+    applyImpulse(velocity_delta * massKg());
+}
+
+Vector PhysicsBall::calculateVelocityDelta(const Duration &time_step)
+{
+    static constexpr double SLIDING_ROLLING_TRANSITION_FACTOR = 5.0 / 7.0;
+
+    auto current_ball_state = getBallState();
+
+    if (initial_kick_speed)
+    {
+        double sliding_to_rolling_speed_threshold =
+            *initial_kick_speed * SLIDING_ROLLING_TRANSITION_FACTOR;
+        Vector future_velocity =
+            TwoStageLinearBallModel(current_ball_state, rolling_friction_acceleration,
+                                    sliding_friction_acceleration,
+                                    sliding_to_rolling_speed_threshold)
+                .getFutureVelocity(time_step);
+        //        if (future_velocity.length() < sliding_to_rolling_speed_threshold)
+        //        {
+        //            // initial kick speed is no longer relevant once ball is rolling
+        //            initial_kick_speed = std::nullopt;
+        //        }
+        return future_velocity - current_ball_state.velocity();
+    }
+    else
+    {
+        return current_ball_state.velocity().normalize(-rolling_friction_acceleration *
+                                                       time_step.toSeconds());
+    }
+}
 
 bool PhysicsBall::isInFlight() const
 {

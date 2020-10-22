@@ -36,6 +36,8 @@ class TwoStageLinearBallModel final : public BallModel
 
     BallState estimateFutureState(const Duration &duration_in_future) override;
 
+    Vector getFutureVelocity(const Duration &duration_in_future);
+
    private:
     const BallState initial_ball_state_;
     // acceleration opposing the direction of travel of a rolling ball
