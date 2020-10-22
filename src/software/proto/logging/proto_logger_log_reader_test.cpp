@@ -2,13 +2,13 @@
 #include <gtest/gtest.h>
 
 #include "software/multithreading/subject.h"
-#include "software/proto/proto_logger/proto_log_reader.h"
-#include "software/proto/proto_logger/proto_logger.h"
+#include "software/proto/logging/proto_log_reader.h"
+#include "software/proto/logging/proto_logger.h"
 #include "software/proto/sensor_msg.pb.h"
 
 // the working directory of tests are the bazel WORKSPACE root (in this case, src)
 // this path is relative to the current working directory, i.e. the bazel root
-constexpr const char* REPLAY_TEST_PATH_SUFFIX = "software/proto/proto_logger/test_logs";
+constexpr const char* REPLAY_TEST_PATH_SUFFIX = "software/proto/logging/test_logs";
 
 namespace fs = std::experimental::filesystem;
 

@@ -62,4 +62,4 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<Msg>
 };
 
 
-#include "software/proto/proto_logger/proto_logger.tpp"
+#include "software/proto/logging/proto_logger.tpp"

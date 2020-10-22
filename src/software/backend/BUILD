@@ -62,8 +62,8 @@ cc_library(
         "//software:constants",
         "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
+        "//software/proto/logging:proto_log_reader",
         "//software/proto/message_translation:tbots_protobuf",
-        "//software/proto/proto_logger:proto_log_reader",
         "//software/util/design_patterns:generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"

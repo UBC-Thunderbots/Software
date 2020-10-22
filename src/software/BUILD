@@ -4,6 +4,7 @@ cc_binary(
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [
+        "//shared/proto:tbots_cc_proto",
         "//software:constants",
         "//software/ai:ai_wrapper",
         "//software/ai/hl/stp:play_info",
@@ -12,7 +13,8 @@ cc_binary(
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
-        "//software/proto/proto_logger",
+        "//software/proto/logging:proto_logger",
+        "//software/proto/logging:world_to_tbots_vision_converter",
         "//software/sensor_fusion:threaded_sensor_fusion",
         "//software/util/design_patterns:generic_factory",
         "@boost//:program_options",

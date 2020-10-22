@@ -6,7 +6,7 @@
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/proto/proto_logger/proto_log_reader.h"
+#include "software/proto/logging/proto_log_reader.h"
 
 class ReplayBackend : public Backend
 {

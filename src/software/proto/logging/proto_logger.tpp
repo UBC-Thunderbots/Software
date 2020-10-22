@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "software/logger/logger.h"
-#include "software/proto/proto_logger/proto_logger.h"
+#include "software/proto/logging/proto_logger.h"
 
 template <typename Msg>
 ProtoLogger<Msg>::ProtoLogger(
