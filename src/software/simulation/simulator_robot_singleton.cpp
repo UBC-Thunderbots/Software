@@ -377,7 +377,7 @@ void SimulatorRobotSingleton::brakeMotorFrontRight()
 }
 
 void SimulatorRobotSingleton::handleRobotLogProto(TbotsProto_RobotLog log,
-                                                  const std::string& robot_colour)
+                                                  const std::string& team_colour)
 {
     std::string log_level = "";
 
@@ -401,7 +401,7 @@ void SimulatorRobotSingleton::handleRobotLogProto(TbotsProto_RobotLog log,
     }
 
     std::cout << "[" << log_level << "]"
-              << "[" << robot_colour << " Robot " << log.robot_id << "]"
+              << "[" << team_colour << " Robot " << log.robot_id << "]"
               << "[" << log.file_name << ":" << log.line_number << "]" << log.log_msg
               << std::endl;
 }

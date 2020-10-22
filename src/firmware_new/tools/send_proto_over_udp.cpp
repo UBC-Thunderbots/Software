@@ -97,10 +97,10 @@ int main(int argc, char* argv[])
             std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
             PRIMITIVE_PORT);
 
-    // auto status_listener =
-    // std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>(
-    // std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
-    // ROBOT_STATUS_PORT, std::function(status_callback));
+    auto status_listener =
+        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>(
+            std::string(MULTICAST_CHANNELS[0]) + "%" + std::string(argv[1]),
+            ROBOT_STATUS_PORT, std::function(status_callback));
 
     auto log_listener =
         std::make_unique<ThreadedProtoMulticastListener<TbotsProto::RobotLog>>(
@@ -110,9 +110,9 @@ int main(int argc, char* argv[])
     while (1)
     {
         // primitive and vision sender
-        // primitive_sender->sendProto(test_primitive_msg);
-        //*(test_vision_msg.mutable_time_sent()) = *createCurrentTimestamp();
-        // vision_sender->sendProto(test_vision_msg);
+        primitive_sender->sendProto(test_primitive_msg);
+        *(test_vision_msg.mutable_time_sent()) = *createCurrentTimestamp();
+        vision_sender->sendProto(test_vision_msg);
 
         // 100 hz test
         std::this_thread::sleep_for(std::chrono::milliseconds(10));

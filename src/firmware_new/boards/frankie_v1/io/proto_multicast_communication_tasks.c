@@ -75,6 +75,8 @@ void io_proto_multicast_sender_task(void* communication_profile)
                   io_proto_multicast_communication_profile_getProtoFields(profile),
                   io_proto_multicast_communication_profile_getProtoStruct(profile));
 
+        io_proto_multicast_communication_profile_releaseLock(profile);
+
         // Max uint16 is 65535, which is significantly over the theoretical max
         // tranfser unit that can be configured at 9000 bytes. We can safely cast
         // stream.bytes_written to a (u16_t)
@@ -85,8 +87,6 @@ void io_proto_multicast_sender_task(void* communication_profile)
         netconn_sendto(conn, tx_buf,
                        io_proto_multicast_communication_profile_getAddress(profile),
                        io_proto_multicast_communication_profile_getPort(profile));
-
-        io_proto_multicast_communication_profile_releaseLock(profile);
     }
 
     // we should never get here

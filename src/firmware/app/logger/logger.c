@@ -12,7 +12,7 @@ typedef struct Logger
     void (*robot_log_msg_handler)(TbotsProto_RobotLog log_msg);
 } Logger_t;
 
-// NOTE: code-style-guide.md explicity advises agains using static variables in the
+// NOTE: code-style-guide.md explicity advises against using static variables in the
 // app layer to prevent undefined behaviour when running the firmware in the simulator.
 //
 // However, the logger is the _only_ exception to that rule, as dependency injecting
@@ -41,11 +41,8 @@ void app_logger_log(const char *file_name, unsigned line_number,
     // see https://www.cprogramming.com/tutorial/c/lesson17.html for more info on VA
     va_list variable_argument_list;
     va_start(variable_argument_list, format);
-
     vsprintf(robot_log.log_msg, format, variable_argument_list);
-
     va_end(variable_argument_list);
 
-    // handle log
     logger.robot_log_msg_handler(robot_log);
 }

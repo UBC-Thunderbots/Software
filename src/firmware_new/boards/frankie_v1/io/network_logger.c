@@ -28,7 +28,6 @@ void io_network_logger_task(void* communication_profile)
     {
         status = osMessageQueueGet(log_message_queue_id_, &dequeued_robot_log_proto, NULL,
                                    osWaitForever);
-
         if (status == osOK)
         {
             io_proto_multicast_communication_profile_acquireLock(profile);
@@ -45,11 +44,11 @@ void io_network_logger_init(osMessageQueueId_t message_queue_id)
     log_message_queue_id_ = message_queue_id;
 }
 
-void io_network_logger_handle_robot_log_msg(TbotsProto_RobotLog log_msg)
+void io_network_logger_handle_robot_log_msg(TbotsProto_RobotLog robot_log)
 {
-    // NOTE: we pass in a ptr to the log_msg on the stack, normally this can lead
-    // to disasters, but osMessageQueuePut gaurantees that the msg is copied, and
+    // NOTE: we pass in a ptr to the robot_log on the stack, normally this can be
+    // catastrophic, but osMessageQueuePut gaurantees that the msg is copied, and
     // the memory at this pointer location does _not_ need to be preserved after
     // calling this function.
-    osMessageQueuePut(log_message_queue_id_, &log_msg, 0, 0);
+    osMessageQueuePut(log_message_queue_id_, &robot_log, 0, 0);
 }

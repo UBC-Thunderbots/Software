@@ -49,6 +49,9 @@ cc_library(
     name = "firmware_ball",
     srcs = ["firmware_ball.c"],
     hdrs = ["firmware_ball.h"],
+    deps = [
+        "//firmware/app/logger",
+    ],
 )
 
 cc_test(
