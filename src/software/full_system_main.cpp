@@ -3,7 +3,6 @@
 #include <iostream>
 #include <numeric>
 
-#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
@@ -117,8 +116,6 @@ int main(int argc, char** argv)
                     proto_log_output_dir / "PrimitiveSet");
             backend->Subject<SensorProto>::registerObserver(sensor_msg_logger);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(primitive_set_logger);
-
-            // log outgoing TbotsProto::Vision (i.e. filtered world state)
         }
 
         // Wait for termination

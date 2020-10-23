@@ -4,7 +4,6 @@ cc_binary(
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [
-        "//shared/proto:tbots_cc_proto",
         "//software:constants",
         "//software/ai:ai_wrapper",
         "//software/ai/hl/stp:play_info",

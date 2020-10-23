@@ -76,7 +76,7 @@ TEST(ProtoLoggerLogReaderTest, test_read_and_write_proto_log)
     // that the entire buffer of messages in the ThreadedObserver has been cleared and
     // written to disk by the ReplayLogger
     // This duration needs to be long enough to de facto make this a 'guarantee'
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     // test that 3 files named "0", "1", and "2" are created in the output directory
     std::unordered_set<std::string> created_filenames;
