@@ -3,7 +3,7 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/gui/drawing/draw_functions.h"
-#include "software/world/team_colour.h"
+#include "software/world/team_types.h"
 #include "software/world/world.h"
 
 /**

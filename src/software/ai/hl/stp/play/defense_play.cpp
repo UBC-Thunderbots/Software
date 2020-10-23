@@ -18,13 +18,13 @@
 bool DefensePlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           !teamHasPossession(world, world.friendlyTeam());
+           (world.getTeamWithPossession() == TeamSide::ENEMY);
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           !teamHasPossession(world, world.friendlyTeam());
+           (world.getTeamWithPossession() == TeamSide::ENEMY);
 }
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)

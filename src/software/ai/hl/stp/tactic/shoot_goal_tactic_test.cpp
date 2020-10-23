@@ -14,9 +14,8 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.updateFriendlyTeamState(Team({robot}));
-    TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -46,9 +45,8 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     world.updateFriendlyTeamState(Team({robot}));
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(4.5, 0.25)},
                                                Timestamp::fromSeconds(0));
-    TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -118,9 +116,8 @@ TEST(ShootGoalTacticTest, robot_will_intercept_ball_if_shot_is_blocked)
     world.updateFriendlyTeamState(Team({robot}));
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(1, 0)},
                                                Timestamp::fromSeconds(0));
-    TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -150,9 +147,8 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
     world.updateFriendlyTeamState(Team({robot}));
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(0.25, 0)},
                                                Timestamp::fromSeconds(0));
-    TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -181,9 +177,8 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.updateFriendlyTeamState(Team({robot}));
 
-    TimestampedBallState ballState(Point(0.5, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(0.5, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -201,9 +196,8 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.updateFriendlyTeamState(Team({robot}));
 
-    TimestampedBallState ballState(Point(3, -2.5), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(3, -2.5), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),

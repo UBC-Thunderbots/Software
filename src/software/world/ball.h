@@ -1,12 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <optional>
 
-#include "software/geom/point.h"
-#include "software/geom/vector.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball_model/ball_model.h"
-#include "software/world/timestamped_ball_state.h"
+#include "software/world/ball_state.h"
 
 class Ball final
 {
@@ -20,28 +19,24 @@ class Ball final
      * @param velocity The velocity of the ball, in metres per second
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
-     * @param history_size The number of previous ball states that should be stored. Must
-     * be > 0
      */
     explicit Ball(const Point &position, const Vector &velocity,
-                  const Timestamp &timestamp, unsigned int history_size = 20);
+                  const Timestamp &timestamp);
 
     /**
      * Creates a new ball with the given initial state
      *
      * @param initial_state The initial state of the ball
-     * @param history_size The number of previous ball states that should be stored. Must
-     * be > 0
+     * @param timestamp the initial timestamp
      */
-    explicit Ball(const TimestampedBallState &initial_state,
-                  unsigned int history_size = 20);
+    explicit Ball(const BallState &initial_state, const Timestamp &timestamp);
 
     /**
      * Returns the current state of the ball
      *
-     * @return TimestampedBallState
+     * @return BallState
      */
-    TimestampedBallState currentState() const;
+    BallState currentState() const;
 
     /**
      * Returns the ball model to predict future states
@@ -51,19 +46,19 @@ class Ball final
     const std::shared_ptr<BallModel> &ballModel() const;
 
     /**
-     * Updates the ball with new data, updating the current data as well as the predictive
-     * model
+     * Updates the ball with new data
      *
      * @param new_state the new state of the ball
+     * @param new_timestamp the new timestamp
      */
-    void updateState(const TimestampedBallState &new_state);
+    void updateState(const BallState &new_state, const Timestamp &new_timestamp);
 
     /**
-     * Returns the timestamp for when this ball's data was last updated
+     * Returns the current timestamp for this ball
      *
-     * @return the timestamp for when this ball's data was last updated
+     * @return the current timestamp
      */
-    Timestamp lastUpdateTimestamp() const;
+    Timestamp timestamp() const;
 
     /**
      * Returns the current position of the ball
@@ -78,14 +73,6 @@ class Ball final
      * @return the current velocity of the ball
      */
     Vector velocity() const;
-
-    /**
-     * Gets the previous states stored in states_
-     *
-     * @return The circular buffer containing the state history starting with the newest
-     * available data at index 0
-     */
-    BallHistory getPreviousStates() const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
@@ -105,11 +92,7 @@ class Ball final
     bool operator!=(const Ball &other) const;
 
    private:
-    // All previous states of the ball, with the most recent state at the front of the
-    // queue, This buffer will never be empty as it's initialized with a BallState on
-    // creation
-    // The buffer size (history_size) must be > 0
-    BallHistory states_;
-
+    BallState current_state_;
+    Timestamp timestamp_;
     std::shared_ptr<BallModel> ball_model_;
 };

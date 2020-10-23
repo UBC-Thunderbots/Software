@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 
@@ -108,8 +107,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 enemy_shot_vector.normalize(this->shadow_distance);
 
             // If the enemy robot already had the ball, try steal it and chip it away
-            if (*robotHasPossession(ball.getPreviousStates(),
-                                    enemy_robot.getPreviousStates()) &&
+            if (enemy_robot.isNearDribbler(ball.position()) &&
                 ball.velocity().length() <= ball_steal_speed)
             {
                 move_action->updateControlParams(
