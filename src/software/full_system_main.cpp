@@ -12,7 +12,6 @@
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/logging/proto_logger.h"
-#include "software/proto/logging/world_to_tbots_vision_converter.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -120,12 +119,6 @@ int main(int argc, char** argv)
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(primitive_set_logger);
 
             // log outgoing TbotsProto::Vision (i.e. filtered world state)
-            auto world_to_tbots_vision_converter =
-                std::make_shared<WorldToTbotsVisionConverter>();
-            auto tbots_vision_logger = std::make_shared<ProtoLogger<TbotsProto::Vision>>(
-                proto_log_output_dir / "Vision");
-            sensor_fusion->Subject<World>::registerObserver(
-                world_to_tbots_vision_converter);
         }
 
         // Wait for termination

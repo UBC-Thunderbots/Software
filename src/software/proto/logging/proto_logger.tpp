@@ -42,7 +42,7 @@ ProtoLogger<Msg>::ProtoLogger(
     // set the current chunk's message_type to the name of Msg's type
     *current_chunk.mutable_message_type() = TYPENAME(Msg);
 
-    LOG(INFO) << "Logging to " << output_dir_path.string();
+    LOG(INFO) << "Logging " << TYPENAME(Msg) << " to " << output_dir_path.string();
 }
 
 template <typename Msg>
@@ -101,6 +101,7 @@ void ProtoLogger<Msg>::saveCurrentChunk()
     }
     else
     {
-        LOG(DEBUG) << "Successfully saved chunk " << current_chunk_idx << "to disk";
+        LOG(DEBUG) << "Successfully saved " << TYPENAME(Msg) << " chunk "
+                   << current_chunk_idx << " to disk";
     }
 }

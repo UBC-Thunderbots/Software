@@ -32,23 +32,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "world_to_tbots_vision_converter",
-    srcs = [
-        "world_to_tbots_vision_converter.cpp",
-    ],
-    hdrs = [
-        "world_to_tbots_vision_converter.h",
-    ],
-    deps = [
-        "//shared/proto:tbots_cc_proto",
-        "//software/multithreading:subject",
-        "//software/multithreading:threaded_observer",
-        "//software/proto/message_translation:tbots_protobuf",
-        "//software/world",
-    ],
-)
-
 cc_test(
     name = "proto_logger_log_reader_test",
     srcs = ["proto_logger_log_reader_test.cpp"],
