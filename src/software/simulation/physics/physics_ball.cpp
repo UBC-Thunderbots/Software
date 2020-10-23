@@ -218,7 +218,7 @@ Vector PhysicsBall::calculateVelocityDelta(const Duration &time_step)
             TwoStageLinearBallModel(current_ball_state, rolling_friction_acceleration,
                                     sliding_friction_acceleration,
                                     sliding_to_rolling_speed_threshold)
-                .getFutureVelocity(time_step);
+                .estimateFutureVelocity(time_step);
         //        if (future_velocity.length() < sliding_to_rolling_speed_threshold)
         //        {
         //            // initial kick speed is no longer relevant once ball is rolling

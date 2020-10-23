@@ -2,7 +2,8 @@
 
 #include <optional>
 
-#include "software/world/ball_model/ball_model.h"
+#include "software/time/duration.h"
+#include "software/world/ball_state.h"
 
 /**
  * TwoStageLinearBallModel is a BallModel that makes the following assumptions about the
@@ -12,7 +13,7 @@
  * 3. rolls with a constant rolling friction below a certain speed threshold
  * 4. the transition between sliding and rolling is instantaneous
  */
-class TwoStageLinearBallModel final : public BallModel
+class TwoStageLinearBallModel
 {
    public:
     TwoStageLinearBallModel() = delete;
@@ -34,9 +35,7 @@ class TwoStageLinearBallModel final : public BallModel
         double sliding_friction_acceleration_m_per_s_squared = 0,
         double sliding_to_rolling_speed_threshold_m_per_s    = 0);
 
-    BallState estimateFutureState(const Duration &duration_in_future) override;
-
-    Vector getFutureVelocity(const Duration &duration_in_future);
+    Vector estimateFutureVelocity(const Duration &duration_in_future);
 
    private:
     const BallState initial_ball_state_;
@@ -46,29 +45,4 @@ class TwoStageLinearBallModel final : public BallModel
     double sliding_friction_acceleration_m_per_s_squared_;
     // threshold above which the ball slides and below which the ball rolls
     double sliding_to_rolling_speed_threshold_m_per_s_;
-
-    /**
-     * Applies linear friction model
-     *
-     * @param duration_in_future Duration into the future
-     *
-     * @return future ball state
-     */
-    BallState applyLinearFrictionModel(const Duration &duration_in_future) const;
-
-    /**
-     * Calculates the future ball state assuming constant acceleration opposing the
-     * velocity of the ball
-     *
-     * @param initial_ball_state The initial ball state
-     * @param constant_friction_acceleration_m_per_s The magnitude of the acceleration due
-     * to friction
-     * @param duration_in_future Duration into the future
-     *
-     * @return future ball state
-     */
-    BallState calculateFutureBallState(
-        const BallState &initial_ball_state,
-        const double constant_friction_acceleration_m_per_s,
-        const Duration &duration_in_future) const;
 };
