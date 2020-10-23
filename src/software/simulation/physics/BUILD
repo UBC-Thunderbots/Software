@@ -48,9 +48,9 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//software/geom/algorithms",
+        "//software/physics",
         "//software/time:duration",
         "//software/world:ball_state",
-        "//software/world/ball_model:two_stage_linear_ball_model",
         "@box2d",
     ],
 )
