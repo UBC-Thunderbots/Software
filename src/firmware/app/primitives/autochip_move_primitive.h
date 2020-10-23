@@ -1,7 +1,6 @@
 #pragma once
 
 #include "firmware/app/primitives/primitive.h"
-#include "shared/proto/primitive.nanopb.h"
 
 extern const primitive_t AUTOCHIP_MOVE_PRIMITIVE;
 
