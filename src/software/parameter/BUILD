@@ -43,6 +43,9 @@ cc_library(
     name = "config",
     hdrs = ["config.h"],
     deps = [
+        ":enumerated_parameter",
+        ":numeric_parameter",
+        "//software/world:game_state",
         "@boost//:program_options",
     ],
 )
