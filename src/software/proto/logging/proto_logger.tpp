@@ -39,7 +39,7 @@ ProtoLogger<Msg>::ProtoLogger(
         LOG(INFO) << "Created directory " << output_dir_path;
     }
 
-    // set the current chunk's message_type to the name of Msg's type
+    // set the current chunk's message_type to the name of MsgT's type
     *current_chunk.mutable_message_type() = TYPENAME(Msg);
 
     LOG(INFO) << "Logging " << TYPENAME(Msg) << " to " << output_dir_path.string();
@@ -79,7 +79,7 @@ void ProtoLogger<Msg>::saveCurrentChunk()
         std::sort(current_chunk.mutable_messages()->begin(),
                   current_chunk.mutable_messages()->end(),
                   [this](const google::protobuf::Any& l, const google::protobuf::Any& r) {
-                      // we have to convert the Any's back into Msg here in order to sort
+                      // we have to convert the Any's back into MsgT here in order to sort
                       // them and this also provides a cleaner interface externally for
                       // the sort comparator
                       Msg lhs;

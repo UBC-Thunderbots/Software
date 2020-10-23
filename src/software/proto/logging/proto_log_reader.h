@@ -19,7 +19,7 @@ class ProtoLogReader
 
     /**
      * Returns the next `Any` message from the current `RepeatedAnyMsg` message, unpacked
-     * into the desired type `Msg`. Throws std::invalid_argument if unsuccessful.
+     * into the desired type `MsgT`. Throws std::invalid_argument if unsuccessful.
      *
      * @return the next recorded SensorProto if available, nullopt otherwise.
      */
@@ -60,7 +60,7 @@ template <typename Msg>
 std::optional<Msg> ProtoLogReader::getNextMsg()
 {
     static_assert(std::is_base_of_v<google::protobuf::Message, Msg>,
-                  "Msg must be a derived class of google::protobuf::Messsage!");
+                  "MsgT must be a derived class of google::protobuf::Messsage!");
 
     if (!hasNextMsg())
     {

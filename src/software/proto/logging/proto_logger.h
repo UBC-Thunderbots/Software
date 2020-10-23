@@ -4,17 +4,17 @@
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/proto/repeated_any_msg.pb.h"
 
-template <typename Msg>
-class ProtoLogger : public FirstInFirstOutThreadedObserver<Msg>
+template <typename MsgT>
+class ProtoLogger : public FirstInFirstOutThreadedObserver<MsgT>
 {
     static_assert(
-        std::is_base_of_v<google::protobuf::Message, Msg>,
+        std::is_base_of_v<google::protobuf::Message, MsgT>,
         "ProtoLogger can only be instantiated with a protobuf message as template parameter!");
 
    public:
     /**
      * Constructs a Protobuf Logger. _msgs_per_chunk is a parameter that sets
-     * how many individual Msg's go into one 'chunk' file. We separate replays into files
+     * how many individual MsgT's go into one 'chunk' file. We separate replays into files
      * of a certain number of messages to reduce the amount of lost data in the case of a
      * crash.
      *
@@ -24,7 +24,7 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<Msg>
      */
     explicit ProtoLogger(const std::string& output_directory,
                          int _msgs_per_chunk = DEFAULT_MSGS_PER_CHUNK,
-                         std::optional<std::function<bool(const Msg&, const Msg&)>>
+                         std::optional<std::function<bool(const MsgT&, const MsgT&)>>
                              message_sort_comparator = std::nullopt);
 
     // if we allow copying of a `ProtoLogger`, we could end up with 2 `ProtoLogger`s
@@ -36,12 +36,13 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<Msg>
 
    private:
     /**
-     * Adds a Msg to the current chunk. This will also save it to disk and clear the chunk
-     * in memory, if the chunk contains `msgs_per_chunk` messages after the addition.
+     * Adds a MsgT to the current chunk. This will also save it to disk and clear the
+     * chunk in memory, if the chunk contains `msgs_per_chunk` messages after the
+     * addition.
      *
-     * @param frame a Msg
+     * @param frame a MsgT
      */
-    void onValueReceived(Msg msg) override;
+    void onValueReceived(MsgT msg) override;
 
     /**
      * Increments the chunk index of the file we are writing to.
@@ -58,7 +59,7 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<Msg>
     size_t current_chunk_idx;
     std::experimental::filesystem::path output_dir_path;
     const int msgs_per_chunk;
-    std::optional<std::function<bool(Msg, Msg)>> sort_comparator;
+    std::optional<std::function<bool(MsgT, MsgT)>> sort_comparator;
 };
 
 
