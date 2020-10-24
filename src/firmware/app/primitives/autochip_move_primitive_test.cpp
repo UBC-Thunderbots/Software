@@ -108,5 +108,4 @@ TEST_F(FirmwareWorldTest, app_autochip_move_primitive_test)
     app_primitive_manager_startNewPrimitive(manager, firmware_world, primitive_msg);
     ASSERT_EQ(set_requested_rpm_fake.arg0_val, 1.0);
     ASSERT_EQ(auto_chip_fake.arg0_val, 2.0);
-    EXPECT_EQ(0, 0);
 }
