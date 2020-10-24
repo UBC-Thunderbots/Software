@@ -8,8 +8,6 @@
 class ExamplePlay : public Play
 {
    public:
-    static const std::string name;
-
     ExamplePlay() = default;
 
     /**
