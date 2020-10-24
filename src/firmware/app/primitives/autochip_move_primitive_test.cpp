@@ -35,58 +35,53 @@ FAKE_VOID_FUNC(request_wheel_force, float);
 FAKE_VALUE_FUNC(float, get_motor_speed);
 FAKE_VOID_FUNC(brake);
 FAKE_VOID_FUNC(coast);
+
 WheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
-        .motor_phase_resistance              = 1.2f,
-        .motor_back_emf_per_rpm              = 1.3f,
-        .motor_max_voltage_before_wheel_slip = 1.4f,
-        .wheel_radius                        = 1.5f,
-        .wheel_rotations_per_motor_rotation  = 0.5f};
+                                    .motor_phase_resistance              = 1.2f,
+                                    .motor_back_emf_per_rpm              = 1.3f,
+                                    .motor_max_voltage_before_wheel_slip = 1.4f,
+                                    .wheel_radius                        = 1.5f,
+                                    .wheel_rotations_per_motor_rotation  = 0.5f};
 
 // Mock controller state
-ControllerState_t controller_state = {.last_applied_acceleration_x = 2.33f,
-                                .last_applied_acceleration_y = 1.22f,
-                                .last_applied_acceleration_angular = 3.22f};
+ControllerState_t controller_state = {.last_applied_acceleration_x       = 2.33f,
+                                      .last_applied_acceleration_y       = 1.22f,
+                                      .last_applied_acceleration_angular = 3.22f};
 
 // Mock robot constants
-RobotConstants_t robot_constants = {.mass              = 1.1f,
-        .moment_of_inertia = 1.2f,
-        .robot_radius      = 1.3f,
-        .jerk_limit        = 1.4f};
+RobotConstants_t robot_constants = {
+    .mass = 1.1f, .moment_of_inertia = 1.2f, .robot_radius = 1.3f, .jerk_limit = 1.4f};
 
 // Mock fake ball functions
 FAKE_VALUE_FUNC(float, get_ball_property);
 
 class FirmwareWorldTest : public testing::Test
 {
-protected:
+   protected:
     virtual void SetUp(void)
     {
-        Charger_t* charger = app_charger_create(&(charge_capacitor),
-                                                &(discharge_capacitor),
-                                                &(float_capacitor));
+        Charger_t* charger = app_charger_create(
+            &(charge_capacitor), &(discharge_capacitor), &(float_capacitor));
 
-        Chicker_t* chicker = app_chicker_create(&(set_kick_speed),
-        &(set_chip_distance),
-        &(auto_kick),
-        &(auto_chip),
-        &(disable_auto_chip),
-        &(disable_auto_kick));
+        Chicker_t* chicker =
+            app_chicker_create(&(set_kick_speed), &(set_chip_distance), &(auto_kick),
+                               &(auto_chip), &(disable_auto_chip), &(disable_auto_kick));
 
         Dribbler_t* dribbler = app_dribbler_create(&(set_requested_rpm), &(enable_coast),
                                                    &(get_temperature_deg_c));
 
-        Wheel_t* wheel = app_wheel_create(&(request_wheel_force),
-                                  &(get_motor_speed), &(brake),
-                                  &(coast), wheel_constants);
+        Wheel_t* wheel = app_wheel_create(&(request_wheel_force), &(get_motor_speed),
+                                          &(brake), &(coast), wheel_constants);
 
         FirmwareRobot_t* robot = app_firmware_robot_create(
-                charger, chicker, dribbler, &(get_robot_property), &(get_robot_property),
-                &(get_robot_property), &(get_robot_property), &(get_robot_property),
-                &(get_robot_property), &(get_robot_property), wheel,
-                wheel, wheel, wheel, &controller_state, robot_constants);
+            charger, chicker, dribbler, &(get_robot_property), &(get_robot_property),
+            &(get_robot_property), &(get_robot_property), &(get_robot_property),
+            &(get_robot_property), &(get_robot_property), wheel, wheel, wheel, wheel,
+            &controller_state, robot_constants);
 
-        FirmwareBall_t* ball = app_firmware_ball_create(&(get_ball_property), &(get_ball_property),
-                &(get_ball_property), &(get_ball_property));
+        FirmwareBall_t* ball =
+            app_firmware_ball_create(&(get_ball_property), &(get_ball_property),
+                                     &(get_ball_property), &(get_ball_property));
 
         firmware_world = app_firmware_world_create(robot, ball);
     }
@@ -104,14 +99,14 @@ TEST_F(FirmwareWorldTest, app_autochip_move_primitive_test)
     TbotsProto_Primitive primitive_msg;
     primitive_msg.which_primitive = TbotsProto_Primitive_autochip_move_tag;
     TbotsProto_AutochipMovePrimitive autochip_primitive_msg;
-    autochip_primitive_msg.dribbler_speed_rpm = 1.0;
+    autochip_primitive_msg.dribbler_speed_rpm   = 1.0;
     autochip_primitive_msg.chip_distance_meters = 2.0;
-    primitive_msg.primitive.autochip_move = autochip_primitive_msg;
+    primitive_msg.primitive.autochip_move       = autochip_primitive_msg;
 
     PrimitiveManager_t* manager = app_primitive_manager_create();
 
-    app_primitive_manager_startNewPrimitive(manager,
-                                            firmware_world,
-                                            primitive_msg);
+    app_primitive_manager_startNewPrimitive(manager, firmware_world, primitive_msg);
+    ASSERT_EQ(set_requested_rpm_fake.arg0_val, 1.0);
+    ASSERT_EQ(auto_chip_fake.arg0_val, 2.0);
     EXPECT_EQ(0, 0);
 }

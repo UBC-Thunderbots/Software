@@ -165,8 +165,7 @@ TEST_F(FirmwareRobotTest, getBackLeftWheel)
 TEST_F(FirmwareRobotTest, getRobotConstants)
 {
     RobotConstants_t constants = app_firmware_robot_getRobotConstants(firmware_robot);
-    app_firmware_robot_create
-    EXPECT_NEAR(1.1, constants.mass, 1e-5);
+    app_firmware_robot_create EXPECT_NEAR(1.1, constants.mass, 1e-5);
     EXPECT_NEAR(1.2, constants.moment_of_inertia, 1e-5);
     EXPECT_NEAR(1.3, constants.robot_radius, 1e-5);
     EXPECT_NEAR(1.4, constants.jerk_limit, 1e-5);
