@@ -70,7 +70,7 @@ TEST(ProtoLoggerLogReaderTest, test_read_and_write_proto_log)
     {
         subject.sendValue(msg);
         // we have 3000 frames of replay_logging so we have to try to not fill the buffer
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
     // unfortunately we have to do this because there is otherwise no way to 'guarantee'
     // that the entire buffer of messages in the ThreadedObserver has been cleared and
