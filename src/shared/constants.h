@@ -119,5 +119,5 @@ const unsigned NETWORK_TIMEOUT_MS = 1000;
 // this is an int to avoid Wconversion with lwip
 const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 
-// The total number of possible robot ids between two teams on the playing field
+// The total number of possible robot ids between two teams
 const int MAX_ROBOT_IDS = 16;

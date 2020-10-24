@@ -219,6 +219,7 @@ std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(
     return std::nullopt;
 }
 
+// TODO (1610)
 Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_friendly_team =
