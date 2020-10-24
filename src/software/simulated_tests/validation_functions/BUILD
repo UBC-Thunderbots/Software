@@ -11,7 +11,6 @@ cc_library(
         "robot_received_ball_validation.h",
     ],
     deps = [
-        "//software/ai/evaluation:robot",
         "//software/geom/algorithms",
         "//software/simulated_tests/validation:validation_function",
         "//software/world",
