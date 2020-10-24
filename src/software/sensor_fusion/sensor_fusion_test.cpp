@@ -442,6 +442,8 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
     sensor_fusion.updateWorld(sensor_msg);
     World result = *sensor_fusion.getWorld();
 
+    // ball placement is only set when the Referee command is for friendly team
+    // so result should remain std::nullopt
     std::optional<Point> returned_point = result.gameState().getBallPlacementPoint();
     EXPECT_EQ(std::nullopt, returned_point);
 }
