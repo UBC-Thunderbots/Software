@@ -1,0 +1,24 @@
+SimulatorConfig:
+  SlidingFrictionAcceleration:
+    min: 0
+    max: 10
+    default: 0.0
+    type: "double"
+    description: >-
+      The scalar friction acceleration in m/s^2 that is applied to the ball 
+      while the ball is sliding
+  RollingFrictionAcceleration:
+    min: 0
+    max: 10
+    default: 0.0
+    type: "double"
+    description: >-
+      The scalar friction acceleration in m/s^2 that is applied to the ball 
+      while the ball is rolling
+  BallRestitution:
+    min: 0
+    max: 1.0
+    default: 1.0
+    type: "double"
+    description: >-
+      The restitution factor of the ball when the ball collides with other objects

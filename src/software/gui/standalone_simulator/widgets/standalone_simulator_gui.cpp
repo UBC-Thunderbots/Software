@@ -52,7 +52,7 @@ StandaloneSimulatorGUI::StandaloneSimulatorGUI(
 
     main_widget->simulation_graphics_view->setStandaloneSimulator(standalone_simulator);
     main_widget->dynamic_parameter_widget->setupParameters(
-        MutableDynamicParameters->getMutableStandaloneSimulatorConfig());
+        MutableDynamicParameters->getMutableSimulatorConfig());
 
     connect(update_timer, &QTimer::timeout, this, &StandaloneSimulatorGUI::handleUpdate);
     update_timer->start(static_cast<int>(
