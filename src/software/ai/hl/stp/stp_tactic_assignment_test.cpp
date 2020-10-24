@@ -374,7 +374,7 @@ TEST_F(STPTacticAssignmentTest,
     Team friendly_team(Duration::fromSeconds(0));
     // this robot has no capabilities
     Robot robot_0(0, Point(0.1, 0.1), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0), 10, allRobotCapabilities());
+                  Timestamp::fromSeconds(0), allRobotCapabilities());
     Robot robot_1(1, Point(-10, -10), Vector(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});

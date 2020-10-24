@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/constants.h"
 #include "software/multithreading/thread_safe_buffer.h"
 
 /**
@@ -69,7 +70,7 @@ class Observer
 
    private:
     ThreadSafeBuffer<T> buffer;
-    boost::circular_buffer<std::chrono::milliseconds> time_buffer;
+    boost::circular_buffer<std::chrono::milliseconds> receive_time_buffer;
 };
 
 #include "software/multithreading/observer.tpp"

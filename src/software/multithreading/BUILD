@@ -6,7 +6,10 @@ cc_library(
         "observer.h",
         "observer.tpp",
     ],
-    deps = [":thread_safe_buffer"],
+    deps = [
+        ":thread_safe_buffer",
+        "//shared:constants",
+    ],
 )
 
 cc_library(

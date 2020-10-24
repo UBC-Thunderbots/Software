@@ -41,12 +41,10 @@ double ratePass(const World& world, const Pass& pass,
                                       ->MaxTimeOffsetForPassSeconds()
                                       ->value();
     double pass_time_offset_quality =
-        sigmoid(pass.startTime().getSeconds(),
-                min_pass_time_offset + world.getMostRecentTimestamp().getSeconds(), 0.5) *
-        (1 -
-         sigmoid(pass.startTime().getSeconds(),
-                 max_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(),
-                 0.5));
+        sigmoid(pass.startTime().toSeconds(),
+                min_pass_time_offset + world.getMostRecentTimestamp().toSeconds(), 0.5) *
+        (1 - sigmoid(pass.startTime().toSeconds(),
+                     max_pass_time_offset + world.ball().timestamp().toSeconds(), 0.5));
 
     // Place strict limits on the ball speed
     double min_pass_speed = DynamicParameters->getAIConfig()
@@ -207,7 +205,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
-    Duration time_until_pass     = pass.startTime() - enemy_robot.lastUpdateTimestamp();
+    Duration time_until_pass     = pass.startTime() - enemy_robot.timestamp();
     Duration enemy_reaction_time = Duration::fromSeconds(DynamicParameters->getAIConfig()
                                                              ->getPassingConfig()
                                                              ->EnemyReactionTime()
@@ -216,11 +214,11 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
     double robot_ball_time_diff_at_closest_pass_point =
         ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
          (ball_time_to_closest_pass_point + time_until_pass))
-            .getSeconds();
+            .toSeconds();
     double robot_ball_time_diff_at_pass_receive_point =
         ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
          (ball_time_to_pass_receive_position + time_until_pass))
-            .getSeconds();
+            .toSeconds();
 
     double min_time_diff = std::min(robot_ball_time_diff_at_closest_pass_point,
                                     robot_ball_time_diff_at_pass_receive_point);
@@ -278,7 +276,7 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
         best_receiver.position(), pass.receiverPoint(), ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Timestamp earliest_time_to_receive_point =
-        best_receiver.lastUpdateTimestamp() + min_robot_travel_time;
+        best_receiver.timestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
     Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
@@ -286,7 +284,7 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
         best_receiver.orientation(), receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
         ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
     Timestamp earliest_time_to_receive_angle =
-        best_receiver.lastUpdateTimestamp() + time_to_receive_angle;
+        best_receiver.timestamp() + time_to_receive_angle;
 
     // Figure out if rotation or moving will take us longer
     Timestamp latest_time_to_reciever_state =
@@ -294,8 +292,8 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
-    return sigmoid(receive_time.getSeconds(),
-                   latest_time_to_reciever_state.getSeconds() + 0.25, 0.5);
+    return sigmoid(receive_time.toSeconds(),
+                   latest_time_to_reciever_state.toSeconds() + 0.25, 0.5);
 }
 
 double getStaticPositionQuality(const Field& field, const Point& position)

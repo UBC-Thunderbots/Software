@@ -116,7 +116,7 @@ class BallFilterTest : public ::testing::Test
         Duration max_ball_travel_duration =
             Duration::fromSeconds(ball_path.length() / ball_velocity_magnitude);
         int num_iterations = static_cast<int>(
-            std::round(max_ball_travel_duration.getSeconds() / time_step.getSeconds()));
+            std::round(max_ball_travel_duration.toSeconds() / time_step.toSeconds()));
 
         testFilterHelper(start_time, ball_starting_position, ball_velocity,
                          ball_position_variance, time_step_variance,
@@ -179,8 +179,8 @@ class BallFilterTest : public ::testing::Test
             // than expected on the last iteration so the ball's final position is close
             // to what's expected by the caller of this function
             Timestamp current_timestamp_with_noise =
-                start_time + Duration::fromSeconds(i * time_step.getSeconds() +
-                                                   time_step_noise.getSeconds());
+                start_time + Duration::fromSeconds(i * time_step.toSeconds() +
+                                                   time_step_noise.toSeconds());
             this->current_timestamp = std::min(current_timestamp_with_noise,
                                                start_time + max_ball_travel_duration);
 
@@ -189,7 +189,7 @@ class BallFilterTest : public ::testing::Test
             Duration time_diff = current_timestamp - start_time;
             Point current_ball_position =
                 ball_starting_position +
-                ball_velocity.normalize(ball_velocity.length() * time_diff.getSeconds());
+                ball_velocity.normalize(ball_velocity.length() * time_diff.toSeconds());
 
             // Apply noise to the ball's position to simulate measurement noise
             Point ball_position_with_noise = current_ball_position + position_noise;
@@ -209,7 +209,7 @@ class BallFilterTest : public ::testing::Test
 
             ASSERT_TRUE(filtered_ball);
             double ball_position_difference =
-                (filtered_ball->state().position() - current_ball_position).length();
+                (filtered_ball->position() - current_ball_position).length();
             EXPECT_LT(ball_position_difference, expected_position_tolerance);
             // Only check the velocity once we have more than 1 data entry in the filter
             // since the filter can't return a realistic velocity with only a single
@@ -218,8 +218,7 @@ class BallFilterTest : public ::testing::Test
             {
                 // Check the direction of the velocity
                 double velocity_orientation_difference =
-                    std::fabs(filtered_ball->state()
-                                  .velocity()
+                    std::fabs(filtered_ball->velocity()
                                   .orientation()
                                   .minDiff(ball_velocity.orientation())
                                   .toDegrees());
@@ -227,7 +226,7 @@ class BallFilterTest : public ::testing::Test
                           expected_velocity_angle_tolerance.toDegrees());
                 // Check the magnitude of the velocity
                 double velocity_magnitude_difference = std::fabs(
-                    filtered_ball->state().velocity().length() - ball_velocity.length());
+                    filtered_ball->velocity().length() - ball_velocity.length());
                 EXPECT_LE(velocity_magnitude_difference,
                           expected_velocity_magnitude_tolerance);
             }

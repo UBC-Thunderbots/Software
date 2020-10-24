@@ -51,8 +51,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // ourselves in the best position possible to take the pass
     // We wait for the ball to start moving at least a bit to make sure the passer
     // has actually started the pass
-    while (ball.lastUpdateTimestamp() < pass.startTime() ||
-           ball.velocity().length() < 0.5)
+    while (ball.timestamp() < pass.startTime() || ball.velocity().length() < 0.5)
     {
         // If there is a feasible shot we can take, we want to wait for the pass at the
         // halfway point between the angle required to receive the ball and the angle

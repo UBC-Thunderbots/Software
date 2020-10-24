@@ -26,7 +26,6 @@
 #include <unused.h>
 
 #include "firmware/app/primitives/primitive.h"
-#include "firmware/app/primitives/stop_primitive.h"
 #include "firmware/shared/physics.h"
 #include "io/charger.h"
 #include "io/chicker.h"
@@ -39,7 +38,6 @@
 #include "main.h"
 #include "pb_encode.h"
 #include "priority.h"
-#include "shared/proto/primitive.nanopb.h"
 
 /**
  * \brief The number of robots in the drive packet.
@@ -180,16 +178,9 @@ void receive_tick(log_record_t *record)
     // Decrement timeout tick counter if nonzero.
     if (timeout_ticks == 1)
     {
-        timeout_ticks = 0;
-        charger_enable(false);
-        chicker_discharge(true);
-
-        TbotsProto_Primitive primitive_msg = TbotsProto_Primitive_init_zero;
-        primitive_msg.which_primitive      = TbotsProto_Primitive_stop_tag;
-
-        xSemaphoreTake(drive_mtx, portMAX_DELAY);
-        app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive_msg);
-        xSemaphoreGive(drive_mtx);
+        timeout_ticks = 1;
+        // Make robot safe by discharging through chicker and stopping all motors
+        app_primitive_makeRobotSafe(world);
     }
     else if (timeout_ticks > 1)
     {
@@ -222,12 +213,8 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
     TbotsProto_Primitive prim_msg = TbotsProto_Primitive_init_zero;
     if (estop_triggered)
     {
-        // Set the primitive to bring the robot to a stop
-        prim_msg.which_primitive = TbotsProto_Primitive_stop_tag;
-
-        // Disable charging and discharge through chicker
-        charger_enable(false);
-        chicker_discharge(true);
+        // Make robot safe by discharging through chicker and stopping all motors
+        app_primitive_makeRobotSafe(world);
     }
     else
     {
@@ -240,19 +227,16 @@ void handle_drive_packet(uint8_t *packet_data, size_t packet_size)
             // proceed
             return;
         }
+        // We rely on the primitive manager to set the charger to the right state
+        //
+        // Take the drive mutex.
+        xSemaphoreTake(drive_mtx, portMAX_DELAY);
 
-        // Enable charging
-        charger_enable(true);
-        chicker_discharge(false);
+        app_primitive_manager_startNewPrimitive(primitive_manager, world, prim_msg);
+
+        // Release the drive mutex.
+        xSemaphoreGive(drive_mtx);
     }
-
-    // Take the drive mutex.
-    xSemaphoreTake(drive_mtx, portMAX_DELAY);
-
-    app_primitive_manager_startNewPrimitive(primitive_manager, world, prim_msg);
-
-    // Release the drive mutex.
-    xSemaphoreGive(drive_mtx);
 }
 
 void handle_camera_packet(uint8_t *dma_buffer, uint8_t buffer_position)
