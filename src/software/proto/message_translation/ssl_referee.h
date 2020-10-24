@@ -3,7 +3,7 @@
 #include "software/geom/point.h"
 #include "software/proto/ssl_gc_referee_message.pb.h"
 #include "software/world/game_state.h"
-#include "software/world/team_colour.h"
+#include "software/world/team_types.h"
 
 /**
  * Converts a SSLProto::Referee packet into a RefereeCommand for the GameController

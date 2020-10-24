@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/circular_buffer.hpp>
 #include <cstdlib>
 #include <map>
 #include <optional>
@@ -20,12 +19,9 @@ class Team
      *
      * @param robot_expiry_buffer_duration The Duration for which a robot must not
      * have been updated for before it is removed from the team
-     * @param buffer_size The number of elements in the Timestamp history buffer of the
-     * Team object
      */
     explicit Team(
-        const Duration& robot_expiry_buffer_duration = Duration::fromMilliseconds(50),
-        unsigned int buffer_size                     = 20);
+        const Duration& robot_expiry_buffer_duration = Duration::fromMilliseconds(50));
 
     /**
      * Create a new team
@@ -112,7 +108,7 @@ class Team
      * @return the Duration for which a Robot must not have been updated for before
      * being removed from this team.
      */
-    Duration getRobotExpiryBufferDuration() const;
+    const Duration& getRobotExpiryBufferDuration() const;
 
     /**
      * Sets the Duration for which a Robot must not have been updated for before being
@@ -177,7 +173,7 @@ class Team
      * @return the timestamp of the most recently updated robot on this team, or
      *         std::nullopt if this team is empty
      */
-    std::optional<Timestamp> lastUpdateTimestamp() const;
+    std::optional<Timestamp> timestamp() const;
 
     /**
      * Defines the equality operator for a Team. Teams are equal if their robots are equal
@@ -197,13 +193,6 @@ class Team
     bool operator!=(const Team& other) const;
 
     /**
-     * Returns the entire update Timestamp history for Field object
-     *
-     * @return boost::circular_buffer of Timestamp history for the Field object
-     */
-    boost::circular_buffer<Timestamp> getTimestampHistory() const;
-
-    /**
      * Returns the most Timestamp corresponding to the most recent update to Field object
      *
      * @return Timestamp : The Timestamp corresponding to the most recent update to the
@@ -213,11 +202,14 @@ class Team
 
    private:
     /**
-     * Updates the timestamp history for the Field object
+     * Updates the last update timestamp
      *
-     * @param time_stamp : The timestamp at which the Field object was updated
+     * @param timestamp The last time this Team was updated
+     *
+     * @throws std::invalid_argument if timestamp is older than the current last update
+     * timestamp
      */
-    void updateTimestamp(Timestamp time_stamp);
+    void updateTimestamp(Timestamp timestamp);
 
     /**
      * Returns the most recent Timestamp from all robots in a Team
@@ -236,9 +228,7 @@ class Team
     // being removed from this team.
     Duration robot_expiry_buffer_duration;
 
-    // All previous timestamps of when the field was updated, with the most recent
-    // timestamp at the front of the queue,
-    boost::circular_buffer<Timestamp> last_update_timestamps;
+    Timestamp last_update_timestamp;
 };
 
 enum class TeamType

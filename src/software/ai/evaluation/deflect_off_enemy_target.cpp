@@ -40,7 +40,8 @@ Point deflect_off_enemy_target(World world)
             if (fabs(enemy_robot.position().y() - closestEdgeY) < shortest_len_to_edge)
             {
                 enemy_closest_to_edge = enemy_robot;
-                enemy_closest_to_edge.updateState(enemy_robot.currentState());
+                enemy_closest_to_edge.updateState(enemy_robot.currentState(),
+                                                  enemy_robot.timestamp());
                 shortest_len_to_edge = fabs(enemy_robot.position().y() - closestEdgeY);
             }
         }
