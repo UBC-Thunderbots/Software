@@ -69,4 +69,11 @@ template <typename STATE_TYPE>
 std::optional<STATE_TYPE> findState(boost::circular_buffer<STATE_TYPE> states,
                                     Timestamp& timestamp);
 
-bool pointNearRobot(Point point, Robot robot);
+/**
+ * Checks if the given point is within a circle of radius ROBOT_MAX_RADIUS_METERS + 0.2
+ * with the centre of that circle being the centre of the robot
+ * @param point the point to check against the circle
+ * @param robot the robot we are concerned about
+ * @return true if the given point is within the circle, false otherwise
+ */
+bool pointNearRobot(const Point& point, const Robot& robot);

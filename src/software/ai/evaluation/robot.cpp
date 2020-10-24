@@ -143,7 +143,7 @@ std::optional<STATE_TYPE> findState(boost::circular_buffer<STATE_TYPE> states,
     return std::nullopt;
 }
 
-bool pointNearRobot(Point point, Robot robot)
+bool pointNearRobot(const Point& point, const Robot& robot)
 {
     Vector vector_to_test_point                     = point - robot.position();
     static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + 0.2;

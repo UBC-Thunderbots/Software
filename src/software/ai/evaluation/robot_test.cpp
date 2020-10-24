@@ -461,7 +461,6 @@ TEST(RobotIsNearDribblerTest, ball_near_dribbler_directly_in_front_of_robot)
                         timestamp);
 
     EXPECT_TRUE(pointNearRobot(ball_position, robot));
-    EXPECT_TRUE(pointNearRobot(ball_position, robot));
 }
 
 TEST(RobotIsNearDribblerTest, ball_near_dribbler_ball_to_side_of_robot)
