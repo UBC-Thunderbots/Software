@@ -1,5 +1,6 @@
 #include "software/simulation/simulator_robot_singleton.h"
 
+#include "shared/proto/robot_log_msg.pb.h"
 #include "software/logger/logger.h"
 #include "software/world/field.h"
 
@@ -123,12 +124,12 @@ void SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
 
 void SimulatorRobotSingleton::handleBlueRobotLogProto(TbotsProto_RobotLog log)
 {
-    SimulatorRobotSingleton::handleRobotLogProto(log, "Blue");
+    SimulatorRobotSingleton::handleRobotLogProto(log, "BLUE");
 }
 
 void SimulatorRobotSingleton::handleYellowRobotLogProto(TbotsProto_RobotLog log)
 {
-    SimulatorRobotSingleton::handleRobotLogProto(log, "Yellow");
+    SimulatorRobotSingleton::handleRobotLogProto(log, "YELLOW");
 }
 
 void SimulatorRobotSingleton::checkValidAndExecuteVoid(
@@ -379,29 +380,9 @@ void SimulatorRobotSingleton::brakeMotorFrontRight()
 void SimulatorRobotSingleton::handleRobotLogProto(TbotsProto_RobotLog log,
                                                   const std::string& team_colour)
 {
-    std::string log_level = "";
-
-    switch (log.log_level)
-    {
-        case TbotsProto_LogLevel_DEBUG:
-            log_level = "DEBUG";
-            break;
-        case TbotsProto_LogLevel_INFO:
-            log_level = "INFO";
-            break;
-        case TbotsProto_LogLevel_WARN:
-            log_level = "WARN";
-            break;
-        case TbotsProto_LogLevel_FATAL:
-            log_level = "FATAL";
-            break;
-        default:
-            log_level = "UNKNOWN";
-            break;
-    }
-
-    std::cout << "[" << log_level << "]"
-              << "[" << team_colour << " Robot " << log.robot_id << "]"
-              << "[" << log.file_name << ":" << log.line_number << "]" << log.log_msg
-              << std::endl;
+    LOG(INFO) << "[" << team_colour << " ROBOT " << log.robot_id << " "
+              << TbotsProto::LogLevel_Name(
+                     static_cast<TbotsProto::LogLevel>(log.log_level))
+              << "]"
+              << "[" << log.file_name << ":" << log.line_number << "]: " << log.log_msg;
 }

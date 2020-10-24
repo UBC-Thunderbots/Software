@@ -67,6 +67,7 @@ cc_library(
         "//firmware/app/world:firmware_robot",
         "//firmware/app/world:wheel",
         "//firmware/shared:physics",
+        "//shared/proto:tbots_cc_proto",
         "//software/logger",
         "//software/world:field",
     ],
@@ -139,6 +140,7 @@ cc_library(
         "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:field",
+        "//software/world:team_colour",
     ],
 )
 

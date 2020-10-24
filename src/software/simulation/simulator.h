@@ -7,7 +7,7 @@
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
 #include "software/world/field.h"
-#include "software/world/team_colour.h"
+#include "software/world/team_types.h"
 #include "software/world/world.h"
 
 extern "C"

@@ -44,29 +44,8 @@ void status_callback(TbotsProto::RobotStatus test)
 
 void log_callback(TbotsProto::RobotLog log)
 {
-    std::string log_level = "";
-
-    switch (log.log_level())
-    {
-        case TbotsProto::LogLevel::DEBUG:
-            log_level = "DEBUG";
-            break;
-        case TbotsProto::LogLevel::INFO:
-            log_level = "INFO";
-            break;
-        case TbotsProto::LogLevel::WARN:
-            log_level = "WARN";
-            break;
-        case TbotsProto::LogLevel::FATAL:
-            log_level = "FATAL";
-            break;
-        default:
-            log_level = "UNKNOWN";
-            break;
-    }
-
-    std::cout << "[" << log_level << "]"
-              << "[Robot " << log.robot_id() << "]"
+    LOG(INFO) << "[ROBOT " << log.robot_id() << " " << LogLevel_Name(log.log_level())
+              << "]"
               << "[" << log.file_name() << ":" << log.line_number()
               << "]: " << log.log_msg() << std::endl;
 }
