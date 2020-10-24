@@ -42,7 +42,7 @@ Windows has a Windows Subsystem for Linux component that can be used to develop 
 2. Start WSL and use your terminal text editor of choice to edit `/etc/profile.d/wsl-integration.sh` and change the line `export LIBGL_ALWAYS_INDIRECT=1` to `# export LIBGL_ALWAYS_INDIRECT=1`
     - This comments out the line that sets the `LIBGL_ALWAYS_INDIRECT` environment variable which sets OpenGL programs to render on the X server instead of directly using the local OpenGL drivers. Unfortunately, this only supports OpenGL 1.4 which makes thunderbots give a black window.
     - This makes WSL use the `llvmpipe` software rasterizer instead, which will run extremely poorly on low spec machines. 
-3. Create a firewall exception for VcXsrv.
+3. Create a firewall exception for VcXsrv. This is required because the X Window System communication between the Hyper-V Linux VM and the Windows-side X server appears as network traffic over the `vEthernet (WSL)` network interface from another computer.
     - Open the Start menu and type "Firewall & network protection" to take you to the firewall settings.
     - Click "Allow an app through firewall". A window will appear titled "Allow apps to communicate through Windows Defender firewall".
     - Click "Allow another app" on the window that just popped up. Hit "Browse" and navigate to where you installed "VcXsrv", usually `C:\Program Files\VcXsrv\`. Select `VcXsrv.exe`.
