@@ -25,8 +25,19 @@ int main(int argc, char **argv)
                 ->setValue(args->interface()->value());
         }
 
+        MutableDynamicParameters->getMutableSimulatorConfig()
+            ->mutableSlidingFrictionAcceleration()
+            ->setValue(6.9);
+        MutableDynamicParameters->getMutableSimulatorConfig()
+            ->mutableRollingFrictionAcceleration()
+            ->setValue(0.5);
+        MutableDynamicParameters->getMutableSimulatorConfig()
+            ->mutableBallRestitution()
+            ->setValue(0.8);
+
         auto standalone_simulator = std::make_shared<StandaloneSimulator>(
-            MutableDynamicParameters->getMutableStandaloneSimulatorConfig());
+            MutableDynamicParameters->getMutableStandaloneSimulatorConfig(),
+            MutableDynamicParameters->getMutableSimulatorConfig());
         standalone_simulator->setupInitialSimulationState();
 
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(

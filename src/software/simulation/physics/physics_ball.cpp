@@ -7,16 +7,13 @@
 #include "software/simulation/physics/physics_object_user_data.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_state,
-                         const double mass_kg, double restitution,
-                         double sliding_friction_acceleration,
-                         double rolling_friction_acceleration)
+                         const double mass_kg,
+                         std::shared_ptr<const SimulatorConfig> simulator_config)
     : in_flight_origin(std::nullopt),
       in_flight_distance_meters(0.0),
       flight_angle_of_departure(Angle::zero()),
-      ball_restitution(restitution),
       initial_kick_speed(std::nullopt),
-      sliding_friction_acceleration(sliding_friction_acceleration),
-      rolling_friction_acceleration(rolling_friction_acceleration)
+      simulator_config(simulator_config)
 //      sliding_friction_acceleration(6.9),
 //      rolling_friction_acceleration(0.5)
 {
@@ -45,9 +42,10 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
     // desired mass. The density is uniform across the shape.
     float ball_area =
         static_cast<float>(M_PI * ball_shape.m_radius * ball_shape.m_radius);
-    ball_fixture_def.density     = static_cast<float>(mass_kg / ball_area);
-    ball_fixture_def.restitution = static_cast<float>(ball_restitution);
-    ball_fixture_def.friction    = static_cast<float>(BALL_FRICTION);
+    ball_fixture_def.density = static_cast<float>(mass_kg / ball_area);
+    ball_fixture_def.restitution =
+        static_cast<float>(simulator_config->BallRestitution()->value());
+    ball_fixture_def.friction = static_cast<float>(BALL_FRICTION);
     ball_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
 
@@ -210,6 +208,8 @@ void PhysicsBall::applyBallFrictionModel(const Duration &time_step)
 Vector PhysicsBall::calculateVelocityDeltaDueToFriction(const Duration &time_step)
 {
     static constexpr double SLIDING_ROLLING_TRANSITION_FACTOR = 5.0 / 7.0;
+    const double rolling_friction_acceleration =
+        simulator_config->RollingFrictionAcceleration()->value();
 
     auto current_ball_state = getBallState();
 
@@ -239,6 +239,10 @@ Vector PhysicsBall::calculateTwoStageBallModelFutureVelocity(
 {
     const double seconds_in_future = duration_in_future.toSeconds();
     const double initial_speed     = initial_ball_velocity.length();
+    const double sliding_friction_acceleration =
+        simulator_config->SlidingFrictionAcceleration()->value();
+    const double rolling_friction_acceleration =
+        simulator_config->RollingFrictionAcceleration()->value();
 
     // Figure out how long the ball will roll/slide, if at all
     const double max_sliding_duration_secs =

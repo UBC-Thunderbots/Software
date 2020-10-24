@@ -14,14 +14,10 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-Simulator::Simulator(const Field& field, const Duration& physics_time_step)
-    : Simulator(field, 1.0, 0.0, physics_time_step)
-{
-}
-
-Simulator::Simulator(const Field& field, double ball_restitution,
-                     double ball_linear_damping, const Duration& physics_time_step)
-    : physics_world(field, ball_restitution, ball_linear_damping),
+Simulator::Simulator(const Field& field,
+                     std::shared_ptr<const SimulatorConfig> simulator_config,
+                     const Duration& physics_time_step)
+    : physics_world(field, simulator_config),
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),

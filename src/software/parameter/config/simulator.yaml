@@ -21,4 +21,5 @@ SimulatorConfig:
     default: 1.0
     type: "double"
     description: >-
-      The restitution factor of the ball when the ball collides with other objects
+      The restitution is the amount of energy retained when bouncing off walls and
+      robots, 0.0 means perfectly inelastic and 1.0 means perfectly elastic collision.

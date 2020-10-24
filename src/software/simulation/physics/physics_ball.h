@@ -6,6 +6,7 @@
 
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/time/duration.h"
 #include "software/world/ball_state.h"
 
@@ -24,14 +25,12 @@ class PhysicsBall
      * @param world A shared_ptr to a Box2D World
      * @param ball_state The initial state of the ball
      * @param mass_kg The mass of the ball in kg
-     * @param restitution The restitution of the ball
-     * @param sliding_friction_acceleration friction acceleration while ball is sliding
-     * @param rolling_friction_acceleration friction acceleration while ball is rolling
+     * @param simulator_config The config to fetch parameters from
      */
     explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
-                         const double mass_kg, double restitution = 1.0,
-                         double sliding_friction_acceleration = 0.0,
-                         double rolling_friction_acceleration = 0.0);
+                         const double mass_kg,
+                         std::shared_ptr<const SimulatorConfig> simulator_config =
+                             DynamicParameters->getSimulatorConfig());
     PhysicsBall() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
@@ -185,12 +184,8 @@ class PhysicsBall
     // friction with other objects, such as robots/wall
     static constexpr double BALL_FRICTION = 0.0;
 
-    // The restitution is the amount of energy retained when bouncing off walls and
-    // robots, 0.0 means perfectly inelastic and 1.0 means perfectly elastic collision.
-    const double ball_restitution;
-
     // initial speed a ball is kicked to model friction behaviour
-    std::optional<double> initial_kick_speed;    // m/s
-    const double sliding_friction_acceleration;  // m/s^2
-    const double rolling_friction_acceleration;  // m/s^2
+    std::optional<double> initial_kick_speed;  // m/s
+
+    std::shared_ptr<const SimulatorConfig> simulator_config;
 };
