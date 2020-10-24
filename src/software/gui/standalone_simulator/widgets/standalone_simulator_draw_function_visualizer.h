@@ -8,7 +8,7 @@
 #include "software/simulation/physics/physics_robot.h"
 #include "software/simulation/standalone_simulator.h"
 #include "software/world/robot_state.h"
-#include "software/world/team_colour.h"
+#include "software/world/team_types.h"
 
 /**
  * A custom version of the DrawFunctionVisualizer widget that allows the user to

@@ -238,8 +238,7 @@ World Simulator::getWorld() const
     Ball ball = Ball(Point(0, 0), Vector(0, 0), timestamp);
     if (physics_world.getBallState())
     {
-        ball =
-            Ball(TimestampedBallState(physics_world.getBallState().value(), timestamp));
+        ball = Ball(BallState(physics_world.getBallState().value()), timestamp);
     }
 
     // Note: The simulator currently makes the invariant that friendly robots
@@ -248,15 +247,13 @@ World Simulator::getWorld() const
     std::vector<Robot> friendly_team_robots;
     for (const auto& robot_state : physics_world.getYellowRobotStates())
     {
-        TimestampedRobotState timestamped_robot_state(robot_state.robot_state, timestamp);
-        Robot robot(robot_state.id, timestamped_robot_state);
+        Robot robot(robot_state.id, robot_state.robot_state, timestamp);
         friendly_team_robots.emplace_back(robot);
     }
     std::vector<Robot> enemy_team_robots;
     for (const auto& robot_state : physics_world.getBlueRobotStates())
     {
-        TimestampedRobotState timestamped_robot_state(robot_state.robot_state, timestamp);
-        Robot robot(robot_state.id, timestamped_robot_state);
+        Robot robot(robot_state.id, robot_state.robot_state, timestamp);
         enemy_team_robots.emplace_back(robot);
     }
 

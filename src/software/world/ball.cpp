@@ -3,28 +3,22 @@
 #include "shared/constants.h"
 #include "software/world/ball_model/two_stage_linear_ball_model.h"
 
-Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp,
-           unsigned int history_size)
-    : Ball(TimestampedBallState(position, velocity, timestamp), history_size)
+Ball::Ball(const Point &position, const Vector &velocity, const Timestamp &timestamp)
+    : Ball(BallState(position, velocity), timestamp)
 {
 }
 
-Ball::Ball(const TimestampedBallState &initial_state, unsigned int history_size)
-    : states_(history_size),
+Ball::Ball(const BallState &initial_state, const Timestamp &timestamp)
+    : current_state_(initial_state),
+      timestamp_(timestamp),
       ball_model_(std::make_shared<TwoStageLinearBallModel>(
-          TwoStageLinearBallModel(initial_state.state())))
+          TwoStageLinearBallModel(initial_state)))
 {
-    if (history_size <= 0)
-    {
-        throw std::invalid_argument("Error: history_size must be greater than 0");
-    }
-
-    updateState(initial_state);
 }
 
-TimestampedBallState Ball::currentState() const
+BallState Ball::currentState() const
 {
-    return states_.front();
+    return current_state_;
 }
 
 const std::shared_ptr<BallModel> &Ball::ballModel() const
@@ -32,36 +26,32 @@ const std::shared_ptr<BallModel> &Ball::ballModel() const
     return ball_model_;
 }
 
-void Ball::updateState(const TimestampedBallState &new_state)
+void Ball::updateState(const BallState &new_state, const Timestamp &new_timestamp)
 {
-    if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
+    if (new_timestamp < timestamp())
     {
         throw std::invalid_argument(
             "Error: Trying to update ball state using a state older then the current state");
     }
-    ball_model_ = std::make_shared<TwoStageLinearBallModel>(
-        TwoStageLinearBallModel(new_state.state()));
-    states_.push_front(new_state);
+    ball_model_ =
+        std::make_shared<TwoStageLinearBallModel>(TwoStageLinearBallModel(new_state));
+    current_state_ = new_state;
+    timestamp_     = new_timestamp;
 }
 
-Timestamp Ball::lastUpdateTimestamp() const
+Timestamp Ball::timestamp() const
 {
-    return states_.front().timestamp();
+    return timestamp_;
 }
 
 Point Ball::position() const
 {
-    return states_.front().state().position();
+    return current_state_.position();
 }
 
 Vector Ball::velocity() const
 {
-    return states_.front().state().velocity();
-}
-
-BallHistory Ball::getPreviousStates() const
-{
-    return states_;
+    return current_state_.velocity();
 }
 
 bool Ball::operator==(const Ball &other) const
