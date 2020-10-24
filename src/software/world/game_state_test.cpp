@@ -123,6 +123,23 @@ TEST(GameStateTest, equality_diff_placement_point)
     EXPECT_NE(gameState1, gameState2);
 }
 
+TEST(GetBallPlacementTest, get_ball_placement_no_ball_set)
+{
+    GameState game_state;
+    EXPECT_EQ(game_state.getBallPlacementPoint(), std::nullopt);
+}
+
+TEST(GetBallPlacementTest, get_ball_placement_set)
+{
+    GameState game_state;
+
+    game_state.setBallPlacementPoint(Point(15, 36));
+    EXPECT_EQ(game_state.getBallPlacementPoint().value(), Point(15, 36));
+
+    game_state.setBallPlacementPoint(Point(-3, -45));
+    EXPECT_EQ(game_state.getBallPlacementPoint().value(), Point(-3, -45));
+}
+
 // tuple of start state, update state, end state, our_restart, restart reason
 typedef std::tuple<RefereeCommand, RefereeCommand, RefereeCommand, bool,
                    GameState::RestartReason>
