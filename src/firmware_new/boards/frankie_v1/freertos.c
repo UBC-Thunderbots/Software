@@ -235,7 +235,7 @@ void test_msg_update(void *argument)
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
-    app_logger_init(0, &io_network_logger_handle_robot_log_msg);
+    app_logger_init(0, &io_network_logger_handle_robot_log);
 
     /* Infinite loop */
     for (;;)
