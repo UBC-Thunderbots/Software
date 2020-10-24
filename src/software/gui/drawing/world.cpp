@@ -31,7 +31,7 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
     highlightGoalsByTeam(scene, world.field(), friendly_goal_colour, enemy_goal_colour);
     drawTeam(scene, world.friendlyTeam(), friendly_team_colour_);
     drawTeam(scene, world.enemyTeam(), enemy_team_colour_);
-    drawBall(scene, world.ball().currentState().state());
+    drawBall(scene, world.ball().currentState());
     drawBallConeToFriendlyNet(scene, world.ball().position(), world.field());
 }
 

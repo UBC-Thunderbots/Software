@@ -18,14 +18,13 @@ ShootOrPassPlay::ShootOrPassPlay() {}
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           teamHasPossession(world, world.friendlyTeam());
+           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
 }
 
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (teamHasPossession(world, world.friendlyTeam()) ||
-            teamPassInProgress(world, world.friendlyTeam()));
+           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
 }
 
 void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,

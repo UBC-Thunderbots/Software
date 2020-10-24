@@ -13,7 +13,7 @@
 
 BallFilter::BallFilter() : ball_detection_buffer(MAX_BUFFER_SIZE) {}
 
-std::optional<TimestampedBallState> BallFilter::estimateBallState(
+std::optional<Ball> BallFilter::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area)
 {
     addNewDetectionsToBuffer(new_ball_detections, filter_area);
@@ -99,7 +99,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
     }
 }
 
-std::optional<TimestampedBallState> BallFilter::estimateBallStateFromBuffer(
+std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
     boost::circular_buffer<BallDetection> ball_detections)
 {
     // Sort the detections in decreasing order before processing. This places the most
@@ -117,9 +117,8 @@ std::optional<TimestampedBallState> BallFilter::estimateBallStateFromBuffer(
         // or calculate a velocity so we do our best with just the position
         BallState ball_state(ball_detections.front().position, Vector(0, 0),
                              ball_detections.front().distance_from_ground);
-        TimestampedBallState timestamped_ball_state(ball_state,
-                                                    ball_detections.front().timestamp);
-        return timestamped_ball_state;
+        Ball ball(ball_state, ball_detections.front().timestamp);
+        return ball;
     }
 
     std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
@@ -140,7 +139,7 @@ std::optional<TimestampedBallState> BallFilter::estimateBallStateFromBuffer(
 
     BallState ball_state(filtered_position, estimated_velocity->average_velocity,
                          ball_detections.front().distance_from_ground);
-    return TimestampedBallState(ball_state, ball_detections.front().timestamp);
+    return Ball(ball_state, ball_detections.front().timestamp);
 }
 
 std::optional<size_t> BallFilter::getAdjustedBufferSize(
