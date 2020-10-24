@@ -4,12 +4,15 @@
 
 #include <cmath>
 
+#include "shared/proto/robot_log_msg.nanopb.h"
+#include "shared/proto/robot_log_msg.pb.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
 
 extern "C"
 {
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/world/firmware_robot.h"
 }
 
@@ -21,6 +24,21 @@ extern "C"
 class SimulatorRobotSingletonTest : public testing::Test
 {
    protected:
+    void SetUp() override
+    {
+        app_logger_init(0, &SimulatorRobotSingletonTest::handleRobotLog);
+    }
+
+    static void handleRobotLog(TbotsProto_RobotLog log)
+    {
+        LOG(INFO) << "[SIMULATED TEST ROBOT]["
+                  << TbotsProto::LogLevel_Name(
+                         static_cast<TbotsProto::LogLevel>(log.log_level))
+                  << "]"
+                  << "[" << log.file_name << ":" << log.line_number
+                  << "]: " << log.log_msg;
+    }
+
     std::tuple<std::shared_ptr<PhysicsWorld>,
                std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>,
                std::shared_ptr<SimulatorBall>>
