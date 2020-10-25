@@ -149,8 +149,8 @@ class PhysicsBall
     Vector calculateVelocityDeltaDueToFriction(const Duration& time_step);
 
     /**
-     * Calculate the new speed of the ball after applying the two-stage ball model for the
-     * given amount of time
+     * Calculate the new speed of the ball after applying the sliding/rolling friction
+     * ball model for the given amount of time
      *
      * @param initial_ball_velocity The initial velocity of the ball
      * @param sliding_to_rolling_speed_threshold The speed threshold when the ball goes
@@ -160,7 +160,7 @@ class PhysicsBall
      *
      * @return the new velocity of the ball
      */
-    Vector calculateTwoStageBallModelFutureVelocity(
+    Vector calculateFrictionBallModelFutureVelocity(
         const Vector& initial_ball_velocity, double sliding_to_rolling_speed_threshold,
         const Duration& duration_in_future) const;
 

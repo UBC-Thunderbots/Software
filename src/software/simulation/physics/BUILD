@@ -61,6 +61,7 @@ cc_test(
     srcs = ["physics_ball_test.cpp"],
     deps = [
         ":physics_ball",
+        "//software/test_util",
         "//software/world:ball",
         "@box2d",
         "@gtest//:gtest_main",

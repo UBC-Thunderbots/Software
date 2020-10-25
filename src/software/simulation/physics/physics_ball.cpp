@@ -217,7 +217,7 @@ Vector PhysicsBall::calculateVelocityDeltaDueToFriction(const Duration &time_ste
     {
         double sliding_to_rolling_speed_threshold =
             *initial_kick_speed * SLIDING_ROLLING_TRANSITION_FACTOR;
-        Vector future_velocity = calculateTwoStageBallModelFutureVelocity(
+        Vector future_velocity = calculateFrictionBallModelFutureVelocity(
             current_ball_state.velocity(), sliding_to_rolling_speed_threshold, time_step);
         if (future_velocity.length() < sliding_to_rolling_speed_threshold)
         {
@@ -233,7 +233,7 @@ Vector PhysicsBall::calculateVelocityDeltaDueToFriction(const Duration &time_ste
     }
 }
 
-Vector PhysicsBall::calculateTwoStageBallModelFutureVelocity(
+Vector PhysicsBall::calculateFrictionBallModelFutureVelocity(
     const Vector &initial_ball_velocity, double sliding_to_rolling_speed_threshold,
     const Duration &duration_in_future) const
 {
@@ -257,7 +257,7 @@ Vector PhysicsBall::calculateTwoStageBallModelFutureVelocity(
         0.0,
         std::min(seconds_in_future - sliding_duration_secs, max_rolling_duration_secs));
 
-    // Figure out where the ball is after the two stages
+    // Figure out where the ball is after sliding and rolling
     const Vector sliding_acceleration_vector =
         initial_ball_velocity.normalize(-sliding_friction_acceleration);
     const Vector velocity_after_sliding =
