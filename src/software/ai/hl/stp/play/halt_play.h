@@ -9,8 +9,6 @@
 class HaltPlay : public Play
 {
    public:
-    static const std::string name;
-
     HaltPlay() = default;
 
     bool isApplicable(const World &world) const override;

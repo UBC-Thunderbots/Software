@@ -17,7 +17,6 @@ class WifiBackend : public Backend
                 std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
                     DynamicParameters->getSensorFusionConfig());
 
-    static const std::string name;
 
    private:
     void onValueReceived(TbotsProto::PrimitiveSet primitives) override;

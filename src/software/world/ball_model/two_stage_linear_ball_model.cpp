@@ -36,7 +36,7 @@ BallState TwoStageLinearBallModel::estimateFutureState(const Duration &duration_
 BallState TwoStageLinearBallModel::applyLinearFrictionModel(
     const Duration &duration_in_future) const
 {
-    const double seconds_in_future     = duration_in_future.getSeconds();
+    const double seconds_in_future     = duration_in_future.toSeconds();
     const double initial_speed_m_per_s = initial_ball_state_.velocity().length();
 
     // Figure out how long the ball will roll/slide, if at all

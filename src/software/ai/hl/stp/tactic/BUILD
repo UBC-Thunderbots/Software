@@ -115,7 +115,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/evaluation:robot",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/logger",
@@ -192,6 +191,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//software/ai/evaluation:ball",
         "//software/ai/hl/stp/action:intercept_ball_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",

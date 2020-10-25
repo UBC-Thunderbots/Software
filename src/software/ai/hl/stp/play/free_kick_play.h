@@ -14,8 +14,6 @@
 class FreeKickPlay : public Play
 {
    public:
-    static const std::string name;
-
     FreeKickPlay();
 
     bool isApplicable(const World &world) const override;

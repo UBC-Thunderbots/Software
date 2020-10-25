@@ -17,8 +17,6 @@
 class MoveTestPlay : public Play
 {
    public:
-    static const std::string name;
-
     MoveTestPlay() = default;
 
     bool isApplicable(const World &world) const override;

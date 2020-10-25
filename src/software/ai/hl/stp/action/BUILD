@@ -34,7 +34,6 @@ cc_library(
         ":move_action",
         "//shared:constants",
         "//software/ai/evaluation:intercept",
-        "//software/ai/evaluation:robot",
         "//software/ai/intent:move_intent",
         "//software/geom/algorithms",
         "//software/logger",

@@ -67,6 +67,15 @@ void ReplayLogger::nextChunk()
 
 void ReplayLogger::saveCurrentChunk()
 {
+    // unfortunately somehow we can end up with messages not in order when emitted
+    // by the backend, deal with that here
+    std::sort(current_chunk.mutable_replay_msgs()->begin(),
+              current_chunk.mutable_replay_msgs()->end(),
+              [](const auto& lhs, const auto& rhs) {
+                  return lhs.backend_received_time().epoch_timestamp_seconds() <
+                         rhs.backend_received_time().epoch_timestamp_seconds();
+              });
+
     fs::path chunk_path = output_dir_path / std::to_string(current_chunk_idx);
     std::ofstream chunk_ofstream(chunk_path);
     auto result = google::protobuf::util::SerializeDelimitedToOstream(current_chunk,
