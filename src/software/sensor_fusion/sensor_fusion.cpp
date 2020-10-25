@@ -219,7 +219,7 @@ std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(
     return std::nullopt;
 }
 
-// TODO (1610)
+// TODO (1610) Implement friendly goalie ID override
 Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_friendly_team =
@@ -229,6 +229,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
     return new_friendly_team;
 }
 
+// TODO (1610) Implement enemy goalie ID override
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
