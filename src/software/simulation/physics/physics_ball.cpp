@@ -201,6 +201,8 @@ void PhysicsBall::setInitialKickSpeed(double speed)
 
 void PhysicsBall::applyBallFrictionModel(const Duration &time_step)
 {
+    // Friction model adapted from section 5 of
+    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
     Vector velocity_delta = calculateVelocityDeltaDueToFriction(time_step);
     applyImpulse(velocity_delta * massKg());
 }
