@@ -125,17 +125,15 @@ class exampleConfig : public Config
             "example_float_param", 4.04, 1.1, 9.01);
         example_string_param = std::make_shared<Parameter<std::string>>(
             "example_string_param", "Hello World");
-        example_enum_param = std::make_shared<EnumeratedParameter<RefereeCommand>>(
-            "example_enum_param", RefereeCommand::HALT, allValuesRefereeCommand());
+        example_enum_param = std::make_shared<EnumeratedParameter<std::string>>(
+            "example_enum_param", "HALT", allValuesRefereeCommandString());
         example_factory_param = std::make_shared<EnumeratedParameter<std::string>>(
             "example_factory_param", "HaltPlay",
             GenericFactory<std::string, Play>::getRegisteredNames());
-        example_optional_param = std::make_shared<Parameter<std::optional<bool>>>(
-            "example_optional_param", false);
         mutable_internal_param_list = {
-            example_bool_param,    example_int_param,      example_unsigned_int_param,
-            example_float_param,   example_string_param,   example_enum_param,
-            example_factory_param, example_optional_param, foo_config,
+            example_bool_param,    example_int_param,    example_unsigned_int_param,
+            example_float_param,   example_string_param, example_enum_param,
+            example_factory_param, foo_config,
         };
         immutable_internal_param_list = {
             std::const_pointer_cast<const Parameter<bool>>(example_bool_param),
@@ -144,12 +142,10 @@ class exampleConfig : public Config
                 example_unsigned_int_param),
             std::const_pointer_cast<const NumericParameter<float>>(example_float_param),
             std::const_pointer_cast<const Parameter<std::string>>(example_string_param),
-            std::const_pointer_cast<const EnumeratedParameter<RefereeCommand>>(
+            std::const_pointer_cast<const EnumeratedParameter<std::string>>(
                 example_enum_param),
             std::const_pointer_cast<const EnumeratedParameter<std::string>>(
                 example_factory_param),
-            std::const_pointer_cast<const Parameter<std::optional<bool>>>(
-                example_optional_param),
             std::const_pointer_cast<const fooConfig>(foo_config),
         };
     }
@@ -207,14 +203,13 @@ class exampleConfig : public Config
         return example_string_param;
     }
 
-    const std::shared_ptr<const EnumeratedParameter<RefereeCommand>> exampleEnumParam()
-        const
+    const std::shared_ptr<const EnumeratedParameter<std::string>> exampleEnumParam() const
     {
-        return std::const_pointer_cast<const EnumeratedParameter<RefereeCommand>>(
+        return std::const_pointer_cast<const EnumeratedParameter<std::string>>(
             example_enum_param);
     }
 
-    const std::shared_ptr<EnumeratedParameter<RefereeCommand>> mutableExampleEnumParam()
+    const std::shared_ptr<EnumeratedParameter<std::string>> mutableExampleEnumParam()
     {
         return example_enum_param;
     }
@@ -229,18 +224,6 @@ class exampleConfig : public Config
     const std::shared_ptr<EnumeratedParameter<std::string>> mutableExampleFactoryParam()
     {
         return example_factory_param;
-    }
-
-    const std::shared_ptr<const Parameter<std::optional<bool>>> exampleOptionalParam()
-        const
-    {
-        return std::const_pointer_cast<const Parameter<std::optional<bool>>>(
-            example_optional_param);
-    }
-
-    const std::shared_ptr<Parameter<std::optional<bool>>> mutableExampleOptionalParam()
-    {
-        return example_optional_param;
     }
 
     const std::shared_ptr<const fooConfig> getFooConfig()
@@ -268,16 +251,14 @@ class exampleConfig : public Config
 
         struct commandLineArgs
         {
-            bool help                           = false;
-            bool example_bool_param             = true;
-            int example_int_param               = 3;
-            uint example_unsigned_int_param     = 3;
-            float example_float_param           = 4.04f;
-            std::string example_string_param    = "Hello World";
-            std::string example_enum_param      = "HALT";
-            std::string example_factory_param   = "HaltPlay";
-            bool example_optional_param         = false;
-            bool example_optional_param_nullopt = false;
+            bool help                         = false;
+            bool example_bool_param           = true;
+            int example_int_param             = 3;
+            uint example_unsigned_int_param   = 3;
+            float example_float_param         = 4.04f;
+            std::string example_string_param  = "Hello World";
+            std::string example_enum_param    = "HALT";
+            std::string example_factory_param = "HaltPlay";
             fooConfigCommandLineArgs foo_config_args;
         };
 
@@ -314,14 +295,6 @@ class exampleConfig : public Config
             boost::program_options::value<std::string>(&args.example_factory_param),
             "Accepts all registered IndexType values for the GenericFactory<index_type, type_to_create>");
         desc.add_options()(
-            "example_optional_param",
-            boost::program_options::value<bool>(&args.example_optional_param),
-            "Optional parameters will generate with std::optional as their value return type");
-        desc.add_options()(
-            "example_optional_param_nullopt",
-            boost::program_options::value<bool>(&args.example_optional_param_nullopt),
-            "Set as true to set example_optional_param as nullopt");
-        desc.add_options()(
             "fooConfig.foo_bool",
             boost::program_options::value<bool>(&args.foo_config_args.foo_bool),
             "foo bool");
@@ -338,17 +311,8 @@ class exampleConfig : public Config
         this->mutableExampleUnsignedIntParam()->setValue(args.example_unsigned_int_param);
         this->mutableExampleFloatParam()->setValue(args.example_float_param);
         this->mutableExampleStringParam()->setValue(args.example_string_param);
-        this->mutableExampleEnumParam()->setValue(
-            fromStringToRefereeCommand(args.example_enum_param));
+        this->mutableExampleEnumParam()->setValue(args.example_enum_param);
         this->mutableExampleFactoryParam()->setValue(args.example_factory_param);
-        if (args.example_optional_param_nullopt)
-        {
-            this->mutableExampleOptionalParam()->setValue(std::nullopt);
-        }
-        else
-        {
-            this->mutableExampleOptionalParam()->setValue(args.example_optional_param);
-        }
         this->getMutableFooConfig()->mutableFooBool()->setValue(
             args.foo_config_args.foo_bool);
         this->getMutableFooConfig()->mutableFooInt()->setValue(
@@ -373,6 +337,11 @@ class exampleConfig : public Config
     }
 
    private:
+    std::vector<std::string> allValuesRefereeCommandString()
+    {
+        return separateEnumStrings(std::string{enum_string_args_RefereeCommand});
+    }
+
     MutableParameterList mutable_internal_param_list;
     ParameterList immutable_internal_param_list;
     std::shared_ptr<Parameter<bool>> example_bool_param;
@@ -380,9 +349,8 @@ class exampleConfig : public Config
     std::shared_ptr<NumericParameter<uint>> example_unsigned_int_param;
     std::shared_ptr<NumericParameter<float>> example_float_param;
     std::shared_ptr<Parameter<std::string>> example_string_param;
-    std::shared_ptr<EnumeratedParameter<RefereeCommand>> example_enum_param;
+    std::shared_ptr<EnumeratedParameter<std::string>> example_enum_param;
     std::shared_ptr<EnumeratedParameter<std::string>> example_factory_param;
-    std::shared_ptr<Parameter<std::optional<bool>>> example_optional_param;
     std::shared_ptr<fooConfig> foo_config;
 };
 
