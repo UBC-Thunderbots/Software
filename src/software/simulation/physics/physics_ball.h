@@ -139,7 +139,7 @@ class PhysicsBall
     bool isTouchingOtherObject() const;
 
     /**
-     * Calculate the amount that the ball is needs to slow down during this timestep to
+     * Calculate the amount that the ball needs to slow down during this timestep to
      * properly model friction
      *
      * @param time_step The amount of time in the future to calculate velocity delta

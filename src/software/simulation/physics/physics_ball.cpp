@@ -14,8 +14,6 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
       flight_angle_of_departure(Angle::zero()),
       initial_kick_speed(std::nullopt),
       simulator_config(simulator_config)
-//      sliding_friction_acceleration(6.9),
-//      rolling_friction_acceleration(0.5)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -201,14 +199,17 @@ void PhysicsBall::setInitialKickSpeed(double speed)
 
 void PhysicsBall::applyBallFrictionModel(const Duration &time_step)
 {
-    // Friction model adapted from section 5 of
-    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
     Vector velocity_delta = calculateVelocityDeltaDueToFriction(time_step);
     applyImpulse(velocity_delta * massKg());
 }
 
 Vector PhysicsBall::calculateVelocityDeltaDueToFriction(const Duration &time_step)
 {
+    // Friction model adapted from section 5 of
+    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
+    //
+    // To summarize, because the ball is a uniform density sphere, v1 = 5 / 7 * v0,
+    // where v1 is the initial rolling speed and v0 is the initial sliding speed
     static constexpr double SLIDING_ROLLING_TRANSITION_FACTOR = 5.0 / 7.0;
     const double rolling_friction_acceleration =
         simulator_config->RollingFrictionAcceleration()->value();
@@ -247,11 +248,15 @@ Vector PhysicsBall::calculateFrictionBallModelFutureVelocity(
         simulator_config->RollingFrictionAcceleration()->value();
 
     // Figure out how long the ball will roll/slide, if at all
+    // if sliding_friction_acceleration is 0 then max_sliding_duration_secs is inf,
+    // which is handled by std::min
     const double max_sliding_duration_secs =
         (initial_speed - sliding_to_rolling_speed_threshold) /
         sliding_friction_acceleration;
     const double sliding_duration_secs =
         std::max(0.0, std::min(seconds_in_future, max_sliding_duration_secs));
+    // if rolling_friction_acceleration is 0 then max_rolling_duration_secs is inf,
+    // which is handled by std::min
     const double max_rolling_duration_secs =
         std::min(initial_speed, sliding_to_rolling_speed_threshold) /
         rolling_friction_acceleration;

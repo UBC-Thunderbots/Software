@@ -26,7 +26,7 @@ void Ball::updateState(const BallState &new_state, const Timestamp &new_timestam
     if (new_timestamp < timestamp())
     {
         throw std::invalid_argument(
-            "Error: Trying to update ball state using a state older then the current state");
+            "Error: Trying to update ball state using a state older than the current state");
     }
     current_state_ = new_state;
     timestamp_     = new_timestamp;
