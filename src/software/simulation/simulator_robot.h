@@ -287,7 +287,7 @@ class SimulatorRobot
         bool can_be_controlled;
     } DribblerBall;
 
-    std::vector<DribblerBall> balls_in_dribbler_area;
+    std::optional<DribblerBall> ball_in_dribbler_area;
 
     std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter> primitive_manager;
 
