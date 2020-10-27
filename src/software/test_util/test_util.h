@@ -132,9 +132,9 @@ namespace TestUtil
         const std::vector<Point> &positions);
 
     /**
-     * Takes a RobotLog and creates an INFO level log
+     * Takes a RobotLog proto and creates an INFO level g3log
      *
-     * * @param robot_log The RobotLog to log
+     * @param robot_log The RobotLog to log
      */
     void handleTestRobotLog(TbotsProto_RobotLog robot_log);
 
