@@ -2,8 +2,6 @@
 
 #include <stdlib.h>
 
-#include "firmware/app/logger/logger.h"
-
 struct FirmwareRobot
 {
     // NOTE: Everything here is in the global field reference frame (ie. 0,0 is the center
@@ -53,8 +51,6 @@ FirmwareRobot_t* app_firmware_robot_create(
     new_robot->back_left_wheel            = back_left_wheel;
     new_robot->robot_constants            = robot_constants;
     new_robot->controller_state           = controller_state;
-
-    TLOG_INFO("new robot has been created!");
 
     return new_robot;
 }

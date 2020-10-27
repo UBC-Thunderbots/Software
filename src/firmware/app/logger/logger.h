@@ -31,7 +31,7 @@ void app_logger_log(const char *file_name, unsigned line_number,
     app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_DEBUG, __VA_ARGS__)
 #define TLOG_INFO(...)                                                                   \
     app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_INFO, __VA_ARGS__)
-#define TLOG_WARN(...)                                                                   \
-    app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_WARN, __VA_ARGS__)
+#define TLOG_WARNING(...)                                                                \
+    app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_WARNING, __VA_ARGS__)
 #define TLOG_FATAL(...)                                                                  \
     app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_FATAL, __VA_ARGS__)

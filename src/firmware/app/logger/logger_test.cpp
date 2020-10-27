@@ -48,10 +48,10 @@ TEST_F(FirmwareLoggerTest, robot_4_log_warn_macro_test)
     std::string expected_file_name = __FILE__;
     int expected_line_number       = __LINE__ + 2;
 
-    TLOG_WARN("this is a test %d %x %s", 100, 15, "log");
+    TLOG_WARNING("this is a test %d %x %s", 100, 15, "log");
 
     EXPECT_EQ(4, getRecentlyHandledLog().robot_id);
-    EXPECT_EQ(TbotsProto_LogLevel_WARN, getRecentlyHandledLog().log_level);
+    EXPECT_EQ(TbotsProto_LogLevel_WARNING, getRecentlyHandledLog().log_level);
     EXPECT_EQ("this is a test 100 f log", std::string(getRecentlyHandledLog().log_msg));
     EXPECT_EQ(expected_file_name, std::string(getRecentlyHandledLog().file_name));
     EXPECT_EQ(expected_line_number, getRecentlyHandledLog().line_number);

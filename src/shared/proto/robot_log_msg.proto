@@ -8,10 +8,10 @@ import "nanopb/options.proto";
 // the severity level of the log
 enum LogLevel
 {
-    DEBUG = 0;
-    INFO  = 1;
-    WARN  = 2;
-    FATAL = 3;
+    DEBUG   = 0;
+    INFO    = 1;
+    WARNING = 2;
+    FATAL   = 3;
 };
 
 message RobotLog

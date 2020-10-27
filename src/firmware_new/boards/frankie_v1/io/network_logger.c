@@ -47,7 +47,7 @@ void io_network_logger_init(osMessageQueueId_t message_queue_id)
 void io_network_logger_handle_robot_log(TbotsProto_RobotLog robot_log)
 {
     // NOTE: we pass in a ptr to the robot_log on the stack, normally this can be
-    // catastrophic, but osMessageQueuePut gaurantees that the msg is copied, and
+    // catastrophic, but osMessageQueuePut guarantees that the msg is copied, and
     // the memory at this pointer location does _not_ need to be preserved after
     // calling this function.
     osMessageQueuePut(log_message_queue_id_, &robot_log, 0, 0);

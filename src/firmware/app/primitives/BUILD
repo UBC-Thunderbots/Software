@@ -47,6 +47,7 @@ cc_library(
     deps = [
         ":primitive",
         "//firmware/app/control",
+        "//firmware/app/logger",
     ],
 )
 

@@ -26,17 +26,7 @@ class SimulatorRobotSingletonTest : public testing::Test
    protected:
     void SetUp() override
     {
-        app_logger_init(0, &SimulatorRobotSingletonTest::handleRobotLog);
-    }
-
-    static void handleRobotLog(TbotsProto_RobotLog log)
-    {
-        LOG(INFO) << "[SIMULATED TEST ROBOT]["
-                  << TbotsProto::LogLevel_Name(
-                         static_cast<TbotsProto::LogLevel>(log.log_level))
-                  << "]"
-                  << "[" << log.file_name << ":" << log.line_number
-                  << "]: " << log.log_msg;
+        app_logger_init(0, &TestUtil::handleTestRobotLog);
     }
 
     std::tuple<std::shared_ptr<PhysicsWorld>,
