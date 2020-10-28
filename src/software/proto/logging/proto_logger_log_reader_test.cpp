@@ -83,11 +83,11 @@ TEST(ProtoLoggerLogReaderTest, test_read_and_write_proto_log)
         if (i % MSGS_PER_CHUNK == MSGS_PER_CHUNK - 1)
         {
             // we just sent the last message in a chunk, sleep for longer
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(5));
         }
         else
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 
