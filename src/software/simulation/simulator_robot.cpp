@@ -402,7 +402,7 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
 void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
                                               PhysicsBall *physics_ball)
 {
-    ball_in_dribbler_area = std::nullopt;
+    clearBallInDribblerArea();
 }
 
 void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
@@ -416,6 +416,11 @@ void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmwa
 {
     app_primitive_manager_runCurrentPrimitive(primitive_manager.get(),
                                               firmware_world.get());
+}
+
+void SimulatorRobot::clearBallInDribblerArea()
+{
+    ball_in_dribbler_area = std::nullopt;
 }
 
 void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,

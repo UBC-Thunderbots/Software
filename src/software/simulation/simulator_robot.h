@@ -40,6 +40,11 @@ class SimulatorRobot
      */
     unsigned int getRobotId();
 
+    /**
+     * Clears balls tracked as being in dribbler area
+     */
+    void clearBallInDribblerArea();
+
    protected:
     /**
      * Returns the x-position of the robot, in global field coordinates, in meters

@@ -33,6 +33,16 @@ void Simulator::setBallState(const BallState& ball_state)
 {
     physics_world.setBallState(ball_state);
     simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
+
+    for (auto& robot_pair : yellow_simulator_robots)
+    {
+        robot_pair.first->clearBallInDribblerArea();
+    }
+
+    for (auto& robot_pair : blue_simulator_robots)
+    {
+        robot_pair.first->clearBallInDribblerArea();
+    }
 }
 
 void Simulator::removeBall()
