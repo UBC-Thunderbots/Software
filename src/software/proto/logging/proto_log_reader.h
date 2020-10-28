@@ -23,8 +23,8 @@ class ProtoLogReader
      *
      * @return the next recorded SensorProto if available, nullopt otherwise.
      */
-    template <typename Msg>
-    std::optional<Msg> getNextMsg();
+    template <typename MsgT>
+    std::optional<MsgT> getNextMsg();
 
    private:
     /**
@@ -56,10 +56,10 @@ class ProtoLogReader
     std::experimental::filesystem::path replay_dir;
 };
 
-template <typename Msg>
-std::optional<Msg> ProtoLogReader::getNextMsg()
+template <typename MsgT>
+std::optional<MsgT> ProtoLogReader::getNextMsg()
 {
-    static_assert(std::is_base_of_v<google::protobuf::Message, Msg>,
+    static_assert(std::is_base_of_v<google::protobuf::Message, MsgT>,
                   "MsgT must be a derived class of google::protobuf::Messsage!");
 
     if (!hasNextMsg())
@@ -72,12 +72,12 @@ std::optional<Msg> ProtoLogReader::getNextMsg()
         nextChunk();
     }
 
-    Msg ret;
+    MsgT ret;
     bool success = cur_chunk.messages(cur_msg_idx).UnpackTo(&ret);
 
     if (!success)
     {
-        throw std::invalid_argument("Failed to parse " + TYPENAME(Msg) + " into " +
+        throw std::invalid_argument("Failed to parse " + TYPENAME(MsgT) + " into " +
                                     cur_chunk.messages(cur_msg_idx).type_url());
     }
 

@@ -5,11 +5,11 @@
 #include "software/logger/logger.h"
 #include "software/proto/logging/proto_logger.h"
 
-template <typename Msg>
-ProtoLogger<Msg>::ProtoLogger(
+template <typename MsgT>
+ProtoLogger<MsgT>::ProtoLogger(
     const std::string& output_directory, int _msgs_per_chunk,
-    std::optional<std::function<bool(const Msg&, const Msg&)>> message_sort_comparator)
-    : FirstInFirstOutThreadedObserver<Msg>(2000),
+    std::optional<std::function<bool(const MsgT&, const MsgT&)>> message_sort_comparator)
+    : FirstInFirstOutThreadedObserver<MsgT>(2000),
       current_chunk(),
       current_chunk_idx(0),
       output_dir_path(output_directory),
@@ -40,19 +40,19 @@ ProtoLogger<Msg>::ProtoLogger(
     }
 
     // set the current chunk's message_type to the name of MsgT's type
-    *current_chunk.mutable_message_type() = TYPENAME(Msg);
+    *current_chunk.mutable_message_type() = TYPENAME(MsgT);
 
-    LOG(INFO) << "Logging " << TYPENAME(Msg) << " to " << output_dir_path.string();
+    LOG(INFO) << "Logging " << TYPENAME(MsgT) << " to " << output_dir_path.string();
 }
 
-template <typename Msg>
-ProtoLogger<Msg>::~ProtoLogger()
+template <typename MsgT>
+ProtoLogger<MsgT>::~ProtoLogger()
 {
     saveCurrentChunk();
 }
 
-template <typename Msg>
-void ProtoLogger<Msg>::onValueReceived(Msg msg)
+template <typename MsgT>
+void ProtoLogger<MsgT>::onValueReceived(MsgT msg)
 {
     current_chunk.add_messages()->PackFrom(std::move(msg));
     if (current_chunk.messages_size() >= msgs_per_chunk)
@@ -62,15 +62,15 @@ void ProtoLogger<Msg>::onValueReceived(Msg msg)
     }
 }
 
-template <typename Msg>
-void ProtoLogger<Msg>::nextChunk()
+template <typename MsgT>
+void ProtoLogger<MsgT>::nextChunk()
 {
     current_chunk_idx++;
     current_chunk.Clear();
 }
 
-template <typename Msg>
-void ProtoLogger<Msg>::saveCurrentChunk()
+template <typename MsgT>
+void ProtoLogger<MsgT>::saveCurrentChunk()
 {
     if (sort_comparator)
     {
@@ -82,9 +82,9 @@ void ProtoLogger<Msg>::saveCurrentChunk()
                       // we have to convert the Any's back into MsgT here in order to sort
                       // them and this also provides a cleaner interface externally for
                       // the sort comparator
-                      Msg lhs;
+                      MsgT lhs;
                       l.UnpackTo(&lhs);
-                      Msg rhs;
+                      MsgT rhs;
                       r.UnpackTo(&rhs);
                       return (*sort_comparator)(lhs, rhs);
                   });
@@ -101,7 +101,7 @@ void ProtoLogger<Msg>::saveCurrentChunk()
     }
     else
     {
-        LOG(DEBUG) << "Successfully saved " << TYPENAME(Msg) << " chunk "
+        LOG(DEBUG) << "Successfully saved " << TYPENAME(MsgT) << " chunk "
                    << current_chunk_idx << " to disk";
     }
 }

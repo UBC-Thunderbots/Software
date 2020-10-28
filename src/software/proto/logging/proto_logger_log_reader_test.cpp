@@ -28,6 +28,8 @@ TEST(ProtoLoggerLogReaderTest, test_read_and_write_proto_log)
     // generate test files that actually work, we have to read recorded replays back,
     // write them, and then read them again in the same test
 
+    static constexpr size_t MSGS_PER_CHUNK = 1000;
+
     std::vector<SensorProto> read_replay_msgs;
 
     ProtoLogReader reader(fs::current_path() / REPLAY_TEST_PATH_SUFFIX);
@@ -60,27 +62,38 @@ TEST(ProtoLoggerLogReaderTest, test_read_and_write_proto_log)
     auto output_path = fs::current_path() / "replaytest";
     std::shared_ptr<Observer<SensorProto>> logger_ptr =
         std::make_shared<ProtoLogger<SensorProto>>(
-            output_path, 1000, [](const SensorProto& lhs, const SensorProto& rhs) {
+            output_path, MSGS_PER_CHUNK,
+            [](const SensorProto& lhs, const SensorProto& rhs) {
                 return lhs.backend_received_time().epoch_timestamp_seconds() <
                        rhs.backend_received_time().epoch_timestamp_seconds();
             });
     TestSubject subject;
     subject.registerObserver(logger_ptr);
-    for (const auto msg : read_replay_msgs)
+
+    // unfortunately we have to do this due to the performance of the CI node since
+    // the sort that happens right before a chunk is saved to disk is time consuming
+    // and there's still messages in the buffer left to process
+    for (size_t i = 0; i < read_replay_msgs.size(); i++)
     {
+        auto& msg = read_replay_msgs[i];
         subject.sendValue(msg);
-        // we have 3000 frames of replay_logging so we have to try to not fill the buffer
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        LOG(INFO) << "Sent message with timestamp "
+                  << msg.backend_received_time().epoch_timestamp_seconds();
+
+        if (i % MSGS_PER_CHUNK == MSGS_PER_CHUNK - 1)
+        {
+            // we just sent the last message in a chunk, sleep for longer
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
     }
-    // unfortunately we have to do this because there is otherwise no way to 'guarantee'
-    // that the entire buffer of messages in the ThreadedObserver has been cleared and
-    // written to disk by the ReplayLogger
-    // This duration needs to be long enough to de facto make this a 'guarantee'
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // test that 3 files named "0", "1", and "2" are created in the output directory
     std::unordered_set<std::string> created_filenames;
-    const std::unordered_set<std::string> expected_filenames = {"0", "1", "2", "3"};
+    const std::unordered_set<std::string> expected_filenames = {"0", "1", "2"};
 
     for (const auto& dir_entry : fs::directory_iterator(output_path))
     {
