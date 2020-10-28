@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/multithreading/threaded_observer.h"
-#include "software/util/typename/typename.h"
 
 template <typename T>
 ThreadedObserver<T>::ThreadedObserver(size_t buffer_size)
