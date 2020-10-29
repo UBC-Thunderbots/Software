@@ -21,6 +21,13 @@ class ChipTactic : public Tactic
     ChipTactic() = delete;
 
     /**
+    * Updates the world parameters for this ChipTactic.
+    *
+    * @param World The current state of the world
+    */
+    void updateWorldParams(const World& world) override;
+
+    /**
      * Updates the world parameters for this ChipTactic.
      *
      * @param ball The ball being kicked

@@ -9,6 +9,13 @@ ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
 {
 }
 
+
+void ChipTactic::updateWorldParams(const World& world)
+{
+    updateWorldParams(world.ball());
+}
+
+
 void ChipTactic::updateWorldParams(const Ball &ball)
 {
     // update the world parameters stored by this tactic

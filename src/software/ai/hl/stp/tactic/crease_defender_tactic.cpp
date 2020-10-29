@@ -23,6 +23,11 @@ CreaseDefenderTactic::CreaseDefenderTactic(
 {
 }
 
+void CreaseDefenderTactic::updateWorldParams(const World &world) {
+    updateWorldParams(world.ball(), world.field(), world.friendlyTeam(),
+                      world.enemyTeam());
+}
+
 void CreaseDefenderTactic::updateWorldParams(const Ball &ball, const Field &field,
                                              const Team &friendly_team,
                                              const Team &enemy_team)

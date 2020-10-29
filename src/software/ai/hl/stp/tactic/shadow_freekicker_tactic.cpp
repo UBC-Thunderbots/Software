@@ -17,6 +17,10 @@ ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadow
 {
 }
 
+void ShadowFreekickerTactic::updateWorldParams(const World &world) {
+    updateWorldParams(world.enemyTeam(), world.ball());
+}
+
 void ShadowFreekickerTactic::updateWorldParams(Team enemy_team, Ball ball)
 {
     this->enemy_team = enemy_team;

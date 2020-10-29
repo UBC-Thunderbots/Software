@@ -18,6 +18,8 @@ PatrolTactic::PatrolTactic(const std::vector<Point> &points,
 {
 }
 
+void PatrolTactic::updateWorldParams(const World &world) {}
+
 double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     if (patrol_points.empty())

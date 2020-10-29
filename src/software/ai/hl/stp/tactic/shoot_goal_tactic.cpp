@@ -23,6 +23,11 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
 {
 }
 
+void ShootGoalTactic::updateWorldParams(const World &world) {
+    updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                      world.ball());
+}
+
 void ShootGoalTactic::updateWorldParams(const Field &field, const Team &friendly_team,
                                         const Team &enemy_team, const Ball &ball)
 {

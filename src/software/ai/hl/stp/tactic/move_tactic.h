@@ -21,6 +21,13 @@ class MoveTactic : public Tactic
     MoveTactic() = delete;
 
     /**
+    * Updates the world parameters for this ChipTactic.
+    *
+    * @param World The current state of the world
+    */
+    void updateWorldParams(const World& world) override;
+
+    /**
      * Updates the control parameters for this MoveTactic.
      *
      * @param destination The destination to move to (in global coordinates)

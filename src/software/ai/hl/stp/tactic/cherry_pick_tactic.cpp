@@ -12,6 +12,8 @@ CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_r
     pass_generator.setTargetRegion(target_region);
 }
 
+
+
 void CherryPickTactic::updateWorldParams(const World& world)
 {
     this->world = world;

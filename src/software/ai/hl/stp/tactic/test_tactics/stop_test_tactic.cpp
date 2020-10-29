@@ -10,6 +10,8 @@ double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world
     return 0.5;
 }
 
+void StopTestTactic::updateWorldParams(const World &world) {}
+
 void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     do

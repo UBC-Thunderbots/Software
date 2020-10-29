@@ -26,7 +26,6 @@ class CherryPickTactic : public Tactic
      *
      * @param world The current state of the world
      */
-
     void updateWorldParams(const World& world);
 
     /**

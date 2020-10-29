@@ -5,6 +5,8 @@ GoalieTestTactic::GoalieTestTactic(bool loop_forever)
 {
 }
 
+void GoalieTestTactic::updateWorldParams(const World &world) {}
+
 bool GoalieTestTactic::isGoalieTactic() const
 {
     return true;

@@ -25,6 +25,13 @@ class PenaltyKickTactic : public Tactic
     PenaltyKickTactic() = delete;
 
     /**
+    * Updates the world parameters for this ChipTactic.
+    *
+    * @param World The current state of the world
+    */
+    void updateWorldParams(const World& world) override;
+
+    /**
      * Updates the world parameters for this PenaltyKickTactic.
      *
      * @param updated_ball : The ball

@@ -28,6 +28,13 @@ class PatrolTactic : public Tactic
     PatrolTactic() = delete;
 
     /**
+    * Updates the world parameters for this ChipTactic.
+    *
+    * @param World The current state of the world
+    */
+    void updateWorldParams(const World& world) override;
+
+    /**
      * Calculates the cost of assigning the given robot to this Tactic. If a robot is
      * already assigned to this tactic, that robot is preferred to be assigned again.
      * Otherwise, prefers robots closer to the current patrol point being moved to.
