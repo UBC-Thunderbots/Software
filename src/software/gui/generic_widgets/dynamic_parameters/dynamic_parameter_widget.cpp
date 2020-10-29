@@ -183,24 +183,12 @@ QWidget* DynamicParameterWidget::createDoubleParameter(
     // https://github.com/UBC-Thunderbots/Software/issues/1581
     // Placeholder MIN/MAX values are decided by looking at all the existing double
     // parameters
-    static const double STEP_SIZE = 100.0;
-    static const double MIN       = -10.0;
-    static const double MAX       = 200.0;
-    setupSliderLineEdit(param_line_edit, param_slider, on_slider_value_changed, MIN, MAX,
-                        STEP_SIZE);
+    static const double STEP_SIZE   = 100.0;
+    static const double MIN         = -10.0;
+    static const double MAX         = 200.0;
+    auto on_parameter_value_changed = setupSliderLineEdit(
+        param_line_edit, param_slider, on_slider_value_changed, MIN, MAX, STEP_SIZE);
 
-    auto on_parameter_value_changed = [param_line_edit, param_slider](double new_value) {
-        // We block signals while setting the value of the spinbox so that we don't
-        // trigger the `on_slider_value_changed` function, which would set the
-        // parameter value again and deadlock on the parameter's internal mutex
-        param_line_edit->blockSignals(true);
-        param_line_edit->setText(QString::number(new_value));
-        param_line_edit->blockSignals(false);
-
-        param_slider->blockSignals(true);
-        param_slider->setValue(static_cast<int>(new_value * STEP_SIZE));
-        param_slider->blockSignals(false);
-    };
     parameter->registerCallbackFunction(on_parameter_value_changed);
     on_parameter_value_changed(parameter->value());
 

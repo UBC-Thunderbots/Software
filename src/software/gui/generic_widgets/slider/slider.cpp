@@ -1,8 +1,9 @@
 #include "software/gui/generic_widgets/slider/slider.h"
 
-void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
-                         std::function<void(double)> value_changed_callback, double min,
-                         double max, double slider_step_size)
+std::function<void(double)> setupSliderLineEdit(
+    QLineEdit *line_edit, QSlider *slider,
+    std::function<void(double)> value_changed_callback, double min, double max,
+    double slider_step_size)
 {
     slider->setMinimum(static_cast<int>(min * slider_step_size));
     slider->setMaximum(static_cast<int>(max * slider_step_size));
@@ -49,4 +50,16 @@ void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
     QWidget::connect(slider, &QSlider::valueChanged, on_slider_changed);
 
     QWidget::connect(line_edit, &QLineEdit::textChanged, on_line_edit_changed);
+
+    return [line_edit, slider, slider_step_size](double new_value) {
+        // We block signals while setting the value of the slider/line edit so that we
+        // don't trigger the `value_changed_callback` function
+        line_edit->blockSignals(true);
+        line_edit->setText(QString::number(new_value));
+        line_edit->blockSignals(false);
+
+        slider->blockSignals(true);
+        slider->setValue(static_cast<int>(new_value * slider_step_size));
+        slider->blockSignals(false);
+    };
 }

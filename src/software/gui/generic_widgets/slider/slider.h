@@ -15,7 +15,10 @@
  * @param max max value for value
  * @param slider_step_size how much the line_edit value should be scaled up to display on
  * slider
+ *
+ * @return function to call to set the slider and line edit to a new value
  */
-void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
-                         std::function<void(double)> value_changed_callback, double min,
-                         double max, double slider_step_size);
+std::function<void(double)> setupSliderLineEdit(
+    QLineEdit *line_edit, QSlider *slider,
+    std::function<void(double)> value_changed_callback, double min, double max,
+    double slider_step_size);
