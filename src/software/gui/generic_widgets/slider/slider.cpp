@@ -1,4 +1,4 @@
-#include "software/gui/robot_diagnostics/widgets/slider.h"
+#include "software/gui/generic_widgets/slider/slider.h"
 
 void setupSliderLineEdit(QLineEdit *line_edit, QSlider *slider,
                          std::function<void(double)> value_changed_callback, double min,

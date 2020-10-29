@@ -2,7 +2,6 @@
 
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDoubleSpinBox>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QScrollArea>
@@ -51,18 +50,39 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
                          double_param_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(double_param_widget);
                      },
-                     [&](std::shared_ptr<Config> config_) { setupParameters(config_); }},
+                     [&](std::shared_ptr<Config> config) {
+                         QWidget* config_label_widget = createConfigLabel(config);
+                         config_label_widget->setParent(params_widget);
+                         params_widget->layout()->addWidget(config_label_widget);
+                         setupParameters(config);
+                     }},
             mutable_parameter);
     }
     setWidget(params_widget);
     setWidgetResizable(true);
 }
 
+QWidget* DynamicParameterWidget::createConfigLabel(std::shared_ptr<Config> config)
+{
+    QWidget* widget     = new QWidget();
+    QVBoxLayout* layout = new QVBoxLayout(widget);
+
+    QLabel* label = new QLabel(widget);
+    label->setText(QString::fromStdString(config->name()));
+    QFont font(label->font());
+    font.setUnderline(true);
+    label->setFont(font);
+    layout->addWidget(label);
+    widget->setLayout(layout);
+
+    return widget;
+}
+
 QWidget* DynamicParameterWidget::createBooleanParameter(
     std::shared_ptr<Parameter<bool>> parameter)
 {
     QWidget* widget     = new QWidget();
-    QHBoxLayout* layout = new QHBoxLayout(widget);
+    QVBoxLayout* layout = new QVBoxLayout(widget);
 
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(parameter->name()));
@@ -98,7 +118,7 @@ QWidget* DynamicParameterWidget::createIntegerParameter(
     std::shared_ptr<Parameter<int>> parameter)
 {
     QWidget* widget     = new QWidget();
-    QHBoxLayout* layout = new QHBoxLayout(widget);
+    QVBoxLayout* layout = new QVBoxLayout(widget);
 
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(parameter->name()));
@@ -133,45 +153,56 @@ QWidget* DynamicParameterWidget::createIntegerParameter(
 QWidget* DynamicParameterWidget::createDoubleParameter(
     std::shared_ptr<Parameter<double>> parameter)
 {
-    QWidget* widget     = new QWidget();
-    QHBoxLayout* layout = new QHBoxLayout(widget);
+    QWidget* widget              = new QWidget();
+    QVBoxLayout* vertical_layout = new QVBoxLayout(widget);
 
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(parameter->name()));
-    QDoubleSpinBox* spinbox = new QDoubleSpinBox(widget);
+    vertical_layout->addWidget(label);
+
+    QHBoxLayout* horizontal_layout = new QHBoxLayout();
+    horizontal_layout->setSpacing(6);
+
+    QSlider* param_slider = new QSlider(widget);
+    param_slider->setOrientation(Qt::Horizontal);
+    horizontal_layout->addWidget(param_slider);
+
+    QLineEdit* param_line_edit = new QLineEdit(widget);
+    horizontal_layout->addWidget(param_line_edit);
+    vertical_layout->addLayout(horizontal_layout);
+
+    widget->setLayout(vertical_layout);
+
+    auto on_slider_value_changed = [parameter](double new_value) {
+        LOG(INFO) << "Value for " << parameter->name() << " (double param) changed to "
+                  << new_value << std::endl;
+        parameter->setValue(new_value);
+    };
+
     // TODO: set range to the range of the parameter
     // https://github.com/UBC-Thunderbots/Software/issues/1581
-    spinbox->setRange(std::numeric_limits<double>::lowest(),
-                      std::numeric_limits<double>::max());
-    spinbox->setValue(parameter->value());
-    spinbox->setSingleStep(0.05);
+    // Placeholder MIN/MAX values are decided by looking at all the existing double
+    // parameters
+    static const double STEP_SIZE = 100.0;
+    static const double MIN       = -10.0;
+    static const double MAX       = 200.0;
+    setupSliderLineEdit(param_line_edit, param_slider, on_slider_value_changed, MIN, MAX,
+                        STEP_SIZE);
 
-    layout->addWidget(label);
-    layout->addWidget(spinbox);
-
-    auto on_spinbox_value_changed = [parameter, spinbox]() {
-        LOG(INFO) << "Value for double param " << parameter->name() << " changed to "
-                  << spinbox->value() << std::endl;
-        parameter->setValue(spinbox->value());
-    };
-    // QDoubleSpinBox has 2 "valueChanged" signals that each provide different info
-    // (string vs int), so we need to static_cast to specify the integer version
-    QWidget::connect(
-        spinbox,
-        static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-        on_spinbox_value_changed);
-
-    auto on_parameter_value_changed = [spinbox](int new_value) {
+    auto on_parameter_value_changed = [param_line_edit, param_slider](double new_value) {
         // We block signals while setting the value of the spinbox so that we don't
-        // trigger the `on_spinbox_value_changed` function, which would set the
+        // trigger the `on_slider_value_changed` function, which would set the
         // parameter value again and deadlock on the parameter's internal mutex
-        spinbox->blockSignals(true);
-        spinbox->setValue(new_value);
-        spinbox->blockSignals(false);
+        param_line_edit->blockSignals(true);
+        param_line_edit->setText(QString::number(new_value));
+        param_line_edit->blockSignals(false);
+
+        param_slider->blockSignals(true);
+        param_slider->setValue(static_cast<int>(new_value * STEP_SIZE));
+        param_slider->blockSignals(false);
     };
     parameter->registerCallbackFunction(on_parameter_value_changed);
-
-    widget->setLayout(layout);
+    on_parameter_value_changed(parameter->value());
 
     return widget;
 }
@@ -180,7 +211,7 @@ QWidget* DynamicParameterWidget::createStringParameter(
     std::shared_ptr<Parameter<std::string>> parameter)
 {
     QWidget* widget     = new QWidget();
-    QHBoxLayout* layout = new QHBoxLayout(widget);
+    QVBoxLayout* layout = new QVBoxLayout(widget);
 
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(parameter->name()));
