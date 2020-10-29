@@ -8,5 +8,6 @@ cc_library(
     ],
     deps = [
         "@g3log",
+        "@g3sinks",
     ],
 )

@@ -2,6 +2,7 @@
 
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
+#include <g3sinks/LogRotate.h>
 
 /**
  * This class acts as a Singleton that's responsible for initializing the logger.
