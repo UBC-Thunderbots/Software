@@ -32,8 +32,7 @@ bool CornerKickPlay::isApplicable(const World &world) const
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-           (!teamHasPossession(world, world.enemyTeam()) ||
-            teamPassInProgress(world, world.friendlyTeam()));
+           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
 }
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)

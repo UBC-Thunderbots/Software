@@ -10,23 +10,18 @@
 #include <QtWidgets/QWidget>
 #include <limits>
 
+#include "software/gui/shared/parameters_spinbox.h"
 #include "software/logger/logger.h"
 #include "software/util/variant_visitor/variant_visitor.h"
 
 DynamicParameterWidget::DynamicParameterWidget(QWidget* parent) : QScrollArea(parent)
 {
-    QWidget* params_widget            = new QWidget(this);
+    params_widget                     = new QWidget(this);
     QVBoxLayout* params_widget_layout = new QVBoxLayout(params_widget);
     params_widget->setLayout(params_widget_layout);
-
-    setupParametersHelper(params_widget, MutableDynamicParameters);
-
-    setWidget(params_widget);
-    setWidgetResizable(true);
 }
 
-void DynamicParameterWidget::setupParametersHelper(QWidget* params_widget,
-                                                   std::shared_ptr<Config> config)
+void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
 {
     if (!params_widget->layout())
     {
@@ -56,11 +51,11 @@ void DynamicParameterWidget::setupParametersHelper(QWidget* params_widget,
                          double_param_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(double_param_widget);
                      },
-                     [&](std::shared_ptr<Config> config_) {
-                         setupParametersHelper(params_widget, config_);
-                     }},
+                     [&](std::shared_ptr<Config> config_) { setupParameters(config_); }},
             mutable_parameter);
     }
+    setWidget(params_widget);
+    setWidgetResizable(true);
 }
 
 QWidget* DynamicParameterWidget::createBooleanParameter(
@@ -128,15 +123,7 @@ QWidget* DynamicParameterWidget::createIntegerParameter(
                      static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                      on_spinbox_value_changed);
 
-    auto on_parameter_value_changed = [spinbox](int new_value) {
-        // We block signals while setting the value of the spinbox so that we don't
-        // trigger the `on_spinbox_value_changed` function, which would set the
-        // parameter value again and deadlock on the parameter's internal mutex
-        spinbox->blockSignals(true);
-        spinbox->setValue(new_value);
-        spinbox->blockSignals(false);
-    };
-    parameter->registerCallbackFunction(on_parameter_value_changed);
+    setupSpinBox(spinbox, parameter);
 
     widget->setLayout(layout);
 

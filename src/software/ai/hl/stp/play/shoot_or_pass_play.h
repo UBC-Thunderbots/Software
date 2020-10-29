@@ -14,8 +14,6 @@
 class ShootOrPassPlay : public Play
 {
    public:
-    static const std::string name;
-
     ShootOrPassPlay();
 
     bool isApplicable(const World &world) const override;

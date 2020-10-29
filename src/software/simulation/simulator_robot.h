@@ -40,6 +40,11 @@ class SimulatorRobot
      */
     unsigned int getRobotId();
 
+    /**
+     * Clears balls tracked as being in dribbler area
+     */
+    void clearBallInDribblerArea();
+
    protected:
     /**
      * Returns the x-position of the robot, in global field coordinates, in meters
@@ -287,7 +292,7 @@ class SimulatorRobot
         bool can_be_controlled;
     } DribblerBall;
 
-    std::vector<DribblerBall> balls_in_dribbler_area;
+    std::optional<DribblerBall> ball_in_dribbler_area;
 
     std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter> primitive_manager;
 

@@ -56,7 +56,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // until it's time to perform the pass
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
-    while (ball.lastUpdateTimestamp() < pass.startTime())
+    while (ball.timestamp() < pass.startTime())
     {
         // We want to wait just behind where the pass is supposed to start, so that the
         // ball is *almost* touching the kicker

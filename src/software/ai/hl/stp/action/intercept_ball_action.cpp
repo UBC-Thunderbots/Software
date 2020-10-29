@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/evaluation/pass.h"
-#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"

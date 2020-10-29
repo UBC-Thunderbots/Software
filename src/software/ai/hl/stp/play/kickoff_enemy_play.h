@@ -11,8 +11,6 @@
 class KickoffEnemyPlay : public Play
 {
    public:
-    static const std::string name;
-
     KickoffEnemyPlay() = default;
 
     bool isApplicable(const World &world) const override;

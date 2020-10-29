@@ -129,7 +129,7 @@ Point PenaltyKickTactic::evaluate_next_position()
 void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     // We will need to keep track of time so we don't break the rules by taking too long
-    Timestamp penalty_kick_start = robot->lastUpdateTimestamp();
+    Timestamp penalty_kick_start = robot->timestamp();
 
 
     auto approach_ball_move_act = std::make_shared<MoveAction>(
@@ -182,9 +182,8 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             yield(rotate_with_ball_move_act);
         }
 
-    } while (
-        !(kick_action->done() ||
-          (penalty_kick_start - robot->lastUpdateTimestamp()) < penalty_shot_timeout));
+    } while (!(kick_action->done() ||
+               (penalty_kick_start - robot->timestamp()) < penalty_shot_timeout));
 }
 
 void PenaltyKickTactic::accept(MutableTacticVisitor& visitor)
