@@ -113,14 +113,9 @@ float SimulatorRobot::getBatteryVoltage()
 void SimulatorRobot::kick(float speed_m_per_s)
 {
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
-        for (auto &dribbler_ball : this->balls_in_dribbler_area)
+        if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
         {
-            if (!dribbler_ball.can_be_controlled)
-            {
-                continue;
-            }
-
-            auto ball = dribbler_ball.ball;
+            auto ball = ball_in_dribbler_area->ball;
             Vector robot_orientation_vector =
                 Vector::createFromAngle(robot->getRobotState().orientation());
 
@@ -163,7 +158,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
             ball->applyImpulse(kick_impulse);
             ball->setInitialKickSpeed(speed_m_per_s);
 
-            dribbler_ball.can_be_controlled = false;
+            ball_in_dribbler_area->can_be_controlled = false;
         }
     });
 }
@@ -171,14 +166,9 @@ void SimulatorRobot::kick(float speed_m_per_s)
 void SimulatorRobot::chip(float distance_m)
 {
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
-        for (auto &dribbler_ball : this->balls_in_dribbler_area)
+        if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
         {
-            if (!dribbler_ball.can_be_controlled)
-            {
-                continue;
-            }
-
-            auto ball = dribbler_ball.ball;
+            auto ball = ball_in_dribbler_area->ball;
             // Assume the ball is chipped at a 45 degree angle
             // TODO: Use a robot-specific constant
             // https://github.com/UBC-Thunderbots/Software/issues/1179
@@ -202,7 +192,7 @@ void SimulatorRobot::chip(float distance_m)
                 initial_velocity * static_cast<float>(chip_angle.cos());
             kick(ground_velocity);
 
-            dribbler_ball.can_be_controlled = false;
+            ball_in_dribbler_area->can_be_controlled = false;
         }
     });
 }
@@ -355,20 +345,14 @@ void SimulatorRobot::brakeMotorFrontRight()
 void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
                                            PhysicsBall *physics_ball)
 {
-    if (dribbler_rpm > 0)
+    if (dribbler_rpm > 0 && ball_in_dribbler_area)
     {
-        auto iter =
-            std::find_if(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(),
-                         [physics_ball](DribblerBall dribbler_ball) {
-                             return dribbler_ball.ball == physics_ball;
-                         });
-
-        if (iter == balls_in_dribbler_area.end())
+        if (ball_in_dribbler_area->ball != physics_ball)
         {
             throw std::runtime_error("Trying to dribble ball not in the dribbler area");
         }
 
-        if (iter->can_be_controlled)
+        if (ball_in_dribbler_area->can_be_controlled)
         {
             applyDribblerForce(physics_robot, physics_ball);
         }
@@ -394,7 +378,7 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
     auto ball = DribblerBall{.ball = physics_ball, .can_be_controlled = true};
 
     // Keep track of all balls in the dribbler
-    balls_in_dribbler_area.emplace_back(ball);
+    ball_in_dribbler_area = ball;
 
     // Even if the dribbler is on, we are guaranteed to apply kicking force
     // and disable ball control before the dribbler checks to apply dribbling force.
@@ -419,15 +403,7 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
 void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
                                               PhysicsBall *physics_ball)
 {
-    auto iter = std::find_if(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(),
-                             [physics_ball](DribblerBall dribbler_ball) {
-                                 return dribbler_ball.ball == physics_ball;
-                             });
-
-    if (iter != balls_in_dribbler_area.end())
-    {
-        balls_in_dribbler_area.erase(iter);
-    }
+    clearBallInDribblerArea();
 }
 
 void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
@@ -441,6 +417,11 @@ void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmwa
 {
     app_primitive_manager_runCurrentPrimitive(primitive_manager.get(),
                                               firmware_world.get());
+}
+
+void SimulatorRobot::clearBallInDribblerArea()
+{
+    ball_in_dribbler_area = std::nullopt;
 }
 
 void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
