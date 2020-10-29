@@ -18,6 +18,8 @@ class StopTactic : public Tactic
      */
     explicit StopTactic(bool coast);
 
+    StopTactic() = delete;
+
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally

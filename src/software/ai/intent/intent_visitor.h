@@ -20,6 +20,8 @@ class IntentVisitor
    public:
     virtual ~IntentVisitor() = default;
 
+    IntentVisitor() = delete;
+
     /**
      * Visits an Intent to perform an operation.
      * NOTE: Since NavigatingIntent also has a visitor, we need to visit each

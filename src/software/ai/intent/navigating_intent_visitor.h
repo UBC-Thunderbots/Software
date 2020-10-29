@@ -19,6 +19,8 @@ class NavigatingIntentVisitor
    public:
     virtual ~NavigatingIntentVisitor() = default;
 
+    NavigatingIntentVisitor() = delete;
+
     /**
      * Visits an NavigatingIntent to perform an operation.
      *

@@ -25,6 +25,8 @@ class PasserTactic : public Tactic
     explicit PasserTactic(Pass pass, const Ball& ball, const Field& field,
                           bool loop_forever);
 
+    PasserTactic() = delete;
+
     /**
      * Updates the world parameters for this PasserTactic.
      *

@@ -21,6 +21,8 @@ class MutableActionVisitor
    public:
     virtual ~MutableActionVisitor() = default;
 
+    MutableActionVisitor() = delete;
+
     // The javadoc comment for all methods here can be read as:
     /**
      * Visits an instance of X to perform an operation

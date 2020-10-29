@@ -24,6 +24,8 @@ class NavigatingIntent : public Intent
                               Point destination, double final_speed,
                               BallCollisionType ball_collision_type);
 
+    NavigatingIntent() = delete;
+
     /**
      * Accepts an NavigatingIntent Visitor and calls the visit function
      *
