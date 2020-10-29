@@ -437,23 +437,3 @@ cc_library(
     name = "mutable_tactic_visitor",
     hdrs = ["mutable_tactic_visitor.h"],
 )
-
-#cc_library(
-#    name = "tactic_world_params_update_visitor",
-#    srcs = ["tactic_world_params_update_visitor.cpp"],
-#    hdrs = ["tactic_world_params_update_visitor.h"],
-#    deps = [
-#        ":all_tactics",
-#        ":mutable_tactic_visitor",
-#    ],
-#)
-#
-#cc_test(
-#    name = "tactic_world_params_update_visitor_test",
-#    srcs = ["tactic_world_params_update_visitor_test.cpp"],
-#    deps = [
-#        ":tactic_world_params_update_visitor",
-#        "//software/test_util",
-#        "@gtest//:gtest_main",
-#    ],
-#)
