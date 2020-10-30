@@ -152,7 +152,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     - The Simulator runs our firmware and Box2D (a physics engine) to simulate how our robots would behave on the field.
     - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
     - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
-    - You can use cntrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
+    - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
 5. Run Robot Diagnostics: `bazel run //software/gui/robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
 
