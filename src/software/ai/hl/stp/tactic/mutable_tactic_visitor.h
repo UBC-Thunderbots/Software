@@ -33,8 +33,6 @@ class MutableTacticVisitor
    public:
     virtual ~MutableTacticVisitor() = default;
 
-    MutableTacticVisitor() = delete;
-
     // The javadoc comment for all methods here can be read as:
     /**
      * Visits an instance of X to perform an operation
