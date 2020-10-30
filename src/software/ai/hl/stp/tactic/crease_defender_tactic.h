@@ -42,11 +42,11 @@ class CreaseDefenderTactic : public Tactic
     CreaseDefenderTactic() = delete;
 
     /**
-    * Updates the world parameters for this ChipTactic.
-    *
-    * @param World The current state of the world
-    */
-    void updateWorldParams(const World& world) override;
+     * Updates the world parameters for this ChipTactic.
+     *
+     * @param World The current state of the world
+     */
+    void updateWorldParams(const World &world) override;
 
     /**
      * Updates the world parameters for this CreaseDefenderTactic.

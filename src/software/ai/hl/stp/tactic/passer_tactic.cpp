@@ -16,7 +16,8 @@ PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
 {
 }
 
-void PasserTactic::updateWorldParams(const World &world) {
+void PasserTactic::updateWorldParams(const World& world)
+{
     updateWorldParams(world.ball(), world.field());
 }
 

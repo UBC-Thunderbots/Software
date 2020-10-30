@@ -33,10 +33,10 @@ class ReceiverTactic : public Tactic
     ReceiverTactic() = delete;
 
     /**
-    * Updates the world parameters for this ChipTactic.
-    *
-    * @param World The current state of the world
-    */
+     * Updates the world parameters for this ChipTactic.
+     *
+     * @param World The current state of the world
+     */
     void updateWorldParams(const World& world) override;
 
     /**

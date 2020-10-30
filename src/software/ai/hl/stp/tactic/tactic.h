@@ -65,7 +65,7 @@ class Tactic
      *
      * @param world The current state of the world
      */
-    virtual void updateWorldParams(const World& world) = 0;
+    virtual void updateWorldParams(const World &world) = 0;
 
 
     /**

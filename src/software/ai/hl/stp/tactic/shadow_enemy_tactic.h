@@ -33,11 +33,11 @@ class ShadowEnemyTactic : public Tactic
     ShadowEnemyTactic() = delete;
 
     /**
-    * Updates the world parameters for this ChipTactic.
-    *
-    * @param World The current state of the world
-    */
-    void updateWorldParams(const World& world) override;
+     * Updates the world parameters for this ChipTactic.
+     *
+     * @param World The current state of the world
+     */
+    void updateWorldParams(const World &world) override;
 
     /**
      * Updates the world parameters for this ShadowEnemyTactic.

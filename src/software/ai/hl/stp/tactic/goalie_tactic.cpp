@@ -103,7 +103,8 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     }
 }
 
-void GoalieTactic::updateWorldParams(const World &world) {
+void GoalieTactic::updateWorldParams(const World &world)
+{
     updateWorldParams(world.ball(), world.field(), world.friendlyTeam(),
                       world.enemyTeam());
 }

@@ -21,7 +21,8 @@ PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
 {
 }
 
-void PenaltyKickTactic::updateWorldParams(const World &world) {
+void PenaltyKickTactic::updateWorldParams(const World& world)
+{
     updateWorldParams(world.ball(), world.enemyTeam().goalie(), world.field());
 }
 

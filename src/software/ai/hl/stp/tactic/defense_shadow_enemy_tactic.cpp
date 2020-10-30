@@ -21,14 +21,16 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
 {
 }
 
-void DefenseShadowEnemyTactic::updateWorldParams(const World &world) {
+void DefenseShadowEnemyTactic::updateWorldParams(const World &world)
+{
     updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                       world.ball());
 }
 
 void DefenseShadowEnemyTactic::updateWorldParams(const Field &updated_field,
                                                  const Team &updated_friendly_team,
-                                                 const Team &updated_enemy_team, const Ball &updated_ball)
+                                                 const Team &updated_enemy_team,
+                                                 const Ball &updated_ball)
 {
     this->field         = updated_field;
     this->friendly_team = updated_friendly_team;

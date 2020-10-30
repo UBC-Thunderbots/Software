@@ -10,7 +10,7 @@ ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
 }
 
 
-void ChipTactic::updateWorldParams(const World& world)
+void ChipTactic::updateWorldParams(const World &world)
 {
     updateWorldParams(world.ball());
 }

@@ -46,10 +46,10 @@ class ShadowFreekickerTactic : public Tactic
     void updateWorldParams(Team enemy_team, Ball ball);
 
     /**
-    * Updates the world parameters for this ChipTactic.
-    *
-    * @param World The current state of the world
-    */
+     * Updates the world parameters for this ChipTactic.
+     *
+     * @param World The current state of the world
+     */
     void updateWorldParams(const World& world) override;
 
     /**

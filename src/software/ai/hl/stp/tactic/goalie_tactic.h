@@ -52,11 +52,11 @@ class GoalieTactic : public Tactic
                            const Team &friendly_team, const Team &enemy_team);
 
     /**
-    * Updates the world parameters for this ChipTactic.
-    *
-    * @param World The current state of the world
-    */
-    void updateWorldParams(const World& world) override;
+     * Updates the world parameters for this ChipTactic.
+     *
+     * @param World The current state of the world
+     */
+    void updateWorldParams(const World &world) override;
 
     double calculateRobotCost(const Robot &robot, const World &world) override;
 

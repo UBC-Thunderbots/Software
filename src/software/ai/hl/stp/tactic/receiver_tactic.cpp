@@ -19,7 +19,8 @@ ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
 {
 }
 
-void ReceiverTactic::updateWorldParams(const World &world) {
+void ReceiverTactic::updateWorldParams(const World& world)
+{
     updateWorldParams(world.friendlyTeam(), world.enemyTeam(), world.ball());
 }
 

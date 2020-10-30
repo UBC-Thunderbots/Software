@@ -20,7 +20,8 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
 {
 }
 
-void ShadowEnemyTactic::updateWorldParams(const World &world) {
+void ShadowEnemyTactic::updateWorldParams(const World &world)
+{
     updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                       world.ball());
 }
