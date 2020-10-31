@@ -12,13 +12,6 @@ class KickoffChipTactic : public ChipTactic
 {
    public:
     /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
-    void updateWorldParams(const World& world) override;
-
-    /**
      * Creates a new KickoffChipTactic
      *
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
@@ -28,5 +21,7 @@ class KickoffChipTactic : public ChipTactic
 
     KickoffChipTactic() = delete;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void updateWorldParams(const World& world) override;
+
+    void accept(TacticVisitor& visitor) override;
 };

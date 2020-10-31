@@ -10,12 +10,7 @@
 class PenaltySetupTactic : public MoveTactic
 {
    public:
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
-    void updateWorldParams(const World& world) override;
+
 
     /**
      * Creates a new PenaltySetupTactic
@@ -25,7 +20,10 @@ class PenaltySetupTactic : public MoveTactic
      */
     explicit PenaltySetupTactic(bool loop_forever);
 
+    void updateWorldParams(const World& world) override;
+
     PenaltySetupTactic() = delete;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
+
 };

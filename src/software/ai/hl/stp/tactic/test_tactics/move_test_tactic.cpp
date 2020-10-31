@@ -34,7 +34,7 @@ void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 
-void MoveTestTactic::accept(MutableTacticVisitor &visitor)
+void MoveTestTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

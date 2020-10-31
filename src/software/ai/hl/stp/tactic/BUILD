@@ -416,7 +416,7 @@ cc_library(
     srcs = ["tactic.cpp"],
     hdrs = ["tactic.h"],
     deps = [
-        "mutable_tactic_visitor",
+        "tactic_visitor",
         "//software/ai/hl/stp/action",
         "//software/world",
     ],
@@ -434,6 +434,6 @@ cc_test(
 )
 
 cc_library(
-    name = "mutable_tactic_visitor",
-    hdrs = ["mutable_tactic_visitor.h"],
+    name = "tactic_visitor",
+    hdrs = ["tactic_visitor.h"],
 )

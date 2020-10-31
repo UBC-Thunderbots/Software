@@ -23,20 +23,12 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
 
 void DefenseShadowEnemyTactic::updateWorldParams(const World &world)
 {
-    updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                      world.ball());
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
 
-void DefenseShadowEnemyTactic::updateWorldParams(const Field &updated_field,
-                                                 const Team &updated_friendly_team,
-                                                 const Team &updated_enemy_team,
-                                                 const Ball &updated_ball)
-{
-    this->field         = updated_field;
-    this->friendly_team = updated_friendly_team;
-    this->enemy_team    = updated_enemy_team;
-    this->ball          = updated_ball;
-}
 
 void DefenseShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_threat)
 {
@@ -123,7 +115,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
     } while (!move_action->done());
 }
 
-void DefenseShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
+void DefenseShadowEnemyTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

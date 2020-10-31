@@ -25,17 +25,10 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
 
 void ShootGoalTactic::updateWorldParams(const World &world)
 {
-    updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                      world.ball());
-}
-
-void ShootGoalTactic::updateWorldParams(const Field &field, const Team &friendly_team,
-                                        const Team &enemy_team, const Ball &ball)
-{
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-    this->ball          = ball;
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
 
 void ShootGoalTactic::updateControlParams(std::optional<Point> chip_target)
@@ -180,7 +173,7 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!(kick_action->done() || chip_action->done()));
 }
 
-void ShootGoalTactic::accept(MutableTacticVisitor &visitor)
+void ShootGoalTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

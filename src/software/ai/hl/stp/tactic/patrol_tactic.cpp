@@ -85,7 +85,7 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (true);
 }
 
-void PatrolTactic::accept(MutableTacticVisitor &visitor)
+void PatrolTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

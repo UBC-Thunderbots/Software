@@ -4,7 +4,7 @@
 #include <optional>
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/world/world.h"
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
@@ -116,7 +116,7 @@ class Tactic
      *
      * @param visitor A Tactic Visitor
      */
-    virtual void accept(MutableTacticVisitor &visitor) = 0;
+    virtual void accept(TacticVisitor &visitor) = 0;
 
     virtual ~Tactic() = default;
 

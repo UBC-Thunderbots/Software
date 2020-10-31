@@ -19,13 +19,8 @@ ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadow
 
 void ShadowFreekickerTactic::updateWorldParams(const World &world)
 {
-    updateWorldParams(world.enemyTeam(), world.ball());
-}
-
-void ShadowFreekickerTactic::updateWorldParams(Team enemy_team, Ball ball)
-{
-    this->enemy_team = enemy_team;
-    this->ball       = ball;
+    this->enemy_team = world.enemyTeam();
+    this->ball       = world.ball();
 }
 
 double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -87,7 +82,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
     } while (true);
 }
 
-void ShadowFreekickerTactic::accept(MutableTacticVisitor &visitor)
+void ShadowFreekickerTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

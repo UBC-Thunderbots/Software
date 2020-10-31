@@ -11,7 +11,7 @@ KickoffChipTactic::KickoffChipTactic(const Ball& ball, bool loop_forever)
 
 void KickoffChipTactic::updateWorldParams(const World& world) {}
 
-void KickoffChipTactic::accept(MutableTacticVisitor& visitor)
+void KickoffChipTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

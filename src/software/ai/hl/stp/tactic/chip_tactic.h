@@ -20,19 +20,7 @@ class ChipTactic : public Tactic
 
     ChipTactic() = delete;
 
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
     void updateWorldParams(const World& world) override;
-
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param ball The ball being kicked
-     */
-    void updateWorldParams(const Ball& ball);
 
     /**
      * Updates the control parameters for this ChipTactic.
@@ -53,7 +41,7 @@ class ChipTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
     Ball getBall() const;
 

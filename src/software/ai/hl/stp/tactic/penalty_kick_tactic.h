@@ -24,22 +24,7 @@ class PenaltyKickTactic : public Tactic
 
     PenaltyKickTactic() = delete;
 
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
     void updateWorldParams(const World &world) override;
-
-    /**
-     * Updates the world parameters for this PenaltyKickTactic.
-     *
-     * @param updated_ball : The ball
-     * @param enemy_goalie : Optional variable for the enemy goalie robot
-     * @param field : The Field we are playing on
-     */
-    void updateWorldParams(const Ball &updated_ball,
-                           const std::optional<Robot> &enemy_goalie, const Field &field);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -52,7 +37,7 @@ class PenaltyKickTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) override;
 
     Ball getBall() const;
     Field getField() const;

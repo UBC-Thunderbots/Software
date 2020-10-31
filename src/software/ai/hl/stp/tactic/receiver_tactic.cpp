@@ -21,16 +21,9 @@ ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
 
 void ReceiverTactic::updateWorldParams(const World& world)
 {
-    updateWorldParams(world.friendlyTeam(), world.enemyTeam(), world.ball());
-}
-
-void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
-                                       const Team& updated_enemy_team,
-                                       const Ball& updated_ball)
-{
-    this->friendly_team = updated_friendly_team;
-    this->enemy_team    = updated_enemy_team;
-    this->ball          = updated_ball;
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
 
 void ReceiverTactic::updateControlParams(const Pass& updated_pass)
@@ -244,7 +237,7 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
     return Shot(ideal_position, ideal_orientation);
 }
 
-void ReceiverTactic::accept(MutableTacticVisitor& visitor)
+void ReceiverTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

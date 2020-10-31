@@ -17,14 +17,9 @@ class StopTactic : public Tactic
      * tactic will be restarted every time it completes
      */
     explicit StopTactic(bool coast);
-
+    
     StopTactic() = delete;
 
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
     void updateWorldParams(const World& world) override;
 
     /**
@@ -38,7 +33,7 @@ class StopTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

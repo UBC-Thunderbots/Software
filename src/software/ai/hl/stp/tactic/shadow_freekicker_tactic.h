@@ -36,20 +36,6 @@ class ShadowFreekickerTactic : public Tactic
 
     ShadowFreekickerTactic() = delete;
 
-    /**
-     * Updates the world parameters for this ShadowFreekicker tactic
-     *
-     * @param field : The field being played on
-     * @param enemy_team : The enemy team of robots.
-     * @param ball  : The Ball being played with
-     */
-    void updateWorldParams(Team enemy_team, Ball ball);
-
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
     void updateWorldParams(const World& world) override;
 
     /**
@@ -63,7 +49,7 @@ class ShadowFreekickerTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
     Ball getBall() const;
     Field getField() const;

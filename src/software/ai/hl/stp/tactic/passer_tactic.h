@@ -27,20 +27,7 @@ class PasserTactic : public Tactic
 
     PasserTactic() = delete;
 
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
     void updateWorldParams(const World& world) override;
-
-    /**
-     * Updates the world parameters for this PasserTactic.
-     *
-     * @param updated_ball The ball we're passing
-     * @param updated_field The field being played on
-     */
-    void updateWorldParams(const Ball& updated_ball, const Field& updated_field);
 
     /**
      * Updates the control parameters for this PasserTactic.
@@ -60,7 +47,7 @@ class PasserTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
     Ball getBall() const;
 

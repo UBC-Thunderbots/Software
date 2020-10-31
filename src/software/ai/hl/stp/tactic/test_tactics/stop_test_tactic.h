@@ -43,7 +43,7 @@ class StopTestTactic : public Tactic
      *
      * @throws std::invalid_argument always
      */
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

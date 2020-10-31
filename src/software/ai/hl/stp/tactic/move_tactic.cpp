@@ -42,7 +42,7 @@ void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void MoveTactic::accept(MutableTacticVisitor &visitor)
+void MoveTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

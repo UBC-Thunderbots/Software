@@ -32,22 +32,8 @@ class ReceiverTactic : public Tactic
 
     ReceiverTactic() = delete;
 
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
     void updateWorldParams(const World& world) override;
 
-    /**
-     * Updates the world parameters for this ReceiverTactic.
-     *
-     * @param updated_friendly_team The current state of the friendly team
-     * @param updated_enemy_team The current state of the enemy team
-     * @param updated_ball The ball being passed
-     */
-    void updateWorldParams(const Team& updated_friendly_team,
-                           const Team& updated_enemy_team, const Ball& updated_ball);
 
     /**
      * Updates the control parameters for this ReceiverTactic.
@@ -92,7 +78,7 @@ class ReceiverTactic : public Tactic
     static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
                                                      const Point& best_shot_target);
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
     Ball getBall() const;
     Field getField() const;
