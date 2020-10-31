@@ -11,7 +11,6 @@
 #include "software/parameter/enumerated_parameter.h"
 #include "software/parameter/numeric_parameter.h"
 #include "software/util/design_patterns/generic_factory.h"
-#include "software/world/game_state.h"
 
 class fooConfig;
 class exampleConfig;
