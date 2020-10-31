@@ -26,6 +26,9 @@ class SimulatorRobotSingletonTest : public testing::Test
    protected:
     void SetUp() override
     {
+        // We use the TestUtil::handleTestRobotLog function here
+        // to not log the robot ID and the colour of the Robot, as
+        // it's not relevant info in a test environment.
         app_logger_init(0, &TestUtil::handleTestRobotLog);
     }
 
