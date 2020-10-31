@@ -32,6 +32,7 @@ class LoggerSingleton
     LoggerSingleton()
     {
         logWorker = g3::LogWorker::createLogWorker();
+        auto sinkHandle = logWorker->addSink(std::make_unique<LogRotate>("thunderbots", "logger/logs"), &LogRotate::save);
         g3::initializeLogging(logWorker.get());
     }
 

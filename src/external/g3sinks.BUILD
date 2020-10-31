@@ -2,6 +2,8 @@ cc_library(
     name = "g3sinks",
     deps = [
         "@g3log",
+        "@boost//:filesystem",
+        "@zlib"
     ],
     srcs = glob(
         [
