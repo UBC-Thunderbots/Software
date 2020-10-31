@@ -391,6 +391,14 @@ class GameState
     bool operator!=(const GameState& other) const;
 
     /**
+     * Returns the point on the field where the ball should be placed if one is specified.
+     *
+     * @return the requested ball placement position on the field if one is specified,
+     * otherwise std::nullopt
+     */
+    std::optional<Point> getBallPlacementPoint(void) const;
+
+    /**
      * Sets the point on the field where the ball should be placed.
      * See Robocup SSL Rules Law 9.2.
      *

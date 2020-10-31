@@ -42,7 +42,7 @@ Team RobotTeamFilter::getFilteredData(
     // been detected for a while
     // TODO: Mathew - The RobotFilter and Team are both handling expiry now?
     // Just the filter probably should
-    auto most_recent_team_timestamp = new_team_state.lastUpdateTimestamp();
+    auto most_recent_team_timestamp = new_team_state.timestamp();
     if (most_recent_team_timestamp)
     {
         new_team_state.removeExpiredRobots(*most_recent_team_timestamp);

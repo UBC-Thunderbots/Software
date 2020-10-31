@@ -86,7 +86,7 @@ void RobotStatusTable::updateTableView()
     for (const auto& status_message : status_messages)
     {
         auto [message, age_duration] = status_message;
-        QString age = QString::number(std::floor(age_duration.getSeconds()));
+        QString age = QString::number(std::floor(age_duration.toSeconds()));
         setItem(row, 0, new QTableWidgetItem(age));
         setItem(row, 1, new QTableWidgetItem(QString::fromStdString(message)));
         row++;

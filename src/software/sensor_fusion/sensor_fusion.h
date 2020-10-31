@@ -60,21 +60,20 @@ class SensorFusion
     void updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame);
 
     /**
-     * Updates relevant components with a new ball state
+     * Updates relevant components with a new ball
      *
-     * @param new_ball_state new TimestampedBallState
+     * @param new_ball_state new Ball
      */
-    void updateBall(TimestampedBallState new_ball_state);
+    void updateBall(Ball new_ball);
 
     /**
      * Create state of the ball from a list of ball detections
      *
      * @param ball_detections list of ball detections to filter
      *
-     * @return TimestampedBallState if filtered from ball detections
+     * @return Ball if filtered from ball detections
      */
-    std::optional<TimestampedBallState> createTimestampedBallState(
-        const std::vector<BallDetection> &ball_detections);
+    std::optional<Ball> createBall(const std::vector<BallDetection> &ball_detections);
 
     /**
      * Create team from a list of robot detections
@@ -96,8 +95,17 @@ class SensorFusion
     RobotDetection invert(RobotDetection robot_detection) const;
     BallDetection invert(BallDetection ball_detection) const;
 
+    /**
+     * Determines if the team has control over the given ball
+     *
+     * @param team The team to check
+     * @param ball The ball to check
+     *
+     * @return whether the team has control over the ball
+     */
+    static bool teamHasBall(const Team &team, const Ball &ball);
+
     std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
-    unsigned int history_size;
     std::optional<Field> field;
     std::optional<Ball> ball;
     Team friendly_team;
@@ -109,5 +117,5 @@ class SensorFusion
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
 
-    BallHistory ball_states;
+    TeamSide team_with_possession;
 };

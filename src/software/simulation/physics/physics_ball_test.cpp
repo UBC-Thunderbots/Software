@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "shared/constants.h"
+#include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 
 class PhysicsBallTest : public testing::Test
@@ -27,7 +28,7 @@ class PhysicsBallTest : public testing::Test
     {
         double step_size_seconds = 1.0 / 60.0;
         unsigned int num_steps =
-            static_cast<unsigned int>(duration.getSeconds() / step_size_seconds);
+            static_cast<unsigned int>(duration.toSeconds() / step_size_seconds);
 
         // We have to take lots of small steps because a significant amount of accuracy
         // is lost if we take a single step of 1 second
@@ -426,4 +427,66 @@ TEST_F(PhysicsBallTest, get_height_when_ball_in_flight)
             EXPECT_DOUBLE_EQ(0.0, ball.distanceFromGround());
         }
     }
+}
+
+class PhysicsBallFrictionTest : public PhysicsBallTest
+{
+   protected:
+    virtual void SetUp()
+    {
+        PhysicsBallTest::SetUp();
+        simulator_config = std::make_shared<SimulatorConfig>();
+        simulator_config->mutableSlidingFrictionAcceleration()->setValue(5.0);
+        simulator_config->mutableRollingFrictionAcceleration()->setValue(0.5);
+    }
+
+    std::shared_ptr<SimulatorConfig> simulator_config;
+};
+
+TEST_F(PhysicsBallFrictionTest, test_no_friction_kick)
+{
+    Point position(3, 5);
+    Vector velocity(1, -1);
+    BallState initial_ball_state(position, velocity);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0);
+    physics_ball.setInitialKickSpeed(velocity.length());
+    physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.0));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(velocity, physics_ball.velocity(), 0.01));
+    physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.5));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(velocity, physics_ball.velocity(), 0.01));
+}
+
+TEST_F(PhysicsBallFrictionTest, test_rolling_friction)
+{
+    Point position(3, 5);
+    Vector velocity(3, -2);
+
+    BallState initial_ball_state(position, velocity);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    physics_ball.setInitialKickSpeed(velocity.length());
+    physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.0));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Vector(1.81, -1.21),
+                                               physics_ball.velocity(), 0.01));
+    physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.5));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Vector(1.19, -0.79),
+                                               physics_ball.velocity(), 0.01));
+}
+
+TEST_F(PhysicsBallFrictionTest, test_sliding_friction)
+{
+    Point position(3, 5);
+    Vector velocity(3, -2);
+
+    BallState initial_ball_state(position, velocity);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    physics_ball.setInitialKickSpeed(velocity.length());
+    physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.0));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Vector(1.81, -1.21),
+                                               physics_ball.velocity(), 0.01));
+    physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.5));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Vector(1.19, -0.79),
+                                               physics_ball.velocity(), 0.01));
+    physics_ball.applyBallFrictionModel(Duration::fromSeconds(2.6));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(Vector(0.11, -0.07),
+                                               physics_ball.velocity(), 0.01));
 }

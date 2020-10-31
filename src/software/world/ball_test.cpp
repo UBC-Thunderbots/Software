@@ -33,7 +33,7 @@ TEST_F(BallTest, construct_with_no_params)
 
     EXPECT_EQ(Point(), ball.position());
     EXPECT_EQ(Vector(), ball.velocity());
-    EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
+    EXPECT_EQ(current_time, ball.timestamp());
 }
 
 TEST_F(BallTest, construct_with_params)
@@ -42,25 +42,23 @@ TEST_F(BallTest, construct_with_params)
 
     EXPECT_EQ(Point(1, 2.3), ball.position());
     EXPECT_EQ(Vector(-0.04, 0.0), ball.velocity());
-    EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
+    EXPECT_EQ(current_time, ball.timestamp());
 }
 
 TEST_F(BallTest, construct_with_initial_state)
 {
-    Ball ball =
-        Ball(TimestampedBallState(Point(1, 2.3), Vector(-0.04, 0.0), current_time));
+    Ball ball = Ball(BallState(Point(1, 2.3), Vector(-0.04, 0.0)), current_time);
 
     EXPECT_EQ(Point(1, 2.3), ball.position());
     EXPECT_EQ(Vector(-0.04, 0.0), ball.velocity());
-    EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
+    EXPECT_EQ(current_time, ball.timestamp());
 }
 
 TEST_F(BallTest, update_state_with_all_params)
 {
     Ball ball = Ball(Point(), Vector(), current_time);
 
-    ball.updateState(
-        TimestampedBallState(Point(-4.23, 1.07), Vector(1, 2), one_second_future));
+    ball.updateState(BallState(Point(-4.23, 1.07), Vector(1, 2)), one_second_future);
 
     EXPECT_EQ(Ball(Point(-4.23, 1.07), Vector(1, 2), one_second_future), ball);
 }
@@ -69,8 +67,7 @@ TEST_F(BallTest, update_state_with_new_position_old_velocity)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
-    ball.updateState(
-        TimestampedBallState(Point(0.01, -99.8), ball.velocity(), current_time));
+    ball.updateState(BallState(Point(0.01, -99.8), ball.velocity()), current_time);
 
     EXPECT_EQ(Ball(Point(0.01, -99.8), Vector(1, 2), current_time), ball);
 }
@@ -79,8 +76,7 @@ TEST_F(BallTest, update_state_with_new_velocity_old_position)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
-    ball.updateState(
-        TimestampedBallState(ball.position(), Vector(-0.0, -9.433), current_time));
+    ball.updateState(BallState(ball.position(), Vector(-0.0, -9.433)), current_time);
 
     EXPECT_EQ(Ball(Point(-4.23, 1.07), Vector(-0.0, -9.433), current_time), ball);
 }
@@ -89,21 +85,21 @@ TEST_F(BallTest, update_state_with_new_ball)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
-    TimestampedBallState ball_updated_state =
-        TimestampedBallState(Point(), Vector(-4.89, 3.1), current_time);
+    BallState ball_updated_state(Point(), Vector(-4.89, 3.1));
 
-    ball.updateState(ball_updated_state);
+    ball.updateState(ball_updated_state, current_time);
 
     EXPECT_EQ(ball_updated_state, ball.currentState());
+    EXPECT_EQ(current_time, ball.timestamp());
 }
 
 TEST_F(BallTest, update_state_with_past_timestamp)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
-    ASSERT_THROW(ball.updateState(TimestampedBallState(Point(-4.23, 1.07), Vector(1, 2),
-                                                       one_second_past)),
-                 std::invalid_argument);
+    ASSERT_THROW(
+        ball.updateState(BallState(Point(-4.23, 1.07), Vector(1, 2)), one_second_past),
+        std::invalid_argument);
 }
 
 TEST_F(BallTest, get_position_at_current_time)
@@ -157,66 +153,26 @@ TEST_F(BallTest, equality_operator_balls_with_different_timestamps)
     EXPECT_EQ(ball_0, ball_1);
 }
 
-TEST_F(BallTest, get_position_history)
+TEST_F(BallTest, acceleration)
 {
-    std::vector prevPositions = {Point(-1.3, 3), Point(-1.2, 3), Point(3, 1.2)};
-
-    Ball ball = Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time);
-    ball.updateState(
-        TimestampedBallState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future));
-    ball.updateState(
-        TimestampedBallState(Point(-1.3, 3), Vector(2.3, -0.05), half_second_future));
-
-    BallHistory previous_states = ball.getPreviousStates();
-    std::vector<Point> previous_positions{};
-    for (size_t i = 0; i < previous_states.size(); i++)
-    {
-        previous_positions.push_back(previous_states.at(i).state().position());
-    }
-    EXPECT_EQ(prevPositions, previous_positions);
+    Ball ball_0 = Ball(Point(2, -3), Vector(1, 2), current_time);
+    EXPECT_EQ(Vector(0, 0), ball_0.acceleration());
+    Ball ball_1 = Ball(Point(2, -3), Vector(1, 2), current_time, Vector(-1, 2));
+    EXPECT_EQ(Vector(-1, 2), ball_1.acceleration());
 }
 
-TEST_F(BallTest, get_velocity_history)
+TEST_F(BallTest, estimate_future_state_no_acceleration)
 {
-    std::vector prevVelocities = {Vector(2.3, -0.05), Vector(2.2, -0.05), Vector(-3, 1)};
-
-    Ball ball = Ball(Point(3, 1.2), Vector(-3, 1), current_time);
-    ball.updateState(
-        TimestampedBallState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future));
-    ball.updateState(
-        TimestampedBallState(Point(-1.3, 3), Vector(2.3, -0.05), half_second_future));
-
-    BallHistory previous_states = ball.getPreviousStates();
-    std::vector<Vector> previous_velocities{};
-    for (size_t i = 0; i < previous_states.size(); i++)
-    {
-        previous_velocities.push_back(previous_states.at(i).state().velocity());
-    }
-    EXPECT_EQ(prevVelocities, previous_velocities);
+    Ball ball = Ball(Point(2, -3), Vector(1, 2), current_time);
+    BallState expected_future_ball_state(Point(3, -1), Vector(1, 2));
+    EXPECT_EQ(expected_future_ball_state,
+              ball.estimateFutureState(Duration::fromSeconds(1.0)));
 }
 
-TEST_F(BallTest, get_timestamp_history)
+TEST_F(BallTest, estimate_future_state_friction)
 {
-    std::vector prevAngularVelocities = {half_second_future, half_second_future,
-                                         current_time};
-
-    Ball ball = Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time);
-    ball.updateState(
-        TimestampedBallState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future));
-    ball.updateState(
-        TimestampedBallState(Point(-1.3, 3), Vector(2.3, -0.05), half_second_future));
-
-    BallHistory previous_states = ball.getPreviousStates();
-    std::vector<Timestamp> previous_timestamps{};
-    for (size_t i = 0; i < previous_states.size(); i++)
-    {
-        previous_timestamps.push_back(previous_states.at(i).timestamp());
-    }
-    EXPECT_EQ(prevAngularVelocities, previous_timestamps);
-}
-
-TEST_F(BallTest, initialize_ball_with_history_size_0)
-{
-    EXPECT_THROW(Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time, 0),
-                 std::invalid_argument);
+    Ball ball = Ball(Point(2, -3), Vector(1, 2), current_time, Vector(-0.5, -1));
+    BallState expected_future_ball_state(Point(2.75, -1.5), Vector(.5, 1));
+    EXPECT_EQ(expected_future_ball_state,
+              ball.estimateFutureState(Duration::fromSeconds(1.0)));
 }

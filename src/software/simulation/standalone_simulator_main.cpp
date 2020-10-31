@@ -25,8 +25,22 @@ int main(int argc, char **argv)
                 ->setValue(args->interface()->value());
         }
 
+        // Experimentally determined restitution value
+        MutableDynamicParameters->getMutableSimulatorConfig()
+            ->mutableBallRestitution()
+            ->setValue(0.8);
+        // Measured these values from fig. 9 on page 8 of
+        // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
+        MutableDynamicParameters->getMutableSimulatorConfig()
+            ->mutableSlidingFrictionAcceleration()
+            ->setValue(6.9);
+        MutableDynamicParameters->getMutableSimulatorConfig()
+            ->mutableRollingFrictionAcceleration()
+            ->setValue(0.5);
+
         auto standalone_simulator = std::make_shared<StandaloneSimulator>(
-            MutableDynamicParameters->getMutableStandaloneSimulatorConfig());
+            MutableDynamicParameters->getMutableStandaloneSimulatorConfig(),
+            MutableDynamicParameters->getMutableSimulatorConfig());
         standalone_simulator->setupInitialSimulationState();
 
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(

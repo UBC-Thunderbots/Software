@@ -20,7 +20,7 @@ void app_autokick_move_primitive_start(TbotsProto_AutokickMovePrimitive prim_msg
     app_chicker_enableAutokick(chicker, prim_msg.kick_speed_meters_per_second);
 }
 
-static void autokick_move_tick(void* void_state_ptr, FirmwareWorld_t* world)
+static void app_autokick_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     app_move_helper_tick(void_state_ptr, world);
 }
@@ -28,7 +28,7 @@ static void autokick_move_tick(void* void_state_ptr, FirmwareWorld_t* world)
 /**
  * \brief The autokick move primitive.
  */
-const primitive_t AUTOKICK_MOVE_PRIMITIVE = {.direct        = false,
-                                             .tick          = &autokick_move_tick,
+const primitive_t AUTOKICK_MOVE_PRIMITIVE = {.direct = false,
+                                             .tick   = &app_autokick_move_primitive_tick,
                                              .create_state  = &createMoveHelperState_t,
                                              .destroy_state = &destroyMoveHelperState_t};

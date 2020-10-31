@@ -42,12 +42,18 @@ Windows has a Windows Subsystem for Linux component that can be used to develop 
 2. Start WSL and use your terminal text editor of choice to edit `/etc/profile.d/wsl-integration.sh` and change the line `export LIBGL_ALWAYS_INDIRECT=1` to `# export LIBGL_ALWAYS_INDIRECT=1`
     - This comments out the line that sets the `LIBGL_ALWAYS_INDIRECT` environment variable which sets OpenGL programs to render on the X server instead of directly using the local OpenGL drivers. Unfortunately, this only supports OpenGL 1.4 which makes thunderbots give a black window.
     - This makes WSL use the `llvmpipe` software rasterizer instead, which will run extremely poorly on low spec machines. 
-3. Start an X server by opening Xlaunch through the Start menu.
+3. Create a firewall exception for VcXsrv. This is required because the X Window System communication between the Hyper-V Linux VM and the Windows-side X server appears as network traffic over the `vEthernet (WSL)` network interface from another computer.
+    - Open the Start menu and type "Firewall & network protection" to take you to the firewall settings.
+    - Click "Allow an app through firewall". A window will appear titled "Allow apps to communicate through Windows Defender firewall".
+    - Click "Allow another app" on the window that just popped up. Hit "Browse" and navigate to where you installed "VcXsrv", usually `C:\Program Files\VcXsrv\`. Select `VcXsrv.exe`.
+    - Click "Network types..." in the bottom-left corner. Check off `Private` and `Public`.
+    - Click add.
+4. Start an X server by opening Xlaunch through the Start menu.
     - Choose 'Multiple windows' on the first screen
     - Choose 'Start no client' on the second screen
     - On the third screen, make sure 'Native opengl' is UNCHECKED and 'Disable access control' is CHECKED
-4. Shut down WSL with `wsl --shutdown` on the Windows command line. Open WSL again through the Ubuntu app in the Start menu.
-5. Install glxgears with `sudo apt install mesa-utils`. glxgears is a tool we will use to validate that everything is set up correctly.
-6. Verify that your system is configured correctly by running `glxgears -info` on the Linux command line. You should see a window pop up with spinning gears and the line `GL_RENDERER   = llvmpipe (LLVM 9.0, 256 bits)` at the top of the output.
+5. Shut down WSL with `wsl --shutdown` on the Windows command line. Open WSL again through the Ubuntu app in the Start menu.
+6. Install glxgears by updating your package lists with `sudo apt update`, and then installing with `sudo apt install mesa-utils`. glxgears is a tool we will use to validate that everything is set up correctly.
+7. Verify that your system is configured correctly by running `glxgears -info` on the Linux command line. You should see a window pop up with spinning gears and the line `GL_RENDERER   = llvmpipe (LLVM 9.0, 256 bits)` at the top of the output.
 
 Once you have completed all of the above, complete the [Software Setup](./getting-started.md).

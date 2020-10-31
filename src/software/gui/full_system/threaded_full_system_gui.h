@@ -6,6 +6,7 @@
 #include <future>
 #include <thread>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/geom/rectangle.h"
 #include "software/gui/drawing/draw_functions.h"
@@ -19,10 +20,12 @@
  * This class wraps our FullSystemGUI object which is responsible for
  * visualizing information about our AI, and allowing users to control it.
  */
-class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
-                              public FirstInFirstOutThreadedObserver<AIDrawFunction>,
-                              public FirstInFirstOutThreadedObserver<PlayInfo>,
-                              public FirstInFirstOutThreadedObserver<SensorProto>
+class ThreadedFullSystemGUI
+    : public FirstInFirstOutThreadedObserver<World>,
+      public FirstInFirstOutThreadedObserver<AIDrawFunction>,
+      public FirstInFirstOutThreadedObserver<PlayInfo>,
+      public FirstInFirstOutThreadedObserver<SensorProto>,
+      public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
    public:
     explicit ThreadedFullSystemGUI();
@@ -33,6 +36,7 @@ class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
     void onValueReceived(AIDrawFunction draw_function) override;
     void onValueReceived(PlayInfo play_info) override;
     void onValueReceived(SensorProto sensor_msg) override;
+    void onValueReceived(TbotsProto::PrimitiveSet primitive_msg) override;
 
     /**
      * Returns a shared_ptr to a promise that can be waited on, and that will
@@ -63,6 +67,8 @@ class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> worlds_received_per_second_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> primitives_sent_per_second_buffer;
 
     // We want to show the most recent world and AI data, but also want things to look
     // smooth if the stream of data isn't perfectly consistent, so we use a very small
@@ -79,6 +85,8 @@ class ThreadedFullSystemGUI : public FirstInFirstOutThreadedObserver<World>,
     // We only care about the most recent view area that was requested, so the
     // buffer is of size 1
     static constexpr std::size_t VIEW_AREA_BUFFER_SIZE = 1;
+    // We only care about the most recent "data" per second values
+    static constexpr std::size_t DATA_PER_SECOND_BUFFER_SIZE = 1;
     // When the application starts up we want to set the initial view area
     // to show all the contents nicely. For some reason doing this only
     // once at the start of the program isn't enough, the GUI seems to need
