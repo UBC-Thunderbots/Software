@@ -10,7 +10,7 @@
     * [Robot](#robot)
     * [Ball](#ball)
     * [Field](#field)
-    * [Gamestate](#gamestate)
+    * [GameState](#gamestate)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
 * [Important Protobuf Messages](#important-protobuf-messages)
@@ -35,9 +35,9 @@
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
   * [Backend](#backend)
-    * [Input](#input-responsibilities)
-    * [Output](#output-responsibilities)
     * [Diagram](#backend-diagram)
+  * [Sensor Fusion](#sensor-fusion)
+    * [Filters](#filters)
   * [AI](#ai)
     * [Strategy](#strategy)
       * [Skills / Actions](#skills--actions)
@@ -51,12 +51,13 @@
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
     * [Draw Functions](#draw-functions)
-* [Simulated Integration Tests](#simulated-integration-tests)
-  * [Architecture](#simulated-integration-tests-architecture)
-    * [Simulator Backend](#simulator-backend)
-    * [World State Validator](#world-state-validator)
-  * [Component Connections and Determinism](#component-connections-and-determinism)
-  * [Diagram](#simulated-integration-tests-diagram)
+* [Simulator](#simulator)
+  * [Standalone Simulator](#standalone-simulator)
+  * [Simulated Tests](#simulated-tests)
+    * [Architecture](#simulated-tests-architecture)
+      * [Validation Functions](#validation-functions)
+    * [Component Connections and Determinism](#component-connections-and-determinism)
+    * [Diagram](#simulated-tests-diagram)
 * [GUI](#gui)
   * [Naming](#naming)
   * [Editing the GUIs](#editing-the-guis)
@@ -79,7 +80,7 @@ A few commonly-used terms and tools to be familiar with:
 
 
 # Important Classes
-These are classes that are either heavily used in our code, or are very important for understanding how the [AI](#ai) works, but are _not_ core components of the [AI](#ai) or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [AI](#ai), and [Visualizer](#visualizer).
+These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [Sensor Fusion](#sensor-fusion), [AI](#ai), and [Visualizer](#visualizer).
 
 ## World
 The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current referee commands. Altogether, it's the information we have at any given time that we can use to make decisions.
@@ -196,7 +197,7 @@ In our system, we need to be able to do multiple things (receive camera data, ru
 **WARNING:** If a class extends multiple `ThreadedObserver`s (for example, [AI](#ai) could extend `ThreadedObserver<World>` and `ThreadedObserver<RobotStatus>`), then there will be two threads running, one for each observer. We **do not check** for data race conditions between observers, so it's entirely possible that one `ThreadedObserver` thread could read/write from data at the same time as the other `ThreadedObserver` is reading/writing the same data. Please make sure any data read/written to/from multiple `ThreadedObserver`s is thread-safe.
 
 ### Example
-One example of this is the `Backend`, which extends `Subject<World>` and the [AI](#ai), which extends `ThreadedObserver<World>`. The backend runs in one thread and sends data to the [AI](#ai), which receives and processes it another thread.
+One example of this is [SensorFusion](#sensor-fusion), which extends `Subject<World>` and the [AI](#ai), which extends `ThreadedObserver<World>`. [SensorFusion](#sensor-fusion) runs in one thread and sends data to the [AI](#ai), which receives and processes it another thread.
 
 ## C++ Templating
 While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
@@ -240,7 +241,7 @@ Lets walk through what's happening here:
     * "yielding" the data here is effectively returning it so that the code in the `main` function can print the result
 3. The second time `main()` calls the `fib()` function, the function will resume immediately after the `yield()` statement. This means that execution will go back to the top of the loop, *and still remember the values of `f1` and `f2` from the last time the function was called*. Since the coroutine saved the function state, it still has the previous values of `f1` and `f2` which it uses to compute the next value in the sequence.
 4. Once again when the `yield()` statement is reached, the newly computed value is returned and the function state is saved. You can think of this as "pausing" the function.
-5. As `main()` keeps calling the `fib()` function, it is computing and returning the values of the fibonacci sequence, and this only works because the coroutine "remembers" the values from each previous fibonacci computation which is uses to compute the next value the next time the function is called.
+5. As `main()` keeps calling the `fib()` function, it is computing and returning the values of the fibonacci sequence, and this only works because the coroutine "remembers" the values from each previous fibonacci computation which it uses to compute the next value the next time the function is called.
     * If the `yield` was replaced with a regular `return` statement, the function would only ever return the value `1`. This is because using `return` would not save the function state, so the next time it's called the function would start at the beginning again, and only ever compute the first value of the sequence.
 
 
@@ -248,7 +249,7 @@ This example / pseudocode does hide away some details about how coroutines are s
 
 
 ## What Coroutines Do We Use?
-We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs/coroutine2/doc/html/index.html). Specifically, we use Asymetric Coroutines.
+We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs/coroutine2/doc/html/index.html). Specifically, we use Asymmetric Coroutines.
 
 [This stackoverfow answer](https://stackoverflow.com/a/42042904) gives a decent explanation of the difference between Symmetric and Asymmetric Coroutines, but understanding the difference is not critical for our purposes. We use Asymmetric Coroutines because boost does not provide Symmetric Coroutines, and the hierarchical structure of Asymmetric Coroutines is more useful to us.
 
@@ -306,7 +307,7 @@ In order to overcome this, our convention is that:
 
 This is easiest to understand in the [diagram](#convention-diagram) below.
 
-Based on what side we are defending, the [Backend](#backend) will transform all the coordinates of incoming data so that it will match our convention. This means that from the perspective of the rest of the system, the friendly half of the field is always negative x and the enemy half is always positive x. Now when we want to tell a robot to move to the friendly goal, we can simply tell it so move to `(-4.5, 0)` and we know this will _always_ be the friendly side. All of our code is written with the assumption in mind.
+Based on what side we are defending, [Sensor Fusion](#sensor-fusion) will transform all the coordinates of incoming data so that it will match our convention. This means that from the perspective of the rest of the system, the friendly half of the field is always negative x and the enemy half is always positive x. Now when we want to tell a robot to move to the friendly goal, we can simply tell it so move to `(-4.5, 0)` and we know this will _always_ be the friendly side. All of our code is written with the assumption in mind.
 
 ## Angles
 Going along with our coordinate convention, we have a convention for angles as well. An Angle of `0` is along the positive x-axis (facing the enemy goal), and positive rotation is counter-clockwise (from a perspective above the field, looking at it like a regular x-y plane where +y is "up"). See the [diagram](#convention-diagram) below.
@@ -318,9 +319,9 @@ Because of our [Coordinate Conventions](#coordinates), this means that an angle 
 
 
 # Architecture Overview
-At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern). Together, they are what make up our [AI](#ai).
+At a high-level our system is made of 4 main components: The [Backend](#backend), the [Sensor Fusion](#sensor-fusion), the [AI](#ai), and the [Visualizer](#visualizer). These 4 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern).
 
-The Backend is responsible for communicating with the outside world (network and radio), the [AI](#ai) is what makes the actual gameplay decisions, and the Visualizer shows us what's happening and lets us control the [AI](#ai).
+The [Backend](#backend) is responsible for communicating with the outside world (network and radio), [Sensor Fusion](#sensor-fusion) is responsible for processing and filtering raw data, the [AI](#ai) makes the actual gameplay decisions, and the [Visualizer](#visualizer) shows us what's happening and lets us control the [AI](#ai).
 
 Each component is described in more detail in their own sections.
 
@@ -329,32 +330,35 @@ Each component is described in more detail in their own sections.
 
 
 # Backend
-The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into Input and Output.
+The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication using `SensorProto` and [Primitives](#primitives) messages:
 
-### Input Responsibilities
-1. Receiving robot status messages
-2. Receiving vision data about where the robots and ball are (typically provided by [SSL-Vision](#ssl-vision))
-2. Receiving referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
-3. Filtering the received data
-    * **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
-4. Storing the filtered data into the [World](#world) datastructures understood by our system
-5. Sending the filtered data to the rest of the system
+* Upon receiving the following messages from the network (outside world), the `Backend` will store it in a `SensorProto` message and send it to [Sensor Fusion](sensor-fusion):
+  * Robot status messages
+  * Vision data about where the robots and ball are (typically from [SSL-Vision](#ssl-vision))
+  * Referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
 
-### Output Responsibilities
-1. Sending robot primitives to the robots
+* Upon receiving [Primitives](#primitives) from the [AI](#ai), `Backend` will send the primitives to the robots or the [Simulator](#simulator).
 
-In practice, the `Backend` is just a simple interface that specifies [World](#world) and [Robot Status](#robot-status) objects must be produced, and [Primitives](#primitives) may be consumed. The interface is very generic so that different implementations may be swapped out in order to communicate with different hardware / protocols / programs. For example, we have multiple implementations of the "output" part of the backend: one that lets us send data to our real robots using the radio, and one that sends commands to simulated robots in the simulator.
-
+The `Backend` was designed to be a simple interface that handles all communication with the "outside world", allowing for different implementations that can be swapped out in order to communicate with different hardware / protocols / programs.
 
 #### Backend Diagram
 ![Backend Diagram](images/backend_diagram.svg)
 
+# Sensor Fusion
+`Sensor Fusion` is responsible for processing the raw data contained in SensorProto into a coherent snapshot of the [World](#world) that the [AI](#ai) can use. It invokes filters to update components of [World](#world), and then combines the components to send out the most up-to-date version.
 
-# [AI](#ai)
-The [AI](#ai) is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from the [Backend](#backend) to make decisions, and sends [Primitives](#primitives) back to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
+## Filters
+Filters take the raw data from SensorProto and returns an updated version of a component of the [World](#world). For example, the `BallFilter` takes `BallDetection`s and returns an updated `Ball`.
 
-The 2 main components of the [AI](#ai) are strategy and navigation.
+* **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
 
+Filters provide a flexible way to modularize the processing of raw data, making it easy to update filters and add new ones. Filters are sometimes stateful. For example, the `BallFilter` "remembers" previous locations of the ball in order to estimate the ball's current velocity.
+
+
+# AI
+The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from [Sensor Fusion](#sensor-fusion) to make decisions, and sends [Primitives](#primitives) to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
+
+The 2 main components of the `AI` are strategy and navigation.
 
 ## Strategy
 We use a framework called `STP (Skills, Tactics, Plays)` to implement our stratgy. The `STP` framework was originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
@@ -433,7 +437,7 @@ The [Visualizer](#visualizer) is implemented using [Qt](https://www.qt.io/), a C
 * [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) (specifically for Widget-based applications)
 * [Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
 
-The [Visualizer](#visualizer) is made up of 3 major components:
+The [Visualizer](#visualizer) is made up of the following components:
 * Qt Components
   * The [QApplication](https://doc.qt.io/qt-5/qapplication.html). This is the Qt component that manages the event loop and all the widgets in the GUI.
   * The `Visualizer Widget`. This contains all of the graphical components used in the [Visualizer](#visualizer).
@@ -455,7 +459,22 @@ Although we want to display information about the [AI](#ai) in the [Visualizer](
 A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
 
 
-# Simulated Integration Tests
+# Simulator
+The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:
+* [SSL-Vision](#ssl-vision) by publishing new vision data
+* the robots by accepting new [Primitives](#primitives)
+
+Using the current state of the simulated world, the `Simulator` simulates the new [Primitives](#primitives) over some time step and publishes new ssl vision data based on the updated simulated world. The `Simulator` is designed to be "perfect", which means that
+* the vision data it publishes exactly reflects the state of the simulated world
+* the simulation perfectly reflects our best understanding of the physics (e.g. friction) with no randomness.
+
+The `Simulator` uses `Box2D`, which provides 2D physics simulation for free. While this simplifies the simulator greatly, it means that we manually implement the physics for "3D effects", such as dribbling and chipping.
+
+## Standalone Simulator
+The `Standalone Simulator` is a wrapper around the `Simulator` so that we can run it as a standlone application that publishes and receives data over the network. The `Standalone Simulator` is designed to interface with the [WifiBackend](#backend) over the network, and so it is essentially indistinguishible from robots receiving [Primitives](#primitives) and an [SSL-Vision](#ssl-vision) client publishing data over the network. The `Standalone Simulator` also has a [GUI](#gui) that provides user-friendly features, such as moving the ball around.
+
+## Simulated Tests
+
 When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
 
 Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire [AI](#ai) pipeline and validate behaviour.
@@ -465,48 +484,41 @@ The primary design goals of this test system are:
 2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
 3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and to understand what they are testing.
 
-## Simulated Integration Tests Architecture
-The system consists of three main components:
-1. A [Backend](#backend) that performs the simulation
-2. A [World State Validator](#world-state-validator) Observer that will handle the "validation"
+### Simulated Tests Architecture
+The `SimulatedTestFixture` consists of three components:
+1. A [Simulator](#simulator) that does physics simulations based on the [Primitives](#primitives) it receives
+2. A [Sensor Fusion](#sensor-fusion) that processed raw data for the [AI](#ai)
 3. The [AI](#ai) under test
 
-### Simulator Backend
-The `SimulatorBackend` is simply another implementation of the [Backend](#backend) interface. It uses a physics library to simulate the various components of the [World](#world), like the [Ball](#ball) and [Robots](#robot). Like any [Backend](#backend), the `SimulatorBackend` publishes the state of the [World](#world) periodically.
+The components of this system are run in a big loop. The [Simulator](#simulator) publishes new vision data with a fixed increment and that data is passed through [Sensor Fusion](#sensor-fusion) to produced an updated [World](#world) for the [AI](#ai). The `SimulatedTestFixture` will wait to receive [Primitives](#primitives) before triggering simulation and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
 
-In order to achieve determinism, the `SimulatorBackend` publishes new [World](#world)'s with a fixed time increment (in [World](#world) time), and will wait to receive [Primitives](#primitives) before simulating and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
+#### Validation Functions
+`Validation Functions` are the way we check that the behaviour of the AI is as we expect. They are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. We can create a list of `Validation Functions` that are run every time `SimulatedTestFixture` produces an updated [World](#world), so that we can continuously check that the behaviour of the [AI](#ai) is as we expected. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
 
-### World State Validator
-The `WorldStateValidator` is an Observer whose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
+A `Validation Function` comes in two types:
+1. Terminating: Some sequence of states or actions that must occur **in a given order** and then **terminate**. (*Eg. A robot moves to point A, then point B, and then finally kicks the ball*)
+2. Non-terminating: Some condition that must be met for the entire duration of the test, i.e. "for all time". (*Eg. The ball never leaves the field or all friendly robots follows SSL rules*).
 
-There are generally 2 "types" of conditions we want to validate.
-1. Some sequence of states or actions occur **in a given order**. (*Eg. A robot moves to point A, then point B, then kicks the  ball*)
-2. Some condition is met for the duration of the test, or for "all time". (*Eg. The ball never leaves the field, or robots never collide*)
-
-We use `ValidationFunctions` to validate both types of conditions. `ValidationFunctions` are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. This lets us write individual functions that can be continuously run to validate both types of conditions above.
-
-Benefits of `ValidationFunctions`:
+Benefits of `Validation Functions`:
 1. They are reuseable. We can write a function that validates the ball never leaves the field, and use it for multiple tests.
-2. They can represent assertions for more complex behavior. For example, we can build up simpler `ValidationFunctions` until we have a single `Validation` function for a specific [Tactic](#tactics).
-3. They let us validate independent sequences of behaviour. For example, we can give the `WorldStateValidator` a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
+2. They can represent assertions for more complex behaviour. For example, we can build up simpler `Validation Functions` until we have a single `Validation` function for a specific [Tactic](#tactics).
+3. They let us validate independent sequences of behaviour. For example, we create a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
 
-The `WorldStateValidator` accepts lists of `ValidationFunctions` that it will run against each [World](#world) it receives. Once all `ValidationFunctions` have been run, the `WorldStateValidator` publishes the [World](#world) again. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
-
-## Component Connections and Determinism
+### Component Connections and Determinism
 When testing, determinism is extremely important. With large integration tests with many components, there are all kinds of timings and execution speed differences that can change the behaviour and results. We make use of a few assumptions and connect our components in such a way that prevents these timing issues.
 
-Most importantly, the [WorldStateValidator](#world-state-validator) acts as a "middleman" between the [Backend](#backend) and [AI](#ai). The [WorldStateValidator](#world-state-validator) observes the [World](#world) from the [Backend](#backend), and the [AI](#ai) observes the [World](#world) from the [WorldStateValidator](#world-state-validator). **The [AI](#ai) does not observe the [World](#world) directly from the [Backend](#backend) in this case.** See the [diagram](#simulated-integration-tests-diagram).
+The [Validation Functions](#validation-functions) are run before updating [AI](#ai) with a new [World](#world) and getting new primitives so that we stop as soon as we know that there's incorrect behaviour. See the [diagram](#simulated-tests-diagram).
 
-Now we have a nice loop from the `Backend -> WorldStateValidator -> [AI](#ai) -> Backend ...`. As mentioned in their own sections, the [Simulator Backend](#simulator-backend) waits to receive [Primitives](#primitives) from the [AI](#ai) before publishing a new [World](#world), and the [WorldStateValidator](#world-state-validator) waits to receive and validate a [World](#world) before re-publishing the [World](#world). **The final assumption we make to complete this loop is that the [AI](#ai) waits to receive a new [World](#world) before publishing new [Primitives](#primitives).**
+Now we have a nice loop from the `Simulator -> Sensor Fusion -> Validation Functions -> AI -> Simulator ...`. As mentioned in their own sections, the [Simulator](#simulator) waits to receive [Primitives](#primitives) from the [AI](#ai) before publishing a new [World](#world), and the [Validation Functions](#validation-functions) wait to receive and validate a [World](#world) allowing the new world to be published. **The final assumption we make to complete this loop is that the [AI](#ai) waits to receive a new [World](#world) before publishing new [Primitives](#primitives).**
 
 **What this means is that each component in the loop waits for the previous one to finish its task and publish new data before executing.** As a result, no matter how fast each component is able to run, we will not have any issues related to speed or timing because each component is blocked by the previous one. As a result, we can have deterministic behaviour because every component is running at the same speed relative to one another.
 
-## Simulated Integration Tests Diagram
-Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the only real difference being the [World State Validator](#world-state-validator) being added between the [Backend](#backend) and [AI](#ai).
+### Simulated Tests Diagram
+Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the [Backend](#backend) replaced by the [Simulator](#simulator) and with [Validation Functions](#validation-functions) in the loop between [Sensor Fusion](#sensor-fusion) and [AI](#ai).
 
-The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and generally not run during the tests (unless debugging).
+The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and are not run during the tests unless we are debugging.
 
-![Simulated Testing High-level Architecture Diagram](images/simulated_integration_test_high_level_architecture.svg)
+![Simulated Testing High-level Architecture Diagram](images/simulated_test_high_level_architecture.svg)
 
 
 # GUI

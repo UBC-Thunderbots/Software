@@ -109,13 +109,13 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 
 ### From the command-line
 
-1) Navigate to the root of this repository (wherever you have it cloned on your computer)
-2) Navigate to `src`.
-3) Build a specific target for running (for example): `bazel build //software/geom:angle_test`
-4) Run a specific target by running (for example): `bazel run //software/geom:angle_test`
-4) Run a specific *test* by running (for example): `bazel test //software/geom:angle_test`
-3) Build everything by running `bazel build //...`
-4) Run all the tests by running `bazel test //...`
+1. Navigate to the root of this repository (wherever you have it cloned on your computer)
+2. Navigate to `src`.
+3. Build a specific target for running (for example): `bazel build //software/geom:angle_test`
+4. Run a specific target by running (for example): `bazel run //software/geom:angle_test`
+5. Run a specific *test* by running (for example): `bazel test //software/geom:angle_test`
+6. Build everything by running `bazel build //...`
+7. Run all the tests by running `bazel test //...`
 *See the bazel [command-line docs](https://docs.bazel.build/versions/master/command-line-reference.html) for more info.*
 
 ### With CLion
@@ -127,7 +127,7 @@ First we need to setup CLion
 4. Select `Import project view file`, and select the file `.bazelproject` (which will be under the `src` folder)
 5. Click `Next`
 6. Change the Project Name to whatever you want. Leave everything else as it is ("Use shared project view file" should be selected).
-6. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
+7. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
 
 
 Now that you're setup, if you can run it on the command line, you can run it in clion. There are two main ways of doing so.
@@ -138,6 +138,24 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     3. For `Target Expression`, you can put anything that comes after a `build`, `run`, `test`, etc. call on the command line. For example: `//software/geom:angle_test`.
     4. For `Bazel Command` you can put any bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
+
+### Running our AI, Simulator or Robot Diagnostics
+
+1. Open your terminal and run `ifconfig`.
+2. Pick the network interface you would like to use:
+    1. If you are running things locally, you can pick any interface that is not `lo`
+    2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
+3. Run our AI: `bazel run //software:full_system -- --interface=[interface_here] --backend=WifiBackend`
+    - This will launch the Visualizer, which displays what the AI is currently "seeing" and allows us to interact with the AI through the dynamic parameters.
+    - The field should be empty, as we are currently not receiving SSL Vision packets.
+4. Run our Simulator: `bazel run //software/simulation:standalone_simulator_main -- --interface=[interface_here]`
+    - The Simulator runs our firmware and Box2D (a physics engine) to simulate how our robots would behave on the field.
+    - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
+    - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
+    - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
+5. Run Robot Diagnostics: `bazel run //software/gui/robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
+    - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
+
 
 ## Debugging
 Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 

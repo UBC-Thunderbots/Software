@@ -152,6 +152,11 @@ void GameState::setBallPlacementPoint(Point placement_point)
     ball_placement_point_ = placement_point;
 }
 
+std::optional<Point> GameState::getBallPlacementPoint() const
+{
+    return ball_placement_point_;
+}
+
 // apologies for this monster switch statement
 void GameState::updateRefereeCommand(RefereeCommand command)
 {

@@ -16,14 +16,10 @@ extern "C"
 #include "shared/proto/robot_log_msg.nanopb.h"
 }
 
-Simulator::Simulator(const Field& field, const Duration& physics_time_step)
-    : Simulator(field, 1.0, 0.0, physics_time_step)
-{
-}
-
-Simulator::Simulator(const Field& field, double ball_restitution,
-                     double ball_linear_damping, const Duration& physics_time_step)
-    : physics_world(field, ball_restitution, ball_linear_damping),
+Simulator::Simulator(const Field& field,
+                     std::shared_ptr<const SimulatorConfig> simulator_config,
+                     const Duration& physics_time_step)
+    : physics_world(field, simulator_config),
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),
@@ -35,6 +31,16 @@ void Simulator::setBallState(const BallState& ball_state)
 {
     physics_world.setBallState(ball_state);
     simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
+
+    for (auto& robot_pair : yellow_simulator_robots)
+    {
+        robot_pair.first->clearBallInDribblerArea();
+    }
+
+    for (auto& robot_pair : blue_simulator_robots)
+    {
+        robot_pair.first->clearBallInDribblerArea();
+    }
 }
 
 void Simulator::removeBall()

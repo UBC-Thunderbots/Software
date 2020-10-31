@@ -10,8 +10,6 @@
 class CornerKickPlay : public Play
 {
    public:
-    static const std::string name;
-
     CornerKickPlay();
 
     bool isApplicable(const World &world) const override;
