@@ -12,7 +12,7 @@ void Circle::setOrigin(const Point &o)
     origin_ = o;
 }
 
-const Point &Circle::getOrigin() const
+const Point &Circle::origin() const
 {
     return origin_;
 }
@@ -28,7 +28,7 @@ void Circle::setRadius(double radius)
     radius_ = radius;
 }
 
-double Circle::getRadius() const
+double Circle::radius() const
 {
     return radius_;
 }
@@ -40,8 +40,8 @@ double Circle::area() const
 
 bool operator==(const Circle &c, const Circle &d)
 {
-    return (c.getOrigin() == d.getOrigin()) &&
-           (std::abs(c.getRadius() - d.getRadius()) < FIXED_EPSILON);
+    return (c.origin() == d.origin()) &&
+           (std::abs(c.radius() - d.radius()) < FIXED_EPSILON);
 }
 
 bool operator!=(const Circle &c, const Circle &d)
@@ -51,6 +51,6 @@ bool operator!=(const Circle &c, const Circle &d)
 
 std::ostream &operator<<(std::ostream &os, const Circle &circle)
 {
-    os << "Circle at " << circle.getOrigin() << " with radius " << circle.getRadius();
+    os << "Circle at " << circle.origin() << " with radius " << circle.origin();
     return os;
 }

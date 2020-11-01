@@ -35,7 +35,7 @@ class Circle final : public ConvexShape
      *
      * @return the origin of this Circle.
      */
-    const Point &getOrigin() const;
+    const Point &origin() const;
 
     /**
      * Sets the radius of this Circle.
@@ -50,7 +50,7 @@ class Circle final : public ConvexShape
      *
      * @return the radius of this Circle.
      */
-    double getRadius() const;
+    double radius() const;
 
     /**
      * Returns the area of this Circle.
@@ -99,7 +99,7 @@ struct std::hash<Circle>
 {
     size_t operator()(const Circle &circle) const
     {
-        return std::hash<Point>()(circle.getOrigin()) ^
-               std::hash<double>()(circle.getRadius());
+        return std::hash<Point>()(circle.origin()) ^
+               std::hash<double>()(circle.radius());
     }
 };
