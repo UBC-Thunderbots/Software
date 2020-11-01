@@ -16,8 +16,8 @@ void app_logger_init(unsigned robot_id,
  * NOTE: If the log msg is longer than the max_size defined in the proto
  * the log will be truncated.
  *
- * @param file_name The file this log is located
- * @param line_number The line number where this log is located
+ * @param file_name The file where the log will be printed
+ * @param line_number The line where the log will be printed
  * @param log_level The severity level of this log
  * @param format The format string followed by printf style args
  */
