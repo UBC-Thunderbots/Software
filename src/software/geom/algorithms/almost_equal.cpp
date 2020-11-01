@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 
 #include "software/geom/geom_constants.h"
 
