@@ -144,9 +144,6 @@ std::vector<Point> intersection(const Ray &ray, const Segment &segment)
     // The ray and segment do not intersect at all
     else
     {
-        //std::cout<<"ray, poi : "<<ray.getStart()<<" , "<<ray.getDirection().toDegrees()<<" , "<<point_of_intersection.value()<<std::endl;
-        //std::cout<<"has value, contained in ray, contained in seg : "<<point_of_intersection.has_value()<<" , "
-        //<<contains(ray, point_of_intersection.value())<<" , "<<contains(segment, point_of_intersection.value())<<std::endl;
         return intersections;
     }
 }

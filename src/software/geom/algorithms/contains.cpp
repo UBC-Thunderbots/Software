@@ -62,25 +62,11 @@ bool contains(const Polygon& container, const Point& contained)
 bool contains(const Ray& container, const Point& contained)
 {
     Point point_in_ray_direction = container.getStart() + container.toUnitVector();
-//    double MY_EPSILON = 1e-10;
     bool point_is_ray_start = contained == container.getStart();
     bool point_collinear_with_ray =
-        collinear(contained, container.getStart(), point_in_ray_direction, 1e-10);
-//    bool point_is_in_ray_direction =
-//        ((contained - container.getStart()).normalize() - container.toUnitVector())
-//            .length() < FIXED_EPSILON;
-//    bool point_is_in_ray_direction =
-//            ((contained - container.getStart()).normalize() - container.toUnitVector())
-//                    .length() < MY_EPSILON;
-    bool point_is_in_ray_direction = almostEqual(((contained - container.getStart()).orientation().toDegrees()),container.toUnitVector().orientation().toDegrees(), 1e-10, ULPS_EPSILON_TEN);
-//    double diff = ((contained - container.getStart()).normalize() - container.toUnitVector())
-//    .length();
-//    bool retval = point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
+        collinear(contained, container.getStart(), point_in_ray_direction, 1e-9, 200);
+    bool point_is_in_ray_direction = almostEqual(((contained - container.getStart()).orientation().toRadians()),container.getDirection().toRadians(), 1e-9, 200);
 
-//    if(!retval) {
-//        std::cout<<"collinear, rayDirection, diff : "<<point_collinear_with_ray<<" , "<<point_is_in_ray_direction<<
-//        " , "<<diff<<std::endl;
-//    }
     return point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
 }
 
