@@ -62,11 +62,13 @@ bool contains(const Polygon& container, const Point& contained)
 bool contains(const Ray& container, const Point& contained)
 {
     Point point_in_ray_direction = container.getStart() + container.toUnitVector();
-    bool point_is_ray_start = contained == container.getStart();
+    bool point_is_ray_start      = contained == container.getStart();
     bool point_collinear_with_ray =
         collinear(contained, container.getStart(), point_in_ray_direction, 1e-9, 200);
-    bool point_is_in_ray_direction = almostEqual(((contained - container.getStart()).orientation().toRadians()),container.getDirection().toRadians(), 1e-9, 200);
-
+    bool point_is_in_ray_direction = almostEqual(
+        ((contained - container.getStart()).normalize() - container.toUnitVector())
+            .length(),
+        0, 1e-9, 200);
     return point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
 }
 
