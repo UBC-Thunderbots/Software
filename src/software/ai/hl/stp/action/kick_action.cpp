@@ -1,12 +1,12 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/ball.h"
 #include "software/ai/intent/kick_intent.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/polygon.h"
 #include "software/world/ball.h"
-#include "software/ai/evaluation/ball.h"
 
 KickAction::KickAction() : Action(false), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
 {
@@ -85,10 +85,11 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
     //                             V
     //                     direction of kick
 
-    do {
-
+    do
+    {
         // A vector in the direction opposite the kick (behind the ball)
-        Vector behind_ball = Vector::createFromAngle(this->kick_direction + Angle::half());
+        Vector behind_ball =
+            Vector::createFromAngle(this->kick_direction + Angle::half());
 
 
         // The points below make up the triangle that defines the region we treat as
@@ -99,29 +100,32 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
         // inside it when taking the kick.
         Point behind_ball_vertex_A = kick_origin;
         Point behind_ball_vertex_B =
-                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
-                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
+            behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
         Point behind_ball_vertex_C =
-                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
-                (behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2));
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
+            (behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2));
 
         Polygon behind_ball_region =
-                Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
+            Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
 
         bool robot_behind_ball = contains(behind_ball_region, robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
-                kick_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
+            kick_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
 
         // If we're not in position to kick, move into position
-        if (!robot_behind_ball) {
-
+        if (!robot_behind_ball)
+        {
             yield(std::make_unique<MoveIntent>(
-                    robot->id(), point_behind_ball, kick_direction, 0.0, 0, DribblerEnable::OFF,
-                    MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID));
-        } else {
+                robot->id(), point_behind_ball, kick_direction, 0.0, 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
+                BallCollisionType::AVOID));
+        }
+        else
+        {
             yield(std::make_unique<KickIntent>(robot->id(), kick_origin, kick_direction,
                                                kick_speed_meters_per_second, 0));
         }
-    } while(!hasBallBeenKicked(ball,kick_direction));
+    } while (!hasBallBeenKicked(ball, kick_direction));
 }

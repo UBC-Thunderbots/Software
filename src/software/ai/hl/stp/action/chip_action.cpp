@@ -1,12 +1,12 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/ball.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/polygon.h"
 #include "software/geom/triangle.h"
-#include "software/ai/evaluation/ball.h"
 
 ChipAction::ChipAction() : Action(false), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
 {
@@ -88,11 +88,11 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     //                             V
     //                     direction of chip
 
-    do {
-
-
+    do
+    {
         // A vector in the direction opposite the chip (behind the ball)
-        Vector behind_ball = Vector::createFromAngle(this->chip_direction + Angle::half());
+        Vector behind_ball =
+            Vector::createFromAngle(this->chip_direction + Angle::half());
 
 
         // The points below make up the triangle that defines the region we treat as
@@ -103,28 +103,32 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         // inside it when taking the chip.
         Point behind_ball_vertex_A = chip_origin;
         Point behind_ball_vertex_B =
-                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
-                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
+            behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
         Point behind_ball_vertex_C =
-                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
-                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+            behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
+            behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
 
         Triangle behind_ball_region =
-                Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
+            Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
 
         bool robot_behind_ball = contains(behind_ball_region, robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
-                chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
+            chip_origin + behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
 
         // If we're not in position to chip, move into position
-        if (!robot_behind_ball) {
+        if (!robot_behind_ball)
+        {
             yield(std::make_unique<MoveIntent>(
-                    robot->id(), point_behind_ball, chip_direction, 0.0, 0, DribblerEnable::OFF,
-                    MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
-        } else {
+                robot->id(), point_behind_ball, chip_direction, 0.0, 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
+                BallCollisionType::ALLOW));
+        }
+        else
+        {
             yield(std::make_unique<ChipIntent>(robot->id(), chip_origin, chip_direction,
                                                chip_distance_meters, 0));
         }
-    } while (!hasBallBeenKicked(ball,chip_direction));
+    } while (!hasBallBeenKicked(ball, chip_direction));
 }
