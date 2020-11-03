@@ -64,11 +64,12 @@ bool contains(const Ray& container, const Point& contained)
     Point point_in_ray_direction = container.getStart() + container.toUnitVector();
     bool point_is_ray_start      = contained == container.getStart();
     bool point_collinear_with_ray =
-        collinear(contained, container.getStart(), point_in_ray_direction, 1e-9, 200);
+        collinear(contained, container.getStart(), point_in_ray_direction,
+                  1000 * FIXED_EPSILON, 2 * ULPS_EPSILON_HUNDRED);
     bool point_is_in_ray_direction = almostEqual(
         ((contained - container.getStart()).normalize() - container.toUnitVector())
             .length(),
-        0, 1e-9, 200);
+        0, 1000 * FIXED_EPSILON, 2 * ULPS_EPSILON_HUNDRED);
     return point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
 }
 
