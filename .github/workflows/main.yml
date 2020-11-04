@@ -9,7 +9,7 @@ on:
     branches: [ master ]
 
 jobs:
-  fix_formatting:
+  Formatting Check:
     runs-on: ubuntu-18.04
 
     steps:
@@ -19,9 +19,32 @@ jobs:
       - name: Environment Setup
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
+      
+      - name: Check Formatting
+        run: |
+          ./formatting_scripts/check_formatting_ci.sh
+          
+        
+  Simulated Tests:
+    runs-on: ubuntu-18.04
 
-
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+        
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+          
       - name: Software Test
         run: |
-          bazel test //software/...
+          cd src
+          bazel coverage                     \
+            --compilation_mode=fastbuild     \
+            --verbose_test_summary           \
+            --instrumentation_filter=//...   \
+            --test_output=errors             \
+            -- //... -//software/simulated_tests/...
+          bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ > codecov.log
+          cat codecov.log | head -n100
+          cat codecov.log | tail -n100
