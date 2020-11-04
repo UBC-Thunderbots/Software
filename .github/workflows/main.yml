@@ -9,12 +9,11 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  fix_formatting:
     runs-on: ubuntu-18.04
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
         
       - name: Environment Setup
@@ -25,8 +24,4 @@ jobs:
 
       - name: Software Test
         run: |
-          bazel build //software/...
-             
-      - name: Test
-        run: |
-          "${GITHUB_WORKSPACE}/bin/bazel" test //...
+          bazel test //software/...
