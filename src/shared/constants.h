@@ -120,7 +120,7 @@ const unsigned NETWORK_TIMEOUT_MS = 1000;
 const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 
 // The total number of possible robot ids between two teams
-const int MAX_ROBOT_IDS = 16;
+const unsigned int MAX_ROBOT_IDS = 16;
 
 // We currently have 4s batteries on the robot that charge up to a little over
 // 16V, so we use 16 here to approximate a fully-charged battery
