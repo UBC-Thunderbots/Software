@@ -19,8 +19,9 @@ jobs:
         
       - name: Environment Setup
         run: |
-          ./"${GITHUB_WORKSPACE}"/Software/environment_setup/setup_firmware.sh
-          ./"${GITHUB_WORKSPACE}"/Software/environment_setup/setup_software.sh
+          ./"${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+          ./"${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
+
 
       - name: Software Test
         run: |
