@@ -32,10 +32,12 @@ TEST(ControllerPrimitiveGeneratorTest, test_create_direct_velocity)
     EXPECT_EQ(direct_velocity_primitive->direct_control().dribbler_speed_rpm(), 200);
 }
 
-// Tests if controller_primitive_generator returns a kick primitive if the
-// kick button is set to pressed
+
 TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
 {
+    // Tests if controller_primitive_generator returns a kick primitive if the
+    // kick button is set to pressed
+
     ControllerInput input = ControllerInput();
     input.setKickButtonPressed(true);
 
@@ -52,10 +54,11 @@ TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
         expected_kick_primitive, actual_primitive));
 }
 
-// Tests if controller_primitive_generator returns a chip primitive if the
-// chip button is set to pressed
 TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1)
 {
+    // Tests if controller_primitive_generator returns a chip primitive if the
+    // chip button is set to pressed
+
     ControllerInput input = ControllerInput();
     input.setChipButtonPressed(true);
 
@@ -71,10 +74,12 @@ TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1)
         expected_chip_primitive, actual_primitive));
 }
 
-// Tests if controller_primitive_generator returns a correct direct velocity
-// primitive after the x/y/angular speed were set
+
 TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input2)
 {
+    // Tests if controller_primitive_generator returns a correct direct velocity
+    // primitive after the x/y/angular speed were set
+
     ControllerInput input = ControllerInput();
     // setting arbitrary values of x/y/angular motion of input
     input.setAngularMotion(90);
