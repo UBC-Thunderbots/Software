@@ -9,7 +9,6 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
                                                                    const Field &field,
                                                                    const Robot &robot)
 {
-    auto ball_model                               = ball.ballModel();
     static const double gradient_approx_step_size = 0.000001;
 
     // We use this to take a smooth absolute value in our objective function
@@ -32,7 +31,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
 
         // Estimate the ball position
         Point new_ball_pos =
-            ball_model->estimateFutureState(Duration::fromSeconds(duration)).position();
+            ball.estimateFutureState(Duration::fromSeconds(duration)).position();
 
         // Figure out how long it will take the robot to get to the new ball position
         Duration time_to_ball_pos = getTimeToPositionForRobot(
@@ -68,7 +67,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     }
 
     Point best_ball_intercept_pos =
-        ball_model->estimateFutureState(best_ball_travel_duration).position();
+        ball.estimateFutureState(best_ball_travel_duration).position();
 
     // Check that we can get to the best position in time
     Duration time_to_ball_pos = getTimeToPositionForRobot(

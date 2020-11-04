@@ -139,7 +139,7 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
-    auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, true);
+    auto intercept_action = std::make_shared<InterceptBallAction>(field, ball);
     std::optional<Shot> shot_target;
     do
     {

@@ -44,7 +44,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // we are likely in a set play and so we don't need to initially collect the ball
     if (ball.velocity().length() > INTERCEPT_BALL_SPEED_THRESHOLD)
     {
-        auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, false);
+        auto intercept_action = std::make_shared<InterceptBallAction>(field, ball);
         do
         {
             intercept_action->updateControlParams(*robot);

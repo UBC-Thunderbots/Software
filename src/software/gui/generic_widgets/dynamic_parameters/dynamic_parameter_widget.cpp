@@ -16,18 +16,12 @@
 
 DynamicParameterWidget::DynamicParameterWidget(QWidget* parent) : QScrollArea(parent)
 {
-    QWidget* params_widget            = new QWidget(this);
+    params_widget                     = new QWidget(this);
     QVBoxLayout* params_widget_layout = new QVBoxLayout(params_widget);
     params_widget->setLayout(params_widget_layout);
-
-    setupParametersHelper(params_widget, MutableDynamicParameters);
-
-    setWidget(params_widget);
-    setWidgetResizable(true);
 }
 
-void DynamicParameterWidget::setupParametersHelper(QWidget* params_widget,
-                                                   std::shared_ptr<Config> config)
+void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
 {
     if (!params_widget->layout())
     {
@@ -57,11 +51,11 @@ void DynamicParameterWidget::setupParametersHelper(QWidget* params_widget,
                          double_param_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(double_param_widget);
                      },
-                     [&](std::shared_ptr<Config> config_) {
-                         setupParametersHelper(params_widget, config_);
-                     }},
+                     [&](std::shared_ptr<Config> config_) { setupParameters(config_); }},
             mutable_parameter);
     }
+    setWidget(params_widget);
+    setWidgetResizable(true);
 }
 
 QWidget* DynamicParameterWidget::createBooleanParameter(

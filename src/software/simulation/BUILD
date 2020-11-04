@@ -130,6 +130,7 @@ cc_library(
         ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
+        "//software/parameter:dynamic_parameters",
         "//software/proto:defending_side_msg_cc_proto",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/proto/message_translation:ssl_detection",

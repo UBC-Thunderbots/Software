@@ -13,9 +13,8 @@
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
 
-InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
-                                         bool loop_forever)
-    : Action(loop_forever), field(field), ball(ball)
+InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball)
+    : Action(false), field(field), ball(ball)
 {
 }
 
