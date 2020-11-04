@@ -219,21 +219,22 @@ std::optional<Ball> SensorFusion::createBall(
     return std::nullopt;
 }
 
-// TODO (1610) Implement friendly goalie ID override
+
 Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
     RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
+    // TODO (1610) Implement friendly goalie ID override
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
 
-// TODO (1610) Implement enemy goalie ID override
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
     RobotId enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
+    // TODO (1610) Implement enemy goalie ID override
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }
