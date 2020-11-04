@@ -19,7 +19,8 @@ jobs:
         
       - name: Environment Setup
         run: |
-          pwd
+          ./"${GITHUB_WORKSPACE}"/Software/environment_setup/setup_firmware.sh
+          ./"${GITHUB_WORKSPACE}"/Software/environment_setup/setup_software.sh
 
       - name: Software Test
         run: |
