@@ -25,6 +25,8 @@ class SpinningMoveAction : public Action
     explicit SpinningMoveAction(
         double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
 
+    SpinningMoveAction() = delete;
+
     /**
      * Updates the params that cannot be derived from the world for this action
      *

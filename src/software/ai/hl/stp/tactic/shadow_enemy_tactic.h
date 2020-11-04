@@ -30,6 +30,8 @@ class ShadowEnemyTactic : public Tactic
                                const Ball &ball, const double ball_steal_speed,
                                bool enemy_team_can_pass, bool loop_forever);
 
+    ShadowEnemyTactic() = delete;
+
     /**
      * Updates the world parameters for this ShadowEnemyTactic.
      *
