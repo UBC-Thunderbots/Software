@@ -6,6 +6,7 @@ language: generic
 
 install:
     - ./environment_setup/setup_software.sh
+    - ./environment_setup/setup_firmware.sh
 
 jobs:
   include:
@@ -37,6 +38,7 @@ jobs:
     - name: "Build Firmware Board Targets"
       before_install: if .travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware_new/boards\|firmware/boards\|environment_setup"; then echo "There are relevant changes. Running tests..."; else echo "No relevant changes. Skipping tests." && travis_terminate 0; fi
       script:
+        - ./.travis/check_cubemx_ci.sh
         - cd src
         # Build ARM Targets For Firmware
         - bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
