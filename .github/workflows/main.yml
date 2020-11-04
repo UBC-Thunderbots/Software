@@ -1,6 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Tbots CI
+name: Thunderbots CI
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -10,7 +8,6 @@ on:
   pull_request:
     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
     runs-on: ubuntu-18.04
@@ -19,11 +16,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        
+      - name: Environment Setup
+        run: |
+          pwd
 
       - name: Software Test
-        run: bazel coverage                  \
-            --compilation_mode=fastbuild     \
-            --verbose_test_summary           \
-            --instrumentation_filter=//...   \
-            --test_output=errors             \
-            -- //... -//software/simulated_tests/...
+        run: |
+          bazel build //software/...
+             
+      - name: Test
+        run: |
+          "${GITHUB_WORKSPACE}/bin/bazel" test //...
