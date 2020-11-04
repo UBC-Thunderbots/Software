@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  Formatting Check:
+  Formatting-Check:
     runs-on: ubuntu-18.04
 
     steps:
@@ -23,7 +23,7 @@ jobs:
           ./formatting_scripts/check_formatting_ci.sh
           
         
-  Simulated Tests:
+  Simulated-Tests:
     runs-on: ubuntu-18.04
 
     steps:
