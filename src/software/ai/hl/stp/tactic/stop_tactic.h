@@ -17,7 +17,7 @@ class StopTactic : public Tactic
      * tactic will be restarted every time it completes
      */
     explicit StopTactic(bool coast);
-    
+
     StopTactic() = delete;
 
     void updateWorldParams(const World& world) override;

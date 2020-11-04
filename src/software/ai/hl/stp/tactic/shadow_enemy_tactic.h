@@ -34,7 +34,6 @@ class ShadowEnemyTactic : public Tactic
 
     void updateWorldParams(const World &world) override;
 
-
     /**
      * Updates the control parameters for this ShadowEnemyTactic
      *
