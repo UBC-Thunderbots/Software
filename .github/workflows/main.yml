@@ -26,9 +26,7 @@ jobs:
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
-      # uploads coverage data to codecov
-      - uses: codecov/codecov-action@v1
-        
+
       - name: Environment Setup
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
@@ -43,6 +41,9 @@ jobs:
             --test_output=errors             \
             -- //... -//software/simulated_tests/... \
             -//firmware_new/...
+             
+      # uploads coverage data to codecov
+      - uses: codecov/codecov-action@v1
              
   firmware-tests:
     runs-on: ubuntu-18.04
@@ -77,8 +78,6 @@ jobs:
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
-      # uploads coverage data to codecov
-      - uses: codecov/codecov-action@v1
         
       - name: Environment Setup
         run: |
@@ -89,14 +88,15 @@ jobs:
           cd src
           bazel test //software/simulated_tests/...
           
+      # uploads coverage data to codecov
+      - uses: codecov/codecov-action@v1
+          
   memory-leak-checks:
     runs-on: ubuntu-18.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
-      # uploads coverage data to codecov
-      - uses: codecov/codecov-action@v1
-        
+
       - name: Environment Setup
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
@@ -121,4 +121,7 @@ jobs:
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             //shared/parameter_v2/...
+            
+      # uploads coverage data to codecov
+      - uses: codecov/codecov-action@v1
 
