@@ -1,6 +1,7 @@
 #include "software/test_util/test_util.h"
 
 #include <gtest/gtest.h>
+#include <thread>
 
 #include <algorithm>
 
