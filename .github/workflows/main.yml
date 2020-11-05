@@ -72,8 +72,7 @@ jobs:
       - name: Old Radio Dongle Firmware Build
         run: |
          cd src
-         bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin 
-             
+         bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin         
              
   simulated-gameplay-tests:
     runs-on: ubuntu-18.04
@@ -91,4 +90,38 @@ jobs:
         run: |
           cd src
           bazel test //software/simulated_tests/...
+          
+  memory-leak-checks:
+    runs-on: ubuntu-18.04
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+      # uploads coverage data to codecov
+      - uses: codecov/codecov-action@v1
+        
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+
+      - name: Simulation Memory Leak Check
+        # Test simulation, firmware and firmware_new, c_dynamic_parameters
+        run: |
+          cd src
+          bazel test -c dbg  \
+            --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
+            //software/simulation/...
+            
+      - name: Firmware Memory Leak Check
+        run: |
+          cd src
+          bazel test -c dbg  \
+            --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
+            //firmware/...
+            
+      - name: Shared Memory Leak Check
+        run: |
+          cd src
+          bazel test -c dbg  \
+            --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
+            //shared/parameter_v2/...
 
