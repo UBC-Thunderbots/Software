@@ -1,9 +1,9 @@
 #include "software/test_util/test_util.h"
 
 #include <gtest/gtest.h>
-#include <thread>
 
 #include <algorithm>
+#include <thread>
 
 /*
  * Unit tests for the unit test utilities
