@@ -9,7 +9,6 @@ on:
 jobs:
   formatting-check:
     runs-on: ubuntu-18.04
-
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -24,7 +23,6 @@ jobs:
           
   software-tests:
     runs-on: ubuntu-18.04
-
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
