@@ -90,13 +90,15 @@ TEST(TestUtilsTest, set_ball_velocity_in_world)
 TEST(TestUtilsTest, test_seconds_since)
 {
     const auto start_time = std::chrono::system_clock::now();
-    EXPECT_TRUE(::TestUtil::secondsSince(start_time) > 0);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    EXPECT_TRUE(::TestUtil::secondsSince(start_time) >= 1);
 }
 
 TEST(TestUtilsTest, test_milliseconds_since)
 {
     const auto start_time = std::chrono::system_clock::now();
-    EXPECT_TRUE(::TestUtil::millisecondsSince(start_time) > 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    EXPECT_TRUE(::TestUtil::millisecondsSince(start_time) >= 10);
 }
 
 TEST(TestUtilsTest, test_create_stationary_robot_states_with_id)
