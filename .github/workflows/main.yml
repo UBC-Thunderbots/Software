@@ -23,12 +23,18 @@ jobs:
           ./formatting_scripts/check_formatting_ci.sh
           
         
-  Simulated-Tests:
+  Software-Tests:
     runs-on: ubuntu-18.04
 
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
+      # uploads coverage data to codecov
+      - uses: codecov/codecov-action@v1
+      - uses: actions/cache@v1
+        with:
+          path: "/home/runner/.cache/bazel"
+          key: bazel
         
       - name: Environment Setup
         run: |
@@ -43,6 +49,27 @@ jobs:
             --instrumentation_filter=//...   \
             --test_output=errors             \
             -- //... -//software/simulated_tests/...
-          bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ > codecov.log
-          cat codecov.log | head -n100
-          cat codecov.log | tail -n100
+             
+             
+  Simulated-Tests:
+    runs-on: ubuntu-18.04
+
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+      # uploads coverage data to codecov
+      - uses: codecov/codecov-action@v1
+      - uses: actions/cache@v1
+        with:
+          path: "/home/runner/.cache/bazel"
+          key: bazel
+        
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+          
+      - name: Software Test
+        run: |
+          cd src
+          bazel test //software/simulated_tests/...
+
