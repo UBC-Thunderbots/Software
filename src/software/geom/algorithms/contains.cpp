@@ -63,6 +63,9 @@ bool contains(const Ray& container, const Point& contained)
 {
     Point point_in_ray_direction = container.getStart() + container.toUnitVector();
     bool point_is_ray_start      = contained == container.getStart();
+
+    // We use broader values for epsilon and ulps because the default values brought
+    // warnings from simulated tests
     bool point_collinear_with_ray =
         collinear(contained, container.getStart(), point_in_ray_direction,
                   1000 * FIXED_EPSILON, 2 * ULPS_EPSILON_HUNDRED);
