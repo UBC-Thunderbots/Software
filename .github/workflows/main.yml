@@ -52,9 +52,7 @@ jobs:
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
-      # uploads coverage data to codecov
-      - uses: codecov/codecov-action@v1
-          
+    
       - name: Environment Setup
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
