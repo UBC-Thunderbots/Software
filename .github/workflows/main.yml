@@ -45,7 +45,7 @@ jobs:
       # uploads coverage data to codecov
       - uses: codecov/codecov-action@v1
         with:
-          directory: /home/runner/.cache/bazel/ 
+          directory: "${GITHUB_WORKSPACE}/src/bazel-testlogs"
              
   firmware-tests:
     runs-on: ubuntu-18.04
