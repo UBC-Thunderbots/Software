@@ -19,6 +19,8 @@ class CherryPickTactic : public Tactic
      */
     explicit CherryPickTactic(const World& world, const Rectangle& target_region);
 
+    CherryPickTactic() = delete;
+
     /**
      * Updates the world parameters for this tactic
      *

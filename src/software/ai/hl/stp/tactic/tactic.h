@@ -34,6 +34,8 @@ class Tactic
      */
     explicit Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_);
 
+    Tactic() = delete;
+
     /**
      * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed
      * to loop forever, this function will always return false.

@@ -18,6 +18,8 @@ class MoveTactic : public Tactic
      */
     explicit MoveTactic(bool loop_forever);
 
+    MoveTactic() = delete;
+
     /**
      * Updates the control parameters for this MoveTactic.
      *

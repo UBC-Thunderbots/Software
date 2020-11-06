@@ -19,4 +19,6 @@ class SpinningMoveIntent : public DirectPrimitiveIntent
     explicit SpinningMoveIntent(unsigned int robot_id, const Point& dest,
                                 const AngularVelocity& angular_vel, double final_speed,
                                 unsigned int priority);
+
+    SpinningMoveIntent() = delete;
 };
