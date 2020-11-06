@@ -17,8 +17,8 @@ FAKE_VOID_FUNC(float_capacitor);
 // mock fake chicker functions
 FAKE_VOID_FUNC(set_kick_speed, float);
 FAKE_VOID_FUNC(set_chip_distance, float);
-FAKE_VOID_FUNC(auto_kick, float);
-FAKE_VOID_FUNC(auto_chip, float);
+FAKE_VOID_FUNC(enable_auto_kick, float);
+FAKE_VOID_FUNC(enable_auto_chip, float);
 FAKE_VOID_FUNC(disable_auto_chip);
 FAKE_VOID_FUNC(disable_auto_kick);
 
@@ -63,21 +63,32 @@ class FirmwareWorldTest : public testing::Test
         Charger_t* charger = app_charger_create(
             &(charge_capacitor), &(discharge_capacitor), &(float_capacitor));
 
-        Chicker_t* chicker =
-            app_chicker_create(&(set_kick_speed), &(set_chip_distance), &(auto_kick),
-                               &(auto_chip), &(disable_auto_chip), &(disable_auto_kick));
+        Chicker_t* chicker = app_chicker_create(
+            &(set_kick_speed), &(set_chip_distance), &(enable_auto_kick),
+            &(enable_auto_chip), &(disable_auto_chip), &(disable_auto_kick));
 
         Dribbler_t* dribbler = app_dribbler_create(&(set_requested_rpm), &(enable_coast),
                                                    &(get_temperature_deg_c));
 
-        Wheel_t* wheel = app_wheel_create(&(request_wheel_force), &(get_motor_speed),
-                                          &(brake), &(coast), wheel_constants);
+        Wheel_t* front_right_wheel =
+            app_wheel_create(&(request_wheel_force), &(get_motor_speed), &(brake),
+                             &(coast), wheel_constants);
+        Wheel_t* front_left_wheel =
+            app_wheel_create(&(request_wheel_force), &(get_motor_speed), &(brake),
+                             &(coast), wheel_constants);
+        Wheel_t* back_right_wheel =
+            app_wheel_create(&(request_wheel_force), &(get_motor_speed), &(brake),
+                             &(coast), wheel_constants);
+        Wheel_t* back_left_wheel =
+            app_wheel_create(&(request_wheel_force), &(get_motor_speed), &(brake),
+                             &(coast), wheel_constants);
 
         FirmwareRobot_t* robot = app_firmware_robot_create(
             charger, chicker, dribbler, &(get_robot_property), &(get_robot_property),
             &(get_robot_property), &(get_robot_property), &(get_robot_property),
-            &(get_robot_property), &(get_robot_property), wheel, wheel, wheel, wheel,
-            &controller_state, robot_constants);
+            &(get_robot_property), &(get_robot_property), front_right_wheel,
+            front_left_wheel, back_right_wheel, back_left_wheel, &controller_state,
+            robot_constants);
 
         FirmwareBall_t* ball =
             app_firmware_ball_create(&(get_ball_property), &(get_ball_property),
@@ -106,6 +117,8 @@ TEST_F(FirmwareWorldTest, app_autochip_move_primitive_test)
     PrimitiveManager_t* manager = app_primitive_manager_create();
 
     app_primitive_manager_startNewPrimitive(manager, firmware_world, primitive_msg);
+    // Checking `dribbler_speed_rpm` is passed into `app_dribbler_setSpeed` mock
     ASSERT_EQ(set_requested_rpm_fake.arg0_val, 1.0);
-    ASSERT_EQ(auto_chip_fake.arg0_val, 2.0);
+    // Checking `chip_distance_meters` is passed into `app_chicker_enableAutokick` mock
+    ASSERT_EQ(enable_auto_chip_fake.arg0_val, 2.0);
 }
