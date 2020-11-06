@@ -90,12 +90,6 @@ jobs:
           cd src
           bazel test //software/simulated_tests/...
           
-      # uploads coverage data to codecov
-      - uses: codecov/codecov-action@v1
-        with:
-          directory: /home/runner/.cache/bazel/ 
-        
-          
   memory-leak-checks:
     runs-on: ubuntu-18.04
     steps:
@@ -126,9 +120,4 @@ jobs:
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             //shared/parameter_v2/...
-            
-      # uploads coverage data to codecov
-      - uses: codecov/codecov-action@v1
-        with:
-          directory: /home/runner/.cache/bazel/ 
 
