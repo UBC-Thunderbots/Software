@@ -61,12 +61,20 @@ TEST(Observer, getDataReceivedPerSecond_time_buffer_filled)
 TEST(Observer, getDataReceivedPerSecond_time_buffer_filled_twice_over)
 {
     TestObserver test_observer;
+    auto wall_time_start = std::chrono::steady_clock::now();
     for (unsigned int i = 0; i < TestObserver::TIME_BUFFER_SIZE * 2; i++)
     {
         test_observer.receiveValue(i);
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
-    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 1 / 0.005, 20);
+
+    auto wall_time_now = std::chrono::steady_clock::now();
+    double test_duration_s = static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(wall_time_now -
+                                                              wall_time_start).count())*SECONDS_PER_MILLISECOND;
+    double scaling_factor = test_duration_s/(0.005*(TestObserver::TIME_BUFFER_SIZE * 2+1));
+
+
+    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 1 / 0.005*scaling_factor, 20);
 }
 
 TEST(Observer, getDataReceivedPerSecond_time_buffer_empty)
