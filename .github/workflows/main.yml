@@ -44,6 +44,8 @@ jobs:
              
       # uploads coverage data to codecov
       - uses: codecov/codecov-action@v1
+        with:
+          directory: /home/runner/.cache/bazel/ 
              
   firmware-tests:
     runs-on: ubuntu-18.04
@@ -90,6 +92,9 @@ jobs:
           
       # uploads coverage data to codecov
       - uses: codecov/codecov-action@v1
+        with:
+          directory: /home/runner/.cache/bazel/ 
+        
           
   memory-leak-checks:
     runs-on: ubuntu-18.04
@@ -124,4 +129,6 @@ jobs:
             
       # uploads coverage data to codecov
       - uses: codecov/codecov-action@v1
+        with:
+          directory: /home/runner/.cache/bazel/ 
 
