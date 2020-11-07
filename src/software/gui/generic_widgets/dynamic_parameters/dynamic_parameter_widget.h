@@ -5,6 +5,8 @@
 #include <QtWidgets/QWidget>
 
 #include "software/parameter/dynamic_parameters.h"
+#include "software/parameter/enumerated_parameter.h"
+#include "software/parameter/numeric_parameter.h"
 #include "software/parameter/parameter.h"
 
 /**

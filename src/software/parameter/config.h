@@ -7,7 +7,6 @@
 #include "software/parameter/enumerated_parameter.h"
 #include "software/parameter/numeric_parameter.h"
 #include "software/parameter/parameter.h"
-#include "software/world/game_state.h"
 
 class Config;
 
@@ -17,20 +16,20 @@ class Config;
 using MutableParameterVariant = std::variant<
     std::shared_ptr<Parameter<int>>, std::shared_ptr<Parameter<bool>>,
     std::shared_ptr<Parameter<double>>, std::shared_ptr<Parameter<std::string>>,
-    std::shared_ptr<NumericParameter<int>>, std::shared_ptr<NumericParameter<uint>>,
-    std::shared_ptr<NumericParameter<float>>,
+    std::shared_ptr<NumericParameter<int>>, std::shared_ptr<NumericParameter<float>>,
     std::shared_ptr<EnumeratedParameter<std::string>>, std::shared_ptr<Config>>;
 
 // A ParameterVariant is similar to a MutableParameterVariant, except the
 // parameters/configs in ParameterVariant can not be mutated.
-using ParameterVariant = std::variant<
-    std::shared_ptr<const Parameter<int>>, std::shared_ptr<const Parameter<bool>>,
-    std::shared_ptr<const Parameter<double>>,
-    std::shared_ptr<const Parameter<std::string>>,
-    std::shared_ptr<const NumericParameter<int>>,
-    std::shared_ptr<const NumericParameter<uint>>,
-    std::shared_ptr<const NumericParameter<float>>,
-    std::shared_ptr<const Parameter<std::optional<bool>>>, std::shared_ptr<const Config>>;
+using ParameterVariant =
+    std::variant<std::shared_ptr<const Parameter<int>>,
+                 std::shared_ptr<const Parameter<bool>>,
+                 std::shared_ptr<const Parameter<double>>,
+                 std::shared_ptr<const Parameter<std::string>>,
+                 std::shared_ptr<const NumericParameter<int>>,
+                 std::shared_ptr<const NumericParameter<float>>,
+                 std::shared_ptr<const EnumeratedParameter<std::string>>,
+                 std::shared_ptr<const Config>>;
 
 // List of ParameterVariants (immutable)
 using ParameterList = std::vector<ParameterVariant>;

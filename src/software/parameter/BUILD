@@ -45,7 +45,6 @@ cc_library(
     deps = [
         ":enumerated_parameter",
         ":numeric_parameter",
-        "//software/world:game_state",
         "@boost//:program_options",
     ],
 )
