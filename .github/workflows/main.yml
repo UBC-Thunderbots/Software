@@ -34,7 +34,7 @@ jobs:
       - name: Cache Bazel External Dependencies
         uses: actions/cache@v2
         with:
-          path: ${GITHUB_WORKSPACE}/src/bazel-src/external
+          path: /home/runner/.cache/bazel
           key: bazel
           
       - name: Software Test
