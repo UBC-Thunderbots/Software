@@ -18,5 +18,7 @@ class PenaltySetupTactic : public MoveTactic
      */
     explicit PenaltySetupTactic(bool loop_forever);
 
+    PenaltySetupTactic() = delete;
+
     void accept(MutableTacticVisitor& visitor) override;
 };

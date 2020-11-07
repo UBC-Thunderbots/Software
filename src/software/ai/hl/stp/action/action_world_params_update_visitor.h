@@ -18,6 +18,8 @@ class ActionWorldParamsUpdateVisitor : public MutableActionVisitor
      */
     ActionWorldParamsUpdateVisitor(const World& world);
 
+    ActionWorldParamsUpdateVisitor() = delete;
+
     /**
      * Visit and update the world parameters for a given action
      */

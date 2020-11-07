@@ -13,6 +13,8 @@ class TacticWorldParamsUpdateVisitor : public MutableTacticVisitor
      */
     explicit TacticWorldParamsUpdateVisitor(const World &world);
 
+    TacticWorldParamsUpdateVisitor() = delete;
+
     /**
      * Calls the updateWorldParam in tactic to update params
      *

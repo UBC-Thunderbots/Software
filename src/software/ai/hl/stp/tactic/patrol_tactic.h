@@ -25,6 +25,8 @@ class PatrolTactic : public Tactic
                           Angle orientation_at_patrol_points,
                           double linear_speed_at_patrol_points);
 
+    PatrolTactic() = delete;
+
     /**
      * Calculates the cost of assigning the given robot to this Tactic. If a robot is
      * already assigned to this tactic, that robot is preferred to be assigned again.

@@ -26,6 +26,8 @@ class GoalieTactic : public Tactic
     explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
                           const Team &enemy_team);
 
+    GoalieTactic() = delete;
+
     /*
      * Restrains the goalie to a rectangle, with the preferred point being the one
      * that intersects the point the goalie wants to move to and the center of the
