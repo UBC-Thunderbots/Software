@@ -2,7 +2,12 @@
 
 Circle::Circle() : origin_(Point()), radius_(0) {}
 
-Circle::Circle(const Point &origin, double radius) : origin_(origin), radius_(radius) {}
+Circle::Circle(const Point &origin, double radius) : origin_(origin), radius_(radius) {
+    if (radius < 0) {
+        throw std::invalid_argument("Circle radius cannot be negative, given: " +
+                                    std::to_string(radius));
+    }
+}
 
 const Point &Circle::origin() const
 {
