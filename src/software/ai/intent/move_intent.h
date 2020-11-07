@@ -28,6 +28,8 @@ class MoveIntent : public NavigatingIntent
                         MoveType move_type, AutochickType autokick,
                         BallCollisionType ball_collision_type);
 
+    MoveIntent() = delete;
+
     void accept(IntentVisitor& visitor) const override;
     void accept(NavigatingIntentVisitor& visitor) const override;
 

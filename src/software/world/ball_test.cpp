@@ -152,3 +152,27 @@ TEST_F(BallTest, equality_operator_balls_with_different_timestamps)
 
     EXPECT_EQ(ball_0, ball_1);
 }
+
+TEST_F(BallTest, acceleration)
+{
+    Ball ball_0 = Ball(Point(2, -3), Vector(1, 2), current_time);
+    EXPECT_EQ(Vector(0, 0), ball_0.acceleration());
+    Ball ball_1 = Ball(Point(2, -3), Vector(1, 2), current_time, Vector(-1, 2));
+    EXPECT_EQ(Vector(-1, 2), ball_1.acceleration());
+}
+
+TEST_F(BallTest, estimate_future_state_no_acceleration)
+{
+    Ball ball = Ball(Point(2, -3), Vector(1, 2), current_time);
+    BallState expected_future_ball_state(Point(3, -1), Vector(1, 2));
+    EXPECT_EQ(expected_future_ball_state,
+              ball.estimateFutureState(Duration::fromSeconds(1.0)));
+}
+
+TEST_F(BallTest, estimate_future_state_friction)
+{
+    Ball ball = Ball(Point(2, -3), Vector(1, 2), current_time, Vector(-0.5, -1));
+    BallState expected_future_ball_state(Point(2.75, -1.5), Vector(.5, 1));
+    EXPECT_EQ(expected_future_ball_state,
+              ball.estimateFutureState(Duration::fromSeconds(1.0)));
+}

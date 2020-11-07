@@ -39,6 +39,8 @@ class CreaseDefenderTactic : public Tactic
                                   const Team &friendly_team, const Team &enemy_team,
                                   LeftOrRight left_or_right);
 
+    CreaseDefenderTactic() = delete;
+
     /**
      * Updates the world parameters for this CreaseDefenderTactic.
      *

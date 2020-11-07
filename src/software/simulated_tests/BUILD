@@ -84,6 +84,7 @@ cc_test(
         ":simulated_test_fixture",
         "//software/ai/hl/stp/play:corner_kick_play",
         "//software/simulated_tests/validation:validation_function",
+        "//software/simulated_tests/validation_functions",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",

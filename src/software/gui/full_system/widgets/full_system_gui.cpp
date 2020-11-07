@@ -42,6 +42,7 @@ FullSystemGUI::FullSystemGUI(
     setFocusPolicy(Qt::StrongFocus);
 
     setupRobotStatusTable(main_widget->robot_status_table_widget);
+    main_widget->dynamic_parameter_widget->setupParameters(MutableDynamicParameters);
     setupAIControls(main_widget, config);
 
     connect(update_timer, &QTimer::timeout, this, &FullSystemGUI::handleUpdate);
