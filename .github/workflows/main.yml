@@ -45,9 +45,7 @@ jobs:
             --verbose_test_summary           \
             --instrumentation_filter=//...   \
             --test_output=errors             \
-            -- //... -//software/simulated_tests/... \
-            -//firmware_new/...
-             
+            -- //shared/...
              
       # uploads coverage data to codecov
       - uses: codecov/codecov-action@v1
