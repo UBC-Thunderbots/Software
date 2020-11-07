@@ -55,6 +55,8 @@ RobotConstants_t robot_constants = {
 // Mock fake ball functions
 FAKE_VALUE_FUNC(float, get_ball_property);
 
+void (*null_func_ptr)(void) = NULL;
+
 class FirmwareWorldTest : public testing::Test
 {
    protected:
@@ -63,9 +65,9 @@ class FirmwareWorldTest : public testing::Test
         Charger_t* charger = app_charger_create(
             &(charge_capacitor), &(discharge_capacitor), &(float_capacitor));
 
-        Chicker_t* chicker = app_chicker_create(
-            &(set_kick_speed), &(set_chip_distance), &(enable_auto_kick),
-            &(enable_auto_chip), &(disable_auto_chip), &(disable_auto_kick));
+        Chicker_t* chicker = app_chicker_create(&(set_kick_speed), &(set_chip_distance),
+                                                &(enable_auto_kick), &(enable_auto_chip),
+                                                (null_func_ptr), &(disable_auto_kick));
 
         Dribbler_t* dribbler = app_dribbler_create(&(set_requested_rpm), &(enable_coast),
                                                    &(get_temperature_deg_c));
