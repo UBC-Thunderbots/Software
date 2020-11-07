@@ -21,9 +21,10 @@ class SpinningMoveAction : public Action
      *
      * @param close_to_dest_threshold How far from the destination the robot must be
      * before the action is considered done
+     * @param loop_forever restart the action after completion
      */
-    explicit SpinningMoveAction(
-        double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
+    explicit SpinningMoveAction(bool loop_forever, double close_to_dest_threshold =
+                                                       ROBOT_CLOSE_TO_DEST_THRESHOLD);
 
     SpinningMoveAction() = delete;
 
