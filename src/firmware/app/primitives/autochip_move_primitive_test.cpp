@@ -9,7 +9,8 @@ extern "C"
 
 #include <gtest/gtest.h>
 
-namespace FirmwareTestUtil {
+namespace FirmwareTestUtil
+{
     // Mock fake charger functions
     FAKE_VOID_FUNC(charge_capacitor);
     FAKE_VOID_FUNC(discharge_capacitor);
@@ -39,7 +40,7 @@ namespace FirmwareTestUtil {
 
     // Mock fake ball functions
     FAKE_VALUE_FUNC(float, get_ball_property);
-};
+};  // namespace FirmwareTestUtil
 
 WheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
                                     .motor_phase_resistance              = 1.2f,
@@ -57,56 +58,93 @@ ControllerState_t controller_state = {.last_applied_acceleration_x       = 2.33f
 RobotConstants_t robot_constants = {
     .mass = 1.1f, .moment_of_inertia = 1.2f, .robot_radius = 1.3f, .jerk_limit = 1.4f};
 
-class FirmwareWorldTest : public testing::Test
+class FirmwareTestUtilWorld : public testing::Test
 {
    protected:
-    // TODO reset it
-    // Leave a common about pattern by linking to doc
-//    void reset()
-//    {
-//        // Register resets
-//        RESET_FAKE(DISPLAY_init);
-//        RESET_FAKE(DISPLAY_clear);
-//        RESET_FAKE(DISPLAY_output_message);
-//        RESET_FAKE(DISPLAY_get_line_capacity);
-//        RESET_FAKE(DISPLAY_get_line_insert_index);
-//    }
+    // In accordance with fff's documentation
+    // https://github.com/meekrosoft/fff#resetting-a-fake
+    void resetFakes(void)
+    {
+        RESET_FAKE(FirmwareTestUtil::charge_capacitor);
+        RESET_FAKE(FirmwareTestUtil::discharge_capacitor);
+        RESET_FAKE(FirmwareTestUtil::float_capacitor);
+
+        // mock fake chicker functions
+        RESET_FAKE(FirmwareTestUtil::set_kick_speed);
+        RESET_FAKE(FirmwareTestUtil::set_chip_distance);
+        RESET_FAKE(FirmwareTestUtil::enable_auto_kick);
+        RESET_FAKE(FirmwareTestUtil::enable_auto_chip);
+        RESET_FAKE(FirmwareTestUtil::disable_auto_chip);
+        RESET_FAKE(FirmwareTestUtil::disable_auto_kick);
+
+        // Mock fake dribbler functions
+        RESET_FAKE(FirmwareTestUtil::set_requested_rpm);
+        RESET_FAKE(FirmwareTestUtil::enable_coast);
+        RESET_FAKE(FirmwareTestUtil::get_temperature_deg_c);
+
+        // Mock fake robot functions
+        RESET_FAKE(FirmwareTestUtil::get_robot_property);
+
+        // Mock fake wheel functions
+        RESET_FAKE(FirmwareTestUtil::request_wheel_force);
+        RESET_FAKE(FirmwareTestUtil::get_motor_speed);
+        RESET_FAKE(FirmwareTestUtil::brake);
+        RESET_FAKE(FirmwareTestUtil::coast);
+
+        // Mock fake ball functions
+        RESET_FAKE(FirmwareTestUtil::get_ball_property);
+    }
 
     virtual void SetUp(void)
     {
-        Charger_t* charger = app_charger_create(
-            &(test::charge_capacitor), &(test::discharge_capacitor), &(test::float_capacitor));
+        resetFakes();
 
-        Chicker_t* chicker = app_chicker_create(&(test::set_kick_speed), &(test::set_chip_distance),
-                                                &(test::enable_auto_kick), &(test::enable_auto_chip),
-                                                &(test::disable_auto_kick), &(test::disable_auto_chip));
+        Charger_t* charger = app_charger_create(&(FirmwareTestUtil::charge_capacitor),
+                                                &(FirmwareTestUtil::discharge_capacitor),
+                                                &(FirmwareTestUtil::float_capacitor));
 
-        Dribbler_t* dribbler = app_dribbler_create(&(test::set_requested_rpm), &(test::enable_coast),
-                                                   &(test::get_temperature_deg_c));
+        Chicker_t* chicker = app_chicker_create(
+            &(FirmwareTestUtil::set_kick_speed), &(FirmwareTestUtil::set_chip_distance),
+            &(FirmwareTestUtil::enable_auto_kick), &(FirmwareTestUtil::enable_auto_chip),
+            &(FirmwareTestUtil::disable_auto_kick),
+            &(FirmwareTestUtil::disable_auto_chip));
 
-        Wheel_t* front_right_wheel =
-            app_wheel_create(&(test::request_wheel_force), &(test::get_motor_speed), &(test::brake),
-                             &(test::coast), wheel_constants);
-        Wheel_t* front_left_wheel =
-            app_wheel_create(&(test::request_wheel_force), &(test::get_motor_speed), &(test::brake),
-                             &(test::coast), wheel_constants);
-        Wheel_t* back_right_wheel =
-            app_wheel_create(&(test::request_wheel_force), &(test::get_motor_speed), &(test::brake),
-                             &(test::coast), wheel_constants);
-        Wheel_t* back_left_wheel =
-            app_wheel_create(&(test::request_wheel_force), &(test::get_motor_speed), &(test::brake),
-                             &(test::coast), wheel_constants);
+        Dribbler_t* dribbler = app_dribbler_create(
+            &(FirmwareTestUtil::set_requested_rpm), &(FirmwareTestUtil::enable_coast),
+            &(FirmwareTestUtil::get_temperature_deg_c));
+
+        Wheel_t* front_right_wheel = app_wheel_create(
+            &(FirmwareTestUtil::request_wheel_force),
+            &(FirmwareTestUtil::get_motor_speed), &(FirmwareTestUtil::brake),
+            &(FirmwareTestUtil::coast), wheel_constants);
+        Wheel_t* front_left_wheel = app_wheel_create(
+            &(FirmwareTestUtil::request_wheel_force),
+            &(FirmwareTestUtil::get_motor_speed), &(FirmwareTestUtil::brake),
+            &(FirmwareTestUtil::coast), wheel_constants);
+        Wheel_t* back_right_wheel = app_wheel_create(
+            &(FirmwareTestUtil::request_wheel_force),
+            &(FirmwareTestUtil::get_motor_speed), &(FirmwareTestUtil::brake),
+            &(FirmwareTestUtil::coast), wheel_constants);
+        Wheel_t* back_left_wheel = app_wheel_create(
+            &(FirmwareTestUtil::request_wheel_force),
+            &(FirmwareTestUtil::get_motor_speed), &(FirmwareTestUtil::brake),
+            &(FirmwareTestUtil::coast), wheel_constants);
 
         FirmwareRobot_t* robot = app_firmware_robot_create(
-            charger, chicker, dribbler, &(test::get_robot_property), &(test::get_robot_property),
-            &(test::get_robot_property), &(test::get_robot_property), &(test::get_robot_property),
-            &(test::get_robot_property), &(test::get_robot_property), front_right_wheel,
-            front_left_wheel, back_right_wheel, back_left_wheel, &controller_state,
-            robot_constants);
+            charger, chicker, dribbler, &(FirmwareTestUtil::get_robot_property),
+            &(FirmwareTestUtil::get_robot_property),
+            &(FirmwareTestUtil::get_robot_property),
+            &(FirmwareTestUtil::get_robot_property),
+            &(FirmwareTestUtil::get_robot_property),
+            &(FirmwareTestUtil::get_robot_property),
+            &(FirmwareTestUtil::get_robot_property), front_right_wheel, front_left_wheel,
+            back_right_wheel, back_left_wheel, &controller_state, robot_constants);
 
         FirmwareBall_t* ball =
-            app_firmware_ball_create(&(test::get_ball_property), &(test::get_ball_property),
-                                     &(test::get_ball_property), &(test::get_ball_property));
+            app_firmware_ball_create(&(FirmwareTestUtil::get_ball_property),
+                                     &(FirmwareTestUtil::get_ball_property),
+                                     &(FirmwareTestUtil::get_ball_property),
+                                     &(FirmwareTestUtil::get_ball_property));
 
         firmware_world = app_firmware_world_create(robot, ball);
     }
@@ -119,7 +157,7 @@ class FirmwareWorldTest : public testing::Test
     FirmwareWorld_t* firmware_world;
 };
 
-TEST_F(FirmwareWorldTest, app_autochip_move_primitive_test)
+TEST_F(FirmwareTestUtilWorld, app_autochip_move_primitive_test)
 {
     TbotsProto_Primitive primitive_msg;
     primitive_msg.which_primitive = TbotsProto_Primitive_autochip_move_tag;
@@ -132,7 +170,7 @@ TEST_F(FirmwareWorldTest, app_autochip_move_primitive_test)
 
     app_primitive_manager_startNewPrimitive(manager, firmware_world, primitive_msg);
     // Checking `dribbler_speed_rpm` is passed into `app_dribbler_setSpeed` mock
-    ASSERT_EQ(test::set_requested_rpm_fake.arg0_val, 1.0);
+    ASSERT_EQ(FirmwareTestUtil::set_requested_rpm_fake.arg0_val, 1.0);
     // Checking `chip_distance_meters` is passed into `app_chicker_enableAutokick` mock
-    ASSERT_EQ(test::enable_auto_chip_fake.arg0_val, 2.0);
+    ASSERT_EQ(FirmwareTestUtil::enable_auto_chip_fake.arg0_val, 2.0);
 }
