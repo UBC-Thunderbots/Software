@@ -8,16 +8,10 @@
  * Returns true if the given points are collinear, false otherwise.
  *
  * @params a, b, c the given points
- * @param fixed_epsilon the epsilon value for near zero double comparisons
- * NOTE: the default value is 4*FIXED_EPSILON because of accumulation of error from
- * subtracting 2 vectors twice and calculating acuteAngle
- * @param ulps_epsilon the epsilon value for double comparisons based on ULPs distance
  *
  * @return true if the given points are collinear, false otherwise
  */
-bool collinear(const Point &a, const Point &b, const Point &c,
-               double fixed_epsilon = 4 * FIXED_EPSILON,
-               int ulps_epsilon     = ULPS_EPSILON_TEN);
+bool collinear(const Point &a, const Point &b, const Point &c);
 
 /**
  * Checks if 2 Segments are collinear.
