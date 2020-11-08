@@ -36,10 +36,25 @@ namespace FirmwareTestUtil
     FAKE_VALUE_FUNC(float, get_robot_property);
 
     // Mock fake wheel functions
-    FAKE_VOID_FUNC(request_wheel_force, float);
-    FAKE_VALUE_FUNC(float, get_motor_speed);
-    FAKE_VOID_FUNC(brake);
-    FAKE_VOID_FUNC(coast);
+    FAKE_VOID_FUNC(request_wheel_force_front_right, float);
+    FAKE_VALUE_FUNC(float, get_motor_speed_front_right);
+    FAKE_VOID_FUNC(brake_front_right);
+    FAKE_VOID_FUNC(coast_front_right);
+
+    FAKE_VOID_FUNC(request_wheel_force_front_left, float);
+    FAKE_VALUE_FUNC(float, get_motor_speed_front_left);
+    FAKE_VOID_FUNC(brake_front_left);
+    FAKE_VOID_FUNC(coast_front_left);
+
+    FAKE_VOID_FUNC(request_wheel_force_back_right, float);
+    FAKE_VALUE_FUNC(float, get_motor_speed_back_right);
+    FAKE_VOID_FUNC(brake_back_right);
+    FAKE_VOID_FUNC(coast_back_right);
+
+    FAKE_VOID_FUNC(request_wheel_force_back_left, float);
+    FAKE_VALUE_FUNC(float, get_motor_speed_back_left);
+    FAKE_VOID_FUNC(brake_back_left);
+    FAKE_VOID_FUNC(coast_back_left);
 
     // Mock fake ball functions
     FAKE_VALUE_FUNC(float, get_ball_property);
@@ -72,7 +87,7 @@ class FirmwareTestUtilWorld : public testing::Test
         RESET_FAKE(FirmwareTestUtil::discharge_capacitor);
         RESET_FAKE(FirmwareTestUtil::float_capacitor);
 
-        // mock fake chicker functions
+        // Reset fake chicker functions
         RESET_FAKE(FirmwareTestUtil::set_kick_speed);
         RESET_FAKE(FirmwareTestUtil::set_chip_distance);
         RESET_FAKE(FirmwareTestUtil::enable_auto_kick);
@@ -80,21 +95,36 @@ class FirmwareTestUtilWorld : public testing::Test
         RESET_FAKE(FirmwareTestUtil::disable_auto_chip);
         RESET_FAKE(FirmwareTestUtil::disable_auto_kick);
 
-        // Mock fake dribbler functions
+        // Reset fake dribbler functions
         RESET_FAKE(FirmwareTestUtil::set_requested_rpm);
         RESET_FAKE(FirmwareTestUtil::enable_coast);
         RESET_FAKE(FirmwareTestUtil::get_temperature_deg_c);
 
-        // Mock fake robot functions
+        // Reset fake robot functions
         RESET_FAKE(FirmwareTestUtil::get_robot_property);
 
-        // Mock fake wheel functions
-        RESET_FAKE(FirmwareTestUtil::request_wheel_force);
-        RESET_FAKE(FirmwareTestUtil::get_motor_speed);
-        RESET_FAKE(FirmwareTestUtil::brake);
-        RESET_FAKE(FirmwareTestUtil::coast);
+        // Reset fake wheel functions
+        RESET_FAKE(FirmwareTestUtil::request_wheel_force_front_right);
+        RESET_FAKE(FirmwareTestUtil::get_motor_speed_front_right);
+        RESET_FAKE(FirmwareTestUtil::brake_front_right);
+        RESET_FAKE(FirmwareTestUtil::coast_front_right);
 
-        // Mock fake ball functions
+        RESET_FAKE(FirmwareTestUtil::request_wheel_force_front_left);
+        RESET_FAKE(FirmwareTestUtil::get_motor_speed_front_left);
+        RESET_FAKE(FirmwareTestUtil::brake_front_left);
+        RESET_FAKE(FirmwareTestUtil::coast_front_left);
+
+        RESET_FAKE(FirmwareTestUtil::request_wheel_force_back_right);
+        RESET_FAKE(FirmwareTestUtil::get_motor_speed_back_right);
+        RESET_FAKE(FirmwareTestUtil::brake_back_right);
+        RESET_FAKE(FirmwareTestUtil::coast_back_right);
+
+        RESET_FAKE(FirmwareTestUtil::request_wheel_force_back_left);
+        RESET_FAKE(FirmwareTestUtil::get_motor_speed_back_left);
+        RESET_FAKE(FirmwareTestUtil::brake_back_left);
+        RESET_FAKE(FirmwareTestUtil::coast_back_left);
+
+        // Reset fake ball functions
         RESET_FAKE(FirmwareTestUtil::get_ball_property);
     }
 
@@ -116,22 +146,26 @@ class FirmwareTestUtilWorld : public testing::Test
             &(FirmwareTestUtil::set_requested_rpm), &(FirmwareTestUtil::enable_coast),
             &(FirmwareTestUtil::get_temperature_deg_c));
 
-        Wheel_t* front_right_wheel = app_wheel_create(
-            &(FirmwareTestUtil::request_wheel_force),
-            &(FirmwareTestUtil::get_motor_speed), &(FirmwareTestUtil::brake),
-            &(FirmwareTestUtil::coast), wheel_constants);
-        Wheel_t* front_left_wheel = app_wheel_create(
-            &(FirmwareTestUtil::request_wheel_force),
-            &(FirmwareTestUtil::get_motor_speed), &(FirmwareTestUtil::brake),
-            &(FirmwareTestUtil::coast), wheel_constants);
-        Wheel_t* back_right_wheel = app_wheel_create(
-            &(FirmwareTestUtil::request_wheel_force),
-            &(FirmwareTestUtil::get_motor_speed), &(FirmwareTestUtil::brake),
-            &(FirmwareTestUtil::coast), wheel_constants);
-        Wheel_t* back_left_wheel = app_wheel_create(
-            &(FirmwareTestUtil::request_wheel_force),
-            &(FirmwareTestUtil::get_motor_speed), &(FirmwareTestUtil::brake),
-            &(FirmwareTestUtil::coast), wheel_constants);
+        Wheel_t* front_right_wheel =
+            app_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_right),
+                             &(FirmwareTestUtil::get_motor_speed_front_right),
+                             &(FirmwareTestUtil::brake_front_right),
+                             &(FirmwareTestUtil::coast_front_right), wheel_constants);
+        Wheel_t* front_left_wheel =
+            app_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_left),
+                             &(FirmwareTestUtil::get_motor_speed_front_left),
+                             &(FirmwareTestUtil::brake_front_left),
+                             &(FirmwareTestUtil::coast_front_left), wheel_constants);
+        Wheel_t* back_right_wheel =
+            app_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_right),
+                             &(FirmwareTestUtil::get_motor_speed_back_right),
+                             &(FirmwareTestUtil::brake_back_right),
+                             &(FirmwareTestUtil::coast_back_right), wheel_constants);
+        Wheel_t* back_left_wheel =
+            app_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_left),
+                             &(FirmwareTestUtil::get_motor_speed_back_left),
+                             &(FirmwareTestUtil::brake_back_left),
+                             &(FirmwareTestUtil::coast_back_left), wheel_constants);
 
         FirmwareRobot_t* robot = app_firmware_robot_create(
             charger, chicker, dribbler, &(FirmwareTestUtil::get_robot_property),

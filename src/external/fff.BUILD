@@ -1,6 +1,6 @@
 # Description:
 #   This library provides us with creating function test doubles
-#   Primarily used for testing firmware primitives in `firmware/app/world`
+#   Primarily used for testing firmware primitives in `firmware/app/primitives`
 #   https://github.com/meekrosoft/fff
 
 cc_library(
