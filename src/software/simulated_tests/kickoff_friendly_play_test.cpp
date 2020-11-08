@@ -7,6 +7,7 @@
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
+#include "software/simulated_tests/simulated_test_main.h"
 
 class KickoffFriendlyPlayTest : public SimulatedTestFixture
 {
@@ -14,6 +15,9 @@ class KickoffFriendlyPlayTest : public SimulatedTestFixture
 
 TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 {
+	std::cout << "Current visualizer state in test: " << SimulatedTestMain::enable_visualizer << '\n';
+	if (SimulatedTestMain::enable_visualizer)
+		enableVisualizer();
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),

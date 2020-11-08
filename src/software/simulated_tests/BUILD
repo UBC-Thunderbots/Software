@@ -22,6 +22,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "simulated_test_main",
+    srcs = ["simulated_test_main.cpp"],
+	hdrs = ["simulated_test_main.h"],
+    deps = [
+        "@gtest",
+        "//software/logger",
+		"//software/parameter:dynamic_parameters",],
+)
+
 cc_test(
     name = "simulated_test_fixture_test",
     srcs = ["simulated_test_fixture_test.cpp"],
@@ -31,7 +41,7 @@ cc_test(
         "//software/time:duration",
         "//software/time:timestamp",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -45,7 +55,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -53,13 +63,13 @@ cc_test(
     name = "kickoff_friendly_play_test",
     srcs = ["kickoff_friendly_play_test.cpp"],
     deps = [
+        "//software/simulated_tests:simulated_test_main",
         ":simulated_test_fixture",
         "//software/ai/hl/stp/play:kickoff_friendly_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -73,7 +83,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -87,7 +97,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -101,7 +111,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -115,7 +125,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -129,7 +139,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -143,7 +153,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -157,7 +167,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -171,7 +181,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -185,7 +195,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -199,7 +209,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
 
@@ -213,6 +223,7 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
+        ":simulated_test_main",
     ],
 )
+
