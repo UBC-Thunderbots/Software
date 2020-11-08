@@ -166,6 +166,7 @@ int main(void)
     MX_USB_OTG_FS_PCD_Init();
     MX_CRC_Init();
     MX_TIM4_Init();
+    MX_UART4_Init();
     /* USER CODE BEGIN 2 */
 
     initIoLayer();
@@ -245,7 +246,8 @@ void SystemClock_Config(void)
     {
         Error_Handler();
     }
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART3 | RCC_PERIPHCLK_USB;
+    PeriphClkInitStruct.PeriphClockSelection =
+        RCC_PERIPHCLK_USART3 | RCC_PERIPHCLK_UART4 | RCC_PERIPHCLK_USB;
     PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
     PeriphClkInitStruct.UsbClockSelection         = RCC_USBCLKSOURCE_PLL;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
