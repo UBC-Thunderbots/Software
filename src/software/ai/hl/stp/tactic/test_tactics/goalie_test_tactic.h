@@ -18,11 +18,6 @@ class GoalieTestTactic : public Tactic
      */
     explicit GoalieTestTactic(bool loop_forever = false);
 
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
     void updateWorldParams(const World& world) override;
 
     bool isGoalieTactic() const override;

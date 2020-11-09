@@ -10,8 +10,6 @@
 class PenaltySetupTactic : public MoveTactic
 {
    public:
-
-
     /**
      * Creates a new PenaltySetupTactic
      *
@@ -25,5 +23,4 @@ class PenaltySetupTactic : public MoveTactic
     PenaltySetupTactic() = delete;
 
     void accept(TacticVisitor& visitor) override;
-
 };

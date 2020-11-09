@@ -18,11 +18,6 @@ class MoveTestTactic : public Tactic
      */
     explicit MoveTestTactic(bool loop_forever = false);
 
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param World The current state of the world
-     */
     void updateWorldParams(const World& world) override;
 
     /**
