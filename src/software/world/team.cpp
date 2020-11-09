@@ -179,6 +179,40 @@ std::vector<Robot> Team::getAllRobotsExceptGoalie() const
 }
 
 
+////////////////////
+
+
+std::optional<Robot> Team::getNearestRobot(const Point &ref_point) const
+{
+    return getNearestRobot(this->getAllRobots(), ref_point);
+}
+
+std::optional<Robot> Team::getNearestRobot(const std::vector<Robot> &robots,
+                                           const Point &ref_point) const
+{
+    if (robots.empty())
+    {
+        return std::nullopt;
+    }
+
+    Robot nearest_robot = robots.at(0);
+    for (const Robot &curRobot : robots)
+    {
+        double curDistance = (ref_point - curRobot.position()).length();
+        if (curDistance < (nearest_robot.position() - ref_point).length())
+        {
+            nearest_robot = curRobot;
+        }
+    }
+
+    return nearest_robot;
+}
+
+
+
+//////////////////
+
+
 void Team::clearAllRobots()
 {
     team_robots.clear();
