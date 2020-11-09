@@ -50,17 +50,16 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
                          double_param_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(double_param_widget);
                      },
+                     [&](std::shared_ptr<NumericParameter<float>> param) {
+                         // This will be implemented once the new parameter system is in
+                         // place (issue #1298) Required to build
+                     },
                      [&](std::shared_ptr<Config> config) {
                          QWidget* config_label_widget = createConfigLabel(config);
                          config_label_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(config_label_widget);
                          setupParameters(config);
                      }},
-                     [&](std::shared_ptr<NumericParameter<float>> param) {
-                         // This will be implemented once the new parameter system is in
-                         // place (issue #1298) Required to build
-                     },
-                     [&](std::shared_ptr<Config> config_) { setupParameters(config_); }},
             mutable_parameter);
     }
     setWidget(params_widget);
