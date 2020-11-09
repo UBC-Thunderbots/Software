@@ -1,10 +1,12 @@
 #include "software/simulation/simulator_robot_singleton.h"
 
+#include "shared/proto/robot_log_msg.pb.h"
 #include "software/logger/logger.h"
 #include "software/world/field.h"
 
 extern "C"
 {
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/world/charger.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
@@ -118,6 +120,16 @@ void SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
 {
     checkValidAndExecuteVoid(
         [firmware_world](auto robot) { robot->runCurrentPrimitive(firmware_world); });
+}
+
+void SimulatorRobotSingleton::handleBlueRobotLogProto(TbotsProto_RobotLog log)
+{
+    SimulatorRobotSingleton::handleRobotLogProto(log, "BLUE");
+}
+
+void SimulatorRobotSingleton::handleYellowRobotLogProto(TbotsProto_RobotLog log)
+{
+    SimulatorRobotSingleton::handleRobotLogProto(log, "YELLOW");
 }
 
 void SimulatorRobotSingleton::checkValidAndExecuteVoid(
@@ -363,4 +375,15 @@ void SimulatorRobotSingleton::brakeMotorBackRight()
 void SimulatorRobotSingleton::brakeMotorFrontRight()
 {
     checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontRight(); });
+}
+
+void SimulatorRobotSingleton::handleRobotLogProto(TbotsProto_RobotLog log,
+                                                  const std::string& team_colour)
+{
+    // TODO #1804: we should be sending the RobotLog to the WifiBackend
+    LOG(INFO) << "[" << team_colour << " ROBOT " << log.robot_id << " "
+              << TbotsProto::LogLevel_Name(
+                     static_cast<TbotsProto::LogLevel>(log.log_level))
+              << "]"
+              << "[" << log.file_name << ":" << log.line_number << "]: " << log.log_msg;
 }
