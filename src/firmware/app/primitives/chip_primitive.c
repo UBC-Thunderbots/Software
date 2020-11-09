@@ -14,7 +14,7 @@ void app_chip_primitive_start(TbotsProto_ChipPrimitive prim_msg, void *void_stat
     app_chicker_enableAutochip(chicker, prim_msg.chip_distance_meters);
 }
 
-static void chip_tick(void *void_state_ptr, FirmwareWorld_t *world)
+static void app_chip_primitive_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
     app_chick_motion_tick(void_state_ptr, world);
 }
@@ -23,6 +23,6 @@ static void chip_tick(void *void_state_ptr, FirmwareWorld_t *world)
  * \brief The chip primitive.
  */
 const primitive_t CHIP_PRIMITIVE = {.direct        = false,
-                                    .tick          = &chip_tick,
+                                    .tick          = &app_chip_primitive_tick,
                                     .create_state  = createChickMotionState_t,
                                     .destroy_state = destroyChickMotionState_t};

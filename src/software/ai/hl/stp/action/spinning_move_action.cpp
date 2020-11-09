@@ -2,8 +2,8 @@
 
 #include "software/ai/intent/spinning_move_intent.h"
 
-SpinningMoveAction::SpinningMoveAction(double close_to_dest_threshold)
-    : Action(false), close_to_dest_threshold(close_to_dest_threshold)
+SpinningMoveAction::SpinningMoveAction(bool loop_forever, double close_to_dest_threshold)
+    : Action(loop_forever), close_to_dest_threshold(close_to_dest_threshold)
 {
 }
 

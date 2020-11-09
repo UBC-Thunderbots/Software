@@ -1,15 +1,16 @@
 #include <boost/program_options.hpp>
+#include <experimental/filesystem>
 #include <iostream>
 #include <numeric>
 
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend.h"
-#include "software/backend/replay_logging/replay_logger.h"
 #include "software/constants.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/proto/logging/proto_logger.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -36,7 +37,7 @@ std::string BANNER =
 // clang-format on
 
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     std::cout << BANNER << std::endl;
 
@@ -87,20 +88,38 @@ int main(int argc, char **argv)
             visualizer = std::make_shared<ThreadedFullSystemGUI>();
 
             sensor_fusion->Subject<World>::registerObserver(visualizer);
+            ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
             ai->Subject<PlayInfo>::registerObserver(visualizer);
             backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 
-        if (!args->replay_output_dir()->value().empty())
+        if (!args->proto_log_output_dir()->value().empty())
         {
-            auto replay_logger =
-                std::make_shared<ReplayLogger>(args->replay_output_dir()->value());
-            backend->Subject<SensorProto>::registerObserver(replay_logger);
+            namespace fs = std::experimental::filesystem;
+            // we want to log protos, make the parent directory and pass the
+            // subdirectories to the ProtoLoggers for each message type
+            fs::path proto_log_output_dir(args->proto_log_output_dir()->value());
+            fs::create_directory(proto_log_output_dir);
+
+            // log incoming SensorMsg
+            auto sensor_msg_logger = std::make_shared<ProtoLogger<SensorProto>>(
+                proto_log_output_dir / "SensorProto",
+                ProtoLogger<SensorProto>::DEFAULT_MSGS_PER_CHUNK,
+                [](const SensorProto& lhs, const SensorProto& rhs) {
+                    return lhs.backend_received_time().epoch_timestamp_seconds() <
+                           rhs.backend_received_time().epoch_timestamp_seconds();
+                });
+            // log outgoing PrimitiveSet
+            auto primitive_set_logger =
+                std::make_shared<ProtoLogger<TbotsProto::PrimitiveSet>>(
+                    proto_log_output_dir / "PrimitiveSet");
+            backend->Subject<SensorProto>::registerObserver(sensor_msg_logger);
+            ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(primitive_set_logger);
         }
 
         // Wait for termination
-        if (!args->headless())
+        if (!args->headless()->value())
         {
             // This blocks forever without using the CPU
             // Wait for the full_system to shut down before shutting

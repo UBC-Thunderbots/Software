@@ -24,6 +24,8 @@ class StopAction : public Action
     explicit StopAction(bool loop_forever, double stopped_speed_threshold =
                                                ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
 
+    StopAction() = delete;
+
     /**
      * Updates the params that cannot be derived from the world for this action
      *

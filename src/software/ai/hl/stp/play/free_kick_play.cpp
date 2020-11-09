@@ -28,8 +28,7 @@ bool FreeKickPlay::isApplicable(const World &world) const
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-           (!teamHasPossession(world, world.enemyTeam()) ||
-            teamPassInProgress(world, world.friendlyTeam()));
+           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
 }
 
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
@@ -249,8 +248,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
-        min_score = 1 - std::min(time_since_commit_stage_start.getSeconds() /
-                                     MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
+        min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
+                                     MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
                                  1.0);
     } while (best_pass_and_score_so_far.rating < min_score ||
              shoot_tactic->hasShotAvailable());

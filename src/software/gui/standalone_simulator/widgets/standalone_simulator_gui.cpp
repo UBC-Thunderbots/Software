@@ -51,10 +51,12 @@ StandaloneSimulatorGUI::StandaloneSimulatorGUI(
     });
 
     main_widget->simulation_graphics_view->setStandaloneSimulator(standalone_simulator);
+    main_widget->dynamic_parameter_widget->setupParameters(
+        MutableDynamicParameters->getMutableSimulatorConfig());
 
     connect(update_timer, &QTimer::timeout, this, &StandaloneSimulatorGUI::handleUpdate);
     update_timer->start(static_cast<int>(
-        Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).getMilliseconds()));
+        Duration::fromSeconds(UPDATE_INTERVAL_SECONDS).toMilliseconds()));
 }
 
 void StandaloneSimulatorGUI::handleUpdate()
