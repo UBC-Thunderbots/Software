@@ -6,6 +6,8 @@
 
 #include "software/gui/generic_widgets/slider/slider.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/parameter/enumerated_parameter.h"
+#include "software/parameter/numeric_parameter.h"
 #include "software/parameter/parameter.h"
 
 /**
@@ -17,7 +19,7 @@ class DynamicParameterWidget : public QScrollArea
     Q_OBJECT
 
    public:
-    explicit DynamicParameterWidget(QWidget* parent = 0);
+    explicit DynamicParameterWidget(QWidget* parent = nullptr);
 
     /**
      * A helper function to recursively setup all parameters and sub-configs of the given

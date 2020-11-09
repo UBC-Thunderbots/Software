@@ -27,6 +27,8 @@ class DefenseShadowEnemyTactic : public Tactic
                                       const Team &enemy_team, const Ball &ball,
                                       bool ignore_goalie, double shadow_distance);
 
+    DefenseShadowEnemyTactic() = delete;
+
     /**
      * Updates the world parameters for this Tactic.
      *

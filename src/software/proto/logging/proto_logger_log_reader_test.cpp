@@ -1,14 +1,14 @@
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
-#include "software/backend/replay_logging/replay_logger.h"
-#include "software/backend/replay_logging/replay_reader.h"
 #include "software/multithreading/subject.h"
+#include "software/proto/logging/proto_log_reader.h"
+#include "software/proto/logging/proto_logger.h"
+#include "software/proto/sensor_msg.pb.h"
 
 // the working directory of tests are the bazel WORKSPACE root (in this case, src)
 // this path is relative to the current working directory, i.e. the bazel root
-constexpr const char* REPLAY_TEST_PATH_SUFFIX =
-    "software/backend/replay_logging/test_replay";
+constexpr const char* REPLAY_TEST_PATH_SUFFIX = "software/proto/logging/test_logs";
 
 namespace fs = std::experimental::filesystem;
 
@@ -22,17 +22,18 @@ class TestSubject : public Subject<SensorProto>
     }
 };
 
-TEST(ReplayTest, test_read_and_write_replay)
+TEST(ProtoLoggerLogReaderTest, test_read_and_write_proto_log)
 {
     // unfortunately due to the unavailablity of ordering tests and functions that
     // generate test files that actually work, we have to read recorded replays back,
     // write them, and then read them again in the same test
-    // TODO: record replay_logging data with the game controller running , see #1584
+
+    static constexpr size_t MSGS_PER_CHUNK = 1000;
 
     std::vector<SensorProto> read_replay_msgs;
 
-    ReplayReader reader(fs::current_path() / REPLAY_TEST_PATH_SUFFIX);
-    while (auto frame = reader.getNextMsg())
+    ProtoLogReader reader(fs::current_path() / REPLAY_TEST_PATH_SUFFIX);
+    while (auto frame = reader.getNextMsg<SensorProto>())
     {
         read_replay_msgs.emplace_back(*frame);
     }
@@ -60,20 +61,35 @@ TEST(ReplayTest, test_read_and_write_replay)
     // write the read frames to another replay_logging directory
     auto output_path = fs::current_path() / "replaytest";
     std::shared_ptr<Observer<SensorProto>> logger_ptr =
-        std::make_shared<ReplayLogger>(output_path, 1000);
+        std::make_shared<ProtoLogger<SensorProto>>(
+            output_path, MSGS_PER_CHUNK,
+            [](const SensorProto& lhs, const SensorProto& rhs) {
+                return lhs.backend_received_time().epoch_timestamp_seconds() <
+                       rhs.backend_received_time().epoch_timestamp_seconds();
+            });
     TestSubject subject;
     subject.registerObserver(logger_ptr);
-    for (const auto msg : read_replay_msgs)
+
+    // unfortunately we have to do this due to the performance of the CI node since
+    // the sort that happens right before a chunk is saved to disk is time consuming
+    // and there's still messages in the buffer left to process
+    for (size_t i = 0; i < read_replay_msgs.size(); i++)
     {
+        auto& msg = read_replay_msgs[i];
         subject.sendValue(msg);
-        // we have 3000 frames of replay_logging so we have to try to not fill the buffer
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        LOG(INFO) << "Sent message with timestamp "
+                  << msg.backend_received_time().epoch_timestamp_seconds();
+
+        if (i % MSGS_PER_CHUNK == MSGS_PER_CHUNK - 1)
+        {
+            // we just sent the last message in a chunk, sleep for longer
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
     }
-    // unfortunately we have to do this because there is otherwise no way to 'guarantee'
-    // that the entire buffer of messages in the ThreadedObserver has been cleared and
-    // written to disk by the ReplayLogger
-    // This duration needs to be long enough to de facto make this a 'guarantee'
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // test that 3 files named "0", "1", and "2" are created in the output directory
     std::unordered_set<std::string> created_filenames;
@@ -88,8 +104,8 @@ TEST(ReplayTest, test_read_and_write_replay)
 
     // compare against the messages that we read
     std::vector<SensorProto> written_read_replay_msgs;
-    ReplayReader reader2(output_path);
-    while (auto frame = reader2.getNextMsg())
+    ProtoLogReader reader2(output_path);
+    while (auto frame = reader2.getNextMsg<SensorProto>())
     {
         written_read_replay_msgs.emplace_back(*frame);
     }

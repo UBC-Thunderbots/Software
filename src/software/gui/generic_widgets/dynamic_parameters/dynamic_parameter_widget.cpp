@@ -56,6 +56,11 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
                          params_widget->layout()->addWidget(config_label_widget);
                          setupParameters(config);
                      }},
+                     [&](std::shared_ptr<NumericParameter<float>> param) {
+                         // This will be implemented once the new parameter system is in
+                         // place (issue #1298) Required to build
+                     },
+                     [&](std::shared_ptr<Config> config_) { setupParameters(config_); }},
             mutable_parameter);
     }
     setWidget(params_widget);
