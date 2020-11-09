@@ -145,6 +145,7 @@ class FirmwareTestUtilWorld : public testing::Test
 
     virtual void SetUp(void)
     {
+        // Reset fake function before running tests
         resetFakes();
 
         Charger_t* charger = app_charger_create(&(FirmwareTestUtil::charge_capacitor),
