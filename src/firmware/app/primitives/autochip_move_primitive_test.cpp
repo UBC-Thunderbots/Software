@@ -20,4 +20,5 @@ TEST_F(FirmwareTestUtilWorld, app_autochip_move_primitive_test)
     ASSERT_EQ(FirmwareTestUtil::set_requested_rpm_fake.arg0_val, 1.0);
     // Checking `chip_distance_meters` is passed into `app_chicker_enableAutokick` mock
     ASSERT_EQ(FirmwareTestUtil::enable_auto_chip_fake.arg0_val, 2.0);
+    app_primitive_manager_destroy(manager);
 }
