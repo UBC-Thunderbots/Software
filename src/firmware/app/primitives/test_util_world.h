@@ -1,5 +1,10 @@
 // This file is a base fixture for testing firmware primitives
 // The `fff` framework creates 'fake' functions for robot and world
+// "Fake" functions offer abilities like viewing args called and number of calls
+// To call a method, use [FUNCTION_NAME]_fake.[METHOD]
+// e.g. FAKE_VOID_FUNC(set_requested_rpm, int) -> set_requested_rpm_fake.arg0_val
+// `set_requested_rpm` takes in an integer. To see the argument called, call `arg0_val` on
+// the fake function
 // For more information, please visit the documentation:
 // https://github.com/meekrosoft/fff
 #include "fff.h"
@@ -12,6 +17,13 @@ extern "C"
 
 #include <gtest/gtest.h>
 
+// Initializing all the mock functions required for robot and world
+// Mocks with no return types or arguments:
+// https://github.com/meekrosoft/fff#hello-fake-world
+// Mocks with input arguments:
+// https://github.com/meekrosoft/fff#capturing-arguments
+// Mocks with outputs:
+// https://github.com/meekrosoft/fff#return-values
 namespace FirmwareTestUtil
 {
     // Mock fake charger functions
@@ -19,7 +31,7 @@ namespace FirmwareTestUtil
     FAKE_VOID_FUNC(discharge_capacitor);
     FAKE_VOID_FUNC(float_capacitor);
 
-    // mock fake chicker functions
+    // Mock fake chicker functions
     FAKE_VOID_FUNC(set_kick_speed, float);
     FAKE_VOID_FUNC(set_chip_distance, float);
     FAKE_VOID_FUNC(enable_auto_kick, float);
@@ -60,6 +72,7 @@ namespace FirmwareTestUtil
     FAKE_VALUE_FUNC(float, get_ball_property);
 };  // namespace FirmwareTestUtil
 
+// Mock wheel state
 WheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
                                     .motor_phase_resistance              = 1.2f,
                                     .motor_back_emf_per_rpm              = 1.3f,
@@ -79,10 +92,12 @@ RobotConstants_t robot_constants = {
 class FirmwareTestUtilWorld : public testing::Test
 {
    protected:
+    // Resetting fake functions to ensure clean state in new tests
     // In accordance with fff's documentation
     // https://github.com/meekrosoft/fff#resetting-a-fake
     void resetFakes(void)
     {
+        // Reset fake charger functions
         RESET_FAKE(FirmwareTestUtil::charge_capacitor);
         RESET_FAKE(FirmwareTestUtil::discharge_capacitor);
         RESET_FAKE(FirmwareTestUtil::float_capacitor);

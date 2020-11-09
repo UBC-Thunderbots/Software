@@ -1,5 +1,7 @@
+extern "C"
+{
 #include "autochip_move_primitive.h"
-
+}
 #include "firmware/app/primitives/test_util_world.h"
 
 TEST_F(FirmwareTestUtilWorld, app_autochip_move_primitive_test)
