@@ -73,9 +73,7 @@ QWidget* DynamicParameterWidget::createConfigLabel(std::shared_ptr<Config> confi
 
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(config->name()));
-    QFont font(label->font());
-    font.setUnderline(true);
-    label->setFont(font);
+    label->setText(QString::fromStdString("<u>" + config->name() + "</u>"));
     layout->addWidget(label);
     widget->setLayout(layout);
 
