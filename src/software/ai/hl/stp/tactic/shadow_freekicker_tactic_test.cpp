@@ -92,6 +92,9 @@ class ShadowFreekickerTacticTest : public testing::Test
         // setup tactic and acquire move action from it
         ShadowFreekickerTactic tactic = ShadowFreekickerTactic(
             left_or_right, world.enemyTeam(), world.ball(), world.field(), false);
+        tactic.updateWorldParams(world);
+        EXPECT_EQ(tactic.getBall().position(), world.ball().position());
+
         tactic.updateRobot(friendly_robot);
         auto action_ptr = tactic.getNextAction();
         ASSERT_TRUE(action_ptr);
