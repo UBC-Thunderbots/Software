@@ -1,12 +1,13 @@
-// This file is a base fixture for testing firmware primitives
-// The `fff` framework creates 'fake' functions for robot and world
-// "Fake" functions offer abilities like viewing args called and number of calls
-// To call a method, use [FUNCTION_NAME]_fake.[METHOD]
-// e.g. FAKE_VOID_FUNC(set_requested_rpm, int) -> set_requested_rpm_fake.arg0_val
-// `set_requested_rpm` takes in an integer. To see the argument called, call `arg0_val` on
-// the fake function
-// For more information, please visit the documentation:
-// https://github.com/meekrosoft/fff
+/**
+ * This file is a base fixture for testing firmware primitives
+ * The `fff` framework creates 'fake' functions for robot and world
+ * "Fake" functions use a macro to create a struct called `"FUNCTION_NAME"_fake`
+ * e.g. FAKE_VOID_FUNC(set_requested_rpm, int) -> set_requested_rpm_fake.arg0_val
+ * `set_requested_rpm` mocked to take in an int. To see the last argument called, access
+ * `arg0_val` in the struct
+ * For more information, please visit the documentation:
+ * https://github.com/meekrosoft/fff
+ */
 #include "fff.h"
 DEFINE_FFF_GLOBALS;
 
@@ -17,13 +18,15 @@ extern "C"
 
 #include <gtest/gtest.h>
 
-// Initializing all the mock functions required for robot and world
-// Mocks with no return types or arguments:
-// https://github.com/meekrosoft/fff#hello-fake-world
-// Mocks with input arguments:
-// https://github.com/meekrosoft/fff#capturing-arguments
-// Mocks with outputs:
-// https://github.com/meekrosoft/fff#return-values
+/**
+ * Initializing all the mock functions required for robot and world
+ * Mocks with no return types or arguments:
+ * https://github.com/meekrosoft/fff#hello-fake-world
+ * Mocks with input arguments:
+ * https://github.com/meekrosoft/fff#capturing-arguments
+ * Mocks with outputs:
+ * https://github.com/meekrosoft/fff#return-values
+ */
 namespace FirmwareTestUtil
 {
     // Mock fake charger functions
@@ -92,9 +95,11 @@ RobotConstants_t robot_constants = {
 class FirmwareTestUtilWorld : public testing::Test
 {
    protected:
-    // Resetting fake functions to ensure clean state in new tests
-    // In accordance with fff's documentation
-    // https://github.com/meekrosoft/fff#resetting-a-fake
+    /**
+     * Resetting fake functions to ensure clean state in new tests
+     * In accordance with fff's documentation
+     * https://github.com/meekrosoft/fff#resetting-a-fake
+     */
     void resetFakes(void)
     {
         // Reset fake charger functions
@@ -148,42 +153,42 @@ class FirmwareTestUtilWorld : public testing::Test
         // Reset fake function before running tests
         resetFakes();
 
-        Charger_t* charger = app_charger_create(&(FirmwareTestUtil::charge_capacitor),
-                                                &(FirmwareTestUtil::discharge_capacitor),
-                                                &(FirmwareTestUtil::float_capacitor));
+        charger = app_charger_create(&(FirmwareTestUtil::charge_capacitor),
+                                     &(FirmwareTestUtil::discharge_capacitor),
+                                     &(FirmwareTestUtil::float_capacitor));
 
-        Chicker_t* chicker = app_chicker_create(
+        chicker = app_chicker_create(
             &(FirmwareTestUtil::set_kick_speed), &(FirmwareTestUtil::set_chip_distance),
             &(FirmwareTestUtil::enable_auto_kick), &(FirmwareTestUtil::enable_auto_chip),
             &(FirmwareTestUtil::disable_auto_kick),
             &(FirmwareTestUtil::disable_auto_chip));
 
-        Dribbler_t* dribbler = app_dribbler_create(
-            &(FirmwareTestUtil::set_requested_rpm), &(FirmwareTestUtil::enable_coast),
-            &(FirmwareTestUtil::get_temperature_deg_c));
+        dribbler = app_dribbler_create(&(FirmwareTestUtil::set_requested_rpm),
+                                       &(FirmwareTestUtil::enable_coast),
+                                       &(FirmwareTestUtil::get_temperature_deg_c));
 
-        Wheel_t* front_right_wheel =
+        front_right_wheel =
             app_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_right),
                              &(FirmwareTestUtil::get_motor_speed_front_right),
                              &(FirmwareTestUtil::brake_front_right),
                              &(FirmwareTestUtil::coast_front_right), wheel_constants);
-        Wheel_t* front_left_wheel =
+        front_left_wheel =
             app_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_left),
                              &(FirmwareTestUtil::get_motor_speed_front_left),
                              &(FirmwareTestUtil::brake_front_left),
                              &(FirmwareTestUtil::coast_front_left), wheel_constants);
-        Wheel_t* back_right_wheel =
+        back_right_wheel =
             app_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_right),
                              &(FirmwareTestUtil::get_motor_speed_back_right),
                              &(FirmwareTestUtil::brake_back_right),
                              &(FirmwareTestUtil::coast_back_right), wheel_constants);
-        Wheel_t* back_left_wheel =
+        back_left_wheel =
             app_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_left),
                              &(FirmwareTestUtil::get_motor_speed_back_left),
                              &(FirmwareTestUtil::brake_back_left),
                              &(FirmwareTestUtil::coast_back_left), wheel_constants);
 
-        FirmwareRobot_t* robot = app_firmware_robot_create(
+        robot = app_firmware_robot_create(
             charger, chicker, dribbler, &(FirmwareTestUtil::get_robot_property),
             &(FirmwareTestUtil::get_robot_property),
             &(FirmwareTestUtil::get_robot_property),
@@ -193,19 +198,36 @@ class FirmwareTestUtilWorld : public testing::Test
             &(FirmwareTestUtil::get_robot_property), front_right_wheel, front_left_wheel,
             back_right_wheel, back_left_wheel, &controller_state, robot_constants);
 
-        FirmwareBall_t* ball =
-            app_firmware_ball_create(&(FirmwareTestUtil::get_ball_property),
-                                     &(FirmwareTestUtil::get_ball_property),
-                                     &(FirmwareTestUtil::get_ball_property),
-                                     &(FirmwareTestUtil::get_ball_property));
+        ball = app_firmware_ball_create(&(FirmwareTestUtil::get_ball_property),
+                                        &(FirmwareTestUtil::get_ball_property),
+                                        &(FirmwareTestUtil::get_ball_property),
+                                        &(FirmwareTestUtil::get_ball_property));
 
         firmware_world = app_firmware_world_create(robot, ball);
     }
 
     virtual void TearDown(void)
     {
+        app_charger_destroy(charger);
+        app_chicker_destroy(chicker);
+        app_dribbler_destroy(dribbler);
+        app_wheel_destroy(front_right_wheel);
+        app_wheel_destroy(front_left_wheel);
+        app_wheel_destroy(back_right_wheel);
+        app_wheel_destroy(back_left_wheel);
+        app_firmware_robot_destroy(robot);
+        app_firmware_ball_destroy(ball);
         app_firmware_world_destroy(firmware_world);
     }
 
     FirmwareWorld_t* firmware_world;
+    Charger_t* charger;
+    Chicker_t* chicker;
+    Dribbler_t* dribbler;
+    Wheel_t* front_right_wheel;
+    Wheel_t* front_left_wheel;
+    Wheel_t* back_right_wheel;
+    Wheel_t* back_left_wheel;
+    FirmwareRobot_t* robot;
+    FirmwareBall_t* ball;
 };
