@@ -127,7 +127,7 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
             // If there are multiple robots that can pass to the robot, we assume
             // it will receive the ball from the closest one since this is more
             // likely
-            auto closest_passer = nearestRobot(receiver_passer_pairs.at(final_receiver),
+            auto closest_passer = passing_team.getNearestRobot(receiver_passer_pairs.at(final_receiver),
                                                final_receiver.position());
             return std::make_pair(pass_num, closest_passer);
         }

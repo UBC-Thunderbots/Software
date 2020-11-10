@@ -20,28 +20,6 @@ cc_test(
 )
 
 cc_library(
-    name = "ball",
-    srcs = ["ball.cpp"],
-    hdrs = ["ball.h"],
-    deps = [
-        "//shared:constants",
-        "//software/geom/algorithms",
-        "//software/world:ball",
-        "//software/world:field",
-    ],
-)
-
-cc_test(
-    name = "ball_test",
-    srcs = ["ball_test.cpp"],
-    deps = [
-        ":ball",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "calc_best_shot",
     srcs = [
         "calc_best_shot.cpp",
@@ -137,6 +115,7 @@ cc_library(
         "//shared:constants",
         "//software/geom/algorithms",
         "//software/world",
+        "//software/world:team",
     ],
 )
 
@@ -209,25 +188,6 @@ cc_test(
         ":possession",
         "//shared:constants",
         "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "team",
-    srcs = ["team.cpp"],
-    hdrs = ["team.h"],
-    deps = [
-        "//software/world:robot",
-        "//software/world:team",
-    ],
-)
-
-cc_test(
-    name = "team_test",
-    srcs = ["team_test.cpp"],
-    deps = [
-        ":team",
         "@gtest//:gtest_main",
     ],
 )
