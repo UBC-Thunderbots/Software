@@ -1,5 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
-LWIP0.BSP.mode=
+#LWIP0.BSP.mode=
 LWIP.LWIP_MULTICAST_TX_OPTIONS=0
 PB13.GPIOParameters=GPIO_Label
 RCC.USART1Freq_Value=108000000
