@@ -37,13 +37,13 @@
      </property>
      <widget class="QTabWidget" name="ai_control_tab_widget">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="usesScrollButtons">
        <bool>false</bool>
@@ -195,7 +195,14 @@
          <enum>QLayout::SetNoConstraint</enum>
         </property>
         <item>
-         <widget class="DynamicParameterWidget" name="dynamic_parameter_widget" native="true"/>
+         <widget class="DynamicParameterWidget" name="dynamic_parameter_widget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

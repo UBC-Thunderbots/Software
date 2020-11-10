@@ -62,8 +62,36 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
                      }},
             mutable_parameter);
     }
-    setWidget(params_widget);
     setWidgetResizable(true);
+    setWidget(params_widget);
+
+
+    LOG(INFO) << "sizePolicy()" << (int)sizePolicy().verticalPolicy()<<std::endl;
+    LOG(INFO) << "params_widget->sizePolicy()" << (int)params_widget->sizePolicy().verticalPolicy()<<std::endl;
+    LOG(INFO) << "minimumHeight()" << minimumHeight()<<std::endl;
+    LOG(INFO) << "params_widget->minimumHeight()" << params_widget->minimumHeight()<<std::endl;
+    LOG(INFO) << "minimumWidth()" << minimumWidth()<<std::endl;
+    LOG(INFO) << "params_widget->minimumWidth()" << params_widget->minimumWidth()<<std::endl;
+
+    LOG(INFO) << "sizeHint().width()" << sizeHint().width()<<std::endl;
+    LOG(INFO) << "params_widget->sizeHint().width()" << params_widget->sizeHint().width()<<std::endl;
+    LOG(INFO) << "sizeHint().height()" << sizeHint().height()<<std::endl;
+    LOG(INFO) << "params_widget->sizeHint().height()" << params_widget->sizeHint().height()<<std::endl;
+
+//    params_widget->resize(5,5);
+//    params_widget->setMinimumSize(0,0);
+    params_widget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    //params_widget->setMinimumSize(100,100);
+
+    LOG(INFO) << "sizeHint().width()" << sizeHint().width()<<std::endl;
+    LOG(INFO) << "params_widget->sizeHint().width()" << params_widget->sizeHint().width()<<std::endl;
+    LOG(INFO) << "sizeHint().height()" << sizeHint().height()<<std::endl;
+    LOG(INFO) << "params_widget->sizeHint().height()" << params_widget->sizeHint().height()<<std::endl;
+
+
+    LOG(INFO) << "sizePolicy()" << (int)sizePolicy().verticalPolicy()<<std::endl;
+    LOG(INFO) << "params_widget->sizePolicy()" << (int)params_widget->sizePolicy().verticalPolicy()<<std::endl;
 }
 
 QWidget* DynamicParameterWidget::createConfigLabel(std::shared_ptr<Config> config)
@@ -172,6 +200,7 @@ QWidget* DynamicParameterWidget::createDoubleParameter(
     horizontal_layout->addWidget(param_slider);
 
     QLineEdit* param_line_edit = new QLineEdit(widget);
+    param_line_edit->setMaximumWidth(60);
     horizontal_layout->addWidget(param_line_edit);
     vertical_layout->addLayout(horizontal_layout);
 
