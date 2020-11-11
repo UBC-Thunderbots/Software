@@ -298,6 +298,7 @@ TEST_F(PatrolTacticTest, cost_of_already_assigned_robot)
     PatrolTactic tactic = PatrolTactic(patrol_points, 1.0, Angle::zero(), 2.0);
 
     tactic.updateRobot(assigned_robot);
+    tactic.updateWorldParams(world);
 
     double cost = tactic.calculateRobotCost(assigned_robot, world);
 

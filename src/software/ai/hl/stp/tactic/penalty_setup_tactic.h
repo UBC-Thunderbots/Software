@@ -18,7 +18,9 @@ class PenaltySetupTactic : public MoveTactic
      */
     explicit PenaltySetupTactic(bool loop_forever);
 
+    void updateWorldParams(const World& world) override;
+
     PenaltySetupTactic() = delete;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 };

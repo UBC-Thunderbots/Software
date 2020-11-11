@@ -57,6 +57,9 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
     Ball ball({1, 1}, {0, 0}, Timestamp::fromSeconds(0));
 
     Field field = Field::createSSLDivisionBField();
+
+    World world = World(field, ball, friendly_team, enemy_team);
+
     ReceiverTactic tactic(field, friendly_team, enemy_team, pass, ball, false);
 
     tactic.updateRobot(receiver);
@@ -66,7 +69,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
     // we're at the target position
     for (int i = 0; i < 5; i++)
     {
-        tactic.updateWorldParams(friendly_team, enemy_team, ball);
+        tactic.updateWorldParams(world);
         tactic.updateControlParams(pass);
         Angle shot_dir = (field.enemyGoalCenter() - receiver.position()).orientation();
 
@@ -224,8 +227,12 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({});
 
+    Field field = Field::createSSLDivisionBField();
+
     // Ball is travelling towards the robot
     Ball ball({-0.5, 0.5}, {-1, 1}, Timestamp::fromSeconds(5));
+
+
 
     ReceiverTactic tactic(Field::createSSLDivisionBField(), friendly_team, enemy_team,
                           pass, ball, false);
@@ -241,7 +248,9 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
         Vector(receiver.orientation().cos(), receiver.orientation().sin())
             .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
     ball = Ball(ball_pos, {-1, 1}, Timestamp::fromSeconds(5));
-    tactic.updateWorldParams(friendly_team, enemy_team, ball);
+    // Create test world with new ball
+    World world = World(field, ball, friendly_team, enemy_team);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(pass);
 
     // Since we've received the ball, we shouldn't yield anything
