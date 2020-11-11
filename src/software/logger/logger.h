@@ -3,7 +3,10 @@
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
 #include <g3log/logmessage.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logcapture.hpp>
 #include <g3sinks/LogRotate.h>
+#include <iostream>
 
 /**
  * This class acts as a Singleton that's responsible for initializing the logger.
@@ -32,8 +35,13 @@ class LoggerSingleton
     LoggerSingleton()
     {
         logWorker = g3::LogWorker::createLogWorker();
-        auto sinkHandle = logWorker->addSink(std::make_unique<LogRotate>("thunderbots", "logger/logs"), &LogRotate::save);
+        auto sinkHandle = logWorker->addSink(std::make_unique<LogRotate>("thunderbots", "software/"), &LogRotate::save);
+        auto MakeLogFatalThrowException = []{
+            
+            throw std::runtime_error("test");
+        };
         g3::initializeLogging(logWorker.get());
+        g3::setFatalPreLoggingHook(MakeLogFatalThrowException);
     }
 
     std::unique_ptr<g3::LogWorker> logWorker;

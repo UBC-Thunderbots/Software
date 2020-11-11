@@ -11,3 +11,12 @@ cc_library(
         "@g3sinks",
     ],
 )
+
+cc_test(
+    name = "logger_test",
+    srcs = ["logger_test.cpp"],
+    deps = [
+        ":logger",
+        "@gtest//:gtest_main",
+    ],
+)
