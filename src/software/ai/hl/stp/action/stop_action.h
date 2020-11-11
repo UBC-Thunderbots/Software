@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 /**
  * The StopAction makes the robot stop with the option to coast
@@ -23,6 +23,8 @@ class StopAction : public Action
      */
     explicit StopAction(bool loop_forever, double stopped_speed_threshold =
                                                ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
+
+    StopAction() = delete;
 
     /**
      * Updates the params that cannot be derived from the world for this action

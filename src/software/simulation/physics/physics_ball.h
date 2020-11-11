@@ -4,8 +4,10 @@
 
 #include <optional>
 
-#include "software/new_geom/point.h"
-#include "software/new_geom/vector.h"
+#include "software/geom/point.h"
+#include "software/geom/vector.h"
+#include "software/parameter/dynamic_parameters.h"
+#include "software/time/duration.h"
 #include "software/world/ball_state.h"
 
 /**
@@ -23,13 +25,12 @@ class PhysicsBall
      * @param world A shared_ptr to a Box2D World
      * @param ball_state The initial state of the ball
      * @param mass_kg The mass of the ball in kg
-     * @param restitution The restitution of the ball
-     * @param linear_damping The linear damping of the ball
+     * @param simulator_config The config to fetch parameters from
      */
     explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
-                         const double mass_kg, double restitution = 1.0,
-                         double linear_damping = 0.0);
-
+                         const double mass_kg,
+                         std::shared_ptr<const SimulatorConfig> simulator_config =
+                             DynamicParameters->getSimulatorConfig());
     PhysicsBall() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
@@ -84,15 +85,35 @@ class PhysicsBall
      * from its current location.
      *
      * @param in_flight_distance The distance for which the ball will be in flight
+     * @param angle_of_departure The angle of departure for the ball as it enters flight
      */
-    void setInFlightForDistance(double in_flight_distance);
+    void setInFlightForDistance(double in_flight_distance, Angle angle_of_departure);
 
     /**
      * Returns true if the ball is currently in flight, and false otherwise
      *
      * @return true if the ball is currently in flight, and false otherwise
      */
-    bool isInFlight();
+    bool isInFlight() const;
+
+    /**
+     * Updates whether or not the ball is "in flight" based on its current state.
+     */
+    void updateIsInFlight() const;
+
+    /**
+     * Applies the ball friction model to appropriately slow down the ball
+     *
+     * @param time_step duration over which to apply friction
+     */
+    void applyBallFrictionModel(const Duration& time_step);
+
+    /**
+     * Sets the initial kick speed of the ball
+     *
+     * @param speed initial kick speed of the ball
+     */
+    void setInitialKickSpeed(double speed);
 
     /**
      * Applies the given force vector to the ball at its center of mass
@@ -117,23 +138,54 @@ class PhysicsBall
      */
     bool isTouchingOtherObject() const;
 
+    /**
+     * Calculate the amount that the ball needs to slow down during this timestep to
+     * properly model friction
+     *
+     * @param time_step The amount of time in the future to calculate velocity delta
+     *
+     * @return velocity delta due to friction
+     */
+    Vector calculateVelocityDeltaDueToFriction(const Duration& time_step);
+
+    /**
+     * Calculate the new speed of the ball after applying the sliding/rolling friction
+     * ball model for the given amount of time
+     *
+     * @param initial_ball_velocity The initial velocity of the ball
+     * @param sliding_to_rolling_speed_threshold The speed threshold when the ball goes
+     * from sliding to rolling
+     * @param duration_in_future The amount of time in the future to calculate future
+     * velocity
+     *
+     * @return the new velocity of the ball
+     */
+    Vector calculateFrictionBallModelFutureVelocity(
+        const Vector& initial_ball_velocity, double sliding_to_rolling_speed_threshold,
+        const Duration& duration_in_future) const;
+
+    /**
+     * Calculates and returns the ball's distance from the ground, in metres
+     *
+     * @return the ball's distance from the ground, in metres
+     */
+    double calculateDistanceFromGround() const;
+
     // See https://box2d.org/manual.pdf chapters 6 and 7 more information on Shapes,
     // Bodies, and Fixtures
     b2Body* ball_body;
 
     // If the ball is currently in flight, the in_flight_origin holds the point
     // where the ball initially became in flight
-    std::optional<Point> in_flight_origin;
+    mutable std::optional<Point> in_flight_origin;
     double in_flight_distance_meters;
+    Angle flight_angle_of_departure;
+
     // friction with other objects, such as robots/wall
     static constexpr double BALL_FRICTION = 0.0;
 
-    // The restitution is the amount of energy retained when bouncing off walls and
-    // robots, 0.0 means perfectly inelastic and 1.0 means perfectly elastic collision.
-    // The linear damping determines how the linear motion of the ball decreases over
-    // time, 0.0 means no damping and the damping increases as linear_damping increases.
-    // Linear Damping link:
-    // https://gamedev.stackexchange.com/questions/160047/what-does-lineardamping-mean-in-box2d
-    const double ball_restitution;
-    const double ball_linear_damping;
+    // initial speed a ball is kicked to model friction behaviour
+    std::optional<double> initial_kick_speed;  // m/s
+
+    std::shared_ptr<const SimulatorConfig> simulator_config;
 };

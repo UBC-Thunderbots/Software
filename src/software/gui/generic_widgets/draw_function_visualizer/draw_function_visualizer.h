@@ -3,9 +3,9 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QOpenGLWidget>
 
+#include "software/geom/rectangle.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/generic_widgets/draw_function_visualizer/zoomable_qgraphics_view.h"
-#include "software/new_geom/rectangle.h"
 
 /**
  * This class is a QGraphicsView widget that allows the user to zoom
@@ -17,7 +17,7 @@ class DrawFunctionVisualizer : public ZoomableQGraphicsView
     Q_OBJECT
 
    public:
-    explicit DrawFunctionVisualizer(QWidget* parent = 0);
+    explicit DrawFunctionVisualizer(QWidget* parent = nullptr);
 
     /**
      * Clears the scene and draws each of the provided DrawFunctions in order

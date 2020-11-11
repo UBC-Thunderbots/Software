@@ -2,7 +2,7 @@
 
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/new_geom/segment.h"
+#include "software/geom/segment.h"
 
 /**
  * A crease defender moves around the exterior of our defense box to help shadow
@@ -39,18 +39,9 @@ class CreaseDefenderTactic : public Tactic
                                   const Team &friendly_team, const Team &enemy_team,
                                   LeftOrRight left_or_right);
 
-    std::string getName() const override;
+    CreaseDefenderTactic() = delete;
 
-    /**
-     * Updates the world parameters for this CreaseDefenderTactic.
-     *
-     * @param ball
-     * @param field
-     * @param friendly_team
-     * @param enemy_team
-     */
-    void updateWorldParams(const Ball &ball, const Field &field,
-                           const Team &friendly_team, const Team &enemy_team);
+    void updateWorldParams(const World &world) override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -61,7 +52,7 @@ class CreaseDefenderTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) override;
 
     Ball getBall() const;
     Field getField() const;

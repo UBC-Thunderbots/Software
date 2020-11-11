@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 
@@ -9,7 +8,7 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
                                      const Team &enemy_team, bool ignore_goalie,
                                      const Ball &ball, const double ball_steal_speed,
                                      bool enemy_team_can_pass, bool loop_forever)
-    : Tactic(loop_forever),
+    : Tactic(loop_forever, {RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -21,18 +20,12 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
 {
 }
 
-std::string ShadowEnemyTactic::getName() const
+void ShadowEnemyTactic::updateWorldParams(const World &world)
 {
-    return "Shadow Enemy Tactic";
-}
-
-void ShadowEnemyTactic::updateWorldParams(const Field &field, const Team &friendly_team,
-                                          const Team &enemy_team, const Ball &ball)
-{
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-    this->ball          = ball;
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
 
 void ShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_threat,
@@ -82,7 +75,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 enemy_to_passer_vector.normalize(this->shadow_distance);
             move_action->updateControlParams(
                 *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::AVOID);
             yield(move_action);
         }
@@ -93,9 +86,10 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             {
                 robots_to_ignore.emplace_back(*friendly_team.goalie());
             }
-            auto best_enemy_shot_opt =
-                calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, enemy_robot,
-                                           ROBOT_MAX_RADIUS_METERS, robots_to_ignore);
+            auto best_enemy_shot_opt = calcBestShotOnGoal(
+                field, friendly_team, enemy_team, enemy_robot.position(),
+                TeamType::FRIENDLY, robots_to_ignore);
+
             Vector enemy_shot_vector = Vector(0, 0);
             if (best_enemy_shot_opt)
             {
@@ -112,14 +106,13 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 enemy_shot_vector.normalize(this->shadow_distance);
 
             // If the enemy robot already had the ball, try steal it and chip it away
-            if (*robotHasPossession(ball.getPreviousStates(),
-                                    enemy_robot.getPreviousStates()) &&
+            if (enemy_robot.isNearDribbler(ball.position()) &&
                 ball.velocity().length() <= ball_steal_speed)
             {
                 move_action->updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0,
-                    DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                    DribblerEnable::ON, MoveType::NORMAL, AutochickType::AUTOCHIP,
                     BallCollisionType::AVOID);
                 yield(move_action);
             }
@@ -128,7 +121,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 move_action->updateControlParams(
                     *robot, position_to_block_shot,
                     enemy_shot_vector.orientation() + Angle::half(), 0,
-                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                    DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
                     BallCollisionType::AVOID);
                 yield(move_action);
             }
@@ -136,7 +129,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void ShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
+void ShadowEnemyTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

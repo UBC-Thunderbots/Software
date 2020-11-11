@@ -1,5 +1,9 @@
 #include "software/simulation/physics/box2d_util.h"
 
+#include <vector>
+
+#include "software/geom/convex_polygon.h"
+
 bool bodyExistsInWorld(b2Body* body, b2World* world)
 {
     if (body == nullptr || world == nullptr)
@@ -47,20 +51,11 @@ float polygonArea(const b2PolygonShape& polygon)
 {
     // Box2D already asserts that Polygons are not degenerate (have < 3 vertices) when
     // they are created, so we do not need to check for that here.
-
-    // Using the shoelace formula / algorithm from
-    // https://www.geeksforgeeks.org/area-of-a-polygon-with-given-n-ordered-vertices/
-    // This requires that the vertices are given in order, either clockwise or
-    // counter-clockwise.
-    double area    = 0.0;
-    unsigned int j = polygon.m_count - 1;
+    std::vector<Point> vertices;
     for (int i = 0; i < polygon.m_count; i++)
     {
-        double x_sum        = polygon.m_vertices[j].x + polygon.m_vertices[i].x;
-        double y_difference = polygon.m_vertices[j].y - polygon.m_vertices[i].y;
-        area += x_sum * y_difference;
-        j = i;
+        vertices.emplace_back(Point(polygon.m_vertices[i].x, polygon.m_vertices[i].y));
     }
 
-    return static_cast<float>(std::fabs(area / 2.0));
+    return static_cast<float>(ConvexPolygon(vertices).area());
 }

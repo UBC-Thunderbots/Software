@@ -1,60 +1,21 @@
 #pragma once
 
-#include "software/primitive/primitive.h"
+#include "software/parameter/dynamic_parameters.h"
+#include "software/proto/defending_side_msg.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
+#include "software/world/field.h"
+#include "software/world/team_types.h"
 #include "software/world/world.h"
 
 extern "C"
 {
 #include "shared/proto/primitive.nanopb.h"
+#include "shared/proto/tbots_software_msgs.nanopb.h"
 }
-
-/**
- * Because the FirmwareWorld_t struct is defined in the .c file (rather than the .h file),
- * C++ considers it an incomplete type and is unable to use it with smart pointers
- * because it doesn't know the size of the object. Therefore we need to create our own
- * "Deleter" class we can provide to the smart pointers to handle that instead.
- *
- * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
- * examples
- */
-struct FirmwareWorldDeleter
-{
-    void operator()(FirmwareWorld_t* firmware_world) const
-    {
-        FirmwareRobot_t* firmware_robot = app_firmware_world_getRobot(firmware_world);
-
-        Wheel_t* firmware_robot_front_left_wheel =
-            app_firmware_robot_getFrontLeftWheel(firmware_robot);
-        app_wheel_destroy(firmware_robot_front_left_wheel);
-        Wheel_t* firmware_robot_back_left_wheel =
-            app_firmware_robot_getBackLeftWheel(firmware_robot);
-        app_wheel_destroy(firmware_robot_back_left_wheel);
-        Wheel_t* firmware_robot_back_right_wheel =
-            app_firmware_robot_getBackRightWheel(firmware_robot);
-        app_wheel_destroy(firmware_robot_back_right_wheel);
-        Wheel_t* firmware_robot_front_right_wheel =
-            app_firmware_robot_getFrontRightWheel(firmware_robot);
-        app_wheel_destroy(firmware_robot_front_right_wheel);
-
-        Chicker_t* firmware_robot_chicker = app_firmware_robot_getChicker(firmware_robot);
-        app_chicker_destroy(firmware_robot_chicker);
-
-        Dribbler_t* firmware_robot_dribbler =
-            app_firmware_robot_getDribbler(firmware_robot);
-        app_dribbler_destroy(firmware_robot_dribbler);
-
-        app_firmware_robot_destroy(firmware_robot);
-
-        FirmwareBall_t* firmware_ball = app_firmware_world_getBall(firmware_world);
-        app_firmware_ball_destroy(firmware_ball);
-
-        app_firmware_world_destroy(firmware_world);
-    };
-};
 
 /**
  * The Simulator abstracts away the physics simulation of all objects in the world,
@@ -69,25 +30,13 @@ class Simulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param simulator_config The config to fetch parameters from
      * @param physics_time_step The time step used to simulated physics
      * and robot primitives.
      */
     explicit Simulator(const Field& field,
-                       const Duration& physics_time_step =
-                           Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
-
-    /**
-     * Creates a new Simulator. The starting state of the simulation
-     * will have the given field, with no robots or ball.
-     *
-     * @param field The field to initialize the simulation with
-     * @param ball_restitution The restitution for ball collisions
-     * @param ball_linear_damping The damping on the ball's linear motion
-     * @param physics_time_step The time step used to simulated physics
-     * and robot primitives.
-     */
-    explicit Simulator(const Field& field, double ball_restitution,
-                       double ball_linear_damping,
+                       std::shared_ptr<const SimulatorConfig> simulator_config =
+                           DynamicParameters->getSimulatorConfig(),
                        const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;
@@ -123,12 +72,13 @@ class Simulator
     void addBlueRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Sets the primitives being simulated by the robots in simulation
+     * Adds a robots to the specified team at the given position. The robot will
+     * automatically be given a valid ID.
      *
-     * @param primitives The primitives to simulate
+     * @param position the position at which to add the robot
      */
-    void setYellowRobotPrimitives(ConstPrimitiveVectorPtr primitives);
-    void setBlueRobotPrimitives(ConstPrimitiveVectorPtr primitives);
+    void addYellowRobot(const Point& position);
+    void addBlueRobot(const Point& position);
 
     /**
      * Sets the primitive being simulated by the robot on the corresponding team
@@ -137,8 +87,30 @@ class Simulator
      * @param id The id of the robot to set the primitive for
      * @param primitive_msg The primitive to run on the robot
      */
-    void setYellowRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
-    void setBlueRobotPrimitive(RobotId id, const PrimitiveMsg& primitive_msg);
+    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+
+    /**
+     * Sets the primitive being simulated by the robot on the corresponding team
+     * in simulation
+     *
+     * @param primitive_set_msg The set of primitives to run on the robot
+     */
+    void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg);
+    void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg);
+
+    /**
+     * Sets which side of the field the corresponding team is defending.
+     *
+     * This will flip robot and ball coordinates an applicable in order to present
+     * the firmware being simulated with data that matches our coordinate convention. See
+     * https://github.com/UBC-Thunderbots/Software/blob/master/docs/software-architecture-and-design.md#coordinates
+     * for more information about our coordinate conventions.
+     *
+     * @param defending_side_proto The side to defend
+     */
+    void setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto);
+    void setBlueTeamDefendingSide(const DefendingSideProto& defending_side_proto);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -156,13 +128,13 @@ class Simulator
     World getWorld() const;
 
     /**
-     * Returns an SSL_WrapperPacket representing the most recent state
+     * Returns an SSLProto::SSL_WrapperPacket representing the most recent state
      * of the simulation
      *
-     * @return an SSL_WrapperPacket representing the most recent state
+     * @return an SSLProto::SSL_WrapperPacket representing the most recent state
      * of the simulation
      */
-    std::unique_ptr<SSL_WrapperPacket> getSSLWrapperPacket() const;
+    std::unique_ptr<SSLProto::SSL_WrapperPacket> getSSLWrapperPacket() const;
 
     /**
      * Returns the field in the simulation
@@ -178,30 +150,38 @@ class Simulator
      */
     Timestamp getTimestamp() const;
 
+    /**
+     * Returns the PhysicsRobot at the given position. This function accounts
+     * for robot radius, so a robot will be returned if the given position is
+     * within the robot's radius from its position.
+     *
+     * @param position The position at which to check for a robot
+     *
+     * @return a weak_ptr to the PhysicsRobot at the given position if one exists,
+     * otherwise returns an empty pointer
+     */
+    std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
+
+    /**
+     * Removes the given PhysicsRobot from the PhysicsWorld, if it exists.
+     *
+     * @param robot The robot to be removed
+     */
+    void removeRobot(std::weak_ptr<PhysicsRobot> robot);
+
    private:
     /**
      * Updates the given simulator_robots to contain and control the given physics_robots
      *
      * @param physics_robots The physics robots to add to the simulator robots
      * @param simulator_robots The simulator robots to add the physics robots to
+     * @param team_colour The color of the team this robot is on
      */
     static void updateSimulatorRobots(
         const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-            simulator_robots);
-
-    /**
-     * Sets the given primitives on the given simulator robots
-     *
-     * @param primitives The primitives to set
-     * @param simulator_robots The robots to set the primitives on
-     * @param simulator_ball The simulator ball to use in the primitives
-     */
-    static void setRobotPrimitives(
-        ConstPrimitiveVectorPtr primitives,
-        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
-        const std::shared_ptr<SimulatorBall>& simulator_ball);
+        TeamColour team_colour);
 
     /**
      * Sets the primitive being simulated by the robot in simulation
@@ -210,12 +190,13 @@ class Simulator
      * @param primitive_msg The primitive to run on the robot
      * @param simulator_robots The robots to set the primitives on
      * @param simulator_ball The simulator ball to use in the primitives
+     * @param defending_side The side of the field the robot is defending
      */
     static void setRobotPrimitive(
-        RobotId id, const PrimitiveMsg& primitive_msg,
+        RobotId id, const TbotsProto_Primitive& primitive_msg,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
             simulator_robots,
-        const std::shared_ptr<SimulatorBall>& simulator_ball);
+        const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side);
 
     PhysicsWorld physics_world;
     std::shared_ptr<SimulatorBall> simulator_ball;
@@ -223,6 +204,8 @@ class Simulator
         yellow_simulator_robots;
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         blue_simulator_robots;
+    FieldSide yellow_team_defending_side;
+    FieldSide blue_team_defending_side;
 
     unsigned int frame_number;
 

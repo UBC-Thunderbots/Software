@@ -2,18 +2,15 @@
 
 #include "software/ai/hl/stp/action/stop_action.h"
 
-StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever) {}
-
-std::string StopTestTactic::getName() const
-{
-    return "Stop Test Tactic";
-}
+StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever, {}) {}
 
 double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // Prefer all robots equally with a cost of 0.5
     return 0.5;
 }
+
+void StopTestTactic::updateWorldParams(const World &world) {}
 
 void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
@@ -23,7 +20,7 @@ void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (this->robot->velocity().length() > 0.05);
 }
 
-void StopTestTactic::accept(MutableTacticVisitor &visitor)
+void StopTestTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

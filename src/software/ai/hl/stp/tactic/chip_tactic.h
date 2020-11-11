@@ -18,25 +18,17 @@ class ChipTactic : public Tactic
      */
     explicit ChipTactic(const Ball& ball, bool loop_forever);
 
-    std::string getName() const override;
+    ChipTactic() = delete;
 
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param ball The ball being kicked
-     */
-    void updateWorldParams(const Ball& ball);
+    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the control parameters for this ChipTactic.
      *
      * @param chip_origin The location where the chip will be taken
      * @param chip_direction The direction the Robot will chip in
-     * @param chip_distance_meters The distance between the starting location
-     * of the chip and the location of the first bounce
      */
-    void updateControlParams(Point chip_origin, Point chip_target,
-                             double chip_distance_meters);
+    void updateControlParams(Point chip_origin, Point chip_target);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -49,7 +41,7 @@ class ChipTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
     Ball getBall() const;
 
@@ -60,5 +52,4 @@ class ChipTactic : public Tactic
     Ball ball;
     Point chip_origin;
     Point chip_target;
-    double chip_distance_meters;
 };

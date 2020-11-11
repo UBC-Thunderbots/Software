@@ -9,12 +9,9 @@ KickoffChipTactic::KickoffChipTactic(const Ball& ball, bool loop_forever)
 {
 }
 
-std::string KickoffChipTactic::getName() const
-{
-    return "Kickoff Chip Tactic";
-}
+void KickoffChipTactic::updateWorldParams(const World& world) {}
 
-void KickoffChipTactic::accept(MutableTacticVisitor& visitor)
+void KickoffChipTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

@@ -9,11 +9,7 @@
 class KickoffFriendlyPlay : public Play
 {
    public:
-    static const std::string name;
-
     KickoffFriendlyPlay() = default;
-
-    std::string getName() const override;
 
     bool isApplicable(const World &world) const override;
 

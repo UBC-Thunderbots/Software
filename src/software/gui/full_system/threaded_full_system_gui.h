@@ -6,12 +6,13 @@
 #include <future>
 #include <thread>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/hl/stp/play_info.h"
+#include "software/geom/rectangle.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/full_system/widgets/full_system_gui.h"
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/multithreading/threaded_observer.h"
-#include "software/new_geom/rectangle.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
 
@@ -19,10 +20,12 @@
  * This class wraps our FullSystemGUI object which is responsible for
  * visualizing information about our AI, and allowing users to control it.
  */
-class ThreadedFullSystemGUI : public ThreadedObserver<World>,
-                              public ThreadedObserver<AIDrawFunction>,
-                              public ThreadedObserver<PlayInfo>,
-                              public ThreadedObserver<SensorMsg>
+class ThreadedFullSystemGUI
+    : public FirstInFirstOutThreadedObserver<World>,
+      public FirstInFirstOutThreadedObserver<AIDrawFunction>,
+      public FirstInFirstOutThreadedObserver<PlayInfo>,
+      public FirstInFirstOutThreadedObserver<SensorProto>,
+      public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
    public:
     explicit ThreadedFullSystemGUI();
@@ -32,7 +35,8 @@ class ThreadedFullSystemGUI : public ThreadedObserver<World>,
     void onValueReceived(World world) override;
     void onValueReceived(AIDrawFunction draw_function) override;
     void onValueReceived(PlayInfo play_info) override;
-    void onValueReceived(SensorMsg sensor_msg) override;
+    void onValueReceived(SensorProto sensor_msg) override;
+    void onValueReceived(TbotsProto::PrimitiveSet primitive_msg) override;
 
     /**
      * Returns a shared_ptr to a promise that can be waited on, and that will
@@ -61,8 +65,10 @@ class ThreadedFullSystemGUI : public ThreadedObserver<World>,
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
-    std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
+    std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> worlds_received_per_second_buffer;
+    std::shared_ptr<ThreadSafeBuffer<double>> primitives_sent_per_second_buffer;
 
     // We want to show the most recent world and AI data, but also want things to look
     // smooth if the stream of data isn't perfectly consistent, so we use a very small
@@ -72,13 +78,15 @@ class ThreadedFullSystemGUI : public ThreadedObserver<World>,
     static constexpr std::size_t AI_DRAW_FUNCTIONS_BUFFER_SIZE    = 2;
     // We only care about the most recent PlayInfo, so the buffer is of size 1
     static constexpr std::size_t PLAY_INFO_BUFFER_SIZE = 1;
-    // We don't want to miss any SensorMsg updates so we make the buffer larger
+    // We don't want to miss any SensorProto updates so we make the buffer larger
     static constexpr std::size_t SENSOR_MSG_BUFFER_SIZE = 60;
     // We don't want to miss any robot status updates so we make the buffer larger
     static constexpr std::size_t ROBOT_STATUS_BUFFER_SIZE = 60;
     // We only care about the most recent view area that was requested, so the
     // buffer is of size 1
     static constexpr std::size_t VIEW_AREA_BUFFER_SIZE = 1;
+    // We only care about the most recent "data" per second values
+    static constexpr std::size_t DATA_PER_SECOND_BUFFER_SIZE = 1;
     // When the application starts up we want to set the initial view area
     // to show all the contents nicely. For some reason doing this only
     // once at the start of the program isn't enough, the GUI seems to need

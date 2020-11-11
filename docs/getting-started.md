@@ -15,7 +15,6 @@
    * [Installing Software Dependencies](#installing-software-dependencies)
    * [Installing Firmware Dependencies](#installing-firmware-dependencies)
    * [Setting Up USB Permissions](#setting-up-usb-permissions)
-   * [Installing grSim](#installing-grsim)
    * [Installing CLion](#installing-clion)
       * [Getting your Student License](#getting-your-student-license)
       * [Installing CLion](#installing-clion-1)
@@ -38,7 +37,7 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 We currently only support Linux, specifically Ubuntu 18.04 LTS. You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
 
-You can use Ubuntu 18.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots AI and grSim on Windows is experimental and not officially supported.**
+You can use Ubuntu 18.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ## Getting the Code
 
@@ -88,13 +87,6 @@ We have several setup scripts to help you easily install the necessary dependenc
     * You will be prompted for your admin password
     * This script will set up the USB permissions required in order to use our radio/wifi dongle
 
-### Installing grSim
-
-* Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-* Run `./setup_grsim.sh`
-  * You will be prompted for your admin password
-  * This script will install `grSim`, which is the main simulator we use for development
-
 ### Installing CLion
 
 CLion is our main IDE for editing our C/C++ code. It is designed to work with our build system, `bazel`, and has all the great features of an IDE such as code completion, syntax highlighting etc. We **strongly** recommend installing CLion and using it for development.
@@ -117,13 +109,13 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 
 ### From the command-line
 
-1) Navigate to the root of this repository (wherever you have it cloned on your computer)
-2) Navigate to `src`.
-3) Build a specific target for running (for example): `bazel build //software/geom:angle_test`
-4) Run a specific target by running (for example): `bazel run //software/geom:angle_test`
-4) Run a specific *test* by running (for example): `bazel test //software/geom:angle_test`
-3) Build everything by running `bazel build //...`
-4) Run all the tests by running `bazel test //...`
+1. Navigate to the root of this repository (wherever you have it cloned on your computer)
+2. Navigate to `src`.
+3. Build a specific target for running (for example): `bazel build //software/geom:angle_test`
+4. Run a specific target by running (for example): `bazel run //software/geom:angle_test`
+5. Run a specific *test* by running (for example): `bazel test //software/geom:angle_test`
+6. Build everything by running `bazel build //...`
+7. Run all the tests by running `bazel test //...`
 *See the bazel [command-line docs](https://docs.bazel.build/versions/master/command-line-reference.html) for more info.*
 
 ### With CLion
@@ -135,7 +127,7 @@ First we need to setup CLion
 4. Select `Import project view file`, and select the file `.bazelproject` (which will be under the `src` folder)
 5. Click `Next`
 6. Change the Project Name to whatever you want. Leave everything else as it is ("Use shared project view file" should be selected).
-6. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
+7. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
 
 
 Now that you're setup, if you can run it on the command line, you can run it in clion. There are two main ways of doing so.
@@ -146,6 +138,24 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     3. For `Target Expression`, you can put anything that comes after a `build`, `run`, `test`, etc. call on the command line. For example: `//software/geom:angle_test`.
     4. For `Bazel Command` you can put any bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
+
+### Running our AI, Simulator or Robot Diagnostics
+
+1. Open your terminal and run `ifconfig`.
+2. Pick the network interface you would like to use:
+    1. If you are running things locally, you can pick any interface that is not `lo`
+    2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
+3. Run our AI: `bazel run //software:full_system -- --interface=[interface_here] --backend=WifiBackend`
+    - This will launch the Visualizer, which displays what the AI is currently "seeing" and allows us to interact with the AI through the dynamic parameters.
+    - The field should be empty, as we are currently not receiving SSL Vision packets.
+4. Run our Simulator: `bazel run //software/simulation:standalone_simulator_main -- --interface=[interface_here]`
+    - The Simulator runs our firmware and Box2D (a physics engine) to simulate how our robots would behave on the field.
+    - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
+    - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
+    - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
+5. Run Robot Diagnostics: `bazel run //software/gui/robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
+    - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
+
 
 ## Debugging
 Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 

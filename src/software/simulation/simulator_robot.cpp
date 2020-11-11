@@ -1,9 +1,9 @@
 #include "software/simulation/simulator_robot.h"
 
 #include "shared/constants.h"
-#include "software/geom/util.h"
+#include "software/geom/algorithms/acute_angle.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/util/acute_angle.h"
+#include "software/math/math_functions.h"
 
 SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),
@@ -13,10 +13,6 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
 {
     if (auto robot = this->physics_robot.lock())
     {
-        robot->registerChickerBallStartContactCallback(
-            [this](PhysicsRobot *robot, PhysicsBall *ball) {
-                this->onChickerBallContact(robot, ball);
-            });
         robot->registerDribblerBallContactCallback(
             [this](PhysicsRobot *robot, PhysicsBall *ball) {
                 this->onDribblerBallContact(robot, ball);
@@ -31,8 +27,9 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
             });
     }
 
-    primitive_manager = std::unique_ptr<PrimitiveManager, PrimitiveManagerDeleter>(
-        app_primitive_manager_create(), PrimitiveManagerDeleter());
+    primitive_manager =
+        std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter>(
+            app_primitive_manager_create(), FirmwarePrimitiveManagerDeleter());
 }
 
 void SimulatorRobot::checkValidAndExecuteVoid(
@@ -110,18 +107,15 @@ float SimulatorRobot::getVelocityAngular()
 
 float SimulatorRobot::getBatteryVoltage()
 {
-    // We currently have 4s batteries on the robot that charge up to a little over
-    // 16V, so we use 16 here to approximate a fully-charged battery
-    // TODO: Should max battery voltage be a constant / injected robot param?
-    // See https://github.com/UBC-Thunderbots/Software/issues/1173
-    return 16.0;
+    return ROBOT_MAX_BATTERY_VOLTAGE;
 }
 
 void SimulatorRobot::kick(float speed_m_per_s)
 {
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
-        for (auto ball : this->balls_in_dribbler_area)
+        if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
         {
+            auto ball = ball_in_dribbler_area->ball;
             Vector robot_orientation_vector =
                 Vector::createFromAngle(robot->getRobotState().orientation());
 
@@ -162,6 +156,9 @@ void SimulatorRobot::kick(float speed_m_per_s)
             ball->applyImpulse(
                 robot_orientation_vector.normalize(ball_head_on_momentum.length()));
             ball->applyImpulse(kick_impulse);
+            ball->setInitialKickSpeed(speed_m_per_s);
+
+            ball_in_dribbler_area->can_be_controlled = false;
         }
     });
 }
@@ -169,16 +166,18 @@ void SimulatorRobot::kick(float speed_m_per_s)
 void SimulatorRobot::chip(float distance_m)
 {
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
-        for (auto ball : this->balls_in_dribbler_area)
+        if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
         {
-            // Mark the ball as "in flight" so collisions are turned off
-            // until it has travelled the desired chip distance.
-            ball->setInFlightForDistance(distance_m);
-
+            auto ball = ball_in_dribbler_area->ball;
             // Assume the ball is chipped at a 45 degree angle
             // TODO: Use a robot-specific constant
             // https://github.com/UBC-Thunderbots/Software/issues/1179
             Angle chip_angle = Angle::fromDegrees(45);
+
+            // Mark the ball as "in flight" so collisions are turned off
+            // until it has travelled the desired chip distance.
+            ball->setInFlightForDistance(distance_m, chip_angle);
+
             // Use the formula for the Range of a parabolic projectile
             // Rearrange to solve for the initial velocity.
             // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
@@ -192,6 +191,8 @@ void SimulatorRobot::chip(float distance_m)
             float ground_velocity =
                 initial_velocity * static_cast<float>(chip_angle.cos());
             kick(ground_velocity);
+
+            ball_in_dribbler_area->can_be_controlled = false;
         }
     });
 }
@@ -200,12 +201,16 @@ void SimulatorRobot::enableAutokick(float speed_m_per_s)
 {
     autokick_speed_m_per_s = speed_m_per_s;
     disableAutochip();
+    // Kick any balls already in the dribbler
+    kick(speed_m_per_s);
 }
 
 void SimulatorRobot::enableAutochip(float distance_m)
 {
     autochip_distance_m = distance_m;
     disableAutokick();
+    // Chip any balls already in the dribbler
+    chip(distance_m);
 }
 
 void SimulatorRobot::disableAutokick()
@@ -337,61 +342,20 @@ void SimulatorRobot::brakeMotorFrontRight()
     checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontRight(); });
 }
 
-void SimulatorRobot::onChickerBallContact(PhysicsRobot *physics_robot,
-                                          PhysicsBall *physics_ball)
-{
-    if (isAutokickEnabled())
-    {
-        kick(autokick_speed_m_per_s.value());
-    }
-    else if (isAutochipEnabled())
-    {
-        chip(autochip_distance_m.value());
-    }
-}
-
 void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
                                            PhysicsBall *physics_ball)
 {
-    if (dribbler_rpm > 0)
+    if (dribbler_rpm > 0 && ball_in_dribbler_area)
     {
-        auto robot = physics_robot->getRobotState();
-        auto ball  = physics_ball->getBallState();
+        if (ball_in_dribbler_area->ball != physics_ball)
+        {
+            throw std::runtime_error("Trying to dribble ball not in the dribbler area");
+        }
 
-        // To dribble, we apply a force towards the center and back of the dribbling area,
-        // closest to the chicker. We vary the magnitude of the force by how far the ball
-        // is from this "dribbling point". This more-or-less acts like a tiny gravity well
-        // that sucks the ball into place, except with more force the further away the
-        // ball is. Once the ball is no longer in the dribbler area this force is not
-        // applied (it is only applied as long as the ball is in the dribbler area).
-
-        Point dribble_point =
-            robot.position() +
-            Vector::createFromAngle(robot.orientation())
-                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS -
-                           PhysicsRobot::dribbler_depth);
-        Vector dribble_force_vector = dribble_point - ball.position();
-        // convert to cm so we operate on a small scale
-        double dist_from_dribble_point_cm =
-            dribble_force_vector.length() * CENTIMETERS_PER_METER;
-        // Combine a polynomial with a slightly offset linear function. This shifts the
-        // intercept with the x-axis to a small positive x-value, so that there is a small
-        // region when the ball is extremely close to the back of the dribbler area (and
-        // close to the chicker) where a tiny amount of force will be applied away from
-        // the robot. This helps prevent us from applying a force into the robot while the
-        // ball is touching it and creating a net force that moves the robot.
-        //
-        // The constants in this equation have been tuned manually so that the dribbling
-        // scenarios in the unit tests pass, which represent reasonable dribbling
-        // behaviour.
-        double polynomial_component = 0.1 * std::pow(dist_from_dribble_point_cm, 4);
-        double linear_component     = ((1.0 / 10.0) * (dist_from_dribble_point_cm - 0.5));
-        double dribble_force_magnitude = polynomial_component + linear_component;
-        dribble_force_magnitude =
-            std::clamp<double>(dribble_force_magnitude, 0, dribble_force_magnitude);
-        dribble_force_vector = dribble_force_vector.normalize(dribble_force_magnitude);
-
-        physics_ball->applyForce(dribble_force_vector);
+        if (ball_in_dribbler_area->can_be_controlled)
+        {
+            applyDribblerForce(physics_robot, physics_ball);
+        }
     }
 }
 
@@ -411,24 +375,39 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
     Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
     physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
 
+    auto ball = DribblerBall{.ball = physics_ball, .can_be_controlled = true};
+
     // Keep track of all balls in the dribbler
-    balls_in_dribbler_area.emplace_back(physics_ball);
+    ball_in_dribbler_area = ball;
+
+    // Even if the dribbler is on, we are guaranteed to apply kicking force
+    // and disable ball control before the dribbler checks to apply dribbling force.
+    // (So that the kick doesn't get messed up by dribbling).
+    // This is because the "StartContact" callbacks are called before the
+    // "PreSolve" contacts in the contact listener
+    // 1.     onDribblerBallStartContactCallback is called
+    // 2.     damping force is applied
+    // 3.     autokick is triggered if it's on
+    // 4.     the onDribblerBallContact callback is called
+    // 5.     Dribbling force would be applied here if the ball was not kicked
+    if (isAutokickEnabled())
+    {
+        kick(autokick_speed_m_per_s.value());
+    }
+    else if (isAutochipEnabled())
+    {
+        chip(autochip_distance_m.value());
+    }
 }
 
 void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
                                               PhysicsBall *physics_ball)
 {
-    auto iter = std::find(balls_in_dribbler_area.begin(), balls_in_dribbler_area.end(),
-                          physics_ball);
-
-    if (iter != balls_in_dribbler_area.end())
-    {
-        balls_in_dribbler_area.erase(iter);
-    }
+    clearBallInDribblerArea();
 }
 
 void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                                       const PrimitiveMsg &primitive_msg)
+                                       const TbotsProto_Primitive &primitive_msg)
 {
     app_primitive_manager_startNewPrimitive(primitive_manager.get(), firmware_world.get(),
                                             primitive_msg);
@@ -438,4 +417,56 @@ void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmwa
 {
     app_primitive_manager_runCurrentPrimitive(primitive_manager.get(),
                                               firmware_world.get());
+}
+
+void SimulatorRobot::clearBallInDribblerArea()
+{
+    ball_in_dribbler_area = std::nullopt;
+}
+
+void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
+                                        PhysicsBall *physics_ball)
+{
+    auto robot = physics_robot->getRobotState();
+    auto ball  = physics_ball->getBallState();
+
+
+    // Damp the ball when it collides with the dribbler. We damp each component
+    // of the ball's momentum separately so we have the flexibility to tune this
+    // behavior to match real life.
+    Vector robot_facing_vector = Vector::createFromAngle(physics_robot->orientation());
+    Vector robot_perp_vector   = robot_facing_vector.perpendicular();
+
+    Vector ball_momentum          = physics_ball->momentum();
+    Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
+    physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
+
+    // To dribble, we apply a force towards the center and back of the dribbling area,
+    // closest to the chicker. We vary the magnitude of the force by how far the ball
+    // is from this "dribbling point". This more-or-less acts like a tiny gravity well
+    // that sucks the ball into place, except with more force the further away the
+    // ball is. Once the ball is no longer in the dribbler area this force is not
+    // applied (it is only applied as long as the ball is in the dribbler area).
+
+    Point dribble_point =
+        robot.position() +
+        Vector::createFromAngle(robot.orientation())
+            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS -
+                       PhysicsRobot::DRIBBLER_DEPTH);
+    Vector dribble_force_vector = dribble_point - ball.position();
+    Vector head_on_force        = dribble_force_vector.project(robot_facing_vector);
+    Vector perp_force           = dribble_force_vector.project(robot_perp_vector);
+    double head_on_dist_cm      = head_on_force.length() * 100;
+    double perp_dist_cm         = perp_force.length() * 100;
+
+    double perp_force_magnitude = 0.5 * std::pow(perp_dist_cm, 2);
+    physics_ball->applyForce(perp_force.normalize(perp_force_magnitude));
+
+    double head_on_magnitude = sigmoid(head_on_dist_cm, 0.15, 0.2);
+    physics_ball->applyForce(head_on_force.normalize(head_on_magnitude));
+
+    // Counteract the force pushing the ball into the robot so there is approximately 0
+    // net force, so that the robot won't move due to dribbling
+    physics_robot->applyForceToCenterOfMass(
+        -(head_on_force.normalize(head_on_magnitude)));
 }

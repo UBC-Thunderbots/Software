@@ -1,9 +1,13 @@
 extern "C"
 {
 #include "firmware/app/world/firmware_robot.h"
+
+#include "firmware/app/logger/logger.h"
 }
 
 #include <gtest/gtest.h>
+
+#include "software/test_util/test_util.h"
 
 class FirmwareRobotTest : public testing::Test
 {
@@ -19,8 +23,10 @@ class FirmwareRobotTest : public testing::Test
         controller_state.last_applied_acceleration_y       = 1.22f;
         controller_state.last_applied_acceleration_angular = 3.22f;
 
+        app_logger_init(0, &TestUtil::handleTestRobotLog);
+
         firmware_robot = app_firmware_robot_create(
-            chicker, dribbler, &(this->returnEight), &(this->returnNine),
+            charger, chicker, dribbler, &(this->returnEight), &(this->returnNine),
             &(this->returnTen), &(this->returnEleven), &(this->returnTwelve),
             &(this->returnThirteen), &(this->returnFourteen), front_right_wheel,
             front_left_wheel, back_right_wheel, back_left_wheel, &controller_state,
@@ -31,6 +37,8 @@ class FirmwareRobotTest : public testing::Test
     {
         app_firmware_robot_destroy(firmware_robot);
     }
+
+    Charger* charger = (Charger*)6;
 
     Chicker* chicker = (Chicker*)7;
 
@@ -89,6 +97,11 @@ class FirmwareRobotTest : public testing::Test
     FirmwareRobot_t* firmware_robot;
     ControllerState_t controller_state;
 };
+
+TEST_F(FirmwareRobotTest, getCharger)
+{
+    EXPECT_EQ(charger, app_firmware_robot_getCharger(firmware_robot));
+}
 
 TEST_F(FirmwareRobotTest, getChicker)
 {

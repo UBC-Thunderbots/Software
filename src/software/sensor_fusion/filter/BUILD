@@ -7,8 +7,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//software/new_geom:angle",
-        "//software/new_geom:point",
+        "//software/geom:angle",
+        "//software/geom:point",
         "//software/time:timestamp",
     ],
 )
@@ -19,11 +19,11 @@ cc_library(
     hdrs = ["ball_filter.h"],
     deps = [
         ":vision_detection",
-        "//software/geom",
+        "//software/geom/algorithms",
         "//software/math:math_functions",
-        "//software/new_geom/util:algorithms",
         "//software/world:ball",
         "//software/world:field",
+        "@boost//:circular_buffer",
         "@eigen",
     ],
 )
@@ -33,6 +33,7 @@ cc_test(
     srcs = ["ball_filter_test.cpp"],
     deps = [
         ":ball_filter",
+        "//software/world:field",
         "@gtest//:gtest_main",
     ],
 )
@@ -43,7 +44,6 @@ cc_library(
     hdrs = ["robot_filter.h"],
     deps = [
         ":vision_detection",
-        "//software/geom",
         "//software/world:robot",
     ],
 )

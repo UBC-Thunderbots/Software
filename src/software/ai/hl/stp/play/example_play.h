@@ -8,16 +8,7 @@
 class ExamplePlay : public Play
 {
    public:
-    static const std::string name;
-
     ExamplePlay() = default;
-
-    /**
-     * This function returns name of the play
-     *
-     * @return name The name of the play (which is is initialized in example_play.cpp)
-     */
-    std::string getName() const override;
 
     /**
      * This function returns whether the play is applicable

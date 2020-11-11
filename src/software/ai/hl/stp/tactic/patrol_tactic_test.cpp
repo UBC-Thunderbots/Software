@@ -8,7 +8,7 @@
 class PatrolTacticTest : public testing::Test
 {
    protected:
-    std::vector<TimestampedRobotState> robot_state_to_complete_actions;
+    std::vector<RobotState> robot_state_to_complete_actions;
     std::vector<std::shared_ptr<MoveAction>> expected_actions;
     const double COST_OF_ASSIGNED_ROBOT                      = 0.0;
     const double COST_OF_NONASSIGNED_ROBOT_UNASSIGNED_TACTIC = 1.0;
@@ -29,7 +29,7 @@ class PatrolTacticTest : public testing::Test
             auto expected_action = std::make_shared<MoveAction>(false);
             expected_action->updateControlParams(
                 robot, patrol_points[i], angle, speed_at_patrol_points,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE,
+                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::AVOID);
             expected_actions.push_back(expected_action);
         }
@@ -46,10 +46,9 @@ class PatrolTacticTest : public testing::Test
     {
         for (size_t i = 0; i < patrol_points.size(); i++)
         {
-            TimestampedRobotState robotState = TimestampedRobotState(
-                patrol_points[i], velocity, Angle::zero(), AngularVelocity::zero(),
-                Timestamp::fromSeconds(static_cast<double>(std::time(nullptr))));
-            robot_state_to_complete_actions.push_back(robotState);
+            RobotState robot_state(patrol_points[i], velocity, Angle::zero(),
+                                   AngularVelocity::zero());
+            robot_state_to_complete_actions.push_back(robot_state);
         }
     }
 
@@ -69,8 +68,8 @@ class PatrolTacticTest : public testing::Test
         EXPECT_EQ(expected_move_action->getFinalOrientation(),
                   move_action->getFinalOrientation());
         EXPECT_EQ(expected_move_action->getFinalSpeed(), move_action->getFinalSpeed());
-        EXPECT_EQ(expected_move_action->getAutoKickType(),
-                  move_action->getAutoKickType());
+        EXPECT_EQ(expected_move_action->getAutochickType(),
+                  move_action->getAutochickType());
         EXPECT_EQ(expected_move_action->getDribblerEnabled(),
                   move_action->getDribblerEnabled());
     }
@@ -78,13 +77,14 @@ class PatrolTacticTest : public testing::Test
     /**
      * Simulates the running of an action until it is done, allowing the patrol tactic
      * to move on to the next point
-     * @param robot: robot that is assigned the tactic
-     * @param new_robot_state: A state that satisfies the patrol tactics's conditions of
-     * moving on to the next point
-     * @param action_ptr: the last action returned by the tactic
-     * @param tactic: the patrol tactic
+     *
+     * @param robot robot that is assigned the tactic
+     * @param new_robot_state A robot state that satisfies the patrol tactics's conditions
+     * of moving on to the next point
+     * @param action_ptr the last action returned by the tactic
+     * @param tactic the patrol tactic
      */
-    void simulateActionToCompletion(Robot &robot, TimestampedRobotState new_robot_state,
+    void simulateActionToCompletion(Robot &robot, RobotState new_robot_state,
                                     std::shared_ptr<Action> action_ptr,
                                     PatrolTactic &tactic)
     {
@@ -92,7 +92,7 @@ class PatrolTacticTest : public testing::Test
         std::unique_ptr<Intent> intent = action_ptr->getNextIntent();
 
         // update state of the robot and tactic
-        robot.updateState(new_robot_state);
+        robot.updateState(new_robot_state, Timestamp());
         tactic.updateRobot(robot);
 
         // complete the action
@@ -116,7 +116,6 @@ TEST_F(PatrolTacticTest, patrol_tactic_constructor)
         PatrolTactic(std::vector<Point>({patrol_point1}), at_patrol_point_tolerance,
                      Angle::zero(), speed_at_patrol_points);
     ASSERT_NE(nullptr, &tactic);
-    ASSERT_EQ("Patrol Tactic", tactic.getName());
 }
 
 TEST_F(PatrolTacticTest, patrol_one_point)
@@ -299,6 +298,7 @@ TEST_F(PatrolTacticTest, cost_of_already_assigned_robot)
     PatrolTactic tactic = PatrolTactic(patrol_points, 1.0, Angle::zero(), 2.0);
 
     tactic.updateRobot(assigned_robot);
+    tactic.updateWorldParams(world);
 
     double cost = tactic.calculateRobotCost(assigned_robot, world);
 

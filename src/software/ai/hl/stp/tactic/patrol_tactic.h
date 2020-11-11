@@ -25,7 +25,9 @@ class PatrolTactic : public Tactic
                           Angle orientation_at_patrol_points,
                           double linear_speed_at_patrol_points);
 
-    std::string getName() const override;
+    PatrolTactic() = delete;
+
+    void updateWorldParams(const World& world) override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. If a robot is
@@ -39,7 +41,7 @@ class PatrolTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

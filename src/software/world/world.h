@@ -3,12 +3,10 @@
 
 #include <boost/circular_buffer.hpp>
 
-#include "software/sensor_fusion/refbox_data.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/game_state.h"
 #include "software/world/team.h"
-#include "software/world/timestamped_ball_state.h"
 
 /**
  * The world object describes the entire state of the world, which for us is all the
@@ -40,9 +38,9 @@ class World final
     /**
      * Updates the state of the ball in the world with the new ball data
      *
-     * @param new_ball_data A BallState containing new ball information
+     * @param new_ball A Ball containing new ball information
      */
-    void updateBallStateWithTimestamp(const TimestampedBallState& new_ball_state);
+    void updateBall(const Ball& new_ball);
 
     /**
      * Updates the state of the friendly team in the world with the new team data
@@ -59,26 +57,26 @@ class World final
     void updateEnemyTeamState(const Team& new_enemy_team_data);
 
     /**
-     * Updates the refbox game state
+     * Updates the referee command
      *
-     * @param game_state the game state sent by refbox
+     * @param command the command sent by the referee
      */
-    void updateGameState(const RefboxGameState& game_state);
+    void updateRefereeCommand(const RefereeCommand& command);
 
     /**
-     * Updates the refbox game state
+     * Updates the referee command
      *
-     * @param game_state the game state sent by refbox
+     * @param command the command sent by the referee
      * @param ball_placement_point ball placement point
      */
-    void updateGameState(const RefboxGameState& game_state, Point ball_placement_point);
+    void updateRefereeCommand(const RefereeCommand& command, Point ball_placement_point);
 
     /**
-     * Updates the refbox stage
+     * Updates the referee stage
      *
-     * @param stage the stage sent by refbox
+     * @param stage the stage sent by the referee
      */
-    void updateRefboxStage(const RefboxStage& stage);
+    void updateRefereeStage(const RefereeStage& stage);
 
     /**
      * Returns a const reference to the Field in the world
@@ -116,11 +114,25 @@ class World final
     const GameState& gameState() const;
 
     /**
-     * Returns a mutable reference to the Game State
+     * Updates the current Game State
      *
-     * @return a mutable reference to the Game State
+     * @param game_state the game state to update with
      */
-    GameState& mutableGameState();
+    void updateGameState(const GameState& game_state);
+
+    /**
+     * Updates the ball inside of game state
+     *
+     * @param ball the ball to update with
+     */
+    void updateGameStateBall(const Ball& ball);
+
+    /**
+     * Returns the current referee stage
+     *
+     * @return the current referee stage
+     */
+    const RefereeStage& getRefereeStage() const;
 
     /**
      * Returns the most recent timestamp value of all timestamped member
@@ -132,27 +144,28 @@ class World final
     const Timestamp getMostRecentTimestamp() const;
 
     /**
-     * Gets the update Timestamp history stored World
+     * Updates the last update timestamp
      *
-     * @return returns circular_buffer<Timestamp> : The Timestamp history stored in the
-     * World
-     */
-    boost::circular_buffer<Timestamp> getTimestampHistory();
-
-    /**
-     * Searches all member objects of world for the most recent Timestamp value
+     * @param timestamp The last time this World was updated
      *
-     */
-    Timestamp getMostRecentTimestampFromMembers();
-
-    /**
-     * Updates the timestamp history for World to include a new timestamp (On the
-     * condition that the parameter Timestamp is newer than any Timestamp already in the
-     * history)
-     *
-     * @param Timestamp corresponding to when the World was last updated
+     * @throws std::invalid_argument if timestamp is older than the current last update
+     * timestamp
      */
     void updateTimestamp(Timestamp timestamp);
+
+    /**
+     * Sets the team with possession
+     *
+     * @param team_with_possesion The team with possession
+     */
+    void setTeamWithPossession(TeamSide team_with_possesion);
+
+    /**
+     * Gets the team with possession
+     *
+     * @return The team with possession
+     */
+    TeamSide getTeamWithPossession() const;
 
     /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
@@ -172,18 +185,27 @@ class World final
      */
     bool operator!=(const World& other) const;
 
+    // The size of the referee history buffers to filter out noise with
+    static constexpr unsigned int REFEREE_COMMAND_BUFFER_SIZE = 3;
+
    private:
+    /**
+     * Searches all member objects of world for the most recent Timestamp value
+     *
+     */
+    Timestamp getMostRecentTimestampFromMembers();
+
     Field field_;
     Ball ball_;
     Team friendly_team_;
     Team enemy_team_;
     GameState current_game_state_;
-    RefboxStage current_refbox_stage_;
-    // All previous timestamps of when the world was updated, with the most recent
-    // timestamp at the front of the queue,
-    boost::circular_buffer<Timestamp> last_update_timestamps;
-    // A small buffer that stores previous refbox game state
-    boost::circular_buffer<RefboxGameState> refbox_game_state_history;
-    // A small buffer that stores previous refbox stage
-    boost::circular_buffer<RefboxStage> refbox_stage_history;
+    RefereeStage current_referee_stage_;
+    Timestamp last_update_timestamp_;
+    // A small buffer that stores previous referee command
+    boost::circular_buffer<RefereeCommand> referee_command_history_;
+    // A small buffer that stores previous referee stage
+    boost::circular_buffer<RefereeStage> referee_stage_history_;
+    // which team has possession of the ball
+    TeamSide team_with_possesion_;
 };

@@ -2,9 +2,9 @@
 
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
-#include "software/new_geom/segment.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
@@ -26,6 +26,8 @@ class GoalieTactic : public Tactic
     explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
                           const Team &enemy_team);
 
+    GoalieTactic() = delete;
+
     /*
      * Restrains the goalie to a rectangle, with the preferred point being the one
      * that intersects the point the goalie wants to move to and the center of the
@@ -38,24 +40,13 @@ class GoalieTactic : public Tactic
     std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
                                                    Rectangle goalie_restricted_area);
 
-    std::string getName() const override;
-
-    /**
-     * Updates the world parameters for this GoalieTactic.
-     *
-     * @param ball The const reference to the ball on the field
-     * @param field The const reference to the field this tactic will run
-     * @param friendly_team The friendly team
-     * @param enemy_team The enemy team
-     */
-    void updateWorldParams(const Ball &ball, const Field &field,
-                           const Team &friendly_team, const Team &enemy_team);
+    void updateWorldParams(const World &world) override;
 
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
     bool isGoalieTactic() const override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) override;
 
     Ball getBall() const;
     Field getField() const;

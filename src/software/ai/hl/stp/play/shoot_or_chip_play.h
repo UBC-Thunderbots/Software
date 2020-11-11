@@ -9,11 +9,7 @@
 class ShootOrChipPlay : public Play
 {
    public:
-    static const std::string name;
-
     ShootOrChipPlay();
-
-    std::string getName() const override;
 
     bool isApplicable(const World &world) const override;
 

@@ -18,7 +18,7 @@ class MoveTestTactic : public Tactic
      */
     explicit MoveTestTactic(bool loop_forever = false);
 
-    std::string getName() const override;
+    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the parameters for this MoveTestTactic.
@@ -45,7 +45,7 @@ class MoveTestTactic : public Tactic
      *
      * @throws std::invalid_argument always
      */
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

@@ -7,10 +7,10 @@
 #include "software/parameter/dynamic_parameters.h"
 
 ThreadedFullSystemGUI::ThreadedFullSystemGUI()
-    : ThreadedObserver<World>(),
-      ThreadedObserver<AIDrawFunction>(),
-      ThreadedObserver<PlayInfo>(),
-      ThreadedObserver<SensorMsg>(),
+    : FirstInFirstOutThreadedObserver<World>(),
+      FirstInFirstOutThreadedObserver<AIDrawFunction>(),
+      FirstInFirstOutThreadedObserver<PlayInfo>(),
+      FirstInFirstOutThreadedObserver<SensorProto>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
           WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
@@ -19,9 +19,13 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI()
       play_info_buffer(
           std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_BUFFER_SIZE, false)),
       sensor_msg_buffer(
-          std::make_shared<ThreadSafeBuffer<SensorMsg>>(SENSOR_MSG_BUFFER_SIZE)),
+          std::make_shared<ThreadSafeBuffer<SensorProto>>(SENSOR_MSG_BUFFER_SIZE)),
       view_area_buffer(
           std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
+      worlds_received_per_second_buffer(
+          std::make_shared<ThreadSafeBuffer<double>>(DATA_PER_SECOND_BUFFER_SIZE, false)),
+      primitives_sent_per_second_buffer(
+          std::make_shared<ThreadSafeBuffer<double>>(DATA_PER_SECOND_BUFFER_SIZE, false)),
       application_shutting_down(false),
       remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
 {
@@ -59,7 +63,8 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
                           [&]() { application_shutting_down = true; });
     FullSystemGUI* full_system_gui = new FullSystemGUI(
         world_draw_functions_buffer, ai_draw_functions_buffer, play_info_buffer,
-        sensor_msg_buffer, view_area_buffer, MutableDynamicParameters);
+        sensor_msg_buffer, view_area_buffer, worlds_received_per_second_buffer,
+        primitives_sent_per_second_buffer, MutableDynamicParameters);
     full_system_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -91,6 +96,8 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         remaining_attempts_to_set_view_area--;
         view_area_buffer->push(world.field().fieldBoundary());
     }
+    worlds_received_per_second_buffer->push(
+        FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
 }
 
 void ThreadedFullSystemGUI::onValueReceived(AIDrawFunction draw_function)
@@ -103,9 +110,16 @@ void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info)
     play_info_buffer->push(play_info);
 }
 
-void ThreadedFullSystemGUI::onValueReceived(SensorMsg sensor_msg)
+void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 {
     sensor_msg_buffer->push(sensor_msg);
+}
+
+void ThreadedFullSystemGUI::onValueReceived(TbotsProto::PrimitiveSet primitive_msg)
+{
+    primitives_sent_per_second_buffer->push(
+        FirstInFirstOutThreadedObserver<
+            TbotsProto::PrimitiveSet>::getDataReceivedPerSecond());
 }
 
 std::shared_ptr<std::promise<void>> ThreadedFullSystemGUI::getTerminationPromise()

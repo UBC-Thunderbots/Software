@@ -6,11 +6,12 @@
 #include <future>
 #include <thread>
 
+#include "shared/proto/tbots_software_msgs.pb.h"
+#include "software/geom/rectangle.h"
 #include "software/gui/robot_diagnostics/widgets/robot_diagnostics_gui.h"
+#include "software/multithreading/first_in_first_out_threaded_observer.h"
+#include "software/multithreading/subject.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/multithreading/threaded_observer.h"
-#include "software/new_geom/rectangle.h"
-#include "software/primitive/primitive.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
 
@@ -18,7 +19,8 @@
  * This class wraps our RobotDiagnosticsGUI object which is responsible for allowing users
  * to interact with and debug the robot
  */
-class ThreadedRobotDiagnosticsGUI : public ThreadedObserver<SensorMsg>
+class ThreadedRobotDiagnosticsGUI : public FirstInFirstOutThreadedObserver<SensorProto>,
+                                    public Subject<TbotsProto::PrimitiveSet>
 {
    public:
     ThreadedRobotDiagnosticsGUI() = delete;
@@ -56,19 +58,21 @@ class ThreadedRobotDiagnosticsGUI : public ThreadedObserver<SensorMsg>
      */
     void createAndRunRobotDiagnosticsGUI(int argc, char** argv);
 
-    void onValueReceived(SensorMsg sensor_msg) override;
+    void onValueReceived(SensorProto sensor_msg) override;
 
     std::thread run_robot_diagnostics_thread;
+    std::thread run_send_primitives_thread;
     std::shared_ptr<std::promise<void>> termination_promise_ptr;
 
     // Buffers that are shared with the instance of the RobotDiagnosticsGUI so that data
     // can be passed safely
-    std::shared_ptr<ThreadSafeBuffer<SensorMsg>> sensor_msg_buffer;
-    std::shared_ptr<ThreadSafeBuffer<std::unique_ptr<Primitive>>> primitive_buffer;
+    std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
+    std::shared_ptr<ThreadSafeBuffer<TbotsProto::PrimitiveSet>> primitive_buffer;
 
     // We don't want to miss any updates so we make the buffer larger
     static constexpr std::size_t sensor_msg_buffer_size = 60;
     static constexpr std::size_t primitive_buffer_size  = 60;
+    const unsigned int send_primitive_interval_ms = static_cast<int>(1.0 / 60.0 * 1000);
 
     std::atomic_bool application_shutting_down;
 };

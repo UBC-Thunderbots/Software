@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
@@ -13,16 +14,14 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.updateFriendlyTeamState(Team({robot}));
-    TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball(), Angle::zero(), std::nullopt, false);
     tactic.updateRobot(robot);
-    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                             world.ball());
+    tactic.updateWorldParams(world);
 
     auto action_ptr = tactic.getNextAction();
 
@@ -45,16 +44,14 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     world.updateFriendlyTeamState(Team({robot}));
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(4.5, 0.25)},
                                                Timestamp::fromSeconds(0));
-    TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball(), Angle::fromDegrees(4), std::nullopt, false);
     tactic.updateRobot(robot);
-    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                             world.ball());
+    tactic.updateWorldParams(world);
 
     // The robot will start the shot since it can see enough of the net
     auto action_ptr = tactic.getNextAction();
@@ -74,8 +71,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(4.2, 0)},
                                                Timestamp::fromSeconds(0));
     tactic.updateRobot(robot);
-    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                             world.ball());
+    tactic.updateWorldParams(world);
     action_ptr = tactic.getNextAction();
 
     // Check an intent was returned (the pointer is not null)
@@ -89,12 +85,11 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     EXPECT_EQ(0, kick_action->getRobot()->id());
 
     // The net is now entirely blocked (but the enemy robot is not quite yet in danger of
-    // taking the ball), so the friendly robot just tries to line up to the ball
+    // taking the ball), so the friendly robot just tries to intercept
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(0.7, 0)},
                                                Timestamp::fromSeconds(0));
     tactic.updateRobot(robot);
-    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                             world.ball());
+    tactic.updateWorldParams(world);
     action_ptr = tactic.getNextAction();
     action_ptr = tactic.getNextAction();
 
@@ -103,14 +98,13 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     EXPECT_FALSE(tactic.done());
     EXPECT_FALSE(tactic.hasShotAvailable());
 
-
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-    ASSERT_NE(nullptr, move_action);
-    ASSERT_TRUE(move_action->getRobot().has_value());
-    EXPECT_EQ(0, move_action->getRobot()->id());
+    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(action_ptr);
+    ASSERT_NE(nullptr, intercept_action);
+    ASSERT_TRUE(intercept_action->getRobot().has_value());
+    EXPECT_EQ(0, intercept_action->getRobot()->id());
 }
 
-TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
+TEST(ShootGoalTacticTest, robot_will_intercept_ball_if_shot_is_blocked)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
@@ -118,16 +112,14 @@ TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
     world.updateFriendlyTeamState(Team({robot}));
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(1, 0)},
                                                Timestamp::fromSeconds(0));
-    TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
-    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                             world.ball());
+    tactic.updateWorldParams(world);
 
     auto action_ptr = tactic.getNextAction();
 
@@ -136,10 +128,10 @@ TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
     EXPECT_FALSE(tactic.done());
     EXPECT_FALSE(tactic.hasShotAvailable());
 
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-    ASSERT_NE(nullptr, move_action);
-    ASSERT_TRUE(move_action->getRobot().has_value());
-    EXPECT_EQ(0, move_action->getRobot()->id());
+    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(action_ptr);
+    ASSERT_NE(nullptr, intercept_action);
+    ASSERT_TRUE(intercept_action->getRobot().has_value());
+    EXPECT_EQ(0, intercept_action->getRobot()->id());
 }
 
 TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
@@ -150,16 +142,14 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
     world.updateFriendlyTeamState(Team({robot}));
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(0.25, 0)},
                                                Timestamp::fromSeconds(0));
-    TimestampedBallState ballState(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball(), Angle::fromDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
-    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                             world.ball());
+    tactic.updateWorldParams(world);
 
     auto action_ptr = tactic.getNextAction();
 
@@ -181,9 +171,8 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.updateFriendlyTeamState(Team({robot}));
 
-    TimestampedBallState ballState(Point(0.5, 0), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(0.5, 0), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
@@ -201,9 +190,8 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.updateFriendlyTeamState(Team({robot}));
 
-    TimestampedBallState ballState(Point(3, -2.5), Vector(0, 0),
-                                   Timestamp::fromSeconds(0));
-    world.updateBallStateWithTimestamp(ballState);
+    BallState ball_state(Point(3, -2.5), Vector(0, 0));
+    world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),

@@ -24,9 +24,10 @@ cc_library(
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
-        ":shot",
         "//shared:constants",
-        "//software/world",
+        "//software/geom/algorithms",
+        "//software/world:ball",
+        "//software/world:field",
     ],
 )
 
@@ -42,21 +43,29 @@ cc_test(
 
 cc_library(
     name = "calc_best_shot",
-    srcs = ["calc_best_shot.cpp"],
-    hdrs = ["calc_best_shot.h"],
+    srcs = [
+        "calc_best_shot.cpp",
+        "calc_best_shot_impl.cpp",
+        "calc_best_shot_impl.h",
+    ],
+    hdrs = [
+        "calc_best_shot.h",
+    ],
     deps = [
         ":shot",
         "//shared:constants",
-        "//software/geom",
-        "//software/new_geom:segment",
-        "//software/new_geom/util:algorithms",
+        "//software/geom:segment",
+        "//software/geom/algorithms",
         "//software/world",
     ],
 )
 
 cc_test(
     name = "calc_best_shot_test",
-    srcs = ["calc_best_shot_test.cpp"],
+    srcs = [
+        "calc_best_shot_impl.h",
+        "calc_best_shot_test.cpp",
+    ],
     deps = [
         ":calc_best_shot",
         ":shot",
@@ -73,8 +82,8 @@ cc_library(
     deps = [
         ":shot",
         "//shared:constants",
-        "//software/geom",
-        "//software/new_geom:triangle",
+        "//software/geom:triangle",
+        "//software/geom/algorithms",
         "//software/world",
     ],
 )
@@ -96,7 +105,7 @@ cc_library(
     hdrs = ["detect_threat.h"],
     deps = [
         "//shared:constants",
-        "//software/new_geom/util:algorithms",
+        "//software/geom/algorithms",
         "//software/world:ball",
         "//software/world:field",
     ],
@@ -123,11 +132,10 @@ cc_library(
         ":calc_best_shot",
         ":intercept",
         ":possession",
-        ":robot",
         ":shot",
         ":team",
         "//shared:constants",
-        "//software/new_geom/util:algorithms",
+        "//software/geom/algorithms",
         "//software/world",
     ],
 )
@@ -149,7 +157,7 @@ cc_library(
     hdrs = ["find_open_areas.h"],
     deps = [
         ":shot",
-        "//software/new_geom/util:algorithms",
+        "//software/geom/algorithms",
         "//software/world",
     ],
 )
@@ -162,6 +170,7 @@ cc_library(
         ":shot",
         "//shared:constants",
         "//software/ai/evaluation:pass",
+        "//software/geom/algorithms",
         "//software/optimization:gradient_descent",
         "//software/world:ball",
         "//software/world:field",
@@ -185,7 +194,6 @@ cc_library(
     hdrs = ["possession.h"],
     deps = [
         ":intercept",
-        ":robot",
         ":shot",
         ":team",
         "//software/world:ball",
@@ -200,27 +208,6 @@ cc_test(
     deps = [
         ":possession",
         "//shared:constants",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "robot",
-    srcs = ["robot.cpp"],
-    hdrs = ["robot.h"],
-    deps = [
-        ":shot",
-        "//shared:constants",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "robot_test",
-    srcs = ["robot_test.cpp"],
-    deps = [
-        ":robot",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -249,5 +236,5 @@ cc_library(
     name = "shot",
     srcs = ["shot.cpp"],
     hdrs = ["shot.h"],
-    deps = ["//software/new_geom:point"],
+    deps = ["//software/geom:point"],
 )

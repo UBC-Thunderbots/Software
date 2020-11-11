@@ -1,6 +1,3 @@
-/**
- * This file contains the declaration for the GradientDescentOptimizer
- */
 #pragma once
 
 #include <algorithm>
@@ -50,41 +47,8 @@ class GradientDescentOptimizer
     /**
      * Creates a GradientDescentOptimizer
      *
-     * This constructor chooses usually sane values for both
-     * "past_gradient_decay_rate" and "past_squared_gradient_decay_rate", and uses a
-     * value of 1 for each param weight
-     */
-    GradientDescentOptimizer();
-
-    /**
-     * Creates a GradientDescentOptimizer
-     *
-     * This constructor chooses usually sane values for both
-     * "past_gradient_decay_rate" and "past_squared_gradient_decay_rate"
-     *
-     * @param param_weights The weights to multiply each parameter by when calculating
-     *                      the gradient of the objective function.
-     */
-    explicit GradientDescentOptimizer(ParamArray param_weights);
-
-    /**
-     * Creates a GradientDescentOptimizer
-     *
-     * This constructor chooses usually sane values for both
-     * "past_gradient_decay_rate" and "past_squared_gradient_decay_rate"
-     *
-     * @param param_weights The weight to multiply
-     * @param gradient_approx_step_size The size of step to take forward when
-     *                                  approximating the gradient of a function
-     */
-    GradientDescentOptimizer(ParamArray param_weights, double gradient_approx_step_size);
-
-    /**
-     * Creates a GradientDescentOptimizer
-     *
-     * NOTE: Unless you know what you're doing, you probably don't want to use this
-     * constructor. Instead, use one of the other constructors that specifies the
-     * decay rates for you, as they use values that are almost always good.
+     * NOTE: Unless you know what you're doing, you probably don't want specify the
+     * decay rates, as the default values are almost always good.
      *
      * @param param_weights The weight to multiply
      * @param gradient_approx_step_size The size of step to take forward when
@@ -95,9 +59,12 @@ class GradientDescentOptimizer
      *                                         rate, see corresponding class member
      *                                         variable for details
      */
-    GradientDescentOptimizer(ParamArray param_weights, double gradient_approx_step_size,
-                             double past_gradient_decay_rate,
-                             double past_squared_gradient_decay_rate);
+    GradientDescentOptimizer(
+        ParamArray param_weights = GradientDescentOptimizer<NUM_PARAMS>::ParamArray{1},
+        double gradient_approx_step_size = DEFAULT_GRADIENT_APPROX_STEP_SIZE,
+        double past_gradient_decay_rate  = DEFAULT_PAST_GRADIENT_DECAY_RATE,
+        double past_squared_gradient_decay_rate =
+            DEFAULT_PAST_SQUARED_GRADIENT_DECAY_RATE);
 
     /**
      * Attempts to maximize the given objective function

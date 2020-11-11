@@ -4,11 +4,11 @@
 #include <QtWidgets/QGraphicsSimpleTextItem>
 
 #include "shared/constants.h"
+#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/segment.h"
 #include "software/gui/drawing/geom.h"
 #include "software/gui/geometry_conversion.h"
 #include "software/math/math_functions.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/acute_angle.h"
 
 void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
                        const Vector& velocity, const QColor& slow_colour,

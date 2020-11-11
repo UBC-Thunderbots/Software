@@ -6,11 +6,11 @@ cc_library(
     hdrs = ["ball.h"],
     deps = [
         "//shared:constants",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:point",
+        "//software/geom:vector",
+        "//software/physics",
         "//software/time:timestamp",
-        "//software/world:timestamped_ball_state",
-        "@boost//:circular_buffer",
+        "//software/world:ball_state",
     ],
 )
 
@@ -19,29 +19,6 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
-        ":timestamped_ball_state",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "timestamped_ball_state",
-    srcs = ["timestamped_ball_state.cpp"],
-    hdrs = ["timestamped_ball_state.h"],
-    deps = [
-        ":ball_state",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
-        "//software/time:timestamp",
-        "@boost//:circular_buffer",
-    ],
-)
-
-cc_test(
-    name = "timestamped_ball_state_test",
-    srcs = ["timestamped_ball_state_test.cpp"],
-    deps = [
-        ":timestamped_ball_state",
         "@gtest//:gtest_main",
     ],
 )
@@ -51,8 +28,8 @@ cc_library(
     srcs = ["ball_state.cpp"],
     hdrs = ["ball_state.h"],
     deps = [
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:point",
+        "//software/geom:vector",
     ],
 )
 
@@ -71,10 +48,10 @@ cc_library(
     hdrs = ["field.h"],
     deps = [
         "//shared:constants",
-        "//software/geom",
-        "//software/new_geom:rectangle",
+        "//software/geom:circle",
+        "//software/geom:rectangle",
+        "//software/geom/algorithms",
         "//software/time:timestamp",
-        "@boost//:circular_buffer",
     ],
 )
 
@@ -95,7 +72,7 @@ cc_library(
     deps = [
         ":ball",
         "//software/logger",
-        "//software/sensor_fusion:refbox_data",
+        "//software/util/make_enum",
     ],
 )
 
@@ -111,7 +88,7 @@ cc_test(
 
 cc_library(
     name = "team_colour",
-    hdrs = ["team_colour.h"],
+    hdrs = ["team_types.h"],
     deps = ["//software/util/make_enum"],
 )
 
@@ -121,11 +98,10 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         ":robot_capabilities",
-        ":timestamped_robot_state",
-        "//software/geom",
+        ":robot_state",
+        "//software/logger",
         "//software/time:duration",
         "//software/time:timestamp",
-        "@boost//:circular_buffer",
     ],
 )
 
@@ -139,40 +115,16 @@ cc_test(
 )
 
 cc_library(
-    name = "timestamped_robot_state",
-    srcs = ["timestamped_robot_state.cpp"],
-    hdrs = ["timestamped_robot_state.h"],
-    deps = [
-        ":robot_state",
-        "//software/new_geom:angle",
-        "//software/new_geom:angular_velocity",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
-        "//software/time:timestamp",
-        "@boost//:circular_buffer",
-    ],
-)
-
-cc_test(
-    name = "timestamped_robot_state_test",
-    srcs = ["timestamped_robot_state_test.cpp"],
-    deps = [
-        ":timestamped_robot_state",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "robot_state",
     srcs = ["robot_state.cpp"],
     hdrs = ["robot_state.h"],
     deps = [
         "team_colour",
         "//shared:constants",
-        "//software/new_geom:angle",
-        "//software/new_geom:angular_velocity",
-        "//software/new_geom:point",
-        "//software/new_geom:vector",
+        "//software/geom:angle",
+        "//software/geom:angular_velocity",
+        "//software/geom:point",
+        "//software/geom:vector",
         "//software/time:duration",
     ],
 )
@@ -189,7 +141,7 @@ cc_test(
 cc_library(
     name = "robot_capabilities",
     hdrs = ["robot_capabilities.h"],
-    deps = [],
+    deps = ["//software/util/make_enum"],
 )
 
 cc_test(
@@ -205,7 +157,10 @@ cc_library(
     name = "team",
     srcs = ["team.cpp"],
     hdrs = ["team.h"],
-    deps = [":robot"],
+    deps = [
+        ":robot",
+        "//software/logger",
+    ],
 )
 
 cc_test(
@@ -228,6 +183,7 @@ cc_library(
         ":robot",
         ":team",
         "//software/parameter:dynamic_parameters",
+        "@boost//:circular_buffer",
     ],
 )
 

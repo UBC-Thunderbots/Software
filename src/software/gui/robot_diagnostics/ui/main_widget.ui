@@ -28,7 +28,7 @@
            <widget class="QLabel" name="label_robot_selection">
             <property name="maximumSize">
              <size>
-              <width>120</width>
+              <width>16777215</width>
               <height>16777215</height>
              </size>
             </property>
@@ -75,7 +75,7 @@
              <widget class="QLabel" name="label_sensor_status">
               <property name="maximumSize">
                <size>
-                <width>135</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -91,6 +91,12 @@
             </item>
             <item>
              <widget class="Line" name="line_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -112,7 +118,7 @@
                <widget class="QLabel" name="label_status">
                 <property name="maximumSize">
                  <size>
-                  <width>50</width>
+                  <width>16777215</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -128,6 +134,12 @@
               </item>
               <item>
                <widget class="Line" name="line_6">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -201,52 +213,19 @@
                  <number>2</number>
                 </property>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_battery">
-                  <property name="maximum">
-                   <number>20</number>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 V</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_battery">
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_capacitor">
-                  <property name="maximum">
-                   <number>200</number>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 V</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_capacitor">
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_dribbler_speed">
-                  <property name="maximum">
-                   <number>6000</number>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 RPM</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_dribbler_speed">
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_break_beam">
-                  <property name="value">
-                   <number>24</number>
-                  </property>
-                  <property name="format">
-                   <string>%1%</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_break_beam">
                  </widget>
                 </item>
                </layout>
@@ -269,7 +248,7 @@
                <widget class="QLabel" name="label_temperature">
                 <property name="maximumSize">
                  <size>
-                  <width>100</width>
+                  <width>16777215</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -285,6 +264,12 @@
               </item>
               <item>
                <widget class="Line" name="line_7">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -334,26 +319,11 @@
                  <number>2</number>
                 </property>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_dribbler_temp">
-                  <property name="maximum">
-                   <number>100</number>
-                  </property>
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 °C</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_dribbler_temp">
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="progressBar_board_temp">
-                  <property name="value">
-                   <number>0</number>
-                  </property>
-                  <property name="format">
-                   <string>%1 °C</string>
-                  </property>
+                 <widget class="DecimalProgressBar" name="progressBar_board_temp">
                  </widget>
                 </item>
                </layout>
@@ -372,7 +342,7 @@
              <widget class="QLabel" name="label_leds">
               <property name="maximumSize">
                <size>
-                <width>45</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -388,6 +358,12 @@
             </item>
             <item>
              <widget class="Line" name="line_3">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -431,7 +407,7 @@
              <widget class="QLabel" name="label_drive">
               <property name="maximumSize">
                <size>
-                <width>50</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -447,6 +423,12 @@
             </item>
             <item>
              <widget class="Line" name="line">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -776,7 +758,7 @@
              <widget class="QLabel" name="label_chicker">
               <property name="maximumSize">
                <size>
-                <width>68</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -792,6 +774,12 @@
             </item>
             <item>
              <widget class="Line" name="line_4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -867,6 +855,12 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="lineEdit_chicker_power">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>60</width>
@@ -943,7 +937,7 @@
              <widget class="QLabel" name="label_dribbler_2">
               <property name="maximumSize">
                <size>
-                <width>80</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -959,6 +953,12 @@
             </item>
             <item>
              <widget class="Line" name="line_5">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -969,29 +969,35 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_15">
             <item>
-             <widget class="QLabel" name="label_dribbler_power">
+             <widget class="QLabel" name="label_dribbler_rpm">
               <property name="font">
                <font>
                 <pointsize>12</pointsize>
                </font>
               </property>
               <property name="text">
-               <string>Power</string>
+               <string>RPM</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSlider" name="slider_dribbler_power">
+             <widget class="QSlider" name="slider_dribbler_rpm">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_dribbler_power">
+             <widget class="QLineEdit" name="lineEdit_dribbler_rpm">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="maximumSize">
                <size>
-                <width>60</width>
+                <width>16777215</width>
                 <height>16777215</height>
                </size>
               </property>
@@ -999,6 +1005,12 @@
             </item>
             <item>
              <widget class="QPushButton" name="pushButton_dribbler_stop">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
                <string>Stop and Reset</string>
               </property>
@@ -1047,11 +1059,16 @@
    <extends>QTableWidget</extends>
    <header>software/gui/generic_widgets/robot_status/robot_status_table.h</header>
   </customwidget>
+  <customwidget>
+   <class>DecimalProgressBar</class>
+   <extends>QProgressBar</extends>
+   <header>software/gui/robot_diagnostics/widgets/decimal_progress_bar.h</header>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_charge_state"/>
   <buttongroup name="buttonGroup_autochick"/>
+  <buttongroup name="buttonGroup_charge_state"/>
  </buttongroups>
 </ui>

@@ -2,114 +2,49 @@
 
 #include "software/gui/standalone_simulator/threaded_standalone_simulator_gui.h"
 #include "software/logger/logger.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/simulation/standalone_simulator.h"
-
-struct commandLineArgs
-{
-    bool help                          = false;
-    std::string network_interface_name = "";
-    bool err                           = false;
-};
-
-/**
- * Parses arguments and indicates which arguments were received
- *
- * @param argc
- * @param argv
- *
- * @return a struct of which arguments are passed
- */
-commandLineArgs parseCommandLineArgs(int argc, char **argv)
-{
-    commandLineArgs args;
-
-    std::string interface_help_str =
-        "The interface to send and receive packets over (can be found through ifconfig)";
-
-    boost::program_options::options_description desc{"Options"};
-    desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
-                       "Help screen");
-    desc.add_options()(
-        "interface",
-        boost::program_options::value<std::string>(&args.network_interface_name),
-        interface_help_str.c_str());
-
-    boost::program_options::variables_map vm;
-
-    try
-    {
-        boost::program_options::store(parse_command_line(argc, argv, desc), vm);
-        boost::program_options::notify(vm);
-
-        if (args.help)
-        {
-            std::cout << desc << std::endl;
-        }
-    }
-    catch (const boost::program_options::error &ex)
-    {
-        std::cerr << ex.what() << '\n';
-        args.err = true;
-        return args;
-    }
-
-    return args;
-}
 
 int main(int argc, char **argv)
 {
     LoggerSingleton::initializeLogger();
 
-    commandLineArgs args = parseCommandLineArgs(argc, argv);
+    // load command line arguments
+    auto args =
+        MutableDynamicParameters->getMutableStandaloneSimulatorMainCommandLineArgs();
+    bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    if (!args.help && !args.err)
+    if (!help_requested)
     {
-        // TODO remove this when we move to non-generic factories for backends
-        // https://github.com/UBC-Thunderbots/Software/issues/1452
-        if (!args.network_interface_name.empty())
+        // TODO remove this when we move to the new dynamic parameter system
+        // https://github.com/UBC-Thunderbots/Software/issues/1298
+        if (!args->interface()->value().empty())
         {
             MutableDynamicParameters->getMutableStandaloneSimulatorConfig()
                 ->mutableNetworkInterface()
-                ->setValue(args.network_interface_name);
+                ->setValue(args->interface()->value());
         }
 
-        StandaloneSimulator standalone_simulator(
-            MutableDynamicParameters->getMutableStandaloneSimulatorConfig());
-        standalone_simulator.setupInitialSimulationState();
+        // Experimentally determined restitution value
+        MutableDynamicParameters->getMutableSimulatorConfig()
+            ->mutableBallRestitution()
+            ->setValue(0.8);
+        // Measured these values from fig. 9 on page 8 of
+        // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
+        MutableDynamicParameters->getMutableSimulatorConfig()
+            ->mutableSlidingFrictionAcceleration()
+            ->setValue(6.9);
+        MutableDynamicParameters->getMutableSimulatorConfig()
+            ->mutableRollingFrictionAcceleration()
+            ->setValue(0.5);
 
-        auto ball_placement_callback =
-            [&standalone_simulator](Point ball_placement_point) {
-                BallState state(ball_placement_point, Vector(0, 0));
-                standalone_simulator.setBallState(state);
-            };
-
-        auto simulation_mode_callback =
-            [&standalone_simulator](
-                StandaloneSimulator::SimulationMode new_simulation_mode) {
-                switch (new_simulation_mode)
-                {
-                    case StandaloneSimulator::SimulationMode::PLAY:
-                        standalone_simulator.resetSlowMotionMultiplier();
-                        standalone_simulator.startSimulation();
-                        break;
-                    case StandaloneSimulator::SimulationMode::PAUSE:
-                        standalone_simulator.stopSimulation();
-                        break;
-                    case StandaloneSimulator::SimulationMode::SLOW_MOTION:
-                        standalone_simulator.setSlowMotionMultiplier(
-                            StandaloneSimulator::DEFAULT_SLOW_MOTION_MULTIPLIER);
-                        standalone_simulator.startSimulation();
-                        break;
-                }
-            };
+        auto standalone_simulator = std::make_shared<StandaloneSimulator>(
+            MutableDynamicParameters->getMutableStandaloneSimulatorConfig(),
+            MutableDynamicParameters->getMutableSimulatorConfig());
+        standalone_simulator->setupInitialSimulationState();
 
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(
-            ball_placement_callback, simulation_mode_callback);
-
-        standalone_simulator.registerOnSSLWrapperPacketReadyCallback(
-            [&threaded_standalone_simulator_gui](SSL_WrapperPacket wrapper_packet) {
-                threaded_standalone_simulator_gui.onValueReceived(wrapper_packet);
-            });
+            standalone_simulator);
 
         // This blocks forever without using the CPU.
         // Wait for the Simulator GUI to shut down before shutting

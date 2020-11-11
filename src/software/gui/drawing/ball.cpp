@@ -1,20 +1,20 @@
 #include "software/gui/drawing/ball.h"
 
 #include "shared/constants.h"
+#include "software/geom/segment.h"
 #include "software/gui/drawing/geom.h"
 #include "software/math/math_functions.h"
-#include "software/new_geom/segment.h"
 
 void drawBallVelocity(QGraphicsScene *scene, const Point &position,
                       const Vector &velocity, const QColor &slow_colour,
                       const QColor &fast_colour)
 {
     // A somewhat arbitrary value that we've determined looks nice in the GUI
-    const double max_velocity_line_length = 1.0;
+    static const double MAX_VELOCITY_LINE_LENGTH = 1.0;
 
     QGradient gradient = QLinearGradient(
         createQPointF(position),
-        createQPointF(position + velocity.normalize(max_velocity_line_length)));
+        createQPointF(position + velocity.normalize(MAX_VELOCITY_LINE_LENGTH)));
     gradient.setColorAt(0, slow_colour);
     gradient.setColorAt(1, fast_colour);
 
@@ -27,31 +27,36 @@ void drawBallVelocity(QGraphicsScene *scene, const Point &position,
 
     double speed     = velocity.length();
     auto line_length = normalizeValueToRange<double>(
-        speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, 0.0, max_velocity_line_length);
+        speed, 0, BALL_MAX_SPEED_METERS_PER_SECOND, 0.0, MAX_VELOCITY_LINE_LENGTH);
 
     drawSegment(scene, Segment(position, position + velocity.normalize(line_length)),
                 pen);
 }
 
 void drawBallPosition(QGraphicsScene *scene, const Point &position,
-                      const double distance_from_ground, const QColor &color)
+                      const double distance_from_ground, QColor color)
 {
+    // A rough estimate of the max distance from the ground the ball will ever reach.
+    // This value sets the maximum above which no change will be visible.
+    static const double BALL_MAX_DISTANCE_FROM_GROUND = 1.25;
+
+    // Decrease the alpha value as the ball moves further from the ground
+    double alpha = normalizeValueToRange<double>(distance_from_ground, 0,
+                                                 BALL_MAX_DISTANCE_FROM_GROUND, 1.0, 0.4);
+    color.setAlphaF(alpha);
+
+    // Increase the radius of the ball the further from the ground it is.
+    double ball_radius = normalizeValueToRange<double>(
+        distance_from_ground, 0, BALL_MAX_DISTANCE_FROM_GROUND, BALL_MAX_RADIUS_METERS,
+        4 * BALL_MAX_RADIUS_METERS);
+
     QPen pen(color);
     pen.setWidth(2);
     pen.setCosmetic(true);
 
-    QColor fill_colour = color;
-    // Decrease the alpha value as the ball moves further from the ground
-    double alpha = 1.0 - normalizeValueToRange<double>(distance_from_ground, 0,
-                                                       ROBOT_MAX_HEIGHT_METERS, 0.0, 0.5);
-    fill_colour.setAlphaF(alpha);
     QBrush brush(color);
     brush.setStyle(Qt::BrushStyle::SolidPattern);
 
-    // Increase the radius of the ball the further from the ground it is.
-    // 2.0 is an estimate upper bound on how high the ball will go
-    double ball_radius = normalizeValueToRange<double>(
-        distance_from_ground, 0, 2.0, BALL_MAX_RADIUS_METERS, 3 * BALL_MAX_RADIUS_METERS);
     drawCircle(scene, Circle(position, ball_radius), pen, brush);
 }
 

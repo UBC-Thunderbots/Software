@@ -3,15 +3,14 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
+#include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/util/acute_angle.h"
-#include "software/new_geom/util/closest_point.h"
 
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
                                const Team& enemy_team, const Pass pass, const Ball& ball,
                                bool loop_forever)
-    : Tactic(loop_forever),
+    : Tactic(loop_forever, {RobotCapability::Move}),
       field(field),
       pass(pass),
       ball(ball),
@@ -20,18 +19,11 @@ ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
 {
 }
 
-std::string ReceiverTactic::getName() const
+void ReceiverTactic::updateWorldParams(const World& world)
 {
-    return "Receiver Tactic";
-}
-
-void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
-                                       const Team& updated_enemy_team,
-                                       const Ball& updated_ball)
-{
-    this->friendly_team = updated_friendly_team;
-    this->enemy_team    = updated_enemy_team;
-    this->ball          = updated_ball;
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
 
 void ReceiverTactic::updateControlParams(const Pass& updated_pass)
@@ -57,8 +49,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // ourselves in the best position possible to take the pass
     // We wait for the ball to start moving at least a bit to make sure the passer
     // has actually started the pass
-    while (ball.lastUpdateTimestamp() < pass.startTime() ||
-           ball.velocity().length() < 0.5)
+    while (ball.timestamp() < pass.startTime() || ball.velocity().length() < 0.5)
     {
         // If there is a feasible shot we can take, we want to wait for the pass at the
         // halfway point between the angle required to receive the ball and the angle
@@ -81,7 +72,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // rotate to the correct orientation
         move_action->updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
                                          DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutokickType::NONE, BallCollisionType::ALLOW);
+                                         AutochickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
@@ -109,9 +100,9 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             Point ideal_position    = shot.getPointToShootAt();
             Angle ideal_orientation = shot.getOpenAngle();
 
-            move_action->updateControlParams(*robot, ideal_position, ideal_orientation, 0,
-                                             DribblerEnable::OFF, MoveType::NORMAL,
-                                             AUTOKICK, BallCollisionType::ALLOW);
+            move_action->updateControlParams(
+                *robot, ideal_position, ideal_orientation, 0, DribblerEnable::OFF,
+                MoveType::NORMAL, AutochickType::AUTOKICK, BallCollisionType::ALLOW);
             yield(move_action);
 
             // Calculations to check for termination conditions
@@ -128,16 +119,20 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         while ((ball.position() - robot->position()).length() >
                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
-            Point ball_receive_pos = closestPointOnLine(
-                robot->position(),
-                Line(ball.position(), ball.position() + ball.velocity()));
+            Point ball_receive_pos = ball.position();
+            if (ball.velocity().length() != 0)
+            {
+                ball_receive_pos = closestPoint(
+                    robot->position(),
+                    Line(ball.position(), ball.position() + ball.velocity()));
+            }
             Angle ball_receive_orientation =
                 (ball.position() - robot->position()).orientation();
 
             // Move into position with the dribbler on
             move_action->updateControlParams(
                 *robot, ball_receive_pos, ball_receive_orientation, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW);
             yield(move_action);
         }
     }
@@ -175,7 +170,8 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
 {
     // Check if we can shoot on the enemy goal from the receiver position
     std::optional<Shot> best_shot_opt =
-        calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
+        calcBestShotOnGoal(field, friendly_team, enemy_team, robot->position(),
+                           TeamType::ENEMY, {*this->getAssignedRobot()});
 
     // Vector from the ball to the robot
     Vector robot_to_ball = ball.position() - robot->position();
@@ -221,8 +217,12 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
         Vector::createFromAngle(robot.orientation()).normalize(dist_to_ball_in_dribbler);
 
     // Find the closest point to the ball contact point on the ball's trajectory
-    Point closest_ball_pos = closestPointOnLine(
-        ball_contact_point, Line(ball.position(), ball.position() + ball.velocity()));
+    Point closest_ball_pos = ball.position();
+    if (ball.velocity().length() != 0)
+    {
+        closest_ball_pos = closestPoint(
+            ball_contact_point, Line(ball.position(), ball.position() + ball.velocity()));
+    }
     Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
 
     Angle ideal_orientation      = getOneTimeShotDirection(shot, ball);
@@ -237,7 +237,7 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
     return Shot(ideal_position, ideal_orientation);
 }
 
-void ReceiverTactic::accept(MutableTacticVisitor& visitor)
+void ReceiverTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

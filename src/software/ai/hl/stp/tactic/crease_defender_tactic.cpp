@@ -4,18 +4,17 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/geom/util.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/point.h"
+#include "software/geom/ray.h"
+#include "software/geom/segment.h"
 #include "software/logger/logger.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/ray.h"
-#include "software/new_geom/segment.h"
-#include "software/new_geom/util/intersection.h"
 #include "software/parameter/dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,
     const Team &enemy_team, CreaseDefenderTactic::LeftOrRight left_or_right)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       field(field),
       ball(ball),
       friendly_team(friendly_team),
@@ -24,21 +23,14 @@ CreaseDefenderTactic::CreaseDefenderTactic(
 {
 }
 
-std::string CreaseDefenderTactic::getName() const
+void CreaseDefenderTactic::updateWorldParams(const World &world)
 {
-    return "Crease Defender Tactic";
+    this->ball          = world.ball();
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
 }
 
-void CreaseDefenderTactic::updateWorldParams(const Ball &ball, const Field &field,
-                                             const Team &friendly_team,
-                                             const Team &enemy_team)
-{
-    // Update the world parameters stored by this Tactic
-    this->ball          = ball;
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-}
 
 double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
@@ -130,9 +122,8 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
         std::optional<Point> defender_position;
 
         // Find the best shot
-        auto best_shot =
-            calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, ball.position(),
-                                       ROBOT_MAX_RADIUS_METERS, {robot});
+        auto best_shot     = calcBestShotOnGoal(field, friendly_team, enemy_team,
+                                            ball.position(), TeamType::FRIENDLY, {robot});
         Vector shot_vector = best_shot->getPointToShootAt() - ball.position();
         Ray shot_ray       = Ray(ball.position(), shot_vector);
 
@@ -178,7 +169,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
             move_action->updateControlParams(
                 *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutokickType::AUTOCHIP, BallCollisionType::ALLOW);
+                MoveType::NORMAL, AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
             yield(move_action);
         }
         else
@@ -233,7 +224,7 @@ std::optional<Point> CreaseDefenderTactic::getPointOnCreasePath(Field field, Rob
     return std::nullopt;
 }
 
-void CreaseDefenderTactic::accept(MutableTacticVisitor &visitor)
+void CreaseDefenderTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

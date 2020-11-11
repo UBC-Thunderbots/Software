@@ -20,11 +20,12 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     ShadowEnemyTactic tactic =
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, false, true);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat, 0.5);
 
     auto action_ptr = tactic.getNextAction();
@@ -37,7 +38,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
                                                Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == NONE);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::NONE);
 }
 
 TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
@@ -60,11 +61,12 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
     Team enemy_team    = Team({enemy_robot, enemy_robot_2}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     ShadowEnemyTactic tactic =
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true, true);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat, 0.2);
 
     auto action_ptr = tactic.getNextAction();
@@ -77,7 +79,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
                                                Point(0, 0.2), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::quarter()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == NONE);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::NONE);
 }
 
 
@@ -96,11 +98,12 @@ TEST(ShadowEnemyTacticTest,
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
               Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     ShadowEnemyTactic tactic =
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true, true);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat, 0.5);
 
     auto action_ptr = tactic.getNextAction();
@@ -114,7 +117,7 @@ TEST(ShadowEnemyTacticTest,
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (ball.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
 }
 
 TEST(
@@ -133,11 +136,12 @@ TEST(
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(4, 3),
               Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     ShadowEnemyTactic tactic =
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true, true);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat, 0.5);
 
     auto action_ptr = tactic.getNextAction();
@@ -150,5 +154,5 @@ TEST(
                                                Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == NONE);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::NONE);
 }

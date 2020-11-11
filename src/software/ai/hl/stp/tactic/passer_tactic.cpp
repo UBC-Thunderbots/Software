@@ -1,24 +1,25 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/ball.h"
+#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
 #include "software/logger/logger.h"
 
-PasserTactic::PasserTactic(Pass pass, const Ball& ball, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick}), pass(std::move(pass)), ball(ball)
+PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
+                           bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
+      pass(std::move(pass)),
+      ball(ball),
+      field(field)
 {
 }
 
-std::string PasserTactic::getName() const
+void PasserTactic::updateWorldParams(const World& world)
 {
-    return "Passer Tactic";
-}
-
-void PasserTactic::updateWorldParams(const Ball& updated_ball)
-{
-    this->ball = updated_ball;
+    this->ball  = world.ball();
+    this->field = world.field();
 }
 
 void PasserTactic::updateControlParams(const Pass& updated_pass)
@@ -38,11 +39,24 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
 
 void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    auto move_action = std::make_shared<MoveAction>(
-        true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
+    // If the ball is moving, we are likely already in a live game scenario and
+    // so we need to collect the ball before we can pass. If the ball is not moving,
+    // we are likely in a set play and so we don't need to initially collect the ball
+    if (ball.velocity().length() > INTERCEPT_BALL_SPEED_THRESHOLD)
+    {
+        auto intercept_action = std::make_shared<InterceptBallAction>(field, ball);
+        do
+        {
+            intercept_action->updateControlParams(*robot);
+            yield(intercept_action);
+        } while (!intercept_action->done());
+    }
+
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass
-    while (ball.lastUpdateTimestamp() < pass.startTime())
+    auto move_action = std::make_shared<MoveAction>(
+        true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
+    while (ball.timestamp() < pass.startTime())
     {
         // We want to wait just behind where the pass is supposed to start, so that the
         // ball is *almost* touching the kicker
@@ -53,13 +67,11 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
         move_action->updateControlParams(*robot, wait_position, pass.passerOrientation(),
                                          0, DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutokickType::NONE, BallCollisionType::ALLOW);
+                                         AutochickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
-    // The angle between the ball velocity vector and a vector from the passer
-    // point to the receiver point
-    Angle ball_velocity_to_pass_orientation;
+    Angle kick_direction;
 
     auto kick_action = std::make_shared<KickAction>();
     do
@@ -72,15 +84,12 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
         // We want to keep trying to kick until the ball is moving along the pass
         // vector with sufficient velocity
-        Angle passer_to_receiver_angle =
-            (pass.receiverPoint() - pass.passerPoint()).orientation();
-        ball_velocity_to_pass_orientation =
-            ball.velocity().orientation().minDiff(passer_to_receiver_angle);
-    } while (ball_velocity_to_pass_orientation.abs() > Angle::fromDegrees(20) ||
-             ball.velocity().length() < 0.5);
+        kick_direction = (pass.receiverPoint() - ball.position()).orientation();
+
+    } while (!hasBallBeenKicked(ball, kick_direction));
 }
 
-void PasserTactic::accept(MutableTacticVisitor& visitor)
+void PasserTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

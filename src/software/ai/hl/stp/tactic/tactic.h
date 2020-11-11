@@ -4,7 +4,7 @@
 #include <optional>
 
 #include "software/ai/hl/stp/action/action.h"
-#include "software/ai/hl/stp/tactic/mutable_tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/world/world.h"
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
@@ -12,28 +12,16 @@
 typedef boost::coroutines2::coroutine<std::shared_ptr<Action>> ActionCoroutine;
 
 /**
- * In the STP framework, a Tactic represents a role or objective for a single robot. For
- * example, being the goalie, shooting on the opposing goal, moving to receive a pass,
- * or acting as a defender. Tactics are where most of the complicated logic takes place,
- * and they tend to rely a lot on our Evaluation functions. Ultimately, Tactics will
- * return the next Action that the Robot assigned to this Tactic should run in order
- * to work towards its objective.
+ * In the STP framework, a Tactic represents a role or objective for a single robot.
+ * This can be thought of as a "position" on a typical soccer team. Some examples are:
+ * - The goalie
+ * - A "striker" that tries to get the ball and shoot on the enemy goal
+ * - A defender that shadows enemy robots
+ * - A passer
+ * - A receiver (for a pass)
  *
- * HOW THIS CLASS IS USED:
- * Plays will construct and return the Tactics they want to be running. Every time a play
- * is run, it will update the parameters of each tactic with the updateWorldParams(...)
- * and the updateControlParams(...) function (see the concrete implementations of this
- * class for examples). The updateWorldParams(...) updates any parameters that are derived
- * from the World independent of play, and the updateControlParams(...) updates all other
- * parameters. This is done every time in order for the Tactics to have the most up to
- * date information when they calculate the next Action they want to run (for example if
- * we were following a moving robot, we need to constantly update our destination).
- *
- * The calulateRobotCost() and getNextAction() functions will be called after the params
- * are updated. Params must be updated first so that these functions can make the correct
- * decisions.
- *
- * See the Play and PlayExecutor classes for more details on how Tactics are used
+ * Tactics are stateful, and use Actions to implement their behaviour. They also
+ * make heavy use of our Evaluation functions in order to help them make decisions.
  */
 class Tactic
 {
@@ -44,8 +32,9 @@ class Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes and will never report done
      */
-    explicit Tactic(bool loop_forever,
-                    const std::set<RobotCapability> &capability_reqs_ = {});
+    explicit Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_);
+
+    Tactic() = delete;
 
     /**
      * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed
@@ -70,6 +59,14 @@ class Tactic
      * this Tactic
      */
     void updateRobot(const Robot &robot);
+
+    /**
+     * Updates the world parameters for this tactic
+     *
+     * @param world The current state of the world
+     */
+    virtual void updateWorldParams(const World &world) = 0;
+
 
     /**
      * robot hardware capability requirements of the tactic.
@@ -115,18 +112,11 @@ class Tactic
     std::shared_ptr<Action> getNextAction(void);
 
     /**
-     * Returns the name of the Tactic
-     *
-     * @return the name of the Tactic
-     */
-    virtual std::string getName() const = 0;
-
-    /**
      * Accepts a Tactic Visitor and calls the visit function on itself
      *
      * @param visitor A Tactic Visitor
      */
-    virtual void accept(MutableTacticVisitor &visitor) = 0;
+    virtual void accept(TacticVisitor &visitor) = 0;
 
     virtual ~Tactic() = default;
 

@@ -8,11 +8,7 @@
 class EnemyFreekickPlay : public Play
 {
    public:
-    static const std::string name;
-
     EnemyFreekickPlay() = default;
-
-    std::string getName() const override;
 
     bool isApplicable(const World &world) const override;
 

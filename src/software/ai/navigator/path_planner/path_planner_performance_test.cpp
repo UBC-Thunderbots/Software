@@ -8,9 +8,10 @@
 #include "software/ai/navigator/path_planner/path_planner.h"
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 #include "software/test_util/test_util.h"
+#include "software/util/typename/typename.h"
 #include "software/world/world.h"
 
 using PathPlannerConstructor = std::function<std::unique_ptr<PathPlanner>()>;
@@ -272,7 +273,7 @@ template <typename PlannerT>
 std::pair<std::string, PathPlannerConstructor> nameAndConstructor()
 {
     return std::pair<std::string, PathPlannerConstructor>(
-        typeid(PlannerT).name(), []() { return std::make_unique<PlannerT>(); });
+        TYPENAME(PlannerT), []() { return std::make_unique<PlannerT>(); });
 }
 
 std::vector<std::pair<std::string, PathPlannerConstructor>>
@@ -292,7 +293,7 @@ class PlannerPerformanceTest
 // the test name
 TEST_P(PlannerPerformanceTest, DISABLED_path_planner_performance)
 {
-    std::string planner_name             = std::get<0>(GetParam()).first.substr(2);
+    std::string planner_name             = std::get<0>(GetParam()).first;
     std::unique_ptr<PathPlanner> planner = std::get<0>(GetParam()).second();
     auto planner_test_case               = std::get<1>(GetParam());
 

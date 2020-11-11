@@ -2,9 +2,8 @@
 
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
-#include "software/primitive/move_primitive.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 class MoveAction : public Action
 {
@@ -26,6 +25,8 @@ class MoveAction : public Action
         bool loop_forever, double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD,
         Angle close_to_orientation_threshold = ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
 
+    MoveAction() = delete;
+
     /**
      * Updates the params that cannot be derived from the world for this action
      *
@@ -43,7 +44,7 @@ class MoveAction : public Action
     void updateControlParams(const Robot& robot, Point destination,
                              Angle final_orientation, double final_speed,
                              DribblerEnable enable_dribbler, MoveType move_type,
-                             AutokickType autokick,
+                             AutochickType autokick,
                              BallCollisionType ball_collision_type);
 
     /**
@@ -74,7 +75,7 @@ class MoveAction : public Action
      *
      * @return The auto-kick mode this move action should operate with
      */
-    AutokickType getAutoKickType();
+    AutochickType getAutochickType();
 
     /**
      * Gets the dribbler mode this move action should operate with
@@ -94,7 +95,7 @@ class MoveAction : public Action
     double final_speed;
     DribblerEnable enable_dribbler;
     MoveType move_type;
-    AutokickType autokick_type;
+    AutochickType autokick_type;
     BallCollisionType ball_collision_type;
 
     double close_to_dest_threshold;

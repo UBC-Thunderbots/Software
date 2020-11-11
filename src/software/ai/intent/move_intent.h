@@ -1,26 +1,15 @@
 #pragma once
 
-#include "software/ai/intent/intent.h"
-#include "software/new_geom/angle.h"
-#include "software/new_geom/point.h"
-#include "software/primitive/move_primitive.h"
+#include "software/ai/intent/navigating_intent.h"
 
-enum BallCollisionType
-{
-    AVOID,
-    ALLOW
-};
-
-class MoveIntent : public MovePrimitive, public Intent
+class MoveIntent : public NavigatingIntent
 {
    public:
-    static const std::string INTENT_NAME;
-
     /**
      * Creates a new Move Intent
      *
      * @param robot_id The id of the robot that this Intent is for
-     * @param dest The destination of the Movement
+     * @param destination The destination of the Movement
      * @param final_angle The final angle the robot should have at the end of the movement
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
@@ -33,28 +22,51 @@ class MoveIntent : public MovePrimitive, public Intent
      *                        of it
      * @param ball_collision_type how to navigate around the ball
      */
-    explicit MoveIntent(unsigned int robot_id, const Point& dest,
+    explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
                         unsigned int priority, DribblerEnable enable_dribbler,
-                        MoveType move_type, AutokickType autokick,
+                        MoveType move_type, AutochickType autokick,
                         BallCollisionType ball_collision_type);
 
-    std::string getIntentName(void) const override;
-
-    /**
-     * Gets type of navigation around the ball
-     *
-     * @return type of navigation around the ball
-     */
-    BallCollisionType getBallCollisionType() const;
+    MoveIntent() = delete;
 
     void accept(IntentVisitor& visitor) const override;
+    void accept(NavigatingIntentVisitor& visitor) const override;
+
+    /**
+     * Gets the robot's destination orientation
+     *
+     * @return The robots final orientation as an Angle
+     */
+    const Angle& getFinalAngle() const;
+
+    /**
+     * Gets whether or not auto-kick/auto-chip should be enabled while moving
+     *
+     * @return whether or not auto-kick/auto-chip should be enabled while moving
+     */
+    const AutochickType& getAutochickType() const;
+
+    /**
+     * Gets whether or not the dribbler should be enabled while moving
+     *
+     * @return whether or not the dribbler should be enabled while moving
+     */
+    const DribblerEnable& getDribblerEnable() const;
+
+    /**
+     * Gets whether or not the robot should be moving slow
+     *
+     * @return whether or not the robot should be moving slow
+     */
+    const MoveType& getMoveType() const;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
      * their member variables are equal.
      *
-     * @param other the MoveIntents to compare with for equality
+     * @param other the MoveIntent to compare with for equality
+     *
      * @return true if the MoveIntents are equal and false otherwise
      */
     bool operator==(const MoveIntent& other) const;
@@ -63,10 +75,14 @@ class MoveIntent : public MovePrimitive, public Intent
      * Compares MoveIntents for inequality.
      *
      * @param other the MoveIntent to compare with for inequality
+     *
      * @return true if the MoveIntents are not equal and false otherwise
      */
     bool operator!=(const MoveIntent& other) const;
 
    private:
-    BallCollisionType ball_collision_type;
+    Angle final_angle;
+    DribblerEnable enable_dribbler;
+    MoveType move_type;
+    AutochickType autokick;
 };

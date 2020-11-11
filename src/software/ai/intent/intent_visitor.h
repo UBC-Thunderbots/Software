@@ -5,15 +5,8 @@
 // because intent.h includes intent_visitor.h, and each individual library includes
 // intent.h. Note: every subclass of this visitor must include all of the classes listed
 // below
-class ChipIntent;
-class DirectVelocityIntent;
-class DirectWheelsIntent;
-class DribbleIntent;
-class KickIntent;
 class MoveIntent;
-class MoveSpinIntent;
-class PivotIntent;
-class StopIntent;
+class DirectPrimitiveIntent;
 
 /**
  * This class provides an interface for all Intent Visitors. The Visitor design pattern
@@ -29,16 +22,18 @@ class IntentVisitor
 
     /**
      * Visits an Intent to perform an operation.
+     * NOTE: Since NavigatingIntent also has a visitor, we need to visit each
+     * individual subclass of NavigatingIntent
      *
-     * @param The Intent to visit
+     * @param intent The Intent to visit
      */
-    virtual void visit(const ChipIntent &chip_intent)                      = 0;
-    virtual void visit(const DirectVelocityIntent &direct_velocity_intent) = 0;
-    virtual void visit(const DirectWheelsIntent &direct_wheels_intent)     = 0;
-    virtual void visit(const DribbleIntent &direct_wheels_intent)          = 0;
-    virtual void visit(const KickIntent &kick_intent)                      = 0;
-    virtual void visit(const MoveIntent &move_intent)                      = 0;
-    virtual void visit(const MoveSpinIntent &move_spin_intent)             = 0;
-    virtual void visit(const PivotIntent &pivot_intent)                    = 0;
-    virtual void visit(const StopIntent &stop_intent)                      = 0;
+    virtual void visit(const MoveIntent &intent) = 0;
+
+    /**
+     * Visits an DirectPrimitiveIntent to perform an operation.
+     * NOTE: This visit covers all the subclasses of DirectPrimitiveIntent
+     *
+     * @param intent The Intent to visit
+     */
+    virtual void visit(const DirectPrimitiveIntent &intent) = 0;
 };

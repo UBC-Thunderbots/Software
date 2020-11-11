@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/logger/logger.h"
@@ -12,7 +11,7 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
                                                    const Team &enemy_team,
                                                    const Ball &ball, bool ignore_goalie,
                                                    double shadow_distance)
-    : Tactic(true),
+    : Tactic(true, {RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -22,20 +21,14 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
 {
 }
 
-std::string DefenseShadowEnemyTactic::getName() const
+void DefenseShadowEnemyTactic::updateWorldParams(const World &world)
 {
-    return "Defense Shadow Enemy Tactic";
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
 
-void DefenseShadowEnemyTactic::updateWorldParams(const Field &field,
-                                                 const Team &friendly_team,
-                                                 const Team &enemy_team, const Ball &ball)
-{
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-    this->ball          = ball;
-}
 
 void DefenseShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_threat)
 {
@@ -80,8 +73,8 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         }
 
         auto best_enemy_shot_opt =
-            calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, enemy_robot,
-                                       ROBOT_MAX_RADIUS_METERS, robots_to_ignore);
+            calcBestShotOnGoal(field, friendly_team, enemy_team, enemy_robot.position(),
+                               TeamType::FRIENDLY, robots_to_ignore);
 
         Vector enemy_shot_vector = field.friendlyGoalCenter() - enemy_robot.position();
         Point position_to_block_shot =
@@ -96,8 +89,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
 
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
-        if (*robotHasPossession(ball.getPreviousStates(),
-                                enemy_robot.getPreviousStates()) &&
+        if (enemy_robot.isNearDribbler(ball.position()) &&
             ball.velocity().length() < DynamicParameters->getAIConfig()
                                            ->getDefenseShadowEnemyTacticConfig()
                                            ->BallStealSpeed()
@@ -105,7 +97,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         {
             move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
-                0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP,
+                0, DribblerEnable::ON, MoveType::NORMAL, AutochickType::AUTOCHIP,
                 BallCollisionType::AVOID);
             yield(move_action);
         }
@@ -115,7 +107,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
                 (enemy_robot.position() - robot->position()).orientation();
             move_action->updateControlParams(*robot, position_to_block_shot,
                                              facing_enemy_robot, 0, DribblerEnable::OFF,
-                                             MoveType::NORMAL, AutokickType::AUTOCHIP,
+                                             MoveType::NORMAL, AutochickType::AUTOCHIP,
                                              BallCollisionType::AVOID);
             yield(move_action);
         }
@@ -123,7 +115,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
     } while (!move_action->done());
 }
 
-void DefenseShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
+void DefenseShadowEnemyTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

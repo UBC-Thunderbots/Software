@@ -111,18 +111,18 @@ TEST(TerminatingFunctionValidatorTest,
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
 
-    world->updateBallStateWithTimestamp(
-        TimestampedBallState(Point(-1, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world->updateBall(
+        Ball(BallState(Point(-1, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
 
-    world->updateBallStateWithTimestamp(
-        TimestampedBallState(Point(-0.1, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world->updateBall(
+        Ball(BallState(Point(-0.1, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
 
-    world->updateBallStateWithTimestamp(
-        TimestampedBallState(Point(0.05, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world->updateBall(
+        Ball(BallState(Point(0.05, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
 }
@@ -148,18 +148,18 @@ TEST(TerminatingFunctionValidatorTest,
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
 
-    world->updateBallStateWithTimestamp(
-        TimestampedBallState(Point(-1, -1), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world->updateBall(
+        Ball(BallState(Point(-1, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
 
-    world->updateBallStateWithTimestamp(
-        TimestampedBallState(Point(1, -1), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world->updateBall(
+        Ball(BallState(Point(1, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
 
-    world->updateBallStateWithTimestamp(
-        TimestampedBallState(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world->updateBall(
+        Ball(BallState(Point(1, 1), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
 }
@@ -183,9 +183,9 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
 
-    world->mutableGameState().updateRefboxGameState(RefboxGameState::STOP);
-    world->updateBallStateWithTimestamp(
-        TimestampedBallState(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world->updateRefereeCommand(RefereeCommand::STOP);
+    world->updateBall(
+        Ball(BallState(Point(0, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
 
     for (unsigned int i = 0; i < 10; i++)
     {
@@ -193,7 +193,11 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
         EXPECT_FALSE(result);
     }
 
-    world->mutableGameState().updateRefboxGameState(RefboxGameState::HALT);
+    for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE; i++)
+    {
+        world->updateRefereeCommand(RefereeCommand::HALT);
+    }
+
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
 }

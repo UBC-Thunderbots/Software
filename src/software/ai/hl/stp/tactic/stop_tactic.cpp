@@ -4,18 +4,15 @@
 
 #include "software/ai/hl/stp/action/stop_action.h"
 
-StopTactic::StopTactic(bool coast) : Tactic(true), coast(coast) {}
-
-std::string StopTactic::getName() const
-{
-    return "Stop Tactic";
-}
+StopTactic::StopTactic(bool coast) : Tactic(true, {}), coast(coast) {}
 
 double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // Prefer all robots equally
     return 0.5;
 }
+
+void StopTactic::updateWorldParams(const World &world) {}
 
 void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
@@ -28,7 +25,7 @@ void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!stop_action->done());
 }
 
-void StopTactic::accept(MutableTacticVisitor &visitor)
+void StopTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "software/simulation/simulator_robot.h"
+#include "software/world/field.h"
 extern "C"
 {
 #include "firmware/app/world/chicker.h"
@@ -12,48 +13,9 @@ extern "C"
 #include "firmware/app/world/wheel.h"
 #include "firmware/shared/physics.h"
 #include "shared/proto/primitive.nanopb.h"
+#include "shared/proto/robot_log_msg.nanopb.h"
+#include "software/simulation/firmware_object_deleter.h"
 }
-
-/**
- * Because the FirmwareRobot_t struct is defined in the .c file (rather than the .h file),
- * C++ considers it an incomplete type and is unable to use it with smart pointers
- * because it doesn't know the size of the object. Therefore we need to create our own
- * "Deleter" class we can provide to the smart pointers to handle that instead.
- *
- * See https://en.cppreference.com/w/cpp/memory/unique_ptr/unique_ptr for more info and
- * examples
- */
-struct FirmwareRobotDeleter
-{
-    void operator()(FirmwareRobot_t* firmware_robot) const
-    {
-        Wheel_t* front_left_wheel = app_firmware_robot_getFrontLeftWheel(firmware_robot);
-        app_wheel_destroy(front_left_wheel);
-
-        Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot);
-        app_wheel_destroy(back_left_wheel);
-
-        Wheel_t* back_right_wheel = app_firmware_robot_getBackRightWheel(firmware_robot);
-        app_wheel_destroy(back_right_wheel);
-
-        Wheel_t* front_right_wheel =
-            app_firmware_robot_getFrontRightWheel(firmware_robot);
-        app_wheel_destroy(front_right_wheel);
-
-        Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot);
-        app_chicker_destroy(chicker);
-
-        Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot);
-        app_dribbler_destroy(dribbler);
-
-        ControllerState_t* controller_state =
-            app_firmware_robot_getControllerState(firmware_robot);
-        delete controller_state;
-
-        app_firmware_robot_destroy(firmware_robot);
-    };
-};
-
 
 /**
  * This class acts as a wrapper around a SimulatorRobot so that the SimulatorRobot
@@ -77,9 +39,26 @@ class SimulatorRobotSingleton
     /**
      * Sets the SimulatorRobot being controlled by this class
      *
+     * The attributes of the robot, such as position, will be given for the POV of
+     * a robot defending the specified field side. Eg. If the robot is at (-1, 2)
+     * in real-world coordinates, it's position will be reported as (-1, 2) if
+     * the negative field side is specified. On the other hand if the positive
+     * field side is specified, the robot's position will be reported as (1, -2).
+     *
+     * This different behaviour for either field side exists because our firmware
+     * expects its knowledge of the world to math our coordinate convention, which is
+     * relative to the side of the field the robot is defending. See
+     * https://github.com/UBC-Thunderbots/Software/blob/master/docs/software-architecture-and-design.md#coordinates
+     * for more information about our coordinate conventions. Because we can't actually
+     * change the positions and dynamics of the underlying physics objects, we use this
+     * class to enforce this convention for the firmware.
+     *
      * @param robot The SimulatorRobot being controlled by this class
+     * @param field_side The side of the field being defended by the robots using
+     * this class
      */
-    static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot);
+    static void setSimulatorRobot(std::shared_ptr<SimulatorRobot> robot,
+                                  FieldSide field_side);
 
     /**
      * Creates a FirmwareRobot_t with functions bound to the static functions in this
@@ -101,7 +80,7 @@ class SimulatorRobotSingleton
      */
     static void startNewPrimitiveOnCurrentSimulatorRobot(
         std::shared_ptr<FirmwareWorld_t> firmware_world,
-        const PrimitiveMsg& primitive_msg);
+        const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Runs the current primitive on the SimulatorRobot currently being controlled by this
@@ -111,6 +90,15 @@ class SimulatorRobotSingleton
      */
     static void runPrimitiveOnCurrentSimulatorRobot(
         std::shared_ptr<FirmwareWorld_t> firmware_world);
+
+    /**
+     * Handler for the firmware logger, runs on every TLOG_* event. Since we can have
+     * two robots with the same ID, we have a log handler for each robot color
+     *
+     * @param the nanopb RobotLog proto logged by a robot
+     */
+    static void handleBlueRobotLogProto(TbotsProto_RobotLog log);
+    static void handleYellowRobotLogProto(TbotsProto_RobotLog log);
 
    private:
     /** * Returns the x-position of the robot, in global field coordinates, in meters
@@ -273,6 +261,30 @@ class SimulatorRobotSingleton
     static unsigned int checkValidAndReturnUint(
         std::function<unsigned int(std::shared_ptr<SimulatorRobot>)> func);
 
+    /**
+     * A helper function that will negate the given value if needed
+     * in order for it to match our coordinate convention for the
+     * current value of field_side
+     *
+     * @param value The value to invert
+     *
+     * @throws std::invalid_argument if there is an unhandled value of FieldSide
+     *
+     * @return value if field_side_ is NEG_X, and -value if field_side_
+     * is POS_X
+     */
+    static float invertValueToMatchFieldSide(float value);
+
+    /**
+     * Helper function for handling robot logs with given team color string
+     *
+     * @param log The nanopb RobotLog proto logged by a robot
+     * @param robot_colour The color of the robot logging
+     */
+    static void handleRobotLogProto(TbotsProto_RobotLog log,
+                                    const std::string& robot_colour);
+
     // The simulator robot being controlled by this class
     static std::shared_ptr<SimulatorRobot> simulator_robot;
+    static FieldSide field_side_;
 };

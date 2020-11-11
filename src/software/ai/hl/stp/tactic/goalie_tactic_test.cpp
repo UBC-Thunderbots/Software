@@ -8,9 +8,9 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/new_geom/line.h"
-#include "software/new_geom/util/contains.h"
-#include "software/new_geom/util/intersection.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/geom/line.h"
 #include "software/test_util/test_util.h"
 
 // The following tests will make sure the goalie stays in the requested
@@ -88,7 +88,7 @@ class GoalieTacticTest : public testing::Test
     void expectMoveAction(Ball ball, Point destination)
     {
         World world = ::TestUtil::createBlankTestingWorld();
-        world.updateBallStateWithTimestamp(ball.currentState());
+        world.updateBall(ball);
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -114,7 +114,7 @@ class GoalieTacticTest : public testing::Test
     void expectStopAction(Ball ball)
     {
         World world = ::TestUtil::createBlankTestingWorld();
-        world.updateBallStateWithTimestamp(ball.currentState());
+        world.updateBall(ball);
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -136,7 +136,7 @@ class GoalieTacticTest : public testing::Test
     void expectChipAction(Ball ball)
     {
         World world = ::TestUtil::createBlankTestingWorld();
-        world.updateBallStateWithTimestamp(ball.currentState());
+        world.updateBall(ball);
 
         Robot goalie = Robot(0, Point(-4.5, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));

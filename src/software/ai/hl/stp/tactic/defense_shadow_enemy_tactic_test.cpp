@@ -20,11 +20,12 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     DefenseShadowEnemyTactic tactic =
         DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat);
 
     auto action_ptr = tactic.getNextAction();
@@ -37,7 +38,7 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
                                                Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AutokickType::AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
 }
 
 TEST(DefenseShadowEnemyTacticTest,
@@ -55,11 +56,12 @@ TEST(DefenseShadowEnemyTacticTest,
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
               Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     DefenseShadowEnemyTactic tactic =
         DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat);
 
     auto action_ptr = tactic.getNextAction();
@@ -73,7 +75,7 @@ TEST(DefenseShadowEnemyTacticTest,
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - field.friendlyGoalCenter()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
 }
 
 
@@ -93,11 +95,12 @@ TEST(
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(4, 3),
               Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     DefenseShadowEnemyTactic tactic =
         DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat);
 
     auto action_ptr = tactic.getNextAction();
@@ -111,5 +114,5 @@ TEST(
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutoKickType() == AUTOCHIP);
+    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
 }

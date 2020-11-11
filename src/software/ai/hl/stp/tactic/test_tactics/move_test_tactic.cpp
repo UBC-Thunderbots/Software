@@ -5,15 +5,11 @@
 #include "software/ai/hl/stp/action/move_action.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
-    : Tactic(loop_forever,
-             {RobotCapability::Dribble, RobotCapability::Kick, RobotCapability::Chip})
+    : Tactic(loop_forever, allRobotCapabilities())
 {
 }
 
-std::string MoveTestTactic::getName() const
-{
-    return "Move Test Tactic";
-}
+void MoveTestTactic::updateWorldParams(const World &world) {}
 
 void MoveTestTactic::updateControlParams(Point destination_)
 {
@@ -38,7 +34,7 @@ void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 
-void MoveTestTactic::accept(MutableTacticVisitor &visitor)
+void MoveTestTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

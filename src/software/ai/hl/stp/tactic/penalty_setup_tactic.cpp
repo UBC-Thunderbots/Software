@@ -4,12 +4,9 @@
 
 PenaltySetupTactic::PenaltySetupTactic(bool loop_forever) : MoveTactic(loop_forever) {}
 
-std::string PenaltySetupTactic::getName() const
-{
-    return "Penalty Setup Tactic";
-}
+void PenaltySetupTactic::updateWorldParams(const World& world) {}
 
-void PenaltySetupTactic::accept(MutableTacticVisitor& visitor)
+void PenaltySetupTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

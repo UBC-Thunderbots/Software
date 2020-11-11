@@ -1,11 +1,11 @@
 #include "software/ai/hl/stp/tactic/test_tactics/goalie_test_tactic.h"
 
-GoalieTestTactic::GoalieTestTactic(bool loop_forever) : Tactic(loop_forever) {}
-
-std::string GoalieTestTactic::getName() const
+GoalieTestTactic::GoalieTestTactic(bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Move})
 {
-    return "Goalie Test Tactic";
 }
+
+void GoalieTestTactic::updateWorldParams(const World &world) {}
 
 bool GoalieTestTactic::isGoalieTactic() const
 {
@@ -23,7 +23,7 @@ void GoalieTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     // Yield nothing
 }
 
-void GoalieTestTactic::accept(MutableTacticVisitor &visitor)
+void GoalieTestTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "software/new_geom/circle.h"
-#include "software/new_geom/point.h"
-#include "software/new_geom/rectangle.h"
+#include "software/geom/circle.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 
 typedef enum
 {
@@ -354,26 +354,6 @@ class Field
      * @returns true if point p is in enemy defense area
      */
     bool pointInEnemyDefenseArea(const Point &p) const;
-
-    /**
-     * Returns whether p is within the field lines of the this field.
-     *
-     * @param p The point to check
-     *
-     * @return true if p is within the field lines of the field, false otherwise
-     */
-    bool pointInFieldLines(const Point &p) const;
-
-    /**
-     * Returns whether p is anywhere within the entire field, including the boundary
-     * area around the field lines. ie, if the point is within the total width and height
-     * of the field.
-     *
-     * @param p The point to check
-     *
-     * @return true if p is anywhere within the entire field, and false otherwise
-     */
-    bool pointInEntireField(const Point &p) const;
 
     /**
      * Compares two fields for equality

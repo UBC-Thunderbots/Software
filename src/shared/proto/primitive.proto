@@ -1,37 +1,123 @@
 syntax = "proto3";
 
-// This message is used to ensure backwards compatibility with our old format
-// for primitive parameters while we migrate to a new format where each primitive
-// has it's own unique proto message
-// TODO: Remove this once it's no longer needed
-//       (https://github.com/UBC-Thunderbots/Software/issues/1578)
-message PrimitiveParamsMsg
-{
-    // The parameters for the primitive
-    float parameter1 = 1;
-    float parameter2 = 2;
-    float parameter3 = 3;
-    float parameter4 = 4;
+package TbotsProto;
 
-    // Extra bits used for flags and/or additional information
-    uint32 extra_bits = 5;
+import "shared/proto/geometry.proto";
 
-    // Indicates whether the robot should move slowly (<1.5 m/s)
-    bool slow = 6;
-}
-
-message PrimitiveMsg
+message Primitive
 {
     oneof primitive
     {
-        PrimitiveParamsMsg move            = 1;
-        PrimitiveParamsMsg stop            = 2;
-        PrimitiveParamsMsg dribble         = 3;
-        PrimitiveParamsMsg shoot           = 4;
-        PrimitiveParamsMsg pivot           = 5;
-        PrimitiveParamsMsg spin            = 6;
-        PrimitiveParamsMsg movespin        = 7;
-        PrimitiveParamsMsg direct_wheels   = 8;
-        PrimitiveParamsMsg direct_velocity = 9;
+        EstopPrimitive estop                  = 1;
+        ChipPrimitive chip                    = 2;
+        KickPrimitive kick                    = 3;
+        MovePrimitive move                    = 4;
+        SpinningMovePrimitive spinning_move   = 5;
+        AutochipMovePrimitive autochip_move   = 6;
+        AutokickMovePrimitive autokick_move   = 7;
+        StopPrimitive stop                    = 8;
+        DirectControlPrimitive direct_control = 9;
     }
+}
+
+message EstopPrimitive {}
+
+message ChipPrimitive
+{
+    Point chip_origin          = 1;
+    Angle chip_direction       = 2;
+    float chip_distance_meters = 3;
+}
+
+message KickPrimitive
+{
+    Point kick_origin                  = 1;
+    Angle kick_direction               = 2;
+    float kick_speed_meters_per_second = 3;
+}
+
+message MovePrimitive
+{
+    MovePositionParams position_params = 1;
+    Angle final_angle                  = 2;
+    float dribbler_speed_rpm           = 3;
+}
+
+message SpinningMovePrimitive
+{
+    MovePositionParams position_params = 1;
+    AngularVelocity angular_velocity   = 2;
+    float dribbler_speed_rpm           = 3;
+}
+
+message AutochipMovePrimitive
+{
+    MovePositionParams position_params = 1;
+    Angle final_angle                  = 2;
+    float dribbler_speed_rpm           = 3;
+    float chip_distance_meters         = 4;
+}
+
+message AutokickMovePrimitive
+{
+    MovePositionParams position_params = 1;
+    Angle final_angle                  = 2;
+    float dribbler_speed_rpm           = 3;
+    float kick_speed_meters_per_second = 4;
+}
+
+message StopPrimitive
+{
+    enum StopType
+    {
+        BRAKE = 0;
+        COAST = 1;
+    }
+    StopType stop_type = 1;
+}
+
+message DirectControlPrimitive
+{
+    enum ChargeMode
+    {
+        DISCHARGE = 0;
+        CHARGE    = 1;
+        FLOAT     = 2;
+    }
+
+    message DirectPerWheelControl
+    {
+        float front_left_wheel_rpm  = 1;
+        float back_left_wheel_rpm   = 2;
+        float front_right_wheel_rpm = 3;
+        float back_right_wheel_rpm  = 4;
+    }
+
+    message DirectVelocityControl
+    {
+        Vector velocity                  = 1;
+        AngularVelocity angular_velocity = 2;
+    }
+
+    oneof wheel_control
+    {
+        DirectPerWheelControl direct_per_wheel_control = 1;
+        DirectVelocityControl direct_velocity_control  = 2;
+    }
+    ChargeMode charge_mode = 3;
+    oneof chick_command
+    {
+        float kick_speed_meters_per_second     = 4;
+        float chip_distance_meters             = 5;
+        float autokick_speed_meters_per_second = 6;
+        float autochip_distance_meters         = 7;
+    }
+    float dribbler_speed_rpm = 8;
+}
+
+message MovePositionParams
+{
+    Point destination                   = 1;
+    float final_speed_meters_per_second = 2;
+    bool slow                           = 3;
 }

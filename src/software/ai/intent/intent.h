@@ -3,8 +3,14 @@
 #include <set>
 #include <string>
 
+#include "shared/proto/primitive.pb.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
+#include "software/proto/primitive/primitive_msg_factory.h"
+
+MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a
@@ -27,16 +33,12 @@ class Intent
      * Creates a new Intent with the given priority. A larger number indicates a higher
      * priority. The priority value must be in the range [0, 100]
      *
+     * @param robot_id The id of the Robot to run this Primitive
      * @param priority The priority of this Intent
      */
-    explicit Intent(unsigned int priority);
+    explicit Intent(unsigned int robot_id, unsigned int priority);
 
-    /**
-     * Returns the name of this Intent
-     *
-     * @return the name of this Intent
-     */
-    virtual std::string getIntentName(void) const = 0;
+    Intent() = delete;
 
     /**
      * Returns the priority of this Intent. The priority value is an integer in the range
@@ -45,6 +47,13 @@ class Intent
      * @return the priority of this Intent
      */
     unsigned int getPriority(void) const;
+
+    /**
+     * Returns the ID of the robot that this Intent corresponds to
+     *
+     * @return The robot id
+     */
+    unsigned int getRobotId() const;
 
     /**
      * Sets the priority of this Intent. The priority value must be an integer in the
@@ -57,6 +66,7 @@ class Intent
      * their member variables are equal.
      *
      * @param other the Intents to compare with for equality
+     *
      * @return true if the Intents are equal and false otherwise
      */
     bool operator==(const Intent& other) const;
@@ -65,6 +75,7 @@ class Intent
      * Compares Intents for inequality.
      *
      * @param other the Intent to compare with for inequality
+     *
      * @return true if the Intents are not equal and false otherwise
      */
     bool operator!=(const Intent& other) const;
@@ -93,6 +104,11 @@ class Intent
     virtual ~Intent() = default;
 
    private:
+    /**
+     * The id of the robot that this intent is meant to be run on
+     */
+    unsigned int robot_id;
+
     /**
      * The priority of this intent. Must be in the range [0, 100]
      * higher value => higher priority

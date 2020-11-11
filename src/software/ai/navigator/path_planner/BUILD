@@ -5,8 +5,7 @@ cc_library(
     hdrs = ["path_planner.h"],
     deps = [
         "//software/ai/navigator/obstacle",
-        "//software/geom",
-        "//software/new_geom:linear_spline2d",
+        "//software/geom:linear_spline2d",
     ],
 )
 
@@ -32,7 +31,7 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
-        "//software/new_geom/util:algorithms",
+        "//software/geom/algorithms",
     ],
 )
 
@@ -74,6 +73,7 @@ cc_test(
         ":theta_star_path_planner",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
+        "//software/util/typename",
         "@gtest//:gtest_main",
     ],
 )
@@ -87,6 +87,7 @@ cc_test(
         ":theta_star_path_planner",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
+        "//software/util/typename",
         "@gtest//:gtest_main",
     ],
 )

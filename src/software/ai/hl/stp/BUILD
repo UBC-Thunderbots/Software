@@ -2,18 +2,21 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "stp",
-    srcs = ["stp.cpp"],
+    srcs = [
+        "stp.cpp",
+    ],
     hdrs = ["stp.h"],
     deps = [
         "//software/ai/hl",
         "//software/ai/hl/stp/action:action_world_params_update_visitor",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic:tactic_world_params_update_visitor",
+        "//software/ai/hl/stp/tactic:all_tactics",
         "//software/ai/intent:stop_intent",
         "//software/ai/motion_constraint:motion_constraint_manager",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
+        "//software/util/typename",
         "@munkres_cpp",
     ],
 )
@@ -35,11 +38,11 @@ cc_test(
 )
 
 cc_test(
-    name = "stp_refbox_game_state_play_selection_test",
-    srcs = ["stp_refbox_game_state_play_selection_test.cpp"],
+    name = "stp_referee_command_play_selection_test",
+    srcs = ["stp_referee_command_play_selection_test.cpp"],
     deps = [
         ":stp",
-        "//software/ai/hl/stp/play:halt_play",
+        "//software/ai/hl/stp/play:all_plays",
         "//software/test_util",
         "//software/world",
         "@gtest//:gtest_main",

@@ -2,9 +2,9 @@
 
 #include "shared/constants.h"
 
-std::unique_ptr<SSL_DetectionBall> createSSLDetectionBall(const BallState& ball)
+std::unique_ptr<SSLProto::SSL_DetectionBall> createSSLDetectionBall(const BallState& ball)
 {
-    auto detection_ball = std::make_unique<SSL_DetectionBall>();
+    auto detection_ball = std::make_unique<SSLProto::SSL_DetectionBall>();
 
     // Give all detections "perfect" confidence since we have no means of reasonably
     // esimating confidence
@@ -26,9 +26,10 @@ std::unique_ptr<SSL_DetectionBall> createSSLDetectionBall(const BallState& ball)
     return std::move(detection_ball);
 }
 
-std::unique_ptr<SSL_DetectionRobot> createSSLDetectionRobot(const RobotStateWithId& robot)
+std::unique_ptr<SSLProto::SSL_DetectionRobot> createSSLDetectionRobot(
+    const RobotStateWithId& robot)
 {
-    auto detection_robot = std::make_unique<SSL_DetectionRobot>();
+    auto detection_robot = std::make_unique<SSLProto::SSL_DetectionRobot>();
 
     // Give all detections "perfect" confidence since we have no means of reasonably
     // esimating confidence
@@ -52,18 +53,18 @@ std::unique_ptr<SSL_DetectionRobot> createSSLDetectionRobot(const RobotStateWith
     return std::move(detection_robot);
 }
 
-std::unique_ptr<SSL_DetectionFrame> createSSLDetectionFrame(
+std::unique_ptr<SSLProto::SSL_DetectionFrame> createSSLDetectionFrame(
     uint32_t camera_id, const Timestamp& t_capture, uint32_t frame_number,
     const std::vector<BallState>& balls,
     const std::vector<RobotStateWithId>& yellow_robots,
     const std::vector<RobotStateWithId>& blue_robots)
 {
-    auto detection_frame = std::make_unique<SSL_DetectionFrame>();
+    auto detection_frame = std::make_unique<SSLProto::SSL_DetectionFrame>();
 
     detection_frame->set_frame_number(frame_number);
     // Assume the frame was sent instantly after it was captured
-    detection_frame->set_t_capture(t_capture.getSeconds());
-    detection_frame->set_t_sent(t_capture.getSeconds());
+    detection_frame->set_t_capture(t_capture.toSeconds());
+    detection_frame->set_t_sent(t_capture.toSeconds());
     detection_frame->set_camera_id(camera_id);
 
     for (const auto& ball_state : balls)
@@ -85,14 +86,14 @@ std::unique_ptr<SSL_DetectionFrame> createSSLDetectionFrame(
 }
 
 std::vector<BallDetection> createBallDetections(
-    const std::vector<SSL_DetectionFrame>& detections, double min_valid_x,
+    const std::vector<SSLProto::SSL_DetectionFrame>& detections, double min_valid_x,
     double max_valid_x, bool ignore_invalid_camera_data)
 {
     auto ball_detections = std::vector<BallDetection>();
 
     for (const auto& detection : detections)
     {
-        for (const SSL_DetectionBall& ball : detection.balls())
+        for (const SSLProto::SSL_DetectionBall& ball : detection.balls())
         {
             // Convert all data to meters and radians
             BallDetection ball_detection{
@@ -116,7 +117,7 @@ std::vector<BallDetection> createBallDetections(
 }
 
 std::vector<RobotDetection> createTeamDetection(
-    const std::vector<SSL_DetectionFrame>& detections, TeamColour team_colour,
+    const std::vector<SSLProto::SSL_DetectionFrame>& detections, TeamColour team_colour,
     double min_valid_x, double max_valid_x, bool ignore_invalid_camera_data)
 {
     std::vector<RobotDetection> robot_detections = std::vector<RobotDetection>();

@@ -125,7 +125,7 @@ typedef struct VelocityTrajectory
  *
  * @pre path_parameters members have been completely initialized and have values
  *
- * @param path_parameters [in] The path parameters that define the physical limitations
+ * @param path_parameters The path parameters that define the physical limitations
  * and profile of the trajectory.
  *
  * @param position_trajectory [out] The trajectory data struct to be modified to contain
@@ -152,7 +152,7 @@ app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
  * @param variable_period_trajectory [in] The variable-period trajectory that will be used
  * to generate the constant-period trajectory.
  *
- * @param interpolation_period [in] The interpolation period of the constant-period
+ * @param interpolation_period The interpolation period of the constant-period
  * trajectory. This parameter defines the length of time between successive elements in
  * the trajectory. In seconds.
  *
@@ -176,11 +176,11 @@ app_trajectory_planner_interpolateConstantPeriodPositionTrajectory(
  * parameterization trajectory then uses linear interpolation to calculate the equivalent
  * constant period trajectory
  *
- * @param interpolation_period [in] The duration of time between successive trajectory
+ * @param interpolation_period The duration of time between successive trajectory
  * elements. In seconds.
  *
  * @param path_parameters [in/out] The path parameters that define the trajectory. The
- * input path_parameters.num_elements defines the number of constant-parameterization
+ * input path_parameters. num_elements defines the number of constant-parameterization
  * elements, and the returned path_parameters.num_elements defines the number of
  * constant-period elements in the trajectory,
  *
@@ -200,7 +200,7 @@ app_trajectory_planner_generateConstantPeriodPositionTrajectory(
  *
  * @param position_trajectory [in] A completely defined position trajectory.
  *
- * @param num_elements [in] The number of elements in the trajectory.
+ * @param num_elements The number of elements in the trajectory.
  *
  * @param velocity_trajectory [out] A completely defined velocity trajectory that has
  * equally time-spaced elements. The velocity trajectory has the name number of elements

@@ -35,6 +35,7 @@
 #include <unused.h>
 #include <usb.h>
 
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/world/firmware_world.h"
 #include "io/adc.h"
@@ -54,6 +55,7 @@
 #include "io/pins.h"
 #include "io/receive.h"
 #include "io/sdcard.h"
+#include "io/uart_logger.h"
 #include "io/usb_config.h"
 #include "io/wheels.h"
 #include "priority.h"
@@ -360,6 +362,33 @@ static void stm32_main(void)
     __builtin_unreachable();
 }
 
+/**
+ * Charge the capacitor.
+ */
+void charger_charge(void)
+{
+    charger_enable(true);
+    chicker_discharge(false);
+}
+
+/**
+ * Discharge the capacitor.
+ */
+static void charger_discharge(void)
+{
+    charger_enable(false);
+    chicker_discharge(true);
+}
+
+/**
+ * Float the capacitor.
+ */
+void charger_float(void)
+{
+    charger_enable(false);
+    chicker_discharge(false);
+}
+
 static void run_normal(void)
 {
     // Read the configuration switches.
@@ -456,6 +485,8 @@ static void run_normal(void)
         exception_reboot_without_core = false;
     }
 
+    app_logger_init(switches[0U], &io_uart_logger_handle_robot_log);
+
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
     WheelConstants_t wheel_constants = {
@@ -477,6 +508,8 @@ static void run_normal(void)
     Wheel_t* back_left_wheel =
         app_wheel_create(apply_wheel_force_back_left, wheels_get_back_left_rpm,
                          wheels_brake_back_left, wheels_coast_back_left, wheel_constants);
+    Charger_t* charger =
+        app_charger_create(charger_charge, charger_discharge, charger_float);
     Chicker_t* chicker = app_chicker_create(
         chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
         chicker_auto_disarm, chicker_auto_disarm);
@@ -494,7 +527,7 @@ static void run_normal(void)
         .last_applied_acceleration_angular = 0,
     };
     FirmwareRobot_t* robot = app_firmware_robot_create(
-        chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
+        charger, chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
         dr_get_robot_orientation, dr_get_robot_velocity_x, dr_get_robot_velocity_y,
         dr_get_robot_angular_velocity, adc_battery, front_right_wheel, front_left_wheel,
         back_right_wheel, back_left_wheel, &controller_state, robot_constants);

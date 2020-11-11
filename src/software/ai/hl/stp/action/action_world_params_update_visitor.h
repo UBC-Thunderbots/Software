@@ -18,16 +18,16 @@ class ActionWorldParamsUpdateVisitor : public MutableActionVisitor
      */
     ActionWorldParamsUpdateVisitor(const World& world);
 
+    ActionWorldParamsUpdateVisitor() = delete;
+
     /**
      * Visit and update the world parameters for a given action
      */
     void visit(ChipAction& action) override;
-    void visit(DribbleAction& action) override;
     void visit(InterceptBallAction& action) override;
     void visit(KickAction& action) override;
     void visit(MoveAction& action) override;
-    void visit(MoveSpinAction& action) override;
-    void visit(PivotAction& action) override;
+    void visit(SpinningMoveAction& action) override;
     void visit(StopAction& action) override;
 
    private:

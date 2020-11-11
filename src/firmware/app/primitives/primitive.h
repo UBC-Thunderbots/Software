@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "firmware/app/world/firmware_world.h"
+#include "shared/proto/primitive.nanopb.h"
 
 /**
  * \brief The definition of a movement primitive.
@@ -20,18 +21,6 @@ typedef struct
      * \brief Whether or not the primitive is a type of direct-mode operation.
      */
     bool direct;
-
-    /**
-     * \brief Ends a movement using the primitive.
-     *
-     * This is invoked every time a new movement begins after a primitive has
-     * been in use, regardless of whether the new movement is of the same or a
-     * different type.
-     * \param[in] state_void_ptr A pointer to the state object for this primitive, as
-     *                           created by the `create_state` function
-     * \param[in] world The world to perform the primitive in
-     */
-    void (*end)(void* state_void_ptr, FirmwareWorld_t* world);
 
     /**
      * \brief Advances time in the primitive.
@@ -77,3 +66,22 @@ typedef struct
     {                                                                                    \
         free((STATE_TYPE*)state);                                                        \
     }
+
+/**
+ * Stop the robot by disabling all motors and disabling autokicking and autochipping
+ *
+ * NOTE: this primitive does *NOT* discharge capacitors
+ *
+ * @param world [in] The world containing the robot to stop
+ * @param stop_type whether the robot should coast or brake when stopping
+ */
+void app_primitive_stopRobot(FirmwareWorld_t* world,
+                             TbotsProto_StopPrimitive_StopType stop_type);
+
+/**
+ * Make the robot in the given world "safe" by disabling potentially dangerous
+ * functionality and bringing the robot to a stop, including discharging capacitors
+ *
+ * @param world [in] The world containing the robot to make safe
+ */
+void app_primitive_makeRobotSafe(FirmwareWorld_t* world);

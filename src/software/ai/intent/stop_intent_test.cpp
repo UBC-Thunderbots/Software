@@ -1,18 +1,7 @@
-/**
- * This file contains unit tests for the Stop Intent class
- */
-
 #include "software/ai/intent/stop_intent.h"
 
 #include <gtest/gtest.h>
 #include <string.h>
-
-TEST(StopIntentTest, intent_name_test)
-{
-    StopIntent stop_intent = StopIntent(0, false, 0);
-
-    EXPECT_EQ("Stop Intent", stop_intent.getIntentName());
-}
 
 // For equality operators, we only check for cases not covered in the Primitive tests,
 // since Intents inherit from Primitives

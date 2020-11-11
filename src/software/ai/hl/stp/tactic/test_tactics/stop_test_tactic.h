@@ -18,7 +18,7 @@ class StopTestTactic : public Tactic
      */
     explicit StopTestTactic(bool loop_forever = false);
 
-    std::string getName() const override;
+    void updateWorldParams(const World& world) override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
@@ -38,7 +38,7 @@ class StopTestTactic : public Tactic
      *
      * @throws std::invalid_argument always
      */
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

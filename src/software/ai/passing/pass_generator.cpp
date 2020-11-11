@@ -312,7 +312,7 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
     std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
                                                   world.field().yLength() / 2);
 
-    double curr_time             = world.getMostRecentTimestamp().getSeconds();
+    double curr_time             = world.getMostRecentTimestamp().toSeconds();
     double min_start_time_offset = DynamicParameters->getAIConfig()
                                        ->getPassingConfig()
                                        ->MinTimeOffsetForPassSeconds()
@@ -373,7 +373,7 @@ bool PassGenerator::passesEqual(Pass pass1, Pass pass2)
         (pass1.receiverPoint() - pass2.receiverPoint()).length();
     double passer_position_difference =
         (pass1.passerPoint() - pass2.passerPoint()).length();
-    double time_difference  = (pass1.startTime() - pass2.startTime()).getSeconds();
+    double time_difference  = (pass1.startTime() - pass2.startTime()).toSeconds();
     double speed_difference = pass1.speed() - pass2.speed();
 
     return std::abs(receiver_position_difference) < max_position_difference_meters &&
@@ -389,7 +389,7 @@ PassGenerator::convertPassToArray(const Pass& pass)
     std::lock_guard<std::mutex> world_lock(world_mutex);
 
     return {pass.receiverPoint().x(), pass.receiverPoint().y(), pass.speed(),
-            pass.startTime().getSeconds()};
+            pass.startTime().toSeconds()};
 }
 
 Pass PassGenerator::convertArrayToPass(

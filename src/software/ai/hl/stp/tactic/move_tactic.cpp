@@ -3,12 +3,11 @@
 #include <algorithm>
 
 
-MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
-
-std::string MoveTactic::getName() const
+MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever, {RobotCapability::Move})
 {
-    return "Move Tactic";
 }
+
+void MoveTactic::updateWorldParams(const World &world) {}
 
 void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
                                      double final_speed)
@@ -38,12 +37,12 @@ void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     {
         move_action->updateControlParams(
             *robot, destination, final_orientation, final_speed, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE, BallCollisionType::AVOID);
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID);
         yield(move_action);
     } while (!move_action->done());
 }
 
-void MoveTactic::accept(MutableTacticVisitor &visitor)
+void MoveTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

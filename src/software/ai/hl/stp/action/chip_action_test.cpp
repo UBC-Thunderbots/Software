@@ -1,9 +1,11 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 
+#include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
 
 TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)
@@ -40,11 +42,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 
     try
     {
-        ChipIntent kick_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
-        EXPECT_EQ(0, kick_intent.getRobotId());
-        EXPECT_EQ(Point(0, 0), kick_intent.getChipOrigin());
-        EXPECT_EQ(Angle::zero(), kick_intent.getChipDirection());
-        EXPECT_EQ(5.0, kick_intent.getChipDistance());
+        ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
+        EXPECT_EQ(0, chip_intent.getRobotId());
+        EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+            chip_intent.getPrimitive().chip().chip_origin(),
+            *createPointProto(Point(0, 0))));
+        EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+            chip_intent.getPrimitive().chip().chip_direction(),
+            *createAngleProto(Angle::zero())));
+        EXPECT_EQ(5.0, chip_intent.getPrimitive().chip().chip_distance_meters());
     }
     catch (...)
     {
@@ -69,11 +75,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
 
     try
     {
-        ChipIntent kick_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
-        EXPECT_EQ(0, kick_intent.getRobotId());
-        EXPECT_EQ(Point(-2.5, 2.5), kick_intent.getChipOrigin());
-        EXPECT_EQ(Angle::fromDegrees(105), kick_intent.getChipDirection());
-        EXPECT_EQ(5.0, kick_intent.getChipDistance());
+        ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
+        EXPECT_EQ(0, chip_intent.getRobotId());
+        EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+            chip_intent.getPrimitive().chip().chip_origin(),
+            *createPointProto(Point(-2.5, 2.5))));
+        EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+            chip_intent.getPrimitive().chip().chip_direction(),
+            *createAngleProto(Angle::fromDegrees(105))));
+        EXPECT_EQ(5.0, chip_intent.getPrimitive().chip().chip_distance_meters());
     }
     catch (...)
     {
@@ -98,11 +108,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 
     try
     {
-        ChipIntent kick_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
-        EXPECT_EQ(0, kick_intent.getRobotId());
-        EXPECT_EQ(Point(-0.05, -0.2), kick_intent.getChipOrigin());
-        EXPECT_EQ(Angle::fromDegrees(255), kick_intent.getChipDirection());
-        EXPECT_EQ(3.0, kick_intent.getChipDistance());
+        ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
+        EXPECT_EQ(0, chip_intent.getRobotId());
+        EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+            chip_intent.getPrimitive().chip().chip_origin(),
+            *createPointProto(Point(-0.05, -0.2))));
+        EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+            chip_intent.getPrimitive().chip().chip_direction(),
+            *createAngleProto(Angle::fromDegrees(255))));
+        EXPECT_EQ(3.0, chip_intent.getPrimitive().chip().chip_distance_meters());
     }
     catch (...)
     {
@@ -127,11 +141,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
 
     try
     {
-        ChipIntent kick_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
-        EXPECT_EQ(0, kick_intent.getRobotId());
-        EXPECT_EQ(Point(0, 0), kick_intent.getChipOrigin());
-        EXPECT_EQ(Angle::fromDegrees(306), kick_intent.getChipDirection());
-        EXPECT_EQ(5.0, kick_intent.getChipDistance());
+        ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
+        EXPECT_EQ(0, chip_intent.getRobotId());
+        EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+            chip_intent.getPrimitive().chip().chip_origin(),
+            *createPointProto(Point(0, 0))));
+        EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
+            chip_intent.getPrimitive().chip().chip_direction(),
+            *createAngleProto(Angle::fromDegrees(306))));
+        EXPECT_EQ(5.0, chip_intent.getPrimitive().chip().chip_distance_meters());
     }
     catch (...)
     {

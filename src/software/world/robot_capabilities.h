@@ -1,14 +1,11 @@
 #pragma once
+
 #include <algorithm>
 #include <set>
 
-enum class RobotCapability
-{
-    Dribble,
-    Kick,
-    Chip,
-    Move
-};
+#include "software/util/make_enum/make_enum.h"
+
+MAKE_ENUM(RobotCapability, Dribble, Kick, Chip, Move);
 
 /**
  * Returns a set of all capabilities.

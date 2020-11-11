@@ -3,10 +3,13 @@
 #include "software/logger/logger.h"
 
 std::shared_ptr<SimulatorBall> SimulatorBallSingleton::simulator_ball = nullptr;
+FieldSide SimulatorBallSingleton::field_side_                         = FieldSide::NEG_X;
 
-void SimulatorBallSingleton::setSimulatorBall(std::shared_ptr<SimulatorBall> ball)
+void SimulatorBallSingleton::setSimulatorBall(std::shared_ptr<SimulatorBall> ball,
+                                              FieldSide field_side)
 {
     simulator_ball = ball;
+    field_side_    = field_side;
 }
 
 std::unique_ptr<FirmwareBall_t, FirmwareBallDeleter>
@@ -37,22 +40,39 @@ float SimulatorBallSingleton::checkValidAndReturnFloat(
     return 0.0f;
 }
 
+float SimulatorBallSingleton::invertValueToMatchFieldSide(double value)
+{
+    switch (field_side_)
+    {
+        case FieldSide::NEG_X:
+            return static_cast<float>(value);
+        case FieldSide::POS_X:
+            return static_cast<float>(-value);
+        default:
+            throw std::invalid_argument("Unhandled value of FieldSide");
+    }
+}
+
 float SimulatorBallSingleton::getBallPositionX()
 {
-    return checkValidAndReturnFloat([](auto ball) { return ball->position().x(); });
+    return checkValidAndReturnFloat(
+        [](auto ball) { return invertValueToMatchFieldSide(ball->position().x()); });
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
-    return checkValidAndReturnFloat([](auto ball) { return ball->position().y(); });
+    return checkValidAndReturnFloat(
+        [](auto ball) { return invertValueToMatchFieldSide(ball->position().y()); });
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
-    return checkValidAndReturnFloat([](auto ball) { return ball->velocity().x(); });
+    return checkValidAndReturnFloat(
+        [](auto ball) { return invertValueToMatchFieldSide(ball->velocity().x()); });
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
-    return checkValidAndReturnFloat([](auto ball) { return ball->velocity().y(); });
+    return checkValidAndReturnFloat(
+        [](auto ball) { return invertValueToMatchFieldSide(ball->velocity().y()); });
 }
