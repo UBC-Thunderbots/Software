@@ -23,7 +23,18 @@ typedef struct Matrix Matrix_t;
  *
  * @return Pointer to the created Matrix
  */
-Matrix_t* shared_matrix_create(unsigned int n_rows, unsigned int n_cols);
+Matrix_t* shared_matrix_createBlank(unsigned int n_rows, unsigned int n_cols);
+
+/**
+ * Sets the values of a N*M matrix to be the values contained in the values array
+ * NOTE: Value format is [ [ROW_1], [ROW_2], ROW_3]... [ROW_N] ]
+ *
+ * @param matrix [in] The N*M matrix to copy values into
+ * @param values [in] The N*M array containing matrix values to be copied
+ *
+ * @return Pointer to the created Matrix
+ */
+void shared_matrix_setValues(Matrix_t* matrix, float** values);
 
 /**
  * Frees the memory used up by a matrix.
@@ -36,8 +47,8 @@ void shared_matrix_destroy(Matrix_t* matrix);
  * Multiplies two matrices together and returns the resulting matrix, which is of size
  * A.n_rows x B.n_cols
  *
- * @param A [in] the left matrix
- * @param B [in] the right matrix
+ * @param A [in] The left matrix
+ * @param B [in] The right matrix
  *
  * @return the resulting Matrix from the matrix multiplication
  */
@@ -46,7 +57,7 @@ Matrix_t* shared_matrix_multiply(Matrix_t* A, Matrix_t* B);
 /**
  * Creates a shared_matrix_transpose of the given in_matrix.
  *
- * @param in_matrix [in] the matrix to transpose
+ * @param in_matrix [in] The matrix to transpose
  *
  * @return the shared_matrix_transpose of the given matrix
  */
@@ -130,7 +141,7 @@ void shared_matrix_insertRow(unsigned int row, float column_values[],
  *
  * @param num_columns [in] The number of columns in the matrix
  *
- * @return A pointer ot the Matrix
+ * @return A pointer to the Matrix
  */
 Matrix_t* shared_matrix_createMatrixFromValues(float** matrix_values,
                                                unsigned int num_rows,
