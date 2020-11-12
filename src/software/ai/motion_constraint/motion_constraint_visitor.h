@@ -46,6 +46,7 @@ class MotionConstraintVisitor : public TacticVisitor
      * @param The tactic to register
      *
      * @modifies current_allowed_constraints
+     * @return set of MotionConstraints
      */
     std::set<MotionConstraint> getCurrentAllowedConstraints(Tactic &tactic);
 
