@@ -177,9 +177,6 @@ TEST_F(BallTest, estimate_future_state_friction)
               ball.estimateFutureState(Duration::fromSeconds(1.0)));
 }
 
-
-////////////////////////
-
 TEST(HasBallBeenKickedTest, ball_over_speed_threshold_and_no_direction_difference)
 {
     Ball ball({0, 0}, {5, 5}, Timestamp::fromSeconds(0));

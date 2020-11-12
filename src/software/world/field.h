@@ -355,10 +355,6 @@ class Field
      */
     bool pointInEnemyDefenseArea(const Point &p) const;
 
-
-    /////////////////////
-
-
     /**
      * Returns true if the ball is in the friendly half of the field, and false otherwise
      *
@@ -394,9 +390,6 @@ class Field
      * field.
      */
     bool pointInEnemyCorner(const Point &p, double radius) const;
-
-
-    ////////////////
 
     /**
      * Compares two fields for equality

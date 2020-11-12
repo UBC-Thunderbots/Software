@@ -64,9 +64,6 @@ BallState Ball::estimateFutureState(const Duration &duration_in_future) const
     return BallState(future_position, future_velocity);
 }
 
-/////////////////
-
-
 bool Ball::hasBallBeenKicked(const Angle &expected_kick_direction,
                              double min_kick_speed) const
 {
@@ -78,9 +75,6 @@ bool Ball::hasBallBeenKicked(const Angle &expected_kick_direction,
     return (kick_orientation_difference.abs() < MAX_ANGLE_DIFFERENCE &&
             velocity().length() > min_kick_speed);
 }
-
-
-//////////////
 
 bool Ball::operator==(const Ball &other) const
 {

@@ -357,10 +357,6 @@ TEST_F(FieldTest, degenerate_field_neg_lengths)
     EXPECT_THROW(Field(2, 2, 3, -2, 0, 2, 3, 4), std::invalid_argument);
 }
 
-
-/////////////////////////////
-
-
 TEST(BallInFriendlyHalfTest, ball_barely_in_friendly_half)
 {
     Field field = Field::createSSLDivisionBField();

@@ -248,9 +248,6 @@ bool Field::pointInEnemyDefenseArea(const Point &p) const
     return contains(enemyDefenseArea(), p);
 }
 
-//////////////////////
-
-
 bool Field::pointInFriendlyHalf(const Point &p) const
 {
     return p.x() < centerPoint().x();
@@ -274,9 +271,6 @@ bool Field::pointInEnemyCorner(const Point &p, double radius) const
             (distance(p, enemyCornerNeg()) < radius)) &&
            contains(fieldLines(), p);
 }
-
-
-///////////////////////
 
 bool Field::operator==(const Field &other) const
 {

@@ -162,9 +162,6 @@ class Team
      */
     std::vector<Robot> getAllRobotsExceptGoalie() const;
 
-
-    /////////////////////
-
     /**
      * Given a team, finds the robot on that team that is closest to a reference point.
      *
@@ -183,9 +180,6 @@ class Team
      */
     std::optional<Robot> getNearestRobot(const std::vector<Robot>& robots,
                                          const Point& ref_point) const;
-
-
-    /////////////////////
 
     /**
      * Removes all Robots from this team. Does not affect the goalie id.

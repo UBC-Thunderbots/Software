@@ -89,10 +89,6 @@ class Ball final
      */
     BallState estimateFutureState(const Duration &duration_in_future) const;
 
-
-    ///////////////////////
-
-
     /**
      * Software approximation that finds if a ball has been kicked, regardless of whether
      * the kick was a pass, shot, or chip.
@@ -107,9 +103,6 @@ class Ball final
      */
     bool hasBallBeenKicked(const Angle &expected_kick_direction,
                            double min_kick_speed = 0.5) const;
-
-
-    ///////////////////////
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and

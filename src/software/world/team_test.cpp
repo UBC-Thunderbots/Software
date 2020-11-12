@@ -383,10 +383,6 @@ TEST_F(TeamTest, set_robot_expiry_buffer)
     EXPECT_EQ(Duration::fromMilliseconds(831), team.getRobotExpiryBufferDuration());
 }
 
-
-/////////////////////////////
-
-
 TEST_F(TeamTest, nearest_friendy_one_robot)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
@@ -482,8 +478,6 @@ TEST_F(TeamTest, nearest_robot_zero_robots)
 
     EXPECT_EQ(std::nullopt, team.getNearestRobot(Point(0, 0)));
 }
-
-//////////////////////////////////
 
 TEST_F(TeamTest, equality_operator_compare_team_with_itself)
 {

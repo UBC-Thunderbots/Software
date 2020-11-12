@@ -178,10 +178,6 @@ std::vector<Robot> Team::getAllRobotsExceptGoalie() const
     return all_robots;
 }
 
-
-////////////////////
-
-
 std::optional<Robot> Team::getNearestRobot(const Point& ref_point) const
 {
     return getNearestRobot(this->getAllRobots(), ref_point);
@@ -207,11 +203,6 @@ std::optional<Robot> Team::getNearestRobot(const std::vector<Robot>& robots,
 
     return nearest_robot;
 }
-
-
-
-//////////////////
-
 
 void Team::clearAllRobots()
 {
