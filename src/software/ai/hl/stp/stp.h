@@ -5,7 +5,6 @@
 #include "software/ai/hl/hl.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/intent/intent.h"
-#include "software/ai/motion_constraint/motion_constraint_manager.h"
 #include "software/parameter/dynamic_parameters.h"
 
 /**
@@ -225,5 +224,4 @@ class STP : public HL
     bool override_play;
     bool previous_override_play;
     GameState current_game_state;
-    MotionConstraintManager motion_constraint_manager;
 };
