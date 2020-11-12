@@ -266,7 +266,7 @@ TEST_F(SensorFusionTest, test_geom_wrapper_packet)
         std::move(geom_data), std::unique_ptr<SSLProto::SSL_DetectionFrame>());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
 }
 
@@ -277,7 +277,7 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
         std::unique_ptr<SSLProto::SSL_GeometryData>(), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
 }
 
@@ -289,7 +289,7 @@ TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
     auto result = sensor_fusion.getWorld();
     ASSERT_TRUE(result);
     EXPECT_EQ(initInvertedWorld(), result);
@@ -302,7 +302,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_packet)
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result = *sensor_fusion.getWorld();
     EXPECT_EQ(initWorld(), result);
@@ -312,7 +312,7 @@ TEST_F(SensorFusionTest, test_robot_status_msg_packet)
 {
     SensorProto sensor_msg;
     *(sensor_msg.add_robot_status_msgs()) = *robot_status_msg_id_1;
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
     EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
 }
 
@@ -323,14 +323,14 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_1_at_a_time
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg_1.add_robot_status_msgs())  = *robot_status_msg_id_1;
-    sensor_fusion.updateWorld(sensor_msg_1);
+    sensor_fusion.processSensorProto(sensor_msg_1);
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result_1 = *sensor_fusion.getWorld();
     // TODO (Issue #1276): Add checks on the state of World
     SensorProto sensor_msg_2;
     *(sensor_msg_2.add_robot_status_msgs()) = *robot_status_msg_id_2;
-    sensor_fusion.updateWorld(sensor_msg_2);
+    sensor_fusion.processSensorProto(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     // TODO (Issue #1276): Add checks on the state of World
 }
@@ -341,7 +341,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg_1.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    sensor_fusion.updateWorld(sensor_msg_1);
+    sensor_fusion.processSensorProto(sensor_msg_1);
     EXPECT_NE(std::nullopt, sensor_fusion.getWorld());
     ASSERT_TRUE(sensor_fusion.getWorld());
     World result_1 = *sensor_fusion.getWorld();
@@ -349,7 +349,7 @@ TEST_F(SensorFusionTest, test_complete_wrapper_with_robot_status_msg_2_at_a_time
     SensorProto sensor_msg_2;
     *(sensor_msg_2.add_robot_status_msgs()) = *robot_status_msg_id_1;
     *(sensor_msg_2.add_robot_status_msgs()) = *robot_status_msg_id_2;
-    sensor_fusion.updateWorld(sensor_msg_2);
+    sensor_fusion.processSensorProto(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     // TODO (Issue #1276): Add checks on the state of World
 }
@@ -368,13 +368,13 @@ TEST_F(SensorFusionTest, test_referee_yellow_then_normal)
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
     *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_yellow;
-    sensor_fusion.updateWorld(sensor_msg_1);
+    sensor_fusion.processSensorProto(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
     SensorProto sensor_msg_2;
     *(sensor_msg_2.mutable_ssl_referee_msg()) = *referee_normal_start;
-    sensor_fusion.updateWorld(sensor_msg_2);
+    sensor_fusion.processSensorProto(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_2, result_2.gameState());
 }
@@ -393,13 +393,13 @@ TEST_F(SensorFusionTest, test_referee_blue_then_normal)
     // set vision msg so that world is valid
     *(sensor_msg_1.mutable_ssl_vision_msg())  = *ssl_wrapper_packet;
     *(sensor_msg_1.mutable_ssl_referee_msg()) = *referee_indirect_blue;
-    sensor_fusion.updateWorld(sensor_msg_1);
+    sensor_fusion.processSensorProto(sensor_msg_1);
     World result_1 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_1, result_1.gameState());
 
     SensorProto sensor_msg_2;
     *(sensor_msg_2.mutable_ssl_referee_msg()) = *referee_normal_start;
-    sensor_fusion.updateWorld(sensor_msg_2);
+    sensor_fusion.processSensorProto(sensor_msg_2);
     World result_2 = *sensor_fusion.getWorld();
     EXPECT_EQ(expected_2, result_2.gameState());
 }
@@ -416,7 +416,7 @@ TEST_F(SensorFusionTest, ball_placement_friendly_set_by_referee)
     // set vision msg so that world is valid
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
     World result = *sensor_fusion.getWorld();
 
     Point returned_point = result.gameState().getBallPlacementPoint().value();
@@ -435,7 +435,7 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
     // set vision msg so that world is valid
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
     World result = *sensor_fusion.getWorld();
 
     // ball placement is only set when the Referee command is for friendly team

@@ -31,11 +31,12 @@ class SensorFusion
     virtual ~SensorFusion() = default;
 
     /**
-     * Updates components of world based on a new data
+     * Processes a new SensorProto, which may update the latest representation of the
+     * World
      *
      * @param new data
      */
-    void updateWorld(const SensorProto &sensor_msg);
+    void processSensorProto(const SensorProto &sensor_msg);
 
     /**
      * Returns the most up-to-date world if enough data has been received

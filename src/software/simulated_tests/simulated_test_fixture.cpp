@@ -142,7 +142,7 @@ void SimulatedTestFixture::updateSensorFusion()
     auto sensor_msg                        = SensorProto();
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
 }
 
 void SimulatedTestFixture::sleep(

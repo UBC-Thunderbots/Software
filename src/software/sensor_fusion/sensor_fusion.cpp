@@ -40,7 +40,7 @@ std::optional<World> SensorFusion::getWorld() const
     }
 }
 
-void SensorFusion::updateWorld(const SensorProto &sensor_msg)
+void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {
@@ -113,7 +113,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    // TODO (issue #1149): incorporate RobotStatus into world and update world
+    // TODO (#1819): Update robot capabilities based on robot status msgs
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
