@@ -21,5 +21,7 @@ class KickoffChipTactic : public ChipTactic
 
     KickoffChipTactic() = delete;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void updateWorldParams(const World& world) override;
+
+    void accept(TacticVisitor& visitor) override;
 };
