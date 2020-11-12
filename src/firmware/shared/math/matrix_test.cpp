@@ -95,8 +95,8 @@ TEST(MatrixTest, testCreateSetMatrixValues)
 
     float matrix_values_new[3][4] = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
 
-    float* p_values_new[] = {matrix_values_new[0], matrix_values_new[1], matrix_values_new[2],
-                         matrix_values_new[3]};
+    float* p_values_new[] = {matrix_values_new[0], matrix_values_new[1],
+                             matrix_values_new[2], matrix_values_new[3]};
     shared_matrix_setValues(matrix, p_values_new);
 
     EXPECT_EQ(shared_matrix_getValueAtIndex(1, 1, matrix), 1);

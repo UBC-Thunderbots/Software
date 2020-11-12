@@ -25,10 +25,10 @@ Matrix_t* shared_matrix_createBlank(unsigned int n_rows, unsigned int n_cols)
     return matrix;
 }
 
-void shared_matrix_setValues(Matrix_t* matrix, float** values) {
-
+void shared_matrix_setValues(Matrix_t* matrix, float** values)
+{
     const unsigned int num_columns = matrix->n_cols;
-    const unsigned int num_rows = matrix->n_rows;
+    const unsigned int num_rows    = matrix->n_rows;
 
     for (unsigned int row = 1; row <= num_rows; row++)
     {
@@ -65,7 +65,8 @@ Matrix_t* shared_matrix_multiply(Matrix_t* A, Matrix_t* B)
 
 Matrix_t* shared_matrix_transpose(Matrix_t* in_matrix)
 {
-    Matrix_t* out_matrix = shared_matrix_createBlank(in_matrix->n_cols, in_matrix->n_rows);
+    Matrix_t* out_matrix =
+        shared_matrix_createBlank(in_matrix->n_cols, in_matrix->n_rows);
     for (unsigned int i = 0; i < in_matrix->n_rows; i++)
     {
         for (unsigned int j = 0; j < in_matrix->n_cols; j++)
