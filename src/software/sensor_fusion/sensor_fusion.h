@@ -97,6 +97,18 @@ class SensorFusion
     BallDetection invert(BallDetection ball_detection) const;
 
     /**
+     * Checks for a vision reset and if there is one, then reset SensorFusion
+     *
+     * @param t_capture The t_capture of a new packet
+     */
+    void checkForVisionReset(double t_capture);
+
+    /**
+     * Resets the world components to initial state
+     */
+    void resetWorldComponents();
+
+    /**
      * Determines if the team has control over the given ball
      *
      * @param team The team to check
@@ -119,4 +131,11 @@ class SensorFusion
     RobotTeamFilter enemy_team_filter;
 
     TeamSide team_with_possession;
+
+    // Number of vision packets to indicate that the vision client most likely reset,
+    // determined experimentally with the simulator
+    const unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
+    // Vision packets before this threshold time indicate that the vision client has just
+    // started, determined experimentally with the simulator
+    const double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
 };
