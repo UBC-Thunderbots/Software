@@ -111,7 +111,6 @@ cc_library(
         ":intercept",
         ":possession",
         ":shot",
-        ":team",
         "//shared:constants",
         "//software/geom/algorithms",
         "//software/world",
@@ -174,10 +173,10 @@ cc_library(
     deps = [
         ":intercept",
         ":shot",
-        ":team",
         "//software/world:ball",
         "//software/world:field",
         "//software/world:robot",
+        "//software/world:team",
     ],
 )
 

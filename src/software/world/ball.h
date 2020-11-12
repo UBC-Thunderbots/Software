@@ -94,15 +94,16 @@ class Ball final
 
 
     /**
-     * Software approximation that finds if a ball has been kicked, regardless of whether the
-     * kick was a pass, shot, or chip.
+     * Software approximation that finds if a ball has been kicked, regardless of whether
+     * the kick was a pass, shot, or chip.
      *
      * @param expected_kick_direction The direction that we expect the ball to be kicked
      * towards
-     * @param min_kick_speed The minimum speed of the ball to be considered a kick, in metres
-     * per second
+     * @param min_kick_speed The minimum speed of the ball to be considered a kick, in
+     * metres per second
      *
-     * @return True if ball was kicked in the approximate direction we expect, false otherwise
+     * @return True if ball was kicked in the approximate direction we expect, false
+     * otherwise
      */
     bool hasBallBeenKicked(const Angle &expected_kick_direction,
                            double min_kick_speed = 0.5) const;

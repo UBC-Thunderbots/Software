@@ -73,7 +73,7 @@ bool Ball::hasBallBeenKicked(const Angle &expected_kick_direction,
     static constexpr Angle MAX_ANGLE_DIFFERENCE = Angle::fromDegrees(20);
 
     Angle kick_orientation_difference =
-            velocity().orientation().minDiff(expected_kick_direction);
+        velocity().orientation().minDiff(expected_kick_direction);
 
     return (kick_orientation_difference.abs() < MAX_ANGLE_DIFFERENCE &&
             velocity().length() > min_kick_speed);

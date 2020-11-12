@@ -372,7 +372,7 @@ TEST(BallInFriendlyHalfTest, ball_barely_in_friendly_half)
 TEST(BallInFriendlyHalfTest, ball_at_friendly_corner)
 {
     Field field = Field::createSSLDivisionBField();
-    Point p = field.friendlyCornerNeg();
+    Point p     = field.friendlyCornerNeg();
 
     EXPECT_TRUE(field.pointInFriendlyHalf(p));
 }
@@ -404,7 +404,7 @@ TEST(BallInEnemyHalfTest, ball_barely_in_enemy_half)
 TEST(BallInEnemyHalfTest, ball_at_enemy_corner)
 {
     Field field = Field::createSSLDivisionBField();
-    Point p = field.enemyCornerNeg();
+    Point p     = field.enemyCornerNeg();
 
     EXPECT_TRUE(field.pointInEnemyHalf(p));
 }
@@ -444,7 +444,7 @@ class BallPositionsInEnemyCornerOffField : public ::testing::TestWithParam<Point
 TEST_P(BallPositionsInFriendlyCornerOnField, in_corner_inside_field)
 {
     Field field = Field::createSSLDivisionBField();
-    Point p = GetParam();
+    Point p     = GetParam();
 
     EXPECT_FALSE(field.pointInEnemyCorner(p, 2.0));
     EXPECT_TRUE(field.pointInFriendlyCorner(p, 2.0));
@@ -460,7 +460,7 @@ INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInFriendlyCornerOnField,
 TEST_P(BallPositionsInFriendlyCornerOffField, in_corner_outside_field)
 {
     Field field = Field::createSSLDivisionBField();
-    Point p = GetParam();
+    Point p     = GetParam();
 
     EXPECT_FALSE(field.pointInFriendlyCorner(p, 1.0));
     EXPECT_FALSE(field.pointInEnemyCorner(p, 1.0));
@@ -474,7 +474,7 @@ INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInFriendlyCornerOffField,
 TEST_P(BallPositionsInEnemyCornerOnField, in_corner_inside_field)
 {
     Field field = Field::createSSLDivisionBField();
-    Point p = GetParam();
+    Point p     = GetParam();
 
     EXPECT_TRUE(field.pointInEnemyCorner(p, 2.0));
     EXPECT_FALSE(field.pointInFriendlyCorner(p, 2.0));
@@ -490,7 +490,7 @@ INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInEnemyCornerOnField,
 TEST_P(BallPositionsInEnemyCornerOffField, in_corner_outside_field)
 {
     Field field = Field::createSSLDivisionBField();
-    Point p = GetParam();
+    Point p     = GetParam();
 
     EXPECT_FALSE(field.pointInEnemyCorner(p, 1.0));
     EXPECT_FALSE(field.pointInFriendlyCorner(p, 1.0));
