@@ -7,8 +7,29 @@ on:
     branches: [ master ]
 
 jobs:
+  diff-check:
+    name: Check for Software and/or Firmware Changes
+    outputs:
+      run_software_tests: ${{ steps.check_files.outputs.run_software_tests }}
+      run_firmware_tests: ${{ steps.check_files.outputs.run_fimrware_tests }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check files
+        id: check_files
+        run: |
+          if "${GITHUB_WORKSPACE}"/.travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware\|software\|environment_setup";
+          then echo "::set-output name=run_software_tests::true"; else echo "::set-output name=run_software_tests::true"; fi
+          
+          if "${GITHUB_WORKSPACE}"/.travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware_new/boards\|firmware/boards\|environment_setup";
+          then echo "::set-output name=run_firmware_tests::true"; else echo "::set-output name=run_firmware_tests::true"; fi
+            
   formatting-check:
+    name: Formatting Check
     runs-on: ubuntu-18.04
+    
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -22,7 +43,11 @@ jobs:
           ./formatting_scripts/check_formatting_ci.sh
           
   software-tests:
+    name: Software Tests
     runs-on: ubuntu-18.04
+    needs: diff-check
+    if: steps.check_files.outputs.run_software_tests == 'true'
+    
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -54,7 +79,10 @@ jobs:
           directory: ${GITHUB_WORKSPACE}/src/bazel-testlogs
              
   firmware-tests:
+    name: Firmware Tests
     runs-on: ubuntu-18.04
+    needs: diff-check
+    if: steps.check_files.outputs.run_firmware_tests == 'true'
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -80,7 +108,10 @@ jobs:
          bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin         
              
   simulated-gameplay-tests:
+    name: Simulated Gameplay Tests
     runs-on: ubuntu-18.04
+    needs: diff-check
+    if: steps.check_files.outputs.run_software_tests == 'true'
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -95,7 +126,10 @@ jobs:
           bazel test //software/simulated_tests/...
           
   memory-leak-checks:
+    name: Memory Leak Checks
     runs-on: ubuntu-18.04
+    needs: diff-check
+    if: steps.check_files.outputs.run_software_tests == 'true'
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
