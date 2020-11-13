@@ -45,7 +45,7 @@ jobs:
   software-tests:
     name: Software Tests
     needs: diff-check
-    if: steps.check_files.outputs.run_software_tests == 'true'
+    if: needs.diff_check.outputs.run_software_tests == 'true'
     runs-on: ubuntu-18.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
@@ -81,7 +81,7 @@ jobs:
     name: Firmware Tests
     runs-on: ubuntu-18.04
     needs: diff-check
-    if: steps.check_files.outputs.run_firmware_tests == 'true'
+    if: needs.diff_check.outputs.run_firmware_tests == 'true'
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -110,7 +110,7 @@ jobs:
     name: Simulated Gameplay Tests
     runs-on: ubuntu-18.04
     needs: diff-check
-    if: steps.check_files.outputs.run_software_tests == 'true'
+    if: needs.diff_check.outputs.run_software_tests == 'true'
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -128,7 +128,7 @@ jobs:
     name: Memory Leak Checks
     runs-on: ubuntu-18.04
     needs: diff-check
-    if: steps.check_files.outputs.run_software_tests == 'true'
+    if: needs.diff_check.outputs.run_software_tests == 'true'
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
