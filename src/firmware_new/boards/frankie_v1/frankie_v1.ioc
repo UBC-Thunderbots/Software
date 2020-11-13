@@ -1,5 +1,10 @@
 #MicroXplorer Configuration settings - do not modify
+<<<<<<< HEAD
 #LWIP0.BSP.mode=
+=======
+LWIP0.BSP.mode=
+FREERTOS.Queues01=RobotLogProtoQ,16,TbotsProto_RobotLog,0,Dynamic,NULL,NULL
+>>>>>>> d3cb8535b42f4e950b7445c66243ea112370a42a
 LWIP.LWIP_MULTICAST_TX_OPTIONS=0
 PB13.GPIOParameters=GPIO_Label
 RCC.USART1Freq_Value=108000000
@@ -129,7 +134,7 @@ RCC.PLLQoutputFreq_Value=48000000
 ProjectManager.ProjectFileName=frankie_v1.ioc
 RCC.ADC12outputFreq_Value=72000000
 RCC.DIVQ1=4
-FREERTOS.Tasks01=NetStartTask,47,1024,io_proto_multicast_startNetworkingTask,As weak,NULL,Dynamic,NULL,NULL;RobotStatusTask,47,1024,io_proto_multicast_sender_task,As external,(void *)robot_status_msg_sender_profile,Dynamic,NULL,NULL;VisionMsgTask,47,1024,io_proto_multicast_listener_task,As external,(void *)vision_msg_listener_profile,Dynamic,NULL,NULL;PrimMsgTask,47,1024,io_proto_multicast_listener_task,As external,(void *)primitive_msg_listener_profile,Dynamic,NULL,NULL;testMsgUpdate,25,1024,test_msg_update,Default,(void *)robot_status_msg_sender_profile,Dynamic,NULL,NULL
+FREERTOS.Tasks01=NetStartTask,24,1024,io_proto_multicast_startNetworkingTask,As weak,NULL,Dynamic,NULL,NULL;RobotStatusTask,24,1024,io_proto_multicast_sender_task,As external,(void *)robot_status_msg_sender_profile,Dynamic,NULL,NULL;VisionMsgTask,24,1024,io_proto_multicast_listener_task,As external,(void *)vision_msg_listener_profile,Dynamic,NULL,NULL;PrimMsgTask,24,1024,io_proto_multicast_listener_task,As external,(void *)primitive_msg_listener_profile,Dynamic,NULL,NULL;testMsgUpdate,24,1024,test_msg_update,Default,(void *)robot_status_msg_sender_profile,Dynamic,NULL,NULL;RobotLogMsgSend,24,1024,io_proto_multicast_sender_task,As external,(void *)robot_log_msg_sender_profile,Dynamic,NULL,NULL;NetworkRobotLog,25,1024,io_network_logger_task,As external,(void*)robot_log_msg_sender_profile,Dynamic,NULL,NULL
 LWIP0.BSP.i2caddr=0
 PD9.GPIO_Label=STLK_TX [STM32F103CBT6_PA2]
 RCC.HPREFreq_Value=96000000
@@ -373,7 +378,7 @@ Mcu.Pin7=PF4
 Mcu.Pin8=PF5
 Mcu.Pin9=PF6
 RCC.VCOSAIOutputFreq_Value=192000000
-FREERTOS.IPParameters=Tasks01,configMINIMAL_STACK_SIZE,FootprintOK,configTOTAL_HEAP_SIZE
+FREERTOS.IPParameters=Tasks01,configMINIMAL_STACK_SIZE,FootprintOK,configTOTAL_HEAP_SIZE,Queues01
 RCC.AHBFreq_Value=216000000
 RCC.TIM2Freq_Value=72000000
 Mcu.Pin0=PC13
@@ -406,7 +411,7 @@ PG13.Mode=RMII
 LWIP0.BSP.solution=LAN8742
 LWIP.LWIP_BROADCAST_PING=1
 PB6.GPIOParameters=GPIO_Label
-FREERTOS.configTOTAL_HEAP_SIZE=30720
+FREERTOS.configTOTAL_HEAP_SIZE=80720
 ProjectManager.ProjectName=frankie_v1
 RCC.APB3Freq_Value=96000000
 LWIP0.BSP.i2creg=

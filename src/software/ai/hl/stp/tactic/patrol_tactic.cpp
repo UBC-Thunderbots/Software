@@ -18,6 +18,8 @@ PatrolTactic::PatrolTactic(const std::vector<Point> &points,
 {
 }
 
+void PatrolTactic::updateWorldParams(const World &world) {}
+
 double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     if (patrol_points.empty())
@@ -83,7 +85,7 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (true);
 }
 
-void PatrolTactic::accept(MutableTacticVisitor &visitor)
+void PatrolTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

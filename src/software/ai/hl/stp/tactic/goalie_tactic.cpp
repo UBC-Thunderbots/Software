@@ -103,14 +103,12 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     }
 }
 
-void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
-                                     const Team &friendly_team, const Team &enemy_team)
+void GoalieTactic::updateWorldParams(const World &world)
 {
-    // Update the world parameters stored by this Tactic
-    this->ball          = ball;
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
+    this->ball          = world.ball();
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
 }
 
 bool GoalieTactic::isGoalieTactic() const
@@ -303,7 +301,7 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void GoalieTactic::accept(MutableTacticVisitor &visitor)
+void GoalieTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

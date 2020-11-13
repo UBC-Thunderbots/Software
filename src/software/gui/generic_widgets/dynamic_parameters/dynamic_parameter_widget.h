@@ -4,7 +4,10 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
+#include "software/gui/generic_widgets/slider/slider.h"
 #include "software/parameter/dynamic_parameters.h"
+#include "software/parameter/enumerated_parameter.h"
+#include "software/parameter/numeric_parameter.h"
 #include "software/parameter/parameter.h"
 
 /**
@@ -16,7 +19,7 @@ class DynamicParameterWidget : public QScrollArea
     Q_OBJECT
 
    public:
-    explicit DynamicParameterWidget(QWidget* parent = 0);
+    explicit DynamicParameterWidget(QWidget* parent = nullptr);
 
     /**
      * A helper function to recursively setup all parameters and sub-configs of the given
@@ -25,6 +28,16 @@ class DynamicParameterWidget : public QScrollArea
      * @param config The config to setup
      */
     void setupParameters(std::shared_ptr<Config> config);
+
+   private:
+    /**
+     * Creates a widget that contains a label for a Config
+     *
+     * @param config The Config to make a label for
+     *
+     * @return A pointer to the QWidget that will be used to show the label
+     */
+    QWidget* createConfigLabel(std::shared_ptr<Config> config);
 
    private:
     /**
