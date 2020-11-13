@@ -44,10 +44,9 @@ jobs:
           
   software-tests:
     name: Software Tests
-    runs-on: ubuntu-18.04
     needs: diff-check
     if: steps.check_files.outputs.run_software_tests == 'true'
-    
+    runs-on: ubuntu-18.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
