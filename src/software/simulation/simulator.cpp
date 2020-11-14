@@ -329,7 +329,7 @@ void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
 
 float Simulator::getCurrentFirmwareTimeSeconds()
 {
-    return static_cast<float>(current_firmware_time.getSeconds());
+    return static_cast<float>(current_firmware_time.toSeconds());
 }
 
 // We must give this variable a value here, as non-const static variables must be

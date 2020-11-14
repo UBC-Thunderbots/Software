@@ -85,7 +85,7 @@ void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
         .orientation_profile = {.coefficients = {0, 0,
                                                  fmodf(destination_orientation -
                                                            current_orientation,
-                                                       (float)M_PI),
+                                                       (float)(2*M_PI)),
                                                  current_orientation}},
         .t_start             = 0,
         .t_end               = 1.0f,
