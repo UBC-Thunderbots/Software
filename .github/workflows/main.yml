@@ -20,12 +20,10 @@ jobs:
       - name: Check files
         id: check_files
         run: |
-          if "${GITHUB_WORKSPACE}"/.travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware\|software\|environment_setup";
-          then echo "::set-output name=run_software_tests::true"; else echo "::set-output name=run_software_tests::false"; fi
-          
-          if "${GITHUB_WORKSPACE}"/.travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware_new/boards\|firmware/boards\|environment_setup";
-          then echo "::set-output name=run_firmware_tests::true"; else echo "::set-output name=run_firmware_tests::false"; fi
-          
+            git fetch origin $GITHUB_BASE_REF --depth=1
+            git diff --name-only origin/$GITHUB_BASE_REF... | grep -qvE '(firmware\|software\|environment_setup)' && echo '::set-output name=run_software_tests::true'
+            git diff --name-only origin/$GITHUB_BASE_REF... | grep -qvE '(firmware_new/boards\|firmware/boards\|environment_setup)' && echo '::set-output name=run_firmware_tests::true'
+ 
   software-tests:
     name: Software Tests
     needs: diff-check
