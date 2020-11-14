@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/logger/logger.h"
@@ -22,15 +21,14 @@ DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
 {
 }
 
-void DefenseShadowEnemyTactic::updateWorldParams(const Field &field,
-                                                 const Team &friendly_team,
-                                                 const Team &enemy_team, const Ball &ball)
+void DefenseShadowEnemyTactic::updateWorldParams(const World &world)
 {
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-    this->ball          = ball;
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
+
 
 void DefenseShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_threat)
 {
@@ -75,8 +73,8 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         }
 
         auto best_enemy_shot_opt =
-            calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, enemy_robot,
-                                       ROBOT_MAX_RADIUS_METERS, robots_to_ignore);
+            calcBestShotOnGoal(field, friendly_team, enemy_team, enemy_robot.position(),
+                               TeamType::FRIENDLY, robots_to_ignore);
 
         Vector enemy_shot_vector = field.friendlyGoalCenter() - enemy_robot.position();
         Point position_to_block_shot =
@@ -91,8 +89,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
 
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
-        if (*robotHasPossession(ball.getPreviousStates(),
-                                enemy_robot.getPreviousStates()) &&
+        if (enemy_robot.isNearDribbler(ball.position()) &&
             ball.velocity().length() < DynamicParameters->getAIConfig()
                                            ->getDefenseShadowEnemyTacticConfig()
                                            ->BallStealSpeed()
@@ -118,7 +115,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
     } while (!move_action->done());
 }
 
-void DefenseShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
+void DefenseShadowEnemyTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

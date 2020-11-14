@@ -8,10 +8,9 @@ cc_library(
         "//shared:constants",
         "//software/geom:point",
         "//software/geom:vector",
+        "//software/physics",
         "//software/time:timestamp",
-        "//software/world:timestamped_ball_state",
-        "//software/world/ball_model",
-        "//software/world/ball_model:two_stage_linear_ball_model",
+        "//software/world:ball_state",
     ],
 )
 
@@ -20,29 +19,6 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
-        ":timestamped_ball_state",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "timestamped_ball_state",
-    srcs = ["timestamped_ball_state.cpp"],
-    hdrs = ["timestamped_ball_state.h"],
-    deps = [
-        ":ball_state",
-        "//software/geom:point",
-        "//software/geom:vector",
-        "//software/time:timestamp",
-        "@boost//:circular_buffer",
-    ],
-)
-
-cc_test(
-    name = "timestamped_ball_state_test",
-    srcs = ["timestamped_ball_state_test.cpp"],
-    deps = [
-        ":timestamped_ball_state",
         "@gtest//:gtest_main",
     ],
 )
@@ -112,7 +88,7 @@ cc_test(
 
 cc_library(
     name = "team_colour",
-    hdrs = ["team_colour.h"],
+    hdrs = ["team_types.h"],
     deps = ["//software/util/make_enum"],
 )
 
@@ -122,7 +98,7 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         ":robot_capabilities",
-        ":timestamped_robot_state",
+        ":robot_state",
         "//software/logger",
         "//software/time:duration",
         "//software/time:timestamp",
@@ -134,30 +110,6 @@ cc_test(
     srcs = ["robot_test.cpp"],
     deps = [
         ":robot",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "timestamped_robot_state",
-    srcs = ["timestamped_robot_state.cpp"],
-    hdrs = ["timestamped_robot_state.h"],
-    deps = [
-        ":robot_state",
-        "//software/geom:angle",
-        "//software/geom:angular_velocity",
-        "//software/geom:point",
-        "//software/geom:vector",
-        "//software/time:timestamp",
-        "@boost//:circular_buffer",
-    ],
-)
-
-cc_test(
-    name = "timestamped_robot_state_test",
-    srcs = ["timestamped_robot_state_test.cpp"],
-    deps = [
-        ":timestamped_robot_state",
         "@gtest//:gtest_main",
     ],
 )
@@ -231,6 +183,7 @@ cc_library(
         ":robot",
         ":team",
         "//software/parameter:dynamic_parameters",
+        "@boost//:circular_buffer",
     ],
 )
 

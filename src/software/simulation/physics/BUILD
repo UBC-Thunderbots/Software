@@ -48,6 +48,9 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//software/geom/algorithms",
+        "//software/parameter:dynamic_parameters",
+        "//software/physics",
+        "//software/time:duration",
         "//software/world:ball_state",
         "@box2d",
     ],
@@ -58,6 +61,7 @@ cc_test(
     srcs = ["physics_ball_test.cpp"],
     deps = [
         ":physics_ball",
+        "//software/test_util",
         "//software/world:ball",
         "@box2d",
         "@gtest//:gtest_main",
@@ -128,6 +132,7 @@ cc_test(
     deps = [
         ":physics_ball",
         ":physics_robot",
+        "//software/test_util",
         "//software/time:duration",
         "//software/world:robot",
         "@box2d",
@@ -145,6 +150,7 @@ cc_library(
         "//shared:constants",
         "//software/logger",
         "//software/multithreading:thread_safe_buffer",
+        "//software/parameter:dynamic_parameters",
         "//software/simulation/physics:physics_ball",
         "//software/simulation/physics:physics_field",
         "//software/simulation/physics:physics_robot",

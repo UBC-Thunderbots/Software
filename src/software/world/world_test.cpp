@@ -67,24 +67,6 @@ TEST_F(WorldTest, get_most_recent_timestamp_from_members)
     EXPECT_EQ(world.getMostRecentTimestamp(), current_time);
 }
 
-// Test that the timestamp history is accurate
-TEST_F(WorldTest, get_timestamp_history)
-{
-    Timestamp timestamp_1 = current_time + Duration::fromSeconds(0);
-    world.updateTimestamp(timestamp_1);
-
-    Timestamp timestamp_2 = current_time + Duration::fromSeconds(1);
-    world.updateTimestamp(timestamp_2);
-
-    Timestamp timestamp_3 = current_time + Duration::fromSeconds(2);
-    world.updateTimestamp(timestamp_3);
-
-    EXPECT_EQ(world.getTimestampHistory()[3], current_time);
-    EXPECT_EQ(world.getTimestampHistory()[2], timestamp_1);
-    EXPECT_EQ(world.getTimestampHistory()[1], timestamp_2);
-    EXPECT_EQ(world.getTimestampHistory()[0], timestamp_3);
-}
-
 TEST_F(WorldTest, equality_basic_tests)
 {
     World world1 = world;
@@ -202,4 +184,12 @@ TEST_F(WorldTest, update_referee_stage)
         world.updateRefereeStage(RefereeStage::NORMAL_SECOND_HALF_PRE);
         EXPECT_EQ(world.getRefereeStage(), RefereeStage::NORMAL_SECOND_HALF_PRE);
     }
+}
+
+TEST_F(WorldTest, set_team_with_possession)
+{
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
+    EXPECT_EQ(world.getTeamWithPossession(), TeamSide::FRIENDLY);
+    world.setTeamWithPossession(TeamSide::ENEMY);
+    EXPECT_EQ(world.getTeamWithPossession(), TeamSide::ENEMY);
 }

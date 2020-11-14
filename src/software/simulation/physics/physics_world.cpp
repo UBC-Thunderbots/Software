@@ -6,15 +6,14 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
-PhysicsWorld::PhysicsWorld(const Field& field, double ball_restitution,
-                           double ball_linear_damping)
+PhysicsWorld::PhysicsWorld(const Field& field,
+                           std::shared_ptr<const SimulatorConfig> simulator_config)
     : b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
       current_timestamp(Timestamp::fromSeconds(0)),
       contact_listener(std::make_unique<SimulationContactListener>()),
       physics_field(b2_world, field),
       physics_ball(nullptr),
-      ball_restitution(ball_restitution),
-      ball_linear_damping(ball_linear_damping)
+      simulator_config(simulator_config)
 {
     b2_world->SetContactListener(contact_listener.get());
 }
@@ -78,7 +77,7 @@ const Timestamp PhysicsWorld::getTimestamp() const
 void PhysicsWorld::setBallState(const BallState& ball_state)
 {
     physics_ball = std::make_shared<PhysicsBall>(b2_world, ball_state, BALL_MASS_KG,
-                                                 ball_restitution, ball_linear_damping);
+                                                 simulator_config);
 }
 
 void PhysicsWorld::removeBall()
@@ -194,8 +193,12 @@ void PhysicsWorld::stepSimulation(const Duration& time_step)
     if (physics_ball)
     {
         physics_ball->updateIsInFlight();
+        if (!physics_ball->isInFlight())
+        {
+            physics_ball->applyBallFrictionModel(time_step);
+        }
     }
-    b2_world->Step(static_cast<float>(time_step.getSeconds()), velocity_iterations,
+    b2_world->Step(static_cast<float>(time_step.toSeconds()), velocity_iterations,
                    position_iterations);
 
     for (const auto& physics_robots : {yellow_physics_robots, blue_physics_robots})

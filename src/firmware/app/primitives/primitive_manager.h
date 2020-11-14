@@ -2,7 +2,6 @@
 
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/world/firmware_world.h"
-#include "shared/proto/primitive.nanopb.h"
 
 typedef struct PrimitiveManager PrimitiveManager_t;
 
@@ -23,11 +22,12 @@ void app_primitive_manager_destroy(PrimitiveManager_t *manager);
  * Start a new primitive with the given PrimitiveManager
  * @param manager [in/out] The PrimitiveManager to run the primitive
  * @param world [in] The world to run the primitive in
- * @param primitive_msg [in] The message representing the primitive to run
+ * @param primitive_msg The message representing the primitive to run
  */
 void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
                                              FirmwareWorld_t *world,
                                              TbotsProto_Primitive primitive_msg);
+
 /**
  * Runs the current primitive
  *

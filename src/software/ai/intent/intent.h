@@ -38,6 +38,8 @@ class Intent
      */
     explicit Intent(unsigned int robot_id, unsigned int priority);
 
+    Intent() = delete;
+
     /**
      * Returns the priority of this Intent. The priority value is an integer in the range
      * [0, 100] that indicates the priority of this Intent.

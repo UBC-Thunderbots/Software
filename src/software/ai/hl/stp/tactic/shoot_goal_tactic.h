@@ -31,16 +31,10 @@ class ShootGoalTactic : public Tactic
                              Angle min_net_open_angle, std::optional<Point> chip_target,
                              bool loop_forever);
 
-    /**
-     * Updates the world parameters for this ShootGoalTactic
-     *
-     * @param field The field being played on
-     * @param friendly_team The friendly team
-     * @param enemy_team The enemy team
-     * @param ball The ball
-     */
-    void updateWorldParams(const Field& field, const Team& friendly_team,
-                           const Team& enemy_team, const Ball& ball);
+    ShootGoalTactic() = delete;
+
+    void updateWorldParams(const World& world) override;
+
 
     /**
      * Updates the control parameters for this ShootGoalTactic
@@ -71,7 +65,7 @@ class ShootGoalTactic : public Tactic
      */
     bool hasShotAvailable() const;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) override;
 
     Ball getBall() const;
     Field getField() const;

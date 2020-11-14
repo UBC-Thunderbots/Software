@@ -107,10 +107,13 @@ const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] 
 // the port robots are listening to for vision and primitives
 const unsigned VISION_PORT    = 42069;
 const unsigned PRIMITIVE_PORT = 42070;
+
 // the port the AI receives msgs from the robot
 const unsigned ROBOT_STATUS_PORT = 42071;
+const unsigned ROBOT_LOGS_PORT   = 42072;
+
 // the port to listen to for what side of the field to defend
-const unsigned DEFENDING_SIDE_PORT = 42072;
+const unsigned DEFENDING_SIDE_PORT = 42073;
 
 // the timeout to recv a network packet
 const unsigned NETWORK_TIMEOUT_MS = 1000;
@@ -118,3 +121,11 @@ const unsigned NETWORK_TIMEOUT_MS = 1000;
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
 const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+
+// The total number of possible robot ids between two teams
+const unsigned int MAX_ROBOT_IDS = 16;
+
+// We currently have 4s batteries on the robot that charge up to a little over
+// 16V, so we use 16 here to approximate a fully-charged battery
+// Makes the battery max voltage a constant now that we are simulating firmware
+const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;

@@ -22,15 +22,9 @@ class PenaltyKickTactic : public Tactic
                                const std::optional<Robot> &enemy_goalie,
                                bool loop_forever);
 
-    /**
-     * Updates the world parameters for this PenaltyKickTactic.
-     *
-     * @param updated_ball : The ball
-     * @param enemy_goalie : Optional variable for the enemy goalie robot
-     * @param field : The Field we are playing on
-     */
-    void updateWorldParams(const Ball &updated_ball,
-                           const std::optional<Robot> &enemy_goalie, const Field &field);
+    PenaltyKickTactic() = delete;
+
+    void updateWorldParams(const World &world) override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -43,7 +37,7 @@ class PenaltyKickTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) override;
 
     Ball getBall() const;
     Field getField() const;

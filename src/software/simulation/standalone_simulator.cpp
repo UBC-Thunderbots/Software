@@ -1,5 +1,6 @@
 #include "software/simulation/standalone_simulator.h"
 
+#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/world/field.h"
 extern "C"
 {
@@ -7,9 +8,10 @@ extern "C"
 }
 
 StandaloneSimulator::StandaloneSimulator(
-    std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config)
+    std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
+    std::shared_ptr<SimulatorConfig> simulator_config)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField(), 0.8, 0.2),
+      simulator(Field::createSSLDivisionBField(), simulator_config),
       most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket())
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(
@@ -59,11 +61,11 @@ void StandaloneSimulator::initNetworking()
             static_cast<unsigned short>(
                 standalone_simulator_config->VisionPort()->value()));
     yellow_team_primitive_listener =
-        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
+        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>>(
             yellow_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1));
     blue_team_primitive_listener =
-        std::make_unique<ThreadedNanoPbPrimitiveSetMulticastListener>(
+        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>>(
             blue_team_ip, PRIMITIVE_PORT,
             boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
     yellow_team_side_listener =
@@ -130,15 +132,15 @@ SSLProto::SSL_WrapperPacket StandaloneSimulator::getSSLWrapperPacket() const
 }
 
 void StandaloneSimulator::setYellowRobotPrimitives(
-    const TbotsProto_PrimitiveSet& primitive_set_msg)
+    const TbotsProto::PrimitiveSet& primitive_set_msg)
 {
-    simulator.setYellowRobotPrimitiveSet(primitive_set_msg);
+    simulator.setYellowRobotPrimitiveSet(createNanoPbPrimitiveSet(primitive_set_msg));
 }
 
 void StandaloneSimulator::setBlueRobotPrimitives(
-    const TbotsProto_PrimitiveSet& primitive_set_msg)
+    const TbotsProto::PrimitiveSet& primitive_set_msg)
 {
-    simulator.setBlueRobotPrimitiveSet(primitive_set_msg);
+    simulator.setBlueRobotPrimitiveSet(createNanoPbPrimitiveSet(primitive_set_msg));
 }
 
 void StandaloneSimulator::startSimulation()

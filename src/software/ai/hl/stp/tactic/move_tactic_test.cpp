@@ -33,6 +33,7 @@ TEST(MoveTacticTest, robot_at_destination)
                         Timestamp::fromSeconds(0));
 
     MoveTactic tactic = MoveTactic(false);
+
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Angle::zero(), 0.0);
 
@@ -58,6 +59,7 @@ TEST(MoveTacticTest, test_calculate_robot_cost)
                         Timestamp::fromSeconds(0));
 
     MoveTactic tactic = MoveTactic(false);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(Point(3, -4), Angle::zero(), 0.0);
 
     EXPECT_EQ(5 / world.field().totalXLength(), tactic.calculateRobotCost(robot, world));

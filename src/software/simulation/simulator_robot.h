@@ -40,6 +40,11 @@ class SimulatorRobot
      */
     unsigned int getRobotId();
 
+    /**
+     * Clears balls tracked as being in dribbler area
+     */
+    void clearBallInDribblerArea();
+
    protected:
     /**
      * Returns the x-position of the robot, in global field coordinates, in meters
@@ -221,15 +226,6 @@ class SimulatorRobot
    private:
     /**
      * A function that is called during every physics step for as long as the ball
-     * is touching this robot's chicker
-     *
-     * @param physics_robot The robot involved in the contact
-     * @param physics_ball The ball invovled in the contact
-     */
-    void onChickerBallContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
-
-    /**
-     * A function that is called during every physics step for as long as the ball
      * is touching this robot's dribbler
      *
      * @param physics_robot The robot involved in the contact
@@ -270,6 +266,15 @@ class SimulatorRobot
     unsigned int checkValidAndReturnUint(
         std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
 
+    /**
+     * Applies force to the physics ball to simulate it being dribbled by the
+     * physics robot.
+     *
+     * @param physics_robot The robot that should dribble the ball
+     * @param physics_ball The ball to be dribbled
+     */
+    void applyDribblerForce(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
+
     std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<float> autokick_speed_m_per_s;
     std::optional<float> autochip_distance_m;
@@ -278,13 +283,16 @@ class SimulatorRobot
     typedef struct DribblerBall_t
     {
         PhysicsBall* ball;
-        // We keep track of whether or not the ball can be kicked.
-        // This extra information is used to prevent edge cases like
-        // the ball getting kicked/chipped multiple times.
-        bool can_be_chicked;
+        // We keep track of whether or not the ball can be controlled
+        // in any way by the robot. This includes kicking, chipping,
+        // and dribbling. This extra information is used to
+        // prevent edge cases like the ball getting kicked/chipped
+        // multiple times, and to prevent the dribbler from affecting
+        // kicking
+        bool can_be_controlled;
     } DribblerBall;
 
-    std::vector<DribblerBall> balls_in_dribbler_area;
+    std::optional<DribblerBall> ball_in_dribbler_area;
 
     std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter> primitive_manager;
 

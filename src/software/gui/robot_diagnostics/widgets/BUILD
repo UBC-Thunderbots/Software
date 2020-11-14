@@ -17,6 +17,8 @@ qt_cc_library(
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/multithreading:thread_safe_buffer",
         "//software/proto:sensor_msg_cc_proto",
+        "//software/proto/message_translation:tbots_geometry",
+        "//software/proto/message_translation:tbots_protobuf",
         "@boost//:bind",
         "@qt//:qt_widgets",
     ],
@@ -27,7 +29,7 @@ qt_cc_library(
     src = "chicker.cpp",
     hdr = "chicker.h",
     deps = [
-        ":slider",
+        "//software/gui/generic_widgets/slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/util/make_enum",
         "@qt//:qt_widgets",
@@ -39,7 +41,7 @@ qt_cc_library(
     src = "dribbler.cpp",
     hdr = "dribbler.h",
     deps = [
-        ":slider",
+        "//software/gui/generic_widgets/slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",
     ],
@@ -50,7 +52,7 @@ qt_cc_library(
     src = "drive.cpp",
     hdr = "drive.h",
     deps = [
-        ":slider",
+        "//software/gui/generic_widgets/slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/util/make_enum",
         "@qt//:qt_widgets",
@@ -62,7 +64,7 @@ qt_cc_library(
     src = "sensor_status.cpp",
     hdr = "sensor_status.h",
     deps = [
-        ":progress_bar",
+        ":decimal_progress_bar",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",
@@ -92,21 +94,10 @@ qt_cc_library(
 )
 
 qt_cc_library(
-    name = "slider",
-    src = "slider.cpp",
-    hdr = "slider.h",
+    name = "decimal_progress_bar",
+    src = "decimal_progress_bar.cpp",
+    hdr = "decimal_progress_bar.h",
     deps = [
-        "//software/gui/robot_diagnostics/ui:main_widget",
-        "@qt//:qt_widgets",
-    ],
-)
-
-qt_cc_library(
-    name = "progress_bar",
-    src = "progress_bar.cpp",
-    hdr = "progress_bar.h",
-    deps = [
-        "//software/gui/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",
     ],
 )

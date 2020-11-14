@@ -49,11 +49,11 @@ For each Issue of project you are working on, you should have a separate branch.
 
 1. Navigate to the base folder of your Software repository: `cd path/to/the/repository/Software`
 2. Make git aware of any new changes to `upstream` by running `git fetch upstream`
-3. Create a new branch from `upstream/master` by running `git checkout -b your-branch-name upstream/master`
+3. Create a new branch from `upstream/master` by running `git checkout upstream/master` then `git checkout -b your-branch-name`
    1. Our branch naming convention is: `your_name/branch_name` (all lowercase, words separated by underscores). The branch name should be short and descriptive of the work being done on the branch.
    
 **Example:** if you were working on a new navigation system using RRT and your name was "Bob" your branch name might look like: `bob/new_rrt_navigator`
-4. You can now commit changes to this branch, and push them to your fork with `git push origin your_branch_name`
+4. You can now commit changes to this branch, and push them to your fork with `git push origin your_branch_name` or `git push -u`
 
 #### Why should you only create branches from "upstream/master"? 
 Because we squash our commits when we merge Pull requests, a new commit with a new hash will be created, containing the multiple commits from the PR branch. Because the hashes are different, git will not recognize that the squashed commit and the series of commits that are inside the squashed commit contain the same changes, which can result in conflicts.
@@ -75,9 +75,9 @@ As you are working on your code on your branch and making commits, you'll want t
 
 To do this, you have 2 options: rebase or merge. [What's the difference?](https://www.atlassian.com/git/tutorials/merging-vs-rebasing). 
 
-Rebasing is generally recommended but requires slightly more knowledge of git. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`. If you do find you run into crazy conflicts, it might be worth aborting and attempting a merge.
+Merging is generally recommended, because it is easier to handle conflicts and get stuff working. To merge, simply run `git pull upstream master`.
 
-To merge, simply run `git pull upstream master`. This _usually_ produces fewer conflicts than rebasing and is a safer option if you just want to get stuff working.
+Rebasing requires more knowledge of git and can cause crazy merge conflicts, so it isn't recommended. You can simply `git pull --rebase upstream master` to rebase your branch onto the latest `upstream/master`.
 
 If you do rebase or merge and get conflicts, you'll need to resolve them manually. [See here for a quick tutorials on what conflicts are and how to resolve them](https://www.atlassian.com/git/tutorials/using-branches/merge-conflicts). Feel free to do this in your IDE or with whatever tool you are most comfortable with. Updating your branch often helps keep conflicts to a minimum, and when they do appear they are usually smaller. Ask for help if you're really stuck!
 
@@ -87,6 +87,7 @@ We use [clang-format](https://electronjs.org/docs/development/clang-format) to a
 To format the code, from the `Software` directory run `./formatting_scripts/fix_formatting.sh`.
 
 We recommend running the formatting script and then committing all your changes, so that your commits can more easily pass CI.
+
 ### Pull Requests
 
 Pull Requests give us a chance to run our automated tests and review the code before it gets merged. This helps us make sure our code on `upstream/master` always compiles and is as bug-free as possible.
@@ -107,10 +108,10 @@ The Pull Request process usually looks like the following:
 9. Click "Create pull request"
 10. Now the code can be reviewed. Respond to feedback given by your team members and make changes as necessary by pushing additional commits to your branch.
     1. **If you are a reviewer:**
-       1. Look over the code, keeping an eye out for typos or bugs
+       1. Look over the code, keeping an eye out for typos, bugs, or improper [code style](code-style-guide.md)
        2. If you are having trouble understanding what a certain part of the code is doing, that's a great place to suggest adding additional comments!
-       3. Remember you are critiquing someone's work. Give useful, constructive feedback and justify your thoughts, and don't be mean or degrading.
-       4. During re-reviews (Pull Requests typically involve several rounds of changes and review), **it is your responsability to check that previously requested changes were made and mark the relevant discussions as "resolved"**. "Unresolved" discussions make a great checklist of things to check during a re-review.
+       3. Remember you are critiquing someone's work. Give useful, constructive feedback and justify your thoughts, and don't be mean or degrading. Try to provide a suggested solution where possible.
+       4. During re-reviews (Pull Requests typically involve several rounds of changes and review), **it is your responsibility to check that previously requested changes were made and mark the relevant discussions as "resolved"**. "Unresolved" discussions make a great checklist of things to check during a re-review.
        5. Mark the Pull Request as "Approved" when you think it looks good
     2. **If you are the recipient of the review (the PR creator):**
        1. **Make sure to reply to the PR comments as you address / fix issues**. This helps the reviewers know you have made a change without having to go check the code diffs to see if you made a change.
@@ -118,6 +119,7 @@ The Pull Request process usually looks like the following:
           2. Leave comments unresolved, let the reviewer resolve them.
        2. Don't be afraid to ask for clarification regarding changes or suggest alternatives if you don't agree with what was suggested. The reviewers and reviewee should work together to come up with the best solution.
        3. **Do not resolve conversations as you address them** (but make sure to leave a comment as mentioned above). That is the responsibility of the reviewers.
+       4. Once you have addressed all the comments, re-request review from reviewers.
 11. Make sure our automated tests with Travis CI are passing. There will be an indicator near the bottom of the Pull Request. If something fails, you can click on the links provided to get more information and debug the problems. More than likely, you'll just need to re-run clang-format on the code.
 12. Once your Pull Request has been approved and the automated tests pass, you can merge the code. There will be a big 'merge" button at the bottom of the Pull Request with several options to choose from
     1. We only allow "Squash and merge". This is because it keep the commit history on `upstream/master` shorter and cleaner, without losing any context from the commit messages (since they are combined in the squashed commit. A squashed commit also makes it easier to revert and entire change/feature, rather than having to "know" the range of commits to revert.

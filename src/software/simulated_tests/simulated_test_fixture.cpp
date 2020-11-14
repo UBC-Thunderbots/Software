@@ -154,7 +154,7 @@ void SimulatedTestFixture::sleep(
         std::chrono::duration_cast<std::chrono::milliseconds>(wall_time_now -
                                                               wall_start_time);
     auto ms_to_sleep = std::chrono::milliseconds(
-                           static_cast<int>(desired_wall_tick_time.getMilliseconds())) -
+                           static_cast<int>(desired_wall_tick_time.toMilliseconds())) -
                        current_tick_wall_time_duration;
     if (ms_to_sleep > std::chrono::milliseconds(0))
     {
@@ -193,8 +193,8 @@ void SimulatedTestFixture::runTest(
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
-    const Duration ai_time_step = Duration::fromSeconds(
-        simulation_time_step.getSeconds() * CAMERA_FRAMES_PER_AI_TICK);
+    const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
+                                                        CAMERA_FRAMES_PER_AI_TICK);
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {

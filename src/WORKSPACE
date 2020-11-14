@@ -94,6 +94,14 @@ git_repository(
     shallow_since = "1549966854 -0800",
 )
 
+# Fake Function Framework
+new_git_repository(
+    name = "fff",
+    build_file = "@//external:fff.BUILD",
+    commit = "7e09f07e5b262b1cc826189dc5057379e40ce886",
+    remote = "https://github.com/meekrosoft/fff.git",
+)
+
 # Right now qt5 is installed on the system using the setup_software.sh script
 # We assume we can find the headers in the "standard" path used in this rule
 new_local_repository(
@@ -106,6 +114,13 @@ new_local_repository(
     name = "linux_gcc",
     build_file = "@//external:linux_gcc.BUILD",
     path = "/",
+)
+
+# libclang-dev is installed into the system through setup_software.sh
+new_local_repository(
+    name = "libclang",
+    build_file = "@//external:libclang.BUILD",
+    path = "/usr/lib/llvm-6.0/",
 )
 
 http_archive(
@@ -202,7 +217,7 @@ pip_install()
 
 pip3_import(
     name = "dynamic_parameter_deps",
-    requirements = "//shared/parameter_v2/scripts:requirements.txt",
+    requirements = "//shared/parameter_v2/generation_scripts:requirements.txt",
 )
 
 load("@dynamic_parameter_deps//:requirements.bzl", "pip_install")

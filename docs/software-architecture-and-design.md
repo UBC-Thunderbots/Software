@@ -10,10 +10,11 @@
     * [Robot](#robot)
     * [Ball](#ball)
     * [Field](#field)
-    * [Gamestate](#gamestate)
-  * [Primitives](#primitives)
+    * [GameState](#gamestate)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
+* [Important Protobuf Messages](#important-protobuf-messages)
+  * [Primitives](#primitives)
   * [Robot Status](#robot-status)
 * [Design Patterns](#design-patterns)
   * [Abstract Classes and Inheritance](#abstract-classes-and-inheritance)
@@ -26,6 +27,7 @@
   * [What Are Coroutines?](#what-are-coroutines)
   * [What Coroutines Do We Use?](#what-coroutines-do-we-use)
   * [How Do We Use Coroutines?](#how-do-we-use-coroutines)
+  * [Best Practices](#couroutine-best-practices)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
   * [Angles](#angles)
@@ -33,9 +35,9 @@
 * [Architecture Overview](#architecture-overview)
   * [Diagram](#architecture-overview-diagram)
   * [Backend](#backend)
-    * [Input](#input-responsibilities)
-    * [Output](#output-responsibilities)
     * [Diagram](#backend-diagram)
+  * [Sensor Fusion](#sensor-fusion)
+    * [Filters](#filters)
   * [AI](#ai)
     * [Strategy](#strategy)
       * [Skills / Actions](#skills--actions)
@@ -49,25 +51,28 @@
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
     * [Draw Functions](#draw-functions)
-    * [Editing the Visualizer](#editing-the-visualizer)
-      * [Editing ui files](#editing-ui-files)
-      * [Promoting Widgets](#promoting-widgets)
-    * [Qt Best Practices](#qt-best-practices)
-      * [Build A Hierarchy](#build-a-hierarchy)
-      * [Create Reusable Widgets](#create-reusable-widgets)
-      * [Miscellaneous Qt Tips](#miscellaneous-qt-tips)
-* [Simulated Integration Tests](#simulated-integration-tests)
-  * [Architecture](#simulated-integration-tests-architecture)
-    * [Simulator Backend](#simulator-backend)
-    * [World State Validator](#world-state-validator)
-  * [Component Connections and Determinism](#component-connections-and-determinism)
-  * [Diagram](#simulated-integration-tests-diagram)
+* [Simulator](#simulator)
+  * [Standalone Simulator](#standalone-simulator)
+  * [Simulated Tests](#simulated-tests)
+    * [Architecture](#simulated-tests-architecture)
+      * [Validation Functions](#validation-functions)
+    * [Component Connections and Determinism](#component-connections-and-determinism)
+    * [Diagram](#simulated-tests-diagram)
+* [GUI](#gui)
+  * [Naming](#naming)
+  * [Editing the GUIs](#editing-the-guis)
+    * [Editing ui files](#editing-ui-files)
+    * [Promoting Widgets](#promoting-widgets)'
+  * [Qt Best Practices](#qt-best-practices)
+    * [Build A Hierarchy](#build-a-hierarchy)
+    * [Create Reusable Widgets](#create-reusable-widgets)
+    * [Miscellaneous Qt Tips](#miscellaneous-qt-tips)
 
 
 # Tools
 A few commonly-used terms and tools to be familiar with:
 #### SSL-Vision
-  * This is the shared vision system used by the Small Size League. It is what connects to the cameras above the field, does the vision processing, and transmits the positional data of everything on the field to our AI computers.
+  * This is the shared vision system used by the Small Size League. It is what connects to the cameras above the field, does the vision processing, and transmits the positional data of everything on the field to our [AI](#ai) computers.
   * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-vision)
 #### SSL-Gamecontroller
   * Sometimes referred to as the "Referee", this is another shared piece of Small Size League software that is used to send gamecontroller and referee commands to the teams. A human controls this application during the games to send the appropriate commands to the robots. For example, some of these commands are what stage the gameplay is in, such as `HALT`, `STOP`, `READY`, or `PLAY`.
@@ -75,7 +80,7 @@ A few commonly-used terms and tools to be familiar with:
 
 
 # Important Classes
-These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [AI](#ai), and [Visualizer](#visualizer).
+These are classes that are either heavily used in our code, or are very important for understanding how the AI works, but are _not_ core components of the AI or other major modules. To learn more about these core modules and their corresponding classes, check out the sections on the [Backend](#backend), [Sensor Fusion](#sensor-fusion), [AI](#ai), and [Visualizer](#visualizer).
 
 ## World
 The `World` class is what we use to represent the state of the world at any given time. In this context, the world includes the positions and orientations of all robots on the field, the position and velocity of the ball, the dimensions of the field being played on, and the current referee commands. Altogether, it's the information we have at any given time that we can use to make decisions.
@@ -95,44 +100,43 @@ The Field class represents the state of the physical field being played on, whic
 ### GameState
 These represent the current state of the game as dictated by the Gamecontroller. These provide functions like `isPlaying()`, `isHalted()` which tell the rest of the system what game state we are in, and make decisions accordingly. We need to obey the rules!
 
-
-## Primitives
-Primitives are very simple actions of things a robot can do. It does not represent or include _how_ these things are done. Some examples are:
-* Moving in a straight line to a position
-* Pivoting around a point
-* Kicking the ball at a certain direction
-
-Primitives act as the abstraction between our AI, and our robot firmware. It's much easier for our AI to send a `Primitive` to a robot telling it what it wants it to do, and have the robot responsible for making sure it does what it's told. For every `Primitive` in our `AI` software, there is an equivalent `Primitive` implementation in our robot firmware. When robots receive a `Primitive` command, they perform their own logic and control in order to perform the task specified by the `Primitive`.
-
-
 ## Intents
-An `Intent` represents a simple thing the `AI` wants (or intends for) a robot to do. It does not represent or include _how_ these things are achieved. Some examples are:
-* Moving to a position (without colliding with anything on its way)
+An `Intent` represents a simple thing the [AI](#ai) wants (or intends for) a robot to do, but is at a level that requires knowledge of the state of the game and the field (e.g. Referee state, location of the other robots). It does not represent or include _how_ these things are achieved. Some examples are:
+* Moving to a position without colliding with anything on its way and while following all rules
 * Pivoting around a point
 * Kicking the ball at a certain direction or at a target
 
-Intents are very similar to Primitives, but include slightly more logic. `Intents` can include extra parameters or data that `Primitives` do not, such as how much to avoid the ball by while moving. In this way, `Intents` are more "context-aware" than `Primitives`, and represent slightly higher-level commands.
-
+There are two types of `Intent`s: `DirectPrimitiveIntent`s and `NavigatingIntent`s. `DirectPrimitiveIntent`s directly represent the [Primitives](#primitives) that the AI is trying to send to the robots. `NavigatingIntent`s are intents that require moving while avoiding obstacles, so they contain extra parameters to help with [Navigation](#navigation).
 
 ## Dynamic Parameters
 `Dynamic Parameters` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! Using `Dynamic Parameters` saves us from having to stop the [AI](#ai), change a constant, recompile the code, and restart the [AI](#ai).
 
-Additionally, we can use `Dynamic Parameters` to communicate between the [Visualizer](#visualizer) and the rest of our system. The [Visualizer](#visualizer) can change the values of `DynamicParameters` when buttons or menu items are clicked, and these new values will be picked up by the rest of the code. For example, we can define a `Dynamic Parameter` called `run_ai` that is a boolean value. Then when the `Start AI` button is clicked in the [Visualizer](#visualizer), it sets the value of `run_ai` to `true`. In the "main loop" for the [AI](#ai), it will check if the value of `run_ai` is true before running its logic. 
+Additionally, we can use `Dynamic Parameters` to communicate between the [Visualizer](#visualizer) and the rest of our system. The [Visualizer](#visualizer) can change the values of `DynamicParameters` when buttons or menu items are clicked, and these new values will be picked up by the rest of the code. For example, we can define a `Dynamic Parameter` called `run_ai` that is a boolean value. Then when the `Start [AI](#ai)` button is clicked in the [Visualizer](#visualizer), it sets the value of `run_ai` to `true`. In the "main loop" for the [AI](#ai), it will check if the value of `run_ai` is true before running its logic.
 
-Here's a slightly more relevant example of how we used `Dynamic Parameters` during a game in RoboCup 2019. We had a parameter called `enemy_team_can_pass`, which indicates whether or not we think the enemy team can pass. This parameter was used in several places in our defensive logic, and specifically affected how we would shadow enemy robots when we were defending them. If we assumed the enemy team could pass, we would shadow between the robots and the ball to block any passes, otherwise we would shadow between the enemy robot and our net to block shots. During the start of a game, we had `enemy_team_can_pass` set to `false` but the enemy did start to attempt some passes during the game. However, we didn't want to use one of our timeouts to change the value. Luckily later during the half, the enemy team took a time out. Because `Dynamic Parameters` are very quick to change and can leave the `AI` running, we were quickly able to change `enemy_team_can_pass` to `true` while the enemy team took their time out. This made our defence much better against that team and didn't take to much time we had to burn our own timeout. Altogether this is an example of how we use `Dynamic Parameters` to control our [AI](#ai) and other parts of the code.
+Here's a slightly more relevant example of how we used `Dynamic Parameters` during a game in RoboCup 2019. We had a parameter called `enemy_team_can_pass`, which indicates whether or not we think the enemy team can pass. This parameter was used in several places in our defensive logic, and specifically affected how we would shadow enemy robots when we were defending them. If we assumed the enemy team could pass, we would shadow between the robots and the ball to block any passes, otherwise we would shadow between the enemy robot and our net to block shots. During the start of a game, we had `enemy_team_can_pass` set to `false` but the enemy did start to attempt some passes during the game. However, we didn't want to use one of our timeouts to change the value. Luckily later during the half, the enemy team took a time out. Because `Dynamic Parameters` can be changed quick without stopping [AI](#ai), we were quickly able to change `enemy_team_can_pass` to `true` while the enemy team took their timeout. This made our defence much better against that team and didn't take so much time that we had to burn our own timeout. Altogether this is an example of how we use `Dynamic Parameters` to control our [AI](#ai) and other parts of the code.
 
 It is worth noting that constants are still useful, and should still be used whenever possible. If a value realistically doesn't need to be changed, it should be a constant (with a nice descriptive name) rather than a `Dynamic Parameter`. Having too many `Dynamic Parameters` is overwhelming because there are too many values to understand and change, and this can make it hard to tune values to get the desired behaviour while under pressure during a game.
 
 
+# Important Protobuf Messages
+These are [protobuf](https://developers.google.com/protocol-buffers/docs/cpptutorial) messages that we define and that are important for understanding how the [AI](#ai) works.
+
+## Primitives
+`TbotsProto::Primitive`s represent simple actions that robots blindly execute (e.g. send signals to motor drivers), so it's up to the [AI](#ai) to send `Primitives` that follow all the rules and avoid collisions with obstacles. Some examples are:
+* Moving in a straight line to a position
+* Pivoting around a point
+* Kicking the ball at a certain direction
+
+`Primitives` act as the abstraction between our [AI](#ai) and our robot firmware. It splits the responsibility such that the [AI](#ai) is responsible for sending a `Primitive` to a robot telling it what it wants it to do, and the robot is responsible for making sure it does what it's told. For every `Primitive` protobuf message, there is an equivalent `Primitive` implementation in our robot firmware. When robots receive a `Primitive` command, they perform their own logic and control in order to perform the task specified by the `Primitive`.
+
 ## Robot Status
-The `Robot Status` class contains information about the status of a single robot. Examples of the information they include are:
+The `TbotsProto::RobotStatus` protobuf message contains information about the status of a single robot. Examples of the information they include are:
 * Robot battery voltage
 * Whether or not the robot senses the ball in the breakbeam
 * The capacitor charge on the robot
 * The temperature of the dribbler motor
 
-Information received from the robots is stored in `Robot Status` objects so that the rest of the system can easily access and make sense of the information if necessary. For example, we monitor incoming `Robot Status` and display warnings in the [Visualizer](#visualizer) if anything looks wrong so we can be alerted. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
-
+Information about the robot status is communicated and stored as `RobotStatus` protobuf messages. The [Visualizer](#visualizer) displays warnings from incoming `RobotStatus`es so we can take appropriate action. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
 
 # Design Patterns
 Below are the main design patterns we use in our code, and what they are used for.
@@ -147,7 +151,6 @@ Examples of this can be found in many places, including:
 * [Tactics](#tactics)
 * [Actions](#skills--actions)
 * [Intents](#intents)
-* [Primitives](#primitives)
 * Different implementations of the [Backend](#backend)
 
 
@@ -168,19 +171,18 @@ Because the Factory needs to know about what objects are available to be created
 
 Read [http://derydoca.com/2019/03/c-tutorial-auto-registering-factory/] for more information.
 
-The auto-registering factory is particularily useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
+The auto-registering factory is particularly useful for our `PlayFactory`, which is responsible for creating [Plays](#plays). Every time we run our [AI](#ai) we want to know what [Plays](#plays) are available to choose from. The Factory pattern makes this really easy, and saves us having to remember to update some list of "available Plays" each time we add or remove one.
 
 The Factory pattern is also used to create different [Backends](#backend)
 
 
 ## Visitor Design Pattern
-The `Visitor Design Pattern` is arguably the most "advanced" design pattern we use. It is used when we need to perform different operations on a group of "similar" objects, for example a bunch of objects that inherit from the same parent class (eg. [Primitives](#primitives) or [Intents](#intents)). We might only know all these objects are an [Intent](#intent), but we don't know specifically which type each one is (eg. `MoveIntent` vs `KickIntent`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
+The `Visitor Design Pattern` is arguably the most "advanced" design pattern we use. It is used when we need to perform different operations on a group of "similar" objects, for example a bunch of objects that inherit from the same parent class ([Intents](#intents)). We might only know all these objects are an [Intent](#intent), but we don't know specifically which type each one is (eg. `MoveIntent` vs `KickIntent`). The Visitor Pattern helps us "recover" that type information so we can perform different operations on the different types of objects. It is generally preferred to a big `if-block` with a case for each type, because the compiler can help warn you when you've forgotten to handle a certain type, and therefore helps prevent mistakes.
 
 Read [https://www.geeksforgeeks.org/visitor-design-pattern/] for more information.
 
 Examples of the Visitor Pattern can be found with the following classes:
 * [Intents](#intents)
-* [Primitives](#primitives)
 * [Tactics](#tactics)
 
 
@@ -190,12 +192,12 @@ The Observer Design Pattern is useful for letting components of a system "notify
 Our implementation of this pattern consists of two classes, `Observer` and `Subject`. `Observer`s can be registered with a `Subject`, after which new values will be sent from each `Subject` to all of it's registered `Observer`s. Please see the headers of both classes for details. Note that a class can extend both `Observer` and `Subject`, thus receiving and sending out data. In this way we can "chain" multiple classes.
 
 ### Threaded Observer
-In our system, we need to be able to do multiple things (receive camera data, run the AI, send commands to the robots) at the same time. In order to facilitate this, we extend the `Observer` to the `ThreadedObserver` class. The `ThreadedObserver` starts a thread with an infinite loop that waits for new data from `Subject` and performs some operation with it.
+In our system, we need to be able to do multiple things (receive camera data, run the [AI](#ai), send commands to the robots) at the same time. In order to facilitate this, we extend the `Observer` to the `ThreadedObserver` class. The `ThreadedObserver` starts a thread with an infinite loop that waits for new data from `Subject` and performs some operation with it.
 
-**WARNING:** If a class extends multiple `ThreadedObserver`s (for example, `AI` could extend `ThreadedObserver<World>` and `ThreadedObserver<RobotStatus>`), then there will be two threads running, one for each observer. We **do not check** for data race conditions between observers, so it's entirely possible that one `ThreadedObserver` thread could read/write from data at the same time as the other `ThreadedObserver` is reading/writing the same data. Please make sure any data read/written to/from multiple `ThreadedObserver`s is thread-safe.
+**WARNING:** If a class extends multiple `ThreadedObserver`s (for example, [AI](#ai) could extend `ThreadedObserver<World>` and `ThreadedObserver<RobotStatus>`), then there will be two threads running, one for each observer. We **do not check** for data race conditions between observers, so it's entirely possible that one `ThreadedObserver` thread could read/write from data at the same time as the other `ThreadedObserver` is reading/writing the same data. Please make sure any data read/written to/from multiple `ThreadedObserver`s is thread-safe.
 
 ### Example
-One example of this is the `Backend`, which extends `Subject<World>` and the `AI`, which extends `ThreadedObserver<World>`. The backend runs in one thread and sends data to the AI, which receives and processes it another thread.
+One example of this is [SensorFusion](#sensor-fusion), which extends `Subject<World>` and the [AI](#ai), which extends `ThreadedObserver<World>`. [SensorFusion](#sensor-fusion) runs in one thread and sends data to the [AI](#ai), which receives and processes it another thread.
 
 ## C++ Templating
 While debatably not a design pattern depending on who you ask, templating in C++ is a powerful tool that is very useful to understand. [https://www.geeksforgeeks.org/templates-cpp/] gives a great explanantion and example.
@@ -239,7 +241,7 @@ Lets walk through what's happening here:
     * "yielding" the data here is effectively returning it so that the code in the `main` function can print the result
 3. The second time `main()` calls the `fib()` function, the function will resume immediately after the `yield()` statement. This means that execution will go back to the top of the loop, *and still remember the values of `f1` and `f2` from the last time the function was called*. Since the coroutine saved the function state, it still has the previous values of `f1` and `f2` which it uses to compute the next value in the sequence.
 4. Once again when the `yield()` statement is reached, the newly computed value is returned and the function state is saved. You can think of this as "pausing" the function.
-5. As `main()` keeps calling the `fib()` function, it is computing and returning the values of the fibonacci sequence, and this only works because the coroutine "remembers" the values from each previous fibonacci computation which is uses to compute the next value the next time the function is called.
+5. As `main()` keeps calling the `fib()` function, it is computing and returning the values of the fibonacci sequence, and this only works because the coroutine "remembers" the values from each previous fibonacci computation which it uses to compute the next value the next time the function is called.
     * If the `yield` was replaced with a regular `return` statement, the function would only ever return the value `1`. This is because using `return` would not save the function state, so the next time it's called the function would start at the beginning again, and only ever compute the first value of the sequence.
 
 
@@ -247,7 +249,7 @@ This example / pseudocode does hide away some details about how coroutines are s
 
 
 ## What Coroutines Do We Use?
-We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs/coroutine2/doc/html/index.html). Specifically, we use Asymetric Coroutines.
+We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs/coroutine2/doc/html/index.html). Specifically, we use Asymmetric Coroutines.
 
 [This stackoverfow answer](https://stackoverflow.com/a/42042904) gives a decent explanation of the difference between Symmetric and Asymmetric Coroutines, but understanding the difference is not critical for our purposes. We use Asymmetric Coroutines because boost does not provide Symmetric Coroutines, and the hierarchical structure of Asymmetric Coroutines is more useful to us.
 
@@ -279,13 +281,20 @@ Once it is time to start the pass, the condition for the loop will become false 
 
 Once we have entered the second stage, we know we don't have to look at the first stage again. Because the coroutine "remembers" where the execution is each time the function is called, we will resume inside the second stage and therefore never execute the first stage again! This makes it much easier to write and read this strategy code, because we can clearly see the 2 stages of the strategy, and we know they will be executed in order.
 
+## Couroutine Best Practices
+Coroutines are a complex feature, and the boost coroutines we use don't always behave in was we expect. We have done extensive testing on how coroutines are safe (or not safe) to us, and derived some best practices from these examples. See [coroutine_test_exmaples.cpp](coroutine_test_examples.cpp) for the full code and more detailed explanantions.
+
+To summarize, the best practices are as follows:
+1. Avoid moving coroutines. If the absolutely must be moved, make sure they are not moved between the stack and heap.
+2. Avoid using coroutines with resizeable containers. If they must be used, make sure that the coroutines are allocated on the heap.
+3. Pass data to the coroutine on creation as much as possible, avoid using member variables.
+
 
 # Conventions
 Various conventions we use and follow that you need to know.
 
-
 ## Coordinates
-We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularily important for any code handling gameplay logic and positions on the field.
+We use a slightly custom coordinate convention to make it easier to write our code in a consistent and understandable way. This is particularly important for any code handling gameplay logic and positions on the field.
 
 The coordinate system is a simple 2D x-y plane. The x-dimension runs between the friendly and enemy goals, along the longer dimension of the field. The y-dimension runs perpendicular to the x-dimension, along the short dimension of the field.
 
@@ -298,7 +307,7 @@ In order to overcome this, our convention is that:
 
 This is easiest to understand in the [diagram](#convention-diagram) below.
 
-Based on what side we are defending, the [Backend](#backend) will transform all the coordinates of incoming data so that it will match our convention. This means that from the perspective of the rest of the system, the friendly half of the field is always negative x and the enemy half is always positive x. Now when we want to tell a robot to move to the friendly goal, we can simply tell it so move to `(-4.5, 0)` and we know this will _always_ be the friendly side. All of our code is written with the assumption in mind.
+Based on what side we are defending, [Sensor Fusion](#sensor-fusion) will transform all the coordinates of incoming data so that it will match our convention. This means that from the perspective of the rest of the system, the friendly half of the field is always negative x and the enemy half is always positive x. Now when we want to tell a robot to move to the friendly goal, we can simply tell it so move to `(-4.5, 0)` and we know this will _always_ be the friendly side. All of our code is written with the assumption in mind.
 
 ## Angles
 Going along with our coordinate convention, we have a convention for angles as well. An Angle of `0` is along the positive x-axis (facing the enemy goal), and positive rotation is counter-clockwise (from a perspective above the field, looking at it like a regular x-y plane where +y is "up"). See the [diagram](#convention-diagram) below.
@@ -310,9 +319,9 @@ Because of our [Coordinate Conventions](#coordinates), this means that an angle 
 
 
 # Architecture Overview
-At a high-level our system is made of 3 main components: The [Backend](#backend), the [AI](#ai), and the [Visualizer](#visualizer). These 3 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern). Together, they are what make up our AI.
+At a high-level our system is made of 4 main components: The [Backend](#backend), the [Sensor Fusion](#sensor-fusion), the [AI](#ai), and the [Visualizer](#visualizer). These 4 components each run in their own thread, and communicate with each other using the [Observer design pattern](#observer-design-pattern).
 
-The Backend is responsible for communicating with the outside world (network and radio), the AI is what makes the actual gameplay decisions, and the Visualizer shows us what's happening and lets us control the AI.
+The [Backend](#backend) is responsible for communicating with the outside world (network and radio), [Sensor Fusion](#sensor-fusion) is responsible for processing and filtering raw data, the [AI](#ai) makes the actual gameplay decisions, and the [Visualizer](#visualizer) shows us what's happening and lets us control the [AI](#ai).
 
 Each component is described in more detail in their own sections.
 
@@ -321,32 +330,35 @@ Each component is described in more detail in their own sections.
 
 
 # Backend
-The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into Input and Output.
+The `Backend` is responsible for all communication with the "outside world". The responsibilities of the `Backend` can be broken down into communication using `SensorProto` and [Primitives](#primitives) messages:
 
-### Input Responsibilities
-1. Receiving robot status messages
-2. Receiving vision data about where the robots and ball are (typically provided by [SSL-Vision](#ssl-vision))
-2. Receiving referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
-3. Filtering the received data
-    * **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
-4. Storing the filtered data into the [World](#world) datastructures understood by our system
-5. Sending the filtered data to the rest of the system
+* Upon receiving the following messages from the network (outside world), the `Backend` will store it in a `SensorProto` message and send it to [Sensor Fusion](sensor-fusion):
+  * Robot status messages
+  * Vision data about where the robots and ball are (typically from [SSL-Vision](#ssl-vision))
+  * Referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
 
-### Output Responsibilities
-1. Sending robot primitives to the robots
+* Upon receiving [Primitives](#primitives) from the [AI](#ai), `Backend` will send the primitives to the robots or the [Simulator](#simulator).
 
-In practice, the `Backend` is just a simple interface that specifies [World](#world) and [Robot Status](#robot-status) objects must be produced, and [Primitves](#primitives) may be consumed. The interface is very generic so that different implementations may be swapped out in order to communicate with different hardware / protocols / programs. For example, we have multiple implementations of the "output" part of the backend: one that lets us send data to our real robots using the radio, and one that sends commands to simulated robots in the simulator.
-
+The `Backend` was designed to be a simple interface that handles all communication with the "outside world", allowing for different implementations that can be swapped out in order to communicate with different hardware / protocols / programs.
 
 #### Backend Diagram
 ![Backend Diagram](images/backend_diagram.svg)
 
+# Sensor Fusion
+`Sensor Fusion` is responsible for processing the raw data contained in SensorProto into a coherent snapshot of the [World](#world) that the [AI](#ai) can use. It invokes filters to update components of [World](#world), and then combines the components to send out the most up-to-date version.
+
+## Filters
+Filters take the raw data from SensorProto and returns an updated version of a component of the [World](#world). For example, the `BallFilter` takes `BallDetection`s and returns an updated `Ball`.
+
+* **Why we need to do this:** Programs that provide data like [SSL-Vision](#ssl-vision) only provide raw data. This means that if there are several orange blobs on the field, [SSL-Vision](#ssl-vision) will tell us the ball is in several different locations. It is up to us to filter this data to determine the "correct" position of the ball. The same idea applies to robot positions and other data we receive.
+
+Filters provide a flexible way to modularize the processing of raw data, making it easy to update filters and add new ones. Filters are sometimes stateful. For example, the `BallFilter` "remembers" previous locations of the ball in order to estimate the ball's current velocity.
+
 
 # AI
-The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from the [Backend](#backend) to make decisions, and sends [Primitives](#primitives) back to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
+The `AI` is where all of our gameplay logic takes place, and is the main "brain" of our system. It uses the information received from [Sensor Fusion](#sensor-fusion) to make decisions, and sends [Primitives](#primitives) to the [Backend](#backend) for the robots to execute. All together this feedback loop is what allows us to react to what's happening on the field and play soccer in real-time.
 
-The 2 main components of the AI are strategy and navigation.
-
+The 2 main components of the `AI` are strategy and navigation.
 
 ## Strategy
 We use a framework called `STP (Skills, Tactics, Plays)` to implement our stratgy. The `STP` framework was originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
@@ -390,15 +402,15 @@ Plays are made up of `Tactics`. Plays can have "stages" and change what `Tactics
 
 Furthermore, every play specifies an `Applicable` and `Invariant` condition. These are used to determine what plays should be run at what time, and when a Play should terminate.
 
-`Applicable` indicates when a `Play` can be started. For example, we would not want to start a `Defense Play` if our team is in possession of the ball. The `Invariant` condition is a condition that must always be met for the `Play` to continue running. If this condition ever becomes false, the current `Play` will stop running and a new one will be chosen. For example, once we start running a friendly `Corner Kick` play, we want the `Play` to continue running as long as the enemy team does not have possession of the bali.
+`Applicable` indicates when a `Play` can be started. For example, we would not want to start a `Defense Play` if our team is in possession of the ball. The `Invariant` condition is a condition that must always be met for the `Play` to continue running. If this condition ever becomes false, the current `Play` will stop running and a new one will be chosen. For example, once we start running a friendly `Corner Kick` play, we want the `Play` to continue running as long as the enemy team does not have possession of the ball.
 
 
 ## Navigation
 The `Navigator` is responsible for path planning and navigation. Once our strategy has decided what it wants to do, it passes the resulting [Intents](#intents) to the `Navigator`. The `Navigator` is then responsible for breaking down the [Intents](#intents) and turning them into [Primitives](#primitives).
 
-Most [Intents](#intents) are easy to break down into  [Primitives](#primitives), and can typically just be converted directly without having to do any extra work. However, some [Intents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behaviour like obstacle avoidance. This is where the "Navigation" part of the `Navigator` comes in.
+[DirectPrimitiveIntents](#intents) are easy to break down into [Primitives](#primitives), and can be converted directly without having to do any extra work.
 
-In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
+However, [NavigatingIntents](#intents) like the `MoveIntent` rely on the navigator to implement more complex behaviour like obstacle avoidance.  In order for a robot to move to the desired destination of a [NavigatingIntents](#intents), the `Navigator` will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the [NavigatingIntents](#intents). The `NavigatingPrimitiveCreator` then translates this path into a series of [Primitives](#primitives), which are sent to the robot sequentially so that it follows the planned path across the field.
 
 ### Path Manager
 The `Path Manager` is responsible for generating a set of paths that don't collide. It is given a set of [Path Objective](#path-objective)s and [Path Planner](#path-planner), and it will generate paths using the given path planner and arbitrate between paths to prevent collisions.
@@ -409,7 +421,7 @@ A path objective is a simple datastructure used to communicate between the navig
 ### Path Planner
 The `Path Planner` is an interface for the responsibility of path planning a single robot around a single set of obstacles from a given start to a given destination. The interface allows us to easily swap out path planners.
 
-## AI Diagram
+## [AI](#ai) Diagram
 ![AI Diagram](images/ai_diagram.svg)
 
 
@@ -425,7 +437,7 @@ The [Visualizer](#visualizer) is implemented using [Qt](https://www.qt.io/), a C
 * [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) (specifically for Widget-based applications)
 * [Widgets](https://doc.qt.io/qt-5/qtwidgets-index.html)
 
-The [Visualizer](#visualizer) is made up of 3 major components:
+The [Visualizer](#visualizer) is made up of the following components:
 * Qt Components
   * The [QApplication](https://doc.qt.io/qt-5/qapplication.html). This is the Qt component that manages the event loop and all the widgets in the GUI.
   * The `Visualizer Widget`. This contains all of the graphical components used in the [Visualizer](#visualizer).
@@ -446,7 +458,86 @@ Although we want to display information about the [AI](#ai) in the [Visualizer](
 
 A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
 
-## Editing the Visualizer
+
+# Simulator
+The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:
+* [SSL-Vision](#ssl-vision) by publishing new vision data
+* the robots by accepting new [Primitives](#primitives)
+
+Using the current state of the simulated world, the `Simulator` simulates the new [Primitives](#primitives) over some time step and publishes new ssl vision data based on the updated simulated world. The `Simulator` is designed to be "perfect", which means that
+* the vision data it publishes exactly reflects the state of the simulated world
+* the simulation perfectly reflects our best understanding of the physics (e.g. friction) with no randomness.
+
+The `Simulator` uses `Box2D`, which provides 2D physics simulation for free. While this simplifies the simulator greatly, it means that we manually implement the physics for "3D effects", such as dribbling and chipping.
+
+## Standalone Simulator
+The `Standalone Simulator` is a wrapper around the `Simulator` so that we can run it as a standlone application that publishes and receives data over the network. The `Standalone Simulator` is designed to interface with the [WifiBackend](#backend) over the network, and so it is essentially indistinguishible from robots receiving [Primitives](#primitives) and an [SSL-Vision](#ssl-vision) client publishing data over the network. The `Standalone Simulator` also has a [GUI](#gui) that provides user-friendly features, such as moving the ball around.
+
+## Simulated Tests
+
+When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
+
+Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire [AI](#ai) pipeline and validate behaviour.
+
+The primary design goals of this test system are:
+1. **Determinism:** We need tests to pass or fail consistently
+2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
+3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and to understand what they are testing.
+
+### Simulated Tests Architecture
+The `SimulatedTestFixture` consists of three components:
+1. A [Simulator](#simulator) that does physics simulations based on the [Primitives](#primitives) it receives
+2. A [Sensor Fusion](#sensor-fusion) that processed raw data for the [AI](#ai)
+3. The [AI](#ai) under test
+
+The components of this system are run in a big loop. The [Simulator](#simulator) publishes new vision data with a fixed increment and that data is passed through [Sensor Fusion](#sensor-fusion) to produced an updated [World](#world) for the [AI](#ai). The `SimulatedTestFixture` will wait to receive [Primitives](#primitives) before triggering simulation and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
+
+#### Validation Functions
+`Validation Functions` are the way we check that the behaviour of the AI is as we expect. They are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. We can create a list of `Validation Functions` that are run every time `SimulatedTestFixture` produces an updated [World](#world), so that we can continuously check that the behaviour of the [AI](#ai) is as we expected. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
+
+A `Validation Function` comes in two types:
+1. Terminating: Some sequence of states or actions that must occur **in a given order** and then **terminate**. (*Eg. A robot moves to point A, then point B, and then finally kicks the ball*)
+2. Non-terminating: Some condition that must be met for the entire duration of the test, i.e. "for all time". (*Eg. The ball never leaves the field or all friendly robots follows SSL rules*).
+
+Benefits of `Validation Functions`:
+1. They are reuseable. We can write a function that validates the ball never leaves the field, and use it for multiple tests.
+2. They can represent assertions for more complex behaviour. For example, we can build up simpler `Validation Functions` until we have a single `Validation` function for a specific [Tactic](#tactics).
+3. They let us validate independent sequences of behaviour. For example, we create a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
+
+### Component Connections and Determinism
+When testing, determinism is extremely important. With large integration tests with many components, there are all kinds of timings and execution speed differences that can change the behaviour and results. We make use of a few assumptions and connect our components in such a way that prevents these timing issues.
+
+The [Validation Functions](#validation-functions) are run before updating [AI](#ai) with a new [World](#world) and getting new primitives so that we stop as soon as we know that there's incorrect behaviour. See the [diagram](#simulated-tests-diagram).
+
+Now we have a nice loop from the `Simulator -> Sensor Fusion -> Validation Functions -> AI -> Simulator ...`. As mentioned in their own sections, the [Simulator](#simulator) waits to receive [Primitives](#primitives) from the [AI](#ai) before publishing a new [World](#world), and the [Validation Functions](#validation-functions) wait to receive and validate a [World](#world) allowing the new world to be published. **The final assumption we make to complete this loop is that the [AI](#ai) waits to receive a new [World](#world) before publishing new [Primitives](#primitives).**
+
+**What this means is that each component in the loop waits for the previous one to finish its task and publish new data before executing.** As a result, no matter how fast each component is able to run, we will not have any issues related to speed or timing because each component is blocked by the previous one. As a result, we can have deterministic behaviour because every component is running at the same speed relative to one another.
+
+### Simulated Tests Diagram
+Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the [Backend](#backend) replaced by the [Simulator](#simulator) and with [Validation Functions](#validation-functions) in the loop between [Sensor Fusion](#sensor-fusion) and [AI](#ai).
+
+The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and are not run during the tests unless we are debugging.
+
+![Simulated Testing High-level Architecture Diagram](images/simulated_test_high_level_architecture.svg)
+
+
+# GUI
+
+## Naming
+
+### Variables
+When creating widgets in [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), all widgets should be given a descriptive name. This is because the `.ui` file will eventually be generated into code that we interact with, so we want the variable names to be descriptive and consistent with our naming conventions.
+
+Names should follow our [reglar naming conventions for variables](code-style-guide.md#names-and-variables). Furthermore, they should be named in the form `<purpose>_<widget>`. The purpose is essentially the "normal" variable name that should describe what the variable is. The widget component should be the name of the widget.
+
+For example, a `QLabel` for team colour should be named `team_colour_label`. Similarly, the button that starts the [AI](#ai) should be named `start_ai_button`.
+
+![Good Qt Widget Naming](images/qt_widget_naming_example.png)
+
+### Classes
+Only the top-level class for a given GUI should be suffixed with `GUI`. These top-level classes should just aggregate top-level widgets (typically generated from a `.ui` file) and connect callbacks. They should not define additional widgets or features themselves. For example, `FullSystemGUI` connects incoming buffers of data to the `main_widget` generated by a `.ui` file.
+
+## Editing the GUIs
 Qt provides [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html), an IDE used for visually creating GUIs and laying out widgets. We use this editor as much as possible since it is easy to learn and use, and saves us having to define the entire GUI in code (which is more complex and makes things generally harder to understand and modify).
 
 Our rule of thumb is that [QtCreator](https://doc.qt.io/qtcreator/creator-using-qt-designer.html) should be used to define all the widgets in the [Visualizer](#visualizer), and define the layout for everything. All logic (including connecting signals and slots, receiving data from buffers, etc.) should be implemented in the code ourselves.
@@ -493,7 +584,7 @@ The main point to remember is to use [layouts](https://doc.qt.io/qt-5/layout.htm
 ### Create Reusable Widgets
 Much like how we create functions in order to reuse code, [widgets](https://doc.qt.io/qt-5/qtwidgets-index.html) should be created so that they are reusable.
 
-For example, if you create a few widgets that work together to gather user input with a slider and display the current value next to it, you should combine all of this into its own `SliderWithValue` widget. This will make it very easy to make several copies of this widget, or use it somewhere else in a completely different application.
+For example, if you create a few widgets that work together to gather user input with a slider and display the current value next to it, you should combine all of this into its own `SliderWithValue` widget. This will make it very easy to make several copies of this widget, or use it somewhere else in a completely different application. Similarly, if you need specialized functionality from any widget (for example, our `ZoomableQGraphicsView`), this should also be implemented as a custom reusable widget.
 
 ![Reusable Widget Example](images/qt_reusable_widget_example.png)
 
@@ -502,58 +593,3 @@ Creating widgets that are slightly more generic and reusable are very useful and
 ### Miscellaneous Qt Tips
 * Define minimum and maximum sizes (if it makes sense) to help enforce the correct sizing of elements
     * Eg. define a minimum width for a textbox based on what it's expected to contain
-
-
-# Simulated Integration Tests
-When it comes to gameplay logic, it is very difficult if not impossible to unit test anything higher-level than a [Tactic](#tactics) (and even those can be a bit of a challenge). Therefore if we want to test [Plays](#plays) we need a higher-level integration test that can account for all the independent events, sequences of actions, and timings that are not possible to adequately cover in a unit test. For example, testing that a passing play works is effectively impossible to unit test because the logic needed to coordinate a passer and receiver relies on more time-based information like the movement of the ball and robots. We can only validate that decisions at a single point in time are correct, not that the overall objective is achieved successfully.
-
-Ultimately, we want a test suite that validates our [Plays](#plays) are generally doing the right thing. We might not care exactly where a robot receives the ball during a passing play, as long as the pass was successful overall. The solution to this problem is to use simulation to allow us to deterministically run our entire AI pipeline and validate behaviour.
-
-The primary design goals of this test system are:
-1. **Determinism:** We need tests to pass or fail consistently
-2. **Test "ideal" behaviour:** We want to test the logic in a "perfect world", where we don't care about all the exact limitations of our system in the real world with real physics. Eg. we don't care about modelling robot wheels slipping on the ground as we accelerate.
-3. **Ease of use:** It should be as easy and intuitive as possible to write tests, and understand what they are testing.
-
-## Simulated Integration Tests Architecture
-The system consists of three main components:
-1. A [Backend](#backend) that performs the simulation
-2. A [World State Validator](#world-state-validator) Observer that will handle the "validation"
-3. The [AI](#ai) under test
-
-### Simulator Backend
-The `SimulatorBackend` is simply another implementation of the [Backend](#backend) interface. It uses a physics library to simulate the various components of the [World](#world), like the [Ball](#ball) and [Robots](#robot). Like any [Backend](#backend), the `SimulatorBackend` publishes the state of the [World](#world) periodically.
-
-In order to achieve determinism, the `SimulatorBackend` publishes new [World](#world)'s with a fixed time increment (in [World](#world) time), and will wait to receive [Primitives](#primitives) before simulating and publishing the next [World](#world). This means that no matter how much faster or slower the simulation runs than the rest of the system, everything will always happen "at the same speed" from the POV of the rest of the system, since each newly published [World](#world) will be a fixed amount of time newer than the last. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for why this is important.
-
-### World State Validator
-The `WorldStateValidator` is an Observer whose purpose is to check that the state of the world is "correct" according to some user-provided metrics, or is changing as expected. This is effectively the "assert" statements of our tests.
-
-There are generally 2 "types" of conditions we want to validate.
-1. Some sequence of states or actions occur **in a given order**. (*Eg. A robot moves to point A, then point B, then kicks the  ball*)
-2. Some condition is met for the duration of the test, or for "all time". (*Eg. The ball never leaves the field, or robots never collide*)
-
-We use `ValidationFunctions` to validate both types of conditions. `ValidationFunctions` are essentially functions that contain [Google Test](https://github.com/google/googletest) `ASSERT` statements, and use [Coroutines](#coroutines) to maintain state. This lets us write individual functions that can be continuously run to validate both types of conditions above.
-
-Benefits of `ValidationFunctions`:
-1. They are reuseable. We can write a function that validates the ball never leaves the field, and use it for multiple tests.
-2. They can represent assertions for more complex behavior. For example, we can build up simpler `ValidationFunctions` until we have a single `Validation` function for a specific [Tactic](#tactics).
-3. They let us validate independent sequences of behaviour. For example, we can give the `WorldStateValidator` a different `ValidationFunction` for each [Robot](#robot) in the test. This makes it easy to validate each [Robot](#robot) is doing the right thing, regardless if they are dependent or independent actions.
-
-The `WorldStateValidator` accepts lists of `ValidationFunctions` that it will run against each [World](#world) it receives. Once all `ValidationFunctions` have been run, the `WorldStateValidator` publishes the [World](#world) again. See the section on [Component Connections and Determinism](#component-connections-and-determinism) for how this is used and why this is important.
-
-## Component Connections and Determinism
-When testing, determinism is extremely important. With large integration tests with many components, there are all kinds of timings and execution speed differences that can change the behaviour and results. We make use of a few assumptions and connect our components in such a way that prevents these timing issues.
-
-Most importantly, the [WorldStateValidator](#world-state-validator) acts as a "middleman" between the [Backend](#backend) and [AI](#ai). The [WorldStateValidator](#world-state-validator) observes the [World](#world) from the [Backend](#backend), and the [AI](#ai) observes the [World](#world) from the [WorldStateValidator](#world-state-validator). **The [AI](#ai) does not observe the [World](#world) directly from the [Backend](#backend) in this case.** See the [diagram](#simulated-integration-tests-diagram).
-
-Now we have a nice loop from the `Backend -> WorldStateValidator -> AI -> Backend ...`. As mentioned in their own sections, the [Simulator Backend](#simulator-backend) waits to receive [Primitives](#primitives) from the [AI](#ai) before publishing a new [World](#world), and the [WorldStateValidator](#world-state-validator) waits to receive and validate a [World](#world) before re-publishing the [World](#world). **The final assumption we make to complete this loop is that the [AI](#ai) waits to receive a new [World](#world) before publishing new [Primitives](#primitives).**
-
-**What this means is that each component in the loop waits for the previous one to finish its task and publish new data before executing.** As a result, no matter how fast each component is able to run, we will not have any issues related to speed or timing because each component is blocked by the previous one. As a result, we can have deterministic behaviour because every component is running at the same speed relative to one another.
-
-## Simulated Integration Tests Diagram
-Notice this is very similar to the [Architecture Overview Diagram](#architecture-overview-diagram), with the only real difference being the [World State Validator](#world-state-validator) being added between the [Backend](#backend) and [AI](#ai).
-
-The [Visualizer](#visualizer) and connections to it are marked with dashed lines, since they are optional and generally not run during the tests (unless debugging).
-
-![Simulated Testing High-level Architecture Diagram](images/simulated_integration_test_high_level_architecture.svg)
-

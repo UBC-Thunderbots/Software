@@ -30,14 +30,14 @@ class Time
      *
      * @return the value of the Time in seconds
      */
-    double getSeconds() const;
+    double toSeconds() const;
 
     /**
      * Returns the value of the Time in milliseconds
      *
      * @return the value of the Time in milliseconds
      */
-    double getMilliseconds() const;
+    double toMilliseconds() const;
 
     /**
      * Destructor

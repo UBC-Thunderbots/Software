@@ -31,7 +31,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
     {
         // add up all data points for this robot and then average it
         if (robot_data.id == this->getRobotId() &&
-            robot_data.timestamp > this->current_robot_state.lastUpdateTimestamp())
+            robot_data.timestamp > this->current_robot_state.timestamp())
         {
             filtered_data.position =
                 filtered_data.position + robot_data.position.toVector();
@@ -39,14 +39,14 @@ std::optional<Robot> RobotFilter::getFilteredData(
                 filtered_data.orientation + robot_data.orientation;
 
             filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
-                filtered_data.timestamp.getMilliseconds() +
-                robot_data.timestamp.getMilliseconds());
+                filtered_data.timestamp.toMilliseconds() +
+                robot_data.timestamp.toMilliseconds());
             data_num++;
         }
 
         // to get the latest timestamp of all data points in case there is no data for
         // this robot id
-        if (latest_timestamp.getMilliseconds() < robot_data.timestamp.getMilliseconds())
+        if (latest_timestamp.toMilliseconds() < robot_data.timestamp.toMilliseconds())
         {
             latest_timestamp = robot_data.timestamp;
         }
@@ -56,9 +56,9 @@ std::optional<Robot> RobotFilter::getFilteredData(
     {
         // if there is no data the duration of expiry_buffer_duration after previously
         // recorded robot state, return null. Otherwise remain the same state
-        if (latest_timestamp.getMilliseconds() >
-            this->expiry_buffer_duration.getMilliseconds() +
-                current_robot_state.lastUpdateTimestamp().getMilliseconds())
+        if (latest_timestamp.toMilliseconds() >
+            this->expiry_buffer_duration.toMilliseconds() +
+                current_robot_state.timestamp().toMilliseconds())
         {
             return std::nullopt;
         }
@@ -74,19 +74,19 @@ std::optional<Robot> RobotFilter::getFilteredData(
         filtered_data.orientation = filtered_data.orientation / data_num;
 
         filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
-            filtered_data.timestamp.getMilliseconds() / data_num);
+            filtered_data.timestamp.toMilliseconds() / data_num);
 
         // velocity = position difference / time difference
         filtered_data.velocity =
             (filtered_data.position - current_robot_state.position()) /
-            (filtered_data.timestamp.getSeconds() -
-             current_robot_state.lastUpdateTimestamp().getSeconds());
+            (filtered_data.timestamp.toSeconds() -
+             current_robot_state.timestamp().toSeconds());
 
         // angular_velocity = orientation difference / time difference
         filtered_data.angular_velocity =
             (filtered_data.orientation - current_robot_state.orientation()) /
-            (filtered_data.timestamp.getSeconds() -
-             current_robot_state.lastUpdateTimestamp().getSeconds());
+            (filtered_data.timestamp.toSeconds() -
+             current_robot_state.timestamp().toSeconds());
 
         // update current_robot_state
         this->current_robot_state =

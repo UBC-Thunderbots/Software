@@ -33,6 +33,7 @@ void app_firmware_world_destroy(FirmwareWorld_t* world);
 /**
  * Get the robot from the given world
  * @param world The world to get the robot from
+ *
  * @return The robot from the given world
  */
 FirmwareRobot_t* app_firmware_world_getRobot(FirmwareWorld_t* world);
@@ -40,6 +41,7 @@ FirmwareRobot_t* app_firmware_world_getRobot(FirmwareWorld_t* world);
 /**
  * Get the ball from the given world
  * @param world The world to get the ball from
+ *
  * @return The ball from the given world
  */
 FirmwareBall_t* app_firmware_world_getBall(FirmwareWorld_t* world);

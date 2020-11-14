@@ -19,13 +19,11 @@ ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
 {
 }
 
-void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
-                                       const Team& updated_enemy_team,
-                                       const Ball& updated_ball)
+void ReceiverTactic::updateWorldParams(const World& world)
 {
-    this->friendly_team = updated_friendly_team;
-    this->enemy_team    = updated_enemy_team;
-    this->ball          = updated_ball;
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
 
 void ReceiverTactic::updateControlParams(const Pass& updated_pass)
@@ -51,8 +49,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // ourselves in the best position possible to take the pass
     // We wait for the ball to start moving at least a bit to make sure the passer
     // has actually started the pass
-    while (ball.lastUpdateTimestamp() < pass.startTime() ||
-           ball.velocity().length() < 0.5)
+    while (ball.timestamp() < pass.startTime() || ball.velocity().length() < 0.5)
     {
         // If there is a feasible shot we can take, we want to wait for the pass at the
         // halfway point between the angle required to receive the ball and the angle
@@ -173,7 +170,8 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
 {
     // Check if we can shoot on the enemy goal from the receiver position
     std::optional<Shot> best_shot_opt =
-        calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
+        calcBestShotOnGoal(field, friendly_team, enemy_team, robot->position(),
+                           TeamType::ENEMY, {*this->getAssignedRobot()});
 
     // Vector from the ball to the robot
     Vector robot_to_ball = ball.position() - robot->position();
@@ -239,7 +237,7 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
     return Shot(ideal_position, ideal_orientation);
 }
 
-void ReceiverTactic::accept(MutableTacticVisitor& visitor)
+void ReceiverTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/defending_side_msg.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
@@ -7,6 +8,7 @@
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
 #include "software/world/field.h"
+#include "software/world/team_types.h"
 #include "software/world/world.h"
 
 extern "C"
@@ -28,25 +30,13 @@ class Simulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param simulator_config The config to fetch parameters from
      * @param physics_time_step The time step used to simulated physics
      * and robot primitives.
      */
     explicit Simulator(const Field& field,
-                       const Duration& physics_time_step =
-                           Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
-
-    /**
-     * Creates a new Simulator. The starting state of the simulation
-     * will have the given field, with no robots or ball.
-     *
-     * @param field The field to initialize the simulation with
-     * @param ball_restitution The restitution for ball collisions
-     * @param ball_linear_damping The damping on the ball's linear motion
-     * @param physics_time_step The time step used to simulated physics
-     * and robot primitives.
-     */
-    explicit Simulator(const Field& field, double ball_restitution,
-                       double ball_linear_damping,
+                       std::shared_ptr<const SimulatorConfig> simulator_config =
+                           DynamicParameters->getSimulatorConfig(),
                        const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;
@@ -196,11 +186,13 @@ class Simulator
      *
      * @param physics_robots The physics robots to add to the simulator robots
      * @param simulator_robots The simulator robots to add the physics robots to
+     * @param team_colour The color of the team this robot is on
      */
     static void updateSimulatorRobots(
         const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
         std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-            simulator_robots);
+            simulator_robots,
+        TeamColour team_colour);
 
     /**
      * Sets the primitive being simulated by the robot in simulation

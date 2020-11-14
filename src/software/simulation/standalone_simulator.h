@@ -1,16 +1,11 @@
 #pragma once
 
-#include "software/networking/threaded_nanopb_primitive_set_multicast_listener.h"
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/defending_side_msg.pb.h"
 #include "software/simulation/threaded_simulator.h"
-
-extern "C"
-{
-#include "shared/proto/tbots_software_msgs.nanopb.h"
-}
 
 /**
  * This class abstracts all simulation and networking operations for
@@ -32,9 +27,11 @@ class StandaloneSimulator
      * Creates a new StandaloneSimulator, and starts the simulation.
      *
      * @param standalone_simulator_config The config for the StandaloneSimulator
+     * @param simulator_config The config for the Simulator
      */
     explicit StandaloneSimulator(
-        std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config);
+        std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
+        std::shared_ptr<SimulatorConfig> simulator_config);
     StandaloneSimulator() = delete;
 
     /**
@@ -131,8 +128,8 @@ class StandaloneSimulator
      *
      * @param primitive_set_msg The set of primitives to run on the respective team
      */
-    void setYellowRobotPrimitives(const TbotsProto_PrimitiveSet& primitive_set_msg);
-    void setBlueRobotPrimitives(const TbotsProto_PrimitiveSet& primitive_set_msg);
+    void setYellowRobotPrimitives(const TbotsProto::PrimitiveSet& primitive_set_msg);
+    void setBlueRobotPrimitives(const TbotsProto::PrimitiveSet& primitive_set_msg);
 
     /**
      * Sets which side of the field the corresponding team is defending.
@@ -149,12 +146,12 @@ class StandaloneSimulator
 
     /**
      * A helper function that sets up all networking functionality with
-     * the networking information in the StandlaoneSimulatorConfig
+     * the networking information in the StandaloneSimulatorConfig
      */
     void initNetworking();
 
     std::shared_ptr<const StandaloneSimulatorConfig> standalone_simulator_config;
-    std::unique_ptr<ThreadedNanoPbPrimitiveSetMulticastListener>
+    std::unique_ptr<ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>>
         yellow_team_primitive_listener, blue_team_primitive_listener;
     std::unique_ptr<ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>>
         wrapper_packet_sender;

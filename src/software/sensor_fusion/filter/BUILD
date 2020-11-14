@@ -23,6 +23,7 @@ cc_library(
         "//software/math:math_functions",
         "//software/world:ball",
         "//software/world:field",
+        "@boost//:circular_buffer",
         "@eigen",
     ],
 )
@@ -32,6 +33,7 @@ cc_test(
     srcs = ["ball_filter_test.cpp"],
     deps = [
         ":ball_filter",
+        "//software/world:field",
         "@gtest//:gtest_main",
     ],
 )
