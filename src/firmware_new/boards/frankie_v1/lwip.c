@@ -73,7 +73,7 @@ void MX_LWIP_Init(void)
     else
     {
         /* When the netif link is down this function must be called */
-        netif_set_down(&gnetif);
+        netif_set_up(&gnetif);
     }
 
     /* USER CODE BEGIN 3 */
