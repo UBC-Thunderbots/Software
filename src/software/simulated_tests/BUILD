@@ -64,13 +64,13 @@ cc_test(
     name = "kickoff_friendly_play_test",
     srcs = ["kickoff_friendly_play_test.cpp"],
     deps = [
-        "//software/simulated_tests:simulated_test_main",
         ":simulated_test_fixture",
         "//software/ai/hl/stp/play:kickoff_friendly_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+	":simulated_test_main",
     ],
 )
 
