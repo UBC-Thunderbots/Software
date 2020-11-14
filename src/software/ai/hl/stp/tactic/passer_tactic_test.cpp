@@ -119,6 +119,16 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
                         Angle::fromDegrees(-90), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
+    // Robots for creating Teams
+    Robot enemy_robot(1, Point(0, 0), Vector(0, 0), Angle::half(),
+                      AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot(0, Point(-1, -1), Vector(0, 0), Angle::zero(),
+                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    // Teams for creating a world
+    Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
+    Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
+
     // Ball not moving initially
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5));
     Field field = Field::createSSLDivisionBField();
@@ -140,7 +150,10 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
 
     // Ball starts moving as if we've kicked it
     ball = Ball({0, 0}, {0, -2}, Timestamp::fromSeconds(5.1));
-    tactic.updateWorldParams(ball, field);
+
+    // World with updated ball and field
+    World world = World(field, ball, friendly_team, enemy_team);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(pass);
 
     // We need to try to get the next the intent to make the tactic finish
