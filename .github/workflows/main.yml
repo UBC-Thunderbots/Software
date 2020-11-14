@@ -20,7 +20,7 @@ jobs:
       - name: Check files
         id: check_files
         run: |
-            git fetch origin $GITHUB_BASE_REF --depth=0
+            git fetch origin $GITHUB_BASE_REF --depth=1
             git diff --name-only origin/$GITHUB_BASE_REF... | grep -qvE '(firmware\|software\|environment_setup)' && echo '::set-output name=run_software_tests::true'
             git diff --name-only origin/$GITHUB_BASE_REF... | grep -qvE '(firmware_new/boards\|firmware/boards\|environment_setup)' && echo '::set-output name=run_firmware_tests::true'
  
