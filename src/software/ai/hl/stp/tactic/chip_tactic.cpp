@@ -9,11 +9,12 @@ ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
 {
 }
 
-void ChipTactic::updateWorldParams(const Ball &ball)
+
+void ChipTactic::updateWorldParams(const World &world)
 {
-    // update the world parameters stored by this tactic
-    this->ball = ball;
+    this->ball = world.ball();
 }
+
 
 void ChipTactic::updateControlParams(Point chip_origin, Point chip_target)
 {
@@ -41,7 +42,7 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!chip_action->done());
 }
 
-void ChipTactic::accept(MutableTacticVisitor &visitor)
+void ChipTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

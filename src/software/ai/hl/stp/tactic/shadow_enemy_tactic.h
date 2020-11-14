@@ -32,16 +32,7 @@ class ShadowEnemyTactic : public Tactic
 
     ShadowEnemyTactic() = delete;
 
-    /**
-     * Updates the world parameters for this ShadowEnemyTactic.
-     *
-     * @param field The field being played on
-     * @param friendly_team The friendly team
-     * @param enemy_team The enemy team
-     * @param ball The ball
-     */
-    void updateWorldParams(const Field &field, const Team &friendly_team,
-                           const Team &enemy_team, const Ball &ball);
+    void updateWorldParams(const World &world) override;
 
     /**
      * Updates the control parameters for this ShadowEnemyTactic
@@ -64,7 +55,7 @@ class ShadowEnemyTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) override;
 
     Ball getBall() const;
     Field getField() const;
