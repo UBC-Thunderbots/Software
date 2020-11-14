@@ -53,7 +53,7 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_friendly_half)
 {
     if (SimulatedTestFixture::enable_visualizer)
     {
-	enableVisualizer();
+        enableVisualizer();
     }
     setBallState(BallState(Point(-1.5, -3), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(

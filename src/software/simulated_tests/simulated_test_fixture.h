@@ -19,10 +19,10 @@ class SimulatedTestFixture : public ::testing::Test
 {
    public:
     explicit SimulatedTestFixture();
-    
-    //Controls whether the visualizer will be enabled during the simulated tests
-    //if false, visualizer does not run during simulated tests
-    //if true, running tests are displayed on the visualizer
+
+    // Controls whether the visualizer will be enabled during the simulated tests
+    // if false, visualizer does not run during simulated tests
+    // if true, running tests are displayed on the visualizer
     static bool enable_visualizer;
 
    protected:
@@ -182,5 +182,5 @@ class SimulatedTestFixture : public ::testing::Test
     // camera frames we receive per AI tick. For example, a value of 2 means
     // that we will simulate 2 time steps (2 camera frames) before we give
     // the latest data to the AI and run it.
-    static constexpr unsigned int CAMERA_FRAMES_PER_AI_TICK = 2;	
+    static constexpr unsigned int CAMERA_FRAMES_PER_AI_TICK = 2;
 };
