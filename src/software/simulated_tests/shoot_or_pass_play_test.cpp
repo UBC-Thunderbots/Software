@@ -14,6 +14,10 @@ class ShootOrPassPlayTest : public SimulatedTestFixture
 
 TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 {
+    if (SimulatedTestFixture::enable_visualizer)
+    {
+        enableVisualizer();
+    }
     setBallState(BallState(Point(-4.4, 2.9), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({
         field().friendlyGoalCenter(),

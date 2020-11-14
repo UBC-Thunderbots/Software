@@ -14,6 +14,10 @@ class ExamplePlayTest : public SimulatedTestFixture
 
 TEST_F(ExamplePlayTest, test_example_play)
 {
+    if (SimulatedTestFixture::enable_visualizer)
+    {
+        enableVisualizer();
+    }
     setBallState(BallState(Point(-0.8, 0), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1), Point(-1, -3), Point(2, 0),

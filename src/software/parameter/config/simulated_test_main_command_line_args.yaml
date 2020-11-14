@@ -3,4 +3,4 @@ SimulatedTestMainCommandLineArgs:
         type: "bool"
         default: false
         description: >-
-            Set true to display the simulated test on the visualizer and false to run test internally
+            Displays simulated test on visualizer

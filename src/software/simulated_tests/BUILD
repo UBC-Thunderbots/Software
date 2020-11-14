@@ -25,11 +25,12 @@ cc_library(
 cc_library(
     name = "simulated_test_main",
     srcs = ["simulated_test_main.cpp"],
-	hdrs = ["simulated_test_main.h"],
+    testonly = True,
     deps = [
         "@gtest",
         "//software/logger",
-		"//software/parameter:dynamic_parameters",],
+	"//software/parameter:dynamic_parameters",
+	":simulated_test_fixture",],
 )
 
 cc_test(
