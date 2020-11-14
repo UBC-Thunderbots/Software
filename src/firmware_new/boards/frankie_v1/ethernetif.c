@@ -185,15 +185,7 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef *ethHandle)
         GPIO_InitStruct.Pull      = GPIO_NOPULL;
         GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
         GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(RMII_TXD1_GPIO_Port, &GPIO_InitStruct);
-
-        GPIO_InitStruct.Pin       = RMII_TX_EN_Pin | RMII_TXD0_Pin;
-        GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull      = GPIO_NOPULL;
-        GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
-        GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
-
+        
         /* Peripheral interrupt init */
         HAL_NVIC_SetPriority(ETH_IRQn, 5, 0);
         HAL_NVIC_EnableIRQ(ETH_IRQn);
