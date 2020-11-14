@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "bazelbuild.vscode-bazel",
+        "ms-python.python"
+    ]
+}
+

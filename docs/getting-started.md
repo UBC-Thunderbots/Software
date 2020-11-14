@@ -18,6 +18,7 @@
    * [Installing CLion](#installing-clion)
       * [Getting your Student License](#getting-your-student-license)
       * [Installing CLion](#installing-clion-1)
+   * [Installing VSCode](#installing-vscode)
 * [Building and Running the Code](#building-and-running-the-code)
 * [Debugging](#debugging)
 * [Profiling](#profiling)
@@ -89,7 +90,7 @@ We have several setup scripts to help you easily install the necessary dependenc
 
 ### Installing CLion
 
-CLion is our main IDE for editing our C/C++ code. It is designed to work with our build system, `bazel`, and has all the great features of an IDE such as code completion, syntax highlighting etc. We **strongly** recommend installing CLion and using it for development.
+CLion is our main IDE for editing our C/C++ code. It is designed to work with our build system, `bazel`, and has all the great features of an IDE such as code completion, syntax highlighting etc. If you are running Software on an ultrabook or a virtual machine, see [Installing VSCode](#installing-vscode) for a less resource intensive option.
 
 #### Getting your Student License
 
@@ -104,6 +105,12 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
 * Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
 * When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
+
+### Installing VSCode
+
+* Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
+* Run `./install_vscode.sh` (* **DO NOT** download VSCode yourself unless you know what you're doing. The `install_vscode.sh` script will grab the most stable version of VSCode)
+* Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop.
 
 ## Building and Running the Code
 
@@ -129,7 +136,6 @@ First we need to setup CLion
 6. Change the Project Name to whatever you want. Leave everything else as it is ("Use shared project view file" should be selected).
 7. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
 
-
 Now that you're setup, if you can run it on the command line, you can run it in clion. There are two main ways of doing so.
 1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
 2. Add a custom build configuration (more powerful, so make sure you understand this!)
@@ -138,6 +144,14 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     3. For `Target Expression`, you can put anything that comes after a `build`, `run`, `test`, etc. call on the command line. For example: `//software/geom:angle_test`.
     4. For `Bazel Command` you can put any bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
+
+### With VSCode
+
+First we need to setup VSCode
+1. Open VSCode 
+2. Click `Open Folder` and navigate to where you cloned software. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
+3. VSCode will prompt you to install recommended extensions, click `Install`, this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc..)
+
 
 ### Running our AI, Simulator or Robot Diagnostics
 
