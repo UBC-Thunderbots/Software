@@ -522,6 +522,11 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
         static_cast<int>((max_navigable_y_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
                          SIZE_OF_GRID_CELL_IN_METERS);
 
+    //add assertion to ensure that the key value in Coordinate and Coordinate pair would not overflow,
+    //overflow would happen when grid row or col is larger than 1<<16
+    assert(num_grid_rows < (1 << 16));
+    assert(num_grid_cols < (1 << 16));
+
     // Reset data structures to path plan again
     open_list.clear();
     closed_list.clear();

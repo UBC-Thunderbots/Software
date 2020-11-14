@@ -47,8 +47,6 @@ class ThetaStarPathPlanner : public PathPlanner
         Coordinate(unsigned int row, unsigned int col)
             : row_(row), col_(col), internal_comparison_key_(computeComparisonKey(*this))
         {
-            assert(row < (1 << 16));
-            assert(col < (1 << 16));
         }
 
         Coordinate() : row_(0), col_(0) {}
