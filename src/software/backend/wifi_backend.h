@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/proto/robot_log_msg.pb.h"
 #include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
@@ -24,7 +25,7 @@ class WifiBackend : public Backend
 
     /**
      * Joins the specified multicast group on the vision_output, primitive_output
-     * and robot_msg_input. Multicast Channel and Multicast Group are used
+     * and robot_status_input. Multicast Channel and Multicast Group are used
      * interchangeably.
      *
      * NOTE: This will terminate the existing connection on the previous channel
@@ -37,6 +38,13 @@ class WifiBackend : public Backend
      */
     void joinMulticastChannel(int channel, const std::string& interface);
 
+    /**
+     * Callback for the RobotLog listener
+     *
+     * @param robot_log The robot_log that was received
+     */
+    void receiveRobotLogs(TbotsProto::RobotLog robot_log);
+
     const std::shared_ptr<const NetworkConfig> network_config;
     const std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
 
@@ -48,7 +56,8 @@ class WifiBackend : public Backend
     std::unique_ptr<ThreadedProtoMulticastSender<TbotsProto::PrimitiveSet>>
         primitive_output;
     std::unique_ptr<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>
-        robot_msg_input;
+        robot_status_input;
+    std::unique_ptr<ThreadedProtoMulticastListener<TbotsProto::RobotLog>> robot_log_input;
     std::unique_ptr<ThreadedProtoMulticastSender<DefendingSideProto>>
         defending_side_output;
 };

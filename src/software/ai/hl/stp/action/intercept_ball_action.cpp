@@ -13,9 +13,8 @@
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
 
-InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
-                                         bool loop_forever)
-    : Action(loop_forever), field(field), ball(ball)
+InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball)
+    : Action(false), field(field), ball(ball)
 {
 }
 
@@ -151,6 +150,7 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
         {
             restart();
         }
+
         bool ball_very_close_to_robot_dribbler =
             distance(ball.position(),
                      robot->position() + Vector::createFromAngle(robot->orientation())

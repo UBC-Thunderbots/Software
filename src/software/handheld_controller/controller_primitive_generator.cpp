@@ -17,13 +17,14 @@ void ControllerPrimitiveGenerator::onValueReceived(ControllerInput controller_in
 
     auto &robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
     robot_primitives_map[robot_id] =
-        *createPrimitiveFromControllerInput(controller_input);
+        *createPrimitiveFromControllerInput(controller_input, controller_input_config);
     Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*primitive_set_msg);
 }
 
 std::unique_ptr<TbotsProto::Primitive>
 ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
-    const ControllerInput &controller_input)
+    const ControllerInput &controller_input,
+    std::shared_ptr<const HandheldControllerConfig> controller_input_config)
 {
     if (controller_input.isKickButtonPressed())
     {

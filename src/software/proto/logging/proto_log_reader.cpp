@@ -1,4 +1,4 @@
-#include "replay_reader.h"
+#include "proto_log_reader.h"
 
 #include <google/protobuf/util/delimited_message_util.h>
 
@@ -6,7 +6,7 @@
 
 namespace fs = std::experimental::filesystem;
 
-ReplayProto ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_path)
+RepeatedAnyMsg ProtoLogReader::readDelimitedRepeatedAnyMsgFile(const fs::path& file_path)
 {
     std::ifstream file_ifstream(file_path, std::ios_base::in | std::ios_base::binary);
     auto file_input =
@@ -14,7 +14,7 @@ ReplayProto ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_p
     auto coded_input =
         std::make_unique<google::protobuf::io::CodedInputStream>(file_input.get());
 
-    ReplayProto msg;
+    RepeatedAnyMsg msg;
     bool result = google::protobuf::util::ParseDelimitedFromCodedStream(
         dynamic_cast<google::protobuf::MessageLite*>(&msg), coded_input.get(), nullptr);
     if (!result)
@@ -25,7 +25,7 @@ ReplayProto ReplayReader::readDelimitedReplayProtobufFile(const fs::path& file_p
     return msg;
 }
 
-ReplayReader::ReplayReader(const std::string& _replay_dir)
+ProtoLogReader::ProtoLogReader(const std::string& _replay_dir)
     : cur_msg_idx(0), replay_dir(_replay_dir)
 {
     if (!fs::exists(replay_dir) || !fs::is_directory(replay_dir))
@@ -68,33 +68,16 @@ ReplayReader::ReplayReader(const std::string& _replay_dir)
     max_chunk_idx   = *chunk_indices.rbegin();
     auto chunk_path = replay_dir / std::to_string(cur_chunk_idx);
 
-    cur_chunk.CopyFrom(readDelimitedReplayProtobufFile(chunk_path));
+    cur_chunk.CopyFrom(readDelimitedRepeatedAnyMsgFile(chunk_path));
 }
 
-std::optional<SensorProto> ReplayReader::getNextMsg()
+
+bool ProtoLogReader::hasNextMsg() const
 {
-    if (!hasNextMsg())
-    {
-        return std::nullopt;
-    }
-
-    if (cur_msg_idx >= cur_chunk.replay_msgs_size())
-    {
-        nextChunk();
-    }
-
-    auto ret = cur_chunk.replay_msgs(cur_msg_idx);
-    cur_msg_idx++;
-    return ret;
+    return !(cur_chunk_idx == max_chunk_idx && cur_msg_idx == cur_chunk.messages_size());
 }
 
-bool ReplayReader::hasNextMsg() const
-{
-    return !(cur_chunk_idx == max_chunk_idx &&
-             cur_msg_idx == cur_chunk.replay_msgs_size());
-}
-
-void ReplayReader::nextChunk()
+void ProtoLogReader::nextChunk()
 {
     cur_chunk_idx++;
     auto chunk_path = replay_dir / std::to_string(cur_chunk_idx);
@@ -104,6 +87,6 @@ void ReplayReader::nextChunk()
         throw std::out_of_range("Reached end of replay_logging!");
     }
 
-    cur_chunk   = readDelimitedReplayProtobufFile(chunk_path);
+    cur_chunk   = readDelimitedRepeatedAnyMsgFile(chunk_path);
     cur_msg_idx = 0;
 }
