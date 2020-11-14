@@ -21,26 +21,10 @@ jobs:
         id: check_files
         run: |
           if "${GITHUB_WORKSPACE}"/.travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware\|software\|environment_setup";
-          then echo "::set-output name=run_software_tests::true"; else echo "::set-output name=run_software_tests::true"; fi
+          then echo "::set-output name=run_software_tests::true"; else echo "::set-output name=run_software_tests::false"; fi
           
           if "${GITHUB_WORKSPACE}"/.travis/check_for_changes.sh $TRAVIS_COMMIT_RANGE "firmware_new/boards\|firmware/boards\|environment_setup";
-          then echo "::set-output name=run_firmware_tests::true"; else echo "::set-output name=run_firmware_tests::true"; fi
-            
-  formatting-check:
-    name: Formatting Check
-    runs-on: ubuntu-18.04
-    
-    steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
-        
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
-      
-      - name: Check Formatting
-        run: |
-          ./formatting_scripts/check_formatting_ci.sh
+          then echo "::set-output name=run_firmware_tests::true"; else echo "::set-output name=run_firmware_tests::false"; fi
           
   software-tests:
     name: Software Tests
