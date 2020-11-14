@@ -229,4 +229,3 @@ cc_test(
         "//software/world",
     ],
 )
-
