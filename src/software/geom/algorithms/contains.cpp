@@ -5,7 +5,6 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/geom_constants.h"
 
-
 bool contains(const Circle& container, const Segment& contained)
 {
     return contains(container, contained.getStart()) &&
@@ -62,17 +61,13 @@ bool contains(const Polygon& container, const Point& contained)
 bool contains(const Ray& container, const Point& contained)
 {
     Point point_in_ray_direction = container.getStart() + container.toUnitVector();
-    bool point_is_ray_start      = contained == container.getStart();
 
-    // We use broader values for epsilon and ulps because the default values brought
-    // warnings from simulated tests
+    bool point_is_ray_start = contained == container.getStart();
     bool point_collinear_with_ray =
-        collinear(contained, container.getStart(), point_in_ray_direction,
-                  1000 * FIXED_EPSILON, 2 * ULPS_EPSILON_HUNDRED);
-    bool point_is_in_ray_direction = almostEqual(
+        collinear(contained, container.getStart(), point_in_ray_direction);
+    bool point_is_in_ray_direction =
         ((contained - container.getStart()).normalize() - container.toUnitVector())
-            .length(),
-        0, 1000 * FIXED_EPSILON, 2 * ULPS_EPSILON_HUNDRED);
+            .length() < FIXED_EPSILON;
     return point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
 }
 
