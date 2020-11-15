@@ -305,7 +305,8 @@ TEST_F(TestThetaStarPathPlanner, no_navigable_area)
     EXPECT_EQ(std::nullopt, path);
 }
 
-TEST_F(TestThetaStarPathPlanner, test_theta_star_small_distance_that_is_greater_than_robot_radius)
+TEST_F(TestThetaStarPathPlanner,
+       test_theta_star_small_distance_that_is_greater_than_robot_radius)
 {
     Field field = Field::createSSLDivisionBField();
     Point start{-4.528, -3.119}, dest{-4.44, -3.031};

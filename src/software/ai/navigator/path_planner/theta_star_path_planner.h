@@ -338,7 +338,7 @@ class ThetaStarPathPlanner : public PathPlanner
     const double SIZE_OF_GRID_CELL_IN_METERS =
         ROBOT_MAX_RADIUS_METERS;  // this is the n in the O(n^2) algorithm :p
 
-        std::vector<ObstaclePtr> obstacles;
+    std::vector<ObstaclePtr> obstacles;
     unsigned int num_grid_rows;
     unsigned int num_grid_cols;
     double max_navigable_x_coord;
