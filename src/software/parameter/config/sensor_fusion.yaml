@@ -48,7 +48,7 @@ SensorFusionConfig:
       with defendingPositiveSide parameter
   DefendingPositiveSide:
     type: "bool"
-    default: true
+    default: false
     description: >-
       Positive if selected, Negative if unselected
   OverrideGameControllerFriendlyTeamColor:
