@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 py_test(
-    name = "test",
-    srcs = ["test.py"],
+    name = "test_hermetic_python_environment",
+    srcs = ["test_hermetic_python_environment.py"],
 )
