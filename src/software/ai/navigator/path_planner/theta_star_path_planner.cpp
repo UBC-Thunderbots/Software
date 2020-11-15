@@ -201,7 +201,6 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     if (found_end == false)
     {
-        std::cout<<"start_coord, end_coord: ("<< start_coord.first<<" , "<<start_coord.second<<" , ) ( "<<end_coord.first<<" , "<<end_coord.second<<std::endl;
         return std::nullopt;
     }
 
