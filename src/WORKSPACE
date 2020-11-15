@@ -248,3 +248,9 @@ pip_install(
     python_interpreter_target = "@python_interpreter//:python_bin",
     requirements = "//external:nanopb_requirements.txt",
 )
+
+pip_install(
+    name = "python_tools_deps",
+    python_interpreter_target = "@python_interpreter//:python_bin",
+    requirements = "//python_tools:requirements.txt",
+)
