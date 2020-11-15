@@ -173,7 +173,7 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!(kick_action->done() || chip_action->done()));
 }
 
-void ShootGoalTactic::accept(TacticVisitor &visitor)
+void ShootGoalTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

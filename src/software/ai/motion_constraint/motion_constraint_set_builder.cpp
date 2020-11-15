@@ -4,7 +4,7 @@
 #include "software/ai/motion_constraint/motion_constraint_visitor.h"
 
 std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
-                                                    Tactic &tactic)
+                                                    const Tactic &tactic)
 {
     std::set<MotionConstraint> current_allowed_constraints;
     MotionConstraintVisitor motion_constraint_visitor;

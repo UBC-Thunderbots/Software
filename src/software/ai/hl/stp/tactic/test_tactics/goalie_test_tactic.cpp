@@ -23,7 +23,7 @@ void GoalieTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     // Yield nothing
 }
 
-void GoalieTestTactic::accept(TacticVisitor &visitor)
+void GoalieTestTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

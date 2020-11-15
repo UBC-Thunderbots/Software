@@ -17,7 +17,7 @@
  * @return set of MotionConstraints
  */
 std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
-                                                    Tactic &tactic);
+                                                    const Tactic &tactic);
 
 
 
@@ -26,6 +26,8 @@ std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
  * gamestate
  *
  * @param game_state GameState to generate move constraints from
+ *
+ * @return set of MotionConstraints
  */
 std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
     const GameState &game_state);

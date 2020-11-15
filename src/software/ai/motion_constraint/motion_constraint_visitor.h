@@ -48,7 +48,7 @@ class MotionConstraintVisitor : public TacticVisitor
      * @modifies current_allowed_constraints
      * @return set of MotionConstraints
      */
-    std::set<MotionConstraint> getCurrentAllowedConstraints(Tactic &tactic);
+    std::set<MotionConstraint> getCurrentAllowedConstraints(const Tactic &tactic);
 
    private:
     std::set<MotionConstraint> current_allowed_constraints;

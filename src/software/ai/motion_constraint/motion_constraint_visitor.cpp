@@ -82,7 +82,7 @@ void MotionConstraintVisitor::visit(const GoalieTestTactic &tactic) {}
 // clang-format on
 
 std::set<MotionConstraint> MotionConstraintVisitor::getCurrentAllowedConstraints(
-    Tactic &tactic)
+    const Tactic &tactic)
 {
     tactic.accept(*this);
     return current_allowed_constraints;
