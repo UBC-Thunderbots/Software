@@ -182,7 +182,8 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     // if the start and end points are close enough, then return a straightline path
     if ((start - end).length() < CLOSE_TO_END_THRESHOLD ||
-        ((start - end).length() < SIZE_OF_GRID_CELL_IN_METERS))
+            ((abs(start.x() - end.x()) < SIZE_OF_GRID_CELL_IN_METERS) &&
+        abs(start.y() - end.y()) < SIZE_OF_GRID_CELL_IN_METERS))
     {
         return Path(std::vector<Point>({start, end}));
     }
@@ -200,6 +201,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     if (found_end == false)
     {
+        std::cout<<"start_coord, end_coord: ("<< start_coord.first<<" , "<<start_coord.second<<" , ) ( "<<end_coord.first<<" , "<<end_coord.second<<std::endl;
         return std::nullopt;
     }
 
