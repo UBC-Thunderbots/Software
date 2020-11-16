@@ -222,7 +222,7 @@ filegroup(
     patch_cmds = [
         "mkdir $(pwd)/bazel_install",
         _py_configure,
-        "make -j4",
+        "make -j$(nproc)",
         "make install",
         "ln -s bazel_install/bin/python3 python_bin",
     ],

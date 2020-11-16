@@ -10,9 +10,13 @@ py_test(
 py_binary(
     name = "jupyter",
     srcs = ["jupyter.py"],
+    # glob all the notebooks in this directory
+    data = [":notebooks"],
     deps = [
         requirement("jupyter"),
         requirement("notebook"),
+        requirement("numpy"),
+        requirement("matplotlib"),
         "//shared/proto:tbots_py_proto",
         "//software/proto:software_py_proto",
     ],

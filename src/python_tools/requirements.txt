@@ -1,2 +1,4 @@
 jupyter==1.0.0
 notebook==6.1.5
+numpy
+matplotlib

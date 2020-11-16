@@ -92,6 +92,7 @@ py_proto_library(
         "messages_robocup_ssl_detection.proto",
         "messages_robocup_ssl_geometry.proto",
         "messages_robocup_ssl_wrapper.proto",
+        "repeated_any_msg.proto",
         "replay_msg.proto",
         "sensor_msg.proto",
         "ssl_gc_common.proto",
