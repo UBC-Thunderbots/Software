@@ -2,3 +2,4 @@ jupyter==1.0.0
 notebook==6.1.5
 numpy
 matplotlib
+protobuf==3.6.1

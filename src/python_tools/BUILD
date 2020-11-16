@@ -7,6 +7,15 @@ py_test(
     srcs = ["test_hermetic_python_environment.py"],
 )
 
+py_library(
+    name = "proto_log",
+    srcs = ["proto_log.py"],
+    deps = [
+        "//software/proto:software_py_proto",
+        requirement("protobuf"),
+    ],
+)
+
 py_binary(
     name = "jupyter",
     srcs = ["jupyter.py"],
@@ -17,6 +26,7 @@ py_binary(
         requirement("notebook"),
         requirement("numpy"),
         requirement("matplotlib"),
+        ":proto_log",
         "//shared/proto:tbots_py_proto",
         "//software/proto:software_py_proto",
     ],
