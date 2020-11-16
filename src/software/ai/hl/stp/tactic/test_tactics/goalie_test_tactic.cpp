@@ -5,6 +5,8 @@ GoalieTestTactic::GoalieTestTactic(bool loop_forever)
 {
 }
 
+void GoalieTestTactic::updateWorldParams(const World &world) {}
+
 bool GoalieTestTactic::isGoalieTactic() const
 {
     return true;
@@ -21,7 +23,7 @@ void GoalieTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     // Yield nothing
 }
 
-void GoalieTestTactic::accept(MutableTacticVisitor &visitor)
+void GoalieTestTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

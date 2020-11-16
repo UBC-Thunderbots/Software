@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 
@@ -21,13 +20,12 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
 {
 }
 
-void ShadowEnemyTactic::updateWorldParams(const Field &field, const Team &friendly_team,
-                                          const Team &enemy_team, const Ball &ball)
+void ShadowEnemyTactic::updateWorldParams(const World &world)
 {
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-    this->ball          = ball;
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
 
 void ShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_threat,
@@ -108,8 +106,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 enemy_shot_vector.normalize(this->shadow_distance);
 
             // If the enemy robot already had the ball, try steal it and chip it away
-            if (*robotHasPossession(ball.getPreviousStates(),
-                                    enemy_robot.getPreviousStates()) &&
+            if (enemy_robot.isNearDribbler(ball.position()) &&
                 ball.velocity().length() <= ball_steal_speed)
             {
                 move_action->updateControlParams(
@@ -132,7 +129,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void ShadowEnemyTactic::accept(MutableTacticVisitor &visitor)
+void ShadowEnemyTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

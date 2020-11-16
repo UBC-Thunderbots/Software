@@ -50,6 +50,17 @@ proto_library(
     visibility = ["//visibility:private"],
 )
 
+proto_library(
+    name = "repeated_any_msg_proto",
+    srcs = [
+        "repeated_any_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@com_google_protobuf//:any_proto",
+    ],
+)
+
 cc_proto_library(
     name = "ssl_cc_proto",
     deps = [":ssl_proto"],
@@ -68,6 +79,11 @@ cc_proto_library(
 cc_proto_library(
     name = "defending_side_msg_cc_proto",
     deps = [":defending_side_msg_proto"],
+)
+
+cc_proto_library(
+    name = "repeated_any_msg_cc_proto",
+    deps = [":repeated_any_msg_proto"],
 )
 
 py_proto_library(

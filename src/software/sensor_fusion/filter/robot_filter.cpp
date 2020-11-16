@@ -31,7 +31,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
     {
         // add up all data points for this robot and then average it
         if (robot_data.id == this->getRobotId() &&
-            robot_data.timestamp > this->current_robot_state.lastUpdateTimestamp())
+            robot_data.timestamp > this->current_robot_state.timestamp())
         {
             filtered_data.position =
                 filtered_data.position + robot_data.position.toVector();
@@ -58,7 +58,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
         // recorded robot state, return null. Otherwise remain the same state
         if (latest_timestamp.toMilliseconds() >
             this->expiry_buffer_duration.toMilliseconds() +
-                current_robot_state.lastUpdateTimestamp().toMilliseconds())
+                current_robot_state.timestamp().toMilliseconds())
         {
             return std::nullopt;
         }
@@ -80,13 +80,13 @@ std::optional<Robot> RobotFilter::getFilteredData(
         filtered_data.velocity =
             (filtered_data.position - current_robot_state.position()) /
             (filtered_data.timestamp.toSeconds() -
-             current_robot_state.lastUpdateTimestamp().toSeconds());
+             current_robot_state.timestamp().toSeconds());
 
         // angular_velocity = orientation difference / time difference
         filtered_data.angular_velocity =
             (filtered_data.orientation - current_robot_state.orientation()) /
             (filtered_data.timestamp.toSeconds() -
-             current_robot_state.lastUpdateTimestamp().toSeconds());
+             current_robot_state.timestamp().toSeconds());
 
         // update current_robot_state
         this->current_robot_state =

@@ -10,6 +10,8 @@ double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world
     return 0.5;
 }
 
+void StopTestTactic::updateWorldParams(const World &world) {}
+
 void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     do
@@ -18,7 +20,7 @@ void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (this->robot->velocity().length() > 0.05);
 }
 
-void StopTestTactic::accept(MutableTacticVisitor &visitor)
+void StopTestTactic::accept(TacticVisitor &visitor)
 {
     visitor.visit(*this);
 }

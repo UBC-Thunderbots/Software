@@ -9,19 +9,17 @@
 
 extern "C"
 {
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/world/firmware_ball.h"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/firmware_world.h"
+#include "shared/proto/robot_log_msg.nanopb.h"
 }
 
-Simulator::Simulator(const Field& field, const Duration& physics_time_step)
-    : Simulator(field, 1.0, 0.0, physics_time_step)
-{
-}
-
-Simulator::Simulator(const Field& field, double ball_restitution,
-                     double ball_linear_damping, const Duration& physics_time_step)
-    : physics_world(field, ball_restitution, ball_linear_damping),
+Simulator::Simulator(const Field& field,
+                     std::shared_ptr<const SimulatorConfig> simulator_config,
+                     const Duration& physics_time_step)
+    : physics_world(field, simulator_config),
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),
@@ -33,6 +31,16 @@ void Simulator::setBallState(const BallState& ball_state)
 {
     physics_world.setBallState(ball_state);
     simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
+
+    for (auto& robot_pair : yellow_simulator_robots)
+    {
+        robot_pair.first->clearBallInDribblerArea();
+    }
+
+    for (auto& robot_pair : blue_simulator_robots)
+    {
+        robot_pair.first->clearBallInDribblerArea();
+    }
 }
 
 void Simulator::removeBall()
@@ -44,26 +52,44 @@ void Simulator::removeBall()
 void Simulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
     physics_world.addYellowRobots(robots);
-    updateSimulatorRobots(physics_world.getYellowPhysicsRobots(),
-                          yellow_simulator_robots);
+    updateSimulatorRobots(physics_world.getYellowPhysicsRobots(), yellow_simulator_robots,
+                          TeamColour::YELLOW);
 }
 
 void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
     physics_world.addBlueRobots(robots);
-    updateSimulatorRobots(physics_world.getBluePhysicsRobots(), blue_simulator_robots);
+    updateSimulatorRobots(physics_world.getBluePhysicsRobots(), blue_simulator_robots,
+                          TeamColour::BLUE);
 }
 
 void Simulator::updateSimulatorRobots(
     const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-        simulator_robots)
+        simulator_robots,
+    TeamColour team_colour)
 {
     for (const auto& physics_robot : physics_robots)
     {
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
-        auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
-        auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
+
+        // we initialize the logger with the appropriate logging function based
+        // on the team color and the robot id to propagate any logs when creating
+        // the firmware_robot and firmware_ball
+        if (team_colour == TeamColour::BLUE)
+        {
+            app_logger_init(simulator_robot->getRobotId(),
+                            &SimulatorRobotSingleton::handleBlueRobotLogProto);
+        }
+        else if (team_colour == TeamColour::YELLOW)
+        {
+            app_logger_init(simulator_robot->getRobotId(),
+                            &SimulatorRobotSingleton::handleYellowRobotLogProto);
+        }
+
+        auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
+        auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
+
         FirmwareWorld_t* firmware_world_raw =
             app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
         auto firmware_world =
@@ -174,6 +200,10 @@ void Simulator::stepSimulation(const Duration& time_step)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
+
+            app_logger_init(simulator_robot->getRobotId(),
+                            &SimulatorRobotSingleton::handleBlueRobotLogProto);
+
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
                                                        blue_team_defending_side);
             SimulatorBallSingleton::setSimulatorBall(simulator_ball,
@@ -185,6 +215,10 @@ void Simulator::stepSimulation(const Duration& time_step)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
+
+            app_logger_init(simulator_robot->getRobotId(),
+                            &SimulatorRobotSingleton::handleYellowRobotLogProto);
+
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
                                                        yellow_team_defending_side);
             SimulatorBallSingleton::setSimulatorBall(simulator_ball,
@@ -210,8 +244,7 @@ World Simulator::getWorld() const
     Ball ball = Ball(Point(0, 0), Vector(0, 0), timestamp);
     if (physics_world.getBallState())
     {
-        ball =
-            Ball(TimestampedBallState(physics_world.getBallState().value(), timestamp));
+        ball = Ball(BallState(physics_world.getBallState().value()), timestamp);
     }
 
     // Note: The simulator currently makes the invariant that friendly robots
@@ -220,15 +253,13 @@ World Simulator::getWorld() const
     std::vector<Robot> friendly_team_robots;
     for (const auto& robot_state : physics_world.getYellowRobotStates())
     {
-        TimestampedRobotState timestamped_robot_state(robot_state.robot_state, timestamp);
-        Robot robot(robot_state.id, timestamped_robot_state);
+        Robot robot(robot_state.id, robot_state.robot_state, timestamp);
         friendly_team_robots.emplace_back(robot);
     }
     std::vector<Robot> enemy_team_robots;
     for (const auto& robot_state : physics_world.getBlueRobotStates())
     {
-        TimestampedRobotState timestamped_robot_state(robot_state.robot_state, timestamp);
-        Robot robot(robot_state.id, timestamped_robot_state);
+        Robot robot(robot_state.id, robot_state.robot_state, timestamp);
         enemy_team_robots.emplace_back(robot);
     }
 

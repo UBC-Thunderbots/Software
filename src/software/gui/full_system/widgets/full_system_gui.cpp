@@ -42,6 +42,10 @@ FullSystemGUI::FullSystemGUI(
     setFocusPolicy(Qt::StrongFocus);
 
     setupRobotStatusTable(main_widget->robot_status_table_widget);
+    main_widget->dynamic_parameter_widget->setupParameters(MutableDynamicParameters);
+    // This ignores the vertical size hint so that the widget can shrink vertically
+    main_widget->dynamic_parameter_widget->setSizePolicy(QSizePolicy::Preferred,
+                                                         QSizePolicy::Ignored);
     setupAIControls(main_widget, config);
 
     connect(update_timer, &QTimer::timeout, this, &FullSystemGUI::handleUpdate);

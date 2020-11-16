@@ -25,6 +25,8 @@ class MoveAction : public Action
         bool loop_forever, double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD,
         Angle close_to_orientation_threshold = ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
 
+    MoveAction() = delete;
+
     /**
      * Updates the params that cannot be derived from the world for this action
      *

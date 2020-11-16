@@ -15,7 +15,7 @@ TEST(InterceptBallActionTest, intercept_fast_moving_ball)
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    InterceptBallAction action = InterceptBallAction(field, ball, true);
+    InterceptBallAction action = InterceptBallAction(field, ball);
 
     action.updateWorldParams(field, ball);
     action.updateControlParams(robot);
@@ -48,7 +48,7 @@ TEST(InterceptBallActionTest, ball_moving_too_fast_to_intercept_within_field)
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    InterceptBallAction action = InterceptBallAction(field, ball, true);
+    InterceptBallAction action = InterceptBallAction(field, ball);
 
     action.updateWorldParams(field, ball);
     action.updateControlParams(robot);
@@ -81,7 +81,7 @@ TEST(InterceptBallActionTest, intercept_slow_moving_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
 
-    InterceptBallAction action = InterceptBallAction(field, ball, true);
+    InterceptBallAction action = InterceptBallAction(field, ball);
 
     action.updateWorldParams(field, ball);
     action.updateControlParams(robot);

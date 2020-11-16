@@ -16,10 +16,10 @@ PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
 {
 }
 
-void PasserTactic::updateWorldParams(const Ball& updated_ball, const Field& updated_field)
+void PasserTactic::updateWorldParams(const World& world)
 {
-    this->ball  = updated_ball;
-    this->field = updated_field;
+    this->ball  = world.ball();
+    this->field = world.field();
 }
 
 void PasserTactic::updateControlParams(const Pass& updated_pass)
@@ -44,7 +44,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // we are likely in a set play and so we don't need to initially collect the ball
     if (ball.velocity().length() > INTERCEPT_BALL_SPEED_THRESHOLD)
     {
-        auto intercept_action = std::make_shared<InterceptBallAction>(field, ball, false);
+        auto intercept_action = std::make_shared<InterceptBallAction>(field, ball);
         do
         {
             intercept_action->updateControlParams(*robot);
@@ -56,7 +56,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // until it's time to perform the pass
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
-    while (ball.lastUpdateTimestamp() < pass.startTime())
+    while (ball.timestamp() < pass.startTime())
     {
         // We want to wait just behind where the pass is supposed to start, so that the
         // ball is *almost* touching the kicker
@@ -89,7 +89,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     } while (!hasBallBeenKicked(ball, kick_direction));
 }
 
-void PasserTactic::accept(MutableTacticVisitor& visitor)
+void PasserTactic::accept(TacticVisitor& visitor)
 {
     visitor.visit(*this);
 }
