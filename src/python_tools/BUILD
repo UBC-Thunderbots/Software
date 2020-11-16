@@ -13,5 +13,7 @@ py_binary(
     deps = [
         requirement("jupyter"),
         requirement("notebook"),
+        "//shared/proto:tbots_py_proto",
+        "//software/proto:software_py_proto",
     ],
 )
