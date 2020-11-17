@@ -39,12 +39,12 @@ AIControlConfig:
         parameter
   CurrentRefereeCommand:
     type: "std::string"
-    default: "Halt"
+    default: "HALT"
     description: >-
         Specifies the referee command that should be in use
   PreviousRefereeCommand:
     type: "std::string"
-    default: "Halt"
+    default: "HALT"
     description: >-
         Specifies the previous referee command to correctly set up 
         the referee command state machine when overriding the referee command.

@@ -46,9 +46,6 @@ void SimulatedTestFixture::SetUp()
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideGameControllerFriendlyTeamColor()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
         ->setValue(true);
 }

@@ -26,7 +26,6 @@ class SensorFusionTest : public ::testing::Test
           referee_ball_placement_yellow(initRefereeBallPlacementYellow()),
           referee_ball_placement_blue(initRefereeBallPlacementBlue())
     {
-        config->mutableOverrideGameControllerFriendlyTeamColor()->setValue(true);
         config->mutableFriendlyColorYellow()->setValue(true);
 
         config->mutableOverrideGameControllerDefendingSide()->setValue(true);

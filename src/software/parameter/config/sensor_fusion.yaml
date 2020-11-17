@@ -51,12 +51,6 @@ SensorFusionConfig:
     default: false
     description: >-
       Positive if selected, Negative if unselected
-  OverrideGameControllerFriendlyTeamColor:
-    type: "bool"
-    default: true
-    description: >-
-      Overrides the team color provided by the game controller,
-      with friendlyColorYellow parameter
   FriendlyColorYellow:
     type: "bool"
     default: true
