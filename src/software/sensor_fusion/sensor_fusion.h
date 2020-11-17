@@ -134,8 +134,8 @@ class SensorFusion
 
     // Number of vision packets to indicate that the vision client most likely reset,
     // determined experimentally with the simulator
-    const unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
+    static constexpr unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
     // Vision packets before this threshold time indicate that the vision client has just
     // started, determined experimentally with the simulator
-    const double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
+    static constexpr double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
 };
