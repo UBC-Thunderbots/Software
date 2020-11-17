@@ -145,6 +145,25 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "autochip_move_test",
+    srcs = ["autochip_move_primitive_test.cpp"],
+    deps = [
+        ":autochip_move",
+        ":test_util_world",
+    ],
+)
+
+cc_library(
+    name = "test_util_world",
+    hdrs = ["test_util_world.h"],
+    deps = [
+        ":primitive_manager",
+        "@fff",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "stop",
     srcs = ["stop_primitive.c"],

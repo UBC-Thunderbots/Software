@@ -19,15 +19,15 @@ void SimulatedTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger();
 
-    // TODO: Ideally we should reset all DynamicParameters for each test. However
-    // because DynamicParameters are still partially global, this can't be done
-    // until https://github.com/UBC-Thunderbots/Software/issues/1483 is complete
-
-    // Re-create all objects for each test so we start from a clean setup
-    // every time. Because the simulator is created initially in the
-    // constructor's initialization list, and before every test in this SetUp function, we
-    // can guarantee the pointer will never be null / empty
-    simulator = std::make_unique<Simulator>(Field::createSSLDivisionBField());
+    // init() resets all DynamicParameters for each test. Since DynamicParameters are
+    // still partially global, we need to reinitialize simulator, sensor_fusion, and ai,
+    // so that they can grab the new dynamic parameter pointers. Note that this is a bit
+    // of hack because we're changing a global variable, but it can't be easily fixed
+    // through dependency injection until
+    // https://github.com/UBC-Thunderbots/Software/issues/1299
+    MutableDynamicParameters->init();
+    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
+    sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
     ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
 
     MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
