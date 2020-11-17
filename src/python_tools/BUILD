@@ -16,6 +16,15 @@ py_library(
     ],
 )
 
+py_library(
+    name = "sensor_proto_log",
+    srcs = ["sensor_proto_log.py"],
+    deps = [
+        ":proto_log",
+        "//software/proto:software_py_proto",
+    ],
+)
+
 py_binary(
     name = "jupyter",
     srcs = ["jupyter.py"],
@@ -27,6 +36,7 @@ py_binary(
         requirement("numpy"),
         requirement("matplotlib"),
         ":proto_log",
+        ":sensor_proto_log",
         "//shared/proto:tbots_py_proto",
         "//software/proto:software_py_proto",
     ],

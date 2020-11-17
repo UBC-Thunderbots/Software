@@ -2,6 +2,7 @@ from software.proto.repeated_any_msg_pb2 import RepeatedAnyMsg
 from google.protobuf.internal.decoder import _DecodeVarint32
 import os
 
+
 class ProtoLog:
     def __init__(self, directory, msg_class):
         self.msg_class = msg_class
@@ -12,10 +13,10 @@ class ProtoLog:
         for file in os.listdir(directory):
             filepath = os.path.join(directory, file)
             if file.isnumeric() and os.path.isfile(filepath):
-                buf = open(filepath, 'rb').read()
+                buf = open(filepath, "rb").read()
                 msg_len, new_pos = _DecodeVarint32(buf, 0)
                 repeated_any_msg = RepeatedAnyMsg()
-                repeated_any_msg.ParseFromString(buf[new_pos:new_pos + msg_len])
+                repeated_any_msg.ParseFromString(buf[new_pos : new_pos + msg_len])
                 self.repeated_any_msgs.append(repeated_any_msg)
                 self.chunk_start_idxs.append(cur_start_idx)
                 cur_start_idx += len(repeated_any_msg.messages)
@@ -30,8 +31,13 @@ class ProtoLog:
             return self.cached_unpacked_msgs[idx]
 
         if idx >= self.chunk_start_idxs[-1] + len(self.repeated_any_msgs[-1].messages):
-            raise IndexError("Tried to access msg idx {} when we only have {} msgs!".format(
-                idx, self.chunk_start_idxs[-1] + len(self.repeated_any_msgs[-1].messages)))
+            raise IndexError(
+                "Tried to access msg idx {} when we only have {} msgs!".format(
+                    idx,
+                    self.chunk_start_idxs[-1]
+                    + len(self.repeated_any_msgs[-1].messages),
+                )
+            )
 
         chunk_idx = len(self.chunk_start_idxs) - 1
         for cidx in range(len(self.chunk_start_idxs) - 1):
@@ -40,14 +46,10 @@ class ProtoLog:
                 break
 
         msg_idx = idx - self.chunk_start_idxs[chunk_idx]
-
-        print("idx {} -> chunk_idx={}, msg_idx={}".format(idx, chunk_idx, msg_idx))
-
         msg = self.msg_class()
         self.repeated_any_msgs[chunk_idx].messages[msg_idx].Unpack(msg)
         self.cached_unpacked_msgs[idx] = msg
         return msg
-
 
     def __getitem__(self, key):
         if isinstance(key, slice):
