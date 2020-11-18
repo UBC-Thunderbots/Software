@@ -14,14 +14,15 @@ echo "=========================================================="
 cd src
 bazel run --cpu=stm32h7 //firmware_new/tools:cubemx_regen firmware_new/boards/frankie_v1
 if [[ "$?" != 0 ]]; then
-    echo "There was a problem running the formatting script, stopping now."
+    echo "There was an regenerating cubemx, stopping now."
     exit 1
 fi
 
 cd ..
 # Fix formatting
 ./formatting_scripts/fix_formatting.sh
+git diff
 if [[ "$?" != 0 ]]; then
-    echo "There was a problem running the formatting script, stopping now."
+    echo "Code generated is different from code committed, stopping now."
     exit 1
 fi
