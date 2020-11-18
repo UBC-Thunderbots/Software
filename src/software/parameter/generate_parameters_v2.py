@@ -5,6 +5,7 @@ generates the necessary c++ files before compiling to setup DynamicParameters
 
 """
 import yaml
+from yaml import SafeLoader
 import os
 import time
 import sys
@@ -35,7 +36,7 @@ def load_configuration(paths_to_yaml: list):
     for filename in paths_to_yaml:
         with open(filename, "r") as param_yaml:
             try:
-                config_descriptions = yaml.load(param_yaml)
+                config_descriptions = yaml.load(param_yaml, SafeLoader)
                 param_info.update(config_descriptions)
             except yaml.YAMLError as ymle:
                 error_msg = "{} could not be loaded correctly, please check format".format(
