@@ -278,7 +278,8 @@ void SensorFusion::checkForVisionReset(double t_capture)
     }
     else
     {
-        last_t_capture = t_capture;
+        reset_time_vision_packets_detected = 0;
+        last_t_capture                     = t_capture;
     }
 
     if (reset_time_vision_packets_detected > VISION_PACKET_RESET_COUNT_THRESHOLD)

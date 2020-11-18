@@ -47,6 +47,13 @@ class SensorFusion
      */
     std::optional<World> getWorld() const;
 
+    // Number of vision packets to indicate that the vision client most likely reset,
+    // determined experimentally with the simulator
+    static constexpr unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
+    // Vision packets before this threshold time indicate that the vision client has just
+    // started, determined experimentally with the simulator
+    static constexpr double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
+
    private:
     /**
      * Updates relevant components of world based on a new data
@@ -131,11 +138,4 @@ class SensorFusion
     RobotTeamFilter enemy_team_filter;
 
     TeamSide team_with_possession;
-
-    // Number of vision packets to indicate that the vision client most likely reset,
-    // determined experimentally with the simulator
-    static constexpr unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
-    // Vision packets before this threshold time indicate that the vision client has just
-    // started, determined experimentally with the simulator
-    static constexpr double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
 };

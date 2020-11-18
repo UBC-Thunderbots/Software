@@ -127,6 +127,26 @@ class SensorFusionTest : public ::testing::Test
                                        blue_robot_states);
     }
 
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> initDetectionFrameWithTime0()
+    {
+        const uint32_t camera_id    = 0;
+        const uint32_t frame_number = 40391;
+
+        return createSSLDetectionFrame(camera_id, Timestamp::fromSeconds(0), frame_number,
+                                       {ball_state}, yellow_robot_states,
+                                       blue_robot_states);
+    }
+
+    std::unique_ptr<SSLProto::SSL_DetectionFrame> initDetectionFrameWithFutureTime()
+    {
+        const uint32_t camera_id    = 0;
+        const uint32_t frame_number = 40391;
+
+        return createSSLDetectionFrame(camera_id, current_time + Duration::fromSeconds(1),
+                                       frame_number, {ball_state}, yellow_robot_states,
+                                       blue_robot_states);
+    }
+
     std::unique_ptr<SSLProto::SSL_GeometryData> initSSLDivBGeomData()
     {
         Field field           = Field::createSSLDivisionBField();
@@ -441,4 +461,84 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
     // so result should remain std::nullopt
     std::optional<Point> returned_point = result.gameState().getBallPlacementPoint();
     EXPECT_EQ(std::nullopt, returned_point);
+}
+
+TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
+{
+    SensorProto sensor_msg;
+    SensorProto sensor_msg_0;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    auto ssl_wrapper_packet_0 =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrameWithTime0());
+    *(sensor_msg.mutable_ssl_vision_msg())   = *ssl_wrapper_packet;
+    *(sensor_msg_0.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_0;
+    EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
+    sensor_fusion.processSensorProto(sensor_msg);
+    ASSERT_TRUE(sensor_fusion.getWorld());
+    World result = *sensor_fusion.getWorld();
+    EXPECT_EQ(initWorld(), result);
+    for (unsigned int i = 0; i < SensorFusion::VISION_PACKET_RESET_COUNT_THRESHOLD; i++)
+    {
+        sensor_fusion.processSensorProto(sensor_msg_0);
+        ASSERT_TRUE(sensor_fusion.getWorld());
+        result = *sensor_fusion.getWorld();
+        EXPECT_EQ(initWorld(), result);
+    }
+    sensor_fusion.processSensorProto(sensor_msg_0);
+    EXPECT_FALSE(sensor_fusion.getWorld());
+    sensor_fusion.processSensorProto(sensor_msg);
+    ASSERT_TRUE(sensor_fusion.getWorld());
+    result = *sensor_fusion.getWorld();
+    EXPECT_EQ(initWorld(), result);
+}
+
+TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    SensorProto sensor_msg_0;
+    auto ssl_wrapper_packet_0 =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrameWithTime0());
+    *(sensor_msg_0.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_0;
+
+    SensorProto sensor_msg_future;
+    auto ssl_wrapper_packet_future =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrameWithFutureTime());
+    *(sensor_msg_future.mutable_ssl_vision_msg()) = *ssl_wrapper_packet_future;
+
+
+    EXPECT_EQ(std::nullopt, sensor_fusion.getWorld());
+    sensor_fusion.processSensorProto(sensor_msg);
+    ASSERT_TRUE(sensor_fusion.getWorld());
+    World result = *sensor_fusion.getWorld();
+    EXPECT_EQ(initWorld(), result);
+    for (unsigned int i = 0; i < SensorFusion::VISION_PACKET_RESET_COUNT_THRESHOLD - 1;
+         i++)
+    {
+        sensor_fusion.processSensorProto(sensor_msg_0);
+        ASSERT_TRUE(sensor_fusion.getWorld());
+        result = *sensor_fusion.getWorld();
+        EXPECT_EQ(initWorld(), result);
+    }
+
+    sensor_fusion.processSensorProto(sensor_msg_future);
+    ASSERT_TRUE(sensor_fusion.getWorld());
+    result = *sensor_fusion.getWorld();
+    EXPECT_NE(initWorld(), result);
+    for (unsigned int i = 0; i < SensorFusion::VISION_PACKET_RESET_COUNT_THRESHOLD; i++)
+    {
+        sensor_fusion.processSensorProto(sensor_msg_0);
+        ASSERT_TRUE(sensor_fusion.getWorld());
+    }
+
+    sensor_fusion.processSensorProto(sensor_msg_0);
+    EXPECT_FALSE(sensor_fusion.getWorld());
+    sensor_fusion.processSensorProto(sensor_msg);
+    ASSERT_TRUE(sensor_fusion.getWorld());
+    result = *sensor_fusion.getWorld();
+    EXPECT_EQ(initWorld(), result);
 }
