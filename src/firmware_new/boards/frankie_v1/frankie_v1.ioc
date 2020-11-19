@@ -1,13 +1,9 @@
 #MicroXplorer Configuration settings - do not modify
-<<<<<<< HEAD
-#LWIP0.BSP.mode=
-=======
 LWIP0.BSP.mode=
 FREERTOS.Queues01=RobotLogProtoQ,16,TbotsProto_RobotLog,0,Dynamic,NULL,NULL
->>>>>>> d3cb8535b42f4e950b7445c66243ea112370a42a
 LWIP.LWIP_MULTICAST_TX_OPTIONS=0
 PB13.GPIOParameters=GPIO_Label
-RCC.USART1Freq_Value=108000000
+RCC.USART1Freq_Value=10800000012311182039810
 RCC.TIM17Freq_Value=72000000
 RCC.PLLCLKFreq_Value=216000000
 PB14.GPIO_Label=LD3 [Red]
