@@ -22,5 +22,5 @@ class PenaltySetupTactic : public MoveTactic
 
     PenaltySetupTactic() = delete;
 
-    void accept(TacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 };

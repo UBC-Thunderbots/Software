@@ -82,7 +82,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
     } while (true);
 }
 
-void ShadowFreekickerTactic::accept(TacticVisitor &visitor)
+void ShadowFreekickerTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

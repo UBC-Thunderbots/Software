@@ -42,7 +42,7 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     } while (true);
 }
 
-void CherryPickTactic::accept(TacticVisitor& visitor)
+void CherryPickTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

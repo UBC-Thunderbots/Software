@@ -25,7 +25,7 @@ void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!stop_action->done());
 }
 
-void StopTactic::accept(TacticVisitor &visitor)
+void StopTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

@@ -13,7 +13,7 @@ cc_library(
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic:all_tactics",
         "//software/ai/intent:stop_intent",
-        "//software/ai/motion_constraint:motion_constraint_manager",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
         "//software/util/typename",
