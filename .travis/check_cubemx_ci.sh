@@ -21,7 +21,7 @@ fi
 cd ..
 # Fix formatting
 ./formatting_scripts/fix_formatting.sh
-git diff
+git diff --exit-code
 if [[ "$?" != 0 ]]; then
     echo "Code generated is different from code committed, stopping now."
     exit 1
