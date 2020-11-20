@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "shared/constants.h"
+#include "shared/proto/robot_log_msg.nanopb.h"
 #include "software/geom/algorithms/almost_equal.h"
 #include "software/geom/geom_constants.h"
 #include "software/geom/point.h"
@@ -128,4 +129,12 @@ namespace TestUtil
      */
     std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
         const std::vector<Point> &positions);
+
+    /**
+     * Takes a RobotLog proto and creates an INFO level g3log
+     *
+     * @param robot_log The RobotLog to log
+     */
+    void handleTestRobotLog(TbotsProto_RobotLog robot_log);
+
 };  // namespace TestUtil

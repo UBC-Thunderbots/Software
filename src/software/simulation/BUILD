@@ -61,11 +61,13 @@ cc_library(
     deps = [
         ":firmware_object_deleter",
         ":simulator_robot",
+        "//firmware/app/logger",
         "//firmware/app/world:chicker",
         "//firmware/app/world:dribbler",
         "//firmware/app/world:firmware_robot",
         "//firmware/app/world:wheel",
         "//firmware/shared:physics",
+        "//shared/proto:tbots_cc_proto",
         "//software/logger",
         "//software/world:field",
     ],
@@ -78,7 +80,10 @@ cc_test(
         ":simulator_ball",
         ":simulator_robot",
         ":simulator_robot_singleton",
+        "//firmware/app/logger",
         "//firmware/app/world:firmware_robot",
+        "//shared/proto:tbots_cc_proto",
+        "//shared/proto:tbots_nanopb_proto",
         "//software/simulation/physics:physics_robot",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
@@ -139,6 +144,7 @@ cc_library(
         "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:field",
+        "//software/world:team_colour",
     ],
 )
 

@@ -150,6 +150,7 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
         {
             restart();
         }
+
         bool ball_very_close_to_robot_dribbler =
             distance(ball.position(),
                      robot->position() + Vector::createFromAngle(robot->orientation())

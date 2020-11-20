@@ -21,13 +21,11 @@ PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
 {
 }
 
-void PenaltyKickTactic::updateWorldParams(
-    const Ball& updated_ball, const std::optional<Robot>& updated_enemy_goalie,
-    const Field& updated_field)
+void PenaltyKickTactic::updateWorldParams(const World& world)
 {
-    this->enemy_goalie = updated_enemy_goalie;
-    this->ball         = updated_ball;
-    this->field        = updated_field;
+    this->enemy_goalie = world.enemyTeam().goalie();
+    this->ball         = world.ball();
+    this->field        = world.field();
 }
 
 double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& world)
@@ -186,7 +184,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
                (penalty_kick_start - robot->timestamp()) < penalty_shot_timeout));
 }
 
-void PenaltyKickTactic::accept(MutableTacticVisitor& visitor)
+void PenaltyKickTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

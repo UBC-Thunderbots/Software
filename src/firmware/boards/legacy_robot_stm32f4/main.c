@@ -35,6 +35,7 @@
 #include <unused.h>
 #include <usb.h>
 
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/world/firmware_world.h"
 #include "io/adc.h"
@@ -54,6 +55,7 @@
 #include "io/pins.h"
 #include "io/receive.h"
 #include "io/sdcard.h"
+#include "io/uart_logger.h"
 #include "io/usb_config.h"
 #include "io/wheels.h"
 #include "priority.h"
@@ -482,6 +484,8 @@ static void run_normal(void)
         error_et_fire(ERROR_ET_CRASH_NO_CORE);
         exception_reboot_without_core = false;
     }
+
+    app_logger_init(switches[0U], &io_uart_logger_handle_robot_log);
 
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
