@@ -7,27 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  diff-check:
-    name: Check for Software and/or Firmware Changes
-    outputs:
-      run_software_tests: ${{ steps.check_files.outputs.run_software_tests }}
-      run_firmware_tests: ${{ steps.check_files.outputs.run_fimrware_tests }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Check files
-        id: check_files
-        run: |
-            echo $GITHUB_BASE_REF
-            git diff --name-only origin/$GITHUB_BASE_REF...HEAD | grep -qvE '(firmware\|software\|environment_setup)' && echo '::set-output name=run_software_tests::true'
-            git diff --name-only origin/$GITHUB_BASE_REF...HEAD | grep -qvE '(firmware_new/boards\|firmware/boards\|environment_setup)' && echo '::set-output name=run_firmware_tests::true'
- 
   software-tests:
     name: Software Tests
-    needs: diff-check
-    if: needs.diff_check.outputs.run_software_tests == 'true'
     runs-on: ubuntu-18.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
@@ -62,8 +43,6 @@ jobs:
   firmware-tests:
     name: Firmware Tests
     runs-on: ubuntu-18.04
-    needs: diff-check
-    if: needs.diff_check.outputs.run_firmware_tests == 'true'
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -91,8 +70,6 @@ jobs:
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
     runs-on: ubuntu-18.04
-    needs: diff-check
-    if: needs.diff_check.outputs.run_software_tests == 'true'
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -109,8 +86,6 @@ jobs:
   memory-leak-checks:
     name: Memory Leak Checks
     runs-on: ubuntu-18.04
-    needs: diff-check
-    if: needs.diff_check.outputs.run_software_tests == 'true'
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
