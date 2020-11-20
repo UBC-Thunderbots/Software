@@ -190,16 +190,7 @@ git_repository(
 
 # Based on the hermetic Python 3 guide found here
 # https://thethoughtfulkoala.com/posts/2020/05/16/bazel-hermetic-python.html
-
-# Special logic for building python interpreter with OpenSSL from homebrew.
-# See https://devguide.python.org/setup/#macos-and-os-x
-_py_configure = """
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    ./configure --prefix=$(pwd)/bazel_install --with-openssl=$(brew --prefix openssl)
-else
-    ./configure --prefix=$(pwd)/bazel_install
-fi
-"""
+_py_configure = "./configure --prefix=$(pwd)/bazel_install"
 
 http_archive(
     name = "python_interpreter",
@@ -214,7 +205,7 @@ filegroup(
     patch_cmds = [
         "mkdir $(pwd)/bazel_install",
         _py_configure,
-        "make",
+        "make -j$(nproc)",
         "make install",
         "ln -s bazel_install/bin/python3 python_bin",
     ],
