@@ -7,6 +7,20 @@ on:
     branches: [ master ]
 
 jobs:
+  formatting-check:
+    runs-on: ubuntu-18.04
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+        
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+      
+      - name: Check Formatting
+        run: |
+          ./formatting_scripts/check_formatting_ci.sh
+          
   software-tests:
     name: Software Tests
     runs-on: ubuntu-18.04
