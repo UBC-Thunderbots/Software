@@ -105,10 +105,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             // Face towards the ball
             Angle orientation =
-                (world.ball().position() - chip_targets[i].getOrigin()).orientation();
+                (world.ball().position() - chip_targets[i].origin()).orientation();
             // Move a bit backwards to make it more likely we'll receive the chip
             Point position =
-                chip_targets[i].getOrigin() -
+                chip_targets[i].origin() -
                 Vector::createFromAngle(orientation).normalize(ROBOT_MAX_RADIUS_METERS);
             ;
             move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0);
@@ -119,7 +119,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::optional<Point> chip_target = std::nullopt;
         if (!chip_targets.empty())
         {
-            chip_target = chip_targets[0].getOrigin();
+            chip_target = chip_targets[0].origin();
         }
         shoot_or_chip_tactic->updateControlParams(chip_target);
 
