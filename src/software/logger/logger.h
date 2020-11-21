@@ -41,8 +41,9 @@ class LoggerSingleton
         // robot diagnostics logs are in
         // bazel-out/k8-fastbuild/bin/software/gui/robot_diagnostics/robot_diagnostics_main.runfiles/__main__/software
         // full system logs are in
-        // bazel-out/k8-fastbuild/bin/software/full_system.runfiles/__main__/software Sink
-        // for outputting logs to the terminal
+        // bazel-out/k8-fastbuild/bin/software/full_system.runfiles/__main__/software
+
+        // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle = logWorker->addSink(
             std::make_unique<ColouredCoutSink>(), &ColouredCoutSink::displayColouredLog);
         // Sink for storing a file of all logs
