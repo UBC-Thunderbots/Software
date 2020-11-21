@@ -172,6 +172,17 @@ class Team
     std::optional<Robot> getNearestRobot(const Point& ref_point) const;
 
     /**
+     * Given a list of robots, finds the robot on that team that is closest to a
+     * reference point.
+     *
+     * @param robots the list of robots
+     * @param ref_point The point where the distance to each robot will be measured.
+     * @return Robot that is closest to the reference point.
+     */
+    std::optional<Robot> getNearestRobot(const std::vector<Robot>& robots,
+                                         const Point& ref_point) const;
+
+    /**
      * Removes all Robots from this team. Does not affect the goalie id.
      */
     void clearAllRobots();
