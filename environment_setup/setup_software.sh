@@ -59,6 +59,8 @@ host_software_packages=(
     qt5-default # The GUI library for our visualizer
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
+    libssl-dev # needed to build Python 3 with ssl support
+    openssl # possibly also necessary for ssl in Python 3
 )
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
