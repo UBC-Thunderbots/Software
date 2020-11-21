@@ -113,6 +113,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 3. Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop.
 &. Click `Open Folder` and navigate to where you cloned software. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
 4. VSCode will prompt you to install recommended extensions, click `Install`, this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc..)
+5. Navigate to File -> Preferences -> Settings -> Workspace -> Extensions -> Bazel and select the `Bazel: Enable Code Lens` option.
 
 ## Building and Running the Code
 
@@ -146,6 +147,12 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     3. For `Target Expression`, you can put anything that comes after a `build`, `run`, `test`, etc. call on the command line. For example: `//software/geom:angle_test`.
     4. For `Bazel Command` you can put any bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
+ 
+### With VSCode
+1. Open VSCode
+2. Navigate to `Software/src/software/geom/BUILD`
+3. On top of every `cc_test`, `cc_library` and `cc_binary` there should be a `Test ...`, `Build ...` or `Run ...` for the respective target.
+4. Click `Test //software/geom:angle_test` to run the `angle_test`
 
 ### Running our AI, Simulator or Robot Diagnostics
 
