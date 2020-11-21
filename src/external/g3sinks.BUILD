@@ -1,10 +1,5 @@
 cc_library(
     name = "g3sinks",
-    deps = [
-        "@g3log",
-        "@boost//:filesystem",
-        "@zlib"
-    ],
     srcs = glob(
         [
             "logrotate/src/*.cpp",
@@ -20,4 +15,9 @@ cc_library(
         "./logrotate/src",
     ],
     visibility = ["@//software/logger:__subpackages__"],
+    deps = [
+        "@boost//:filesystem",
+        "@g3log",
+        "@zlib",
+    ],
 )
