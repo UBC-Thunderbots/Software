@@ -89,7 +89,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     } while (!hasBallBeenKicked(ball, kick_direction));
 }
 
-void PasserTactic::accept(TacticVisitor& visitor)
+void PasserTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

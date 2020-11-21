@@ -78,7 +78,7 @@ class ReceiverTactic : public Tactic
     static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
                                                      const Point& best_shot_target);
 
-    void accept(TacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
     Ball getBall() const;
     Field getField() const;
