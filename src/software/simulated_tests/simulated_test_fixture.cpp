@@ -53,7 +53,7 @@ void SimulatedTestFixture::SetUp()
         ->setValue(true);
     if (SimulatedTestFixture::enable_visualizer)
     {
-	enableVisualizer();
+        enableVisualizer();
     }
 }
 
