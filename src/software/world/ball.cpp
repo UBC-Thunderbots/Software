@@ -67,6 +67,8 @@ BallState Ball::estimateFutureState(const Duration &duration_in_future) const
 bool Ball::hasBallBeenKicked(const Angle &expected_kick_direction,
                              double min_kick_speed) const
 {
+    // 20deg arbitrarily chosen as the maximum angle difference to determine
+    // if ball has been kicked in the approximate direction as expected
     static constexpr Angle MAX_ANGLE_DIFFERENCE = Angle::fromDegrees(20);
 
     Angle kick_orientation_difference =

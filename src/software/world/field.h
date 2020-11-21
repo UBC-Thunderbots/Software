@@ -356,38 +356,42 @@ class Field
     bool pointInEnemyDefenseArea(const Point &p) const;
 
     /**
-     * Returns true if the ball is in the friendly half of the field, and false otherwise
+     * Returns true if the point is in the friendly half of the field, and false otherwise
      *
-     * @param ball The ball
-     * @return true if the ball is in the friendly half of the field, and false otherwise
+     * @param point
+     * @return true if the point is in the friendly half of the field, and false otherwise
      */
     bool pointInFriendlyHalf(const Point &p) const;
 
     /**
-     * Returns true if the ball is in the enemy half of the field, and false otherwise
+     * Returns true if the point is in the enemy half of the field, and false otherwise
      *
-     * @param ball The ball
-     * @return true if the ball is in the enemy's half of the field, and false otherwise
+     * @param point
+     * @return true if the point is in the enemy's half of the field, and false otherwise
      */
     bool pointInEnemyHalf(const Point &p) const;
 
     /**
-     * Returns true if the ball is in within the provided radius in one of the friendly
+     * Returns true if the point is in within the provided radius in one of the friendly
      * corner.
      *
-     * @param ball The ball
-     * @param the radius from the corner, to decide whether or not the ball is in the
+     * @param point
+     * @param the radius from the corner, to decide whether or not the point is in the
      * field.
+     * @return true if the point is in within the provided radius in one of the friendly
+     * corner.
      */
     bool pointInFriendlyCorner(const Point &p, double radius) const;
 
     /**
-     * Returns true if the ball is in within the provided radius in one of the enemy
+     * Returns true if the point is in within the provided radius in one of the enemy
      * corner.
      *
-     * @param ball The ball
-     * @param the radius from the corner, to decide whether or not the ball is in the
+     * @param point
+     * @param the radius from the corner, to decide whether or not the point is in the
      * field.
+     * @return true if the point is in within the provided radius in one of the enemy
+     * corner.
      */
     bool pointInEnemyCorner(const Point &p, double radius) const;
 

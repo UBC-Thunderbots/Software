@@ -180,12 +180,7 @@ std::vector<Robot> Team::getAllRobotsExceptGoalie() const
 
 std::optional<Robot> Team::getNearestRobot(const Point& ref_point) const
 {
-    return getNearestRobot(this->getAllRobots(), ref_point);
-}
-
-std::optional<Robot> Team::getNearestRobot(const std::vector<Robot>& robots,
-                                           const Point& ref_point) const
-{
+    const std::vector<Robot>& robots = this->getAllRobots();
     if (robots.empty())
     {
         return std::nullopt;
