@@ -7,9 +7,9 @@ cc_library(
 )
 
 cc_library(
-    name = "motion_constraint_manager",
-    srcs = ["motion_constraint_manager.cpp"],
-    hdrs = ["motion_constraint_manager.h"],
+    name = "motion_constraint_visitor",
+    srcs = ["motion_constraint_visitor.cpp"],
+    hdrs = ["motion_constraint_visitor.h"],
     deps = [
         ":motion_constraint",
         "//software/ai/hl/stp/tactic:all_tactics",
@@ -17,11 +17,21 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "motion_constraint_manager_test",
-    srcs = ["motion_constraint_manager_test.cpp"],
+cc_library(
+    name = "motion_constraint_set_builder",
+    srcs = ["motion_constraint_set_builder.cpp"],
+    hdrs = ["motion_constraint_set_builder.h"],
     deps = [
-        ":motion_constraint_manager",
+        ":motion_constraint_visitor",
+    ],
+)
+
+cc_test(
+    name = "motion_constraint_set_builder_test",
+    srcs = ["motion_constraint_set_builder_test.cpp"],
+    deps = [
+        ":motion_constraint_set_builder",
+        ":motion_constraint_visitor",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

@@ -45,7 +45,7 @@ class MoveTestTactic : public Tactic
      *
      * @throws std::invalid_argument always
      */
-    void accept(TacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

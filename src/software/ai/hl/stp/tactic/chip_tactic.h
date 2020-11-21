@@ -41,7 +41,7 @@ class ChipTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(TacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
     Ball getBall() const;
 
