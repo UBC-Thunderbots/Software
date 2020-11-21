@@ -7,16 +7,31 @@ cc_library(
         "logger.h",
     ],
     deps = [
+        ":coloured_cout_sink",
         "@g3log",
         "@g3sinks",
     ],
 )
 
 cc_test(
-    name = "logger_test",
-    srcs = ["logger_test.cpp"],
+    name = "coloured_cout_sink_test",
+    srcs = ["coloured_cout_sink_test.cpp"],
     deps = [
+        ":coloured_cout_sink",
         ":logger",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "coloured_cout_sink",
+    srcs = [
+        "coloured_cout_sink.cpp",
+    ],
+    hdrs = [
+        "coloured_cout_sink.h",
+    ],
+    deps = [
+        "@g3log",
     ],
 )
