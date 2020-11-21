@@ -16,10 +16,10 @@ PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
 {
 }
 
-void PasserTactic::updateWorldParams(const Ball& updated_ball, const Field& updated_field)
+void PasserTactic::updateWorldParams(const World& world)
 {
-    this->ball  = updated_ball;
-    this->field = updated_field;
+    this->ball  = world.ball();
+    this->field = world.field();
 }
 
 void PasserTactic::updateControlParams(const Pass& updated_pass)
@@ -89,7 +89,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     } while (!ball.hasBallBeenKicked(kick_direction));
 }
 
-void PasserTactic::accept(MutableTacticVisitor& visitor)
+void PasserTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

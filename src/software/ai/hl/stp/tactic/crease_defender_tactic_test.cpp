@@ -57,6 +57,9 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
     CreaseDefenderTactic tactic =
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
                              world.enemyTeam(), CreaseDefenderTactic::LEFT);
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), Point(0, 0));
+
     tactic.updateRobot(friendly_robot);
     auto action_ptr = tactic.getNextAction();
 

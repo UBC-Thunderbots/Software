@@ -21,13 +21,7 @@ class CherryPickTactic : public Tactic
 
     CherryPickTactic() = delete;
 
-    /**
-     * Updates the world parameters for this tactic
-     *
-     * @param world The current state of the world
-     */
-
-    void updateWorldParams(const World& world);
+    void updateWorldParams(const World& world) override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -40,7 +34,7 @@ class CherryPickTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
     /**
      *
      * @return
