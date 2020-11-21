@@ -14,10 +14,6 @@ class PenaltyKickPlayTest : public SimulatedTestFixture
 
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_play)
 {
-    if (SimulatedTestFixture::enable_visualizer)
-    {
-        enableVisualizer();
-    }
     setBallState(BallState(field().penaltyFriendly(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),

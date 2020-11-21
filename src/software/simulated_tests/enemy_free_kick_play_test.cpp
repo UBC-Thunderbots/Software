@@ -13,10 +13,6 @@ class EnemyFreekickPlayTest : public SimulatedTestFixture
 
 TEST_F(EnemyFreekickPlayTest, test_enemy_freekick_play)
 {
-    if (SimulatedTestFixture::enable_visualizer)
-    {
-        enableVisualizer();
-    }
     setBallState(BallState(Point(0.9, 2.85), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),

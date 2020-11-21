@@ -51,6 +51,10 @@ void SimulatedTestFixture::SetUp()
     MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
         ->setValue(true);
+    if (SimulatedTestFixture::enable_visualizer)
+    {
+	enableVisualizer();
+    }
 }
 
 void SimulatedTestFixture::setBallState(const BallState &ball)

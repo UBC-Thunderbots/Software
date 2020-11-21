@@ -14,10 +14,6 @@ class FreeKickPlayTest : public SimulatedTestFixture
 
 TEST_F(FreeKickPlayTest, test_free_kick_play_on_enemy_half)
 {
-    if (SimulatedTestFixture::enable_visualizer)
-    {
-        enableVisualizer();
-    }
     setBallState(BallState(Point(1.5, -3), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
@@ -51,10 +47,6 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_enemy_half)
 
 TEST_F(FreeKickPlayTest, test_free_kick_play_on_friendly_half)
 {
-    if (SimulatedTestFixture::enable_visualizer)
-    {
-        enableVisualizer();
-    }
     setBallState(BallState(Point(-1.5, -3), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),

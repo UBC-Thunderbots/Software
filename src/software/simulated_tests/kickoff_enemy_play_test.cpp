@@ -14,10 +14,6 @@ class KickoffEnemyPlayTest : public SimulatedTestFixture
 
 TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 {
-    if (SimulatedTestFixture::enable_visualizer)
-    {
-        enableVisualizer();
-    }
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
