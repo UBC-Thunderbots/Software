@@ -28,10 +28,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware/app/logger/logger.h"
-#include "firmware_new/boards/frankie_v1/io/network_logger.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
-#include "firmware_new/boards/frankie_v1/io/uart_logger.h"
 #include "firmware_new/boards/frankie_v1/usart.h"
 #include "shared/constants.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
@@ -238,8 +236,6 @@ void test_msg_update(void *argument)
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
-    app_logger_init(0, &io_uart_logger_handle_robot_log);
-
     /* Infinite loop */
     for (;;)
     {
@@ -251,12 +247,9 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
         TLOG_DEBUG("logging debug level message %d", sys_now());
-        TLOG_INFO("logging info level message %x", sys_now());
-        TLOG_WARNING("logging warning level message %x", sys_now());
-        TLOG_FATAL("logging error level message %d", sys_now());
 
         // run loop at 100hz
-        osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
+        osDelay(1 / 10 * MILLISECONDS_PER_SECOND);
     }
     /* USER CODE END test_msg_update */
 }
@@ -271,7 +264,6 @@ void initIoNetworking()
     unsigned robot_id = 0;
 
     io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
-    /*io_ublox_odin262_at_interface_init(*/
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
