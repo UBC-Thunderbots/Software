@@ -13,6 +13,7 @@
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
+#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -106,8 +107,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
 
         if (intent)
         {
-            auto motion_constraints = motion_constraint_manager.getMotionConstraints(
-                current_game_state, *tactic);
+            auto motion_constraints =
+                buildMotionConstraintSet(current_game_state, *tactic);
             intent->setMotionConstraints(motion_constraints);
 
             intents.emplace_back(std::move(intent));

@@ -20,7 +20,7 @@ void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (this->robot->velocity().length() > 0.05);
 }
 
-void StopTestTactic::accept(TacticVisitor &visitor)
+void StopTestTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

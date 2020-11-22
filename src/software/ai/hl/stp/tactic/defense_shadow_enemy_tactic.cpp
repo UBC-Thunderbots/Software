@@ -115,7 +115,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
     } while (!move_action->done());
 }
 
-void DefenseShadowEnemyTactic::accept(TacticVisitor &visitor)
+void DefenseShadowEnemyTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

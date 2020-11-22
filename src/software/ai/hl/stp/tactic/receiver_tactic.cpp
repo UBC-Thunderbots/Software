@@ -237,7 +237,7 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
     return Shot(ideal_position, ideal_orientation);
 }
 
-void ReceiverTactic::accept(TacticVisitor& visitor)
+void ReceiverTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

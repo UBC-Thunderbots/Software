@@ -7,21 +7,10 @@
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/world/game_state.h"
 
-class MotionConstraintManager : public TacticVisitor
+class MotionConstraintVisitor : public TacticVisitor
 {
    public:
-    explicit MotionConstraintManager() = default;
-
-    /**
-     * Gets Motion Constraint based on gamestate and tactic
-     *
-     * @param gamestate Current GameState to process
-     * @param tactic Current Tactic to process
-     *
-     * @return set of MotionConstraints
-     */
-    std::set<MotionConstraint> getMotionConstraints(const GameState &game_state,
-                                                    Tactic &tactic);
+    explicit MotionConstraintVisitor() = default;
 
     /**
      * Visits a tactic to register the associated motion constraint
@@ -50,14 +39,17 @@ class MotionConstraintManager : public TacticVisitor
     void visit(const StopTestTactic &tactic) override;
     void visit(const GoalieTestTactic &tactic) override;
 
-   private:
-    std::set<MotionConstraint> current_allowed_constraints;
 
     /**
-     * Adds move constraints determined from gamestate to current_motion_constraints
+     * Gets the current allowed constraints from a tactic
      *
-     * @param game_state GameState to generate move constraints from
+     * @param The tactic to register
+     *
+     * @modifies current_allowed_constraints
+     * @return set of MotionConstraints
      */
-    std::set<MotionConstraint> getMotionConstraintsFromGameState(
-        const GameState &game_state) const;
+    std::set<MotionConstraint> getCurrentAllowedConstraints(const Tactic &tactic);
+
+   private:
+    std::set<MotionConstraint> current_allowed_constraints;
 };
