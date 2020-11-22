@@ -15,11 +15,17 @@
    * [Installing Software Dependencies](#installing-software-dependencies)
    * [Installing Firmware Dependencies](#installing-firmware-dependencies)
    * [Setting Up USB Permissions](#setting-up-usb-permissions)
-   * [Installing CLion](#installing-clion)
+   * [CLion](#clion)
       * [Getting your Student License](#getting-your-student-license)
-      * [Installing CLion](#installing-clion-1)
+      * [Installing CLion](#installing-clion)
 * [Building and Running the Code](#building-and-running-the-code)
+   * [Building from the command-line](#building-from-the-command-line)
+   * [Building with CLion](#building-with-clion)
+   * [Running our AI, Simulator, or Robot Diagnostics](#running-our-ai-simulator-or-robot-diagnostics)
+   * [Running AI vs AI](#running-ai-vs-ai)
 * [Debugging](#debugging)
+   * [Debugging with CLion](#debugging-with-clion)
+   * [Debugging from the Command line](#debugging-from-the-command-line)
 * [Profiling](#profiling)
 * [Flashing and Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
 * [Flashing and Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
@@ -87,7 +93,7 @@ We have several setup scripts to help you easily install the necessary dependenc
     * You will be prompted for your admin password
     * This script will set up the USB permissions required in order to use our radio/wifi dongle
 
-### Installing CLion
+### CLion
 
 CLion is our main IDE for editing our C/C++ code. It is designed to work with our build system, `bazel`, and has all the great features of an IDE such as code completion, syntax highlighting etc. We **strongly** recommend installing CLion and using it for development.
 
@@ -107,7 +113,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 
 ## Building and Running the Code
 
-### From the command-line
+### Building from the command-line
 
 1. Navigate to the root of this repository (wherever you have it cloned on your computer)
 2. Navigate to `src`.
@@ -118,7 +124,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 7. Run all the tests by running `bazel test //...`
 *See the bazel [command-line docs](https://docs.bazel.build/versions/master/command-line-reference.html) for more info.*
 
-### With CLion
+### Building with CLion
 
 First we need to setup CLion
 1. Open CLion
@@ -139,9 +145,9 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     4. For `Bazel Command` you can put any bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
 
-### Running our AI, Simulator or Robot Diagnostics
+### Running our AI, Simulator, or Robot Diagnostics
 
-1. Open your terminal and run `ifconfig`.
+1. Open your terminal, `cd` into `Software/src` and run `ifconfig`.
 2. Pick the network interface you would like to use:
     1. If you are running things locally, you can pick any interface that is not `lo`
     2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
@@ -156,14 +162,17 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 5. Run Robot Diagnostics: `bazel run //software/gui/robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
 
+### Running AI vs AI
+1. Open your terminal, `cd` into `Software/src`
+2. Run `./software/run_ai_vs_ai.sh interface_name`, using the same interface as from [above](#running-our-ai-simulator-or-robot-diagnostics)
 
 ## Debugging
 Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 
 
-### With CLion
+### Debugging with CLion
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
 
-### From The Command line
+### Debugging from the Command line
 `bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see (here)[https://www.cs.cmu.edu/~gilpin/tutorial/] for a tutorial on how to use `gdb` if you're not familiar with it.
 
 
