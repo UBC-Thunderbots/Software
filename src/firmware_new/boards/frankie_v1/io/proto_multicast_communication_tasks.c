@@ -129,7 +129,6 @@ void io_proto_multicast_listener_task(void* communication_profile)
                                                                       RECEIVE_TIMEOUT);
                 break;
             }
-
             case ERR_OK:
             {
                 pb_istream_t in_stream = pb_istream_from_buffer(

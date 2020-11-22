@@ -249,7 +249,7 @@ void test_msg_update(void *argument)
         TLOG_DEBUG("logging debug level message %d", sys_now());
 
         // run loop at 100hz
-        osDelay(1 / 10 * MILLISECONDS_PER_SECOND);
+        osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
     }
     /* USER CODE END test_msg_update */
 }
@@ -260,8 +260,7 @@ void initIoNetworking()
 {
     // TODO channel and robot_id need to be hooked up to the dials on the robot, when
     // available https://github.com/UBC-Thunderbots/Software/issues/1517
-    unsigned channel  = 0;
-    unsigned robot_id = 0;
+    unsigned channel = 0;
 
     io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
 

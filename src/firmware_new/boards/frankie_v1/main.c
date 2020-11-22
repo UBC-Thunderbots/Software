@@ -30,8 +30,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "firmware/app/logger/logger.h"
+#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "firmware_new/boards/frankie_v1/io/uart_logger.h"
 
 /* USER CODE END Includes */
