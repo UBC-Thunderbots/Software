@@ -15,10 +15,11 @@
    * [Installing Software Dependencies](#installing-software-dependencies)
    * [Installing Firmware Dependencies](#installing-firmware-dependencies)
    * [Setting Up USB Permissions](#setting-up-usb-permissions)
-   * [CLion](#clion)
-      * [Getting your Student License](#getting-your-student-license)
-      * [Installing CLion](#installing-clion)
-   * [Installing VSCode](#installing-vscode)
+   * [Installing an IDE](#installing-an-ide)
+      * [CLion](#clion)
+         * [Getting your Student License](#getting-your-student-license)
+         * [Installing CLion](#installing-clion)
+      * [VSCode](#vscode)
 * [Building and Running the Code](#building-and-running-the-code)
    * [Building from the command-line](#building-from-the-command-line)
    * [Building with CLion](#building-with-clion)
@@ -94,11 +95,15 @@ We have several setup scripts to help you easily install the necessary dependenc
     * You will be prompted for your admin password
     * This script will set up the USB permissions required in order to use our radio/wifi dongle
 
-### CLion
+### Installing an IDE
 
-CLion is our main IDE for editing our C/C++ code. It is designed to work with our build system, `bazel`, and has all the great features of an IDE such as code completion, syntax highlighting etc. If you are running Software on an ultrabook or a virtual machine, see [Installing VSCode](#installing-vscode) for a less resource intensive option.
+For those who prefer working on C/C++ with an IDE, we provide two options: [CLion](#clion) for an integrated experience and [VSCode](vscode) for a more lightweight setup. Both support our build system `bazel`.
 
-#### Getting your Student License
+#### CLion
+
+CLion is the most full-featured IDE, with code completion, code navigation, and integrated building, testing, and debugging.
+
+##### Getting your Student License
 
 CLion is free for students, and you can use your UBC alumni email address to create a student account. If you already have a student account with JetBrains, you can skip this step.
 
@@ -106,13 +111,15 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 2. Using your UBC email account, get a JetBrains education account [here](https://www.jetbrains.com/shop/eform/students).
    1. _JetBrains will send an initial email to confirm the UBC email you inputted. Once you have confirmed, another email will be sent to activate your new education account. You will use this account to set up CLion later on._
 
-#### Installing CLion
+##### Installing CLion
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
 * Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
 * When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
 
-### Installing VSCode
+#### VSCode
+
+VSCode is the more lightweight IDE, with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated into this IDE.
 
 1. Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
 2. Run `./install_vscode.sh` (* **DO NOT** download VSCode yourself unless you know what you're doing. The `install_vscode.sh` script will grab the most stable version of VSCode)
