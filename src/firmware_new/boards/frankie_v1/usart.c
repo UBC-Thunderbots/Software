@@ -57,15 +57,6 @@ void MX_UART4_Init(void)
     {
         Error_Handler();
     }
-    for (;;)
-    {
-        uint8_t buffer[2];
-        buffer[0] = 65;
-        buffer[1] = 84;
-        HAL_UART_Transmit(&huart4, buffer, sizeof(buffer), HAL_MAX_DELAY);
-        HAL_UART_Receive(&huart4, buffer, sizeof(buffer), HAL_MAX_DELAY);
-        HAL_UART_Transmit(&huart4, buffer, sizeof(buffer), HAL_MAX_DELAY);
-    }
 }
 /* USART3 init function */
 

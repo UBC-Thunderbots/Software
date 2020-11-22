@@ -97,3 +97,18 @@ cc_library(
     ],
     alwayslink = True,
 )
+
+cc_library(
+    name = "uart_logger",
+    srcs = ["uart_logger.c"],
+    hdrs = ["uart_logger.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware_new/boards/frankie_v1:frankie_v1_main_lib",
+        "//firmware_new/boards/frankie_v1:hal",
+        "//firmware_new/boards/frankie_v1:rtos",
+        "//shared/proto:tbots_nanopb_proto",
+        "@nanopb",
+    ],
+    alwayslink = True,
+)

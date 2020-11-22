@@ -31,6 +31,8 @@
 #include "firmware_new/boards/frankie_v1/io/network_logger.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
+#include "firmware_new/boards/frankie_v1/io/uart_logger.h"
+#include "firmware_new/boards/frankie_v1/usart.h"
 #include "shared/constants.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 #include "shared/proto/robot_status_msg.nanopb.h"
@@ -194,6 +196,7 @@ void MX_FREERTOS_Init(void)
 
     /* USER CODE BEGIN RTOS_THREADS */
     io_network_logger_init(RobotLogProtoQHandle);
+    io_uart_logger_init(&huart3);
     /* USER CODE END RTOS_THREADS */
 }
 
@@ -235,7 +238,7 @@ void test_msg_update(void *argument)
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
-    app_logger_init(0, &io_network_logger_handle_robot_log);
+    app_logger_init(0, &io_uart_logger_handle_robot_log);
 
     /* Infinite loop */
     for (;;)
@@ -268,6 +271,7 @@ void initIoNetworking()
     unsigned robot_id = 0;
 
     io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
+    /*io_ublox_odin262_at_interface_init(*/
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,

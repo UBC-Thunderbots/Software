@@ -85,8 +85,8 @@ void MX_GPIO_Init(void)
     HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(wheel_motor_back_right_mode_GPIO_Port,
-                      wheel_motor_back_right_mode_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOD, ublox_reset_Pin | wheel_motor_back_right_mode_Pin,
+                      GPIO_PIN_RESET);
 
     /*Configure GPIO pin : PtPin */
     GPIO_InitStruct.Pin  = USER_Btn_Pin;
@@ -152,12 +152,12 @@ void MX_GPIO_Init(void)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
 
-    /*Configure GPIO pin : PtPin */
-    GPIO_InitStruct.Pin   = wheel_motor_back_right_mode_Pin;
+    /*Configure GPIO pins : PDPin PDPin */
+    GPIO_InitStruct.Pin   = ublox_reset_Pin | wheel_motor_back_right_mode_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(wheel_motor_back_right_mode_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 }
 
 /* USER CODE BEGIN 2 */

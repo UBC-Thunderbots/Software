@@ -171,6 +171,45 @@ int main(void)
 
     initIoLayer();
 
+    /*GpioPin_t *ublox_reset_pin = io_gpio_pin_create(ublox_reset_GPIO_Port,
+     * ublox_reset_Pin, ACTIVE_LOW);*/
+    /*char buff[7];*/
+    /*buff[1] = 'A';*/
+    /*buff[2] = 'K';*/
+    /*buff[3] = 'H';*/
+    /*buff[4] = 'I';*/
+    /*buff[5] = 'L';*/
+    /*buff[6] = '\r';*/
+    /*HAL_UART_Transmit(&huart3, buff, sizeof(buff), HAL_MAX_DELAY);*/
+
+    /*io_gpio_pin_setActive(ublox_reset_pin);*/
+    /*io_gpio_pin_setInactive(ublox_reset_pin);*/
+    /*char buffer[2];*/
+    /*buffer[0] = '+';*/
+    /*buffer[1] = '\r';*/
+
+    /*for (;;)*/
+    /*{*/
+    /*int count = 0;*/
+    /*while (count < 100000000)*/
+    /*{*/
+    /*count++;*/
+    /*}*/
+    /*char buffer[3];*/
+    /*char buffer2[3];*/
+    /*buffer[0] = 'A';*/
+    /*buffer[1] = 'T';*/
+    /*buffer[2] = '\r';*/
+    /*HAL_UART_Transmit(&huart4, buffer, sizeof(buffer), HAL_MAX_DELAY);*/
+    /*HAL_UART_Receive(&huart4, buffer2, sizeof(buffer2), HAL_MAX_DELAY);*/
+    /*HAL_UART_Transmit(&huart4, buffer, sizeof(buffer), HAL_MAX_DELAY);*/
+    /*HAL_UART_Receive(&huart4, buffer2, sizeof(buffer2), HAL_MAX_DELAY);*/
+    /*HAL_UART_Transmit(&huart4, buffer, sizeof(buffer), HAL_MAX_DELAY);*/
+    /*HAL_UART_Receive(&huart4, buffer2, sizeof(buffer2), HAL_MAX_DELAY);*/
+    /*HAL_UART_Transmit(&huart4, buffer, sizeof(buffer), HAL_MAX_DELAY);*/
+    /*HAL_UART_Receive(&huart4, buffer2, sizeof(buffer2), HAL_MAX_DELAY);*/
+    /*}*/
+
     /* USER CODE END 2 */
 
     /* Init scheduler */

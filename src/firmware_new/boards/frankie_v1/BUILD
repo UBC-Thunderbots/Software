@@ -4,7 +4,10 @@ load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
 
 cc_binary(
     name = "frankie_v1_main",
-    srcs = ["main.c"],
+    srcs = [
+        "freertos.c",
+        "main.c",
+    ],
     copts = [
         # We don't want to mark warnings as errors for 3rd party code
         "-Wno-error",
@@ -24,10 +27,13 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":frankie_v1_main_lib",
+        "//firmware/app/logger",
         "//firmware_new/boards/frankie_v1/io:drivetrain",
         "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
         "//firmware_new/boards/frankie_v1/io:gpio_pin",
+        "//firmware_new/boards/frankie_v1/io:network_logger",
         "//firmware_new/boards/frankie_v1/io:pwm_pin",
+        "//firmware_new/boards/frankie_v1/io:uart_logger",
     ],
 )
 
@@ -35,7 +41,6 @@ cc_library(
     name = "frankie_v1_main_lib",
     srcs = [
         "crc.c",
-        "freertos.c",
         "gpio.c",
         "startup_stm32h743xx.s",
         "stm32h7xx_hal_msp.c",
@@ -64,8 +69,6 @@ cc_library(
     deps = [
         ":hal",
         ":lwip",
-        "//firmware/app/logger",
-        "//firmware_new/boards/frankie_v1/io:network_logger",
         "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
         "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
