@@ -60,6 +60,9 @@
 
 /* External variables --------------------------------------------------------*/
 extern ETH_HandleTypeDef heth;
+extern DMA_HandleTypeDef hdma_uart4_rx;
+extern DMA_HandleTypeDef hdma_uart4_tx;
+extern UART_HandleTypeDef huart4;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -181,6 +184,55 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32h7xx.s).                    */
 /******************************************************************************/
+
+/**
+ * @brief This function handles DMA1 stream6 global interrupt.
+ */
+void DMA1_Stream6_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA1_Stream6_IRQn 0 */
+
+    /* USER CODE END DMA1_Stream6_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_uart4_rx);
+    /* USER CODE BEGIN DMA1_Stream6_IRQn 1 */
+
+    /* USER CODE END DMA1_Stream6_IRQn 1 */
+}
+
+/**
+ * @brief This function handles DMA1 stream7 global interrupt.
+ */
+void DMA1_Stream7_IRQHandler(void)
+{
+    /* USER CODE BEGIN DMA1_Stream7_IRQn 0 */
+
+    /* USER CODE END DMA1_Stream7_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_uart4_tx);
+    /* USER CODE BEGIN DMA1_Stream7_IRQn 1 */
+
+    /* USER CODE END DMA1_Stream7_IRQn 1 */
+}
+
+/**
+ * @brief This function handles UART4 global interrupt.
+ */
+void UART4_IRQHandler(void)
+{
+    /* USER CODE BEGIN UART4_IRQn 0 */
+    if (RESET != __HAL_UART_GET_FLAG(
+                     &huart4, UART_FLAG_IDLE))  // Judging whether it is idle interruption
+    {
+        __HAL_UART_CLEAR_IDLEFLAG(&huart4);   // Clear idle interrupt sign (otherwise it
+                                              // will continue to enter the interrupt)
+        USER_UART_IdleLineCallback(&huart4);  // Call interrupt handler
+    }
+
+    /* USER CODE END UART4_IRQn 0 */
+    HAL_UART_IRQHandler(&huart4);
+    /* USER CODE BEGIN UART4_IRQn 1 */
+
+    /* USER CODE END UART4_IRQn 1 */
+}
 
 /**
  * @brief This function handles Ethernet global interrupt.

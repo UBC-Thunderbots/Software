@@ -16,7 +16,7 @@ typedef struct UbloxOdinW262CommandInterface UbloxOdinW262CommandInterface_t;
  *
  * @returns A Ublox OdinW262 command interface
  */
-UbloxOdinW262CommandInterface_t* io_ublox_odinw262_interface_create(
+UbloxOdinW262CommandInterface_t* io_ublox_odinw262_command_interface_create(
     UART_HandleTypeDef* uart_handle, GpioPin_t* ublox_reset);
 
 /**
@@ -24,11 +24,13 @@ UbloxOdinW262CommandInterface_t* io_ublox_odinw262_interface_create(
  *
  * @param command_interface The UbloxOdinW262CommandInterface_t interface to destroy
  */
-void io_ublox_odinw262_interface_destroy(
+void io_ublox_odinw262_command_interface_destroy(
     UbloxOdinW262CommandInterface_t* command_interface);
 
 /*
  * Reset the UBlox ODIN W262
+ *
+ * NOTE: This resets the chip, including the interface
  *
  * @param command_interface
  */
