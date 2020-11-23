@@ -1,10 +1,37 @@
 from software.proto.repeated_any_msg_pb2 import RepeatedAnyMsg
 from google.protobuf.internal.decoder import _DecodeVarint32
+from typing import TypeVar, Generic, Type, Any, Iterator
 import os
 
+MsgClass = TypeVar("MsgClass")
 
-class ProtoLog:
-    def __init__(self, directory, msg_class):
+
+class ProtoLog(Generic[MsgClass]):
+    """
+    ProtoLog allows users to work with directories containing serialized, delimited "RepeatedAnyMsg"
+    chunks, representing a consecutive series of messages encapsulated in "Any" messages.
+
+    Usage:
+    `proto_log = ProtoLog('/tmp/test/PrimitiveSet/', PrimitiveSet)`
+    loads the directory of chunks that represent a series of PrimitiveSet
+
+    `proto_log[1000]` gets the 1000th PrimitiveSet message in the directory
+
+    ```
+    for primitive_set_msg in proto_log:
+        print(primitive_set_msg.time_sent)
+    ```
+    will iterate over the messages in the directory and print the `time_sent` field.
+
+    """
+
+    def __init__(self, directory: str, msg_class: Type[MsgClass]):
+        """
+        Constructs a ProtoLog from the directory of delimited Protobuf 'RepeatedAnyMsg' messages
+        at the given path.
+        :param directory: The path of a directory containing delimited RepeatedAnyMsg messages in files
+        :param msg_class: The type of the message contained in the RepeatedAnyMsg chunks
+        """
         self.msg_class = msg_class
         self.repeated_any_msgs = []
         self.chunk_start_idxs = []
@@ -21,12 +48,19 @@ class ProtoLog:
                 self.chunk_start_idxs.append(cur_start_idx)
                 cur_start_idx += len(repeated_any_msg.messages)
 
-        print("Loaded {} RepeatedAnyMsg chunks".format(len(self.repeated_any_msgs)))
-
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Returns the total number of messages in the data directory.
+        :return: the total number of messages in the data directory.
+        """
         return self.chunk_start_idxs[-1] + len(self.repeated_any_msgs[-1].messages)
 
-    def _get_item_at_idx(self, idx):
+    def _get_item_at_idx(self, idx: int) -> MsgClass:
+        """
+        Returns the idx'th message out of all the messages in the data directory.
+        :param idx: index of the message
+        :return: the message at the given index
+        """
         if idx in self.cached_unpacked_msgs:
             return self.cached_unpacked_msgs[idx]
 
@@ -39,19 +73,26 @@ class ProtoLog:
                 )
             )
 
-        chunk_idx = len(self.chunk_start_idxs) - 1
-        for cidx in range(len(self.chunk_start_idxs) - 1):
-            if self.chunk_start_idxs[cidx + 1] > idx:
-                chunk_idx = cidx
+        item_chunk_idx = len(self.chunk_start_idxs) - 1
+        for chunk_idx in range(len(self.chunk_start_idxs) - 1):
+            if self.chunk_start_idxs[chunk_idx + 1] > idx:
+                item_chunk_idx = chunk_idx
                 break
 
-        msg_idx = idx - self.chunk_start_idxs[chunk_idx]
+        msg_idx = idx - self.chunk_start_idxs[item_chunk_idx]
         msg = self.msg_class()
-        self.repeated_any_msgs[chunk_idx].messages[msg_idx].Unpack(msg)
+        self.repeated_any_msgs[item_chunk_idx].messages[msg_idx].Unpack(msg)
         self.cached_unpacked_msgs[idx] = msg
         return msg
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Any) -> MsgClass:
+        """
+        Returns the message at the given index if key is an integer, returns every message
+        of messages from the slice.start and slice.stop at intervals of slice.step, if the key
+        is a slice, else throws IndexError
+        :param key: an integer or a slice
+        :return: a message at the given index or a series of messages as specified by the slice
+        """
         if isinstance(key, slice):
             start = key.start if key.start else 0
             stop = key.stop if key.stop else len(self)
@@ -68,14 +109,30 @@ class ProtoLog:
         else:
             raise IndexError("Invalid index type!")
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[MsgClass]:
+        """
+        Returns an iterator over the messages in the data directory.
+        :return: An iterator
+        """
         self.iter_idx = 0
         return self
 
-    def __next__(self):
+    def __next__(self) -> MsgClass:
+        """
+        Increments the iterator and returns the message at the current iterator position.
+        :return: the message at the current iterator position.
+        """
         try:
             result = self[self.iter_idx]
             self.iter_idx += 1
             return result
         except IndexError:
             raise StopIteration
+
+    def get_chunk_count(self) -> int:
+        """
+        Returns the number of chunk files in the data directory that this object was
+        constructed with.
+        :return: the number of chunk files in the data directory.
+        """
+        return len(self.repeated_any_msgs)
