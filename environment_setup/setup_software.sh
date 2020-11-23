@@ -57,6 +57,7 @@ host_software_packages=(
                     # to manually install it ourselves
     python3-yaml # Load dynamic parameter configuration files
     qt5-default # The GUI library for our visualizer
+    tmux        # Used by AI vs AI script
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
 )
