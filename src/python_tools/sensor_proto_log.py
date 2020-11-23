@@ -1,7 +1,7 @@
 from .proto_log import ProtoLog
 from software.proto.sensor_msg_pb2 import SensorProto
 from google.protobuf.message import Message
-from typing import List
+from typing import List, Dict
 
 
 class SensorProtoLog:
@@ -25,7 +25,7 @@ class SensorProtoLog:
         :param directory: A directory containing RepeatedAnyMsg delimited files containg SensorProto's
         """
         proto_log = ProtoLog(directory, SensorProto)
-        self._messages = dict()
+        self._messages: Dict[str, List[Message]] = dict()
         for sensor_msg in proto_log:
             # ListFields() gives a list of tuple of (FieldDescriptor, Message)
             field_names = [field[0].name for field in sensor_msg.ListFields()]

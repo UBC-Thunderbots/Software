@@ -1,6 +1,6 @@
 from software.proto.repeated_any_msg_pb2 import RepeatedAnyMsg
 from google.protobuf.internal.decoder import _DecodeVarint32
-from typing import TypeVar, Generic, Type, Any, Iterator
+from typing import TypeVar, Generic, Type, Any, Iterator, List, Dict
 import os
 
 MsgClass = TypeVar("MsgClass")
@@ -32,10 +32,10 @@ class ProtoLog(Generic[MsgClass]):
         :param directory: The path of a directory containing delimited RepeatedAnyMsg messages in files
         :param msg_class: The type of the message contained in the RepeatedAnyMsg chunks
         """
-        self.msg_class = msg_class
-        self.repeated_any_msgs = []
-        self.chunk_start_idxs = []
-        self.cached_unpacked_msgs = dict()
+        self.msg_class: Type[MsgClass] = msg_class
+        self.repeated_any_msgs: List[RepeatedAnyMsg] = []
+        self.chunk_start_idxs: List[int] = []
+        self.cached_unpacked_msgs: Dict[int, MsgClass] = dict()
         cur_start_idx = 0
         for file in os.listdir(directory):
             filepath = os.path.join(directory, file)
