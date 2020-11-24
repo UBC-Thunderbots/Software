@@ -35,3 +35,13 @@ void io_ublox_odinw262_command_interface_destroy(
  * @param command_interface
  */
 void io_ublox_odinw262_reset(UbloxOdinW262CommandInterface_t* command_interface);
+
+/**
+ * Uart Idle Line Interrupt Service Routine
+ *
+ * This will be called in an ISR context when the UART line is idle, this is useful when
+ * We update the counter, post the semaphore, and return.
+ *
+ * @param uart_handle The uart_handle
+ */
+void io_ublox_odinw262_command_interface_handleIdleLineInterrupt(UART_HandleTypeDef* uart_handle);

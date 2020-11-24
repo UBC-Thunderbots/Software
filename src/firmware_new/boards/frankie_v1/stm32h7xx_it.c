@@ -225,7 +225,8 @@ void UART4_IRQHandler(void)
     {
         __HAL_UART_CLEAR_IDLEFLAG(&huart4);  // Clear idle interrupt sign (otherwise it
                                              // will continue to enter the interrupt)
-        (&huart4);                           // Call interrupt handler
+        // Call interrupt handler
+        io_ublox_odinw262_command_interface_handleIdleLineInterrupt(&huart4);
     }
 
     /* USER CODE END UART4_IRQn 0 */
