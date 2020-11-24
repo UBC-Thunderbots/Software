@@ -26,7 +26,10 @@ cc_binary(
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":STM32H743ZITx_FLASH.ld",
+        ":dma",
         ":frankie_v1_main_lib",
+        ":gpio",
+        ":lwip",
         "//firmware/app/logger",
         "//firmware_new/boards/frankie_v1/io:drivetrain",
         "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
@@ -40,25 +43,15 @@ cc_binary(
 cc_library(
     name = "frankie_v1_main_lib",
     srcs = [
-        "crc.c",
-        "gpio.c",
         "startup_stm32h743xx.s",
         "stm32h7xx_hal_msp.c",
         "stm32h7xx_it.c",
         "system_stm32h7xx.c",
-        "tim.c",
-        "usart.c",
-        "usb_otg.c",
     ],
     hdrs = [
         "FreeRTOSConfig.h",
-        "crc.h",
-        "gpio.h",
         "stm32h7xx_hal_conf.h",
         "stm32h7xx_it.h",
-        "tim.h",
-        "usart.h",
-        "usb_otg.h",
     ],
     copts = [
         "-DSTM32H743xx",
@@ -67,9 +60,14 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
+        ":crc",
         ":hal",
         ":lwip",
+        ":tim",
+        ":usart",
+        ":usb_otg",
         "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
+        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_command_interface",
         "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
@@ -81,26 +79,142 @@ cc_library(
 )
 
 cc_library(
-    name = "frankie_v1_lwip",
+    name = "usb_otg",
     srcs = [
-        "ethernetif.c",
-        "lwip.c",
+        "usb_otg.c",
     ],
     hdrs = [
-        "FreeRTOSConfig.h",
-        "ethernetif.h",
-        "lwip.h",
-        "lwipopts.h",
+        "main.h",
+        "usb_otg.h",
     ],
     copts = [
-        "-DSTM32H743xx",
         # We don't want to mark warnings as errors for 3rd party code
         "-Wno-error",
+        "-DSTM32H743xx",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":hal",
-        ":lwip",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
+    name = "crc",
+    srcs = [
+        "crc.c",
+    ],
+    hdrs = [
+        "crc.h",
+        "main.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+        "-DSTM32H743xx",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":hal",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
+    name = "tim",
+    srcs = [
+        "tim.c",
+    ],
+    hdrs = [
+        "main.h",
+        "tim.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+        "-DSTM32H743xx",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":hal",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
+    name = "gpio",
+    srcs = [
+        "gpio.c",
+    ],
+    hdrs = [
+        "gpio.h",
+        "main.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+        "-DSTM32H743xx",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":hal",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
+    name = "dma",
+    srcs = [
+        "dma.c",
+    ],
+    hdrs = [
+        "dma.h",
+        "main.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+        "-DSTM32H743xx",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":hal",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
+    name = "usart",
+    srcs = [
+        "usart.c",
+    ],
+    hdrs = [
+        "main.h",
+        "usart.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+        "-DSTM32H743xx",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":hal",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the
     # interrupt handling code, which *will not* cause an error, and *will* cause
@@ -246,6 +360,7 @@ cc_library(
     ],
     hdrs = [
         "FreeRTOSConfig.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h",
         "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h",
@@ -388,12 +503,12 @@ cc_library(
         "Middlewares/Third_Party/LwIP/src/netif/ppp/utils.c",
         "Middlewares/Third_Party/LwIP/src/netif/ppp/vj.c",
         "Middlewares/Third_Party/LwIP/system/OS/sys_arch.c",
+        "ethernetif.c",
+        "lwip.c",
     ],
     hdrs = [
         "Drivers/BSP/Components/lan8742/lan8742.h",
         "FreeRTOSConfig.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h",
-        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h",
         "Middlewares/Third_Party/LwIP/src/apps/httpd/fsdata.c",
         "Middlewares/Third_Party/LwIP/src/apps/httpd/fsdata.h",
         "Middlewares/Third_Party/LwIP/src/apps/httpd/httpd_structs.h",

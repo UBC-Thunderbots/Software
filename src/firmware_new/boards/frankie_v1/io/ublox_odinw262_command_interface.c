@@ -1,6 +1,7 @@
 #include "firmware_new/boards/frankie_v1/io/ublox_odinw262_command_interface.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "firmware_new/boards/frankie_v1/io/gpio_pin.h"
 #include "firmware_new/boards/frankie_v1/usart.h"
@@ -8,6 +9,10 @@
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
 #define TX_BUFFER_LENGTH (1024)
 #define RX_BUFFER_LENGTH (1024)
+
+// These buffers are stored in the R2 domain which is what the DMA
+// controller has access to write to
+DMA_BUFFER static uint8_t uart_receive_buffer[RX_BUFFER_LENGTH];
 
 typedef struct UbloxOdinW262CommandInterface
 {
@@ -45,12 +50,24 @@ void io_ublox_odinw262_command_interface_init(
     //
     // NOTE: Even though this is in a while loop, it only takes 1 or 2 tries
     // for HAL to not be busy and initialize the DMA transfer  */
-    while (HAL_UART_Receive_DMA(command_interface->at_interface_uart_handle, recv_buf,
-                                RX_BUFFER_LENGTH) != HAL_OK)
+    while (HAL_UART_Receive_DMA(command_interface->at_interface_uart_handle,
+                                uart_receive_buffer, RX_BUFFER_LENGTH) != HAL_OK)
     {
     }
 }
 
+/**
+ * Uart Idle Line Interrupt Service Routine
+ *
+ * This will be called in an ISR context when the UART line is idle, this is useful when
+ * We update the counter, post the semaphore, and return.
+ *
+ * @param uart_handle The uart_handle
+ */
+void io_ublox_odinw262_command_interface_handleIdleLineInterrupt(
+    UART_HandleTypeDef* uart_handle)
+{
+}
 
 void io_ublox_odinw262_interface_destroy(UbloxOdinW262CommandInterface_t* interface)
 {
@@ -63,11 +80,9 @@ void io_ublox_odinw262_reset(UbloxOdinW262CommandInterface_t* interface)
     io_gpio_pin_setInactive(interface->ublox_reset_pin);
 }
 
-void io_ublox_odinw262_sendATCommand(uint8_t* at_command, size_t at_command_size)
+void io_ublox_odinw262_sendATCommand(uint8_t* at_command, uint16_t at_command_size)
 {
-    const char* buffer HAL_UART_Transmit(&huart4, (uint8_t*)at_command,
-                                         strlen(at_command), HAL_MAX_DELAY);
-    HAL_UART_Receive(&huart4, (uint8_t*)at_command, strlen(at_command), HAL_MAX_DELAY);
+    HAL_UART_Transmit(&huart4, (uint8_t*)at_command, at_command_size, HAL_MAX_DELAY);
 }
 
 void io_ublox_odinw262_getMACAddress() {}

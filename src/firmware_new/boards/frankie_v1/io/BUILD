@@ -74,7 +74,6 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:frankie_v1_lwip",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:lwip",
         "//shared/proto:tbots_nanopb_proto",
@@ -104,9 +103,9 @@ cc_library(
     hdrs = ["uart_logger.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:frankie_v1_main_lib",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:rtos",
+        "//firmware_new/boards/frankie_v1:usart",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],
@@ -120,9 +119,9 @@ cc_library(
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":gpio_pin",
-        "//firmware_new/boards/frankie_v1:frankie_v1_main_lib",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:rtos",
+        "//firmware_new/boards/frankie_v1:usart",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],

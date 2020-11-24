@@ -22,6 +22,7 @@
 #include "stm32h7xx_it.h"
 
 #include "FreeRTOS.h"
+#include "firmware_new/boards/frankie_v1/io/ublox_odinw262_command_interface.h"
 #include "main.h"
 #include "task.h"
 /* Private includes ----------------------------------------------------------*/
@@ -222,9 +223,9 @@ void UART4_IRQHandler(void)
     if (RESET != __HAL_UART_GET_FLAG(
                      &huart4, UART_FLAG_IDLE))  // Judging whether it is idle interruption
     {
-        __HAL_UART_CLEAR_IDLEFLAG(&huart4);   // Clear idle interrupt sign (otherwise it
-                                              // will continue to enter the interrupt)
-        USER_UART_IdleLineCallback(&huart4);  // Call interrupt handler
+        __HAL_UART_CLEAR_IDLEFLAG(&huart4);  // Clear idle interrupt sign (otherwise it
+                                             // will continue to enter the interrupt)
+        (&huart4);                           // Call interrupt handler
     }
 
     /* USER CODE END UART4_IRQn 0 */
