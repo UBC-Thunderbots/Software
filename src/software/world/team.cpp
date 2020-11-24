@@ -184,7 +184,7 @@ std::optional<Robot> Team::getNearestRobot(const Point& ref_point) const
 }
 
 std::optional<Robot> Team::getNearestRobot(const std::vector<Robot>& robots,
-                                           const Point& ref_point) const
+                                                  const Point& ref_point)
 {
     if (robots.empty())
     {
