@@ -35,7 +35,8 @@ jobs:
       - name: Cache Bazel External Dependencies
         uses: actions/cache@v2
         with:
-          path: /home/runner/.cache/bazel
+          path: |
+            "${GITHUB_WORKSPACE}"/src/bazel-src/external
           key: bazel
           
       - name: Software Test
@@ -54,6 +55,8 @@ jobs:
         run: |
          cd src
          bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ > codecov.log
+         cat codecov.log | head -n100
+         cat codecov.log | tail -n100
          
   firmware-tests:
     name: Firmware Tests
