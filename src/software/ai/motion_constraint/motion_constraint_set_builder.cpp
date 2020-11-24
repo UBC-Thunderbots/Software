@@ -64,7 +64,6 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
     else
     {
         motion_constraints.insert(MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA);
-        
     }
 
     return motion_constraints;
