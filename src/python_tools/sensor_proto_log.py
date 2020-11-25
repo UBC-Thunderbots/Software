@@ -9,6 +9,7 @@ class SensorProtoLog:
     SensorProtoLog allows users to work with different types of messages 'multiplexed' into 'SensorProto'.
     A list is created for each member message type of 'SensorProto', with the same name. All of the
     messages of that type are put into the list for the given 'SensorProto' type data directory.
+    The timestamps for each message type are placed into the <field name>_timestamp attribute of this class.
 
     Usage:
     ```
@@ -37,6 +38,14 @@ class SensorProtoLog:
                     if field_name not in self._messages:
                         self._messages[field_name] = []
                     self._messages[field_name].append(getattr(sensor_msg, field_name))
+
+                    # add the associated timestamp to the list of timestamps for
+                    # the current field name
+                    timestamp_key_name = field_name + "_timestamp"
+                    timestamp = sensor_msg.backend_received_time.epoch_timestamp_seconds
+                    if timestamp_key_name not in self._messages:
+                        self._messages[timestamp_key_name] = []
+                    self._messages[timestamp_key_name].append(timestamp)
 
     def __getattr__(self, attr_name: str) -> List[Message]:
         """
