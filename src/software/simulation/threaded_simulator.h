@@ -3,6 +3,7 @@
 #include <atomic>
 #include <thread>
 
+#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/defending_side_msg.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/simulator.h"
@@ -23,11 +24,11 @@ class ThreadedSimulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
-     * @param ball_restitution The restitution for ball collisions
-     * @param ball_linear_damping The damping on the ball's linear motion
+     * @param simulator_config The config to fetch parameters from
      */
-    explicit ThreadedSimulator(const Field& field, double ball_restitution = 1.0,
-                               double ball_linear_damping = 0.0);
+    explicit ThreadedSimulator(const Field& field,
+                               std::shared_ptr<const SimulatorConfig> simulator_config =
+                                   DynamicParameters->getSimulatorConfig());
     ~ThreadedSimulator();
 
     /**

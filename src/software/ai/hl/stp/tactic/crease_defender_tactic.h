@@ -39,16 +39,9 @@ class CreaseDefenderTactic : public Tactic
                                   const Team &friendly_team, const Team &enemy_team,
                                   LeftOrRight left_or_right);
 
-    /**
-     * Updates the world parameters for this CreaseDefenderTactic.
-     *
-     * @param ball
-     * @param field
-     * @param friendly_team
-     * @param enemy_team
-     */
-    void updateWorldParams(const Ball &ball, const Field &field,
-                           const Team &friendly_team, const Team &enemy_team);
+    CreaseDefenderTactic() = delete;
+
+    void updateWorldParams(const World &world) override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -59,7 +52,7 @@ class CreaseDefenderTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) const override;
 
     Ball getBall() const;
     Field getField() const;

@@ -18,6 +18,10 @@ class StopTactic : public Tactic
      */
     explicit StopTactic(bool coast);
 
+    StopTactic() = delete;
+
+    void updateWorldParams(const World& world) override;
+
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally
@@ -29,7 +33,7 @@ class StopTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

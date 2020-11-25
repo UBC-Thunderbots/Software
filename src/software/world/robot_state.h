@@ -5,7 +5,7 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
-#include "software/world/team_colour.h"
+#include "software/world/team_types.h"
 
 using RobotId = unsigned int;
 

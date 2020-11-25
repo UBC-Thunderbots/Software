@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/evaluation/pass.h"
-#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
@@ -14,9 +13,8 @@
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
 
-InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball,
-                                         bool loop_forever)
-    : Action(loop_forever), field(field), ball(ball)
+InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball)
+    : Action(false), field(field), ball(ball)
 {
 }
 
@@ -152,6 +150,7 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
         {
             restart();
         }
+
         bool ball_very_close_to_robot_dribbler =
             distance(ball.position(),
                      robot->position() + Vector::createFromAngle(robot->orientation())

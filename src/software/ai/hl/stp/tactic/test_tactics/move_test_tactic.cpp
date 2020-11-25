@@ -9,6 +9,8 @@ MoveTestTactic::MoveTestTactic(bool loop_forever)
 {
 }
 
+void MoveTestTactic::updateWorldParams(const World &world) {}
+
 void MoveTestTactic::updateControlParams(Point destination_)
 {
     // Update the parameters stored by this Tactic
@@ -32,7 +34,7 @@ void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while ((this->robot->position() - this->destination).length() > 0.01);
 }
 
-void MoveTestTactic::accept(MutableTacticVisitor &visitor)
+void MoveTestTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

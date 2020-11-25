@@ -1,6 +1,9 @@
 #include "software/test_util/test_util.h"
 
+#include "shared/proto/robot_log_msg.nanopb.h"
+#include "shared/proto/robot_log_msg.pb.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/logger/logger.h"
 
 namespace TestUtil
 {
@@ -58,18 +61,16 @@ namespace TestUtil
 
     World setBallPosition(World world, Point ball_position, Timestamp timestamp)
     {
-        TimestampedBallState ballState =
-            TimestampedBallState(ball_position, world.ball().velocity(), timestamp);
-        world.updateBallStateWithTimestamp(ballState);
+        BallState ball_state(ball_position, world.ball().velocity());
+        world.updateBall(Ball(ball_state, timestamp));
 
         return world;
     }
 
     World setBallVelocity(World world, Vector ball_velocity, Timestamp timestamp)
     {
-        TimestampedBallState ballState =
-            TimestampedBallState(world.ball().position(), ball_velocity, timestamp);
-        world.updateBallStateWithTimestamp(ballState);
+        BallState ball_state(world.ball().position(), ball_velocity);
+        world.updateBall(Ball(ball_state, timestamp));
 
         return world;
     }
@@ -109,4 +110,15 @@ namespace TestUtil
         }
         return states;
     }
+
+    void handleTestRobotLog(TbotsProto_RobotLog robot_log)
+    {
+        LOG(INFO) << "[TEST ROBOT " << robot_log.robot_id << "]["
+                  << TbotsProto::LogLevel_Name(
+                         static_cast<TbotsProto::LogLevel>(robot_log.log_level))
+                  << "]"
+                  << "[" << robot_log.file_name << ":" << robot_log.line_number
+                  << "]: " << robot_log.log_msg;
+    }
+
 };  // namespace TestUtil

@@ -8,6 +8,7 @@ qt_ui_library(
     deps = [
         # Need to include targets used in promoted widgets
         "//software/gui/standalone_simulator/widgets:standalone_simulator_draw_function_visualizer",
+        "//software/gui/generic_widgets/dynamic_parameters:dynamic_parameter_widget",
         "@qt//:qt_widgets",
     ],
 )

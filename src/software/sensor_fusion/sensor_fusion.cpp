@@ -4,7 +4,6 @@
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
     : sensor_fusion_config(sensor_fusion_config),
-      history_size(20),
       field(std::nullopt),
       ball(std::nullopt),
       friendly_team(),
@@ -14,7 +13,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
-      ball_states(history_size)
+      team_with_possession(TeamSide::ENEMY)
 {
     if (!sensor_fusion_config)
     {
@@ -28,6 +27,7 @@ std::optional<World> SensorFusion::getWorld() const
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
+        new_world.setTeamWithPossession(team_with_possession);
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
@@ -140,7 +140,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     // https://github.com/UBC-Thunderbots/Software/issues/960
     bool friendly_team_is_yellow = sensor_fusion_config->FriendlyColorYellow()->value();
 
-    std::optional<TimestampedBallState> new_ball_state;
+    std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
                                                 max_valid_x, ignore_invalid_camera_data);
     auto yellow_team =
@@ -166,7 +166,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         }
     }
 
-    new_ball_state = createTimestampedBallState(ball_detections);
     if (friendly_team_is_yellow)
     {
         friendly_team = createFriendlyTeam(yellow_team);
@@ -178,52 +177,55 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         enemy_team    = createEnemyTeam(yellow_team);
     }
 
-    if (new_ball_state)
+    new_ball = createBall(ball_detections);
+    if (new_ball)
     {
-        updateBall(*new_ball_state);
+        updateBall(*new_ball);
     }
-}
-
-void SensorFusion::updateBall(TimestampedBallState new_ball_state)
-{
-    if (!ball_states.empty() &&
-        new_ball_state.timestamp() < ball_states.front().timestamp())
-    {
-        throw std::invalid_argument(
-            "Error: Trying to update ball state using a state older then the current state");
-    }
-
-    ball_states.push_front(new_ball_state);
 
     if (ball)
     {
-        ball->updateState(new_ball_state);
-    }
-    else
-    {
-        ball = Ball(new_ball_state);
-    }
+        bool friendly_team_has_ball = teamHasBall(friendly_team, *ball);
+        bool enemy_team_has_ball    = teamHasBall(enemy_team, *ball);
 
+        if (friendly_team_has_ball && !enemy_team_has_ball)
+        {
+            // take defensive view of exclusive possession for friendly possession
+            team_with_possession = TeamSide::FRIENDLY;
+        }
+
+        if (enemy_team_has_ball)
+        {
+            team_with_possession = TeamSide::ENEMY;
+        }
+    }
+}
+
+void SensorFusion::updateBall(Ball new_ball)
+{
+    ball = new_ball;
     game_state.updateBall(*ball);
 }
 
-std::optional<TimestampedBallState> SensorFusion::createTimestampedBallState(
+std::optional<Ball> SensorFusion::createBall(
     const std::vector<BallDetection> &ball_detections)
 {
     if (field)
     {
-        std::optional<TimestampedBallState> new_ball =
+        std::optional<Ball> new_ball =
             ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary());
         return new_ball;
     }
     return std::nullopt;
 }
 
+
 Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
     RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
+    // TODO (1610) Implement friendly goalie ID override
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
@@ -232,6 +234,7 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
     RobotId enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
+    // TODO (1610) Implement enemy goalie ID override
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }
@@ -249,4 +252,16 @@ BallDetection SensorFusion::invert(BallDetection ball_detection) const
     ball_detection.position =
         Point(-ball_detection.position.x(), -ball_detection.position.y());
     return ball_detection;
+}
+
+bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
+{
+    for (const auto &robot : team.getAllRobots())
+    {
+        if (robot.isNearDribbler(ball.position()))
+        {
+            return true;
+        }
+    }
+    return false;
 }

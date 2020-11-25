@@ -12,6 +12,8 @@ double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
     return 0.5;
 }
 
+void StopTactic::updateWorldParams(const World &world) {}
+
 void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     auto stop_action = std::make_shared<StopAction>(false);
@@ -23,7 +25,7 @@ void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!stop_action->done());
 }
 
-void StopTactic::accept(MutableTacticVisitor &visitor)
+void StopTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

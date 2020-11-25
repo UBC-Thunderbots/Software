@@ -27,16 +27,9 @@ class DefenseShadowEnemyTactic : public Tactic
                                       const Team &enemy_team, const Ball &ball,
                                       bool ignore_goalie, double shadow_distance);
 
-    /**
-     * Updates the world parameters for this Tactic.
-     *
-     * @param field The current state of the field
-     * @param friendly_team The current state of the friendly team
-     * @param enemy_team The current state of the enemy team
-     * @param ball The current state of the ball
-     */
-    void updateWorldParams(const Field &field, const Team &friendly_team,
-                           const Team &enemy_team, const Ball &ball);
+    DefenseShadowEnemyTactic() = delete;
+
+    void updateWorldParams(const World &world) override;
 
     /**
      * Updates the control parameters for this Tactic
@@ -47,7 +40,7 @@ class DefenseShadowEnemyTactic : public Tactic
 
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) const override;
 
     Ball getBall() const;
     Field getField() const;
