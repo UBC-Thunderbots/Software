@@ -22,9 +22,9 @@ if [[ "$1" == "help" ]]; then
   exit 0
 fi
 
+# download SSL GameController if not downloaded already
 wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.4.0/ssl-game-controller_v2.4.0_linux_amd64 -O /tmp/ssl-game-controller_v2.4.0_linux_amd64
 chmod +x /tmp/ssl-game-controller_v2.4.0_linux_amd64
-xdg-open http://localhost:8081&
 
 tmux new-session \; \
   set -g mouse on \; \
@@ -32,7 +32,9 @@ tmux new-session \; \
   split-window -h \; \
   send-keys "bazel run //software:full_system -- --backend=WifiBackend --interface=$1" C-m \; \
   split-window -v \; \
-  send-keys "/tmp/ssl-game-controller_v2.4.0_linux_amd64" C-m \; \
+  send-keys "/tmp/ssl-game-controller_v2.4.0_linux_amd64&" C-m \; \
+  send-keys "xdg-open http://localhost:8081" C-m \; \
+  send-keys "fg" C-m \; \
   select-pane -t 0 \; \
   split-window -v \; \
   send-keys "bazel run //software/simulation:standalone_simulator_main -- --interface=$1" C-m \;
