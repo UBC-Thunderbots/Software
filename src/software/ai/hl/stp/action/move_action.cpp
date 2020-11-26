@@ -15,6 +15,8 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
 {
 }
 
+void MoveAction::updateWorldParams(const World& world) {}
+
 void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      Angle final_orientation, double final_speed,
                                      DribblerEnable enable_dribbler, MoveType move_type,

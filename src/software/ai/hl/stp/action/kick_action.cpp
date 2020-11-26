@@ -12,9 +12,9 @@ KickAction::KickAction() : Action(false), ball({0, 0}, {0, 0}, Timestamp::fromSe
 {
 }
 
-void KickAction::updateWorldParams(const Ball &ball)
+void KickAction::updateWorldParams(const World &world)
 {
-    this->ball = ball;
+    this->ball = world.ball();
 }
 
 void KickAction::updateControlParams(const Robot &robot, Point kick_origin,

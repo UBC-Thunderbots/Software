@@ -181,14 +181,3 @@ cc_library(
     name = "mutable_action_visitor",
     hdrs = ["mutable_action_visitor.h"],
 )
-
-cc_library(
-    name = "action_world_params_update_visitor",
-    srcs = ["action_world_params_update_visitor.cpp"],
-    hdrs = ["action_world_params_update_visitor.h"],
-    deps = [
-        ":all_actions",
-        ":mutable_action_visitor",
-        "//software/world",
-    ],
-)

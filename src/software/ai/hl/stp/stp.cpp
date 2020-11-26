@@ -7,7 +7,6 @@
 #include <exception>
 #include <random>
 
-#include "software/ai/hl/stp/action/action_world_params_update_visitor.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"

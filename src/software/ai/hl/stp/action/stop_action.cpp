@@ -8,6 +8,8 @@ StopAction::StopAction(bool loop_forever, double stopped_speed_threshold)
 {
 }
 
+void StopAction::updateWorldParams(const World& world) {}
+
 void StopAction::updateControlParams(const Robot& robot, bool coast)
 {
     this->robot = robot;

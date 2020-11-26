@@ -20,9 +20,9 @@ class KickAction : public Action
     /**
      * Updates the params that can be derived from the world for this action
      *
-     * @param ball The ball being kicked
+     * @param ball The world to update from
      */
-    void updateWorldParams(const Ball &ball);
+    void updateWorldParams(const World &world) override;
 
     /**
      * Updates the params that cannot be derived from the world for this action

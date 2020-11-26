@@ -22,10 +22,9 @@ class InterceptBallAction : public Action
     /**
      * Updates this action with all the parameters it needs from the world
      *
-     * @param field The field
-     * @param ball The ball
+     * @param world The world to update from
      */
-    void updateWorldParams(const Field& field, const Ball& ball);
+    void updateWorldParams(const World& world) override;
 
     /**
      * Updates this action with all the parameters it needs that don't come from the world

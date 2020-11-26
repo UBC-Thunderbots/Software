@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/robot.h"
+#include "software/world/world.h"
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
@@ -74,6 +75,13 @@ class Action
      * @param visitor A Action Visitor
      */
     virtual void accept(MutableActionVisitor &visitor) = 0;
+
+    /**
+     * Updates the world parameters for this action
+     *
+     * @param world The world that will be used to update the action
+     */
+    virtual void updateWorldParams(const World &world);
 
     virtual ~Action() = default;
 

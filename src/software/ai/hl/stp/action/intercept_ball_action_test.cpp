@@ -10,14 +10,17 @@
 
 TEST(InterceptBallActionTest, intercept_fast_moving_ball)
 {
-    Field field = Field::createSSLDivisionBField();
     Ball ball   = Ball(Point(-3, 0), Vector(2, 0), Timestamp::fromSeconds(0));
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    InterceptBallAction action = InterceptBallAction(field, ball);
+    World world = ::TestUtil::createBlankTestingWorld();
+    ::TestUtil::setBallPosition(world, {-3, 0}, Timestamp::fromSeconds(0));
+    ::TestUtil::setBallVelocity(world, Vector(2, 0), Timestamp::fromSeconds(0));
 
-    action.updateWorldParams(field, ball);
+    InterceptBallAction action = InterceptBallAction(world.field(), world.ball());
+
+    action.updateWorldParams(world);
     action.updateControlParams(robot);
     std::unique_ptr<Intent> intent_ptr = action.getNextIntent();
 
@@ -43,14 +46,15 @@ TEST(InterceptBallActionTest, intercept_fast_moving_ball)
 
 TEST(InterceptBallActionTest, ball_moving_too_fast_to_intercept_within_field)
 {
-    Field field = Field::createSSLDivisionBField();
-    Ball ball   = Ball(Point(0, 0), Vector(-10, 0), Timestamp::fromSeconds(0));
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    ::TestUtil::setBallVelocity(world, Vector(-10, 0), Timestamp::fromSeconds(0));
 
-    InterceptBallAction action = InterceptBallAction(field, ball);
+    InterceptBallAction action = InterceptBallAction(world.field(), world.ball());
 
-    action.updateWorldParams(field, ball);
+    action.updateWorldParams(world);
     action.updateControlParams(robot);
     std::unique_ptr<Intent> intent_ptr = action.getNextIntent();
 
@@ -61,10 +65,10 @@ TEST(InterceptBallActionTest, ball_moving_too_fast_to_intercept_within_field)
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         // The robot should move to approximately where the ball will leave the field
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(field.friendlyGoalCenter(),
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(world.field().friendlyGoalCenter(),
                                                    move_intent.getDestination(), 0.15));
 
-        EXPECT_EQ((-ball.velocity()).orientation(), move_intent.getFinalAngle());
+        EXPECT_EQ((-world.ball().velocity()).orientation(), move_intent.getFinalAngle());
         EXPECT_EQ(AutochickType::NONE, move_intent.getAutochickType());
     }
     catch (std::bad_cast)
@@ -75,15 +79,15 @@ TEST(InterceptBallActionTest, ball_moving_too_fast_to_intercept_within_field)
 
 TEST(InterceptBallActionTest, intercept_slow_moving_ball)
 {
-    Field field = Field::createSSLDivisionBField();
-    Ball ball   = Ball(Point(0, 0), Vector(0.1, 0), Timestamp::fromSeconds(0));
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    ::TestUtil::setBallVelocity(world, Vector(0.1, 0), Timestamp::fromSeconds(0));
 
+    InterceptBallAction action = InterceptBallAction(world.field(), world.ball());
 
-    InterceptBallAction action = InterceptBallAction(field, ball);
-
-    action.updateWorldParams(field, ball);
+    action.updateWorldParams(world);
     action.updateControlParams(robot);
     std::unique_ptr<Intent> intent_ptr = action.getNextIntent();
 
@@ -94,9 +98,10 @@ TEST(InterceptBallActionTest, intercept_slow_moving_ball)
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(ball.position(),
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(world.ball().position(),
                                                    move_intent.getDestination(), 0.01));
-        Angle angle_facing_ball = (ball.position() - robot.position()).orientation();
+        Angle angle_facing_ball =
+            (world.ball().position() - robot.position()).orientation();
         EXPECT_EQ(angle_facing_ball, move_intent.getFinalAngle());
         EXPECT_EQ(AutochickType::NONE, move_intent.getAutochickType());
     }

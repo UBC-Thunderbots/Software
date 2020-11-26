@@ -22,7 +22,7 @@ class ChipAction : public Action
      *
      * @param ball The ball being kicked
      */
-    void updateWorldParams(const Ball& ball);
+    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the params for this action that cannot be derived from the world
