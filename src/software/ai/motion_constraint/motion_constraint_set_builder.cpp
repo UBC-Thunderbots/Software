@@ -63,19 +63,7 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
     }
     else
     {
-        if (game_state.stayAwayFromBall() || game_state.isOurKickoff())
-        {
-            motion_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
-        }
-
-        if (game_state.isOurPenalty())
-        {
-            motion_constraints.insert(MotionConstraint::ENEMY_DEFENSE_AREA);
-        }
-        else
-        {
-            motion_constraints.insert(MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA);
-        }
+        motion_constraints.insert(MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA);
     }
 
     return motion_constraints;
