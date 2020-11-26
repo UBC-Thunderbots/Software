@@ -50,12 +50,23 @@ TEST(Observer, receiveValue_value_not_yet_available)
 TEST(Observer, getDataReceivedPerSecond_time_buffer_filled)
 {
     TestObserver test_observer;
+    auto wall_time_start = std::chrono::steady_clock::now();
     for (unsigned int i = 0; i < TestObserver::TIME_BUFFER_SIZE; i++)
     {
         test_observer.receiveValue(i);
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 1 / 0.01, 20);
+
+    auto wall_time_now = std::chrono::steady_clock::now();
+    double test_duration_s =
+        static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(
+                                wall_time_now - wall_time_start)
+                                .count()) *
+        SECONDS_PER_MILLISECOND;
+    double scaling_factor = test_duration_s / (0.01 * (TestObserver::TIME_BUFFER_SIZE));
+
+
+    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 1 / 0.01 * scaling_factor, 20);
 }
 
 TEST(Observer, getDataReceivedPerSecond_time_buffer_filled_twice_over)
@@ -69,12 +80,16 @@ TEST(Observer, getDataReceivedPerSecond_time_buffer_filled_twice_over)
     }
 
     auto wall_time_now = std::chrono::steady_clock::now();
-    double test_duration_s = static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(wall_time_now -
-                                                              wall_time_start).count())*SECONDS_PER_MILLISECOND;
-    double scaling_factor = test_duration_s/(0.005*(TestObserver::TIME_BUFFER_SIZE * 2+1));
+    double test_duration_s =
+        static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(
+                                wall_time_now - wall_time_start)
+                                .count()) *
+        SECONDS_PER_MILLISECOND;
+    double scaling_factor =
+        test_duration_s / (0.005 * (TestObserver::TIME_BUFFER_SIZE * 2));
 
 
-    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 1 / 0.005*scaling_factor, 20);
+    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 1 / 0.005 * scaling_factor, 20);
 }
 
 TEST(Observer, getDataReceivedPerSecond_time_buffer_empty)
@@ -86,13 +101,21 @@ TEST(Observer, getDataReceivedPerSecond_time_buffer_empty)
 TEST(Observer, getDataReceivedPerSecond_time_buffer_partially_empty)
 {
     TestObserver test_observer;
+    auto wall_time_start = std::chrono::steady_clock::now();
     for (unsigned int i = 0; i < TestObserver::TIME_BUFFER_SIZE / 2; i++)
     {
         test_observer.receiveValue(i);
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
-    // the data received value is noisy when the buffer is partially empty, so we allow a
-    // larger margin of error
-    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 1 / 0.01, 60);
+    auto wall_time_now = std::chrono::steady_clock::now();
+    double test_duration_s =
+        static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(
+                                wall_time_now - wall_time_start)
+                                .count()) *
+        SECONDS_PER_MILLISECOND;
+    double scaling_factor =
+        test_duration_s / (0.01 * (TestObserver::TIME_BUFFER_SIZE / 2));
+
+    EXPECT_NEAR(test_observer.getDataReceivedPerSecond(), 1 / 0.01 * scaling_factor, 20);
 }
