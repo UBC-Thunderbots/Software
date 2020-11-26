@@ -31,7 +31,9 @@
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
 #include "firmware_new/boards/frankie_v1/usart.h"
+#include "firmware_new/boards/frankie_v1/tim.h"
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware_new/boards/frankie_v1/io/ublox_odinw262_communicator.h"
 #include "shared/constants.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 #include "shared/proto/robot_status_msg.nanopb.h"
@@ -194,9 +196,6 @@ void MX_FREERTOS_Init(void)
                     &NetworkRobotLog_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
-    io_uart_logger_init(&huart3);
-    io_ublox_odinw262_command_interface_create(&huart4, 
-    io_ublox_odinw262_command_interface_init(&huart4);
     /* USER CODE END RTOS_THREADS */
 }
 
@@ -283,12 +282,17 @@ void initIoNetworking()
         "robot_log_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_LOGS_PORT,
         &robot_log_msg, TbotsProto_RobotLog_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
+    // initialize ublox
+    GpioPin_t *ublox_reset_pin =                                                           
+            io_gpio_pin_create(ublox_reset_GPIO_Port, ublox_reset_Pin, ACTIVE_LOW);
+
+    UbloxOdinW262Communicator_t* ublox_communicator = 
+            io_ublox_odinw262_communicator_create(&huart4, ublox_reset_pin);
+
+    io_ublox_odinw262_communicator_connectToWifi(ublox_communicator, "SHAW_E1C430", "aksr#1605");
+
     // initialize network logger
     io_network_logger_init(RobotLogProtoQHandle);
-
-    // initialize ublox
-    
-
 }
 
 void initIoDrivetrain(void)

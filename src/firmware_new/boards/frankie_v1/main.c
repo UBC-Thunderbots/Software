@@ -131,8 +131,8 @@ int main(void)
     //              ---- Initialize App/IO Layers ----
     //
     // At this point the UART peripheral should be configured correctly
-    // so we initialize the uart logger here so that we can see any logs
-    // from the initialization functions
+    // so we initialize the UART logger here so that we can see logs
+    // from the initialization functions without having to be connected to a network
     io_uart_logger_init(&huart3);
     app_logger_init(0, &io_uart_logger_handle_robot_log);
 

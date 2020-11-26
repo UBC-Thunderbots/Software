@@ -37,6 +37,7 @@ cc_binary(
         "//firmware_new/boards/frankie_v1/io:network_logger",
         "//firmware_new/boards/frankie_v1/io:pwm_pin",
         "//firmware_new/boards/frankie_v1/io:uart_logger",
+        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator",
     ],
 )
 
@@ -67,7 +68,7 @@ cc_library(
         ":usart",
         ":usb_otg",
         "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
-        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_command_interface",
+        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator",
         "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",

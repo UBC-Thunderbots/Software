@@ -113,15 +113,16 @@ cc_library(
 )
 
 cc_library(
-    name = "ublox_odinw262_command_interface",
-    srcs = ["ublox_odinw262_command_interface.c"],
-    hdrs = ["ublox_odinw262_command_interface.h"],
+    name = "ublox_odinw262_communicator",
+    srcs = ["ublox_odinw262_communicator.c"],
+    hdrs = ["ublox_odinw262_communicator.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":gpio_pin",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:rtos",
         "//firmware_new/boards/frankie_v1:usart",
+        "//firmware/app/logger:logger",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],

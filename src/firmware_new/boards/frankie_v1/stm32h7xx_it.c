@@ -22,7 +22,7 @@
 #include "stm32h7xx_it.h"
 
 #include "FreeRTOS.h"
-#include "firmware_new/boards/frankie_v1/io/ublox_odinw262_command_interface.h"
+#include "firmware_new/boards/frankie_v1/io/ublox_odinw262_communicator.h"
 #include "main.h"
 #include "task.h"
 /* Private includes ----------------------------------------------------------*/
@@ -226,7 +226,7 @@ void UART4_IRQHandler(void)
         __HAL_UART_CLEAR_IDLEFLAG(&huart4);  // Clear idle interrupt sign (otherwise it
                                              // will continue to enter the interrupt)
         // Call interrupt handler
-        io_ublox_odinw262_command_interface_handleIdleLineInterrupt(&huart4);
+        io_ublox_odinw262_communicator_handleIdleLineInterrupt(&huart4);
     }
 
     /* USER CODE END UART4_IRQn 0 */
