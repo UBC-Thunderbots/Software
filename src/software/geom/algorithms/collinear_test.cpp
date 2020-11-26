@@ -60,3 +60,16 @@ TEST(CollinearPointsTest, test_collinear_segments)
         EXPECT_TRUE(val);
     }
 }
+
+TEST(CollinearPointsTest, test_collinear_near_floating_point_error)
+{
+    Point a1(-3.3649999999999998, 0.58600823341148167);
+    Point b1(-3.6996445312500001, 0.36075723266601561);
+    Point c1(-2.8700676805557683, 0.91914979063239866);
+    EXPECT_TRUE(collinear(a1, b1, c1));
+
+    Point a2(-3.7905116725681518, -1.135);
+    Point b2(-4.0008916015625005, -0.80003082275390625);
+    Point c2(-3.4690320039460172, -1.6468633731576046);
+    EXPECT_TRUE(collinear(a2, b2, c2));
+}
