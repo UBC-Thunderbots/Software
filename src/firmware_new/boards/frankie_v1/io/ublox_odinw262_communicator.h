@@ -47,4 +47,4 @@ void io_ublox_odinw262_reset(UbloxOdinW262Communicator_t* communicator);
 void io_ublox_odinw262_communicator_connectToWifi(UbloxOdinW262Communicator_t* communicator, const char* wifi_ssid, const char* wifi_password);
 void io_ublox_odinw262_communicator_handleIdleLineInterrupt(UART_HandleTypeDef* uart_handle);
 
-void io_ublox_odinw262_communicator_sendATCommand(UbloxOdinW262Communicator_t* communicator, char* at_command);
+void io_ublox_odinw262_communicator_sendATCommand(UbloxOdinW262Communicator_t* communicator, const char* at_command);
