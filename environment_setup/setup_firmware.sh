@@ -34,7 +34,8 @@ sudo usermod -a -G dialout $USER
 # installs platformio to virtual environment
 python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"
 
-#sym links executable to directory used by 
+#sym links executable to directory used by platformio 
 sudo n -s ~/.platformio/penv/bin/platformio /usr/local/bin/platformio
 sudo ln -s ~/.platformio/penv/bin/pio /usr/local/bin/pio
+
 

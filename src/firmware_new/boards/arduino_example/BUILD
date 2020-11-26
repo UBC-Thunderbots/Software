@@ -7,17 +7,17 @@ load(
 )
 
 platformio_library(
-    name = "echo_function",
-    src = "echo_function.cc",
-    hdr = "echo_function.h",
+    name = "echo_library",
+    src = "echo_library.cc",
+    hdr = "echo_library.h",
 )
 
 platformio_project(
-    name = "example_arduino_echo_project",
-    src = "serialEchoExample.cc",
+    name = "example_arduino_project",
+    src = "serial_echo_example.cc",
     board = "uno",
     framework = "arduino",
     deps = [
-        ":echo_function",
+        ":echo_library",
     ],
 )
