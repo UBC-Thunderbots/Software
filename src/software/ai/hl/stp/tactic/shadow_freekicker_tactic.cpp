@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/shadow_freekicker_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
 
 #include <algorithm>
 

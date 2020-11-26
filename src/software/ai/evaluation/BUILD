@@ -76,9 +76,9 @@ cc_test(
 )
 
 cc_library(
-    name = "deflect_off_enemy_target",
-    srcs = ["deflect_off_enemy_target.cpp"],
-    hdrs = ["deflect_off_enemy_target.h"],
+    name = "deflectOffEnemyTarget",
+    srcs = ["deflectOffEnemyTarget.cpp"],
+    hdrs = ["deflectOffEnemyTarget.h"],
     deps = [
         ":shot",
         "//shared:constants",
@@ -89,10 +89,10 @@ cc_library(
 )
 
 cc_test(
-    name = "deflect_off_enemy_target_test",
-    srcs = ["deflect_off_enemy_target_test.cpp"],
+    name = "deflectOffEnemyTarget_test",
+    srcs = ["deflectOffEnemyTarget_test.cpp"],
     deps = [
-        ":deflect_off_enemy_target",
+        ":deflectOffEnemyTarget",
         ":shot",
         "//software/test_util",
         "@gtest//:gtest_main",

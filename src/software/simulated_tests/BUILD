@@ -111,7 +111,7 @@ cc_test(
     srcs = ["enemy_free_kick_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
-        "//software/ai/hl/stp/play:enemy_freekick_play",
+        "//software/ai/hl/stp/play:enemy_free_kick_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",

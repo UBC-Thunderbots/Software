@@ -1,4 +1,4 @@
-#include "software/ai/evaluation/deflect_off_enemy_target.h"
+#include "software/ai/evaluation/deflectOffEnemyTarget.h"
 
 #include "shared/constants.h"
 #include "software/geom/algorithms/contains.h"
@@ -6,7 +6,7 @@
 #include "software/geom/triangle.h"
 #include "software/world/world.h"
 
-Point deflect_off_enemy_target(World world)
+Point deflectOffEnemyTarget(World world)
 {
     Point enemy_goal_positive = world.field().enemyGoalpostPos();
     Point enemy_goal_negative = world.field().enemyGoalpostNeg();
