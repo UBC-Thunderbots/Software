@@ -46,9 +46,6 @@ void SimulatedTestFixture::SetUp()
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideGameControllerFriendlyTeamColor()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
         ->setValue(true);
 }
@@ -142,7 +139,7 @@ void SimulatedTestFixture::updateSensorFusion()
     auto sensor_msg                        = SensorProto();
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
 }
 
 void SimulatedTestFixture::sleep(

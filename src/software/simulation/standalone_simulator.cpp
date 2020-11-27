@@ -15,17 +15,56 @@ StandaloneSimulator::StandaloneSimulator(
       most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket())
 {
     standalone_simulator_config->mutableBlueTeamChannel()->registerCallbackFunction(
-        [this](int) { this->initNetworking(); });
+        [this](int blue_team_channel) {
+            setupNetworking(
+                blue_team_channel,
+                this->standalone_simulator_config->YellowTeamChannel()->value(),
+                this->standalone_simulator_config->NetworkInterface()->value(),
+                this->standalone_simulator_config->VisionPort()->value(),
+                this->standalone_simulator_config->VisionIPv4Address()->value());
+        });
     standalone_simulator_config->mutableYellowTeamChannel()->registerCallbackFunction(
-        [this](int) { this->initNetworking(); });
+        [this](int yellow_team_channel) {
+            setupNetworking(
+                this->standalone_simulator_config->BlueTeamChannel()->value(),
+                yellow_team_channel,
+                this->standalone_simulator_config->NetworkInterface()->value(),
+                this->standalone_simulator_config->VisionPort()->value(),
+                this->standalone_simulator_config->VisionIPv4Address()->value());
+        });
     standalone_simulator_config->mutableNetworkInterface()->registerCallbackFunction(
-        [this](std::string) { this->initNetworking(); });
+        [this](std::string network_interface) {
+            setupNetworking(
+                this->standalone_simulator_config->BlueTeamChannel()->value(),
+                this->standalone_simulator_config->YellowTeamChannel()->value(),
+                network_interface,
+                this->standalone_simulator_config->VisionPort()->value(),
+                this->standalone_simulator_config->VisionIPv4Address()->value());
+        });
     standalone_simulator_config->mutableVisionPort()->registerCallbackFunction(
-        [this](int) { this->initNetworking(); });
+        [this](int vision_port) {
+            setupNetworking(
+                this->standalone_simulator_config->BlueTeamChannel()->value(),
+                this->standalone_simulator_config->YellowTeamChannel()->value(),
+                this->standalone_simulator_config->NetworkInterface()->value(),
+                vision_port,
+                this->standalone_simulator_config->VisionIPv4Address()->value());
+        });
     standalone_simulator_config->mutableVisionIPv4Address()->registerCallbackFunction(
-        [this](std::string) { this->initNetworking(); });
+        [this](std::string vision_ip_address) {
+            setupNetworking(
+                this->standalone_simulator_config->BlueTeamChannel()->value(),
+                this->standalone_simulator_config->YellowTeamChannel()->value(),
+                this->standalone_simulator_config->NetworkInterface()->value(),
+                this->standalone_simulator_config->VisionPort()->value(),
+                vision_ip_address);
+        });
 
-    initNetworking();
+    setupNetworking(standalone_simulator_config->BlueTeamChannel()->value(),
+                    standalone_simulator_config->YellowTeamChannel()->value(),
+                    standalone_simulator_config->NetworkInterface()->value(),
+                    standalone_simulator_config->VisionPort()->value(),
+                    standalone_simulator_config->VisionIPv4Address()->value());
 
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [this](SSLProto::SSL_WrapperPacket wrapper_packet) {
@@ -45,37 +84,33 @@ void StandaloneSimulator::registerOnSSLWrapperPacketReadyCallback(
     simulator.registerOnSSLWrapperPacketReadyCallback(callback);
 }
 
-void StandaloneSimulator::initNetworking()
+void StandaloneSimulator::setupNetworking(int blue_team_channel, int yellow_team_channel,
+                                          std::string network_interface, int vision_port,
+                                          std::string vision_ip_address)
 {
-    auto network_interface  = standalone_simulator_config->NetworkInterface()->value();
-    int yellow_team_channel = standalone_simulator_config->YellowTeamChannel()->value();
     std::string yellow_team_ip =
         std::string(MULTICAST_CHANNELS[yellow_team_channel]) + "%" + network_interface;
-    int blue_team_channel = standalone_simulator_config->BlueTeamChannel()->value();
     std::string blue_team_ip =
         std::string(MULTICAST_CHANNELS[blue_team_channel]) + "%" + network_interface;
 
-    wrapper_packet_sender =
-        std::make_unique<ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>>(
-            standalone_simulator_config->VisionIPv4Address()->value(),
-            static_cast<unsigned short>(
-                standalone_simulator_config->VisionPort()->value()));
-    yellow_team_primitive_listener =
-        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>>(
+    wrapper_packet_sender.reset(
+        new ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>(
+            vision_ip_address, static_cast<unsigned short>(vision_port)));
+    yellow_team_primitive_listener.reset(
+        new ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>(
             yellow_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1));
-    blue_team_primitive_listener =
-        std::make_unique<ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>>(
+            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1)));
+    blue_team_primitive_listener.reset(
+        new ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>(
             blue_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1));
-    yellow_team_side_listener =
-        std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
+            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1)));
+    yellow_team_side_listener.reset(
+        new ThreadedProtoMulticastListener<DefendingSideProto>(
             yellow_team_ip, DEFENDING_SIDE_PORT,
-            boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1));
-    blue_team_side_listener =
-        std::make_unique<ThreadedProtoMulticastListener<DefendingSideProto>>(
-            blue_team_ip, DEFENDING_SIDE_PORT,
-            boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1));
+            boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1)));
+    blue_team_side_listener.reset(new ThreadedProtoMulticastListener<DefendingSideProto>(
+        blue_team_ip, DEFENDING_SIDE_PORT,
+        boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1)));
 }
 
 void StandaloneSimulator::setupInitialSimulationState()

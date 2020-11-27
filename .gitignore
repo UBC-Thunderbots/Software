@@ -132,3 +132,6 @@ src/core*
 *./__py_cache__
 *./.mypy_cache
 
+# SSL GameController
+src/config
+*.stream
