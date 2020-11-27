@@ -13,33 +13,37 @@
  * objects, passing them to the `AI`, getting the primitives to send to the
  * robots based on the World state, and sending them out.
  */
-class AIWrapper : public FirstInFirstOutThreadedObserver<World>,
-                  public Subject<TbotsProto::PrimitiveSet>,
-                  public Subject<AIDrawFunction>,
-                  public Subject<PlayInfo>
+class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
+                   public Subject<TbotsProto::PrimitiveSet>,
+                   public Subject<AIDrawFunction>,
+                   public Subject<PlayInfo>
 {
    public:
-    AIWrapper() = delete;
+    ThreadedAI() = delete;
 
     /**
      * Create an AI with the given config
      *
      * @param config The AI configuration
      */
-    explicit AIWrapper(std::shared_ptr<const AIConfig> ai_config,
-                       std::shared_ptr<const AIControlConfig> control_config);
+    explicit ThreadedAI(std::shared_ptr<const AIConfig> ai_config,
+                        std::shared_ptr<const AIControlConfig> control_config);
 
    private:
     void onValueReceived(World world) override;
 
     /**
-     * Get primitives for the currently known world from the AI and pass them to
-     * observers
+     * Get primitives for the new world from the AI and pass them to observers
+     *
+     * @param world the new world
      */
-    void runAIAndSendPrimitives();
+    void runAIAndSendPrimitives(const World &world);
+
+    /**
+     * Publishes draw functions
+     */
     void drawAI();
 
     AI ai;
     std::shared_ptr<const AIControlConfig> control_config;
-    std::optional<World> most_recent_world;
 };
