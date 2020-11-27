@@ -116,7 +116,7 @@ const osThreadAttr_t RobotLogMsgSend_attributes = {
 osThreadId_t NetworkRobotLogHandle;
 const osThreadAttr_t NetworkRobotLog_attributes = {
   .name = "NetworkRobotLog",
-  .priority = (osPriority_t) osPriorityNormal1,
+  .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 1024 * 4
 };
 /* Definitions for UbloxOdinTask */
@@ -255,8 +255,6 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
-        TLOG_DEBUG("logging debug level message %d", sys_now());
-
         // run loop at 100hz
         osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
     }

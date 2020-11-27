@@ -28,6 +28,7 @@ typedef struct UbloxOdinW262Communicator
 
 void io_ublox_odinw262_communicator_task(void* arg)
 {
+    TLOG_DEBUG("YEEEEEEEEEEHAW");
     UbloxOdinW262Communicator_t* communicator = (UbloxOdinW262Communicator_t*)arg;
 
     TLOG_DEBUG("pinging ublox odinw262");
@@ -61,10 +62,6 @@ UbloxOdinW262Communicator_t* io_ublox_odinw262_communicator_create(
     communicator->at_interface_uart_handle = uart_handle;
     communicator->ublox_reset_pin          = ublox_reset;
 
-    // If we don't call these two functions (DeInit then Init) in this sequence,
-    // we are only able to do one transfer and then everything grinds to a halt.
-    // This was determined experimentally
-    HAL_UART_DeInit(communicator->at_interface_uart_handle);
     if(HAL_UART_Init(communicator->at_interface_uart_handle) != HAL_OK)
     {
         TLOG_FATAL("Failed to initialize UART connection");
@@ -83,7 +80,7 @@ UbloxOdinW262Communicator_t* io_ublox_odinw262_communicator_create(
     return communicator;
 }
 
-void io_ublox_odinw262_task(UbloxOdinW262Communicator_t* communicator)
+void io_ublox_odinw262_communicator_destroy(UbloxOdinW262Communicator_t* communicator)
 {
     HAL_UART_DMAStop(communicator->at_interface_uart_handle);
     HAL_UART_DeInit(communicator->at_interface_uart_handle);
@@ -106,5 +103,4 @@ void io_ublox_odinw262_communicator_sendATCommand(UbloxOdinW262Communicator_t* c
 {
     HAL_UART_Transmit(&huart4, (uint8_t*)at_command, (uint16_t)strlen(at_command), HAL_MAX_DELAY);
     // Pend on sempahore
-
 }
