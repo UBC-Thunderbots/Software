@@ -1,3 +1,7 @@
+include:
+  - "bar.yaml"
+---
+
 - bool:
     name: foo_bool
     value: true

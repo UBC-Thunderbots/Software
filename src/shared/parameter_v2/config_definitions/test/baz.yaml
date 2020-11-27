@@ -1,0 +1,7 @@
+- int:
+    name: baz_int
+    min: 2
+    max: 6
+    value: 0
+    constant: true
+    description: baz int

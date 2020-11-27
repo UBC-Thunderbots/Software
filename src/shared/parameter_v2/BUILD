@@ -20,6 +20,46 @@ cc_library(
     hdrs = [":c_params"],
 )
 
+cc_library(
+    name = "cpp_configs",
+    srcs = ["dynamic_parameters.cpp"],
+    hdrs = [
+        "dynamic_parameters.h",
+        ":cpp_params",
+    ],
+    deps = [
+        "parameter",
+        ":config",
+    ],
+)
+
+cc_library(
+    name = "parameter",
+    hdrs = ["parameter.h"],
+)
+
+cc_library(
+    name = "numeric_parameter",
+    hdrs = ["numeric_parameter.h"],
+    deps = ["//software/logger"],
+)
+
+cc_library(
+    name = "enumerated_parameter",
+    hdrs = ["enumerated_parameter.h"],
+    deps = ["//software/logger"],
+)
+
+cc_library(
+    name = "config",
+    hdrs = ["config.h"],
+    deps = [
+        ":enumerated_parameter",
+        ":numeric_parameter",
+        "@boost//:program_options",
+    ],
+)
+
 cc_test(
     name = "c_config_test",
     srcs = [
@@ -35,5 +75,16 @@ cc_test(
         "@gtest//:gtest_main",
         "@libclang",
         "@yaml-cpp",
+    ],
+)
+
+cc_test(
+    name = "cpp_config_test",
+    srcs = [
+        "cpp_config_test.cpp",
+    ],
+    deps = [
+        "//shared/parameter_v2:cpp_configs",
+        "@gtest//:gtest_main",
     ],
 )

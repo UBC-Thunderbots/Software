@@ -9,6 +9,7 @@ from config_yaml_loader import (
     ConfigYamlMalformed,
 )
 
+from cpp_writer import CppWriter
 from c_writer import CWriter
 
 # Path relative to the bazel WORKSPACE root
@@ -17,14 +18,14 @@ PARAMETER_CONFIG_PATH = Path(os.path.dirname(__file__), "../config_definitions")
 
 
 def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
+    yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
+    config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
 
-    # A temporary implementation used to show we can access the YAML files
     if generate_for_cpp:
-        with open(output_file, "w") as temp_file:
-            temp_file.write("Hello World")
+        CppWriter.write_config_metadata(
+            output_file, "ThunderbotsConfig", config_metadata
+        )
     else:
-        yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
-        config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
         CWriter.write_config_metadata(output_file, "ThunderbotsConfig", config_metadata)
 
 
@@ -64,6 +65,7 @@ def main():
     generate_dynamic_parameters(
         args.output_file, args.include_headers, args.generate_for_cpp
     )
+    print(args)  # should be able to retrieve enum deps here
 
 
 #######################################################################
