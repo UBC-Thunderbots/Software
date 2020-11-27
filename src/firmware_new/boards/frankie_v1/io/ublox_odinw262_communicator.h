@@ -6,6 +6,11 @@
 typedef struct UbloxOdinW262Communicator UbloxOdinW262Communicator_t;
 
 /**
+ *
+ */
+void io_ublox_odinw262_communicator_task(void* arg);
+
+/**
  * Creates a UbloxOdinW262Communicator_t to communicate with the AT interface of the
  * Odin W262. This allows us to send AT Commands according to the manual:
  *
@@ -44,7 +49,6 @@ void io_ublox_odinw262_reset(UbloxOdinW262Communicator_t* communicator);
  *
  * @param uart_handle The uart_handle
  */
-void io_ublox_odinw262_communicator_connectToWifi(UbloxOdinW262Communicator_t* communicator, const char* wifi_ssid, const char* wifi_password);
 void io_ublox_odinw262_communicator_handleIdleLineInterrupt(UART_HandleTypeDef* uart_handle);
 
 void io_ublox_odinw262_communicator_sendATCommand(UbloxOdinW262Communicator_t* communicator, const char* at_command);
