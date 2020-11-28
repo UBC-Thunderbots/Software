@@ -1,0 +1,6 @@
+SimulatedTestMainCommandLineArgs:
+    enable_visualizer:
+        type: "bool"
+        default: false
+        description: >-
+            Displays simulated test on visualizer

@@ -22,16 +22,28 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "simulated_test_main",
+    testonly = True,
+    srcs = ["simulated_test_main.cpp"],
+    deps = [
+        ":simulated_test_fixture",
+        "//software/logger",
+        "//software/parameter:dynamic_parameters",
+        "@gtest",
+    ],
+)
+
 cc_test(
     name = "simulated_test_fixture_test",
     srcs = ["simulated_test_fixture_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/simulated_tests/validation:validation_function",
         "//software/time:duration",
         "//software/time:timestamp",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -40,12 +52,12 @@ cc_test(
     srcs = ["example_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:example_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -54,12 +66,12 @@ cc_test(
     srcs = ["kickoff_friendly_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:kickoff_friendly_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -68,12 +80,12 @@ cc_test(
     srcs = ["kickoff_enemy_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:kickoff_enemy_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -82,13 +94,13 @@ cc_test(
     srcs = ["corner_kick_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:corner_kick_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/simulated_tests/validation_functions",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -97,12 +109,12 @@ cc_test(
     srcs = ["defense_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:defense_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -111,12 +123,16 @@ cc_test(
     srcs = ["enemy_free_kick_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+<<<<<<< HEAD
         "//software/ai/hl/stp/play:enemy_free_kick_play",
+=======
+        ":simulated_test_main",
+        "//software/ai/hl/stp/play:enemy_freekick_play",
+>>>>>>> 7cb9575daa7f6ef7b34951d85f0d6852977d0925
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -125,12 +141,12 @@ cc_test(
     srcs = ["stop_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:stop_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -139,12 +155,12 @@ cc_test(
     srcs = ["halt_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:halt_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -153,12 +169,12 @@ cc_test(
     srcs = ["free_kick_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:free_kick_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -167,12 +183,12 @@ cc_test(
     srcs = ["shoot_or_pass_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:shoot_or_pass_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -181,12 +197,12 @@ cc_test(
     srcs = ["shoot_or_chip_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:shoot_or_chip_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -195,12 +211,12 @@ cc_test(
     srcs = ["penalty_kick_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:penalty_kick_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -209,11 +225,11 @@ cc_test(
     srcs = ["penalty_kick_enemy_play_test.cpp"],
     deps = [
         ":simulated_test_fixture",
+        ":simulated_test_main",
         "//software/ai/hl/stp/play:penalty_kick_enemy_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )

@@ -2,7 +2,9 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "matrix",
+    srcs = ["matrix.c"],
     hdrs = ["matrix.h"],
+    deps = [],
 )
 
 cc_library(
@@ -17,6 +19,15 @@ cc_test(
     srcs = ["polynomial_1d_test.cpp"],
     deps = [
         ":polynomial_1d",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "matrix_test",
+    srcs = ["matrix_test.cpp"],
+    deps = [
+        ":matrix",
         "@gtest//:gtest_main",
     ],
 )
