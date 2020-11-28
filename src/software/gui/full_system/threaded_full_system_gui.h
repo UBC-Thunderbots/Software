@@ -79,9 +79,7 @@ class ThreadedFullSystemGUI
     // We only care about the most recent PlayInfo, so the buffer is of size 1
     static constexpr std::size_t PLAY_INFO_BUFFER_SIZE = 1;
     // We don't want to miss any SensorProto updates so we make the buffer larger
-    static constexpr std::size_t SENSOR_MSG_BUFFER_SIZE = 60;
-    // We don't want to miss any robot status updates so we make the buffer larger
-    static constexpr std::size_t ROBOT_STATUS_BUFFER_SIZE = 60;
+    static constexpr std::size_t SENSOR_MSG_BUFFER_SIZE = 2;
     // We only care about the most recent view area that was requested, so the
     // buffer is of size 1
     static constexpr std::size_t VIEW_AREA_BUFFER_SIZE = 1;

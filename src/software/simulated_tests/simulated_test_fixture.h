@@ -20,6 +20,11 @@ class SimulatedTestFixture : public ::testing::Test
    public:
     explicit SimulatedTestFixture();
 
+    // Controls whether the visualizer will be enabled during the simulated tests
+    // if false, visualizer does not run during simulated tests
+    // if true, running tests are displayed on the visualizer
+    static bool enable_visualizer;
+
    protected:
     void SetUp() override;
 
