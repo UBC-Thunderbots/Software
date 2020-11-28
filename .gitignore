@@ -34,11 +34,13 @@ Makefile
 .setting/
 
 # VSCode
-.vscode/
+.vscode/.*
+!.vscode/extensions.json
 
 # Vim
 *.swo
 *.swp
+src/compile_commands.json
 
 # Emacs
 \#*#
@@ -133,3 +135,6 @@ src/core*
 *./__py_cache__
 *./.mypy_cache
 
+# SSL GameController
+src/config
+*.stream

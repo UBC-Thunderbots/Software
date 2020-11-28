@@ -15,11 +15,19 @@
    * [Installing Software Dependencies](#installing-software-dependencies)
    * [Installing Firmware Dependencies](#installing-firmware-dependencies)
    * [Setting Up USB Permissions](#setting-up-usb-permissions)
-   * [Installing CLion](#installing-clion)
-      * [Getting your Student License](#getting-your-student-license)
-      * [Installing CLion](#installing-clion-1)
+   * [Installing an IDE](#installing-an-ide)
+      * [CLion](#clion)
+         * [Getting your Student License](#getting-your-student-license)
+         * [Installing CLion](#installing-clion)
+      * [VSCode](#vscode)
 * [Building and Running the Code](#building-and-running-the-code)
+   * [Building from the command-line](#building-from-the-command-line)
+   * [Building with CLion](#building-with-clion)
+   * [Running our AI, Simulator, or Robot Diagnostics](#running-our-ai-simulator-or-robot-diagnostics)
+   * [Running AI vs AI](#running-ai-vs-ai)
 * [Debugging](#debugging)
+   * [Debugging with CLion](#debugging-with-clion)
+   * [Debugging from the Command line](#debugging-from-the-command-line)
 * [Profiling](#profiling)
 * [Flashing and Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
 * [Flashing and Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
@@ -87,11 +95,15 @@ We have several setup scripts to help you easily install the necessary dependenc
     * You will be prompted for your admin password
     * This script will set up the USB permissions required in order to use our radio/wifi dongle
 
-### Installing CLion
+### Installing an IDE
 
-CLion is our main IDE for editing our C/C++ code. It is designed to work with our build system, `bazel`, and has all the great features of an IDE such as code completion, syntax highlighting etc. We **strongly** recommend installing CLion and using it for development.
+For those who prefer working on C/C++ with an IDE, we provide two options: [CLion](#clion) for an integrated experience and [VSCode](vscode) for a more lightweight setup. Both support our build system `bazel`.
 
-#### Getting your Student License
+#### CLion
+
+CLion is the most full-featured IDE, with code completion, code navigation, and integrated building, testing, and debugging.
+
+##### Getting your Student License
 
 CLion is free for students, and you can use your UBC alumni email address to create a student account. If you already have a student account with JetBrains, you can skip this step.
 
@@ -99,15 +111,26 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 2. Using your UBC email account, get a JetBrains education account [here](https://www.jetbrains.com/shop/eform/students).
    1. _JetBrains will send an initial email to confirm the UBC email you inputted. Once you have confirmed, another email will be sent to activate your new education account. You will use this account to set up CLion later on._
 
-#### Installing CLion
+##### Installing CLion
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
 * Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
 * When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
 
+#### VSCode
+
+VSCode is the more lightweight IDE, with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated into this IDE.
+
+1. Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
+2. Run `./install_vscode.sh` (* **DO NOT** download VSCode yourself unless you know what you're doing. The `install_vscode.sh` script will grab the most stable version of VSCode)
+3. Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop.
+&. Click `Open Folder` and navigate to where you cloned software. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
+4. VSCode will prompt you to install recommended extensions, click `Install`, this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc..)
+5. Navigate to File -> Preferences -> Settings -> Workspace -> Extensions -> Bazel and select the `Bazel: Enable Code Lens` option.
+
 ## Building and Running the Code
 
-### From the command-line
+### Building from the command-line
 
 1. Navigate to the root of this repository (wherever you have it cloned on your computer)
 2. Navigate to `src`.
@@ -118,7 +141,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 7. Run all the tests by running `bazel test //...`
 *See the bazel [command-line docs](https://docs.bazel.build/versions/master/command-line-reference.html) for more info.*
 
-### With CLion
+### Building with CLion
 
 First we need to setup CLion
 1. Open CLion
@@ -129,7 +152,6 @@ First we need to setup CLion
 6. Change the Project Name to whatever you want. Leave everything else as it is ("Use shared project view file" should be selected).
 7. Click `Finish` and you're good to go! Give CLion some time to find everything in your repo.
 
-
 Now that you're setup, if you can run it on the command line, you can run it in clion. There are two main ways of doing so.
 1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
 2. Add a custom build configuration (more powerful, so make sure you understand this!)
@@ -138,10 +160,16 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     3. For `Target Expression`, you can put anything that comes after a `build`, `run`, `test`, etc. call on the command line. For example: `//software/geom:angle_test`.
     4. For `Bazel Command` you can put any bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
+ 
+### With VSCode
+1. Open VSCode
+2. Navigate to `Software/src/software/geom/BUILD`
+3. On top of every `cc_test`, `cc_library` and `cc_binary` there should be a `Test ...`, `Build ...` or `Run ...` for the respective target.
+4. Click `Test //software/geom:angle_test` to run the `angle_test`
 
 ### Running our AI, Simulator, SimulatedTests or Robot Diagnostics
 
-1. Open your terminal and run `ifconfig`.
+1. Open your terminal, `cd` into `Software/src` and run `ifconfig`.
 2. Pick the network interface you would like to use:
     1. If you are running things locally, you can pick any interface that is not `lo`
     2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
@@ -157,13 +185,18 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
 6. Run our SimulatedTests in the visualizer: `bazel test //software/simulated_tests:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/simulated_tests:[some_target_here] -- --enable_visualizer`
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
+
+### Running AI vs AI
+1. Open your terminal, `cd` into `Software/src`
+2. Run `./software/run_ai_vs_ai.sh interface_name`, using the same interface as from [above](#running-our-ai-simulator-or-robot-diagnostics)
+
 ## Debugging
 Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 
 
-### With CLion
+### Debugging with CLion
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
 
-### From The Command line
+### Debugging from the Command line
 `bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see (here)[https://www.cs.cmu.edu/~gilpin/tutorial/] for a tutorial on how to use `gdb` if you're not familiar with it.
 
 

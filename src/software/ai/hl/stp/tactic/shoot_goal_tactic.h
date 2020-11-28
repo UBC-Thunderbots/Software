@@ -65,7 +65,7 @@ class ShootGoalTactic : public Tactic
      */
     bool hasShotAvailable() const;
 
-    void accept(TacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
     Ball getBall() const;
     Field getField() const;
