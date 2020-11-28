@@ -19,15 +19,15 @@ void SimulatedTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger();
 
-    // TODO: Ideally we should reset all DynamicParameters for each test. However
-    // because DynamicParameters are still partially global, this can't be done
-    // until https://github.com/UBC-Thunderbots/Software/issues/1483 is complete
-
-    // Re-create all objects for each test so we start from a clean setup
-    // every time. Because the simulator is created initially in the
-    // constructor's initialization list, and before every test in this SetUp function, we
-    // can guarantee the pointer will never be null / empty
-    simulator = std::make_unique<Simulator>(Field::createSSLDivisionBField());
+    // init() resets all DynamicParameters for each test. Since DynamicParameters are
+    // still partially global, we need to reinitialize simulator, sensor_fusion, and ai,
+    // so that they can grab the new dynamic parameter pointers. Note that this is a bit
+    // of hack because we're changing a global variable, but it can't be easily fixed
+    // through dependency injection until
+    // https://github.com/UBC-Thunderbots/Software/issues/1299
+    MutableDynamicParameters->init();
+    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
+    sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
     ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
 
     MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
@@ -46,11 +46,12 @@ void SimulatedTestFixture::SetUp()
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideGameControllerFriendlyTeamColor()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
         ->setValue(true);
+    if (SimulatedTestFixture::enable_visualizer)
+    {
+        enableVisualizer();
+    }
 }
 
 void SimulatedTestFixture::setBallState(const BallState &ball)
@@ -142,7 +143,7 @@ void SimulatedTestFixture::updateSensorFusion()
     auto sensor_msg                        = SensorProto();
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
 }
 
 void SimulatedTestFixture::sleep(
@@ -154,7 +155,7 @@ void SimulatedTestFixture::sleep(
         std::chrono::duration_cast<std::chrono::milliseconds>(wall_time_now -
                                                               wall_start_time);
     auto ms_to_sleep = std::chrono::milliseconds(
-                           static_cast<int>(desired_wall_tick_time.getMilliseconds())) -
+                           static_cast<int>(desired_wall_tick_time.toMilliseconds())) -
                        current_tick_wall_time_duration;
     if (ms_to_sleep > std::chrono::milliseconds(0))
     {
@@ -193,8 +194,8 @@ void SimulatedTestFixture::runTest(
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
-    const Duration ai_time_step = Duration::fromSeconds(
-        simulation_time_step.getSeconds() * CAMERA_FRAMES_PER_AI_TICK);
+    const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
+                                                        CAMERA_FRAMES_PER_AI_TICK);
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {

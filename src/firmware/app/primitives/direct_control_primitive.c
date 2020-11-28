@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "firmware/app/control/control.h"
+#include "firmware/app/logger/logger.h"
 
 typedef struct DirectControlPrimitiveState
 {
@@ -54,8 +55,7 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
         default:
         {
             // Do nothing
-            // TODO (Issue #1652): LOG(WARNING)<<"Wheel control command is not a valid
-            // type"
+            TLOG_WARNING("Wheel control command is not a valid type");
             state->direct_velocity = false;
         }
     }
@@ -109,14 +109,15 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
         default:
         {
             // Do nothing
-            // TODO (Issue #1652): LOG(WARNING)<<"Chick command is not a valid type"
+            TLOG_WARNING("Chick command is not a valid type");
         }
     }
 
     app_dribbler_setSpeed(dribbler, (uint32_t)prim_msg.dribbler_speed_rpm);
 }
 
-static void direct_control_tick(void* void_state_ptr, FirmwareWorld_t* world)
+static void app_direct_control_primitive_tick(void* void_state_ptr,
+                                              FirmwareWorld_t* world)
 {
     DirectControlPrimitiveState_t* state = (DirectControlPrimitiveState_t*)void_state_ptr;
     if (state->direct_velocity)
@@ -133,6 +134,6 @@ static void direct_control_tick(void* void_state_ptr, FirmwareWorld_t* world)
  */
 const primitive_t DIRECT_CONTROL_PRIMITIVE = {
     .direct        = true,
-    .tick          = &direct_control_tick,
+    .tick          = &app_direct_control_primitive_tick,
     .create_state  = &createDirectControlPrimitiveState_t,
     .destroy_state = &destroyDirectControlPrimitiveState_t};

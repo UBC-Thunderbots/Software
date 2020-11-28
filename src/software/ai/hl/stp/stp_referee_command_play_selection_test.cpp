@@ -42,8 +42,7 @@ TEST_P(STPRefereeCommandPlaySelectionTestWithPositions,
     ::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
                                           Timestamp());
     ::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions, Timestamp());
-    world.updateBallStateWithTimestamp(
-        TimestampedBallState(GetParam().ball_position, Vector(), Timestamp()));
+    world.updateBall(Ball(BallState(GetParam().ball_position, Vector()), Timestamp()));
 
     // to set restart reason, etc. properly
     world.updateRefereeCommand(GetParam().first_game_state);

@@ -7,6 +7,8 @@ MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever, {RobotCapabilit
 {
 }
 
+void MoveTactic::updateWorldParams(const World &world) {}
+
 void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
                                      double final_speed)
 {
@@ -40,7 +42,7 @@ void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!move_action->done());
 }
 
-void MoveTactic::accept(MutableTacticVisitor &visitor)
+void MoveTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

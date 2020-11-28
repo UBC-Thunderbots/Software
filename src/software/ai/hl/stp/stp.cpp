@@ -10,9 +10,10 @@
 #include "software/ai/hl/stp/action/action_world_params_update_visitor.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
+#include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/hl/stp/tactic/tactic_world_params_update_visitor.h"
 #include "software/ai/intent/stop_intent.h"
+#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -90,11 +91,10 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     assignRobotsToTactics(world, current_tactics);
 
     ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
-    TacticWorldParamsUpdateVisitor tactic_world_params_update_visitor(world);
 
     for (const std::shared_ptr<Tactic>& tactic : current_tactics)
     {
-        tactic->accept(tactic_world_params_update_visitor);
+        tactic->updateWorldParams(world);
 
         // Try to get an intent from the tactic
         std::shared_ptr<Action> action = tactic->getNextAction();
@@ -107,8 +107,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
 
         if (intent)
         {
-            auto motion_constraints = motion_constraint_manager.getMotionConstraints(
-                current_game_state, *tactic);
+            auto motion_constraints =
+                buildMotionConstraintSet(current_game_state, *tactic);
             intent->setMotionConstraints(motion_constraints);
 
             intents.emplace_back(std::move(intent));
@@ -359,7 +359,7 @@ void STP::assignNonGoalieRobotsToTactics(
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();
             std::set<RobotCapability> robot_capabilities =
-                robot.getCapabilitiesWhitelist();
+                robot.getAvailableCapabilities();
             std::set<RobotCapability> missing_capabilities;
             std::set_difference(
                 required_capabilities.begin(), required_capabilities.end(),

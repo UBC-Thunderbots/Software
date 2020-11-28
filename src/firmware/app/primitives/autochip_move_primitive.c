@@ -20,7 +20,7 @@ void app_autochip_move_primitive_start(TbotsProto_AutochipMovePrimitive prim_msg
     app_chicker_enableAutochip(chicker, prim_msg.chip_distance_meters);
 }
 
-static void autochip_move_tick(void* void_state_ptr, FirmwareWorld_t* world)
+static void app_autochip_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     app_move_helper_tick(void_state_ptr, world);
 }
@@ -28,7 +28,7 @@ static void autochip_move_tick(void* void_state_ptr, FirmwareWorld_t* world)
 /**
  * \brief The autochip move primitive.
  */
-const primitive_t AUTOCHIP_MOVE_PRIMITIVE = {.direct        = false,
-                                             .tick          = &autochip_move_tick,
+const primitive_t AUTOCHIP_MOVE_PRIMITIVE = {.direct = false,
+                                             .tick   = &app_autochip_move_primitive_tick,
                                              .create_state  = &createMoveHelperState_t,
                                              .destroy_state = &destroyMoveHelperState_t};

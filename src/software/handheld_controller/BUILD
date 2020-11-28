@@ -54,6 +54,7 @@ cc_test(
     srcs = ["controller_primitive_generator_test.cpp"],
     deps = [
         ":controller_primitive_generator",
+        "//software/parameter:dynamic_parameters",
         "@gtest//:gtest_main",
     ],
 )

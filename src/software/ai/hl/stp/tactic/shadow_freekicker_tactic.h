@@ -34,14 +34,9 @@ class ShadowFreekickerTactic : public Tactic
     explicit ShadowFreekickerTactic(FreekickShadower free_kick_shadower, Team enemy_team,
                                     Ball ball, Field field, bool loop_forever);
 
-    /**
-     * Updates the world parameters for this ShadowFreekicker tactic
-     *
-     * @param field : The field being played on
-     * @param enemy_team : The enemy team of robots.
-     * @param ball  : The Ball being played with
-     */
-    void updateWorldParams(Team enemy_team, Ball ball);
+    ShadowFreekickerTactic() = delete;
+
+    void updateWorldParams(const World& world) override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
@@ -54,7 +49,7 @@ class ShadowFreekickerTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
     Ball getBall() const;
     Field getField() const;

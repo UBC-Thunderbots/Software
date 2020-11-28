@@ -23,16 +23,14 @@ CreaseDefenderTactic::CreaseDefenderTactic(
 {
 }
 
-void CreaseDefenderTactic::updateWorldParams(const Ball &ball, const Field &field,
-                                             const Team &friendly_team,
-                                             const Team &enemy_team)
+void CreaseDefenderTactic::updateWorldParams(const World &world)
 {
-    // Update the world parameters stored by this Tactic
-    this->ball          = ball;
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
+    this->ball          = world.ball();
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
 }
+
 
 double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
@@ -226,7 +224,7 @@ std::optional<Point> CreaseDefenderTactic::getPointOnCreasePath(Field field, Rob
     return std::nullopt;
 }
 
-void CreaseDefenderTactic::accept(MutableTacticVisitor &visitor)
+void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

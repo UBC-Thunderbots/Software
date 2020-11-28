@@ -2,55 +2,41 @@
 
 #include "shared/constants.h"
 #include "software/logger/logger.h"
-#include "software/world/timestamped_robot_state.h"
 
 Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
-             const Timestamp &timestamp, unsigned int history_size,
+             const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities)
-    : id_(id), states_(history_size), unavailable_capabilities_(unavailable_capabilities)
+    : id_(id),
+      current_state_(position, velocity, orientation, angular_velocity),
+      timestamp_(timestamp),
+      unavailable_capabilities_(unavailable_capabilities)
 {
-    if (history_size < 1)
-    {
-        throw std::invalid_argument("Error: history_size must be greater than 0");
-    }
-
-    updateState(TimestampedRobotState(position, velocity, orientation, angular_velocity,
-                                      timestamp));
 }
 
-Robot::Robot(RobotId id, const TimestampedRobotState &initial_state,
-             unsigned int history_size,
+Robot::Robot(RobotId id, const RobotState &initial_state, const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities)
-    : id_(id), states_(history_size), unavailable_capabilities_(unavailable_capabilities)
+    : id_(id),
+      current_state_(initial_state),
+      timestamp_(timestamp),
+      unavailable_capabilities_(unavailable_capabilities)
 {
-    if (history_size < 1)
-    {
-        throw std::invalid_argument("Error: history_size must be greater than 0");
-    }
-
-    updateState(initial_state);
 }
 
-void Robot::updateState(const TimestampedRobotState &new_state)
+void Robot::updateState(const RobotState &state, const Timestamp &timestamp)
 {
-    if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
-    {
-        throw std::invalid_argument(
-            "Error: Trying to update robot state using a state older then the current state");
-    }
-
-    states_.push_front(new_state);
+    current_state_ = state;
+    timestamp_     = timestamp;
 }
 
-TimestampedRobotState Robot::currentState() const
+RobotState Robot::currentState() const
 {
-    return states_.front();
+    return current_state_;
 }
 
-Timestamp Robot::lastUpdateTimestamp() const
+Timestamp Robot::timestamp() const
 {
-    return states_.front().timestamp();
+    return timestamp_;
 }
 
 RobotId Robot::id() const
@@ -60,27 +46,42 @@ RobotId Robot::id() const
 
 Point Robot::position() const
 {
-    return states_.front().state().position();
+    return current_state_.position();
 }
 
 Vector Robot::velocity() const
 {
-    return states_.front().state().velocity();
+    return current_state_.velocity();
 }
 
 Angle Robot::orientation() const
 {
-    return states_.front().state().orientation();
+    return current_state_.orientation();
 }
 
 AngularVelocity Robot::angularVelocity() const
 {
-    return states_.front().state().angularVelocity();
+    return current_state_.angularVelocity();
 }
 
-RobotHistory Robot::getPreviousStates() const
+bool Robot::isNearDribbler(const Point &test_point) const
 {
-    return states_;
+    // 0.2 was experimentally derived to correctly detect when a point is near the
+    // dribbler
+    static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + 0.2;
+
+    Vector vector_to_test_point = test_point - position();
+    if (vector_to_test_point.length() > POSSESSION_THRESHOLD_METERS)
+    {
+        return false;
+    }
+    else
+    {
+        // check that ball is in a 90-degree cone in front of the robot
+        auto ball_to_robot_angle =
+            orientation().minDiff(vector_to_test_point.orientation());
+        return (ball_to_robot_angle < Angle::fromDegrees(45.0));
+    }
 }
 
 bool Robot::operator==(const Robot &other) const
@@ -96,20 +97,20 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const std::set<RobotCapability> &Robot::getCapabilitiesBlacklist() const
+const std::set<RobotCapability> &Robot::getUnavailableCapabilities() const
 {
     return unavailable_capabilities_;
 }
 
-std::set<RobotCapability> Robot::getCapabilitiesWhitelist() const
+std::set<RobotCapability> Robot::getAvailableCapabilities() const
 {
     // robot capabilities = all possible capabilities - unavailable capabilities
 
     std::set<RobotCapability> all_capabilities = allRobotCapabilities();
     std::set<RobotCapability> robot_capabilities;
     std::set_difference(all_capabilities.begin(), all_capabilities.end(),
-                        getCapabilitiesBlacklist().begin(),
-                        getCapabilitiesBlacklist().end(),
+                        getUnavailableCapabilities().begin(),
+                        getUnavailableCapabilities().end(),
                         std::inserter(robot_capabilities, robot_capabilities.begin()));
 
     return robot_capabilities;

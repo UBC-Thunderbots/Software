@@ -2,16 +2,18 @@
 
 #include "shared/constants.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/physics/physics.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_state,
-                         const double mass_kg, double restitution, double linear_damping)
+                         const double mass_kg,
+                         std::shared_ptr<const SimulatorConfig> simulator_config)
     : in_flight_origin(std::nullopt),
       in_flight_distance_meters(0.0),
       flight_angle_of_departure(Angle::zero()),
-      ball_restitution(restitution),
-      ball_linear_damping(linear_damping)
+      initial_kick_speed(std::nullopt),
+      simulator_config(simulator_config)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -26,7 +28,7 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
     // See the "Breakdown of a collision" section of:
     // https://www.iforce2d.net/b2dtut/collision-anatomy
     ball_body_def.bullet        = true;
-    ball_body_def.linearDamping = static_cast<float>(ball_linear_damping);
+    ball_body_def.linearDamping = 0.0;
     ball_body                   = world->CreateBody(&ball_body_def);
 
     b2CircleShape ball_shape;
@@ -38,9 +40,10 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
     // desired mass. The density is uniform across the shape.
     float ball_area =
         static_cast<float>(M_PI * ball_shape.m_radius * ball_shape.m_radius);
-    ball_fixture_def.density     = static_cast<float>(mass_kg / ball_area);
-    ball_fixture_def.restitution = static_cast<float>(ball_restitution);
-    ball_fixture_def.friction    = static_cast<float>(BALL_FRICTION);
+    ball_fixture_def.density = static_cast<float>(mass_kg / ball_area);
+    ball_fixture_def.restitution =
+        static_cast<float>(simulator_config->BallRestitution()->value());
+    ball_fixture_def.friction = static_cast<float>(BALL_FRICTION);
     ball_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
 
@@ -187,6 +190,94 @@ void PhysicsBall::updateIsInFlight() const
             in_flight_origin = std::nullopt;
         }
     }
+}
+
+void PhysicsBall::setInitialKickSpeed(double speed)
+{
+    initial_kick_speed = speed;
+}
+
+void PhysicsBall::applyBallFrictionModel(const Duration &time_step)
+{
+    Vector velocity_delta = calculateVelocityDeltaDueToFriction(time_step);
+    applyImpulse(velocity_delta * massKg());
+}
+
+Vector PhysicsBall::calculateVelocityDeltaDueToFriction(const Duration &time_step)
+{
+    // Friction model adapted from section 5 of
+    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
+    //
+    // To summarize, because the ball is a uniform density sphere, v1 = 5 / 7 * v0,
+    // where v1 is the initial rolling speed and v0 is the initial sliding speed
+    static constexpr double SLIDING_ROLLING_TRANSITION_FACTOR = 5.0 / 7.0;
+    const double rolling_friction_acceleration =
+        simulator_config->RollingFrictionAcceleration()->value();
+
+    auto current_ball_state = getBallState();
+
+    if (initial_kick_speed)
+    {
+        double sliding_to_rolling_speed_threshold =
+            *initial_kick_speed * SLIDING_ROLLING_TRANSITION_FACTOR;
+        Vector future_velocity = calculateFrictionBallModelFutureVelocity(
+            current_ball_state.velocity(), sliding_to_rolling_speed_threshold, time_step);
+        if (future_velocity.length() < sliding_to_rolling_speed_threshold)
+        {
+            // initial kick speed is no longer relevant once ball is rolling
+            initial_kick_speed = std::nullopt;
+        }
+        return future_velocity - current_ball_state.velocity();
+    }
+    else
+    {
+        return current_ball_state.velocity().normalize(-rolling_friction_acceleration *
+                                                       time_step.toSeconds());
+    }
+}
+
+Vector PhysicsBall::calculateFrictionBallModelFutureVelocity(
+    const Vector &initial_ball_velocity, double sliding_to_rolling_speed_threshold,
+    const Duration &duration_in_future) const
+{
+    const double seconds_in_future = duration_in_future.toSeconds();
+    const double initial_speed     = initial_ball_velocity.length();
+    const double sliding_friction_acceleration =
+        simulator_config->SlidingFrictionAcceleration()->value();
+    const double rolling_friction_acceleration =
+        simulator_config->RollingFrictionAcceleration()->value();
+
+    // Figure out how long the ball will roll/slide, if at all
+    // if sliding_friction_acceleration is 0 then max_sliding_duration_secs is inf,
+    // which is handled by std::min
+    const double max_sliding_duration_secs =
+        (initial_speed - sliding_to_rolling_speed_threshold) /
+        sliding_friction_acceleration;
+    const double sliding_duration_secs =
+        std::max(0.0, std::min(seconds_in_future, max_sliding_duration_secs));
+    // if rolling_friction_acceleration is 0 then max_rolling_duration_secs is inf,
+    // which is handled by std::min
+    const double max_rolling_duration_secs =
+        std::min(initial_speed, sliding_to_rolling_speed_threshold) /
+        rolling_friction_acceleration;
+    const double rolling_duration_secs = std::max(
+        0.0,
+        std::min(seconds_in_future - sliding_duration_secs, max_rolling_duration_secs));
+
+    // Figure out where the ball is after sliding and rolling
+    const Vector sliding_acceleration_vector =
+        initial_ball_velocity.normalize(-sliding_friction_acceleration);
+    const Vector velocity_after_sliding =
+        calculateFutureVelocity(initial_ball_velocity, sliding_acceleration_vector,
+                                Duration::fromSeconds(sliding_duration_secs));
+
+    const Vector rolling_acceleration_vector =
+        initial_ball_velocity.normalize(-rolling_friction_acceleration);
+    const Vector velocity_after_rolling =
+        calculateFutureVelocity(velocity_after_sliding, rolling_acceleration_vector,
+                                Duration::fromSeconds(rolling_duration_secs));
+
+    return velocity_after_rolling;
 }
 
 bool PhysicsBall::isInFlight() const

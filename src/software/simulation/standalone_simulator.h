@@ -27,9 +27,11 @@ class StandaloneSimulator
      * Creates a new StandaloneSimulator, and starts the simulation.
      *
      * @param standalone_simulator_config The config for the StandaloneSimulator
+     * @param simulator_config The config for the Simulator
      */
     explicit StandaloneSimulator(
-        std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config);
+        std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
+        std::shared_ptr<SimulatorConfig> simulator_config);
     StandaloneSimulator() = delete;
 
     /**
@@ -143,10 +145,17 @@ class StandaloneSimulator
     void setBlueTeamDefendingSide(const DefendingSideProto& defending_side_protoj);
 
     /**
-     * A helper function that sets up all networking functionality with
-     * the networking information in the StandaloneSimulatorConfig
+     * A helper function that sets up all networking functionality
+     *
+     * @param blue_team_channel The blue team channel
+     * @param yellow_team_channel The yellow team channel
+     * @param network_interface The network interface to network over
+     * @param vision_port The port to receive vision
+     * @param ip_address The ip address to access vision
      */
-    void initNetworking();
+    void setupNetworking(int blue_team_channel, int yellow_team_channel,
+                         std::string network_interface, int vision_port,
+                         std::string vision_ip_address);
 
     std::shared_ptr<const StandaloneSimulatorConfig> standalone_simulator_config;
     std::unique_ptr<ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>>
