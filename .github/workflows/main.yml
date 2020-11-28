@@ -73,8 +73,8 @@ jobs:
       - name: CubeMX Code Generation Check
         uses: GabrielBB/xvfb-action@v1 # we need this to create a virtual Xserver to launch the CubeMX GUI
         with:
-          run: |
-            "${GITHUB_WORKSPACE}"/.travis/check_cubemx_ci.sh
+          working-directory: "${GITHUB_WORKSPACE}"
+          run: .travis/check_cubemx_ci.sh
             
       - name: New Robot Firmware Build
         run: |
