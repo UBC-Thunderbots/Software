@@ -30,6 +30,11 @@ void setupChicker(
                                         chicker_state_changed_callback](ChickMode mode) {
         *chick_mode = mode;
         chicker_state_changed_callback(*chicker_power, *charge_mode, *chick_mode);
+        if (*chick_mode == ChickMode::KICK || *chick_mode == ChickMode::CHIP)
+        {
+            // Reset ChickMode since kick/chip pressed should only trigger one kick/chip
+            *chick_mode = ChickMode::NONE;
+        }
     };
 
     setupSliderLineEdit(widget->lineEdit_chicker_power, widget->slider_chicker_power,

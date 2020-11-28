@@ -16,4 +16,6 @@ class StopIntent : public DirectPrimitiveIntent
      * priority
      */
     explicit StopIntent(unsigned int robot_id, bool coast, unsigned int priority);
+
+    StopIntent() = delete;
 };

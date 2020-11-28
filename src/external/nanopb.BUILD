@@ -4,6 +4,8 @@ exports_files(["LICENSE.txt"])
 
 package(default_visibility = ["//visibility:public"])
 
+load("@nanopb_deps//:requirements.bzl", "requirement")
+
 common_defines = [
     # By default, NanoPb only supports 8-bit tags. This define changes the tag type to
     # one that supports 16-bit tags.
@@ -52,7 +54,9 @@ cc_library(
 py_binary(
     name = "nanopb_generator",
     srcs = ["generator/nanopb_generator.py"],
-    imports = ["proto"],
+    deps = [
+        requirement("protobuf"),
+    ],
 )
 
 proto_library(

@@ -21,4 +21,6 @@ class ChipIntent : public DirectPrimitiveIntent
     explicit ChipIntent(unsigned int robot_id, const Point& chip_origin,
                         const Angle& chip_direction, double chip_distance_meters,
                         unsigned int priority);
+
+    ChipIntent() = delete;
 };

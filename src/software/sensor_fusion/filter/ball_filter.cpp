@@ -13,7 +13,7 @@
 
 BallFilter::BallFilter() : ball_detection_buffer(MAX_BUFFER_SIZE) {}
 
-std::optional<TimestampedBallState> BallFilter::estimateBallState(
+std::optional<Ball> BallFilter::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area)
 {
     addNewDetectionsToBuffer(new_ball_detections, filter_area);
@@ -47,7 +47,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
             // Ignore any data from the past, and any data that is as old as the oldest
             // data in the buffer since it provides no additional value. This also
             // prevents division by 0 when calculating the estimated velocity
-            if (time_diff.getSeconds() <= 0)
+            if (time_diff.toSeconds() <= 0)
             {
                 continue;
             }
@@ -62,7 +62,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
                 (detection.position - detection_with_smallest_timestamp.position)
                     .length();
             double estimated_detection_velocity_magnitude =
-                detection_distance / time_diff.getSeconds();
+                detection_distance / time_diff.toSeconds();
 
             // Make the maximum acceptable velocity a bit larger than the strict limits
             // according to the game rules to account for measurement error, and to be a
@@ -99,7 +99,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
     }
 }
 
-std::optional<TimestampedBallState> BallFilter::estimateBallStateFromBuffer(
+std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
     boost::circular_buffer<BallDetection> ball_detections)
 {
     // Sort the detections in decreasing order before processing. This places the most
@@ -117,9 +117,8 @@ std::optional<TimestampedBallState> BallFilter::estimateBallStateFromBuffer(
         // or calculate a velocity so we do our best with just the position
         BallState ball_state(ball_detections.front().position, Vector(0, 0),
                              ball_detections.front().distance_from_ground);
-        TimestampedBallState timestamped_ball_state(ball_state,
-                                                    ball_detections.front().timestamp);
-        return timestamped_ball_state;
+        Ball ball(ball_state, ball_detections.front().timestamp);
+        return ball;
     }
 
     std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
@@ -140,7 +139,7 @@ std::optional<TimestampedBallState> BallFilter::estimateBallStateFromBuffer(
 
     BallState ball_state(filtered_position, estimated_velocity->average_velocity,
                          ball_detections.front().distance_from_ground);
-    return TimestampedBallState(ball_state, ball_detections.front().timestamp);
+    return Ball(ball_state, ball_detections.front().timestamp);
 }
 
 std::optional<size_t> BallFilter::getAdjustedBufferSize(
@@ -322,7 +321,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
                 current_detection.timestamp - previous_detection.timestamp;
             // Avoid division by 0. If we have adjacent detections with the same timestamp
             // the velocity cannot be calculated
-            if (time_diff.getSeconds() == 0)
+            if (time_diff.toSeconds() == 0)
             {
                 continue;
             }
@@ -343,7 +342,7 @@ std::optional<BallFilter::BallVelocityEstimate> BallFilter::estimateBallVelocity
                 previous_position = previous_detection.position;
             }
             Vector velocity_vector    = current_position - previous_position;
-            double velocity_magnitude = velocity_vector.length() / time_diff.getSeconds();
+            double velocity_magnitude = velocity_vector.length() / time_diff.toSeconds();
             Vector velocity           = velocity_vector.normalize(velocity_magnitude);
 
             ball_velocity_magnitudes.emplace_back(velocity_magnitude);

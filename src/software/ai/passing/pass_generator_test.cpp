@@ -64,8 +64,8 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     // could use, so we don't, and hence this test does not really test convergence
     // of pass start time.
 
-    world.updateBallStateWithTimestamp(
-        TimestampedBallState(Point(2, 2), Vector(0, 0), Timestamp::fromSeconds(0)));
+    world.updateBall(
+        Ball(BallState(Point(2, 2), Vector(0, 0)), Timestamp::fromSeconds(0)));
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
         Robot(3, {1, 0}, {0.5, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -111,7 +111,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).length(), 0.3);
         EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.3);
-        EXPECT_LE(abs((converged_pass.startTime() - pass.startTime()).getSeconds()), 0.2);
+        EXPECT_LE(abs((converged_pass.startTime() - pass.startTime()).toSeconds()), 0.2);
         UNUSED(score);
     }
     UNUSED(converged_score);
@@ -121,8 +121,7 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
 {
     // Test that the pass generator does not converge to use the robot set as the passer
 
-    world.updateBallStateWithTimestamp(
-        TimestampedBallState({2, 0.5}, {0, 0}, Timestamp::fromSeconds(0)));
+    world.updateBall(Ball(BallState({2, 0.5}, {0, 0}), Timestamp::fromSeconds(0)));
     pass_generator->setPasserPoint({2, 0.5});
 
     Team friendly_team(Duration::fromSeconds(10));
@@ -167,8 +166,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
 {
     // Test that we do not converge to a pass from the passer robot to itself
 
-    world.updateBallStateWithTimestamp(
-        TimestampedBallState({3.5, 0}, {0, 0}, Timestamp::fromSeconds(0)));
+    world.updateBall(Ball(BallState({3.5, 0}, {0, 0}), Timestamp::fromSeconds(0)));
     pass_generator->setPasserPoint({3.5, 0});
 
     // The passer robot

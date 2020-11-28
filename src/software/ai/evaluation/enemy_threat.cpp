@@ -6,7 +6,6 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/evaluation/robot.h"
 #include "software/ai/evaluation/team.h"
 #include "software/geom/algorithms/intersects.h"
 
@@ -232,8 +231,7 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
 
     for (const auto &robot : enemy_team.getAllRobots())
     {
-        bool has_ball =
-            *robotHasPossession(ball.getPreviousStates(), robot.getPreviousStates());
+        bool has_ball = robot.isNearDribbler(ball.position());
 
         // Get the angle from the robot to each friendly goalpost, then find the
         // difference between these angles to get the goal_angle for the robot
