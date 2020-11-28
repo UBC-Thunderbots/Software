@@ -42,7 +42,7 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     } while (!chip_action->done());
 }
 
-void ChipTactic::accept(TacticVisitor &visitor)
+void ChipTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

@@ -306,13 +306,13 @@ TEST_F(TestThetaStarPathPlanner, no_navigable_area)
 }
 
 TEST_F(TestThetaStarPathPlanner,
-       test_theta_star_path_planner_navigable_area_not_centred_at_origin)
-{
+       test_theta_star_path_planner_navigable_area_not_centred_at_origin) {
     Point start{0.5, 0.5}, dest{2.5, 2.5};
 
     std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
 
-    Rectangle navigable_area{{0.0, 0.0}, {3.0, 3.0}};
+    Rectangle navigable_area{{0.0, 0.0},
+                             {3.0, 3.0}};
 
     auto path = planner->findPath(start, dest, navigable_area, obstacles);
 
@@ -328,4 +328,22 @@ TEST_F(TestThetaStarPathPlanner,
     checkPathDoesNotExceedBoundingBox(path_points, navigable_area);
 
     checkPathDoesNotIntersectObstacle(path_points, obstacles);
+}
+
+TEST_F(TestThetaStarPathPlanner,
+       test_theta_star_small_distance_that_is_greater_than_robot_radius)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point start{-4.528, -3.119}, dest{-4.44, -3.031};
+
+    std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
 }

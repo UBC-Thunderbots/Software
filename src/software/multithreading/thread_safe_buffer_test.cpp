@@ -63,6 +63,35 @@ TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_
     EXPECT_EQ(84, *result);
 }
 
+TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_is_full)
+{
+    ThreadSafeBuffer<int> buffer(2);
+    buffer.push(114);
+    buffer.push(115);
+    buffer.push(116);
+
+    std::optional<int> result = std::nullopt;
+
+    // This "popLeastRecentlyAddedValue" call should block until something is "pushed"
+    std::thread puller_thread([&]() {
+        while (!result)
+        {
+            // should find values already in the buffer
+            result = buffer.popLeastRecentlyAddedValue(Duration::fromSeconds(2));
+        }
+    });
+
+    // this push should be too late to affect the previous call
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    buffer.push(117);
+
+    // Wait for the popLeastRecentlyAddedValue to complete
+    puller_thread.join();
+
+    ASSERT_TRUE(result);
+    EXPECT_EQ(115, *result);
+}
+
 TEST(ThreadSafeBufferTest,
      pullMostRecentlyAddedValue_single_value_when_value_already_on_buffer_length_one)
 {

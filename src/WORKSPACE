@@ -100,6 +100,7 @@ new_git_repository(
     build_file = "@//external:fff.BUILD",
     commit = "7e09f07e5b262b1cc826189dc5057379e40ce886",
     remote = "https://github.com/meekrosoft/fff.git",
+    shallow_since = "1566392271 +0200",
 )
 
 # Right now qt5 is installed on the system using the setup_software.sh script
@@ -191,35 +192,65 @@ http_archive(
 
 git_repository(
     name = "rules_python",
-    commit = "a0fbf98d4e3a232144df4d0d80b577c7a693b570",
+    commit = "c8c79aae9aa1b61d199ad03d5fe06338febd0774",
     remote = "https://github.com/bazelbuild/rules_python.git",
     shallow_since = "1586444447 +0200",
 )
+
+# Based on the hermetic Python 3 guide found here
+# https://thethoughtfulkoala.com/posts/2020/05/16/bazel-hermetic-python.html
+_py_configure = "./configure --prefix=$(pwd)/bazel_install"
+
+http_archive(
+    name = "python_interpreter",
+    build_file_content = """
+exports_files(["python_bin"])
+filegroup(
+    name = "files",
+    srcs = glob(["bazel_install/**"], exclude = ["**/* *"]),
+    visibility = ["//visibility:public"],
+)
+""",
+    patch_cmds = [
+        "mkdir $(pwd)/bazel_install",
+        _py_configure,
+        "make -j$(nproc)",
+        "make install",
+        "ln -s bazel_install/bin/python3 python_bin",
+    ],
+    sha256 = "91923007b05005b5f9bd46f3b9172248aea5abc1543e8a636d59e629c3331b01",
+    strip_prefix = "Python-3.7.9",
+    urls = ["https://www.python.org/ftp/python/3.7.9/Python-3.7.9.tar.xz"],
+)
+
+register_toolchains("//:py_toolchain")
 
 load("@rules_python//python:repositories.bzl", "py_repositories")
 
 py_repositories()
 
-load("@rules_python//python:pip.bzl", "pip_repositories")
+load("@rules_python//python:pip.bzl", "pip_install")
 
-pip_repositories()
-
-load("@rules_python//python:pip.bzl", "pip3_import")
-
-pip3_import(
+pip_install(
     name = "python_control_deps",
+    python_interpreter_target = "@python_interpreter//:python_bin",
     requirements = "//firmware/app/control/python_controller:requirements.txt",
 )
 
-load("@python_control_deps//:requirements.bzl", "pip_install")
-
-pip_install()
-
-pip3_import(
+pip_install(
     name = "dynamic_parameter_deps",
+    python_interpreter_target = "@python_interpreter//:python_bin",
     requirements = "//shared/parameter_v2/generation_scripts:requirements.txt",
 )
 
-load("@dynamic_parameter_deps//:requirements.bzl", "pip_install")
+pip_install(
+    name = "nanopb_deps",
+    python_interpreter_target = "@python_interpreter//:python_bin",
+    requirements = "//external:nanopb_requirements.txt",
+)
 
-pip_install()
+pip_install(
+    name = "python_tools_deps",
+    python_interpreter_target = "@python_interpreter//:python_bin",
+    requirements = "//python_tools:requirements.txt",
+)
