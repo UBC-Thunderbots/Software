@@ -12,8 +12,7 @@
 void io_uart_logger_init(UART_HandleTypeDef* uart_handle);
 
 /**
- * Transfers the robot_log over UART. This is routed through the STLink
- * and shows up on /dev/ttyACM*. You can view the logs with screen /dev/ttyACM0 115200
+ * Transfers the robot_log over UART.
  *
  * @param robot_log The log msg to send
  */

@@ -176,8 +176,7 @@ int main(void)
     // At this point the UART peripheral should be configured correctly,
     // so we initialize the logger with a UART robot log handler.
     //
-    // Logs can been seen through `screen /dev/ttyACM0 115200` until the
-    // robot connects to a network.
+    // Logs can been seen through `screen /dev/ttyACM0 115200`
     io_uart_logger_init(&huart3);
     app_logger_init(0, &io_uart_logger_handle_robot_log);
 
