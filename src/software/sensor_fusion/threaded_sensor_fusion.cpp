@@ -13,7 +13,7 @@ ThreadedSensorFusion::ThreadedSensorFusion(
 
 void ThreadedSensorFusion::onValueReceived(SensorProto sensor_msg)
 {
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
     std::optional<World> world = sensor_fusion.getWorld();
     if (world)
     {

@@ -17,15 +17,14 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config,
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->getSSLCommunicationConfig())
 {
-    std::string network_interface =
-        DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
-    int channel = DynamicParameters->getNetworkConfig()->Channel()->value();
+    std::string network_interface = this->network_config->NetworkInterface()->value();
+    int channel                   = this->network_config->Channel()->value();
 
     MutableDynamicParameters->getMutableNetworkConfig()
         ->mutableChannel()
         ->registerCallbackFunction([this](int new_channel) {
             std::string new_network_interface =
-                DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
+                this->network_config->NetworkInterface()->value();
             joinMulticastChannel(new_channel, new_network_interface);
         });
 
