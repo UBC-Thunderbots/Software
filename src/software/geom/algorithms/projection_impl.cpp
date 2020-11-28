@@ -157,8 +157,7 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     {
         double perpDist = std::sqrt(circle.radius() * circle.radius() -
                                     (circle.origin() - start).lengthSquared());
-        Point p1 =
-            start + (circle.origin() - start).perpendicular().normalize(perpDist);
+        Point p1 = start + (circle.origin() - start).perpendicular().normalize(perpDist);
         Point p2 =
             start - ((circle.origin() - start).perpendicular().normalize(perpDist));
         return std::make_pair(p1, p2);
@@ -168,11 +167,11 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
         double radiusAngle =
             std::acos(circle.radius() / (start - circle.origin()).length());
         Point p1 = circle.origin() + (start - circle.origin())
-                                            .rotate(Angle::fromRadians(radiusAngle))
-                                            .normalize(circle.radius());
+                                         .rotate(Angle::fromRadians(radiusAngle))
+                                         .normalize(circle.radius());
         Point p2 = circle.origin() + (start - circle.origin())
-                                            .rotate(-Angle::fromRadians(radiusAngle))
-                                            .normalize(circle.radius());
+                                         .rotate(-Angle::fromRadians(radiusAngle))
+                                         .normalize(circle.radius());
         return std::make_pair(p1, p2);
     }
 }
