@@ -224,7 +224,21 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-    RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
+
+    const bool override_game_controller_friendly_goalie_id =
+            sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value();
+
+    if (override_game_controller_friendly_goalie_id) {
+        RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
+        new_friendly_team.assignGoalie(friendly_goalie_id);
+        return new_friendly_team;
+    }
+
+
+    for (Robot robot : new_friendly_team.getAllRobots()) {
+
+    }
+
     // TODO (1610) Implement friendly goalie ID override
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
