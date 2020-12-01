@@ -38,4 +38,6 @@ python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio
 sudo ln -sf ~/.platformio/penv/bin/platformio /usr/local/bin/platformio
 sudo ln -sf ~/.platformio/penv/bin/pio /usr/local/bin/pio
 
-
+echo "================================================================"
+echo "Done platformio Setup, please reboot for changes to take place"
+echo "================================================================"
