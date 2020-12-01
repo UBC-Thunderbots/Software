@@ -113,7 +113,7 @@ std::vector<Circle> findOpenCircles(const Rectangle &bounding_box,
 
     // Sort the circles in descending order of radius
     std::sort(empty_circles.begin(), empty_circles.end(),
-              [](auto c1, auto c2) { return c1.getRadius() > c2.getRadius(); });
+              [](auto c1, auto c2) { return c1.radius() > c2.radius(); });
 
     return empty_circles;
 }
