@@ -356,3 +356,143 @@ TEST_F(FieldTest, degenerate_field_neg_lengths)
     EXPECT_THROW(Field(-4, 2, 3, -1, 0, 5, 5, 4), std::invalid_argument);
     EXPECT_THROW(Field(2, 2, 3, -2, 0, 2, 3, 4), std::invalid_argument);
 }
+
+TEST(BallInFriendlyHalfTest, ball_barely_in_friendly_half)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p(-0.01, 1);
+
+    EXPECT_TRUE(field.pointInFriendlyHalf(p));
+}
+
+TEST(BallInFriendlyHalfTest, ball_at_friendly_corner)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p     = field.friendlyCornerNeg();
+
+    EXPECT_TRUE(field.pointInFriendlyHalf(p));
+}
+
+TEST(BallInFriendlyHalfTest, ball_barely_in_enemy_half)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p(0.03, -3);
+
+    EXPECT_FALSE(field.pointInFriendlyHalf(p));
+}
+
+TEST(BallInFriendlyHalfTest, ball_at_enemy_goal)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p(field.enemyGoalCenter());
+
+    EXPECT_FALSE(field.pointInFriendlyHalf(p));
+}
+
+TEST(BallInEnemyHalfTest, ball_barely_in_enemy_half)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p(0.01, 1);
+
+    EXPECT_TRUE(field.pointInEnemyHalf(p));
+}
+
+TEST(BallInEnemyHalfTest, ball_at_enemy_corner)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p     = field.enemyCornerNeg();
+
+    EXPECT_TRUE(field.pointInEnemyHalf(p));
+}
+
+TEST(BallInEnemyHalfTest, ball_barely_in_friendly_half)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p(-0.03, -3);
+
+    EXPECT_FALSE(field.pointInEnemyHalf(p));
+}
+
+TEST(BallInEnemyHalfTest, ball_at_friendly_goal)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p(field.friendlyGoalCenter());
+
+    EXPECT_FALSE(field.pointInEnemyHalf(p));
+}
+
+class BallPositionsInFriendlyCornerOffField : public ::testing::TestWithParam<Point>
+{
+};
+
+class BallPositionsInFriendlyCornerOnField : public ::testing::TestWithParam<Point>
+{
+};
+
+class BallPositionsInEnemyCornerOnField : public ::testing::TestWithParam<Point>
+{
+};
+
+class BallPositionsInEnemyCornerOffField : public ::testing::TestWithParam<Point>
+{
+};
+
+TEST_P(BallPositionsInFriendlyCornerOnField, in_corner_inside_field)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p     = GetParam();
+
+    EXPECT_FALSE(field.pointInEnemyCorner(p, 2.0));
+    EXPECT_TRUE(field.pointInFriendlyCorner(p, 2.0));
+
+    EXPECT_FALSE(field.pointInEnemyCorner(p, 1.0));
+    EXPECT_TRUE(field.pointInFriendlyCorner(p, 1.0));
+}
+
+INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInFriendlyCornerOnField,
+                        ::testing::Values(Point(-4.5, 3), Point(-4.5, -3), Point(-4.0, 3),
+                                          Point(-4.0, -3)));
+
+TEST_P(BallPositionsInFriendlyCornerOffField, in_corner_outside_field)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p     = GetParam();
+
+    EXPECT_FALSE(field.pointInFriendlyCorner(p, 1.0));
+    EXPECT_FALSE(field.pointInEnemyCorner(p, 1.0));
+}
+
+INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInFriendlyCornerOffField,
+                        ::testing::Values(Point(-4.6, 3), Point(-4.6, -3), Point(-5.0, 3),
+                                          Point(-5.0, -3), Point(-4.5, -3.1),
+                                          Point(-4.0, -3.1)));
+
+TEST_P(BallPositionsInEnemyCornerOnField, in_corner_inside_field)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p     = GetParam();
+
+    EXPECT_TRUE(field.pointInEnemyCorner(p, 2.0));
+    EXPECT_FALSE(field.pointInFriendlyCorner(p, 2.0));
+
+    EXPECT_TRUE(field.pointInEnemyCorner(p, 1.0));
+    EXPECT_FALSE(field.pointInFriendlyCorner(p, 1.0));
+}
+
+INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInEnemyCornerOnField,
+                        ::testing::Values(Point(4.5, 3), Point(4.5, -3), Point(4.0, 3),
+                                          Point(4.0, -3)));
+
+TEST_P(BallPositionsInEnemyCornerOffField, in_corner_outside_field)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point p     = GetParam();
+
+    EXPECT_FALSE(field.pointInEnemyCorner(p, 1.0));
+    EXPECT_FALSE(field.pointInFriendlyCorner(p, 1.0));
+}
+
+INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInEnemyCornerOffField,
+                        ::testing::Values(Point(4.6, 3), Point(4.6, -3), Point(5.0, 3),
+                                          Point(5.0, -3), Point(4.5, -3.1),
+                                          Point(4.0, -3.1)));
