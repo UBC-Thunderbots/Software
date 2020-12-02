@@ -23,21 +23,21 @@ TEST(FindOpenCirclesTest, test_find_open_circles_one_point_in_rectangle)
 
     ASSERT_EQ(4, empty_circles.size());
 
-    EXPECT_EQ(Point(-1, -1), empty_circles[0].getOrigin());
+    EXPECT_EQ(Point(-1, -1), empty_circles[0].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(1.9, 2)),
-                     empty_circles[0].getRadius());
+                     empty_circles[0].radius());
 
-    EXPECT_EQ(Point(-1, 1), empty_circles[1].getOrigin());
+    EXPECT_EQ(Point(-1, 1), empty_circles[1].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(0.1, 2)),
-                     empty_circles[1].getRadius());
+                     empty_circles[1].radius());
 
-    EXPECT_EQ(Point(1, 1), empty_circles[2].getOrigin());
+    EXPECT_EQ(Point(1, 1), empty_circles[2].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2)),
-                     empty_circles[2].getRadius());
+                     empty_circles[2].radius());
 
-    EXPECT_EQ(Point(1, -1), empty_circles[3].getOrigin());
+    EXPECT_EQ(Point(1, -1), empty_circles[3].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(0.1, 2)),
-                     empty_circles[3].getRadius());
+                     empty_circles[3].radius());
 }
 
 TEST(FindOpenCirclesTest, test_find_open_circles_two_points_in_rectangle)
@@ -64,9 +64,9 @@ TEST(FindOpenCirclesTest, test_find_open_circles_two_points_in_rectangle)
 
         for (const Circle &empty_circle : empty_circles)
         {
-            if (expected_origin == empty_circle.getOrigin())
+            if (expected_origin == empty_circle.origin())
             {
-                EXPECT_DOUBLE_EQ(expected_radius, empty_circle.getRadius());
+                EXPECT_DOUBLE_EQ(expected_radius, empty_circle.radius());
                 found = true;
             }
         }
@@ -85,36 +85,36 @@ TEST(FindOpenCirclesTest, test_find_open_circle_three_in_rectangle)
     ASSERT_EQ(8, empty_circles.size());
 
     // Calculated from Voronoi diagram
-    EXPECT_EQ(-4.5, empty_circles[2].getOrigin().x());
-    EXPECT_NEAR(2.09, empty_circles[2].getOrigin().y(), 0.05);
-    EXPECT_NEAR(4.628, empty_circles[2].getRadius(), 0.005);
+    EXPECT_EQ(-4.5, empty_circles[2].origin().x());
+    EXPECT_NEAR(2.09, empty_circles[2].origin().y(), 0.05);
+    EXPECT_NEAR(4.628, empty_circles[2].radius(), 0.005);
 
-    EXPECT_EQ(4.5, empty_circles[3].getOrigin().x());
-    EXPECT_NEAR(2.09, empty_circles[3].getOrigin().y(), 0.05);
-    EXPECT_NEAR(4.628, empty_circles[3].getRadius(), 0.005);
+    EXPECT_EQ(4.5, empty_circles[3].origin().x());
+    EXPECT_NEAR(2.09, empty_circles[3].origin().y(), 0.05);
+    EXPECT_NEAR(4.628, empty_circles[3].radius(), 0.005);
 
-    EXPECT_EQ(Point(0, -3), empty_circles[6].getOrigin());
-    EXPECT_NEAR(2.236, empty_circles[6].getRadius(), 0.005);
+    EXPECT_EQ(Point(0, -3), empty_circles[6].origin());
+    EXPECT_NEAR(2.236, empty_circles[6].radius(), 0.005);
 
-    EXPECT_EQ(Point(0, -0.25), empty_circles[7].getOrigin());
-    EXPECT_NEAR(1.25, empty_circles[7].getRadius(), 0.005);
+    EXPECT_EQ(Point(0, -0.25), empty_circles[7].origin());
+    EXPECT_NEAR(1.25, empty_circles[7].radius(), 0.005);
 
     // Corner Points
-    EXPECT_EQ(Point(-4.5, 3), empty_circles[0].getOrigin());
+    EXPECT_EQ(Point(-4.5, 3), empty_circles[0].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(4.5, 2) + std::pow(2, 2)),
-                     empty_circles[0].getRadius());
+                     empty_circles[0].radius());
 
-    EXPECT_EQ(Point(4.5, 3), empty_circles[1].getOrigin());
+    EXPECT_EQ(Point(4.5, 3), empty_circles[1].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(4.5, 2) + std::pow(2, 2)),
-                     empty_circles[1].getRadius());
+                     empty_circles[1].radius());
 
-    EXPECT_EQ(Point(-4.5, -3), empty_circles[4].getOrigin());
+    EXPECT_EQ(Point(-4.5, -3), empty_circles[4].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(3.5, 2) + std::pow(2, 2)),
-                     empty_circles[4].getRadius());
+                     empty_circles[4].radius());
 
-    EXPECT_EQ(Point(4.5, -3), empty_circles[5].getOrigin());
+    EXPECT_EQ(Point(4.5, -3), empty_circles[5].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(3.5, 2) + std::pow(2, 2)),
-                     empty_circles[5].getRadius());
+                     empty_circles[5].radius());
 }
 
 TEST(FindOpenCirclesTest, test_find_open_circle_points_outside_of_box_one_in_box)
@@ -127,21 +127,21 @@ TEST(FindOpenCirclesTest, test_find_open_circle_points_outside_of_box_one_in_box
 
     ASSERT_EQ(4, empty_circles.size());
 
-    EXPECT_EQ(Point(-1, -1), empty_circles[0].getOrigin());
+    EXPECT_EQ(Point(-1, -1), empty_circles[0].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(1.9, 2)),
-                     empty_circles[0].getRadius());
+                     empty_circles[0].radius());
 
-    EXPECT_EQ(Point(-1, 1), empty_circles[1].getOrigin());
+    EXPECT_EQ(Point(-1, 1), empty_circles[1].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(0.1, 2)),
-                     empty_circles[1].getRadius());
+                     empty_circles[1].radius());
 
-    EXPECT_EQ(Point(1, 1), empty_circles[2].getOrigin());
+    EXPECT_EQ(Point(1, 1), empty_circles[2].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2)),
-                     empty_circles[2].getRadius());
+                     empty_circles[2].radius());
 
-    EXPECT_EQ(Point(1, -1), empty_circles[3].getOrigin());
+    EXPECT_EQ(Point(1, -1), empty_circles[3].origin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(0.1, 2)),
-                     empty_circles[3].getRadius());
+                     empty_circles[3].radius());
 }
 
 TEST(FindOpenCirclesTest, test_find_open_circle_points_outside_of_box)
