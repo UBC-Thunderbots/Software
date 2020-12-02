@@ -223,10 +223,9 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 ## Flashing the Radio Dongle
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a dongle plugged into your computer. Do not plug both the dongle and the robot at the same time!
 2. From the `src` folder, to flash the radio dongle, run `bazel run --cpu=stm32f4 //firmware/tools:legacy_flash_firmware radio_dongle`.
-3. If the dongle has a blue pcb, then follow step (a). If the dongle has a green pcb then follow step (b).
+3. If the dongle has a blue pcb, then follow step (a). If the dongle has a green pcb then follow step (b). There should be a progress bar indicating the flashing progress.
     (a) Hold down the red button while unplugging and plugging in the dongle. There should be a single orange light on. Then run the script described in step 2.
     (b) Hold down the yellow button while running the script described in step 2.
-4. There should be a progress bar indicating the flashing progress, hold the switch back until the process finishes.
 
 ## Flashing And Debugging A STM32H7 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html) plugged into your computer.
