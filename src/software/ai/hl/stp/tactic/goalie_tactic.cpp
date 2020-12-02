@@ -13,15 +13,16 @@
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
-#include "software/parameter/dynamic_parameters.h"
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
-                           const Team &friendly_team, const Team &enemy_team)
+                           const Team &friendly_team, const Team &enemy_team,
+                           std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
     : Tactic(true, {RobotCapability::Move}),
       ball(ball),
       field(field),
       friendly_team(friendly_team),
-      enemy_team(enemy_team)
+      enemy_team(enemy_team),
+      goalie_tactic_config(goalie_tactic_config)
 {
 }
 
@@ -159,37 +160,22 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         // robot radius so as we move along the segment we don't try to run into the goal
         // posts. This will be used in case 3 as a fallback when we don't have an
         // intersection with the crease lines
-        const Point neg_goal_line_inflated =
-            field.friendlyGoalpostNeg() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
-        const Point pos_goal_line_inflated =
-            field.friendlyGoalpostPos() + Vector(0, ROBOT_MAX_RADIUS_METERS);
         Segment full_goal_segment =
-            Segment(neg_goal_line_inflated, pos_goal_line_inflated);
+            Segment(field.friendlyGoalpostNeg() + Vector(0, -ROBOT_MAX_RADIUS_METERS),
+                    field.friendlyGoalpostPos() + Vector(0, ROBOT_MAX_RADIUS_METERS));
 
         std::vector<Point> intersections = intersection(ball_ray, full_goal_segment);
 
-        // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
-        auto ball_speed_panic = DynamicParameters->getAIConfig()
-                                    ->getGoalieTacticConfig()
-                                    ->BallSpeedPanic()
-                                    ->value();
+        auto ball_speed_panic = goalie_tactic_config->BallSpeedPanic()->value();
         // what should the final goalie speed be, so that the goalie accelerates faster
-        auto goalie_final_speed = DynamicParameters->getAIConfig()
-                                      ->getGoalieTacticConfig()
-                                      ->GoalieFinalSpeed()
-                                      ->value();
+        auto goalie_final_speed = goalie_tactic_config->GoalieFinalSpeed()->value();
         // how far in should the goalie wedge itself into the block cone, to block balls
-        auto block_cone_radius = DynamicParameters->getAIConfig()
-                                     ->getGoalieTacticConfig()
-                                     ->BlockConeRadius()
-                                     ->value();
+        auto block_cone_radius = goalie_tactic_config->BlockConeRadius()->value();
         // by how much should the defense area be decreased so the goalie stays close
         // towards the net
-        auto defense_area_deflation = DynamicParameters->getAIConfig()
-                                          ->getGoalieTacticConfig()
-                                          ->DefenseAreaDeflation()
-                                          ->value();
+        auto defense_area_deflation =
+            goalie_tactic_config->DefenseAreaDeflation()->value();
 
         // if the ball is in the don't chip rectangle we do not chip the ball
         // as we risk bumping the ball into our own net trying to move behind

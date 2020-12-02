@@ -5,6 +5,7 @@
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
@@ -22,9 +23,17 @@ class GoalieTactic : public Tactic
    public:
     /**
      * Creates a new GoalieTactic
+     *
+     * @param ball The ball
+     * @param field The field
+     * @param friendly_team The friendly team
+     * @param enemy_team The enemy team
+     * @param goalie_tactic_config The config to fetch parameters from
      */
     explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
-                          const Team &enemy_team);
+                          const Team &enemy_team,
+                          std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
+                              DynamicParameters->getAIConfig()->getGoalieTacticConfig());
 
     GoalieTactic() = delete;
 
@@ -61,4 +70,5 @@ class GoalieTactic : public Tactic
     Field field;
     Team friendly_team;
     Team enemy_team;
+    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
 };
