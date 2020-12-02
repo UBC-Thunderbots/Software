@@ -6,8 +6,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/evaluation/team.h"
 #include "software/geom/algorithms/intersects.h"
+#include "software/world/team.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> findAllReceiverPasserPairs(
     const std::vector<Robot> &possible_passers,
@@ -127,8 +127,8 @@ std::optional<std::pair<int, std::optional<Robot>>> getNumPassesToRobot(
             // If there are multiple robots that can pass to the robot, we assume
             // it will receive the ball from the closest one since this is more
             // likely
-            auto closest_passer = nearestRobot(receiver_passer_pairs.at(final_receiver),
-                                               final_receiver.position());
+            auto closest_passer = Team::getNearestRobot(
+                receiver_passer_pairs.at(final_receiver), final_receiver.position());
             return std::make_pair(pass_num, closest_passer);
         }
 
