@@ -14,7 +14,7 @@ bool contains(const Circle& container, const Segment& contained)
 
 bool contains(const Circle& container, const Point& contained)
 {
-    return distance(container.getOrigin(), contained) <= container.getRadius();
+    return distance(container.origin(), contained) <= container.radius();
 }
 
 bool contains(const Polygon& container, const Point& contained)

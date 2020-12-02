@@ -2,9 +2,9 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/intercept.h"
-#include "software/ai/evaluation/team.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
+#include "software/world/team.h"
 
 std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
                                                          const Ball &ball,
@@ -39,6 +39,6 @@ std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
     }
     else
     {
-        return nearestRobot(team, ball.position());
+        return team.getNearestRobot(ball.position());
     }
 }
