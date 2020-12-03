@@ -53,6 +53,42 @@ class GoalieTactic : public Tactic
 
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
+    /**
+     * Gets intersections between the ball velocity ray and the full goal segment
+     */
+    std::vector<Point> getIntersectionsBetweenBallVelocityAndFullGoalSegment();
+
+    /**
+     * Creates action to panic and stop the ball
+     *
+     * @param move_action The move action to reuse
+     * @param stop_ball_point The point to the stop the ball
+     *
+     * @return the action to use to stop the ball
+     */
+    std::shared_ptr<Action> panicAndStopBall(std::shared_ptr<MoveAction> move_action,
+                                             const Point &stop_ball_point);
+
+    /**
+     * Chip ball if safe
+     *
+     * @param chip_action The chip action to reuse
+     * @param stop_action The stop action to reuse
+     *
+     * @return Action to chip the ball if it is safe to do so
+     */
+    std::shared_ptr<Action> chipBallIfSafe(std::shared_ptr<ChipAction> chip_action,
+                                           std::shared_ptr<StopAction> stop_action);
+
+    /**
+     * Position robot to block potential shots
+     *
+     * @param move_action The move action to reuse
+     *
+     * @return The Action to position the robot to block the shot
+     */
+    std::shared_ptr<Action> positionToBlockShot(std::shared_ptr<MoveAction> move_action);
+
     bool isGoalieTactic() const override;
 
     void accept(TacticVisitor &visitor) const override;
