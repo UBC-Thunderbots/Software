@@ -16,7 +16,7 @@ void io_uart_logger_init(UART_HandleTypeDef* uart_handle)
 void io_uart_logger_handleRobotLog(TbotsProto_RobotLog robot_log)
 {
     int size = sprintf(g_robot_log_buffer, "[%s][%s:%ld]: %s\r\n",
-                       io_uart_logger_convertLogLevelEnumToString(log_level),
+                       io_uart_logger_convertLogLevelEnumToString(robot_log.log_level),
                        robot_log.file_name, robot_log.line_number, robot_log.log_msg);
 
     HAL_UART_Transmit(g_uart_handle, (uint8_t*)g_robot_log_buffer, (uint16_t)size,
@@ -25,7 +25,7 @@ void io_uart_logger_handleRobotLog(TbotsProto_RobotLog robot_log)
 
 const char* io_uart_logger_convertLogLevelEnumToString(TbotsProto_LogLevel log_level)
 {
-    switch(log_level)
+    switch (log_level)
     {
         case TbotsProto_LogLevel_DEBUG:
         {
@@ -49,4 +49,3 @@ const char* io_uart_logger_convertLogLevelEnumToString(TbotsProto_LogLevel log_l
         }
     }
 }
-

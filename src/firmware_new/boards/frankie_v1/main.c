@@ -178,7 +178,7 @@ int main(void)
     //
     // Logs can been seen through `screen /dev/ttyACM0 115200`
     io_uart_logger_init(&huart3);
-    app_logger_init(0, &io_uart_logger_handle_robot_log);
+    app_logger_init(0, &io_uart_logger_handleRobotLog);
 
     TLOG_INFO("Initializing IO Layer");
     initIoLayer();
