@@ -16,4 +16,12 @@ void io_uart_logger_init(UART_HandleTypeDef* uart_handle);
  *
  * @param robot_log The log msg to send
  */
-void io_uart_logger_handle_robot_log(TbotsProto_RobotLog robot_log);
+void io_uart_logger_handleRobotLog(TbotsProto_RobotLog robot_log);
+
+/**
+ * Converts the TbotsProto_LogLevel enum to a string
+ *
+ * @param log_level The log level to convert to a string
+ * @returns converted string
+ */
+const char* io_uart_logger_convertLogLevelEnumToString(TbotsProto_LogLevel log_level);
