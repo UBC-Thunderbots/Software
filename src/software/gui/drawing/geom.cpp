@@ -33,8 +33,8 @@ void drawCircle(QGraphicsScene* scene, const Circle& circle, const QPen& pen,
 {
     // The addEllipse function does not center the ellipse at the given coordinates, so it
     // is slightly easier to define the bounding rect within which the ellipse is drawn
-    Point origin  = circle.getOrigin();
-    double radius = circle.getRadius();
+    Point origin  = circle.origin();
+    double radius = circle.radius();
     QRectF circle_bounding_rect(createQPointF(origin + Vector(-radius, radius)),
                                 createQPointF(origin + Vector(radius, -radius)));
     if (brush_opt)
