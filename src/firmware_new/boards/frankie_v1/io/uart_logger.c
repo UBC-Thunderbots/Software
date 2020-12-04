@@ -45,7 +45,7 @@ const char* io_uart_logger_convertLogLevelEnumToString(TbotsProto_LogLevel log_l
         }
         default:
         {
-            return "UNKOWN";
+            return "UNKNOWN";
         }
     }
 }
