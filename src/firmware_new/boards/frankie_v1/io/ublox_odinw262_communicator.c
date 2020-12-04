@@ -17,7 +17,7 @@
 #define RX_BUFFER_LENGTH_BYTES 4096
 #define UBLOX_OK_RESPONSE_LENGTH_BYTES 4
 #define UBLOX_ERROR_RESPONSE_LENGTH_BYTES 7
-#define UBLOX_RESPONSE_TIMEOUT_S 100
+#define UBLOX_RESPONSE_TIMEOUT_S 10
 
 typedef enum
 {
@@ -28,7 +28,7 @@ typedef enum
 } UbloxResponseStatus_t;
 
 DMA_BUFFER static uint8_t g_uart_receive_dma_buffer[RX_BUFFER_LENGTH_BYTES] = {0};
-/*static char g_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES];*/
+static char g_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES];
 
 static const char* g_ublox_ok_response    = "OK\r\n";
 static const char* g_ublox_error_response = "ERROR\r\n";
@@ -75,6 +75,7 @@ void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
 void io_ublox_odinw262_communicator_task(void* arg)
 {
     assert(g_initialized);
+    g_last_byte_parsed_from_dma_buffer = 0;
 
     for (;;)
     {
@@ -84,25 +85,33 @@ void io_ublox_odinw262_communicator_task(void* arg)
         SCB_InvalidateDCache_by_Addr(
                 (uint32_t*)(((uint32_t)g_uart_receive_dma_buffer) & ~(uint32_t)0x1F), RX_BUFFER_LENGTH_BYTES+32);
 
-        TLOG_DEBUG("pinging ublox odinw262");
-        io_ublox_odinw262_communicator_sendATCommand("AT\r");
-        osDelay(8 * 1000);
+        const char* response = io_ublox_odinw262_communicator_sendATCommand("AT\r");
+        TLOG_DEBUG("Response: %s", response);
+        osDelay(10 * 1000);
+        
+        response = io_ublox_odinw262_communicator_sendATCommand("AT\r");
+        TLOG_DEBUG("Response: %s", response);
+        osDelay(10 * 1000);
 
         TLOG_DEBUG("Enable Ethernet Bridge");
-        io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
-        osDelay(8 * 1000);
+        response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
+        TLOG_DEBUG("Response: %s", response);
+        osDelay(10 * 1000);
 
-        TLOG_DEBUG("What mac addresses are there");
-        io_ublox_odinw262_communicator_sendATCommand("AT+UWAPMACADDR\r");
-        osDelay(8 * 1000);
+        TLOG_DEBUG("what mac addresses are there");
+        response = io_ublox_odinw262_communicator_sendATCommand("AT+UWAPMACADDR\r");
+        TLOG_DEBUG("Response: %s", response);
+        osDelay(10 * 1000);
 
-        TLOG_DEBUG("Activate Bridge Connection");
-        io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
-        osDelay(8 * 1000);
+        TLOG_DEBUG("activate bridge connection");
+        response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
+        TLOG_DEBUG("Response: %s", response);
+        osDelay(10 * 1000);
 
-        TLOG_DEBUG("Activate Ethernet");
-        io_ublox_odinw262_communicator_sendATCommand("AT+UETHCA=3\r");
-        osDelay(8 * 1000);
+        TLOG_DEBUG("do a wifi scan");
+        response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSCAN=SHAW-E1C430\r");
+        TLOG_DEBUG("Response: %s", response);
+        osDelay(10 * 1000);
     }
 }
 
@@ -166,42 +175,74 @@ void io_ublox_odinw262_reset()
 char* io_ublox_odinw262_communicator_sendATCommand(const char* command)
 {
     assert(g_initialized);
+    TLOG_DEBUG("Sending AT Command: %s to u-blox", command);
+
     HAL_UART_Transmit(g_ublox_uart_handle, (uint8_t*)command, (uint16_t)strlen(command),
                       HAL_MAX_DELAY);
 
-    jank:
+    wait_for_ublox_to_respond:
     {
-        osStatus_t status = osSemaphoreAcquire(g_dma_receive_semaphore, UBLOX_RESPONSE_TIMEOUT_S);
+        osStatus_t status = osSemaphoreAcquire(g_dma_receive_semaphore,
+                                UBLOX_RESPONSE_TIMEOUT_S * configTICK_RATE_HZ);
 
         if (status == osErrorTimeout)
         {
-            TLOG_WARNING("Ublox did not respond to %s in %d seconds", command,
-                         UBLOX_RESPONSE_TIMEOUT_S);
+            TLOG_WARNING("u-blox did not respond to %s in %d seconds", command,
+                    UBLOX_RESPONSE_TIMEOUT_S);
             return NULL;
         }
     }
 
     switch (g_ublox_response_status)
     {
-        case UBLOX_RESPONSE_ERROR:
-        {
-            TLOG_INFO("Ublox response error");
-            break;
-        }
-        case UBLOX_RESPONSE_UNKOWN:
-        {
-            TLOG_INFO("Ublox response unkown");
-            break;
-        }
         case UBLOX_RESPONSE_OK:
         {
-            TLOG_INFO("Ublox response OK");
+            TLOG_INFO("u-blox response OK");
+            break;
+        }
+        case UBLOX_RESPONSE_ERROR:
+        {
+            TLOG_INFO("u-blox response ERROR");
             break;
         }
         case UBLOX_RESPONSE_INVALID:
         {
-            TLOG_INFO("Ublox response invalid");
-            goto jank;
+            // A UBLOX_RESPONSE_INVALID indicates that there was a blip in the UART
+            // msgs that was being received, triggering an idle line part way through
+            // the transmission. We go back to waiting for the rest of the data.
+            TLOG_INFO("u-blox invalid response");
+            goto wait_for_ublox_to_respond;
+        }
+        case UBLOX_RESPONSE_UNKOWN:
+        {
+            TLOG_FATAL("invalid state, handleIdleLineInterrupt failed");
+            break;
         }
     }
+
+    if (g_last_byte_parsed_from_dma_buffer < g_dma_counter_on_uart_idle_line)
+    {
+        memcpy(g_uart_receive_buffer,
+               g_uart_receive_dma_buffer + g_last_byte_parsed_from_dma_buffer,
+               g_dma_counter_on_uart_idle_line - g_last_byte_parsed_from_dma_buffer -
+                   UBLOX_OK_RESPONSE_LENGTH_BYTES);
+
+        TLOG_INFO("RUNNIGN THIS %d %d", g_dma_counter_on_uart_idle_line,
+                  g_last_byte_parsed_from_dma_buffer);
+    }
+    else
+    {
+        memcpy(g_uart_receive_buffer,
+               g_uart_receive_dma_buffer + g_last_byte_parsed_from_dma_buffer,
+               RX_BUFFER_LENGTH_BYTES - g_last_byte_parsed_from_dma_buffer);
+
+        memcpy(g_uart_receive_buffer +
+                   (RX_BUFFER_LENGTH_BYTES - g_last_byte_parsed_from_dma_buffer),
+               g_uart_receive_dma_buffer,
+               g_dma_counter_on_uart_idle_line - UBLOX_OK_RESPONSE_LENGTH_BYTES);
+    }
+
+    g_last_byte_parsed_from_dma_buffer = g_dma_counter_on_uart_idle_line;
+    g_uart_receive_buffer[g_dma_counter_on_uart_idle_line] = '\0';
+    return g_uart_receive_buffer;
 }
