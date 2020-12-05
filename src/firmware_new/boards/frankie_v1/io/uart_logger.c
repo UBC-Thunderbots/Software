@@ -19,26 +19,26 @@ void io_uart_logger_handle_robot_log(TbotsProto_RobotLog robot_log)
 
     if (robot_log.log_level == TbotsProto_LogLevel_DEBUG)
     {
-        log_level = "DEBUG";
+        log_level = "\033[36m[ DEBUG ]";
     }
     else if (robot_log.log_level == TbotsProto_LogLevel_INFO)
     {
-        log_level = "INFO";
+        log_level = "\033[37m[ INFO  ]";
     }
     else if (robot_log.log_level == TbotsProto_LogLevel_WARNING)
     {
-        log_level = "WARNING";
+        log_level = "\033[33m[ WARN  ]";
     }
     else if (robot_log.log_level == TbotsProto_LogLevel_FATAL)
     {
-        log_level = "FATAL";
+        log_level = "\033[31m[ FATAL ]";
     }
     else
     {
-        log_level = "UNKOWN";
+        log_level = "UNKNOWN";
     }
 
-    int size = sprintf(robot_log_buffer, "[%s][%s:%ld]: %s\r\n", log_level, robot_log.file_name,
+    int size = sprintf(robot_log_buffer, "%s[%s:%ld]: %s\033[0m\r\n", log_level, robot_log.file_name,
                        robot_log.line_number, robot_log.log_msg);
 
     HAL_UART_Transmit(huart, (uint8_t*)robot_log_buffer, (uint16_t)size, HAL_MAX_DELAY);
