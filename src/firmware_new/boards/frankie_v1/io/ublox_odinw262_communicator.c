@@ -33,8 +33,8 @@ static char g_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES];
 static const char* g_ublox_ok_response    = "OK\r\n";
 static const char* g_ublox_error_response = "ERROR\r\n";
 
-volatile uint32_t g_dma_counter_on_uart_idle_line = 0;
-volatile uint32_t g_last_byte_parsed_from_dma_buffer = 0;
+volatile uint32_t g_dma_counter_on_uart_idle_line      = 0;
+volatile uint32_t g_last_byte_parsed_from_dma_buffer   = 0;
 volatile UbloxResponseStatus_t g_ublox_response_status = UBLOX_RESPONSE_UNKOWN;
 
 static osSemaphoreId_t g_dma_receive_semaphore;
@@ -77,7 +77,7 @@ void io_ublox_odinw262_communicator_task(void* arg)
     assert(g_initialized);
     g_last_byte_parsed_from_dma_buffer = 0;
 
-    while(g_ublox_response_status != UBLOX_RESPONSE_OK)
+    while (g_ublox_response_status != UBLOX_RESPONSE_OK)
     {
         TLOG_INFO("Waiting for u-blox to boot up");
         io_ublox_odinw262_communicator_sendATCommand("AT\r");
@@ -92,9 +92,9 @@ void io_ublox_odinw262_communicator_task(void* arg)
         do
         {
             response = io_ublox_odinw262_communicator_sendATCommand("AT\r");
-        } while(response!=NULL);
+        } while (response != NULL);
         TLOG_DEBUG("Response: %s", response);
-        
+
         TLOG_DEBUG("Enable Ethernet Bridge");
         response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
         TLOG_DEBUG("Response: %s", response);
@@ -108,9 +108,10 @@ void io_ublox_odinw262_communicator_task(void* arg)
         TLOG_DEBUG("Response: %s", response);
 
         TLOG_DEBUG("do a wifi scan");
-        response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSCAN=SHAW-E1C430\r");
+        response =
+            io_ublox_odinw262_communicator_sendATCommand("AT+UWSCAN=SHAW-E1C430\r");
         if (response != NULL)
-        TLOG_DEBUG("Response: %s", response);
+            TLOG_DEBUG("Response: %s", response);
     }
 }
 
@@ -160,7 +161,8 @@ void io_ublox_odinw262_communicator_handleIdleLine(bool is_in_interrupt)
     }
 
 finalize_interrupt:
-    if(is_in_interrupt == true){
+    if (is_in_interrupt == true)
+    {
         osSemaphoreRelease(g_dma_receive_semaphore);
     }
 }
@@ -180,24 +182,27 @@ char* io_ublox_odinw262_communicator_sendATCommand(const char* command)
     HAL_UART_Transmit(g_ublox_uart_handle, (uint8_t*)command, (uint16_t)strlen(command),
                       HAL_MAX_DELAY);
 
-    wait_for_ublox_to_respond:
+wait_for_ublox_to_respond:
+{
+    osStatus_t status = osSemaphoreAcquire(g_dma_receive_semaphore,
+                                           UBLOX_RESPONSE_TIMEOUT_S * configTICK_RATE_HZ);
+
+    if (status == osErrorTimeout)
     {
-        osStatus_t status = osSemaphoreAcquire(g_dma_receive_semaphore,
-                                UBLOX_RESPONSE_TIMEOUT_S * configTICK_RATE_HZ);
-
-        if (status == osErrorTimeout)
-        {
-            io_ublox_odinw262_communicator_handleIdleLine(false);
-            TLOG_WARNING("u-blox did not respond in %d seconds to %s", UBLOX_RESPONSE_TIMEOUT_S, command);
-            return NULL;
-        }
+        io_ublox_odinw262_communicator_handleIdleLine(false);
+        TLOG_WARNING("u-blox did not respond in %d seconds to %s",
+                     UBLOX_RESPONSE_TIMEOUT_S, command);
+        return NULL;
     }
+}
 
-    // Invalidate D-cache before reception 
-    // Make sure the address is 32-byte aligned and add 32-bytes to length, in case it overlaps cacheline 
+    // Invalidate D-cache before reception
+    // Make sure the address is 32-byte aligned and add 32-bytes to length, in case it
+    // overlaps cacheline
     // https://community.st.com/s/article/FAQ-DMA-is-not-working-on-STM32H7-devices
     SCB_InvalidateDCache_by_Addr(
-            (uint32_t*)(((uint32_t)g_uart_receive_dma_buffer) & ~(uint32_t)0x1F), RX_BUFFER_LENGTH_BYTES+32);
+        (uint32_t*)(((uint32_t)g_uart_receive_dma_buffer) & ~(uint32_t)0x1F),
+        RX_BUFFER_LENGTH_BYTES + 32);
 
 
     switch (g_ublox_response_status)
@@ -207,9 +212,10 @@ char* io_ublox_odinw262_communicator_sendATCommand(const char* command)
             TLOG_INFO("u-blox response OK");
             if (g_last_byte_parsed_from_dma_buffer < g_dma_counter_on_uart_idle_line)
             {
-                memcpy(g_uart_receive_buffer,
-                       g_uart_receive_dma_buffer + g_last_byte_parsed_from_dma_buffer,
-                       g_dma_counter_on_uart_idle_line - g_last_byte_parsed_from_dma_buffer);
+                memcpy(
+                    g_uart_receive_buffer,
+                    g_uart_receive_dma_buffer + g_last_byte_parsed_from_dma_buffer,
+                    g_dma_counter_on_uart_idle_line - g_last_byte_parsed_from_dma_buffer);
             }
             else
             {
@@ -223,7 +229,8 @@ char* io_ublox_odinw262_communicator_sendATCommand(const char* command)
                        g_uart_receive_dma_buffer, g_dma_counter_on_uart_idle_line);
             }
 
-            TLOG_INFO("GETTING HERE %d, %d", g_dma_counter_on_uart_idle_line, g_last_byte_parsed_from_dma_buffer);
+            TLOG_INFO("GETTING HERE %d, %d", g_dma_counter_on_uart_idle_line,
+                      g_last_byte_parsed_from_dma_buffer);
 
             g_last_byte_parsed_from_dma_buffer = g_dma_counter_on_uart_idle_line;
             g_uart_receive_buffer[g_dma_counter_on_uart_idle_line] = '\0';

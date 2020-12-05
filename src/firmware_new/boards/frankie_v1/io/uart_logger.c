@@ -5,8 +5,8 @@
 #include "firmware_new/boards/frankie_v1/usart.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 
-static char robot_log_buffer[TbotsProto_RobotLog_size];
-static UART_HandleTypeDef* huart;
+static char g_robot_log_buffer[TbotsProto_RobotLog_size];
+static UART_HandleTypeDef* g_uart_handle;
 
 void io_uart_logger_init(UART_HandleTypeDef* uart_handle)
 {
@@ -15,7 +15,9 @@ void io_uart_logger_init(UART_HandleTypeDef* uart_handle)
 
 void io_uart_logger_handle_robot_log(TbotsProto_RobotLog robot_log)
 {
-    const char* log_level;
+    int size = sprintf(g_robot_log_buffer, "%s[%s:%ld]: %s\r\n\033[0m",
+                       io_uart_logger_convertLogLevelEnumToString(robot_log.log_level),
+                       robot_log.file_name, robot_log.line_number, robot_log.log_msg);
 
     if (robot_log.log_level == TbotsProto_LogLevel_DEBUG)
     {

@@ -74,8 +74,8 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:hal",
         ":ublox_odinw262_communicator",
+        "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:lwip",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
@@ -120,11 +120,11 @@ cc_library(
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":gpio_pin",
-        "//shared:constants",
+        "//firmware/app/logger",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:rtos",
         "//firmware_new/boards/frankie_v1:usart",
-        "//firmware/app/logger:logger",
+        "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],

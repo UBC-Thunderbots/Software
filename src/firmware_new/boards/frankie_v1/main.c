@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under Ultimate Liberty license
+ * SLA0044, the "License"; You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ *                             www.st.com/SLA0044
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -32,6 +32,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware/app/logger/logger.h"
+<<<<<<< HEAD
+=======
+#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+>>>>>>> 73ee787b... something hella broken
 #include "firmware_new/boards/frankie_v1/io/uart_logger.h"
 
 /* USER CODE END Includes */
@@ -116,6 +120,8 @@ int main(void)
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
+<<<<<<< HEAD
+=======
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
@@ -127,13 +133,36 @@ int main(void)
   MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
+    //               ---- Initialize App/IO Layer ----
+    //
+    // At this point the UART peripheral should be configured correctly,
+    // so we initialize the logger with a UART robot log handler.
+    //
+    // Logs can been seen through `screen /dev/ttyACM0 115200`
+    io_uart_logger_init(&huart3);
+    app_logger_init(0, &io_uart_logger_handleRobotLog);
+
+    TLOG_INFO("Initializing IO Layer");
+    initIoLayer();
+>>>>>>> 73ee787b... something hella broken
+
+    /* Initialize all configured peripherals */
+    MX_GPIO_Init();
+    MX_DMA_Init();
+    MX_USART3_UART_Init();
+    MX_USB_OTG_FS_PCD_Init();
+    MX_CRC_Init();
+    MX_TIM4_Init();
+    MX_UART4_Init();
+    /* USER CODE BEGIN 2 */
+
     //              ---- Initialize App/IO Layers ----
     //
     // At this point the UART peripheral should be configured correctly
     // so we initialize the UART logger here so that we can see logs
     // from the initialization functions without having to be connected to a network
     io_uart_logger_init(&huart3);
-    app_logger_init(0, &io_uart_logger_handle_robot_log);
+    app_logger_init(0, &io_uart_logger_handleRobotLog);
 
     TLOG_DEBUG("Initializing I/O Layer");
     initIoLayer();

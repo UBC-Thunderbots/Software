@@ -1,8 +1,9 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include "firmware_new/boards/frankie_v1/io/gpio_pin.h"
 #include "firmware_new/boards/frankie_v1/usart.h"
-#include <stdbool.h>
 
 /**
  *

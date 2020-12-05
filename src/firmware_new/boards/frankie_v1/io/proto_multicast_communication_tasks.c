@@ -4,7 +4,6 @@
 
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/ublox_odinw262_communicator.h"
-#include "main.h"
 #include "lwip.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
@@ -15,6 +14,7 @@
 #include "lwip/sys.h"
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
+#include "main.h"
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
