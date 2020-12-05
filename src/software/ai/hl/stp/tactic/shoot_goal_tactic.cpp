@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 
+#include "software/ai/ball_interception/ball_interception_generator.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/intercept.h"
-#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/rectangle.h"
@@ -138,7 +138,6 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
-    auto intercept_action = std::make_shared<InterceptBallAction>(field, ball);
     std::optional<Shot> shot_target;
     do
     {
@@ -167,8 +166,11 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         }
         else
         {
-            intercept_action->updateControlParams(*robot);
-            yield(intercept_action);
+            move_action->updateControlParams(
+                *robot, generateBallInterceptionPoint(field, ball, *robot),
+                (-ball.velocity()).orientation(), 0.0, DribblerEnable::ON,
+                MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID);
+            yield(move_action);
         }
     } while (!(kick_action->done() || chip_action->done()));
 }

@@ -191,6 +191,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//software/ai/ball_interception:ball_interception_generator",
         "//software/ai/hl/stp/action:intercept_ball_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
@@ -344,6 +345,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//software/ai/ball_interception:ball_interception_generator",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:intercept_ball_action",

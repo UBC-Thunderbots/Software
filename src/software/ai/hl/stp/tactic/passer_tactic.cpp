@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 
 #include "shared/constants.h"
+#include "software/ai/ball_interception/ball_interception_generator.h"
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
@@ -39,23 +40,22 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
 
 void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
+    auto move_action = std::make_shared<MoveAction>(
+        true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
     // If the ball is moving, we are likely already in a live game scenario and
     // so we need to collect the ball before we can pass. If the ball is not moving,
     // we are likely in a set play and so we don't need to initially collect the ball
-    if (ball.velocity().length() > INTERCEPT_BALL_SPEED_THRESHOLD)
+    while (ball.velocity().length() > INTERCEPT_BALL_SPEED_THRESHOLD)
     {
-        auto intercept_action = std::make_shared<InterceptBallAction>(field, ball);
-        do
-        {
-            intercept_action->updateControlParams(*robot);
-            yield(intercept_action);
-        } while (!intercept_action->done());
+        move_action->updateControlParams(
+            *robot, generateBallInterceptionPoint(field, ball, *robot),
+            (-ball.velocity()).orientation(), 0.0, DribblerEnable::ON, MoveType::NORMAL,
+            AutochickType::NONE, BallCollisionType::AVOID);
+        yield(move_action);
     }
 
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass
-    auto move_action = std::make_shared<MoveAction>(
-        true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
     while (ball.timestamp() < pass.startTime())
     {
         // We want to wait just behind where the pass is supposed to start, so that the
