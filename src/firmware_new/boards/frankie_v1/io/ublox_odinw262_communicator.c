@@ -21,13 +21,13 @@
 
 typedef enum
 {
-    UBLOX_RESPONSE_UNKOWN  = 0,  // The state is unkown, and yet to be determined
-    UBLOX_RESPONSE_INVALID = 1,  // An invalid sequence of characters was detected
+    UBLOX_RESPONSE_UNDETERMINED  = 0,  // The state is unkown, and yet to be determined
+    UBLOX_RESPONSE_INCOMPLETE = 1,  // An incomlete transmission was detected
     UBLOX_RESPONSE_OK      = 2,  // OK\r\n was returned at the end of the response
     UBLOX_RESPONSE_ERROR   = 3,  // ERROR\r\n was returned at the end of the response
 } UbloxResponseStatus_t;
 
-DMA_BUFFER static uint8_t g_uart_receive_dma_buffer[RX_BUFFER_LENGTH_BYTES] = {0};
+DMA_BUFFER static uint8_t g_dma_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES] = {0};
 static char g_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES];
 
 static const char* g_ublox_ok_response    = "OK\r\n";
@@ -35,7 +35,7 @@ static const char* g_ublox_error_response = "ERROR\r\n";
 
 volatile uint32_t g_dma_counter_on_uart_idle_line      = 0;
 volatile uint32_t g_last_byte_parsed_from_dma_buffer   = 0;
-volatile UbloxResponseStatus_t g_ublox_response_status = UBLOX_RESPONSE_UNKOWN;
+volatile UbloxResponseStatus_t g_ublox_response_status = UBLOX_RESPONSE_UNDETERMINED;
 
 static osSemaphoreId_t g_dma_receive_semaphore;
 static UART_HandleTypeDef* g_ublox_uart_handle;
@@ -63,7 +63,7 @@ void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
 
     // Setup DMA transfer to continually receive data over UART as the DMA
     // controller is setup in circular mode for rx/tx
-    if (HAL_UART_Receive_DMA(g_ublox_uart_handle, g_uart_receive_dma_buffer,
+    if (HAL_UART_Receive_DMA(g_ublox_uart_handle, g_dma_uart_receive_buffer,
                              RX_BUFFER_LENGTH_BYTES) != HAL_OK)
     {
         TLOG_FATAL("Failed to setup UART DMA Receive Transfer");
@@ -117,45 +117,86 @@ void io_ublox_odinw262_communicator_task(void* arg)
 
 void io_ublox_odinw262_communicator_handleIdleLine(bool is_in_interrupt)
 {
-    g_dma_counter_on_uart_idle_line =
-        RX_BUFFER_LENGTH_BYTES - __HAL_DMA_GET_COUNTER(g_ublox_uart_handle->hdmarx);
+    // This function is desgined to run inside an interrupt routine, triggered when there
+    // is an idle line on the g_ublox_uart_handle peripheral. The DMA receive buffer is configured
+    // in circular mode.
+    // 
+    // To learn more about UART + DMA + Idle Line Detection, visit this link:
+    // https://stm32f4-discovery.net/2017/07/stm32-tutorial-efficiently-receive-uart-data-using-dma/
+    //
+    // This function is supposed to be _fast_ and its only purpose is to figure out if the u-blox
+    // finished transmission by checking for either an ERROR\r\n or an OK\r\n when the IDLE_LINE interrupt
+    // is triggered, set the g_ublox_response_status and exit.
+    //
+    //  g_dma_uart_receive_buffer              start_pos_response_ok    RX_BUFFER_LENGTH_BYTES
+    //                                                                                      
+    //               │                                   │                        │         
+    //               │                                   │                        │         
+    //            ┌──▼───────────────────────────────────▼────────────────────────▼──┐      
+    //            │ ┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐             ┌─┐ │      
+    //            │ │A││T││R││N││O││K││R││N││A││T││R││N││O││K││R││N│ ──────────▶ │?│ │      
+    //            │ └─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘             └─┘ │      
+    //            └─────────────────────────────▲─────────────────▲──────────────────┘      
+    //                                          │                 │                         
+    //                                          │                 │                         
+    //                                                            │                         
+    //                              start_pos_response_error      │                         
+    //                                                                                      
+    //                                             g_dma_counter_on_uart_idle_line          
+    //
+    //  Since we will be sending valid AT commands, we first compute the position of where the
+    //  g_ublox_ok_response would start and store it in start_pos_response_ok. We then compare
+    //  the characters starting from start_pos_response_ok in the g_dma_uart_receive_buffer and check 
+    //  if they match g_ublox_ok_response. If they match, we set the g_ublox_response_status to
+    //  UBLOX_RESPONSE_OK and post the g_dma_receive_semaphore.
+    //
+    //  If g_ublox_ok_response does not match, we repeat the same steps with g_ublox_error_response.
+    //
+    //  If g_ublox_error_response does not match, the UART_IT_IDLE must have triggered prematurely.
+    //  We set the g_ublox_response_status to UBLOX_RESPONSE_INCOMPLETE and post the sempahore.
+    //
+    g_ublox_response_status = UBLOX_RESPONSE_UNDETERMINED;
 
-    g_ublox_response_status = UBLOX_RESPONSE_UNKOWN;
-    int start_pos           = (RX_BUFFER_LENGTH_BYTES + g_dma_counter_on_uart_idle_line -
+    // __HAL_DMA_GET_COUNTER returns how many bytes are left in the buffer for transfer, we subtract
+    // the length of the buffer to get the current counter
+    g_dma_counter_on_uart_idle_line = RX_BUFFER_LENGTH_BYTES - __HAL_DMA_GET_COUNTER(g_ublox_uart_handle->hdmarx);
+
+    int start_pos_response_ok           = (RX_BUFFER_LENGTH_BYTES + g_dma_counter_on_uart_idle_line -
                      UBLOX_OK_RESPONSE_LENGTH_BYTES) %
                     RX_BUFFER_LENGTH_BYTES;
 
     for (int k = 0; k < UBLOX_OK_RESPONSE_LENGTH_BYTES; k++)
     {
         if (g_ublox_ok_response[k] !=
-            g_uart_receive_dma_buffer[(start_pos + k) % RX_BUFFER_LENGTH_BYTES])
+            g_dma_uart_receive_buffer[(start_pos_response_ok + k) % RX_BUFFER_LENGTH_BYTES])
         {
-            g_ublox_response_status = UBLOX_RESPONSE_INVALID;
+            g_ublox_response_status = UBLOX_RESPONSE_INCOMPLETE;
             break;
         }
     }
 
-    if (g_ublox_response_status == UBLOX_RESPONSE_UNKOWN)
+    if (g_ublox_response_status == UBLOX_RESPONSE_UNDETERMINED)
     {
         g_ublox_response_status = UBLOX_RESPONSE_OK;
         goto finalize_interrupt;
     }
 
-    g_ublox_response_status = UBLOX_RESPONSE_UNKOWN;
-    start_pos               = (RX_BUFFER_LENGTH_BYTES + g_dma_counter_on_uart_idle_line -
+    g_ublox_response_status = UBLOX_RESPONSE_UNDETERMINED;
+
+    int start_pos_response_error      = (RX_BUFFER_LENGTH_BYTES + g_dma_counter_on_uart_idle_line -
                  UBLOX_ERROR_RESPONSE_LENGTH_BYTES) %
                 RX_BUFFER_LENGTH_BYTES;
     for (int k = 0; k < UBLOX_ERROR_RESPONSE_LENGTH_BYTES; k++)
     {
         if (g_ublox_error_response[k] !=
-            g_uart_receive_dma_buffer[(start_pos + k) % RX_BUFFER_LENGTH_BYTES])
+            g_dma_uart_receive_buffer[(start_pos + k) % RX_BUFFER_LENGTH_BYTES])
         {
-            g_ublox_response_status = UBLOX_RESPONSE_INVALID;
+            g_ublox_response_status = UBLOX_RESPONSE_INCOMPLETE;
             break;
         }
     }
 
-    if (g_ublox_response_status == UBLOX_RESPONSE_UNKOWN)
+    if (g_ublox_response_status == UBLOX_RESPONSE_UNDETERMINED)
     {
         g_ublox_response_status = UBLOX_RESPONSE_ERROR;
     }
@@ -201,7 +242,7 @@ wait_for_ublox_to_respond:
     // overlaps cacheline
     // https://community.st.com/s/article/FAQ-DMA-is-not-working-on-STM32H7-devices
     SCB_InvalidateDCache_by_Addr(
-        (uint32_t*)(((uint32_t)g_uart_receive_dma_buffer) & ~(uint32_t)0x1F),
+        (uint32_t*)(((uint32_t)g_dma_uart_receive_buffer) & ~(uint32_t)0x1F),
         RX_BUFFER_LENGTH_BYTES + 32);
 
 
@@ -214,19 +255,19 @@ wait_for_ublox_to_respond:
             {
                 memcpy(
                     g_uart_receive_buffer,
-                    g_uart_receive_dma_buffer + g_last_byte_parsed_from_dma_buffer,
+                    g_dma_uart_receive_buffer + g_last_byte_parsed_from_dma_buffer,
                     g_dma_counter_on_uart_idle_line - g_last_byte_parsed_from_dma_buffer);
             }
             else
             {
                 TLOG_INFO("IN ROW LOGIX");
                 memcpy(g_uart_receive_buffer,
-                       g_uart_receive_dma_buffer + g_last_byte_parsed_from_dma_buffer,
+                       g_dma_uart_receive_buffer + g_last_byte_parsed_from_dma_buffer,
                        RX_BUFFER_LENGTH_BYTES - g_last_byte_parsed_from_dma_buffer);
 
                 memcpy(g_uart_receive_buffer +
                            (RX_BUFFER_LENGTH_BYTES - g_last_byte_parsed_from_dma_buffer),
-                       g_uart_receive_dma_buffer, g_dma_counter_on_uart_idle_line);
+                       g_dma_uart_receive_buffer, g_dma_counter_on_uart_idle_line);
             }
 
             TLOG_INFO("GETTING HERE %d, %d", g_dma_counter_on_uart_idle_line,
@@ -241,12 +282,12 @@ wait_for_ublox_to_respond:
             TLOG_INFO("u-blox response ERROR");
             return NULL;
         }
-        case UBLOX_RESPONSE_INVALID:
+        case UBLOX_RESPONSE_INCOMPLETE:
         {
-            // A UBLOX_RESPONSE_INVALID indicates that there was a blip in the UART
+            // A UBLOX_RESPONSE_INCOMPLETE indicates that there was a blip in the UART
             // msgs that was being received, triggering an idle line part way through
             // the transmission. We go back to waiting for the rest of the data.
-            TLOG_DEBUG("u-blox invalid response");
+            TLOG_DEBUG("u-blox incomplete response");
             goto wait_for_ublox_to_respond;
         }
         case UBLOX_RESPONSE_UNKOWN:
