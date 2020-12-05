@@ -395,6 +395,19 @@ TEST(ContainsTest, test_ray_contains_ray_start)
     EXPECT_TRUE(contains(ray, ray.getStart()));
 }
 
+TEST(ContainsTest, test_ray_contains_point_within_fp_error)
+{
+    Ray ray1(Point(-3.6996445312500001, 0.36075723266601561),
+             Angle::fromRadians(0.59244686852568906));
+    Point p1(-3.3649999999999998, 0.58600823341148167);
+    EXPECT_TRUE(contains(ray1, p1));
+
+    Ray ray2(Point(-4.0008916015625005, -0.80003082275390625),
+             Angle::fromRadians(-1.0100013270136343));
+    Point p2(-3.7905116725681518, -1.135);
+    EXPECT_TRUE(contains(ray2, p2));
+}
+
 TEST(ContainsTest, test_segment_contains_point_no_x_deviation)
 {
     Segment segment = Segment(Point(0, 0), Point(0, 1));
