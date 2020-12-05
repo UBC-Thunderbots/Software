@@ -218,7 +218,7 @@ std::shared_ptr<Action> GoalieTactic::panicAndStopBall(
 std::shared_ptr<Action> GoalieTactic::chipBallIfSafe(
     std::shared_ptr<ChipAction> chip_action, std::shared_ptr<StopAction> stop_action)
 {
-    // if the ball is in the don't chip rectangle we do not chip the ball
+    // if the ball is in the "don't chip rectangle" we do not chip the ball
     // as we risk bumping the ball into our own net trying to move behind
     // the ball
     auto dont_chip_rectangle =
@@ -226,8 +226,8 @@ std::shared_ptr<Action> GoalieTactic::chipBallIfSafe(
                   field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
 
     // if the ball is slow but its not safe to chip it out, don't.
-    // TODO finesse the ball out of the goal using the dribbler.
-    // for now we just stop https://github.com/UBC-Thunderbots/Software/issues/744
+    // TODO (#744) finesse the ball out of the goal using the dribbler.
+    // for now we just stop
     if (contains(dont_chip_rectangle, ball.position()) == true)
     {
         stop_action->updateControlParams(*robot, false);
