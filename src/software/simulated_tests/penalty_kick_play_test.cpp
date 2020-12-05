@@ -14,16 +14,16 @@ class PenaltyKickPlayTest : public SimulatedTestFixture
 
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_play)
 {
-    setBallState(BallState(field().penaltyFriendly(), Vector(0, 0)));
+    setBallState(BallState(field().penaltyEnemy(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(4.6, -3.1)}));
+        {Point(-2, -2), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
+         Point(2, -3.1)}));
     setFriendlyGoalie(0);
     addEnemyRobots(
         TestUtil::createStationaryRobotStatesWithId({field().enemyGoalCenter()}));
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickPlay));
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_US);
+    setRefereeCommand(RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::NORMAL_START);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
@@ -31,7 +31,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_play)
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(29.5))
             {
                 yield();
             }
@@ -39,6 +39,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_play)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
+    enableVisualizer();
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(30));
 }

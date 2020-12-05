@@ -209,8 +209,10 @@ cc_library(
         "//software/ai/hl/stp/tactic:move_tactic",
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
         "//software/ai/hl/stp/tactic:penalty_setup_tactic",
+	"//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
+	"@boost//:iostreams",
     ],
     alwayslink = True,
 )
