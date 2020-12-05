@@ -24,7 +24,6 @@ class ActionWorldParamsUpdateVisitor : public MutableActionVisitor
      * Visit and update the world parameters for a given action
      */
     void visit(ChipAction& action) override;
-    void visit(InterceptBallAction& action) override;
     void visit(KickAction& action) override;
     void visit(MoveAction& action) override;
     void visit(SpinningMoveAction& action) override;

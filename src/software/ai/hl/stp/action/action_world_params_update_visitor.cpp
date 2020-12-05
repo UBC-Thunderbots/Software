@@ -10,11 +10,6 @@ void ActionWorldParamsUpdateVisitor::visit(ChipAction& action)
     action.updateWorldParams(world.ball());
 }
 
-void ActionWorldParamsUpdateVisitor::visit(InterceptBallAction& action)
-{
-    action.updateWorldParams(world.field(), world.ball());
-}
-
 void ActionWorldParamsUpdateVisitor::visit(KickAction& action)
 {
     action.updateWorldParams(world.ball());

@@ -6,7 +6,6 @@
 // action.h. Note: every subclass of this visitor must include all of the classes listed
 // below
 class ChipAction;
-class InterceptBallAction;
 class KickAction;
 class MoveAction;
 class SpinningMoveAction;
@@ -28,10 +27,9 @@ class MutableActionVisitor
      * @param action The action to visit
      */
 
-    virtual void visit(ChipAction& action)          = 0;
-    virtual void visit(InterceptBallAction& action) = 0;
-    virtual void visit(KickAction& action)          = 0;
-    virtual void visit(MoveAction& action)          = 0;
-    virtual void visit(SpinningMoveAction& action)  = 0;
-    virtual void visit(StopAction& action)          = 0;
+    virtual void visit(ChipAction& action)         = 0;
+    virtual void visit(KickAction& action)         = 0;
+    virtual void visit(MoveAction& action)         = 0;
+    virtual void visit(SpinningMoveAction& action) = 0;
+    virtual void visit(StopAction& action)         = 0;
 };

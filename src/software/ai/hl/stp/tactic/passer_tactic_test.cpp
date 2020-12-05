@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
@@ -180,12 +179,10 @@ TEST(PasserTacticTest, kick_pass_started_with_moving_ball)
 
     tactic.updateRobot(robot);
 
-    // Initially try intercept the ball to make sure we have control
-    auto intercept_action =
-        std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
-    ASSERT_TRUE(intercept_action);
-    EXPECT_TRUE(intercept_action->getRobot().has_value());
-    EXPECT_EQ(13, intercept_action->getRobot()->id());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_TRUE(move_action);
+    EXPECT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
 }
 
 TEST(PasserTacticTest, kick_pass_not_yet_started_with_moving_ball)
@@ -205,10 +202,8 @@ TEST(PasserTacticTest, kick_pass_not_yet_started_with_moving_ball)
 
     tactic.updateRobot(robot);
 
-    // Initially try intercept the ball to make sure we have control
-    auto intercept_action =
-        std::dynamic_pointer_cast<InterceptBallAction>(tactic.getNextAction());
-    ASSERT_TRUE(intercept_action);
-    EXPECT_TRUE(intercept_action->getRobot().has_value());
-    EXPECT_EQ(13, intercept_action->getRobot()->id());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
+    ASSERT_TRUE(move_action);
+    EXPECT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(13, move_action->getRobot()->id());
 }

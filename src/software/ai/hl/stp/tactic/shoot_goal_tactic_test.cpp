@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/hl/stp/action/chip_action.h"
-#include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
@@ -85,7 +84,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     EXPECT_EQ(0, kick_action->getRobot()->id());
 
     // The net is now entirely blocked (but the enemy robot is not quite yet in danger of
-    // taking the ball), so the friendly robot just tries to intercept
+    // taking the ball), so the friendly robot just tries to move
     world = ::TestUtil::setEnemyRobotPositions(world, {Point(0.7, 0)},
                                                Timestamp::fromSeconds(0));
     tactic.updateRobot(robot);
@@ -98,13 +97,13 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     EXPECT_FALSE(tactic.done());
     EXPECT_FALSE(tactic.hasShotAvailable());
 
-    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(action_ptr);
-    ASSERT_NE(nullptr, intercept_action);
-    ASSERT_TRUE(intercept_action->getRobot().has_value());
-    EXPECT_EQ(0, intercept_action->getRobot()->id());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(nullptr, move_action);
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(0, move_action->getRobot()->id());
 }
 
-TEST(ShootGoalTacticTest, robot_will_intercept_ball_if_shot_is_blocked)
+TEST(ShootGoalTacticTest, robot_will_move_ball_if_shot_is_blocked)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
@@ -128,10 +127,10 @@ TEST(ShootGoalTacticTest, robot_will_intercept_ball_if_shot_is_blocked)
     EXPECT_FALSE(tactic.done());
     EXPECT_FALSE(tactic.hasShotAvailable());
 
-    auto intercept_action = std::dynamic_pointer_cast<InterceptBallAction>(action_ptr);
-    ASSERT_NE(nullptr, intercept_action);
-    ASSERT_TRUE(intercept_action->getRobot().has_value());
-    EXPECT_EQ(0, intercept_action->getRobot()->id());
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(nullptr, move_action);
+    ASSERT_TRUE(move_action->getRobot().has_value());
+    EXPECT_EQ(0, move_action->getRobot()->id());
 }
 
 TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
