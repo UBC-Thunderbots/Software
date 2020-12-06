@@ -30,6 +30,20 @@ void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
         intent.getDribblerMode(), intent.getAutochickType());
 }
 
+void NavigatingPrimitiveCreator::visit(const AutochipMoveIntent &intent)
+{
+    current_primitive = *createAutochipMovePrimitive(
+        new_destination, new_final_speed, intent.getFinalAngle(),
+        intent.getDribblerMode(), intent.getChipDistance());
+}
+
+void NavigatingPrimitiveCreator::visit(const AutokickMoveIntent &intent)
+{
+    current_primitive = *createAutokickMovePrimitive(
+        new_destination, new_final_speed, intent.getFinalAngle(),
+        intent.getDribblerMode(), intent.getKickSpeed());
+}
+
 std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFinalSpeed(
     double final_speed, Path path,
     const std::vector<ObstaclePtr> &enemy_robot_obstacles) const
