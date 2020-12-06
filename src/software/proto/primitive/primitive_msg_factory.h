@@ -62,7 +62,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  * of the movement
  * @param final_speed The final speed the Robot should have when it reaches
  * its destination at the end of the movement
- * @param dribbler_mode Whether or not to enable the dribbler
+ * @param dribbler_mode The dribbler mode
  * @param autochick A flag indicating if autokick should be enabled while the robot is
  * moving. This will enable the "break-beam" on the robot that will trigger the kicker
  * or chipper to fire as soon as the ball is in front of it

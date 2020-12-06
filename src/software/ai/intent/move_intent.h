@@ -45,9 +45,9 @@ class MoveIntent : public NavigatingIntent
     const AutochickType& getAutochickType() const;
 
     /**
-     * Gets whether or not the dribbler should be enabled while moving
+     * Gets DribblerMode for this move intent
      *
-     * @return whether or not the dribbler should be enabled while moving
+     * @return dribbler mode
      */
     const DribblerMode& getDribblerMode() const;
 
