@@ -132,7 +132,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             // Move into position with the dribbler on
             move_action->updateControlParams(
                 *robot, ball_receive_pos, ball_receive_orientation, 0,
-                DribblerMode::INDEFINITE, AutochickType::NONE, BallCollisionType::ALLOW);
+                DribblerMode::MAX_FORCE, AutochickType::NONE, BallCollisionType::ALLOW);
             yield(move_action);
         }
     }

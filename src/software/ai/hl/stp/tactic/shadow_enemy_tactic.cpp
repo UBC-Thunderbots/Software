@@ -111,7 +111,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 move_action->updateControlParams(
                     *robot, ball.position(),
                     (ball.position() - robot->position()).orientation(), 0,
-                    DribblerMode::INDEFINITE, AutochickType::AUTOCHIP,
+                    DribblerMode::MAX_FORCE, AutochickType::AUTOCHIP,
                     BallCollisionType::AVOID);
                 yield(move_action);
             }

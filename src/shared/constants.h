@@ -66,8 +66,9 @@ const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
 const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 
-// Converts dribbler RPM to a smaller number firmware uses
-const double DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR = 1.0 / 300.0;
+// Dribbler speed in indefinite and max force modes
+const double INDEFINITE_DRIBBLER_SPEED = 1000.0;
+const double MAX_FORCE_DRIBBLER_SPEED  = 16000.0;
 
 const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
 

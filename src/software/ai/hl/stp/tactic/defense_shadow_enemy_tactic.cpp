@@ -95,7 +95,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         {
             move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
-                0, DribblerMode::INDEFINITE, AutochickType::AUTOCHIP,
+                0, DribblerMode::MAX_FORCE, AutochickType::AUTOCHIP,
                 BallCollisionType::AVOID);
             yield(move_action);
         }

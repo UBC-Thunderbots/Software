@@ -163,7 +163,7 @@ TEST(ReceiverTacticTest,
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_EQ(DribblerMode::INDEFINITE, move_action->getDribblerModed());
+    EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerModed());
     EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
 }
 
@@ -208,7 +208,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_EQ(DribblerMode::INDEFINITE, move_action->getDribblerModed());
+    EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerModed());
     EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
 }
 

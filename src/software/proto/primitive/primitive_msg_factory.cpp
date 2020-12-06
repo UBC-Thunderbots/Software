@@ -40,7 +40,7 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    double dribbler_speed_rpm)
+    DribblerMode dribbler_mode)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -56,7 +56,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) = *final_angle_msg;
 
     move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(
-        static_cast<float>(dribbler_speed_rpm));
+        static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
 
     return move_primitive_msg;
 }
@@ -70,33 +70,28 @@ std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
     // planner is integrated in case the arguments for creating createMovePrimitive,
     // createAutochipMovePrimitive, and createAutokickMovePrimitive changes.
 
-    // NOTE: 16000 is rpm set for the old move primitive
     if (autochick == AutochickType::AUTOKICK)
     {
         // The old move primitive hardcoded BALL_MAX_SPEED_METERS_PER_SECOND - 1 as the
         // kick speed
-        return createAutokickMovePrimitive(
-            dest, final_speed, final_angle,
-            dribbler_mode == DribblerMode::INDEFINITE ? 16000 : 0,
-            BALL_MAX_SPEED_METERS_PER_SECOND - 1);
+        return createAutokickMovePrimitive(dest, final_speed, final_angle, dribbler_mode,
+                                           BALL_MAX_SPEED_METERS_PER_SECOND - 1);
     }
     else if (autochick == AutochickType::AUTOCHIP)
     {
         // The old move primitive hardcoded 2 as the chip distance
-        return createAutochipMovePrimitive(
-            dest, final_speed, final_angle,
-            dribbler_mode == DribblerMode::INDEFINITE ? 16000 : 0, 2);
+        return createAutochipMovePrimitive(dest, final_speed, final_angle, dribbler_mode,
+                                           2);
     }
     else
     {
-        return createMovePrimitive(dest, final_speed, final_angle,
-                                   dribbler_mode == DribblerMode::INDEFINITE ? 16000 : 0);
+        return createMovePrimitive(dest, final_speed, final_angle, dribbler_mode);
     }
 }
 
 std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
     const Point &dest, double final_speed_meters_per_second,
-    const AngularVelocity &angular_velocity, double dribbler_speed_rpm)
+    const AngularVelocity &angular_velocity, DribblerMode dribbler_mode)
 {
     auto spinning_move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -113,14 +108,14 @@ std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
         *angular_velocity_msg;
 
     spinning_move_primitive_msg->mutable_spinning_move()->set_dribbler_speed_rpm(
-        static_cast<float>(dribbler_speed_rpm));
+        static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
 
     return spinning_move_primitive_msg;
 }
 
 std::unique_ptr<TbotsProto::Primitive> createAutochipMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    double dribbler_speed_rpm, double chip_distance_meters)
+    DribblerMode dribbler_mode, double chip_distance_meters)
 {
     auto autochip_move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -137,7 +132,7 @@ std::unique_ptr<TbotsProto::Primitive> createAutochipMovePrimitive(
         *final_angle_msg;
 
     autochip_move_primitive_msg->mutable_autochip_move()->set_dribbler_speed_rpm(
-        static_cast<float>(dribbler_speed_rpm));
+        static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
 
     autochip_move_primitive_msg->mutable_autochip_move()->set_chip_distance_meters(
         static_cast<float>(chip_distance_meters));
@@ -147,7 +142,7 @@ std::unique_ptr<TbotsProto::Primitive> createAutochipMovePrimitive(
 
 std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    double dribbler_speed_rpm, double kick_speed_meters_per_second)
+    DribblerMode dribbler_mode, double kick_speed_meters_per_second)
 {
     auto autokick_move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -164,7 +159,7 @@ std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
         *final_angle_msg;
 
     autokick_move_primitive_msg->mutable_autokick_move()->set_dribbler_speed_rpm(
-        static_cast<float>(dribbler_speed_rpm));
+        static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
 
     autokick_move_primitive_msg->mutable_autokick_move()
         ->set_kick_speed_meters_per_second(
@@ -189,4 +184,19 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
     }
 
     return stop_primitive_msg;
+}
+
+double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode)
+{
+    switch (dribbler_mode)
+    {
+        case DribblerMode::INDEFINITE:
+            return INDEFINITE_DRIBBLER_SPEED;
+        case DribblerMode::MAX_FORCE:
+            return MAX_FORCE_DRIBBLER_SPEED;
+        case DribblerMode::OFF:
+            return 0.0;
+        default:
+            return 0.0;
+    }
 }

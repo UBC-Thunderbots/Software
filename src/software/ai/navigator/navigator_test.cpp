@@ -109,8 +109,8 @@ TEST_F(ThetaStarNavigatorTest, convert_spinning_move_intent_to_spinning_move_pri
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive =
-        *createSpinningMovePrimitive(Point(), 1, AngularVelocity::full(), 0);
+    auto expected_primitive = *createSpinningMovePrimitive(
+        Point(), 1, AngularVelocity::full(), DribblerMode::OFF);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }

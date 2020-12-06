@@ -75,10 +75,10 @@ TEST(MoveActionTest, getDribblerModed)
     EXPECT_EQ(DribblerMode::OFF, action.getDribblerModed());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
-                               DribblerMode::INDEFINITE, AutochickType::AUTOCHIP,
+                               DribblerMode::MAX_FORCE, AutochickType::AUTOCHIP,
                                BallCollisionType::AVOID);
 
-    EXPECT_EQ(DribblerMode::INDEFINITE, action.getDribblerModed());
+    EXPECT_EQ(DribblerMode::MAX_FORCE, action.getDribblerModed());
 }
 
 TEST(MoveActionTest, robot_far_from_destination)
@@ -101,7 +101,7 @@ TEST(MoveActionTest, robot_far_from_destination)
     EXPECT_EQ(Point(1, 0), move_intent.getDestination());
     EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
     EXPECT_EQ(1.0, move_intent.getFinalSpeed());
-    EXPECT_FALSE(move_intent.getDribblerMode() == DribblerMode::INDEFINITE);
+    EXPECT_FALSE(move_intent.getDribblerMode() == DribblerMode::MAX_FORCE);
     EXPECT_EQ(move_intent.getAutochickType(), AutochickType::NONE);
 }
 
@@ -215,7 +215,7 @@ TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
     MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
-                               DribblerMode::INDEFINITE, AutochickType::NONE,
+                               DribblerMode::MAX_FORCE, AutochickType::NONE,
                                BallCollisionType::AVOID);
     auto intent_ptr = action.getNextIntent();
 
@@ -228,6 +228,6 @@ TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
     EXPECT_EQ(Point(1, 0), move_intent.getDestination());
     EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
     EXPECT_EQ(1.0, move_intent.getFinalSpeed());
-    EXPECT_TRUE(move_intent.getDribblerMode() == DribblerMode::INDEFINITE);
+    EXPECT_TRUE(move_intent.getDribblerMode() == DribblerMode::MAX_FORCE);
     EXPECT_EQ(move_intent.getAutochickType(), AutochickType::NONE);
 }
