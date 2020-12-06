@@ -36,7 +36,6 @@ class MoveAction : public Action
      * the destination
      * @param final_speed The final speed the robot should have at the destination
      * @param dribbler_mode The dribbler mode
-     * @param slow Whether or not to move slow
      * @param autokick This will enable the "break-beam" on the robot, that will
      * trigger the kicker or chippper to fire as soon as the ball is in front of it
      * @param ball_collision_type how to navigate around the ball

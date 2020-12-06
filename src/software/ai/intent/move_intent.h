@@ -14,7 +14,6 @@ class MoveIntent : public NavigatingIntent
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
      * @param dribbler_mode Dribbler mode
-     * @param slow Whether or not to move slower (1 m/s)
      * @param autokick This will enable the "break-beam" on the robot, that will
      *                        trigger the kicker to fire as soon as the ball is in front
      *                        of it
