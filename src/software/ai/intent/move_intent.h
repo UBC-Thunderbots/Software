@@ -13,7 +13,7 @@ class MoveIntent : public NavigatingIntent
      * @param final_angle The final angle the robot should have at the end of the movement
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
-     * @param enable_dribbler Whether or not to enable the dribbler
+     * @param dribbler_mode Dribbler mode
      * @param slow Whether or not to move slower (1 m/s)
      * @param autokick This will enable the "break-beam" on the robot, that will
      *                        trigger the kicker to fire as soon as the ball is in front
@@ -22,7 +22,7 @@ class MoveIntent : public NavigatingIntent
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
-                        DribblerEnable enable_dribbler, MoveType move_type,
+                        DribblerMode dribbler_mode, MoveType move_type,
                         AutochickType autokick, BallCollisionType ball_collision_type);
 
     MoveIntent() = delete;
@@ -49,7 +49,7 @@ class MoveIntent : public NavigatingIntent
      *
      * @return whether or not the dribbler should be enabled while moving
      */
-    const DribblerEnable& getDribblerEnable() const;
+    const DribblerMode& getDribblerMode() const;
 
     /**
      * Gets whether or not the robot should be moving slow
@@ -79,7 +79,7 @@ class MoveIntent : public NavigatingIntent
 
    private:
     Angle final_angle;
-    DribblerEnable enable_dribbler;
+    DribblerMode dribbler_mode;
     MoveType move_type;
     AutochickType autokick;
 };

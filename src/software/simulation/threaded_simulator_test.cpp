@@ -171,20 +171,20 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
 
     threaded_simulator.setBlueRobotPrimitive(
         1, createNanoPbPrimitive(*createLegacyMovePrimitive(
-               Point(-1, -1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               Point(-1, -1), Angle::zero(), 0.0, DribblerMode::OFF, MoveType::NORMAL,
                AutochickType::NONE)));
     threaded_simulator.setBlueRobotPrimitive(
         2, createNanoPbPrimitive(*createLegacyMovePrimitive(
-               Point(-3, 0), Angle::half(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               Point(-3, 0), Angle::half(), 0.0, DribblerMode::OFF, MoveType::NORMAL,
                AutochickType::NONE)));
 
     threaded_simulator.setYellowRobotPrimitive(
         1, createNanoPbPrimitive(*createLegacyMovePrimitive(
-               Point(1, 1), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               Point(1, 1), Angle::zero(), 0.0, DribblerMode::OFF, MoveType::NORMAL,
                AutochickType::NONE)));
     threaded_simulator.setYellowRobotPrimitive(
         2, createNanoPbPrimitive(*createLegacyMovePrimitive(
-               Point(3, -2), Angle::zero(), 0.0, DribblerEnable::OFF, MoveType::NORMAL,
+               Point(3, -2), Angle::zero(), 0.0, DribblerMode::OFF, MoveType::NORMAL,
                AutochickType::NONE)));
 
     std::this_thread::yield();

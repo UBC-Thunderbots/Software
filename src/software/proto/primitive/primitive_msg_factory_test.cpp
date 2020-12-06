@@ -47,7 +47,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive)
 TEST(PrimitiveFactoryTest, test_create_legacy_move_primitive_no_chick)
 {
     auto move_primitive = createLegacyMovePrimitive(Point(-5, 1), Angle::threeQuarter(),
-                                                    3.0, DribblerEnable::ON,
+                                                    3.0, DribblerMode::INDEFINITE,
                                                     MoveType::SLOW, AutochickType::NONE);
 
     ASSERT_TRUE(move_primitive->has_move());
@@ -64,7 +64,7 @@ TEST(PrimitiveFactoryTest, test_create_legacy_move_primitive_no_chick)
 TEST(PrimitiveFactoryTest, test_create_legacy_move_primitive_kick)
 {
     auto move_primitive = createLegacyMovePrimitive(
-        Point(-5, 1), Angle::threeQuarter(), 3.0, DribblerEnable::ON, MoveType::SLOW,
+        Point(-5, 1), Angle::threeQuarter(), 3.0, DribblerMode::INDEFINITE, MoveType::SLOW,
         AutochickType::AUTOKICK);
 
     ASSERT_TRUE(move_primitive->has_autokick_move());
@@ -86,7 +86,7 @@ TEST(PrimitiveFactoryTest, test_create_legacy_move_primitive_kick)
 TEST(PrimitiveFactoryTest, test_create_legacy_move_primitive_chip)
 {
     auto move_primitive = createLegacyMovePrimitive(
-        Point(5, -1), Angle::threeQuarter(), 3.0, DribblerEnable::ON, MoveType::NORMAL,
+        Point(5, -1), Angle::threeQuarter(), 3.0, DribblerMode::INDEFINITE, MoveType::NORMAL,
         AutochickType::AUTOCHIP);
 
     ASSERT_TRUE(move_primitive->has_autochip_move());

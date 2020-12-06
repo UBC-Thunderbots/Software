@@ -6,7 +6,7 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
       destination(0, 0),
       final_orientation(Angle::zero()),
       final_speed(0.0),
-      enable_dribbler(DribblerEnable::OFF),
+      dribbler_mode(DribblerMode::OFF),
       move_type(MoveType::NORMAL),
       autokick_type(AutochickType::NONE),
       ball_collision_type(BallCollisionType::AVOID),
@@ -17,7 +17,7 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
 
 void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      Angle final_orientation, double final_speed,
-                                     DribblerEnable enable_dribbler, MoveType move_type,
+                                     DribblerMode dribbler_mode, MoveType move_type,
                                      AutochickType autokick,
                                      BallCollisionType ball_collision_type)
 {
@@ -25,7 +25,7 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
     this->destination         = destination;
     this->final_orientation   = final_orientation;
     this->final_speed         = final_speed;
-    this->enable_dribbler     = enable_dribbler;
+    this->dribbler_mode     = dribbler_mode;
     this->move_type           = move_type;
     this->autokick_type       = autokick;
     this->ball_collision_type = ball_collision_type;
@@ -51,9 +51,9 @@ AutochickType MoveAction::getAutochickType()
     return autokick_type;
 }
 
-DribblerEnable MoveAction::getDribblerEnabled()
+DribblerMode MoveAction::getDribblerModed()
 {
-    return enable_dribbler;
+    return dribbler_mode;
 }
 
 void MoveAction::accept(MutableActionVisitor& visitor)
@@ -71,7 +71,7 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     do
     {
         yield(std::make_unique<MoveIntent>(robot->id(), destination, final_orientation,
-                                           final_speed, enable_dribbler, move_type,
+                                           final_speed, dribbler_mode, move_type,
                                            autokick_type, ball_collision_type));
     } while ((robot->position() - destination).length() > close_to_dest_threshold ||
              (robot->orientation().minDiff(final_orientation) >

@@ -36,7 +36,7 @@ void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     do
     {
         move_action->updateControlParams(
-            *robot, destination, final_orientation, final_speed, DribblerEnable::OFF,
+            *robot, destination, final_orientation, final_speed, DribblerMode::OFF,
             MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID);
         yield(move_action);
     } while (!move_action->done());

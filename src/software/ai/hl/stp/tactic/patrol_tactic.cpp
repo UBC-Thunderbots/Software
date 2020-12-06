@@ -68,7 +68,7 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     {
         move_action->updateControlParams(
             *robot, patrol_points.at(patrol_point_index), orientation_at_patrol_points,
-            linear_speed_at_patrol_points, DribblerEnable::OFF, MoveType::NORMAL,
+            linear_speed_at_patrol_points, DribblerMode::OFF, MoveType::NORMAL,
             AutochickType::NONE, BallCollisionType::AVOID);
         if (move_action->done())
         {
@@ -78,7 +78,7 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             move_action->updateControlParams(
                 *robot, patrol_points.at(patrol_point_index),
                 orientation_at_patrol_points, linear_speed_at_patrol_points,
-                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
+                DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::AVOID);
         }
         yield(move_action);

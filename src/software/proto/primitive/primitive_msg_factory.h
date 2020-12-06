@@ -10,7 +10,7 @@ MAKE_ENUM(AutochickType, NONE, AUTOKICK, AUTOCHIP);
 
 MAKE_ENUM(MoveType, NORMAL, SLOW);
 
-MAKE_ENUM(DribblerEnable, OFF, ON);
+MAKE_ENUM(DribblerMode, OFF, INDEFINITE, MAX_FORCE);
 
 /**
  * Create a Chip Primitive Message
@@ -65,7 +65,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  * of the movement
  * @param final_speed The final speed the Robot should have when it reaches
  * its destination at the end of the movement
- * @param enable_dribbler Whether or not to enable the dribbler
+ * @param dribbler_mode Whether or not to enable the dribbler
  * @param slow Whether or not to move at a slower speed (1m/s)
  * @param autochick A flag indicating if autokick should be enabled while the robot is
  * moving. This will enable the "break-beam" on the robot that will trigger the kicker
@@ -75,7 +75,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  */
 std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
     const Point &dest, const Angle &final_angle, double final_speed,
-    DribblerEnable enable_dribbler, MoveType move_type, AutochickType autochick);
+    DribblerMode dribbler_mode, MoveType move_type, AutochickType autochick);
 
 /**
  * Create a Spinning Move Primitive Message

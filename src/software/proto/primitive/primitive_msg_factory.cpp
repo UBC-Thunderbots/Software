@@ -64,7 +64,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 
 std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
     const Point &dest, const Angle &final_angle, double final_speed,
-    DribblerEnable enable_dribbler, MoveType move_type, AutochickType autochick)
+    DribblerMode dribbler_mode, MoveType move_type, AutochickType autochick)
 {
     // TODO (#1638): Remove this and use createMovePrimitive, createAutochipMovePrimitive,
     // or createAutokickMovePrimitive instead. This should be done after trajectory
@@ -78,7 +78,7 @@ std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
         // kick speed
         return createAutokickMovePrimitive(
             dest, final_speed, move_type == MoveType::SLOW, final_angle,
-            enable_dribbler == DribblerEnable::ON ? 16000 : 0,
+            dribbler_mode == DribblerMode::INDEFINITE ? 16000 : 0,
             BALL_MAX_SPEED_METERS_PER_SECOND - 1);
     }
     else if (autochick == AutochickType::AUTOCHIP)
@@ -86,13 +86,13 @@ std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
         // The old move primitive hardcoded 2 as the chip distance
         return createAutochipMovePrimitive(
             dest, final_speed, move_type == MoveType::SLOW, final_angle,
-            enable_dribbler == DribblerEnable::ON ? 16000 : 0, 2);
+            dribbler_mode == DribblerMode::INDEFINITE ? 16000 : 0, 2);
     }
     else
     {
         return createMovePrimitive(dest, final_speed, move_type == MoveType::SLOW,
                                    final_angle,
-                                   enable_dribbler == DribblerEnable::ON ? 16000 : 0);
+                                   dribbler_mode == DribblerMode::INDEFINITE ? 16000 : 0);
     }
 }
 

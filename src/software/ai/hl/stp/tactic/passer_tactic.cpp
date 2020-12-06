@@ -66,7 +66,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         Point wait_position = pass.passerPoint() - ball_offset;
 
         move_action->updateControlParams(*robot, wait_position, pass.passerOrientation(),
-                                         0, DribblerEnable::OFF, MoveType::NORMAL,
+                                         0, DribblerMode::OFF, MoveType::NORMAL,
                                          AutochickType::NONE, BallCollisionType::ALLOW);
         yield(move_action);
     }

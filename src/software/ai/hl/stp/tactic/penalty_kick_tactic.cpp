@@ -166,7 +166,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         {
             approach_ball_move_act->updateControlParams(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
+                DribblerMode::INDEFINITE, MoveType::NORMAL, AutochickType::NONE,
                 BallCollisionType::ALLOW);
             yield(approach_ball_move_act);
         }
@@ -175,7 +175,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             const Point next_shot_position = evaluate_next_position();
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
             rotate_with_ball_move_act->updateControlParams(
-                *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
+                *robot, robot.value().position(), next_angle, 0, DribblerMode::INDEFINITE,
                 MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW);
             yield(rotate_with_ball_move_act);
         }
