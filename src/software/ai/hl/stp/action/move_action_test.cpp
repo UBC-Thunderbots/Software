@@ -62,7 +62,7 @@ TEST(MoveActionTest, getAutochickType)
     EXPECT_EQ(AutochickType::AUTOCHIP, action.getAutochickType());
 }
 
-TEST(MoveActionTest, getDribblerModed)
+TEST(MoveActionTest, getDribblerMode)
 {
     Robot robot       = Robot(13, Point(1, 2), Vector(3, 4), Angle::fromDegrees(5),
                         AngularVelocity::fromDegrees(6), Timestamp::fromSeconds(7));
@@ -72,13 +72,13 @@ TEST(MoveActionTest, getDribblerModed)
                                DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
 
-    EXPECT_EQ(DribblerMode::OFF, action.getDribblerModed());
+    EXPECT_EQ(DribblerMode::OFF, action.getDribblerMode());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
                                DribblerMode::MAX_FORCE, AutochickType::AUTOCHIP,
                                BallCollisionType::AVOID);
 
-    EXPECT_EQ(DribblerMode::MAX_FORCE, action.getDribblerModed());
+    EXPECT_EQ(DribblerMode::MAX_FORCE, action.getDribblerMode());
 }
 
 TEST(MoveActionTest, robot_far_from_destination)

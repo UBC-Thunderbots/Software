@@ -80,7 +80,7 @@ class MoveAction : public Action
      *
      * @return the dribbler mode this move action should operate with
      */
-    DribblerMode getDribblerModed();
+    DribblerMode getDribblerMode();
 
     void accept(MutableActionVisitor& visitor) override;
 

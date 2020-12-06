@@ -48,7 +48,7 @@ AutochickType MoveAction::getAutochickType()
     return autokick_type;
 }
 
-DribblerMode MoveAction::getDribblerModed()
+DribblerMode MoveAction::getDribblerMode()
 {
     return dribbler_mode;
 }
