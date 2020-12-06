@@ -71,8 +71,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation
         move_action->updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
-                                         DribblerMode::OFF, AutochickType::NONE,
-                                         BallCollisionType::ALLOW);
+                                         DribblerMode::OFF, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
@@ -132,7 +131,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             // Move into position with the dribbler on
             move_action->updateControlParams(
                 *robot, ball_receive_pos, ball_receive_orientation, 0,
-                DribblerMode::MAX_FORCE, AutochickType::NONE, BallCollisionType::ALLOW);
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW);
             yield(move_action);
         }
     }

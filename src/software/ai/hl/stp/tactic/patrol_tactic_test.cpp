@@ -29,7 +29,7 @@ class PatrolTacticTest : public testing::Test
             auto expected_action = std::make_shared<MoveAction>(false);
             expected_action->updateControlParams(
                 robot, patrol_points[i], angle, speed_at_patrol_points, DribblerMode::OFF,
-                AutochickType::NONE, BallCollisionType::AVOID);
+                BallCollisionType::AVOID);
             expected_actions.push_back(expected_action);
         }
     }

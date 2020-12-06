@@ -66,19 +66,18 @@ void PatrolTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         std::make_shared<MoveAction>(false, this->at_patrol_point_tolerance, Angle());
     do
     {
-        move_action->updateControlParams(*robot, patrol_points.at(patrol_point_index),
-                                         orientation_at_patrol_points,
-                                         linear_speed_at_patrol_points, DribblerMode::OFF,
-                                         AutochickType::NONE, BallCollisionType::AVOID);
+        move_action->updateControlParams(
+            *robot, patrol_points.at(patrol_point_index), orientation_at_patrol_points,
+            linear_speed_at_patrol_points, DribblerMode::OFF, BallCollisionType::AVOID);
         if (move_action->done())
         {
             move_action->restart();
             patrol_point_index = (patrol_point_index + 1) %
                                  static_cast<unsigned int>(patrol_points.size());
-            move_action->updateControlParams(
-                *robot, patrol_points.at(patrol_point_index),
-                orientation_at_patrol_points, linear_speed_at_patrol_points,
-                DribblerMode::OFF, AutochickType::NONE, BallCollisionType::AVOID);
+            move_action->updateControlParams(*robot, patrol_points.at(patrol_point_index),
+                                             orientation_at_patrol_points,
+                                             linear_speed_at_patrol_points,
+                                             DribblerMode::OFF, BallCollisionType::AVOID);
         }
         yield(move_action);
     } while (true);

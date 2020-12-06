@@ -73,9 +73,9 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             Point position_to_block_pass =
                 enemy_robot.position() +
                 enemy_to_passer_vector.normalize(this->shadow_distance);
-            move_action->updateControlParams(
-                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
-                DribblerMode::OFF, AutochickType::NONE, BallCollisionType::AVOID);
+            move_action->updateControlParams(*robot, position_to_block_pass,
+                                             enemy_to_passer_vector.orientation(), 0,
+                                             DribblerMode::OFF, BallCollisionType::AVOID);
             yield(move_action);
         }
         else
@@ -120,7 +120,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                 move_action->updateControlParams(
                     *robot, position_to_block_shot,
                     enemy_shot_vector.orientation() + Angle::half(), 0, DribblerMode::OFF,
-                    AutochickType::NONE, BallCollisionType::AVOID);
+                    BallCollisionType::AVOID);
                 yield(move_action);
             }
         }
