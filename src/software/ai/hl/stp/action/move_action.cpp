@@ -7,7 +7,6 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
       final_orientation(Angle::zero()),
       final_speed(0.0),
       dribbler_mode(DribblerMode::OFF),
-      move_type(MoveType::NORMAL),
       autokick_type(AutochickType::NONE),
       ball_collision_type(BallCollisionType::AVOID),
       close_to_dest_threshold(close_to_dest_threshold),
@@ -17,16 +16,14 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
 
 void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      Angle final_orientation, double final_speed,
-                                     DribblerMode dribbler_mode, MoveType move_type,
-                                     AutochickType autokick,
+                                     DribblerMode dribbler_mode, AutochickType autokick,
                                      BallCollisionType ball_collision_type)
 {
     this->robot               = robot;
     this->destination         = destination;
     this->final_orientation   = final_orientation;
     this->final_speed         = final_speed;
-    this->dribbler_mode     = dribbler_mode;
-    this->move_type           = move_type;
+    this->dribbler_mode       = dribbler_mode;
     this->autokick_type       = autokick;
     this->ball_collision_type = ball_collision_type;
 }
@@ -71,8 +68,8 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     do
     {
         yield(std::make_unique<MoveIntent>(robot->id(), destination, final_orientation,
-                                           final_speed, dribbler_mode, move_type,
-                                           autokick_type, ball_collision_type));
+                                           final_speed, dribbler_mode, autokick_type,
+                                           ball_collision_type));
     } while ((robot->position() - destination).length() > close_to_dest_threshold ||
              (robot->orientation().minDiff(final_orientation) >
               close_to_orientation_threshold));

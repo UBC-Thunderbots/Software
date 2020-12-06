@@ -22,8 +22,8 @@ class MoveIntent : public NavigatingIntent
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
-                        DribblerMode dribbler_mode, MoveType move_type,
-                        AutochickType autokick, BallCollisionType ball_collision_type);
+                        DribblerMode dribbler_mode, AutochickType autokick,
+                        BallCollisionType ball_collision_type);
 
     MoveIntent() = delete;
 
@@ -52,13 +52,6 @@ class MoveIntent : public NavigatingIntent
     const DribblerMode& getDribblerMode() const;
 
     /**
-     * Gets whether or not the robot should be moving slow
-     *
-     * @return whether or not the robot should be moving slow
-     */
-    const MoveType& getMoveType() const;
-
-    /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
      * their member variables are equal.
      *
@@ -80,6 +73,5 @@ class MoveIntent : public NavigatingIntent
    private:
     Angle final_angle;
     DribblerMode dribbler_mode;
-    MoveType move_type;
     AutochickType autokick;
 };

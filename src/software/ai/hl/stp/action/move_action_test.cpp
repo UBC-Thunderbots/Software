@@ -11,7 +11,7 @@ TEST(MoveActionTest, getDestination)
     MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(11, 12), Angle::quarter(), 1.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
 
     EXPECT_EQ(Point(11, 12), action.getDestination());
@@ -24,7 +24,7 @@ TEST(MoveActionTest, getFinalOrientation)
     MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
 
     EXPECT_EQ(Angle::quarter(), action.getFinalOrientation());
@@ -37,7 +37,7 @@ TEST(MoveActionTest, getFinalSpeed)
     MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
 
     EXPECT_EQ(99, action.getFinalSpeed());
@@ -50,14 +50,14 @@ TEST(MoveActionTest, getAutochickType)
     MoveAction action = MoveAction(false);
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
 
     EXPECT_EQ(AutochickType::NONE, action.getAutochickType());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
-                               DribblerMode::OFF, MoveType::NORMAL,
-                               AutochickType::AUTOCHIP, BallCollisionType::AVOID);
+                               DribblerMode::OFF, AutochickType::AUTOCHIP,
+                               BallCollisionType::AVOID);
 
     EXPECT_EQ(AutochickType::AUTOCHIP, action.getAutochickType());
 }
@@ -69,14 +69,14 @@ TEST(MoveActionTest, getDribblerModed)
     MoveAction action = MoveAction(false);
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
 
     EXPECT_EQ(DribblerMode::OFF, action.getDribblerModed());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 99.0,
-                               DribblerMode::INDEFINITE, MoveType::NORMAL,
-                               AutochickType::AUTOCHIP, BallCollisionType::AVOID);
+                               DribblerMode::INDEFINITE, AutochickType::AUTOCHIP,
+                               BallCollisionType::AVOID);
 
     EXPECT_EQ(DribblerMode::INDEFINITE, action.getDribblerModed());
 }
@@ -88,7 +88,7 @@ TEST(MoveActionTest, robot_far_from_destination)
     MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
     auto intent_ptr = action.getNextIntent();
 
@@ -114,9 +114,8 @@ TEST(MoveActionTest, robot_at_destination)
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
     // done and so will return a null pointer
-    action.updateControlParams(robot, Point(0, 0), Angle::zero(), 0.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
-                               BallCollisionType::AVOID);
+    action.updateControlParams(robot, Point(0, 0), Angle::zero(), 0.0, DribblerMode::OFF,
+                               AutochickType::NONE, BallCollisionType::AVOID);
     action.getNextIntent();
     action.getNextIntent();
 
@@ -131,7 +130,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
 
     // Run the Action several times
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
     for (int i = 0; i < 10; i++)
     {
@@ -152,7 +151,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done_angle_threshol
 
     // Run the Action several times
     action.updateControlParams(robot, Point(0, 0), Angle::quarter(), 1.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
     for (int i = 0; i < 10; i++)
     {
@@ -172,7 +171,7 @@ TEST(MoveActionTest, test_action_finishes_within_orientation_threshold)
 
     // Run the Action several times
     action.updateControlParams(robot, Point(0, 0), Angle::quarter(), 1.0,
-                               DribblerMode::OFF, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::OFF, AutochickType::NONE,
                                BallCollisionType::AVOID);
     for (int i = 0; i < 10; i++)
     {
@@ -192,8 +191,8 @@ TEST(MoveActionTest, robot_far_from_destination_autokick_turned_on)
     MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
-                               DribblerMode::OFF, MoveType::NORMAL,
-                               AutochickType::AUTOKICK, BallCollisionType::AVOID);
+                               DribblerMode::OFF, AutochickType::AUTOKICK,
+                               BallCollisionType::AVOID);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -216,7 +215,7 @@ TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
     MoveAction action = MoveAction(false, 0.05, Angle());
 
     action.updateControlParams(robot, Point(1, 0), Angle::quarter(), 1.0,
-                               DribblerMode::INDEFINITE, MoveType::NORMAL, AutochickType::NONE,
+                               DribblerMode::INDEFINITE, AutochickType::NONE,
                                BallCollisionType::AVOID);
     auto intent_ptr = action.getNextIntent();
 

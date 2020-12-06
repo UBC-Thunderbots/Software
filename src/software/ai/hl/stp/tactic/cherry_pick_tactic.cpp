@@ -35,8 +35,7 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // find (within the target region)
         Pass pass = pass_generator.getBestPassSoFar().pass;
         move_action->updateControlParams(*robot, pass.receiverPoint(),
-                                         pass.receiverOrientation(), 0,
-                                         DribblerMode::OFF, MoveType::NORMAL,
+                                         pass.receiverOrientation(), 0, DribblerMode::OFF,
                                          AutochickType::NONE, BallCollisionType::AVOID);
         yield(move_action);
     } while (true);

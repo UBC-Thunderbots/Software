@@ -23,9 +23,9 @@ void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // different location
     do
     {
-        yield(std::make_unique<MoveIntent>(
-            robot->id(), destination, Angle::zero(), 0.0, DribblerMode::OFF,
-            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID));
+        yield(std::make_unique<MoveIntent>(robot->id(), destination, Angle::zero(), 0.0,
+                                           DribblerMode::OFF, AutochickType::NONE,
+                                           BallCollisionType::AVOID));
     } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }
 

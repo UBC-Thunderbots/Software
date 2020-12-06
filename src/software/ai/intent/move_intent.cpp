@@ -2,12 +2,11 @@
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &destination,
                        const Angle &final_angle, double final_speed,
-                       DribblerMode dribbler_mode, MoveType move_type,
-                       AutochickType autokick, BallCollisionType ball_collision_type)
+                       DribblerMode dribbler_mode, AutochickType autokick,
+                       BallCollisionType ball_collision_type)
     : NavigatingIntent(robot_id, destination, final_speed, ball_collision_type),
       final_angle(final_angle),
       dribbler_mode(dribbler_mode),
-      move_type(move_type),
       autokick(autokick)
 {
 }
@@ -37,17 +36,11 @@ const DribblerMode &MoveIntent::getDribblerMode() const
     return dribbler_mode;
 }
 
-const MoveType &MoveIntent::getMoveType() const
-{
-    return move_type;
-}
-
 bool MoveIntent::operator==(const MoveIntent &other) const
 {
     return NavigatingIntent::operator==(other) &&
            this->final_angle == other.final_angle &&
-           this->dribbler_mode == other.dribbler_mode &&
-           this->move_type == other.move_type && this->autokick == other.autokick;
+           this->dribbler_mode == other.dribbler_mode && this->autokick == other.autokick;
 }
 
 bool MoveIntent::operator!=(const MoveIntent &other) const
