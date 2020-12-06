@@ -23,6 +23,6 @@ void StopAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     do
     {
-        yield(std::make_unique<StopIntent>(robot->id(), coast, 0));
+        yield(std::make_unique<StopIntent>(robot->id(), coast));
     } while (robot->velocity().length() > stopped_speed_threshold);
 }

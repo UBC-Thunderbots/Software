@@ -13,8 +13,6 @@ class MoveIntent : public NavigatingIntent
      * @param final_angle The final angle the robot should have at the end of the movement
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
-     * @param priority The priority of this Intent. A larger number indicates a higher
-     * priority
      * @param enable_dribbler Whether or not to enable the dribbler
      * @param slow Whether or not to move slower (1 m/s)
      * @param autokick This will enable the "break-beam" on the robot, that will
@@ -24,9 +22,8 @@ class MoveIntent : public NavigatingIntent
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
-                        unsigned int priority, DribblerEnable enable_dribbler,
-                        MoveType move_type, AutochickType autokick,
-                        BallCollisionType ball_collision_type);
+                        DribblerEnable enable_dribbler, MoveType move_type,
+                        AutochickType autokick, BallCollisionType ball_collision_type);
 
     MoveIntent() = delete;
 
