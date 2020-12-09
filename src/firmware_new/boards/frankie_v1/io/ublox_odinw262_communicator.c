@@ -189,7 +189,7 @@ void io_ublox_odinw262_communicator_handleIdleLine(bool is_in_interrupt)
     for (int k = 0; k < UBLOX_ERROR_RESPONSE_LENGTH_BYTES; k++)
     {
         if (g_ublox_error_response[k] !=
-            g_dma_uart_receive_buffer[(start_pos + k) % RX_BUFFER_LENGTH_BYTES])
+            g_dma_uart_receive_buffer[(start_pos_response_error + k) % RX_BUFFER_LENGTH_BYTES])
         {
             g_ublox_response_status = UBLOX_RESPONSE_INCOMPLETE;
             break;
@@ -290,7 +290,7 @@ wait_for_ublox_to_respond:
             TLOG_DEBUG("u-blox incomplete response");
             goto wait_for_ublox_to_respond;
         }
-        case UBLOX_RESPONSE_UNKOWN:
+        case UBLOX_RESPONSE_UNDETERMINED:
         {
             TLOG_FATAL("invalid state, handleIdleLineInterrupt failed");
             break;
