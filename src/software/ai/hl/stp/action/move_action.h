@@ -91,8 +91,6 @@ class MoveAction : public Action
      */
     DribblerEnable getDribblerEnabled();
 
-    void accept(MutableActionVisitor& visitor) override;
-
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 

@@ -3,7 +3,6 @@
 #include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 
-#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"

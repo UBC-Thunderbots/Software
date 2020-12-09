@@ -29,11 +29,6 @@ void InterceptBallAction::updateControlParams(const Robot& robot)
     this->robot = robot;
 }
 
-void InterceptBallAction::accept(MutableActionVisitor& visitor)
-{
-    visitor.visit(*this);
-}
-
 void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)
 {
     // Run into the ball until the ball is in the dribbler and the ball's velocity

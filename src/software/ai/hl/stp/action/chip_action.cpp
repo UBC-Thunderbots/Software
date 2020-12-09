@@ -53,11 +53,6 @@ double ChipAction::getChipDistanceMeters()
     return chip_distance_meters;
 }
 
-void ChipAction::accept(MutableActionVisitor& visitor)
-{
-    visitor.visit(*this);
-}
-
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // How large the triangle is that defines the region where the robot is

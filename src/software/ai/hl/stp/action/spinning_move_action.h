@@ -55,8 +55,6 @@ class SpinningMoveAction : public Action
      */
     Point getDestination();
 
-    void accept(MutableActionVisitor& visitor) override;
-
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 

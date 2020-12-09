@@ -33,8 +33,6 @@ class InterceptBallAction : public Action
      */
     void updateControlParams(const Robot& robot);
 
-    void accept(MutableActionVisitor& visitor) override;
-
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 

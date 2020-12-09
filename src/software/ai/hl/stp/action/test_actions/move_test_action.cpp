@@ -1,6 +1,5 @@
 #include "software/ai/hl/stp/action/test_actions/move_test_action.h"
 
-#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/move_intent.h"
 
 MoveTestAction::MoveTestAction(double close_to_dest_threshold, bool loop_forever)

@@ -69,8 +69,6 @@ class KickAction : public Action
      */
     double getKickSpeed();
 
-    void accept(MutableActionVisitor &visitor) override;
-
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 

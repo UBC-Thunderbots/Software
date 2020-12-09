@@ -24,11 +24,6 @@ Point SpinningMoveAction::getDestination()
     return destination;
 }
 
-void SpinningMoveAction::accept(MutableActionVisitor& visitor)
-{
-    visitor.visit(*this);
-}
-
 void SpinningMoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // We use a do-while loop so that we return the Intent at least once. If the robot was

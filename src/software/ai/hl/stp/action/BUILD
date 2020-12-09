@@ -157,7 +157,6 @@ cc_library(
     srcs = ["action.cpp"],
     hdrs = ["action.h"],
     deps = [
-        ":mutable_action_visitor",
         "//software/ai/intent",
         "//software/world:ball",
         "//software/world:robot",
@@ -174,9 +173,4 @@ cc_test(
         "//software/ai/intent:move_intent",
         "@gtest//:gtest_main",
     ],
-)
-
-cc_library(
-    name = "mutable_action_visitor",
-    hdrs = ["mutable_action_visitor.h"],
 )

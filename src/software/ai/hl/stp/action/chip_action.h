@@ -80,8 +80,6 @@ class ChipAction : public Action
      */
     double getChipDistanceMeters();
 
-    void accept(MutableActionVisitor& visitor) override;
-
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 

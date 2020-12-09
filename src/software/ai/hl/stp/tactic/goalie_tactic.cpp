@@ -2,9 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/chip_action.h"
-#include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
