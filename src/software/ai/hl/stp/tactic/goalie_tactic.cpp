@@ -209,9 +209,9 @@ std::shared_ptr<Action> GoalieTactic::panicAndStopBall(
         closestPoint((*robot).position(), Segment(ball.position(), stop_ball_point));
     Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-            move_action->updateControlParams(*robot, goalie_pos, goalie_orientation, 0.0,
-                                             DribblerMode::OFF, AutochickType::AUTOCHIP,
-                                             BallCollisionType::ALLOW);
+    move_action->updateControlParams(*robot, goalie_pos, goalie_orientation, 0.0,
+                                     DribblerMode::OFF, AutochickType::AUTOCHIP,
+                                     BallCollisionType::ALLOW);
     return move_action;
 }
 
@@ -302,10 +302,9 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
     // what should the final goalie speed be, so that the goalie accelerates
     // faster
     auto goalie_final_speed = goalie_tactic_config->GoalieFinalSpeed()->value();
-            move_action->updateControlParams(*robot, goalie_pos, goalie_orientation,
-                                             goalie_final_speed, DribblerMode::OFF,
-                                              AutochickType::AUTOCHIP,
-                                             BallCollisionType::ALLOW);
+    move_action->updateControlParams(*robot, goalie_pos, goalie_orientation,
+                                     goalie_final_speed, DribblerMode::OFF,
+                                     AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
     return move_action;
 }
 
