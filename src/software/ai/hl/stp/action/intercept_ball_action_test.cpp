@@ -15,8 +15,8 @@ TEST(InterceptBallActionTest, intercept_fast_moving_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {-3, 0}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, Vector(2, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallPosition(world, {-3, 0}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, Vector(2, 0), Timestamp::fromSeconds(0));
 
     InterceptBallAction action = InterceptBallAction(world.field(), world.ball());
 
@@ -49,8 +49,8 @@ TEST(InterceptBallActionTest, ball_moving_too_fast_to_intercept_within_field)
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, Vector(-10, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, Vector(-10, 0), Timestamp::fromSeconds(0));
 
     InterceptBallAction action = InterceptBallAction(world.field(), world.ball());
 
@@ -82,8 +82,8 @@ TEST(InterceptBallActionTest, intercept_slow_moving_ball)
     Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, Vector(0.1, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, Vector(0.1, 0), Timestamp::fromSeconds(0));
 
     InterceptBallAction action = InterceptBallAction(world.field(), world.ball());
 

@@ -406,7 +406,7 @@ TEST(EnemyThreatTest, no_enemies_on_field)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
-    world = ::TestUtil::setBallPosition(world,
+    world = world = ::TestUtil::setBallPosition(world,
                                         Point(world.field().friendlyGoalCenter()) +
                                             Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
                                         Timestamp::fromSeconds(0));
@@ -429,7 +429,7 @@ TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
     enemy_team.updateRobots({enemy_robot_0});
     world.updateEnemyTeamState(enemy_team);
 
-    world = ::TestUtil::setBallPosition(world,
+    world = world = ::TestUtil::setBallPosition(world,
                                         Point(world.field().friendlyGoalCenter()) +
                                             Vector(2 - ROBOT_MAX_RADIUS_METERS, 0),
                                         Timestamp::fromSeconds(0));
@@ -506,7 +506,7 @@ TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
     world.updateFriendlyTeamState(friendly_team);
 
     // Put the ball right in front of enemy 1
-    world = ::TestUtil::setBallPosition(
+    world = world = ::TestUtil::setBallPosition(
         world, enemy_robot_1.position() + Vector(-ROBOT_MAX_RADIUS_METERS, 0),
         Timestamp::fromSeconds(0));
 

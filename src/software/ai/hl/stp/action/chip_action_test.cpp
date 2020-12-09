@@ -13,8 +13,8 @@ TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)
     Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+    world = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
                                 Timestamp::fromSeconds(0));
 
     std::shared_ptr<ChipAction> chip_action = std::make_shared<ChipAction>();
@@ -32,8 +32,8 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
     Robot robot(0, Point(-0.3, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+    world = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
                                 Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
@@ -68,8 +68,8 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
     Robot robot(0, Point(-2.4, 2.3), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+    world = ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
                                 Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
@@ -106,8 +106,8 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
                 Timestamp::fromSeconds(0));
 
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {-0.05, -0.2}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+    world = ::TestUtil::setBallPosition(world, {-0.05, -0.2}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
                                 Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
@@ -143,8 +143,8 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
     Robot robot(0, Point(-0.125, 0.25), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+    world = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
                                 Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
@@ -180,8 +180,8 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
     Robot robot(0, Point(-1, 0.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+    world = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
                                 Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
@@ -214,8 +214,8 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
     Robot robot(0, Point(-2, 5), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+    world = ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
                                 Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
@@ -250,8 +250,8 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
     Robot robot(0, Point(0, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {-1, -4}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+    world = ::TestUtil::setBallPosition(world, {-1, -4}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
                                 Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
@@ -285,8 +285,8 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_negative_
     Robot robot(0, Point(0.5, 1), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+    world = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
                                 Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
