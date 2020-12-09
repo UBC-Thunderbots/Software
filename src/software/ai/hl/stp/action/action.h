@@ -73,7 +73,7 @@ class Action
      *
      * @param world The world that will be used to update the action
      */
-    virtual void updateWorldParams(const World &world);
+    virtual void updateWorldParams(const World &world) = 0;
 
     virtual ~Action() = default;
 

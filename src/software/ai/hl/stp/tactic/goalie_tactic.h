@@ -1,10 +1,10 @@
 #pragma once
 
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"

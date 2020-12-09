@@ -28,10 +28,4 @@ void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }
 
-void MoveTestAction::accept(MutableActionVisitor& visitor)
-{
-    // We don't call "visitor.visit" here because this class is just intended
-    // for testing and shouldn't be part of the visitor
-    throw std::logic_error(
-        "accept(MutableActionVisitor) is not implemented for MoveTestAction!");
-}
+void MoveTestAction::updateWorldParams(const World& world) {}
