@@ -13,9 +13,9 @@ TEST(KickActionTest, getKickDirection)
     Robot robot(0, Point(-1, -2), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, {-1, 2}, Timestamp::fromSeconds(0));
-    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallPosition(world, {-1, 2}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -30,9 +30,9 @@ TEST(KickActionTest, getKickOrigin)
     Robot robot(0, Point(-1, -2), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, {-1, 2}, Timestamp::fromSeconds(0));
-    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallPosition(world, {-1, 2}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -47,9 +47,9 @@ TEST(KickActionTest, getKickSpeed)
     Robot robot(0, Point(-1, -2), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, {-1, 2}, Timestamp::fromSeconds(0));
-    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallPosition(world, {-1, 2}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -64,9 +64,9 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
     Robot robot(0, Point(-0.3, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
-    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -103,7 +103,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_positive_y)
     World world = ::TestUtil::createBlankTestingWorld();
     world = ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
     world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -141,7 +141,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_negative_y)
     World world = ::TestUtil::createBlankTestingWorld();
     world = ::TestUtil::setBallPosition(world, {-0.05, -0.2}, Timestamp::fromSeconds(0));
     world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -177,9 +177,9 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_negative_y)
     Robot robot(0, Point(-0.125, 0.25), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
-    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -215,9 +215,9 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_positive_y
     Robot robot(0, Point(-1, 0.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
-    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -252,7 +252,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_positive_y
     World world = ::TestUtil::createBlankTestingWorld();
     world = ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
     world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -286,9 +286,9 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_negative_y
     Robot robot(0, Point(0, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, {-1, -4}, Timestamp::fromSeconds(0));
-    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallPosition(world, {-1, -4}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 
@@ -322,9 +322,9 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_negative_y
     Robot robot(0, Point(0.5, 1), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
     World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
-    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
-                                Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
 
     KickAction action = KickAction();
 

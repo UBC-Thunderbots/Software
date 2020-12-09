@@ -15,7 +15,7 @@ TEST(InterceptBallActionTest, intercept_fast_moving_ball)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, {-3, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallPosition(world, {-3, 0}, Timestamp::fromSeconds(0));
     world = ::TestUtil::setBallVelocity(world, Vector(2, 0), Timestamp::fromSeconds(0));
 
     InterceptBallAction action = InterceptBallAction(world.field(), world.ball());

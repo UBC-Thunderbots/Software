@@ -74,7 +74,7 @@ TEST(TestUtilsTest, set_ball_position_in_world)
     World world = ::TestUtil::createBlankTestingWorld();
 
     world =
-        world = ::TestUtil::setBallPosition(world, Point(-0.2, 3.11), Timestamp::fromSeconds(0));
+        ::TestUtil::setBallPosition(world, Point(-0.2, 3.11), Timestamp::fromSeconds(0));
     EXPECT_EQ(Point(-0.2, 3.11), world.ball().position());
     EXPECT_EQ(Vector(), world.ball().velocity());
 }

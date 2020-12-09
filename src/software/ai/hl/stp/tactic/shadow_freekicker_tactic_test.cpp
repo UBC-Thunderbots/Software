@@ -29,8 +29,10 @@ class ShadowFreekickerTacticTest : public testing::Test
         world = ::TestUtil::setEnemyRobotPositions(world, enemy_robot_positions,
                                                    Timestamp::fromSeconds(0));
 
-        world = ::TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
-        world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+        world =
+            ::TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
+        world =
+            ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
         Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -79,8 +81,10 @@ class ShadowFreekickerTacticTest : public testing::Test
         // set up world, robot, balls
         world = ::TestUtil::createBlankTestingWorld();
 
-        world = ::TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
-        world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+        world =
+            ::TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));
+        world =
+            ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
         Robot friendly_robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
         world.updateFriendlyTeamState(Team({friendly_robot}));
