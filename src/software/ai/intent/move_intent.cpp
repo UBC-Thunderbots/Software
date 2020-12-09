@@ -2,10 +2,9 @@
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &destination,
                        const Angle &final_angle, double final_speed,
-                       unsigned int priority, DribblerEnable enable_dribbler,
-                       MoveType move_type, AutochickType autokick,
-                       BallCollisionType ball_collision_type)
-    : NavigatingIntent(robot_id, priority, destination, final_speed, ball_collision_type),
+                       DribblerEnable enable_dribbler, MoveType move_type,
+                       AutochickType autokick, BallCollisionType ball_collision_type)
+    : NavigatingIntent(robot_id, destination, final_speed, ball_collision_type),
       final_angle(final_angle),
       enable_dribbler(enable_dribbler),
       move_type(move_type),

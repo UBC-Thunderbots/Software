@@ -1,9 +1,9 @@
 #include "software/ai/intent/navigating_intent.h"
 
-NavigatingIntent::NavigatingIntent(unsigned int robot_id, unsigned int priority,
-                                   Point destination, double final_speed,
+NavigatingIntent::NavigatingIntent(unsigned int robot_id, Point destination,
+                                   double final_speed,
                                    BallCollisionType ball_collision_type)
-    : Intent(robot_id, priority),
+    : Intent(robot_id),
       destination(destination),
       final_speed(final_speed),
       ball_collision_type(ball_collision_type)
