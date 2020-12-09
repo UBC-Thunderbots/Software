@@ -20,12 +20,13 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
-#include "task.h"
-#include "main.h"
+
 #include "cmsis_os.h"
+#include "main.h"
+#include "task.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */     
+/* USER CODE BEGIN Includes */
 #include "firmware/app/logger/logger.h"
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
@@ -71,64 +72,53 @@ static TbotsProto_Primitive primitive_msg;
 /* Definitions for NetStartTask */
 osThreadId_t NetStartTaskHandle;
 const osThreadAttr_t NetStartTask_attributes = {
-  .name = "NetStartTask",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
-};
+    .name       = "NetStartTask",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for RobotStatusTask */
 osThreadId_t RobotStatusTaskHandle;
 const osThreadAttr_t RobotStatusTask_attributes = {
-  .name = "RobotStatusTask",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
-};
+    .name       = "RobotStatusTask",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for VisionMsgTask */
 osThreadId_t VisionMsgTaskHandle;
 const osThreadAttr_t VisionMsgTask_attributes = {
-  .name = "VisionMsgTask",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
-};
+    .name       = "VisionMsgTask",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for PrimMsgTask */
 osThreadId_t PrimMsgTaskHandle;
-const osThreadAttr_t PrimMsgTask_attributes = {
-  .name = "PrimMsgTask",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
-};
+const osThreadAttr_t PrimMsgTask_attributes = {.name     = "PrimMsgTask",
+                                               .priority = (osPriority_t)osPriorityNormal,
+                                               .stack_size = 1024 * 4};
 /* Definitions for testMsgUpdate */
 osThreadId_t testMsgUpdateHandle;
 const osThreadAttr_t testMsgUpdate_attributes = {
-  .name = "testMsgUpdate",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
-};
+    .name       = "testMsgUpdate",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for RobotLogMsgSend */
 osThreadId_t RobotLogMsgSendHandle;
 const osThreadAttr_t RobotLogMsgSend_attributes = {
-  .name = "RobotLogMsgSend",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
-};
+    .name       = "RobotLogMsgSend",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for NetworkRobotLog */
 osThreadId_t NetworkRobotLogHandle;
 const osThreadAttr_t NetworkRobotLog_attributes = {
-  .name = "NetworkRobotLog",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
-};
+    .name       = "NetworkRobotLog",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for UbloxOdinTask */
 osThreadId_t UbloxOdinTaskHandle;
 const osThreadAttr_t UbloxOdinTask_attributes = {
-  .name = "UbloxOdinTask",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4
-};
+    .name       = "UbloxOdinTask",
+    .priority   = (osPriority_t)osPriorityNormal,
+    .stack_size = 1024 * 4};
 /* Definitions for RobotLogProtoQ */
 osMessageQueueId_t RobotLogProtoQHandle;
-const osMessageQueueAttr_t RobotLogProtoQ_attributes = {
-  .name = "RobotLogProtoQ"
-};
+const osMessageQueueAttr_t RobotLogProtoQ_attributes = {.name = "RobotLogProtoQ"};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -146,63 +136,78 @@ extern void MX_LWIP_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
-  * @brief  FreeRTOS initialization
-  * @param  None
-  * @retval None
-  */
-void MX_FREERTOS_Init(void) {
-  /* USER CODE BEGIN Init */
+ * @brief  FreeRTOS initialization
+ * @param  None
+ * @retval None
+ */
+void MX_FREERTOS_Init(void)
+{
+    /* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+    /* USER CODE END Init */
 
-  /* USER CODE BEGIN RTOS_MUTEX */
+    /* USER CODE BEGIN RTOS_MUTEX */
     /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
+    /* USER CODE END RTOS_MUTEX */
 
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
+    /* USER CODE BEGIN RTOS_SEMAPHORES */
     /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
+    /* USER CODE END RTOS_SEMAPHORES */
 
-  /* USER CODE BEGIN RTOS_TIMERS */
+    /* USER CODE BEGIN RTOS_TIMERS */
     /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
+    /* USER CODE END RTOS_TIMERS */
 
-  /* Create the queue(s) */
-  /* creation of RobotLogProtoQ */
-  RobotLogProtoQHandle = osMessageQueueNew (16, sizeof(TbotsProto_RobotLog), &RobotLogProtoQ_attributes);
+    /* Create the queue(s) */
+    /* creation of RobotLogProtoQ */
+    RobotLogProtoQHandle =
+        osMessageQueueNew(16, sizeof(TbotsProto_RobotLog), &RobotLogProtoQ_attributes);
 
-  /* USER CODE BEGIN RTOS_QUEUES */
+    /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
+    /* USER CODE END RTOS_QUEUES */
 
-  /* Create the thread(s) */
-  /* creation of NetStartTask */
-  NetStartTaskHandle = osThreadNew(io_proto_multicast_startNetworkingTask, NULL, &NetStartTask_attributes);
+    /* Create the thread(s) */
+    /* creation of NetStartTask */
+    NetStartTaskHandle = osThreadNew(io_proto_multicast_startNetworkingTask, NULL,
+                                     &NetStartTask_attributes);
 
-  /* creation of RobotStatusTask */
-  RobotStatusTaskHandle = osThreadNew(io_proto_multicast_sender_task, (void *)robot_status_msg_sender_profile, &RobotStatusTask_attributes);
+    /* creation of RobotStatusTask */
+    RobotStatusTaskHandle =
+        osThreadNew(io_proto_multicast_sender_task,
+                    (void *)robot_status_msg_sender_profile, &RobotStatusTask_attributes);
 
-  /* creation of VisionMsgTask */
-  VisionMsgTaskHandle = osThreadNew(io_proto_multicast_listener_task, (void *)vision_msg_listener_profile, &VisionMsgTask_attributes);
+    /* creation of VisionMsgTask */
+    VisionMsgTaskHandle =
+        osThreadNew(io_proto_multicast_listener_task, (void *)vision_msg_listener_profile,
+                    &VisionMsgTask_attributes);
 
-  /* creation of PrimMsgTask */
-  PrimMsgTaskHandle = osThreadNew(io_proto_multicast_listener_task, (void *)primitive_msg_listener_profile, &PrimMsgTask_attributes);
+    /* creation of PrimMsgTask */
+    PrimMsgTaskHandle =
+        osThreadNew(io_proto_multicast_listener_task,
+                    (void *)primitive_msg_listener_profile, &PrimMsgTask_attributes);
 
-  /* creation of testMsgUpdate */
-  testMsgUpdateHandle = osThreadNew(test_msg_update, (void *)robot_status_msg_sender_profile, &testMsgUpdate_attributes);
+    /* creation of testMsgUpdate */
+    testMsgUpdateHandle =
+        osThreadNew(test_msg_update, (void *)robot_status_msg_sender_profile,
+                    &testMsgUpdate_attributes);
 
-  /* creation of RobotLogMsgSend */
-  RobotLogMsgSendHandle = osThreadNew(io_proto_multicast_sender_task, (void *)robot_log_msg_sender_profile, &RobotLogMsgSend_attributes);
+    /* creation of RobotLogMsgSend */
+    RobotLogMsgSendHandle =
+        osThreadNew(io_proto_multicast_sender_task, (void *)robot_log_msg_sender_profile,
+                    &RobotLogMsgSend_attributes);
 
-  /* creation of NetworkRobotLog */
-  NetworkRobotLogHandle = osThreadNew(io_network_logger_task, (void*)robot_log_msg_sender_profile, &NetworkRobotLog_attributes);
+    /* creation of NetworkRobotLog */
+    NetworkRobotLogHandle =
+        osThreadNew(io_network_logger_task, (void *)robot_log_msg_sender_profile,
+                    &NetworkRobotLog_attributes);
 
-  /* creation of UbloxOdinTask */
-  UbloxOdinTaskHandle = osThreadNew(io_ublox_odinw262_communicator_task, NULL, &UbloxOdinTask_attributes);
+    /* creation of UbloxOdinTask */
+    UbloxOdinTaskHandle =
+        osThreadNew(io_ublox_odinw262_communicator_task, NULL, &UbloxOdinTask_attributes);
 
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* USER CODE END RTOS_THREADS */
-
+    /* USER CODE BEGIN RTOS_THREADS */
+    /* USER CODE END RTOS_THREADS */
 }
 
 /* USER CODE BEGIN Header_io_proto_multicast_startNetworkingTask */
@@ -214,15 +219,15 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_io_proto_multicast_startNetworkingTask */
 __weak void io_proto_multicast_startNetworkingTask(void *argument)
 {
-  /* init code for LWIP */
-  MX_LWIP_Init();
-  /* USER CODE BEGIN io_proto_multicast_startNetworkingTask */
+    /* init code for LWIP */
+    MX_LWIP_Init();
+    /* USER CODE BEGIN io_proto_multicast_startNetworkingTask */
     /* Infinite loop */
     for (;;)
     {
         osDelay(1);
     }
-  /* USER CODE END io_proto_multicast_startNetworkingTask */
+    /* USER CODE END io_proto_multicast_startNetworkingTask */
 }
 
 /* USER CODE BEGIN Header_test_msg_update */
@@ -234,7 +239,7 @@ __weak void io_proto_multicast_startNetworkingTask(void *argument)
 /* USER CODE END Header_test_msg_update */
 void test_msg_update(void *argument)
 {
-  /* USER CODE BEGIN test_msg_update */
+    /* USER CODE BEGIN test_msg_update */
 
     // TODO https://github.com/UBC-Thunderbots/Software/issues/1519
     // This is a placeholder task to test sending robot status NOT
@@ -256,7 +261,7 @@ void test_msg_update(void *argument)
         // run loop at 100hz
         osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
     }
-  /* USER CODE END test_msg_update */
+    /* USER CODE END test_msg_update */
 }
 
 /* Private application code --------------------------------------------------*/
