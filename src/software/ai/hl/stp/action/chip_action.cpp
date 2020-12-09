@@ -1,12 +1,12 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 
 #include "shared/constants.h"
-#include "software/ai/evaluation/ball.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/polygon.h"
 #include "software/geom/triangle.h"
+#include "software/world/ball.h"
 
 ChipAction::ChipAction() : Action(false), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0))
 {
@@ -121,14 +121,13 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         if (!robot_behind_ball)
         {
             yield(std::make_unique<MoveIntent>(
-                robot->id(), point_behind_ball, chip_direction, 0.0, 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
-                BallCollisionType::ALLOW));
+                robot->id(), point_behind_ball, chip_direction, 0.0, DribblerEnable::OFF,
+                MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
         }
         else
         {
             yield(std::make_unique<ChipIntent>(robot->id(), chip_origin, chip_direction,
-                                               chip_distance_meters, 0));
+                                               chip_distance_meters));
         }
-    } while (!hasBallBeenKicked(ball, chip_direction));
+    } while (!ball.hasBallBeenKicked(chip_direction));
 }

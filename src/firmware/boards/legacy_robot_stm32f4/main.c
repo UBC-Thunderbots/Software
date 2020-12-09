@@ -485,7 +485,7 @@ static void run_normal(void)
         exception_reboot_without_core = false;
     }
 
-    app_logger_init(switches[0U], &io_uart_logger_handle_robot_log);
+    app_logger_init(switches[0U], &io_uart_logger_handleRobotLog);
 
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
