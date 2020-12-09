@@ -70,13 +70,6 @@ class Action
     std::optional<Robot> getRobot();
 
     /**
-     * Accepts a Action Visitor and calls the visit function on itself
-     *
-     * @param visitor A Action Visitor
-     */
-    virtual void accept(MutableActionVisitor &visitor) = 0;
-
-    /**
      * Updates the world parameters for this action
      *
      * @param world The world that will be used to update the action

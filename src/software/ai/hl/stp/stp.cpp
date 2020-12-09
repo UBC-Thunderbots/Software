@@ -89,8 +89,6 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     std::vector<std::unique_ptr<Intent>> intents;
     assignRobotsToTactics(world, current_tactics);
 
-    ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
-
     for (const std::shared_ptr<Tactic>& tactic : current_tactics)
     {
         tactic->updateWorldParams(world);
@@ -100,7 +98,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
         std::unique_ptr<Intent> intent;
         if (action)
         {
-            action->accept(action_world_params_update_visitor);
+            action->updateWorldParams(world);
             intent = action->getNextIntent();
         }
 
