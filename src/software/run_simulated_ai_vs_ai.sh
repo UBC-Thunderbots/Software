@@ -24,7 +24,7 @@ fi
 
 # download SSL GameController if not downloaded already
 wget -nc https://github.com/RoboCup-SSL/ssl-game-controller/releases/download/v2.4.0/ssl-game-controller_v2.4.0_linux_amd64 -O /tmp/ssl-game-controller_v2.4.0_linux_amd64
-chmode +x /tmp/ssl-game-controller_v2.4.0_linux_amd64
+chmod +x /tmp/ssl-game-controller_v2.4.0_linux_amd64
 
 tmux new-session \; \
   set -g mouse on \; \

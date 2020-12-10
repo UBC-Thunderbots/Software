@@ -136,6 +136,6 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
  *
  * @param dribbler_mode The DribblerMode
  *
- * @return the dribbler speed
+ * @return the dribbler speed in RPM
  */
 double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode);
