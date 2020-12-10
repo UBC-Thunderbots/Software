@@ -116,7 +116,7 @@ message Referee
     }
     required Command command = 4;
 
-    // The number of commands issued since startup (mode 2^32).
+    // The number of commands issued since startup (mod 2^32).
     required uint32 command_counter = 5;
 
     // The UNIX timestamp when the command was issued, in microseconds.
