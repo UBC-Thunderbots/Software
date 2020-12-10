@@ -17,11 +17,6 @@ class ChipAction : public Action
      */
     explicit ChipAction();
 
-    /**
-     * Updates the params that can be derived from the world for this action
-     *
-     * @param ball The ball being kicked
-     */
     void updateWorldParams(const World& world) override;
 
     /**

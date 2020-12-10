@@ -19,11 +19,6 @@ class InterceptBallAction : public Action
 
     InterceptBallAction() = delete;
 
-    /**
-     * Updates this action with all the parameters it needs from the world
-     *
-     * @param world The world to update from
-     */
     void updateWorldParams(const World& world) override;
 
     /**

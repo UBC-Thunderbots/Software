@@ -17,11 +17,6 @@ class KickAction : public Action
      */
     explicit KickAction();
 
-    /**
-     * Updates the params that can be derived from the world for this action
-     *
-     * @param ball The world to update from
-     */
     void updateWorldParams(const World &world) override;
 
     /**
