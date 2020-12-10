@@ -124,9 +124,28 @@ cc_library(
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:rtos",
         "//firmware_new/boards/frankie_v1:usart",
+        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator_buffer_handlers",
         "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],
     alwayslink = True,
+)
+
+cc_library(
+    name = "ublox_odinw262_communicator_buffer_handlers",
+    srcs = ["ublox_odinw262_communicator_buffer_handlers.c"],
+    hdrs = ["ublox_odinw262_communicator_buffer_handlers.h"],
+    alwayslink = True,
+)
+
+cc_test(
+    name = "ublox_odinw262_communicator_test",
+    srcs = ["ublox_odinw262_communicator_test.cpp"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator_buffer_handlers",
+        "@gtest//:gtest_main",
+        "@rapidcheck",
+    ],
 )

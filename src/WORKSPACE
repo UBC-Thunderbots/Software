@@ -42,6 +42,13 @@ load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 boost_deps()
 
 new_git_repository(
+    name = "rapidcheck",
+    build_file = "@//external:rapidcheck.BUILD",
+    commit = "7bc7d302191a4f3d0bf005692677126136e02f60",
+    remote = "https://github.com/emil-e/rapidcheck",
+)
+
+new_git_repository(
     name = "eigen",
     build_file = "@//external:eigen.BUILD",
     commit = "21ae2afd4edaa1b69782c67a54182d34efe43f9c",
