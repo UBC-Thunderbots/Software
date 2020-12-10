@@ -9,6 +9,7 @@
 #include "cmsis_os.h"
 #include "firmware/app/logger/logger.h"
 #include "firmware_new/boards/frankie_v1/io/gpio_pin.h"
+#include "firmware_new/boards/frankie_v1/io/ublox_odinw262_communicator_buffer_utils.h"
 #include "firmware_new/boards/frankie_v1/usart.h"
 #include "main.h"
 #include "task.h"
@@ -77,31 +78,33 @@ void io_ublox_odinw262_communicator_task(void* arg)
 
     TLOG_INFO("u-blox detected, sending AT Commands");
 
-    for (;;)
-    {
-        const char* response = NULL;
+    const char* response = NULL;
 
-        TLOG_DEBUG("Enable ethernet Bridge");
-        response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
-        TLOG_DEBUG("Response: %s", response);
-
-        TLOG_DEBUG("what mac addresses are there");
-        response = io_ublox_odinw262_communicator_sendATCommand("AT+UWAPMACADDR\r");
-        TLOG_DEBUG("Response: %s", response);
-
-        TLOG_DEBUG("activate bridge connection");
-        response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
-        TLOG_DEBUG("Response: %s", response);
-
-        TLOG_DEBUG("do a wifi scan");
-        response =
-            io_ublox_odinw262_communicator_sendATCommand("AT+UWSCAN=SHAW-E1C430\r");
-        if (response != NULL)
-            TLOG_DEBUG("Response: %s", response);
+#define SEND_AT_COMMAND(at_command, msg)                                                 \
+    TLOG_DEBUG(msg);                                                                     \
+    response = io_ublox_odinw262_communicator_sendATCommand(at_command);                 \
+    if (response == NULL)                                                                \
+    {                                                                                    \
+        TLOG_FATAL("%s failed", msg);                                                    \
     }
+
+    SEND_AT_COMMAND("AT+UMLA=2,00AAAAAAAA00\r",
+                    "Change the MAC address to match the Robot");
+    SEND_AT_COMMAND("AT&W\r", "Store the config to startup database");
+    SEND_AT_COMMAND("AT+CPWROFF\r", "Reboot the module");
+    SEND_AT_COMMAND("AT+UBRGC=0,1,1,3\r", "Enable the Wi-Fi bridge");
+    SEND_AT_COMMAND("AT+UBRGCA=0,3\r", "Activate the bridge connection");
+    SEND_AT_COMMAND("AT+UETHC=1,0\r", "Use PHY");
+    SEND_AT_COMMAND("AT+UETHCA=3\r", "Activate ethernet connection");
+    SEND_AT_COMMAND("AT+UWSC=0,2,\"SHAW-E1C430\"\r", "Configure Wi-Fi SSID");
+    SEND_AT_COMMAND("AT+UWSC=0,8,\"aksr#1605\"\r", "Configure Wi-Fi PASS");
+    SEND_AT_COMMAND("AT+UWSC=0,5,2\r", "Configure to use WPA2");
+    SEND_AT_COMMAND("AT+UWSCA=0,3\r", "Activate the WiFi connection");
+
+#undef SEND_AT_COMMAND
 }
 
-void io_ublox_odinw262_communicator_handleIdleLine(bool is_in_interrupt)
+void io_ublox_odinw262_communicator_handleIdleLine()
 {
     g_dma_counter_on_uart_idle_line =
         RX_BUFFER_LENGTH_BYTES - __HAL_DMA_GET_COUNTER(g_ublox_uart_handle->hdmarx);
@@ -134,7 +137,9 @@ wait_for_ublox_to_respond:
 
     if (status == osErrorTimeout)
     {
-        io_ublox_odinw262_communicator_handleIdleLine(false);
+        io_ublox_odinw262_communicator_handleIdleLine();
+        status = osSemaphoreAcquire(g_dma_receive_semaphore,
+                                    g_ublox_response_timeout * configTICK_RATE_HZ);
         TLOG_WARNING("u-blox did not respond in %d seconds to %s",
                      g_ublox_response_timeout, command);
         return NULL;
