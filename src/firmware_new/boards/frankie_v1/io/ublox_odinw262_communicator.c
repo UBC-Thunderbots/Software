@@ -81,7 +81,7 @@ void io_ublox_odinw262_communicator_task(void* arg)
     const char* response = NULL;
 
 #define SEND_AT_COMMAND(at_command, msg)                                                 \
-    TLOG_DEBUG(msg);                                                                     \
+    TLOG_INFO(msg);                                                                      \
     response = io_ublox_odinw262_communicator_sendATCommand(at_command);                 \
     if (response == NULL)                                                                \
     {                                                                                    \

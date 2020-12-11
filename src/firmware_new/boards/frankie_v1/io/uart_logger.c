@@ -29,11 +29,11 @@ const char* io_uart_logger_convertLogLevelEnumToString(TbotsProto_LogLevel log_l
     {
         case TbotsProto_LogLevel_DEBUG:
         {
-            return "\033[36m[ DEBUG ]";
+            return "\033[37m[ DEBUG ]";
         }
         case TbotsProto_LogLevel_INFO:
         {
-            return "\033[37m[ INFO  ]";
+            return "\033[36m[ INFO  ]";
         }
         case TbotsProto_LogLevel_WARNING:
         {
