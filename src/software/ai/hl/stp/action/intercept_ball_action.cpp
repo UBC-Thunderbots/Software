@@ -43,7 +43,7 @@ void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)
     {
         auto face_ball_orientation = (ball.position() - robot->position()).orientation();
         yield(std::make_unique<MoveIntent>(
-            robot->id(), ball.position(), face_ball_orientation, 0, 0, DribblerEnable::ON,
+            robot->id(), ball.position(), face_ball_orientation, 0, DribblerEnable::ON,
             MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
 
         // Restart the action if the ball's speed has sped up substantially.
@@ -83,9 +83,8 @@ void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)
         auto face_ball_orientation = (ball.position() - robot->position()).orientation();
 
         yield(std::make_unique<MoveIntent>(
-            robot->id(), robot->position(), face_ball_orientation, 0, 0,
-            DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
-            BallCollisionType::ALLOW));
+            robot->id(), robot->position(), face_ball_orientation, 0, DribblerEnable::ON,
+            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW));
     } while (robot->velocity().length() > ROBOT_STOPPED_SPEED_M_PER_S);
 }
 
@@ -114,7 +113,7 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
     do
     {
         yield(std::make_unique<MoveIntent>(
-            robot->id(), intercept_position, (-ball.velocity()).orientation(), 0, 0,
+            robot->id(), intercept_position, (-ball.velocity()).orientation(), 0,
             DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
             BallCollisionType::AVOID));
 
@@ -141,7 +140,7 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
     do
     {
         yield(std::make_unique<MoveIntent>(
-            robot->id(), intercept_position, (-ball.velocity()).orientation(), 0, 0,
+            robot->id(), intercept_position, (-ball.velocity()).orientation(), 0,
             DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
             BallCollisionType::ALLOW));
 

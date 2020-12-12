@@ -118,7 +118,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
             // If we couldn't get an intent, we send the robot a StopIntent so
             // it doesn't do anything crazy until it starts running a new Tactic
             intents.emplace_back(
-                std::make_unique<StopIntent>(tactic->getAssignedRobot()->id(), false, 0));
+                std::make_unique<StopIntent>(tactic->getAssignedRobot()->id(), false));
         }
         else
         {
