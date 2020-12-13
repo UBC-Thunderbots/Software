@@ -26,11 +26,6 @@ class StopAction : public Action
 
     StopAction() = delete;
 
-    /**
-     * Updates the params that can be derived from the world for this action
-     *
-     * @param ball The world to update from
-     */
     void updateWorldParams(const World& world) override;
 
     void updateControlParams(const Robot& robot, bool coast);
