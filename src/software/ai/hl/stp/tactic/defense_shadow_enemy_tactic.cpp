@@ -95,7 +95,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         {
             move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
-                0, DribblerEnable::ON, MoveType::NORMAL, AutochickType::AUTOCHIP,
+                0, DribblerMode::MAX_FORCE, AutochickType::AUTOCHIP,
                 BallCollisionType::AVOID);
             yield(move_action);
         }
@@ -103,10 +103,9 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         {
             Angle facing_enemy_robot =
                 (enemy_robot.position() - robot->position()).orientation();
-            move_action->updateControlParams(*robot, position_to_block_shot,
-                                             facing_enemy_robot, 0, DribblerEnable::OFF,
-                                             MoveType::NORMAL, AutochickType::AUTOCHIP,
-                                             BallCollisionType::AVOID);
+            move_action->updateControlParams(
+                *robot, position_to_block_shot, facing_enemy_robot, 0, DribblerMode::OFF,
+                AutochickType::AUTOCHIP, BallCollisionType::AVOID);
             yield(move_action);
         }
 

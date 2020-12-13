@@ -27,7 +27,7 @@ void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
 {
     current_primitive = *createLegacyMovePrimitive(
         new_destination, intent.getFinalAngle(), new_final_speed,
-        intent.getDribblerEnable(), intent.getMoveType(), intent.getAutochickType());
+        intent.getDribblerMode(), intent.getAutochickType());
 }
 
 std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFinalSpeed(

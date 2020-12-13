@@ -13,8 +13,7 @@ class MoveIntent : public NavigatingIntent
      * @param final_angle The final angle the robot should have at the end of the movement
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
-     * @param enable_dribbler Whether or not to enable the dribbler
-     * @param slow Whether or not to move slower (1 m/s)
+     * @param dribbler_mode Dribbler mode
      * @param autokick This will enable the "break-beam" on the robot, that will
      *                        trigger the kicker to fire as soon as the ball is in front
      *                        of it
@@ -22,8 +21,8 @@ class MoveIntent : public NavigatingIntent
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
-                        DribblerEnable enable_dribbler, MoveType move_type,
-                        AutochickType autokick, BallCollisionType ball_collision_type);
+                        DribblerMode dribbler_mode, AutochickType autokick,
+                        BallCollisionType ball_collision_type);
 
     MoveIntent() = delete;
 
@@ -45,18 +44,11 @@ class MoveIntent : public NavigatingIntent
     const AutochickType& getAutochickType() const;
 
     /**
-     * Gets whether or not the dribbler should be enabled while moving
+     * Gets DribblerMode for this move intent
      *
-     * @return whether or not the dribbler should be enabled while moving
+     * @return dribbler mode
      */
-    const DribblerEnable& getDribblerEnable() const;
-
-    /**
-     * Gets whether or not the robot should be moving slow
-     *
-     * @return whether or not the robot should be moving slow
-     */
-    const MoveType& getMoveType() const;
+    const DribblerMode& getDribblerMode() const;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
@@ -79,7 +71,6 @@ class MoveIntent : public NavigatingIntent
 
    private:
     Angle final_angle;
-    DribblerEnable enable_dribbler;
-    MoveType move_type;
+    DribblerMode dribbler_mode;
     AutochickType autokick;
 };
