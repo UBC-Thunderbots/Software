@@ -157,7 +157,6 @@ cc_library(
     srcs = ["action.cpp"],
     hdrs = ["action.h"],
     deps = [
-        ":mutable_action_visitor",
         "//software/ai/intent",
         "//software/world:ball",
         "//software/world:robot",
@@ -173,21 +172,5 @@ cc_test(
         "//software/ai/hl/stp/action/test_actions:move_test_action",
         "//software/ai/intent:move_intent",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "mutable_action_visitor",
-    hdrs = ["mutable_action_visitor.h"],
-)
-
-cc_library(
-    name = "action_world_params_update_visitor",
-    srcs = ["action_world_params_update_visitor.cpp"],
-    hdrs = ["action_world_params_update_visitor.h"],
-    deps = [
-        ":all_actions",
-        ":mutable_action_visitor",
-        "//software/world",
     ],
 )

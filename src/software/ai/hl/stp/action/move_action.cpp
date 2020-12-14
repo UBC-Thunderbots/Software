@@ -14,6 +14,8 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
 {
 }
 
+void MoveAction::updateWorldParams(const World& world) {}
+
 void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      Angle final_orientation, double final_speed,
                                      DribblerMode dribbler_mode, AutochickType autokick,
@@ -51,11 +53,6 @@ AutochickType MoveAction::getAutochickType()
 DribblerMode MoveAction::getDribblerMode()
 {
     return dribbler_mode;
-}
-
-void MoveAction::accept(MutableActionVisitor& visitor)
-{
-    visitor.visit(*this);
 }
 
 void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)

@@ -11,9 +11,9 @@ KickAction::KickAction() : Action(false), ball({0, 0}, {0, 0}, Timestamp::fromSe
 {
 }
 
-void KickAction::updateWorldParams(const Ball &ball)
+void KickAction::updateWorldParams(const World &world)
 {
-    this->ball = ball;
+    this->ball = world.ball();
 }
 
 void KickAction::updateControlParams(const Robot &robot, Point kick_origin,
@@ -47,11 +47,6 @@ Point KickAction::getKickOrigin()
 double KickAction::getKickSpeed()
 {
     return kick_speed_meters_per_second;
-}
-
-void KickAction::accept(MutableActionVisitor &visitor)
-{
-    visitor.visit(*this);
 }
 
 void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)

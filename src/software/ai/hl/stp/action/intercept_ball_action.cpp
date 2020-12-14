@@ -18,20 +18,15 @@ InterceptBallAction::InterceptBallAction(const Field& field, const Ball& ball)
 {
 }
 
-void InterceptBallAction::updateWorldParams(const Field& field, const Ball& ball)
+void InterceptBallAction::updateWorldParams(const World& world)
 {
-    this->ball  = ball;
-    this->field = field;
+    this->ball  = world.ball();
+    this->field = world.field();
 }
 
 void InterceptBallAction::updateControlParams(const Robot& robot)
 {
     this->robot = robot;
-}
-
-void InterceptBallAction::accept(MutableActionVisitor& visitor)
-{
-    visitor.visit(*this);
 }
 
 void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)

@@ -7,6 +7,8 @@ SpinningMoveAction::SpinningMoveAction(bool loop_forever, double close_to_dest_t
 {
 }
 
+void SpinningMoveAction::updateWorldParams(const World& world) {}
+
 void SpinningMoveAction::updateControlParams(const Robot& robot, Point destination,
                                              AngularVelocity angular_velocity,
                                              double final_linear_speed)
@@ -20,11 +22,6 @@ void SpinningMoveAction::updateControlParams(const Robot& robot, Point destinati
 Point SpinningMoveAction::getDestination()
 {
     return destination;
-}
-
-void SpinningMoveAction::accept(MutableActionVisitor& visitor)
-{
-    visitor.visit(*this);
 }
 
 void SpinningMoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)

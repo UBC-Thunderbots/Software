@@ -7,7 +7,6 @@
 #include <exception>
 #include <random>
 
-#include "software/ai/hl/stp/action/action_world_params_update_visitor.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
@@ -90,8 +89,6 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     std::vector<std::unique_ptr<Intent>> intents;
     assignRobotsToTactics(world, current_tactics);
 
-    ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
-
     for (const std::shared_ptr<Tactic>& tactic : current_tactics)
     {
         tactic->updateWorldParams(world);
@@ -101,7 +98,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
         std::unique_ptr<Intent> intent;
         if (action)
         {
-            action->accept(action_world_params_update_visitor);
+            action->updateWorldParams(world);
             intent = action->getNextIntent();
         }
 

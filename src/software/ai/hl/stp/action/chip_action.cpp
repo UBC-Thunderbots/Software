@@ -12,9 +12,9 @@ ChipAction::ChipAction() : Action(false), ball({0, 0}, {0, 0}, Timestamp::fromSe
 {
 }
 
-void ChipAction::updateWorldParams(const Ball& ball)
+void ChipAction::updateWorldParams(const World& world)
 {
-    this->ball = ball;
+    this->ball = world.ball();
 }
 
 void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
@@ -51,11 +51,6 @@ Angle ChipAction::getChipDirection()
 double ChipAction::getChipDistanceMeters()
 {
     return chip_distance_meters;
-}
-
-void ChipAction::accept(MutableActionVisitor& visitor)
-{
-    visitor.visit(*this);
 }
 
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)

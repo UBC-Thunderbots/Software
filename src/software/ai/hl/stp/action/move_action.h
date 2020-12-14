@@ -27,6 +27,8 @@ class MoveAction : public Action
 
     MoveAction() = delete;
 
+    void updateWorldParams(const World& world) override;
+
     /**
      * Updates the params that cannot be derived from the world for this action
      *
@@ -81,8 +83,6 @@ class MoveAction : public Action
      * @return the dribbler mode this move action should operate with
      */
     DribblerMode getDribblerMode();
-
-    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
