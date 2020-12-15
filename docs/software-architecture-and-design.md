@@ -101,7 +101,7 @@ The Field class represents the state of the physical field being played on, whic
 These represent the current state of the game as dictated by the Gamecontroller. These provide functions like `isPlaying()`, `isHalted()` which tell the rest of the system what game state we are in, and make decisions accordingly. We need to obey the rules!
 
 ## Intents
-An `Intent` represents a simple thing the [AI](#ai) wants (or intends for) a robot to do, but is at a level that requires knowledge of the state of the game and the field (e.g. Referee state, location of the other robots). It does not represent or include _how_ these things are achieved. Some examples are:
+An `Intent` represents a simplest task that the [AI](#ai) wants (or intends for) a robot to do, but is at a level that requires knowledge of the state of the game and the field (e.g. Referee state, location of the other robots). `Intent`s are stateless, which means that using the same intent in the same state of the world will always result in the same behaviour. It does not represent or include _how_ these things are achieved. Some examples are:
 * Moving to a position without colliding with anything on its way and while following all rules
 * Pivoting around a point
 * Kicking the ball at a certain direction or at a target
@@ -369,16 +369,13 @@ When the [AI](#ai) is given new information and asked to make a decision, our `S
 
 
 ### Skills / Actions
-The `S` in `STP` stands for `Skills`. In our system, we call these `Actions`. Actions represent simple tasks an individual robot can do. Examples include:
-1. Moving to a position (without colliding with anything)
-2. Shooting the ball at a target
-3. Intercepting a moving ball
+The `S` in `STP` stands for `Skills`. In our system, we call these `Actions`. `Action`s are tasks an individual robot can do. They can be simple like moving to a position, or complex like intercepting a ball. `Action`s can take multiple steps to accomplish, so they are _stateful_, calling an `Action` at different times with the same world state might yield different behaviour. `Action`s have a done condition, which allows users to know when the task is done.
 
-Actions use [Intents](#intents) to implement their behaviour. Actions are responsible for obeying any preconditions `Intents` have.
+`Action`s use [Intents](#intents) to implement their behaviour. `Action`s are responsible for obeying any preconditions `Intents` have.
 
-**It seems like Actions and Intents are basically the same thing. Why aren't they combined into a single class?**
+**Why aren't `Action`s and `Intent`s combined into a single class?**
 
-[Actions](#skills--actions) and [Intents](#intents) are not combined because [Actions](#skills--actions) are part of [STP](#strategy) and our strategy logic, while [Intents](#intents) are more part of the [Navigator](#navigation). Combining them would break the abstraction and couple our strategy implementation to the [Navigator](#navigation), removing our flexibility to implement different strategy systems in the future.
+[Actions](#skills--actions) and [Intents](#intents) are not combined because [Actions](#skills--actions) are part of [STP](#strategy) and our strategy logic, while [Intents](#intents) are more part of the [Navigator](#navigation). Combining them would break the abstraction and couple our strategy implementation to the [Navigator](#navigation), removing our flexibility to implement different strategy systems in the future. Additionally, it is easier to reason about navigation using stateless [Intents](#intents), rather than with stateful `Action`s
 
 
 ### Tactics
@@ -389,6 +386,10 @@ The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robots' r
 4. Being a defender that tries to steal the ball from enemies
 
 Tactics use [Actions](#skills--actions) to implement their behaviour. Using the [Action](#skills--actions) abstraction makes it much easier for Tactics to express what they want to do, and make it easier to design and implement behaviour. Tactics can focus more on what things to do, and when to do them, in order to implement more intelligent and adaptable behaviour.
+
+**Why aren't `Tactic`s and `Action`s combined into a single class?**
+
+[Actions](#skills--actions) are a useful abstraction for sharing stateful robot behaviour between `Tactic`s. It's possible to do away with the abstraction, but it would probably decrease code reuse.
 
 ### Plays
 The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like Plays in real-life soccer. Examples include:
