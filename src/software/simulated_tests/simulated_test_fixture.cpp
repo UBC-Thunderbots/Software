@@ -199,6 +199,10 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {
+        if (!DynamicParameters->getAIControlConfig()->RunAI()->value())
+        {
+            continue;
+        }
         auto wall_start_time = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {
@@ -217,23 +221,20 @@ void SimulatedTestFixture::runTest(
                 break;
             }
 
-            if (DynamicParameters->getAIControlConfig()->RunAI()->value())
+            auto primitive_set_msg = ai.getPrimitives(*world);
+            simulator->setYellowRobotPrimitiveSet(
+                createNanoPbPrimitiveSet(*primitive_set_msg));
+
+            if (run_simulation_in_realtime)
             {
-                auto primitive_set_msg = ai.getPrimitives(*world);
-                simulator->setYellowRobotPrimitiveSet(
-                    createNanoPbPrimitiveSet(*primitive_set_msg));
+                sleep(wall_start_time, ai_time_step);
+            }
 
-                if (run_simulation_in_realtime)
-                {
-                    sleep(wall_start_time, ai_time_step);
-                }
-
-                if (full_system_gui)
-                {
-                    full_system_gui->onValueReceived(*world);
-                    full_system_gui->onValueReceived(ai.getPlayInfo());
-                    full_system_gui->onValueReceived(drawNavigator(ai.getNavigator()));
-                }
+            if (full_system_gui)
+            {
+                full_system_gui->onValueReceived(*world);
+                full_system_gui->onValueReceived(ai.getPlayInfo());
+                full_system_gui->onValueReceived(drawNavigator(ai.getNavigator()));
             }
         }
         else
