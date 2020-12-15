@@ -33,8 +33,8 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 
 TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
 {
-    *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORC);
-    *createMovePrimitive(Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE, );
+    *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE);
+    *createMovePrimitive(Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE);
     TbotsProto::Primitive google_primitive_1 =
         *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE);
     TbotsProto::Primitive google_primitive_2 =

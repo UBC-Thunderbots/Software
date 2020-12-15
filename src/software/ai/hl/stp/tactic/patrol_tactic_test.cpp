@@ -67,8 +67,6 @@ class PatrolTacticTest : public testing::Test
         EXPECT_EQ(expected_move_action->getFinalOrientation(),
                   move_action->getFinalOrientation());
         EXPECT_EQ(expected_move_action->getFinalSpeed(), move_action->getFinalSpeed());
-        EXPECT_EQ(expected_move_action->getAutochickType(),
-                  move_action->getAutochickType());
         EXPECT_EQ(expected_move_action->getDribblerMode(),
                   move_action->getDribblerMode());
     }

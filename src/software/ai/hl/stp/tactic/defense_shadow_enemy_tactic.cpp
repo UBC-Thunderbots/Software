@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/autochip_move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/logger/logger.h"
 
@@ -52,8 +52,8 @@ double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
 
 void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>(false);
-    auto stop_action = std::make_shared<StopAction>(true);
+    auto autochip_move_action = std::make_shared<AutochipMoveAction>(false);
+    auto stop_action          = std::make_shared<StopAction>(true);
 
     do
     {
@@ -93,23 +93,23 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
             ball.velocity().length() <
                 defense_shadow_enemy_tactic_config->BallStealSpeed()->value())
         {
-            move_action->updateControlParams(
+            autochip_move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
-                0, DribblerMode::MAX_FORCE, AutochickType::AUTOCHIP,
+                0, DribblerMode::MAX_FORCE, YEET_CHIP_DISTANCE_METERS,
                 BallCollisionType::AVOID);
-            yield(move_action);
+            yield(autochip_move_action);
         }
         else
         {
             Angle facing_enemy_robot =
                 (enemy_robot.position() - robot->position()).orientation();
-            move_action->updateControlParams(
+            autochip_move_action->updateControlParams(
                 *robot, position_to_block_shot, facing_enemy_robot, 0, DribblerMode::OFF,
-                AutochickType::AUTOCHIP, BallCollisionType::AVOID);
-            yield(move_action);
+                YEET_CHIP_DISTANCE_METERS, BallCollisionType::AVOID);
+            yield(autochip_move_action);
         }
 
-    } while (!move_action->done());
+    } while (!autochip_move_action->done());
 }
 
 void DefenseShadowEnemyTactic::accept(TacticVisitor &visitor) const

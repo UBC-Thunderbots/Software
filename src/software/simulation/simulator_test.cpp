@@ -339,8 +339,8 @@ TEST(SimulatorTest, simulate_single_yellow_robot_with_primitive)
     simulator.addYellowRobots(states);
 
     simulator.setYellowRobotPrimitive(
-        1, createNanoPbPrimitive(*createMovePrimitive(
-               Point(1, 0), 0.0,Angle::zero(),  DribblerMode::OFF);
+        1, createNanoPbPrimitive(
+               *createMovePrimitive(Point(1, 0), 0.0, Angle::zero(), DribblerMode::OFF)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
