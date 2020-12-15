@@ -38,13 +38,11 @@ class MoveAction : public Action
      * the destination
      * @param final_speed The final speed the robot should have at the destination
      * @param dribbler_mode The dribbler mode
-     * @param autokick This will enable the "break-beam" on the robot, that will
-     * trigger the kicker or chippper to fire as soon as the ball is in front of it
      * @param ball_collision_type how to navigate around the ball
      */
     void updateControlParams(const Robot& robot, Point destination,
                              Angle final_orientation, double final_speed,
-                             DribblerMode dribbler_mode, AutochickType autokick,
+                             DribblerMode dribbler_mode,
                              BallCollisionType ball_collision_type);
 
     /**
@@ -69,15 +67,6 @@ class MoveAction : public Action
     double getFinalSpeed();
 
     /**
-     * Gets what auto-kick mode this move action should operate with
-     *
-     * (ex. "auto-kick", "auto-chip")
-     *
-     * @return The auto-kick mode this move action should operate with
-     */
-    AutochickType getAutochickType();
-
-    /**
      * Gets the dribbler mode this move action should operate with
      *
      * @return the dribbler mode this move action should operate with
@@ -92,7 +81,6 @@ class MoveAction : public Action
     Angle final_orientation;
     double final_speed;
     DribblerMode dribbler_mode;
-    AutochickType autokick_type;
     BallCollisionType ball_collision_type;
 
     double close_to_dest_threshold;
