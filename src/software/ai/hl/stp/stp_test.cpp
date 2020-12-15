@@ -52,7 +52,8 @@ TEST_F(STPTest, test_exception_thrown_when_no_play_applicable)
 {
     // Put the ball where both its x and y coordinates are negative. Neither test Play
     // is applicable in this case
-    world = ::TestUtil::setBallPosition(world, Point(-1, -1), Timestamp::fromSeconds(0));
+    world = world =
+        ::TestUtil::setBallPosition(world, Point(-1, -1), Timestamp::fromSeconds(0));
     EXPECT_THROW(stp.calculateNewPlay(world), std::runtime_error);
 }
 

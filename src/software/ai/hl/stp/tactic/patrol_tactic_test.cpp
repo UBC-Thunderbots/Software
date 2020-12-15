@@ -28,9 +28,8 @@ class PatrolTacticTest : public testing::Test
         {
             auto expected_action = std::make_shared<MoveAction>(false);
             expected_action->updateControlParams(
-                robot, patrol_points[i], angle, speed_at_patrol_points,
-                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
-                BallCollisionType::AVOID);
+                robot, patrol_points[i], angle, speed_at_patrol_points, DribblerMode::OFF,
+                AutochickType::NONE, BallCollisionType::AVOID);
             expected_actions.push_back(expected_action);
         }
     }
@@ -70,8 +69,8 @@ class PatrolTacticTest : public testing::Test
         EXPECT_EQ(expected_move_action->getFinalSpeed(), move_action->getFinalSpeed());
         EXPECT_EQ(expected_move_action->getAutochickType(),
                   move_action->getAutochickType());
-        EXPECT_EQ(expected_move_action->getDribblerEnabled(),
-                  move_action->getDribblerEnabled());
+        EXPECT_EQ(expected_move_action->getDribblerMode(),
+                  move_action->getDribblerMode());
     }
 
     /**

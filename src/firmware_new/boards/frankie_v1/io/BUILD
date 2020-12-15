@@ -74,7 +74,6 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:frankie_v1_lwip",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:lwip",
         "//shared/proto:tbots_nanopb_proto",
@@ -92,6 +91,21 @@ cc_library(
         "//firmware_new/boards/frankie_v1:lwip",
         "//firmware_new/boards/frankie_v1:rtos",
         "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
+        "//shared/proto:tbots_nanopb_proto",
+        "@nanopb",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "uart_logger",
+    srcs = ["uart_logger.c"],
+    hdrs = ["uart_logger.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware_new/boards/frankie_v1:hal",
+        "//firmware_new/boards/frankie_v1:rtos",
+        "//firmware_new/boards/frankie_v1:usart",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],

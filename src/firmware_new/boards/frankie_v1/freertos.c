@@ -235,8 +235,6 @@ void test_msg_update(void *argument)
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
-    app_logger_init(0, &io_network_logger_handle_robot_log);
-
     /* Infinite loop */
     for (;;)
     {
@@ -248,12 +246,9 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
         TLOG_DEBUG("logging debug level message %d", sys_now());
-        TLOG_INFO("logging info level message %x", sys_now());
-        TLOG_WARNING("logging warning level message %x", sys_now());
-        TLOG_FATAL("logging error level message %d", sys_now());
 
         // run loop at 100hz
-        osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
+        osDelay(1 / 10 * MILLISECONDS_PER_SECOND);
     }
     /* USER CODE END test_msg_update */
 }

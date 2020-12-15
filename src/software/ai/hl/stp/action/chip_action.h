@@ -17,12 +17,7 @@ class ChipAction : public Action
      */
     explicit ChipAction();
 
-    /**
-     * Updates the params that can be derived from the world for this action
-     *
-     * @param ball The ball being kicked
-     */
-    void updateWorldParams(const Ball& ball);
+    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the params for this action that cannot be derived from the world
@@ -79,8 +74,6 @@ class ChipAction : public Action
      * @return the distance this ChipAction will chip to
      */
     double getChipDistanceMeters();
-
-    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

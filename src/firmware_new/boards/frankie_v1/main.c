@@ -30,7 +30,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "firmware/app/logger/logger.h"
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware_new/boards/frankie_v1/io/uart_logger.h"
+
 
 /* USER CODE END Includes */
 
@@ -168,6 +171,16 @@ int main(void)
     MX_TIM4_Init();
     /* USER CODE BEGIN 2 */
 
+    //               ---- Initialize App/IO Layer ----
+    //
+    // At this point the UART peripheral should be configured correctly,
+    // so we initialize the logger with a UART robot log handler.
+    //
+    // Logs can been seen through `screen /dev/ttyACM0 115200`
+    io_uart_logger_init(&huart3);
+    app_logger_init(0, &io_uart_logger_handleRobotLog);
+
+    TLOG_INFO("Initializing IO Layer");
     initIoLayer();
 
     /* USER CODE END 2 */
