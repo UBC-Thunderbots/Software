@@ -48,6 +48,13 @@ DribblerMode MoveAction::getDribblerMode()
     return dribbler_mode;
 }
 
+bool MoveAction::robotCloseToDestination()
+{
+    return (robot->position() - destination).length() > close_to_dest_threshold ||
+           (robot->orientation().minDiff(final_orientation) >
+            close_to_orientation_threshold);
+}
+
 void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // We use a do-while loop so that we return the Intent at least once. If the robot was
@@ -60,7 +67,5 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         yield(std::make_unique<MoveIntent>(robot->id(), destination, final_orientation,
                                            final_speed, dribbler_mode,
                                            ball_collision_type));
-    } while ((robot->position() - destination).length() > close_to_dest_threshold ||
-             (robot->orientation().minDiff(final_orientation) >
-              close_to_orientation_threshold));
+    } while (robotCloseToDestination());
 }

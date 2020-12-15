@@ -13,6 +13,7 @@ class MoveAction : public Action
     // camera and positioning noise
     static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD       = 0.02;
     static constexpr Angle ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD = Angle::fromDegrees(2);
+
     /**
      * Creates a new MoveAction
      *
@@ -73,8 +74,13 @@ class MoveAction : public Action
      */
     DribblerMode getDribblerMode();
 
-   private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+   protected:
+    /**
+     * Checks if robot is close to the destination
+     *
+     * @return if robot is close to the destination
+     */
+    bool robotCloseToDestination();
 
     // Action parameters
     Point destination;
@@ -85,4 +91,7 @@ class MoveAction : public Action
 
     double close_to_dest_threshold;
     Angle close_to_orientation_threshold;
+
+   private:
+    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 };
