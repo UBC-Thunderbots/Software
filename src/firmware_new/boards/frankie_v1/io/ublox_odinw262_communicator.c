@@ -70,38 +70,87 @@ void io_ublox_odinw262_communicator_task(void* arg)
     assert(g_initialized);
     g_last_byte_parsed_from_dma_buffer = 0;
 
-    while (g_ublox_response_status != UBLOX_RESPONSE_OK)
-    {
-        TLOG_INFO("Waiting for u-blox to boot up");
-        io_ublox_odinw262_communicator_sendATCommand("AT\r");
-    }
+#define WAIT_FOR_UBLOX_TO_BOOT                                                           \
+    do                                                                                   \
+    {                                                                                    \
+        TLOG_INFO("Waiting for u-blox to boot up");                                      \
+        io_ublox_odinw262_communicator_sendATCommand("AT\r");                            \
+    } while (g_ublox_response_status != UBLOX_RESPONSE_OK);
 
     TLOG_INFO("u-blox detected, sending AT Commands");
 
     const char* response = NULL;
 
-#define SEND_AT_COMMAND(at_command, msg)                                                 \
-    TLOG_INFO(msg);                                                                      \
-    response = io_ublox_odinw262_communicator_sendATCommand(at_command);                 \
-    if (response == NULL)                                                                \
-    {                                                                                    \
-        TLOG_FATAL("%s failed", msg);                                                    \
-    }
-
-    SEND_AT_COMMAND("AT+UMLA=2,00AAAAAAAA00\r",
-                    "Change the MAC address to match the Robot");
-    SEND_AT_COMMAND("AT&W\r", "Store the config to startup database");
-    SEND_AT_COMMAND("AT+CPWROFF\r", "Reboot the module");
-    SEND_AT_COMMAND("AT+UBRGC=0,1,1,3\r", "Enable the Wi-Fi bridge");
-    SEND_AT_COMMAND("AT+UBRGCA=0,3\r", "Activate the bridge connection");
-    SEND_AT_COMMAND("AT+UETHC=1,0\r", "Use PHY");
-    SEND_AT_COMMAND("AT+UETHCA=3\r", "Activate ethernet connection");
-    SEND_AT_COMMAND("AT+UWSC=0,2,\"SHAW-E1C430\"\r", "Configure Wi-Fi SSID");
-    SEND_AT_COMMAND("AT+UWSC=0,8,\"aksr#1605\"\r", "Configure Wi-Fi PASS");
-    SEND_AT_COMMAND("AT+UWSC=0,5,2\r", "Configure to use WPA2");
-    SEND_AT_COMMAND("AT+UWSCA=0,3\r", "Activate the WiFi connection");
-
-#undef SEND_AT_COMMAND
+    io_ublox_odinw262_reset();
+    WAIT_FOR_UBLOX_TO_BOOT
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UFACTORY\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,00AAAAAAAA00\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT&W\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,0,0\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,2,1,3\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,100,0\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,107,0\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=1,1\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=4,0\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UETHCA=3\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,0,0\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response =
+        io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,2,\"SHAW-E1C430-5G\"\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,5,2\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response =
+        io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,8,\"aksr#1605\"\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,300,0\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,1\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
+    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSCA=0,3\r");
+    WAIT_FOR_UBLOX_TO_BOOT
+    TLOG_INFO("Reponse %s,", response);
 }
 
 void io_ublox_odinw262_communicator_handleIdleLine()
@@ -145,6 +194,7 @@ wait_for_ublox_to_respond:
         return NULL;
     }
 }
+    osDelay(100);
 
     // Invalidate D-cache before reception
     // Make sure the address is 32-byte aligned and add 32-bytes to length, in case it
