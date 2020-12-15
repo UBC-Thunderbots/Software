@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -75,6 +76,7 @@ io_ublox_odinw262_communicator_getUbloxResponseStatusFromCircularBuffer(
     size_t start_pos_response_error =
         (buffer_length + current_byte_position - UBLOX_ERROR_RESPONSE_LENGTH_BYTES) %
         buffer_length;
+
     for (size_t k = 0; k < UBLOX_ERROR_RESPONSE_LENGTH_BYTES; k++)
     {
         if (UBLOX_ERROR_RESPONSE_STRING[k] !=
@@ -95,8 +97,10 @@ io_ublox_odinw262_communicator_getUbloxResponseStatusFromCircularBuffer(
 
 void io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
     size_t last_parsed_byte_position, size_t current_byte_position, size_t buffer_length,
-    uint8_t* circular_buffer, uint8_t* linear_buffer)
+    uint8_t* circular_buffer, char* linear_buffer)
 {
+    memset(linear_buffer, 0, buffer_length);
+
     if (last_parsed_byte_position < current_byte_position)
     {
         memcpy(linear_buffer, circular_buffer + last_parsed_byte_position,
@@ -111,5 +115,6 @@ void io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
                circular_buffer, current_byte_position);
     }
 
-    linear_buffer[current_byte_position] = '\0';
+    linear_buffer[(buffer_length - last_parsed_byte_position) + current_byte_position] =
+        '\0';
 }

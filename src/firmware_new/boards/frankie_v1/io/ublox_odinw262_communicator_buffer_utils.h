@@ -31,10 +31,12 @@ typedef enum
  * @param buffer_length The length of the circular and linear buffer
  * @param circular_buffer The circular buffer to extract from
  * @param linear_buffer The buffer to copy data from circular_buffer into
+ *  NOTE: This buffer must be the same size as the circular_buffer, it will be
+ *  cleared and a '\0' character will be appended at the end of the unwrapped data.
  */
 void io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
     size_t last_parsed_byte_pos, size_t last_updated_byte_pos, size_t buffer_length,
-    uint8_t* circular_buffer, uint8_t* linear_buffer);
+    uint8_t* circular_buffer, char* linear_buffer);
 
 /**
  * Peeks at the end of circular_buffer looking back from the last_updated_byte_pos,
