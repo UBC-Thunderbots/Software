@@ -206,8 +206,8 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = *createLegacyMovePrimitive(
-        poi, Angle::zero(), 0, DribblerMode::OFF, AutochickType::NONE);
+    auto expected_primitive =
+        *createMovePrimitive(poi, 0, Angle::zero(), DribblerMode::OFF);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
