@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
+#include "software/util/typename/typename.h"
+
 // For equality operators, we only check for cases not covered in the Primitive tests,
 // since Intents inherit from Primitives
 TEST(AutokickMoveIntentTest, test_equality_operator_intents_equal)
@@ -25,4 +27,12 @@ TEST(AutokickMoveIntentTest, test_get_destination_ball_collision)
     EXPECT_EQ(intent.getFinalAngle(), Angle::quarter());
     EXPECT_EQ(intent.getDribblerMode(), DribblerMode::OFF);
     EXPECT_EQ(intent.getBallCollisionType(), BallCollisionType::AVOID);
+}
+
+TEST(AutokickMoveIntentTest, test_intent_pointer)
+{
+    std::shared_ptr<Intent> intent = std::make_shared<AutokickMoveIntent>(
+        AutokickMoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF, 3.2,
+                           BallCollisionType::AVOID));
+    EXPECT_EQ("AutokickMoveIntent", TYPENAME(*intent));
 }

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "software/ai/intent/navigating_intent.h"
+#include "software/ai/intent/move_intent.h"
 
-class AutokickMoveIntent : public NavigatingIntent
+class AutokickMoveIntent : public MoveIntent
 {
    public:
     /**
-     * Creates a new Move Intent
+     * Creates a new Autochip Move Intent
      *
      * @param robot_id The id of the robot that this Intent is for
      * @param destination The destination of the Movement
@@ -24,24 +24,20 @@ class AutokickMoveIntent : public NavigatingIntent
                                 double kick_speed_meters_per_second,
                                 BallCollisionType ball_collision_type);
 
+    /**
+     * Creates a new Autokick Move Intent
+     *
+     * @param move_intent The MoveIntent to base this on
+     * @param kick_speed_meters_per_second The distance between the starting location
+     * of the kick and the location of the first bounce
+     */
+    explicit AutokickMoveIntent(MoveIntent move_intent,
+                                double kick_speed_meters_per_second);
+
     AutokickMoveIntent() = delete;
 
     void accept(IntentVisitor& visitor) const override;
     void accept(NavigatingIntentVisitor& visitor) const override;
-
-    /**
-     * Gets the robot's destination orientation
-     *
-     * @return The robots final orientation as an Angle
-     */
-    const Angle& getFinalAngle() const;
-
-    /**
-     * Gets DribblerMode for this move intent
-     *
-     * @return dribbler mode
-     */
-    const DribblerMode& getDribblerMode() const;
 
     /**
      * Gets the kick speed in metres per second
@@ -70,7 +66,5 @@ class AutokickMoveIntent : public NavigatingIntent
     bool operator!=(const AutokickMoveIntent& other) const;
 
    private:
-    Angle final_angle;
-    DribblerMode dribbler_mode;
     double kick_speed_meters_per_second;
 };

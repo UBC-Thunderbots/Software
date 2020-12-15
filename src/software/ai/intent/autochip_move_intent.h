@@ -1,12 +1,12 @@
 #pragma once
 
-#include "software/ai/intent/navigating_intent.h"
+#include "software/ai/intent/move_intent.h"
 
-class AutochipMoveIntent : public NavigatingIntent
+class AutochipMoveIntent : public MoveIntent
 {
    public:
     /**
-     * Creates a new Move Intent
+     * Creates a new Autochip Move Intent
      *
      * @param robot_id The id of the robot that this Intent is for
      * @param destination The destination of the Movement
@@ -23,24 +23,19 @@ class AutochipMoveIntent : public NavigatingIntent
                                 DribblerMode dribbler_mode, double chip_distance_meters,
                                 BallCollisionType ball_collision_type);
 
+    /**
+     * Creates a new Autochip Move Intent
+     *
+     * @param move_intent The MoveIntent to base this on
+     * @param chip_distance_meters The distance between the starting location
+     * of the chip and the location of the first bounce
+     */
+    explicit AutochipMoveIntent(MoveIntent move_intent, double chip_distance_meters);
+
     AutochipMoveIntent() = delete;
 
     void accept(IntentVisitor& visitor) const override;
     void accept(NavigatingIntentVisitor& visitor) const override;
-
-    /**
-     * Gets the robot's destination orientation
-     *
-     * @return The robots final orientation as an Angle
-     */
-    const Angle& getFinalAngle() const;
-
-    /**
-     * Gets DribblerMode for this move intent
-     *
-     * @return dribbler mode
-     */
-    const DribblerMode& getDribblerMode() const;
 
     /**
      * Gets the chip distance in metres
@@ -69,7 +64,5 @@ class AutochipMoveIntent : public NavigatingIntent
     bool operator!=(const AutochipMoveIntent& other) const;
 
    private:
-    Angle final_angle;
-    DribblerMode dribbler_mode;
     double chip_distance_meters;
 };

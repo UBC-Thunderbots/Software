@@ -81,7 +81,7 @@ cc_library(
     srcs = ["autochip_move_intent.cpp"],
     hdrs = ["autochip_move_intent.h"],
     deps = [
-        ":navigating_intent",
+        ":move_intent",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/util/make_enum",
@@ -93,6 +93,7 @@ cc_test(
     srcs = ["autochip_move_intent_test.cpp"],
     deps = [
         ":autochip_move_intent",
+        "//software/util/typename",
         "@gtest//:gtest_main",
     ],
 )
@@ -102,7 +103,7 @@ cc_library(
     srcs = ["autokick_move_intent.cpp"],
     hdrs = ["autokick_move_intent.h"],
     deps = [
-        ":navigating_intent",
+        ":move_intent",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/util/make_enum",
@@ -114,6 +115,7 @@ cc_test(
     srcs = ["autokick_move_intent_test.cpp"],
     deps = [
         ":autokick_move_intent",
+        "//software/util/typename",
         "@gtest//:gtest_main",
     ],
 )

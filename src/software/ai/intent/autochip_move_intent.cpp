@@ -5,10 +5,15 @@ AutochipMoveIntent::AutochipMoveIntent(unsigned int robot_id, const Point &desti
                                        DribblerMode dribbler_mode,
                                        double chip_distance_meters,
                                        BallCollisionType ball_collision_type)
-    : NavigatingIntent(robot_id, destination, final_speed, ball_collision_type),
-      final_angle(final_angle),
-      dribbler_mode(dribbler_mode),
+    : MoveIntent(robot_id, destination, final_angle, final_speed, dribbler_mode,
+                 ball_collision_type),
       chip_distance_meters(chip_distance_meters)
+{
+}
+
+AutochipMoveIntent::AutochipMoveIntent(MoveIntent move_intent,
+                                       double chip_distance_meters)
+    : MoveIntent(move_intent), chip_distance_meters(chip_distance_meters)
 {
 }
 
@@ -22,16 +27,6 @@ void AutochipMoveIntent::accept(NavigatingIntentVisitor &visitor) const
     visitor.visit(*this);
 }
 
-const Angle &AutochipMoveIntent::getFinalAngle() const
-{
-    return final_angle;
-}
-
-const DribblerMode &AutochipMoveIntent::getDribblerMode() const
-{
-    return dribbler_mode;
-}
-
 double AutochipMoveIntent::getChipDistance() const
 {
     return chip_distance_meters;
@@ -39,10 +34,8 @@ double AutochipMoveIntent::getChipDistance() const
 
 bool AutochipMoveIntent::operator==(const AutochipMoveIntent &other) const
 {
-    return NavigatingIntent::operator==(other) &&
-           this->final_angle == other.final_angle &&
-           this->chip_distance_meters == other.chip_distance_meters &&
-           this->dribbler_mode == other.dribbler_mode;
+    return MoveIntent::operator==(other) &&
+           this->chip_distance_meters == other.chip_distance_meters;
 }
 
 bool AutochipMoveIntent::operator!=(const AutochipMoveIntent &other) const
