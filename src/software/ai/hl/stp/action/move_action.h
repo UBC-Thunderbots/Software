@@ -5,6 +5,11 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
+/**
+ * The MoveAction makes the robot move to the specified location
+ *
+ * Done condition: The robot is close to the specified location
+ */
 class MoveAction : public Action
 {
    public:

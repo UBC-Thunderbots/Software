@@ -7,6 +7,8 @@
 /**
  * The SpinningMoveAction will move the given Robot to the specified destination while
  * spinning with the desired angular velocity
+ *
+ * Done condition: The robot is close to the specified location
  */
 class SpinningMoveAction : public Action
 {

@@ -6,6 +6,11 @@
 #include "software/world/ball.h"
 #include "software/world/field.h"
 
+/**
+ * The InterceptBallAction makes the robot intercept the ball
+ *
+ * Done condition: The ball has been intercepted and the robot has control over the ball
+ */
 class InterceptBallAction : public Action
 {
    public:

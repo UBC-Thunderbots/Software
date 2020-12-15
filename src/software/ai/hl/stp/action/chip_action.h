@@ -8,6 +8,8 @@
 /**
  * The ChipAction makes the robot chip from the given location in the given
  * direction, with the given power
+ *
+ * Done condition: The ball has been chipped in the given direction
  */
 class ChipAction : public Action
 {

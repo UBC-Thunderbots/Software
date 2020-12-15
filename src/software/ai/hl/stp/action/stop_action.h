@@ -6,6 +6,8 @@
 
 /**
  * The StopAction makes the robot stop with the option to coast
+ *
+ * Done condition: The robot is moving very slowly or stopped
  */
 class StopAction : public Action
 {

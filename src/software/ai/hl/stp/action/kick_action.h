@@ -8,6 +8,8 @@
 /**
  * The KickAction makes the robot take a kick from the given location in the given
  * direction, with the given power.
+ *
+ * Done condition: The ball has been kicked in the given direction
  */
 class KickAction : public Action
 {
