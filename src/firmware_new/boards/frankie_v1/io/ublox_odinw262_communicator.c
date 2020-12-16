@@ -85,72 +85,94 @@ void io_ublox_odinw262_communicator_task(void* arg)
     WAIT_FOR_UBLOX_TO_BOOT
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UFACTORY\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,00AAAAAAAA00\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT&W\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,0,0\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,2,1,3\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,100,0\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,107,0\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=1,1\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=4,0\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UETHCA=3\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,0,0\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response =
         io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,2,\"SHAW-E1C430-5G\"\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,5,2\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response =
         io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,8,\"aksr#1605\"\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,300,0\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,1\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
     response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSCA=0,3\r");
     WAIT_FOR_UBLOX_TO_BOOT
-    TLOG_INFO("Reponse %s,", response);
+    if (response != NULL)
+        TLOG_INFO("Reponse %s,", response);
 }
 
 void io_ublox_odinw262_communicator_handleIdleLine()
@@ -194,7 +216,6 @@ wait_for_ublox_to_respond:
         return NULL;
     }
 }
-    osDelay(100);
 
     // Invalidate D-cache before reception
     // Make sure the address is 32-byte aligned and add 32-bytes to length, in case it
@@ -212,10 +233,8 @@ wait_for_ublox_to_respond:
 
             io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
                 g_last_byte_parsed_from_dma_buffer, g_dma_counter_on_uart_idle_line,
-                RX_BUFFER_LENGTH_BYTES, g_dma_uart_receive_buffer,
-                (uint8_t*)g_uart_receive_buffer);
+                RX_BUFFER_LENGTH_BYTES, g_dma_uart_receive_buffer, g_uart_receive_buffer);
 
-            g_uart_receive_buffer[g_dma_counter_on_uart_idle_line] = '\0';
             g_last_byte_parsed_from_dma_buffer = g_dma_counter_on_uart_idle_line;
             return g_uart_receive_buffer;
         }

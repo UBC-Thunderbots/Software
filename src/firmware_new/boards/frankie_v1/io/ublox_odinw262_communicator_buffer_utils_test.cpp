@@ -11,13 +11,28 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 
+#include <numeric>
+
 static char linear_buffer[500];
 static char circular_buffer[500];
+
+/**
+ * The following test uses the rapidcheck testing framework. Instead of creating test
+ * cases for all the possible buffer configurations and trying to catch edge cases with
+ * static tests, we define different "Commands" which are events that modify the state of
+ * the buffers or System Under Test (Sut), and properties that should hold true when these
+ * commands are applied.
+ *
+ * rapidcheck then tries to break those properties with the given commands. If any of
+ * those properties were to not hold when applying the provided commands, rapidcheck will
+ * log the sequence of commands that lead to that failure, and the test will fail.
+ *
+ * Read more about it here: https://github.com/emil-e/rapidcheck/
+ */
 
 struct UbloxBuffersModel
 {
     std::vector<std::string> data;
-    int total_data_size_bytes;
 };
 
 struct UbloxBuffersSut
@@ -26,8 +41,8 @@ struct UbloxBuffersSut
     char *linear_buffer;
     size_t buffer_length;
     size_t current_byte_position;
+    size_t last_written_byte_position;
     size_t last_parsed_byte_position;
-    size_t counter_no_wrap;
 };
 
 struct PlaceDataInCircularBufferCommand
@@ -42,33 +57,23 @@ struct PlaceDataInCircularBufferCommand
 
     void run(const UbloxBuffersModel &model, UbloxBuffersSut &sut) const override
     {
-        if (data.length() + sut.last_parsed_byte_position < sut.buffer_length)
+        if (data.length() + sut.last_written_byte_position < sut.buffer_length)
         {
-            memcpy(sut.circular_buffer + sut.last_parsed_byte_position, &data[0],
+            memcpy(sut.circular_buffer + sut.last_written_byte_position, &data[0],
                    data.length());
         }
         else
         {
-            size_t buffer_remaining = sut.buffer_length - sut.last_parsed_byte_position;
-            memcpy(sut.circular_buffer + sut.last_parsed_byte_position, &data[0],
+            size_t buffer_remaining = sut.buffer_length - sut.last_written_byte_position;
+            memcpy(sut.circular_buffer + sut.last_written_byte_position, &data[0],
                    buffer_remaining);
             memcpy(sut.circular_buffer, &data[0] + buffer_remaining,
                    data.length() - buffer_remaining);
         }
+
         sut.current_byte_position =
             (sut.current_byte_position + data.length()) % sut.buffer_length;
-
-        io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
-            sut.last_parsed_byte_position, sut.current_byte_position, sut.buffer_length,
-            (uint8_t *)(sut.circular_buffer), sut.linear_buffer);
-
-        // std::cerr << "Generated AT Command: " << data << std::endl;
-        // std::cerr << "Extracted AT Command: " << std::string(sut.linear_buffer)
-        //<< std::endl;
-
-        RC_ASSERT(data == std::string(sut.linear_buffer));
-
-        sut.last_parsed_byte_position = sut.current_byte_position;
+        sut.last_written_byte_position = sut.current_byte_position;
     }
 };
 
@@ -118,6 +123,11 @@ struct ATCommandResposne : PlaceDataInCircularBufferCommand
         data = *rc::gen::elementOf(valid_at_reponses);
     }
 
+    void apply(UbloxBuffersModel &model) const override
+    {
+        model.data.clear();
+    }
+
     void run(const UbloxBuffersModel &model, UbloxBuffersSut &sut) const override
     {
         PlaceDataInCircularBufferCommand::run(model, sut);
@@ -138,6 +148,16 @@ struct ATCommandResposne : PlaceDataInCircularBufferCommand
                     sut.current_byte_position, sut.buffer_length,
                     (uint8_t *)sut.circular_buffer));
         }
+
+        io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
+            sut.last_parsed_byte_position, sut.current_byte_position, sut.buffer_length,
+            (uint8_t *)(sut.circular_buffer), sut.linear_buffer);
+
+        std::string expected_response =
+            std::accumulate(model.data.begin(), model.data.end(), std::string("")) + data;
+        RC_ASSERT(expected_response == std::string(sut.linear_buffer));
+
+        sut.last_parsed_byte_position = sut.current_byte_position;
     }
     void show(std::ostream &os) const override
     {
@@ -188,5 +208,9 @@ TEST(UbloxBufferTests, test_extract_response_from_circular_buffer)
             rc::state::gen::execOneOfWithArgs<ATCommandRequest, ATCommandResposne,
                                               RandomUbloxGarbage>());
     });
+
+    // This will not really be useful, however, rc::check should have printed the exact
+    // sequence of ATCommandRequest, ATCommandResposne, and RandomUbloxGarbage commands
+    // that caused the failure.
     EXPECT_TRUE(result);
 }
