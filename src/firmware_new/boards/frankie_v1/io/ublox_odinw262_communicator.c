@@ -68,111 +68,36 @@ void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
 void io_ublox_odinw262_communicator_task(void* arg)
 {
     assert(g_initialized);
-    g_last_byte_parsed_from_dma_buffer = 0;
-
-#define WAIT_FOR_UBLOX_TO_BOOT                                                           \
-    do                                                                                   \
-    {                                                                                    \
-        TLOG_INFO("Waiting for u-blox to boot up");                                      \
-        io_ublox_odinw262_communicator_sendATCommand("AT\r");                            \
-    } while (g_ublox_response_status != UBLOX_RESPONSE_OK);
-
-    TLOG_INFO("u-blox detected, sending AT Commands");
-
-    const char* response = NULL;
 
     io_ublox_odinw262_reset();
-    WAIT_FOR_UBLOX_TO_BOOT
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UFACTORY\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,00AAAAAAAA00\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT&W\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,0,0\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,2,1,3\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,100,0\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,107,0\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=1,1\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=4,0\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UETHCA=3\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,0,0\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response =
-        io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,2,\"SHAW-E1C430-5G\"\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,5,2\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response =
-        io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,8,\"aksr#1605\"\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,300,0\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,1\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
-    response = io_ublox_odinw262_communicator_sendATCommand("AT+UWSCA=0,3\r");
-    WAIT_FOR_UBLOX_TO_BOOT
-    if (response != NULL)
-        TLOG_INFO("Reponse %s,", response);
+    io_ublox_odinw262_communicator_waitForBoot();
+
+    io_ublox_odinw262_communicator_sendATCommand("AT+UFACTORY\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
+    io_ublox_odinw262_communicator_waitForBoot();
+
+    io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,00AAAAAAAA00\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT&W\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
+    io_ublox_odinw262_communicator_waitForBoot();
+
+    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,0,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,2,1,3\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,100,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,107,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=1,1\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=4,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UETHCA=3\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,0,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,2,\"SHAW-E1C430-5G\"\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,5,2\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,8,\"aksr#1605\"\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,300,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,1\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSCA=0,3\r");
 }
 
 void io_ublox_odinw262_communicator_handleIdleLine()
@@ -193,10 +118,21 @@ void io_ublox_odinw262_reset()
     io_gpio_pin_setInactive(g_ublox_reset_pin);
 }
 
+void io_ublox_odinw262_communicator_waitForBoot(void)
+{
+    do
+    {
+        TLOG_INFO("Waiting for u-blox to boot up");
+        io_ublox_odinw262_communicator_sendATCommand("AT\r");
+    } while (g_ublox_response_status != UBLOX_RESPONSE_OK);
+
+    TLOG_INFO("u-blox detected");
+}
+
 char* io_ublox_odinw262_communicator_sendATCommand(const char* command)
 {
     assert(g_initialized);
-    TLOG_DEBUG("Sending AT Command to u-blox: %s", command);
+    TLOG_INFO("Sending AT Command to u-blox: %s", command);
 
     HAL_UART_Transmit(g_ublox_uart_handle, (uint8_t*)command, (uint16_t)strlen(command),
                       HAL_MAX_DELAY);
@@ -209,17 +145,20 @@ wait_for_ublox_to_respond:
     if (status == osErrorTimeout)
     {
         io_ublox_odinw262_communicator_handleIdleLine();
-        status = osSemaphoreAcquire(g_dma_receive_semaphore,
-                                    g_ublox_response_timeout * configTICK_RATE_HZ);
-        TLOG_WARNING("u-blox did not respond in %d seconds to %s",
-                     g_ublox_response_timeout, command);
-        return NULL;
+        osSemaphoreAcquire(g_dma_receive_semaphore,
+                           g_ublox_response_timeout * configTICK_RATE_HZ);
+
+        if (g_ublox_response_status == UBLOX_RESPONSE_INCOMPLETE)
+        {
+            TLOG_WARNING("u-blox did not respond in %d seconds to %s",
+                         g_ublox_response_timeout, command);
+            return NULL;
+        }
     }
 }
 
-    // Invalidate D-cache before reception
-    // Make sure the address is 32-byte aligned and add 32-bytes to length, in case it
-    // overlaps cacheline
+    // Invalidate d-cache before reception. Make sure the address is 32-byte aligned
+    // and add 32-bytes to length, in case it overlaps cacheline
     // https://community.st.com/s/article/FAQ-DMA-is-not-working-on-STM32H7-devices
     SCB_InvalidateDCache_by_Addr(
         (uint32_t*)(((uint32_t)g_dma_uart_receive_buffer) & ~(uint32_t)0x1F),

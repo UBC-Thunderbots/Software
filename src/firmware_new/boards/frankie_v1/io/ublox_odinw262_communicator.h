@@ -34,6 +34,11 @@ void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
  */
 void io_ublox_odinw262_reset(void);
 
+/*
+ * Wait for the u-blox Odin W262 to boot up
+ */
+void io_ublox_odinw262_communicator_waitForBoot(void);
+
 /**
  * UART Idle Line Interrupt Service Routine
  *

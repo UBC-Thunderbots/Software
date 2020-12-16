@@ -138,6 +138,7 @@ cc_library(
     name = "ublox_odinw262_communicator_buffer_utils",
     srcs = ["ublox_odinw262_communicator_buffer_utils.c"],
     hdrs = ["ublox_odinw262_communicator_buffer_utils.h"],
+    alwayslink = True,
 )
 
 # external cmake repo for property based testing

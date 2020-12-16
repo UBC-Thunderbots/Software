@@ -105,6 +105,8 @@ void io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
     {
         memcpy(linear_buffer, circular_buffer + last_parsed_byte_position,
                current_byte_position - last_parsed_byte_position);
+
+        linear_buffer[current_byte_position] = '\0';
     }
     else
     {
@@ -113,8 +115,8 @@ void io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
 
         memcpy(linear_buffer + (buffer_length - last_parsed_byte_position),
                circular_buffer, current_byte_position);
-    }
 
-    linear_buffer[(buffer_length - last_parsed_byte_position) + current_byte_position] =
-        '\0';
+        linear_buffer[(buffer_length - last_parsed_byte_position) +
+                      current_byte_position] = '\0';
+    }
 }
