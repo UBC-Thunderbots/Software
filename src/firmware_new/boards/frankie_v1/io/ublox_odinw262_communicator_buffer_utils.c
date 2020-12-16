@@ -103,6 +103,31 @@ void io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
 
     if (last_parsed_byte_position < current_byte_position)
     {
+        //
+        //              last_parsed_byte_pos
+        //                       │
+        //  circular_buffer      │     current_byte_pos
+        //        │              │           │
+        //        │              │           │
+        //      ┌─▼──────────────▼───────────▼──────────┐
+        //      │┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐│
+        //      │└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘│
+        //      └───────────────────────────────────────┘
+        //                       │        │
+        //                       └───┬────┘
+        //                  memcpy   │
+        //             ┌─────────────┘
+        //        ┌────▼───┐
+        //        │        │
+        //      ┌───────────────────────────────────────┐
+        //      │┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐│
+        //      │└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘│
+        //      └─▲───────────▲─────────────────────────┘
+        //        │           │
+        //        │           │
+        //        │          \0
+        //  linear_buffer
+
         memcpy(linear_buffer, circular_buffer + last_parsed_byte_position,
                current_byte_position - last_parsed_byte_position);
 
@@ -110,6 +135,30 @@ void io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
     }
     else
     {
+        //                           current_byte_pos
+        //                          │
+        //  circular_buffer         │  last_parsed_byte_pos
+        //        │                 │           │
+        //        │                 │           │
+        //      ┌─▼─────────────────▼───────────▼───────┐
+        //      │┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐│
+        //      │└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘│
+        //      └───────────────────────────────────────┘
+        //        │              │              │     │
+        //        └─────┬────────┘              └──┬──┘
+        //           ┌──┼──────────────memcpy──────┘
+        //           │  └──memcpy──┐
+        //        ┌──▼──┐  ┌───────▼──────┐
+        //        │     │  │              │
+        //      ┌───────────────────────────────────────┐
+        //      │┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐│
+        //      │└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘└─┘│
+        //      └─▲──────────────────────────▲──────────┘
+        //        │                          │
+        //        │                          │
+        //        │                         \0
+        //  linear_buffer
+
         memcpy(linear_buffer, circular_buffer + last_parsed_byte_position,
                buffer_length - last_parsed_byte_position);
 

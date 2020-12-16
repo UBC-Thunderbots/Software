@@ -17,14 +17,13 @@ static char linear_buffer[500];
 static char circular_buffer[500];
 
 /**
- * The following test uses the rapidcheck testing framework. Instead of creating test
- * cases for all the possible buffer configurations and trying to catch edge cases with
- * static tests, we define different "Commands" which are events that modify the state of
- * the buffers or System Under Test (Sut), and properties that should hold true when these
- * commands are applied.
+ * The following test uses the rapidcheck testing framework. Instead of trying to catch
+ * edge cases with static tests, we define different "Commands" which are events that
+ * modify the state of the buffers or System Under Test (Sut), and properties that should
+ * hold true when these commands are applied.
  *
  * rapidcheck then tries to break those properties with the given commands. If any of
- * those properties were to not hold when applying the provided commands, rapidcheck will
+ * the defined properties break when applying the provided commands, rapidcheck will
  * log the sequence of commands that lead to that failure, and the test will fail.
  *
  * Read more about it here: https://github.com/emil-e/rapidcheck/

@@ -14,6 +14,12 @@
 #include "main.h"
 #include "task.h"
 
+// clang-format off
+// TODO have a way of configuring these values
+#define WIFI_SSID SHAW-E1C430-5G
+#define WIFI_PASS aksr#1605
+// clang-format on
+
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
 #define RX_BUFFER_LENGTH_BYTES 4096
 
@@ -72,14 +78,14 @@ void io_ublox_odinw262_communicator_task(void* arg)
     io_ublox_odinw262_reset();
     io_ublox_odinw262_communicator_waitForBoot();
 
-    /*io_ublox_odinw262_communicator_sendATCommand("AT+UFACTORY\r");*/
-    /*io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");*/
-    /*io_ublox_odinw262_communicator_waitForBoot();*/
+    io_ublox_odinw262_communicator_sendATCommand("AT+UFACTORY\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
+    io_ublox_odinw262_communicator_waitForBoot();
 
-    /*io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,00AAAAAAAA00\r");*/
-    /*io_ublox_odinw262_communicator_sendATCommand("AT&W\r");*/
-    /*io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");*/
-    /*io_ublox_odinw262_communicator_waitForBoot();*/
+    io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,00AAAAAAAA00\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT&W\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
+    io_ublox_odinw262_communicator_waitForBoot();
 
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,0,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
@@ -92,9 +98,9 @@ void io_ublox_odinw262_communicator_task(void* arg)
     io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=4,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UETHCA=3\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,0,0\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,2,\"SHAW-E1C430-5G\"\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,2,\"#WIFI_SSID\"\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,5,2\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,8,\"aksr#1605\"\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,8,\"#WIFI_PASS\"\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,300,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,1\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSCA=0,3\r");
