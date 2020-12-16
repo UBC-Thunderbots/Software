@@ -60,13 +60,13 @@ class SSLGeometryTest : public ::testing::Test
     {
         EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
                         field_arc.thickness());
-        EXPECT_FLOAT_EQ(static_cast<float>(circle.getRadius() * MILLIMETERS_PER_METER),
+        EXPECT_FLOAT_EQ(static_cast<float>(circle.radius() * MILLIMETERS_PER_METER),
                         field_arc.radius());
 
         auto result = ::testing::AssertionSuccess();
 
         auto center_eq =
-            equalWithinTolerance(circle.getOrigin(), field_arc.center(), tolerance);
+            equalWithinTolerance(circle.origin(), field_arc.center(), tolerance);
         auto a1_eq = ::TestUtil::equalWithinTolerance(Angle::zero().toRadians(),
                                                       field_arc.a1(), tolerance);
         auto a2_eq = ::TestUtil::equalWithinTolerance(Angle::full().toRadians(),
@@ -78,7 +78,7 @@ class SSLGeometryTest : public ::testing::Test
             if (!center_eq)
             {
                 result << "Arc center was (" << field_arc.center().x() << ", "
-                       << field_arc.center().y() << "), expected " << circle.getOrigin();
+                       << field_arc.center().y() << "), expected " << circle.origin();
             }
             if (!a1_eq)
             {
@@ -350,8 +350,8 @@ TEST_F(SSLGeometryTest, test_create_field_circular_arc_with_valid_values)
     EXPECT_FLOAT_EQ(static_cast<float>(thickness * MILLIMETERS_PER_METER),
                     circular_arc_msg->thickness());
     EXPECT_TRUE(
-        equalWithinTolerance(circle.getOrigin(), circular_arc_msg->center(), tolerance));
-    EXPECT_FLOAT_EQ(static_cast<float>(circle.getRadius() * MILLIMETERS_PER_METER),
+        equalWithinTolerance(circle.origin(), circular_arc_msg->center(), tolerance));
+    EXPECT_FLOAT_EQ(static_cast<float>(circle.radius() * MILLIMETERS_PER_METER),
                     circular_arc_msg->radius());
     EXPECT_EQ(SSLProto::SSL_FieldShapeType::CenterCircle, circular_arc_msg->type());
 }

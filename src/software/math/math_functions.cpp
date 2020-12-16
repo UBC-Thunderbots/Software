@@ -33,9 +33,9 @@ double rectangleSigmoid(const Rectangle& rect, const Point& point,
 double circleSigmoid(const Circle& circle, const Point& point, const double& sig_width)
 {
     // Calculate how far the point is from the circle center
-    double distance_from_circle_center = (point - circle.getOrigin()).length();
+    double distance_from_circle_center = (point - circle.origin()).length();
 
-    return sigmoid(distance_from_circle_center, circle.getRadius(), -sig_width);
+    return sigmoid(distance_from_circle_center, circle.radius(), -sig_width);
 }
 
 double sigmoid(const double& v, const double& offset, const double& sig_width)
