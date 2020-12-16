@@ -79,7 +79,7 @@ const osThreadAttr_t NetStartTask_attributes = {
 osThreadId_t RobotStatusTaskHandle;
 const osThreadAttr_t RobotStatusTask_attributes = {
     .name       = "RobotStatusTask",
-    .priority   = (osPriority_t)osPriorityNormal1,
+    .priority   = (osPriority_t)osPriorityNormal,
     .stack_size = 1024 * 4};
 /* Definitions for VisionMsgTask */
 osThreadId_t VisionMsgTaskHandle;
