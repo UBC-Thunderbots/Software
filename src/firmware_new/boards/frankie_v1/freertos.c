@@ -259,7 +259,7 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
         // run loop at 100hz
-        osDelay(1 / 100 * MILLISECONDS_PER_SECOND);
+        osDelay(1 / 10 * MILLISECONDS_PER_SECOND);
     }
     /* USER CODE END test_msg_update */
 }

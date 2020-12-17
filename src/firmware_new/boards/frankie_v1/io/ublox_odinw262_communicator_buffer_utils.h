@@ -17,6 +17,7 @@ typedef enum
 
 #define UBLOX_OK_RESPONSE_STRING "OK\r\n"
 #define UBLOX_ERROR_RESPONSE_STRING "ERROR\r\n"
+
 #define UBLOX_OK_RESPONSE_LENGTH_BYTES 4
 #define UBLOX_ERROR_RESPONSE_LENGTH_BYTES 7
 
@@ -31,8 +32,10 @@ typedef enum
  * @param buffer_length The length of the circular and linear buffer
  * @param circular_buffer The circular buffer to extract from
  * @param linear_buffer The buffer to copy data from circular_buffer into
- *  NOTE: This buffer must be the same size as the circular_buffer, it will be
- *  cleared and a '\0' character will be appended at the end of the unwrapped data.
+ *
+ * NOTE: This buffer must be the same size as the circular_buffer,
+ * it will be cleared and a '\0' character will be appended at the end of the unwrapped
+ * data.
  */
 void io_ublox_odinw262_communicator_extractResponseFromCircularBuffer(
     size_t last_parsed_byte_pos, size_t last_updated_byte_pos, size_t buffer_length,

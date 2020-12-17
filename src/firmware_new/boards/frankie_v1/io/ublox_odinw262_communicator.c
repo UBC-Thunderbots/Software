@@ -16,8 +16,8 @@
 
 // clang-format off
 // TODO have a way of configuring these values
-#define WIFI_SSID SHAW-E1C430-5G
-#define WIFI_PASS aksr#1605
+#define WIFI_SSID "SHAW-E1C430"
+#define WIFI_PASS "aksr#1605"
 // clang-format on
 
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
@@ -78,31 +78,31 @@ void io_ublox_odinw262_communicator_task(void* arg)
     io_ublox_odinw262_reset();
     io_ublox_odinw262_communicator_waitForBoot();
 
-    io_ublox_odinw262_communicator_sendATCommand("AT+UFACTORY\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
-    io_ublox_odinw262_communicator_waitForBoot();
-
+    // TODO handle errors and implement WiFi watchdog
+    // https://github.com/UBC-Thunderbots/Software/issues/1875
     io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,00AAAAAAAA00\r");
     io_ublox_odinw262_communicator_sendATCommand("AT&W\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
     io_ublox_odinw262_communicator_waitForBoot();
 
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,0,0\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,1,3\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,2,1,3\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,3,1\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,100,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,107,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=0,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=1,1\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=4,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=2,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=3,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=5,3\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=4,1\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UETHCA=3\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,0,0\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,2,\"#WIFI_SSID\"\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,2,\"" WIFI_SSID "\"\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,5,2\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,8,\"#WIFI_PASS\"\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,8,\"" WIFI_PASS "\"\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,300,0\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,1\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSCA=0,3\r");
 
     for (;;)

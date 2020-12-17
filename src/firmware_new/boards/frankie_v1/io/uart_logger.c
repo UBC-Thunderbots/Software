@@ -11,6 +11,9 @@ static UART_HandleTypeDef* g_uart_handle;
 void io_uart_logger_init(UART_HandleTypeDef* uart_handle)
 {
     g_uart_handle = uart_handle;
+
+    // clear the console by sending the clear command
+    HAL_UART_Transmit(g_uart_handle, (uint8_t*)"\x1b[2J", 7, HAL_MAX_DELAY);
 }
 
 void io_uart_logger_handleRobotLog(TbotsProto_RobotLog robot_log)
