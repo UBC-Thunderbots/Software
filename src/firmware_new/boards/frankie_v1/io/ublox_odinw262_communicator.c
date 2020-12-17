@@ -15,9 +15,10 @@
 #include "task.h"
 
 // clang-format off
-// TODO have a way of configuring these values
-#define WIFI_SSID "SHAW-E1C430"
-#define WIFI_PASS "aksr#1605"
+// TODO have a way of configuring these values externally
+// https://github.com/UBC-Thunderbots/Software/issues/1876
+#define WIFI_SSID "thunderbots"
+#define WIFI_PASS "tbots1234"
 // clang-format on
 
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
