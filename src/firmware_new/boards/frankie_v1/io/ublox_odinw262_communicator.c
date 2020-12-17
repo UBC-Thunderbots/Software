@@ -14,12 +14,10 @@
 #include "main.h"
 #include "task.h"
 
-// clang-format off
 // TODO have a way of configuring these values externally
 // https://github.com/UBC-Thunderbots/Software/issues/1876
 #define WIFI_SSID "thunderbots"
 #define WIFI_PASS "tbots1234"
-// clang-format on
 
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
 #define RX_BUFFER_LENGTH_BYTES 4096
@@ -28,7 +26,7 @@
 DMA_BUFFER static uint8_t g_dma_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES] = {0};
 static char g_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES]                   = {0};
 
-// Interrupt State: The response status and counters are used by handleIdleLine
+// Interrupt state: the response status and counters are used by handleidleline
 volatile size_t g_dma_counter_on_uart_idle_line        = 0;
 volatile size_t g_last_byte_parsed_from_dma_buffer     = 0;
 volatile UbloxResponseStatus_t g_ublox_response_status = UBLOX_RESPONSE_UNDETERMINED;
@@ -52,7 +50,6 @@ void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
     g_ublox_reset_pin        = ublox_reset;
     g_ublox_response_timeout = ublox_response_timeout;
 
-    HAL_UART_DeInit(g_ublox_uart_handle);
     if (HAL_UART_Init(g_ublox_uart_handle) != HAL_OK)
     {
         TLOG_FATAL("Failed to initialize UART connection");
