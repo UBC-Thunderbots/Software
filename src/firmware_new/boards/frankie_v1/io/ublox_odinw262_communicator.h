@@ -6,7 +6,7 @@
 #include "firmware_new/boards/frankie_v1/usart.h"
 
 /**
- * Connects the u-blox Odin W262 to wifi and makes sure the connection is maintained
+ * Connects the u-blox ODIN-W262 to wifi and makes sure the connection is maintained
  * throughout the lifetime of the task.
  *
  * @param arg unused
@@ -14,7 +14,7 @@
 void io_ublox_odinw262_communicator_task(void* arg);
 
 /**
- * Initializes the Ublox Odin W262 Communicator. This allows us to send AT Commands
+ * Initializes the Ublox ODIN-W262 Communicator. This allows us to send AT Commands
  * according to the manual:
  *
  * https://www.u-blox.com/sites/default/files/u-connect-ATCommands-Manual_%28UBX-14044127%29_C1-Public.pdf
@@ -28,14 +28,14 @@ void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
                                          GpioPin_t* ublox_reset,
                                          uint32_t ublox_response_timeout);
 /*
- * Reset the u-blox Odin W262
+ * Reset the u-blox ODIN-W262
  *
  * NOTE: This resets the chip, including the interface
  */
 void io_ublox_odinw262_reset(void);
 
 /*
- * Wait for the u-blox Odin W262 to boot up
+ * Wait for the u-blox ODIN-W262 to boot up
  */
 void io_ublox_odinw262_communicator_waitForBoot(void);
 

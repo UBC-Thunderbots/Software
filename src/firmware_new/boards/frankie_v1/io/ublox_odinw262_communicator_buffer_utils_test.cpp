@@ -18,13 +18,13 @@ static char circular_buffer[500];
 
 /**
  * The following test uses the rapidcheck testing framework. Instead of trying to catch
- * edge cases with static tests, we define different "Commands" which are events that
- * modify the state of the buffers or System Under Test (Sut), and properties that should
- * hold true when these commands are applied.
+ * edge cases with static tests, we define "commands" which are events that modify the
+ * state of the buffers or System Under Test (Sut). We also define properties that should
+ * hold true when these commands are applied in any order.
  *
- * rapidcheck then tries to break those properties with the given commands. If any of
- * the defined properties break when applying the provided commands, rapidcheck will
- * log the sequence of commands that lead to that failure, and the test will fail.
+ * rapidcheck then tries to break the defined properties with the given commands. If any
+ * of the defined properties break when applying the commands, rapidcheck will log the
+ * sequence of commands that lead to that failure, and the test will fail.
  *
  * Read more about it here: https://github.com/emil-e/rapidcheck/
  */
@@ -64,6 +64,7 @@ struct PlaceDataInCircularBufferCommand
         else
         {
             size_t buffer_remaining = sut.buffer_length - sut.last_written_byte_position;
+
             memcpy(sut.circular_buffer + sut.last_written_byte_position, &data[0],
                    buffer_remaining);
             memcpy(sut.circular_buffer, &data[0] + buffer_remaining,
@@ -160,7 +161,7 @@ struct ATCommandResposne : PlaceDataInCircularBufferCommand
     }
     void show(std::ostream &os) const override
     {
-        os << "u-blox odin w262 responding: " << data;
+        os << "u-blox ODIN-W262 responding: " << data;
     }
 };
 

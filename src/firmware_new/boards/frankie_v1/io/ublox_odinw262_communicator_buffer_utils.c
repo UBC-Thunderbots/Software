@@ -10,7 +10,7 @@ inline UbloxResponseStatus_t
 io_ublox_odinw262_communicator_getUbloxResponseStatusFromCircularBuffer(
     size_t current_byte_position, size_t buffer_length, uint8_t* circular_buffer)
 {
-    // This function is desgined to run inside an interrupt routine, triggered when there
+    // This function is designed to run inside an interrupt routine, triggered when there
     // is an idle line on the g_ublox_uart_handle peripheral. The DMA receive buffer is
     // configured in circular mode with the IDLE_LINE interrupt enabled.
     //
@@ -48,7 +48,7 @@ io_ublox_odinw262_communicator_getUbloxResponseStatusFromCircularBuffer(
     //  repeat the same steps with g_ublox_error_response.
     //
     //  If g_ublox_error_response does not match, the UART_IT_IDLE must have triggered
-    //  prematurely. We return UBLOX_RESPONSE_INCOMPLETE in this case.
+    //  prematurely, so we return UBLOX_RESPONSE_INCOMPLETE.
     //
     UbloxResponseStatus_t ublox_response_status = UBLOX_RESPONSE_UNDETERMINED;
 
