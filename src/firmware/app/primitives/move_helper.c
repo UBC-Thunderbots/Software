@@ -33,7 +33,6 @@ typedef struct MoveHelperState
     // We store a wheel index here so we only have to calculate the axis
     // we want to use when move start is called
     unsigned optimal_wheel_axes_index;
-    bool slow;
 } MoveHelperState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveHelperState_t)
 
@@ -161,7 +160,6 @@ void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
     state->destination[1] = move_position_params.destination.y_meters;
     state->destination[2] = final_angle;
     state->end_speed      = move_position_params.final_speed_meters_per_second;
-    state->slow           = move_position_params.slow;
 
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
@@ -199,7 +197,7 @@ void app_move_helper_tick(void* void_state_ptr, FirmwareWorld_t* world)
 
     // plan major axis movement
     float max_major_a     = 3.5;
-    float max_major_v     = state->slow ? 1.25 : 3.0;
+    float max_major_v     = 3.0;
     float major_params[3] = {state->end_speed, max_major_a, max_major_v};
     app_physbot_planMove(&pb.maj, major_params);
 

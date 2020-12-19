@@ -27,6 +27,8 @@ class MoveAction : public Action
 
     MoveAction() = delete;
 
+    void updateWorldParams(const World& world) override;
+
     /**
      * Updates the params that cannot be derived from the world for this action
      *
@@ -35,16 +37,14 @@ class MoveAction : public Action
      * @param final_orientation The final orientation the robot should have at
      * the destination
      * @param final_speed The final speed the robot should have at the destination
-     * @param enable_dribbler Whether or not to enable the dribbler
-     * @param slow Whether or not to move slow
+     * @param dribbler_mode The dribbler mode
      * @param autokick This will enable the "break-beam" on the robot, that will
      * trigger the kicker or chippper to fire as soon as the ball is in front of it
      * @param ball_collision_type how to navigate around the ball
      */
     void updateControlParams(const Robot& robot, Point destination,
                              Angle final_orientation, double final_speed,
-                             DribblerEnable enable_dribbler, MoveType move_type,
-                             AutochickType autokick,
+                             DribblerMode dribbler_mode, AutochickType autokick,
                              BallCollisionType ball_collision_type);
 
     /**
@@ -82,9 +82,7 @@ class MoveAction : public Action
      *
      * @return the dribbler mode this move action should operate with
      */
-    DribblerEnable getDribblerEnabled();
-
-    void accept(MutableActionVisitor& visitor) override;
+    DribblerMode getDribblerMode();
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
@@ -93,8 +91,7 @@ class MoveAction : public Action
     Point destination;
     Angle final_orientation;
     double final_speed;
-    DribblerEnable enable_dribbler;
-    MoveType move_type;
+    DribblerMode dribbler_mode;
     AutochickType autokick_type;
     BallCollisionType ball_collision_type;
 

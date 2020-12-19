@@ -37,7 +37,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
     EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
     EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
               move_action->getFinalOrientation());
-    EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
+    EXPECT_EQ(DribblerMode::OFF, move_action->getDribblerMode());
     EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
 }
 
@@ -81,7 +81,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
         EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
         EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
                   move_action->getFinalOrientation());
-        EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
+        EXPECT_EQ(DribblerMode::OFF, move_action->getDribblerMode());
         EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
     }
 }
@@ -125,7 +125,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
     EXPECT_LT(move_action->getFinalOrientation().toDegrees(), -1);
     EXPECT_GT(move_action->getFinalOrientation().toDegrees(), -90);
 
-    EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
+    EXPECT_EQ(DribblerMode::OFF, move_action->getDribblerMode());
     EXPECT_EQ(move_action->getAutochickType(), AutochickType::AUTOKICK);
 }
 
@@ -163,7 +163,7 @@ TEST(ReceiverTacticTest,
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
+    EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerMode());
     EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
 }
 
@@ -208,7 +208,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
+    EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerMode());
     EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
 }
 

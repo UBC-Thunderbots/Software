@@ -191,12 +191,12 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
-        "//software/ai/evaluation:ball",
         "//software/ai/hl/stp/action:intercept_ball_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/logger",
+        "//software/world:ball",
     ],
 )
 
@@ -205,29 +205,6 @@ cc_test(
     srcs = ["passer_tactic_test.cpp"],
     deps = [
         ":passer_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "patrol_tactic",
-    srcs = ["patrol_tactic.cpp"],
-    hdrs = ["patrol_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "patrol_tactic_test",
-    srcs = ["patrol_tactic_test.cpp"],
-    deps = [
-        ":patrol_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -399,7 +376,6 @@ cc_library(
         ":kickoff_chip_tactic",
         ":move_tactic",
         ":passer_tactic",
-        ":patrol_tactic",
         ":penalty_kick_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",

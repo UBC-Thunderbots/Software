@@ -11,7 +11,6 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//software/ai/evaluation:ball",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:cherry_pick_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
@@ -21,6 +20,7 @@ cc_library(
         "//software/ai/passing:pass_generator",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
+        "//software/world:ball",
     ],
     alwayslink = True,
 )
@@ -34,7 +34,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
-        "//software/ai/evaluation:team",
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
         "//software/ai/hl/stp/tactic:defense_shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
@@ -46,6 +45,7 @@ cc_library(
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
         "//software/world:game_state",
+        "//software/world:team",
     ],
     alwayslink = True,
 )
@@ -132,7 +132,6 @@ cc_library(
         ":corner_kick_play",
         ":play",
         "//shared:constants",
-        "//software/ai/evaluation:ball",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:cherry_pick_tactic",
@@ -146,6 +145,7 @@ cc_library(
         "//software/ai/passing:pass_generator",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
+        "//software/world:ball",
     ],
     alwayslink = True,
 )
@@ -228,7 +228,6 @@ cc_library(
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
-        "//software/ai/hl/stp/tactic:patrol_tactic",
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:shoot_goal_tactic",
         "//software/ai/hl/stp/tactic:stop_tactic",

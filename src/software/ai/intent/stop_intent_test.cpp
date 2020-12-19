@@ -7,16 +7,8 @@
 // since Intents inherit from Primitives
 TEST(StopIntentTest, test_equality_operator_intents_equal)
 {
-    StopIntent stop_intent       = StopIntent(0, false, 0);
-    StopIntent stop_intent_other = StopIntent(0, false, 0);
+    StopIntent stop_intent       = StopIntent(0, false);
+    StopIntent stop_intent_other = StopIntent(0, false);
 
     EXPECT_EQ(stop_intent, stop_intent_other);
-}
-
-TEST(StopIntentTest, test_inequality_operator_with_mismatched_priorities)
-{
-    StopIntent stop_intent       = StopIntent(0, false, 1);
-    StopIntent stop_intent_other = StopIntent(0, false, 3);
-
-    EXPECT_NE(stop_intent, stop_intent_other);
 }
