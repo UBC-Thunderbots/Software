@@ -61,8 +61,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern ETH_HandleTypeDef heth;
-extern DMA_HandleTypeDef hdma_uart4_rx;
-extern UART_HandleTypeDef huart4;
+extern DMA_HandleTypeDef hdma_uart8_rx;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -186,38 +185,17 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
- * @brief This function handles DMA1 stream6 global interrupt.
+ * @brief This function handles DMA1 stream0 global interrupt.
  */
-void DMA1_Stream6_IRQHandler(void)
+void DMA1_Stream0_IRQHandler(void)
 {
-    /* USER CODE BEGIN DMA1_Stream6_IRQn 0 */
+    /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
 
-    /* USER CODE END DMA1_Stream6_IRQn 0 */
-    HAL_DMA_IRQHandler(&hdma_uart4_rx);
-    /* USER CODE BEGIN DMA1_Stream6_IRQn 1 */
+    /* USER CODE END DMA1_Stream0_IRQn 0 */
+    HAL_DMA_IRQHandler(&hdma_uart8_rx);
+    /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
 
-    /* USER CODE END DMA1_Stream6_IRQn 1 */
-}
-
-/**
- * @brief This function handles UART4 global interrupt.
- */
-void UART4_IRQHandler(void)
-{
-    /* USER CODE BEGIN UART4_IRQn 0 */
-    if (RESET != __HAL_UART_GET_FLAG(
-                     &huart4, UART_FLAG_IDLE))  // Judging whether it is idle interruption
-    {
-        __HAL_UART_CLEAR_IDLEFLAG(&huart4);  // Clear idle interrupt sign (otherwise it
-                                             // will continue to enter the interrupt)
-        io_ublox_odinw262_communicator_handleIdleLine();
-    }
-
-    /* USER CODE END UART4_IRQn 0 */
-    HAL_UART_IRQHandler(&huart4);
-    /* USER CODE BEGIN UART4_IRQn 1 */
-
-    /* USER CODE END UART4_IRQn 1 */
+    /* USER CODE END DMA1_Stream0_IRQn 1 */
 }
 
 /**

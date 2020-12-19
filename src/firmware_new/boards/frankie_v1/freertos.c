@@ -79,7 +79,7 @@ const osThreadAttr_t NetStartTask_attributes = {
 osThreadId_t RobotStatusTaskHandle;
 const osThreadAttr_t RobotStatusTask_attributes = {
     .name       = "RobotStatusTask",
-    .priority   = (osPriority_t)osPriorityNormal,
+    .priority   = (osPriority_t)osPriorityNormal1,
     .stack_size = 1024 * 4};
 /* Definitions for VisionMsgTask */
 osThreadId_t VisionMsgTaskHandle;
@@ -295,7 +295,7 @@ void initIoNetworking()
     GpioPin_t *ublox_reset_pin =
         io_gpio_pin_create(ublox_reset_GPIO_Port, ublox_reset_Pin, ACTIVE_LOW);
 
-    io_ublox_odinw262_communicator_init(&huart4, ublox_reset_pin, 5);
+    io_ublox_odinw262_communicator_init(&huart8, ublox_reset_pin, 5);
 
     // initialize network logger
     io_network_logger_init(RobotLogProtoQHandle);
