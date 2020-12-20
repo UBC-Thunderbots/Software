@@ -254,10 +254,12 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
         // TODO enable SNTP sys_now is currently only time since reset
         // https://github.com/UBC-Thunderbots/Software/issues/1518
-        // Change the values randomly for now
         robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();
-        robot_status_msg.break_beam_status.ball_in_beam = sys_now() % 2;
-        robot_status_msg.power_status.battery_voltage = sys_now() % 100;
+
+        // We change the power status values randomly so that robot diagnostics
+        // can "see" this robot on the network. This is a stopgap until we have
+        // actual values for RobotStatus
+        robot_status_msg.power_status.battery_voltage   = sys_now() % 100;
         robot_status_msg.power_status.capacitor_voltage = sys_now() % 100;
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,

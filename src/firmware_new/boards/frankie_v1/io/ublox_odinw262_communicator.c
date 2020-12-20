@@ -16,20 +16,20 @@
 
 // TODO have a way of configuring these values externally
 // https://github.com/UBC-Thunderbots/Software/issues/1876
-#define WIFI_SSID "thunderbots"
-#define WIFI_PASS "tbots1234"
+#define WIFI_SSID "SHAW-E1C430"
+#define WIFI_PASS "aksr#1605"
 
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
 #define RX_BUFFER_LENGTH_BYTES 4096
 
 // Buffers: The DMA_BUFFER is managed by the UART peripheral configured in "circular" mode
-DMA_BUFFER static uint8_t g_dma_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES] = {0};
-static char g_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES]                   = {0};
+DMA_BUFFER static uint8_t g_dma_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES];
+static char g_uart_receive_buffer[RX_BUFFER_LENGTH_BYTES];
 
 // Interrupt state: the response status and counters are used by handleidleline
 volatile size_t g_dma_counter_on_uart_idle_line        = 0;
 volatile size_t g_last_byte_parsed_from_dma_buffer     = 0;
-volatile UbloxResponseStatus_t g_ublox_response_status = UBLOX_RESPONSE_UNDETERMINED;
+volatile UbloxResponseStatus_t g_ublox_response_status = UBLOX_RESPONSE_INCOMPLETE;
 
 static osSemaphoreId_t g_dma_receive_semaphore;
 static UART_HandleTypeDef* g_ublox_uart_handle;
@@ -55,6 +55,9 @@ void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
         TLOG_FATAL("Failed to initialize UART connection");
     }
 
+    // clear out the DMA buffer from previous runs
+    memset(g_dma_uart_receive_buffer, 0, RX_BUFFER_LENGTH_BYTES);
+
     // We use idle line detection to know when to parse the circular buffer
     __HAL_UART_ENABLE_IT(g_ublox_uart_handle, UART_IT_IDLE);
 
@@ -76,13 +79,20 @@ void io_ublox_odinw262_communicator_task(void* arg)
     io_ublox_odinw262_reset();
     io_ublox_odinw262_communicator_waitForBoot();
 
-    // TODO handle errors and implement WiFi watchdog
-    // https://github.com/UBC-Thunderbots/Software/issues/1875
+    // TODO check the response of io_ublox_odinw262_communicator_sendATCommand
+    // and handle errors: https://github.com/UBC-Thunderbots/Software/issues/1875
     io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,00AAAAAAAA00\r");
     io_ublox_odinw262_communicator_sendATCommand("AT&W\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
     io_ublox_odinw262_communicator_waitForBoot();
 
+    // Adapted from 4.1.5 Use case #5: RMII/Ethernet to Wi-Fi Station Bridge
+    // https://www.u-blox.com/en/docs/UBX-16024251
+    //
+    // See
+    // https://www.u-blox.com/sites/default/files/u-connect-ATCommands-Manual_%28UBX-14044127%29_C1-Public.pdf
+    // for more info on each command. We setup the ethernet bridge, followed by the
+    // ethernet interface and then connect the u-blox to WiFi.
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,0,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,1,3,1\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,100,0\r");
@@ -103,6 +113,8 @@ void io_ublox_odinw262_communicator_task(void* arg)
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSCA=0,3\r");
 
+    // TODO implement WiFi watchdog, for now we just sleep indefinetly
+    // https://github.com/UBC-Thunderbots/Software/issues/1875
     for (;;)
     {
         osDelay(1000);
@@ -142,7 +154,6 @@ char* io_ublox_odinw262_communicator_sendATCommand(const char* command)
 {
     assert(g_initialized);
     TLOG_INFO("Sending AT Command to u-blox: %s", command);
-
     HAL_UART_Transmit(g_ublox_uart_handle, (uint8_t*)command, (uint16_t)strlen(command),
                       HAL_MAX_DELAY);
 
@@ -191,7 +202,7 @@ wait_for_ublox_to_respond:
             // A UBLOX_RESPONSE_INCOMPLETE indicates that there was a blip in the UART
             // msgs that was being received, triggering an idle line part way through
             // the transmission. We go back to waiting for the rest of the data.
-            TLOG_DEBUG("u-blox incomplete response");
+            /*TLOG_DEBUG("u-blox incomplete response");*/
             goto wait_for_ublox_to_respond;
         }
         case UBLOX_RESPONSE_ERROR:

@@ -22,6 +22,8 @@ typedef struct InfineonTLE5009E1000AngleSensor InfineonTLE5009E1000AngleSensor_t
  * waveform
  * @param x_min_value [in] The minimum value observed over a full period of the X output
  * waveform
+ * @param y_max_value [in] The maximum value observed over a full period of the Y output
+ * waveform
  * @param y_min_value [in] The minimum value observed over a full period of the Y output
  * waveform
  * @param x_magnitude_45_degrees [in] The X waveform magnitude at 45 degrees (as read by

@@ -62,6 +62,7 @@
 /* External variables --------------------------------------------------------*/
 extern ETH_HandleTypeDef heth;
 extern DMA_HandleTypeDef hdma_uart8_rx;
+extern UART_HandleTypeDef huart8;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -224,6 +225,27 @@ void ETH_WKUP_IRQHandler(void)
     /* USER CODE BEGIN ETH_WKUP_IRQn 1 */
 
     /* USER CODE END ETH_WKUP_IRQn 1 */
+}
+
+/**
+ * @brief This function handles UART8 global interrupt.
+ */
+void UART8_IRQHandler(void)
+{
+    /* USER CODE BEGIN UART8_IRQn 0 */
+    if (RESET != __HAL_UART_GET_FLAG(
+                     &huart8, UART_FLAG_IDLE))  // Judging whether it is idle interruption
+    {
+        __HAL_UART_CLEAR_IDLEFLAG(&huart8);  // Clear idle interrupt sign (otherwise it
+                                             // will continue to enter the interrupt)
+        io_ublox_odinw262_communicator_handleIdleLine();
+    }
+
+    /* USER CODE END UART8_IRQn 0 */
+    HAL_UART_IRQHandler(&huart8);
+    /* USER CODE BEGIN UART8_IRQn 1 */
+
+    /* USER CODE END UART8_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

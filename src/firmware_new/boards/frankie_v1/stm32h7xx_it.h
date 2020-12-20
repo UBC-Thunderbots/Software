@@ -58,6 +58,7 @@ extern "C"
     void DMA1_Stream0_IRQHandler(void);
     void ETH_IRQHandler(void);
     void ETH_WKUP_IRQHandler(void);
+    void UART8_IRQHandler(void);
     /* USER CODE BEGIN EFP */
 
     /* USER CODE END EFP */
