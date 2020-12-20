@@ -202,7 +202,6 @@ wait_for_ublox_to_respond:
             // A UBLOX_RESPONSE_INCOMPLETE indicates that there was a blip in the UART
             // msgs that was being received, triggering an idle line part way through
             // the transmission. We go back to waiting for the rest of the data.
-            /*TLOG_DEBUG("u-blox incomplete response");*/
             goto wait_for_ublox_to_respond;
         }
         case UBLOX_RESPONSE_ERROR:
