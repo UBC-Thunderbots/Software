@@ -42,7 +42,7 @@ const char* io_uart_logger_convertLogLevelEnumToString(TbotsProto_LogLevel log_l
         }
         case TbotsProto_LogLevel_WARNING:
         {
-            return "\033[33m[ WARN  ]";
+            return "\033[33m[WARNING]";
         }
         case TbotsProto_LogLevel_FATAL:
         {

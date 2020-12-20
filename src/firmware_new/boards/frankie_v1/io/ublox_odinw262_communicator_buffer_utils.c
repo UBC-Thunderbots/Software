@@ -50,6 +50,12 @@ io_ublox_odinw262_communicator_getUbloxResponseStatusFromCircularBuffer(
     //  If g_ublox_error_response does not match, the UART_IT_IDLE must have triggered
     //  prematurely, so we return UBLOX_RESPONSE_INCOMPLETE.
     //
+    //  NOTE: To compare the strings, we don't use strstr because we would need to
+    //  copy the data out of the circular buffer, add a null char, and then call strstr,
+    //  which would potentially make the interrupt pretty heavy.
+    //
+    //  Instead, we just use a simple for loop to compare the characters directly
+    //  in the circular_buffer.
     UbloxResponseStatus_t ublox_response_status = UBLOX_RESPONSE_UNDETERMINED;
 
     size_t start_pos_response_ok =
