@@ -10,6 +10,7 @@
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 
+
 /**
  * A custom version of the DrawFunctionVisualizer widget that allows the user to
  * interact with the simulation, such as clicking to place the ball
@@ -28,6 +29,14 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
      */
     void setStandaloneSimulator(std::shared_ptr<StandaloneSimulator> simulator);
 
+
+    /**
+     * Gets the WorldDrawFunction for the Simulator to draw the
+     * vector when the ball is moving
+     *
+     */
+    WorldDrawFunction getDrawBallVelocityFunction();
+
    private:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
@@ -36,5 +45,15 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
 
     // The robot currently being placed by the user, if any
     std::weak_ptr<PhysicsRobot> robot;
+
+    // Boolean to check if the user ctrl clicked
+    bool ctrl_clicked = false;
+
+    //The initial point when adding force to the ball, if any
+    Point initial_point;
+
+    //The final point when adding force to the ball, if any
+    Point final_point;
+
     std::shared_ptr<StandaloneSimulator> standalone_simulator;
 };

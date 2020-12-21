@@ -14,7 +14,8 @@ qt_cc_library(
         "//software/simulation/physics:physics_robot",
         "//software/world:robot_state",
         "//software/world:team_colour",
-        "@qt//:qt_widgets",
+        "//software/gui/drawing:ball",
+        "@qt//:qt_widgets"
     ],
 )
 
