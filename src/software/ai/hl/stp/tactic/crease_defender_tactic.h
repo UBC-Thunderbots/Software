@@ -60,6 +60,7 @@ class CreaseDefenderTactic : public Tactic
     Team getFriendlyTeam() const;
 
     // Distance to chip the ball when trying to yeet it
+    // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
    private:
