@@ -49,10 +49,10 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
     // Boolean to check if the user ctrl clicked
     bool ctrl_clicked = false;
 
-    //The initial point when adding force to the ball, if any
+    // The initial point when adding force to the ball, if any
     Point initial_point;
 
-    //The final point when adding force to the ball, if any
+    // The final point when adding force to the ball, if any
     Point final_point;
 
     std::shared_ptr<StandaloneSimulator> standalone_simulator;

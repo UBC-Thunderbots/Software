@@ -1,9 +1,10 @@
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_draw_function_visualizer.h"
 
 #include <QtWidgets/QMenu>
+
+#include "software/gui/drawing/ball.h"
 #include "software/gui/geometry_conversion.h"
 #include "software/simulation/simulator.h"
-#include "software/gui/drawing/ball.h"
 
 
 StandaloneSimulatorDrawFunctionVisualizer::StandaloneSimulatorDrawFunctionVisualizer(
@@ -25,12 +26,10 @@ void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* eve
     // If Ctrl is pressed, place the ball where the user clicks
     if (event->modifiers() & Qt::ControlModifier && standalone_simulator)
     {
-        ctrl_clicked = true;
+        ctrl_clicked         = true;
         Point point_in_scene = createPoint(mapToScene(event->pos()));
         initial_point        = createPoint(mapToScene(event->pos()));
         standalone_simulator->setBallState(BallState(point_in_scene, Vector(0, 0)));
-        
-
     }
     else if (event->modifiers() & Qt::ShiftModifier && standalone_simulator)
     {
@@ -47,12 +46,14 @@ void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* eve
 void StandaloneSimulatorDrawFunctionVisualizer::mouseReleaseEvent(QMouseEvent* event)
 {
     robot.reset();
-    if(ctrl_clicked){
+    if (ctrl_clicked)
+    {
         final_point = createPoint(mapToScene(event->pos()));
-        standalone_simulator->setBallState(BallState(initial_point, initial_point - final_point));
-        initial_point = Point(0,0);
-        final_point = Point(0,0);
-        ctrl_clicked = false;
+        standalone_simulator->setBallState(
+            BallState(initial_point, initial_point - final_point));
+        initial_point = Point(0, 0);
+        final_point   = Point(0, 0);
+        ctrl_clicked  = false;
     }
 
     DrawFunctionVisualizer::mouseReleaseEvent(event);
@@ -69,17 +70,18 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseMoveEvent(QMouseEvent* even
     if (ctrl_clicked && standalone_simulator)
     {
         final_point = createPoint(mapToScene(event->pos()));
-
     }
     DrawFunctionVisualizer::mouseMoveEvent(event);
 }
 
-WorldDrawFunction StandaloneSimulatorDrawFunctionVisualizer::getDrawBallVelocityFunction(){
-    Point position = initial_point;
+WorldDrawFunction StandaloneSimulatorDrawFunctionVisualizer::getDrawBallVelocityFunction()
+{
+    Point position  = initial_point;
     Vector velocity = initial_point - final_point;
 
-    auto draw_function = [position,velocity](QGraphicsScene* scene){
-        drawBallVelocity(scene, position,velocity,ball_speed_slow_color,ball_speed_fast_color);
+    auto draw_function = [position, velocity](QGraphicsScene* scene) {
+        drawBallVelocity(scene, position, velocity, ball_speed_slow_color,
+                         ball_speed_fast_color);
     };
     return WorldDrawFunction(draw_function);
 }
