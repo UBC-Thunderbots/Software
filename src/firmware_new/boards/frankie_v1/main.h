@@ -135,6 +135,8 @@ extern "C"
 #define USB_DM_GPIO_Port GPIOA
 #define USB_DP_Pin GPIO_PIN_12
 #define USB_DP_GPIO_Port GPIOA
+#define ublox_reset_Pin GPIO_PIN_2
+#define ublox_reset_GPIO_Port GPIOD
 #define wheel_motor_back_right_mode_Pin GPIO_PIN_3
 #define wheel_motor_back_right_mode_GPIO_Port GPIOD
 #define RMII_TX_EN_Pin GPIO_PIN_11
