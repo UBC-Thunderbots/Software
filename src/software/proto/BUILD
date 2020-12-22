@@ -1,4 +1,5 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -83,4 +84,23 @@ cc_proto_library(
 cc_proto_library(
     name = "repeated_any_msg_cc_proto",
     deps = [":repeated_any_msg_proto"],
+)
+
+py_proto_library(
+    name = "software_py_proto",
+    srcs = [
+        "messages_robocup_ssl_detection.proto",
+        "messages_robocup_ssl_geometry.proto",
+        "messages_robocup_ssl_wrapper.proto",
+        "repeated_any_msg.proto",
+        "replay_msg.proto",
+        "sensor_msg.proto",
+        "ssl_gc_common.proto",
+        "ssl_gc_game_event.proto",
+        "ssl_gc_geometry.proto",
+        "ssl_gc_referee_message.proto",
+    ],
+    deps = [
+        "//shared/proto:tbots_py_proto",
+    ],
 )

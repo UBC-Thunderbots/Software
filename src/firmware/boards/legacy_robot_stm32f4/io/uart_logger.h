@@ -7,4 +7,4 @@
  *
  * @param log The log msg to print over UART
  */
-void io_uart_logger_handle_robot_log(TbotsProto_RobotLog log);
+void io_uart_logger_handleRobotLog(TbotsProto_RobotLog log);

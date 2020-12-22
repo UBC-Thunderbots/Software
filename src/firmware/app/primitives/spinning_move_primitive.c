@@ -15,7 +15,6 @@ typedef struct SpinningMovePrimitiveState
     float y_final;
     float avel_final;
     float end_speed;
-    bool slow;
 
     float major_vec[2];
     float minor_vec[2];
@@ -38,7 +37,6 @@ void app_spinning_move_primitive_start(TbotsProto_SpinningMovePrimitive prim_msg
     state->y_final    = prim_msg.position_params.destination.y_meters;
     state->avel_final = prim_msg.angular_velocity.radians_per_second;
     state->end_speed  = prim_msg.position_params.final_speed_meters_per_second;
-    state->slow       = prim_msg.position_params.slow;
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 

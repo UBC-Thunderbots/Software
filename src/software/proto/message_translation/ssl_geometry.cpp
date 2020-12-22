@@ -125,11 +125,11 @@ std::unique_ptr<SSLProto::SSL_FieldCircularArc> createFieldCircularArc(
     auto field_circular_arc = std::make_unique<SSLProto::SSL_FieldCircularArc>();
 
     field_circular_arc->set_name(ssl_circular_arc_names.at(arc_type));
-    *(field_circular_arc->mutable_center()) = *createVector2f(circle.getOrigin());
+    *(field_circular_arc->mutable_center()) = *createVector2f(circle.origin());
     // SSL Vision publishes all units in millimeters (even though the datatype
     // is a float), so we need to convert units
     field_circular_arc->set_radius(
-        static_cast<float>(circle.getRadius() * MILLIMETERS_PER_METER));
+        static_cast<float>(circle.radius() * MILLIMETERS_PER_METER));
     field_circular_arc->set_a1(static_cast<float>(Angle::zero().toRadians()));
     field_circular_arc->set_a2(static_cast<float>(Angle::full().toRadians()));
     field_circular_arc->set_thickness(
