@@ -6,7 +6,7 @@ CPP_TYPE_MAP = {
     "float": "double",
     "string": "std::string",
     "factory": "std::string",
-    "enum": None,
+    "enum": "std::string",
 }
 
 C_TYPE_MAP = {

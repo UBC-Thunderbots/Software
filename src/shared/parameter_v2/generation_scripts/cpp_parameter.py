@@ -1,4 +1,5 @@
 from type_map import CPP_TYPE_MAP
+from dynamic_parameter_schema import CONSTANT_KEY
 import re
 
 #######################################################################
@@ -15,6 +16,11 @@ PARAMETER_PUBLIC_ENTRY = """const std::shared_ptr<const {param_class}<{type}>> {
         return {param_variable_name};
     }}"""
 
+PARAMETER_PUBLIC_ENTRY_CONST = """const std::shared_ptr<const {param_class}<{type}>> {immutable_accessor_name}() const
+    {{
+        return std::const_pointer_cast<const {param_class}<{type}>>({param_variable_name});
+    }}"""
+
 PARAMETER_PRIVATE_ENTRY = (
     "std::shared_ptr<{param_class}<{type}>> {param_variable_name};"
 )
@@ -29,7 +35,7 @@ IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY = (
 
 PARAMETER_COMMAND_LINE_BOOL_SWITCH_ENTRY = 'desc.add_options()("{param_name}", boost::program_options::bool_switch(&args.{arg_prefix}{param_name}), "{param_desc}");'
 
-PARAMETER_COMMAND_LINE_ENTRY = 'desc.add_options()("{param_name}", boost::program_options::value<{type}>(&args.{arg_prefix}{param_name}), "{param_desc}");'
+PARAMETER_COMMAND_LINE_ENTRY = 'desc.add_options()("{arg_prefix}{param_name}", boost::program_options::value<{type}>(&args.{arg_prefix}{param_name}), "{param_desc}");'
 
 COMMAND_LINE_ARG_ENTRY = "{param_type} {param_name} = {quote}{value}{quote};"
 
@@ -47,7 +53,8 @@ class CppParameter(object):
         self.param_type = param_type
         self.param_name = param_metadata["name"]
         self.__param_variable_name = self.param_name + "_param"
-        self.param_description = param_metadata["description"]
+        self.param_description = param_metadata["description"] #TODO: change strings to KEY
+        self.is_constant = param_metadata[CONSTANT_KEY] if CONSTANT_KEY in param_metadata else False
         param_value = param_metadata["value"]
 
         quote = CppParameter.find_quote(param_type)
@@ -120,7 +127,12 @@ class CppParameter(object):
             param_variable_name=self.param_variable_name,
         )
 
-        self.__parameter_public_entry = PARAMETER_PUBLIC_ENTRY.format(
+        self.__parameter_public_entry = PARAMETER_PUBLIC_ENTRY_CONST.format(
+            param_class=param_class,
+            type=self.type_parameter,
+            immutable_accessor_name=self.param_name,
+            param_variable_name=self.param_variable_name,
+        ) if self.is_constant else PARAMETER_PUBLIC_ENTRY.format(
             param_class=param_class,
             type=self.type_parameter,
             immutable_accessor_name=self.param_name,

@@ -1,7 +1,7 @@
 from cpp_config import CppConfig
 from cpp_parameter import CppParameter
 from typing import List
-from dynamic_parameter_schema import PARAMETER_KEY, INCLUDE_KEY, CONSTANT_KEY
+from dynamic_parameter_schema import PARAMETER_KEY, INCLUDE_KEY
 import networkx as nx
 
 #######################################################################
@@ -65,6 +65,7 @@ class CppWriter(object):
         cpp_configs = []
         cpp_configs_dict = {}
         dependency_graph = nx.DiGraph()
+        top_level_config = CppConfig(top_level_config_name, True)
 
         # first pass to construct all CppConfig objects
         for config, metadata in config_metadata.items():
@@ -73,6 +74,7 @@ class CppWriter(object):
             )  # TODO: just use Cwriter to_camel_case for all usages of the function
 
             config = CppConfig(config_name)
+            top_level_config.include_config(config)
 
             if PARAMETER_KEY in metadata:
                 for parameter in metadata[PARAMETER_KEY]:
@@ -115,13 +117,12 @@ class CppWriter(object):
                 nx.algorithms.dag.descendants(dependency_graph, node)
             )
 
-        for node in dependency_graph.nodes:
-            # all nodes have dependency graph set, init the rest of config properties
-            # TODO: maybe do this in reverse topo order to avoid doing post_init
-            dependency_graph.nodes[node]["config"].post_dependency_graph_init()
+        top_level_config.dependency_graph = dependency_graph
+        cpp_configs.append(top_level_config)
 
-        # create cpp config objects
-        # create a dict from
+        for config in cpp_configs:
+            # all nodes have dependency graph set, init the rest of config properties
+            config.post_dependency_graph_init()
 
         # create graph of dependencies, with all sources as starting vertex
         return cpp_configs
@@ -134,7 +135,6 @@ class CppWriter(object):
     def write_config_metadata(
         output_file: str, top_level_config_name: str, config_metadata: dict
     ):
-        print("========================================")
         cpp_configs = CppWriter.create_config_list_from_metadata(
             top_level_config_name, config_metadata
         )
@@ -156,4 +156,5 @@ class CppWriter(object):
 
     @staticmethod
     def to_camel_case(snake_str):
+        # TODO: change x
         return "".join(x.title() for x in snake_str.split("_"))
