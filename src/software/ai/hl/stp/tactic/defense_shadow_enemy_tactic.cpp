@@ -4,20 +4,20 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
 
-DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field,
-                                                   const Team &friendly_team,
-                                                   const Team &enemy_team,
-                                                   const Ball &ball, bool ignore_goalie,
-                                                   double shadow_distance)
+DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(
+    const Field &field, const Team &friendly_team, const Team &enemy_team,
+    const Ball &ball, bool ignore_goalie, double shadow_distance,
+    std::shared_ptr<const DefenseShadowEnemyTacticConfig>
+        defense_shadow_enemy_tactic_config)
     : Tactic(true, {RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       ball(ball),
       ignore_goalie(ignore_goalie),
-      shadow_distance(shadow_distance)
+      shadow_distance(shadow_distance),
+      defense_shadow_enemy_tactic_config(defense_shadow_enemy_tactic_config)
 {
 }
 
@@ -90,14 +90,12 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
         if (enemy_robot.isNearDribbler(ball.position()) &&
-            ball.velocity().length() < DynamicParameters->getAIConfig()
-                                           ->getDefenseShadowEnemyTacticConfig()
-                                           ->BallStealSpeed()
-                                           ->value())
+            ball.velocity().length() <
+                defense_shadow_enemy_tactic_config->BallStealSpeed()->value())
         {
             move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
-                0, DribblerEnable::ON, MoveType::NORMAL, AutochickType::AUTOCHIP,
+                0, DribblerMode::MAX_FORCE, AutochickType::AUTOCHIP,
                 BallCollisionType::AVOID);
             yield(move_action);
         }
@@ -105,10 +103,9 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         {
             Angle facing_enemy_robot =
                 (enemy_robot.position() - robot->position()).orientation();
-            move_action->updateControlParams(*robot, position_to_block_shot,
-                                             facing_enemy_robot, 0, DribblerEnable::OFF,
-                                             MoveType::NORMAL, AutochickType::AUTOCHIP,
-                                             BallCollisionType::AVOID);
+            move_action->updateControlParams(
+                *robot, position_to_block_shot, facing_enemy_robot, 0, DribblerMode::OFF,
+                AutochickType::AUTOCHIP, BallCollisionType::AVOID);
             yield(move_action);
         }
 

@@ -3,8 +3,8 @@
 #include <iostream>
 #include <numeric>
 
-#include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
+#include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend>::create(args->backend()->value());
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(sensor_fusion_config);
-        auto ai            = std::make_shared<AIWrapper>(ai_config, ai_control_config);
+        auto ai            = std::make_shared<ThreadedAI>(ai_config, ai_control_config);
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers

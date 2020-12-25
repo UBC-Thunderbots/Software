@@ -1,37 +1,36 @@
-#include "software/ai/ai_wrapper.h"
+#include "software/ai/threaded_ai.h"
 
 #include <boost/bind.hpp>
 
 #include "software/gui/drawing/navigator.h"
 #include "software/parameter/dynamic_parameters.h"
 
-AIWrapper::AIWrapper(std::shared_ptr<const AIConfig> ai_config,
-                     std::shared_ptr<const AIControlConfig> control_config)
+ThreadedAI::ThreadedAI(std::shared_ptr<const AIConfig> ai_config,
+                       std::shared_ptr<const AIControlConfig> control_config)
     : ai(ai_config, control_config), control_config(control_config)
 {
 }
 
-void AIWrapper::onValueReceived(World world)
+void ThreadedAI::onValueReceived(World world)
 {
-    most_recent_world = world;
-    runAIAndSendPrimitives();
+    runAIAndSendPrimitives(world);
+    drawAI();
 }
 
-void AIWrapper::runAIAndSendPrimitives()
+void ThreadedAI::runAIAndSendPrimitives(const World &world)
 {
-    if (most_recent_world && control_config->RunAI()->value())
+    if (control_config->RunAI()->value())
     {
-        auto new_primitives = ai.getPrimitives(*most_recent_world);
+        auto new_primitives = ai.getPrimitives(world);
 
         PlayInfo play_info = ai.getPlayInfo();
         Subject<PlayInfo>::sendValueToObservers(play_info);
 
         Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
     }
-    drawAI();
 }
 
-void AIWrapper::drawAI()
+void ThreadedAI::drawAI()
 {
     if (ai.getNavigator())
     {

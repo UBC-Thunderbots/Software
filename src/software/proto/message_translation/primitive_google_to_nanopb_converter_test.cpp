@@ -15,9 +15,8 @@
 
 TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 {
-    TbotsProto::Primitive google_primitive =
-        *createLegacyMovePrimitive(Point(1, 2), Angle::half(), 100, DribblerEnable::ON,
-                                   MoveType::SLOW, AutochickType::NONE);
+    TbotsProto::Primitive google_primitive = *createLegacyMovePrimitive(
+        Point(1, 2), Angle::half(), 100, DribblerMode::MAX_FORCE, AutochickType::NONE);
 
     TbotsProto_Primitive nanopb_primitive = createNanoPbPrimitive(google_primitive);
 
@@ -27,7 +26,6 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
     EXPECT_EQ(
         nanopb_primitive.primitive.move.position_params.final_speed_meters_per_second,
         100.0f);
-    EXPECT_EQ(nanopb_primitive.primitive.move.position_params.slow, true);
     EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
               static_cast<float>(M_PI));
     EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);
@@ -35,16 +33,14 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 
 TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
 {
-    *createLegacyMovePrimitive(Point(1, 2), Angle::half(), 100, DribblerEnable::ON,
-                               MoveType::SLOW, AutochickType::NONE);
-    *createLegacyMovePrimitive(Point(2, 4), Angle::half(), 50, DribblerEnable::ON,
-                               MoveType::NORMAL, AutochickType::NONE);
-    TbotsProto::Primitive google_primitive_1 =
-        *createLegacyMovePrimitive(Point(1, 2), Angle::half(), 100, DribblerEnable::ON,
-                                   MoveType::SLOW, AutochickType::NONE);
-    TbotsProto::Primitive google_primitive_2 =
-        *createLegacyMovePrimitive(Point(2, 4), Angle::half(), 50, DribblerEnable::ON,
-                                   MoveType::NORMAL, AutochickType::NONE);
+    *createLegacyMovePrimitive(Point(1, 2), Angle::half(), 100, DribblerMode::MAX_FORCE,
+                               AutochickType::NONE);
+    *createLegacyMovePrimitive(Point(2, 4), Angle::half(), 50, DribblerMode::MAX_FORCE,
+                               AutochickType::NONE);
+    TbotsProto::Primitive google_primitive_1 = *createLegacyMovePrimitive(
+        Point(1, 2), Angle::half(), 100, DribblerMode::MAX_FORCE, AutochickType::NONE);
+    TbotsProto::Primitive google_primitive_2 = *createLegacyMovePrimitive(
+        Point(2, 4), Angle::half(), 50, DribblerMode::MAX_FORCE, AutochickType::NONE);
 
     auto google_primitive_set  = std::make_unique<TbotsProto::PrimitiveSet>();
     auto& robot_primitives_map = *google_primitive_set->mutable_robot_primitives();
@@ -73,7 +69,6 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
             EXPECT_EQ(nanopb_primitive.primitive.move.position_params
                           .final_speed_meters_per_second,
                       100.0f);
-            EXPECT_EQ(nanopb_primitive.primitive.move.position_params.slow, true);
             EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
                       static_cast<float>(M_PI));
             EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);
@@ -92,7 +87,6 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
             EXPECT_EQ(nanopb_primitive.primitive.move.position_params
                           .final_speed_meters_per_second,
                       50.0f);
-            EXPECT_EQ(nanopb_primitive.primitive.move.position_params.slow, false);
             EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
                       static_cast<float>(M_PI));
             EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);

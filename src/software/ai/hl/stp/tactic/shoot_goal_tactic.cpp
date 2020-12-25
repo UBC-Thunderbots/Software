@@ -6,12 +6,12 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/rectangle.h"
-#include "software/parameter/dynamic_parameters.h"
 
-ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
-                                 const Team &enemy_team, const Ball &ball,
-                                 Angle min_net_open_angle,
-                                 std::optional<Point> chip_target, bool loop_forever)
+ShootGoalTactic::ShootGoalTactic(
+    const Field &field, const Team &friendly_team, const Team &enemy_team,
+    const Ball &ball, Angle min_net_open_angle, std::optional<Point> chip_target,
+    bool loop_forever,
+    std::shared_ptr<const ShootGoalTacticConfig> shoot_goal_tactic_config)
     : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
@@ -19,7 +19,8 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
       ball(ball),
       min_net_open_angle(min_net_open_angle),
       chip_target(chip_target),
-      has_shot_available(false)
+      has_shot_available(false),
+      shoot_goal_tactic_config(shoot_goal_tactic_config)
 {
 }
 
@@ -74,14 +75,11 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     Vector front_of_robot_dir =
         Vector(robot->orientation().cos(), robot->orientation().sin());
 
-    auto steal_ball_rect_width = DynamicParameters->getAIConfig()
-                                     ->getShootGoalTacticConfig()
-                                     ->EnemyAboutToStealBallRectangleWidth()
-                                     ->value();
-    auto steal_ball_rect_length = DynamicParameters->getAIConfig()
-                                      ->getShootGoalTacticConfig()
-                                      ->EnemyAboutToStealBallRectangleExtensionLength()
-                                      ->value();
+    auto steal_ball_rect_width =
+        shoot_goal_tactic_config->EnemyAboutToStealBallRectangleWidth()->value();
+    auto steal_ball_rect_length =
+        shoot_goal_tactic_config->EnemyAboutToStealBallRectangleExtensionLength()
+            ->value();
     Rectangle baller_frontal_area = Rectangle(
         (robot->position() +
          front_of_robot_dir.perpendicular().normalize(steal_ball_rect_width / 2.0)),
