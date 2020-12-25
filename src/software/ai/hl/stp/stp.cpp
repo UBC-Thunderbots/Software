@@ -36,26 +36,6 @@ void STP::updateSTPState(const World& world)
 void STP::updateGameState(const World& world)
 {
     current_game_state = world.gameState();
-    if (control_config->OverrideRefereeCommand()->value())
-    {
-        std::string previous_state_string =
-            control_config->PreviousRefereeCommand()->value();
-        std::string current_state_string =
-            control_config->CurrentRefereeCommand()->value();
-        try
-        {
-            RefereeCommand previous_state =
-                fromStringToRefereeCommand(previous_state_string);
-            current_game_state.updateRefereeCommand(previous_state);
-            RefereeCommand current_state =
-                fromStringToRefereeCommand(current_state_string);
-            current_game_state.updateRefereeCommand(current_state);
-        }
-        catch (std::invalid_argument e)
-        {
-            LOG(WARNING) << e.what();
-        }
-    }
 }
 
 void STP::updateAIPlay(const World& world)

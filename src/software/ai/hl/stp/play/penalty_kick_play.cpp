@@ -49,7 +49,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Point behind_ball = world.ball().position() + behind_ball_direction.normalize(
                                                           DIST_TO_FRONT_OF_ROBOT_METERS +
                                                           BALL_MAX_RADIUS_METERS + 0.1);
-	//double non_shooter_y_behind_ball = behind_ball.y() - 1;
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
@@ -80,7 +79,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             tactics_to_run.emplace_back(penalty_shot_tactic);
         }
         // Move all non-shooter robots to the center of the field
-	std::cout << world.gameState().isSetupState() << "\n";
 	tactics_to_run.emplace_back(goalie_tactic);
         tactics_to_run.emplace_back(move_tactic_2);
         tactics_to_run.emplace_back(move_tactic_3);

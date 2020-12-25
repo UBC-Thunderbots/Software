@@ -68,3 +68,25 @@ SensorFusionConfig:
     description: >-
       Overrides the enemy goalie id provided by the game controller,
       with EnemyGoalieId parameter
+  OverrideRefereeCommand:
+    type: "bool"
+    default: true
+    description: >-
+        Overrides the current referee command with the play 
+        specified by CurrentRefereeCommand and PreviousRefereeCommand
+        parameter
+  CurrentRefereeCommand:
+    type: "std::string"
+    default: "HALT"
+    description: >-
+        Specifies the referee command that should be in use
+  PreviousRefereeCommand:
+    type: "std::string"
+    default: "HALT"
+    description: >-
+        Specifies the previous referee command to correctly set up 
+        the referee command state machine when overriding the referee command.
+        For example, if `PREPARE_KICKOFF_US` followed by `NORMAL_START`, 
+        then `isOurRestart()` will be `true`, while 
+        `PREPARE_KICKOFF_THEM` followed by `NORMAL_START` will set 
+        `isOurRestart()` to `false`

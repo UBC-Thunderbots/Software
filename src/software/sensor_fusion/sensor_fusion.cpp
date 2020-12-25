@@ -52,6 +52,27 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
         updateWorld(sensor_msg.ssl_referee_msg());
     }
 
+    if (sensor_fusion_config->OverrideRefereeCommand()->value())
+    {
+        std::string previous_state_string =
+            sensor_fusion_config->PreviousRefereeCommand()->value();
+        std::string current_state_string =
+            sensor_fusion_config->CurrentRefereeCommand()->value();
+        try
+        {
+            RefereeCommand previous_state =
+                fromStringToRefereeCommand(previous_state_string);
+            game_state.updateRefereeCommand(previous_state);
+            RefereeCommand current_state =
+                fromStringToRefereeCommand(current_state_string);
+            game_state.updateRefereeCommand(current_state);
+        }
+        catch (std::invalid_argument e)
+        {
+            LOG(WARNING) << e.what();
+        }
+    }
+
     updateWorld(sensor_msg.robot_status_msgs());
 }
 
@@ -81,8 +102,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
 }
 
 void SensorFusion::updateWorld(const SSLProto::Referee &packet)
-{
-    // TODO remove DynamicParameters as part of
+{   // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {

@@ -102,13 +102,13 @@ void SimulatedTestFixture::setRefereeCommand(
     const RefereeCommand &current_referee_command,
     const RefereeCommand &previous_referee_command)
 {
-    MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableOverrideRefereeCommand()
         ->setValue(true);
-    MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableCurrentRefereeCommand()
         ->setValue(toString(current_referee_command));
-    MutableDynamicParameters->getMutableAIControlConfig()
+    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutablePreviousRefereeCommand()
         ->setValue(toString(previous_referee_command));
 }
@@ -167,7 +167,12 @@ void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &terminating_validation_functions,
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
-{
+{   //send referee packet??
+
+    SensorProto sensor_msg;
+    *(sensor_msg.mutable_ssl_referee_msg()) = *(std::make_unique<SSLProto::Referee>());
+    sensor_fusion.processSensorProto(sensor_msg);
+
     updateSensorFusion();
     std::shared_ptr<World> world;
     if (auto world_opt = sensor_fusion.getWorld())
@@ -199,7 +204,6 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {
-      std::cout <<  sensor_fusion.getWorld().value().gameState().isSetupState() << "\n";
         auto wall_start_time = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {
