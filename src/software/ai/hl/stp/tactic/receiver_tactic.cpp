@@ -101,6 +101,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             Point ideal_position    = shot.getPointToShootAt();
             Angle ideal_orientation = shot.getOpenAngle();
 
+            // Kicking at less than ball max speed to make sure we don't break rules
             autokick_move_action->updateControlParams(
                 *robot, ideal_position, ideal_orientation, 0, DribblerMode::OFF,
                 BALL_MAX_SPEED_METERS_PER_SECOND - 1, BallCollisionType::ALLOW);
