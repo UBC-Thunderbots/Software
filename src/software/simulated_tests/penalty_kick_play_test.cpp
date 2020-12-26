@@ -4,6 +4,7 @@
 
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
+#include "software/simulated_tests/validation_functions/friendly_scored_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -31,7 +32,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(29.5))
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
                 yield();
             }
@@ -41,7 +42,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 
     enableVisualizer();
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(9.5));
 }
 
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
@@ -69,15 +70,12 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(29.5))
-            {
-                yield();
-            }
+            friendlyScored(world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     enableVisualizer();
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(30));
+            Duration::fromSeconds(9.5));
 }

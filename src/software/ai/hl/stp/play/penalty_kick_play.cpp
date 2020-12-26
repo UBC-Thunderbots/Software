@@ -79,7 +79,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             tactics_to_run.emplace_back(penalty_shot_tactic);
         }
         // Move all non-shooter robots to the center of the field
-	tactics_to_run.emplace_back(goalie_tactic);
+	    tactics_to_run.emplace_back(goalie_tactic);
         tactics_to_run.emplace_back(move_tactic_2);
         tactics_to_run.emplace_back(move_tactic_3);
         tactics_to_run.emplace_back(move_tactic_4);

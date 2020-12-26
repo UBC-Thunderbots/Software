@@ -59,6 +59,8 @@ class PenaltyKickTactic : public Tactic
     static constexpr double PENALTY_KICK_SHOT_SPEED     = 5.0;
     static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
     static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds
+    // offset from the goal post in y direction when shooting
+    static constexpr double OFFSET                      = 0.02;
 
     const Duration penalty_shot_timeout = Duration::fromSeconds(10);
 };
