@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
- * File Name          : USART.h
- * Description        : This file provides code for the configuration
- *                      of the USART instances.
+ * File Name          : dma.h
+ * Description        : This file contains all the function prototypes for
+ *                      the dma.c file
  ******************************************************************************
  * @attention
  *
@@ -17,8 +17,9 @@
  ******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __usart_H
-#define __usart_H
+#ifndef __dma_H
+#define __dma_H
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -27,19 +28,17 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+    /* DMA memory to memory transfer handles -------------------------------------*/
+
     /* USER CODE BEGIN Includes */
 
     /* USER CODE END Includes */
-
-    extern UART_HandleTypeDef huart8;
-    extern UART_HandleTypeDef huart3;
 
     /* USER CODE BEGIN Private defines */
 
     /* USER CODE END Private defines */
 
-    void MX_UART8_Init(void);
-    void MX_USART3_UART_Init(void);
+    void MX_DMA_Init(void);
 
     /* USER CODE BEGIN Prototypes */
 
@@ -48,11 +47,8 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ usart_H */
 
-/**
- * @}
- */
+#endif /* __dma_H */
 
 /**
  * @}

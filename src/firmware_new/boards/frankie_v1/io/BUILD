@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@rules_foreign_cc//tools/build_defs:cmake.bzl", "cmake_external")
+
 cc_library(
     name = "gpio_pin",
     srcs = ["gpio_pin.c"],
@@ -74,6 +76,7 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
+        ":ublox_odinw262_communicator",
         "//firmware_new/boards/frankie_v1:hal",
         "//firmware_new/boards/frankie_v1:lwip",
         "//shared/proto:tbots_nanopb_proto",
@@ -110,4 +113,47 @@ cc_library(
         "@nanopb",
     ],
     alwayslink = True,
+)
+
+cc_library(
+    name = "ublox_odinw262_communicator",
+    srcs = ["ublox_odinw262_communicator.c"],
+    hdrs = ["ublox_odinw262_communicator.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":gpio_pin",
+        "//firmware/app/logger",
+        "//firmware_new/boards/frankie_v1:hal",
+        "//firmware_new/boards/frankie_v1:rtos",
+        "//firmware_new/boards/frankie_v1:usart",
+        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator_buffer_utils",
+        "//shared:constants",
+        "//shared/proto:tbots_nanopb_proto",
+        "@nanopb",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "ublox_odinw262_communicator_buffer_utils",
+    srcs = ["ublox_odinw262_communicator_buffer_utils.c"],
+    hdrs = ["ublox_odinw262_communicator_buffer_utils.h"],
+    alwayslink = True,
+)
+
+# external cmake repo for property based testing
+cmake_external(
+    name = "rapidcheck",
+    lib_source = "@rapidcheck//:all",
+    static_libraries = ["librapidcheck.a"],
+)
+
+cc_test(
+    name = "ublox_odinw262_communicator_buffer_utils_test",
+    srcs = ["ublox_odinw262_communicator_buffer_utils_test.cpp"],
+    deps = [
+        ":rapidcheck",
+        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator_buffer_utils",
+        "@gtest//:gtest_main",
+    ],
 )
