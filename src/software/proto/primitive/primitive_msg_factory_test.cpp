@@ -43,65 +43,6 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive)
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(), INDEFINITE_DRIBBLER_SPEED);
 }
 
-TEST(PrimitiveFactoryTest, test_create_legacy_move_primitive_no_chick)
-{
-    auto move_primitive =
-        createLegacyMovePrimitive(Point(-5, 1), Angle::threeQuarter(), 3.0,
-                                  DribblerMode::MAX_FORCE, AutochickType::NONE);
-
-    ASSERT_TRUE(move_primitive->has_move());
-    EXPECT_EQ(move_primitive->move().position_params().destination().x_meters(), -5);
-    EXPECT_EQ(move_primitive->move().position_params().destination().y_meters(), 1);
-    EXPECT_EQ(move_primitive->move().position_params().final_speed_meters_per_second(),
-              3.0);
-    EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              static_cast<float>(Angle::threeQuarter().toRadians()));
-    EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(), MAX_FORCE_DRIBBLER_SPEED);
-}
-
-TEST(PrimitiveFactoryTest, test_create_legacy_move_primitive_kick)
-{
-    auto move_primitive =
-        createLegacyMovePrimitive(Point(-5, 1), Angle::threeQuarter(), 3.0,
-                                  DribblerMode::MAX_FORCE, AutochickType::AUTOKICK);
-
-    ASSERT_TRUE(move_primitive->has_autokick_move());
-    EXPECT_EQ(move_primitive->autokick_move().position_params().destination().x_meters(),
-              -5);
-    EXPECT_EQ(move_primitive->autokick_move().position_params().destination().y_meters(),
-              1);
-    EXPECT_EQ(
-        move_primitive->autokick_move().position_params().final_speed_meters_per_second(),
-        3.0);
-    EXPECT_EQ(move_primitive->autokick_move().final_angle().radians(),
-              static_cast<float>(Angle::threeQuarter().toRadians()));
-    EXPECT_EQ(move_primitive->autokick_move().dribbler_speed_rpm(),
-              MAX_FORCE_DRIBBLER_SPEED);
-    EXPECT_EQ(move_primitive->autokick_move().kick_speed_meters_per_second(),
-              BALL_MAX_SPEED_METERS_PER_SECOND - 1);
-}
-
-TEST(PrimitiveFactoryTest, test_create_legacy_move_primitive_chip)
-{
-    auto move_primitive =
-        createLegacyMovePrimitive(Point(5, -1), Angle::threeQuarter(), 3.0,
-                                  DribblerMode::MAX_FORCE, AutochickType::AUTOCHIP);
-
-    ASSERT_TRUE(move_primitive->has_autochip_move());
-    EXPECT_EQ(move_primitive->autochip_move().position_params().destination().x_meters(),
-              5);
-    EXPECT_EQ(move_primitive->autochip_move().position_params().destination().y_meters(),
-              -1);
-    EXPECT_EQ(
-        move_primitive->autochip_move().position_params().final_speed_meters_per_second(),
-        3.0);
-    EXPECT_EQ(move_primitive->autochip_move().final_angle().radians(),
-              static_cast<float>(Angle::threeQuarter().toRadians()));
-    EXPECT_EQ(move_primitive->autochip_move().dribbler_speed_rpm(),
-              MAX_FORCE_DRIBBLER_SPEED);
-    EXPECT_EQ(move_primitive->autochip_move().chip_distance_meters(), 2);
-}
-
 TEST(PrimitiveFactoryTest, test_create_spinning_move_primitive)
 {
     auto spinning_move_primitive = createSpinningMovePrimitive(

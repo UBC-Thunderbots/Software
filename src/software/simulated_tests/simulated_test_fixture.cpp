@@ -199,6 +199,10 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {
+        if (!DynamicParameters->getAIControlConfig()->RunAI()->value())
+        {
+            continue;
+        }
         auto wall_start_time = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {
