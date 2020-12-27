@@ -1,4 +1,7 @@
-package(default_visibility = ["//software/ai:__subpackages__"])
+package(default_visibility = [
+    "//software/ai:__subpackages__",
+    "//software/simulated_tests:__subpackages__",
+])
 
 cc_library(
     name = "path_planner",
