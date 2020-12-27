@@ -5,6 +5,12 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
+/**
+ * The AutokickMoveAction makes the robot move to the specified location with autokick
+ * armed
+ *
+ * Done condition: The robot is close to the specified location
+ */
 class AutokickMoveAction : public MoveAction
 {
    public:

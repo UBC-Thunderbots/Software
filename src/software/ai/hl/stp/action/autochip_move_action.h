@@ -5,6 +5,12 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
+/**
+ * The AutochipMoveAction makes the robot move to the specified location with autochip
+ * armed
+ *
+ * Done condition: The robot is close to the specified location
+ */
 class AutochipMoveAction : public MoveAction
 {
    public:
