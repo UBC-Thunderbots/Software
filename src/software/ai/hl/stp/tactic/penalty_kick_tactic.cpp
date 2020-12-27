@@ -127,7 +127,9 @@ Point PenaltyKickTactic::evaluate_next_position()
 void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     // We will need to keep track of time so we don't break the rules by taking too long
-    Timestamp penalty_kick_start = robot->timestamp();
+    const Timestamp penalty_kick_start = robot->timestamp();
+    const Timestamp complete_approach = penalty_kick_start + Duration::fromSeconds(2);
+    const Timestamp complete_shot_setup = complete_approach + Duration::fromSeconds(5);
 
     auto approach_ball_move_act = std::make_shared<MoveAction>(
         false);
@@ -139,11 +141,61 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // robot
     Point behind_ball = ball.position() + behind_ball_vector.normalize(
                                                 BALL_MAX_RADIUS_METERS +
+                                                DIST_TO_FRONT_OF_ROBOT_METERS + 0.05);
+    Point behind_ball_closer = ball.position() + behind_ball_vector.normalize(
+                                                BALL_MAX_RADIUS_METERS +
                                                 DIST_TO_FRONT_OF_ROBOT_METERS);
 
+    do
+    {
+        Vector behind_ball_vector = (ball.position() - field.enemyGoalCenter());
+        // A point behind the ball that leaves 5cm between the ball and kicker of the
+        // robot
+        Point behind_ball = ball.position() + behind_ball_vector.normalize(
+                                                  BALL_MAX_RADIUS_METERS +
+                                                  DIST_TO_FRONT_OF_ROBOT_METERS + 0.04);
+
+        // If we haven't approached the ball yet, get close
+
+        if ((robot.value().position() - behind_ball).length() <=
+                MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD &&
+            (robot.value()
+                 .orientation()
+                 .minDiff((-behind_ball_vector).orientation())
+                 .toDegrees() < 5.0))
+        {
+            if (evaluate_penalty_shot())
+            {
+                kick_action->updateControlParams(*robot, ball.position(),
+                                                 robot.value().orientation(),
+                                                 PENALTY_KICK_SHOT_SPEED);
+                yield(kick_action);
+            }
+        }
+        else if (!approach_ball_move_act->done())
+        {
+            approach_ball_move_act->updateControlParams(
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW);
+            yield(approach_ball_move_act);
+        }
+        else
+        {
+            const Point next_shot_position = evaluate_next_position();
+            const Angle next_angle = (next_shot_position - ball.position()).orientation();
+            rotate_with_ball_move_act->updateControlParams(
+                *robot, robot.value().position(), next_angle, 0, DribblerMode::MAX_FORCE,
+                BallCollisionType::ALLOW);
+            yield(rotate_with_ball_move_act);
+        }
+
+    } while (!(kick_action->done() ||
+               (penalty_kick_start - robot->timestamp()) < penalty_shot_timeout));
     // approach ball
-    while (!approach_ball_move_act && (robot.value().position() - behind_ball).length() >
-        MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD)
+    /**while (!approach_ball_move_act->done() && 
+            ((robot.value().position() - behind_ball).length() > 
+            MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD) &&
+            (robot->timestamp() <= complete_approach))
     {
         approach_ball_move_act->updateControlParams(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
@@ -152,7 +204,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             std::cout << "Approaching ball\n";
             yield(approach_ball_move_act);
     }
-    printf("COMPLETE STAGE 1\n");
+    std::cout << "COMPLETE STAGE 1, Robot ID: "  << robot->id() << "\n";
 
     // rotate to shoot
     do
@@ -160,12 +212,14 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         const Point next_shot_position = evaluate_next_position();
         const Angle next_angle = -(next_shot_position - ball.position()).orientation();
         rotate_with_ball_move_act->updateControlParams(
-*robot, robot.value().position(), next_angle, 0, DribblerMode::MAX_FORCE,
+            *robot, behind_ball_closer, next_angle, 0, DribblerMode::MAX_FORCE,
             AutochickType::NONE, BallCollisionType::ALLOW);
-        std::cout << "Rotate with movement\n";
+        std::cout << "(robot->timestamp() 0 complete_shot_setup)" << 
+                    robot->timestamp()-complete_shot_setup << '\n';
         yield(rotate_with_ball_move_act);
-    } while (!rotate_with_ball_move_act);
-    printf("COMPLETE STAGE 2\n");
+    } while (!rotate_with_ball_move_act->done() &&
+                (robot->timestamp() <= complete_shot_setup));
+    std::cout << "COMPLETE STAGE 2, Robot ID: "  << robot->id() << "\n";
 
     //shoot
     do
@@ -178,8 +232,8 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             yield(kick_action);
         }
         std::cout << "Kicking?\n";
-    } while (!(kick_action->done() ||
-               (penalty_kick_start - robot->timestamp()) < penalty_shot_timeout));
+    } while (!kick_action->done() &&
+               ((robot->timestamp() - penalty_kick_start) < penalty_shot_timeout));*/
 }
 
 void PenaltyKickTactic::accept(TacticVisitor& visitor) const
