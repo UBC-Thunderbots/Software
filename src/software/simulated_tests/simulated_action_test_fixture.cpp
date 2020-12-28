@@ -94,23 +94,17 @@ Field SimulatedActionTestFixture::field() const
     return simulator->getField();
 }
 
-void SimulatedActionTestFixture::setFriendlyGoalie(RobotId goalie_id)
-{
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableFriendlyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
-}
-
-void SimulatedActionTestFixture::setEnemyGoalie(RobotId goalie_id)
-{
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableEnemyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
-}
-
 void SimulatedActionTestFixture::setAction(std::shared_ptr<Action> action)
 {
-    this->action = action;
+    if (action && action->getRobot() &&
+        simulator->getWorld().friendlyTeam().getRobotById(action->getRobot()->id()))
+    {
+        this->action = action;
+    }
+    else
+    {
+        throw std::invalid_argument("Action does not contain a robot in the simulator");
+    }
 }
 
 void SimulatedActionTestFixture::setRefereeCommand(

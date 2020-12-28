@@ -11,10 +11,9 @@
 #include "software/simulation/simulator.h"
 
 /**
- * This is a test fixture designed to make it easy to write integration tests. It provides
- * an easy interface to set up robots on the field, and then validate how the world
- * changes over time during simulation. This allows us to easily write tests for
- * the AI's behaviour.
+ * This is a test fixture designed to make it easy to write integration tests for Actions.
+ * It provides an easy interface to set up a single robot running a single action , and
+ * then validate how the world changes over time during simulation
  */
 class SimulatedActionTestFixture : public ::testing::Test
 {
@@ -89,18 +88,12 @@ class SimulatedActionTestFixture : public ::testing::Test
     void addEnemyRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Sets the goalie for the specified team. If this function is not called,
-     * the goalie will be set to the default ID of the DynamicParameters
-     *
-     * @param goalie_id The ID of the robot to be goalie
-     */
-    void setFriendlyGoalie(RobotId goalie_id);
-    void setEnemyGoalie(RobotId goalie_id);
-
-    /**
      * Sets the action to test
      *
-     * @param action The action
+     * @param action The action under test. The Pointer means that the user and this
+     * fixture both share access to the action
+     *
+     * @throw invalid_argument if robot attached to the action does not exist in the world
      */
     void setAction(std::shared_ptr<Action> action);
 
