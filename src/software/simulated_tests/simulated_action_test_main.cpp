@@ -2,7 +2,7 @@
 
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/simulated_tests/simulated_action_tests/simulated_action_test_fixture.h"
+#include "software/simulated_tests/simulated_action_test_fixture.h"
 
 bool SimulatedActionTestFixture::enable_visualizer = false;
 

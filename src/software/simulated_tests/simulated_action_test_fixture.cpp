@@ -1,4 +1,4 @@
-#include "software/simulated_tests/simulated_action_tests/simulated_action_test_fixture.h"
+#include "software/simulated_tests/simulated_action_test_fixture.h"
 
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
