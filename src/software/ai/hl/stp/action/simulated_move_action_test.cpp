@@ -1,9 +1,8 @@
-#include "software/ai/hl/stp/action/move_action.h"
-
 #include <gtest/gtest.h>
 
 #include <utility>
 
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_action_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -12,11 +11,11 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class MoveActionTest : public SimulatedActionTestFixture
+class SimulatedMoveActionTest : public SimulatedActionTestFixture
 {
 };
 
-TEST_F(MoveActionTest, test_corner_kick_play)
+TEST_F(SimulatedMoveActionTest, test_corner_kick_play)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(2.5, -1.1);
