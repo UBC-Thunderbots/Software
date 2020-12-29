@@ -129,6 +129,13 @@ class SimulatedActionTestFixture : public ::testing::Test
     void updateSensorFusion();
 
     /**
+     * Updates primitives based on the new world
+     *
+     * @param world to update primitives with
+     */
+    void updatePrimitives(const World& world);
+
+    /**
      * Runs the given function validators and returns whether or not the
      * FunctionValidators have completed (Note: completed does not necessarily
      * mean passed).

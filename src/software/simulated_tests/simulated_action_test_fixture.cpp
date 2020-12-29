@@ -155,6 +155,21 @@ void SimulatedActionTestFixture::updateSensorFusion()
     sensor_fusion.processSensorProto(sensor_msg);
 }
 
+    void SimulatedActionTestFixture::updatePrimitives(const World& world){
+            std::vector<std::unique_ptr<Intent>> intents;
+            action->updateRobot(
+                *world.friendlyTeam().getRobotById(action->getRobot()->id()));
+            action->updateWorldParams(world);
+            auto intent = action->getNextIntent();
+            intent->setMotionConstraints(motion_constraints);
+            intents.emplace_back(std::move(intent));
+
+            auto primitive_set_msg =
+                navigator->getAssignedPrimitives(world, intents);
+            simulator->setYellowRobotPrimitiveSet(
+                createNanoPbPrimitiveSet(*primitive_set_msg));
+    }
+
 void SimulatedActionTestFixture::sleep(
     const std::chrono::steady_clock::time_point &wall_start_time,
     const Duration &desired_wall_tick_time)
@@ -230,18 +245,7 @@ void SimulatedActionTestFixture::runTest(
                 break;
             }
 
-            std::vector<std::unique_ptr<Intent>> intents;
-            action->updateRobot(
-                *world_opt->friendlyTeam().getRobotById(action->getRobot()->id()));
-            action->updateWorldParams(*world_opt);
-            auto intent = action->getNextIntent();
-            intent->setMotionConstraints(motion_constraints);
-            intents.emplace_back(std::move(intent));
-
-            auto primitive_set_msg =
-                navigator->getAssignedPrimitives(*world_opt, intents);
-            simulator->setYellowRobotPrimitiveSet(
-                createNanoPbPrimitiveSet(*primitive_set_msg));
+            updatePrimitives(*world_opt);
 
             if (run_simulation_in_realtime)
             {
