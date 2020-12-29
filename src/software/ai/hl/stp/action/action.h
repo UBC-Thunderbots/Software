@@ -69,6 +69,13 @@ class Action
     std::optional<Robot> getRobot();
 
     /**
+     * Updates the robot
+     *
+     * @param robot The robot to update with
+     */
+    void updateRobot(const Robot &robot);
+
+    /**
      * Updates the world parameters for this action
      *
      * @param world The world that will be used to update the action

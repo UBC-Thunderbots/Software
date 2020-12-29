@@ -14,6 +14,9 @@
  * This is a test fixture designed to make it easy to write integration tests for Actions.
  * It provides an easy interface to set up a single robot running a single action , and
  * then validate how the world changes over time during simulation
+ *
+ * Since users can't update the Action in sync with simulation ticks, the
+ * SimulatedActionTestFixture will update the robot of the action
  */
 class SimulatedActionTestFixture : public ::testing::Test
 {
@@ -90,8 +93,7 @@ class SimulatedActionTestFixture : public ::testing::Test
     /**
      * Sets the action to test
      *
-     * @param action The action under test. The Pointer means that the user and this
-     * fixture both share access to the action
+     * @param action The action under test
      *
      * @throw invalid_argument if robot attached to the action does not exist in the world
      */

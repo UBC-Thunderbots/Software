@@ -61,7 +61,12 @@ std::optional<Robot> Action::getRobot()
     return robot;
 }
 
-void Action::calculateNextIntentWrapper(IntentCoroutine::push_type &yield)
+void Action::updateRobot(const Robot& robot)
+{
+    this->robot = robot;
+}
+
+void Action::calculateNextIntentWrapper(IntentCoroutine::push_type& yield)
 {
     // Yield a null pointer the very first time the function is called. This value will
     // never be seen/used by the rest of the system.

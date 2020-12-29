@@ -231,6 +231,8 @@ void SimulatedActionTestFixture::runTest(
             }
 
             std::vector<std::unique_ptr<Intent>> intents;
+            action->updateRobot(
+                *world_opt->friendlyTeam().getRobotById(action->getRobot()->id()));
             action->updateWorldParams(*world_opt);
             auto intent = action->getNextIntent();
             intent->setMotionConstraints(motion_constraints);
