@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_test_fixture.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/simulated_tests/validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/validation_functions/robot_received_ball_validation.h"
@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class CornerKickPlayTest : public SimulatedTestFixture
+class CornerKickPlayTest : public SimulatedPlayTestFixture
 {
 };
 

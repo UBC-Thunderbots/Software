@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/ai.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
@@ -88,22 +87,6 @@ class SimulatedTestFixture : public ::testing::Test
     void addEnemyRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Sets the goalie for the specified team. If this function is not called,
-     * the goalie will be set to the default ID of the DynamicParameters
-     *
-     * @param goalie_id The ID of the robot to be goalie
-     */
-    void setFriendlyGoalie(RobotId goalie_id);
-    void setEnemyGoalie(RobotId goalie_id);
-
-    /**
-     * Sets the AI play to run in the simulated test
-     *
-     * @param ai_play The name of the AI play
-     */
-    void setAIPlay(const std::string& ai_play);
-
-    /**
      * Sets the Referee command to override for the simulated test
      *
      * @param current_referee_command The name of the current referee command to set
@@ -124,6 +107,29 @@ class SimulatedTestFixture : public ::testing::Test
      * A helper function that updates SensorFusion with the latest data from the Simulator
      */
     void updateSensorFusion();
+
+    /**
+     * Updates primitives in the simulator based on the new world
+     *
+     * @param world to update primitives with
+     * @param simulator_to_update The simulator to update
+     */
+    virtual void updatePrimitives(const World& world,
+                                  std::shared_ptr<Simulator> simulator_to_update) = 0;
+
+    /**
+     * Gets play info for displaying on the FullSystemGUI
+     *
+     * @return play info to display, if any
+     */
+    virtual std::optional<PlayInfo> getPlayInfo() = 0;
+
+    /**
+     * Gets draw functions for visualizing on the FullSystemGUI
+     *
+     * @return draw functions to draw
+     */
+    virtual AIDrawFunction getDrawFunctions() = 0;
 
     /**
      * Runs the given function validators and returns whether or not the
@@ -158,11 +164,9 @@ class SimulatedTestFixture : public ::testing::Test
     // the object in the SetUp function. Because the simulator has no
     // copy assignment operator, we have to make it a dynamically-allocated
     // object so we can assign new instances to this variable
-    std::unique_ptr<Simulator> simulator;
+    std::shared_ptr<Simulator> simulator;
     // The SensorFusion being tested and used in simulation
     SensorFusion sensor_fusion;
-    // The AI being tested and used in simulation
-    AI ai;
 
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
