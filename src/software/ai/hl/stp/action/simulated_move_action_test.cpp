@@ -15,7 +15,7 @@ class SimulatedMoveActionTest : public SimulatedActionTestFixture
 {
 };
 
-TEST_F(SimulatedMoveActionTest, test_corner_kick_play)
+TEST_F(SimulatedMoveActionTest, test_move_across_field)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(2.5, -1.1);
@@ -38,8 +38,12 @@ TEST_F(SimulatedMoveActionTest, test_corner_kick_play)
     setAction(action);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [destination](std::shared_ptr<World> world_ptr,
-                      ValidationCoroutine::push_type& yield) {
+        [destination, action](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            while (!action->done())
+            {
+                yield();
+            }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
 

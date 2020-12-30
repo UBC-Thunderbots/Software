@@ -7,7 +7,8 @@
 #include "software/proto/message_translation/tbots_protobuf.h"
 
 SimulatedActionTestFixture::SimulatedActionTestFixture()
-    : navigator(std::make_shared<Navigator>(
+    : motion_constraints(),
+      navigator(std::make_shared<Navigator>(
           std::make_unique<VelocityObstaclePathManager>(
               std::make_unique<ThetaStarPathPlanner>(),
               RobotNavigationObstacleFactory(
@@ -45,23 +46,36 @@ void SimulatedActionTestFixture::setAction(std::shared_ptr<Action> action)
     }
 }
 
+void SimulatedActionTestFixture::setMotionConstraints(
+    const std::set<MotionConstraint>& motion_constraints)
+{
+    this->motion_constraints = motion_constraints;
+}
 
 void SimulatedActionTestFixture::updatePrimitives(
     const World& world, std::shared_ptr<Simulator> simulator_to_update)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    if (auto new_robot = world.friendlyTeam().getRobotById(action->getRobot()->id()))
+    RobotId robot_id = action->getRobot()->id();
+    if (auto new_robot = world.friendlyTeam().getRobotById(robot_id))
     {
-        action->updateRobot(*world.friendlyTeam().getRobotById(action->getRobot()->id()));
+        action->updateRobot(*world.friendlyTeam().getRobotById(robot_id));
     }
     else
     {
-        LOG(FATAL) << "No robot with robot id " << action->getRobot()->id() << std::endl;
+        LOG(FATAL) << "No robot with robot id " << robot_id << std::endl;
     }
     action->updateWorldParams(world);
     auto intent = action->getNextIntent();
-    intent->setMotionConstraints(motion_constraints);
-    intents.emplace_back(std::move(intent));
+    if (intent)
+    {
+        intent->setMotionConstraints(motion_constraints);
+        intents.emplace_back(std::move(intent));
+    }
+    else
+    {
+        intents.emplace_back(std::make_unique<StopIntent>(robot_id, false));
+    }
 
     auto primitive_set_msg = navigator->getAssignedPrimitives(world, intents);
     simulator_to_update->setYellowRobotPrimitiveSet(

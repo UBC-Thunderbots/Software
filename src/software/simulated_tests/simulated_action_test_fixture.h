@@ -36,7 +36,7 @@ class SimulatedActionTestFixture : public SimulatedTestFixture
      *
      * @param motion_constraints The motion constraints for the action
      */
-    void setMotionConstraints(std::set<MotionConstraint> motion_constraints);
+    void setMotionConstraints(const std::set<MotionConstraint>& motion_constraints);
 
    private:
     void updatePrimitives(const World& world,
