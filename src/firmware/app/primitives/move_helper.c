@@ -134,7 +134,7 @@ void app_move_helper_tick(void* void_state_ptr, FirmwareWorld_t* world)
 
     float total_disp = sqrtf(dx * dx + dy * dy);
     // Add a small number to avoid division by zero
-    float major_vec[2] = {dx / total_disp, dy / (total_disp + 1e-6f)};
+    float major_vec[2] = {dx / (total_disp + 1e-6f), dy / (total_disp + 1e-6f)};
     float minor_vec[2] = {major_vec[0], major_vec[1]};
     rotate(minor_vec, P_PI / 2);
 
