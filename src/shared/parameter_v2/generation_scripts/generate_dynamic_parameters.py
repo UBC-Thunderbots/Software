@@ -23,7 +23,7 @@ def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
 
     if generate_for_cpp:
         CppWriter.write_config_metadata(
-            output_file, "ThunderbotsConfig", config_metadata
+            output_file, include_headers, "ThunderbotsConfig", config_metadata
         )
     else:
         CWriter.write_config_metadata(output_file, "ThunderbotsConfig", config_metadata)
@@ -65,8 +65,6 @@ def main():
     generate_dynamic_parameters(
         args.output_file, args.include_headers, args.generate_for_cpp
     )
-    print(args)  # should be able to retrieve enum deps here
-
 
 #######################################################################
 #                                Main                                 #

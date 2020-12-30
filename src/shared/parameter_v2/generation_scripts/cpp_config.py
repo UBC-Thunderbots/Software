@@ -2,6 +2,7 @@ from __future__ import annotations
 from cpp_parameter import CppParameter
 from typing import List
 from collections.abc import Iterable
+from util import to_snake_case
 import networkx as nx
 
 #######################################################################
@@ -21,11 +22,11 @@ CONFIG_CONSTRUCTOR_HEADER_WITH_INCLUDES = """{config_name}(
     : {config_constructor_initializer_list}"""
 
 INCLUDED_CONFIG_CONSTRUCTOR_ARG_ENTRY = (
-    "std::shared_ptr<{config_name}> {config_variable_name}"
+    "std::shared_ptr<{config_name}> {config_arg_name}"
 )
 
 INCLUDED_CONFIG_CONSTRUCTOR_INITIALIZER_LIST_ENTRY = (
-    "{config_variable_name}({config_variable_name})"
+    "{config_variable_name}({config_arg_name})"
 )
 
 COMMAND_LINE_ARG_STRUCT = """struct commandLineArgs {{
@@ -38,7 +39,7 @@ INCLUDED_CONFIG_COMMAND_LINE_ARG_STRUCT = """struct {config_name}CommandLineArgs
             {command_line_arg_struct_contents}
         }};"""
 
-INCLUDED_CONFIG_COMMAND_LINE_ARG_ENTRY = "{config_name}CommandLineArgs {config_name};"
+INCLUDED_CONFIG_COMMAND_LINE_ARG_ENTRY = "{config_name}CommandLineArgs {config_arg_name};"
 
 CONFIG_PUBLIC_ENTRY = """const std::shared_ptr<const {config_name}> {immutable_accessor_name}() const
     {{
@@ -122,43 +123,11 @@ CONFIG_CLASS = """class {config_name} : public Config
 
 class CppConfig(object):
     def __init__(self, config_name: str, is_top_level_config: bool = False):
-        self.config_name = config_name  # TODO: add "Config"?
-        self.config_variable_name = config_name + "_config"
+        self.config_name = config_name 
+        self.config_variable_name = to_snake_case(config_name) + "_config"
         self.is_top_level_config = is_top_level_config
         self.parameters: List[CppParameter] = list()
         self.configs: List[CppConfig] = list()
-
-        self.__forward_declaration = FORWARD_DECLARATION.format(
-            config_name=self.config_name
-        )
-
-        self.__included_config_constructor_arg_entry = INCLUDED_CONFIG_CONSTRUCTOR_ARG_ENTRY.format(
-            config_name=self.config_name, config_variable_name=self.config_variable_name
-        )
-
-        self.__included_config_constructor_initializer_list_entry = INCLUDED_CONFIG_CONSTRUCTOR_INITIALIZER_LIST_ENTRY.format(
-            config_variable_name=self.config_variable_name
-        )
-
-        self.__immutable_parameter_list_config_entry = IMMUTABLE_PARAMETER_LIST_CONFIG_ENTRY.format(
-            config_name=self.config_name,
-            config_variable_name=self.config_variable_name,
-        )
-
-        self.__config_public_entry = CONFIG_PUBLIC_ENTRY.format(
-            config_name=self.config_name,
-            immutable_accessor_name="get" + self.config_name,
-            mutable_accessor_name="getMutable" + self.config_name,
-            config_variable_name=self.config_variable_name,
-        )
-
-        self.__config_private_entry = CONFIG_PRIVATE_ENTRY.format(
-            config_name=self.config_name, config_variable_name=self.config_variable_name
-        )
-
-        self.__included_config_command_line_arg_entry = INCLUDED_CONFIG_COMMAND_LINE_ARG_ENTRY.format(
-            config_name=self.config_name
-        )
 
     def add_parameter(self, parameter: CppParameter):
         self.parameters.append(parameter)
@@ -172,7 +141,7 @@ class CppConfig(object):
     @staticmethod
     def join_with_tabs(
         str: str, iterable: Iterable, num_tabs: int, half_tab: bool = False
-    ):
+    ) -> str:
         tab_size = HALF_TAB_SIZE if half_tab else TAB_SIZE
         return (str + num_tabs * tab_size * " ").join(iterable)
 
@@ -182,58 +151,26 @@ class CppConfig(object):
 
     @dependency_graph.setter
     def dependency_graph(self, dependency_graph: nx.DiGraph):
-        print("Setting dependency graph for: " + self.config_name)
-        print(dependency_graph.nodes)
-        print(dependency_graph.edges)
-
         self.__dependency_graph = dependency_graph
-
-    # to be run after dependency_graph has been set for all configs
-    # TODO: can this be avoided?
-    def post_dependency_graph_init(self):
-        self.__dependency_graph_source_nodes = [
-            node
-            for node in self.dependency_graph.nodes
-            if self.dependency_graph.in_degree(node) == 0
-        ]
-        print("All dag sources:", self.dependency_graph_source_nodes)
-        self.__dependency_graph_topological_order_nodes = list(
-            nx.topological_sort(self.dependency_graph)
-        )
-
-        self.__config_constructor_entry = CONFIG_CONSTRUCTOR_ENTRY.format(
-            config_variable_name=self.config_variable_name,
-            config_name=self.config_name,
-            args=self.config_constructor_args,
-        )
         
-        self.__config_constructor_header = (
-            CONFIG_CONSTRUCTOR_HEADER_NO_INCLUDES.format(config_name=self.config_name)
-            if self.is_top_level_config or not self.dependency_graph_source_nodes
-            else CONFIG_CONSTRUCTOR_HEADER_WITH_INCLUDES.format(
-                config_name=self.config_name,
-                config_constructor_definition_args=self.config_constructor_definition_args,
-                config_constructor_initializer_list=self.config_constructor_initializer_list,
-            )
-        )
-
-        self.__included_config_command_line_arg_struct = INCLUDED_CONFIG_COMMAND_LINE_ARG_STRUCT.format(
-            config_name=self.config_name,
-            command_line_arg_struct_contents=self.command_line_arg_struct_contents,
-        )
+        self.dependency_graph_topological_order_configs = [
+            self.dependency_graph.nodes[node]["config"]
+            for node in list(reversed(list(nx.topological_sort(self.dependency_graph))))
+        ]
 
         self.included_config_command_line_arg_entries = []
         self.included_config_load_command_line_args_into_config_contents = []
-        for source in self.dependency_graph_source_nodes:
-            self.dfs_helper(source, "", "")
+        for config in self.configs:
+            self.dfs_helper(config, "", "")
 
-    def dfs_helper(self, node, arg_prefix, load_dependency):
-        config = self.dependency_graph.nodes[node]["config"]
-        arg_prefix = node if not arg_prefix else arg_prefix + "." + node
+    def dfs_helper(self, config: CppConfig, arg_prefix: str, load_dependency: str):
+        arg_prefix = to_snake_case(config.config_name) if not arg_prefix else arg_prefix + "." + to_snake_case(config.config_name)
         load_dependency = load_dependency + "getMutable{config_name}()->".format(
-            config_name=node
+            config_name=config.config_name
         )
-        for param in config.parameters:
+
+        mutable_param_gen = (param for param in config.parameters if not param.is_constant)
+        for param in mutable_param_gen:
             self.included_config_command_line_arg_entries.append(
                 param.command_line_option_entry_with_prefix(arg_prefix + ".")
             )
@@ -243,20 +180,16 @@ class CppConfig(object):
                 )
             )
 
-        for neighbor in self.dependency_graph.neighbors(node):
-            self.dfs_helper(neighbor, arg_prefix, load_dependency)
-
-    @property
-    def dependency_graph_source_nodes(self):
-        return self.__dependency_graph_source_nodes
-
-    @property
-    def dependency_graph_topological_order_nodes(self):
-        return self.__dependency_graph_topological_order_nodes
+        # top level config has access to all configs, so no need to recursively add options
+        # if not self.is_top_level_config:
+        for included_config in config.configs:
+            self.dfs_helper(included_config, arg_prefix, load_dependency)
 
     @property
     def forward_declaration(self):
-        return self.__forward_declaration
+        return FORWARD_DECLARATION.format(
+            config_name=self.config_name
+        )
 
     @property
     def definition(self):
@@ -275,17 +208,22 @@ class CppConfig(object):
 
     @property
     def included_config_constructor_arg_entry(self):
-        return self.__included_config_constructor_arg_entry
+        return INCLUDED_CONFIG_CONSTRUCTOR_ARG_ENTRY.format(
+            config_name=self.config_name, config_arg_name=to_snake_case(self.config_name)
+        )
 
     @property
     def included_config_constructor_initializer_list_entry(self):
-        return self.__included_config_constructor_initializer_list_entry
+        return INCLUDED_CONFIG_CONSTRUCTOR_INITIALIZER_LIST_ENTRY.format(
+            config_variable_name=self.config_variable_name,
+            config_arg_name=to_snake_case(self.config_name)
+        )
 
     @property
     def config_constructor_args(self):
         return CppConfig.join_with_tabs(
             ", ",
-            [conf.config_name for conf in self.configs],
+            [conf.config_variable_name for conf in self.configs],
             0
         )
 
@@ -311,24 +249,29 @@ class CppConfig(object):
 
     @property
     def config_constructor_header(self):
-        return self.__config_constructor_header
+        return (
+            CONFIG_CONSTRUCTOR_HEADER_NO_INCLUDES.format(config_name=self.config_name)
+            if self.is_top_level_config or not self.configs
+            else CONFIG_CONSTRUCTOR_HEADER_WITH_INCLUDES.format(
+                config_name=self.config_name,
+                config_constructor_definition_args=self.config_constructor_definition_args,
+                config_constructor_initializer_list=self.config_constructor_initializer_list,
+            )
+        )
 
     @property
     def config_constructor_entry(self):
-        # TODO: constructor with included configs
-        return self.__config_constructor_entry
+        return CONFIG_CONSTRUCTOR_ENTRY.format(
+            config_variable_name=self.config_variable_name,
+            config_name=self.config_name,
+            args=self.config_constructor_args,
+        )
 
     @property
     def constructor_entries(self):
-        # TODO: remove duplicate, maybe make reversed one default - reverse include direction
-        dependency_graph_reverse_topological_order_configs = [
-            self.dependency_graph.nodes[node]["config"]
-            for node in list(reversed(self.dependency_graph_topological_order_nodes))
-        ]
-        
         return CppConfig.join_with_tabs(
             "\n",
-            [conf.config_constructor_entry for conf in dependency_graph_reverse_topological_order_configs] if self.is_top_level_config else [param.constructor_entry for param in self.parameters],
+            [conf.config_constructor_entry for conf in self.dependency_graph_topological_order_configs] if self.is_top_level_config else [param.constructor_entry for param in self.parameters],
             2,
         )
 
@@ -340,7 +283,10 @@ class CppConfig(object):
 
     @property
     def immutable_parameter_list_config_entry(self):
-        return self.__immutable_parameter_list_config_entry
+        return IMMUTABLE_PARAMETER_LIST_CONFIG_ENTRY.format(
+            config_name=self.config_name,
+            config_variable_name=self.config_variable_name,
+        )
 
     @property
     def immutable_parameter_list_entries(self):
@@ -352,15 +298,21 @@ class CppConfig(object):
 
     @property
     def config_public_entry(self):
-        return self.__config_public_entry
+        return CONFIG_PUBLIC_ENTRY.format(
+            config_name=self.config_name,
+            immutable_accessor_name="get" + self.config_name,
+            mutable_accessor_name="getMutable" + self.config_name,
+            config_variable_name=self.config_variable_name,
+        )
 
     @property
     def config_private_entry(self):
-        return self.__config_private_entry
+        return CONFIG_PRIVATE_ENTRY.format(
+            config_name=self.config_name, config_variable_name=self.config_variable_name
+        )
 
     @property
     def public_entries(self):
-        # TODO: camel case or snake case
         return CppConfig.join_with_tabs(
             "\n\n",
             [param.parameter_public_entry for param in self.parameters]
@@ -381,31 +333,33 @@ class CppConfig(object):
     def parse_command_line_args_function_contents(self):
         return CppConfig.join_with_tabs(
             "\n",
-            [param.parameter_command_line_entry for param in self.parameters]
+            [param.parameter_command_line_option_entry for param in self.parameters]
             + self.included_config_command_line_arg_entries,
             2,
         )
 
     @property
     def included_config_command_line_arg_entry(self):
-        return self.__included_config_command_line_arg_entry
+        return INCLUDED_CONFIG_COMMAND_LINE_ARG_ENTRY.format(
+            config_name=self.config_name,
+            config_arg_name=to_snake_case(self.config_name)
+        )
 
     @property
     def included_config_command_line_arg_struct(self):
-        return self.__included_config_command_line_arg_struct
+        return INCLUDED_CONFIG_COMMAND_LINE_ARG_STRUCT.format(
+            config_name=self.config_name,
+            command_line_arg_struct_contents=self.command_line_arg_struct_contents,
+        )
     
     @property
     def command_line_arg_struct_contents(self):
-        dependency_graph_source_configs = [
-            self.dependency_graph.nodes[node]["config"]
-            for node in self.dependency_graph_source_nodes
-        ]
         return CppConfig.join_with_tabs(
             "\n",
             [param.command_line_arg_entry for param in self.parameters]
             + [
                 conf.included_config_command_line_arg_entry
-                for conf in dependency_graph_source_configs
+                for conf in self.configs
             ],
             3,
         )
@@ -418,15 +372,11 @@ class CppConfig(object):
     
     @property
     def command_line_arg_structs(self):
-        dependency_graph_reverse_topological_order_configs = [
-            self.dependency_graph.nodes[node]["config"]
-            for node in list(reversed(self.dependency_graph_topological_order_nodes))
-        ]
         return CppConfig.join_with_tabs(
             "\n\n",
             [
                 conf.included_config_command_line_arg_struct
-                for conf in dependency_graph_reverse_topological_order_configs
+                for conf in self.dependency_graph_topological_order_configs
             ] + [self.command_line_arg_struct],
             2,
         )
@@ -435,7 +385,7 @@ class CppConfig(object):
     def load_command_line_args_into_config_contents(self):
         return CppConfig.join_with_tabs(
             "\n",
-            [param.load_command_line_arg_into_config for param in self.parameters]
+            [param.load_command_line_arg_into_config for param in self.parameters if not param.is_constant]
             + self.included_config_load_command_line_args_into_config_contents,
             2,
         )
