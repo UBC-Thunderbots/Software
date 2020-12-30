@@ -60,18 +60,18 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "simulated_test_fixture_test",
-#    srcs = ["simulated_test_fixture_test.cpp"],
-#    deps = [
-#        ":simulated_test_fixture",
-#        ":simulated_test_main",
-#        "//software/simulated_tests/validation:validation_function",
-#        "//software/time:duration",
-#        "//software/time:timestamp",
-#        "//software/world",
-#    ],
-#)
+cc_test(
+    name = "simulated_play_test_fixture_test",
+    srcs = ["simulated_play_test_fixture_test.cpp"],
+    deps = [
+        ":simulated_play_test_fixture",
+        ":simulated_test_main",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/time:duration",
+        "//software/time:timestamp",
+        "//software/world",
+    ],
+)
 
 cc_test(
     name = "example_play_test",
