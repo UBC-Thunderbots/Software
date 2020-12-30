@@ -43,6 +43,8 @@ class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
      * @param The NavigatingIntent to convert
      */
     void visit(const MoveIntent &intent) override;
+    void visit(const AutochipMoveIntent &intent) override;
+    void visit(const AutokickMoveIntent &intent) override;
 
     /**
      * Calculates the transition speed for the robot between two line segments
