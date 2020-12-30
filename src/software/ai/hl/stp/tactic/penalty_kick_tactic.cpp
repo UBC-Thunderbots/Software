@@ -166,8 +166,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         {
             approach_ball_move_act->updateControlParams(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::ON, MoveType::NORMAL, AutochickType::NONE,
-                BallCollisionType::ALLOW);
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW);
             yield(approach_ball_move_act);
         }
         else
@@ -175,8 +174,8 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             const Point next_shot_position = evaluate_next_position();
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
             rotate_with_ball_move_act->updateControlParams(
-                *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW);
+                *robot, robot.value().position(), next_angle, 0, DribblerMode::MAX_FORCE,
+                BallCollisionType::ALLOW);
             yield(rotate_with_ball_move_act);
         }
 
@@ -184,7 +183,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
                (penalty_kick_start - robot->timestamp()) < penalty_shot_timeout));
 }
 
-void PenaltyKickTactic::accept(TacticVisitor& visitor)
+void PenaltyKickTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

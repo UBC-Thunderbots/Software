@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/play/free_kick_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/evaluation/ball.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/tactic/chip_tactic.h"
@@ -11,6 +10,7 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "software/world/ball.h"
 
 FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
 

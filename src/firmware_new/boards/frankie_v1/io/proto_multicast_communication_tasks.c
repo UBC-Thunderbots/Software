@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
+#include "firmware_new/boards/frankie_v1/io/ublox_odinw262_communicator.h"
 #include "lwip.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
@@ -13,6 +14,7 @@
 #include "lwip/sys.h"
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
+#include "main.h"
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
@@ -69,7 +71,7 @@ void io_proto_multicast_sender_task(void* communication_profile)
         // serialize proto into buffer
         io_proto_multicast_communication_profile_acquireLock(profile);
 
-        // we ingore the error returned by pb_encode, it is up to the receiver to handle
+        // we ignore the error returned by pb_encode, it is up to the receiver to handle
         // malformed proto, so we send the buffer regardless
         pb_encode(&stream,
                   io_proto_multicast_communication_profile_getProtoFields(profile),
@@ -129,7 +131,6 @@ void io_proto_multicast_listener_task(void* communication_profile)
                                                                       RECEIVE_TIMEOUT);
                 break;
             }
-
             case ERR_OK:
             {
                 pb_istream_t in_stream = pb_istream_from_buffer(

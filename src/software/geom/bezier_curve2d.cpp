@@ -38,7 +38,7 @@ Polynomial2d BezierCurve2d::getPolynomial() const
 const Point BezierCurve2d::deCasteljauAlgorithm(const std::vector<Point>& points,
                                                 const double t)
 {
-    // For more information on this algorithm, please see the wikipedia arcticle:
+    // For more information on this algorithm, please see the wikipedia article:
     // (https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm)
     if (points.size() == 0)
     {

@@ -23,7 +23,7 @@ std::unique_ptr<SSLProto::SSL_DetectionBall> createSSLDetectionBall(const BallSt
     detection_ball->set_pixel_x(x_position_mm);
     detection_ball->set_pixel_y(y_position_mm);
 
-    return std::move(detection_ball);
+    return detection_ball;
 }
 
 std::unique_ptr<SSLProto::SSL_DetectionRobot> createSSLDetectionRobot(
@@ -50,7 +50,7 @@ std::unique_ptr<SSLProto::SSL_DetectionRobot> createSSLDetectionRobot(
     detection_robot->set_height(
         static_cast<float>(ROBOT_MAX_HEIGHT_METERS * MILLIMETERS_PER_METER));
 
-    return std::move(detection_robot);
+    return detection_robot;
 }
 
 std::unique_ptr<SSLProto::SSL_DetectionFrame> createSSLDetectionFrame(
@@ -82,7 +82,7 @@ std::unique_ptr<SSLProto::SSL_DetectionFrame> createSSLDetectionFrame(
         *(detection_frame->add_robots_blue()) = *createSSLDetectionRobot(blue_robot);
     }
 
-    return std::move(detection_frame);
+    return detection_frame;
 }
 
 std::vector<BallDetection> createBallDetections(

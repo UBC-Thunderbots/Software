@@ -1,4 +1,4 @@
-#include "software/ai/motion_constraint/motion_constraint_manager.h"
+#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 
 #include <gtest/gtest.h>
 
@@ -52,9 +52,6 @@ namespace
                                             MotionConstraint::ENEMY_DEFENSE_AREA,
                                             MotionConstraint::FRIENDLY_HALF,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PatrolTactic(std::vector<Point>(), 0.0, Angle::zero(), 0.0),
-                std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ReceiverTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                                    pass, world.ball(), false),
@@ -114,7 +111,6 @@ class CheckMotionConstraints
    public:
     std::set<MotionConstraint> correct_motion_constraints;
     GameState game_state;
-    MotionConstraintManager manager;
 };
 
 
@@ -129,43 +125,43 @@ TEST_P(CheckMotionConstraints, CycleStoppageOrThemGameStatesTest)
 
     game_state.updateRefereeCommand(RefereeCommand::HALT);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::STOP);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::NORMAL_START);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_THEM);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_THEM);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::TIMEOUT_US);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::TIMEOUT_THEM);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::GOAL_US);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::GOAL_THEM);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 }
 
 TEST_P(CheckMotionConstraints, CycleGameStartOrUsGameStatesTest)
@@ -179,19 +175,19 @@ TEST_P(CheckMotionConstraints, CycleGameStartOrUsGameStatesTest)
 
     game_state.updateRefereeCommand(RefereeCommand::FORCE_START);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_US);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 }
 
 TEST_P(CheckMotionConstraints, CycleKickoffGameStatesTest)
@@ -205,11 +201,11 @@ TEST_P(CheckMotionConstraints, CycleKickoffGameStatesTest)
 
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_KICKOFF_US);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_KICKOFF_THEM);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 }
 
 TEST_P(CheckMotionConstraints, CycleOurPenaltyGameStatesTest)
@@ -223,7 +219,7 @@ TEST_P(CheckMotionConstraints, CycleOurPenaltyGameStatesTest)
 
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_US);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 }
 
 TEST_P(CheckMotionConstraints, CycleThemPenaltyGameStatesTest)
@@ -237,7 +233,7 @@ TEST_P(CheckMotionConstraints, CycleThemPenaltyGameStatesTest)
 
     game_state.updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_THEM);
     EXPECT_EQ(correct_motion_constraints,
-              manager.getMotionConstraints(game_state, *GetParam().first));
+              buildMotionConstraintSet(game_state, *GetParam().first));
 }
 
 INSTANTIATE_TEST_CASE_P(CycleStoppageOrThemGameStatesTest, CheckMotionConstraints,

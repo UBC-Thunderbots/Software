@@ -69,7 +69,11 @@ void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
     const float destination_orientation = final_angle;
     const float speed_at_dest_m_per_s =
         move_position_params.final_speed_meters_per_second;
-    state->move_slow = move_position_params.slow;
+
+    // TODO: should remove this from the state entirely if its no longer in 
+    //       the proto
+    //state->move_slow = move_position_params.slow;
+    state->move_slow = false;
 
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 

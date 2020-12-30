@@ -77,7 +77,7 @@ struct RadioRobotStatus
     // The received signal strength of the last received packet, in decibels.
     int32_t received_signal_strength_db;
 
-    // Whether or nott the build ID information is valid.
+    // Whether or not the build ID information is valid.
     bool build_ids_valid;
 
     // The microcontroller firmware build ID.

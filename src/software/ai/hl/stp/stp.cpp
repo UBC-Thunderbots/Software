@@ -7,12 +7,12 @@
 #include <exception>
 #include <random>
 
-#include "software/ai/hl/stp/action/action_world_params_update_visitor.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
+#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -50,7 +50,7 @@ void STP::updateGameState(const World& world)
                 fromStringToRefereeCommand(current_state_string);
             current_game_state.updateRefereeCommand(current_state);
         }
-        catch (std::invalid_argument e)
+        catch (std::invalid_argument& e)
         {
             LOG(WARNING) << e.what();
         }
@@ -89,8 +89,6 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     std::vector<std::unique_ptr<Intent>> intents;
     assignRobotsToTactics(world, current_tactics);
 
-    ActionWorldParamsUpdateVisitor action_world_params_update_visitor(world);
-
     for (const std::shared_ptr<Tactic>& tactic : current_tactics)
     {
         tactic->updateWorldParams(world);
@@ -100,14 +98,14 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
         std::unique_ptr<Intent> intent;
         if (action)
         {
-            action->accept(action_world_params_update_visitor);
+            action->updateWorldParams(world);
             intent = action->getNextIntent();
         }
 
         if (intent)
         {
-            auto motion_constraints = motion_constraint_manager.getMotionConstraints(
-                current_game_state, *tactic);
+            auto motion_constraints =
+                buildMotionConstraintSet(current_game_state, *tactic);
             intent->setMotionConstraints(motion_constraints);
 
             intents.emplace_back(std::move(intent));
@@ -117,7 +115,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
             // If we couldn't get an intent, we send the robot a StopIntent so
             // it doesn't do anything crazy until it starts running a new Tactic
             intents.emplace_back(
-                std::make_unique<StopIntent>(tactic->getAssignedRobot()->id(), false, 0));
+                std::make_unique<StopIntent>(tactic->getAssignedRobot()->id(), false));
         }
         else
         {
@@ -246,7 +244,7 @@ bool STP::overrideAIPlayIfApplicable()
                 current_play =
                     GenericFactory<std::string, Play>::create(override_play_name);
             }
-            catch (std::invalid_argument)
+            catch (std::invalid_argument&)
             {
                 auto default_play = default_play_constructor();
                 LOG(WARNING) << "Error: The Play \"" << override_play_name

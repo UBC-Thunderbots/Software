@@ -2,9 +2,9 @@
 
 SpinningMoveIntent::SpinningMoveIntent(unsigned int robot_id, const Point &dest,
                                        const AngularVelocity &angular_vel,
-                                       double final_speed, unsigned int priority)
+                                       double final_speed)
     : DirectPrimitiveIntent(
-          robot_id, priority,
-          *createSpinningMovePrimitive(dest, final_speed, false, angular_vel, 0))
+          robot_id,
+          *createSpinningMovePrimitive(dest, final_speed, angular_vel, DribblerMode::OFF))
 {
 }

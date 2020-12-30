@@ -156,7 +156,7 @@ SECTIONS
   . = ALIGN(4);
   .bss :
   {
-    /* This is used by the startup in order to initialize the .bss secion */
+    /* This is used by the startup in order to initialize the .bss section */
     _sbss = .;         /* define a global symbol at bss start */
     __bss_start__ = _sbss;
     *(.bss)
@@ -189,6 +189,13 @@ SECTIONS
     . = ABSOLUTE(0x30040200);
     *(.RxArraySection) 
   } >RAM_D2 AT> FLASH
+
+   /* DMA1 and DMA2 are directly connected to D2 Domain so we allocate
+   * any DMA buffers there */
+  .dma_buffer :
+  {
+    *(.dma_buffer)
+  } >RAM_D2
 
   /* Remove information from the standard libraries */
   /DISCARD/ :

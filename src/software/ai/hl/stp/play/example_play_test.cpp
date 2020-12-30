@@ -35,7 +35,7 @@ TEST(ExamplePlayTest, test_example_play_returns_correct_tactics)
     for (const auto& t : tactics)
     {
         // The result of the dynamic_cast will be a nullptr if the pointer does not
-        // actually point to a conrete type of MoveTactic
+        // actually point to a concrete type of MoveTactic
         EXPECT_NE(dynamic_cast<MoveTactic*>(t.get()), nullptr);
     }
 }

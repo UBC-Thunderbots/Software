@@ -4,6 +4,9 @@ exports_files(["LICENSE.txt"])
 
 package(default_visibility = ["//visibility:public"])
 
+load("@nanopb_deps//:requirements.bzl", "requirement")
+load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
+
 common_defines = [
     # By default, NanoPb only supports 8-bit tags. This define changes the tag type to
     # one that supports 16-bit tags.
@@ -52,14 +55,23 @@ cc_library(
 py_binary(
     name = "nanopb_generator",
     srcs = ["generator/nanopb_generator.py"],
-    imports = ["proto"],
+    deps = [
+        requirement("protobuf"),
+    ],
 )
 
 proto_library(
     name = "nanopb_options_proto",
     srcs = ["generator/nanopb/options.proto"],
-    strip_import_prefix = "generator/",
     deps = [
         "@com_google_protobuf//:descriptor_proto",
+    ],
+)
+
+py_proto_library(
+    name = "nanopb_options_py_proto",
+    srcs = ["generator/nanopb/options.proto"],
+    deps = [
+        "@com_google_protobuf//:protobuf_python",
     ],
 )
