@@ -23,7 +23,7 @@ def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
 
     if generate_for_cpp:
         CppWriter.write_config_metadata(
-            output_file, include_headers, "ThunderbotsConfig", config_metadata
+            output_file, include_headers, "ThunderbotsConfigNew", config_metadata
         )
     else:
         CWriter.write_config_metadata(output_file, "ThunderbotsConfig", config_metadata)
