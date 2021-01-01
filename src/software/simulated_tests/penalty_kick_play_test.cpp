@@ -59,7 +59,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
          Point(2, -3.1)}));
     setFriendlyGoalie(0);
     addEnemyRobots(
-        TestUtil::createStationaryRobotStatesWithId({field().enemyGoalCenter()}));
+		   TestUtil::createStationaryRobotStatesWithId({field().enemyGoalpostPos()}));
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_US);
@@ -69,7 +69,13 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+	[](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+	    while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+	    {
+	        yield();
+	    }
+	}
+        ,[](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             friendlyScored(world_ptr, yield);
         }};
 
