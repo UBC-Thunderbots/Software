@@ -206,7 +206,8 @@ class FirmwareTestUtilWorld : public testing::Test
                                         &(FirmwareTestUtil::get_ball_property),
                                         &(FirmwareTestUtil::get_ball_property));
 
-        firmware_world = app_firmware_world_create(robot, ball, FirmwareTestUtil::get_current_time_seconds);
+        firmware_world = app_firmware_world_create(
+            robot, ball, FirmwareTestUtil::get_current_time_seconds);
     }
 
     virtual void TearDown(void)

@@ -37,7 +37,7 @@ TEST(InterceptBallActionTest, intercept_fast_moving_ball)
         // The robot should immediately try facing the direction the ball is coming from
         EXPECT_EQ((-ball.velocity()).orientation(), move_intent.getFinalAngle());
     }
-    catch (std::bad_cast&)
+    catch (std::bad_cast &)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the InterceptBallAction";
     }
@@ -69,7 +69,7 @@ TEST(InterceptBallActionTest, ball_moving_too_fast_to_intercept_within_field)
 
         EXPECT_EQ((-world.ball().velocity()).orientation(), move_intent.getFinalAngle());
     }
-    catch (std::bad_cast&)
+    catch (std::bad_cast &)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the InterceptBallAction";
     }
@@ -102,7 +102,7 @@ TEST(InterceptBallActionTest, intercept_slow_moving_ball)
             (world.ball().position() - robot.position()).orientation();
         EXPECT_EQ(angle_facing_ball, move_intent.getFinalAngle());
     }
-    catch (std::bad_cast&)
+    catch (std::bad_cast &)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the InterceptBallAction";
     }

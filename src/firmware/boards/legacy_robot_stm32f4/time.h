@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 /**
  * Get the current time in seconds based on the current freertos tick
