@@ -1,15 +1,8 @@
 #pragma once
 
-#include <boost/coroutine2/all.hpp>
-#include <optional>
-
-#include "software/ai/hl/stp/action/action.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/intent/intent.h"
 #include "software/world/world.h"
-
-// We typedef the coroutine return type to make it shorter, more descriptive,
-// and easier to work with
-typedef boost::coroutines2::coroutine<std::shared_ptr<Action>> ActionCoroutine;
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot.
@@ -20,7 +13,7 @@ typedef boost::coroutines2::coroutine<std::shared_ptr<Action>> ActionCoroutine;
  * - A passer
  * - A receiver (for a pass)
  *
- * Tactics are stateful, and use Actions to implement their behaviour. They also
+ * Tactics are stateful, and use Intents to implement their behaviour. They also
  * make heavy use of our Evaluation functions in order to help them make decisions.
  */
 class Tactic
@@ -31,6 +24,7 @@ class Tactic
      *
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes and will never report done
+     * @param capability_reqs_ The capability requirements for running this tactic
      */
     explicit Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_);
 
@@ -42,31 +36,7 @@ class Tactic
      *
      * @return true if the Tactic is done and false otherwise
      */
-    bool done() const;
-
-    /**
-     * Returns the Robot assigned to this Tactic
-     *
-     * @return an std::optional containing the Robot assigned to this Tactic if one has
-     * been assigned, otherwise returns std::nullopt
-     */
-    std::optional<Robot> getAssignedRobot() const;
-
-    /**
-     * Updates the robot assigned to this Tactic
-     *
-     * @param robot The updated state of the Robot that should be performing
-     * this Tactic
-     */
-    void updateRobot(const Robot &robot);
-
-    /**
-     * Updates the world parameters for this tactic
-     *
-     * @param world The current state of the world
-     */
-    virtual void updateWorldParams(const World &world) = 0;
-
+    virtual bool done() const = 0;
 
     /**
      * robot hardware capability requirements of the tactic.
@@ -76,6 +46,8 @@ class Tactic
     /**
      * Mutable robot hardware capability requirements of the tactic.
      */
+    // TODO: this should be automatically updated or handled because it's too much to
+    // expect of users
     std::set<RobotCapability> &mutableRobotCapabilityRequirements();
 
 
@@ -93,23 +65,24 @@ class Tactic
      * @return A cost value in the range [0, 1] indicating the cost of assigning the given
      * robot to this Tactic. Lower cost values indicate more preferred robots.
      */
-    virtual double calculateRobotCost(const Robot &robot, const World &world) = 0;
+    virtual double cost(const Robot &robot, const World &world) = 0;
 
     /**
      * Whether or not this tactic is one used by the goalie
      * @return Whether or not this tactic is one used by the goalie
      */
+    // TODO (#1859): Delete this!
     virtual bool isGoalieTactic() const;
 
     /**
-     * Runs the coroutine and get the next Action to run from the calculateNextAction
-     * function. If the Tactic is not done, the next Action is returned. If the Tactic
-     * is done, a nullptr is returned.
+     * Updates and returns the next intent from this tactic
      *
-     * @return A unique pointer to the next Action that should be run for the Tactic.
-     * If the Tactic is done, a nullptr is returned.
+     * @param robot The robot this tactic is being assigned
+     * @param world The updated world
+     *
+     * @return the next intent
      */
-    std::shared_ptr<Action> getNextAction(void);
+    std::unique_ptr<Intent> next(const Robot &robot, const World &world);
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself
@@ -121,62 +94,10 @@ class Tactic
     virtual ~Tactic() = default;
 
    protected:
-    // The robot performing this Tactic
-    std::optional<Robot> robot;
+    std::unique_ptr<Intent> intent;
 
    private:
-    /**
-     * A wrapper function for the calculateNextAction function.
-     *
-     * This function exists because when the coroutine (action_sequence) is first
-     * constructed the coroutine is called/entered. This would normally cause the
-     * calculateNextAction to be run once and potentially return incorrect results
-     * due to default constructed values.
-     *
-     * This wrapper function will yield a null pointer the first time it's called and
-     * otherwise use the calculateNextAction function. This first "null" value will never
-     * be seen/used by the rest of the system since this will be during construction,
-     * and the coroutine will be called again with valid parameters before any values are
-     * returned. This effectively "shields" the logic from any errors caused by default
-     * values during construction.
-     *
-     * This function yields a unique pointer to the next Action that should be run for the
-     * Tactic. If the Tactic is done, an empty/null unique pointer is returned. The very
-     * first time this function is called, a null pointer will be returned (this does not
-     * signify the Tactic is done). This yield happens in place of a return.
-     *
-     * @param yield The coroutine push_type for the Tactic
-     */
-    void calculateNextActionWrapper(ActionCoroutine::push_type &yield);
-
-    /**
-     * Calculates the next Action for the Tactic. If the Tactic is done
-     * (ie. it has achieved its objective and has no more Actions to return),
-     * a nullptr is returned.
-     *
-     * This function yields a unique pointer to the next Action that should be run for the
-     * Tactic. If the Tactic is done, a nullptr is returned. This yield happens in place
-     * of a return
-     *
-     * @param yield The coroutine push_type for the Tactic
-     */
-    virtual void calculateNextAction(ActionCoroutine::push_type &yield) = 0;
-
-    /**
-     * A helper function that runs the action_sequence coroutine and returns the result
-     * of the coroutine. The done_ member variable is also updated to reflect whether
-     * or not the Tactic is done. If the Tactic is done, a nullptr is returned.
-     *
-     * @return the next Action this Tactic wants to run. If the Tactic is done, a nullptr
-     * is returned
-     */
-    std::shared_ptr<Action> getNextActionHelper();
-
-    // The coroutine that sequentially returns the Actions the Tactic wants to run
-    ActionCoroutine::pull_type action_sequence;
-
-    // Whether or not this Tactic is done
-    bool done_;
+    virtual void updateFSM(const Robot &robot, const World &world) = 0;
 
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;

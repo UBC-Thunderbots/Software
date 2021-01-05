@@ -394,7 +394,8 @@ cc_library(
     hdrs = ["tactic.h"],
     deps = [
         "tactic_visitor",
-        "//software/ai/hl/stp/action",
+        "//software/ai/intent",
+        "//software/ai/intent:stop_intent",
         "//software/world",
     ],
 )
