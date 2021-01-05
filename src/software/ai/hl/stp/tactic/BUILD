@@ -169,7 +169,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/intent:move_intent",
         "//software/logger",
     ],
 )

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/intent/move_intent.h"
 
 /**
  * The MoveTactic will move the assigned robot to the given destination and arrive
@@ -19,8 +19,6 @@ class MoveTactic : public Tactic
     explicit MoveTactic(bool loop_forever);
 
     MoveTactic() = delete;
-
-    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the control parameters for this MoveTactic.
@@ -42,12 +40,21 @@ class MoveTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double cost(const Robot& robot, const World& world) override;
 
     void accept(TacticVisitor& visitor) const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
+    struct MoveTacticUpdate
+    {
+        Point destination;
+        Angle final_orientation;
+        double final_speed;
+        Robot robot;
+        World world;
+    };
+
+    void updateFSM(const Robot& robot, const World& world) override;
 
     // Tactic parameters
     // The point the robot is trying to move to
