@@ -58,6 +58,9 @@ cc_test(
     srcs = [
         "cpp_config_test.cpp",
     ],
+    data = [
+        "//shared/parameter_v2/config_definitions:test_configs",
+    ],
     deps = [
         "//shared/parameter_v2:cpp_configs",
         "//software/util/variant_visitor",

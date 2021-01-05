@@ -50,7 +50,7 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
                          double_param_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(double_param_widget);
                      },
-                     [&](std::shared_ptr<NumericParameter<float>> param) {
+                     [&](std::shared_ptr<NumericParameter<unsigned>> param) {
                          // This will be implemented once the new parameter system is in
                          // place (issue #1298) Required to build
                      },

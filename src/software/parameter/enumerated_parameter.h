@@ -33,11 +33,6 @@ class EnumeratedParameter : public Parameter<T>
         if (std::find(allowed_values.begin(), allowed_values.end(), value) ==
             allowed_values.end())
         {
-            for (auto x : allowed_values) {
-                std::cout << ". " << x << std::endl;
-            }
-            std::cout << name << std::endl;
-            std::cout << "What the fuck " << allowed_values.size() << std::endl;
             throw std::invalid_argument(
                 "EnumeratedParameter constructed with invalid value");
         }
