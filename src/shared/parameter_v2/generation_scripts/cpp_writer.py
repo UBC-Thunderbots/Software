@@ -49,7 +49,6 @@ CONFIG_H = (
 
 INCLUDE_HEADER = '#include "{header_file}"'
 
-
 class CppWriter(object):
     @staticmethod
     def create_config_list_from_metadata(
