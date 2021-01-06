@@ -8,4 +8,5 @@
     min: 0
     max: 5
     value: 3
+    constant: true
     description: foo int
