@@ -60,6 +60,27 @@ bool isValidParamType(const std::string& str) {
 }
 
 /**
+ * Gets the value of a field from a parameter node
+ * 
+ * @param param_node the YAML node of parameter
+ * @param field the name of the field
+ */
+template<typename T>
+T getParamField(const YAML::Node& param_node, const std::string& field) {
+    return param_node.begin()->second[field].template as<T>();
+}
+
+/**
+ * Checks if a given parameter node is constant
+ * 
+ * @param param_node the YAML node of parameter
+ * @return true if the node contains constant field and the field is true, false otherwise
+ */
+bool isParamConstant(const YAML::Node& param_node) {
+    return param_node.begin()->second["constant"] && getParamField<bool>(param_node, "constant");
+}
+
+/**
  * Finds the parameter node (which could be an included config) within a config node
  * 
  * @param config the config to look in
@@ -73,7 +94,7 @@ YAML::Node findParamNode(const YAML::Node& config, const std::string& param_name
        // If a sequence, there are no included configs
        for (YAML::const_iterator config_it = config.begin(); config_it != config.end(); config_it++) {
         const YAML::Node param_node = *config_it;
-        if (param_node.begin()->second["name"].as<std::string>() == param_name) {
+        if (getParamField<std::string>(param_node, "name") == param_name) {
             return param_node;
         }
     }
@@ -90,8 +111,7 @@ YAML::Node findParamNode(const YAML::Node& config, const std::string& param_name
                 continue;
             }
 
-            YAML::const_iterator param_it = param_node.begin();
-            if (isValidParamType(param_it->first.as<std::string>()) && param_it->second["name"].as<std::string>() == param_name) {
+            if (isValidParamType(param_node.begin()->first.as<std::string>()) && getParamField<std::string>(param_node, "name") == param_name) {
                 return param_node;
             }
         }
@@ -179,9 +199,6 @@ class TestAutogenParameterList : public YamlLoadFixture
    /*
     * Tests that the generated parameterlist tree is identical to the yaml tree
     * Visits each config in the top level config and descends (sort of depth first)
-    *
-    * NOTE: at any given time this test may fail due to the key not existing in the yaml
-    * dictionary which indicates an error w/ the generate script.
     */
    void visit_parameters(ParameterVariant paramvar, const YAML::Node& current_config)
    {
@@ -211,8 +228,8 @@ class TestAutogenParameterList : public YamlLoadFixture
    }
 
    /*
-    * Function takes a param and the corresponding yaml description
-    * and checks that the yaml was generated correctly into the expected
+    * Function takes a param and the config node that contains it, and 
+    * checks that the yaml was generated correctly into the expected
     * parameter.
     *
     * Interally asserts and creates failures
@@ -223,10 +240,10 @@ class TestAutogenParameterList : public YamlLoadFixture
    {
        try
        {
-           const YAML::Node param_description = findParamNode(config_node, param->name());
+           const YAML::Node param_node = findParamNode(config_node, param->name());
            // make sure the default value matches, accessing the yaml node with an
            // invalid key will fail the test by default
-           ASSERT_EQ(param_description.begin()->second["value"].template as<T>(), param->value());
+           ASSERT_EQ(getParamField<T>(param_node, "value"), param->value());
        }
        catch (...)
        {
@@ -255,12 +272,12 @@ class TestParameterMutation : public YamlLoadFixture
     * Visits each parameter and mutates on the following policy
     *
     * std::string gets "test" appended at the end
-    * int gets incremented by 4
-    * double gets incremented by 2
+    * int gets incremented by 2
+    * double gets decremented by 2
+    * unsigned gets decremented by 1
     * bool gets flipped
-    *
-    * NOTE: at any given time this test may fail due to the key not existing in the yaml
-    * dictionary which indicates an error w/ the generate script.
+    * 
+    * Some parameters such as example_enum_param has a specific value set
     */
    void mutate_all_parameters(MutableParameterVariant paramvar)
    {
@@ -279,7 +296,7 @@ class TestParameterMutation : public YamlLoadFixture
                                param->setValue(param->value() - 2.0);
                            },
                            [&](std::shared_ptr<NumericParameter<unsigned>> param) {
-                               param->setValue(param->value() + 3);
+                               param->setValue(param->value() - 1);
                            },
                            [&](std::shared_ptr<EnumeratedParameter<std::string>> param) {
                                if (param->name() == "example_factory_param") {
@@ -302,58 +319,66 @@ class TestParameterMutation : public YamlLoadFixture
 
    /*
     * Tests that the mutations in the mutable parameter list tree are propagated to
-    * the immutable tree
-    *
-    * NOTE: at any given time this test may fail due to the key not existing in the yaml
-    * dictionary which indicates an error w/ the generate script.
+    * the immutable tree, and that constant parameters have not changed
     */
-   void assert_mutations(ParameterVariant paramvar, const YAML::Node& current_config)
+   void assert_mutation(ParameterVariant paramvar, const YAML::Node& current_config)
    {
        std::visit(
            overload{
                [&](std::shared_ptr<const Parameter<int>> param) {
                    const YAML::Node param_node = findParamNode(current_config, param->name());
-                   if (!(param_node.begin()->second["constant"] && param_node.begin()->second["constant"].as<bool>())) {
-                   ASSERT_EQ(param_node.begin()->second["value"].as<int>() + 2,
+                   if (!(isParamConstant(param_node))) {
+                        ASSERT_EQ(getParamField<int>(param_node, "value") + 2,
                              param->value());
+                   } else {
+                       ASSERT_EQ(getParamField<int>(param_node, "value"), param->value());
                    }
                },
                [&](std::shared_ptr<const Parameter<bool>> param) {
                    const YAML::Node param_node = findParamNode(current_config, param->name());
-                   if (!(param_node.begin()->second["constant"] && param_node.begin()->second["constant"].as<bool>())) {
-                   ASSERT_EQ(!param_node.begin()->second["value"].as<bool>(),
+                   if (!(isParamConstant(param_node))) {
+                   ASSERT_EQ(!getParamField<bool>(param_node, "value"),
                              param->value());
+                   } else {
+                       ASSERT_EQ(getParamField<bool>(param_node, "value"), param->value());
                    }
                },
                [&](std::shared_ptr<const Parameter<std::string>> param) {
                    const YAML::Node param_node = findParamNode(current_config, param->name());
-                   if (!(param_node.begin()->second["constant"] && param_node.begin()->second["constant"].as<bool>())) {
-                   ASSERT_EQ(param_node.begin()->second["value"].as<std::string>() +
-                                 "test",
+                   if (!(isParamConstant(param_node))) {
+                   ASSERT_EQ(getParamField<std::string>(param_node, "value") + "test",
                              param->value());
+                   } else {
+                       ASSERT_EQ(getParamField<std::string>(param_node, "value"), param->value());
                    }
                },
                [&](std::shared_ptr<const Parameter<double>> param) {
                    const YAML::Node param_node = findParamNode(current_config, param->name());
-                   if (!(param_node.begin()->second["constant"] && param_node.begin()->second["constant"].as<bool>())) {
-                   ASSERT_NEAR(param_node.begin()->second["value"].as<double>() + 2.0,
+                   if (!(isParamConstant(param_node))) {
+                   ASSERT_NEAR(getParamField<double>(param_node, "value") - 2.0,
                                param->value(), 1E-10);
+                   } else {
+                       ASSERT_EQ(getParamField<double>(param_node, "value"), param->value());
                    }
                },
                [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
                    const YAML::Node param_node = findParamNode(current_config, param->name());
-                   if (!(param_node.begin()->second["constant"] && param_node.begin()->second["constant"].as<bool>())) {
-                   ASSERT_EQ(param_node.begin()->second["value"].as<unsigned>() + 3, param->value());
+                   if (!(isParamConstant(param_node))) {
+                   ASSERT_EQ(getParamField<unsigned>(param_node, "value") - 1, param->value());
+                   } else {
+                       ASSERT_EQ(getParamField<unsigned>(param_node, "value"), param->value());
                    }
                },
                [&](std::shared_ptr<const EnumeratedParameter<std::string>> param) {
                    const YAML::Node param_node = findParamNode(current_config, param->name());
-                   if (!(param_node.begin()->second["constant"] && param_node.begin()->second["constant"].as<bool>())) {
+                   if (!(isParamConstant(param_node))) {
                        if (param->name() == "example_enum_param") {
                           ASSERT_EQ("STOP", param->value()); 
                        } else if (param->name() == "example_factory_param") {
                            ASSERT_EQ("ExamplePlay", param->value());
                        }
+                   } else {
+                       ASSERT_EQ(getParamField<std::string>(param_node, "value"), param->value());
                    }
                },
                [&](std::shared_ptr<const Config> param) {
@@ -365,10 +390,6 @@ class TestParameterMutation : public YamlLoadFixture
                }},
            paramvar);
    }
-
-   template <typename T>
-   void assert_mutation(const std::shared_ptr<const Parameter<T>>& param,
-                         const YAML::Node& config_node)
 };
 
 TEST_F(TestParameterMutation, DynamicParametersTest)
@@ -382,5 +403,5 @@ TEST_F(TestParameterMutation, DynamicParametersTest)
         std::const_pointer_cast<const ThunderbotsConfigNew>(MutableDynamicParameters);
 
     mutate_all_parameters(MutableDynamicParameters);
-    assert_mutations(DynamicParameters, config_yaml);
+    assert_mutation(DynamicParameters, config_yaml);
 }
