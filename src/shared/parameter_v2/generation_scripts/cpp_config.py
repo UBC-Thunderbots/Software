@@ -39,7 +39,9 @@ INCLUDED_CONFIG_COMMAND_LINE_ARG_STRUCT = """struct {config_name}CommandLineArgs
             {command_line_arg_struct_contents}
         }};"""
 
-INCLUDED_CONFIG_COMMAND_LINE_ARG_ENTRY = "{config_name}CommandLineArgs {config_arg_name};"
+INCLUDED_CONFIG_COMMAND_LINE_ARG_ENTRY = (
+    "{config_name}CommandLineArgs {config_arg_name};"
+)
 
 CONFIG_PUBLIC_ENTRY = """const std::shared_ptr<const {config_name}> {immutable_accessor_name}() const
     {{
@@ -53,7 +55,9 @@ CONFIG_PUBLIC_ENTRY = """const std::shared_ptr<const {config_name}> {immutable_a
 
 CONFIG_PRIVATE_ENTRY = "std::shared_ptr<{config_name}> {config_variable_name};"
 
-CONFIG_CONSTRUCTOR_ENTRY = "{config_variable_name} = std::make_shared<{config_name}>({args});"
+CONFIG_CONSTRUCTOR_ENTRY = (
+    "{config_variable_name} = std::make_shared<{config_name}>({args});"
+)
 
 IMMUTABLE_PARAMETER_LIST_CONFIG_ENTRY = (
     "std::const_pointer_cast<const {config_name}>({config_variable_name})"
@@ -123,7 +127,7 @@ CONFIG_CLASS = """class {config_name} : public Config
 
 class CppConfig(object):
     def __init__(self, config_name: str, is_top_level_config: bool = False):
-        self.config_name = config_name 
+        self.config_name = config_name
         self.config_variable_name = to_snake_case(config_name) + "_config"
         self.is_top_level_config = is_top_level_config
         self.parameters: List[CppParameter] = list()
@@ -152,7 +156,7 @@ class CppConfig(object):
     @dependency_graph.setter
     def dependency_graph(self, dependency_graph: nx.DiGraph):
         self.__dependency_graph = dependency_graph
-        
+
         self.dependency_graph_topological_order_configs = [
             self.dependency_graph.nodes[node]["config"]
             for node in list(reversed(list(nx.topological_sort(self.dependency_graph))))
@@ -164,12 +168,18 @@ class CppConfig(object):
             self.dfs_helper(config, "", "")
 
     def dfs_helper(self, config: CppConfig, arg_prefix: str, load_dependency: str):
-        arg_prefix = to_snake_case(config.config_name) if not arg_prefix else arg_prefix + "." + to_snake_case(config.config_name)
+        arg_prefix = (
+            to_snake_case(config.config_name)
+            if not arg_prefix
+            else arg_prefix + "." + to_snake_case(config.config_name)
+        )
         load_dependency = load_dependency + "getMutable{config_name}()->".format(
             config_name=config.config_name
         )
 
-        mutable_param_gen = (param for param in config.parameters if not param.is_constant)
+        mutable_param_gen = (
+            param for param in config.parameters if not param.is_constant
+        )
         for param in mutable_param_gen:
             self.included_config_command_line_arg_entries.append(
                 param.command_line_option_entry_with_prefix(arg_prefix + ".")
@@ -187,9 +197,7 @@ class CppConfig(object):
 
     @property
     def forward_declaration(self):
-        return FORWARD_DECLARATION.format(
-            config_name=self.config_name
-        )
+        return FORWARD_DECLARATION.format(config_name=self.config_name)
 
     @property
     def definition(self):
@@ -209,22 +217,21 @@ class CppConfig(object):
     @property
     def included_config_constructor_arg_entry(self):
         return INCLUDED_CONFIG_CONSTRUCTOR_ARG_ENTRY.format(
-            config_name=self.config_name, config_arg_name=to_snake_case(self.config_name)
+            config_name=self.config_name,
+            config_arg_name=to_snake_case(self.config_name),
         )
 
     @property
     def included_config_constructor_initializer_list_entry(self):
         return INCLUDED_CONFIG_CONSTRUCTOR_INITIALIZER_LIST_ENTRY.format(
             config_variable_name=self.config_variable_name,
-            config_arg_name=to_snake_case(self.config_name)
+            config_arg_name=to_snake_case(self.config_name),
         )
 
     @property
     def config_constructor_args(self):
         return CppConfig.join_with_tabs(
-            ", ",
-            [conf.config_variable_name for conf in self.configs],
-            0
+            ", ", [conf.config_variable_name for conf in self.configs], 0
         )
 
     @property
@@ -271,14 +278,26 @@ class CppConfig(object):
     def constructor_entries(self):
         return CppConfig.join_with_tabs(
             "\n",
-            [conf.config_constructor_entry for conf in self.dependency_graph_topological_order_configs] if self.is_top_level_config else [param.constructor_entry for param in self.parameters],
+            [
+                conf.config_constructor_entry
+                for conf in self.dependency_graph_topological_order_configs
+            ]
+            if self.is_top_level_config
+            else [param.constructor_entry for param in self.parameters],
             2,
         )
 
     @property
     def mutable_parameter_list_entries(self):
         return CppConfig.join_with_tabs(
-            ",\n", [param.param_variable_name for param in self.parameters if not param.is_constant] + [conf.config_variable_name for conf in self.configs], 3
+            ",\n",
+            [
+                param.param_variable_name
+                for param in self.parameters
+                if not param.is_constant
+            ]
+            + [conf.config_variable_name for conf in self.configs],
+            3,
         )
 
     @property
@@ -292,7 +311,8 @@ class CppConfig(object):
     def immutable_parameter_list_entries(self):
         return CppConfig.join_with_tabs(
             ",\n",
-            [param.immutable_parameter_list_entry for param in self.parameters] + [conf.immutable_parameter_list_config_entry for conf in self.configs],
+            [param.immutable_parameter_list_entry for param in self.parameters]
+            + [conf.immutable_parameter_list_config_entry for conf in self.configs],
             3,
         )
 
@@ -342,7 +362,7 @@ class CppConfig(object):
     def included_config_command_line_arg_entry(self):
         return INCLUDED_CONFIG_COMMAND_LINE_ARG_ENTRY.format(
             config_name=self.config_name,
-            config_arg_name=to_snake_case(self.config_name)
+            config_arg_name=to_snake_case(self.config_name),
         )
 
     @property
@@ -351,25 +371,22 @@ class CppConfig(object):
             config_name=self.config_name,
             command_line_arg_struct_contents=self.command_line_arg_struct_contents,
         )
-    
+
     @property
     def command_line_arg_struct_contents(self):
         return CppConfig.join_with_tabs(
             "\n",
             [param.command_line_arg_entry for param in self.parameters]
-            + [
-                conf.included_config_command_line_arg_entry
-                for conf in self.configs
-            ],
+            + [conf.included_config_command_line_arg_entry for conf in self.configs],
             3,
         )
-    
+
     @property
     def command_line_arg_struct(self):
         return COMMAND_LINE_ARG_STRUCT.format(
-           command_line_arg_struct_contents=self.command_line_arg_struct_contents 
+            command_line_arg_struct_contents=self.command_line_arg_struct_contents
         )
-    
+
     @property
     def command_line_arg_structs(self):
         return CppConfig.join_with_tabs(
@@ -377,7 +394,8 @@ class CppConfig(object):
             [
                 conf.included_config_command_line_arg_struct
                 for conf in self.dependency_graph_topological_order_configs
-            ] + [self.command_line_arg_struct],
+            ]
+            + [self.command_line_arg_struct],
             2,
         )
 
@@ -385,7 +403,11 @@ class CppConfig(object):
     def load_command_line_args_into_config_contents(self):
         return CppConfig.join_with_tabs(
             "\n",
-            [param.load_command_line_arg_into_config for param in self.parameters if not param.is_constant]
+            [
+                param.load_command_line_arg_into_config
+                for param in self.parameters
+                if not param.is_constant
+            ]
             + self.included_config_load_command_line_args_into_config_contents,
             2,
         )

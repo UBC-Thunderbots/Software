@@ -105,7 +105,7 @@ std::vector<std::string> separateEnumStrings(std::string enum_string);
             values.emplace_back(static_cast<name>(i));                                     \
         }                                                                                  \
         return values;                                                                     \
-    }                                                                                      
+    }
 
 template <typename T>
 std::string toString(const T& value)

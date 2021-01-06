@@ -46,20 +46,21 @@ LOAD_COMMAND_LINE_ARG_INTO_CONFIG = "this->{dependencies}mutable{param_accessor_
 NUMERIC_PARAMETER_MIN = "std::numeric_limits<{type}>::min()"
 NUMERIC_PARAMETER_MAX = "std::numeric_limits<{type}>::max()"
 
+
 class CppParameter(object):
     def __init__(self, param_type: str, param_metadata: dict):
         self.param_type = param_type
         self.param_metadata = param_metadata
         self.param_name = param_metadata["name"]
         self.param_variable_name = self.param_name + "_param"
-        self.param_description = param_metadata["description"] 
+        self.param_description = param_metadata["description"]
         self.param_value = param_metadata["value"]
-        self.is_constant = param_metadata[CONSTANT_KEY] if CONSTANT_KEY in param_metadata else False
+        self.is_constant = (
+            param_metadata[CONSTANT_KEY] if CONSTANT_KEY in param_metadata else False
+        )
 
         self.quote = CppParameter.find_quote(param_type)
-        self.cpp_type = CppParameter.find_cpp_type(
-            self.param_type, param_metadata
-        )
+        self.cpp_type = CppParameter.find_cpp_type(self.param_type, param_metadata)
         self.param_class = CppParameter.find_param_class(self.param_type)
 
         # Python stores booleans as True and False, but we need them to be
@@ -85,9 +86,7 @@ class CppParameter(object):
             return "Parameter"
 
     @staticmethod
-    def find_cpp_type(
-        param_type: str, param_metadata: dict
-    ) -> str: 
+    def find_cpp_type(param_type: str, param_metadata: dict) -> str:
         if param_type == "factory":
             return param_metadata["index_type"]
         else:
@@ -125,17 +124,21 @@ class CppParameter(object):
 
     @property
     def parameter_public_entry(self):
-        return PARAMETER_PUBLIC_ENTRY_CONST.format(
-            param_class=self.param_class,
-            type=self.cpp_type,
-            immutable_accessor_name=to_lower_camel_case(self.param_name),
-            param_variable_name=self.param_variable_name,
-        ) if self.is_constant else PARAMETER_PUBLIC_ENTRY.format(
-            param_class=self.param_class,
-            type=self.cpp_type,
-            immutable_accessor_name=to_lower_camel_case(self.param_name),
-            mutable_accessor_name="mutable" + to_upper_camel_case(self.param_name),
-            param_variable_name=self.param_variable_name,
+        return (
+            PARAMETER_PUBLIC_ENTRY_CONST.format(
+                param_class=self.param_class,
+                type=self.cpp_type,
+                immutable_accessor_name=to_lower_camel_case(self.param_name),
+                param_variable_name=self.param_variable_name,
+            )
+            if self.is_constant
+            else PARAMETER_PUBLIC_ENTRY.format(
+                param_class=self.param_class,
+                type=self.cpp_type,
+                immutable_accessor_name=to_lower_camel_case(self.param_name),
+                mutable_accessor_name="mutable" + to_upper_camel_case(self.param_name),
+                param_variable_name=self.param_variable_name,
+            )
         )
 
     @property
@@ -240,5 +243,8 @@ class CppParameter(object):
     @property
     def load_command_line_arg_into_config(self):
         return LOAD_COMMAND_LINE_ARG_INTO_CONFIG.format(
-            param_name=self.param_name, param_accessor_name=to_upper_camel_case(self.param_name), dependencies="", arg_prefix="",
+            param_name=self.param_name,
+            param_accessor_name=to_upper_camel_case(self.param_name),
+            dependencies="",
+            arg_prefix="",
         )

@@ -6,7 +6,7 @@ cpp_dynamic_parameters(
     name = "cpp_params",
     enum_deps = [
         "//software/world:game_state",
-        "//software/ai/hl/stp/play"
+        "//software/ai/hl/stp/play",
     ],
     generated_parameter_file = "cpp_dynamic_parameters.h",
 )
@@ -27,12 +27,12 @@ cc_library(
         ":cpp_params",
     ],
     deps = [
+        "//software/ai/hl/stp/play:example_play",
+        "//software/ai/hl/stp/play:halt_play",
         "//software/parameter",
         "//software/parameter:config",
         "//software/util/design_patterns:generic_factory",
         "//software/world:game_state",
-        "//software/ai/hl/stp/play:halt_play",
-        "//software/ai/hl/stp/play:example_play",
     ],
 )
 
@@ -67,6 +67,6 @@ cc_test(
         "//software/util/variant_visitor",
         "@boost//:filesystem",
         "@gtest//:gtest_main",
-        "@yaml-cpp"
+        "@yaml-cpp",
     ],
 )

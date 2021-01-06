@@ -59,9 +59,10 @@ CONFIG_H = (
 
 INCLUDE_HEADER = '#include "{header_file}"'
 
+
 class CppWriter(object):
     @staticmethod
-    def create_config_list_from_metadata( 
+    def create_config_list_from_metadata(
         top_level_config_name: str, config_metadata: dict
     ) -> List[CppConfig]:
         cpp_configs = []
@@ -71,9 +72,7 @@ class CppWriter(object):
 
         # first pass to construct all CppConfig objects
         for config, metadata in config_metadata.items():
-            config_name = to_upper_camel_case(
-                config.split(".")[0]
-            )
+            config_name = to_upper_camel_case(config.split(".")[0])
 
             config = CppConfig(config_name)
             top_level_config.include_config(config)
@@ -128,7 +127,10 @@ class CppWriter(object):
 
     @staticmethod
     def write_config_metadata(
-        output_file: str, include_headers: List[str], top_level_config_name: str, config_metadata: dict
+        output_file: str,
+        include_headers: List[str],
+        top_level_config_name: str,
+        config_metadata: dict,
     ):
         cpp_configs = CppWriter.create_config_list_from_metadata(
             top_level_config_name, config_metadata
@@ -137,7 +139,12 @@ class CppWriter(object):
         # generate header file
         with open(f"{output_file}", "w") as header_file:
             contents = "\n".join([conf.definition for conf in cpp_configs])
-            include_headers_formatted = "\n".join([INCLUDE_HEADER.format(header_file=header_file) for header_file in include_headers])
+            include_headers_formatted = "\n".join(
+                [
+                    INCLUDE_HEADER.format(header_file=header_file)
+                    for header_file in include_headers
+                ]
+            )
             forward_declarations = "\n".join(
                 [conf.forward_declaration for conf in cpp_configs]
             )
