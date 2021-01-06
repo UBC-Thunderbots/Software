@@ -61,7 +61,7 @@ class EnumeratedParameter : public Parameter<T>
      * @param new_value The new value to set
      * @returns true if the value was accepted, false if rejected
      */
-    bool setValue(const T new_value)
+    bool setValue(const T new_value) override
     {
         if (std::find(allowed_values_.begin(), allowed_values_.end(), new_value) !=
             allowed_values_.end())

@@ -49,8 +49,9 @@ class Parameter
      * callback functions with the new value
      *
      * @param new_value The new value to set
+     * @return true if the value has been set - in Parameter class, always true
      */
-    void setValue(const T new_value)
+    virtual bool setValue(const T new_value)
     {
         std::scoped_lock value_lock(this->value_mutex_);
         this->value_ = new_value;
@@ -60,6 +61,8 @@ class Parameter
         {
             callback_func(new_value);
         }
+
+        return true;
     }
 
     /**
