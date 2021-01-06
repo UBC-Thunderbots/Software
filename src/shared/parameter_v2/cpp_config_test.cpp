@@ -181,7 +181,7 @@ class YamlLoadFixture : public ::testing::Test
                     //
                     // We try to load the first document as a parameter definitions, and
                     // if the conversion doesn't match, we load it as an include list.
-                    current_config_yaml = config[0];  // Convert this to function
+                    current_config_yaml = config[0];
                 }
                 catch (const YAML::BadConversion& e)
                 {
@@ -340,7 +340,7 @@ class TestParameterMutation : public YamlLoadFixture
                                 {
                                     if (visited.find(v) == visited.end())
                                     {
-                                        // Only mutate once per parametr
+                                        // Only mutate once per parameter
                                         mutate_all_parameters(v);
                                     }
                                 }
