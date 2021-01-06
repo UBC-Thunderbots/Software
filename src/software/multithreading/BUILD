@@ -25,6 +25,17 @@ cc_library(
 )
 
 cc_library(
+    name = "observer_subject_adapter",
+    hdrs = [
+        "observer_subject_adapter.h",
+        "observer_subject_adapter.tpp",
+    ],
+    deps = [
+        ":observer",
+    ],
+)
+
+cc_library(
     name = "thread_safe_buffer",
     hdrs = [
         "thread_safe_buffer.h",
