@@ -53,7 +53,6 @@ class CWriter(object):
             # we convert the yaml file name to camel case
             # and store that as the config_name
             config_name = CWriter.to_camel_case(config.split(".")[0])
-            print(config_name)
 
             config = CConfig(
                 config_name, "{}_ptr->{}".format(top_level_config_name, config_name)
@@ -106,7 +105,6 @@ class CWriter(object):
                 c_configs.append(config)
 
         c_configs.append(top_level_config)
-        print(c_configs)
 
         return c_configs
 
@@ -131,7 +129,6 @@ class CWriter(object):
 
             # forward declerations and definitions
             contents = "".join([conf.forward_declaration for conf in c_configs])
-            print(contents)
             contents += "".join([conf.definition for conf in c_configs])
 
             app_dynamic_parameters_create_impl = ""
