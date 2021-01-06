@@ -1,6 +1,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
+#include <set>
 #include <boost/filesystem.hpp>
 
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
@@ -48,38 +48,51 @@ std::string toCamelCase(const std::string& snake_case_input)
     return ret_str;
 }
 
-YAML::Node findParamNode(const YAML::Node& config, const std::string& param_name) {
-    std::cout << "Finding: " << param_name << std::endl;
-    std::cout << "Config: " << config << std::endl;
+/**
+ * Finds if the given string is a valid parameter type
+ * 
+ * @param str the string
+ * @return true if string is a valid parameter type, false otherwise
+ */
+bool isValidParamType(const std::string& str) {
+    const static std::set<std::string> types = {"bool", "int", "uint", "float", "string", "enum", "factory"};
+    return types.find(str) != types.end();
+}
 
+/**
+ * Finds the parameter node (which could be an included config) within a config node
+ * 
+ * @param config the config to look in
+ * @param param_name the name of the parameter to be looked for
+ * @return the parameter node if found, a null node otherwise
+ */
+YAML::Node findParamNode(const YAML::Node& config, const std::string& param_name) {
+    // If a config does not include other configs, it contains its paramters as a list. Otherwise,
+    // it is a map where the key is an index number for non-config parameters, and the config names for included configs.
     if (config.IsSequence()) {
-       // If a sequence, there are no nested configs
+       // If a sequence, there are no included configs
        for (YAML::const_iterator config_it = config.begin(); config_it != config.end(); config_it++) {
-        auto& param_node = *config_it;
-        std::cout << "value: " << param_node << std::endl;
-        for (YAML::const_iterator param_it = param_node.begin(); param_it != param_node.end(); param_it++) {
-            if (param_it->second["name"].as<std::string>() == param_name) {
-                return param_node;
-            }
+        const YAML::Node param_node = *config_it;
+        if (param_node.begin()->second["name"].as<std::string>() == param_name) {
+            return param_node;
         }
     }
     } else if (config.IsMap()) {
         for (YAML::const_iterator config_it = config.begin(); config_it != config.end(); config_it++) {
-            auto& param_index = config_it->first;
-            auto& param_node = config_it->second;
+            const std::string param_index = config_it->first.as<std::string>();
+            const YAML::Node param_node = config_it->second;
 
-            std::cout << "index: " << param_index << std::endl;
-            std::cout << "value: " << param_node << std::endl;
-
-            if (param_index.as<std::string>() == param_name) {
-                // Index matches name, so it must be a nested config
+            if (param_index == param_name) {
+                // Must be the included config we are looking for
                 return param_node;
+            } else if (param_node.IsSequence()) {
+                // Only a config can be a sequence type, and since it is not the included config we are looking for, continue
+                continue;
             }
 
-            for (YAML::const_iterator param_it = param_node.begin(); param_it != param_node.end(); param_it++) {
-                if (param_it->second["name"].as<std::string>() == param_name) {
-                    return param_node;
-                }
+            YAML::const_iterator param_it = param_node.begin();
+            if (isValidParamType(param_it->first.as<std::string>()) && param_it->second["name"].as<std::string>() == param_name) {
+                return param_node;
             }
         }
     }
@@ -90,20 +103,7 @@ YAML::Node findParamNode(const YAML::Node& config, const std::string& param_name
 
 class YamlLoadFixture : public ::testing::Test
 {
-   protected:
-    typedef struct ConfigMetadata
-    {
-        // the name of the config in snake_case
-        std::string config_name;
-
-        // the included configs in snake_case
-        std::vector<std::string> included_configs;
-
-        // the parameters defined by this config metadata
-        std::map<std::string, YAML::Node> parameters;
-
-    } ConfigMetadata_t;
-
+    protected:
     /*
      * Sets up the test by loading the yaml files in the config folder.
      *
@@ -198,8 +198,7 @@ class TestAutogenParameterList : public YamlLoadFixture
                                assert_parameter<double>(param, current_config);
                            },
                            [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
-                               // This will be tested as part of the new parameter system
-                               // (issue #1298)
+                               assert_parameter<unsigned>(param, current_config);
                            },
                            [&](std::shared_ptr<const Config> param) {
                                for (auto& v : param->getParameterList())
@@ -226,12 +225,7 @@ class TestAutogenParameterList : public YamlLoadFixture
            const auto& param_description = findParamNode(config_node, param->name());
            // make sure the default value matches, accessing the yaml node with an
            // invalid key will fail the test by default
-           for(YAML::const_iterator it=param_description.begin();it != param_description.end(); it++) {
-               std::cout << "Key: " << it->first.as<std::string>() << std::endl;       // <- key
-               std::cout << "Value: " << it->second << std::endl;
-              ASSERT_EQ(it->second["value"].template as<T>(),
-                      param->value());
-            }
+           ASSERT_EQ(param_description.begin()->second["value"].template as<T>(), param->value());
        }
        catch (...)
        {
@@ -250,9 +244,7 @@ TEST_F(TestAutogenParameterList, DynamicParametersTest)
    const std::shared_ptr<const ThunderbotsConfigNew> DynamicParameters =
        std::const_pointer_cast<const ThunderbotsConfigNew>(MutableDynamicParameters);
 
-   visit_parameters(DynamicParameters, config_yaml); // TODO: Delete the tbots config layer?
-    //config_yaml["ThunderbotsConfig"]["Example"]["Foo"] = config_yaml["ThunderbotsConfig"]["Foo"];
-    //std::cout << config_yaml["ThunderbotsConfig"]["Example"] << std::endl;;
+   visit_parameters(DynamicParameters, config_yaml);
 }
 
 class TestParameterMutation : public YamlLoadFixture
@@ -284,8 +276,14 @@ class TestParameterMutation : public YamlLoadFixture
                                param->setValue(param->value() - 2.0);
                            },
                            [&](std::shared_ptr<NumericParameter<unsigned>> param) {
-                               // This will be tested as part of the new parameter system
-                               // (issue #1298)
+                               param->setValue(param->value() + 3);
+                           },
+                           [&](std::shared_ptr<EnumeratedParameter<std::string>> param) {
+                               if (param->name() == "example_factory_param") {
+                                   param->setValue("ExamplePlay");
+                               } else {
+                                   param->setValue("STOP");
+                               }
                            },
                            [&](std::shared_ptr<Config> param) {
                                for (auto& v : param->getMutableParameterList())
@@ -338,17 +336,17 @@ class TestParameterMutation : public YamlLoadFixture
    }
 };
 
-//TEST(TestParameterMutation, DynamicParametersTest)
-//{
-//    // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
-//    const std::shared_ptr<ThunderbotsConfigNew> MutableDynamicParameters =
-//        std::make_shared<ThunderbotsConfigNew>();
-//
-//   // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
-//    const std::shared_ptr<const ThunderbotsConfigNew> DynamicParameters =
-//        std::const_pointer_cast<const ThunderbotsConfigNew>(MutableDynamicParameters);
-//
-//    mutate_all_parameters(MutableDynamicParameters);
-//    assert_mutation(DynamicParameters, config_yaml);
-//}
+TEST_F(TestParameterMutation, DynamicParametersTest)
+{
+    // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
+    const std::shared_ptr<ThunderbotsConfigNew> MutableDynamicParameters =
+        std::make_shared<ThunderbotsConfigNew>();
+
+   // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
+    const std::shared_ptr<const ThunderbotsConfigNew> DynamicParameters =
+        std::const_pointer_cast<const ThunderbotsConfigNew>(MutableDynamicParameters);
+
+    mutate_all_parameters(MutableDynamicParameters);
+    //assert_mutation(DynamicParameters, config_yaml);
+}
 
