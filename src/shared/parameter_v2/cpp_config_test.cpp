@@ -215,8 +215,6 @@ class YamlLoadFixture : public ::testing::Test
         }
     }
 
-    // store the config metadata which contains the included configs and the parameters
-    // in a mapping to the config file it was loaded from
     YAML::Node config_yaml;
     std::map<std::string, std::vector<std::string>> config_name_to_includes_map;
 };
