@@ -55,7 +55,6 @@ class CppWriter(object):
     def create_config_list_from_metadata(
         top_level_config_name: str, config_metadata: dict
     ) -> List[CppConfig]:
-        cpp_configs = []
         cpp_configs_dict = {}
         dependency_graph = nx.DiGraph()
         top_level_config = CppConfig(top_level_config_name, True)
@@ -75,7 +74,6 @@ class CppWriter(object):
                     cpp_param = CppParameter(param_type, param_metadata)
                     config.add_parameter(cpp_param)
 
-            cpp_configs.append(config)
             cpp_configs_dict[config_name] = config
             dependency_graph.add_node(config_name, config=config)
 
@@ -112,7 +110,6 @@ class CppWriter(object):
         ]
         cpp_configs.append(top_level_config)
 
-        # create graph of dependencies, with all sources as starting vertex
         return cpp_configs
 
     @staticmethod
