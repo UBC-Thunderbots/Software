@@ -1,10 +1,10 @@
-#include "software/multithreading/observer.h"
-
 #include <gtest/gtest.h>
 
 #include <thread>
 
-class TestObserver : public Observer<int>
+#include "software/multithreading/observer_buffer.h"
+
+class TestObserverBuffer : public ObserverBuffer<int>
 {
    public:
     std::optional<int> getMostRecentValueFromBufferWrapper()
@@ -25,7 +25,7 @@ namespace TestUtil
      * @return AssertionSuccess the observer returns the correct data received per second
      */
     ::testing::AssertionResult testGetDataReceivedPerSecondByFillingBuffer(
-        TestObserver test_observer, unsigned int data_received_period_milliseconds,
+        TestObserverBuffer test_observer, unsigned int data_received_period_milliseconds,
         unsigned int number_of_messages)
     {
         auto wall_time_start = std::chrono::steady_clock::now();
@@ -64,7 +64,7 @@ namespace TestUtil
 
 TEST(Observer, receiveValue_value_already_available)
 {
-    TestObserver test_observer;
+    TestObserverBuffer test_observer;
 
     test_observer.receiveValue(202);
 
@@ -75,7 +75,7 @@ TEST(Observer, receiveValue_value_already_available)
 
 TEST(Observer, receiveValue_value_not_yet_available)
 {
-    TestObserver test_observer;
+    TestObserverBuffer test_observer;
 
     // Create a separate thread to grab the value for us
     std::optional<int> result = std::nullopt;
@@ -99,23 +99,23 @@ TEST(Observer, receiveValue_value_not_yet_available)
 TEST(Observer, getDataReceivedPerSecond_time_buffer_filled)
 {
     EXPECT_TRUE(TestUtil::testGetDataReceivedPerSecondByFillingBuffer(
-        TestObserver(), 10, TestObserver::TIME_BUFFER_SIZE));
+        TestObserverBuffer(), 10, TestObserverBuffer::TIME_BUFFER_SIZE));
 }
 
 TEST(Observer, getDataReceivedPerSecond_time_buffer_filled_twice_over)
 {
     EXPECT_TRUE(TestUtil::testGetDataReceivedPerSecondByFillingBuffer(
-        TestObserver(), 5, TestObserver::TIME_BUFFER_SIZE * 2));
+        TestObserverBuffer(), 5, TestObserverBuffer::TIME_BUFFER_SIZE * 2));
 }
 
 TEST(Observer, getDataReceivedPerSecond_time_buffer_empty)
 {
-    TestObserver test_observer;
+    TestObserverBuffer test_observer;
     EXPECT_EQ(test_observer.getDataReceivedPerSecond(), 0);
 }
 
 TEST(Observer, getDataReceivedPerSecond_time_buffer_partially_empty)
 {
     EXPECT_TRUE(TestUtil::testGetDataReceivedPerSecondByFillingBuffer(
-        TestObserver(), 10, TestObserver::TIME_BUFFER_SIZE / 2));
+        TestObserverBuffer(), 10, TestObserverBuffer::TIME_BUFFER_SIZE / 2));
 }

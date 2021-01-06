@@ -4,7 +4,8 @@ cc_library(
     name = "observer",
     hdrs = [
         "observer.h",
-        "observer.tpp",
+        "observer_buffer.h",
+        "observer_buffer.tpp",
     ],
     deps = [
         ":thread_safe_buffer",
