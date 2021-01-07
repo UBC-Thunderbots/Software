@@ -53,9 +53,6 @@ namespace
                                             MotionConstraint::FRIENDLY_HALF,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PatrolTactic(std::vector<Point>(), 0.0, Angle::zero(), 0.0),
-                std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ReceiverTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                                    pass, world.ball(), false),
                 std::set<MotionConstraint>({})),

@@ -1,11 +1,11 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 
 #include "shared/constants.h"
-#include "software/ai/evaluation/ball.h"
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/logger/logger.h"
+#include "software/world/ball.h"
 
 PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
                            bool loop_forever)
@@ -66,8 +66,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         Point wait_position = pass.passerPoint() - ball_offset;
 
         move_action->updateControlParams(*robot, wait_position, pass.passerOrientation(),
-                                         0, DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutochickType::NONE, BallCollisionType::ALLOW);
+                                         0, DribblerMode::OFF, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
@@ -86,7 +85,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // vector with sufficient velocity
         kick_direction = (pass.receiverPoint() - ball.position()).orientation();
 
-    } while (!hasBallBeenKicked(ball, kick_direction));
+    } while (!ball.hasBallBeenKicked(kick_direction));
 }
 
 void PasserTactic::accept(TacticVisitor& visitor) const

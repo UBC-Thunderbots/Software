@@ -2,6 +2,7 @@
 
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * The ShadowEnemyTactic will shadow and mark the robot specified in the given
@@ -21,11 +22,14 @@ class DefenseShadowEnemyTactic : public Tactic
      * @param ignore_goalie Whether or not to ignore the friendly goalie when determining
      * the best position to shadow in order to block shots
      * @param shadow_distance How far away to shadow the enemy from
-     * @param loop_forever Whether or not this tactic should loop forever
+     * @param defense_shadow_enemy_tactic_config The config to fetch parameters from
      */
-    explicit DefenseShadowEnemyTactic(const Field &field, const Team &friendly_team,
-                                      const Team &enemy_team, const Ball &ball,
-                                      bool ignore_goalie, double shadow_distance);
+    explicit DefenseShadowEnemyTactic(
+        const Field &field, const Team &friendly_team, const Team &enemy_team,
+        const Ball &ball, bool ignore_goalie, double shadow_distance,
+        std::shared_ptr<const DefenseShadowEnemyTacticConfig>
+            defense_shadow_enemy_tactic_config =
+                DynamicParameters->getAIConfig()->getDefenseShadowEnemyTacticConfig());
 
     DefenseShadowEnemyTactic() = delete;
 
@@ -47,6 +51,9 @@ class DefenseShadowEnemyTactic : public Tactic
     Team getFriendlyTeam() const;
     Team getEnemyTeam() const;
 
+    // Distance to chip the ball when trying to yeet it
+    // TODO (#1878): Replace this with a more intelligent chip distance system
+    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
@@ -66,4 +73,6 @@ class DefenseShadowEnemyTactic : public Tactic
     bool ignore_goalie;
     // How far from the enemy the robot will position itself to shadow
     double shadow_distance;
+    std::shared_ptr<const DefenseShadowEnemyTacticConfig>
+        defense_shadow_enemy_tactic_config;
 };

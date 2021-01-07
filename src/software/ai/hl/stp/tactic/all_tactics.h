@@ -8,7 +8,6 @@
 #include "software/ai/hl/stp/tactic/kickoff_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
-#include "software/ai/hl/stp/tactic/patrol_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"

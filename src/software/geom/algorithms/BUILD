@@ -84,6 +84,7 @@ cc_test(
     deps = [
         ":algorithms",
         "//software/geom:rectangle",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

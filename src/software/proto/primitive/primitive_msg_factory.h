@@ -6,11 +6,7 @@
 #include "software/geom/point.h"
 #include "software/util/make_enum/make_enum.h"
 
-MAKE_ENUM(AutochickType, NONE, AUTOKICK, AUTOCHIP);
-
-MAKE_ENUM(MoveType, NORMAL, SLOW);
-
-MAKE_ENUM(DribblerEnable, OFF, ON);
+MAKE_ENUM(DribblerMode, OFF, INDEFINITE, MAX_FORCE);
 
 /**
  * Create a Chip Primitive Message
@@ -45,90 +41,64 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
  *
  * @param dest The final destination of the movement
  * @param final_speed_meters_per_second The speed at final destination
- * @param slow Whether or not to move at a slower speed (1m/s)
  * @param final_angle The final orientation the robot should have at the end
  * of the movement
- * @param dribbler_speed_rpm The speed of how fast the dribbler runs
+ * @param dribbler_mode The dribbler mode
  *
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, bool slow,
-    const Angle &final_angle, double dribbler_speed_rpm);
-
-/**
- * Create a Move Primitive Message using the arguments of the old MovePrimitive
- * This is meant to replicate the behaviour of the old move primitive
- *
- * @param dest The final destination of the movement
- * @param final_angle The final orientation the robot should have at the end
- * of the movement
- * @param final_speed The final speed the Robot should have when it reaches
- * its destination at the end of the movement
- * @param enable_dribbler Whether or not to enable the dribbler
- * @param slow Whether or not to move at a slower speed (1m/s)
- * @param autochick A flag indicating if autokick should be enabled while the robot is
- * moving. This will enable the "break-beam" on the robot that will trigger the kicker
- * or chipper to fire as soon as the ball is in front of it
- *
- * @return Pointer to Move Primitive Message
- */
-std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
-    const Point &dest, const Angle &final_angle, double final_speed,
-    DribblerEnable enable_dribbler, MoveType move_type, AutochickType autochick);
+    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
+    DribblerMode dribbler_mode);
 
 /**
  * Create a Spinning Move Primitive Message
  *
  * @param dest The final destination of the movement
  * @param final_speed_meters_per_second The speed at final destination
- * @param slow Whether or not to move at a slower speed (1m/s)
  * @param angular_velocity The angular velocity of the robot
  * of the movement
- * @param dribbler_speed_rpm The speed of how fast the dribbler runs
+ * @param dribbler_mode The dribbler mode
  *
  * @return Pointer to Spinning Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, bool slow,
-    const AngularVelocity &angular_velocity, double dribbler_speed_rpm);
+    const Point &dest, double final_speed_meters_per_second,
+    const AngularVelocity &angular_velocity, DribblerMode dribbler_mode);
 
 /**
  * Create an Autochip Move Primitive Message
  *
  * @param dest The final destination of the movement
  * @param final_speed_meters_per_second The speed at final destination
- * @param slow Whether or not to move at a slower speed (1m/s)
  * @param final_angle The final orientation the robot should have at the end
  * of the movement
- * @param dribbler_speed_rpm The speed of how fast the dribbler runs
+ * @param dribbler_mode The dribbler mode
  * @param chip_distance_meters The distance between the starting location
  * of the chip and the location of the first bounce
  *
  * @return Pointer to Autochip Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createAutochipMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, bool slow,
-    const Angle &final_angle, double dribbler_speed_rpm, double chip_distance_meters);
+    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
+    DribblerMode dribbler_mode, double chip_distance_meters);
 
 /**
  * Create an Autokick Move Primitive Message
  *
  * @param dest The final destination of the movement
  * @param final_speed_meters_per_second The speed at final destination
- * @param slow Whether or not to move at a slower speed (1m/s)
  * @param final_angle The final orientation the robot should have at the end
  * of the movement
- * @param dribbler_speed_rpm The speed of how fast the dribbler runs
+ * @param dribbler_mode The dribbler mode
  * @param kick_speed_meters_per_second The speed of how fast the Robot
  * will kick the ball in meters per second
  *
  * @return Pointer to Autokick Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, bool slow,
-    const Angle &final_angle, double dribbler_speed_rpm,
-    double kick_speed_meters_per_second);
+    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
+    DribblerMode dribbler_mode, double kick_speed_meters_per_second);
 
 /**
  * Create a Stop Move Primitive Message
@@ -138,3 +108,12 @@ std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
  * @return Pointer to Stop Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
+
+/**
+ * Convert dribbler mode to dribbler speed
+ *
+ * @param dribbler_mode The DribblerMode
+ *
+ * @return the dribbler speed in RPM
+ */
+double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode);
