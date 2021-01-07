@@ -118,9 +118,9 @@ CONFIG_CLASS = """class {config_name} : public Config
     }}
 
    private:
-        MutableParameterList mutable_internal_param_list;
-        ParameterList immutable_internal_param_list;
-        {private_entries}
+    MutableParameterList mutable_internal_param_list;
+    ParameterList immutable_internal_param_list;
+    {private_entries}
 }};
 """
 
@@ -346,7 +346,7 @@ class CppConfig(object):
             "\n",
             [param.parameter_private_entry for param in self.parameters]
             + [conf.config_private_entry for conf in self.configs],
-            2,
+            1,
         )
 
     @property
