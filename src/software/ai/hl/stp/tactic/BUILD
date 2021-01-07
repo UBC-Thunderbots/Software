@@ -349,8 +349,8 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
+        "//software/ai/intent:move_intent",
+        "//software/ai/intent:stop_intent",
         "//software/logger",
     ],
 )

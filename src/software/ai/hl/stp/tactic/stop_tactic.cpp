@@ -2,27 +2,21 @@
 
 #include <algorithm>
 
-#include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/intent/stop_intent.h"
 
 StopTactic::StopTactic(bool coast) : Tactic(true, {}), coast(coast) {}
 
-double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
+double StopTactic::cost(const Robot &robot, const World &world)
 {
     // Prefer all robots equally
     return 0.5;
 }
 
-void StopTactic::updateWorldParams(const World &world) {}
-
-void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
+void StopTactic::updateFSM(const Robot &robot, const World &world)
 {
-    auto stop_action = std::make_shared<StopAction>(false);
-
-    do
-    {
-        stop_action->updateControlParams(*robot, this->coast);
-        yield(stop_action);
-    } while (!stop_action->done());
+    StopTacticUpdate event{.robot = robot, .world = world};
+    // fsm.process_event(event);
+    // ^this modifies intent
 }
 
 void StopTactic::accept(TacticVisitor &visitor) const

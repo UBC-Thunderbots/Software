@@ -37,7 +37,6 @@ void MoveTactic::updateFSM(const Robot &robot, const World &world)
     // ^this modifies intent
 }
 
-
 void MoveTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

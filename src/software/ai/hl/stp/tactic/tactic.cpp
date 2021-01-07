@@ -33,6 +33,7 @@ std::unique_ptr<Intent> Tactic::next(const Robot &robot, const World &world)
     }
     else
     {
+        LOG(WARNING) << "No intent set for this tactic" << std::endl;
         return std::make_unique<StopIntent>(robot.id(), false);
     }
 }

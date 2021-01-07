@@ -285,6 +285,7 @@ cc_library(
     hdrs = ["play.h"],
     deps = [
         "//software/ai/hl/stp/tactic",
+        "@boost//:coroutine2",
     ],
 )
 

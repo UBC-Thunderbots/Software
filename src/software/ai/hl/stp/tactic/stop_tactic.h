@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
@@ -20,8 +19,6 @@ class StopTactic : public Tactic
 
     StopTactic() = delete;
 
-    void updateWorldParams(const World& world) override;
-
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally
@@ -31,12 +28,18 @@ class StopTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double cost(const Robot& robot, const World& world) override;
 
     void accept(TacticVisitor& visitor) const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
+    struct StopTacticUpdate
+    {
+        Robot robot;
+        World world;
+    };
+
+    void updateFSM(const Robot& robot, const World& world) override;
 
     // Tactic parameters
     // Whether or not the robot should coast to a stop
