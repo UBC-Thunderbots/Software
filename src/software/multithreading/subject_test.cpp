@@ -4,9 +4,9 @@
 
 #include <thread>
 
-#include "software/multithreading/observer_buffer.h"
+#include "software/multithreading/observer.h"
 
-class MockObserver : public ObserverBuffer<int>
+class MockObserver : public Observer<int>
 {
    public:
     std::optional<int> getMostRecentValueFromBufferWrapper()

@@ -1,10 +1,10 @@
+#include "software/multithreading/observer.h"
+
 #include <gtest/gtest.h>
 
 #include <thread>
 
-#include "software/multithreading/observer_buffer.h"
-
-class TestObserver : public ObserverBuffer<int>
+class TestObserver : public Observer<int>
 {
    public:
     std::optional<int> getMostRecentValueFromBufferWrapper()

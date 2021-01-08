@@ -1,13 +1,13 @@
 #pragma once
 
 template <typename T>
-ObserverBuffer<T>::ObserverBuffer(size_t buffer_size)
+Observer<T>::Observer(size_t buffer_size)
     : buffer(buffer_size), receive_time_buffer(TIME_BUFFER_SIZE)
 {
 }
 
 template <typename T>
-void ObserverBuffer<T>::receiveValue(T val)
+void Observer<T>::receiveValue(T val)
 {
     receive_time_buffer.push_back(std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch()));
@@ -15,19 +15,19 @@ void ObserverBuffer<T>::receiveValue(T val)
 }
 
 template <typename T>
-std::optional<T> ObserverBuffer<T>::popMostRecentlyReceivedValue(Duration max_wait_time)
+std::optional<T> Observer<T>::popMostRecentlyReceivedValue(Duration max_wait_time)
 {
     return buffer.popMostRecentlyAddedValue(max_wait_time);
 }
 
 template <typename T>
-std::optional<T> ObserverBuffer<T>::popLeastRecentlyReceivedValue(Duration max_wait_time)
+std::optional<T> Observer<T>::popLeastRecentlyReceivedValue(Duration max_wait_time)
 {
     return buffer.popLeastRecentlyAddedValue(max_wait_time);
 }
 
 template <typename T>
-double ObserverBuffer<T>::getDataReceivedPerSecond()
+double Observer<T>::getDataReceivedPerSecond()
 {
     if (receive_time_buffer.empty())
     {

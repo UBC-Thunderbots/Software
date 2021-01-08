@@ -3,7 +3,7 @@
 #include <boost/bind.hpp>
 #include <thread>
 
-#include "software/multithreading/observer_buffer.h"
+#include "software/multithreading/observer.h"
 
 /**
  * The general usage of this class should be to extend it, then override
@@ -14,10 +14,10 @@
  * @tparam T The type of object this class is observing
  */
 template <typename T>
-class ThreadedObserver : public ObserverBuffer<T>
+class ThreadedObserver : public Observer<T>
 {
    public:
-    explicit ThreadedObserver(size_t buffer_size = ObserverBuffer<T>::DEFAULT_BUFFER_SIZE);
+    explicit ThreadedObserver(size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
 
     ~ThreadedObserver() override;
 

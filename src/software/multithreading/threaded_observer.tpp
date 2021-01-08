@@ -4,7 +4,7 @@
 
 template <typename T>
 ThreadedObserver<T>::ThreadedObserver(size_t buffer_size)
-    : ObserverBuffer<T>(buffer_size),
+    : Observer<T>(buffer_size),
       in_destructor(false),
       IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {
