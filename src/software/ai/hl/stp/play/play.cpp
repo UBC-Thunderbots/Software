@@ -39,6 +39,39 @@ std::vector<std::shared_ptr<Tactic>> Play::getTactics(const World &world)
     return std::vector<std::shared_ptr<Tactic>>();
 }
 
+std::vector<std::shared_ptr<const Tactic>> Play::copyConstTactics(
+    std::vector<std::shared_ptr<Tactic>> tactics)
+{
+    std::vector<std::shared_ptr<const Tactic>> const_tactics;
+    const_tactics.resize(tactics.size());
+    for (const auto tactic : tactics)
+    {
+        const_tactics.push_back(tactic);
+    }
+    return const_tactics;
+}
+
+std::vector<std::unique_ptr<Intent>> Play::get(
+    AssignRobotsToTactics assign_robots_to_tactics, const World &world)
+{
+    std::vector<std::unique_ptr<Intent>> intents;
+    auto tactics = getTactics(world);
+    if (tactics.size() > 0)
+    {
+        auto robot_tactic_assignment =
+            assign_robots_to_tactics(copyConstTactics(tactics), world);
+        for (auto tactic : tactics)
+        {
+            auto iter = robot_tactic_assignment.find(tactic);
+            if (iter != robot_tactic_assignment.end())
+            {
+                intents.push_back(tactic->next(iter->second, world));
+            }
+        }
+    }
+    return intents;
+}
+
 void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
 {
     // Yield an empty vector the very first time the function is called. This value will

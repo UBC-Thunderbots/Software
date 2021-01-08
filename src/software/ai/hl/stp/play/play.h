@@ -8,6 +8,10 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/world/world.h"
 
+using AssignRobotsToTactics =
+    std::function<std::map<const std::shared_ptr<const Tactic>, Robot>(
+        const std::vector<std::shared_ptr<const Tactic>>&, const World& world)>;
+
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with.
 // This coroutine returns a list of shared_ptrs to Tactic objects
@@ -68,6 +72,21 @@ class Play
     virtual bool invariantHolds(const World& world) const = 0;
 
     /**
+     * Returns true if the Play is done and false otherwise. The Play is considered
+     * done when its coroutine is done (the getNextTactics() function has no
+     * more work to do)
+     *
+     * @return true if the Play is done and false otherwise
+     */
+    bool done() const;
+
+    std::vector<std::unique_ptr<Intent>> get(
+        AssignRobotsToTactics assign_robots_to_tactics, const World& world);
+
+    virtual ~Play() = default;
+
+   private:
+    /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority. The Tactic at the beginning of the vector has the highest
      * priority, and the Tactic at the end has the lowest priority.
@@ -84,18 +103,6 @@ class Play
      */
     std::vector<std::shared_ptr<Tactic>> getTactics(const World& world);
 
-    /**
-     * Returns true if the Play is done and false otherwise. The Play is considered
-     * done when its coroutine is done (the getNextTactics() function has no
-     * more work to do)
-     *
-     * @return true if the Play is done and false otherwise
-     */
-    bool done() const;
-
-    virtual ~Play() = default;
-
-   private:
     /**
      * A wrapper function for the getNextTactics function.
      *
@@ -127,6 +134,9 @@ class Play
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
+
+    static std::vector<std::shared_ptr<const Tactic>> copyConstTactics(
+        std::vector<std::shared_ptr<Tactic>> tactics);
 
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;
