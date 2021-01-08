@@ -171,6 +171,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/intent:move_intent",
         "//software/logger",
+        "@sml",
     ],
 )
 
