@@ -16,7 +16,7 @@ void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
     this->final_speed       = final_speed;
 }
 
-double MoveTactic::cost(const Robot &robot, const World &world)
+double MoveTactic::cost(const Robot &robot, const World &world) const
 {
     // Prefer robots closer to the destination
     // We normalize with the total field length so that robots that are within the field
@@ -24,6 +24,11 @@ double MoveTactic::cost(const Robot &robot, const World &world)
     double cost =
         (robot.position() - destination).length() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
+}
+
+bool MoveTactic::done() const
+{
+    return false;
 }
 
 void MoveTactic::updateFSM(const Robot &robot, const World &world)

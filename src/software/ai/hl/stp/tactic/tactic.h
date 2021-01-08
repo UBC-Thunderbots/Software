@@ -65,7 +65,7 @@ class Tactic
      * @return A cost value in the range [0, 1] indicating the cost of assigning the given
      * robot to this Tactic. Lower cost values indicate more preferred robots.
      */
-    virtual double cost(const Robot &robot, const World &world) = 0;
+    virtual double cost(const Robot &robot, const World &world) const = 0;
 
     /**
      * Whether or not this tactic is one used by the goalie

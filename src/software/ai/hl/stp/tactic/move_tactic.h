@@ -40,9 +40,9 @@ class MoveTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double cost(const Robot& robot, const World& world) override;
-
+    double cost(const Robot& robot, const World& world) const override;
     void accept(TacticVisitor& visitor) const override;
+    bool done() const override;
 
    private:
     struct MoveTacticUpdate

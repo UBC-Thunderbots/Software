@@ -6,10 +6,15 @@
 
 StopTactic::StopTactic(bool coast) : Tactic(true, {}), coast(coast) {}
 
-double StopTactic::cost(const Robot &robot, const World &world)
+double StopTactic::cost(const Robot &robot, const World &world) const
 {
     // Prefer all robots equally
     return 0.5;
+}
+
+bool StopTactic::done() const
+{
+    return false;
 }
 
 void StopTactic::updateFSM(const Robot &robot, const World &world)

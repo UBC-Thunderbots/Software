@@ -135,16 +135,16 @@ class STP : public HL
      * only 4 robots on the field at the time, only the first 4 Tactics in the vector
      * would be assigned to robots and run.
      *
-     * @param world The state of the world, which contains the friendly Robots that will
-     * be assigned to each tactic
-     * @param [in/out] tactics The list of tactics that should be assigned a robot. Note
+     * @param tactics The list of tactics that should be assigned a robot. Note
      * that this function modifies tactics to make the correct assignments, because we
      * need to modify the individual tactics _and_ possibly add/remove tactics
+     * @param world The state of the world, which contains the friendly Robots that will
+     * be assigned to each tactic
      *
-     * @return The list of tactics that were assigned to the robots
+     * @return map from assigned tactics to robot
      */
-    static void assignRobotsToTactics(const World &world,
-                                      std::vector<std::shared_ptr<Tactic>> &tactics);
+    std::map<std::shared_ptr<const Tactic>, const Robot &> assignRobotsToTactics(
+        std::vector<std::shared_ptr<const Tactic>> tactics, const World &world);
 
    private:
     /**
@@ -171,9 +171,10 @@ class STP : public HL
      *
      * @return The list of tactics that were assigned to the robots
      */
-    static void assignNonGoalieRobotsToTactics(
+    static std::map<std::shared_ptr<const Tactic>, const Robot &>
+    assignNonGoalieRobotsToTactics(
         const World &world, const std::vector<Robot> &non_goalie_robots,
-        std::vector<std::shared_ptr<Tactic>> &non_goalie_tactics);
+        std::vector<std::shared_ptr<const Tactic>> &non_goalie_tactics);
 
     /**
      * Updates the current STP state based on the state of the world
@@ -224,4 +225,5 @@ class STP : public HL
     bool override_play;
     bool previous_override_play;
     GameState current_game_state;
+    AssignRobotsToTactics assign_robots_to_tactics;
 };
