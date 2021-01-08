@@ -228,10 +228,10 @@ bool STP::overrideAIPlayIfApplicable()
     return override_play;
 }
 
-std::map<std::shared_ptr<const Tactic>, const Robot&> STP::assignRobotsToTactics(
+std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     std::vector<std::shared_ptr<const Tactic>> tactics, const World& world)
 {
-    std::map<std::shared_ptr<const Tactic>, const Robot&> robot_tactic_assignment;
+    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
 
     auto friendly_team         = world.friendlyTeam();
     auto& friendly_team_robots = friendly_team.getAllRobots();
@@ -276,12 +276,11 @@ std::map<std::shared_ptr<const Tactic>, const Robot&> STP::assignRobotsToTactics
     return robot_tactic_assignment;
 }
 
-std::map<std::shared_ptr<const Tactic>, const Robot&> STP::assignNonGoalieRobotsToTactics(
+std::map<std::shared_ptr<const Tactic>, Robot> STP::assignNonGoalieRobotsToTactics(
     const World& world, const std::vector<Robot>& non_goalie_robots,
     std::vector<std::shared_ptr<const Tactic>>& non_goalie_tactics)
 {
-    std::map<std::shared_ptr<const Tactic>, const Robot&>
-        non_goalie_robot_tactic_assignment;
+    std::map<std::shared_ptr<const Tactic>, Robot> non_goalie_robot_tactic_assignment;
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
     // (also known as the Munkres algorithm)

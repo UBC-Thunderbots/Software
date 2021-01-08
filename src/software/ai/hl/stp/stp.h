@@ -143,7 +143,7 @@ class STP : public HL
      *
      * @return map from assigned tactics to robot
      */
-    std::map<std::shared_ptr<const Tactic>, const Robot &> assignRobotsToTactics(
+    std::map<std::shared_ptr<const Tactic>, Robot> assignRobotsToTactics(
         std::vector<std::shared_ptr<const Tactic>> tactics, const World &world);
 
    private:
@@ -171,8 +171,7 @@ class STP : public HL
      *
      * @return The list of tactics that were assigned to the robots
      */
-    static std::map<std::shared_ptr<const Tactic>, const Robot &>
-    assignNonGoalieRobotsToTactics(
+    static std::map<std::shared_ptr<const Tactic>, Robot> assignNonGoalieRobotsToTactics(
         const World &world, const std::vector<Robot> &non_goalie_robots,
         std::vector<std::shared_ptr<const Tactic>> &non_goalie_tactics);
 

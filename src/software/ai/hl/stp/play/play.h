@@ -9,7 +9,7 @@
 #include "software/world/world.h"
 
 using AssignRobotsToTactics =
-    std::function<std::map<std::shared_ptr<const Tactic>, const Robot&>(
+    std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
         const std::vector<std::shared_ptr<const Tactic>>&, const World&)>;
 
 // We typedef the coroutine return type to make it shorter, more descriptive,

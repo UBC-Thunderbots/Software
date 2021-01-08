@@ -43,7 +43,6 @@ std::vector<std::shared_ptr<const Tactic>> Play::copyConstTactics(
     std::vector<std::shared_ptr<Tactic>> tactics)
 {
     std::vector<std::shared_ptr<const Tactic>> const_tactics;
-    const_tactics.resize(tactics.size());
     for (const auto tactic : tactics)
     {
         const_tactics.push_back(tactic);
@@ -56,17 +55,14 @@ std::vector<std::unique_ptr<Intent>> Play::get(
 {
     std::vector<std::unique_ptr<Intent>> intents;
     auto tactics = getTactics(world);
-    if (tactics.size() > 0)
+    auto robot_tactic_assignment =
+        assign_robots_to_tactics(copyConstTactics(tactics), world);
+    for (auto tactic : tactics)
     {
-        auto robot_tactic_assignment =
-            assign_robots_to_tactics(copyConstTactics(tactics), world);
-        for (auto tactic : tactics)
+        auto iter = robot_tactic_assignment.find(tactic);
+        if (iter != robot_tactic_assignment.end())
         {
-            auto iter = robot_tactic_assignment.find(tactic);
-            if (iter != robot_tactic_assignment.end())
-            {
-                intents.push_back(tactic->next(iter->second, world));
-            }
+            intents.push_back(tactic->next(iter->second, world));
         }
     }
     return intents;
