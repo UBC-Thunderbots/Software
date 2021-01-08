@@ -84,6 +84,17 @@ cc_test(
 )
 
 cc_test(
+    name = "observer_subject_adapter_test",
+    srcs = ["observer_subject_adapter_test.cpp"],
+    deps = [
+        ":observer",
+        ":observer_subject_adapter",
+        ":subject",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "thread_safe_buffer_test",
     srcs = ["thread_safe_buffer_test.cpp"],
     deps = [

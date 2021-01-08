@@ -9,12 +9,12 @@
 #include "software/constants.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
+#include "software/multithreading/observer_subject_adapter.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/logging/proto_logger.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
-#include "software/multithreading/observer_subject_adapter.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
 
 struct commandLineArgs
 {
@@ -119,14 +119,11 @@ int main(int argc, char** argv)
             backend->Subject<SensorProto>::registerObserver(sensor_msg_logger);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(primitive_set_logger);
             // log filtered vision
-            auto vision_logger =
-                std::make_shared<ProtoLogger<TbotsProto::Vision>>(
-                    proto_log_output_dir / "Vision");
+            auto vision_logger = std::make_shared<ProtoLogger<TbotsProto::Vision>>(
+                proto_log_output_dir / "Vision");
             auto world_to_vision_adapter =
                 std::make_shared<ObserverSubjectAdapter<World, TbotsProto::Vision>>(
-                    [] (const World& world) {
-                        return *createVision(world);
-                    });
+                    [](const World& world) { return *createVision(world); });
             sensor_fusion->registerObserver(world_to_vision_adapter);
             world_to_vision_adapter->registerObserver(vision_logger);
         }
