@@ -8,6 +8,10 @@
  * ObserverSubjectAdapter is a class made to "adapt" a type emitted by a Subject to
  * a different type consumed by an Observer with a conversion function passed in the
  * constructor.
+ *
+ * Based on the Adapter design pattern described here:
+ * https://refactoring.guru/design-patterns/adapter
+ *
  * @tparam ObserverType The type that this class observes, i.e. converted-from type
  * @tparam SubjectType The type that this class is a subject of, i.e. converted-to type
  */
