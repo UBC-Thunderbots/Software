@@ -12,9 +12,9 @@ ChipAction::ChipAction() : Action(false), ball({0, 0}, {0, 0}, Timestamp::fromSe
 {
 }
 
-void ChipAction::updateWorldParams(const Ball& ball)
+void ChipAction::updateWorldParams(const World& world)
 {
-    this->ball = ball;
+    this->ball = world.ball();
 }
 
 void ChipAction::updateControlParams(const Robot& robot, Point chip_origin,
@@ -51,11 +51,6 @@ Angle ChipAction::getChipDirection()
 double ChipAction::getChipDistanceMeters()
 {
     return chip_distance_meters;
-}
-
-void ChipAction::accept(MutableActionVisitor& visitor)
-{
-    visitor.visit(*this);
 }
 
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
@@ -120,15 +115,14 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         // If we're not in position to chip, move into position
         if (!robot_behind_ball)
         {
-            yield(std::make_unique<MoveIntent>(
-                robot->id(), point_behind_ball, chip_direction, 0.0, 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
-                BallCollisionType::ALLOW));
+            yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball,
+                                               chip_direction, 0.0, DribblerMode::OFF,
+                                               BallCollisionType::ALLOW));
         }
         else
         {
             yield(std::make_unique<ChipIntent>(robot->id(), chip_origin, chip_direction,
-                                               chip_distance_meters, 0));
+                                               chip_distance_meters));
         }
     } while (!ball.hasBallBeenKicked(chip_direction));
 }

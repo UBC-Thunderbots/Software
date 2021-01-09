@@ -5,7 +5,7 @@ cc_binary(
     srcs = ["full_system_main.cpp"],
     deps = [
         "//software:constants",
-        "//software/ai:ai_wrapper",
+        "//software/ai:threaded_ai",
         "//software/ai/hl/stp:play_info",
         "//software/backend",
         "//software/backend:all_backends",

@@ -35,9 +35,9 @@ void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                                      MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
     do
     {
-        move_action->updateControlParams(
-            *robot, destination, final_orientation, final_speed, DribblerEnable::OFF,
-            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID);
+        move_action->updateControlParams(*robot, destination, final_orientation,
+                                         final_speed, DribblerMode::OFF,
+                                         BallCollisionType::AVOID);
         yield(move_action);
     } while (!move_action->done());
 }
