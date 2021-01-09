@@ -23,7 +23,7 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
          std::shared_ptr<const AIControlConfig> control_config, long random_seed)
     : default_play_constructor(default_play_constructor),
       current_play(nullptr),
-      current_tactics(),
+      robot_tactic_assignment(),
       random_number_generator(random_seed),
       control_config(control_config),
       override_play_name(""),
@@ -144,49 +144,18 @@ PlayInfo STP::getPlayInfo()
 {
     std::string info_referee_command = toString(current_game_state.getRefereeCommand());
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
-    std::unordered_set<std::string> info_robot_tactic_assignment = {};
-    PlayInfo info =
-        PlayInfo(info_referee_command, info_play_name, info_robot_tactic_assignment);
+    PlayInfo info              = PlayInfo(info_referee_command, info_play_name, {});
 
-    // Sort the tactics by the id of the robot they are assigned to, so we can report
-    // the tactics in order or robot id. This makes it much easier to read if tactics
-    // or robots change, since the order of the robots won't change
-    //    if (current_play)
-    //    {
-    //        auto compare_tactic_by_robot_id = [](auto t1, auto t2) {
-    //            if (t1->getAssignedRobot() && t2->getAssignedRobot())
-    //            {
-    //                return t1->getAssignedRobot()->id() < t2->getAssignedRobot()->id();
-    //            }
-    //            else if (!t1->getAssignedRobot() && t2->getAssignedRobot())
-    //            {
-    //                return false;
-    //            }
-    //            else if (t1->getAssignedRobot() && !t2->getAssignedRobot())
-    //            {
-    //                return true;
-    //            }
-    //            else
-    //            {
-    //                return true;
-    //            }
-    //        };
-    //        auto tactics = current_tactics;
-    //        std::sort(tactics.begin(), tactics.end(), compare_tactic_by_robot_id);
-    //
-    //        for (const auto& tactic : tactics)
-    //        {
-    //            auto robot = tactic->getAssignedRobot();
-    //            if (!robot)
-    //            {
-    //                continue;
-    //            }
-    //            std::string s = "Robot " +
-    //            std::to_string(tactic->getAssignedRobot()->id()) +
-    //                            "  -  " + TYPENAME(*tactic);
-    //            info.addRobotTacticAssignment(s);
-    //        }
-    //    }
+    std::map<RobotId, std::string> readable_robot_tactic_assignment;
+    for (const auto& [tactic, robot] : robot_tactic_assignment)
+    {
+        readable_robot_tactic_assignment.emplace(robot.id(), TYPENAME(*tactic));
+    }
+    for (const auto& [robot_id, tactic_string] : readable_robot_tactic_assignment)
+    {
+        std::string s = "Robot " + std::to_string(robot_id) + "  -  " + tactic_string;
+        info.addRobotTacticAssignment(s);
+    }
 
     return info;
 }
@@ -231,7 +200,7 @@ bool STP::overrideAIPlayIfApplicable()
 std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     std::vector<std::shared_ptr<const Tactic>> tactics, const World& world)
 {
-    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
+    robot_tactic_assignment.clear();
 
     auto friendly_team         = world.friendlyTeam();
     auto& friendly_team_robots = friendly_team.getAllRobots();

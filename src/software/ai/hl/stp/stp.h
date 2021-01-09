@@ -210,12 +210,19 @@ class STP : public HL
      */
     bool overrideAIPlayIfApplicable();
 
+    /**
+     * Gets a readable robot tactic assignment: robot id -> string representing the tactic
+     *
+     * @return map with readable representation
+     */
+    std::map<RobotId, std::string> getReadableRobotTacticAssignment();
+
     // A function that constructs a Play that will be used if no other Plays are
     // applicable
     std::function<std::unique_ptr<Play>()> default_play_constructor;
     // The Play that is currently running
     std::unique_ptr<Play> current_play;
-    std::vector<std::shared_ptr<Tactic>> current_tactics;
+    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
     // The random number generator
     std::mt19937 random_number_generator;
     std::shared_ptr<const AIControlConfig> control_config;

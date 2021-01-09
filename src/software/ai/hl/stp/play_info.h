@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 /**
@@ -17,7 +16,7 @@ class PlayInfo
      * Constructs a PlayInfo object with given arguments for fields
      */
     explicit PlayInfo(std::string referee_command_name, std::string play_name,
-                      std::unordered_set<std::string> robots_tactic_assignment);
+                      std::vector<std::string> robots_tactic_assignment);
 
     /**
      * Get referee command name
@@ -38,7 +37,7 @@ class PlayInfo
      *
      * @return robot_tactic_assignment field
      */
-    std::unordered_set<std::string> getRobotTacticAssignment() const;
+    std::vector<std::string> getRobotTacticAssignment() const;
 
     /**
      * Adds new_assignment to robot_tactic_assignment
@@ -57,5 +56,5 @@ class PlayInfo
    private:
     std::string referee_command_name;
     std::string play_name;
-    std::unordered_set<std::string> robot_tactic_assignment;
+    std::vector<std::string> robot_tactic_assignment;
 };
