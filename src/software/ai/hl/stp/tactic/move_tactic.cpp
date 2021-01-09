@@ -31,12 +31,12 @@ bool MoveTactic::done() const
     return fsm.is(boost::sml::X);
 }
 
-void MoveTactic::updateFSM(const TacticFSMUpdate &tactic_fsm_update_event)
+void MoveTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     MoveTacticFSM::Update event{.destination       = destination,
                                 .final_orientation = final_orientation,
                                 .final_speed       = final_speed,
-                                .common            = tactic_fsm_update_event};
+                                .common            = tactic_update};
     fsm.process_event(event);
 }
 

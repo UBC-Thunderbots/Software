@@ -80,6 +80,15 @@ class Play
      */
     bool done() const;
 
+    /**
+     * Gets Intents from the Play given the assignment algorithm and world
+     *
+     * @param robots_to_tactics_assignment_algorithm The algorithm for assigning robots to
+     * tactics
+     * @param world The updated world
+     *
+     * @return the vector of intents to execute
+     */
     std::vector<std::unique_ptr<Intent>> get(
         AssignRobotsToTactics assign_robots_to_tactics, const World& world);
 
@@ -135,6 +144,14 @@ class Play
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
 
+    /**
+     * Helper function that copies a vector of std::shared_ptr<Tactic> to a vector of
+     * std::shared_ptr<const Tactic>
+     *
+     * @param tactics The tactics to copy over
+     *
+     * @return the vector that has std::shared_ptr<const Tactic>
+     */
     static std::vector<std::shared_ptr<const Tactic>> copyConstTactics(
         std::vector<std::shared_ptr<Tactic>> tactics);
 

@@ -8,7 +8,7 @@
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
 
-struct TacticFSMUpdate
+struct TacticUpdate
 {
     Robot robot;
     World world;
@@ -108,7 +108,13 @@ class Tactic
     std::unique_ptr<Intent> intent;
 
    private:
-    virtual void updateFSM(const TacticFSMUpdate &tactic_fsm_update_event) = 0;
+    /**
+     * Updates the intent ptr with the new intent
+     *
+     * @param tactic_update The tactic_update struct that contains all the information for
+     * updating the intent
+     */
+    virtual void updateIntent(const TacticUpdate &tactic_update) = 0;
 
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;

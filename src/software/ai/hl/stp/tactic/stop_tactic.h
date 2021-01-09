@@ -12,7 +12,7 @@ struct StopTacticFSM
     struct Update
     {
         bool coast;
-        TacticFSMUpdate common;
+        TacticUpdate common;
     };
 
     auto operator()()
@@ -66,7 +66,7 @@ class StopTactic : public Tactic
     bool done() const override;
 
    private:
-    void updateFSM(const TacticFSMUpdate& tactic_fsm_update_event) override;
+    void updateIntent(const TacticUpdate& tactic_update) override;
 
     boost::sml::sm<StopTacticFSM> fsm;
 

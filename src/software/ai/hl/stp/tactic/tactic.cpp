@@ -26,7 +26,7 @@ std::set<RobotCapability> &Tactic::mutableRobotCapabilityRequirements()
 
 std::unique_ptr<Intent> Tactic::next(const Robot &robot, const World &world)
 {
-    updateFSM(TacticFSMUpdate{.robot      = robot,
+    updateIntent(TacticUpdate{.robot      = robot,
                               .world      = world,
                               .set_intent = [this](std::unique_ptr<Intent> new_intent) {
                                   intent = std::move(new_intent);

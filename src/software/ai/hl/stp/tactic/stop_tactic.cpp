@@ -15,9 +15,9 @@ bool StopTactic::done() const
     return fsm.is(boost::sml::X);
 }
 
-void StopTactic::updateFSM(const TacticFSMUpdate &tactic_fsm_update_event)
+void StopTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    StopTacticFSM::Update event{.coast = coast, .common = tactic_fsm_update_event};
+    StopTacticFSM::Update event{.coast = coast, .common = tactic_update};
     fsm.process_event(event);
 }
 

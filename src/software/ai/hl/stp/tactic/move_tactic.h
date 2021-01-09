@@ -15,7 +15,7 @@ struct MoveTacticFSM
         Point destination;
         Angle final_orientation;
         double final_speed;
-        TacticFSMUpdate common;
+        TacticUpdate common;
     };
 
     auto operator()()
@@ -82,7 +82,7 @@ class MoveTactic : public Tactic
     bool done() const override;
 
    private:
-    void updateFSM(const TacticFSMUpdate& tactic_fsm_update_event) override;
+    void updateIntent(const TacticUpdate& tactic_update) override;
 
     boost::sml::sm<MoveTacticFSM> fsm;
 

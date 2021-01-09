@@ -2,6 +2,9 @@
 
 #include "software/world/world.h"
 
+// Transition conditions are conditions to check before transitioning between different
+// gameplay behaviour
+
 /**
  * Checks whether the robot is done moving
  *
