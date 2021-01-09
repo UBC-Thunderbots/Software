@@ -31,17 +31,12 @@ bool MoveTactic::done() const
     return fsm.is(boost::sml::X);
 }
 
-void MoveTactic::updateFSM(const Robot &robot, const World &world)
+void MoveTactic::updateFSM(const TacticFSMUpdate &tactic_fsm_update_event)
 {
-    MoveTacticFSM::Update event{
-        .destination       = destination,
-        .final_orientation = final_orientation,
-        .final_speed       = final_speed,
-        .common            = {.robot      = robot,
-                   .world      = world,
-                   .set_intent = [this](std::unique_ptr<Intent> new_intent) {
-                       intent = std::move(new_intent);
-                   }}};
+    MoveTacticFSM::Update event{.destination       = destination,
+                                .final_orientation = final_orientation,
+                                .final_speed       = final_speed,
+                                .common            = tactic_fsm_update_event};
     fsm.process_event(event);
 }
 

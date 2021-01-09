@@ -82,7 +82,7 @@ class MoveTactic : public Tactic
     bool done() const override;
 
    private:
-    void updateFSM(const Robot& robot, const World& world) override;
+    void updateFSM(const TacticFSMUpdate& tactic_fsm_update_event) override;
 
     boost::sml::sm<MoveTacticFSM> fsm;
 

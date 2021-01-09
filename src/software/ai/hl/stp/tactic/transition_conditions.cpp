@@ -7,3 +7,8 @@ bool moveRobotDone(const Robot& robot, const Point& destination,
     return (robot.position() - destination).length() < DISTANCE_THRESHOLD &&
            (robot.orientation().minDiff(final_orientation) < ANGLE_THRESHOLD);
 }
+
+bool robotStopped(const Robot& robot, double SPEED_THRESHOLD)
+{
+    return robot.velocity().length() < SPEED_THRESHOLD;
+}

@@ -15,15 +15,9 @@ bool StopTactic::done() const
     return fsm.is(boost::sml::X);
 }
 
-void StopTactic::updateFSM(const Robot &robot, const World &world)
+void StopTactic::updateFSM(const TacticFSMUpdate &tactic_fsm_update_event)
 {
-    StopTacticFSM::Update event{
-        .coast  = coast,
-        .common = {.robot      = robot,
-                   .world      = world,
-                   .set_intent = [this](std::unique_ptr<Intent> new_intent) {
-                       intent = std::move(new_intent);
-                   }}};
+    StopTacticFSM::Update event{.coast = coast, .common = tactic_fsm_update_event};
     fsm.process_event(event);
 }
 

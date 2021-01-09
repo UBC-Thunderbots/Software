@@ -8,6 +8,13 @@
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
 
+struct TacticFSMUpdate
+{
+    Robot robot;
+    World world;
+    std::function<void(std::unique_ptr<Intent>)> set_intent;
+};
+
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot.
  * This can be thought of as a "position" on a typical soccer team. Some examples are:
@@ -101,18 +108,11 @@ class Tactic
     std::unique_ptr<Intent> intent;
 
    private:
-    virtual void updateFSM(const Robot &robot, const World &world) = 0;
+    virtual void updateFSM(const TacticFSMUpdate &tactic_fsm_update_event) = 0;
 
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;
 
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;
-};
-
-struct TacticFSMUpdate
-{
-    Robot robot;
-    World world;
-    std::function<void(std::unique_ptr<Intent>)> set_intent;
 };

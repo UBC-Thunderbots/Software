@@ -66,11 +66,10 @@ class StopTactic : public Tactic
     bool done() const override;
 
    private:
-    void updateFSM(const Robot& robot, const World& world) override;
+    void updateFSM(const TacticFSMUpdate& tactic_fsm_update_event) override;
 
     boost::sml::sm<StopTacticFSM> fsm;
 
-    // Tactic parameters
     // Whether or not the robot should coast to a stop
     bool coast;
 };
