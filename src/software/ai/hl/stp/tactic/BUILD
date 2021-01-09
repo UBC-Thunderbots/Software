@@ -382,6 +382,7 @@ cc_library(
     hdrs = ["tactic.h"],
     deps = [
         "tactic_visitor",
+        "transition_conditions",
         "//software/ai/intent",
         "//software/ai/intent:stop_intent",
         "//software/world",
@@ -402,4 +403,13 @@ cc_test(
 cc_library(
     name = "tactic_visitor",
     hdrs = ["tactic_visitor.h"],
+)
+
+cc_library(
+    name = "transition_conditions",
+    srcs = ["transition_conditions.cpp"],
+    hdrs = ["transition_conditions.h"],
+    deps = [
+        "//software/world",
+    ],
 )

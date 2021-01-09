@@ -1,58 +1,45 @@
 #pragma once
 
-#include <functional>
 #include <include/boost/sml.hpp>
 
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/move_intent.h"
-
-using namespace boost;
-
-struct MoveToDestination
-{ /* state */
-};
-
-struct MoveTacticFSMUpdate
-{
-    /* event */
-    Point destination;
-    Angle final_orientation;
-    double final_speed;
-    Robot robot;
-    World world;
-    std::function<void(std::unique_ptr<Intent>)> set_intent;
-};
 
 struct MoveTacticFsm
 {
-   public:
+    struct Move
+    { /* state */
+    };
+
+    struct Update
+    {
+        /* event */
+        Point destination;
+        Angle final_orientation;
+        double final_speed;
+        TacticFSMUpdate common;
+    };
+
     auto operator()()
     {
         using namespace boost::sml;
 
         const auto update_move_intent = [](auto event) {
-            event.set_intent(std::make_unique<MoveIntent>(
-                event.robot.id(), event.destination, event.final_orientation,
+            event.common.set_intent(std::make_unique<MoveIntent>(
+                event.common.robot.id(), event.destination, event.final_orientation,
                 event.final_speed, DribblerMode::OFF, BallCollisionType::AVOID));
         };
 
-        const auto move_action_done = [](auto event) {
-            return false;
-            static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD = 0.02;
-            static constexpr Angle ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD =
-                Angle::fromDegrees(2);
-            return (event.robot.position() - event.destination).length() <
-                       ROBOT_CLOSE_TO_DEST_THRESHOLD &&
-                   (event.robot.orientation().minDiff(event.final_orientation) <
-                    ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
+        const auto movement_done = [](auto event) {
+            return moveRobotDone(event.common.robot, event.destination,
+                                 event.final_orientation);
         };
 
         return make_transition_table(
-            *"idle"_s + event<MoveTacticFSMUpdate> / update_move_intent =
-                state<MoveToDestination>,
-            state<MoveToDestination> +
-                event<MoveTacticFSMUpdate>[!move_action_done] / update_move_intent,
-            state<MoveToDestination> + event<MoveTacticFSMUpdate>[move_action_done] = X);
+            *"idle"_s + event<Update> / update_move_intent = state<Move>,
+            state<Move> + event<Update>[!movement_done] / update_move_intent,
+            state<Move> + event<Update>[movement_done] = X);
     }
 };
 
@@ -98,11 +85,10 @@ class MoveTactic : public Tactic
     bool done() const override;
 
    private:
-    sml::sm<MoveTacticFsm> fsm;
-
     void updateFSM(const Robot& robot, const World& world) override;
 
-    // Tactic parameters
+    boost::sml::sm<MoveTacticFsm> fsm;
+
     // The point the robot is trying to move to
     Point destination;
     // The orientation the robot should have when it arrives at its destination

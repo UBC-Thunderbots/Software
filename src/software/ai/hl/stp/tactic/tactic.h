@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
@@ -104,4 +106,11 @@ class Tactic
 
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;
+};
+
+struct TacticFSMUpdate
+{
+    Robot robot;
+    World world;
+    std::function<void(std::unique_ptr<Intent>)> set_intent;
 };
