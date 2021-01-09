@@ -1,12 +1,9 @@
 #pragma once
 
-#include <include/boost/sml.hpp>
-
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/move_intent.h"
 
-struct MoveTacticFsm
+struct MoveTacticFSM
 {
     struct Move
     { /* state */
@@ -87,7 +84,7 @@ class MoveTactic : public Tactic
    private:
     void updateFSM(const Robot& robot, const World& world) override;
 
-    boost::sml::sm<MoveTacticFsm> fsm;
+    boost::sml::sm<MoveTacticFSM> fsm;
 
     // The point the robot is trying to move to
     Point destination;

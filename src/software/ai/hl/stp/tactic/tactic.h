@@ -1,8 +1,10 @@
 #pragma once
 
 #include <functional>
+#include <include/boost/sml.hpp>
 
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
 

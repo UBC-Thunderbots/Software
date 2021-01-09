@@ -1,6 +1,39 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/intent/stop_intent.h"
+
+struct StopTacticFSM
+{
+    struct Stop
+    { /* state */
+    };
+
+    struct Update
+    {
+        bool coast;
+        TacticFSMUpdate common;
+    };
+
+    auto operator()()
+    {
+        using namespace boost::sml;
+
+        const auto update_move_intent = [](auto event) {
+            event.common.set_intent(
+                std::make_unique<StopIntent>(event.common.robot.id(), event.coast));
+        };
+
+        const auto stop_done = [](auto event) {
+            return robotStopped(event.common.robot);
+        };
+
+        return make_transition_table(
+            *"idle"_s + event<Update> / update_move_intent = state<Stop>,
+            state<Stop> + event<Update>[!stop_done] / update_move_intent,
+            state<Stop> + event<Update>[stop_done] = X);
+    }
+};
 
 /**
  * The StopTactic will stop the robot from moving. The robot will actively try and brake
@@ -33,13 +66,9 @@ class StopTactic : public Tactic
     bool done() const override;
 
    private:
-    struct StopTacticUpdate
-    {
-        Robot robot;
-        World world;
-    };
-
     void updateFSM(const Robot& robot, const World& world) override;
+
+    boost::sml::sm<StopTacticFSM> fsm;
 
     // Tactic parameters
     // Whether or not the robot should coast to a stop

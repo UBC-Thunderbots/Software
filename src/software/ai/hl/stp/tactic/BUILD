@@ -171,7 +171,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/intent:move_intent",
         "//software/logger",
-        "@sml",
     ],
 )
 
@@ -386,6 +385,7 @@ cc_library(
         "//software/ai/intent",
         "//software/ai/intent:stop_intent",
         "//software/world",
+        "@sml",
     ],
 )
 

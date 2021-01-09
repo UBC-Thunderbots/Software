@@ -33,7 +33,7 @@ bool MoveTactic::done() const
 
 void MoveTactic::updateFSM(const Robot &robot, const World &world)
 {
-    MoveTacticFsm::Update event{
+    MoveTacticFSM::Update event{
         .destination       = destination,
         .final_orientation = final_orientation,
         .final_speed       = final_speed,

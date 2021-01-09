@@ -2,8 +2,6 @@
 
 #include <algorithm>
 
-#include "software/ai/intent/stop_intent.h"
-
 StopTactic::StopTactic(bool coast) : Tactic(true, {}), coast(coast) {}
 
 double StopTactic::cost(const Robot &robot, const World &world) const
@@ -14,14 +12,19 @@ double StopTactic::cost(const Robot &robot, const World &world) const
 
 bool StopTactic::done() const
 {
-    return false;
+    return fsm.is(boost::sml::X);
 }
 
 void StopTactic::updateFSM(const Robot &robot, const World &world)
 {
-    StopTacticUpdate event{.robot = robot, .world = world};
-    // fsm.process_event(event);
-    // ^this modifies intent
+    StopTacticFSM::Update event{
+        .coast  = coast,
+        .common = {.robot      = robot,
+                   .world      = world,
+                   .set_intent = [this](std::unique_ptr<Intent> new_intent) {
+                       intent = std::move(new_intent);
+                   }}};
+    fsm.process_event(event);
 }
 
 void StopTactic::accept(TacticVisitor &visitor) const
