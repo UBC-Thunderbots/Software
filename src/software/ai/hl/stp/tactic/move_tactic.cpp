@@ -3,7 +3,8 @@
 #include <algorithm>
 
 
-MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever, {RobotCapability::Move})
+MoveTactic::MoveTactic(bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Move}), fsm()
 {
 }
 
@@ -28,18 +29,20 @@ double MoveTactic::cost(const Robot &robot, const World &world) const
 
 bool MoveTactic::done() const
 {
-    return false;
+    return fsm.is(sml::X);
 }
 
 void MoveTactic::updateFSM(const Robot &robot, const World &world)
 {
-    MoveTacticUpdate event{.destination       = destination,
-                           .final_orientation = final_orientation,
-                           .final_speed       = final_speed,
-                           .robot             = robot,
-                           .world             = world};
-    // fsm.process_event(event);
-    // ^this modifies intent
+    MoveTacticFSMUpdate event{.destination       = destination,
+                              .final_orientation = final_orientation,
+                              .final_speed       = final_speed,
+                              .robot             = robot,
+                              .world             = world,
+                              .set_intent = [this](std::unique_ptr<Intent> new_intent) {
+                                  intent = std::move(new_intent);
+                              }};
+    fsm.process_event(event);
 }
 
 void MoveTactic::accept(TacticVisitor &visitor) const
