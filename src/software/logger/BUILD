@@ -32,6 +32,7 @@ cc_library(
         "coloured_cout_sink.h",
     ],
     deps = [
+        "//software/util/make_enum",
         "@g3log",
     ],
 )

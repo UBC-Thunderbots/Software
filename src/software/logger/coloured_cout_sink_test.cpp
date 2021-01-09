@@ -7,10 +7,7 @@
 
 #include "software/logger/logger.h"
 
-using Colour = ColouredCoutSink::FG_Colour;
-
-class ColouredCoutSinkTest
-    : public testing::TestWithParam<std::tuple<LEVELS, ColouredCoutSink::FG_Colour>>
+class ColouredCoutSinkTest : public testing::TestWithParam<std::tuple<LEVELS, FG_Colour>>
 {
 };
 const std::string test_str =
@@ -31,7 +28,7 @@ TEST_P(ColouredCoutSinkTest, testLogInfo)
 
     LEVELS level = std::get<0>(GetParam());
     const std::string colour_prefix =
-        "\033[" + std::to_string(std::get<1>(GetParam())) + "m";
+        "\033[" + ColouredCoutSink::colourToString(std::get<1>(GetParam())) + "m";
 
     testing::internal::CaptureStdout();
 
@@ -49,8 +46,8 @@ TEST_P(ColouredCoutSinkTest, testLogInfo)
 // LOG(FATAL) isn't tested because it causes a SIGABRT
 INSTANTIATE_TEST_CASE_P(
     All, ColouredCoutSinkTest,
-    ::testing::Values(std::make_tuple<LEVELS, Colour>(LEVELS(INFO), Colour::WHITE),
-                      std::make_tuple<LEVELS, Colour>(LEVELS(DEBUG), Colour::GREEN),
-                      std::make_tuple<LEVELS, Colour>(LEVELS(ROBOT_STATUS),
-                                                      Colour::WHITE),
-                      std::make_tuple<LEVELS, Colour>(LEVELS(WARNING), Colour::YELLOW)));
+    ::testing::Values(
+        std::make_tuple<LEVELS, FG_Colour>(LEVELS(INFO), FG_Colour::WHITE),
+        std::make_tuple<LEVELS, FG_Colour>(LEVELS(DEBUG), FG_Colour::GREEN),
+        std::make_tuple<LEVELS, FG_Colour>(LEVELS(ROBOT_STATUS), FG_Colour::WHITE),
+        std::make_tuple<LEVELS, FG_Colour>(LEVELS(WARNING), FG_Colour::YELLOW)));

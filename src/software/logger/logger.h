@@ -38,21 +38,24 @@ class LoggerSingleton
     LoggerSingleton()
     {
         logWorker = g3::LogWorker::createLogWorker();
-        // robot diagnostics logs are in
-        // bazel-out/k8-fastbuild/bin/software/gui/robot_diagnostics/robot_diagnostics_main.runfiles/__main__/software
-        // full system logs are in
-        // bazel-out/k8-fastbuild/bin/software/full_system.runfiles/__main__/software
+        // Robot diagnostics logs are in
+        // bazel-out/k8-fastbuild/bin/software/gui/robot_diagnostics/robot_diagnostics_main.runfiles/__main__/software/
+        // Full system logs are in
+        // bazel-out/k8-fastbuild/bin/software/full_system.runfiles/__main__/software/
+        // Simulated test logs are in
+        // bazel-out/k8-fastbuild/bin/software/simulated_tests/TEST_NAME.runfiles/__main__/software/
+        // where TEST_NAME is the name of the simulated test
 
         // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle = logWorker->addSink(
             std::make_unique<ColouredCoutSink>(), &ColouredCoutSink::displayColouredLog);
         // Sink for storing a file of all logs
         auto log_rotate_sink_handle = logWorker->addSink(
-            std::make_unique<LogRotate>(log_name, "/software"), &LogRotate::save);
+            std::make_unique<LogRotate>(log_name, "./software/"), &LogRotate::save);
         // Sink for storing a file of filtered logs
         auto filtered_log_rotate_sink_handle = logWorker->addSink(
             std::make_unique<LogRotateWithFilter>(
-                std::make_unique<LogRotate>(log_name + filter_suffix, "/software"),
+                std::make_unique<LogRotate>(log_name + filter_suffix, "./software/"),
                 level_filter),
             &LogRotateWithFilter::save);
 

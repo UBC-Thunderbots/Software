@@ -2,21 +2,24 @@
 #include <g3log/logmessage.hpp>
 #include <iostream>
 
+#include "software/util/make_enum/make_enum.h"
+
+MAKE_ENUM(FG_Colour, YELLOW, RED, GREEN, WHITE);
 /**
  * This class acts a custom sink for g3log
  */
 class ColouredCoutSink
 {
    public:
-    // Linux xterm foreground color
-    // http://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
-    enum FG_Colour
-    {
-        YELLOW = 33,
-        RED    = 31,
-        GREEN  = 32,
-        WHITE  = 37
-    };
+    /**
+     * This is a helper function for mapping the FG_Colour enum to its relative
+     * Linux xterm foreground color
+     * http://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
+     *
+     * @param colour the colour to be converted
+     * @return the string representation of the FG_Colour
+     */
+    static std::string colourToString(const FG_Colour colour);
     /**
      * This function is called on every call to LOG(). Displays coloured log messages in
      * the terminal
