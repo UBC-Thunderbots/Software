@@ -86,10 +86,24 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
+        friendly_team.assignGoalie(packet.yellow().goalkeeper());
+        enemy_team.assignGoalie(packet.blue().goalkeeper());
     }
     else
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
+        friendly_team.assignGoalie(packet.blue().goalkeeper());
+        enemy_team.assignGoalie(packet.yellow().goalkeeper());
+    }
+
+    if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value()) {
+        RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
+        friendly_team.assignGoalie(friendly_goalie_id);
+    }
+
+    if (sensor_fusion_config->OverrideGameControllerEnemyGoalieID()->value()) {
+        RobotId enemy_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
+        enemy_team.assignGoalie(enemy_goalie_id);
     }
 
     if (game_state.isOurBallPlacement())
@@ -219,37 +233,18 @@ std::optional<Ball> SensorFusion::createBall(
     return std::nullopt;
 }
 
-
 Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_detections)
 {
+    // TODO (1610) Implement friendly goalie ID override (in updateWorld)
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-
-    const bool override_game_controller_friendly_goalie_id =
-            sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value();
-
-    if (override_game_controller_friendly_goalie_id) {
-        RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
-        new_friendly_team.assignGoalie(friendly_goalie_id);
-        return new_friendly_team;
-    }
-
-
-    for (Robot robot : new_friendly_team.getAllRobots()) {
-
-    }
-
-    // TODO (1610) Implement friendly goalie ID override
-    new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
 
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
+    // TODO (1610) Implement enemy goalie ID override (in updateWorld)
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
-    RobotId enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
-    // TODO (1610) Implement enemy goalie ID override
-    new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }
 
