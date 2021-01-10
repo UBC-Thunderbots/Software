@@ -20,7 +20,7 @@ struct StopTacticFSM
     {
         using namespace boost::sml;
 
-        const auto update_move_intent = [](auto event) {
+        const auto update_stop_intent = [](auto event) {
             event.common.set_intent(
                 std::make_unique<StopIntent>(event.common.robot.id(), event.coast));
         };
@@ -30,9 +30,10 @@ struct StopTacticFSM
         };
 
         return make_transition_table(
-            *"idle"_s + event<Update> / update_move_intent = state<Stop>,
-            state<Stop> + event<Update>[!stop_done] / update_move_intent,
-            state<Stop> + event<Update>[stop_done] = X);
+            *"idle"_s + event<Update> / update_stop_intent = state<Stop>,
+            state<Stop> + event<Update>[!stop_done] / update_stop_intent,
+            state<Stop> + event<Update>[stop_done] / update_stop_intent = X,
+            X + event<Update>[!stop_done] / update_stop_intent);
     }
 };
 
