@@ -23,16 +23,14 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
          std::shared_ptr<const AIControlConfig> control_config, long random_seed)
     : default_play_constructor(default_play_constructor),
       current_play(nullptr),
-      robot_tactic_assignment(),
+      readable_robot_tactic_assignment(),
       random_number_generator(random_seed),
       control_config(control_config),
       override_play_name(""),
       previous_override_play_name(""),
       override_play(false),
       previous_override_play(false),
-      current_game_state(),
-      robot_to_tactic_assignment_algorithm(
-          boost::bind(&STP::assignRobotsToTactics, this, _1, _2))
+      current_game_state()
 {
 }
 
@@ -94,7 +92,10 @@ void STP::updateAIPlay(const World& world)
 
 std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
 {
-    return current_play->get(robot_to_tactic_assignment_algorithm, world);
+    return current_play->get(
+        [this](const std::vector<std::shared_ptr<const Tactic>>& tactics,
+               const World& world) { return assignRobotsToTactics(tactics, world); },
+        world);
 }
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
@@ -147,11 +148,6 @@ PlayInfo STP::getPlayInfo()
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
     PlayInfo info              = PlayInfo(info_referee_command, info_play_name, {});
 
-    std::map<RobotId, std::string> readable_robot_tactic_assignment;
-    for (const auto& [tactic, robot] : robot_tactic_assignment)
-    {
-        readable_robot_tactic_assignment.emplace(robot.id(), TYPENAME(*tactic));
-    }
     for (const auto& [robot_id, tactic_string] : readable_robot_tactic_assignment)
     {
         std::string s = "Robot " + std::to_string(robot_id) + "  -  " + tactic_string;
@@ -201,7 +197,7 @@ bool STP::overrideAIPlayIfApplicable()
 std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     std::vector<std::shared_ptr<const Tactic>> tactics, const World& world)
 {
-    robot_tactic_assignment.clear();
+    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
 
     auto friendly_team         = world.friendlyTeam();
     auto& friendly_team_robots = friendly_team.getAllRobots();
@@ -240,8 +236,12 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     robot_tactic_assignment.merge(
         assignNonGoalieRobotsToTactics(world, non_goalie_robots, tactics));
 
-    // Re-insert goalie tactics to returned tactics
-    tactics.insert(tactics.begin(), goalie_tactics.begin(), goalie_tactics.end());
+    // store readable assignment map for PlayInfo
+    readable_robot_tactic_assignment.clear();
+    for (const auto& [tactic, robot] : robot_tactic_assignment)
+    {
+        readable_robot_tactic_assignment.emplace(robot.id(), TYPENAME(*tactic));
+    }
 
     return robot_tactic_assignment;
 }

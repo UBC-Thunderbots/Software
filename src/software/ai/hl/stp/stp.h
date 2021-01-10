@@ -215,7 +215,7 @@ class STP : public HL
     std::function<std::unique_ptr<Play>()> default_play_constructor;
     // The Play that is currently running
     std::unique_ptr<Play> current_play;
-    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
+    std::map<RobotId, std::string> readable_robot_tactic_assignment;
     // The random number generator
     std::mt19937 random_number_generator;
     std::shared_ptr<const AIControlConfig> control_config;
@@ -224,5 +224,4 @@ class STP : public HL
     bool override_play;
     bool previous_override_play;
     GameState current_game_state;
-    RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm;
 };

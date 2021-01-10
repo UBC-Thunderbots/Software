@@ -91,7 +91,7 @@ class Play
      */
     std::vector<std::unique_ptr<Intent>> get(
         RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm,
-        const World& world);
+        const World& new_world);
 
     virtual ~Play() = default;
 
