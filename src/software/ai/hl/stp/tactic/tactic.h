@@ -57,7 +57,7 @@ class Tactic
     /**
      * Mutable robot hardware capability requirements of the tactic.
      */
-    // TODO: this should be automatically updated or handled because it's too much to
+    // TODO: this should be automatically updated or handled differently because it's too much to
     // expect of users
     std::set<RobotCapability> &mutableRobotCapabilityRequirements();
 
@@ -104,10 +104,9 @@ class Tactic
 
     virtual ~Tactic() = default;
 
-   protected:
+   private:
     std::unique_ptr<Intent> intent;
 
-   private:
     /**
      * Updates the intent ptr with the new intent
      *
