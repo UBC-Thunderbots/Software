@@ -51,18 +51,19 @@ std::vector<std::shared_ptr<const Tactic>> Play::copyConstTactics(
 }
 
 std::vector<std::unique_ptr<Intent>> Play::get(
-    AssignRobotsToTactics assign_robots_to_tactics, const World &world)
+    RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm,
+    const World &world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
     auto tactics = getTactics(world);
     auto robot_tactic_assignment =
-        assign_robots_to_tactics(copyConstTactics(tactics), world);
+        robot_to_tactic_assignment_algorithm(copyConstTactics(tactics), world);
     for (auto tactic : tactics)
     {
         auto iter = robot_tactic_assignment.find(tactic);
         if (iter != robot_tactic_assignment.end())
         {
-            intents.push_back(tactic->next(iter->second, world));
+            intents.push_back(tactic->get(iter->second, world));
         }
     }
     return intents;

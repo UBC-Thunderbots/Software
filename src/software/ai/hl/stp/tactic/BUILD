@@ -169,6 +169,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//software/ai/hl/stp/action:move_action",
         "//software/ai/intent:move_intent",
         "//software/logger",
     ],
@@ -349,6 +350,8 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/intent:move_intent",
         "//software/ai/intent:stop_intent",
         "//software/logger",
@@ -382,6 +385,7 @@ cc_library(
     deps = [
         "tactic_visitor",
         "transition_conditions",
+        "//software/ai/hl/stp/action",
         "//software/ai/intent",
         "//software/ai/intent:stop_intent",
         "//software/world",

@@ -210,13 +210,6 @@ class STP : public HL
      */
     bool overrideAIPlayIfApplicable();
 
-    /**
-     * Gets a readable robot tactic assignment: robot id -> string representing the tactic
-     *
-     * @return map with readable representation
-     */
-    std::map<RobotId, std::string> getReadableRobotTacticAssignment();
-
     // A function that constructs a Play that will be used if no other Plays are
     // applicable
     std::function<std::unique_ptr<Play>()> default_play_constructor;
@@ -231,5 +224,5 @@ class STP : public HL
     bool override_play;
     bool previous_override_play;
     GameState current_game_state;
-    AssignRobotsToTactics assign_robots_to_tactics;
+    RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm;
 };

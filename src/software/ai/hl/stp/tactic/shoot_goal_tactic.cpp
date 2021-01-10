@@ -37,7 +37,7 @@ void ShootGoalTactic::updateControlParams(std::optional<Point> chip_target)
     this->chip_target = chip_target;
 }
 
-double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)
+double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     auto ball_intercept_opt =
         findBestInterceptForBall(world.ball(), world.field(), robot);

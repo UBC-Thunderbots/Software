@@ -4,7 +4,7 @@
 
 StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever, {}) {}
 
-double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world)
+double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // Prefer all robots equally with a cost of 0.5
     return 0.5;

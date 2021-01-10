@@ -114,7 +114,7 @@ bool GoalieTactic::isGoalieTactic() const
     return true;
 }
 
-double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
+double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // We don't prefer any particular robot to be the goalie, as there should only
     // ever be one robot that can act as the goalie

@@ -31,7 +31,8 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
       override_play(false),
       previous_override_play(false),
       current_game_state(),
-      assign_robots_to_tactics(boost::bind(&STP::assignRobotsToTactics, this, _1, _2))
+      robot_to_tactic_assignment_algorithm(
+          boost::bind(&STP::assignRobotsToTactics, this, _1, _2))
 {
 }
 
@@ -93,7 +94,7 @@ void STP::updateAIPlay(const World& world)
 
 std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
 {
-    return current_play->get(assign_robots_to_tactics, world);
+    return current_play->get(robot_to_tactic_assignment_algorithm, world);
 }
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
@@ -296,7 +297,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignNonGoalieRobotsToTacti
         {
             Robot robot                           = non_goalie_robots.at(row);
             std::shared_ptr<const Tactic>& tactic = non_goalie_tactics.at(col);
-            double robot_cost_for_tactic          = tactic->cost(robot, world);
+            double robot_cost_for_tactic = tactic->calculateRobotCost(robot, world);
 
             std::set<RobotCapability> required_capabilities =
                 tactic->robotCapabilityRequirements();

@@ -32,7 +32,8 @@ void CreaseDefenderTactic::updateWorldParams(const World &world)
 }
 
 
-double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World &world)
+double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
+                                                const World &world) const
 {
     // Prefer robots closer to the crease defender desired position
     // We normalize with the total field length so that robots that are within the field

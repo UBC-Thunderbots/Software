@@ -1,5 +1,6 @@
 #pragma once
 
+#include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
 
@@ -52,6 +53,8 @@ class StopTactic : public Tactic
 
     StopTactic() = delete;
 
+    void updateWorldParams(const World& world) override;
+
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally
@@ -61,11 +64,14 @@ class StopTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double cost(const Robot& robot, const World& world) const override;
+    double calculateRobotCost(const Robot& robot, const World& world) const override;
+
     void accept(TacticVisitor& visitor) const override;
     bool done() const override;
 
    private:
+    void calculateNextAction(ActionCoroutine::push_type& yield) override;
+
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     boost::sml::sm<StopTacticFSM> fsm;

@@ -12,7 +12,7 @@ bool GoalieTestTactic::isGoalieTactic() const
     return true;
 }
 
-double GoalieTestTactic::calculateRobotCost(const Robot &robot, const World &world)
+double GoalieTestTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // Prefer all robots equally with a cost of 0.5
     return 0.5;

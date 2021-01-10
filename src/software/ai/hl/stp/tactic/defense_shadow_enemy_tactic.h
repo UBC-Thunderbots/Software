@@ -42,7 +42,7 @@ class DefenseShadowEnemyTactic : public Tactic
      */
     void updateControlParams(const EnemyThreat &enemy_threat);
 
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     void accept(TacticVisitor &visitor) const override;
 

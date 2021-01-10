@@ -17,7 +17,7 @@ void CherryPickTactic::updateWorldParams(const World& world)
     this->world = world;
 }
 
-double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& world)
+double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // Prefer robots closer to the target region
     return distance(robot.position(), target_region);

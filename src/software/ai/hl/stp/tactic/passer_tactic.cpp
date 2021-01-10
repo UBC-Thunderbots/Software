@@ -27,7 +27,7 @@ void PasserTactic::updateControlParams(const Pass& updated_pass)
     this->pass = updated_pass;
 }
 
-double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
+double PasserTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // Prefer robots closer to the pass start position
     // We normalize with the total field length so that robots that are within the field

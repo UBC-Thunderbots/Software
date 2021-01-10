@@ -8,7 +8,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/world/world.h"
 
-using AssignRobotsToTactics =
+using RobotToTacticAssignmentAlgorithm =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
         const std::vector<std::shared_ptr<const Tactic>>&, const World&)>;
 
@@ -83,14 +83,15 @@ class Play
     /**
      * Gets Intents from the Play given the assignment algorithm and world
      *
-     * @param robots_to_tactics_assignment_algorithm The algorithm for assigning robots to
+     * @param robot_to_tactic_assignment_algorithm The algorithm for assigning robots to
      * tactics
      * @param world The updated world
      *
      * @return the vector of intents to execute
      */
     std::vector<std::unique_ptr<Intent>> get(
-        AssignRobotsToTactics assign_robots_to_tactics, const World& world);
+        RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm,
+        const World& world);
 
     virtual ~Play() = default;
 

@@ -35,7 +35,7 @@ void ShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_threat,
     this->shadow_distance = shadow_distance;
 }
 
-double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &world)
+double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     if (!enemy_threat)
     {

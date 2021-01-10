@@ -17,7 +17,7 @@ void MoveTestTactic::updateControlParams(Point destination_)
     this->destination = destination_;
 }
 
-double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world)
+double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // Prefer robots closer to the destination
     // We normalize with a constant factor so test results to not change based on any

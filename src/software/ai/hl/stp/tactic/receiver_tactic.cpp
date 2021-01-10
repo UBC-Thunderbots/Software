@@ -32,7 +32,7 @@ void ReceiverTactic::updateControlParams(const Pass& updated_pass)
     this->pass = updated_pass;
 }
 
-double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world)
+double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // Prefer robots closer to the pass receive position
     // We normalize with the total field length so that robots that are within the field

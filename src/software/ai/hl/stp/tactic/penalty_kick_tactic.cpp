@@ -28,7 +28,7 @@ void PenaltyKickTactic::updateWorldParams(const World& world)
     this->field        = world.field();
 }
 
-double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& world)
+double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1

@@ -23,7 +23,8 @@ void ShadowFreekickerTactic::updateWorldParams(const World &world)
     this->ball       = world.ball();
 }
 
-double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const World &world)
+double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot,
+                                                  const World &world) const
 {
     double cost = (robot.position() - world.ball().position()).length() /
                   world.field().totalXLength();
