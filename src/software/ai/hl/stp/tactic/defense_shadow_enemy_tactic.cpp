@@ -36,7 +36,7 @@ void DefenseShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_thre
 }
 
 double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
-                                                    const World &world)
+                                                    const World &world) const
 {
     if (!enemy_threat)
     {

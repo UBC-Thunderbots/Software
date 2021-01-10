@@ -49,7 +49,7 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
 }
 
 std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredState(
-    const Robot &robot)
+    const Robot &robot) const
 {
     if (friendly_team.goalie())
     {

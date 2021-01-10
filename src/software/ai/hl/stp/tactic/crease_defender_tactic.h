@@ -72,7 +72,8 @@ class CreaseDefenderTactic : public Tactic
      * @return The position and orientation we would like the defender to be in, or
      * std::nullopt if we could not compute one
      */
-    std::optional<std::pair<Point, Angle>> calculateDesiredState(const Robot &robot);
+    std::optional<std::pair<Point, Angle>> calculateDesiredState(
+        const Robot &robot) const;
 
     /**
      * Gets the segments that make up the path the Crease Defender should follow

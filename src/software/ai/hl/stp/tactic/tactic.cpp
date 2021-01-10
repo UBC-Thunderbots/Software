@@ -12,7 +12,7 @@ Tactic::Tactic(bool loop_forever, const std::set<RobotCapability> &capability_re
 {
 }
 
-bool Tactic::doneCoroutine() const
+bool Tactic::done() const
 {
     return done_;
 }
@@ -125,5 +125,20 @@ std::unique_ptr<Intent> Tactic::get(const Robot &robot, const World &world)
     {
         LOG(WARNING) << "No intent set for this tactic" << std::endl;
         return std::make_unique<StopIntent>(robot.id(), false);
+    }
+}
+
+void Tactic::updateIntent(const TacticUpdate &tactic_update)
+{
+    updateWorldParams(tactic_update.world);
+    updateRobot(tactic_update.robot);
+
+    // Try to get an intent from the tactic
+    std::shared_ptr<Action> action = getNextAction();
+    std::unique_ptr<Intent> intent;
+    if (action)
+    {
+        action->updateWorldParams(tactic_update.world);
+        tactic_update.set_intent(action->getNextIntent());
     }
 }

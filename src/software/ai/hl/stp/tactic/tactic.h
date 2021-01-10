@@ -53,18 +53,11 @@ class Tactic
      * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed
      * to loop forever, this function will always return false.
      *
-     * @return true if the Tactic is done and false otherwise
-     */
-    virtual bool done() const = 0;
-
-    // TODO (#1888): remove this function
-    /**
-     * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed
-     * to loop forever, this function will always return false.
+     * Default implementation is when coroutine is done
      *
      * @return true if the Tactic is done and false otherwise
      */
-    bool doneCoroutine() const;
+    virtual bool done() const;  // TODO (#1888): make this function pure virtual
 
     // TODO (#1888): remove this function
     /**
@@ -91,7 +84,6 @@ class Tactic
      * @param world The current state of the world
      */
     virtual void updateWorldParams(const World &world) = 0;
-
 
     /**
      * robot hardware capability requirements of the tactic.
@@ -229,7 +221,9 @@ class Tactic
      * @param tactic_update The tactic_update struct that contains all the information for
      * updating the intent
      */
-    virtual void updateIntent(const TacticUpdate &tactic_update) = 0;
+    virtual void updateIntent(
+        const TacticUpdate
+            &tactic_update);  // TODO (#1888): make this function pure virtual
 
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;
