@@ -152,7 +152,7 @@ class Tactic
    protected:
     // TODO (#1888): remove this field
     // The robot performing this Tactic
-    std::optional<Robot> robot;
+    std::optional<Robot> robot_;
 
    private:
     // TODO (#1888): remove this function

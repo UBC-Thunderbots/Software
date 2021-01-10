@@ -164,12 +164,12 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
     do
     {
         std::optional<std::pair<Point, Angle>> desired_robot_state_opt =
-            calculateDesiredState(*this->robot);
+            calculateDesiredState(*this->robot_);
         if (desired_robot_state_opt)
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
             autochip_move_action->updateControlParams(
-                *robot, defender_position, defender_orientation, 0.0, DribblerMode::OFF,
+                *robot_, defender_position, defender_orientation, 0.0, DribblerMode::OFF,
                 YEET_CHIP_DISTANCE_METERS, BallCollisionType::ALLOW);
             yield(autochip_move_action);
         }
@@ -177,7 +177,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
         {
             LOG(WARNING) << "Error updating robot state, stopping";
 
-            stop_action->updateControlParams(*robot, false);
+            stop_action->updateControlParams(*robot_, false);
             yield(stop_action);
         }
     } while (!autochip_move_action->done());

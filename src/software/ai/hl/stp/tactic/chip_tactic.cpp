@@ -37,7 +37,7 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     do
     {
-        chip_action->updateControlParams(*robot, chip_origin, chip_target);
+        chip_action->updateControlParams(*robot_, chip_origin, chip_target);
         yield(chip_action);
     } while (!chip_action->done());
 }

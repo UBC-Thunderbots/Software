@@ -20,7 +20,7 @@ void StopTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 
     do
     {
-        stop_action->updateControlParams(*robot, this->coast);
+        stop_action->updateControlParams(*robot_, this->coast);
         yield(stop_action);
     } while (!stop_action->done());
 }

@@ -19,12 +19,12 @@ bool Tactic::done() const
 
 std::optional<Robot> Tactic::getAssignedRobot() const
 {
-    return robot;
+    return robot_;
 }
 
 void Tactic::updateRobot(const Robot &robot)
 {
-    this->robot = robot;
+    this->robot_ = robot;
 }
 
 bool Tactic::isGoalieTactic() const
@@ -35,7 +35,7 @@ bool Tactic::isGoalieTactic() const
 std::shared_ptr<Action> Tactic::getNextAction(void)
 {
     std::shared_ptr<Action> next_action = nullptr;
-    if (!robot)
+    if (!robot_)
     {
         LOG(WARNING) << "Requesting the next Action for a Tactic without a Robot assigned"
                      << std::endl;
@@ -112,6 +112,10 @@ std::set<RobotCapability> &Tactic::mutableRobotCapabilityRequirements()
 
 std::unique_ptr<Intent> Tactic::get(const Robot &robot, const World &world)
 {
+    // TODO (#1888): remove these updates
+    updateWorldParams(world);
+    updateRobot(robot);
+
     updateIntent(TacticUpdate{.robot      = robot,
                               .world      = world,
                               .set_intent = [this](std::unique_ptr<Intent> new_intent) {
@@ -130,9 +134,6 @@ std::unique_ptr<Intent> Tactic::get(const Robot &robot, const World &world)
 
 void Tactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    updateWorldParams(tactic_update.world);
-    updateRobot(tactic_update.robot);
-
     // Try to get an intent from the tactic
     std::shared_ptr<Action> action = getNextAction();
     std::unique_ptr<Intent> intent;

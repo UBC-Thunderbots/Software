@@ -17,7 +17,7 @@ void StopTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     do
     {
         yield(std::make_shared<StopAction>(false));
-    } while (this->robot->velocity().length() > 0.05);
+    } while (this->robot_->velocity().length() > 0.05);
 }
 
 void StopTestTactic::accept(TacticVisitor &visitor) const
