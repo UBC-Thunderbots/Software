@@ -95,6 +95,9 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     return current_play->get(
         [this](const std::vector<std::shared_ptr<const Tactic>>& tactics,
                const World& world) { return assignRobotsToTactics(tactics, world); },
+        [this](const Tactic& tactic) {
+            return buildMotionConstraintSet(current_game_state, tactic);
+        },
         world);
 }
 

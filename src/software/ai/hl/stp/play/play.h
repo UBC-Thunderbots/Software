@@ -12,6 +12,9 @@ using RobotToTacticAssignmentAlgorithm =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
         const std::vector<std::shared_ptr<const Tactic>>&, const World&)>;
 
+using MotionConstraintCalculator =
+    std::function<std::set<MotionConstraint>(const Tactic& tactic)>;
+
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with.
 // This coroutine returns a list of shared_ptrs to Tactic objects
@@ -85,13 +88,14 @@ class Play
      *
      * @param robot_to_tactic_assignment_algorithm The algorithm for assigning robots to
      * tactics
+     * @param motion_constraint_builder Builds motion constraints from tactics
      * @param world The updated world
      *
      * @return the vector of intents to execute
      */
     std::vector<std::unique_ptr<Intent>> get(
         RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm,
-        const World& new_world);
+        MotionConstraintCalculator motion_constraint_builder, const World& new_world);
 
     virtual ~Play() = default;
 

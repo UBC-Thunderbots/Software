@@ -52,7 +52,7 @@ std::vector<std::shared_ptr<const Tactic>> Play::copyConstTactics(
 
 std::vector<std::unique_ptr<Intent>> Play::get(
     RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm,
-    const World &new_world)
+    MotionConstraintCalculator motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
     auto tactics = getTactics(new_world);
@@ -63,7 +63,9 @@ std::vector<std::unique_ptr<Intent>> Play::get(
         auto iter = robot_tactic_assignment.find(tactic);
         if (iter != robot_tactic_assignment.end())
         {
-            intents.push_back(tactic->get(iter->second, new_world));
+            auto intent = tactic->get(iter->second, new_world);
+            intent->setMotionConstraints(motion_constraint_builder(*tactic));
+            intents.push_back(std::move(intent));
         }
     }
     return intents;
