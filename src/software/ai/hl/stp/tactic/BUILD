@@ -30,6 +30,7 @@ cc_library(
     srcs = ["chip_tactic.cpp"],
     hdrs = ["chip_tactic.h"],
     deps = [
+        ":move_tactic",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
@@ -182,6 +183,21 @@ cc_test(
         ":move_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "get_behind_ball_tactic",
+    srcs = ["get_behind_ball_tactic.cpp"],
+    hdrs = ["get_behind_ball_tactic.h"],
+    deps = [
+        ":tactic",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/intent:move_intent",
+        "//software/geom:triangle",
+        "//software/geom/algorithms",
+        "//software/logger",
     ],
 )
 
@@ -376,6 +392,7 @@ cc_library(
         ":chip_tactic",
         ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
+        ":get_behind_ball_tactic",
         ":goalie_tactic",
         ":kickoff_chip_tactic",
         ":move_tactic",
