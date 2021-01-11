@@ -10,12 +10,19 @@ struct MoveTacticFSM
     { /* state */
     };
 
+    struct Controls
+    {
+        // The point the robot is trying to move to
+        Point destination;
+        // The orientation the robot should have when it arrives at its destination
+        Angle final_orientation;
+        // The speed the robot should have when it arrives at its destination
+        double final_speed;
+    };
+
     struct Update
     {
-        /* event */
-        Point destination;
-        Angle final_orientation;
-        double final_speed;
+        Controls controls;
         TacticUpdate common;
     };
 
@@ -25,13 +32,14 @@ struct MoveTacticFSM
 
         const auto update_move_intent = [](auto event) {
             event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), event.destination, event.final_orientation,
-                event.final_speed, DribblerMode::OFF, BallCollisionType::AVOID));
+                event.common.robot.id(), event.controls.destination,
+                event.controls.final_orientation, event.controls.final_speed,
+                DribblerMode::OFF, BallCollisionType::AVOID));
         };
 
         const auto movement_done = [](auto event) {
-            return moveRobotDone(event.common.robot, event.destination,
-                                 event.final_orientation);
+            return moveRobotDone(event.common.robot, event.controls.destination,
+                                 event.controls.final_orientation);
         };
 
         return make_transition_table(
@@ -92,10 +100,5 @@ class MoveTactic : public Tactic
 
     boost::sml::sm<MoveTacticFSM> fsm;
 
-    // The point the robot is trying to move to
-    Point destination;
-    // The orientation the robot should have when it arrives at its destination
-    Angle final_orientation;
-    // The speed the robot should have when it arrives at its destination
-    double final_speed;
+    MoveTacticFSM::Controls controls;
 };
