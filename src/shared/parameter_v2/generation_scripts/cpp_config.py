@@ -365,7 +365,11 @@ class CppConfig(object):
     def parse_command_line_args_function_contents(self):
         return CppConfig.join_with_tabs(
             "\n",
-            [param.parameter_command_line_option_entry for param in self.parameters if not param.is_constant]
+            [
+                param.parameter_command_line_option_entry
+                for param in self.parameters
+                if not param.is_constant
+            ]
             + self.included_config_command_line_arg_entries,
             2,
         )
@@ -388,7 +392,11 @@ class CppConfig(object):
     def command_line_arg_struct_contents(self):
         return CppConfig.join_with_tabs(
             "\n",
-            [param.command_line_arg_entry for param in self.parameters if not param.is_constant]
+            [
+                param.command_line_arg_entry
+                for param in self.parameters
+                if not param.is_constant
+            ]
             + [conf.included_config_command_line_arg_entry for conf in self.configs],
             3,
         )
