@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/autochip_move_action.h"
 #include "software/test_util/test_util.h"
 
 TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
@@ -20,24 +20,26 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
     Team enemy_team    = Team({enemy_robot}, Duration::fromSeconds(1));
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     DefenseShadowEnemyTactic tactic =
         DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat);
 
     auto action_ptr = tactic.getNextAction();
 
     ASSERT_TRUE(action_ptr);
 
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-    ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
+    ASSERT_NE(autochip_move_action, nullptr);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
                                                Point(-0.5, 0), 0.01));
-    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
+    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
+    EXPECT_EQ(autochip_move_action->getChipDistance(),
+              DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }
 
 TEST(DefenseShadowEnemyTacticTest,
@@ -55,25 +57,27 @@ TEST(DefenseShadowEnemyTacticTest,
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
               Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     DefenseShadowEnemyTactic tactic =
         DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat);
 
     auto action_ptr = tactic.getNextAction();
 
     ASSERT_TRUE(action_ptr);
 
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-    ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
+    ASSERT_NE(autochip_move_action, nullptr);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
                                                ball.position(), 0.01));
-    EXPECT_LT(move_action->getFinalOrientation().minDiff(
+    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - field.friendlyGoalCenter()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
+    EXPECT_EQ(autochip_move_action->getChipDistance(),
+              DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }
 
 
@@ -93,23 +97,25 @@ TEST(
     Team friendly_team = Team({friendly_robot}, Duration::fromSeconds(1));
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(4, 3),
               Timestamp::fromSeconds(0));
+    World world = World(field, ball, friendly_team, enemy_team);
 
     DefenseShadowEnemyTactic tactic =
         DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5);
     tactic.updateRobot(friendly_robot);
-    tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat);
 
     auto action_ptr = tactic.getNextAction();
 
     ASSERT_TRUE(action_ptr);
 
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
-    ASSERT_NE(move_action, nullptr);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
+    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
+    ASSERT_NE(autochip_move_action, nullptr);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
                                                Point(-0.5, 0), 0.01));
-    EXPECT_LT(move_action->getFinalOrientation().minDiff(
+    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_TRUE(move_action->getAutochickType() == AutochickType::AUTOCHIP);
+    EXPECT_EQ(autochip_move_action->getChipDistance(),
+              DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }

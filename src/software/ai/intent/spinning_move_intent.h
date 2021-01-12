@@ -13,10 +13,9 @@ class SpinningMoveIntent : public DirectPrimitiveIntent
      * @param angular_vel The angular velocity of the robot
      * of the movement
      * @param final_speed The speed at final destination
-     * @param priority The priority of this Intent. A larger number indicates a higher
-     * priority
      */
     explicit SpinningMoveIntent(unsigned int robot_id, const Point& dest,
-                                const AngularVelocity& angular_vel, double final_speed,
-                                unsigned int priority);
+                                const AngularVelocity& angular_vel, double final_speed);
+
+    SpinningMoveIntent() = delete;
 };

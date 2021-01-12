@@ -9,8 +9,8 @@
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
     ::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
                                        Timestamp::fromSeconds(0));
 
@@ -40,8 +40,8 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side)
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
     ::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
                                        Timestamp::fromSeconds(0));
 
@@ -57,6 +57,9 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
     CreaseDefenderTactic tactic =
         CreaseDefenderTactic(world.field(), world.ball(), world.friendlyTeam(),
                              world.enemyTeam(), CreaseDefenderTactic::LEFT);
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), Point(0, 0));
+
     tactic.updateRobot(friendly_robot);
     auto action_ptr = tactic.getNextAction();
 
@@ -79,8 +82,8 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
 TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_side)
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-    ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
     ::TestUtil::setEnemyRobotPositions(world, {Point(0.09, 0)},
                                        Timestamp::fromSeconds(0));
 

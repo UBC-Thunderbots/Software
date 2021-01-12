@@ -12,18 +12,14 @@ class InterceptBallAction : public Action
     /**
      * Creates a new InterceptBallAction
      *
-     * @param loop_forever Continue yielding new Move Intents, even after we have reached
-     *                     our goal
-     */
-    explicit InterceptBallAction(const Field& field, const Ball& ball, bool loop_forever);
-
-    /**
-     * Updates this action with all the parameters it needs from the world
-     *
      * @param field The field
      * @param ball The ball
      */
-    void updateWorldParams(const Field& field, const Ball& ball);
+    explicit InterceptBallAction(const Field& field, const Ball& ball);
+
+    InterceptBallAction() = delete;
+
+    void updateWorldParams(const World& world) override;
 
     /**
      * Updates this action with all the parameters it needs that don't come from the world
@@ -31,8 +27,6 @@ class InterceptBallAction : public Action
      * @param robot The robot to move
      */
     void updateControlParams(const Robot& robot);
-
-    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

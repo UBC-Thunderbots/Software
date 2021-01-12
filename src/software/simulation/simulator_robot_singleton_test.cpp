@@ -4,12 +4,15 @@
 
 #include <cmath>
 
+#include "shared/proto/robot_log_msg.nanopb.h"
+#include "shared/proto/robot_log_msg.pb.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
 
 extern "C"
 {
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/world/firmware_robot.h"
 }
 
@@ -21,6 +24,14 @@ extern "C"
 class SimulatorRobotSingletonTest : public testing::Test
 {
    protected:
+    void SetUp() override
+    {
+        // We use the TestUtil::handleTestRobotLog function here
+        // to not log the robot ID and the colour of the Robot, as
+        // it's not relevant info in a test environment.
+        app_logger_init(0, &TestUtil::handleTestRobotLog);
+    }
+
     std::tuple<std::shared_ptr<PhysicsWorld>,
                std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>,
                std::shared_ptr<SimulatorBall>>

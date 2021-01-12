@@ -21,9 +21,14 @@ class SpinningMoveAction : public Action
      *
      * @param close_to_dest_threshold How far from the destination the robot must be
      * before the action is considered done
+     * @param loop_forever restart the action after completion
      */
-    explicit SpinningMoveAction(
-        double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
+    explicit SpinningMoveAction(bool loop_forever, double close_to_dest_threshold =
+                                                       ROBOT_CLOSE_TO_DEST_THRESHOLD);
+
+    SpinningMoveAction() = delete;
+
+    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the params that cannot be derived from the world for this action
@@ -44,8 +49,6 @@ class SpinningMoveAction : public Action
      * @return The destination this SpinningMoveAction is trying to move to
      */
     Point getDestination();
-
-    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

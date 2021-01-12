@@ -10,19 +10,18 @@ class NavigatingIntent : public Intent
 {
    public:
     /**
-     * Creates a new Intent with the given priority. A larger number indicates a higher
-     * priority. The priority value must be in the range [0, 100]
+     * Creates a new Navigating Intent
      *
      * @param robot_id The id of the Robot to run this Primitive
-     * @param priority The priority of this Intent
      * @param destination The destination of the Movement
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
      * @param ball_collision_type how to navigate around the ball
      */
-    explicit NavigatingIntent(unsigned int robot_id, unsigned int priority,
-                              Point destination, double final_speed,
-                              BallCollisionType ball_collision_type);
+    explicit NavigatingIntent(unsigned int robot_id, Point destination,
+                              double final_speed, BallCollisionType ball_collision_type);
+
+    NavigatingIntent() = delete;
 
     /**
      * Accepts an NavigatingIntent Visitor and calls the visit function

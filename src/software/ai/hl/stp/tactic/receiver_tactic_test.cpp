@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/autokick_move_action.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 
@@ -37,8 +37,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
     EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
     EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
               move_action->getFinalOrientation());
-    EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
+    EXPECT_EQ(DribblerMode::OFF, move_action->getDribblerMode());
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
@@ -57,6 +56,9 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
     Ball ball({1, 1}, {0, 0}, Timestamp::fromSeconds(0));
 
     Field field = Field::createSSLDivisionBField();
+
+    World world = World(field, ball, friendly_team, enemy_team);
+
     ReceiverTactic tactic(field, friendly_team, enemy_team, pass, ball, false);
 
     tactic.updateRobot(receiver);
@@ -66,7 +68,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
     // we're at the target position
     for (int i = 0; i < 5; i++)
     {
-        tactic.updateWorldParams(friendly_team, enemy_team, ball);
+        tactic.updateWorldParams(world);
         tactic.updateControlParams(pass);
         Angle shot_dir = (field.enemyGoalCenter() - receiver.position()).orientation();
 
@@ -78,8 +80,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
         EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
         EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
                   move_action->getFinalOrientation());
-        EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
-        EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
+        EXPECT_EQ(DribblerMode::OFF, move_action->getDribblerMode());
     }
 }
 
@@ -107,23 +108,24 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
 
     // We should be trying to move into a position to properly deflect the ball into
     // the net with a kick
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
-    ASSERT_NE(move_action, nullptr);
+    auto autokick_move_action =
+        std::dynamic_pointer_cast<AutokickMoveAction>(tactic.getNextAction());
+    ASSERT_NE(autokick_move_action, nullptr);
 
-    ASSERT_TRUE(move_action->getRobot().has_value());
-    EXPECT_EQ(13, move_action->getRobot()->id());
+    ASSERT_TRUE(autokick_move_action->getRobot().has_value());
+    EXPECT_EQ(13, autokick_move_action->getRobot()->id());
 
-    EXPECT_LT(move_action->getDestination().x(), -0.001);
-    EXPECT_GT(move_action->getDestination().x(), -0.2);
+    EXPECT_LT(autokick_move_action->getDestination().x(), -0.001);
+    EXPECT_GT(autokick_move_action->getDestination().x(), -0.2);
 
-    EXPECT_GT(move_action->getDestination().y(), 0.001);
-    EXPECT_LT(move_action->getDestination().y(), 0.1);
+    EXPECT_GT(autokick_move_action->getDestination().y(), 0.001);
+    EXPECT_LT(autokick_move_action->getDestination().y(), 0.1);
 
-    EXPECT_LT(move_action->getFinalOrientation().toDegrees(), -1);
-    EXPECT_GT(move_action->getFinalOrientation().toDegrees(), -90);
+    EXPECT_LT(autokick_move_action->getFinalOrientation().toDegrees(), -1);
+    EXPECT_GT(autokick_move_action->getFinalOrientation().toDegrees(), -90);
 
-    EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutochickType(), AutochickType::AUTOKICK);
+    EXPECT_EQ(DribblerMode::OFF, autokick_move_action->getDribblerMode());
+    EXPECT_EQ(autokick_move_action->getKickSpeed(), BALL_MAX_SPEED_METERS_PER_SECOND - 1);
 }
 
 TEST(ReceiverTacticTest,
@@ -160,8 +162,7 @@ TEST(ReceiverTacticTest,
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
+    EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerMode());
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
@@ -205,8 +206,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
+    EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerMode());
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
@@ -224,8 +224,12 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({});
 
+    Field field = Field::createSSLDivisionBField();
+
     // Ball is travelling towards the robot
     Ball ball({-0.5, 0.5}, {-1, 1}, Timestamp::fromSeconds(5));
+
+
 
     ReceiverTactic tactic(Field::createSSLDivisionBField(), friendly_team, enemy_team,
                           pass, ball, false);
@@ -241,7 +245,9 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
         Vector(receiver.orientation().cos(), receiver.orientation().sin())
             .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
     ball = Ball(ball_pos, {-1, 1}, Timestamp::fromSeconds(5));
-    tactic.updateWorldParams(friendly_team, enemy_team, ball);
+    // Create test world with new ball
+    World world = World(field, ball, friendly_team, enemy_team);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(pass);
 
     // Since we've received the ball, we shouldn't yield anything

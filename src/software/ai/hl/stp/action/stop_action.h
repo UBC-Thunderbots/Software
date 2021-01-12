@@ -24,16 +24,11 @@ class StopAction : public Action
     explicit StopAction(bool loop_forever, double stopped_speed_threshold =
                                                ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT);
 
-    /**
-     * Updates the params that cannot be derived from the world for this action
-     *
-     * @param robot the robot that should stop
-     * @param coast Whether or not to coast to a stop. If this is false, the robot will
-     * try actively brake to come to a stop
-     */
-    void updateControlParams(const Robot& robot, bool coast);
+    StopAction() = delete;
 
-    void accept(MutableActionVisitor& visitor) override;
+    void updateWorldParams(const World& world) override;
+
+    void updateControlParams(const Robot& robot, bool coast);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

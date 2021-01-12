@@ -3,9 +3,9 @@
 #include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 
-#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/robot.h"
+#include "software/world/world.h"
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
@@ -34,6 +34,8 @@ class Action
      * @param loop_forever: whether action should continuously restart once its done
      */
     explicit Action(bool loop_forever);
+
+    Action() = delete;
 
     /**
      * Returns true if the Action is done and false otherwise. The Action is considered
@@ -67,11 +69,11 @@ class Action
     std::optional<Robot> getRobot();
 
     /**
-     * Accepts a Action Visitor and calls the visit function on itself
+     * Updates the world parameters for this action
      *
-     * @param visitor A Action Visitor
+     * @param world The world that will be used to update the action
      */
-    virtual void accept(MutableActionVisitor &visitor) = 0;
+    virtual void updateWorldParams(const World &world) = 0;
 
     virtual ~Action() = default;
 

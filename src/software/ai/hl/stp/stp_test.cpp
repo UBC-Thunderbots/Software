@@ -24,6 +24,11 @@ class STPTest : public ::testing::Test
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
             return std::make_unique<HaltTestPlay>();
         };
+        // Explicitly setting override AI Play to be false because we can't rely on
+        // default values
+        MutableDynamicParameters->getMutableAIControlConfig()
+            ->mutableOverrideAIPlay()
+            ->setValue(false);
         // Give an explicit seed to STP so that our tests are deterministic
         stp   = STP(default_play_constructor, DynamicParameters->getAIControlConfig(), 0);
         world = ::TestUtil::createBlankTestingWorld();
@@ -47,7 +52,8 @@ TEST_F(STPTest, test_exception_thrown_when_no_play_applicable)
 {
     // Put the ball where both its x and y coordinates are negative. Neither test Play
     // is applicable in this case
-    world = ::TestUtil::setBallPosition(world, Point(-1, -1), Timestamp::fromSeconds(0));
+    world = world =
+        ::TestUtil::setBallPosition(world, Point(-1, -1), Timestamp::fromSeconds(0));
     EXPECT_THROW(stp.calculateNewPlay(world), std::runtime_error);
 }
 

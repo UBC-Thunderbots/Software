@@ -18,6 +18,10 @@ class MoveTactic : public Tactic
      */
     explicit MoveTactic(bool loop_forever);
 
+    MoveTactic() = delete;
+
+    void updateWorldParams(const World& world) override;
+
     /**
      * Updates the control parameters for this MoveTactic.
      *
@@ -40,7 +44,7 @@ class MoveTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

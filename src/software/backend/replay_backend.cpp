@@ -11,8 +11,6 @@ ReplayBackend::ReplayBackend(const std::string& replay_input_dir)
 {
 }
 
-// TODO: https://github.com/UBC-Thunderbots/Software/issues/1745
-//       perhaps we want to encode the output primitives to proto and log them?
 void ReplayBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     // update the time when the backend received the last primitive message. this is
@@ -26,7 +24,7 @@ void ReplayBackend::onValueReceived(World world) {}
 
 void ReplayBackend::continuouslyPullFromReplayFiles()
 {
-    while (auto sensor_msg_or_null = replay_reader.getNextMsg())
+    while (auto sensor_msg_or_null = replay_reader.getNextMsg<SensorProto>())
     {
         auto this_msg_received_time = std::chrono::duration<double>(
             sensor_msg_or_null->backend_received_time().epoch_timestamp_seconds());

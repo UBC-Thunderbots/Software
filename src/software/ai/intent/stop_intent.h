@@ -12,8 +12,8 @@ class StopIntent : public DirectPrimitiveIntent
      *
      * @param robot_id The id of the Robot to run this Primitive
      * @param coast to coast to a stop or not
-     * @param priority The priority of this Intent. A larger number indicates a higher
-     * priority
      */
-    explicit StopIntent(unsigned int robot_id, bool coast, unsigned int priority);
+    explicit StopIntent(unsigned int robot_id, bool coast);
+
+    StopIntent() = delete;
 };

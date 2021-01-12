@@ -13,12 +13,12 @@ class DirectPrimitiveIntent : public Intent
      * Creates a new DirectPrimitiveIntent
      *
      * @param robot_id The id of the Robot to run this Primitive
-     * @param priority The priority of this Intent. A larger number indicates a higher
-     * priority
      * @param the TbotsProto::Primitive directly underlying this Intent
      */
-    explicit DirectPrimitiveIntent(unsigned int robot_id, unsigned int priority,
+    explicit DirectPrimitiveIntent(unsigned int robot_id,
                                    TbotsProto::Primitive primitive_msg);
+
+    DirectPrimitiveIntent() = delete;
 
     void accept(IntentVisitor& visitor) const override;
 

@@ -13,6 +13,7 @@ class MoveAction : public Action
     // camera and positioning noise
     static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD       = 0.02;
     static constexpr Angle ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD = Angle::fromDegrees(2);
+
     /**
      * Creates a new MoveAction
      *
@@ -25,6 +26,10 @@ class MoveAction : public Action
         bool loop_forever, double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD,
         Angle close_to_orientation_threshold = ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
 
+    MoveAction() = delete;
+
+    void updateWorldParams(const World& world) override;
+
     /**
      * Updates the params that cannot be derived from the world for this action
      *
@@ -33,16 +38,12 @@ class MoveAction : public Action
      * @param final_orientation The final orientation the robot should have at
      * the destination
      * @param final_speed The final speed the robot should have at the destination
-     * @param enable_dribbler Whether or not to enable the dribbler
-     * @param slow Whether or not to move slow
-     * @param autokick This will enable the "break-beam" on the robot, that will
-     * trigger the kicker or chippper to fire as soon as the ball is in front of it
+     * @param dribbler_mode The dribbler mode
      * @param ball_collision_type how to navigate around the ball
      */
     void updateControlParams(const Robot& robot, Point destination,
                              Angle final_orientation, double final_speed,
-                             DribblerEnable enable_dribbler, MoveType move_type,
-                             AutochickType autokick,
+                             DribblerMode dribbler_mode,
                              BallCollisionType ball_collision_type);
 
     /**
@@ -67,35 +68,30 @@ class MoveAction : public Action
     double getFinalSpeed();
 
     /**
-     * Gets what auto-kick mode this move action should operate with
-     *
-     * (ex. "auto-kick", "auto-chip")
-     *
-     * @return The auto-kick mode this move action should operate with
-     */
-    AutochickType getAutochickType();
-
-    /**
      * Gets the dribbler mode this move action should operate with
      *
      * @return the dribbler mode this move action should operate with
      */
-    DribblerEnable getDribblerEnabled();
+    DribblerMode getDribblerMode();
 
-    void accept(MutableActionVisitor& visitor) override;
-
-   private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+   protected:
+    /**
+     * Checks if robot is close to the destination
+     *
+     * @return if robot is close to the destination
+     */
+    bool robotCloseToDestination();
 
     // Action parameters
     Point destination;
     Angle final_orientation;
     double final_speed;
-    DribblerEnable enable_dribbler;
-    MoveType move_type;
-    AutochickType autokick_type;
+    DribblerMode dribbler_mode;
     BallCollisionType ball_collision_type;
 
     double close_to_dest_threshold;
     Angle close_to_orientation_threshold;
+
+   private:
+    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 };

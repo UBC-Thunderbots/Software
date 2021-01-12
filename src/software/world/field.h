@@ -356,6 +356,46 @@ class Field
     bool pointInEnemyDefenseArea(const Point &p) const;
 
     /**
+     * Returns true if the point is in the friendly half of the field, and false otherwise
+     *
+     * @param point
+     * @return true if the point is in the friendly half of the field, and false otherwise
+     */
+    bool pointInFriendlyHalf(const Point &p) const;
+
+    /**
+     * Returns true if the point is in the enemy half of the field, and false otherwise
+     *
+     * @param point
+     * @return true if the point is in the enemy's half of the field, and false otherwise
+     */
+    bool pointInEnemyHalf(const Point &p) const;
+
+    /**
+     * Returns true if the point is in within the provided radius in one of the friendly
+     * corner.
+     *
+     * @param point
+     * @param the radius from the corner, to decide whether or not the point is in the
+     * field.
+     * @return true if the point is in within the provided radius in one of the friendly
+     * corner.
+     */
+    bool pointInFriendlyCorner(const Point &p, double radius) const;
+
+    /**
+     * Returns true if the point is in within the provided radius in one of the enemy
+     * corner.
+     *
+     * @param point
+     * @param the radius from the corner, to decide whether or not the point is in the
+     * field.
+     * @return true if the point is in within the provided radius in one of the enemy
+     * corner.
+     */
+    bool pointInEnemyCorner(const Point &p, double radius) const;
+
+    /**
      * Compares two fields for equality
      *
      * @param other the field to compare to
