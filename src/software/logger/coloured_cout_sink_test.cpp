@@ -17,7 +17,7 @@ const std::string test_str =
     "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur "
     "sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id "
     "est laborum.";
-const std::string reset_colour_suffix = "\n\033[m\n\x1B[37m \x1B[m";
+const std::string reset_colour_suffix = "\n\033[m\x1B[37m \x1B[m";
 
 TEST_P(ColouredCoutSinkTest, testLogInfo)
 {
