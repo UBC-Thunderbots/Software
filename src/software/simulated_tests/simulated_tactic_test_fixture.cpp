@@ -1,4 +1,4 @@
-#include "software/simulated_tests/simulated_action_test_fixture.h"
+#include "software/simulated_tests/simulated_tactic_test_fixture.h"
 
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
@@ -6,7 +6,7 @@
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
 
-SimulatedActionTestFixture::SimulatedActionTestFixture()
+SimulatedTacticTestFixture::SimulatedTacticTestFixture()
     : motion_constraints(),
       navigator(std::make_shared<Navigator>(
           std::make_unique<VelocityObstaclePathManager>(
@@ -20,7 +20,7 @@ SimulatedActionTestFixture::SimulatedActionTestFixture()
 {
 }
 
-void SimulatedActionTestFixture::SetUp()
+void SimulatedTacticTestFixture::SetUp()
 {
     SimulatedTestFixture::SetUp();
     navigator = std::make_shared<Navigator>(
@@ -34,47 +34,42 @@ void SimulatedActionTestFixture::SetUp()
         DynamicParameters->getAIConfig()->getNavigatorConfig());
 }
 
-void SimulatedActionTestFixture::setAction(std::shared_ptr<Action> action)
+void SimulatedTacticTestFixture::setTactic(std::shared_ptr<Tactic> tactic)
 {
-    if (action && action->getRobot())
+    if (tactic)
     {
-        this->action = action;
+        this->tactic = tactic;
     }
     else
     {
-        throw std::invalid_argument("Action does not contain a robot in the simulator");
+        throw std::invalid_argument("Tactic is invalid");
     }
 }
 
-void SimulatedActionTestFixture::setMotionConstraints(
+void SimulatedTacticTestFixture::setRobotId(RobotId robot_id)
+{
+    this->robot_id = robot_id;
+}
+
+void SimulatedTacticTestFixture::setMotionConstraints(
     const std::set<MotionConstraint>& motion_constraints)
 {
     this->motion_constraints = motion_constraints;
 }
 
-void SimulatedActionTestFixture::updatePrimitives(
+void SimulatedTacticTestFixture::updatePrimitives(
     const World& world, std::shared_ptr<Simulator> simulator_to_update)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    RobotId robot_id = action->getRobot()->id();
     if (auto new_robot = world.friendlyTeam().getRobotById(robot_id))
     {
-        action->updateRobot(*world.friendlyTeam().getRobotById(robot_id));
+        auto intent = tactic->get(*world.friendlyTeam().getRobotById(robot_id), world);
+        intent->setMotionConstraints(motion_constraints);
+        intents.push_back(std::move(intent));
     }
     else
     {
         LOG(FATAL) << "No robot with robot id " << robot_id << std::endl;
-    }
-    action->updateWorldParams(world);
-    auto intent = action->getNextIntent();
-    if (intent)
-    {
-        intent->setMotionConstraints(motion_constraints);
-        intents.emplace_back(std::move(intent));
-    }
-    else
-    {
-        intents.emplace_back(std::make_unique<StopIntent>(robot_id, false));
     }
 
     auto primitive_set_msg = navigator->getAssignedPrimitives(world, intents);
@@ -83,12 +78,12 @@ void SimulatedActionTestFixture::updatePrimitives(
 }
 
 
-std::optional<PlayInfo> SimulatedActionTestFixture::getPlayInfo()
+std::optional<PlayInfo> SimulatedTacticTestFixture::getPlayInfo()
 {
     return std::nullopt;
 }
 
-AIDrawFunction SimulatedActionTestFixture::getDrawFunctions()
+AIDrawFunction SimulatedTacticTestFixture::getDrawFunctions()
 {
     return drawNavigator(navigator);
 }

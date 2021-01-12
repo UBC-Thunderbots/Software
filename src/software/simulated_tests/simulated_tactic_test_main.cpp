@@ -2,9 +2,9 @@
 
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/simulated_tests/simulated_action_test_fixture.h"
+#include "software/simulated_tests/simulated_tactic_test_fixture.h"
 
-bool SimulatedActionTestFixture::enable_visualizer = false;
+bool SimulatedTacticTestFixture::enable_visualizer = false;
 
 int main(int argc, char **argv)
 {
@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
     if (!help_requested)
     {
-        SimulatedActionTestFixture::enable_visualizer =
+        SimulatedTacticTestFixture::enable_visualizer =
             args->enable_visualizer()->value();
     }
 
