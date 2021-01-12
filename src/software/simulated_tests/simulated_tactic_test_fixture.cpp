@@ -61,15 +61,19 @@ void SimulatedTacticTestFixture::updatePrimitives(
     const World& world, std::shared_ptr<Simulator> simulator_to_update)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    if (auto new_robot = world.friendlyTeam().getRobotById(robot_id))
+    if (!robot_id)
     {
-        auto intent = tactic->get(*world.friendlyTeam().getRobotById(robot_id), world);
+        LOG(FATAL) << "No robot id set" << std::endl;
+    }
+    else if (auto new_robot = world.friendlyTeam().getRobotById(*robot_id))
+    {
+        auto intent = tactic->get(*world.friendlyTeam().getRobotById(*robot_id), world);
         intent->setMotionConstraints(motion_constraints);
         intents.push_back(std::move(intent));
     }
     else
     {
-        LOG(FATAL) << "No robot with robot id " << robot_id << std::endl;
+        LOG(FATAL) << "No robot with robot id " << *robot_id << std::endl;
     }
 
     auto primitive_set_msg = navigator->getAssignedPrimitives(world, intents);

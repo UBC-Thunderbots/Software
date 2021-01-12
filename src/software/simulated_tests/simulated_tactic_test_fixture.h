@@ -52,7 +52,7 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
     AIDrawFunction getDrawFunctions() override;
 
     std::shared_ptr<Tactic> tactic;
-    RobotId robot_id;
+    std::optional<RobotId> robot_id;
     // Motion constraints to set for intent
     std::set<MotionConstraint> motion_constraints;
     // The Navigator

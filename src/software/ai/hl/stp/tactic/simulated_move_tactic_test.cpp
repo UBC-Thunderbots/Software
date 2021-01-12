@@ -2,20 +2,20 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_action_test_fixture.h"
+#include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/simulated_tests/validation_functions/robot_at_position_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedMoveActionTest : public SimulatedActionTestFixture
+class SimulatedMoveTacticTest : public SimulatedTacticTestFixture
 {
 };
 
-TEST_F(SimulatedMoveActionTest, test_move_across_field)
+TEST_F(SimulatedMoveTacticTest, test_move_across_field)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(2.5, -1.1);
@@ -28,19 +28,15 @@ TEST_F(SimulatedMoveActionTest, test_move_across_field)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto action = std::make_shared<MoveAction>(false);
-    action->updateControlParams(Robot(1,
-                                      RobotState(Point(-3, 1.5), Vector(0, 0),
-                                                 Angle::zero(), AngularVelocity::zero()),
-                                      Timestamp::fromSeconds(0)),
-                                destination, Angle::zero(), 0, DribblerMode::OFF,
-                                BallCollisionType::AVOID);
-    setAction(action);
+    auto tactic = std::make_shared<MoveTactic>(false);
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(tactic);
+    setRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [destination, action](std::shared_ptr<World> world_ptr,
+        [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            while (!action->done())
+            while (!tactic->done())
             {
                 yield();
             }

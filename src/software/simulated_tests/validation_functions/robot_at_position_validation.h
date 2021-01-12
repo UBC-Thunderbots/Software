@@ -11,7 +11,7 @@
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param destination The point to arrive at
  * @param close_to_destination_threshold The threshold where the robot is considered close
- * enough to the destination
+ * enough to the destination in metres
  * @param yield yields control to the next routine (coroutines)
  */
 void robotAtPosition(RobotId robot_id, std::shared_ptr<World> world_ptr,

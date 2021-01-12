@@ -101,21 +101,6 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "simulated_move_action_test",
-    srcs = ["simulated_move_action_test.cpp"],
-    deps = [
-        "//software/ai/hl/stp/action:move_action",
-        "//software/simulated_tests:simulated_action_test_fixture",
-        "//software/simulated_tests:simulated_test_main",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/simulated_tests/validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
 cc_library(
     name = "autochip_move_action",
     srcs = ["autochip_move_action.cpp"],
