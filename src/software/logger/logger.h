@@ -10,6 +10,7 @@
 
 #include "software/logger/coloured_cout_sink.h"
 #include "software/logger/custom_logging_levels.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * This class acts as a Singleton that's responsible for initializing the logger.
@@ -28,14 +29,14 @@ class LoggerSingleton
      * Initializes a g3log logger for the calling program. This should only be
      * called once at the start of a program.
      */
-    static void initializeLogger()
+    static void initializeLogger(const std::string& log_directory)
     {
-        static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton());
+        static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton(log_directory));
     }
 
 
    private:
-    LoggerSingleton()
+    LoggerSingleton(const std::string& log_directory)
     {
         logWorker = g3::LogWorker::createLogWorker();
         // Robot diagnostics logs are in
@@ -51,11 +52,11 @@ class LoggerSingleton
             std::make_unique<ColouredCoutSink>(), &ColouredCoutSink::displayColouredLog);
         // Sink for storing a file of all logs
         auto log_rotate_sink_handle = logWorker->addSink(
-            std::make_unique<LogRotate>(log_name, "./software/"), &LogRotate::save);
+            std::make_unique<LogRotate>(log_name, log_directory), &LogRotate::save);
         // Sink for storing a file of filtered logs
         auto filtered_log_rotate_sink_handle = logWorker->addSink(
             std::make_unique<LogRotateWithFilter>(
-                std::make_unique<LogRotate>(log_name + filter_suffix, "./software/"),
+                std::make_unique<LogRotate>(log_name + filter_suffix, log_directory),
                 level_filter),
             &LogRotateWithFilter::save);
 

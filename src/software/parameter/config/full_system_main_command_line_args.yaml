@@ -26,3 +26,9 @@ FullSystemMainCommandLineArgs:
         default: ""
         description: >-
             The directory to replay logged data from, if the 'replay' backend is selected
+    logging_dir:
+        type: "std::string"
+        default: ""
+        description: >-
+            The directory to output logs to. Logs will not be logged if this argument
+            is not used.
