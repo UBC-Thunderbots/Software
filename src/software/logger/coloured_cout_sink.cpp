@@ -50,8 +50,7 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     auto colour = colourToString(getColour(level));
 
     std::ostringstream oss;
-    oss << "\033[" << colour << "m" << log_entry.get().toString() << "\033[m"
-        << std::endl;
-    std::cout << oss.str();
+    oss << "\033[" << colour << "m" << log_entry.get().toString() << "\033[m";
+    std::cout << oss.str() << std::flush;
     resetColour();
 }

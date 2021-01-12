@@ -4,3 +4,9 @@ SimulatedTestMainCommandLineArgs:
         default: false
         description: >-
             Displays simulated test on visualizer
+    logging_dir:
+        type: "std::string"
+        default: ""
+        description: >-
+            The directory to output logs to. Logs will not be outputted if this argument
+            is not used.

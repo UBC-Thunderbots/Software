@@ -32,7 +32,6 @@ cc_library(
         "coloured_cout_sink.h",
     ],
     deps = [
-        "//software/parameter:dynamic_parameters",
         "//software/util/make_enum",
         "@g3log",
     ],

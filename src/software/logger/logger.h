@@ -10,7 +10,6 @@
 
 #include "software/logger/coloured_cout_sink.h"
 #include "software/logger/custom_logging_levels.h"
-#include "software/parameter/dynamic_parameters.h"
 
 /**
  * This class acts as a Singleton that's responsible for initializing the logger.
