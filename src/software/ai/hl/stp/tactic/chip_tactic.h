@@ -1,6 +1,64 @@
 #pragma once
 
+#include "software/ai/hl/stp/tactic/get_behind_ball_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/intent/chip_intent.h"
+
+struct ChipFSM
+{
+    struct Chip
+    { /* state */
+    };
+
+    struct Controls
+    {
+        // The location where the chip will be taken
+        Point chip_origin;
+        // The direction the Robot will chip in
+        Angle chip_direction;
+        // The distance between the starting location
+        double chip_distance_meters;
+    };
+
+    struct Update
+    {
+        /* event */
+        Controls controls;
+        TacticUpdate common;
+    };
+
+    auto operator()()
+    {
+        using namespace boost::sml;
+
+        const auto update_chip_intent = [](auto event) {
+            event.common.set_intent(std::make_unique<ChipIntent>(
+                event.common.robot.id(), event.controls.chip_origin,
+                event.controls.chip_direction, event.controls.chip_distance_meters));
+        };
+
+        const auto ball_chicked = [](auto event) {
+            return event.common.world.ball().hasBallBeenKicked(
+                event.controls.chip_direction);
+        };
+
+        const auto update_get_behind_ball = [](auto event) {
+            GetBehindBallFSM::Update gbb_event{
+                .controls =
+                    GetBehindBallFSM::Controls{
+                        .ball_location   = event.controls.chip_origin,
+                        .chick_direction = event.controls.chip_direction},
+                .common = event.common};
+            process(gbb_event);
+        };
+
+        return make_transition_table(
+            *state<GetBehindBallFSM> = state<Chip>,
+            state<Chip> + event<Update>[!ball_chicked] / update_chip_intent,
+            state<Chip> + event<Update>[ball_chicked] = X,
+            *"update_get_behind_ball"_s + event<Update> / update_get_behind_ball);
+    }
+};
 
 /**
  * The ChipTactic will move the assigned robot to the given chip origin and then
@@ -23,12 +81,23 @@ class ChipTactic : public Tactic
     void updateWorldParams(const World& world) override;
 
     /**
+     * Updates the params for this tactic that cannot be derived from the world
+     *
+     * @param chip_origin The location where the chip will be taken
+     * @param chip_direction The direction the Robot will chip in
+     * @param chip_distance_meters The distance between the starting location
+     * of the chip and the location of the first bounce
+     */
+    void updateControlParams(const Point& chip_origin, const Angle& chip_direction,
+                             double chip_distance_meters);
+
+    /**
      * Updates the control parameters for this ChipTactic.
      *
      * @param chip_origin The location where the chip will be taken
      * @param chip_direction The direction the Robot will chip in
      */
-    void updateControlParams(Point chip_origin, Point chip_target);
+    void updateControlParams(const Point& chip_origin, const Point& chip_target);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -45,11 +114,15 @@ class ChipTactic : public Tactic
 
     Ball getBall() const;
 
+    bool done() const override;
+
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
+    void updateIntent(const TacticUpdate& tactic_update) override;
+
+    boost::sml::sm<ChipFSM> fsm;
 
     // Tactic parameters
     Ball ball;
-    Point chip_origin;
-    Point chip_target;
+    ChipFSM::Controls controls;
 };

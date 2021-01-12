@@ -30,7 +30,7 @@ cc_library(
     srcs = ["chip_tactic.cpp"],
     hdrs = ["chip_tactic.h"],
     deps = [
-        ":move_tactic",
+        ":get_behind_ball_tactic",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
