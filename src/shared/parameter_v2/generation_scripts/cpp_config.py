@@ -2,7 +2,7 @@ from __future__ import annotations
 from cpp_parameter import CppParameter
 from typing import List
 from collections.abc import Iterable
-from util import to_snake_case
+from case_conversion import to_snake_case
 import networkx as nx
 
 #######################################################################
@@ -127,6 +127,11 @@ CONFIG_CLASS = """class {config_name} : public Config
 
 class CppConfig(object):
     def __init__(self, config_name: str, is_top_level_config: bool = False):
+        """Initializes a CppConfig object, which can generate various strings specific to a config through properties. Some of the properties depend on having the dependency_graph set.
+
+        :param config_name: the name of the config
+        :param is_top_level_config: true if this is the top level config, false otherwise
+        """
         self.config_name = config_name
         self.config_variable_name = to_snake_case(config_name) + "_config"
         self.is_top_level_config = is_top_level_config
@@ -168,6 +173,13 @@ class CppConfig(object):
             self.dfs_helper(config, "", "")
 
     def dfs_helper(self, config: CppConfig, arg_prefix: str, load_dependency: str):
+        """A depth first search helper for adding the necessary prefix to accessing and setting
+        parameters of included configs in loadFromCommmandLineArguments function
+
+        :param config: the current CppConfig object
+        :param arg_prefix: the prefix for accessing the arg struct
+        :param load_depndency: the prefix for accessing the actual parameter
+        """
         arg_prefix = (
             to_snake_case(config.config_name)
             if not arg_prefix
@@ -353,7 +365,7 @@ class CppConfig(object):
     def parse_command_line_args_function_contents(self):
         return CppConfig.join_with_tabs(
             "\n",
-            [param.parameter_command_line_option_entry for param in self.parameters]
+            [param.parameter_command_line_option_entry for param in self.parameters if not param.is_constant]
             + self.included_config_command_line_arg_entries,
             2,
         )
@@ -376,7 +388,7 @@ class CppConfig(object):
     def command_line_arg_struct_contents(self):
         return CppConfig.join_with_tabs(
             "\n",
-            [param.command_line_arg_entry for param in self.parameters]
+            [param.command_line_arg_entry for param in self.parameters if not param.is_constant]
             + [conf.included_config_command_line_arg_entry for conf in self.configs],
             3,
         )

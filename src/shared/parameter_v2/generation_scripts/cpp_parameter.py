@@ -1,6 +1,6 @@
 from type_map import CPP_TYPE_MAP
 from dynamic_parameter_schema import CONSTANT_KEY
-from util import to_upper_camel_case, to_lower_camel_case
+from case_conversion import to_pascal_case, to_camel_case
 import re
 
 #######################################################################
@@ -49,6 +49,11 @@ NUMERIC_PARAMETER_MAX = "std::numeric_limits<{type}>::max()"
 
 class CppParameter(object):
     def __init__(self, param_type: str, param_metadata: dict):
+        """Initializes a CppParameter object, which can generate various strings specific to a parameter through properties.
+
+        :param param_type: the type of parameter (ex: bool, int)
+        :param parm_metadata: dictionary containing the metadata about the parameter (ex: name, value)
+        """
         self.param_type = param_type
         self.param_metadata = param_metadata
         self.param_name = param_metadata["name"]
@@ -117,7 +122,7 @@ class CppParameter(object):
     ):
         return LOAD_COMMAND_LINE_ARG_INTO_CONFIG.format(
             param_name=self.param_name,
-            param_accessor_name=to_upper_camel_case(self.param_name),
+            param_accessor_name=to_pascal_case(self.param_name),
             dependencies=dependencies,
             arg_prefix=arg_prefix,
         )
@@ -128,15 +133,15 @@ class CppParameter(object):
             PARAMETER_PUBLIC_ENTRY_CONST.format(
                 param_class=self.param_class,
                 type=self.cpp_type,
-                immutable_accessor_name=to_lower_camel_case(self.param_name),
+                immutable_accessor_name=to_camel_case(self.param_name),
                 param_variable_name=self.param_variable_name,
             )
             if self.is_constant
             else PARAMETER_PUBLIC_ENTRY.format(
                 param_class=self.param_class,
                 type=self.cpp_type,
-                immutable_accessor_name=to_lower_camel_case(self.param_name),
-                mutable_accessor_name="mutable" + to_upper_camel_case(self.param_name),
+                immutable_accessor_name=to_camel_case(self.param_name),
+                mutable_accessor_name="mutable" + to_pascal_case(self.param_name),
                 param_variable_name=self.param_variable_name,
             )
         )
@@ -244,7 +249,7 @@ class CppParameter(object):
     def load_command_line_arg_into_config(self):
         return LOAD_COMMAND_LINE_ARG_INTO_CONFIG.format(
             param_name=self.param_name,
-            param_accessor_name=to_upper_camel_case(self.param_name),
+            param_accessor_name=to_pascal_case(self.param_name),
             dependencies="",
             arg_prefix="",
         )

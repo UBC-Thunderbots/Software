@@ -119,6 +119,7 @@ include:
 # The following are example of special attributes that can be applied to any parameter
 #########################################################################################
 # Make a parameter value optional (CPP only)
+# TODO: add support for optional parameter (issue #1889)
 #- bool:
 #    name: example_optional_parameter
 #    value: false

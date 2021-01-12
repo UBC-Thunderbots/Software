@@ -2,7 +2,7 @@ from cpp_config import CppConfig
 from cpp_parameter import CppParameter
 from typing import List
 from dynamic_parameter_schema import PARAMETER_KEY, INCLUDE_KEY
-from util import to_upper_camel_case
+from case_conversion import to_pascal_case
 import networkx as nx
 
 #######################################################################
@@ -55,13 +55,20 @@ class CppWriter(object):
     def create_config_list_from_metadata(
         top_level_config_name: str, config_metadata: dict
     ) -> List[CppConfig]:
+        """Takes the config metadata loaded by config_yaml_loader, and converts it to a list of CppConfig objects;
+        this includes setting the dependency graphs needed for the configs.
+
+        :param top_leve_config_name: the name of the top level config
+        :pararm config_metadata: the dictionary containing the config metadata
+        :return: list of CppConfig objects
+        """
         cpp_configs_dict = {}
         dependency_graph = nx.DiGraph()
         top_level_config = CppConfig(top_level_config_name, True)
 
         # first pass to construct all CppConfig objects
         for config, metadata in config_metadata.items():
-            config_name = to_upper_camel_case(config.split(".")[0])
+            config_name = to_pascal_case(config.split(".")[0])
 
             config = CppConfig(config_name)
             top_level_config.include_config(config)
@@ -79,15 +86,13 @@ class CppWriter(object):
 
         # second pass to create dependency graph
         for config, metadata in config_metadata.items():
-            config_name = to_upper_camel_case(config.split(".")[0])
+            config_name = to_pascal_case(config.split(".")[0])
 
             config = cpp_configs_dict[config_name]
 
             if INCLUDE_KEY in metadata:
                 for included_yaml in metadata[INCLUDE_KEY]:
-                    included_config_name = to_upper_camel_case(
-                        included_yaml.split(".")[0]
-                    )
+                    included_config_name = to_pascal_case(included_yaml.split(".")[0])
                     config.include_config(cpp_configs_dict[included_config_name])
                     # add an edge from config node to included config node
                     dependency_graph.add_edge(config_name, included_config_name)
@@ -119,6 +124,13 @@ class CppWriter(object):
         top_level_config_name: str,
         config_metadata: dict,
     ):
+        """Generates the .h config file.
+
+        :param output_file: the name of the config file
+        :param include_headers: the list of headers that need to be included in the config file
+        :param top_level_config_name: the name of the top level config
+        :param config_metadata: the dictionary containing the config metadata
+        """
         cpp_configs = CppWriter.create_config_list_from_metadata(
             top_level_config_name, config_metadata
         )
