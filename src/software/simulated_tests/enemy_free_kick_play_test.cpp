@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/hl/stp/play/enemy_freekick_play.h"
-#include "software/simulated_tests/simulated_test_fixture.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class EnemyFreekickPlayTest : public SimulatedTestFixture
+class EnemyFreekickPlayTest : public SimulatedPlayTestFixture
 {
 };
 
