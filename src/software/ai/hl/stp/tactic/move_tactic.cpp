@@ -49,7 +49,7 @@ bool MoveTactic::done() const
 
 void MoveTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    MoveTacticFSM::Update event{.controls = controls, .common = tactic_update};
+    MoveFSM::Update event{.controls = controls, .common = tactic_update};
     fsm.process_event(event);
 }
 

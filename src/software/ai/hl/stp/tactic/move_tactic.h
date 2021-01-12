@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 
-struct MoveTacticFSM
+struct MoveFSM
 {
     struct Move
     { /* state */
@@ -98,7 +98,7 @@ class MoveTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    boost::sml::sm<MoveTacticFSM> fsm;
+    boost::sml::sm<MoveFSM> fsm;
 
-    MoveTacticFSM::Controls controls;
+    MoveFSM::Controls controls;
 };
