@@ -44,9 +44,10 @@ struct MoveFSM
 
         return make_transition_table(
             *"idle"_s + event<Update> / update_move_intent = state<Move>,
-            state<Move> + event<Update>[!movement_done] / update_move_intent,
+            state<Move> + event<Update>[!movement_done] / update_move_intent =
+                state<Move>,
             state<Move> + event<Update>[movement_done] / update_move_intent = X,
-            X + event<Update>[movement_done] / update_move_intent);
+            X + event<Update>[movement_done] / update_move_intent           = X);
     }
 };
 
