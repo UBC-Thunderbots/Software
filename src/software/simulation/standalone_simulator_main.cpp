@@ -12,7 +12,7 @@ int main(int argc, char **argv)
         MutableDynamicParameters->getMutableStandaloneSimulatorMainCommandLineArgs();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    LoggerSingleton::initializeLogger(LoggerSingleton::initializeLogger(args->logging_dir()->value());
+    LoggerSingleton::initializeLogger(args->logging_dir()->value());
 
     if (!help_requested)
     {

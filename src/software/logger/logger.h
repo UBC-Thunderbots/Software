@@ -38,13 +38,19 @@ class LoggerSingleton
     LoggerSingleton(const std::string& log_directory)
     {
         logWorker = g3::LogWorker::createLogWorker();
-        // Robot diagnostics logs are in
-        // bazel-out/k8-fastbuild/bin/software/gui/robot_diagnostics/robot_diagnostics_main.runfiles/__main__/software/
-        // Full system logs are in
-        // bazel-out/k8-fastbuild/bin/software/full_system.runfiles/__main__/software/
-        // Simulated test logs are in
-        // bazel-out/k8-fastbuild/bin/software/simulated_tests/TEST_NAME.runfiles/__main__/software/
-        // where TEST_NAME is the name of the simulated test
+        // Default locations
+        // Full system: bazel-out/k8-fastbuild/bin/software/full_system.runfiles/__main__/
+        // Robot diagnostics:
+        // bazel-out/k8-fastbuild/bin/software/gui/robot_diagnostics/robot_diagnostics_main.runfiles/__main__/
+        // Standalone Simulator:
+        // bazel-out/k8-fastbuild/bin/software/simulation/standalone_simulator_main.runfiles/__main__/
+        // Simulated
+        // tests:bazel-out/k8-fastbuild/bin/software/simulated_tests/TEST_NAME.runfiles/__main__/
+        //   where TEST_NAME is the name of the simulated test
+
+        // Log locations can also be defined by setting the --logging_dir command line
+        // arg. Note: log locations are defaulted to the bazel-out folder due to Bazel's
+        // hermetic build principles
 
         // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle = logWorker->addSink(
