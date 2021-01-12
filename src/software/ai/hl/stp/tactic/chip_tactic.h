@@ -42,21 +42,10 @@ struct ChipFSM
                 event.controls.chip_direction);
         };
 
-        const auto update_get_behind_ball = [](auto event) {
-            GetBehindBallFSM::Update gbb_event{
-                .controls =
-                    GetBehindBallFSM::Controls{
-                        .ball_location   = event.controls.chip_origin,
-                        .chick_direction = event.controls.chip_direction},
-                .common = event.common};
-            process(gbb_event);
-        };
-
         return make_transition_table(
-            *state<GetBehindBallFSM> = state<Chip>,
-            state<Chip> + event<Update>[!ball_chicked] / update_chip_intent,
-            state<Chip> + event<Update>[ball_chicked] = X,
-            *"update_get_behind_ball"_s + event<Update> / update_get_behind_ball);
+            *state<GetBehindBallFSM>                                        = state<Chip>,
+            state<Chip> + event<Update>[!ball_chicked] / update_chip_intent = state<Chip>,
+            state<Chip> + event<Update>[ball_chicked]                       = X);
     }
 };
 

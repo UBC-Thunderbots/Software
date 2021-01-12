@@ -99,9 +99,10 @@ struct GetBehindBallFSM
 
         return make_transition_table(
             *"idle"_s + event<Update> / update_move_intent = state<GetBehindBall>,
-            state<GetBehindBall> + event<Update>[!behind_ball] / update_move_intent = state<GetBehindBall>,
+            state<GetBehindBall> + event<Update>[!behind_ball] / update_move_intent =
+                state<GetBehindBall>,
             state<GetBehindBall> + event<Update>[behind_ball] / update_move_intent = X,
-            X + event<Update>[behind_ball] / update_move_intent = X);
+            X + event<Update>[behind_ball] / update_move_intent                    = X);
     }
 
    private:
