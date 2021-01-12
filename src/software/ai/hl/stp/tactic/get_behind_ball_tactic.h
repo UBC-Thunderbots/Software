@@ -69,7 +69,6 @@ struct GetBehindBallFSM
                 event.common.robot.id(), point_behind_ball,
                 event.controls.chick_direction, 0.0, DribblerMode::OFF,
                 BallCollisionType::AVOID));
-            std::cout << "Updating MoveIntet from get_behind_ball_tactic" << std::endl;
         };
 
         const auto behind_ball = [size_of_region_behind_ball](auto event) {
@@ -100,9 +99,9 @@ struct GetBehindBallFSM
 
         return make_transition_table(
             *"idle"_s + event<Update> / update_move_intent = state<GetBehindBall>,
-            state<GetBehindBall> + event<Update>[!behind_ball] / update_move_intent,
+            state<GetBehindBall> + event<Update>[!behind_ball] / update_move_intent = state<GetBehindBall>,
             state<GetBehindBall> + event<Update>[behind_ball] / update_move_intent = X,
-            X + event<Update>[behind_ball] / update_move_intent);
+            X + event<Update>[behind_ball] / update_move_intent = X);
     }
 
    private:
