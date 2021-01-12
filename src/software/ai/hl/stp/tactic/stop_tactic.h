@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
 
-struct StopTacticFSM
+struct StopFSM
 {
     struct Stop
     { /* state */
@@ -75,7 +75,7 @@ class StopTactic : public Tactic
 
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    boost::sml::sm<StopTacticFSM> fsm;
+    boost::sml::sm<StopFSM> fsm;
 
     // Whether or not the robot should coast to a stop
     bool coast;

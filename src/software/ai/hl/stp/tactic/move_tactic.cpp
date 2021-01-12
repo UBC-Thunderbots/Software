@@ -13,9 +13,9 @@ void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
                                      double final_speed)
 {
     // Update the control parameters stored by this Tactic
-    this->destination       = destination;
-    this->final_orientation = final_orientation;
-    this->final_speed       = final_speed;
+    controls.destination       = destination;
+    controls.final_orientation = final_orientation;
+    controls.final_speed       = final_speed;
 }
 
 double MoveTactic::calculateRobotCost(const Robot &robot, const World &world) const
@@ -24,7 +24,7 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world) co
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =
-        (robot.position() - destination).length() / world.field().totalXLength();
+        (robot.position() - controls.destination).length() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -35,9 +35,9 @@ void MoveTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                                      MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
     do
     {
-        move_action->updateControlParams(*robot_, destination, final_orientation,
-                                         final_speed, DribblerMode::OFF,
-                                         BallCollisionType::AVOID);
+        move_action->updateControlParams(*robot_, controls.destination,
+                                         controls.final_orientation, controls.final_speed,
+                                         DribblerMode::OFF, BallCollisionType::AVOID);
         yield(move_action);
     } while (!move_action->done());
 }
@@ -49,10 +49,7 @@ bool MoveTactic::done() const
 
 void MoveTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    MoveTacticFSM::Update event{.destination       = destination,
-                                .final_orientation = final_orientation,
-                                .final_speed       = final_speed,
-                                .common            = tactic_update};
+    MoveFSM::Update event{.controls = controls, .common = tactic_update};
     fsm.process_event(event);
 }
 

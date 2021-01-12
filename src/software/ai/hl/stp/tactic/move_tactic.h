@@ -4,18 +4,25 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 
-struct MoveTacticFSM
+struct MoveFSM
 {
     struct Move
     { /* state */
     };
 
+    struct Controls
+    {
+        // The point the robot is trying to move to
+        Point destination;
+        // The orientation the robot should have when it arrives at its destination
+        Angle final_orientation;
+        // The speed the robot should have when it arrives at its destination
+        double final_speed;
+    };
+
     struct Update
     {
-        /* event */
-        Point destination;
-        Angle final_orientation;
-        double final_speed;
+        Controls controls;
         TacticUpdate common;
     };
 
@@ -25,13 +32,14 @@ struct MoveTacticFSM
 
         const auto update_move_intent = [](auto event) {
             event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), event.destination, event.final_orientation,
-                event.final_speed, DribblerMode::OFF, BallCollisionType::AVOID));
+                event.common.robot.id(), event.controls.destination,
+                event.controls.final_orientation, event.controls.final_speed,
+                DribblerMode::OFF, BallCollisionType::AVOID));
         };
 
         const auto movement_done = [](auto event) {
-            return moveRobotDone(event.common.robot, event.destination,
-                                 event.final_orientation);
+            return moveRobotDone(event.common.robot, event.controls.destination,
+                                 event.controls.final_orientation);
         };
 
         return make_transition_table(
@@ -90,12 +98,7 @@ class MoveTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    boost::sml::sm<MoveTacticFSM> fsm;
+    boost::sml::sm<MoveFSM> fsm;
 
-    // The point the robot is trying to move to
-    Point destination;
-    // The orientation the robot should have when it arrives at its destination
-    Angle final_orientation;
-    // The speed the robot should have when it arrives at its destination
-    double final_speed;
+    MoveFSM::Controls controls;
 };
