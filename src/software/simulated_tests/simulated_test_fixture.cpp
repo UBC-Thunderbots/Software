@@ -144,7 +144,7 @@ void SimulatedTestFixture::updateSensorFusion()
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
     sensor_fusion.processSensorProto(sensor_msg);
-	sensor_fusion.overrideRefereeCommand();
+    sensor_fusion.overrideRefereeCommand();
 }
 
 void SimulatedTestFixture::sleep(

@@ -41,7 +41,7 @@ std::optional<World> SensorFusion::getWorld() const
 }
 
 void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
-{	
+{
     if (sensor_msg.has_ssl_vision_msg())
     {
         updateWorld(sensor_msg.ssl_vision_msg());
@@ -81,7 +81,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
 }
 
 void SensorFusion::updateWorld(const SSLProto::Referee &packet)
-{   // TODO remove DynamicParameters as part of
+{  // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
@@ -306,7 +306,7 @@ void SensorFusion::resetWorldComponents()
 
 void SensorFusion::overrideRefereeCommand()
 {
-	if (sensor_fusion_config->OverrideRefereeCommand()->value())
+    if (sensor_fusion_config->OverrideRefereeCommand()->value())
     {
         std::string previous_state_string =
             sensor_fusion_config->PreviousRefereeCommand()->value();

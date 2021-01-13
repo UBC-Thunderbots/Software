@@ -62,7 +62,7 @@ bool PenaltyKickTactic::evaluatePenaltyShot()
         // If we have an intersection, calculate if we have a viable shot
 
         const double shooter_to_goal_distance =
-		  (robot.value().position() - intersections[0]).length();
+            (robot.value().position() - intersections[0]).length();
         const double time_to_score =
             fabs(shooter_to_goal_distance / PENALTY_KICK_SHOT_SPEED) +
             SSL_VISION_DELAY;  // Include the vision delay in our penalty shot
@@ -74,22 +74,22 @@ bool PenaltyKickTactic::evaluatePenaltyShot()
         //          dX - init_vel - (0.5*a*t)t
         const double max_enemy_movement_x =
             enemy_goalie.value().velocity().x() * time_to_score +
-            0.5 * std::copysign(1, goalie_to_goal.x()) *
-            PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_score, 2);
+            0.5 * std::copysign(1, goalie_to_goal.x()) * PENALTY_KICK_GOALIE_MAX_ACC *
+                pow(time_to_score, 2);
         const double max_enemy_movement_y =
             enemy_goalie.value().velocity().y() * time_to_score +
-		  0.5 * std::copysign(1, goalie_to_goal.y()) *
-			PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_score, 2);
+            0.5 * std::copysign(1, goalie_to_goal.y()) * PENALTY_KICK_GOALIE_MAX_ACC *
+                pow(time_to_score, 2);
 
-		// If the maximum distance that the goalie can move is less than actual
-		// distance it must move to reach the ball, return true for a viable
-		// shot
-		// Not simplifying this if statement makes the code logic slightly
-		// easier to understand
+        // If the maximum distance that the goalie can move is less than actual
+        // distance it must move to reach the ball, return true for a viable
+        // shot
+        // Not simplifying this if statement makes the code logic slightly
+        // easier to understand
         if ((fabs(goalie_to_goal.x()) >
-			 (fabs(max_enemy_movement_x) + ROBOT_MAX_RADIUS_METERS)) ||
-			(fabs(goalie_to_goal.y()) >
-			 (fabs(max_enemy_movement_y) + ROBOT_MAX_RADIUS_METERS)))
+             (fabs(max_enemy_movement_x) + ROBOT_MAX_RADIUS_METERS)) ||
+            (fabs(goalie_to_goal.y()) >
+             (fabs(max_enemy_movement_y) + ROBOT_MAX_RADIUS_METERS)))
         {
             return true;
         }
@@ -101,7 +101,7 @@ bool PenaltyKickTactic::evaluatePenaltyShot()
     else
     {
         // If a shot in our current direction will not end in a goal, don't
-		// shoot
+        // shoot
         return false;
     }
 }
@@ -130,61 +130,60 @@ Point PenaltyKickTactic::evaluateNextPosition()
 void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
     // We will need to keep track of time so we don't break the rules by taking
-	// too long
+    // too long
     const Timestamp penalty_kick_start = robot->timestamp();
-    const Timestamp complete_approach = penalty_kick_start + Duration::fromSeconds(2);
+    const Timestamp complete_approach  = penalty_kick_start + Duration::fromSeconds(2);
 
     auto approach_ball_move_act = std::make_shared<MoveAction>(false);
-    auto approach_goalie_act = std::make_shared<MoveAction>(
+    auto approach_goalie_act    = std::make_shared<MoveAction>(
         false, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
-    auto kick_action = std::make_shared<KickAction>();
+    auto kick_action          = std::make_shared<KickAction>();
     Vector behind_ball_vector = (ball.position() - field.enemyGoalpostPos());
     // A point behind the ball for the kicker too approach
-    Point behind_ball = ball.position() + behind_ball_vector.normalize(
-                                               BALL_MAX_RADIUS_METERS +
-                                               DIST_TO_FRONT_OF_ROBOT_METERS);
+    Point behind_ball =
+        ball.position() + behind_ball_vector.normalize(BALL_MAX_RADIUS_METERS +
+                                                       DIST_TO_FRONT_OF_ROBOT_METERS);
 
     // approach the ball in preparation to shoot
-    while (!approach_ball_move_act->done() && 
-            ((robot.value().position() - behind_ball).length() > 
+    while (!approach_ball_move_act->done() &&
+           ((robot.value().position() - behind_ball).length() >
             MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD) &&
-            (robot->timestamp() <= complete_approach))
+           (robot->timestamp() <= complete_approach))
     {
         approach_ball_move_act->updateControlParams(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW);
-            std::cout << "Approaching ball\n";
-            yield(approach_ball_move_act);
+            *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
+            DribblerMode::MAX_FORCE, BallCollisionType::ALLOW);
+        std::cout << "Approaching ball\n";
+        yield(approach_ball_move_act);
     }
 
     const Timestamp penalty_start_approaching_goalie = robot->timestamp();
-    
+
     // prepare to shoot:
     // keep moving forward toward the goalkeeper until we have a viable shot or
-	// our timeout runs out
+    // our timeout runs out
     Angle shot_angle;
     do
     {
-		const Point next_shot_position = evaluateNextPosition();
+        const Point next_shot_position = evaluateNextPosition();
         shot_angle = (next_shot_position - ball.position()).orientation();
-		const Point next_robot_position = robot.value().position() + Vector(0.04, 0);
-        approach_goalie_act->updateControlParams(
-	   *robot, next_robot_position, shot_angle, 0, DribblerMode::MAX_FORCE,
-	   BallCollisionType::ALLOW);
+        const Point next_robot_position = robot.value().position() + Vector(0.04, 0);
+        approach_goalie_act->updateControlParams(*robot, next_robot_position, shot_angle,
+                                                 0, DribblerMode::MAX_FORCE,
+                                                 BallCollisionType::ALLOW);
         yield(approach_goalie_act);
     } while (((robot->timestamp() - penalty_start_approaching_goalie) <=
-			  PENALTY_FORCE_SHOOT_TIMEOUT)
-			 && !evaluatePenaltyShot());
+              PENALTY_FORCE_SHOOT_TIMEOUT) &&
+             !evaluatePenaltyShot());
 
     // shoot
     do
     {
-	kick_action->updateControlParams(*robot, ball.position(),
-					 shot_angle,
-					    PENALTY_KICK_SHOT_SPEED);
-	yield(kick_action);
+        kick_action->updateControlParams(*robot, ball.position(), shot_angle,
+                                         PENALTY_KICK_SHOT_SPEED);
+        yield(kick_action);
     } while (!kick_action->done() &&
-               ((robot->timestamp() - penalty_kick_start) < PENALTY_SHOT_TIMEOUT));
+             ((robot->timestamp() - penalty_kick_start) < PENALTY_SHOT_TIMEOUT));
 }
 
 void PenaltyKickTactic::accept(TacticVisitor& visitor) const

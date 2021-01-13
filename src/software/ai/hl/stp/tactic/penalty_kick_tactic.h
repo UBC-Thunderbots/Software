@@ -45,13 +45,13 @@ class PenaltyKickTactic : public Tactic
     // Evaluation function designed specifically for 1-on-1 penalty shots
     bool evaluatePenaltyShot();
 
-	// Evaluation function designed specifically for determining the next potential shot
+    // Evaluation function designed specifically for determining the next potential shot
     // in a penalty kick
     Point evaluateNextPosition();
-	
+
     // offset from the goal post in y direction when shooting
-    static constexpr double PENALTY_KICK_POST_OFFSET    = 0.04;
-	
+    static constexpr double PENALTY_KICK_POST_OFFSET = 0.04;
+
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
 
@@ -60,14 +60,14 @@ class PenaltyKickTactic : public Tactic
     Field field;
     std::optional<Robot> enemy_goalie;
 
-    static constexpr double PENALTY_KICK_SHOT_SPEED      = 5.0;
-	// this constants is the expected maximum acceleration of the opposition
-	// goalie robot
-    static constexpr double PENALTY_KICK_GOALIE_MAX_ACC  = 1.5;
-    static constexpr double SSL_VISION_DELAY             = 0.30;  // seconds
-	
-	// this is the timeout that forces a shot after the robot approaches the
-	// ball and advances towards the keeper
-	const Duration PENALTY_FORCE_SHOOT_TIMEOUT = Duration::fromSeconds(1.5);
-    const Duration PENALTY_SHOT_TIMEOUT = Duration::fromSeconds(10);
+    static constexpr double PENALTY_KICK_SHOT_SPEED = 5.0;
+    // this constants is the expected maximum acceleration of the opposition
+    // goalie robot
+    static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
+    static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds
+
+    // this is the timeout that forces a shot after the robot approaches the
+    // ball and advances towards the keeper
+    const Duration PENALTY_FORCE_SHOOT_TIMEOUT = Duration::fromSeconds(1.5);
+    const Duration PENALTY_SHOT_TIMEOUT        = Duration::fromSeconds(10);
 };

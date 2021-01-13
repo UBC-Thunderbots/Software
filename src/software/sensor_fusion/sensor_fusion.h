@@ -47,12 +47,12 @@ class SensorFusion
      */
     std::optional<World> getWorld() const;
 
-	 /**
-	 * Overrides the referee commands and updates the game state accordingly if
-	 * an override exists.
-	 **/
-	void overrideRefereeCommand();
-	
+    /**
+     * Overrides the referee commands and updates the game state accordingly if
+     * an override exists.
+     **/
+    void overrideRefereeCommand();
+
     // Number of vision packets to indicate that the vision client most likely reset,
     // determined experimentally with the simulator
     static constexpr unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;

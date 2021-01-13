@@ -47,17 +47,18 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 {
     Vector behind_ball_direction =
-            (field().penaltyEnemy() - field().enemyGoalpostPos()).normalize();
+        (field().penaltyEnemy() - field().enemyGoalpostPos()).normalize();
 
-    Point behind_ball = field().penaltyEnemy() + behind_ball_direction.normalize(
-                                                        DIST_TO_FRONT_OF_ROBOT_METERS +
+    Point behind_ball = field().penaltyEnemy() +
+                        behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS + 0.1);
     setBallState(BallState(field().penaltyEnemy(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4, 0), behind_ball, Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(2, -3.1)}));
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({field().enemyGoalCenter()}));
+    addEnemyRobots(
+        TestUtil::createStationaryRobotStatesWithId({field().enemyGoalCenter()}));
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_US);
@@ -67,11 +68,12 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
-	[](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-	    while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-	    {
-	        yield();
-	    }}};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            {
+                yield();
+            }
+        }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
