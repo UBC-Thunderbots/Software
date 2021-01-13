@@ -41,7 +41,7 @@ std::optional<World> SensorFusion::getWorld() const
 }
 
 void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
-{
+{	
     if (sensor_msg.has_ssl_vision_msg())
     {
         updateWorld(sensor_msg.ssl_vision_msg());
@@ -50,27 +50,6 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
     if (sensor_msg.has_ssl_referee_msg())
     {
         updateWorld(sensor_msg.ssl_referee_msg());
-    }
-
-    if (sensor_fusion_config->OverrideRefereeCommand()->value())
-    {
-        std::string previous_state_string =
-            sensor_fusion_config->PreviousRefereeCommand()->value();
-        std::string current_state_string =
-            sensor_fusion_config->CurrentRefereeCommand()->value();
-        try
-        {
-            RefereeCommand previous_state =
-                fromStringToRefereeCommand(previous_state_string);
-            game_state.updateRefereeCommand(previous_state);
-            RefereeCommand current_state =
-                fromStringToRefereeCommand(current_state_string);
-            game_state.updateRefereeCommand(current_state);
-        }
-        catch (std::invalid_argument e)
-        {
-            LOG(WARNING) << e.what();
-        }
     }
 
     updateWorld(sensor_msg.robot_status_msgs());
@@ -323,4 +302,28 @@ void SensorFusion::resetWorldComponents()
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     team_with_possession = TeamSide::ENEMY;
+}
+
+void SensorFusion::overrideRefereeCommand()
+{
+	if (sensor_fusion_config->OverrideRefereeCommand()->value())
+    {
+        std::string previous_state_string =
+            sensor_fusion_config->PreviousRefereeCommand()->value();
+        std::string current_state_string =
+            sensor_fusion_config->CurrentRefereeCommand()->value();
+        try
+        {
+            RefereeCommand previous_state =
+                fromStringToRefereeCommand(previous_state_string);
+            game_state.updateRefereeCommand(previous_state);
+            RefereeCommand current_state =
+                fromStringToRefereeCommand(current_state_string);
+            game_state.updateRefereeCommand(current_state);
+        }
+        catch (std::invalid_argument e)
+        {
+            LOG(WARNING) << e.what();
+        }
+    }
 }

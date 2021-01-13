@@ -40,7 +40,6 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    enableVisualizer();
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(9.5));
 }
@@ -58,8 +57,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
         {Point(-4, 0), behind_ball, Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(2, -3.1)}));
     setFriendlyGoalie(0);
-    addEnemyRobots(
-		   TestUtil::createStationaryRobotStatesWithId({field().enemyGoalpostPos()}));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({field().enemyGoalCenter()}));
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_US);
@@ -73,15 +71,10 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 	    while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
 	    {
 	        yield();
-	    }
-	}
-        ,[](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            friendlyScored(world_ptr, yield);
-        }};
+	    }}};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    enableVisualizer();
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(9.5));
 }

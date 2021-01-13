@@ -35,7 +35,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
     auto move_tactic_5 = std::make_shared<MoveTactic>(true);
-    //auto move_tactic_6 = std::make_shared<MoveTactic>(true);
 
     do
     {
@@ -63,9 +62,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         move_tactic_5->updateControlParams(
             Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
-	//  move_tactic_6->updateControlParams(
-	//  Point(non_shooter_y_behind_ball, -8 * ROBOT_MAX_RADIUS_METERS),
-	//  world.field().enemyGoalCenter().toVector().orientation(), 0);
 
         shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0);
 
@@ -78,13 +74,13 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             tactics_to_run.emplace_back(penalty_shot_tactic);
         }
+		
         // Move all non-shooter robots to the center of the field
 	    tactics_to_run.emplace_back(goalie_tactic);
         tactics_to_run.emplace_back(move_tactic_2);
         tactics_to_run.emplace_back(move_tactic_3);
         tactics_to_run.emplace_back(move_tactic_4);
         tactics_to_run.emplace_back(move_tactic_5);
-	//   tactics_to_run.emplace_back(move_tactic_6);
         
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);

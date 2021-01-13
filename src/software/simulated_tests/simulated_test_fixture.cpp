@@ -144,6 +144,7 @@ void SimulatedTestFixture::updateSensorFusion()
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
     sensor_fusion.processSensorProto(sensor_msg);
+	sensor_fusion.overrideRefereeCommand();
 }
 
 void SimulatedTestFixture::sleep(
@@ -167,12 +168,7 @@ void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &terminating_validation_functions,
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
-{   //send referee packet??
-
-    SensorProto sensor_msg;
-    *(sensor_msg.mutable_ssl_referee_msg()) = *(std::make_unique<SSLProto::Referee>());
-    sensor_fusion.processSensorProto(sensor_msg);
-
+{
     updateSensorFusion();
     std::shared_ptr<World> world;
     if (auto world_opt = sensor_fusion.getWorld())
