@@ -59,7 +59,7 @@ class CppWriter(object):
         this includes setting the dependency graphs needed for the configs.
 
         :param top_leve_config_name: the name of the top level config
-        :pararm config_metadata: the dictionary containing the config metadata
+        :param config_metadata: the dictionary containing the config metadata
         :return: list of CppConfig objects
         """
         cpp_configs_dict = {}
