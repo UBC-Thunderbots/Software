@@ -212,7 +212,6 @@ cc_library(
         "//software/ai/hl/stp/tactic:penalty_setup_tactic",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
-        "@boost//:iostreams",
     ],
     alwayslink = True,
 )

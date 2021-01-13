@@ -1,7 +1,5 @@
 #include "software/ai/hl/stp/play/penalty_kick_play.h"
 
-#include <iostream>
-
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"

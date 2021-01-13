@@ -78,5 +78,5 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(9.5));
+            Duration::fromSeconds(10));
 }
