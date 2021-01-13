@@ -30,10 +30,10 @@ struct StopFSM
         };
 
         return make_transition_table(
-            *"idle"_s + event<Update> / update_stop_intent = state<Stop>,
-            state<Stop> + event<Update>[!stop_done] / update_stop_intent,
-            state<Stop> + event<Update>[stop_done] / update_stop_intent = X,
-            X + event<Update>[!stop_done] / update_stop_intent);
+            *"idle"_s + event<Update> / update_stop_intent               = state<Stop>,
+            state<Stop> + event<Update>[!stop_done] / update_stop_intent = state<Stop>,
+            state<Stop> + event<Update>[stop_done] / update_stop_intent  = X,
+            X + event<Update>[!stop_done] / update_stop_intent           = X);
     }
 };
 

@@ -11,6 +11,7 @@ cc_binary(
         "//software/backend:all_backends",
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
+        "//software/multithreading:observer_subject_adapter",
         "//software/parameter:dynamic_parameters",
         "//software/proto/logging:proto_logger",
         "//software/sensor_fusion:threaded_sensor_fusion",

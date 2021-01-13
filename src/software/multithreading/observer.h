@@ -20,7 +20,7 @@ class Observer
      *
      * @param val The value to add to the internal buffer
      */
-    virtual void receiveValue(T val) final;
+    virtual void receiveValue(T val);
 
     /**
      * Calculate the data received per second using the internal time buffer
