@@ -1,4 +1,4 @@
-#include "software/ai/evaluation/deflectOffEnemyTarget.h"
+#include "software/ai/evaluation/deflect_off_enemy_target.h"
 
 #include <gtest/gtest.h>
 
