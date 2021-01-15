@@ -430,3 +430,13 @@ cc_library(
         "//software/world",
     ],
 )
+
+cc_library(
+    name = "transition_conditions_test",
+    srcs = ["transition_conditions_test.cpp"],
+    deps = [
+        ":tactic",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
+)
