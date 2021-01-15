@@ -14,5 +14,5 @@ RobotDiagnosticsMainCommandLineArgs:
         type: "std::string"
         default: ""
         description: >-
-            The directory to output logs to. Logs will not be outputted if this argument
-            is not used.
+            The directory to output logs to. Absolute paths are recommended as the working directory
+            is inside the bazel-out directory.
