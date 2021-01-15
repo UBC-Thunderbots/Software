@@ -8,13 +8,13 @@ bool SimulatedTestFixture::enable_visualizer = false;
 
 int main(int argc, char **argv)
 {
-    LoggerSingleton::initializeLogger();
-
     testing::InitGoogleTest(&argc, argv);
 
     // load command line arguments
     auto args = MutableDynamicParameters->getMutableSimulatedTestMainCommandLineArgs();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
+
+    LoggerSingleton::initializeLogger(args->logging_dir()->value());
 
     if (!help_requested)
     {
