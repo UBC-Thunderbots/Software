@@ -43,11 +43,11 @@ int main(int argc, char** argv)
 {
     std::cout << BANNER << std::endl;
 
-    LoggerSingleton::initializeLogger();
-
     // load command line arguments
     auto args = MutableDynamicParameters->getMutableFullSystemMainCommandLineArgs();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
+
+    LoggerSingleton::initializeLogger(args->logging_dir()->value());
 
     if (!help_requested)
     {
