@@ -266,8 +266,8 @@ class SensorFusionTest : public ::testing::Test
         auto ref_msg           = std::make_unique<SSLProto::Referee>();
         auto ref_friendly_team = std::make_unique<SSLProto::Referee_TeamInfo>();
         auto ref_enemy_team    = std::make_unique<SSLProto::Referee_TeamInfo>();
-        ref_friendly_team->set_goalkeeper(1);
-        ref_enemy_team->set_goalkeeper(1);
+        ref_friendly_team->set_goalkeeper(2);
+        ref_enemy_team->set_goalkeeper(2);
         *(ref_msg->mutable_yellow()) = *ref_friendly_team;
         *(ref_msg->mutable_blue())   = *ref_enemy_team;
 
@@ -465,6 +465,33 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
 TEST_F(SensorFusionTest, goalie_id_set_by_referee)
 {
     config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
+    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(false);
+
+    SensorProto sensor_msg;
+
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_goalie_id;
+
+    auto ssl_wrapper_packet =
+            createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    World result = *sensor_fusion.getWorld();
+    sensor_fusion.updateWorld(sensor_msg);
+
+    unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieID().value();
+    unsigned int enemy_goalie_id = result.enemyTeam().getGoalieID().value();
+
+    EXPECT_EQ(2, friendly_goalie_id);
+    EXPECT_EQ(2, enemy_goalie_id);
+}
+
+TEST_F(SensorFusionTest, goalie_id_overridden)
+{
+    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(true);
+    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(true);
+    config->mutableFriendlyGoalieId()->setValue(1);
+    config->mutableEnemyGoalieId()->setValue(3);
 
     SensorProto sensor_msg;
 
@@ -482,12 +509,6 @@ TEST_F(SensorFusionTest, goalie_id_set_by_referee)
     unsigned int enemy_goalie_id = result.enemyTeam().getGoalieID().value();
 
     EXPECT_EQ(1, friendly_goalie_id);
-    EXPECT_EQ(1, enemy_goalie_id);
-}
-
-TEST_F(SensorFusionTest, goalie_id_overridden)
-{
-    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(true);
-
+    EXPECT_EQ(3, enemy_goalie_id);
 }
 

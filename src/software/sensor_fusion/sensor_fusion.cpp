@@ -1,5 +1,4 @@
 #include "software/sensor_fusion/sensor_fusion.h"
-
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
@@ -21,6 +20,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
     }
 }
 
+// changed to 1 for now bc test file teams don't have a robot with id 0
 unsigned int friendly_goalie_id = 1;
 unsigned int enemy_goalie_id = 1;
 
@@ -247,7 +247,7 @@ Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_dete
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
     new_enemy_team.assignGoalie(enemy_goalie_id);
     if (sensor_fusion_config->OverrideGameControllerEnemyGoalieID()->value()) {
-        RobotId enemy_goalie_id_override = sensor_fusion_config->FriendlyGoalieId()->value();
+        RobotId enemy_goalie_id_override = sensor_fusion_config->EnemyGoalieId()->value();
         new_enemy_team.assignGoalie(enemy_goalie_id_override);
     }
     return new_enemy_team;
