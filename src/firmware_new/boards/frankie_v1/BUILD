@@ -27,6 +27,7 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":dma",
+        ":i2c",
         ":frankie_v1_main_lib",
         ":gpio",
         ":lwip",
@@ -200,6 +201,30 @@ cc_library(
 )
 
 cc_library(
+    name = "i2c",
+    srcs = [
+        "i2c.c",
+    ],
+    hdrs = [
+        "i2c.h",
+        "main.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+        "-DSTM32H743xx",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":hal",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
     name = "usart",
     srcs = [
         "usart.c",
@@ -232,6 +257,7 @@ cc_library(
     name = "hal",
     srcs = [
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c",
+"Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_smbus.h",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_crc.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_crc_ex.c",
