@@ -328,10 +328,6 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
     {
         for (int y_offset : {-1, 0, 1})
         {
-            if (i == 0 || i == num_grid_rows || j == 0 || j == num_grid_cols)
-            {
-                continue;
-            }
             next_coord = Coordinate(i + x_offset, j + y_offset);
             // check for clipping obstacles
             if (lineOfSight(current_coord, next_coord))
