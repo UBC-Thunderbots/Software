@@ -59,13 +59,3 @@ cc_test(
     ],
 )
 
-cc_binary(
-    name = "handheld_control",
-    srcs = ["handheld_control_main.cpp"],
-    deps = [
-        ":controller_primitive_generator",
-        ":xbox_360_controller",
-        "//software/backend:radio_backend",
-        "//software/parameter:dynamic_parameters",
-    ],
-)
