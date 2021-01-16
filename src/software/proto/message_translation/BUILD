@@ -101,7 +101,9 @@ cc_library(
     deps = [
         ":ssl_detection",
         ":ssl_geometry",
+        "//software/logger",
         "//software/proto:ssl_cc_proto",
+        "//software/world",
     ],
 )
 
