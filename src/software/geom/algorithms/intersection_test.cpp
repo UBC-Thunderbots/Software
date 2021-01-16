@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/geom/rectangle.h"
+#include "software/test_util/equal_within_tolerance.h"
 
 TEST(SegmentSegmentIntersectionsTest, test_segments_single_point_intersection)
 {
@@ -146,6 +147,60 @@ TEST(RaySegmentIntersectionsTest, test_ray_passes_through_seg_start_and_end)
 
     EXPECT_EQ(intersections[0], segment.getStart());
     EXPECT_EQ(intersections[1], segment.getEnd());
+}
+
+TEST(RaySegmentIntersectionsTest, test_ray_passes_through_vertical_seg_corner_cases)
+{
+    Ray ray1 = Ray(Point(-3.7135717773437502, 0.41596212768554686),
+                   Vector(0.94656302144142834, 0.32251890865447569));
+    Ray ray2 = Ray(Point(-3.6996445312500001, 0.36075723266601561),
+                   Vector(0.8295768506942317, 0.55839255796638299));
+    Segment segment =
+        Segment(Point(-3.3650000000000002, 1.135), Point(-3.3650000000000002, -1.135));
+
+    auto intersections1 = intersection(ray1, segment);
+    ASSERT_TRUE(intersections1.size() == 1);
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(intersections1[0], Point(-3.365, 0.533), 0.01));
+    auto intersections2 = intersection(ray2, segment);
+    ASSERT_TRUE(intersections2.size() == 1);
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(intersections2[0], Point(-3.365, 0.586), 0.01));
+}
+
+TEST(RaySegmentIntersectionsTest, test_ray_passes_through_vertical_seg)
+{
+    Ray ray         = Ray(Point(-3.7, 0.36), Vector(0.8, 0.56));
+    Segment segment = Segment(Point(-3.37, 1.135), Point(-3.37, -1.135));
+
+    auto intersections = intersection(ray, segment);
+    ASSERT_TRUE(intersections.size() == 1);
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(intersections[0], Point(-3.365, 0.586), 0.01));
+}
+
+TEST(RaySegmentIntersectionsTest, test_ray_passes_through_horizontal_seg_corner_cases)
+{
+    Ray ray = Ray(Point(-4.0008916015625005, -0.80003082275390625),
+                  Vector(0.53185959761648338, -0.84683255040369843));
+    Segment segment =
+        Segment(Point(-3.3650000000000002, -1.135), Point(-4.6349999999999998, -1.135));
+
+    auto intersections = intersection(ray, segment);
+    ASSERT_TRUE(intersections.size() == 1);
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(intersections[0], Point(-3.791, -1.135), 0.01));
+}
+
+TEST(RaySegmentIntersectionsTest, test_ray_passes_through_horizontal_seg)
+{
+    Ray ray         = Ray(Point(-4, -0.8), Vector(0.53, -0.85));
+    Segment segment = Segment(Point(-3.37, -1.135), Point(-4.634, -1.135));
+
+    auto intersections = intersection(ray, segment);
+    ASSERT_TRUE(intersections.size() == 1);
+    EXPECT_TRUE(
+        TestUtil::equalWithinTolerance(intersections[0], Point(-3.791, -1.135), 0.01));
 }
 
 TEST(LineLineIntersectionTest, test_intersection)

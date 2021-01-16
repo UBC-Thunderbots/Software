@@ -24,6 +24,17 @@ cc_library(
 )
 
 cc_library(
+    name = "observer_subject_adapter",
+    hdrs = [
+        "observer_subject_adapter.h",
+        "observer_subject_adapter.tpp",
+    ],
+    deps = [
+        ":observer",
+    ],
+)
+
+cc_library(
     name = "thread_safe_buffer",
     hdrs = [
         "thread_safe_buffer.h",
@@ -66,6 +77,17 @@ cc_test(
     name = "subject_test",
     srcs = ["subject_test.cpp"],
     deps = [
+        ":subject",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "observer_subject_adapter_test",
+    srcs = ["observer_subject_adapter_test.cpp"],
+    deps = [
+        ":observer",
+        ":observer_subject_adapter",
         ":subject",
         "@gtest//:gtest_main",
     ],

@@ -34,6 +34,7 @@ Makefile
 .setting/
 
 # VSCode
+.vscode/
 .vscode/.*
 !.vscode/extensions.json
 

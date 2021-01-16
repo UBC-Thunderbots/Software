@@ -44,7 +44,7 @@ void io_network_logger_init(osMessageQueueId_t message_queue_id)
     log_message_queue_id_ = message_queue_id;
 }
 
-void io_network_logger_handle_robot_log(TbotsProto_RobotLog robot_log)
+void io_network_logger_handleRobotLog(TbotsProto_RobotLog robot_log)
 {
     // NOTE: we pass in a ptr to the robot_log on the stack, normally this can be
     // catastrophic, but osMessageQueuePut guarantees that the msg is copied, and

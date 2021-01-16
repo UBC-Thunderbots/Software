@@ -7,6 +7,8 @@ SpinningMoveAction::SpinningMoveAction(bool loop_forever, double close_to_dest_t
 {
 }
 
+void SpinningMoveAction::updateWorldParams(const World& world) {}
+
 void SpinningMoveAction::updateControlParams(const Robot& robot, Point destination,
                                              AngularVelocity angular_velocity,
                                              double final_linear_speed)
@@ -22,11 +24,6 @@ Point SpinningMoveAction::getDestination()
     return destination;
 }
 
-void SpinningMoveAction::accept(MutableActionVisitor& visitor)
-{
-    visitor.visit(*this);
-}
-
 void SpinningMoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // We use a do-while loop so that we return the Intent at least once. If the robot was
@@ -36,7 +33,7 @@ void SpinningMoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // different location
     do
     {
-        yield(std::make_unique<SpinningMoveIntent>(
-            robot->id(), destination, angular_velocity, final_linear_speed, 0));
+        yield(std::make_unique<SpinningMoveIntent>(robot->id(), destination,
+                                                   angular_velocity, final_linear_speed));
     } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }

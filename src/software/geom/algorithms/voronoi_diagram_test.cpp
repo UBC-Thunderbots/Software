@@ -57,9 +57,9 @@ TEST(VoronoiUtilTest, vertices_to_circles_1_vertex_in_diagram)
     std::vector<Circle> empty_circles = vd.voronoiVerticesToOpenCircles(bounding_box);
 
     EXPECT_EQ(1, empty_circles.size());
-    EXPECT_EQ(0, empty_circles[0].getOrigin().x());
-    EXPECT_EQ(-0.25, empty_circles[0].getOrigin().y());
-    EXPECT_EQ(1.25, empty_circles[0].getRadius());
+    EXPECT_EQ(0, empty_circles[0].origin().x());
+    EXPECT_EQ(-0.25, empty_circles[0].origin().y());
+    EXPECT_EQ(1.25, empty_circles[0].radius());
 }
 
 TEST(VoronoiUtilTest, vertices_to_circles_many_vertices_in_circle)
@@ -72,11 +72,11 @@ TEST(VoronoiUtilTest, vertices_to_circles_many_vertices_in_circle)
     std::vector<Circle> empty_circles = vd.voronoiVerticesToOpenCircles(bounding_box);
 
     EXPECT_EQ(2, empty_circles.size());
-    EXPECT_EQ(0, empty_circles[0].getOrigin().x());
-    EXPECT_EQ(-0.25, empty_circles[0].getOrigin().y());
-    EXPECT_EQ(1.25, empty_circles[0].getRadius());
+    EXPECT_EQ(0, empty_circles[0].origin().x());
+    EXPECT_EQ(-0.25, empty_circles[0].origin().y());
+    EXPECT_EQ(1.25, empty_circles[0].radius());
 
-    EXPECT_EQ(0.5, empty_circles[1].getOrigin().x());
-    EXPECT_EQ(0, empty_circles[1].getOrigin().y());
-    EXPECT_NEAR(1.118, empty_circles[1].getRadius(), 0.005);
+    EXPECT_EQ(0.5, empty_circles[1].origin().x());
+    EXPECT_EQ(0, empty_circles[1].origin().y());
+    EXPECT_NEAR(1.118, empty_circles[1].radius(), 0.005);
 }

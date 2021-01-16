@@ -17,12 +17,7 @@ class KickAction : public Action
      */
     explicit KickAction();
 
-    /**
-     * Updates the params that can be derived from the world for this action
-     *
-     * @param ball The ball being kicked
-     */
-    void updateWorldParams(const Ball &ball);
+    void updateWorldParams(const World &world) override;
 
     /**
      * Updates the params that cannot be derived from the world for this action
@@ -68,8 +63,6 @@ class KickAction : public Action
      * @return The speed of the kick this action is trying to perform (in m/s)
      */
     double getKickSpeed();
-
-    void accept(MutableActionVisitor &visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;

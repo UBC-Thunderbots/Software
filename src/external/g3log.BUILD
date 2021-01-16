@@ -43,5 +43,5 @@ cc_library(
         "./include",
         "./src",
     ],
-    visibility = ["@//software/logger:__subpackages__"],
+    visibility = ["//visibility:public"],
 )

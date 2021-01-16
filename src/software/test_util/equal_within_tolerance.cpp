@@ -27,8 +27,8 @@ namespace TestUtil
     ::testing::AssertionResult equalWithinTolerance(const Circle &c1, const Circle &c2,
                                                     double tolerance)
     {
-        if (equalWithinTolerance(c1.getOrigin(), c2.getOrigin(), tolerance) &&
-            equalWithinTolerance(c1.getRadius(), c2.getRadius(), tolerance))
+        if (equalWithinTolerance(c1.origin(), c2.origin(), tolerance) &&
+            equalWithinTolerance(c1.radius(), c2.radius(), tolerance))
         {
             return ::testing::AssertionSuccess();
         }

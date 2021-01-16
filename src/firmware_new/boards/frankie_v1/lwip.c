@@ -77,6 +77,7 @@ void MX_LWIP_Init(void)
     }
 
     /* USER CODE BEGIN 3 */
+
     /* USER CODE END 3 */
 }
 

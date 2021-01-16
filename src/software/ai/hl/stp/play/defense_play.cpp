@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/evaluation/team.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
@@ -14,6 +13,7 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
+#include "software/world/team.h"
 
 bool DefensePlay::isApplicable(const World &world) const
 {
@@ -113,7 +113,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         else
         {
             auto nearest_enemy_robot =
-                nearestRobot(world.enemyTeam(), world.ball().position());
+                world.enemyTeam().getNearestRobot(world.ball().position());
             if (nearest_enemy_robot)
             {
                 Point block_point =
@@ -139,7 +139,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWithBall(
     std::vector<std::shared_ptr<MoveTactic>> move_tactics, const World &world)
 {
-    auto nearest_enemy_robot = nearestRobot(world.enemyTeam(), world.ball().position());
+    auto nearest_enemy_robot = world.enemyTeam().getNearestRobot(world.ball().position());
     if (nearest_enemy_robot)
     {
         Point block_point = nearest_enemy_robot->position() +
