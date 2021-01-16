@@ -27,3 +27,9 @@ FullSystemMainCommandLineArgs:
         description: >-
             The directory to replay logged data from, if the 'replay' backend is selected. This must
             be the `SensorMsg` folder outputted by `proto_log_output_dir`.
+    logging_dir:
+        type: "std::string"
+        default: ""
+        description: >-
+            The directory to output logs to. Absolute paths are recommended as the working directory
+            is inside the bazel-out directory.
