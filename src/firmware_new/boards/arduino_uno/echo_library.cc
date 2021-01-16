@@ -1,7 +1,3 @@
-//
-// Created by amr on 2020-11-21.
-//
-
 
 #ifdef PLATFORMIO_BUILD
 #include "echo_library.h"
