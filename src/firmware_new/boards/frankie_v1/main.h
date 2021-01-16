@@ -59,6 +59,12 @@ extern "C"
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define wheel_motor_back_right_esf_Pin GPIO_PIN_3
+#define wheel_motor_back_right_esf_GPIO_Port GPIOE
+#define wheel_motor_front_right_reset_Pin GPIO_PIN_4
+#define wheel_motor_front_right_reset_GPIO_Port GPIOE
+#define wheel_motor_front_right_coast_Pin GPIO_PIN_5
+#define wheel_motor_front_right_coast_GPIO_Port GPIOE
 #define USER_Btn_Pin GPIO_PIN_13
 #define USER_Btn_GPIO_Port GPIOC
 #define power_monitor_I2C2_SDA_Pin GPIO_PIN_0
