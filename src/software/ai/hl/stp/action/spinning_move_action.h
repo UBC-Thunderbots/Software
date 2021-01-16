@@ -28,6 +28,8 @@ class SpinningMoveAction : public Action
 
     SpinningMoveAction() = delete;
 
+    void updateWorldParams(const World& world) override;
+
     /**
      * Updates the params that cannot be derived from the world for this action
      *
@@ -47,8 +49,6 @@ class SpinningMoveAction : public Action
      * @return The destination this SpinningMoveAction is trying to move to
      */
     Point getDestination();
-
-    void accept(MutableActionVisitor& visitor) override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

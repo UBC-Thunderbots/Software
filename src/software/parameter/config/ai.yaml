@@ -151,14 +151,6 @@ AIConfig:
       description: "Factor for robot obstacle size"
 
   GoalieTacticConfig:
-    BlockConeBuffer:
-        min: 0.0
-        max: 2.0
-        default: 0.0
-        type: "double"
-        description: >-
-          The block cone buffer is the extra distance to add on either side of the robot
-          to allow to it be further back in the block cone
     GoalieFinalSpeed:
         min: 0.0
         max: 3.0

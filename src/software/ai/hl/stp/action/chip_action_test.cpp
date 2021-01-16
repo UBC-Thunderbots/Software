@@ -12,12 +12,14 @@ TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)
 {
     Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
 
     std::shared_ptr<ChipAction> chip_action = std::make_shared<ChipAction>();
-    chip_action->updateControlParams(robot, ball.position(), Angle::fromDegrees(45.0),
-                                     2.0);
+    chip_action->updateControlParams(robot, world.ball().position(),
+                                     Angle::fromDegrees(45.0), 2.0);
 
     ASSERT_NE(chip_action, nullptr);
     EXPECT_EQ(Point(0, 0), chip_action->getChipOrigin());
@@ -29,11 +31,14 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 {
     Robot robot(0, Point(-0.3, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::zero(), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::zero(), 5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -62,11 +67,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
 {
     Robot robot(0, Point(-2.4, 2.3), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-2.5, 2.5}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(105), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(105),
+                               5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -95,11 +104,16 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 {
     Robot robot(0, Point(0, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-0.05, -0.2}, robot.position().toVector(), Timestamp::fromSeconds(0));
+
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, {-0.05, -0.2}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(255), 3.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(255),
+                               3.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -128,11 +142,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
 {
     Robot robot(0, Point(-0.125, 0.25), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(306), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(306),
+                               5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -161,11 +179,14 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
 {
     Robot robot(0, Point(-1, 0.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::zero(), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::zero(), 5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -192,11 +213,16 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
 {
     Robot robot(0, Point(-2, 5), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-2.5, 2.5}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(105), 5.0);
+    action.updateWorldParams(world);
+
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(105),
+                               5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -223,11 +249,15 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
 {
     Robot robot(0, Point(0, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-1, -4}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {-1, -4}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(255), 3.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(255),
+                               3.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -254,11 +284,15 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_negative_
 {
     Robot robot(0, Point(0.5, 1), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(306), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(306),
+                               5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)

@@ -5,6 +5,8 @@
 // because intent.h includes intent_visitor.h, and each individual library includes
 // intent.h. Note: every subclass of this visitor must include all of the classes listed
 // below
+class AutochipMoveIntent;
+class AutokickMoveIntent;
 class MoveIntent;
 class DirectPrimitiveIntent;
 
@@ -27,7 +29,9 @@ class IntentVisitor
      *
      * @param intent The Intent to visit
      */
-    virtual void visit(const MoveIntent &intent) = 0;
+    virtual void visit(const MoveIntent &intent)         = 0;
+    virtual void visit(const AutochipMoveIntent &intent) = 0;
+    virtual void visit(const AutokickMoveIntent &intent) = 0;
 
     /**
      * Visits an DirectPrimitiveIntent to perform an operation.

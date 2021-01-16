@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * The ShootGoalTactic will make the assigned robot shoot on the enemy net
@@ -25,11 +26,14 @@ class ShootGoalTactic : public Tactic
      * not provided, the point defaults to the enemy goal
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
+     * @param shoot_goal_tactic_config The config to fetch parameters from
      */
-    explicit ShootGoalTactic(const Field& field, const Team& friendly_team,
-                             const Team& enemy_team, const Ball& ball,
-                             Angle min_net_open_angle, std::optional<Point> chip_target,
-                             bool loop_forever);
+    explicit ShootGoalTactic(
+        const Field& field, const Team& friendly_team, const Team& enemy_team,
+        const Ball& ball, Angle min_net_open_angle, std::optional<Point> chip_target,
+        bool loop_forever,
+        std::shared_ptr<const ShootGoalTacticConfig> shoot_goal_tactic_config =
+            DynamicParameters->getAIConfig()->getShootGoalTacticConfig());
 
     ShootGoalTactic() = delete;
 
@@ -117,4 +121,6 @@ class ShootGoalTactic : public Tactic
     // The distance between the robot's kicker and the ball while tracking the ball
     // waiting for a shot
     const double TRACK_BALL_DIST = 0.05;
+
+    std::shared_ptr<const ShootGoalTacticConfig> shoot_goal_tactic_config;
 };

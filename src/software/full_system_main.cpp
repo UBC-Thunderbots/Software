@@ -3,14 +3,16 @@
 #include <iostream>
 #include <numeric>
 
-#include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
+#include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
+#include "software/multithreading/observer_subject_adapter.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/logging/proto_logger.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -41,11 +43,11 @@ int main(int argc, char** argv)
 {
     std::cout << BANNER << std::endl;
 
-    LoggerSingleton::initializeLogger();
-
     // load command line arguments
     auto args = MutableDynamicParameters->getMutableFullSystemMainCommandLineArgs();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
+
+    LoggerSingleton::initializeLogger(args->logging_dir()->value());
 
     if (!help_requested)
     {
@@ -76,7 +78,7 @@ int main(int argc, char** argv)
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend>::create(args->backend()->value());
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(sensor_fusion_config);
-        auto ai            = std::make_shared<AIWrapper>(ai_config, ai_control_config);
+        auto ai            = std::make_shared<ThreadedAI>(ai_config, ai_control_config);
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers
@@ -116,6 +118,14 @@ int main(int argc, char** argv)
                     proto_log_output_dir / "PrimitiveSet");
             backend->Subject<SensorProto>::registerObserver(sensor_msg_logger);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(primitive_set_logger);
+            // log filtered vision
+            auto vision_logger = std::make_shared<ProtoLogger<TbotsProto::Vision>>(
+                proto_log_output_dir / "Vision");
+            auto world_to_vision_adapter =
+                std::make_shared<ObserverSubjectAdapter<World, TbotsProto::Vision>>(
+                    [](const World& world) { return *createVision(world); });
+            sensor_fusion->registerObserver(world_to_vision_adapter);
+            world_to_vision_adapter->registerObserver(vision_logger);
         }
 
         // Wait for termination

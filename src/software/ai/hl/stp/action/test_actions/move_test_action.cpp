@@ -1,6 +1,5 @@
 #include "software/ai/hl/stp/action/test_actions/move_test_action.h"
 
-#include "software/ai/hl/stp/action/mutable_action_visitor.h"
 #include "software/ai/intent/move_intent.h"
 
 MoveTestAction::MoveTestAction(double close_to_dest_threshold, bool loop_forever)
@@ -23,16 +22,9 @@ void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // different location
     do
     {
-        yield(std::make_unique<MoveIntent>(
-            robot->id(), destination, Angle::zero(), 0.0, 0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutochickType::NONE, BallCollisionType::AVOID));
+        yield(std::make_unique<MoveIntent>(robot->id(), destination, Angle::zero(), 0.0,
+                                           DribblerMode::OFF, BallCollisionType::AVOID));
     } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }
 
-void MoveTestAction::accept(MutableActionVisitor& visitor)
-{
-    // We don't call "visitor.visit" here because this class is just intended
-    // for testing and shouldn't be part of the visitor
-    throw std::logic_error(
-        "accept(MutableActionVisitor) is not implemented for MoveTestAction!");
-}
+void MoveTestAction::updateWorldParams(const World& world) {}

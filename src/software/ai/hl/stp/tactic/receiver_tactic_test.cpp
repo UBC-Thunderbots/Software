@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/autokick_move_action.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 
@@ -37,8 +37,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
     EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
     EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
               move_action->getFinalOrientation());
-    EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
+    EXPECT_EQ(DribblerMode::OFF, move_action->getDribblerMode());
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
@@ -81,8 +80,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
         EXPECT_DOUBLE_EQ(0.0, move_action->getDestination().y());
         EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
                   move_action->getFinalOrientation());
-        EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
-        EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
+        EXPECT_EQ(DribblerMode::OFF, move_action->getDribblerMode());
     }
 }
 
@@ -110,23 +108,24 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
 
     // We should be trying to move into a position to properly deflect the ball into
     // the net with a kick
-    auto move_action = std::dynamic_pointer_cast<MoveAction>(tactic.getNextAction());
-    ASSERT_NE(move_action, nullptr);
+    auto autokick_move_action =
+        std::dynamic_pointer_cast<AutokickMoveAction>(tactic.getNextAction());
+    ASSERT_NE(autokick_move_action, nullptr);
 
-    ASSERT_TRUE(move_action->getRobot().has_value());
-    EXPECT_EQ(13, move_action->getRobot()->id());
+    ASSERT_TRUE(autokick_move_action->getRobot().has_value());
+    EXPECT_EQ(13, autokick_move_action->getRobot()->id());
 
-    EXPECT_LT(move_action->getDestination().x(), -0.001);
-    EXPECT_GT(move_action->getDestination().x(), -0.2);
+    EXPECT_LT(autokick_move_action->getDestination().x(), -0.001);
+    EXPECT_GT(autokick_move_action->getDestination().x(), -0.2);
 
-    EXPECT_GT(move_action->getDestination().y(), 0.001);
-    EXPECT_LT(move_action->getDestination().y(), 0.1);
+    EXPECT_GT(autokick_move_action->getDestination().y(), 0.001);
+    EXPECT_LT(autokick_move_action->getDestination().y(), 0.1);
 
-    EXPECT_LT(move_action->getFinalOrientation().toDegrees(), -1);
-    EXPECT_GT(move_action->getFinalOrientation().toDegrees(), -90);
+    EXPECT_LT(autokick_move_action->getFinalOrientation().toDegrees(), -1);
+    EXPECT_GT(autokick_move_action->getFinalOrientation().toDegrees(), -90);
 
-    EXPECT_EQ(DribblerEnable::OFF, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutochickType(), AutochickType::AUTOKICK);
+    EXPECT_EQ(DribblerMode::OFF, autokick_move_action->getDribblerMode());
+    EXPECT_EQ(autokick_move_action->getKickSpeed(), BALL_MAX_SPEED_METERS_PER_SECOND - 1);
 }
 
 TEST(ReceiverTacticTest,
@@ -163,8 +162,7 @@ TEST(ReceiverTacticTest,
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
+    EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerMode());
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
@@ -208,8 +206,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_action->getFinalOrientation());
 
-    EXPECT_EQ(DribblerEnable::ON, move_action->getDribblerEnabled());
-    EXPECT_EQ(move_action->getAutochickType(), AutochickType::NONE);
+    EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerMode());
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)

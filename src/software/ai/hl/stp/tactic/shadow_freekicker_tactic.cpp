@@ -76,8 +76,7 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
 
         move_action->updateControlParams(
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
-            0, DribblerEnable::OFF, MoveType::NORMAL, AutochickType::NONE,
-            BallCollisionType::AVOID);
+            0, DribblerMode::OFF, BallCollisionType::AVOID);
         yield(move_action);
     } while (true);
 }

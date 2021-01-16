@@ -119,5 +119,4 @@ message MovePositionParams
 {
     Point destination                   = 1;
     float final_speed_meters_per_second = 2;
-    bool slow                           = 3;
 }

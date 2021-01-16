@@ -12,11 +12,15 @@ TEST(KickActionTest, getKickDirection)
 {
     Robot robot(0, Point(-1, -2), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-1, 2}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {-1, 2}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::quarter(), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::quarter(), 5.0);
 
     EXPECT_EQ(Angle::quarter(), action.getKickDirection());
 }
@@ -25,10 +29,14 @@ TEST(KickActionTest, getKickOrigin)
 {
     Robot robot(0, Point(-1, -2), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-1, 2}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {-1, 2}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
+    action.updateWorldParams(world);
     action.updateControlParams(robot, Point(10, -11), Angle::quarter(), 5.0);
 
     EXPECT_EQ(Point(10, -11), action.getKickOrigin());
@@ -38,10 +46,14 @@ TEST(KickActionTest, getKickSpeed)
 {
     Robot robot(0, Point(-1, -2), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-1, 2}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {-1, 2}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
+    action.updateWorldParams(world);
     action.updateControlParams(robot, Point(10, -11), Angle::quarter(), 5.0);
 
     EXPECT_EQ(5.0, action.getKickSpeed());
@@ -51,11 +63,15 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
 {
     Robot robot(0, Point(-0.3, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::zero(), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::zero(), 5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -84,11 +100,16 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_positive_y)
 {
     Robot robot(0, Point(-2.4, 2.3), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-2.5, 2.5}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(105), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(105),
+                               5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -117,11 +138,16 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_negative_y)
 {
     Robot robot(0, Point(0, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-0.05, -0.2}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, {-0.05, -0.2}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(255), 3.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(255),
+                               3.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -150,11 +176,16 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_negative_y)
 {
     Robot robot(0, Point(-0.125, 0.25), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(306), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(306),
+                               5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -183,11 +214,15 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_positive_y
 {
     Robot robot(0, Point(-1, 0.0), Vector(), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::zero(), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::zero(), 5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -214,11 +249,16 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_positive_y
 {
     Robot robot(0, Point(-2, 5), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-2.5, 2.5}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, {-2.5, 2.5}, Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(105), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(105),
+                               5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -245,11 +285,16 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_negative_y
 {
     Robot robot(0, Point(0, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
-    Ball ball({-1, -4}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {-1, -4}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(255), 3.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(255),
+                               3.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -276,11 +321,16 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_negative_y
 {
     Robot robot(0, Point(0.5, 1), Vector(), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, {0, 0}, Timestamp::fromSeconds(0));
+    world       = ::TestUtil::setBallVelocity(world, robot.position().toVector(),
+                                        Timestamp::fromSeconds(0));
+
     KickAction action = KickAction();
 
-    action.updateWorldParams(ball);
-    action.updateControlParams(robot, ball.position(), Angle::fromDegrees(306), 5.0);
+    action.updateWorldParams(world);
+    action.updateControlParams(robot, world.ball().position(), Angle::fromDegrees(306),
+                               5.0);
     auto intent_ptr = action.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)

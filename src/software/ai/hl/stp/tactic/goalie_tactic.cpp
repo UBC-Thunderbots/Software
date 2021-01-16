@@ -2,9 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/chip_action.h"
-#include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
@@ -13,15 +10,16 @@
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
-#include "software/parameter/dynamic_parameters.h"
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
-                           const Team &friendly_team, const Team &enemy_team)
+                           const Team &friendly_team, const Team &enemy_team,
+                           std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
     : Tactic(true, {RobotCapability::Move}),
       ball(ball),
       field(field),
       friendly_team(friendly_team),
-      enemy_team(enemy_team)
+      enemy_team(enemy_team),
+      goalie_tactic_config(goalie_tactic_config)
 {
 }
 
@@ -125,9 +123,9 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
 
 void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>(true);
-    auto chip_action = std::make_shared<ChipAction>();
-    auto stop_action = std::make_shared<StopAction>(false);
+    auto autochip_move_action = std::make_shared<AutochipMoveAction>(true);
+    auto chip_action          = std::make_shared<ChipAction>();
+    auto stop_action          = std::make_shared<StopAction>(false);
 
     do
     {
@@ -152,153 +150,160 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         //
         std::shared_ptr<Action> next_action;
 
-        // compute intersection points from ball position and velocity
-        Ray ball_ray = Ray(ball.position(), ball.velocity());
+        auto intersections = getIntersectionsBetweenBallVelocityAndFullGoalSegment();
 
-        // Create a segment along the goal line, slightly shortened to account for the
-        // robot radius so as we move along the segment we don't try to run into the goal
-        // posts. This will be used in case 3 as a fallback when we don't have an
-        // intersection with the crease lines
-        const Point neg_goal_line_inflated =
-            field.friendlyGoalpostNeg() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
-        const Point pos_goal_line_inflated =
-            field.friendlyGoalpostPos() + Vector(0, ROBOT_MAX_RADIUS_METERS);
-        Segment full_goal_segment =
-            Segment(neg_goal_line_inflated, pos_goal_line_inflated);
-
-        std::vector<Point> intersections = intersection(ball_ray, full_goal_segment);
-
-        // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
-        auto ball_speed_panic = DynamicParameters->getAIConfig()
-                                    ->getGoalieTacticConfig()
-                                    ->BallSpeedPanic()
-                                    ->value();
-        // what should the final goalie speed be, so that the goalie accelerates faster
-        auto goalie_final_speed = DynamicParameters->getAIConfig()
-                                      ->getGoalieTacticConfig()
-                                      ->GoalieFinalSpeed()
-                                      ->value();
-        // how far in should the goalie wedge itself into the block cone, to block balls
-        auto block_cone_radius = DynamicParameters->getAIConfig()
-                                     ->getGoalieTacticConfig()
-                                     ->BlockConeRadius()
-                                     ->value();
-        // by how much should the defense area be decreased so the goalie stays close
-        // towards the net
-        auto defense_area_deflation = DynamicParameters->getAIConfig()
-                                          ->getGoalieTacticConfig()
-                                          ->DefenseAreaDeflation()
-                                          ->value();
-
-        // if the ball is in the don't chip rectangle we do not chip the ball
-        // as we risk bumping the ball into our own net trying to move behind
-        // the ball
-        auto dont_chip_rectangle = Rectangle(
-            field.friendlyGoalpostNeg(),
-            field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
+        auto ball_speed_panic = goalie_tactic_config->BallSpeedPanic()->value();
 
         // case 1: goalie should panic and stop the ball, its moving too fast towards the
         // net
         if (!intersections.empty() && ball.velocity().length() > ball_speed_panic)
         {
-            // the ball is heading towards the net, move to intercept the shot
-            // the final speed is a dynamic parameter so that if the goalie needs
-            // to dive for the shot instead of stop when reaching the intersection
-            // point it can do so.
-            Point goalie_pos         = closestPoint((*robot).position(),
-                                            Segment(ball.position(), intersections[0]));
-            Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
-
-            move_action->updateControlParams(
-                *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
-            next_action = move_action;
+            next_action = panicAndStopBall(autochip_move_action, intersections[0]);
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
         else if (ball.velocity().length() <= ball_speed_panic &&
                  field.pointInFriendlyDefenseArea(ball.position()))
         {
-            // if the ball is slow but its not safe to chip it out, don't.
-            // TODO finesse the ball out of the goal using the dribbler.
-            // for now we just stop https://github.com/UBC-Thunderbots/Software/issues/744
-            if (contains(dont_chip_rectangle, ball.position()) == true)
-            {
-                stop_action->updateControlParams(*robot, false);
-                next_action = stop_action;
-            }
-            // if the ball is slow or stationary inside our defense area, and is safe
-            // to do so, chip it out
-            else
-            {
-                chip_action->updateControlParams(
-                    *robot, ball.position(),
-                    (ball.position() - field.friendlyGoalCenter()).orientation(), 2);
-                next_action = chip_action;
-            }
+            next_action = chipBallIfSafe(chip_action, stop_action);
         }
         // case 3: ball does not have a clear velocity vector towards the goal, so
         // position goalie in best position to block shot
         else
         {
-            // compute angle between two vectors, negative goal post to ball and positive
-            // goal post to ball
-            Angle block_cone_angle =
-                (ball.position() - field.friendlyGoalpostNeg())
-                    .orientation()
-                    .minDiff(
-                        (ball.position() - field.friendlyGoalpostPos()).orientation());
-
-            // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
-            // either side
-            Point goalie_pos = calculateBlockCone(
-                field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
-                block_cone_radius * block_cone_angle.toRadians());
-
-            // we want to restrict the block cone to the friendly crease, also potentially
-            // scaled by a defense_area_deflation_parameter
-            Rectangle deflated_defense_area = field.friendlyDefenseArea();
-            deflated_defense_area.inflate(-defense_area_deflation);
-
-            // restrain the goalie in the deflated defense area, if the goalie cannot be
-            // restrained or if there is no proper intersection, then we safely default to
-            // center of the goal
-            auto clamped_goalie_pos =
-                restrainGoalieInRectangle(goalie_pos, deflated_defense_area);
-
-            // if the goalie could not be restrained in the deflated defense area,
-            // then the ball must be either on a really sharp angle to the net where
-            // its impossible to get a shot, or the ball is behind the net, in which
-            // case we snap to either post
-            if (!clamped_goalie_pos)
-            {
-                if (ball.position().y() > 0)
-                {
-                    goalie_pos =
-                        field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
-                }
-                else
-                {
-                    goalie_pos =
-                        field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
-                }
-            }
-            else
-            {
-                goalie_pos = *clamped_goalie_pos;
-            }
-            Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
-
-            move_action->updateControlParams(*robot, goalie_pos, goalie_orientation,
-                                             goalie_final_speed, DribblerEnable::OFF,
-                                             MoveType::NORMAL, AutochickType::AUTOCHIP,
-                                             BallCollisionType::ALLOW);
-            next_action = move_action;
+            next_action = positionToBlockShot(autochip_move_action);
         }
 
         yield(next_action);
-    } while (!move_action->done());
+    } while (!autochip_move_action->done());
+}
+
+std::vector<Point> GoalieTactic::getIntersectionsBetweenBallVelocityAndFullGoalSegment()
+{
+    // compute intersection points from ball position and velocity
+    Ray ball_ray = Ray(ball.position(), ball.velocity());
+
+    // Create a segment along the goal line, slightly shortened to account for the
+    // robot radius so as we move along the segment we don't try to run into the goal
+    // posts. This will be used in case 3 as a fallback when we don't have an
+    // intersection with the crease lines
+    Segment full_goal_segment =
+        Segment(field.friendlyGoalpostNeg() + Vector(0, -ROBOT_MAX_RADIUS_METERS),
+                field.friendlyGoalpostPos() + Vector(0, ROBOT_MAX_RADIUS_METERS));
+
+    return intersection(ball_ray, full_goal_segment);
+}
+
+std::shared_ptr<Action> GoalieTactic::panicAndStopBall(
+    std::shared_ptr<AutochipMoveAction> autochip_move_action,
+    const Point &stop_ball_point)
+{
+    // the ball is heading towards the net, move to intercept the shot
+    // the final speed is a dynamic parameter so that if the goalie needs
+    // to dive for the shot instead of stop when reaching the intersection
+    // point it can do so.
+    Point goalie_pos =
+        closestPoint((*robot).position(), Segment(ball.position(), stop_ball_point));
+    Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
+
+    autochip_move_action->updateControlParams(
+        *robot, goalie_pos, goalie_orientation, 0.0, DribblerMode::OFF,
+        YEET_CHIP_DISTANCE_METERS, BallCollisionType::ALLOW);
+    return autochip_move_action;
+}
+
+std::shared_ptr<Action> GoalieTactic::chipBallIfSafe(
+    std::shared_ptr<ChipAction> chip_action, std::shared_ptr<StopAction> stop_action)
+{
+    // if the ball is in the "don't chip rectangle" we do not chip the ball
+    // as we risk bumping the ball into our own net trying to move behind
+    // the ball
+    auto dont_chip_rectangle =
+        Rectangle(field.friendlyGoalpostNeg(),
+                  field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
+
+    // if the ball is slow but its not safe to chip it out, don't.
+    // TODO (#744) finesse the ball out of the goal using the dribbler.
+    // for now we just stop
+    if (contains(dont_chip_rectangle, ball.position()) == true)
+    {
+        stop_action->updateControlParams(*robot, false);
+        return stop_action;
+    }
+    // if the ball is slow or stationary inside our defense area, and is safe
+    // to do so, chip it out
+    else
+    {
+        chip_action->updateControlParams(
+            *robot, ball.position(),
+            (ball.position() - field.friendlyGoalCenter()).orientation(), 2);
+        return chip_action;
+    }
+}
+
+std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
+    std::shared_ptr<AutochipMoveAction> autochip_move_action)
+{
+    // compute angle between two vectors, negative goal post to ball and positive
+    // goal post to ball
+    Angle block_cone_angle =
+        (ball.position() - field.friendlyGoalpostNeg())
+            .orientation()
+            .minDiff((ball.position() - field.friendlyGoalpostPos()).orientation());
+
+    // how far in should the goalie wedge itself into the block cone, to block
+    // balls
+    auto block_cone_radius = goalie_tactic_config->BlockConeRadius()->value();
+    // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
+    // either side
+    Point goalie_pos = calculateBlockCone(
+        field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
+        block_cone_radius * block_cone_angle.toRadians());
+
+    // by how much should the defense area be decreased so the goalie stays close
+    // towards the net
+    auto defense_area_deflation = goalie_tactic_config->DefenseAreaDeflation()->value();
+    // we want to restrict the block cone to the friendly crease, also potentially
+    // scaled by a defense_area_deflation_parameter
+    Rectangle deflated_defense_area = field.friendlyDefenseArea();
+    deflated_defense_area.inflate(-defense_area_deflation);
+
+    // restrain the goalie in the deflated defense area, if the goalie cannot be
+    // restrained or if there is no proper intersection, then we safely default to
+    // center of the goal
+    auto clamped_goalie_pos =
+        restrainGoalieInRectangle(goalie_pos, deflated_defense_area);
+
+    // if the goalie could not be restrained in the deflated defense area,
+    // then the ball must be either on a really sharp angle to the net where
+    // its impossible to get a shot, or the ball is behind the net, in which
+    // case we snap to either post
+    if (!clamped_goalie_pos)
+    {
+        if (ball.position().y() > 0)
+        {
+            goalie_pos =
+                field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
+        }
+        else
+        {
+            goalie_pos = field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
+        }
+    }
+    else
+    {
+        goalie_pos = *clamped_goalie_pos;
+    }
+    Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
+
+    // what should the final goalie speed be, so that the goalie accelerates
+    // faster
+    auto goalie_final_speed = goalie_tactic_config->GoalieFinalSpeed()->value();
+    autochip_move_action->updateControlParams(
+        *robot, goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
+        YEET_CHIP_DISTANCE_METERS, BallCollisionType::ALLOW);
+    return autochip_move_action;
 }
 
 void GoalieTactic::accept(TacticVisitor &visitor) const

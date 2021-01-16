@@ -67,8 +67,7 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
     World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<ChipIntent>(0, Point(), Angle::quarter(), 0, 1));
+    intents.emplace_back(std::make_unique<ChipIntent>(0, Point(), Angle::quarter(), 0));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
@@ -85,8 +84,7 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
     World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<KickIntent>(0, Point(), Angle::quarter(), 0, 1));
+    intents.emplace_back(std::make_unique<KickIntent>(0, Point(), Angle::quarter(), 0));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
@@ -104,15 +102,15 @@ TEST_F(ThetaStarNavigatorTest, convert_spinning_move_intent_to_spinning_move_pri
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
-        std::make_unique<SpinningMoveIntent>(0, Point(), AngularVelocity::full(), 1, 0));
+        std::make_unique<SpinningMoveIntent>(0, Point(), AngularVelocity::full(), 1));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive =
-        *createSpinningMovePrimitive(Point(), 1, false, AngularVelocity::full(), 0);
+    auto expected_primitive = *createSpinningMovePrimitive(
+        Point(), 1, AngularVelocity::full(), DribblerMode::OFF);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -122,7 +120,7 @@ TEST_F(ThetaStarNavigatorTest, convert_stop_intent_to_stop_primitive)
     World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
+    intents.emplace_back(std::make_unique<StopIntent>(0, false));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
@@ -139,8 +137,8 @@ TEST_F(ThetaStarNavigatorTest, convert_multiple_intents_to_primitives)
     World world = ::TestUtil::createBlankTestingWorld();
 
     std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
-    intents.emplace_back(std::make_unique<StopIntent>(1, false, 1));
+    intents.emplace_back(std::make_unique<StopIntent>(0, false));
+    intents.emplace_back(std::make_unique<StopIntent>(1, false));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
@@ -201,8 +199,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(
-        0, poi, Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE, BallCollisionType::AVOID));
+        0, poi, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
@@ -210,8 +207,7 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
     auto expected_primitive =
-        *createLegacyMovePrimitive(poi, Angle::zero(), 0, DribblerEnable::OFF,
-                                   MoveType::NORMAL, AutochickType::NONE);
+        *createMovePrimitive(poi, 0, Angle::zero(), DribblerMode::OFF);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -241,8 +237,7 @@ TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(
-        0, Point(), Angle::zero(), 0, 0, DribblerEnable::OFF, MoveType::NORMAL,
-        AutochickType::NONE, BallCollisionType::AVOID));
+        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
