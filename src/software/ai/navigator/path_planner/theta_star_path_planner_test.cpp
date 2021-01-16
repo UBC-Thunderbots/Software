@@ -306,13 +306,13 @@ TEST_F(TestThetaStarPathPlanner, no_navigable_area)
 }
 
 TEST_F(TestThetaStarPathPlanner,
-       test_theta_star_path_planner_navigable_area_not_centred_at_origin) {
+       test_theta_star_path_planner_navigable_area_not_centred_at_origin)
+{
     Point start{0.5, 0.5}, dest{2.5, 2.5};
 
     std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
 
-    Rectangle navigable_area{{0.0, 0.0},
-                             {3.0, 3.0}};
+    Rectangle navigable_area{{0.0, 0.0}, {3.0, 3.0}};
 
     auto path = planner->findPath(start, dest, navigable_area, obstacles);
 

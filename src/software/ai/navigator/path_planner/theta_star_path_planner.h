@@ -90,6 +90,11 @@ class ThetaStarPathPlanner : public PathPlanner
             return coord.row() + coord.col() * (1 << 16);
         }
 
+        // Each point on the field is discretized and fit into a 2d grid on the navigable
+        // area. row_ is number of the cell that the coordinate is located in the x
+        // direction. col_ is the number of the cell that the coordinate is in the y
+        // direction. internal_comparison_key_ is uniquely assigned to each cell in the
+        // grid for the purpose of comparison
         unsigned int row_;
         unsigned int col_;
         unsigned int internal_comparison_key_;

@@ -167,13 +167,13 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     const Point &start, const Point &end, const Rectangle &navigable_area,
     const std::vector<ObstaclePtr> &obstacles)
 {
-    bool navigable_area_contain_start =
+    bool navigable_area_contains_start =
         (start.x() >= navigable_area.xMin()) && (start.x() <= navigable_area.xMax()) &&
         (start.y() >= navigable_area.yMin()) && (start.y() <= navigable_area.yMax());
-    bool navigable_area_contain_end =
+    bool navigable_area_contains_end =
         (end.x() >= navigable_area.xMin()) && (end.x() <= navigable_area.xMax()) &&
         (end.y() >= navigable_area.yMin()) && (end.y() <= navigable_area.yMax());
-    if (!navigable_area_contain_start || !navigable_area_contain_end)
+    if (!navigable_area_contains_start || !navigable_area_contains_end)
     {
         return std::nullopt;
     }
