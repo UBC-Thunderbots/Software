@@ -24,7 +24,6 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
 std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
     const World& world, bool friendly_team_colour_yellow)
 {
-    auto start_time = std::chrono::high_resolution_clock::now();
     constexpr auto robot_to_robotstate_with_id_fn = [](const Robot& robot) {
         return RobotStateWithId{.id = robot.id(), .robot_state = robot.currentState()};
     };

@@ -112,6 +112,7 @@ cc_test(
     srcs = ["ssl_wrapper_test.cpp"],
     deps = [
         ":ssl_wrapper",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
