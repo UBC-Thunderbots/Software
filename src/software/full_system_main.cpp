@@ -124,7 +124,9 @@ int main(int argc, char** argv)
                 bool friendly_colour_yellow = DynamicParameters->getSensorFusionConfig()
                                                   ->FriendlyColorYellow()
                                                   ->value();
-                return *createSSLWrapperPacket(world, friendly_colour_yellow);
+                auto friendly_team_colour =
+                    friendly_colour_yellow ? TeamColour::YELLOW : TeamColour::BLUE;
+                return *createSSLWrapperPacket(world, friendly_team_colour);
             };
 
             auto vision_logger =

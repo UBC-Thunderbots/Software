@@ -57,13 +57,13 @@ TEST(SSLWrapperTest, test_create_wrapper_with_world_friendly_yellow)
                       AngularVelocity::quarter(), Timestamp());
     std::vector<Robot> blue_robots = {blue_robot1, blue_robot2, blue_robot3};
 
-    bool friendly_robots_are_yellow = true;
+    TeamColour friendly_team_colour = TeamColour::YELLOW;
 
     World world = TestUtil::createBlankTestingWorld();
     world.updateFriendlyTeamState(Team(yellow_robots));
     world.updateEnemyTeamState(Team(blue_robots));
 
-    auto wrapper_packet_ptr = createSSLWrapperPacket(world, friendly_robots_are_yellow);
+    auto wrapper_packet_ptr = createSSLWrapperPacket(world, friendly_team_colour);
 
     EXPECT_EQ(2, wrapper_packet_ptr->detection().robots_yellow_size());
     EXPECT_EQ(3, wrapper_packet_ptr->detection().robots_blue_size());
@@ -85,13 +85,13 @@ TEST(SSLWrapperTest, test_create_wrapper_with_world_friendly_not_yellow)
                       AngularVelocity::quarter(), Timestamp());
     std::vector<Robot> blue_robots = {blue_robot1, blue_robot2, blue_robot3};
 
-    bool friendly_robots_are_yellow = false;
+    TeamColour friendly_team_colour = TeamColour::BLUE;
 
     World world = TestUtil::createBlankTestingWorld();
     world.updateFriendlyTeamState(Team(blue_robots));
     world.updateEnemyTeamState(Team(yellow_robots));
 
-    auto wrapper_packet_ptr = createSSLWrapperPacket(world, friendly_robots_are_yellow);
+    auto wrapper_packet_ptr = createSSLWrapperPacket(world, friendly_team_colour);
 
     EXPECT_EQ(2, wrapper_packet_ptr->detection().robots_yellow_size());
     EXPECT_EQ(3, wrapper_packet_ptr->detection().robots_blue_size());

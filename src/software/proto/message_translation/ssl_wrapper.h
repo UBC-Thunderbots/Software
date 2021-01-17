@@ -30,4 +30,4 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
  * @return A WrapperPacket containing the given data.
  */
 std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
-    const World& world, bool friendly_team_colour_yellow);
+    const World& world, TeamColour friendly_team_colour);

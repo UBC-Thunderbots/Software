@@ -22,7 +22,7 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
     return std::move(wrapper_packet);
 }
 std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
-    const World& world, bool friendly_team_colour_yellow)
+    const World& world, TeamColour friendly_team_colour)
 {
     constexpr auto robot_to_robotstate_with_id_fn = [](const Robot& robot) {
         return RobotStateWithId{.id = robot.id(), .robot_state = robot.currentState()};
@@ -41,11 +41,13 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
         world.enemyTeam().getAllRobots().begin(), world.enemyTeam().getAllRobots().end(),
         std::back_inserter(enemy_robot_states), robot_to_robotstate_with_id_fn);
 
-    const auto& yellow_robot_states =
-        friendly_team_colour_yellow ? friendly_robot_states : enemy_robot_states;
+    const auto& yellow_robot_states = friendly_team_colour == TeamColour::YELLOW
+                                          ? friendly_robot_states
+                                          : enemy_robot_states;
 
-    const auto& blue_robot_states =
-        !friendly_team_colour_yellow ? friendly_robot_states : enemy_robot_states;
+    const auto& blue_robot_states = friendly_team_colour == TeamColour::BLUE
+                                        ? friendly_robot_states
+                                        : enemy_robot_states;
 
     auto ssl_detectionframe = createSSLDetectionFrame(
         std::numeric_limits<uint32_t>::max(), world.getMostRecentTimestamp(),
