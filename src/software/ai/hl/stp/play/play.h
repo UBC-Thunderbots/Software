@@ -149,17 +149,6 @@ class Play
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
 
-    /**
-     * Helper function that copies a vector of std::shared_ptr<Tactic> to a vector of
-     * std::shared_ptr<const Tactic>
-     *
-     * @param tactics The tactics to copy over
-     *
-     * @return the vector that has std::shared_ptr<const Tactic>
-     */
-    static std::vector<std::shared_ptr<const Tactic>> copyConstTactics(
-        std::vector<std::shared_ptr<Tactic>> tactics);
-
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;
 
