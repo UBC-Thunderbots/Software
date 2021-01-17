@@ -35,6 +35,7 @@ py_binary(
         requirement("notebook"),
         requirement("numpy"),
         requirement("matplotlib"),
+        requirement("bokeh"),
         ":proto_log",
         ":sensor_proto_log",
         "//shared/proto:tbots_py_proto",
