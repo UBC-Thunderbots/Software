@@ -8,13 +8,13 @@ AIControlConfig:
         the last commands they were given. DO NOT USE in place of the e-stop.
   OverrideAIPlay:
     type: "bool"
-    default: false
+    default: true
     description: >-
         Overrides the current play with the play
         specified by currentPlay parameter
   CurrentAIPlay:
     type: "std::string"
-    default: "Example Play"
+    default: "Halt Play"
     options:
         - "Example Play"
         - "Stop Play"
@@ -32,19 +32,19 @@ AIControlConfig:
         Specifies the ai play that should be in use
   OverrideRefereeCommand:
     type: "bool"
-    default: false
+    default: true
     description: >-
         Overrides the current referee command with the play 
         specified by CurrentRefereeCommand and PreviousRefereeCommand
         parameter
   CurrentRefereeCommand:
     type: "std::string"
-    default: "Halt"
+    default: "HALT"
     description: >-
         Specifies the referee command that should be in use
   PreviousRefereeCommand:
     type: "std::string"
-    default: "Halt"
+    default: "HALT"
     description: >-
         Specifies the previous referee command to correctly set up 
         the referee command state machine when overriding the referee command.

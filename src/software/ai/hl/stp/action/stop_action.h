@@ -26,16 +26,9 @@ class StopAction : public Action
 
     StopAction() = delete;
 
-    /**
-     * Updates the params that cannot be derived from the world for this action
-     *
-     * @param robot the robot that should stop
-     * @param coast Whether or not to coast to a stop. If this is false, the robot will
-     * try actively brake to come to a stop
-     */
-    void updateControlParams(const Robot& robot, bool coast);
+    void updateWorldParams(const World& world) override;
 
-    void accept(MutableActionVisitor& visitor) override;
+    void updateControlParams(const Robot& robot, bool coast);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

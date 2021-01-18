@@ -17,7 +17,10 @@ SimulatedTestFixture::SimulatedTestFixture()
 
 void SimulatedTestFixture::SetUp()
 {
-    LoggerSingleton::initializeLogger();
+    LoggerSingleton::initializeLogger(
+        DynamicParameters->getStandaloneSimulatorMainCommandLineArgs()
+            ->logging_dir()
+            ->value());
 
     // init() resets all DynamicParameters for each test. Since DynamicParameters are
     // still partially global, we need to reinitialize simulator, sensor_fusion, and ai,
@@ -46,11 +49,12 @@ void SimulatedTestFixture::SetUp()
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideGameControllerFriendlyTeamColor()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
         ->setValue(true);
+    if (SimulatedTestFixture::enable_visualizer)
+    {
+        enableVisualizer();
+    }
 }
 
 void SimulatedTestFixture::setBallState(const BallState &ball)
@@ -142,7 +146,7 @@ void SimulatedTestFixture::updateSensorFusion()
     auto sensor_msg                        = SensorProto();
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
 }
 
 void SimulatedTestFixture::sleep(
@@ -198,6 +202,10 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {
+        if (!DynamicParameters->getAIControlConfig()->RunAI()->value())
+        {
+            continue;
+        }
         auto wall_start_time = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {

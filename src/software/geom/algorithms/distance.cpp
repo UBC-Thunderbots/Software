@@ -57,8 +57,7 @@ double distance(const Polygon &first, const Point &second)
 
 double distance(const Point &first, const Circle &second)
 {
-    double distance_from_edge =
-        (distance(first, second.getOrigin()) - second.getRadius());
+    double distance_from_edge = (distance(first, second.origin()) - second.radius());
     return distance_from_edge > 0 ? distance_from_edge : 0;
 }
 

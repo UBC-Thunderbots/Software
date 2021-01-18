@@ -24,4 +24,4 @@ void io_network_logger_init(osMessageQueueId_t log_message_queue_id);
  *
  * @param robot_log The log msg to send
  */
-void io_network_logger_handle_robot_log(TbotsProto_RobotLog robot_log);
+void io_network_logger_handleRobotLog(TbotsProto_RobotLog robot_log);

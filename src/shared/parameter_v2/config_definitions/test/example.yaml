@@ -40,7 +40,7 @@ include:
     name: example_bool_param
     value: true
     constant: true
-    description: >
+    description: >-
       Can be true or false
 - int:
     name: example_int_param
@@ -48,7 +48,7 @@ include:
     max: 5
     value: 3
     constant: true
-    description: >
+    description: >-
       Can be any integer value in the range [min, max]
 - uint:
     name: example_unsigned_int_param
@@ -56,7 +56,7 @@ include:
     max: 5
     value: 3
     constant: true
-    description: >
+    description: >-
       Can be any integer value in the range [min, max].
       The minimum value must be >= 0
 - float:
@@ -65,7 +65,7 @@ include:
     max: 9.01
     value: 4.04
     constant: true
-    description: >
+    description: >-
       Can be any value in the range [min, max]
 
       For C code, this will be generated as a float.
@@ -74,13 +74,13 @@ include:
     name: example_string_param
     value: "Hello World"
     constant: true
-    description: >
+    description: >-
       Any string value
 - enum:
     name: example_enum_param
     enum: RefereeCommand
     value: HALT
-    description: >
+    description: >-
       Accepts enum values from the specified enum. For example if there was an enum defined as
 
       enum TeamColour {
@@ -106,7 +106,7 @@ include:
     index_type: std::string
     type_to_create: Play
     value: "HaltPlay"
-    description: >
+    description: >-
       Accepts all registered IndexType values for the GenericFactory<index_type, type_to_create>.
 
       For example, if there was a GenericFactory<std::string, Play> with 3 entries registered
@@ -119,16 +119,17 @@ include:
 # The following are example of special attributes that can be applied to any parameter
 #########################################################################################
 # Make a parameter value optional (CPP only)
-- bool:
-    name: example_optional_parameter
-    value: false
-    optional: true
-    description: >
-      Optional parameters will generate with std::optional as their value return type.
-      They can accept std::nullopt as a value. If optional is not specified, it is
-      assumed to be false.
-
-      Will only generate for CPP code.
+# TODO: add support for optional parameter (issue #1889)
+#- bool:
+#    name: example_optional_parameter
+#    value: false
+#    optional: true
+#    description: >-
+#      Optional parameters will generate with std::optional as their value return type.
+#      They can accept std::nullopt as a value. If optional is not specified, it is
+#      assumed to be false.
+#
+#      Will only generate for CPP code.
 # Make a parameter a constant value
 - int:
     name: example_const_parameter
@@ -136,7 +137,7 @@ include:
     max: 255
     value: 50
     constant: true
-    description: >
+    description: >-
       Parameters with the constant attribute do not generate with an API to change their values.
       They are constant. If constant is not specified, it is assumed to be false.
 

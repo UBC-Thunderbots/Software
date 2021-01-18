@@ -39,7 +39,7 @@ std::optional<World> SensorFusion::getWorld() const
     }
 }
 
-void SensorFusion::updateWorld(const SensorProto &sensor_msg)
+void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {
@@ -63,6 +63,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 
     if (packet.has_detection())
     {
+        checkForVisionReset(packet.detection().t_capture());
         updateWorld(packet.detection());
     }
 }
@@ -132,7 +133,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    // TODO (issue #1149): incorporate RobotStatus into world and update world
+    // TODO (#1819): Update robot capabilities based on robot status msgs
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
@@ -290,4 +291,42 @@ bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
         }
     }
     return false;
+}
+
+void SensorFusion::checkForVisionReset(double t_capture)
+{
+    static unsigned int reset_time_vision_packets_detected = 0;
+    static double last_t_capture                           = 0;
+
+    if (t_capture < last_t_capture && t_capture < VISION_PACKET_RESET_TIME_THRESHOLD)
+    {
+        reset_time_vision_packets_detected++;
+    }
+    else
+    {
+        reset_time_vision_packets_detected = 0;
+        last_t_capture                     = t_capture;
+    }
+
+    if (reset_time_vision_packets_detected > VISION_PACKET_RESET_COUNT_THRESHOLD)
+    {
+        LOG(WARNING) << "Vision reset detected... Resetting SensorFusion!" << std::endl;
+        resetWorldComponents();
+        last_t_capture                     = 0;
+        reset_time_vision_packets_detected = 0;
+    }
+}
+
+void SensorFusion::resetWorldComponents()
+{
+    field                = std::nullopt;
+    ball                 = std::nullopt;
+    friendly_team        = Team();
+    enemy_team           = Team();
+    game_state           = GameState();
+    referee_stage        = std::nullopt;
+    ball_filter          = BallFilter();
+    friendly_team_filter = RobotTeamFilter();
+    enemy_team_filter    = RobotTeamFilter();
+    team_with_possession = TeamSide::ENEMY;
 }

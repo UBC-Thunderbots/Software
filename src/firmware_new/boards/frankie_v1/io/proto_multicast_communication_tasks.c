@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
+#include "firmware_new/boards/frankie_v1/io/ublox_odinw262_communicator.h"
 #include "lwip.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
@@ -13,6 +14,7 @@
 #include "lwip/sys.h"
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
+#include "main.h"
 #include "pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
@@ -129,7 +131,6 @@ void io_proto_multicast_listener_task(void* communication_profile)
                                                                       RECEIVE_TIMEOUT);
                 break;
             }
-
             case ERR_OK:
             {
                 pb_istream_t in_stream = pb_istream_from_buffer(

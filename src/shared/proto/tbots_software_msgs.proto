@@ -5,7 +5,7 @@ package TbotsProto;
 import "shared/proto/vision.proto";
 import "shared/proto/primitive.proto";
 import "shared/proto/tbots_timestamp_msg.proto";
-import "nanopb/options.proto";
+import "generator/nanopb/options.proto";
 
 message Vision
 {

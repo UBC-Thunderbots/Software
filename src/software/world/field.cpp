@@ -1,6 +1,7 @@
 #include "software/world/field.h"
 
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/distance.h"
 
 Field Field::createSSLDivisionBField()
 {
@@ -245,6 +246,30 @@ bool Field::pointInFriendlyDefenseArea(const Point &p) const
 bool Field::pointInEnemyDefenseArea(const Point &p) const
 {
     return contains(enemyDefenseArea(), p);
+}
+
+bool Field::pointInFriendlyHalf(const Point &p) const
+{
+    return p.x() < centerPoint().x();
+}
+
+bool Field::pointInEnemyHalf(const Point &p) const
+{
+    return p.x() >= centerPoint().x();
+}
+
+bool Field::pointInFriendlyCorner(const Point &p, double radius) const
+{
+    return ((distance(p, friendlyCornerPos()) < radius) ||
+            (distance(p, friendlyCornerNeg()) < radius)) &&
+           contains(fieldLines(), p);
+}
+
+bool Field::pointInEnemyCorner(const Point &p, double radius) const
+{
+    return ((distance(p, enemyCornerPos()) < radius) ||
+            (distance(p, enemyCornerNeg()) < radius)) &&
+           contains(fieldLines(), p);
 }
 
 bool Field::operator==(const Field &other) const
