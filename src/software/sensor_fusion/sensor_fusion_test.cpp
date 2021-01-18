@@ -292,7 +292,6 @@ class SensorFusionTest : public ::testing::Test
 
         return ref_msg;
     }
-
 };
 
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
@@ -490,7 +489,7 @@ TEST_F(SensorFusionTest, goalie_id_set_by_referee)
     *(sensor_msg.mutable_ssl_referee_msg()) = *referee_goalie_id;
 
     auto ssl_wrapper_packet =
-            createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
@@ -498,7 +497,7 @@ TEST_F(SensorFusionTest, goalie_id_set_by_referee)
     World result = *sensor_fusion.getWorld();
 
     unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieID().value();
-    unsigned int enemy_goalie_id = result.enemyTeam().getGoalieID().value();
+    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieID().value();
 
     EXPECT_EQ(2, friendly_goalie_id);
     EXPECT_EQ(2, enemy_goalie_id);
@@ -516,7 +515,7 @@ TEST_F(SensorFusionTest, goalie_id_overridden)
     *(sensor_msg.mutable_ssl_referee_msg()) = *referee_goalie_id;
 
     auto ssl_wrapper_packet =
-            createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     // set vision msg so that world is valid
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
@@ -524,7 +523,7 @@ TEST_F(SensorFusionTest, goalie_id_overridden)
     World result = *sensor_fusion.getWorld();
 
     unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieID().value();
-    unsigned int enemy_goalie_id = result.enemyTeam().getGoalieID().value();
+    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieID().value();
 
     EXPECT_EQ(1, friendly_goalie_id);
     EXPECT_EQ(3, enemy_goalie_id);

@@ -1,4 +1,5 @@
 #include "software/sensor_fusion/sensor_fusion.h"
+
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
@@ -40,7 +41,7 @@ std::optional<World> SensorFusion::getWorld() const
 }
 
 unsigned int friendly_goalie_id = 1;
-unsigned int enemy_goalie_id = 1;
+unsigned int enemy_goalie_id    = 1;
 
 void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 {
@@ -59,12 +60,15 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
     friendly_team.assignGoalie(friendly_goalie_id);
     enemy_team.assignGoalie(enemy_goalie_id);
 
-    if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value()) {
-        RobotId friendly_goalie_id_override = sensor_fusion_config->FriendlyGoalieId()->value();
+    if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value())
+    {
+        RobotId friendly_goalie_id_override =
+            sensor_fusion_config->FriendlyGoalieId()->value();
         friendly_team.assignGoalie(friendly_goalie_id_override);
     }
 
-    if (sensor_fusion_config->OverrideGameControllerEnemyGoalieID()->value()) {
+    if (sensor_fusion_config->OverrideGameControllerEnemyGoalieID()->value())
+    {
         RobotId enemy_goalie_id_override = sensor_fusion_config->EnemyGoalieId()->value();
         enemy_team.assignGoalie(enemy_goalie_id_override);
     }
@@ -103,13 +107,13 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
         friendly_goalie_id = packet.yellow().goalkeeper();
-        enemy_goalie_id = packet.blue().goalkeeper();
+        enemy_goalie_id    = packet.blue().goalkeeper();
     }
     else
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
         friendly_goalie_id = packet.blue().goalkeeper();
-        enemy_goalie_id = packet.yellow().goalkeeper();
+        enemy_goalie_id    = packet.yellow().goalkeeper();
     }
 
     if (game_state.isOurBallPlacement())
@@ -248,8 +252,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
-    Team new_enemy_team =
-            enemy_team_filter.getFilteredData(enemy_team, robot_detections);
+    Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
     return new_enemy_team;
 }
 
