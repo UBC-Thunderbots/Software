@@ -39,6 +39,9 @@ std::optional<World> SensorFusion::getWorld() const
     }
 }
 
+unsigned int friendly_goalie_id = 1;
+unsigned int enemy_goalie_id = 1;
+
 void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
@@ -52,6 +55,19 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
     }
 
     updateWorld(sensor_msg.robot_status_msgs());
+
+    friendly_team.assignGoalie(friendly_goalie_id);
+    enemy_team.assignGoalie(enemy_goalie_id);
+
+    if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value()) {
+        RobotId friendly_goalie_id_override = sensor_fusion_config->FriendlyGoalieId()->value();
+        friendly_team.assignGoalie(friendly_goalie_id_override);
+    }
+
+    if (sensor_fusion_config->OverrideGameControllerEnemyGoalieID()->value()) {
+        RobotId enemy_goalie_id_override = sensor_fusion_config->EnemyGoalieId()->value();
+        enemy_team.assignGoalie(enemy_goalie_id_override);
+    }
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
@@ -78,9 +94,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
             << "and the createFieldFromPacketGeometry may be parsing using the wrong proto format";
     }
 }
-
-unsigned int friendly_goalie_id = 1;
-unsigned int enemy_goalie_id = 1;
 
 void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
@@ -115,19 +128,6 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     }
 
     referee_stage = createRefereeStage(packet);
-
-    friendly_team.assignGoalie(friendly_goalie_id);
-    enemy_team.assignGoalie(enemy_goalie_id);
-
-    if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value()) {
-        RobotId friendly_goalie_id_override = sensor_fusion_config->FriendlyGoalieId()->value();
-        friendly_team.assignGoalie(friendly_goalie_id_override);
-    }
-
-    if (sensor_fusion_config->OverrideGameControllerEnemyGoalieID()->value()) {
-        RobotId enemy_goalie_id_override = sensor_fusion_config->EnemyGoalieId()->value();
-        enemy_team.assignGoalie(enemy_goalie_id_override);
-    }
 }
 
 void SensorFusion::updateWorld(
