@@ -476,8 +476,8 @@ TEST_F(SensorFusionTest, goalie_id_set_by_referee)
     // set vision msg so that world is valid
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    World result = *sensor_fusion.getWorld();
     sensor_fusion.updateWorld(sensor_msg);
+    World result = *sensor_fusion.getWorld();
 
     unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieID().value();
     unsigned int enemy_goalie_id = result.enemyTeam().getGoalieID().value();
@@ -502,8 +502,8 @@ TEST_F(SensorFusionTest, goalie_id_overridden)
     // set vision msg so that world is valid
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    World result = *sensor_fusion.getWorld();
     sensor_fusion.updateWorld(sensor_msg);
+    World result = *sensor_fusion.getWorld();
 
     unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieID().value();
     unsigned int enemy_goalie_id = result.enemyTeam().getGoalieID().value();

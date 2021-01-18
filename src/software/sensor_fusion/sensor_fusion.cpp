@@ -20,10 +20,6 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
     }
 }
 
-// changed to 1 for now bc test file teams don't have a robot with id 0
-unsigned int friendly_goalie_id = 1;
-unsigned int enemy_goalie_id = 1;
-
 std::optional<World> SensorFusion::getWorld() const
 {
     if (field && ball)
@@ -82,6 +78,10 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
     }
 }
 
+// changed to 1 for now bc test file teams don't have a robot with id 0
+unsigned int friendly_goalie_id = 1;
+unsigned int enemy_goalie_id = 1;
+
 void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
     // TODO remove DynamicParameters as part of
@@ -97,6 +97,18 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
         friendly_goalie_id = packet.blue().goalkeeper();
         enemy_goalie_id = packet.yellow().goalkeeper();
+    }
+    friendly_team.assignGoalie(friendly_goalie_id);
+    enemy_team.assignGoalie(enemy_goalie_id);
+
+    if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value()) {
+        RobotId friendly_goalie_id_override = sensor_fusion_config->FriendlyGoalieId()->value();
+        friendly_team.assignGoalie(friendly_goalie_id_override);
+    }
+
+    if (sensor_fusion_config->OverrideGameControllerEnemyGoalieID()->value()) {
+        RobotId enemy_goalie_id_override = sensor_fusion_config->EnemyGoalieId()->value();
+        enemy_team.assignGoalie(enemy_goalie_id_override);
     }
 
     if (game_state.isOurBallPlacement())
