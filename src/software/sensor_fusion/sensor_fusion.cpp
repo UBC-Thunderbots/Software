@@ -79,7 +79,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
     }
 }
 
-// changed to 1 for now bc test file teams don't have a robot with id 0
 unsigned int friendly_goalie_id = 1;
 unsigned int enemy_goalie_id = 1;
 

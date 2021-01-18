@@ -480,7 +480,6 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
     EXPECT_EQ(std::nullopt, returned_point);
 }
 
-// my stuff
 TEST_F(SensorFusionTest, goalie_id_set_by_referee)
 {
     config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
