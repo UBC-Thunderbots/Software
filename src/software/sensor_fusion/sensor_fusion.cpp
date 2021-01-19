@@ -15,6 +15,9 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY)
 {
+    friendly_team.assignGoalie(0);
+    enemy_team.assignGoalie(0);
+
     if (!sensor_fusion_config)
     {
         throw std::invalid_argument("SensorFusion created with null SensorFusionConfig");
@@ -40,9 +43,6 @@ std::optional<World> SensorFusion::getWorld() const
     }
 }
 
-unsigned int friendly_goalie_id = 1;
-unsigned int enemy_goalie_id    = 1;
-
 void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
@@ -56,9 +56,6 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
     }
 
     updateWorld(sensor_msg.robot_status_msgs());
-
-    friendly_team.assignGoalie(friendly_goalie_id);
-    enemy_team.assignGoalie(enemy_goalie_id);
 
     if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value())
     {
@@ -106,14 +103,14 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
-        friendly_goalie_id = packet.yellow().goalkeeper();
-        enemy_goalie_id    = packet.blue().goalkeeper();
+        friendly_team.assignGoalie(packet.yellow().goalkeeper());
+        enemy_team.assignGoalie(packet.blue().goalkeeper());
     }
     else
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
-        friendly_goalie_id = packet.blue().goalkeeper();
-        enemy_goalie_id    = packet.yellow().goalkeeper();
+        friendly_team.assignGoalie(packet.blue().goalkeeper());
+        enemy_team.assignGoalie(packet.yellow().goalkeeper());
     }
 
     if (game_state.isOurBallPlacement())
