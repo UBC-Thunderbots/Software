@@ -41,6 +41,7 @@ qt_cc_library(
     src = "dribbler.cpp",
     hdr = "dribbler.h",
     deps = [
+        "//shared:constants",
         "//software/gui/generic_widgets/slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",
@@ -65,6 +66,7 @@ qt_cc_library(
     hdr = "sensor_status.h",
     deps = [
         ":decimal_progress_bar",
+        "//shared:constants",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",
