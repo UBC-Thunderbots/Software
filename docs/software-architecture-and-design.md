@@ -10,7 +10,7 @@
     * [Robot](#robot)
     * [Ball](#ball)
     * [Field](#field)
-    * [GameState](#game_state)
+    * [GameState](#gamestate)
   * [Intents](#intents)
   * [Dynamic Parameters](#dynamic-parameters)
 * [Important Protobuf Messages](#important-protobuf-messages)
