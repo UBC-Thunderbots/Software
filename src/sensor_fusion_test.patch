@@ -1,0 +1,26 @@
+diff --git a/src/software/sensor_fusion/sensor_fusion_test.cpp b/src/software/sensor_fusion/sensor_fusion_test.cpp
+index d2921c28..ae7ad8fc 100644
+--- a/src/software/sensor_fusion/sensor_fusion_test.cpp
++++ b/src/software/sensor_fusion/sensor_fusion_test.cpp
+@@ -531,6 +531,10 @@ TEST_F(SensorFusionTest, goalie_id_overridden)
+ 
+ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
+ {
++    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
++    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(false);
++    config->mutableFriendlyGoalieId()->setValue(0);
++    config->mutableEnemyGoalieId()->setValue(0);
+     SensorProto sensor_msg;
+     SensorProto sensor_msg_0;
+     auto ssl_wrapper_packet =
+@@ -561,6 +565,10 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
+ 
+ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
+ {
++    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
++    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(false);
++    config->mutableFriendlyGoalieId()->setValue(0);
++    config->mutableEnemyGoalieId()->setValue(0);
+     SensorProto sensor_msg;
+     auto ssl_wrapper_packet =
+         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
