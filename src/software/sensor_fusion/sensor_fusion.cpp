@@ -13,11 +13,10 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
-      team_with_possession(TeamSide::ENEMY)
+      team_with_possession(TeamSide::ENEMY),
+      friendly_goalie_id(0),
+      enemy_goalie_id(0)
 {
-    friendly_team.assignGoalie(0);
-    enemy_team.assignGoalie(0);
-
     if (!sensor_fusion_config)
     {
         throw std::invalid_argument("SensorFusion created with null SensorFusionConfig");
