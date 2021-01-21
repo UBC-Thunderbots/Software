@@ -106,13 +106,13 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
         friendly_goalie_id = packet.yellow().goalkeeper();
-        enemy_goalie_id = packet.blue().goalkeeper();
+        enemy_goalie_id    = packet.blue().goalkeeper();
     }
     else
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
         friendly_goalie_id = packet.blue().goalkeeper();
-        enemy_goalie_id = packet.yellow().goalkeeper();
+        enemy_goalie_id    = packet.yellow().goalkeeper();
     }
 
     if (game_state.isOurBallPlacement())
