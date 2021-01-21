@@ -56,6 +56,9 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 
     updateWorld(sensor_msg.robot_status_msgs());
 
+    friendly_team.assignGoalie(friendly_goalie_id);
+    enemy_team.assignGoalie(enemy_goalie_id);
+
     if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value())
     {
         RobotId friendly_goalie_id_override =
@@ -102,14 +105,14 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
-        friendly_team.assignGoalie(packet.yellow().goalkeeper());
-        enemy_team.assignGoalie(packet.blue().goalkeeper());
+        friendly_goalie_id = packet.yellow().goalkeeper();
+        enemy_goalie_id = packet.blue().goalkeeper();
     }
     else
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
-        friendly_team.assignGoalie(packet.blue().goalkeeper());
-        enemy_team.assignGoalie(packet.yellow().goalkeeper());
+        friendly_goalie_id = packet.blue().goalkeeper();
+        enemy_goalie_id = packet.yellow().goalkeeper();
     }
 
     if (game_state.isOurBallPlacement())
