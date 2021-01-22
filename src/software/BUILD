@@ -14,6 +14,7 @@ cc_binary(
         "//software/multithreading:observer_subject_adapter",
         "//software/parameter:dynamic_parameters",
         "//software/proto/logging:proto_logger",
+        "//software/proto/message_translation:ssl_wrapper",
         "//software/sensor_fusion:threaded_sensor_fusion",
         "//software/util/design_patterns:generic_factory",
         "@boost//:program_options",
