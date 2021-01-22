@@ -28,6 +28,8 @@ echo "================================================================"
 
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
+# Required to make sure we install protobuf version 3.0.0 or greater
+sudo add-apt-repository ppa:maarten-fonville/protobuf -y
 
 sudo apt-get update
 
@@ -44,6 +46,7 @@ host_software_packages=(
     libprotobuf-dev
     libudev-dev
     libusb-1.0-0-dev
+    protobuf-compiler
     protobuf-compiler # This is required for the "NanoPb" library, which does not
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
@@ -70,7 +73,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(clang)
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
-    sudo apt-get -y install gcc-7 g++-7
+    sudo apt -y install gcc-7 g++-7
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
     
@@ -102,11 +105,11 @@ echo "Installing Bazel"
 echo "================================================================"
 
 # Adapted from https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu
-sudo apt-get install curl gnupg
+sudo apt install curl gnupg
 curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-sudo apt-get update
-if ! sudo apt-get install bazel -y ; then
+sudo apt update
+if ! sudo apt install bazel -y ; then
     echo "##############################################################"
     echo "Error: Installing Bazel failed"
     echo "##############################################################"
