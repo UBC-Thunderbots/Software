@@ -65,6 +65,6 @@ class ShadowFreekickerTactic : public Tactic
     Field field;
 
     const double FREE_KICK_MAX_PROXIMITY =
-        0.50 * 1.05;  // Robots cannot be closer than 50cm from the ball during a free_kick
-                      // (with a buffer factor)
+        0.50 * 1.05;  // Robots cannot be closer than 50cm from the ball during a
+                      // free_kick (with a buffer factor)
 };

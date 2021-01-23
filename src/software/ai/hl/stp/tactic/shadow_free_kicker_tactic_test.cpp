@@ -1,8 +1,7 @@
-#include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
-
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
+#include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/line.h"
