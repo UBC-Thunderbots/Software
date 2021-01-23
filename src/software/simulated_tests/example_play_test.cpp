@@ -29,8 +29,10 @@ TEST_F(ExamplePlayTest, test_example_play)
                     Point ball_position = world_ptr->ball().position();
                     for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
                     {
-                        // Skips the robot assigned as goalie by default in the sensor_fusion constructor
-                        if (robot.id() == 0) {
+                        // Skips the robot assigned as goalie by default in the
+                        // sensor_fusion constructor
+                        if (robot.id() == 0)
+                        {
                             continue;
                         }
                         double abs_error =
