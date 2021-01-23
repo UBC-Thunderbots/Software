@@ -10,7 +10,6 @@
 #include "software/world/robot_state.h"
 #include "software/world/team_types.h"
 
-
 /**
  * A custom version of the DrawFunctionVisualizer widget that allows the user to
  * interact with the simulation, such as clicking to place the ball
