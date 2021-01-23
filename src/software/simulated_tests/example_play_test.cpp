@@ -18,10 +18,8 @@ TEST_F(ExamplePlayTest, test_example_play)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1), Point(-1, -3), Point(2, 0),
          Point(3.5, 3)}));
-    // Set the goalie ID to that of a non-existent robot so that all robots
-    // take on non-goalie roles
-    setFriendlyGoalie(99);
     setAIPlay(TYPENAME(ExamplePlay));
+
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::HALT);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -31,6 +29,10 @@ TEST_F(ExamplePlayTest, test_example_play)
                     Point ball_position = world_ptr->ball().position();
                     for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
                     {
+                        // Skips the robot assigned as goalie by default in the sensor_fusion constructor
+                        if (robot.id() == 0) {
+                            continue;
+                        }
                         double abs_error =
                             std::fabs((robot.position() - ball_position).length() - 1.0);
                         if (abs_error > 0.05)
