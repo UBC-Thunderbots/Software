@@ -401,6 +401,7 @@ cc_library(
         "//software/ai/hl/stp/action",
         "//software/ai/intent",
         "//software/ai/intent:stop_intent",
+        "//software/util/typename",
         "//software/world",
         "@sml",
     ],

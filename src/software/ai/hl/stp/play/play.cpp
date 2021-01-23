@@ -40,8 +40,8 @@ std::vector<std::shared_ptr<Tactic>> Play::getTactics(const World &world)
 }
 
 std::vector<std::unique_ptr<Intent>> Play::get(
-    RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm,
-    MotionConstraintCalculator motion_constraint_builder, const World &new_world)
+    RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
+    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
     auto tactics = getTactics(new_world);

@@ -8,11 +8,11 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/world/world.h"
 
-using RobotToTacticAssignmentAlgorithm =
+using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
         const std::vector<std::shared_ptr<const Tactic>>&, const World&)>;
 
-using MotionConstraintCalculator =
+using MotionConstraintBuildFunction =
     std::function<std::set<MotionConstraint>(const Tactic& tactic)>;
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
@@ -94,8 +94,8 @@ class Play
      * @return the vector of intents to execute
      */
     std::vector<std::unique_ptr<Intent>> get(
-        RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm,
-        MotionConstraintCalculator motion_constraint_builder, const World& new_world);
+        RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
+        MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
 
     virtual ~Play() = default;
 

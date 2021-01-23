@@ -6,9 +6,9 @@ TEST(TransitionConditionTest, test_move_robot_done)
 {
     Robot robot = Robot(0, Point(2, 3), Vector(), Angle::quarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    EXPECT_TRUE(moveRobotDone(robot, Point(2, 3), Angle::quarter()));
-    EXPECT_FALSE(moveRobotDone(robot, Point(2, 2), Angle::quarter()));
-    EXPECT_FALSE(moveRobotDone(robot, Point(2, 3), Angle::threeQuarter()));
+    EXPECT_TRUE(robotReachedDestination(robot, Point(2, 3), Angle::quarter()));
+    EXPECT_FALSE(robotReachedDestination(robot, Point(2, 2), Angle::quarter()));
+    EXPECT_FALSE(robotReachedDestination(robot, Point(2, 3), Angle::threeQuarter()));
 }
 
 TEST(TransitionConditionTest, test_robot_stopped)

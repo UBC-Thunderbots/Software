@@ -6,11 +6,13 @@
 
 struct MoveFSM
 {
+    /* state structs */
     struct Move
-    { /* state */
+    {
     };
 
-    struct Controls
+    /* update structs */
+    struct ControlParams
     {
         // The point the robot is trying to move to
         Point destination;
@@ -22,7 +24,7 @@ struct MoveFSM
 
     struct Update
     {
-        Controls controls;
+        ControlParams control_params;
         TacticUpdate common;
     };
 
@@ -32,17 +34,19 @@ struct MoveFSM
 
         const auto update_move_intent = [](auto event) {
             event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), event.controls.destination,
-                event.controls.final_orientation, event.controls.final_speed,
+                event.common.robot.id(), event.control_params.destination,
+                event.control_params.final_orientation, event.control_params.final_speed,
                 DribblerMode::OFF, BallCollisionType::AVOID));
         };
 
         const auto movement_done = [](auto event) {
-            return moveRobotDone(event.common.robot, event.controls.destination,
-                                 event.controls.final_orientation);
+            return robotReachedDestination(event.common.robot,
+                                           event.control_params.destination,
+                                           event.control_params.final_orientation);
         };
 
         return make_transition_table(
+            // src_state + event [guard] / action = dest state
             *"idle"_s + event<Update> / update_move_intent = state<Move>,
             state<Move> + event<Update>[!movement_done] / update_move_intent =
                 state<Move>,
@@ -101,5 +105,5 @@ class MoveTactic : public Tactic
 
     boost::sml::sm<MoveFSM> fsm;
 
-    MoveFSM::Controls controls;
+    MoveFSM::ControlParams control_params;
 };
