@@ -95,7 +95,7 @@ TEST(PenaltyKickTacticTest, enemy_goalie_offset_right_no_viable_shot)
 TEST(PenaltyKickTacticTest, enemy_goalie_right_viable_shot_left)
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    world       = ::TestUtil::setBallPosition(world, world.field().penaltyEnemy(),
+    world       = ::TestUtil::setBallPosition(world, Point(4, 0),
                                         Timestamp::fromSeconds(0));
     world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
@@ -125,10 +125,10 @@ TEST(PenaltyKickTacticTest, enemy_goalie_right_viable_shot_left)
     EXPECT_TRUE(tactic.evaluatePenaltyShot());
 }
 
-TEST(PenaltyKickPlayTest, enemy_goalie_left_viable_shot_right)
+TEST(PenaltyKickTacticTest, enemy_goalie_left_viable_shot_right)
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    world       = ::TestUtil::setBallPosition(world, world.field().penaltyEnemy(),
+    world       = ::TestUtil::setBallPosition(world, Point(4, 0),
                                         Timestamp::fromSeconds(0));
     world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
@@ -158,7 +158,7 @@ TEST(PenaltyKickPlayTest, enemy_goalie_left_viable_shot_right)
     EXPECT_TRUE(tactic.evaluatePenaltyShot());
 }
 
-TEST(PenaltyKickPlayTest, no_enemy_goalie_shot_position)
+TEST(PenaltyKickTacticTest, no_enemy_goalie_shot_position)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     world       = ::TestUtil::setBallPosition(world, world.field().penaltyEnemy(),
@@ -168,5 +168,43 @@ TEST(PenaltyKickPlayTest, no_enemy_goalie_shot_position)
     PenaltyKickTactic tactic =
         PenaltyKickTactic(world.ball(), world.field(), std::nullopt, false);
 
-    EXPECT_EQ(tactic.evaluateNextPosition(), world.field().enemyGoalCenter());
+    EXPECT_EQ(tactic.evaluateNextShotPosition(), world.field().enemyGoalCenter());
+}
+
+TEST(PenaltyKickTacticTest, enemy_goalie_left_shot_right)
+{
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, world.field().penaltyEnemy(),
+                                        Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+
+    Point enemy_goalie_pos = Point(world.field().enemyGoalCenter().x(), 0.2);
+    Robot enemy_goalie = Robot(0, enemy_goalie_pos, Vector(0, 0), Angle::half(),
+                               AngularVelocity::zero(),
+							   Timestamp::fromSeconds(0));
+    PenaltyKickTactic tactic = PenaltyKickTactic(
+        world.ball(), world.field(), std::optional<Robot>{enemy_goalie}, false);
+
+	Point shot_position = tactic.evaluateNextShotPosition();
+    EXPECT_LE(shot_position.y(), 0);
+	EXPECT_EQ(shot_position.x(), world.field().enemyGoalCenter().x());
+}
+
+TEST(PenaltyKickTacticTest, enemy_goalie_right_shot_left)
+{
+    World world = ::TestUtil::createBlankTestingWorld();
+    world       = ::TestUtil::setBallPosition(world, world.field().penaltyEnemy(),
+                                        Timestamp::fromSeconds(0));
+    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
+
+    Point enemy_goalie_pos = Point(world.field().enemyGoalCenter().x(), -0.2);
+    Robot enemy_goalie = Robot(0, enemy_goalie_pos, Vector(0, 0), Angle::half(),
+                               AngularVelocity::zero(),
+							   Timestamp::fromSeconds(0));
+    PenaltyKickTactic tactic = PenaltyKickTactic(
+        world.ball(), world.field(), std::optional<Robot>{enemy_goalie}, false);
+
+	Point shot_position = tactic.evaluateNextShotPosition();
+    EXPECT_GE(shot_position.y(), 0);
+	EXPECT_EQ(shot_position.x(), world.field().enemyGoalCenter().x());
 }

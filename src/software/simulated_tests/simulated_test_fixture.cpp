@@ -48,10 +48,14 @@ void SimulatedTestFixture::SetUp()
     MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
         ->setValue(true);
+	
     if (SimulatedTestFixture::enable_visualizer)
     {
         enableVisualizer();
     }
+
+	MutableDynamicParameters->getMutableSensorFusionConfig->
+		mutableOverrideRefereeCommand()->registerCallbackFunction([]() overrideRefereeCommand);
 }
 
 void SimulatedTestFixture::setBallState(const BallState &ball)
@@ -144,7 +148,7 @@ void SimulatedTestFixture::updateSensorFusion()
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
     sensor_fusion.processSensorProto(sensor_msg);
-    sensor_fusion.overrideRefereeCommand();
+    //sensor_fusion.overrideRefereeCommand();
 }
 
 void SimulatedTestFixture::sleep(
@@ -169,6 +173,8 @@ void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
+	
+	
     updateSensorFusion();
     std::shared_ptr<World> world;
     if (auto world_opt = sensor_fusion.getWorld())

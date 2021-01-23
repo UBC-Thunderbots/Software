@@ -47,19 +47,21 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Point behind_ball = world.ball().position() + behind_ball_direction.normalize(
                                                           DIST_TO_FRONT_OF_ROBOT_METERS +
                                                           BALL_MAX_RADIUS_METERS + 0.1);
+		double ball_position_x = world.field().penaltyEnemy().x();
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
-            Point(0, 0), world.field().enemyGoalCenter().toVector().orientation(), 0);
+										   Point(ball_position_x - 1.25, 0),
+										   world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_3->updateControlParams(
-            Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoalCenter().toVector().orientation(), 0);
+										   Point(ball_position_x - 1.25, 4 * ROBOT_MAX_RADIUS_METERS),
+										   world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_4->updateControlParams(
-            Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoalCenter().toVector().orientation(), 0);
+										   Point(ball_position_x - 1.25, -4 * ROBOT_MAX_RADIUS_METERS),
+										   world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_5->updateControlParams(
-            Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
-            world.field().enemyGoalCenter().toVector().orientation(), 0);
+										   Point(ball_position_x - 1.25, 8 * ROBOT_MAX_RADIUS_METERS),
+										   world.field().enemyGoalCenter().toVector().orientation(), 0);
 
         shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0);
 
@@ -73,12 +75,12 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             tactics_to_run.emplace_back(penalty_shot_tactic);
         }
 
-        // Move all non-shooter robots to the center of the field
         tactics_to_run.emplace_back(goalie_tactic);
-        tactics_to_run.emplace_back(move_tactic_2);
-        tactics_to_run.emplace_back(move_tactic_3);
-        tactics_to_run.emplace_back(move_tactic_4);
-        tactics_to_run.emplace_back(move_tactic_5);
+		// Move all non-shooter robots to the center of the field
+		tactics_to_run.emplace_back(move_tactic_2);
+		tactics_to_run.emplace_back(move_tactic_3);
+		tactics_to_run.emplace_back(move_tactic_4);
+		tactics_to_run.emplace_back(move_tactic_5);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);
