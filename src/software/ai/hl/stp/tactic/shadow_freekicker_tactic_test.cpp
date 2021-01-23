@@ -79,7 +79,7 @@ class ShadowFreekickerTacticTest : public testing::Test
         Point ball_position, ShadowFreekickerTactic::FreekickShadower left_or_right)
     {
         // set up world, robot, balls
-        World world = ::TestUtil::createBlankTestingWorld();
+        world = ::TestUtil::createBlankTestingWorld();
 
         world =
             ::TestUtil::setBallPosition(world, ball_position, Timestamp::fromSeconds(0));

@@ -4,3 +4,9 @@ StandaloneSimulatorMainCommandLineArgs:
         default: ""
         description: >-
             The interface to send and receive packets over (can be found through ifconfig)
+    logging_dir:
+        type: "std::string"
+        default: ""
+        description: >-
+            The directory to output logs to. Absolute paths are recommended as the working directory
+            is inside the bazel-out directory.

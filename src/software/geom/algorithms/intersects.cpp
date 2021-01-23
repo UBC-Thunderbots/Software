@@ -44,13 +44,13 @@ bool intersects(const Ray &first, const Polygon &second)
 
 bool intersects(const Polygon &first, const Circle &second)
 {
-    if (contains(first, second.getOrigin()))
+    if (contains(first, second.origin()))
     {
         return true;
     }
     for (const auto &seg : first.getSegments())
     {
-        if (distance(seg, second.getOrigin()) < second.getRadius())
+        if (distance(seg, second.origin()) < second.radius())
         {
             return true;
         }
@@ -65,13 +65,13 @@ bool intersects(const Circle &first, const Polygon &second)
 
 bool intersects(const Circle &first, const Circle &second)
 {
-    return (first.getOrigin() - second.getOrigin()).length() <
-           (first.getRadius() + second.getRadius());
+    return (first.origin() - second.origin()).length() <
+           (first.radius() + second.radius());
 }
 
 bool intersects(const Segment &first, const Circle &second)
 {
-    if (distance(first, second.getOrigin()) <= second.getRadius())
+    if (distance(first, second.origin()) <= second.radius())
     {
         return true;
     }

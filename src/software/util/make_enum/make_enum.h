@@ -64,10 +64,13 @@ std::vector<std::string> separateEnumStrings(std::string enum_string);
         /* these cases means we will get warnings (or errors). See this stackoverflow */ \
         /* answer for a similar explanation: https://stackoverflow.com/a/2102673 */      \
     }; \
+    static inline std::vector<std::string> allStringValues##name()                         \
+    {                                                                                      \
+        return separateEnumStrings(#__VA_ARGS__);                                          \
+    }                                                                                      \
     inline std::ostream& operator<<(std::ostream& os, name value)                          \
     {                                                                                      \
-        std::string str                       = #__VA_ARGS__;                              \
-        std::vector<std::string> enum_strings = separateEnumStrings(str);                  \
+        std::vector<std::string> enum_strings = allStringValues##name();                   \
         /* This index lookup relies on the assumption that the enum does not manually */   \
         /* specify any values. If it did, the underlying integer of the given value */     \
         /* may be out of range of the vector of strings */                                 \
@@ -76,14 +79,12 @@ std::vector<std::string> separateEnumStrings(std::string enum_string);
     }                                                                                      \
     static inline size_t size##name()                                                      \
     {                                                                                      \
-        std::string str                       = #__VA_ARGS__;                              \
-        std::vector<std::string> enum_strings = separateEnumStrings(str);                  \
+        std::vector<std::string> enum_strings = allStringValues##name();                   \
         return enum_strings.size();                                                        \
     }                                                                                      \
     static inline name fromStringTo##name(std::string str_in)                              \
     {                                                                                      \
-        std::string str                       = #__VA_ARGS__;                              \
-        std::vector<std::string> enum_strings = separateEnumStrings(str);                  \
+        std::vector<std::string> enum_strings = allStringValues##name();                   \
         for (size_t i = 0; i < enum_strings.size(); i++)                                   \
         {                                                                                  \
             if (str_in == enum_strings[i])                                                 \

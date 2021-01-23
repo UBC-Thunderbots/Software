@@ -2,9 +2,9 @@
 
 #include <google/protobuf/util/message_differencer.h>
 
-DirectPrimitiveIntent::DirectPrimitiveIntent(unsigned int robot_id, unsigned int priority,
+DirectPrimitiveIntent::DirectPrimitiveIntent(unsigned int robot_id,
                                              TbotsProto::Primitive primitive_msg)
-    : Intent(robot_id, priority), primitive_msg(primitive_msg)
+    : Intent(robot_id), primitive_msg(primitive_msg)
 {
 }
 

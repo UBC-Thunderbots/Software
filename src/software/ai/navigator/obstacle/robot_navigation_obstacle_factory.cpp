@@ -165,7 +165,7 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromRobotPosition(
 ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Circle &circle) const
 {
     return std::make_shared<GeomObstacle<Circle>>(
-        Circle(circle.getOrigin(), circle.getRadius() + robot_radius_expansion_amount));
+        Circle(circle.origin(), circle.radius() + robot_radius_expansion_amount));
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Polygon &polygon) const

@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/action/autokick_move_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -43,7 +44,8 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    auto move_action = std::make_shared<MoveAction>(true);
+    auto move_action          = std::make_shared<MoveAction>(true);
+    auto autokick_move_action = std::make_shared<AutokickMoveAction>(true);
 
     // Setup for the pass. We want to use any free time before the pass starts putting
     // ourselves in the best position possible to take the pass
@@ -71,8 +73,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation
         move_action->updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
-                                         DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutochickType::NONE, BallCollisionType::ALLOW);
+                                         DribblerMode::OFF, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
@@ -100,10 +101,11 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             Point ideal_position    = shot.getPointToShootAt();
             Angle ideal_orientation = shot.getOpenAngle();
 
-            move_action->updateControlParams(
-                *robot, ideal_position, ideal_orientation, 0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutochickType::AUTOKICK, BallCollisionType::ALLOW);
-            yield(move_action);
+            // Kicking at less than ball max speed to make sure we don't break rules
+            autokick_move_action->updateControlParams(
+                *robot, ideal_position, ideal_orientation, 0, DribblerMode::OFF,
+                BALL_MAX_SPEED_METERS_PER_SECOND - 1, BallCollisionType::ALLOW);
+            yield(autokick_move_action);
 
             // Calculations to check for termination conditions
             ball_to_robot_vector = robot->position() - ball.position();
@@ -131,8 +133,8 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
             // Move into position with the dribbler on
             move_action->updateControlParams(
-                *robot, ball_receive_pos, ball_receive_orientation, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutochickType::NONE, BallCollisionType::ALLOW);
+                *robot, ball_receive_pos, ball_receive_orientation, 0,
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW);
             yield(move_action);
         }
     }
