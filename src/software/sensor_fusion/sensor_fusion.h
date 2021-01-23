@@ -2,6 +2,7 @@
 
 #include <google/protobuf/repeated_field.h>
 
+#include "bazel-src/bazel-out/k8-fastbuild/bin/shared/proto/robot_status_msg.pb.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
