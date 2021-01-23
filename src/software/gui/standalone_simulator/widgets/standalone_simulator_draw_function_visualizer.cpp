@@ -69,6 +69,7 @@ void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEve
                    [&]() { standalone_simulator->addYellowRobot(point_in_scene); });
     menu.addAction("Add Blue Robot Here",
                    [&]() { standalone_simulator->addBlueRobot(point_in_scene); });
+    menu.addAction("Reset View", [&]() {});
     if (auto physics_robot = robot_under_cursor.lock())
     {
         menu.addAction("Move Robot", [&]() { robot = robot_under_cursor; });
