@@ -9,6 +9,7 @@ from config_yaml_loader import (
     ConfigYamlMalformed,
 )
 
+from cpp_writer import CppWriter
 from c_writer import CWriter
 
 # Path relative to the bazel WORKSPACE root
@@ -17,14 +18,16 @@ PARAMETER_CONFIG_PATH = Path(os.path.dirname(__file__), "../config_definitions")
 
 
 def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
+    yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
+    config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
 
-    # A temporary implementation used to show we can access the YAML files
     if generate_for_cpp:
-        with open(output_file, "w") as temp_file:
-            temp_file.write("Hello World")
+        # TODO: Naming this ThunderbotsConfig was causing issues due to conflicting type name,
+        # the 'New' suffix will be dropped when the old system is replaced (issue #1298)
+        CppWriter.write_config_metadata(
+            output_file, include_headers, "ThunderbotsConfigNew", config_metadata
+        )
     else:
-        yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
-        config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
         CWriter.write_config_metadata(output_file, "ThunderbotsConfig", config_metadata)
 
 

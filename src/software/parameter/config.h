@@ -16,7 +16,8 @@ class Config;
 using MutableParameterVariant = std::variant<
     std::shared_ptr<Parameter<int>>, std::shared_ptr<Parameter<bool>>,
     std::shared_ptr<Parameter<double>>, std::shared_ptr<Parameter<std::string>>,
-    std::shared_ptr<NumericParameter<int>>, std::shared_ptr<NumericParameter<float>>,
+    std::shared_ptr<NumericParameter<int>>, std::shared_ptr<NumericParameter<unsigned>>,
+    std::shared_ptr<NumericParameter<double>>,
     std::shared_ptr<EnumeratedParameter<std::string>>, std::shared_ptr<Config>>;
 
 // A ParameterVariant is similar to a MutableParameterVariant, except the
@@ -27,7 +28,8 @@ using ParameterVariant =
                  std::shared_ptr<const Parameter<double>>,
                  std::shared_ptr<const Parameter<std::string>>,
                  std::shared_ptr<const NumericParameter<int>>,
-                 std::shared_ptr<const NumericParameter<float>>,
+                 std::shared_ptr<const NumericParameter<unsigned>>,
+                 std::shared_ptr<const NumericParameter<double>>,
                  std::shared_ptr<const EnumeratedParameter<std::string>>,
                  std::shared_ptr<const Config>>;
 
