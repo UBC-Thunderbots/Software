@@ -45,7 +45,7 @@ std::vector<PlannerTestCase>
 
                   {.name               = "Single stationary robot in path",
                    .start              = Point(0, 0),
-                   .end                = Point(2, 0),
+                   .end                = Point(2.1, 0),
                    .navigable_area     = Rectangle({-2, -2}, {2.5, 2.5}),
                    .obstacles          = {robot_navigation_obstacle_factory
                                      .createFromRobotPosition(Point(1, 0))},

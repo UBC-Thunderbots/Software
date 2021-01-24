@@ -71,7 +71,7 @@ class TestAutogenParameterList : public YamlLoadFixture
                             [&](std::shared_ptr<const Parameter<double>> param) {
                                 assert_parameter<double>(param, current_config);
                             },
-                            [&](std::shared_ptr<const NumericParameter<float>> param) {
+                            [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
                                 // This will be tested as part of the new parameter system
                                 // (issue #1298)
                             },
@@ -150,7 +150,7 @@ class TestParameterMutation : public YamlLoadFixture
                             [&](std::shared_ptr<Parameter<double>> param) {
                                 param->setValue(param->value() - 2.0);
                             },
-                            [&](std::shared_ptr<NumericParameter<float>> param) {
+                            [&](std::shared_ptr<NumericParameter<unsigned>> param) {
                                 // This will be tested as part of the new parameter system
                                 // (issue #1298)
                             },
@@ -191,7 +191,7 @@ class TestParameterMutation : public YamlLoadFixture
                     ASSERT_NEAR(current_config[param->name()]["default"].as<double>(),
                                 param->value() + 2.0, 1E-10);
                 },
-                [&](std::shared_ptr<const NumericParameter<float>> param) {
+                [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
                     // This will be tested as part of the new parameter system (issue
                     // #1298)
                 },

@@ -23,8 +23,8 @@ bool ThetaStarPathPlanner::isCoordNavigable(const Coordinate &coord) const
 bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
 {
     // If we haven't checked this Coordinate for obstacles before, check it now
-    unsigned long coord_key = computeMapKey(coord);
-    auto unblocked_grid_it  = unblocked_grid.find(coord_key);
+
+    auto unblocked_grid_it = unblocked_grid.find(coord);
     if (unblocked_grid_it == unblocked_grid.end())
     {
         bool blocked = false;
@@ -40,7 +40,7 @@ bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
         }
 
         // We use the opposite convention to indicate blocked or not
-        unblocked_grid[coord_key] = !blocked;
+        unblocked_grid[coord] = !blocked;
         return !blocked;
     }
 
@@ -57,10 +57,9 @@ double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
 
 bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinate &coord2)
 {
-    unsigned long coordinate_pair_key = computeMapKey(coord1, coord2);
-
+    CoordinatePair coord_pair(coord1, coord2);
     // If we haven't checked this Coordinate pair for intersects before, check it now
-    auto line_of_sight_cache_it = line_of_sight_cache.find(coordinate_pair_key);
+    auto line_of_sight_cache_it = line_of_sight_cache.find(coord_pair);
     if (line_of_sight_cache_it == line_of_sight_cache.end())
     {
         Segment seg(convertCoordToPoint(coord1), convertCoordToPoint(coord2));
@@ -76,7 +75,7 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinat
         }
 
         // We use the opposite convention to indicate blocked or not
-        line_of_sight_cache[coordinate_pair_key] = has_line_of_sight;
+        line_of_sight_cache[coord_pair] = has_line_of_sight;
         return has_line_of_sight;
     }
 
@@ -168,6 +167,17 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     const Point &start, const Point &end, const Rectangle &navigable_area,
     const std::vector<ObstaclePtr> &obstacles)
 {
+    bool navigable_area_contains_start =
+        (start.x() >= navigable_area.xMin()) && (start.x() <= navigable_area.xMax()) &&
+        (start.y() >= navigable_area.yMin()) && (start.y() <= navigable_area.yMax());
+    bool navigable_area_contains_end =
+        (end.x() >= navigable_area.xMin()) && (end.x() <= navigable_area.xMax()) &&
+        (end.y() >= navigable_area.yMin()) && (end.y() <= navigable_area.yMax());
+    if (!navigable_area_contains_start || !navigable_area_contains_end)
+    {
+        return std::nullopt;
+    }
+
     resetAndInitializeMemberVariables(navigable_area, obstacles);
 
     Point closest_end      = findClosestFreePoint(end);
@@ -467,25 +477,29 @@ bool ThetaStarPathPlanner::isPointNavigableAndFreeOfObstacles(const Point &p)
 
 bool ThetaStarPathPlanner::isPointNavigable(const Point &p) const
 {
-    return ((p.x() > -max_navigable_x_coord) && (p.x() < max_navigable_x_coord) &&
-            (p.y() > -max_navigable_y_coord) && (p.y() < max_navigable_y_coord));
+    return ((p.x() > -max_navigable_x_coord + centre.x()) &&
+            (p.x() < max_navigable_x_coord + centre.x()) &&
+            (p.y() > -max_navigable_y_coord + centre.y()) &&
+            (p.y() < max_navigable_y_coord + centre.y()));
 }
 
 
 Point ThetaStarPathPlanner::convertCoordToPoint(const Coordinate &coord) const
 {
     // account for robot radius
-    return Point((coord.row() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_x_coord,
-                 (coord.col() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_y_coord);
+    return Point(
+        (coord.row() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_x_coord + centre.x(),
+        (coord.col() * SIZE_OF_GRID_CELL_IN_METERS) - max_navigable_y_coord + centre.y());
 }
 
 ThetaStarPathPlanner::Coordinate ThetaStarPathPlanner::convertPointToCoord(
     const Point &p) const
 {
     // account for robot radius
-    return Coordinate(
-        static_cast<int>((p.x() + max_navigable_x_coord) / SIZE_OF_GRID_CELL_IN_METERS),
-        static_cast<int>((p.y() + max_navigable_y_coord) / SIZE_OF_GRID_CELL_IN_METERS));
+    return Coordinate(static_cast<int>((p.x() + max_navigable_x_coord - centre.x()) /
+                                       SIZE_OF_GRID_CELL_IN_METERS),
+                      static_cast<int>((p.y() + max_navigable_y_coord - centre.y()) /
+                                       SIZE_OF_GRID_CELL_IN_METERS));
 }
 
 void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
@@ -493,6 +507,7 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
 {
     // Initialize member variables
     this->obstacles = obstacles;
+    centre          = navigable_area.centre();
     max_navigable_x_coord =
         std::max(navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS, 0.0);
     max_navigable_y_coord =
@@ -504,6 +519,11 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
         static_cast<int>((max_navigable_y_coord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
                          SIZE_OF_GRID_CELL_IN_METERS);
 
+    // add assertion to ensure that the key value in Coordinate and Coordinate pair would
+    // not overflow, overflow would happen when grid row or col is larger than 1<<16
+    assert(num_grid_rows < (1 << 16));
+    assert(num_grid_cols < (1 << 16));
+
     // Reset data structures to path plan again
     open_list.clear();
     closed_list.clear();
@@ -512,27 +532,4 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
     cell_heuristics = std::vector<std::vector<CellHeuristic>>(
         num_grid_rows,
         std::vector<CellHeuristic>(num_grid_cols, ThetaStarPathPlanner::CellHeuristic()));
-}
-
-
-unsigned long ThetaStarPathPlanner::computeMapKey(const Coordinate &coord) const
-{
-    return coord.row() + coord.col() * (num_grid_rows + 1);
-}
-
-unsigned long ThetaStarPathPlanner::computeMapKey(
-    const ThetaStarPathPlanner::Coordinate &coord1,
-    const ThetaStarPathPlanner::Coordinate &coord2) const
-{
-    unsigned long key1 = computeMapKey(coord1);
-    unsigned long key2 = computeMapKey(coord2);
-    if (coord1.row() < coord2.row() ||
-        (coord1.row() == coord2.row() && coord1.col() < coord2.col()))
-    {
-        return key1 + key2 * (num_grid_cols + num_grid_rows + 1);
-    }
-    else
-    {
-        return key2 + key1 * (num_grid_cols + num_grid_rows + 1);
-    }
 }
