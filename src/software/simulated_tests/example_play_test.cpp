@@ -50,5 +50,5 @@ TEST_F(ExamplePlayTest, test_example_play)
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(8));
 }
