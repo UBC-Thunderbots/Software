@@ -82,7 +82,7 @@ void app_move_helper_start(void* void_state_ptr, FirmwareWorld_t* world,
         .orientation_profile = {.coefficients = {0, 0,
                                                  fmodf(destination_orientation -
                                                            current_orientation,
-                                                       (float)(2*M_PI)),
+                                                       (float)(2 * M_PI)),
                                                  current_orientation}},
         .t_start             = 0,
         .t_end               = 1.0f,
@@ -143,9 +143,8 @@ void app_move_helper_tick(void* void_state_ptr, FirmwareWorld_t* world)
     const float dest_speed = state->position_trajectory.linear_speed[trajectory_index];
 
     // plan major axis movement
-    float max_major_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    float max_major_v =
-        (float)ROBOT_MAX_SPEED_METERS_PER_SECOND;
+    float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    float max_major_v     = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND;
     float major_params[3] = {dest_speed, max_major_a, max_major_v};
     app_physbot_planMove(&pb.maj, major_params);
 

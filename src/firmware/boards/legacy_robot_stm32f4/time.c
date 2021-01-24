@@ -3,6 +3,7 @@
 #include <FreeRTOS.h>
 
 
-float get_current_freertos_tick_time_seconds(){
+float get_current_freertos_tick_time_seconds()
+{
     return ((float)xTaskGetTickCount()) * portTICK_PERIOD_MS;
 }

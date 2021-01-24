@@ -35,7 +35,6 @@
 #include <unused.h>
 #include <usb.h>
 
-#include "time.h"
 #include "firmware/app/logger/logger.h"
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/world/firmware_world.h"
@@ -61,6 +60,7 @@
 #include "io/wheels.h"
 #include "priority.h"
 #include "tick.h"
+#include "time.h"
 #include "upgrade/dfu.h"
 #include "upgrade/fpga.h"
 #include "upgrade/fw.h"
@@ -535,7 +535,8 @@ static void run_normal(void)
     FirmwareBall_t* ball =
         app_firmware_ball_create(dr_get_ball_position_x, dr_get_ball_position_y,
                                  dr_get_ball_velocity_x, dr_get_ball_velocity_y);
-    FirmwareWorld_t* world = app_firmware_world_create(robot, ball, get_current_freertos_tick_time_seconds);
+    FirmwareWorld_t* world =
+        app_firmware_world_create(robot, ball, get_current_freertos_tick_time_seconds);
 
     PrimitiveManager_t* primitive_manager = app_primitive_manager_create();
 
