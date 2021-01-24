@@ -20,6 +20,7 @@ struct TacticUpdate
 {
     Robot robot;
     World world;
+    // callback to return the next intent
     std::function<void(std::unique_ptr<Intent>)> set_intent;
 };
 

@@ -16,9 +16,10 @@
  *
  * @return true if robot movement is done
  */
-bool moveRobotDone(const Robot& robot, const Point& destination,
-                   const Angle& final_orientation, double DISTANCE_THRESHOLD = 0.02,
-                   const Angle& ANGLE_THRESHOLD = Angle::fromDegrees(2));
+bool robotReachedDestination(const Robot& robot, const Point& destination,
+                             const Angle& final_orientation,
+                             double DISTANCE_THRESHOLD    = 0.02,
+                             const Angle& ANGLE_THRESHOLD = Angle::fromDegrees(2));
 
 /**
  * Checks whether the robot is stopped

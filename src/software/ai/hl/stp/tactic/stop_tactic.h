@@ -6,10 +6,12 @@
 
 struct StopFSM
 {
+    /* state structs */
     struct Stop
-    { /* state */
+    {
     };
 
+    /* update structs */
     struct Update
     {
         bool coast;
