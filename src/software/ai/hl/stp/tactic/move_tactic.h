@@ -31,8 +31,9 @@ struct MoveFSM
     {
         using namespace boost::sml;
 
-        const auto idle_s = state<idle_state>;
-        const auto move_s = state<move_state>;
+        const auto idle_s   = state<idle_state>;
+        const auto move_s   = state<move_state>;
+        const auto update_e = event<Update>;
 
         const auto update_move = [](auto event) {
             event.common.set_intent(std::make_unique<MoveIntent>(
@@ -49,10 +50,10 @@ struct MoveFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *idle_s + event<Update> / update_move                = move_s,
-            move_s + event<Update>[!movement_done] / update_move = move_s,
-            move_s + event<Update>[movement_done] / update_move  = X,
-            X + event<Update>[movement_done] / update_move       = X);
+            *idle_s + update_e / update_move                = move_s,
+            move_s + update_e[!movement_done] / update_move = move_s,
+            move_s + update_e[movement_done] / update_move  = X,
+            X + update_e[movement_done] / update_move       = X);
     }
 };
 

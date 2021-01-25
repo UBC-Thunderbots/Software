@@ -21,8 +21,9 @@ struct StopFSM
     {
         using namespace boost::sml;
 
-        const auto idle_s = state<idle_state>;
-        const auto stop_s = state<stop_state>;
+        const auto idle_s   = state<idle_state>;
+        const auto stop_s   = state<stop_state>;
+        const auto update_e = event<Update>;
 
         const auto update_stop = [](auto event) {
             event.common.set_intent(
@@ -34,12 +35,14 @@ struct StopFSM
         };
 
         return make_transition_table(
-            *idle_s + event<Update> / update_stop            = stop_s,
-            stop_s + event<Update>[!stop_done] / update_stop = stop_s,
-            stop_s + event<Update>[stop_done] / update_stop  = X,
-            X + event<Update>[!stop_done] / update_stop      = X);
+            // src_state + event [guard] / action = dest state
+            *idle_s + update_e / update_stop            = stop_s,
+            stop_s + update_e[!stop_done] / update_stop = stop_s,
+            stop_s + update_e[stop_done] / update_stop  = X,
+            X + update_e[!stop_done] / update_stop      = X);
     }
 };
+
 /**
  * The StopTactic will stop the robot from moving. The robot will actively try and brake
  * to come to a halt unless is it told to coast, in which case it will coast to a stop.
