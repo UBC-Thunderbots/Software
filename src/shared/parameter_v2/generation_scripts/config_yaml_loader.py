@@ -112,6 +112,7 @@ class ConfigYamlLoader(object):
         raw_config_metadata = {}
 
         for filename in yaml_paths:
+            print(filename)
             with open(filename, "r") as param_yaml:
 
                 try:

@@ -1,13 +1,12 @@
-RobotCapabilitiesConfig:
-  BrokenDribblers:
+- string:
+    name: broken_dribblers
     default: ""
-    type: "std::string"
     description: Comma-separated list of numbers of robots with broken dribblers
-  BrokenChippers:
+- string:
+    name: broken_chippers
     default: ""
-    type: "std::string"
     description: Comma-separated list of numbers of robots with broken chippers
-  BrokenKickers:
+- string:
+    name: broken_kickers
     default: ""
-    type: "std::string"
     description: Comma-separated list of numbers of robots with broken kickers

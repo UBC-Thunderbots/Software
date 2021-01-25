@@ -1,0 +1,15 @@
+- int:
+    name: channel
+    min: 0
+    max: 15
+    default: 0
+    description: >-
+        The multicast channel to join to communicate with the robots
+- string:
+    name: network_interface:
+    default: "eth0"
+    description: >-
+        The network interface that is connected to the thunderbots router.
+        Can be found using ifconfig on ubuntu.
+
+

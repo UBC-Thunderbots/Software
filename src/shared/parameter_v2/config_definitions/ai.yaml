@@ -1,9 +1,9 @@
 include:
-    - corner_kick_play.yaml
-    - goalie_tactic.yaml
-    - navigator.yaml
-    - pass_generator.yaml
-    - robot_navigation_obstacle_factory.yaml
-    - shoot_goal_tactic.yaml
-    - shoot_or_pass_play.yaml
-    
+  - corner_kick_play.yaml
+  - goalie_tactic.yaml
+  - navigator.yaml
+  - pass_generator.yaml
+  - robot_navigation_obstacle_factory.yaml
+  - shoot_goal_tactic.yaml
+  - shoot_or_pass_play.yaml
+---

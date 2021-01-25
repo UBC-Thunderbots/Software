@@ -1,6 +1,5 @@
-EnemyCapabilityConfig:
-  EnemyTeamCanPass:
-    type: "bool"
+- bool:
+    name: EnemyTeamCanPass:
     default: true
     description: >-
         This value should be set based on whether or not the team we are playing against
