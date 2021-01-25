@@ -112,7 +112,6 @@ class ConfigYamlLoader(object):
         raw_config_metadata = {}
 
         for filename in yaml_paths:
-            print(filename)
             with open(filename, "r") as param_yaml:
 
                 try:
@@ -125,7 +124,7 @@ class ConfigYamlLoader(object):
                     if len(raw_config_metadata[tail]) == 1:
 
                         # include only in file
-                        if isinstance(raw_config_metadata[tail][0], dict):
+                        if isinstance(raw_config_metadata[tail], dict):
                             raw_config_metadata[tail] = {
                                 INCLUDE_KEY: raw_config_metadata[tail][0][INCLUDE_KEY]
                             }
@@ -153,6 +152,10 @@ class ConfigYamlLoader(object):
                     raise ConfigYamlMalformed(
                         "Check malformed {} \n {}".format(tail, ymle)
                     ) from None
+                except Exception as exc:
+                    raise ConfigYamlMalformed(
+                        "Check malformed {} \n {}".format(tail, exc)
+                    ) from exc
 
         return raw_config_metadata
 
@@ -197,7 +200,6 @@ class ConfigYamlLoader(object):
                         )
 
             if PARAMETER_KEY in metadata:
-
                 # validate correct format with schema
                 try:
                     jsonschema.validate(metadata[PARAMETER_KEY], PARAM_DEF_SCHEMA)

@@ -1,6 +1,6 @@
 - bool:
-    name: EnemyTeamCanPass:
-    default: true
+    name: EnemyTeamCanPass
+    value: true
     description: >-
         This value should be set based on whether or not the team we are playing against
         can pass the ball. This will affect how we defend against the team.

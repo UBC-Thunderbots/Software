@@ -89,6 +89,7 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:autochip_move_action",
         "//software/ai/hl/stp/action:stop_action",
+        "//software/parameter:dynamic_parameters",
         "//software/geom/algorithms",
         "//software/logger",
     ],
@@ -139,6 +140,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//software/parameter:dynamic_parameters",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:autochip_move_action",
         "//software/ai/hl/stp/action:chip_action",

@@ -1,11 +1,11 @@
 - string:
     name: interface
-    default: ""
+    value: ""
     description: >-
         The interface to send and receive packets over (can be found through ifconfig)
 - string:
     name: logging_dir
-    default: ""
+    value: ""
     description: >-
         The directory to output logs to. Absolute paths are recommended as the working directory
         is inside the bazel-out directory.

@@ -37,6 +37,7 @@ cc_library(
     deps = [
         ":config",
         ":parameter",
+        "//shared/parameter_v2:cpp_configs",
     ],
 )
 

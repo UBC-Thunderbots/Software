@@ -57,7 +57,7 @@ std::string toCamelCase(const std::string& snake_case_input)
  */
 bool isValidParamType(const std::string& str)
 {
-    const static std::set<std::string> types = {"bool",   "int",  "uint",   "float",
+    const static std::set<std::string> types = {"bool",   "int",  "uint",   "double",
                                                 "string", "enum", "factory"};
     return types.find(str) != types.end();
 }
@@ -155,7 +155,7 @@ class YamlLoadFixture : public ::testing::Test
     void SetUp() override
     {
         // this is loaded from bazel data
-        boost::filesystem::path path("./shared/parameter_v2/config_definitions/test");
+        boost::filesystem::path path("./shared/parameter_v2/config_definitions/");
 
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {
@@ -301,7 +301,7 @@ class TestParameterMutation : public YamlLoadFixture
      * std::string gets "test" appended at the end
      * int gets incremented by 2
      * double gets decremented by 2
-     * unsigned gets decremented by 1
+     * unsigned gets incremented by 1 (to prevent overflow)
      * bool gets flipped
      *
      * Some parameters such as example_enum_param has a specific value set
@@ -323,7 +323,7 @@ class TestParameterMutation : public YamlLoadFixture
                                 param->setValue(param->value() - 2.0);
                             },
                             [&](std::shared_ptr<NumericParameter<unsigned>> param) {
-                                param->setValue(param->value() - 1);
+                                param->setValue(param->value() + 1);
                             },
                             [&](std::shared_ptr<EnumeratedParameter<std::string>> param) {
                                 if (param->name() == "example_factory_param")
@@ -417,7 +417,7 @@ class TestParameterMutation : public YamlLoadFixture
                              findParamNode(current_config, param->name());
                          if (!(isParamConstant(param_node)))
                          {
-                             ASSERT_EQ(getParamField<unsigned>(param_node, "value") - 1,
+                             ASSERT_EQ(getParamField<unsigned>(param_node, "value") + 1,
                                        param->value());
                          }
                          else

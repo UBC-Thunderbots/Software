@@ -1,6 +1,6 @@
 load(":parameter.bzl", "c_dynamic_parameters", "cpp_dynamic_parameters")
 
-package(default_visibility = ["//visibility:private"])
+package(default_visibility = ["//visibility:public"])
 
 cpp_dynamic_parameters(
     name = "cpp_params",
@@ -43,7 +43,7 @@ cc_test(
     ],
     data = [
         "c_parameters.h",
-        "//shared/parameter_v2/config_definitions:test_configs",
+        "//shared/parameter_v2/config_definitions:parameter_configs",
     ],
     deps = [
         "//shared/parameter_v2:c_configs",
@@ -60,7 +60,7 @@ cc_test(
         "cpp_config_test.cpp",
     ],
     data = [
-        "//shared/parameter_v2/config_definitions:test_configs",
+        "//shared/parameter_v2/config_definitions:parameter_configs",
     ],
     deps = [
         "//shared/parameter_v2:cpp_configs",

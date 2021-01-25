@@ -6,4 +6,3 @@ include:
   - robot_navigation_obstacle_factory.yaml
   - shoot_goal_tactic.yaml
   - shoot_or_pass_play.yaml
----

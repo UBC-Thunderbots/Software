@@ -11,6 +11,7 @@ cc_library(
         "//software/math:math_functions",
         "//software/util/make_enum",
         "//software/world",
+        "//software/parameter:dynamic_parameters",
     ],
 )
 
