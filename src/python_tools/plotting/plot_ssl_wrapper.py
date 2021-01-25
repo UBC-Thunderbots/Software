@@ -25,6 +25,16 @@ def plot_circular_section(
     start_angle: float,
     end_angle: float,
 ):
+    '''
+    Draw a circular section on to the given figure by drawing line segments between points sampled from the circle at
+    regular angle intervals between the start angle and end angle
+    :param fig: a Bokeh figure
+    :param center_x: x of the center of the circle
+    :param center_y: y of the center of the circle
+    :param radius: radius of the circle
+    :param start_angle: angle of the start of the circular section
+    :param end_angle: angle of the end of the circular section
+    '''
     # decide how many samples to take along the arc, a full circle will be a 36-gon
     num_samples = (end_angle - start_angle) * (18 / np.pi)
     sample_angles = np.linspace(
@@ -56,6 +66,13 @@ def plot_robots(
     colour: str,
     label_robot_ids: bool = True,
 ):
+    '''
+    Plot the given robots onto the given figure.
+    :param fig: a Bokeh figure
+    :param ssl_detectionrobots_protos: the SSL_DetectionRobot protos to plot
+    :param colour: colour of the robots
+    :param label_robot_ids: whether to label the robot IDs on top of the robots
+    '''
     robot_xs = np.asarray([robot.x for robot in ssl_detectionrobots_protos]) / MM_PER_M
     robot_ys = np.asarray([robot.y for robot in ssl_detectionrobots_protos]) / MM_PER_M
     robot_oris = [robot.orientation for robot in ssl_detectionrobots_protos]
@@ -103,6 +120,11 @@ def plot_robots(
 
 
 def plot_balls(fig: figure, ssl_detectionballs: Iterable[SSL_DetectionBall]):
+    '''
+    Plot the given balls onto the given Bokeh figure.
+    :param fig: a Bokeh figure
+    :param ssl_detectionballs: the SSL_DetectionBall protos to plot
+    '''
     ball_xs = np.asarray([ball.x for ball in ssl_detectionballs]) / MM_PER_M
     ball_ys = np.asarray([ball.y for ball in ssl_detectionballs]) / MM_PER_M
 
@@ -112,6 +134,12 @@ def plot_balls(fig: figure, ssl_detectionballs: Iterable[SSL_DetectionBall]):
 def plot_field_line_segments(
     fig: figure, field_lines_proto: Iterable[SSL_FieldLineSegment]
 ):
+    '''
+    Plot the given field line segments onto the given Bokeh figure.
+    :param fig: a Bokeh figure
+    :param field_lines_proto: an Iterable of SSL_FieldLineSegment
+    :return:
+    '''
     field_line_xs = (
         np.asarray([[line.p1.x, line.p2.x] for line in field_lines_proto]) / MM_PER_M
     )
@@ -140,6 +168,13 @@ def plot_field_circular_arcs(
 def plot_ssl_wrapperpacket(
     fig: figure, ssl_wrapperpacket: SSL_WrapperPacket, label_robot_ids: bool = True
 ):
+    '''
+    Plot the given SSL_WrapperPacket representing the state of the entire world onto the
+    given Bokeh figure.
+    :param fig: a Bokeh figure
+    :param ssl_wrapperpacket: an SSL_WrapperPacket proto to plot the world state from
+    :param label_robot_ids: whether to label robot IDs on top of the robots
+    '''
     if ssl_wrapperpacket.HasField("detection"):
         plot_robots(
             fig,

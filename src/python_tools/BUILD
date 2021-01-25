@@ -38,7 +38,7 @@ py_binary(
         requirement("bokeh"),
         ":proto_log",
         ":sensor_proto_log",
-        "//python_tools/plotting:ssl_wrapper_plot_helpers",
+        "//python_tools/plotting:plot_ssl_wrapper",
         "//shared/proto:tbots_py_proto",
         "//software/proto:software_py_proto",
     ],
