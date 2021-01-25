@@ -1,4 +1,5 @@
 #include <gmock/gmock.h>
+
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
@@ -179,14 +180,14 @@ class YamlLoadFixture : public ::testing::Test
                     // document) or both includes and parameters (2 documents).  See a
                     // yaml config for an example
                     //
-                    // We try to load the first document as a parameter definitions, and
-                    // if the conversion doesn't match, we load it as an include list.
-                    current_config_yaml = config[0];
+                    // We try to load the first document as a include list, and
+                    // if the conversion doesn't match, we load it as parameters.
+                    config_name_to_includes_map[config_name] =
+                        config[0]["include"].as<std::vector<std::string>>();
                 }
                 catch (const YAML::BadConversion& e)
                 {
-                    config_name_to_includes_map[config_name] =
-                        config[0]["include"].as<std::vector<std::string>>();
+                    current_config_yaml = config[0];
                 }
             }
             else if (config.size() == 2)
