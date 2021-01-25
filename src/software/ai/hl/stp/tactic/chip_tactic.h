@@ -12,11 +12,11 @@ struct ChipFSM
 
     struct ControlParams
     {
-        // The location where the chip will be taken
+        // The location where the chip will be taken from
         Point chip_origin;
         // The direction the Robot will chip in
         Angle chip_direction;
-        // The distance between the starting location
+        // The distance the robot will chip to
         double chip_distance_meters;
     };
 
@@ -60,9 +60,10 @@ struct ChipFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *get_behind_ball_s + update_e / update_get_behind_ball = chip_s,
-            chip_s + update_e[!ball_chicked] / update_chip         = chip_s,
-            chip_s + update_e[ball_chicked]                        = X);
+            *get_behind_ball_s + update_e / update_get_behind_ball,
+            get_behind_ball_s                              = chip_s,
+            chip_s + update_e[!ball_chicked] / update_chip = chip_s,
+            chip_s + update_e[ball_chicked]                = X);
     }
 };
 
