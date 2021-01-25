@@ -6,11 +6,13 @@
 
 struct MoveFSM
 {
-    /* state classes */
+    // these classes define the states used in the transition table
+    // they are exposed so that tests can check if the FSM is in a particular state
     class idle_state;
     class move_state;
 
-    /* update structs */
+    // this struct defines the unique control parameters that the MoveFSM requires in its
+    // update
     struct ControlParams
     {
         // The point the robot is trying to move to
@@ -21,9 +23,11 @@ struct MoveFSM
         double final_speed;
     };
 
+    // this struct defines the only event that the MoveFSM responds to
     struct Update
     {
         ControlParams control_params;
+        // The TacticUpdate struct is common to all tactic fsms
         TacticUpdate common;
     };
 
@@ -31,10 +35,15 @@ struct MoveFSM
     {
         using namespace boost::sml;
 
-        const auto idle_s   = state<idle_state>;
-        const auto move_s   = state<move_state>;
+        // idle_s and move_s are the two _states_ used in the transition table
+        const auto idle_s = state<idle_state>;
+        const auto move_s = state<move_state>;
+
+        // update_e is the _event_ that the MoveFSM responds to
         const auto update_e = event<Update>;
 
+        // this _action_ sets the intent to a move intent corresponding to the update_e
+        // event
         const auto update_move = [](auto event) {
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), event.control_params.destination,
@@ -42,7 +51,8 @@ struct MoveFSM
                 DribblerMode::OFF, BallCollisionType::AVOID));
         };
 
-        const auto movement_done = [](auto event) {
+        // this _guard_ is used check if the robot is done moving
+        const auto move_done = [](auto event) {
             return robotReachedDestination(event.common.robot,
                                            event.control_params.destination,
                                            event.control_params.final_orientation);
@@ -50,10 +60,10 @@ struct MoveFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *idle_s + update_e / update_move                = move_s,
-            move_s + update_e[!movement_done] / update_move = move_s,
-            move_s + update_e[movement_done] / update_move  = X,
-            X + update_e[movement_done] / update_move       = X);
+            *idle_s + update_e / update_move            = move_s,
+            move_s + update_e[!move_done] / update_move = move_s,
+            move_s + update_e[move_done] / update_move  = X,
+            X + update_e[move_done] / update_move       = X);
     }
 };
 
