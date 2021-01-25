@@ -6,10 +6,9 @@
 
 struct StopFSM
 {
-    /* state structs */
-    struct Stop
-    {
-    };
+    /* state classes */
+    class idle_state;
+    class stop_state;
 
     /* update structs */
     struct Update
@@ -22,7 +21,11 @@ struct StopFSM
     {
         using namespace boost::sml;
 
-        const auto update_stop_intent = [](auto event) {
+        const auto idle_s   = state<idle_state>;
+        const auto stop_s   = state<stop_state>;
+        const auto update_e = event<Update>;
+
+        const auto update_stop = [](auto event) {
             event.common.set_intent(
                 std::make_unique<StopIntent>(event.common.robot.id(), event.coast));
         };
@@ -32,10 +35,11 @@ struct StopFSM
         };
 
         return make_transition_table(
-            *"idle"_s + event<Update> / update_stop_intent               = state<Stop>,
-            state<Stop> + event<Update>[!stop_done] / update_stop_intent = state<Stop>,
-            state<Stop> + event<Update>[stop_done] / update_stop_intent  = X,
-            X + event<Update>[!stop_done] / update_stop_intent           = X);
+            // src_state + event [guard] / action = dest state
+            *idle_s + update_e / update_stop            = stop_s,
+            stop_s + update_e[!stop_done] / update_stop = stop_s,
+            stop_s + update_e[stop_done] / update_stop  = X,
+            X + update_e[!stop_done] / update_stop      = X);
     }
 };
 

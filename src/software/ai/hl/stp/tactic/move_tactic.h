@@ -6,10 +6,9 @@
 
 struct MoveFSM
 {
-    /* state structs */
-    struct Move
-    {
-    };
+    /* state classes */
+    class idle_state;
+    class move_state;
 
     /* update structs */
     struct ControlParams
@@ -32,7 +31,11 @@ struct MoveFSM
     {
         using namespace boost::sml;
 
-        const auto update_move_intent = [](auto event) {
+        const auto idle_s   = state<idle_state>;
+        const auto move_s   = state<move_state>;
+        const auto update_e = event<Update>;
+
+        const auto update_move = [](auto event) {
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), event.control_params.destination,
                 event.control_params.final_orientation, event.control_params.final_speed,
@@ -47,11 +50,10 @@ struct MoveFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *"idle"_s + event<Update> / update_move_intent = state<Move>,
-            state<Move> + event<Update>[!movement_done] / update_move_intent =
-                state<Move>,
-            state<Move> + event<Update>[movement_done] / update_move_intent = X,
-            X + event<Update>[movement_done] / update_move_intent           = X);
+            *idle_s + update_e / update_move                = move_s,
+            move_s + update_e[!movement_done] / update_move = move_s,
+            move_s + update_e[movement_done] / update_move  = X,
+            X + update_e[movement_done] / update_move       = X);
     }
 };
 
