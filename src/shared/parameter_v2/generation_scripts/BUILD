@@ -13,6 +13,7 @@ py_binary(
         ":cpp_parameter.py",
         ":cpp_writer.py",
         ":generate_dynamic_parameters.py",
+        ":case_conversion.py",
         ":type_map.py",
     ],
     data = [

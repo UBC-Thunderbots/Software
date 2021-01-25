@@ -1,6 +1,6 @@
 from type_map import CPP_TYPE_MAP
 from dynamic_parameter_schema import CONSTANT_KEY
-from case_conversion import to_pascal_case, to_camel_case
+from case_conversion import to_pascal_case
 import re
 
 #######################################################################
@@ -133,14 +133,14 @@ class CppParameter(object):
             PARAMETER_PUBLIC_ENTRY_CONST.format(
                 param_class=self.param_class,
                 type=self.cpp_type,
-                immutable_accessor_name=to_camel_case(self.param_name),
+                immutable_accessor_name=to_pascal_case(self.param_name),
                 param_variable_name=self.param_variable_name,
             )
             if self.is_constant
             else PARAMETER_PUBLIC_ENTRY.format(
                 param_class=self.param_class,
                 type=self.cpp_type,
-                immutable_accessor_name=to_camel_case(self.param_name),
+                immutable_accessor_name=to_pascal_case(self.param_name),
                 mutable_accessor_name="mutable" + to_pascal_case(self.param_name),
                 param_variable_name=self.param_variable_name,
             )

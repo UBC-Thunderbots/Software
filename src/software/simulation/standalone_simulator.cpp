@@ -21,7 +21,7 @@ StandaloneSimulator::StandaloneSimulator(
                 this->standalone_simulator_config->YellowTeamChannel()->value(),
                 this->standalone_simulator_config->NetworkInterface()->value(),
                 this->standalone_simulator_config->VisionPort()->value(),
-                this->standalone_simulator_config->VisionIPv4Address()->value());
+                this->standalone_simulator_config->VisionIpv4Address()->value());
         });
     standalone_simulator_config->mutableYellowTeamChannel()->registerCallbackFunction(
         [this](int yellow_team_channel) {
@@ -30,7 +30,7 @@ StandaloneSimulator::StandaloneSimulator(
                 yellow_team_channel,
                 this->standalone_simulator_config->NetworkInterface()->value(),
                 this->standalone_simulator_config->VisionPort()->value(),
-                this->standalone_simulator_config->VisionIPv4Address()->value());
+                this->standalone_simulator_config->VisionIpv4Address()->value());
         });
     standalone_simulator_config->mutableNetworkInterface()->registerCallbackFunction(
         [this](std::string network_interface) {
@@ -39,7 +39,7 @@ StandaloneSimulator::StandaloneSimulator(
                 this->standalone_simulator_config->YellowTeamChannel()->value(),
                 network_interface,
                 this->standalone_simulator_config->VisionPort()->value(),
-                this->standalone_simulator_config->VisionIPv4Address()->value());
+                this->standalone_simulator_config->VisionIpv4Address()->value());
         });
     standalone_simulator_config->mutableVisionPort()->registerCallbackFunction(
         [this](int vision_port) {
@@ -48,9 +48,9 @@ StandaloneSimulator::StandaloneSimulator(
                 this->standalone_simulator_config->YellowTeamChannel()->value(),
                 this->standalone_simulator_config->NetworkInterface()->value(),
                 vision_port,
-                this->standalone_simulator_config->VisionIPv4Address()->value());
+                this->standalone_simulator_config->VisionIpv4Address()->value());
         });
-    standalone_simulator_config->mutableVisionIPv4Address()->registerCallbackFunction(
+    standalone_simulator_config->mutableVisionIpv4Address()->registerCallbackFunction(
         [this](std::string vision_ip_address) {
             setupNetworking(
                 this->standalone_simulator_config->BlueTeamChannel()->value(),
@@ -64,7 +64,7 @@ StandaloneSimulator::StandaloneSimulator(
                     standalone_simulator_config->YellowTeamChannel()->value(),
                     standalone_simulator_config->NetworkInterface()->value(),
                     standalone_simulator_config->VisionPort()->value(),
-                    standalone_simulator_config->VisionIPv4Address()->value());
+                    standalone_simulator_config->VisionIpv4Address()->value());
 
     simulator.registerOnSSLWrapperPacketReadyCallback(
         [this](SSLProto::SSL_WrapperPacket wrapper_packet) {

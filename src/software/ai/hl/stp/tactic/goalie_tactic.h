@@ -36,7 +36,7 @@ class GoalieTactic : public Tactic
     explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
                           const Team &enemy_team,
                           std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-                              DynamicParameters->getAiConfig()->getGoalieTacticConfig());
+                              DynamicParameters->getAIConfig()->getGoalieTacticConfig());
 
     GoalieTactic() = delete;
 

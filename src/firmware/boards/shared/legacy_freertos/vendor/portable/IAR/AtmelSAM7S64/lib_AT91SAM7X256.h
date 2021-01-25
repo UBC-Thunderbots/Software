@@ -53,7 +53,7 @@
 //* \brief Interrupt Handler Initialization
 //*----------------------------------------------------------------------------
 __inline unsigned int AT91F_AIC_ConfigureIt (
-	AT91PS_AIC pAic,  // \arg pointer to the AIC registers
+	AT91PS_AIC pAIc,  // \arg pointer to the AIC registers
 	unsigned int irq_id,     // \arg interrupt number to initialize
 	unsigned int priority,   // \arg priority to give to the interrupt
 	unsigned int src_type,   // \arg activation and sense of activation
@@ -62,17 +62,17 @@ __inline unsigned int AT91F_AIC_ConfigureIt (
 	unsigned int oldHandler;
     unsigned int mask ;
 
-    oldHandler = pAic->AIC_SVR[irq_id];
+    oldHandler = pAIc->AIC_SVR[irq_id];
 
     mask = 0x1 << irq_id ;
     //* Disable the interrupt on the interrupt controller
-    pAic->AIC_IDCR = mask ;
+    pAIc->AIC_IDCR = mask ;
     //* Save the interrupt handler routine pointer and the interrupt priority
-    pAic->AIC_SVR[irq_id] = (unsigned int) newHandler ;
+    pAIc->AIC_SVR[irq_id] = (unsigned int) newHandler ;
     //* Store the Source Mode Register
-    pAic->AIC_SMR[irq_id] = src_type | priority  ;
+    pAIc->AIC_SMR[irq_id] = src_type | priority  ;
     //* Clear the interrupt on the interrupt controller
-    pAic->AIC_ICCR = mask ;
+    pAIc->AIC_ICCR = mask ;
 
 	return oldHandler;
 }
@@ -82,11 +82,11 @@ __inline unsigned int AT91F_AIC_ConfigureIt (
 //* \brief Enable corresponding IT number
 //*----------------------------------------------------------------------------
 __inline void AT91F_AIC_EnableIt (
-	AT91PS_AIC pAic,      // \arg pointer to the AIC registers
+	AT91PS_AIC pAIc,      // \arg pointer to the AIC registers
 	unsigned int irq_id ) // \arg interrupt number to initialize
 {
     //* Enable the interrupt on the interrupt controller
-    pAic->AIC_IECR = 0x1 << irq_id ;
+    pAIc->AIC_IECR = 0x1 << irq_id ;
 }
 
 //*----------------------------------------------------------------------------
@@ -94,14 +94,14 @@ __inline void AT91F_AIC_EnableIt (
 //* \brief Disable corresponding IT number
 //*----------------------------------------------------------------------------
 __inline void AT91F_AIC_DisableIt (
-	AT91PS_AIC pAic,      // \arg pointer to the AIC registers
+	AT91PS_AIC pAIc,      // \arg pointer to the AIC registers
 	unsigned int irq_id ) // \arg interrupt number to initialize
 {
     unsigned int mask = 0x1 << irq_id;
     //* Disable the interrupt on the interrupt controller
-    pAic->AIC_IDCR = mask ;
+    pAIc->AIC_IDCR = mask ;
     //* Clear the interrupt on the Interrupt Controller ( if one is pending )
-    pAic->AIC_ICCR = mask ;
+    pAIc->AIC_ICCR = mask ;
 }
 
 //*----------------------------------------------------------------------------
@@ -109,11 +109,11 @@ __inline void AT91F_AIC_DisableIt (
 //* \brief Clear corresponding IT number
 //*----------------------------------------------------------------------------
 __inline void AT91F_AIC_ClearIt (
-	AT91PS_AIC pAic,     // \arg pointer to the AIC registers
+	AT91PS_AIC pAIc,     // \arg pointer to the AIC registers
 	unsigned int irq_id) // \arg interrupt number to initialize
 {
     //* Clear the interrupt on the Interrupt Controller ( if one is pending )
-    pAic->AIC_ICCR = (0x1 << irq_id);
+    pAIc->AIC_ICCR = (0x1 << irq_id);
 }
 
 //*----------------------------------------------------------------------------
@@ -121,9 +121,9 @@ __inline void AT91F_AIC_ClearIt (
 //* \brief Acknowledge corresponding IT number
 //*----------------------------------------------------------------------------
 __inline void AT91F_AIC_AcknowledgeIt (
-	AT91PS_AIC pAic)     // \arg pointer to the AIC registers
+	AT91PS_AIC pAIc)     // \arg pointer to the AIC registers
 {
-    pAic->AIC_EOICR = pAic->AIC_EOICR;
+    pAIc->AIC_EOICR = pAIc->AIC_EOICR;
 }
 
 //*----------------------------------------------------------------------------
@@ -149,10 +149,10 @@ __inline unsigned int  AT91F_AIC_SetExceptionVector (
 //* \brief Trig an IT
 //*----------------------------------------------------------------------------
 __inline void  AT91F_AIC_Trig (
-	AT91PS_AIC pAic,     // \arg pointer to the AIC registers
+	AT91PS_AIC pAIc,     // \arg pointer to the AIC registers
 	unsigned int irq_id) // \arg interrupt number
 {
-	pAic->AIC_ISCR = (0x1 << irq_id) ;
+	pAIc->AIC_ISCR = (0x1 << irq_id) ;
 }
 
 //*----------------------------------------------------------------------------
@@ -160,10 +160,10 @@ __inline void  AT91F_AIC_Trig (
 //* \brief Test if an IT is active
 //*----------------------------------------------------------------------------
 __inline unsigned int  AT91F_AIC_IsActive (
-	AT91PS_AIC pAic,     // \arg pointer to the AIC registers
+	AT91PS_AIC pAIc,     // \arg pointer to the AIC registers
 	unsigned int irq_id) // \arg Interrupt Number
 {
-	return (pAic->AIC_ISR & (0x1 << irq_id));
+	return (pAIc->AIC_ISR & (0x1 << irq_id));
 }
 
 //*----------------------------------------------------------------------------
@@ -171,10 +171,10 @@ __inline unsigned int  AT91F_AIC_IsActive (
 //* \brief Test if an IT is pending
 //*----------------------------------------------------------------------------
 __inline unsigned int  AT91F_AIC_IsPending (
-	AT91PS_AIC pAic,     // \arg pointer to the AIC registers
+	AT91PS_AIC pAIc,     // \arg pointer to the AIC registers
 	unsigned int irq_id) // \arg Interrupt Number
 {
-	return (pAic->AIC_IPR & (0x1 << irq_id));
+	return (pAIc->AIC_IPR & (0x1 << irq_id));
 }
 
 //*----------------------------------------------------------------------------
@@ -182,7 +182,7 @@ __inline unsigned int  AT91F_AIC_IsPending (
 //* \brief Set exception vectors and AIC registers to default values
 //*----------------------------------------------------------------------------
 __inline void AT91F_AIC_Open(
-	AT91PS_AIC pAic,        // \arg pointer to the AIC registers
+	AT91PS_AIC pAIc,        // \arg pointer to the AIC registers
 	void (*IrqHandler) (),  // \arg Default IRQ vector exception
 	void (*FiqHandler) (),  // \arg Default FIQ vector exception
 	void (*DefaultHandler)  (), // \arg Default Handler set in ISR
@@ -193,8 +193,8 @@ __inline void AT91F_AIC_Open(
 
 	// Disable all interrupts and set IVR to the default handler
 	for (i = 0; i < 32; ++i) {
-		AT91F_AIC_DisableIt(pAic, i);
-		AT91F_AIC_ConfigureIt(pAic, i, AT91C_AIC_PRIOR_LOWEST, AT91C_AIC_SRCTYPE_HIGH_LEVEL, DefaultHandler);
+		AT91F_AIC_DisableIt(pAIc, i);
+		AT91F_AIC_ConfigureIt(pAIc, i, AT91C_AIC_PRIOR_LOWEST, AT91C_AIC_SRCTYPE_HIGH_LEVEL, DefaultHandler);
 	}
 
 	// Set the IRQ exception vector
@@ -202,8 +202,8 @@ __inline void AT91F_AIC_Open(
 	// Set the Fast Interrupt exception vector
 	AT91F_AIC_SetExceptionVector((unsigned int *) 0x1C, FiqHandler);
 
-	pAic->AIC_SPU = (unsigned int) SpuriousHandler;
-	pAic->AIC_DCR = protectMode;
+	pAIc->AIC_SPU = (unsigned int) SpuriousHandler;
+	pAIc->AIC_DCR = protectMode;
 }
 /* *****************************************************************************
                 SOFTWARE API FOR PDC

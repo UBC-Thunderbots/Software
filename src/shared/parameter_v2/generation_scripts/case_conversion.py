@@ -1,8 +1,12 @@
 import re
 
+ALLOWED_ACRONYMS = [
+   "ai",
+   "ssl",
+]
 
 def to_pascal_case(snake_str):
-    return "".join(x.title() for x in snake_str.split("_"))
+    return "".join(x.upper() if x in ALLOWED_ACRONYMS else x.title() for x in snake_str.split("_"))
 
 
 def to_camel_case(snake_str):
