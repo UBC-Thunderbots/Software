@@ -1,5 +1,7 @@
 #pragma once
 
+#include <queue>
+
 #include "software/ai/hl/stp/tactic/get_behind_ball_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/chip_intent.h"
@@ -37,13 +39,24 @@ struct ChipFSM
                 event.controls.chip_direction, event.controls.chip_distance_meters));
         };
 
+        const auto update_get_behind_ball =
+            [](auto event, back::process<GetBehindBallFSM::Update> processEvent) {
+                processEvent(GetBehindBallFSM::Update{
+                    .controls =
+                        GetBehindBallFSM::Controls{
+                            .ball_location   = event.controls.chip_origin,
+                            .chick_direction = event.controls.chip_direction},
+                    .common = event.common});
+            };
+
         const auto ball_chicked = [](auto event) {
             return event.common.world.ball().hasBallBeenKicked(
                 event.controls.chip_direction);
         };
 
         return make_transition_table(
-            *state<GetBehindBallFSM>                                        = state<Chip>,
+            *state<GetBehindBallFSM> + event<Update> / update_get_behind_ball =
+                state<Chip>,
             state<Chip> + event<Update>[!ball_chicked] / update_chip_intent = state<Chip>,
             state<Chip> + event<Update>[ball_chicked]                       = X);
     }
@@ -109,7 +122,7 @@ class ChipTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    boost::sml::sm<ChipFSM> fsm;
+    boost::sml::sm<ChipFSM, boost::sml::process_queue<std::queue>> fsm;
 
     // Tactic parameters
     Ball ball;

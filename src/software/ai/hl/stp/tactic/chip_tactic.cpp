@@ -68,9 +68,4 @@ bool ChipTactic::done() const
 void ChipTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(ChipFSM::Update{.controls = controls, .common = tactic_update});
-    fsm.process_event(GetBehindBallFSM::Update{
-        .controls =
-            GetBehindBallFSM::Controls{.ball_location   = controls.chip_origin,
-                                       .chick_direction = controls.chip_direction},
-        .common = tactic_update});
 }
