@@ -201,6 +201,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "get_behind_ball_tactic_test",
+    srcs = ["get_behind_ball_tactic_test.cpp"],
+    deps = [
+        ":get_behind_ball_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "passer_tactic",
     srcs = ["passer_tactic.cpp"],

@@ -18,9 +18,9 @@ void ChipTactic::updateControlParams(const Point &chip_origin,
                                      const Angle &chip_direction,
                                      double chip_distance_meters)
 {
-    controls.chip_origin          = chip_origin;
-    controls.chip_direction       = chip_direction;
-    controls.chip_distance_meters = chip_distance_meters;
+    control_params.chip_origin          = chip_origin;
+    control_params.chip_direction       = chip_direction;
+    control_params.chip_distance_meters = chip_distance_meters;
 }
 
 void ChipTactic::updateControlParams(const Point &chip_origin, const Point &chip_target)
@@ -43,9 +43,9 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     do
     {
-        chip_action->updateControlParams(*robot_, controls.chip_origin,
-                                         controls.chip_direction,
-                                         controls.chip_distance_meters);
+        chip_action->updateControlParams(*robot_, control_params.chip_origin,
+                                         control_params.chip_direction,
+                                         control_params.chip_distance_meters);
         yield(chip_action);
     } while (!chip_action->done());
 }
@@ -67,5 +67,6 @@ bool ChipTactic::done() const
 
 void ChipTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(ChipFSM::Update{.controls = controls, .common = tactic_update});
+    fsm.process_event(
+        ChipFSM::Update{.control_params = control_params, .common = tactic_update});
 }

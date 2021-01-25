@@ -10,7 +10,7 @@ struct ChipFSM
 {
     class chip_state;
 
-    struct Controls
+    struct ControlParams
     {
         // The location where the chip will be taken
         Point chip_origin;
@@ -23,7 +23,7 @@ struct ChipFSM
     struct Update
     {
         /* event */
-        Controls controls;
+        ControlParams control_params;
         TacticUpdate common;
     };
 
@@ -37,24 +37,25 @@ struct ChipFSM
 
         const auto update_chip = [](auto event) {
             event.common.set_intent(std::make_unique<ChipIntent>(
-                event.common.robot.id(), event.controls.chip_origin,
-                event.controls.chip_direction, event.controls.chip_distance_meters));
+                event.common.robot.id(), event.control_params.chip_origin,
+                event.control_params.chip_direction,
+                event.control_params.chip_distance_meters));
         };
 
         const auto update_get_behind_ball =
             [](auto event, back::process<GetBehindBallFSM::Update> processEvent) {
                 // Update the get behind ball fsm
                 processEvent(GetBehindBallFSM::Update{
-                    .controls =
-                        GetBehindBallFSM::Controls{
-                            .ball_location   = event.controls.chip_origin,
-                            .chick_direction = event.controls.chip_direction},
+                    .control_params =
+                        GetBehindBallFSM::ControlParams{
+                            .ball_location   = event.control_params.chip_origin,
+                            .chick_direction = event.control_params.chip_direction},
                     .common = event.common});
             };
 
         const auto ball_chicked = [](auto event) {
             return event.common.world.ball().hasBallBeenKicked(
-                event.controls.chip_direction);
+                event.control_params.chip_direction);
         };
 
         return make_transition_table(
@@ -129,5 +130,5 @@ class ChipTactic : public Tactic
 
     // Tactic parameters
     Ball ball;
-    ChipFSM::Controls controls;
+    ChipFSM::ControlParams control_params;
 };

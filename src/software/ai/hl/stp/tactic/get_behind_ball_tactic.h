@@ -11,7 +11,7 @@ struct GetBehindBallFSM
     class idle_state;
     class get_behind_ball_state;
 
-    struct Controls
+    struct ControlParams
     {
         // The location where the chick will be taken, i.e. where we expect the ball to be
         // when we chip or kick it
@@ -23,7 +23,7 @@ struct GetBehindBallFSM
     struct Update
     {
         /* event */
-        Controls controls;
+        ControlParams control_params;
         TacticUpdate common;
     };
 
@@ -63,21 +63,21 @@ struct GetBehindBallFSM
         //         direction of chip/kick
 
         const auto update_move = [size_of_region_behind_ball](auto event) {
-            Vector behind_ball =
-                Vector::createFromAngle(event.controls.chick_direction + Angle::half());
+            Vector behind_ball = Vector::createFromAngle(
+                event.control_params.chick_direction + Angle::half());
             Point point_behind_ball =
-                event.controls.ball_location +
+                event.control_params.ball_location +
                 behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), point_behind_ball,
-                event.controls.chick_direction, 0.0, DribblerMode::OFF,
+                event.control_params.chick_direction, 0.0, DribblerMode::OFF,
                 BallCollisionType::AVOID));
         };
 
         const auto behind_ball = [size_of_region_behind_ball](auto event) {
             // A vector in the direction opposite the chip (behind the ball)
-            Vector behind_ball =
-                Vector::createFromAngle(event.controls.chick_direction + Angle::half());
+            Vector behind_ball = Vector::createFromAngle(
+                event.control_params.chick_direction + Angle::half());
 
 
             // The points below make up the triangle that defines the region we treat as
@@ -86,7 +86,7 @@ struct GetBehindBallFSM
 
             // We make the region close enough to the ball so that the robot will still be
             // inside it when taking the chip.
-            Point behind_ball_vertex_A = event.controls.ball_location;
+            Point behind_ball_vertex_A = event.control_params.ball_location;
             Point behind_ball_vertex_B =
                 behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
                 behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
@@ -157,5 +157,5 @@ class GetBehindBallTactic : public Tactic
 
     boost::sml::sm<GetBehindBallFSM> fsm;
 
-    GetBehindBallFSM::Controls controls;
+    GetBehindBallFSM::ControlParams control_params;
 };
