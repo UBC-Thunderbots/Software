@@ -190,6 +190,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 ### Running AI vs AI
 1. Open your terminal, `cd` into `Software/src`
 2. Run `./software/run_ai_vs_ai.sh interface_name`, using the same interface as from [above](#running-our-ai-simulator-or-robot-diagnostics)
+3. If the script does not run, run `./software/configure_ai_vs_ai.sh` to open the required networking ports
 
 ## Debugging
 Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 
