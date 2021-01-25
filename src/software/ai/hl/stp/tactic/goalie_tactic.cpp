@@ -254,7 +254,7 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
 
     // how far in should the goalie wedge itself into the block cone, to block
     // balls
-    auto block_cone_radius = goalie_tactic_config->BlockConeRadius()->value();
+    auto block_cone_radius = goalie_tactic_config->blockConeRadius()->value();
     // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
     // either side
     Point goalie_pos = calculateBlockCone(
@@ -263,7 +263,7 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
 
     // by how much should the defense area be decreased so the goalie stays close
     // towards the net
-    auto defense_area_deflation = goalie_tactic_config->DefenseAreaDeflation()->value();
+    auto defense_area_deflation = goalie_tactic_config->defenseAreaDeflation()->value();
     // we want to restrict the block cone to the friendly crease, also potentially
     // scaled by a defense_area_deflation_parameter
     Rectangle deflated_defense_area = field.friendlyDefenseArea();
@@ -299,7 +299,7 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
 
     // what should the final goalie speed be, so that the goalie accelerates
     // faster
-    auto goalie_final_speed = goalie_tactic_config->GoalieFinalSpeed()->value();
+    auto goalie_final_speed = goalie_tactic_config->goalieFinalSpeed()->value();
     autochip_move_action->updateControlParams(
         *robot, goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
         YEET_CHIP_DISTANCE_METERS, BallCollisionType::ALLOW);

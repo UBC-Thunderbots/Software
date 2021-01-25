@@ -165,7 +165,7 @@ class YamlLoadFixture : public ::testing::Test
 
             // Store the config name, the name of the file
             boost::filesystem::path config_path(entry.path().string());
-            std::string config_name = toCamelCase(config_path.stem().string());
+            std::string config_name = toCamelCase(config_path.stem().string()) + "Config";
             YAML::Node current_config_yaml;
 
             if (config.size() == 1)

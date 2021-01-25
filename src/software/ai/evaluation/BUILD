@@ -135,6 +135,7 @@ cc_library(
     hdrs = ["find_open_areas.h"],
     deps = [
         ":shot",
+        "//software/parameter:dynamic_parameters",
         "//software/geom/algorithms",
         "//software/world",
     ],

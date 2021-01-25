@@ -68,7 +68,7 @@ class CppWriter(object):
 
         # first pass to construct all CppConfig objects
         for config, metadata in config_metadata.items():
-            config_name = to_pascal_case(config.split(".")[0])
+            config_name = to_pascal_case(config.split(".")[0]) + "Config"
 
             config = CppConfig(config_name)
             top_level_config.include_config(config)
@@ -86,7 +86,7 @@ class CppWriter(object):
 
         # second pass to create dependency graph
         for config, metadata in config_metadata.items():
-            config_name = to_pascal_case(config.split(".")[0])
+            config_name = to_pascal_case(config.split(".")[0]) + "Config"
 
             config = cpp_configs_dict[config_name]
 
