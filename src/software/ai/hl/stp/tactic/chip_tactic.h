@@ -8,9 +8,7 @@
 
 struct ChipFSM
 {
-    struct Chip
-    { /* state */
-    };
+    class chip_state;
 
     struct Controls
     {
@@ -33,7 +31,11 @@ struct ChipFSM
     {
         using namespace boost::sml;
 
-        const auto update_chip_intent = [](auto event) {
+        const auto get_behind_ball_s = state<GetBehindBallFSM>;
+        const auto chip_s            = state<chip_state>;
+        const auto update_e          = event<Update>;
+
+        const auto update_chip = [](auto event) {
             event.common.set_intent(std::make_unique<ChipIntent>(
                 event.common.robot.id(), event.controls.chip_origin,
                 event.controls.chip_direction, event.controls.chip_distance_meters));
@@ -41,6 +43,7 @@ struct ChipFSM
 
         const auto update_get_behind_ball =
             [](auto event, back::process<GetBehindBallFSM::Update> processEvent) {
+                // Update the get behind ball fsm
                 processEvent(GetBehindBallFSM::Update{
                     .controls =
                         GetBehindBallFSM::Controls{
@@ -55,10 +58,10 @@ struct ChipFSM
         };
 
         return make_transition_table(
-            *state<GetBehindBallFSM> + event<Update> / update_get_behind_ball =
-                state<Chip>,
-            state<Chip> + event<Update>[!ball_chicked] / update_chip_intent = state<Chip>,
-            state<Chip> + event<Update>[ball_chicked]                       = X);
+            // src_state + event [guard] / action = dest state
+            *get_behind_ball_s + update_e / update_get_behind_ball = chip_s,
+            chip_s + update_e[!ball_chicked] / update_chip         = chip_s,
+            chip_s + update_e[ball_chicked]                        = X);
     }
 };
 

@@ -8,9 +8,8 @@
 
 struct GetBehindBallFSM
 {
-    struct GetBehindBall
-    { /* state */
-    };
+    class idle_state;
+    class get_behind_ball_state;
 
     struct Controls
     {
@@ -31,6 +30,10 @@ struct GetBehindBallFSM
     auto operator()()
     {
         using namespace boost::sml;
+
+        const auto idle_s            = state<idle_state>;
+        const auto get_behind_ball_s = state<get_behind_ball_state>;
+        const auto update_e          = event<Update>;
 
         // How large the triangle is that defines the region where the robot is
         // behind the chick origin and ready to chip or kick.
@@ -59,7 +62,7 @@ struct GetBehindBallFSM
         //                 V
         //         direction of chip/kick
 
-        const auto update_move_intent = [size_of_region_behind_ball](auto event) {
+        const auto update_move = [size_of_region_behind_ball](auto event) {
             Vector behind_ball =
                 Vector::createFromAngle(event.controls.chick_direction + Angle::half());
             Point point_behind_ball =
@@ -98,11 +101,10 @@ struct GetBehindBallFSM
         };
 
         return make_transition_table(
-            *"idle"_s + event<Update> / update_move_intent = state<GetBehindBall>,
-            state<GetBehindBall> + event<Update>[!behind_ball] / update_move_intent =
-                state<GetBehindBall>,
-            state<GetBehindBall> + event<Update>[behind_ball] / update_move_intent = X,
-            X + event<Update>[behind_ball] / update_move_intent                    = X);
+            *idle_s + update_e / update_move                         = get_behind_ball_s,
+            get_behind_ball_s + update_e[!behind_ball] / update_move = get_behind_ball_s,
+            get_behind_ball_s + update_e[behind_ball] / update_move  = X,
+            X + update_e[behind_ball] / update_move                  = X);
     }
 
    private:
