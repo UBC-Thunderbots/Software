@@ -47,6 +47,7 @@ std::vector<std::unique_ptr<Intent>> Play::get(
     auto tactics = getTactics(new_world);
     std::vector<std::shared_ptr<const Tactic>> const_tactics;
     const_tactics.reserve(tactics.size());
+    // convert pointers to const pointers
     std::transform(tactics.begin(), tactics.end(), std::back_inserter(const_tactics),
                    [](std::shared_ptr<Tactic> tactic) { return tactic; });
     auto robot_tactic_assignment =
