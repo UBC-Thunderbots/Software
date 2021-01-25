@@ -124,13 +124,13 @@ class ConfigYamlLoader(object):
                     if len(raw_config_metadata[tail]) == 1:
 
                         # include only in file
-                        if isinstance(raw_config_metadata[tail], dict):
+                        if isinstance(raw_config_metadata[tail][0], dict):
                             raw_config_metadata[tail] = {
                                 INCLUDE_KEY: raw_config_metadata[tail][0][INCLUDE_KEY]
                             }
 
                         # parameter definitions only in file
-                        if isinstance(raw_config_metadata[tail][0], list):
+                        elif isinstance(raw_config_metadata[tail][0], list):
                             raw_config_metadata[tail] = {
                                 PARAMETER_KEY: raw_config_metadata[tail][0]
                             }
