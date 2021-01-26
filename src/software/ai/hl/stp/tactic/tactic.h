@@ -16,9 +16,12 @@
 // and easier to work with
 typedef boost::coroutines2::coroutine<std::shared_ptr<Action>> ActionCoroutine;
 
+// The tactic update struct is used to update tactics and set the new intent
 struct TacticUpdate
 {
+    // updated robot that tactic is assigned to
     Robot robot;
+    // updated world
     World world;
     // callback to return the next intent
     std::function<void(std::unique_ptr<Intent>)> set_intent;

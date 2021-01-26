@@ -6,11 +6,9 @@
 
 struct StopFSM
 {
-    /* state classes */
     class idle_state;
     class stop_state;
 
-    /* update structs */
     struct Update
     {
         bool coast;
