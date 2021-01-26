@@ -16,5 +16,6 @@ void echo() {
 
         // say what you got:
         Serial.print((char)incomingByte);
+        Serial.print('h');
     }
 }

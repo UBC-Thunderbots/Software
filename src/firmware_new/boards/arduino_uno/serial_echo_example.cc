@@ -6,9 +6,9 @@
 
 
 #ifdef PLATFORMIO_BUILD
-#include "echo_library.h"  // This is how PlatformIO sees and includes the library.
+#include "echo_library.h"  // PlatformIO sees and includes the library based on the file name ONLY
 #else
-#include "echo_library.h"  // actual path to file (in this example its the same)
+#include "echo_library.h"  // actual path to file (in this example it is the same)
 #endif
 
 #include <Arduino.h>
