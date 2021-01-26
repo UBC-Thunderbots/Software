@@ -349,6 +349,7 @@ cc_library(
     srcs = ["stop_tactic.cpp"],
     hdrs = ["stop_tactic.h"],
     deps = [
+        ":stop_fsm",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
@@ -466,6 +467,25 @@ cc_test(
     srcs = ["move_fsm_test.cpp"],
     deps = [
         ":move_fsm",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "stop_fsm",
+    hdrs = ["stop_fsm.h"],
+    deps = [
+        ":tactic_fsm",
+        "//software/ai/intent:stop_intent",
+    ],
+)
+
+cc_test(
+    name = "stop_fsm_test",
+    srcs = ["stop_fsm_test.cpp"],
+    deps = [
+        ":stop_fsm",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
