@@ -4,7 +4,11 @@
 
 void robotsSlowedDown(std::shared_ptr<World> world_ptr,
                       ValidationCoroutine::push_type& yield) {
-    while (true) {
+
+
+
+
+    while () {
         yield();
     }
 
