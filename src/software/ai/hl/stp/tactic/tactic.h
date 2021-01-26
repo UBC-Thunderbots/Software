@@ -2,7 +2,6 @@
 
 #include <boost/coroutine2/all.hpp>  // TODO (#1888): remove this dependency
 #include <functional>
-#include <include/boost/sml.hpp>
 #include <optional>  // TODO (#1888): remove this dependency
 
 #include "software/ai/hl/stp/action/action.h"  // TODO (#1888): remove this dependency
@@ -225,9 +224,8 @@ class Tactic
      * @param tactic_update The tactic_update struct that contains all the information for
      * updating the intent
      */
-    virtual void updateIntent(
-        const TacticUpdate
-            &tactic_update);  // TODO (#1888): make this function pure virtual
+    // TODO (#1888): make this function pure virtual
+    virtual void updateIntent(const TacticUpdate &tactic_update);
 
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;
