@@ -20,12 +20,11 @@ void robotSlowedDown(RobotId robot_id, std::shared_ptr<World> world_ptr,
         return (speed <= MAX_SPEED);
     };
 
-    if (robot_slowed_down(world_ptr))
+    if (!robot_slowed_down(world_ptr))
     {
-        yield();
+        LOG(FATAL) << "Robot " + std::to_string(robot_id) + " failed to slow down";
     }
     else {
-        LOG(FATAL) << "Robot " + std::to_string(robot_id) + " failed to reach required speed";
+        LOG(WARNING) << "Robot " + std::to_string(robot_id) + " slowed down!";
     }
-
 }
