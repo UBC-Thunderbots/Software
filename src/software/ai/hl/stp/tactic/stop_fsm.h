@@ -10,6 +10,7 @@ struct StopFSM
 
     struct Update
     {
+        Update(bool coast, const TacticUpdate& common) : coast(coast), common(common) {}
         bool coast;
         TacticUpdate common;
     };

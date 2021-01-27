@@ -23,12 +23,7 @@ struct MoveFSM
     };
 
     // this struct defines the only event that the MoveFSM responds to
-    struct Update
-    {
-        ControlParams control_params;
-        // The TacticUpdate struct is common to all tactic fsms
-        TacticUpdate common;
-    };
+    UPDATE_STRUCT_WITH_CONTROL_PARAMS_AND_COMMON
 
     auto operator()()
     {
