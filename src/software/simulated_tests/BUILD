@@ -140,6 +140,7 @@ cc_test(
         ":simulated_test_main",
         "//software/ai/hl/stp/play:stop_play",
         "//software/simulated_tests/validation:validation_function",
+        "//software/simulated_tests/validation_functions",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
