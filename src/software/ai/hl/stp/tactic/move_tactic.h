@@ -1,55 +1,9 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
+#include "software/ai/hl/stp/tactic/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
-
-struct MoveFSM
-{
-    struct Move
-    { /* state */
-    };
-
-    struct Controls
-    {
-        // The point the robot is trying to move to
-        Point destination;
-        // The orientation the robot should have when it arrives at its destination
-        Angle final_orientation;
-        // The speed the robot should have when it arrives at its destination
-        double final_speed;
-    };
-
-    struct Update
-    {
-        Controls controls;
-        TacticUpdate common;
-    };
-
-    auto operator()()
-    {
-        using namespace boost::sml;
-
-        const auto update_move_intent = [](auto event) {
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), event.controls.destination,
-                event.controls.final_orientation, event.controls.final_speed,
-                DribblerMode::OFF, BallCollisionType::AVOID));
-        };
-
-        const auto movement_done = [](auto event) {
-            return moveRobotDone(event.common.robot, event.controls.destination,
-                                 event.controls.final_orientation);
-        };
-
-        return make_transition_table(
-            *"idle"_s + event<Update> / update_move_intent = state<Move>,
-            state<Move> + event<Update>[!movement_done] / update_move_intent =
-                state<Move>,
-            state<Move> + event<Update>[movement_done] / update_move_intent = X,
-            X + event<Update>[movement_done] / update_move_intent           = X);
-    }
-};
 
 /**
  * The MoveTactic will move the assigned robot to the given destination and arrive
@@ -99,7 +53,7 @@ class MoveTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    boost::sml::sm<MoveFSM> fsm;
+    BaseFSM<MoveFSM> fsm;
 
-    MoveFSM::Controls controls;
+    MoveFSM::ControlParams control_params;
 };

@@ -39,25 +39,19 @@ std::vector<std::shared_ptr<Tactic>> Play::getTactics(const World &world)
     return std::vector<std::shared_ptr<Tactic>>();
 }
 
-std::vector<std::shared_ptr<const Tactic>> Play::copyConstTactics(
-    std::vector<std::shared_ptr<Tactic>> tactics)
-{
-    std::vector<std::shared_ptr<const Tactic>> const_tactics;
-    for (const auto tactic : tactics)
-    {
-        const_tactics.push_back(tactic);
-    }
-    return const_tactics;
-}
-
 std::vector<std::unique_ptr<Intent>> Play::get(
-    RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm,
-    MotionConstraintCalculator motion_constraint_builder, const World &new_world)
+    RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
+    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
     auto tactics = getTactics(new_world);
+    std::vector<std::shared_ptr<const Tactic>> const_tactics;
+    const_tactics.reserve(tactics.size());
+    // convert pointers to const pointers
+    std::transform(tactics.begin(), tactics.end(), std::back_inserter(const_tactics),
+                   [](std::shared_ptr<Tactic> tactic) { return tactic; });
     auto robot_tactic_assignment =
-        robot_to_tactic_assignment_algorithm(copyConstTactics(tactics), new_world);
+        robot_to_tactic_assignment_algorithm(const_tactics, new_world);
     for (auto tactic : tactics)
     {
         auto iter = robot_tactic_assignment.find(tactic);

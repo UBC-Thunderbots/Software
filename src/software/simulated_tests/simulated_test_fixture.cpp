@@ -12,7 +12,10 @@ SimulatedTestFixture::SimulatedTestFixture()
 
 void SimulatedTestFixture::SetUp()
 {
-    LoggerSingleton::initializeLogger();
+    LoggerSingleton::initializeLogger(
+        DynamicParameters->getStandaloneSimulatorMainCommandLineArgs()
+            ->logging_dir()
+            ->value());
 
     // init() resets all DynamicParameters for each test. Since DynamicParameters are
     // still partially global, we need to reinitialize simulator, sensor_fusion, and ai,

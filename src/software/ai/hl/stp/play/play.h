@@ -8,11 +8,11 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/world/world.h"
 
-using RobotToTacticAssignmentAlgorithm =
+using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
         const std::vector<std::shared_ptr<const Tactic>>&, const World&)>;
 
-using MotionConstraintCalculator =
+using MotionConstraintBuildFunction =
     std::function<std::set<MotionConstraint>(const Tactic& tactic)>;
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
@@ -94,8 +94,8 @@ class Play
      * @return the vector of intents to execute
      */
     std::vector<std::unique_ptr<Intent>> get(
-        RobotToTacticAssignmentAlgorithm robot_to_tactic_assignment_algorithm,
-        MotionConstraintCalculator motion_constraint_builder, const World& new_world);
+        RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
+        MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
 
     virtual ~Play() = default;
 
@@ -148,17 +148,6 @@ class Play
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
-
-    /**
-     * Helper function that copies a vector of std::shared_ptr<Tactic> to a vector of
-     * std::shared_ptr<const Tactic>
-     *
-     * @param tactics The tactics to copy over
-     *
-     * @return the vector that has std::shared_ptr<const Tactic>
-     */
-    static std::vector<std::shared_ptr<const Tactic>> copyConstTactics(
-        std::vector<std::shared_ptr<Tactic>> tactics);
 
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;

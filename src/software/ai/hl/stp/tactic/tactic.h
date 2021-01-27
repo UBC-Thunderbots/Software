@@ -1,11 +1,10 @@
 #pragma once
 
 #include <boost/coroutine2/all.hpp>  // TODO (#1888): remove this dependency
-#include <functional>
-#include <include/boost/sml.hpp>
-#include <optional>  // TODO (#1888): remove this dependency
+#include <optional>                  // TODO (#1888): remove this dependency
 
 #include "software/ai/hl/stp/action/action.h"  // TODO (#1888): remove this dependency
+#include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/intent.h"
@@ -15,13 +14,6 @@
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
 typedef boost::coroutines2::coroutine<std::shared_ptr<Action>> ActionCoroutine;
-
-struct TacticUpdate
-{
-    Robot robot;
-    World world;
-    std::function<void(std::unique_ptr<Intent>)> set_intent;
-};
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot.
@@ -221,9 +213,8 @@ class Tactic
      * @param tactic_update The tactic_update struct that contains all the information for
      * updating the intent
      */
-    virtual void updateIntent(
-        const TacticUpdate
-            &tactic_update);  // TODO (#1888): make this function pure virtual
+    // TODO (#1888): make this function pure virtual
+    virtual void updateIntent(const TacticUpdate &tactic_update);
 
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;

@@ -32,8 +32,7 @@ bool StopTactic::done() const
 
 void StopTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    StopFSM::Update event{.coast = coast, .common = tactic_update};
-    fsm.process_event(event);
+    fsm.process_event(StopFSM::Update(coast, tactic_update));
 }
 
 void StopTactic::accept(TacticVisitor &visitor) const

@@ -2,6 +2,7 @@
 
 #include "software/ai/intent/stop_intent.h"
 #include "software/logger/logger.h"
+#include "software/util/typename/typename.h"
 
 Tactic::Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_)
     : action_sequence(boost::bind(&Tactic::calculateNextActionWrapper, this, _1)),
@@ -112,22 +113,21 @@ std::set<RobotCapability> &Tactic::mutableRobotCapabilityRequirements()
 
 std::unique_ptr<Intent> Tactic::get(const Robot &robot, const World &world)
 {
-    // TODO (#1888): remove these updates
+    // TODO (#1888): remove updateWorldParams and updateRobot
     updateWorldParams(world);
     updateRobot(robot);
 
-    updateIntent(TacticUpdate{.robot      = robot,
-                              .world      = world,
-                              .set_intent = [this](std::unique_ptr<Intent> new_intent) {
-                                  intent = std::move(new_intent);
-                              }});
+    updateIntent(TacticUpdate(robot, world, [this](std::unique_ptr<Intent> new_intent) {
+        intent = std::move(new_intent);
+    }));
+
     if (intent)
     {
         return std::move(intent);
     }
     else
     {
-        LOG(WARNING) << "No intent set for this tactic" << std::endl;
+        LOG(WARNING) << "No intent set for this tactic: " << TYPENAME(*this) << std::endl;
         return std::make_unique<StopIntent>(robot.id(), false);
     }
 }
