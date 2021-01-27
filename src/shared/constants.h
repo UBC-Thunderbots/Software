@@ -132,3 +132,5 @@ const unsigned int MAX_ROBOT_IDS = 16;
 // 16V, so we use 16 here to approximate a fully-charged battery
 // Makes the battery max voltage a constant now that we are simulating firmware
 const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
+
+const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;

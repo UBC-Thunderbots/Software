@@ -4,6 +4,7 @@
 #include <functional>
 #include <include/boost/sml.hpp>
 #include <optional>  // TODO (#1888): remove this dependency
+#include <queue>
 
 #include "software/ai/hl/stp/action/action.h"  // TODO (#1888): remove this dependency
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
@@ -16,16 +17,43 @@
 // and easier to work with
 typedef boost::coroutines2::coroutine<std::shared_ptr<Action>> ActionCoroutine;
 
+// alias for FSMs that have at least 2 levels of hierarchy
+template <class FSM>
+using HFSM = boost::sml::sm<FSM, boost::sml::process_queue<std::queue>>;
+
+// alias for FSMs that have no hierarchy
+template <class FSM>
+using BaseFSM = boost::sml::sm<FSM>;
+
+using SetIntentFunction = std::function<void(std::unique_ptr<Intent>)>;
+
 // The tactic update struct is used to update tactics and set the new intent
 struct TacticUpdate
 {
+    TacticUpdate(const Robot &robot, const World &world,
+                 const SetIntentFunction set_intent_fun)
+        : robot(robot), world(world), set_intent(set_intent_fun)
+    {
+    }
     // updated robot that tactic is assigned to
     Robot robot;
     // updated world
     World world;
     // callback to return the next intent
-    std::function<void(std::unique_ptr<Intent>)> set_intent;
+    SetIntentFunction set_intent;
 };
+
+#define UPDATE_STRUCT_WITH_CONTROL_PARAMS_AND_COMMON                                     \
+    struct Update                                                                        \
+    {                                                                                    \
+        Update(const ControlParams &control_params, const TacticUpdate &common)          \
+            : control_params(control_params), common(common)                             \
+        {                                                                                \
+        }                                                                                \
+        ControlParams control_params;                                                    \
+        TacticUpdate common;                                                             \
+    };
+
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot.
@@ -225,9 +253,8 @@ class Tactic
      * @param tactic_update The tactic_update struct that contains all the information for
      * updating the intent
      */
-    virtual void updateIntent(
-        const TacticUpdate
-            &tactic_update);  // TODO (#1888): make this function pure virtual
+    // TODO (#1888): make this function pure virtual
+    virtual void updateIntent(const TacticUpdate &tactic_update);
 
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;

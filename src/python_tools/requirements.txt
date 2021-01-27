@@ -3,3 +3,4 @@ notebook==6.1.5
 numpy==1.19.4
 matplotlib==3.3.3
 protobuf==3.6.1
+bokeh==2.2.3

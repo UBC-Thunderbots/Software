@@ -49,8 +49,7 @@ bool MoveTactic::done() const
 
 void MoveTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    MoveFSM::Update event{.control_params = control_params, .common = tactic_update};
-    fsm.process_event(event);
+    fsm.process_event(MoveFSM::Update(control_params, tactic_update));
 }
 
 void MoveTactic::accept(TacticVisitor &visitor) const

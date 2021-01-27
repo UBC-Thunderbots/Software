@@ -117,11 +117,10 @@ std::unique_ptr<Intent> Tactic::get(const Robot &robot, const World &world)
     updateWorldParams(world);
     updateRobot(robot);
 
-    updateIntent(TacticUpdate{.robot      = robot,
-                              .world      = world,
-                              .set_intent = [this](std::unique_ptr<Intent> new_intent) {
-                                  intent = std::move(new_intent);
-                              }});
+    updateIntent(TacticUpdate(robot, world, [this](std::unique_ptr<Intent> new_intent) {
+        intent = std::move(new_intent);
+    }));
+
     if (intent)
     {
         return std::move(intent);
