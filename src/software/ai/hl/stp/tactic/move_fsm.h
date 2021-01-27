@@ -36,7 +36,7 @@ struct MoveFSM
         // update_e is the _event_ that the MoveFSM responds to
         const auto update_e = event<Update>;
 
-        // this _action_ sets the intent to a move intent corresponding to the update_e
+        // this action sets the intent to a move intent corresponding to the update_e
         // event
         const auto update_move = [](auto event) {
             event.common.set_intent(std::make_unique<MoveIntent>(
@@ -45,7 +45,7 @@ struct MoveFSM
                 DribblerMode::OFF, BallCollisionType::AVOID));
         };
 
-        // this _guard_ is used check if the robot is done moving
+        // this guard is used check if the robot is done moving
         const auto move_done = [](auto event) {
             return robotReachedDestination(event.common.robot,
                                            event.control_params.destination,
