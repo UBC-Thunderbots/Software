@@ -165,9 +165,11 @@ cc_test(
 cc_library(
     name = "move_tactic",
     srcs = ["move_tactic.cpp"],
-    hdrs = ["move_tactic.h"],
+    hdrs = [
+        "move_fsm.h",
+        "move_tactic.h",
+    ],
     deps = [
-        ":move_fsm",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
@@ -347,9 +349,11 @@ cc_test(
 cc_library(
     name = "stop_tactic",
     srcs = ["stop_tactic.cpp"],
-    hdrs = ["stop_tactic.h"],
+    hdrs = [
+        "stop_fsm.h",
+        "stop_tactic.h",
+    ],
     deps = [
-        ":stop_fsm",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
@@ -405,6 +409,7 @@ cc_library(
         "//software/ai/intent:stop_intent",
         "//software/util/typename",
         "//software/world",
+        "@sml",
     ],
 )
 
@@ -421,7 +426,9 @@ cc_test(
 
 cc_library(
     name = "tactic_visitor",
+    srcs = [],
     hdrs = ["tactic_visitor.h"],
+    alwayslink = True,
 )
 
 cc_library(
@@ -443,41 +450,13 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "tactic_fsm",
-    hdrs = ["tactic_fsm.h"],
-    deps = [
-        ":tactic",
-        ":transition_conditions",
-        "@sml",
-    ],
-)
-
-cc_library(
-    name = "move_fsm",
-    hdrs = ["move_fsm.h"],
-    deps = [
-        ":tactic_fsm",
-        "//software/ai/intent:move_intent",
-    ],
-)
-
 cc_test(
     name = "move_fsm_test",
     srcs = ["move_fsm_test.cpp"],
     deps = [
-        ":move_fsm",
+        ":move_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "stop_fsm",
-    hdrs = ["stop_fsm.h"],
-    deps = [
-        ":tactic_fsm",
-        "//software/ai/intent:stop_intent",
     ],
 )
 
@@ -485,7 +464,7 @@ cc_test(
     name = "stop_fsm_test",
     srcs = ["stop_fsm_test.cpp"],
     deps = [
-        ":stop_fsm",
+        ":stop_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

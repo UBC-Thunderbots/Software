@@ -2,7 +2,9 @@
 
 #include <boost/coroutine2/all.hpp>  // TODO (#1888): remove this dependency
 #include <functional>
+#include <include/boost/sml.hpp>
 #include <optional>  // TODO (#1888): remove this dependency
+#include <queue>
 
 #include "software/ai/hl/stp/action/action.h"  // TODO (#1888): remove this dependency
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
@@ -25,6 +27,14 @@ struct TacticUpdate
     // callback to return the next intent
     std::function<void(std::unique_ptr<Intent>)> set_intent;
 };
+
+// alias for FSMs that have at least 2 levels of hierarchy
+template <class FSM>
+using HFSM = boost::sml::sm<FSM, boost::sml::process_queue<std::queue>>;
+
+// alias for FSMs that have no hierarchy
+template <class FSM>
+using BaseFSM = boost::sml::sm<FSM>;
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot.

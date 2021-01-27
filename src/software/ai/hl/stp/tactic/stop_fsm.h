@@ -1,16 +1,12 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic_fsm.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
 
 struct StopFSM
 {
-    struct IdleState
-    {
-    };
-    struct StopState
-    {
-    };
+    class idle_state;
+    class stop_state;
 
     struct Update
     {

@@ -53,7 +53,7 @@ class MoveTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    boost::sml::sm<MoveFSM> fsm;
+    BaseFSM<MoveFSM> fsm;
 
     MoveFSM::ControlParams control_params;
 };

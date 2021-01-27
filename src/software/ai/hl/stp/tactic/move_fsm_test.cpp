@@ -12,7 +12,7 @@ TEST(MoveFSMTest, test_transitions)
                                           .final_orientation = Angle::half(),
                                           .final_speed       = 0.0};
 
-    boost::sml::sm<MoveFSM> fsm;
+    BaseFSM<MoveFSM> fsm;
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::idle_state>));
     fsm.process_event(MoveFSM::Update{
         .control_params = control_params,

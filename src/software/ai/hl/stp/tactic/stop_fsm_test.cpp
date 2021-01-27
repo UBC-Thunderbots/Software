@@ -12,7 +12,7 @@ TEST(StopFSMTest, test_transitions)
                            AngularVelocity::zero()),
                 Timestamp::fromSeconds(123));
 
-    boost::sml::sm<StopFSM> fsm;
+    BaseFSM<StopFSM> fsm;
     EXPECT_TRUE(fsm.is(boost::sml::state<StopFSM::idle_state>));
     fsm.process_event(StopFSM::Update{
         .coast  = false,
