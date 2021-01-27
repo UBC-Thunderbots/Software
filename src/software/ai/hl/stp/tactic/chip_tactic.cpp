@@ -67,6 +67,5 @@ bool ChipTactic::done() const
 
 void ChipTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(
-        ChipFSM::Update{.control_params = control_params, .common = tactic_update});
+    fsm.process_event(ChipFSM::Update(control_params, tactic_update));
 }

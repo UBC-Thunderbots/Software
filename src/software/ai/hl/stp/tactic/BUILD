@@ -28,13 +28,26 @@ cc_test(
 cc_library(
     name = "chip_tactic",
     srcs = ["chip_tactic.cpp"],
-    hdrs = ["chip_tactic.h"],
+    hdrs = [
+        "chip_fsm.h",
+        "chip_tactic.h",
+    ],
     deps = [
         ":get_behind_ball_tactic",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "chip_fsm_test",
+    srcs = ["chip_fsm_test.cpp"],
+    deps = [
+        ":chip_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -202,7 +215,10 @@ cc_test(
 cc_library(
     name = "get_behind_ball_tactic",
     srcs = ["get_behind_ball_tactic.cpp"],
-    hdrs = ["get_behind_ball_tactic.h"],
+    hdrs = [
+        "get_behind_ball_fsm.h",
+        "get_behind_ball_tactic.h",
+    ],
     deps = [
         ":tactic",
         "//shared:constants",
@@ -215,8 +231,8 @@ cc_library(
 )
 
 cc_test(
-    name = "get_behind_ball_tactic_test",
-    srcs = ["get_behind_ball_tactic_test.cpp"],
+    name = "get_behind_ball_fsm_test",
+    srcs = ["get_behind_ball_fsm_test.cpp"],
     deps = [
         ":get_behind_ball_tactic",
         "//software/test_util",

@@ -56,9 +56,7 @@ bool GetBehindBallTactic::done() const
 
 void GetBehindBallTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    GetBehindBallFSM::Update event{.control_params = control_params,
-                                   .common         = tactic_update};
-    fsm.process_event(event);
+    fsm.process_event(GetBehindBallFSM::Update(control_params, tactic_update));
 }
 
 void GetBehindBallTactic::accept(TacticVisitor &visitor) const
