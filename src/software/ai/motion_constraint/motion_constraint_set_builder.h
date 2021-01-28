@@ -23,7 +23,7 @@ std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
 
 /**
  * Builds a set of motion constraints by adding motion constraints determined from
- * game_state
+ * game state
  *
  * @param game_state GameState to generate move constraints from
  *

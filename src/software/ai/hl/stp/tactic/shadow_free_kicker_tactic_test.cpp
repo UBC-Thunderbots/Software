@@ -18,7 +18,7 @@ class ShadowFreekickerTacticTest : public testing::Test
      * @param enemy_robot_positions: a vector of Points to represent the position of
      * robots
      * @param left_or_right: a enum argument in the shadowFreekickerTactic to represent
-     * whether the robot is  blocking the free_kick from left or right
+     * whether the robot is  blocking the free kick from left or right
      */
     void CreateSceneWithEnemyRobot(Point ball_position,
                                    std::vector<Point> enemy_robot_positions,
@@ -73,7 +73,7 @@ class ShadowFreekickerTacticTest : public testing::Test
      * distances needed for unit tests
      * @param ball_position: the position of the ball in Point format
      * @param left_or_right: a enum argument in the shadowFreekickerTactic to represent
-     * whether the robot is  blocking the free_kick from left or right
+     * whether the robot is  blocking the free kick from left or right
      */
     void CreateSceneWithoutEnemyRobot(
         Point ball_position, ShadowFreekickerTactic::FreekickShadower left_or_right)

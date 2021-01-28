@@ -59,8 +59,8 @@ void setupDefendingSideComboBox(
  * @param game_state_override_combo_box The ComboBox to set up
  * @param game_state_override_parameter The parameter that controls whether or not
  * we override the game_state
- * @param previous_game_state_parameter The parameter that holds the previous game_state
- * @param current_game_state_parameter The parameter that holds the current game_state
+ * @param previous_game_state_parameter The parameter that holds the previous game state
+ * @param current_game_state_parameter The parameter that holds the current game state
  */
 void setupGameStateOverrideComboBox(
     QComboBox *game_state_override_combo_box,

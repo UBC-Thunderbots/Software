@@ -77,7 +77,7 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new StopTactic(false), std::set<MotionConstraint>({}))};
 
-    // sets of motion constraints for each type of game_state
+    // sets of motion constraints for each type of game state
     auto stoppage_or_them_motion_constraints =
         std::set<MotionConstraint>({MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
                                     MotionConstraint::ENEMY_ROBOTS_COLLISION,
