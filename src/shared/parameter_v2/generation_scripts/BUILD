@@ -9,11 +9,11 @@ py_binary(
         ":c_config.py",
         ":c_parameter.py",
         ":c_writer.py",
+        ":case_conversion.py",
         ":cpp_config.py",
         ":cpp_parameter.py",
         ":cpp_writer.py",
         ":generate_dynamic_parameters.py",
-        ":case_conversion.py",
         ":type_map.py",
     ],
     data = [

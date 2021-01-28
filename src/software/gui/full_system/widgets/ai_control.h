@@ -99,6 +99,6 @@ void setupChannelSpinBox(QSpinBox *channel_spin_box,
  * we override the goalie id
  * @param goalie_id_parameter The parameter that controls the goalie id
  */
-void setupGoalieIDComboBox(QComboBox *id_comboBox,
-                           std::shared_ptr<Parameter<bool>> override_goalie_id_parameter,
-                           std::shared_ptr<NumericParameter<unsigned int>> goalie_id_parameter);
+void setupGoalieIDComboBox(
+    QComboBox *id_comboBox, std::shared_ptr<Parameter<bool>> override_goalie_id_parameter,
+    std::shared_ptr<NumericParameter<unsigned int>> goalie_id_parameter);
