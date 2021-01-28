@@ -2,8 +2,9 @@
 #include <memory>
 
 #include "software/parameter/parameter.h"
+#include "software/parameter/numeric_parameter.h"
 
-void setupSpinBox(QSpinBox* spin_box, std::shared_ptr<Parameter<int>>& parameter)
+void setupSpinBox(QSpinBox* spin_box, std::shared_ptr<NumericParameter<int>>& parameter)
 {
     auto on_parameter_value_changed = [spin_box](int new_value) {
         // We block signals while setting the value of the spinbox so that we don't

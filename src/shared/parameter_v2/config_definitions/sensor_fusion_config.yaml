@@ -32,7 +32,7 @@
     value: 0
     description: >-
       The id of the friendly goalie
-- int:
+- uint:
     name: enemy_goalie_id
     min: 0
     max: 16

@@ -16,15 +16,6 @@
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-struct commandLineArgs
-{
-    bool help                          = false;
-    std::string backend_name           = "";
-    std::string network_interface_name = "";
-    bool headless                      = false;
-    bool err                           = false;
-};
-
 // clang-format off
 std::string BANNER =
 "        ,/                                                                                                                     ,/   \n"
@@ -47,7 +38,7 @@ int main(int argc, char** argv)
     auto args = MutableDynamicParameters->getMutableFullSystemMainCommandLineArgs();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    LoggerSingleton::initializeLogger(args->logging_dir()->value());
+    LoggerSingleton::initializeLogger(args->LoggingDir()->value());
 
     if (!help_requested)
     {
@@ -63,20 +54,20 @@ int main(int argc, char** argv)
 
         // TODO remove this when we move to the new dynamic parameter system
         // https://github.com/UBC-Thunderbots/Software/issues/1298
-        if (!args->interface()->value().empty())
+        if (!args->Interface()->value().empty())
         {
             MutableDynamicParameters->getMutableNetworkConfig()
                 ->mutableNetworkInterface()
-                ->setValue(args->interface()->value());
+                ->setValue(args->Interface()->value());
         }
 
-        if (args->backend()->value().empty())
+        if (args->Backend()->value().empty())
         {
             LOG(FATAL) << "The option '--backend' is required but missing";
         }
 
         std::shared_ptr<Backend> backend =
-            GenericFactory<std::string, Backend>::create(args->backend()->value());
+            GenericFactory<std::string, Backend>::create(args->Backend()->value());
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(sensor_fusion_config);
         auto ai            = std::make_shared<ThreadedAI>(ai_config, ai_control_config);
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
@@ -85,7 +76,7 @@ int main(int argc, char** argv)
         ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
         sensor_fusion->Subject<World>::registerObserver(ai);
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
-        if (!args->headless()->value())
+        if (!args->Headless()->value())
         {
             visualizer = std::make_shared<ThreadedFullSystemGUI>();
 
@@ -96,12 +87,12 @@ int main(int argc, char** argv)
             backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 
-        if (!args->proto_log_output_dir()->value().empty())
+        if (!args->ProtoLogOutputDir()->value().empty())
         {
             namespace fs = std::experimental::filesystem;
             // we want to log protos, make the parent directory and pass the
             // subdirectories to the ProtoLoggers for each message type
-            fs::path proto_log_output_dir(args->proto_log_output_dir()->value());
+            fs::path proto_log_output_dir(args->ProtoLogOutputDir()->value());
             fs::create_directory(proto_log_output_dir);
 
             // log incoming SensorMsg
@@ -140,7 +131,7 @@ int main(int argc, char** argv)
         }
 
         // Wait for termination
-        if (!args->headless()->value())
+        if (!args->Headless()->value())
         {
             // This blocks forever without using the CPU
             // Wait for the full_system to shut down before shutting

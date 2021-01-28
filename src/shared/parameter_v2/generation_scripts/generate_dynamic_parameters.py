@@ -22,10 +22,8 @@ def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
     config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
 
     if generate_for_cpp:
-        # TODO: Naming this ThunderbotsConfig was causing issues due to conflicting type name,
-        # the 'New' suffix will be dropped when the old system is replaced (issue #1298)
         CppWriter.write_config_metadata(
-            output_file, include_headers, "ThunderbotsConfigNew", config_metadata
+            output_file, include_headers, "ThunderbotsConfig", config_metadata
         )
     else:
         CWriter.write_config_metadata(output_file, "ThunderbotsConfig", config_metadata)

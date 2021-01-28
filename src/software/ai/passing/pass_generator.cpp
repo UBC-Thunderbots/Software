@@ -54,7 +54,7 @@ void PassGenerator::setPasserPoint(Point passer_point)
     this->passer_point = passer_point;
 }
 
-void PassGenerator::setPasserRobotId(unsigned int robot_id)
+void PassGenerator::setPasserRobotID(unsigned int robot_id)
 {
     // Take ownershp of the passer robot id for the duration of this function
     std::lock_guard<std::mutex> passer_robot_id_lock(passer_robot_id_mutex);

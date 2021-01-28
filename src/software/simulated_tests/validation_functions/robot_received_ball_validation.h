@@ -11,5 +11,5 @@
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param yield yields control to the next routine (coroutines)
  */
-void robotReceivedBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
+void robotReceivedBall(RobotID robot_id, std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield);

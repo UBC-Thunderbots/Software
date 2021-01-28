@@ -13,7 +13,7 @@ class ReplayBackend : public Backend
    public:
     explicit ReplayBackend(const std::string& replay_input_dir =
                                DynamicParameters->getFullSystemMainCommandLineArgs()
-                                   ->replay_input_dir()
+                                   ->ReplayInputDir()
                                    ->value());
 
    private:

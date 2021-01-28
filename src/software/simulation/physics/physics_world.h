@@ -124,14 +124,14 @@ class PhysicsWorld
      *
      * @return the lowest available robot ID that is not already in use by a yellow robot.
      */
-    RobotId getAvailableYellowRobotId() const;
+    RobotID getAvailableYellowRobotID() const;
 
     /**
      * Returns the lowest available robot ID that is not already in use by a blue robot.
      *
      * @return the lowest available robot ID that is not already in use by a blue robot.
      */
-    RobotId getAvailableBlueRobotId() const;
+    RobotID getAvailableBlueRobotID() const;
 
     /**
      * Advances the physics simulation by the given time step
@@ -200,7 +200,7 @@ class PhysicsWorld
      * @return the lowest available robot ID that is not already in use
      * by a robot of the specified colour
      */
-    RobotId getAvailableRobotId(TeamColour colour) const;
+    RobotID getAvailableRobotID(TeamColour colour) const;
 
     /**
      * Returns true if the given id is not already in use by the specified team
@@ -211,7 +211,7 @@ class PhysicsWorld
      * @return true if the given id is not already in use by the speciried team,
      * and false otherwise
      */
-    bool isRobotIdAvailable(RobotId id, TeamColour colour) const;
+    bool isRobotIDAvailable(RobotID id, TeamColour colour) const;
 
     // Note: we declare the b2World first so it is destroyed last. If it is destroyed
     // before the physics objects, segfaults will occur due to pointers internal to Box2D

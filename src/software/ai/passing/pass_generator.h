@@ -97,7 +97,7 @@ class PassGenerator
      *
      * @param robot_id The id of the robot performing the pass
      */
-    void setPasserRobotId(unsigned int robot_id);
+    void setPasserRobotID(unsigned int robot_id);
 
     /**
      * Set the target region that we would like to pass to

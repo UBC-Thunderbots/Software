@@ -36,7 +36,7 @@ TEST(AutochipMoveActionTest, robot_far_from_destination)
 
     AutochipMoveIntent autochip_move_intent =
         dynamic_cast<AutochipMoveIntent &>(*intent_ptr);
-    EXPECT_EQ(0, autochip_move_intent.getRobotId());
+    EXPECT_EQ(0, autochip_move_intent.getRobotID());
     EXPECT_EQ(Point(1, 0), autochip_move_intent.getDestination());
     EXPECT_EQ(Angle::quarter(), autochip_move_intent.getFinalAngle());
     EXPECT_EQ(1.0, autochip_move_intent.getFinalSpeed());
@@ -135,7 +135,7 @@ TEST(AutochipMoveActionTest, robot_far_from_destination_autokick_turned_on)
     EXPECT_FALSE(action.done());
 
     AutochipMoveIntent move_intent = dynamic_cast<AutochipMoveIntent &>(*intent_ptr);
-    EXPECT_EQ(0, move_intent.getRobotId());
+    EXPECT_EQ(0, move_intent.getRobotID());
     EXPECT_EQ(Point(1, 0), move_intent.getDestination());
     EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
     EXPECT_EQ(1.0, move_intent.getFinalSpeed());
@@ -158,7 +158,7 @@ TEST(AutochipMoveActionTest, robot_far_from_destination_dribble_turned_on)
     EXPECT_FALSE(action.done());
 
     AutochipMoveIntent move_intent = dynamic_cast<AutochipMoveIntent &>(*intent_ptr);
-    EXPECT_EQ(0, move_intent.getRobotId());
+    EXPECT_EQ(0, move_intent.getRobotID());
     EXPECT_EQ(Point(1, 0), move_intent.getDestination());
     EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
     EXPECT_EQ(1.0, move_intent.getFinalSpeed());

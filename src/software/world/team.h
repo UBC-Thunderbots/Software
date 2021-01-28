@@ -85,7 +85,7 @@ class Team
      * @param new_goalie_id The id of the new goalie for this team
      *
      */
-    void assignGoalie(RobotId new_goalie_id);
+    void assignGoalie(RobotID new_goalie_id);
 
     /**
      * Clears the goalie for this team. There will be no goalie assigned after

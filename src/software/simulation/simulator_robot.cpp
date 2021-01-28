@@ -68,9 +68,9 @@ unsigned int SimulatorRobot::checkValidAndReturnUint(
     return 0;
 }
 
-unsigned int SimulatorRobot::getRobotId()
+unsigned int SimulatorRobot::getRobotID()
 {
-    return checkValidAndReturnUint([](auto robot) { return robot->getRobotId(); });
+    return checkValidAndReturnUint([](auto robot) { return robot->getRobotID(); });
 }
 
 float SimulatorRobot::getPositionX()

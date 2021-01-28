@@ -20,7 +20,7 @@ TEST(StopActionTest, robot_stopping_without_coasting_while_already_moving)
     try
     {
         StopIntent stop_intent = dynamic_cast<StopIntent &>(*intent_ptr);
-        EXPECT_EQ(0, stop_intent.getRobotId());
+        EXPECT_EQ(0, stop_intent.getRobotID());
         EXPECT_EQ(TbotsProto::StopPrimitive::BRAKE,
                   stop_intent.getPrimitive().stop().stop_type());
     }

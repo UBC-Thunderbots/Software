@@ -19,7 +19,7 @@ void SimulatedTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(
         DynamicParameters->getStandaloneSimulatorMainCommandLineArgs()
-            ->logging_dir()
+            ->LoggingDir()
             ->value());
 
     // init() resets all DynamicParameters for each test. Since DynamicParameters are
@@ -28,7 +28,7 @@ void SimulatedTestFixture::SetUp()
     // of hack because we're changing a global variable, but it can't be easily fixed
     // through dependency injection until
     // https://github.com/UBC-Thunderbots/Software/issues/1299
-    MutableDynamicParameters->init();
+    //MutableDynamicParameters->init();
     simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
     ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
@@ -77,17 +77,17 @@ Field SimulatedTestFixture::field() const
     return simulator->getField();
 }
 
-void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
+void SimulatedTestFixture::setFriendlyGoalie(RobotID goalie_id)
 {
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableFriendlyGoalieId()
+        ->mutableFriendlyGoalieID()
         ->setValue(static_cast<int>(goalie_id));
 }
 
-void SimulatedTestFixture::setEnemyGoalie(RobotId goalie_id)
+void SimulatedTestFixture::setEnemyGoalie(RobotID goalie_id)
 {
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableEnemyGoalieId()
+        ->mutableEnemyGoalieID()
         ->setValue(static_cast<int>(goalie_id));
 }
 

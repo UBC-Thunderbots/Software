@@ -27,10 +27,10 @@ class PathManager
      * @param objectives vector of path objectives
      * @param navigable_area Rectangle representing the navigable area
      *
-     * @return a map of RobotIds to optional Path
+     * @return a map of RobotIDs to optional Path
      *  *no path is represented by std::nullopt
      */
-    virtual const std::map<RobotId, std::optional<Path>> getManagedPaths(
+    virtual const std::map<RobotID, std::optional<Path>> getManagedPaths(
         const std::unordered_set<PathObjective> &objectives,
         const Rectangle &navigable_area) = 0;
 

@@ -146,7 +146,7 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
     world.updateEnemyTeamState(enemy_team);
 
     pass_generator->setWorld(world);
-    pass_generator->setPasserRobotId(0);
+    pass_generator->setPasserRobotID(0);
 
     // Wait until the pass stops improving or 30 seconds, whichever comes first
     waitForConvergence(pass_generator, 0.01, 30);
@@ -181,7 +181,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     Team friendly_team({passer, receiver}, Duration::fromSeconds(10));
     world.updateFriendlyTeamState(friendly_team);
 
-    pass_generator->setPasserRobotId(passer.id());
+    pass_generator->setPasserRobotID(passer.id());
 
     // We put a few enemies in to force the pass generator to make a decision,
     // otherwise most of the field would be a valid point to pass to
@@ -198,7 +198,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     world.updateEnemyTeamState(enemy_team);
 
     pass_generator->setWorld(world);
-    pass_generator->setPasserRobotId(0);
+    pass_generator->setPasserRobotID(0);
 
     // Wait until the pass stops improving or 30 seconds, whichever comes first
     waitForConvergence(pass_generator, 0.01, 30);

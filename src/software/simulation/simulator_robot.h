@@ -38,7 +38,7 @@ class SimulatorRobot
      *
      * @return the ID of this robot
      */
-    unsigned int getRobotId();
+    unsigned int getRobotID();
 
     /**
      * Clears balls tracked as being in dribbler area

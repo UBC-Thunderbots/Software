@@ -48,7 +48,7 @@ class SimulatorRobotSingletonTest : public testing::Test
         for (const auto& pos : enemy_robot_positions)
         {
             auto state = RobotStateWithId{
-                .id          = physics_world->getAvailableBlueRobotId(),
+                .id          = physics_world->getAvailableBlueRobotID(),
                 .robot_state = RobotState(pos, Vector(0, 0), Angle::zero(),
                                           AngularVelocity::zero())};
             physics_world->addBlueRobots({state});

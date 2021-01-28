@@ -11,7 +11,7 @@ ControllerPrimitiveGenerator::ControllerPrimitiveGenerator(
 
 void ControllerPrimitiveGenerator::onValueReceived(ControllerInput controller_input)
 {
-    unsigned int robot_id  = controller_input_config->RobotId()->value();
+    unsigned int robot_id  = controller_input_config->RobotID()->value();
     auto primitive_set_msg = std::make_unique<TbotsProto::PrimitiveSet>();
     *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestamp();
 

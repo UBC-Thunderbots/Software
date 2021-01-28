@@ -56,7 +56,7 @@ class DynamicParameterWidget : public QScrollArea
      * @param parameter The integer parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    static QWidget* createIntegerParameter(std::shared_ptr<Parameter<int>> parameter);
+    static QWidget* createIntegerParameter(std::shared_ptr<NumericParameter<int>> parameter);
 
     /**
      * Creates a widget that contains the components necessary to display and control a
@@ -65,7 +65,7 @@ class DynamicParameterWidget : public QScrollArea
      * @param parameter The double parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    static QWidget* createDoubleParameter(std::shared_ptr<Parameter<double>> parameter);
+    static QWidget* createDoubleParameter(std::shared_ptr<NumericParameter<double>> parameter);
 
     /**
      * Creates a widget that contains the components necessary to display and control a

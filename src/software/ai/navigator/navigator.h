@@ -84,6 +84,6 @@ class Navigator : public IntentVisitor
     // These are the robots that were assigned direct primitive intents.
     // When navigating intents are processed to path plan, we can avoid these
     // non-navigating robots
-    std::vector<RobotId> direct_primitive_intent_robots;
+    std::vector<RobotID> direct_primitive_intent_robots;
     std::unique_ptr<TbotsProto::PrimitiveSet> primitive_set_msg;
 };

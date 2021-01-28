@@ -17,9 +17,9 @@ Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
 
 void Navigator::visit(const DirectPrimitiveIntent &intent)
 {
-    (*primitive_set_msg->mutable_robot_primitives())[intent.getRobotId()] =
+    (*primitive_set_msg->mutable_robot_primitives())[intent.getRobotID()] =
         intent.getPrimitive();
-    direct_primitive_intent_robots.push_back(intent.getRobotId());
+    direct_primitive_intent_robots.push_back(intent.getRobotID());
 }
 
 void Navigator::visit(const MoveIntent &intent)
@@ -63,7 +63,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
     auto &robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
     for (const auto &intent : navigating_intents)
     {
-        unsigned int robot_id      = intent->getRobotId();
+        unsigned int robot_id      = intent->getRobotID();
         auto robot_id_to_path_iter = robot_id_to_path.find(robot_id);
         if (robot_id_to_path_iter != robot_id_to_path.end() &&
             robot_id_to_path_iter->second)
@@ -77,7 +77,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
         else
         {
             LOG(WARNING)
-                << "Navigator's path manager could not find a path for RobotId = "
+                << "Navigator's path manager could not find a path for RobotID = "
                 << robot_id;
             robot_primitives_map[robot_id] = *createStopPrimitive(false);
         }
@@ -113,7 +113,7 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
 
     for (const auto &intent : navigating_intents)
     {
-        RobotId robot_id = intent->getRobotId();
+        RobotID robot_id = intent->getRobotID();
         // start with direct primitive intent robots and then add motion constraints
         auto obstacles = direct_primitive_intent_obstacles;
 

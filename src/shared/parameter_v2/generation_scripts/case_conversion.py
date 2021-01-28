@@ -3,6 +3,7 @@ import re
 ALLOWED_ACRONYMS = [
    "ai",
    "ssl",
+   "id",
 ]
 
 def to_pascal_case(snake_str):

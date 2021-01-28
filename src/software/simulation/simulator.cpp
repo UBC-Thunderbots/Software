@@ -78,12 +78,12 @@ void Simulator::updateSimulatorRobots(
         // the firmware_robot and firmware_ball
         if (team_colour == TeamColour::BLUE)
         {
-            app_logger_init(simulator_robot->getRobotId(),
+            app_logger_init(simulator_robot->getRobotID(),
                             &SimulatorRobotSingleton::handleBlueRobotLogProto);
         }
         else if (team_colour == TeamColour::YELLOW)
         {
-            app_logger_init(simulator_robot->getRobotId(),
+            app_logger_init(simulator_robot->getRobotID(),
                             &SimulatorRobotSingleton::handleYellowRobotLogProto);
         }
 
@@ -99,14 +99,14 @@ void Simulator::updateSimulatorRobots(
     }
 }
 
-void Simulator::setYellowRobotPrimitive(RobotId id,
+void Simulator::setYellowRobotPrimitive(RobotID id,
                                         const TbotsProto_Primitive& primitive_msg)
 {
     setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball,
                       yellow_team_defending_side);
 }
 
-void Simulator::setBlueRobotPrimitive(RobotId id,
+void Simulator::setBlueRobotPrimitive(RobotID id,
                                       const TbotsProto_Primitive& primitive_msg)
 {
     setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball,
@@ -133,7 +133,7 @@ void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitiv
 }
 
 void Simulator::setRobotPrimitive(
-    RobotId id, const TbotsProto_Primitive& primitive_msg,
+    RobotID id, const TbotsProto_Primitive& primitive_msg,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
     const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side)
@@ -142,7 +142,7 @@ void Simulator::setRobotPrimitive(
     auto simulator_robots_iter =
         std::find_if(simulator_robots.begin(), simulator_robots.end(),
                      [id](const auto& robot_world_pair) {
-                         return robot_world_pair.first->getRobotId() == id;
+                         return robot_world_pair.first->getRobotID() == id;
                      });
 
     if (simulator_robots_iter != simulator_robots.end())
@@ -201,7 +201,7 @@ void Simulator::stepSimulation(const Duration& time_step)
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
 
-            app_logger_init(simulator_robot->getRobotId(),
+            app_logger_init(simulator_robot->getRobotID(),
                             &SimulatorRobotSingleton::handleBlueRobotLogProto);
 
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
@@ -216,7 +216,7 @@ void Simulator::stepSimulation(const Duration& time_step)
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
 
-            app_logger_init(simulator_robot->getRobotId(),
+            app_logger_init(simulator_robot->getRobotID(),
                             &SimulatorRobotSingleton::handleYellowRobotLogProto);
 
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
@@ -303,7 +303,7 @@ std::weak_ptr<PhysicsRobot> Simulator::getRobotAtPosition(const Point& position)
 
 void Simulator::addYellowRobot(const Point& position)
 {
-    RobotId id = physics_world.getAvailableYellowRobotId();
+    RobotID id = physics_world.getAvailableYellowRobotID();
     auto state =
         RobotState(position, Vector(0, 0), Angle::zero(), AngularVelocity::zero());
     auto state_with_id = RobotStateWithId{.id = id, .robot_state = state};
@@ -312,7 +312,7 @@ void Simulator::addYellowRobot(const Point& position)
 
 void Simulator::addBlueRobot(const Point& position)
 {
-    RobotId id = physics_world.getAvailableBlueRobotId();
+    RobotID id = physics_world.getAvailableBlueRobotID();
     auto state =
         RobotState(position, Vector(0, 0), Angle::zero(), AngularVelocity::zero());
     auto state_with_id = RobotStateWithId{.id = id, .robot_state = state};

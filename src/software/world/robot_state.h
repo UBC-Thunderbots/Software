@@ -7,7 +7,7 @@
 #include "software/geom/vector.h"
 #include "software/world/team_types.h"
 
-using RobotId = unsigned int;
+using RobotID = unsigned int;
 
 /**
  * This class represents the physical state of a robot

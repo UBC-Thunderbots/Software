@@ -225,7 +225,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-    RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
+    RobotID friendly_goalie_id = sensor_fusion_config->FriendlyGoalieID()->value();
     // TODO (1610) Implement friendly goalie ID override
     new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
@@ -234,7 +234,7 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
-    RobotId enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
+    RobotID enemy_goalie_id = sensor_fusion_config->EnemyGoalieID()->value();
     // TODO (1610) Implement enemy goalie ID override
     new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;

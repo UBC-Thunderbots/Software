@@ -88,7 +88,7 @@ void setupPlayOverrideComboBox(
  * @param channel_parameter The parameter that controls the communication channel
  */
 void setupChannelSpinBox(QSpinBox *channel_spin_box,
-                         std::shared_ptr<Parameter<int>> channel_parameter);
+                         std::shared_ptr<NumericParameter<int>> channel_parameter);
 
 /**
  * Sets up a ComboBox widget that will be used to override either the
@@ -101,4 +101,4 @@ void setupChannelSpinBox(QSpinBox *channel_spin_box,
  */
 void setupGoalieIDComboBox(QComboBox *id_comboBox,
                            std::shared_ptr<Parameter<bool>> override_goalie_id_parameter,
-                           std::shared_ptr<Parameter<int>> goalie_id_parameter);
+                           std::shared_ptr<NumericParameter<unsigned int>> goalie_id_parameter);

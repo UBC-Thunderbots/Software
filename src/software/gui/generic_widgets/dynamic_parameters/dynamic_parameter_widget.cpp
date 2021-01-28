@@ -31,9 +31,12 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
     {
         std::visit(
             overload{[&](std::shared_ptr<Parameter<int>> param) {
-                         QWidget* int_param_widget = createIntegerParameter(param);
-                         int_param_widget->setParent(params_widget);
-                         params_widget->layout()->addWidget(int_param_widget);
+                         // This will be implemented once the new parameter system is in
+                         // place (issue #1298) Required to build
+                     },
+                     [&](std::shared_ptr<Parameter<double>> param) {
+                         // This will be implemented once the new parameter system is in
+                         // place (issue #1298) Required to build
                      },
                      [&](std::shared_ptr<Parameter<bool>> param) {
                          QWidget* bool_param_widget = createBooleanParameter(param);
@@ -45,7 +48,7 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
                          string_param_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(string_param_widget);
                      },
-                     [&](std::shared_ptr<Parameter<double>> param) {
+                     [&](std::shared_ptr<NumericParameter<double>> param) {
                          QWidget* double_param_widget = createDoubleParameter(param);
                          double_param_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(double_param_widget);
@@ -53,6 +56,11 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
                      [&](std::shared_ptr<NumericParameter<unsigned>> param) {
                          // This will be implemented once the new parameter system is in
                          // place (issue #1298) Required to build
+                     },
+                     [&](std::shared_ptr<NumericParameter<int>> param) {
+                         QWidget* int_param_widget = createIntegerParameter(param);
+                         int_param_widget->setParent(params_widget);
+                         params_widget->layout()->addWidget(int_param_widget);
                      },
                      [&](std::shared_ptr<Config> config) {
                          QWidget* config_label_widget = createConfigLabel(config);
@@ -117,7 +125,7 @@ QWidget* DynamicParameterWidget::createBooleanParameter(
 }
 
 QWidget* DynamicParameterWidget::createIntegerParameter(
-    std::shared_ptr<Parameter<int>> parameter)
+    std::shared_ptr<NumericParameter<int>> parameter)
 {
     QWidget* widget     = new QWidget();
     QVBoxLayout* layout = new QVBoxLayout(widget);
@@ -153,7 +161,7 @@ QWidget* DynamicParameterWidget::createIntegerParameter(
 }
 
 QWidget* DynamicParameterWidget::createDoubleParameter(
-    std::shared_ptr<Parameter<double>> parameter)
+    std::shared_ptr<NumericParameter<double>> parameter)
 {
     QWidget* widget              = new QWidget();
     QVBoxLayout* vertical_layout = new QVBoxLayout(widget);

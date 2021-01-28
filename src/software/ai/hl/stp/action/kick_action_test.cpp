@@ -81,7 +81,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
     try
     {
         KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
-        EXPECT_EQ(0, kick_intent.getRobotId());
+        EXPECT_EQ(0, kick_intent.getRobotID());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             kick_intent.getPrimitive().kick().kick_origin(),
             *createPointProto(Point(0, 0))));
@@ -119,7 +119,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_positive_y)
     try
     {
         KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
-        EXPECT_EQ(0, kick_intent.getRobotId());
+        EXPECT_EQ(0, kick_intent.getRobotID());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             kick_intent.getPrimitive().kick().kick_origin(),
             *createPointProto(Point(-2.5, 2.5))));
@@ -157,7 +157,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_negative_y)
     try
     {
         KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
-        EXPECT_EQ(0, kick_intent.getRobotId());
+        EXPECT_EQ(0, kick_intent.getRobotID());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             kick_intent.getPrimitive().kick().kick_origin(),
             *createPointProto(Point(-0.05, -0.2))));
@@ -195,7 +195,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_negative_y)
     try
     {
         KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
-        EXPECT_EQ(0, kick_intent.getRobotId());
+        EXPECT_EQ(0, kick_intent.getRobotID());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             kick_intent.getPrimitive().kick().kick_origin(),
             *createPointProto(Point(0, 0))));
@@ -232,7 +232,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_positive_y
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_EQ(0, move_intent.getRobotId());
+        EXPECT_EQ(0, move_intent.getRobotID());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
                                                    Point(-0.18, 0), 0.1));
@@ -268,7 +268,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_positive_y
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_EQ(0, move_intent.getRobotId());
+        EXPECT_EQ(0, move_intent.getRobotID());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
                                                    Point(-2.45, 2.25), 0.1));
@@ -304,7 +304,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_negative_y
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_EQ(0, move_intent.getRobotId());
+        EXPECT_EQ(0, move_intent.getRobotID());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
                                                    Point(-0.85, -3.75), 0.1));
@@ -340,7 +340,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_negative_y
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_EQ(0, move_intent.getRobotId());
+        EXPECT_EQ(0, move_intent.getRobotID());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
                                                    Point(-0.15, 0.25), 0.1));

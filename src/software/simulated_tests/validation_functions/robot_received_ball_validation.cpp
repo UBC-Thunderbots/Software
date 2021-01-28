@@ -3,7 +3,7 @@
 #include "software/logger/logger.h"
 
 
-void robotReceivedBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
+void robotReceivedBall(RobotID robot_id, std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield)
 {
     auto ball_near_dribbler = [robot_id](std::shared_ptr<World> world_ptr) {

@@ -209,7 +209,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
 
     // Set the passer on the pass generator
-    pass_generator.setPasserRobotId(align_to_ball_tactic->getAssignedRobot()->id());
+    pass_generator.setPasserRobotID(align_to_ball_tactic->getAssignedRobot()->id());
     LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
                << "as the passer";
 

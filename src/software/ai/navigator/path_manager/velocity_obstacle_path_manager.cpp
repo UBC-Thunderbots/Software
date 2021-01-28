@@ -8,10 +8,10 @@ VelocityObstaclePathManager::VelocityObstaclePathManager(
 {
 }
 
-const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getManagedPaths(
+const std::map<RobotID, std::optional<Path>> VelocityObstaclePathManager::getManagedPaths(
     const std::unordered_set<PathObjective> &objectives, const Rectangle &navigable_area)
 {
-    std::map<RobotId, std::optional<Path>> managed_paths;
+    std::map<RobotID, std::optional<Path>> managed_paths;
     path_planning_obstacles.clear();
 
     // Velocity obstacles used to avoid collisions.

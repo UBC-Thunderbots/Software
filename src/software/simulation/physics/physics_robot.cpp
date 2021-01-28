@@ -23,7 +23,7 @@ const double PhysicsRobot::DRIBBLER_DAMPER_THICKNESS = 0.005;
 const double PhysicsRobot::TOTAL_DRIBBLER_DEPTH =
     PhysicsRobot::DRIBBLER_DEPTH + PhysicsRobot::DRIBBLER_DAMPER_THICKNESS;
 
-PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
+PhysicsRobot::PhysicsRobot(RobotID id, std::shared_ptr<b2World> world,
                            const RobotState& robot_state, const double mass_kg)
     : robot_id(id)
 {
@@ -173,7 +173,7 @@ void PhysicsRobot::setupDribblerDamperFixture(const RobotState& robot_state)
     delete dribbler_damper_shape;
 }
 
-RobotId PhysicsRobot::getRobotId() const
+RobotID PhysicsRobot::getRobotID() const
 {
     return robot_id;
 }

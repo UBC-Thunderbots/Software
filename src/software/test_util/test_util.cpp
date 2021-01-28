@@ -77,7 +77,7 @@ namespace TestUtil
 
     Robot createRobotAtPos(const Point &pt)
     {
-        static RobotId robot_id_counter = 0;
+        static RobotID robot_id_counter = 0;
         return Robot(robot_id_counter++, pt, Vector(), Angle(), AngularVelocity(),
                      Timestamp());
     }
@@ -101,7 +101,7 @@ namespace TestUtil
         const std::vector<Point> &positions)
     {
         std::vector<RobotStateWithId> states;
-        for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
+        for (RobotID id = 0; id < static_cast<RobotID>(positions.size()); id++)
         {
             states.push_back(RobotStateWithId{
                 .id          = id,

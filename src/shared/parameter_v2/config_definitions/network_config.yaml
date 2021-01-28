@@ -1,3 +1,6 @@
+include:
+- ssl_communication_config.yaml
+---
 - int:
     name: channel
     min: 0

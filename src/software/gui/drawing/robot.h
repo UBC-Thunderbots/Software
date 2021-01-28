@@ -42,7 +42,7 @@ void drawRobotAtPosition(QGraphicsScene* scene, const Point& position,
  * @param position The position of the robot
  * @param id The id of the robot
  */
-void drawRobotId(QGraphicsScene* scene, const Point& position, RobotId id);
+void drawRobotID(QGraphicsScene* scene, const Point& position, RobotID id);
 
 /**
  * Draws the robot on the given scene.

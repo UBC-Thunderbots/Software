@@ -25,7 +25,7 @@ class Robot
      * state
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      */
-    explicit Robot(RobotId id, const Point &position, const Vector &velocity,
+    explicit Robot(RobotID id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
                    const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
@@ -40,7 +40,7 @@ class Robot
      * state
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
      */
-    explicit Robot(RobotId id, const RobotState &initial_state,
+    explicit Robot(RobotID id, const RobotState &initial_state,
                    const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>());
@@ -72,7 +72,7 @@ class Robot
      *
      * @return the id of the robot
      */
-    RobotId id() const;
+    RobotID id() const;
 
     /**
      * Returns the current position of the robot
@@ -172,7 +172,7 @@ class Robot
 
    private:
     // The id of this robot
-    RobotId id_;
+    RobotID id_;
     RobotState current_state_;
     Timestamp timestamp_;
     // The hardware capabilities of the robot, generated from
