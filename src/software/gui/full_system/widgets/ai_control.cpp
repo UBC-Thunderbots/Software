@@ -217,7 +217,7 @@ void setupChannelSpinBox(QSpinBox *channel_spin_box,
 
 void setupGoalieIDComboBox(
     QComboBox *id_comboBox, std::shared_ptr<Parameter<bool>> override_goalie_id_parameter,
-    std::shared_ptr<NumericParameter<unsigned int>> goalie_id_parameter)
+    std::shared_ptr<NumericParameter<int>> goalie_id_parameter)
 {
     QList<QString> robot_ids;
     for (unsigned int id = 0; id < MAX_ROBOT_IDS; id++)

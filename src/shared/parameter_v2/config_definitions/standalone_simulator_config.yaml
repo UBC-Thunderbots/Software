@@ -1,4 +1,4 @@
-- uint:
+- int:
     name: yellow_team_channel
     min: 0
     max: 16
@@ -7,7 +7,7 @@
       The multicast channel to use to communicate with the yellow robots
       in the simulator
 
-- uint:
+- int:
     name: blue_team_channel
     min: 0
     max: 16

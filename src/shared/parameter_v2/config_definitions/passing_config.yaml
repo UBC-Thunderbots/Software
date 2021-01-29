@@ -79,13 +79,13 @@
      description: >-
        How long we think the enemy will take to recognize we're passing and start
        moving to intercept
- - uint:
+ - int:
      name: num_passes_to_optimize
      min: 1
      max: 1000
      value: 15
      description: "The number of passes to try to optimize at any given time"
- - uint:
+ - int:
      name: num_passes_to_keep_after_pruning
      min: 0
      max: 1000

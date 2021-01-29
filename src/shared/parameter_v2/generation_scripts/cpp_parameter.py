@@ -42,11 +42,6 @@ COMMAND_LINE_ARG_ENTRY = "{param_type} {param_name} = {quote}{value}{quote};"
 
 LOAD_COMMAND_LINE_ARG_INTO_CONFIG = "this->{dependencies}mutable{param_accessor_name}()->setValue(args.{arg_prefix}{param_name});"
 
-# These are to be used of minimum and maximum value attributes are missing from numeric parameters
-NUMERIC_PARAMETER_MIN = "std::numeric_limits<{type}>::min()"
-NUMERIC_PARAMETER_MAX = "std::numeric_limits<{type}>::max()"
-
-
 class CppParameter(object):
     def __init__(self, param_type: str, param_metadata: dict):
         """Initializes a CppParameter object, which can generate various strings specific to a parameter through properties.
@@ -75,7 +70,7 @@ class CppParameter(object):
 
     @staticmethod
     def is_numeric_type(param_type: str) -> bool:
-        return re.match("int|uint|float", param_type)
+        return re.match("int|uint|double", param_type)
 
     @staticmethod
     def find_quote(param_type: str) -> str:
@@ -157,23 +152,13 @@ class CppParameter(object):
     @property
     def constructor_entry(self):
         if CppParameter.is_numeric_type(self.param_type):
-            min_value = (
-                self.param_metadata["min"]
-                if "min" in self.param_metadata
-                else NUMERIC_PARAMETER_MIN.format(type=self.param_type)
-            )
-            max_value = (
-                self.param_metadata["max"]
-                if "max" in self.param_metadata
-                else NUMERIC_PARAMETER_MAX.format(type=self.param_type)
-            )
             return NUMERIC_PARAMETER_CONSTRUCTOR_ENTRY.format(
                 param_variable_name=self.param_variable_name,
                 type=self.cpp_type,
                 param_name=self.param_name,
                 value=self.param_value,
-                min_value=min_value,
-                max_value=max_value,
+                min_value=self.param_metadata["min"],
+                max_value=self.param_metadata["max"],
             )
         elif self.param_type == "enum":
             param_enum = self.param_metadata["enum"]

@@ -30,15 +30,7 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
     for (auto mutable_parameter : config->getMutableParameterList())
     {
         std::visit(
-            overload{[&](std::shared_ptr<Parameter<int>> param) {
-                         // This will be implemented once the new parameter system is in
-                         // place (issue #1298) Required to build
-                     },
-                     [&](std::shared_ptr<Parameter<double>> param) {
-                         // This will be implemented once the new parameter system is in
-                         // place (issue #1298) Required to build
-                     },
-                     [&](std::shared_ptr<Parameter<bool>> param) {
+            overload{[&](std::shared_ptr<Parameter<bool>> param) {
                          QWidget* bool_param_widget = createBooleanParameter(param);
                          bool_param_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(bool_param_widget);
@@ -52,10 +44,6 @@ void DynamicParameterWidget::setupParameters(std::shared_ptr<Config> config)
                          QWidget* double_param_widget = createDoubleParameter(param);
                          double_param_widget->setParent(params_widget);
                          params_widget->layout()->addWidget(double_param_widget);
-                     },
-                     [&](std::shared_ptr<NumericParameter<unsigned>> param) {
-                         // This will be implemented once the new parameter system is in
-                         // place (issue #1298) Required to build
                      },
                      [&](std::shared_ptr<NumericParameter<int>> param) {
                          QWidget* int_param_widget = createIntegerParameter(param);
@@ -133,10 +121,8 @@ QWidget* DynamicParameterWidget::createIntegerParameter(
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(parameter->name()));
     QSpinBox* spinbox = new QSpinBox(widget);
-    // TODO: set range to the range of the parameter
-    // https://github.com/UBC-Thunderbots/Software/issues/1581
-    spinbox->setRange(std::numeric_limits<int>::lowest(),
-                      std::numeric_limits<int>::max());
+
+    spinbox->setRange(parameter->getMin(), parameter->getMax());
     spinbox->setValue(parameter->value());
 
     layout->addWidget(label);
@@ -190,15 +176,8 @@ QWidget* DynamicParameterWidget::createDoubleParameter(
         parameter->setValue(new_value);
     };
 
-    // TODO: set range to the range of the parameter
-    // https://github.com/UBC-Thunderbots/Software/issues/1581
-    // Placeholder MIN/MAX values are decided by looking at all the existing double
-    // parameters
-    static const double STEP_SIZE   = 100.0;
-    static const double MIN         = -10.0;
-    static const double MAX         = 200.0;
     auto on_parameter_value_changed = setupSliderLineEdit(
-        param_line_edit, param_slider, on_slider_value_changed, MIN, MAX, STEP_SIZE);
+        param_line_edit, param_slider, on_slider_value_changed, parameter->getMin(), parameter->getMax(), 100);
 
     parameter->registerCallbackFunction(on_parameter_value_changed);
     on_parameter_value_changed(parameter->value());

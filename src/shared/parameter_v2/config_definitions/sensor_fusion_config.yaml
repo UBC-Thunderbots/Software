@@ -25,14 +25,14 @@
     description: >-
       When ignoreInvalidCameraData is true, any robot or ball detection with an x-coordinate greater than this
       value is ignored.
-- uint:
+- int:
     name: friendly_goalie_id
     min: 0
     max: 16
     value: 0
     description: >-
       The id of the friendly goalie
-- uint:
+- int:
     name: enemy_goalie_id
     min: 0
     max: 16
