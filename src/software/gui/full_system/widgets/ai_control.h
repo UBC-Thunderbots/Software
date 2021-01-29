@@ -56,15 +56,15 @@ void setupDefendingSideComboBox(
 /**
  * Sets up the ComboBox widget that will be used to override the AI GameState
  *
- * @param gamestate_override_combo_box The ComboBox to set up
- * @param gamestate_override_parameter The parameter that controls whether or not
- * we override the gamestate
- * @param previous_game_state_parameter The parameter that holds the previous gamestate
- * @param current_game_state_parameter The parameter that holds the current gamestate
+ * @param game_state_override_combo_box The ComboBox to set up
+ * @param game_state_override_parameter The parameter that controls whether or not
+ * we override the game_state
+ * @param previous_game_state_parameter The parameter that holds the previous game state
+ * @param current_game_state_parameter The parameter that holds the current game state
  */
 void setupGameStateOverrideComboBox(
-    QComboBox *gamestate_override_combo_box,
-    std::shared_ptr<Parameter<bool>> gamestate_override_parameter,
+    QComboBox *game_state_override_combo_box,
+    std::shared_ptr<Parameter<bool>> game_state_override_parameter,
     std::shared_ptr<Parameter<std::string>> previous_game_state_parameter,
     std::shared_ptr<Parameter<std::string>> current_game_state_parameter);
 

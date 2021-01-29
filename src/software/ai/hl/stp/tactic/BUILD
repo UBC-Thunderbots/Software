@@ -293,9 +293,9 @@ cc_test(
 )
 
 cc_library(
-    name = "shadow_freekicker_tactic",
-    srcs = ["shadow_freekicker_tactic.cpp"],
-    hdrs = ["shadow_freekicker_tactic.h"],
+    name = "shadow_free_kicker_tactic",
+    srcs = ["shadow_free_kicker_tactic.cpp"],
+    hdrs = ["shadow_free_kicker_tactic.h"],
     deps = [
         ":tactic",
         "//shared:constants",
@@ -308,10 +308,10 @@ cc_library(
 )
 
 cc_test(
-    name = "shadow_freekicker_tactic_test",
-    srcs = ["shadow_freekicker_tactic_test.cpp"],
+    name = "shadow_free_kicker_tactic_test",
+    srcs = ["shadow_free_kicker_tactic_test.cpp"],
     deps = [
-        ":shadow_freekicker_tactic",
+        ":shadow_free_kicker_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -383,7 +383,7 @@ cc_library(
         ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_enemy_tactic",
-        ":shadow_freekicker_tactic",
+        ":shadow_free_kicker_tactic",
         ":shoot_goal_tactic",
         ":stop_tactic",
         ":tactic",
