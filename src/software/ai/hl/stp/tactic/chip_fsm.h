@@ -18,7 +18,7 @@ struct ChipFSM
         double chip_distance_meters;
     };
 
-    UPDATE_STRUCT_WITH_CONTROL_PARAMS_AND_COMMON
+    UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     auto operator()()
     {

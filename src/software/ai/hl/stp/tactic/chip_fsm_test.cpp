@@ -16,29 +16,20 @@ TEST(ChipFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
         boost::sml::state<GetBehindBallFSM::idle_state>));
-    fsm.process_event(ChipFSM::Update{
-        .control_params = control_params,
-        .common         = TacticUpdate{.robot      = robot,
-                               .world      = world,
-                               .set_intent = [](std::unique_ptr<Intent>) {}}});
+    fsm.process_event(ChipFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
         boost::sml::state<GetBehindBallFSM::get_behind_ball_state>));
     robot = ::TestUtil::createRobotAtPos(Point(-2, 1.8));
-    fsm.process_event(ChipFSM::Update{
-        .control_params = control_params,
-        .common         = TacticUpdate{.robot      = robot,
-                               .world      = world,
-                               .set_intent = [](std::unique_ptr<Intent>) {}}});
+    fsm.process_event(ChipFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM::chip_state>));
     robot = ::TestUtil::createRobotAtPos(Point(-2, 1.8));
     world =
         ::TestUtil::setBallVelocity(world, Vector(0, -2.1), Timestamp::fromSeconds(123));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(Angle::threeQuarter()));
-    fsm.process_event(ChipFSM::Update{
-        .control_params = control_params,
-        .common         = TacticUpdate{.robot      = robot,
-                               .world      = world,
-                               .set_intent = [](std::unique_ptr<Intent>) {}}});
+    fsm.process_event(ChipFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }
