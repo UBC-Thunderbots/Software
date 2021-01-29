@@ -106,7 +106,7 @@ sudo apt-get install curl gnupg
 curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
 sudo apt-get update
-if ! sudo apt-get install bazel=3.7.2 -y --allow_downgrades; then
+if ! sudo apt-get install bazel=3.7.2 --allow_downgrades; then
     echo "##############################################################"
     echo "Error: Installing Bazel failed"
     echo "If you have a newer version installed, please manually downgrade"
