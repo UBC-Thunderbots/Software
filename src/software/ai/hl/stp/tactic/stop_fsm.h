@@ -8,12 +8,13 @@ struct StopFSM
     class idle_state;
     class stop_state;
 
-    struct Update
+    struct ControlParams
     {
-        Update(bool coast, const TacticUpdate& common) : coast(coast), common(common) {}
         bool coast;
-        TacticUpdate common;
     };
+
+
+    UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     auto operator()()
     {
@@ -24,8 +25,8 @@ struct StopFSM
         const auto update_e = event<Update>;
 
         const auto update_stop = [](auto event) {
-            event.common.set_intent(
-                std::make_unique<StopIntent>(event.common.robot.id(), event.coast));
+            event.common.set_intent(std::make_unique<StopIntent>(
+                event.common.robot.id(), event.control_params.coast));
         };
 
         const auto stop_done = [](auto event) {
