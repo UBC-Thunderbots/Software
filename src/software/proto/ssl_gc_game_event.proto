@@ -30,7 +30,7 @@ message GameEvent
 
         BallLeftField ball_left_field_touch_line = 6;
         BallLeftField ball_left_field_goal_line  = 7;
-        AImlessKick aimless_kick                 = 11;
+        AimlessKick aimless_kick                 = 11;
 
         // Stopping Fouls
 
@@ -119,7 +119,7 @@ message GameEvent
         optional Vector2 location = 3;
     }
     // the ball left the field via goal line and a team committed an aimless kick
-    message AImlessKick
+    message AimlessKick
     {
         // the team that last touched the ball
         required Team by_team = 1;
