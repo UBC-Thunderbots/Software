@@ -199,7 +199,7 @@ class YamlLoadFixture : public ::testing::Test
                 current_config_yaml = config[1];
             }
 
-            config_yaml["ThunderbotsConfigNew"][config_name] = current_config_yaml;
+            config_yaml["ThunderbotsConfig"][config_name] = current_config_yaml;
         }
 
         for (auto const& p : config_name_to_includes_map)
@@ -209,8 +209,8 @@ class YamlLoadFixture : public ::testing::Test
                 boost::filesystem::path included_config_path(included_config);
                 std::string included_config_name =
                     toCamelCase(included_config_path.stem().string());
-                config_yaml["ThunderbotsConfigNew"][p.first][included_config_name] =
-                    config_yaml["ThunderbotsConfigNew"][included_config_name];
+                config_yaml["ThunderbotsConfig"][p.first][included_config_name] =
+                    config_yaml["ThunderbotsConfig"][included_config_name];
             }
         }
     }
@@ -282,12 +282,12 @@ class TestAutogenParameterList : public YamlLoadFixture
 TEST_F(TestAutogenParameterList, DynamicParametersTest)
 {
     // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
-    const std::shared_ptr<ThunderbotsConfigNew> MutableDynamicParameters =
-        std::make_shared<ThunderbotsConfigNew>();
+    const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
+        std::make_shared<ThunderbotsConfig>();
 
     // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
-    const std::shared_ptr<const ThunderbotsConfigNew> DynamicParameters =
-        std::const_pointer_cast<const ThunderbotsConfigNew>(MutableDynamicParameters);
+    const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
+        std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
 
     visit_parameters(DynamicParameters, config_yaml);
 }
@@ -461,12 +461,12 @@ class TestParameterMutation : public YamlLoadFixture
 TEST_F(TestParameterMutation, DynamicParametersTest)
 {
     // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
-    const std::shared_ptr<ThunderbotsConfigNew> MutableDynamicParameters =
-        std::make_shared<ThunderbotsConfigNew>();
+    const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
+        std::make_shared<ThunderbotsConfig>();
 
     // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
-    const std::shared_ptr<const ThunderbotsConfigNew> DynamicParameters =
-        std::const_pointer_cast<const ThunderbotsConfigNew>(MutableDynamicParameters);
+    const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
+        std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
 
     mutate_all_parameters(MutableDynamicParameters);
     assert_mutation(DynamicParameters, config_yaml);
