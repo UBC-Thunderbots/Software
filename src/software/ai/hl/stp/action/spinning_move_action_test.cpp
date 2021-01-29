@@ -32,7 +32,7 @@ TEST(SpinningMoveActionTest, robot_far_from_destination)
 
     SpinningMoveIntent spinning_move_intent =
         dynamic_cast<SpinningMoveIntent &>(*intent_ptr);
-    EXPECT_EQ(0, spinning_move_intent.getRobotID());
+    EXPECT_EQ(0, spinning_move_intent.getRobotId());
 
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         spinning_move_intent.getPrimitive()

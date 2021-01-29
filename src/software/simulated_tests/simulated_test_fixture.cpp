@@ -77,17 +77,17 @@ Field SimulatedTestFixture::field() const
     return simulator->getField();
 }
 
-void SimulatedTestFixture::setFriendlyGoalie(RobotID goalie_id)
+void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableFriendlyGoalieID()
+        ->mutableFriendlyGoalieId()
         ->setValue(static_cast<int>(goalie_id));
 }
 
-void SimulatedTestFixture::setEnemyGoalie(RobotID goalie_id)
+void SimulatedTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableEnemyGoalieID()
+        ->mutableEnemyGoalieId()
         ->setValue(static_cast<int>(goalie_id));
 }
 

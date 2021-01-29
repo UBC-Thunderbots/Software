@@ -176,8 +176,9 @@ QWidget* DynamicParameterWidget::createDoubleParameter(
         parameter->setValue(new_value);
     };
 
-    auto on_parameter_value_changed = setupSliderLineEdit(
-        param_line_edit, param_slider, on_slider_value_changed, parameter->getMin(), parameter->getMax(), 100);
+    auto on_parameter_value_changed =
+        setupSliderLineEdit(param_line_edit, param_slider, on_slider_value_changed,
+                            parameter->getMin(), parameter->getMax(), 100);
 
     parameter->registerCallbackFunction(on_parameter_value_changed);
     on_parameter_value_changed(parameter->value());

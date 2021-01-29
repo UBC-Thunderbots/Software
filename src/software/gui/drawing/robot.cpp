@@ -96,7 +96,7 @@ void drawRobotAtPosition(QGraphicsScene* scene, const Point& position,
     drawSegment(scene, front_face, robot_front_face_pen);
 }
 
-void drawRobotID(QGraphicsScene* scene, const Point& position, const RobotID id)
+void drawRobotId(QGraphicsScene* scene, const Point& position, const RobotId id)
 {
     Point robot_bounding_box_top_left =
         position + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
@@ -137,7 +137,7 @@ void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColo
                         robot.robot_state.orientation(), color);
     drawRobotVelocity(scene, robot.robot_state.position(), robot.robot_state.velocity(),
                       robot_speed_slow_color, color);
-    drawRobotID(scene, robot.robot_state.position(), robot.id);
+    drawRobotId(scene, robot.robot_state.position(), robot.id);
 
     // TODO: Show robot charge state
     // https://github.com/UBC-Thunderbots/Software/issues/1492
@@ -146,5 +146,5 @@ void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColo
 void drawRobot(QGraphicsScene* scene, const RobotDetection& robot, const QColor& color)
 {
     drawRobotAtPosition(scene, robot.position, robot.orientation, color);
-    drawRobotID(scene, robot.position, robot.id);
+    drawRobotId(scene, robot.position, robot.id);
 }

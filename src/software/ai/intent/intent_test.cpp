@@ -13,7 +13,7 @@
 TEST(IntentTest, test_get_robot_id)
 {
     StopIntent stop_intent = StopIntent(1, false);
-    EXPECT_EQ(stop_intent.getRobotID(), 1);
+    EXPECT_EQ(stop_intent.getRobotId(), 1);
 }
 
 TEST(IntentTest, test_robot_id_inequality)

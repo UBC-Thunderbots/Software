@@ -14,7 +14,7 @@ class PathObjective
    public:
     PathObjective() = delete;
     PathObjective(const Point start, const Point end, const double current_speed,
-                  const std::vector<ObstaclePtr> &obstacles, RobotID robot_id)
+                  const std::vector<ObstaclePtr> &obstacles, RobotId robot_id)
         : robot_id(robot_id),
           start(start),
           end(end),
@@ -32,7 +32,7 @@ class PathObjective
     {
     }
 
-    const RobotID robot_id;
+    const RobotId robot_id;
     const Point start;
     const Point end;
     const double current_speed;
@@ -54,7 +54,7 @@ struct std::hash<PathObjective> final
 {
     std::size_t operator()(const PathObjective &path_objective) const
     {
-        std::hash<RobotID> h;
+        std::hash<RobotId> h;
         return h(path_objective.robot_id);
     }
 };

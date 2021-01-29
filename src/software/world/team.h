@@ -85,7 +85,7 @@ class Team
      * @param new_goalie_id The id of the new goalie for this team
      *
      */
-    void assignGoalie(RobotID new_goalie_id);
+    void assignGoalie(RobotId new_goalie_id);
 
     /**
      * Clears the goalie for this team. There will be no goalie assigned after
@@ -146,7 +146,7 @@ class Team
      * @return The ID of the goalie robot for this team if one is specified, otherwise
      * returns std::nullopt
      */
-    std::optional<unsigned int> getGoalieID() const;
+    std::optional<unsigned int> getGoalieId() const;
 
     /**
      * Returns a vector of all the robots on this team.

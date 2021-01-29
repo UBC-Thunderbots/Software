@@ -48,7 +48,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
     try
     {
         ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
-        EXPECT_EQ(0, chip_intent.getRobotID());
+        EXPECT_EQ(0, chip_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             chip_intent.getPrimitive().chip().chip_origin(),
             *createPointProto(Point(0, 0))));
@@ -85,7 +85,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
     try
     {
         ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
-        EXPECT_EQ(0, chip_intent.getRobotID());
+        EXPECT_EQ(0, chip_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             chip_intent.getPrimitive().chip().chip_origin(),
             *createPointProto(Point(-2.5, 2.5))));
@@ -123,7 +123,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
     try
     {
         ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
-        EXPECT_EQ(0, chip_intent.getRobotID());
+        EXPECT_EQ(0, chip_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             chip_intent.getPrimitive().chip().chip_origin(),
             *createPointProto(Point(-0.05, -0.2))));
@@ -160,7 +160,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
     try
     {
         ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
-        EXPECT_EQ(0, chip_intent.getRobotID());
+        EXPECT_EQ(0, chip_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             chip_intent.getPrimitive().chip().chip_origin(),
             *createPointProto(Point(0, 0))));
@@ -196,7 +196,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_EQ(0, move_intent.getRobotID());
+        EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
                                                    Point(-0.18, 0), 0.1));
@@ -232,7 +232,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_EQ(0, move_intent.getRobotID());
+        EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
                                                    Point(-2.45, 2.25), 0.1));
@@ -267,7 +267,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_EQ(0, move_intent.getRobotID());
+        EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
                                                    Point(-0.85, -3.75), 0.1));
@@ -302,7 +302,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_negative_
     try
     {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_EQ(0, move_intent.getRobotID());
+        EXPECT_EQ(0, move_intent.getRobotId());
         // Check the MoveIntent is moving roughly behind the ball
         EXPECT_TRUE(TestUtil::equalWithinTolerance(move_intent.getDestination(),
                                                    Point(-0.15, 0.25), 0.1));

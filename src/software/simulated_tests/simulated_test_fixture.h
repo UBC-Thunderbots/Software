@@ -93,8 +93,8 @@ class SimulatedTestFixture : public ::testing::Test
      *
      * @param goalie_id The ID of the robot to be goalie
      */
-    void setFriendlyGoalie(RobotID goalie_id);
-    void setEnemyGoalie(RobotID goalie_id);
+    void setFriendlyGoalie(RobotId goalie_id);
+    void setEnemyGoalie(RobotId goalie_id);
 
     /**
      * Sets the AI play to run in the simulated test

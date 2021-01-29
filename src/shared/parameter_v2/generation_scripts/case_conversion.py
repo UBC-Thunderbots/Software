@@ -3,7 +3,6 @@ import re
 ALLOWED_ACRONYMS = [
     "ai",
     "ssl",
-    "id",
 ]
 
 

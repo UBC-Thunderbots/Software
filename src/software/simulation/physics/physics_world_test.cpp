@@ -334,7 +334,7 @@ TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_no_existing_robots)
 {
     PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
-    EXPECT_EQ(0, physics_world.getAvailableYellowRobotID());
+    EXPECT_EQ(0, physics_world.getAvailableYellowRobotId());
 }
 
 TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_existing_robots)
@@ -351,14 +351,14 @@ TEST(PhysicsWorldTest, get_available_yellow_robot_ids_with_existing_robots)
     };
     physics_world.addYellowRobots(states);
 
-    EXPECT_EQ(1, physics_world.getAvailableYellowRobotID());
+    EXPECT_EQ(1, physics_world.getAvailableYellowRobotId());
 }
 
 TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_no_existing_robots)
 {
     PhysicsWorld physics_world(Field::createSSLDivisionBField());
 
-    EXPECT_EQ(0, physics_world.getAvailableBlueRobotID());
+    EXPECT_EQ(0, physics_world.getAvailableBlueRobotId());
 }
 
 TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_existing_robots)
@@ -375,7 +375,7 @@ TEST(PhysicsWorldTest, get_available_blue_robot_ids_with_existing_robots)
     };
     physics_world.addBlueRobots(states);
 
-    EXPECT_EQ(1, physics_world.getAvailableBlueRobotID());
+    EXPECT_EQ(1, physics_world.getAvailableBlueRobotId());
 }
 
 TEST(PhysicsSimulatorTest, test_world_does_not_change_if_time_step_is_zero)

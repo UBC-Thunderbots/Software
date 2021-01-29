@@ -15,7 +15,7 @@
 class VelocityObstaclePathManager : public PathManager
 {
    public:
-    const std::map<RobotID, std::optional<Path>> getManagedPaths(
+    const std::map<RobotId, std::optional<Path>> getManagedPaths(
         const std::unordered_set<PathObjective>& objectives,
         const Rectangle& navigable_area) override;
     const std::vector<ObstaclePtr> getObstacles(void) const override;

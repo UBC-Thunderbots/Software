@@ -173,7 +173,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         // that will be taking the shot
         if (shoot_tactic->getAssignedRobot())
         {
-            pass_generator.setPasserRobotID(shoot_tactic->getAssignedRobot()->id());
+            pass_generator.setPasserRobotId(shoot_tactic->getAssignedRobot()->id());
             set_passer_robot_in_passgenerator = true;
         }
 

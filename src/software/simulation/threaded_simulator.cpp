@@ -96,14 +96,14 @@ void ThreadedSimulator::addBlueRobots(const std::vector<RobotStateWithId> &robot
     updateCallbacks();
 }
 
-void ThreadedSimulator::setYellowRobotPrimitive(RobotID id,
+void ThreadedSimulator::setYellowRobotPrimitive(RobotId id,
                                                 const TbotsProto_Primitive &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);
     simulator.setYellowRobotPrimitive(id, primitive_msg);
 }
 
-void ThreadedSimulator::setBlueRobotPrimitive(RobotID id,
+void ThreadedSimulator::setBlueRobotPrimitive(RobotId id,
                                               const TbotsProto_Primitive &primitive_msg)
 {
     std::scoped_lock lock(simulator_mutex);

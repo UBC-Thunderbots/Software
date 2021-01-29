@@ -352,7 +352,7 @@ TEST_F(TeamTest, get_goalie_id_with_no_goalie)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
-    EXPECT_EQ(std::nullopt, team.getGoalieID());
+    EXPECT_EQ(std::nullopt, team.getGoalieId());
 }
 
 TEST_F(TeamTest, get_goalie_id_with_goalie)
@@ -364,7 +364,7 @@ TEST_F(TeamTest, get_goalie_id_with_goalie)
     team.updateRobots({robot_0});
     team.assignGoalie(0);
 
-    EXPECT_EQ(0, team.getGoalieID());
+    EXPECT_EQ(0, team.getGoalieId());
 }
 
 TEST_F(TeamTest, get_robot_expiry_buffer)

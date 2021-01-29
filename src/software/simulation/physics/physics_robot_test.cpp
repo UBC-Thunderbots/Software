@@ -69,7 +69,7 @@ TEST_F(PhysicsRobotTest, test_get_robot_id)
                                    AngularVelocity::fromDegrees(-170));
     PhysicsRobot physics_robot(3, world, initial_robot_state, 1.0);
 
-    EXPECT_EQ(3, physics_robot.getRobotID());
+    EXPECT_EQ(3, physics_robot.getRobotId());
 }
 
 TEST_F(PhysicsRobotTest, test_get_physics_robot_state_members)

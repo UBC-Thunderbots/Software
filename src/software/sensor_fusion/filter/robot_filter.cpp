@@ -20,7 +20,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
 {
     int data_num               = 0;
     Timestamp latest_timestamp = Timestamp().fromSeconds(0);
-    FilteredRobotData filtered_data{.id               = this->getRobotID(),
+    FilteredRobotData filtered_data{.id               = this->getRobotId(),
                                     .position         = Point(0, 0),
                                     .velocity         = Vector(0, 0),
                                     .orientation      = Angle::fromRadians(0),
@@ -30,7 +30,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
     for (const RobotDetection &robot_data : new_robot_data)
     {
         // add up all data points for this robot and then average it
-        if (robot_data.id == this->getRobotID() &&
+        if (robot_data.id == this->getRobotId() &&
             robot_data.timestamp > this->current_robot_state.timestamp())
         {
             filtered_data.position =
@@ -90,7 +90,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
 
         // update current_robot_state
         this->current_robot_state =
-            Robot(this->getRobotID(), filtered_data.position, filtered_data.velocity,
+            Robot(this->getRobotId(), filtered_data.position, filtered_data.velocity,
                   filtered_data.orientation, filtered_data.angular_velocity,
                   filtered_data.timestamp);
 
@@ -98,7 +98,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
     }
 }
 
-unsigned int RobotFilter::getRobotID() const
+unsigned int RobotFilter::getRobotId() const
 {
     return this->current_robot_state.id();
 }

@@ -6,7 +6,7 @@
 
 Intent::Intent(unsigned int robot_id) : robot_id(robot_id), motion_constraints() {}
 
-unsigned int Intent::getRobotID() const
+unsigned int Intent::getRobotId() const
 {
     return robot_id;
 }

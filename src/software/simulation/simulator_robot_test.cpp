@@ -63,7 +63,7 @@ TEST_F(SimulatorRobotTest, test_robot_id)
 {
     auto [world, simulator_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
-    EXPECT_EQ(simulator_robot->getRobotID(), 7);
+    EXPECT_EQ(simulator_robot->getRobotId(), 7);
     UNUSED(world);
     UNUSED(simulator_ball);
 }

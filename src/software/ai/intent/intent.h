@@ -43,7 +43,7 @@ class Intent
      *
      * @return The robot id
      */
-    unsigned int getRobotID() const;
+    unsigned int getRobotId() const;
 
     /**
      * Compares Intents for equality. Intents are considered equal if all

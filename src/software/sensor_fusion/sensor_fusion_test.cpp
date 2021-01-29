@@ -481,8 +481,8 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
 
 TEST_F(SensorFusionTest, goalie_id_set_by_referee)
 {
-    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
-    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(false);
+    config->mutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
+    config->mutableOverrideGameControllerEnemyGoalieId()->setValue(false);
 
     SensorProto sensor_msg;
 
@@ -496,8 +496,8 @@ TEST_F(SensorFusionTest, goalie_id_set_by_referee)
     sensor_fusion.processSensorProto(sensor_msg);
     World result = *sensor_fusion.getWorld();
 
-    unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieID().value();
-    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieID().value();
+    unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieId().value();
+    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieId().value();
 
     EXPECT_EQ(2, friendly_goalie_id);
     EXPECT_EQ(2, enemy_goalie_id);
@@ -505,10 +505,10 @@ TEST_F(SensorFusionTest, goalie_id_set_by_referee)
 
 TEST_F(SensorFusionTest, goalie_id_overridden)
 {
-    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(true);
-    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(true);
-    config->mutableFriendlyGoalieID()->setValue(1);
-    config->mutableEnemyGoalieID()->setValue(3);
+    config->mutableOverrideGameControllerFriendlyGoalieId()->setValue(true);
+    config->mutableOverrideGameControllerEnemyGoalieId()->setValue(true);
+    config->mutableFriendlyGoalieId()->setValue(1);
+    config->mutableEnemyGoalieId()->setValue(3);
 
     SensorProto sensor_msg;
 
@@ -522,8 +522,8 @@ TEST_F(SensorFusionTest, goalie_id_overridden)
     sensor_fusion.processSensorProto(sensor_msg);
     World result = *sensor_fusion.getWorld();
 
-    unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieID().value();
-    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieID().value();
+    unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieId().value();
+    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieId().value();
 
     EXPECT_EQ(1, friendly_goalie_id);
     EXPECT_EQ(3, enemy_goalie_id);
@@ -531,10 +531,10 @@ TEST_F(SensorFusionTest, goalie_id_overridden)
 
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 {
-    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
-    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(false);
-    config->mutableFriendlyGoalieID()->setValue(0);
-    config->mutableEnemyGoalieID()->setValue(0);
+    config->mutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
+    config->mutableOverrideGameControllerEnemyGoalieId()->setValue(false);
+    config->mutableFriendlyGoalieId()->setValue(0);
+    config->mutableEnemyGoalieId()->setValue(0);
     SensorProto sensor_msg;
     SensorProto sensor_msg_0;
     auto ssl_wrapper_packet =
@@ -565,10 +565,10 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
 {
-    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
-    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(false);
-    config->mutableFriendlyGoalieID()->setValue(0);
-    config->mutableEnemyGoalieID()->setValue(0);
+    config->mutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
+    config->mutableOverrideGameControllerEnemyGoalieId()->setValue(false);
+    config->mutableFriendlyGoalieId()->setValue(0);
+    config->mutableEnemyGoalieId()->setValue(0);
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());

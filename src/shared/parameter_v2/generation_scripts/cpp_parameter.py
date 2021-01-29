@@ -42,6 +42,7 @@ COMMAND_LINE_ARG_ENTRY = "{param_type} {param_name} = {quote}{value}{quote};"
 
 LOAD_COMMAND_LINE_ARG_INTO_CONFIG = "this->{dependencies}mutable{param_accessor_name}()->setValue(args.{arg_prefix}{param_name});"
 
+
 class CppParameter(object):
     def __init__(self, param_type: str, param_metadata: dict):
         """Initializes a CppParameter object, which can generate various strings specific to a parameter through properties.

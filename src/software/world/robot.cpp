@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/logger/logger.h"
 
-Robot::Robot(RobotID id, const Point &position, const Vector &velocity,
+Robot::Robot(RobotId id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities)
@@ -14,7 +14,7 @@ Robot::Robot(RobotID id, const Point &position, const Vector &velocity,
 {
 }
 
-Robot::Robot(RobotID id, const RobotState &initial_state, const Timestamp &timestamp,
+Robot::Robot(RobotId id, const RobotState &initial_state, const Timestamp &timestamp,
              const std::set<RobotCapability> &unavailable_capabilities)
     : id_(id),
       current_state_(initial_state),
@@ -39,7 +39,7 @@ Timestamp Robot::timestamp() const
     return timestamp_;
 }
 
-RobotID Robot::id() const
+RobotId Robot::id() const
 {
     return id_;
 }
