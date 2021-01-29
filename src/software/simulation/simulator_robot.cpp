@@ -168,11 +168,8 @@ void SimulatorRobot::chip(float distance_m)
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
         {
-            auto ball = ball_in_dribbler_area->ball;
-            // Assume the ball is chipped at a 45 degree angle
-            // TODO: Use a robot-specific constant
-            // https://github.com/UBC-Thunderbots/Software/issues/1179
-            Angle chip_angle = Angle::fromDegrees(45);
+            auto ball        = ball_in_dribbler_area->ball;
+            Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
 
             // Mark the ball as "in flight" so collisions are turned off
             // until it has travelled the desired chip distance.

@@ -1,6 +1,7 @@
+#include "software/ai/hl/stp/play/enemy_free_kick_play.h"
+
 #include <gtest/gtest.h>
 
-#include "software/ai/hl/stp/play/enemy_freekick_play.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
@@ -11,7 +12,7 @@ class EnemyFreekickPlayTest : public SimulatedTestFixture
 {
 };
 
-TEST_F(EnemyFreekickPlayTest, test_enemy_freekick_play)
+TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_play)
 {
     setBallState(BallState(Point(0.9, 2.85), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
