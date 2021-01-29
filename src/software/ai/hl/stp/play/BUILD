@@ -51,9 +51,9 @@ cc_library(
 )
 
 cc_library(
-    name = "enemy_freekick_play",
-    srcs = ["enemy_freekick_play.cpp"],
-    hdrs = ["enemy_freekick_play.h"],
+    name = "enemy_free_kick_play",
+    srcs = ["enemy_free_kick_play.cpp"],
+    hdrs = ["enemy_free_kick_play.h"],
     deps = [
         ":play",
         "//shared:constants",
@@ -62,7 +62,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic:shadow_freekicker_tactic",
+        "//software/ai/hl/stp/tactic:shadow_free_kicker_tactic",
         "//software/ai/hl/stp/tactic:stop_tactic",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
@@ -293,7 +293,7 @@ cc_library(
     deps = [
         ":corner_kick_play",
         ":defense_play",
-        ":enemy_freekick_play",
+        ":enemy_free_kick_play",
         ":example_play",
         ":free_kick_play",
         ":halt_play",
