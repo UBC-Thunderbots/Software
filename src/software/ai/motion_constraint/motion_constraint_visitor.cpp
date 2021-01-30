@@ -29,6 +29,8 @@ void MotionConstraintVisitor::visit(const MoveTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const ChipTactic &tactic) {}
 
+void MotionConstraintVisitor::visit(const KickTactic &tactic) {}
+
 void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
     current_allowed_constraints = std::set<MotionConstraint>({

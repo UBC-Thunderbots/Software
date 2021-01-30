@@ -61,6 +61,32 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "kick_tactic",
+    srcs = ["kick_tactic.cpp"],
+    hdrs = [
+        "kick_fsm.h",
+        "kick_tactic.h",
+    ],
+    deps = [
+        ":get_behind_ball_tactic",
+        ":tactic",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:kick_action",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "kick_fsm_test",
+    srcs = ["kick_fsm_test.cpp"],
+    deps = [
+        ":kick_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_test(
     name = "kickoff_chip_tactic_test",
     srcs = ["kickoff_chip_tactic_test.cpp"],
@@ -446,6 +472,7 @@ cc_library(
         ":defense_shadow_enemy_tactic",
         ":get_behind_ball_tactic",
         ":goalie_tactic",
+        ":kick_tactic",
         ":kickoff_chip_tactic",
         ":move_tactic",
         ":passer_tactic",

@@ -12,6 +12,7 @@ class DefenseShadowEnemyTactic;
 class GetBehindBallTactic;
 class GoalieTactic;
 class GoalieTestTactic;
+class KickTactic;
 class KickoffChipTactic;
 class MoveTactic;
 class MoveTestTactic;
@@ -47,6 +48,7 @@ class TacticVisitor
     virtual void visit(const GetBehindBallTactic &tactic)      = 0;
     virtual void visit(const GoalieTactic &tactic)             = 0;
     virtual void visit(const GoalieTestTactic &tactic)         = 0;
+    virtual void visit(const KickTactic &tactic)               = 0;
     virtual void visit(const KickoffChipTactic &tactic)        = 0;
     virtual void visit(const MoveTactic &tactic)               = 0;
     virtual void visit(const MoveTestTactic &tactic)           = 0;
