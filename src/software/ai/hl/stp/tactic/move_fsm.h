@@ -23,7 +23,7 @@ struct MoveFSM
     };
 
     // this struct defines the only event that the MoveFSM responds to
-    UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     auto operator()()
     {
