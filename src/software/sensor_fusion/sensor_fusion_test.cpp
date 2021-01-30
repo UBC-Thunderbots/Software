@@ -20,6 +20,7 @@ class SensorFusionTest : public ::testing::Test
           geom_data(initSSLDivBGeomData()),
           robot_status_msg_id_1(initRobotStatusId1()),
           robot_status_msg_id_2(initRobotStatusId2()),
+          robot_status_msg_id_3(initRobotStatusId3()),
           referee_indirect_yellow(initRefereeIndirectYellow()),
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart()),
@@ -42,6 +43,7 @@ class SensorFusionTest : public ::testing::Test
     // world associated with geom_data and detection_frame only
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_3;
     std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
     std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
@@ -232,6 +234,25 @@ class SensorFusionTest : public ::testing::Test
         return std::move(robot_msg);
     }
 
+    ////////////////////////////////////////////////
+    std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusId3()
+    {
+        // Trying to create my own robot, but NOT currently being used
+        // TODO have to also add the robot to friendly_team from World. currently the robot DNE
+        RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::fromRadians(2),
+                                       AngularVelocity::zero());
+        Robot robot(2, robot_state, Timestamp());
+
+        // Adding a WHEEL_0_MOTOR_HOT to robotStatus of robot 2
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
+
+        return std::move(robot_msg);
+    }
+//    std::vector<RobotStateWithId> initYellowRobotStates()
+    ////////////////////////////////////////////////
+
     std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()
     {
         auto ref_msg = std::make_unique<SSLProto::Referee>();
@@ -277,6 +298,30 @@ class SensorFusionTest : public ::testing::Test
         return ref_msg;
     }
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////
+    // TODO write tests for other capabilities being removed, eg. ::Chip multiple capabilities lost at once
+    // create wrapper packet => copy 432 - 436 line from tests change 430 - 431 to mutable_robot_status-msgs
+    // robot_status.cpp line 45 how to add error code in tests, for creating robot msgs. Could create a fn in test file for initializing it 
+
+TEST_F(SensorFusionTest, test_update_robot_capabilities_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+            createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs()) = *robot_status_msg_id_3;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    Team friendly_team = sensor_fusion.getWorld().value().friendlyTeam();
+    std::optional<Robot> robot = friendly_team.getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities = robot.value().getUnavailableCapabilities();
+    bool is_movement_disabled = robot_unavailable_capabilities.find(RobotCapability::Move) != robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_movement_disabled);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
 
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 {

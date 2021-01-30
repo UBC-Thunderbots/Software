@@ -114,34 +114,34 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    // Q: Is it okay to import to .h file
     for(auto &robot_status_msg : robot_status_msgs) {
-        uint32 robot_id = robot_status_msg.robot_id()
-        Robot robot = friendly_team.getRobotById(robot_id); //returns std::optional<Robot>??
-        if(robot == std::nullopt) return; //robot with robot_id DNE
+        int robot_id = robot_status_msg.robot_id();
+        std::set<RobotCapability> unavailableCapabilities;
 
         for(int i = 0; i < robot_status_msg.error_code_size(); i++) {
-            const TbotsProto::ErrorCode msg = robot_status_msg.error_code(i); //ErrorCode_Name
-            set<RobotCapability> capabilities = robot.getMutableRobotCapabilities();
-            if (msg.type() == RobotStatus::WHEEL_0_MOTOR_HOT || 
-                msg.type() == RobotStatus::WHEEL_1_MOTOR_HOT || 
-                msg.type() == RobotStatus::WHEEL_2_MOTOR_HOT || 
-                msg.type() == RobotStatus::WHEEL_3_MOTOR_HOT) 
+            const TbotsProto::ErrorCode msg = robot_status_msg.error_code(i);
+
+            if (msg == TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT ||
+                msg == TbotsProto::ErrorCode::WHEEL_1_MOTOR_HOT ||
+                msg == TbotsProto::ErrorCode::WHEEL_2_MOTOR_HOT ||
+                msg == TbotsProto::ErrorCode::WHEEL_3_MOTOR_HOT)
             {
-                capabilities.erase(RobotCapability::Move); // Q: Erase? capability is enough?
-            }
-            if (msg.type() == RobotStatus::LOW_CAP)
+                unavailableCapabilities.insert(RobotCapability::Move);
+            } else if (msg == TbotsProto::ErrorCode::LOW_CAP)
             {
-                // Q: What is cap?
-                // Q: What capabilities to update
-            }
-            if (msg.type() == RobotStatus::CHARGE_TIMEOUT)
+                unavailableCapabilities.insert(RobotCapability::Kick);
+                unavailableCapabilities.insert(RobotCapability::Chip);
+            } else if (msg == TbotsProto::ErrorCode::CHARGE_TIMEOUT)
             {
-                // Q: What is charge time out
-                // Q: What capabilities to update
+                unavailableCapabilities.insert(RobotCapability::Kick);
+                unavailableCapabilities.insert(RobotCapability::Chip);
             }
         }
+        friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
     }
+    // create wrapper packet => copy 432 - 436 line from tests change 430 - 431 to mutable_robot_status-msgs
+    // robot_status.cpp line 45 how to add error code in tests, for creating robot msgs. Could create a fn in test file for initializing it
+    // Create a robot based on SSL_WrapperPacket and based on robotstatus updated capabilities
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
