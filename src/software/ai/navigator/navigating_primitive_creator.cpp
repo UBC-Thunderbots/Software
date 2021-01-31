@@ -61,8 +61,8 @@ std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFina
     else
     {
         // we are going to some intermediate point so we transition smoothly
-        double transition_final_speed =
-            ROBOT_MAX_SPEED_METERS_PER_SECOND * config->getTransitionSpeedFactor()->value();
+        double transition_final_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                                        config->getTransitionSpeedFactor()->value();
 
         desired_final_speed = calculateTransitionSpeedBetweenSegments(
             path_points[0], path_points[1], path_points[2], transition_final_speed);

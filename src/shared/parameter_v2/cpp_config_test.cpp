@@ -337,7 +337,8 @@ class TestParameterMutation : public YamlLoadFixture
                             [&](std::shared_ptr<Config> param) {
                                 for (auto& v : param->getMutableParameterList())
                                 {
-                                    if (visited.find(v) == visited.end()) {
+                                    if (visited.find(v) == visited.end())
+                                    {
                                         // Only mutate once per parameter
                                         mutate_all_parameters(v);
                                     }

@@ -68,7 +68,8 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 
     if (sensor_fusion_config->getOverrideGameControllerEnemyGoalieId()->value())
     {
-        RobotId enemy_goalie_id_override = sensor_fusion_config->getEnemyGoalieId()->value();
+        RobotId enemy_goalie_id_override =
+            sensor_fusion_config->getEnemyGoalieId()->value();
         enemy_team.assignGoalie(enemy_goalie_id_override);
     }
 }
@@ -161,7 +162,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    bool friendly_team_is_yellow = sensor_fusion_config->getFriendlyColorYellow()->value();
+    bool friendly_team_is_yellow =
+        sensor_fusion_config->getFriendlyColorYellow()->value();
 
     std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,

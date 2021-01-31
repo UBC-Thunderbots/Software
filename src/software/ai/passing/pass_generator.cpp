@@ -174,11 +174,12 @@ void PassGenerator::optimizePasses()
     std::vector<Pass> updated_passes;
     for (Pass& pass : passes_to_optimize)
     {
-        auto pass_array = optimizer.maximize(objective_function, convertPassToArray(pass),
-                                             DynamicParameters->getAiConfig()
-                                                 ->getPassingConfig()
-                                                 ->getNumberOfGradientDescentStepsPerIter()
-                                                 ->value());
+        auto pass_array =
+            optimizer.maximize(objective_function, convertPassToArray(pass),
+                               DynamicParameters->getAiConfig()
+                                   ->getPassingConfig()
+                                   ->getNumberOfGradientDescentStepsPerIter()
+                                   ->value());
         try
         {
             updated_passes.emplace_back(convertArrayToPass(pass_array));
@@ -360,10 +361,11 @@ bool PassGenerator::passesEqual(Pass pass1, Pass pass2)
             ->getPassingConfig()
             ->getPassEqualityMaxPositionDifferenceMeters()
             ->value();
-    double max_time_difference_seconds = DynamicParameters->getAiConfig()
-                                             ->getPassingConfig()
-                                             ->getPassEqualityMaxStartTimeDifferenceSeconds()
-                                             ->value();
+    double max_time_difference_seconds =
+        DynamicParameters->getAiConfig()
+            ->getPassingConfig()
+            ->getPassEqualityMaxStartTimeDifferenceSeconds()
+            ->value();
     double max_speed_difference = DynamicParameters->getAiConfig()
                                       ->getPassingConfig()
                                       ->getPassEqualityMaxSpeedDifferenceMetersPerSecond()

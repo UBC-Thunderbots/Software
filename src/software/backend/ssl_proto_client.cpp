@@ -8,7 +8,8 @@ SSLProtoClient::SSLProtoClient(
       ssl_vision_listener(
           std::make_unique<ThreadedProtoMulticastListener<SSLProto::SSL_WrapperPacket>>(
               ssl_communication_config->getVisionIpv4Address()->value(),
-              ssl_communication_config->getVisionPort()->value(), received_vision_callback)),
+              ssl_communication_config->getVisionPort()->value(),
+              received_vision_callback)),
       ssl_referee_listener(
           std::make_unique<ThreadedProtoMulticastListener<SSLProto::Referee>>(
               ssl_communication_config->getGameControllerIpv4Address()->value(),

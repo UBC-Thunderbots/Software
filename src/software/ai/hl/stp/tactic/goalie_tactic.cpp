@@ -263,7 +263,8 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
 
     // by how much should the defense area be decreased so the goalie stays close
     // towards the net
-    auto defense_area_deflation = goalie_tactic_config->getDefenseAreaDeflation()->value();
+    auto defense_area_deflation =
+        goalie_tactic_config->getDefenseAreaDeflation()->value();
     // we want to restrict the block cone to the friendly crease, also potentially
     // scaled by a defense_area_deflation_parameter
     Rectangle deflated_defense_area = field.friendlyDefenseArea();

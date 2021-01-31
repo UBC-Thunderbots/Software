@@ -33,7 +33,8 @@ void SimulatedTestFixture::SetUp()
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
     ai = AI(DynamicParameters->getAiConfig(), DynamicParameters->getAiControlConfig());
 
-    MutableDynamicParameters->getMutableAiControlConfig()->getMutableRunAi()->setValue(true);
+    MutableDynamicParameters->getMutableAiControlConfig()->getMutableRunAi()->setValue(
+        true);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team

@@ -66,8 +66,9 @@ TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1)
         *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
             input, DynamicParameters->getHandheldControllerConfig());
 
-    double chip_distance =
-        DynamicParameters->getHandheldControllerConfig()->getChipDistanceMeters()->value();
+    double chip_distance = DynamicParameters->getHandheldControllerConfig()
+                               ->getChipDistanceMeters()
+                               ->value();
     auto expected_chip_primitive =
         *createChipPrimitive(Point(0, 0), Angle::zero(), chip_distance);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(

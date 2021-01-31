@@ -28,7 +28,8 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
 {
     if (controller_input.isKickButtonPressed())
     {
-        double kick_speed = controller_input_config->getKickSpeedMetersPerSecond()->value();
+        double kick_speed =
+            controller_input_config->getKickSpeedMetersPerSecond()->value();
         auto kick_primitive = createKickPrimitive(Point(0, 0), Angle::zero(), kick_speed);
         return kick_primitive;
     }
@@ -41,9 +42,10 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
     }
     else
     {
-        unsigned int dribbler_rpm = controller_input.isDribblerButtonPressed()
-                                        ? controller_input_config->getDribblerRpm()->value()
-                                        : 0;
+        unsigned int dribbler_rpm =
+            controller_input.isDribblerButtonPressed()
+                ? controller_input_config->getDribblerRpm()->value()
+                : 0;
         double x_velocity = controller_input.getLinearMotionX() *
                             controller_input_config->getMaxLinearSpeed()->value();
         double y_velocity = controller_input.getLinearMotionY() *
