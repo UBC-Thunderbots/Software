@@ -42,8 +42,11 @@ class KickTactic : public Tactic
      *
      * @param kick_origin The location where the kick will be taken
      * @param kick_direction The direction the Robot will kick in
+     * @param kick_speed_meters_per_second The speed of how fast the Robot
+     * will kick the ball in meters per second
      */
-    void updateControlParams(const Point& kick_origin, const Point& kick_target);
+    void updateControlParams(const Point& kick_origin, const Point& kick_target,
+                             double kick_speed_meters_per_second);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

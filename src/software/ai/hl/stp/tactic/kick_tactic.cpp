@@ -23,10 +23,11 @@ void KickTactic::updateControlParams(const Point &kick_origin,
     control_params.kick_speed_meters_per_second = kick_speed_meters_per_second;
 }
 
-void KickTactic::updateControlParams(const Point &kick_origin, const Point &kick_target)
+void KickTactic::updateControlParams(const Point &kick_origin, const Point &kick_target,
+                                     double kick_speed_meters_per_second)
 {
     updateControlParams(kick_origin, (kick_target - kick_origin).orientation(),
-                        (kick_target - kick_origin).length());
+                        kick_speed_meters_per_second);
 }
 
 double KickTactic::calculateRobotCost(const Robot &robot, const World &world) const
