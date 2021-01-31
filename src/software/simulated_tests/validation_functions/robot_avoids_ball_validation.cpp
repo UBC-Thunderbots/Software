@@ -5,4 +5,19 @@
 void robotAvoidsBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
 
+    auto robot_slowed_down = [robot_id](std::shared_ptr<World> world_ptr) {
+        std::optional<Robot> robotOptional =
+                world_ptr->friendlyTeam().getRobotById(robot_id);
+        if (!robotOptional.has_value())
+        {
+            LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
+        }
+
+        Robot robot                         = robotOptional.value();
+        double distance_from_ball           = (robot.position() - world_ptr->ball().position()).length();
+        const double MIN_DISTANCE_FROM_BALL = ROBOT_MAX_RADIUS_METERS + 0.5;
+
+        return (distance_from_ball <= MIN_DISTANCE_FROM_BALL);
+    };
+
 }
