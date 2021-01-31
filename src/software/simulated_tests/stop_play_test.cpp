@@ -5,6 +5,7 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/simulated_tests/validation_functions/robot_slows_down_validation.h"
+#include "software/simulated_tests/validation_functions/robot_avoids_ball_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -47,6 +48,8 @@ TEST_F(StopPlayTest, test_stop_play)
                 robotSlowsDown(3, world_ptr, yield);
                 robotSlowsDown(4, world_ptr, yield);
                 robotSlowsDown(5, world_ptr, yield);
+
+                robotAvoidsBall(3, world_ptr, yield);
             }
     };
 
