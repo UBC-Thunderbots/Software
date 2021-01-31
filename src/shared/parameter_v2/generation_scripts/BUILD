@@ -18,6 +18,7 @@ py_binary(
     ],
     data = [
         "//shared/parameter_v2/config_definitions:parameter_configs",
+        "//shared/parameter_v2/config_definitions:test_configs",
     ],
     main = ":generate_dynamic_parameters.py",
     python_version = "PY3",
