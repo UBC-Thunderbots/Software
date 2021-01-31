@@ -66,7 +66,7 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_near_ball)
 {
     setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-            {Point(-3, 2.5), Point(-1.5, -1.1)}));
+            {Point(-3, 2.5), Point(1.5, -1.1)}));
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
@@ -86,8 +86,8 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_near_ball)
                 {
                     yield();
                 }
-                robotSlowsDown(0, world_ptr, yield);
-                robotAvoidsBall(0, world_ptr, yield);
+                robotSlowsDown(1, world_ptr, yield);
+                robotAvoidsBall(1, world_ptr, yield);
             }
     };
 
@@ -99,7 +99,7 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_far_from_ball)
 {
     setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-            {Point(-3, 2.5), Point(field().friendlyDefenseArea().posXNegYCorner())}));
+            {Point(-3, 2.5), Point(-4, -2.5)}));
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
@@ -119,8 +119,8 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_far_from_ball)
                 {
                     yield();
                 }
-                robotSlowsDown(0, world_ptr, yield);
-                robotAvoidsBall(0, world_ptr, yield);
+                robotSlowsDown(1, world_ptr, yield);
+                robotAvoidsBall(1, world_ptr, yield);
             }
     };
 
@@ -152,11 +152,16 @@ TEST_F(StopPlayTest, test_stop_play_at_ball)
                 {
                     yield();
                 }
-                robotSlowsDown(0, world_ptr, yield);
-                robotAvoidsBall(0, world_ptr, yield);
+                robotSlowsDown(1, world_ptr, yield);
+                robotAvoidsBall(1, world_ptr, yield);
             }
     };
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
+}
+
+TEST_F(StopPlayTest, test_stop_play_robots_too_fast)
+{
+
 }
