@@ -33,7 +33,7 @@ class ThreadedProtoMulticastSender
     void sendProto(const SendProto& message);
 
    private:
-    // The io_service that will be used to serivce all network requests
+    // The io_service that will be used to service all network requests
     boost::asio::io_service io_service;
     ProtoMulticastSender<SendProto> multicast_sender;
     // The thread running the io_service in the background. This thread will run for the

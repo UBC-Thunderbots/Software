@@ -73,6 +73,9 @@ namespace FirmwareTestUtil
 
     // Mock fake ball functions
     FAKE_VALUE_FUNC(float, get_ball_property);
+
+    // Mock time functions
+    FAKE_VALUE_FUNC(float, get_current_time_seconds);
 };  // namespace FirmwareTestUtil
 
 // Mock wheel state
@@ -203,7 +206,8 @@ class FirmwareTestUtilWorld : public testing::Test
                                         &(FirmwareTestUtil::get_ball_property),
                                         &(FirmwareTestUtil::get_ball_property));
 
-        firmware_world = app_firmware_world_create(robot, ball);
+        firmware_world = app_firmware_world_create(
+            robot, ball, FirmwareTestUtil::get_current_time_seconds);
     }
 
     virtual void TearDown(void)

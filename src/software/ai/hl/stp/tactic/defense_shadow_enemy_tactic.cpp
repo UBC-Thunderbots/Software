@@ -36,7 +36,7 @@ void DefenseShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_thre
 }
 
 double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
-                                                    const World &world)
+                                                    const World &world) const
 {
     if (!enemy_threat)
     {
@@ -60,12 +60,12 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         if (!enemy_threat)
         {
             LOG(WARNING) << "Running DefenseShadowEnemyTactic without an enemy threat";
-            stop_action->updateControlParams(*robot, false);
+            stop_action->updateControlParams(*robot_, false);
             yield(stop_action);
         }
 
         Robot enemy_robot                   = enemy_threat->robot;
-        std::vector<Robot> robots_to_ignore = {*robot};
+        std::vector<Robot> robots_to_ignore = {*robot_};
 
         if (ignore_goalie && friendly_team.goalie())
         {
@@ -94,7 +94,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
                 defense_shadow_enemy_tactic_config->getBallStealSpeed()->value())
         {
             autochip_move_action->updateControlParams(
-                *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
+                *robot_, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
                 0, DribblerMode::MAX_FORCE, YEET_CHIP_DISTANCE_METERS,
                 BallCollisionType::AVOID);
             yield(autochip_move_action);
@@ -102,9 +102,9 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         else
         {
             Angle facing_enemy_robot =
-                (enemy_robot.position() - robot->position()).orientation();
+                (enemy_robot.position() - robot_->position()).orientation();
             autochip_move_action->updateControlParams(
-                *robot, position_to_block_shot, facing_enemy_robot, 0, DribblerMode::OFF,
+                *robot_, position_to_block_shot, facing_enemy_robot, 0, DribblerMode::OFF,
                 YEET_CHIP_DISTANCE_METERS, BallCollisionType::AVOID);
             yield(autochip_move_action);
         }

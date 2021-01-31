@@ -19,7 +19,7 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
         *(wrapper_packet->mutable_detection()) = *detection_frame;
     }
 
-    return std::move(wrapper_packet);
+    return wrapper_packet;
 }
 std::unique_ptr<SSLProto::SSL_WrapperPacket> createSSLWrapperPacket(
     const World& world, TeamColour friendly_team_colour)

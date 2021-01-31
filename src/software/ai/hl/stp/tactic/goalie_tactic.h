@@ -54,7 +54,7 @@ class GoalieTactic : public Tactic
 
     void updateWorldParams(const World &world) override;
 
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment

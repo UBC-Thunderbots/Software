@@ -1,10 +1,13 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 
+#include "software/ai/intent/stop_intent.h"
 #include "software/logger/logger.h"
+#include "software/util/typename/typename.h"
 
 Tactic::Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_)
     : action_sequence(boost::bind(&Tactic::calculateNextActionWrapper, this, _1)),
       done_(false),
+      intent(),
       loop_forever(loop_forever),
       capability_reqs(capability_reqs_)
 {
@@ -17,12 +20,12 @@ bool Tactic::done() const
 
 std::optional<Robot> Tactic::getAssignedRobot() const
 {
-    return robot;
+    return robot_;
 }
 
 void Tactic::updateRobot(const Robot &robot)
 {
-    this->robot = robot;
+    this->robot_ = robot;
 }
 
 bool Tactic::isGoalieTactic() const
@@ -33,7 +36,7 @@ bool Tactic::isGoalieTactic() const
 std::shared_ptr<Action> Tactic::getNextAction(void)
 {
     std::shared_ptr<Action> next_action = nullptr;
-    if (!robot)
+    if (!robot_)
     {
         LOG(WARNING) << "Requesting the next Action for a Tactic without a Robot assigned"
                      << std::endl;
@@ -106,4 +109,37 @@ const std::set<RobotCapability> &Tactic::robotCapabilityRequirements() const
 std::set<RobotCapability> &Tactic::mutableRobotCapabilityRequirements()
 {
     return capability_reqs;
+}
+
+std::unique_ptr<Intent> Tactic::get(const Robot &robot, const World &world)
+{
+    // TODO (#1888): remove updateWorldParams and updateRobot
+    updateWorldParams(world);
+    updateRobot(robot);
+
+    updateIntent(TacticUpdate(robot, world, [this](std::unique_ptr<Intent> new_intent) {
+        intent = std::move(new_intent);
+    }));
+
+    if (intent)
+    {
+        return std::move(intent);
+    }
+    else
+    {
+        LOG(WARNING) << "No intent set for this tactic: " << TYPENAME(*this) << std::endl;
+        return std::make_unique<StopIntent>(robot.id(), false);
+    }
+}
+
+void Tactic::updateIntent(const TacticUpdate &tactic_update)
+{
+    // Try to get an intent from the tactic
+    std::shared_ptr<Action> action = getNextAction();
+    std::unique_ptr<Intent> intent;
+    if (action)
+    {
+        action->updateWorldParams(tactic_update.world);
+        tactic_update.set_intent(action->getNextIntent());
+    }
 }
