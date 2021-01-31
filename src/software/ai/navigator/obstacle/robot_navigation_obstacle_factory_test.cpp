@@ -17,11 +17,11 @@ class RobotNavigationObstacleFactoryTest : public testing::Test
     RobotNavigationObstacleFactoryTest()
         : current_time(Timestamp::fromSeconds(123)),
           robot_navigation_obstacle_factory(
-              DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig())
+              DynamicParameters->getAiConfig()->getRobotNavigationObstacleFactoryConfig())
     {
-        MutableDynamicParameters->getMutableAIConfig()
+        MutableDynamicParameters->getMutableAiConfig()
             ->getMutableRobotNavigationObstacleFactoryConfig()
-            ->mutableRobotObstacleInflationFactor()
+            ->getMutableRobotObstacleInflationFactor()
             ->setValue(1.3);
     }
 
@@ -41,7 +41,7 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
           enemy_team(Duration::fromMilliseconds(1000)),
           world(field, ball, friendly_team, enemy_team),
           robot_navigation_obstacle_factory(
-              DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig())
+              DynamicParameters->getAiConfig()->getRobotNavigationObstacleFactoryConfig())
     {
     }
 

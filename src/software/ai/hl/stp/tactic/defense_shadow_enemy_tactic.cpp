@@ -91,7 +91,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         // received the pass
         if (enemy_robot.isNearDribbler(ball.position()) &&
             ball.velocity().length() <
-                defense_shadow_enemy_tactic_config->BallStealSpeed()->value())
+                defense_shadow_enemy_tactic_config->getBallStealSpeed()->value())
         {
             autochip_move_action->updateControlParams(
                 *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),

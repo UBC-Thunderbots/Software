@@ -436,8 +436,8 @@ class PhysicsBallFrictionTest : public PhysicsBallTest
     {
         PhysicsBallTest::SetUp();
         simulator_config = std::make_shared<SimulatorConfig>();
-        simulator_config->mutableSlidingFrictionAcceleration()->setValue(5.0);
-        simulator_config->mutableRollingFrictionAcceleration()->setValue(0.5);
+        simulator_config->getMutableSlidingFrictionAcceleration()->setValue(5.0);
+        simulator_config->getMutableRollingFrictionAcceleration()->setValue(0.5);
     }
 
     std::shared_ptr<SimulatorConfig> simulator_config;

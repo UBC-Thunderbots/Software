@@ -85,7 +85,7 @@ class STP : public HL
      * The default value is 0
      */
     explicit STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-                 std::shared_ptr<const AIControlConfig> control_config,
+                 std::shared_ptr<const AiControlConfig> control_config,
                  long random_seed = 0);
 
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
@@ -218,7 +218,7 @@ class STP : public HL
     std::vector<std::shared_ptr<Tactic>> current_tactics;
     // The random number generator
     std::mt19937 random_number_generator;
-    std::shared_ptr<const AIControlConfig> control_config;
+    std::shared_ptr<const AiControlConfig> control_config;
     std::string override_play_name;
     std::string previous_override_play_name;
     bool override_play;

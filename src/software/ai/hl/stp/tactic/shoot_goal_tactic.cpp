@@ -76,9 +76,9 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
         Vector(robot->orientation().cos(), robot->orientation().sin());
 
     auto steal_ball_rect_width =
-        shoot_goal_tactic_config->EnemyAboutToStealBallRectangleWidth()->value();
+        shoot_goal_tactic_config->getEnemyAboutToStealBallRectangleWidth()->value();
     auto steal_ball_rect_length =
-        shoot_goal_tactic_config->EnemyAboutToStealBallRectangleExtensionLength()
+        shoot_goal_tactic_config->getEnemyAboutToStealBallRectangleExtensionLength()
             ->value();
     Rectangle baller_frontal_area = Rectangle(
         (robot->position() +

@@ -7,17 +7,17 @@ import re
 #                            CPP Parameter                            #
 #######################################################################
 
-PARAMETER_PUBLIC_ENTRY = """const std::shared_ptr<const {param_class}<{type}>> {immutable_accessor_name}() const
+PARAMETER_PUBLIC_ENTRY = """const std::shared_ptr<const {param_class}<{type}>> get{immutable_accessor_name}() const
     {{
         return std::const_pointer_cast<const {param_class}<{type}>>({param_variable_name});
     }}
 
-    const std::shared_ptr<{param_class}<{type}>> {mutable_accessor_name}()
+    const std::shared_ptr<{param_class}<{type}>> get{mutable_accessor_name}()
     {{
         return {param_variable_name};
     }}"""
 
-PARAMETER_PUBLIC_ENTRY_CONST = """const std::shared_ptr<const {param_class}<{type}>> {immutable_accessor_name}() const
+PARAMETER_PUBLIC_ENTRY_CONST = """const std::shared_ptr<const {param_class}<{type}>> get{immutable_accessor_name}() const
     {{
         return std::const_pointer_cast<const {param_class}<{type}>>({param_variable_name});
     }}"""
@@ -40,7 +40,7 @@ PARAMETER_COMMAND_LINE_OPTION_ENTRY = 'desc.add_options()("{arg_prefix}{param_na
 
 COMMAND_LINE_ARG_ENTRY = "{param_type} {param_name} = {quote}{value}{quote};"
 
-LOAD_COMMAND_LINE_ARG_INTO_CONFIG = "this->{dependencies}mutable{param_accessor_name}()->setValue(args.{arg_prefix}{param_name});"
+LOAD_COMMAND_LINE_ARG_INTO_CONFIG = "this->{dependencies}getMutable{param_accessor_name}()->setValue(args.{arg_prefix}{param_name});"
 
 
 class CppParameter(object):
@@ -137,7 +137,7 @@ class CppParameter(object):
                 param_class=self.param_class,
                 type=self.cpp_type,
                 immutable_accessor_name=to_pascal_case(self.param_name),
-                mutable_accessor_name="mutable" + to_pascal_case(self.param_name),
+                mutable_accessor_name="Mutable" + to_pascal_case(self.param_name),
                 param_variable_name=self.param_variable_name,
             )
         )

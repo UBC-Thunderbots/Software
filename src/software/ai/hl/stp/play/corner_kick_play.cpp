@@ -12,9 +12,9 @@
 #include "software/world/ball.h"
 
 CornerKickPlay::CornerKickPlay()
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(DynamicParameters->getAIConfig()
+    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(DynamicParameters->getAiConfig()
                                                            ->getCornerKickPlayConfig()
-                                                           ->MaxTimeCommitToPassSeconds()
+                                                           ->getMaxTimeCommitToPassSeconds()
                                                            ->value()))
 {
 }

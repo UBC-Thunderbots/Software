@@ -14,11 +14,11 @@ int main(int argc, char **argv)
     auto args = MutableDynamicParameters->getMutableSimulatedTestMainCommandLineArgs();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    LoggerSingleton::initializeLogger(args->LoggingDir()->value());
+    LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
 
     if (!help_requested)
     {
-        SimulatedTestFixture::enable_visualizer = args->EnableVisualizer()->value();
+        SimulatedTestFixture::enable_visualizer = args->getEnableVisualizer()->value();
     }
 
     return RUN_ALL_TESTS();

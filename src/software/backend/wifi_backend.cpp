@@ -15,16 +15,16 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config,
       sensor_fusion_config(sensor_fusion_config),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
-                       network_config->getSSLCommunicationConfig())
+                       network_config->getSslCommunicationConfig())
 {
-    std::string network_interface = this->network_config->NetworkInterface()->value();
-    int channel                   = this->network_config->Channel()->value();
+    std::string network_interface = this->network_config->getNetworkInterface()->value();
+    int channel                   = this->network_config->getChannel()->value();
 
     MutableDynamicParameters->getMutableNetworkConfig()
-        ->mutableChannel()
+        ->getMutableChannel()
         ->registerCallbackFunction([this](int new_channel) {
             std::string new_network_interface =
-                this->network_config->NetworkInterface()->value();
+                this->network_config->getNetworkInterface()->value();
             joinMulticastChannel(new_channel, new_network_interface);
         });
 
@@ -36,10 +36,10 @@ void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
 
-    if (sensor_fusion_config->OverrideGameControllerDefendingSide()->value())
+    if (sensor_fusion_config->getOverrideGameControllerDefendingSide()->value())
     {
         defending_side_output->sendProto(*createDefendingSide(
-            sensor_fusion_config->DefendingPositiveSide()->value() ? FieldSide::POS_X
+            sensor_fusion_config->getDefendingPositiveSide()->value() ? FieldSide::POS_X
                                                                    : FieldSide::NEG_X));
     }
     else

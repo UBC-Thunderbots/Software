@@ -14,26 +14,26 @@ int main(int argc, char **argv)
     auto args = MutableDynamicParameters->getMutableRobotDiagnosticsMainCommandLineArgs();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    LoggerSingleton::initializeLogger(args->LoggingDir()->value());
+    LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
 
     if (!help_requested)
     {
         // TODO remove this when we move to the new dynamic parameter system
         // https://github.com/UBC-Thunderbots/Software/issues/1298
-        if (!args->Interface()->value().empty())
+        if (!args->getInterface()->value().empty())
         {
             MutableDynamicParameters->getMutableNetworkConfig()
-                ->mutableNetworkInterface()
-                ->setValue(args->Interface()->value());
+                ->getMutableNetworkInterface()
+                ->setValue(args->getInterface()->value());
         }
 
-        if (args->Backend()->value().empty())
+        if (args->getBackend()->value().empty())
         {
             LOG(FATAL) << "The option '--backend' is required but missing";
         }
 
         std::shared_ptr<Backend> backend =
-            GenericFactory<std::string, Backend>::create(args->Backend()->value());
+            GenericFactory<std::string, Backend>::create(args->getBackend()->value());
 
         std::shared_ptr<ThreadedRobotDiagnosticsGUI> threaded_robot_diagnostics_gui;
         threaded_robot_diagnostics_gui =
