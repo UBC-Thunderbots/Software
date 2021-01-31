@@ -60,7 +60,7 @@ template <typename MsgT>
 std::optional<MsgT> ProtoLogReader::getNextMsg()
 {
     static_assert(std::is_base_of_v<google::protobuf::Message, MsgT>,
-                  "MsgT must be a derived class of google::protobuf::Messsage!");
+                  "MsgT must be a derived class of google::protobuf::Message!");
 
     if (!hasNextMsg())
     {
