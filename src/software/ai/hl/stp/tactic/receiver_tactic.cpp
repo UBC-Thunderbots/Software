@@ -32,7 +32,7 @@ void ReceiverTactic::updateControlParams(const Pass& updated_pass)
     this->pass = updated_pass;
 }
 
-double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world)
+double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // Prefer robots closer to the pass receive position
     // We normalize with the total field length so that robots that are within the field
@@ -62,7 +62,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         {
             Point target_position = shot->getPointToShootAt();
 
-            Angle shot_angle = (target_position - robot->position()).orientation();
+            Angle shot_angle = (target_position - robot_->position()).orientation();
 
             // If we do have a valid shot on net, orient the robot to face in-between
             // the pass vector and shot vector, so the robot can quickly orient itself
@@ -72,13 +72,13 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         }
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation
-        move_action->updateControlParams(*robot, pass.receiverPoint(), desired_angle, 0,
+        move_action->updateControlParams(*robot_, pass.receiverPoint(), desired_angle, 0,
                                          DribblerMode::OFF, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
     // Vector from the ball to the robot
-    Vector ball_to_robot_vector   = ball.position() - robot->position();
+    Vector ball_to_robot_vector   = ball.position() - robot_->position();
     std::optional<Shot> best_shot = findFeasibleShot();
     if (best_shot)
     {
@@ -87,7 +87,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
         // The angle between the ball velocity and a vector from the ball to the robot
         Vector ball_velocity = ball.velocity();
-        ball_to_robot_vector = robot->position() - ball.position();
+        ball_to_robot_vector = robot_->position() - ball.position();
         Angle ball_robot_angle =
             ball_velocity.orientation().minDiff(ball_to_robot_vector.orientation());
 
@@ -97,18 +97,18 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
                ball_velocity.length() < 0.5)
         {
             Shot shot =
-                getOneTimeShotPositionAndOrientation(*robot, ball, best_shot_target);
+                getOneTimeShotPositionAndOrientation(*robot_, ball, best_shot_target);
             Point ideal_position    = shot.getPointToShootAt();
             Angle ideal_orientation = shot.getOpenAngle();
 
             // Kicking at less than ball max speed to make sure we don't break rules
             autokick_move_action->updateControlParams(
-                *robot, ideal_position, ideal_orientation, 0, DribblerMode::OFF,
+                *robot_, ideal_position, ideal_orientation, 0, DribblerMode::OFF,
                 BALL_MAX_SPEED_METERS_PER_SECOND - 1, BallCollisionType::ALLOW);
             yield(autokick_move_action);
 
             // Calculations to check for termination conditions
-            ball_to_robot_vector = robot->position() - ball.position();
+            ball_to_robot_vector = robot_->position() - ball.position();
             ball_robot_angle =
                 ball_velocity.orientation().minDiff(ball_to_robot_vector.orientation());
         }
@@ -118,22 +118,22 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     else
     {
         LOG(DEBUG) << "Receiving and dribbling";
-        while ((ball.position() - robot->position()).length() >
+        while ((ball.position() - robot_->position()).length() >
                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
             Point ball_receive_pos = ball.position();
             if (ball.velocity().length() != 0)
             {
                 ball_receive_pos = closestPoint(
-                    robot->position(),
+                    robot_->position(),
                     Line(ball.position(), ball.position() + ball.velocity()));
             }
             Angle ball_receive_orientation =
-                (ball.position() - robot->position()).orientation();
+                (ball.position() - robot_->position()).orientation();
 
             // Move into position with the dribbler on
             move_action->updateControlParams(
-                *robot, ball_receive_pos, ball_receive_orientation, 0,
+                *robot_, ball_receive_pos, ball_receive_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW);
             yield(move_action);
         }
@@ -172,11 +172,11 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
 {
     // Check if we can shoot on the enemy goal from the receiver position
     std::optional<Shot> best_shot_opt =
-        calcBestShotOnGoal(field, friendly_team, enemy_team, robot->position(),
+        calcBestShotOnGoal(field, friendly_team, enemy_team, robot_->position(),
                            TeamType::ENEMY, {*this->getAssignedRobot()});
 
     // Vector from the ball to the robot
-    Vector robot_to_ball = ball.position() - robot->position();
+    Vector robot_to_ball = ball.position() - robot_->position();
 
     // The angle the robot will have to deflect the ball to shoot
     Angle abs_angle_between_pass_and_shot_vectors;
@@ -185,13 +185,13 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
     if (best_shot_opt)
     {
         Vector robot_to_shot_target =
-            best_shot_opt->getPointToShootAt() - robot->position();
+            best_shot_opt->getPointToShootAt() - robot_->position();
         abs_angle_between_pass_and_shot_vectors =
             (robot_to_ball.orientation() - robot_to_shot_target.orientation())
                 .clamp()
                 .abs();
 
-        Angle goal_angle = acuteAngle(field.friendlyGoalpostPos(), robot->position(),
+        Angle goal_angle = acuteAngle(field.friendlyGoalpostPos(), robot_->position(),
                                       field.friendlyGoalpostNeg())
                                .abs();
         net_percent_open =
