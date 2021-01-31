@@ -33,7 +33,7 @@ TEST(NonTerminatingFunctionValidatorTest,
                                                 ValidationCoroutine::push_type& yield) {
         if (world->ball().position().x() < -1)
         {
-            throw std::runtime_error("x < -1");
+
         }
         else if (world->ball().position().x() < 0)
         {

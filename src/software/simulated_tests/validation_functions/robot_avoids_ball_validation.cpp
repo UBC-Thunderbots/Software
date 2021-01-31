@@ -20,12 +20,12 @@ void robotAvoidsBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
         return (distance_from_ball >= MIN_DISTANCE_FROM_BALL);
     };
 
-    if (!robot_avoids_ball(world_ptr))
+    if (robot_avoids_ball(world_ptr))
     {
-        LOG(FATAL) << "Robot " + std::to_string(robot_id) + " failed to avoid the ball";
+        LOG(WARNING) << "Robot " + std::to_string(robot_id) + " avoided the ball!";
     }
     else {
-        LOG(WARNING) << "Robot " + std::to_string(robot_id) + " is avoiding the ball!";
+        throw std::runtime_error("Robot" + std::to_string(robot_id) + "did not avoid the ball!");
     }
 
 }
