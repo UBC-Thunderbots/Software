@@ -19,7 +19,7 @@ struct GetBehindBallFSM
         Angle chick_direction;
     };
 
-    UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     auto operator()()
     {

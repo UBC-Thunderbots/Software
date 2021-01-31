@@ -171,6 +171,13 @@ new_git_repository(
     shallow_since = "1571445859 -0700",
 )
 
+# tool used to flash firmware with bazel
+git_repository(
+    name = "platformio_rules",
+    remote = "http://github.com/mum4k/platformio_rules.git",
+    tag = "v0.0.10",
+)
+
 # Developer tools for working with bazel
 git_repository(
     name = "bazel_buildtools",
