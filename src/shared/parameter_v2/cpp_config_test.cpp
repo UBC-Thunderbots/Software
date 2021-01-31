@@ -299,9 +299,8 @@ class TestParameterMutation : public YamlLoadFixture
      * Visits each parameter and mutates on the following policy
      *
      * std::string gets "test" appended at the end
-     * int gets incremented by 2
-     * double gets decremented by 2
-     * unsigned gets incremented by 1 (to prevent overflow)
+     * int gets set to max
+     * double gets set to max
      * bool gets flipped
      *
      * Some parameters such as example_enum_param has a specific value set
@@ -310,8 +309,8 @@ class TestParameterMutation : public YamlLoadFixture
     {
         static std::set<MutableParameterVariant> visited;
         visited.insert(paramvar);
-        std::visit(overload{[&](std::shared_ptr<Parameter<int>> param) {
-                                param->setValue(param->value() + 2);
+        std::visit(overload{[&](std::shared_ptr<NumericParameter<int>> param) {
+                                param->setValue(param->getMax());
                             },
                             [&](std::shared_ptr<Parameter<bool>> param) {
                                 param->setValue(!param->value());
@@ -319,11 +318,11 @@ class TestParameterMutation : public YamlLoadFixture
                             [&](std::shared_ptr<Parameter<std::string>> param) {
                                 param->setValue(param->value() + "test");
                             },
-                            [&](std::shared_ptr<Parameter<double>> param) {
-                                param->setValue(param->value() - 2.0);
+                            [&](std::shared_ptr<NumericParameter<double>> param) {
+                                param->setValue(param->getMax());
                             },
                             [&](std::shared_ptr<NumericParameter<unsigned>> param) {
-                                param->setValue(param->value() + 1);
+                                param->setValue(param->getMax());
                             },
                             [&](std::shared_ptr<EnumeratedParameter<std::string>> param) {
                                 if (param->name() == "example_factory_param")
@@ -338,8 +337,7 @@ class TestParameterMutation : public YamlLoadFixture
                             [&](std::shared_ptr<Config> param) {
                                 for (auto& v : param->getMutableParameterList())
                                 {
-                                    if (visited.find(v) == visited.end())
-                                    {
+                                    if (visited.find(v) == visited.end()) {
                                         // Only mutate once per parameter
                                         mutate_all_parameters(v);
                                     }
@@ -355,12 +353,12 @@ class TestParameterMutation : public YamlLoadFixture
     void assert_mutation(ParameterVariant paramvar, const YAML::Node& current_config)
     {
         std::visit(
-            overload{[&](std::shared_ptr<const Parameter<int>> param) {
+            overload{[&](std::shared_ptr<const NumericParameter<int>> param) {
                          const YAML::Node param_node =
                              findParamNode(current_config, param->name());
                          if (!(isParamConstant(param_node)))
                          {
-                             ASSERT_EQ(getParamField<int>(param_node, "value") + 2,
+                             ASSERT_EQ(getParamField<int>(param_node, "max"),
                                        param->value());
                          }
                          else
@@ -398,12 +396,12 @@ class TestParameterMutation : public YamlLoadFixture
                                        param->value());
                          }
                      },
-                     [&](std::shared_ptr<const Parameter<double>> param) {
+                     [&](std::shared_ptr<const NumericParameter<double>> param) {
                          const YAML::Node param_node =
                              findParamNode(current_config, param->name());
                          if (!(isParamConstant(param_node)))
                          {
-                             ASSERT_NEAR(getParamField<double>(param_node, "value") - 2.0,
+                             ASSERT_NEAR(getParamField<double>(param_node, "max"),
                                          param->value(), 1E-10);
                          }
                          else
@@ -417,7 +415,7 @@ class TestParameterMutation : public YamlLoadFixture
                              findParamNode(current_config, param->name());
                          if (!(isParamConstant(param_node)))
                          {
-                             ASSERT_EQ(getParamField<unsigned>(param_node, "value") + 1,
+                             ASSERT_EQ(getParamField<unsigned>(param_node, "max"),
                                        param->value());
                          }
                          else

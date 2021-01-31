@@ -14,5 +14,3 @@ include:
     description: >-
         The network interface that is connected to the thunderbots router.
         Can be found using ifconfig on ubuntu.
-
-
