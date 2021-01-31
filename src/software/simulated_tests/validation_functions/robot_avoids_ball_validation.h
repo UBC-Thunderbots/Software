@@ -4,12 +4,12 @@
 #include "software/world/world.h"
 
 /**
- * Checks if robots have slowed down to the required speed
- * when the Referee has issued a STOP command
+ * Checks if robots are keeping appropriate distance from
+ * the ball when the Referee has issued a STOP command
  * @param robot_id the ID of the robot in question, there must exist a robot
  * for the given robot_id
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param yield yields control to the next routine (coroutines)
  */
-void robotSlowsDown(RobotId robot_id, std::shared_ptr<World> world_ptr,
-                        ValidationCoroutine::push_type& yield);
+void robotAvoidsBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
+                    ValidationCoroutine::push_type& yield);
