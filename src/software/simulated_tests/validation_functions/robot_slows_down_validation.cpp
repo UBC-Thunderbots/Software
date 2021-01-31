@@ -1,8 +1,8 @@
-#include "software/simulated_tests/validation_functions/robot_slowed_down_validation.h"
+#include "software/simulated_tests/validation_functions/robot_slows_down_validation.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
-void robotSlowedDown(RobotId robot_id, std::shared_ptr<World> world_ptr,
+void robotSlowsDown(RobotId robot_id, std::shared_ptr<World> world_ptr,
                       ValidationCoroutine::push_type& yield) {
 
     auto robot_slowed_down = [robot_id](std::shared_ptr<World> world_ptr) {

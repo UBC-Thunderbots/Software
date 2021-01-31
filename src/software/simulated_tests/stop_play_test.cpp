@@ -4,7 +4,7 @@
 
 #include "software/simulated_tests/simulated_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/simulated_tests/validation_functions/robot_slowed_down_validation.h"
+#include "software/simulated_tests/validation_functions/robot_slows_down_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -41,12 +41,12 @@ TEST_F(StopPlayTest, test_stop_play)
                 {
                     yield();
                 }
-                robotSlowedDown(0, world_ptr, yield);
-                robotSlowedDown(1, world_ptr, yield);
-                robotSlowedDown(2, world_ptr, yield);
-                robotSlowedDown(3, world_ptr, yield);
-                robotSlowedDown(4, world_ptr, yield);
-                robotSlowedDown(5, world_ptr, yield);
+                robotSlowsDown(0, world_ptr, yield);
+                robotSlowsDown(1, world_ptr, yield);
+                robotSlowsDown(2, world_ptr, yield);
+                robotSlowsDown(3, world_ptr, yield);
+                robotSlowsDown(4, world_ptr, yield);
+                robotSlowsDown(5, world_ptr, yield);
             }
     };
 

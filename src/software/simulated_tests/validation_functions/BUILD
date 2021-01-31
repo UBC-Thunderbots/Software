@@ -5,12 +5,12 @@ cc_library(
     srcs = [
         "friendly_scored_validation.cpp",
         "robot_received_ball_validation.cpp",
-        "robot_slowed_down_validation.cpp",
+        "robot_slows_down_validation.cpp",
     ],
     hdrs = [
         "friendly_scored_validation.h",
         "robot_received_ball_validation.h",
-        "robot_slowed_down_validation.h",
+        "robot_slows_down_validation.h",
     ],
     deps = [
         "//software/geom/algorithms",
