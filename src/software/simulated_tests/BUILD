@@ -124,7 +124,7 @@ cc_test(
     deps = [
         ":simulated_test_fixture",
         ":simulated_test_main",
-        "//software/ai/hl/stp/play:enemy_freekick_play",
+        "//software/ai/hl/stp/play:enemy_free_kick_play",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",

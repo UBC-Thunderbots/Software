@@ -29,11 +29,10 @@ TEST(PlayInfoTest, get_play_robot_tactic_assignment_works)
     emptyString = "";
     s1          = "string one";
     s2          = "string two";
-    std::unordered_set<std::string> emptySet, v;
-    emptySet                  = {};
+    std::vector<std::string> v;
     v                         = {s1, s2};
     PlayInfo custom_play_info = PlayInfo(emptyString, emptyString, v);
-    std::unordered_set<std::string> custom_play_rta =
+    std::vector<std::string> custom_play_rta =
         custom_play_info.getRobotTacticAssignment();
     EXPECT_EQ(custom_play_rta, v);
 }
@@ -45,7 +44,7 @@ TEST(PlayInfoTest, add_assignment_test)
     s1 = "string one";
     s2 = "string two";
     s3 = "string three";
-    std::unordered_set<std::string> v, v1, v2, v3;
+    std::vector<std::string> v, v1, v2, v3;
     v  = {};
     v1 = {s1};
     v2 = {s1, s2};
@@ -61,14 +60,13 @@ TEST(PlayInfoTest, add_assignment_test)
 
 TEST(PlayInfoTest, equality_operator_works)
 {
-    std::unordered_set<std::string> emptySet;
+    std::vector<std::string> empty_vector = {};
     std::string s1, s2;
-    s1       = "string one";
-    s2       = "string two";
-    emptySet = {};
-    PlayInfo test_play_info1(s1, s2, emptySet);
-    PlayInfo test_play_info2(s1, s2, emptySet);
-    PlayInfo test_play_info3(s1, s1, emptySet);
+    s1 = "string one";
+    s2 = "string two";
+    PlayInfo test_play_info1(s1, s2, empty_vector);
+    PlayInfo test_play_info2(s1, s2, empty_vector);
+    PlayInfo test_play_info3(s1, s1, empty_vector);
     EXPECT_TRUE(test_play_info1 == test_play_info2);
     EXPECT_FALSE(test_play_info1 == test_play_info3);
 }
