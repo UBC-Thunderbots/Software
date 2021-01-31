@@ -85,7 +85,7 @@ std::unique_ptr<SSLProto::Vector2f> createVector2f(const Point& point)
     // is a float), so we need to convert units
     vector2f->set_x(static_cast<float>(point.x() * MILLIMETERS_PER_METER));
     vector2f->set_y(static_cast<float>(point.y() * MILLIMETERS_PER_METER));
-    return std::move(vector2f);
+    return vector2f;
 }
 
 std::unique_ptr<SSLProto::SSL_FieldLineSegment> createFieldLineSegment(
@@ -109,7 +109,7 @@ std::unique_ptr<SSLProto::SSL_FieldLineSegment> createFieldLineSegment(
         static_cast<float>(thickness * MILLIMETERS_PER_METER));
     field_line_segment->set_type(shape_type);
 
-    return std::move(field_line_segment);
+    return field_line_segment;
 }
 
 std::unique_ptr<SSLProto::SSL_FieldCircularArc> createFieldCircularArc(
@@ -136,7 +136,7 @@ std::unique_ptr<SSLProto::SSL_FieldCircularArc> createFieldCircularArc(
         static_cast<float>(thickness * MILLIMETERS_PER_METER));
     field_circular_arc->set_type(shape_type);
 
-    return std::move(field_circular_arc);
+    return field_circular_arc;
 }
 
 std::unique_ptr<SSLProto::SSL_GeometryFieldSize> createGeometryFieldSize(
@@ -304,7 +304,7 @@ std::unique_ptr<SSLProto::SSL_GeometryFieldSize> createGeometryFieldSize(
         *createFieldCircularArc(center_circle, thickness, SSLCircularArcs::CENTER_CIRCLE,
                                 SSLProto::SSL_FieldShapeType::CenterCircle);
 
-    return std::move(geometry_field_size);
+    return geometry_field_size;
 }
 
 std::unique_ptr<SSLProto::SSL_GeometryData> createGeometryData(const Field& field,
@@ -323,7 +323,7 @@ std::unique_ptr<SSLProto::SSL_GeometryData> createGeometryData(const Field& fiel
     // information from the Field class
     geometry_data->clear_calib();
 
-    return std::move(geometry_data);
+    return geometry_data;
 }
 
 std::optional<Field> createField(const SSLProto::SSL_GeometryData& geometry_packet)

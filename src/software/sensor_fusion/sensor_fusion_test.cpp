@@ -214,7 +214,7 @@ class SensorFusionTest : public ::testing::Test
         chipper_kicker_status->set_ms_since_kicker_fired(9);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
 
-        return std::move(robot_msg);
+        return robot_msg;
     }
 
     std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusId2()
@@ -232,7 +232,7 @@ class SensorFusionTest : public ::testing::Test
         chipper_kicker_status->set_ms_since_kicker_fired(6);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
 
-        return std::move(robot_msg);
+        return robot_msg;
     }
 
     std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()

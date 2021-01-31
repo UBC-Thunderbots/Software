@@ -167,6 +167,14 @@ float app_firmware_robot_getVelocityY(const FirmwareRobot_t* robot);
 float app_firmware_robot_getVelocityAngular(const FirmwareRobot_t* robot);
 
 /**
+ * Get the absolute linear speed of this robot
+ * @param robot The robot to get the speed for
+ * @return The linear speed of the robot, in m/s
+ */
+float app_firmware_robot_getSpeedLinear(const FirmwareRobot_t* robot);
+
+
+/**
  * Get the battery voltage for the given robot
  *
  * @param robot The robot to get the battery voltage for

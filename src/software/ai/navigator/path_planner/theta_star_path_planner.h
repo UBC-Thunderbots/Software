@@ -173,7 +173,7 @@ class ThetaStarPathPlanner : public PathPlanner
 
         /**
          * Updates CellHeuristics internal variables
-         * Once updated, a CellHeuristic is considered intialized
+         * Once updated, a CellHeuristic is considered initialized
          *
          * @param parent parent
          * @param start_to_end_cost_estimate The start to end_cost estimate
