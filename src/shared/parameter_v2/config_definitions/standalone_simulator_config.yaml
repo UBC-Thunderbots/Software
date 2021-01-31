@@ -6,7 +6,6 @@
     description: >-
       The multicast channel to use to communicate with the yellow robots
       in the simulator
-
 - int:
     name: blue_team_channel
     min: 0
@@ -15,19 +14,16 @@
     description: >-
       The multicast channel to use to communicate with the blue robots
       in the simulator
-  
 - string:
     name: network_interface
     value: "wlp3s0"
     description: >-
       The network interface to use for multicast network communication.
       Can be found using the `ifconfig` command.
-  
 - string:
     name: vision_ipv4_address
     value: "224.5.23.2"
     description: The IPv4 address to send vision data to
-  
 - int:
     name: vision_port
     min: 1

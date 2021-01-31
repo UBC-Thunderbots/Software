@@ -28,7 +28,7 @@ void SimulatedTestFixture::SetUp()
     // of hack because we're changing a global variable, but it can't be easily fixed
     // through dependency injection until
     // https://github.com/UBC-Thunderbots/Software/issues/1299
-    // MutableDynamicParameters->init();
+    MutableDynamicParameters->init();
     simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
     ai = AI(DynamicParameters->getAiConfig(), DynamicParameters->getAiControlConfig());

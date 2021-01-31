@@ -6,6 +6,7 @@
     description: >-
         The total width ('sideways' of the robot) of the rectangle starting
         from the friendly robot inside which we think an enemy is about to
+        steal the ball
 
 - double:
     name: enemy_about_to_steal_ball_rectangle_extension_length
