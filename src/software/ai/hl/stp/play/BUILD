@@ -86,19 +86,6 @@ cc_library(
     alwayslink = True,
 )
 
-cc_test(
-    name = "example_play_test",
-    srcs = [
-        "example_play_test.cpp",
-    ],
-    deps = [
-        ":example_play",
-        "//software/ai/hl/stp/tactic:move_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
 cc_library(
     name = "halt_play",
     srcs = ["halt_play.cpp"],
@@ -111,17 +98,6 @@ cc_library(
         "//software/util/design_patterns:generic_factory",
     ],
     alwayslink = True,
-)
-
-cc_test(
-    name = "halt_play_test",
-    srcs = ["halt_play_test.cpp"],
-    deps = [
-        ":halt_play",
-        "//software/ai/hl/stp/tactic:stop_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
 )
 
 cc_library(
@@ -285,6 +261,7 @@ cc_library(
     hdrs = ["play.h"],
     deps = [
         "//software/ai/hl/stp/tactic",
+        "@boost//:coroutine2",
     ],
 )
 

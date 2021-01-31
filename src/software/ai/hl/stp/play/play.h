@@ -1,11 +1,19 @@
 #pragma once
 
+#include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 #include <memory>
 #include <vector>
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/world/world.h"
+
+using RobotToTacticAssignmentFunction =
+    std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
+        const std::vector<std::shared_ptr<const Tactic>>&, const World&)>;
+
+using MotionConstraintBuildFunction =
+    std::function<std::set<MotionConstraint>(const Tactic& tactic)>;
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with.
@@ -67,6 +75,32 @@ class Play
     virtual bool invariantHolds(const World& world) const = 0;
 
     /**
+     * Returns true if the Play is done and false otherwise. The Play is considered
+     * done when its coroutine is done (the getNextTactics() function has no
+     * more work to do)
+     *
+     * @return true if the Play is done and false otherwise
+     */
+    bool done() const;
+
+    /**
+     * Gets Intents from the Play given the assignment algorithm and world
+     *
+     * @param robot_to_tactic_assignment_algorithm The algorithm for assigning robots to
+     * tactics
+     * @param motion_constraint_builder Builds motion constraints from tactics
+     * @param world The updated world
+     *
+     * @return the vector of intents to execute
+     */
+    std::vector<std::unique_ptr<Intent>> get(
+        RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
+        MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
+
+    virtual ~Play() = default;
+
+   private:
+    /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority. The Tactic at the beginning of the vector has the highest
      * priority, and the Tactic at the end has the lowest priority.
@@ -83,18 +117,6 @@ class Play
      */
     std::vector<std::shared_ptr<Tactic>> getTactics(const World& world);
 
-    /**
-     * Returns true if the Play is done and false otherwise. The Play is considered
-     * done when its coroutine is done (the getNextTactics() function has no
-     * more work to do)
-     *
-     * @return true if the Play is done and false otherwise
-     */
-    bool done() const;
-
-    virtual ~Play() = default;
-
-   private:
     /**
      * A wrapper function for the getNextTactics function.
      *

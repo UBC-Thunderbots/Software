@@ -23,7 +23,8 @@ void ShadowFreekickerTactic::updateWorldParams(const World &world)
     this->ball       = world.ball();
 }
 
-double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const World &world)
+double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot,
+                                                  const World &world) const
 {
     double cost = (robot.position() - world.ball().position()).length() /
                   world.field().totalXLength();
@@ -32,7 +33,7 @@ double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const Worl
 void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
     auto move_action      = std::make_shared<MoveAction>(false);
-    Point defend_position = robot->position();
+    Point defend_position = robot_->position();
     // Experimentally determined to be a reasonable value
     double robot_separation_scaling_factor = 1.1;
 
@@ -75,8 +76,9 @@ void ShadowFreekickerTactic::calculateNextAction(ActionCoroutine::push_type &yie
         }
 
         move_action->updateControlParams(
-            *robot, defend_position, (ball.position() - robot->position()).orientation(),
-            0, DribblerMode::OFF, BallCollisionType::AVOID);
+            *robot_, defend_position,
+            (ball.position() - robot_->position()).orientation(), 0, DribblerMode::OFF,
+            BallCollisionType::AVOID);
         yield(move_action);
     } while (true);
 }

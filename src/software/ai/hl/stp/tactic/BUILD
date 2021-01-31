@@ -165,12 +165,26 @@ cc_test(
 cc_library(
     name = "move_tactic",
     srcs = ["move_tactic.cpp"],
-    hdrs = ["move_tactic.h"],
+    hdrs = [
+        "move_fsm.h",
+        "move_tactic.h",
+    ],
     deps = [
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/intent:move_intent",
         "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "move_fsm_test",
+    srcs = ["move_fsm_test.cpp"],
+    deps = [
+        ":move_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -345,13 +359,28 @@ cc_test(
 cc_library(
     name = "stop_tactic",
     srcs = ["stop_tactic.cpp"],
-    hdrs = ["stop_tactic.h"],
+    hdrs = [
+        "stop_fsm.h",
+        "stop_tactic.h",
+    ],
     deps = [
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
+        "//software/ai/intent:move_intent",
+        "//software/ai/intent:stop_intent",
         "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "stop_fsm_test",
+    srcs = ["stop_fsm_test.cpp"],
+    deps = [
+        ":stop_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -391,11 +420,19 @@ cc_library(
 cc_library(
     name = "tactic",
     srcs = ["tactic.cpp"],
-    hdrs = ["tactic.h"],
+    hdrs = [
+        "tactic.h",
+        "tactic_fsm.h",
+        "tactic_visitor.h",
+    ],
     deps = [
-        "tactic_visitor",
+        ":transition_conditions",
         "//software/ai/hl/stp/action",
+        "//software/ai/intent",
+        "//software/ai/intent:stop_intent",
+        "//software/util/typename",
         "//software/world",
+        "@sml",
     ],
 )
 
@@ -411,6 +448,20 @@ cc_test(
 )
 
 cc_library(
-    name = "tactic_visitor",
-    hdrs = ["tactic_visitor.h"],
+    name = "transition_conditions",
+    srcs = ["transition_conditions.cpp"],
+    hdrs = ["transition_conditions.h"],
+    deps = [
+        "//software/world",
+    ],
+)
+
+cc_library(
+    name = "transition_conditions_test",
+    srcs = ["transition_conditions_test.cpp"],
+    deps = [
+        ":tactic",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
 )
