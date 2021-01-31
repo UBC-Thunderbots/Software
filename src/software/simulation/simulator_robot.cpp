@@ -168,11 +168,8 @@ void SimulatorRobot::chip(float distance_m)
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
         {
-            auto ball = ball_in_dribbler_area->ball;
-            // Assume the ball is chipped at a 45 degree angle
-            // TODO: Use a robot-specific constant
-            // https://github.com/UBC-Thunderbots/Software/issues/1179
-            Angle chip_angle = Angle::fromDegrees(45);
+            auto ball        = ball_in_dribbler_area->ball;
+            Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
 
             // Mark the ball as "in flight" so collisions are turned off
             // until it has travelled the desired chip distance.
@@ -372,8 +369,8 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
     Vector dribbler_head_on_momentum = ball_momentum.project(robot_facing_vector);
     physics_ball->applyImpulse(-dribbler_head_on_momentum * DRIBBLER_HEAD_ON_DAMPING);
 
-    Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
-    physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
+    Vector dribbler_perp_momentum = ball_momentum.project(robot_perp_vector);
+    physics_ball->applyImpulse(-dribbler_perp_momentum * DRIBBLER_PERPENDICULAR_DAMPING);
 
     auto ball = DribblerBall{.ball = physics_ball, .can_be_controlled = true};
 
@@ -438,8 +435,8 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     Vector robot_perp_vector   = robot_facing_vector.perpendicular();
 
     Vector ball_momentum          = physics_ball->momentum();
-    Vector dribbler_perp_momenutm = ball_momentum.project(robot_perp_vector);
-    physics_ball->applyImpulse(-dribbler_perp_momenutm * DRIBBLER_PERPENDICULAR_DAMPING);
+    Vector dribbler_perp_momentum = ball_momentum.project(robot_perp_vector);
+    physics_ball->applyImpulse(-dribbler_perp_momentum * DRIBBLER_PERPENDICULAR_DAMPING);
 
     // To dribble, we apply a force towards the center and back of the dribbling area,
     // closest to the chicker. We vary the magnitude of the force by how far the ball
@@ -462,7 +459,8 @@ void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     double perp_force_magnitude = 0.5 * std::pow(perp_dist_cm, 2);
     physics_ball->applyForce(perp_force.normalize(perp_force_magnitude));
 
-    double head_on_magnitude = sigmoid(head_on_dist_cm, 0.15, 0.2);
+    double head_on_magnitude = sigmoid(head_on_dist_cm, 0.15, 0.2) * dribbler_rpm /
+                               MAX_FORCE_DRIBBLER_SPEED / 20;
     physics_ball->applyForce(head_on_force.normalize(head_on_magnitude));
 
     // Counteract the force pushing the ball into the robot so there is approximately 0

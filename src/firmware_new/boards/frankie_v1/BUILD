@@ -8,10 +8,6 @@ cc_binary(
         "freertos.c",
         "main.c",
     ],
-    copts = [
-        # We don't want to mark warnings as errors for 3rd party code
-        "-Wno-error",
-    ],
     defines = [
         "USE_HAL_DRIVER",
         "STM32H743xx",

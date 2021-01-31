@@ -68,9 +68,6 @@ void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 static void initIoLayer(void);
-static void initIoDrivetrain(void);
-static void initIoNetworking(void);
-
 
 /* USER CODE END PFP */
 

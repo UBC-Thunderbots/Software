@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/enemy_freekick_play.h"
+#include "software/ai/hl/stp/play/enemy_free_kick_play.h"
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_freekicker_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
@@ -35,10 +35,10 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // Init FreeKickShadower tactics (these robots will both block the enemy robot taking
     // a free kick (at most we will have 2
-    auto shadow_freekicker_1 = std::make_shared<ShadowFreekickerTactic>(
+    auto shadow_free_kicker_1 = std::make_shared<ShadowFreekickerTactic>(
         ShadowFreekickerTactic::LEFT, world.enemyTeam(), world.ball(), world.field(),
         true);
-    auto shadow_freekicker_2 = std::make_shared<ShadowFreekickerTactic>(
+    auto shadow_free_kicker_2 = std::make_shared<ShadowFreekickerTactic>(
         ShadowFreekickerTactic::RIGHT, world.enemyTeam(), world.ball(), world.field(),
         true);
 
@@ -73,8 +73,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                 world.enemyTeam(), world.ball(), false);
 
         // Add Freekick shadower tactics
-        tactics_to_run.emplace_back(shadow_freekicker_1);
-        tactics_to_run.emplace_back(shadow_freekicker_2);
+        tactics_to_run.emplace_back(shadow_free_kicker_1);
+        tactics_to_run.emplace_back(shadow_free_kicker_2);
         // Add Crease defender tactic
         tactics_to_run.emplace_back(crease_defender_tactic);
 
