@@ -56,9 +56,6 @@ void SimulatedTestFixture::SetUp()
     {
         enableVisualizer();
     }
-
-	MutableDynamicParameters->getMutableSensorFusionConfig->
-		mutableOverrideRefereeCommand()->registerCallbackFunction([]() overrideRefereeCommand);
 }
 
 void SimulatedTestFixture::setBallState(const BallState &ball)
@@ -110,14 +107,14 @@ void SimulatedTestFixture::setRefereeCommand(
     const RefereeCommand &previous_referee_command)
 {
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideRefereeCommand()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableCurrentRefereeCommand()
         ->setValue(toString(current_referee_command));
     MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutablePreviousRefereeCommand()
         ->setValue(toString(previous_referee_command));
+    MutableDynamicParameters->getMutableSensorFusionConfig()
+        ->mutableOverrideRefereeCommand()
+        ->setValue(true);
 }
 
 void SimulatedTestFixture::enableVisualizer()
@@ -151,7 +148,6 @@ void SimulatedTestFixture::updateSensorFusion()
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
     sensor_fusion.processSensorProto(sensor_msg);
-    //sensor_fusion.overrideRefereeCommand();
 }
 
 void SimulatedTestFixture::sleep(

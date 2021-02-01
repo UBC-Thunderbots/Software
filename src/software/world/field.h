@@ -163,6 +163,13 @@ class Field
     double defenseAreaXLength() const;
 
     /**
+     * The distance from the goal centre to the penalty mark
+     *
+     * @return the x coordinate distance from the goal to the penalty mark 
+     */
+    double goalToPenaltyMark() const;
+
+    /**
      * Gets the friendly defense area as a Rectangle.
      *
      * @return defense area of the friendly team

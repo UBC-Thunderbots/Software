@@ -141,6 +141,11 @@ double Field::centerCircleRadius() const
     return center_circle_radius_;
 }
 
+double Field::goalToPenaltyMark() const
+{
+    return (double) 2/3 * xLength();
+}
+
 Circle Field::centerCircle() const
 {
     return Circle(Point(0, 0), centerCircleRadius());
@@ -184,12 +189,12 @@ Rectangle Field::enemyGoal() const
 
 Point Field::penaltyEnemy() const
 {
-    return Point(enemyGoalCenter().x() - 6.0, enemyGoalCenter().y());
+    return Point(enemyGoalCenter().x() - goalToPenaltyMark(), enemyGoalCenter().y());
 }
 
 Point Field::penaltyFriendly() const
 {
-    return Point(friendlyGoalCenter().x() + defenseAreaXLength(),
+    return Point(friendlyGoalCenter().x() + goalToPenaltyMark(),
                  friendlyGoalCenter().y());
 }
 

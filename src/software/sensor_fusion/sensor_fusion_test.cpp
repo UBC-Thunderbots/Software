@@ -30,6 +30,7 @@ class SensorFusionTest : public ::testing::Test
 
         config->mutableOverrideGameControllerDefendingSide()->setValue(true);
         config->mutableDefendingPositiveSide()->setValue(false);
+        config->mutableOverrideRefereeCommand()->setValue(false);
     }
 
     std::shared_ptr<SensorFusionConfig> config;
