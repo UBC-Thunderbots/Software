@@ -39,6 +39,32 @@ std::vector<std::shared_ptr<Tactic>> Play::getTactics(const World &world)
     return std::vector<std::shared_ptr<Tactic>>();
 }
 
+std::vector<std::unique_ptr<Intent>> Play::get(
+    RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
+    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
+{
+    std::vector<std::unique_ptr<Intent>> intents;
+    auto tactics = getTactics(new_world);
+    std::vector<std::shared_ptr<const Tactic>> const_tactics;
+    const_tactics.reserve(tactics.size());
+    // convert pointers to const pointers
+    std::transform(tactics.begin(), tactics.end(), std::back_inserter(const_tactics),
+                   [](std::shared_ptr<Tactic> tactic) { return tactic; });
+    auto robot_tactic_assignment =
+        robot_to_tactic_assignment_algorithm(const_tactics, new_world);
+    for (auto tactic : tactics)
+    {
+        auto iter = robot_tactic_assignment.find(tactic);
+        if (iter != robot_tactic_assignment.end())
+        {
+            auto intent = tactic->get(iter->second, new_world);
+            intent->setMotionConstraints(motion_constraint_builder(*tactic));
+            intents.push_back(std::move(intent));
+        }
+    }
+    return intents;
+}
+
 void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
 {
     // Yield an empty vector the very first time the function is called. This value will

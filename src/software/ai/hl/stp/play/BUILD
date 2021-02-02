@@ -51,9 +51,9 @@ cc_library(
 )
 
 cc_library(
-    name = "enemy_freekick_play",
-    srcs = ["enemy_freekick_play.cpp"],
-    hdrs = ["enemy_freekick_play.h"],
+    name = "enemy_free_kick_play",
+    srcs = ["enemy_free_kick_play.cpp"],
+    hdrs = ["enemy_free_kick_play.h"],
     deps = [
         ":play",
         "//shared:constants",
@@ -62,7 +62,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic:shadow_freekicker_tactic",
+        "//software/ai/hl/stp/tactic:shadow_free_kicker_tactic",
         "//software/ai/hl/stp/tactic:stop_tactic",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
@@ -86,19 +86,6 @@ cc_library(
     alwayslink = True,
 )
 
-cc_test(
-    name = "example_play_test",
-    srcs = [
-        "example_play_test.cpp",
-    ],
-    deps = [
-        ":example_play",
-        "//software/ai/hl/stp/tactic:move_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
 cc_library(
     name = "halt_play",
     srcs = ["halt_play.cpp"],
@@ -111,17 +98,6 @@ cc_library(
         "//software/util/design_patterns:generic_factory",
     ],
     alwayslink = True,
-)
-
-cc_test(
-    name = "halt_play_test",
-    srcs = ["halt_play_test.cpp"],
-    deps = [
-        ":halt_play",
-        "//software/ai/hl/stp/tactic:stop_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
 )
 
 cc_library(
@@ -286,6 +262,7 @@ cc_library(
     hdrs = ["play.h"],
     deps = [
         "//software/ai/hl/stp/tactic",
+        "@boost//:coroutine2",
     ],
 )
 
@@ -294,7 +271,7 @@ cc_library(
     deps = [
         ":corner_kick_play",
         ":defense_play",
-        ":enemy_freekick_play",
+        ":enemy_free_kick_play",
         ":example_play",
         ":free_kick_play",
         ":halt_play",
