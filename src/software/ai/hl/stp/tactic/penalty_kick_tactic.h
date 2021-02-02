@@ -61,7 +61,7 @@ class PenaltyKickTactic : public Tactic
     // expected maximum acceleration of the opposition goalie robot
     static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
     static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds
-	// offset from the goal post in y direction when shooting
+    // offset from the goal post in y direction when shooting
     static constexpr double PENALTY_KICK_POST_OFFSET = 0.04;
 
     // this is the timeout that forces a shot after the robot approaches the

@@ -51,7 +51,7 @@ void SimulatedTestFixture::SetUp()
     MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
         ->setValue(true);
-	
+
     if (SimulatedTestFixture::enable_visualizer)
     {
         enableVisualizer();
@@ -172,8 +172,6 @@ void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
-	
-	
     updateSensorFusion();
     std::shared_ptr<World> world;
     if (auto world_opt = sensor_fusion.getWorld())

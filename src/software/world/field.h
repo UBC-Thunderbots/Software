@@ -165,7 +165,7 @@ class Field
     /**
      * The distance from the goal centre to the penalty mark
      *
-     * @return the x coordinate distance from the goal to the penalty mark 
+     * @return the x coordinate distance from the goal to the penalty mark
      */
     double goalToPenaltyMark() const;
 

@@ -17,8 +17,8 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 {
     setBallState(BallState(field().penaltyEnemy(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(-2, -2), Point(-3, -1), Point(-3, 0), Point(-3, 1),
-		 Point(-3, 2), Point(2, 2.5)}));
+        {Point(-2, -2), Point(-3, -1), Point(-3, 0), Point(-3, 1), Point(-3, 2),
+         Point(2, 2.5)}));
     setFriendlyGoalie(0);
     addEnemyRobots(
         TestUtil::createStationaryRobotStatesWithId({field().enemyGoalCenter()}));
@@ -54,11 +54,11 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
     Point behind_ball = field().penaltyEnemy() +
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS + 0.1);
-	double non_shooter_x_pos = field().penaltyEnemy().x()-1.5;
+    double non_shooter_x_pos = field().penaltyEnemy().x() - 1.5;
     setBallState(BallState(field().penaltyEnemy(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4, 0), behind_ball, Point(non_shooter_x_pos, 0),
-		 Point(non_shooter_x_pos, 1), Point(non_shooter_x_pos, -1),
+         Point(non_shooter_x_pos, 1), Point(non_shooter_x_pos, -1),
          Point(non_shooter_x_pos, 2)}));
     setFriendlyGoalie(0);
     addEnemyRobots(

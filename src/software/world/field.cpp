@@ -143,7 +143,7 @@ double Field::centerCircleRadius() const
 
 double Field::goalToPenaltyMark() const
 {
-    return (double) 2/3 * xLength();
+    return (double)2 / 3 * xLength();
 }
 
 Circle Field::centerCircle() const
