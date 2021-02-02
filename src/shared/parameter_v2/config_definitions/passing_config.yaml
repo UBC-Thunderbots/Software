@@ -29,7 +29,7 @@
      max: 10
      value: 0.5
      description: >-
-                This controls how heavily we weight an enemy robot being near the pass
+                This controls how heavily we weigh an enemy robot being near the pass
                 receiver when calculating enemy risk to a pass
  - double:
      name: ideal_max_rotation_to_shoot_degrees
