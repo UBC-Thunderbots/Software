@@ -1,18 +1,18 @@
-#include "software/ai/hl/stp/play/halt_play.h"
+#include "software/ai/hl/stp/play/stop_play.h"
 
 #include <gtest/gtest.h>
 
-#include "software/simulated_tests/simulated_test_fixture.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class HaltPlayTest : public SimulatedTestFixture
+class StopPlayTest : public SimulatedPlayTestFixture
 {
 };
 
-TEST_F(HaltPlayTest, test_halt_play)
+TEST_F(StopPlayTest, test_stop_play)
 {
     setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
@@ -24,8 +24,8 @@ TEST_F(HaltPlayTest, test_halt_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(HaltPlay));
-    setRefereeCommand(RefereeCommand::HALT, RefereeCommand::HALT);
+    setAIPlay(TYPENAME(StopPlay));
+    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
