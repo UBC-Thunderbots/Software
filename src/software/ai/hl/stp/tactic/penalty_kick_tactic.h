@@ -67,5 +67,7 @@ class PenaltyKickTactic : public Tactic
     // this is the timeout that forces a shot after the robot approaches the
     // ball and advances towards the keeper
     const Duration PENALTY_FORCE_SHOOT_TIMEOUT = Duration::fromSeconds(4);
-    const Duration PENALTY_SHOT_TIMEOUT        = Duration::fromSeconds(10);
+
+    const Duration PENALTY_SHOT_TIMEOUT            = Duration::fromSeconds(8);
+    const Duration PENALTY_FINISH_APPROACH_TIMEOUT = Duration::fromSeconds(4);
 };
