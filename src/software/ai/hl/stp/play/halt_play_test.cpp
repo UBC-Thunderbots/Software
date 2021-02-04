@@ -2,40 +2,45 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/hl/stp/tactic/stop_tactic.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
+#include "software/time/duration.h"
+#include "software/world/world.h"
 
-
-TEST(StopPlayTest, test_example_play_invariant_always_holds)
+class HaltPlayTest : public SimulatedPlayTestFixture
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+};
 
-    HaltPlay halt_play;
-    EXPECT_TRUE(halt_play.invariantHolds(world));
-}
-
-TEST(StopPlayTest, test_stop_play_returns_correct_tactics)
+TEST_F(HaltPlayTest, test_halt_play)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
+         Point(4.6, -3.1)}));
+    setFriendlyGoalie(0);
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
+         field().enemyDefenseArea().negXNegYCorner(),
+         field().enemyDefenseArea().negXPosYCorner()}));
+    setEnemyGoalie(0);
+    setAIPlay(TYPENAME(HaltPlay));
+    setRefereeCommand(RefereeCommand::HALT, RefereeCommand::HALT);
 
-    HaltPlay halt_play;
-    auto tactics = halt_play.getTactics(world);
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        // This will keep the test running for 9.5 seconds to give everything enough
+        // time to settle into position and be observed with the Visualizer
+        // TODO: Implement proper validation
+        // https://github.com/UBC-Thunderbots/Software/issues/1396
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            {
+                yield();
+            }
+        }};
 
-    // Make sure the expected number of tactics was returned
-    EXPECT_EQ((tactics).size(), 6);
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    // Make sure each tactic is an ExampleTactic
-    for (const auto &t : tactics)
-    {
-        try
-        {
-            StopTactic *unused;
-            unused = dynamic_cast<StopTactic *>(t.get());
-            UNUSED(unused);
-        }
-        catch (...)
-        {
-            ADD_FAILURE() << "StopTactic was not returned by the StopPlay!";
-        }
-    }
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }

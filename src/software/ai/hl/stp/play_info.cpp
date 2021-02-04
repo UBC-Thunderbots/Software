@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play_info.h"
 
 PlayInfo::PlayInfo(std::string referee_command_name, std::string play_name,
-                   std::unordered_set<std::string> robot_tactic_assignment)
+                   std::vector<std::string> robot_tactic_assignment)
     : referee_command_name(referee_command_name),
       play_name(play_name),
       robot_tactic_assignment(robot_tactic_assignment)
@@ -18,14 +18,14 @@ std::string PlayInfo::getPlayName() const
     return play_name;
 }
 
-std::unordered_set<std::string> PlayInfo::getRobotTacticAssignment() const
+std::vector<std::string> PlayInfo::getRobotTacticAssignment() const
 {
     return robot_tactic_assignment;
 }
 
 void PlayInfo::addRobotTacticAssignment(std::string new_assignment)
 {
-    this->robot_tactic_assignment.emplace(new_assignment);
+    this->robot_tactic_assignment.push_back(new_assignment);
 }
 
 bool PlayInfo::operator==(const PlayInfo &other) const

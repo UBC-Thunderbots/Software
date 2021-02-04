@@ -210,7 +210,7 @@ class Config(object):
 
             # otherwise this config has a nested config so create that that
             else:
-                # add to local and global lsit
+                # add to local and global list
                 config = Config(name, param_or_config)
                 self.configs.append(config)
                 Config.all_configs.append(config)

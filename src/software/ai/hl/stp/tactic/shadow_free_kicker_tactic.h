@@ -14,7 +14,7 @@ class ShadowFreekickerTactic : public Tactic
      * This enum indicates the side the robot running this tactic should shadow on. "Left"
      * and "Right" are from the POV of a robot in the friendly goal looking at the enemy
      * taking the free kick. For example, the tactic using the LEFT enum would shadow
-     * slightly to the left of the vector from the enemy freekicker to the friendly goal
+     * slightly to the left of the vector from the enemy free kicker to the friendly goal
      */
     enum FreekickShadower
     {
@@ -47,7 +47,7 @@ class ShadowFreekickerTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     void accept(TacticVisitor& visitor) const override;
 
@@ -65,6 +65,6 @@ class ShadowFreekickerTactic : public Tactic
     Field field;
 
     const double FREE_KICK_MAX_PROXIMITY =
-        0.50 * 1.05;  // Robots cannot be closer than 50cm from the ball during a freekick
-                      // (with a buffer factor)
+        0.50 * 1.05;  // Robots cannot be closer than 50cm from the ball during a
+                      // free kick (with a buffer factor)
 };

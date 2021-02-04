@@ -1,17 +1,18 @@
+#include "software/ai/hl/stp/play/defense_play.h"
+
 #include <gtest/gtest.h>
 
-#include "software/ai/hl/stp/play/enemy_freekick_play.h"
-#include "software/simulated_tests/simulated_test_fixture.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class EnemyFreekickPlayTest : public SimulatedTestFixture
+class DefensePlayTest : public SimulatedPlayTestFixture
 {
 };
 
-TEST_F(EnemyFreekickPlayTest, test_enemy_freekick_play)
+TEST_F(DefensePlayTest, test_defense_play)
 {
     setBallState(BallState(Point(0.9, 2.85), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
@@ -27,8 +28,8 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_freekick_play)
         Point(-2, -1.25),
     }));
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(EnemyFreekickPlay));
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_THEM);
+    setAIPlay(TYPENAME(DefensePlay));
+    setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::NORMAL_START);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 

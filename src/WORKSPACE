@@ -171,6 +171,13 @@ new_git_repository(
     shallow_since = "1571445859 -0700",
 )
 
+# tool used to flash firmware with bazel
+git_repository(
+    name = "platformio_rules",
+    remote = "http://github.com/mum4k/platformio_rules.git",
+    tag = "v0.0.10",
+)
+
 # Developer tools for working with bazel
 git_repository(
     name = "bazel_buildtools",
@@ -215,6 +222,15 @@ http_archive(
     sha256 = "46ead728d66d48969f8ae3b88f2fd10fddfc80dd7903fb8b5bff9c568f0ebf25",
     strip_prefix = "buildtools-9e63c6f02e63adaab63e21a3a8feb75f4f7503cb",
     url = "https://github.com/bazelbuild/buildtools/archive/9e63c6f02e63adaab63e21a3a8feb75f4f7503cb.zip",
+)
+
+# State Machine Library
+new_git_repository(
+    name = "sml",
+    build_file = "@//external:sml.BUILD",
+    commit = "07a503cc3f18de2b861ea15d8357d3b3c0c978d6",  # Version `1.1.3`
+    remote = "https://github.com/boost-ext/sml.git",
+    shallow_since = "1596403987 -0600",
 )
 
 git_repository(

@@ -1,7 +1,9 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
+#include "software/ai/hl/stp/tactic/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/intent/move_intent.h"
 
 /**
  * The MoveTactic will move the assigned robot to the given destination and arrive
@@ -42,18 +44,16 @@ class MoveTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     void accept(TacticVisitor& visitor) const override;
+    bool done() const override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
+    void updateIntent(const TacticUpdate& tactic_update) override;
 
-    // Tactic parameters
-    // The point the robot is trying to move to
-    Point destination;
-    // The orientation the robot should have when it arrives at its destination
-    Angle final_orientation;
-    // The speed the robot should have when it arrives at its destination
-    double final_speed;
+    BaseFSM<MoveFSM> fsm;
+
+    MoveFSM::ControlParams control_params;
 };

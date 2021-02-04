@@ -159,7 +159,7 @@ class BallFilterTest : public ::testing::Test
                           const Duration& max_ball_travel_duration,
                           unsigned int num_steps_to_ignore = 0)
     {
-        // Create the distrubutions we use to generate noise when sampling the ball
+        // Create the distributions we use to generate noise when sampling the ball
         std::normal_distribution<double> position_noise_distribution(
             0, ball_position_variance);
         std::normal_distribution<double> time_step_noise_distribution(0,
