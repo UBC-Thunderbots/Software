@@ -56,12 +56,9 @@ host_software_packages=(
     qt5-default # The GUI library for our visualizer
     tmux        # Used by AI vs AI script
     valgrind # Checks for memory leaks
-<<<<<<< HEAD
-=======
     libsqlite3-dev # needed to build Python 3 with sqlite support
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
->>>>>>> 82cb28433f603e8352d27c13e4c049b52d18351a
 )
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
