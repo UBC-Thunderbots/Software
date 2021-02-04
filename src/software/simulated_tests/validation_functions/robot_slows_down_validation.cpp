@@ -16,6 +16,9 @@ void robotSlowsDown(RobotId robot_id, std::shared_ptr<World> world_ptr,
         Robot robot         = robotOptional.value();
         double speed        = robot.velocity().length();
         const double MAX_SPEED = 1.5;
+        if (speed > MAX_SPEED) {
+            LOG(WARNING) << "Robot" + std::to_string(robot_id) + "'s speed: " + std::to_string(speed);
+        }
 
         return (speed <= MAX_SPEED);
     };

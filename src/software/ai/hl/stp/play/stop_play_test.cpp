@@ -82,10 +82,6 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_near_ball)
             // This will keep the test running for 9.5 seconds to give everything enough
             // time to settle into position and be observed with the Visualizer
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-                {
-                    yield();
-                }
                 robotSlowsDown(1, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
             }
@@ -115,10 +111,6 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_far_from_ball)
             // This will keep the test running for 9.5 seconds to give everything enough
             // time to settle into position and be observed with the Visualizer
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-                {
-                    yield();
-                }
                 robotSlowsDown(1, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
             }
@@ -148,10 +140,6 @@ TEST_F(StopPlayTest, test_stop_play_at_ball)
             // This will keep the test running for 9.5 seconds to give everything enough
             // time to settle into position and be observed with the Visualizer
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-                {
-                    yield();
-                }
                 robotSlowsDown(1, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
             }
