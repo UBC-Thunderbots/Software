@@ -58,7 +58,7 @@ void STP::updateGameState(const World& world)
                 fromStringToRefereeCommand(current_state_string);
             current_game_state.updateRefereeCommand(current_state);
         }
-        catch (std::invalid_argument e)
+        catch (std::invalid_argument& e)
         {
             LOG(WARNING) << e.what();
         }
@@ -183,7 +183,7 @@ bool STP::overrideAIPlayIfApplicable()
                 current_play =
                     GenericFactory<std::string, Play>::create(override_play_name);
             }
-            catch (std::invalid_argument)
+            catch (std::invalid_argument&)
             {
                 auto default_play = default_play_constructor();
                 LOG(WARNING) << "Error: The Play \"" << override_play_name

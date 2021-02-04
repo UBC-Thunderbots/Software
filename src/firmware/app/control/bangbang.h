@@ -67,7 +67,7 @@ void app_bangbang_prepareTrajectoryMaxV(BBProfile *b, float d, float vi, float v
 void app_bangbang_prepareTrajectory(BBProfile *b, float d, float vi, float vf,
                                     float MaxA);
 
-// meat and potatoes, computes the relavent details of the trajectory
+// meat and potatoes, computes the relevant details of the trajectory
 void app_bangbang_planTrajectory(BBProfile *b);
 
 // the default acceleration calculator, a typical horizon would be on

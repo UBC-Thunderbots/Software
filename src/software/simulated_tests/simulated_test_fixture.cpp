@@ -1,16 +1,11 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
-#include "software/gui/drawing/navigator.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
-#include "software/time/duration.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
     : simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField())),
       sensor_fusion(DynamicParameters->getSensorFusionConfig()),
-      ai(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig()),
       run_simulation_in_realtime(false)
 {
 }
@@ -31,7 +26,6 @@ void SimulatedTestFixture::SetUp()
     MutableDynamicParameters->init();
     simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
-    ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
 
     MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
 
@@ -75,30 +69,6 @@ void SimulatedTestFixture::addEnemyRobots(const std::vector<RobotStateWithId> &r
 Field SimulatedTestFixture::field() const
 {
     return simulator->getField();
-}
-
-void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
-{
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableFriendlyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
-}
-
-void SimulatedTestFixture::setEnemyGoalie(RobotId goalie_id)
-{
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableEnemyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
-}
-
-void SimulatedTestFixture::setAIPlay(const std::string &ai_play)
-{
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideAIPlay()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentAIPlay()
-        ->setValue(ai_play);
 }
 
 void SimulatedTestFixture::setRefereeCommand(
@@ -224,9 +194,7 @@ void SimulatedTestFixture::runTest(
                 break;
             }
 
-            auto primitive_set_msg = ai.getPrimitives(*world);
-            simulator->setYellowRobotPrimitiveSet(
-                createNanoPbPrimitiveSet(*primitive_set_msg));
+            updatePrimitives(*world_opt, simulator);
 
             if (run_simulation_in_realtime)
             {
@@ -236,8 +204,11 @@ void SimulatedTestFixture::runTest(
             if (full_system_gui)
             {
                 full_system_gui->onValueReceived(*world);
-                full_system_gui->onValueReceived(ai.getPlayInfo());
-                full_system_gui->onValueReceived(drawNavigator(ai.getNavigator()));
+                if (auto play_info = getPlayInfo())
+                {
+                    full_system_gui->onValueReceived(*play_info);
+                }
+                full_system_gui->onValueReceived(getDrawFunctions());
             }
         }
         else

@@ -2,7 +2,7 @@
 #                              Constants                              #
 #######################################################################
 
-# the weird espace charecters at the front change the color to red when
+# the weird espace characters at the front change the color to red when
 # printed in a terminal, the espace charecter at the end clears and resets
 # back to the original color. More info can be found here:
 # https://stackoverflow.com/questions/287871/print-in-terminal-with-colors
