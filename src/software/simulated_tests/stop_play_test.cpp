@@ -38,10 +38,10 @@ TEST_F(StopPlayTest, test_stop_play)
             // https://github.com/UBC-Thunderbots/Software/issues/1396
 
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+                /*while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
                 {
                     yield();
-                }
+                }*/
                 robotSlowsDown(0, world_ptr, yield);
                 robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
