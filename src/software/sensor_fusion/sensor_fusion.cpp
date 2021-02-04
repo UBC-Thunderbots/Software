@@ -127,11 +127,9 @@ void SensorFusion::updateWorld(
                 msg == TbotsProto::ErrorCode::WHEEL_3_MOTOR_HOT)
             {
                 unavailableCapabilities.insert(RobotCapability::Move);
-            } else if (msg == TbotsProto::ErrorCode::LOW_CAP)
-            {
-                unavailableCapabilities.insert(RobotCapability::Kick);
-                unavailableCapabilities.insert(RobotCapability::Chip);
-            } else if (msg == TbotsProto::ErrorCode::CHARGE_TIMEOUT)
+            }
+            else if (msg == TbotsProto::ErrorCode::LOW_CAP ||
+                     msg == TbotsProto::ErrorCode::CHARGE_TIMEOUT)
             {
                 unavailableCapabilities.insert(RobotCapability::Kick);
                 unavailableCapabilities.insert(RobotCapability::Chip);
@@ -139,9 +137,6 @@ void SensorFusion::updateWorld(
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
     }
-    // create wrapper packet => copy 432 - 436 line from tests change 430 - 431 to mutable_robot_status-msgs
-    // robot_status.cpp line 45 how to add error code in tests, for creating robot msgs. Could create a fn in test file for initializing it
-    // Create a robot based on SSL_WrapperPacket and based on robotstatus updated capabilities
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)

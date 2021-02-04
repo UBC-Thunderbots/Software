@@ -21,6 +21,7 @@ class SensorFusionTest : public ::testing::Test
           robot_status_msg_id_1(initRobotStatusId1()),
           robot_status_msg_id_2(initRobotStatusId2()),
           robot_status_msg_id_3(initRobotStatusId3()),
+          robot_status_msg_id_4(initRobotStatusId4()),
           referee_indirect_yellow(initRefereeIndirectYellow()),
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart()),
@@ -44,6 +45,7 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_3;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_4;
     std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
     std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
@@ -237,12 +239,6 @@ class SensorFusionTest : public ::testing::Test
     ////////////////////////////////////////////////
     std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusId3()
     {
-        // Trying to create my own robot, but NOT currently being used
-        // TODO have to also add the robot to friendly_team from World. currently the robot DNE
-        RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::fromRadians(2),
-                                       AngularVelocity::zero());
-        Robot robot(2, robot_state, Timestamp());
-
         // Adding a WHEEL_0_MOTOR_HOT to robotStatus of robot 2
         auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
         robot_msg->set_robot_id(2);
@@ -250,7 +246,15 @@ class SensorFusionTest : public ::testing::Test
 
         return std::move(robot_msg);
     }
-//    std::vector<RobotStateWithId> initYellowRobotStates()
+
+    std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusId4()
+    {
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
+
+        return std::move(robot_msg);
+    }
     ////////////////////////////////////////////////
 
     std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()
@@ -304,7 +308,7 @@ class SensorFusionTest : public ::testing::Test
     // create wrapper packet => copy 432 - 436 line from tests change 430 - 431 to mutable_robot_status-msgs
     // robot_status.cpp line 45 how to add error code in tests, for creating robot msgs. Could create a fn in test file for initializing it 
 
-TEST_F(SensorFusionTest, test_update_robot_capabilities_from_error_code)
+TEST_F(SensorFusionTest, test_making_robot_move_capability_unavailable_from_error_code)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
@@ -313,14 +317,38 @@ TEST_F(SensorFusionTest, test_update_robot_capabilities_from_error_code)
     *(sensor_msg.add_robot_status_msgs()) = *robot_status_msg_id_3;
     sensor_fusion.processSensorProto(sensor_msg);
 
+    std::optional<Robot> robot = sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities = robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(1, robot_unavailable_capabilities.size());
+    bool is_movement_disabled = robot_unavailable_capabilities.find(RobotCapability::Move) !=
+            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_movement_disabled);
+}
+
+TEST_F(SensorFusionTest, test_making_chip_and_kick_robot_capabilities_unavailable_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+            createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs()) = *robot_status_msg_id_4;
+    sensor_fusion.processSensorProto(sensor_msg);
+
     Team friendly_team = sensor_fusion.getWorld().value().friendlyTeam();
     std::optional<Robot> robot = friendly_team.getRobotById(2);
     ASSERT_TRUE(robot);
     std::set<RobotCapability> robot_unavailable_capabilities = robot.value().getUnavailableCapabilities();
-    bool is_movement_disabled = robot_unavailable_capabilities.find(RobotCapability::Move) != robot_unavailable_capabilities.end();
-    ASSERT_TRUE(is_movement_disabled);
-}
+    EXPECT_EQ(2, robot_unavailable_capabilities.size()); // RETURNS 3!!
 
+    bool is_kick_disabled = robot_unavailable_capabilities.find(RobotCapability::Kick) !=
+            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_kick_disabled);
+
+    bool is_chip_disabled = robot_unavailable_capabilities.find(RobotCapability::Chip) !=
+            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_chip_disabled);
+}
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
