@@ -74,9 +74,10 @@ void StandaloneSimulatorGUI::handleUpdate()
 void StandaloneSimulatorGUI::draw()
 {
     auto ssl_wrapper_packet = standalone_simulator->getSSLWrapperPacket();
-    auto draw_function      = getDrawSSLWrapperPacketFunction(ssl_wrapper_packet);
     main_widget->simulation_graphics_view->clearAndDraw(
-        {draw_function.getDrawFunction()});
+        {main_widget->simulation_graphics_view->getDrawBallVelocityFunction()
+             .getDrawFunction(),
+         getDrawSSLWrapperPacketFunction(ssl_wrapper_packet).getDrawFunction()});
 }
 
 void StandaloneSimulatorGUI::updateDrawViewArea()

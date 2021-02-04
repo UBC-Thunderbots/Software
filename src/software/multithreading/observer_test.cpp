@@ -49,7 +49,7 @@ namespace TestUtil
             std::abs(test_observer.getDataReceivedPerSecond() -
                      1 / (data_received_period_milliseconds * SECONDS_PER_MILLISECOND) *
                          scaling_factor);
-        if (expected_actual_difference < 20)
+        if (expected_actual_difference < 50)
         {
             return ::testing::AssertionSuccess();
         }

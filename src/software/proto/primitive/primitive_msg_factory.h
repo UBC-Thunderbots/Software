@@ -6,8 +6,6 @@
 #include "software/geom/point.h"
 #include "software/util/make_enum/make_enum.h"
 
-MAKE_ENUM(AutochickType, NONE, AUTOKICK, AUTOCHIP);
-
 MAKE_ENUM(DribblerMode, OFF, INDEFINITE, MAX_FORCE);
 
 /**
@@ -52,26 +50,6 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
     DribblerMode dribbler_mode);
-
-/**
- * Create a Move Primitive Message using the arguments of the old MovePrimitive
- * This is meant to replicate the behaviour of the old move primitive
- *
- * @param dest The final destination of the movement
- * @param final_angle The final orientation the robot should have at the end
- * of the movement
- * @param final_speed The final speed the Robot should have when it reaches
- * its destination at the end of the movement
- * @param dribbler_mode The dribbler mode
- * @param autochick A flag indicating if autokick should be enabled while the robot is
- * moving. This will enable the "break-beam" on the robot that will trigger the kicker
- * or chipper to fire as soon as the ball is in front of it
- *
- * @return Pointer to Move Primitive Message
- */
-std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
-    const Point &dest, const Angle &final_angle, double final_speed,
-    DribblerMode dribbler_mode, AutochickType autochick);
 
 /**
  * Create a Spinning Move Primitive Message

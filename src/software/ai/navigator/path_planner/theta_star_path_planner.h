@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <map>
 #include <set>
 
@@ -40,25 +41,123 @@ class ThetaStarPathPlanner : public PathPlanner
                                  const std::vector<ObstaclePtr> &obstacles) override;
 
    private:
-    class Coordinate : public std::pair<unsigned int, unsigned int>
+    class Coordinate
     {
        public:
         Coordinate(unsigned int row, unsigned int col)
-            : std::pair<unsigned int, unsigned int>(row, col)
+            : row_(row), col_(col), internal_comparison_key_(computeComparisonKey(*this))
         {
         }
 
-        Coordinate() : std::pair<unsigned int, unsigned int>() {}
+        Coordinate() : row_(0), col_(0) {}
 
         unsigned int row(void) const
         {
-            return this->first;
+            return row_;
         }
 
         unsigned int col(void) const
         {
-            return this->second;
+            return col_;
         }
+
+        unsigned int internalComparisonKey(void) const
+        {
+            return internal_comparison_key_;
+        }
+        bool operator<(const Coordinate &other) const
+        {
+            return internal_comparison_key_ < other.internal_comparison_key_;
+        }
+
+        bool operator==(const Coordinate &other) const
+        {
+            return internal_comparison_key_ == other.internal_comparison_key_;
+        }
+
+       private:
+        /**
+         * Calculate the key of this coordinate based on row and col for comparison. row
+         * and col are smaller than 1<<16 (65536) row value will occupy low 16 bits and
+         * col values will occupy high 16 bits in key
+         *
+         * @param coord the reference to this coordinate itself
+         * @return the key value in unsigned int
+         */
+
+        static unsigned int computeComparisonKey(const Coordinate &coord)
+        {
+            return coord.row() + coord.col() * (1 << 16);
+        }
+
+        // Each point on the field is discretized and fit into a 2d grid on the navigable
+        // area. row_ is number of the cell that the coordinate is located in the x
+        // direction. col_ is the number of the cell that the coordinate is in the y
+        // direction. internal_comparison_key_ is uniquely assigned to each cell in the
+        // grid for the purpose of comparison
+        unsigned int row_;
+        unsigned int col_;
+        unsigned int internal_comparison_key_;
+    };
+
+    class CoordinatePair
+    {
+       public:
+        CoordinatePair(const Coordinate &coord1, const Coordinate &coord2)
+            : coord1_(coord1),
+              coord2_(coord2),
+              internal_comparison_key_(computeComparisonKey(coord1, coord2))
+        {
+        }
+
+        CoordinatePair() : coord1_(), coord2_() {}
+
+        const Coordinate &firstCoordinate(void) const
+        {
+            return coord1_;
+        }
+
+        const Coordinate &secondCoordinate(void) const
+        {
+            return coord2_;
+        }
+
+        bool operator<(const CoordinatePair &other) const
+        {
+            return internal_comparison_key_ < other.internal_comparison_key_;
+        }
+
+       private:
+        /**
+         * Calculate the key value given a pair of coordinates. The key of the coordinate
+         * with smaller row value, or smaller col value when row values are equal wil
+         * occupy the low 32 bits in the key for this CoordinatePair. The key value of the
+         * other coordinate will occupy the high 32 bits in the key for this
+         * CoordinatePair.
+         *
+         * @param coord1 the first coordinate
+         * @param coord2 the second coordinate
+         * @return the key value in unsigned long
+         */
+        static unsigned long computeComparisonKey(const Coordinate &coord1,
+                                                  const Coordinate &coord2)
+        {
+            unsigned long key1 = coord1.internalComparisonKey();
+            unsigned long key2 = coord2.internalComparisonKey();
+            if (coord1.row() < coord2.row() ||
+                (coord1.row() == coord2.row() && coord1.col() < coord2.col()))
+            {
+                return key1 + key2 * (((unsigned long)1) << 32);
+            }
+            else
+            {
+                return key2 + key1 * (((unsigned long)1) << 32);
+            }
+        }
+
+        Coordinate coord1_;
+        Coordinate coord2_;
+        unsigned long internal_comparison_key_;
     };
 
     class CellHeuristic
@@ -74,7 +173,7 @@ class ThetaStarPathPlanner : public PathPlanner
 
         /**
          * Updates CellHeuristics internal variables
-         * Once updated, a CellHeuristic is considered intialized
+         * Once updated, a CellHeuristic is considered initialized
          *
          * @param parent parent
          * @param start_to_end_cost_estimate The start to end_cost estimate
@@ -302,27 +401,6 @@ class ThetaStarPathPlanner : public PathPlanner
     void resetAndInitializeMemberVariables(const Rectangle &navigable_area,
                                            const std::vector<ObstaclePtr> &obstacles);
 
-    /**
-     * Computes a key from the given Coordinate for collision-free access to
-     * unblocked_grid
-     *
-     * @param coord Coordinate to compute
-     *
-     * @return key for the Coordinate
-     */
-    unsigned long computeMapKey(const Coordinate &coord) const;
-
-    /**
-     * Computes a key from the given pair of Coordinates for collision-free access to
-     * line_of_sight_cache
-     * @param coord1 Coordinate 1 of pair to hash
-     * @param coord2 Coordinate 2 of pair to hash
-     *
-     * @return key for the Coordinate pair
-     */
-    unsigned long computeMapKey(const ThetaStarPathPlanner::Coordinate &coord1,
-                                const ThetaStarPathPlanner::Coordinate &coord2) const;
-
     // if close to end then return direct path to end point
     static constexpr double CLOSE_TO_END_THRESHOLD = 0.01;  // in metres
 
@@ -339,6 +417,7 @@ class ThetaStarPathPlanner : public PathPlanner
         ROBOT_MAX_RADIUS_METERS;  // this is the n in the O(n^2) algorithm :p
 
     std::vector<ObstaclePtr> obstacles;
+    Point centre;
     unsigned int num_grid_rows;
     unsigned int num_grid_cols;
     double max_navigable_x_coord;
@@ -359,13 +438,13 @@ class ThetaStarPathPlanner : public PathPlanner
 
     // The following data structures improve performance by caching the results of
     // isUnblocked and lineOfSight.
-    // They are indexed with an unsigned long key for performance
     // Description of the Grid-
+    // unblocked_grid is indexed with coordinate
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::map<unsigned long, bool> unblocked_grid;
-    // Cache of line of sight that maps a unsigned long key computed from a pair of
+    std::map<Coordinate, bool> unblocked_grid;
+    // Cache of line of sight that maps a pair of
     // coordinates to whether those two Coordinates have line of sight between them
-    std::map<unsigned long, bool> line_of_sight_cache;
+    std::map<CoordinatePair, bool> line_of_sight_cache;
 };

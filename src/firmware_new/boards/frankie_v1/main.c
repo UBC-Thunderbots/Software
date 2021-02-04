@@ -6,15 +6,16 @@
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+ * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
  * All rights reserved.</center></h2>
  *
- * This software component is licensed by ST under BSD 3-Clause license,
- * the "License"; You may not use this file except in compliance with the
- * License. You may obtain a copy of the License at:
- *                        opensource.org/licenses/BSD-3-Clause
+ * This software component is licensed by ST under Ultimate Liberty license
+ * SLA0044, the "License"; You may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at:
+ *                             www.st.com/SLA0044
  *
  ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -22,6 +23,7 @@
 
 #include "cmsis_os.h"
 #include "crc.h"
+#include "dma.h"
 #include "gpio.h"
 #include "lwip.h"
 #include "tim.h"
@@ -33,7 +35,6 @@
 #include "firmware/app/logger/logger.h"
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "firmware_new/boards/frankie_v1/io/uart_logger.h"
-
 
 /* USER CODE END Includes */
 
@@ -66,9 +67,6 @@ void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 static void initIoLayer(void);
-static void initIoDrivetrain(void);
-static void initIoNetworking(void);
-
 
 /* USER CODE END PFP */
 
@@ -79,51 +77,6 @@ static void initIoLayer(void)
 {
     initIoDrivetrain();
     initIoNetworking();
-}
-
-void initIoDrivetrain(void)
-{
-    // Initialize a motor driver with the given suffix, on the given
-    // timer channel
-#define INIT_DRIVETRAIN_UNIT(MOTOR_NAME_SUFFIX, TIMER_CHANNEL)                           \
-    {                                                                                    \
-        GpioPin_t *reset_pin =                                                           \
-            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_reset_GPIO_Port,        \
-                               wheel_motor_##MOTOR_NAME_SUFFIX##_reset_Pin, ACTIVE_LOW); \
-        GpioPin_t *coast_pin =                                                           \
-            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_coast_GPIO_Port,        \
-                               wheel_motor_##MOTOR_NAME_SUFFIX##_coast_Pin, ACTIVE_LOW); \
-        GpioPin_t *mode_pin =                                                            \
-            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_mode_GPIO_Port,         \
-                               wheel_motor_##MOTOR_NAME_SUFFIX##_mode_Pin, ACTIVE_HIGH); \
-        GpioPin_t *direction_pin = io_gpio_pin_create(                                   \
-            wheel_motor_##MOTOR_NAME_SUFFIX##_direction_GPIO_Port,                       \
-            wheel_motor_##MOTOR_NAME_SUFFIX##_direction_Pin, ACTIVE_HIGH);               \
-        GpioPin_t *brake_pin =                                                           \
-            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_brake_GPIO_Port,        \
-                               wheel_motor_##MOTOR_NAME_SUFFIX##_brake_Pin, ACTIVE_LOW); \
-        GpioPin_t *esf_pin =                                                             \
-            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_esf_GPIO_Port,          \
-                               wheel_motor_##MOTOR_NAME_SUFFIX##_esf_Pin, ACTIVE_HIGH);  \
-        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIMER_CHANNEL);                    \
-                                                                                         \
-        AllegroA3931MotorDriver_t *motor_driver = io_allegro_a3931_motor_driver_create(  \
-            pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin); \
-        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.0);                      \
-        drivetrain_unit_##MOTOR_NAME_SUFFIX = io_drivetrain_unit_create(motor_driver);   \
-    }
-
-    DrivetrainUnit_t *drivetrain_unit_front_left;
-    DrivetrainUnit_t *drivetrain_unit_back_left;
-    DrivetrainUnit_t *drivetrain_unit_back_right;
-    DrivetrainUnit_t *drivetrain_unit_front_right;
-    INIT_DRIVETRAIN_UNIT(front_left, TIM_CHANNEL_1);
-    INIT_DRIVETRAIN_UNIT(back_left, TIM_CHANNEL_2);
-    INIT_DRIVETRAIN_UNIT(back_right, TIM_CHANNEL_3);
-    INIT_DRIVETRAIN_UNIT(front_right, TIM_CHANNEL_4);
-
-    io_drivetrain_init(drivetrain_unit_front_left, drivetrain_unit_front_right,
-                       drivetrain_unit_back_left, drivetrain_unit_back_right);
 }
 
 /* USER CODE END 0 */
@@ -165,24 +118,24 @@ int main(void)
 
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
+    MX_DMA_Init();
     MX_USART3_UART_Init();
     MX_USB_OTG_FS_PCD_Init();
     MX_CRC_Init();
     MX_TIM4_Init();
+    MX_UART8_Init();
     /* USER CODE BEGIN 2 */
 
-    //               ---- Initialize App/IO Layer ----
+    //              ---- Initialize App/IO Layers ----
     //
-    // At this point the UART peripheral should be configured correctly,
-    // so we initialize the logger with a UART robot log handler.
-    //
-    // Logs can been seen through `screen /dev/ttyACM0 115200`
+    // At this point the UART peripheral should be configured correctly
+    // so we initialize the UART logger here so that we can see logs
+    // from the initialization functions without having to be connected to a network
     io_uart_logger_init(&huart3);
     app_logger_init(0, &io_uart_logger_handleRobotLog);
 
-    TLOG_INFO("Initializing IO Layer");
+    TLOG_DEBUG("Initializing I/O Layer");
     initIoLayer();
-
     /* USER CODE END 2 */
 
     /* Init scheduler */
@@ -258,7 +211,8 @@ void SystemClock_Config(void)
     {
         Error_Handler();
     }
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART3 | RCC_PERIPHCLK_USB;
+    PeriphClkInitStruct.PeriphClockSelection =
+        RCC_PERIPHCLK_USART3 | RCC_PERIPHCLK_UART8 | RCC_PERIPHCLK_USB;
     PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
     PeriphClkInitStruct.UsbClockSelection         = RCC_USBCLKSOURCE_PLL;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)

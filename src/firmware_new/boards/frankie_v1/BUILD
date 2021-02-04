@@ -8,10 +8,6 @@ cc_binary(
         "freertos.c",
         "main.c",
     ],
-    copts = [
-        # We don't want to mark warnings as errors for 3rd party code
-        "-Wno-error",
-    ],
     defines = [
         "USE_HAL_DRIVER",
         "STM32H743xx",
@@ -26,6 +22,7 @@ cc_binary(
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":STM32H743ZITx_FLASH.ld",
+        ":dma",
         ":frankie_v1_main_lib",
         ":gpio",
         ":lwip",
@@ -36,6 +33,7 @@ cc_binary(
         "//firmware_new/boards/frankie_v1/io:network_logger",
         "//firmware_new/boards/frankie_v1/io:pwm_pin",
         "//firmware_new/boards/frankie_v1/io:uart_logger",
+        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator",
     ],
 )
 
@@ -66,6 +64,7 @@ cc_library(
         ":usart",
         ":usb_otg",
         "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
+        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator",
         "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
@@ -155,6 +154,30 @@ cc_library(
     ],
     hdrs = [
         "gpio.h",
+        "main.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+        "-DSTM32H743xx",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":hal",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
+    name = "dma",
+    srcs = [
+        "dma.c",
+    ],
+    hdrs = [
+        "dma.h",
         "main.h",
     ],
     copts = [

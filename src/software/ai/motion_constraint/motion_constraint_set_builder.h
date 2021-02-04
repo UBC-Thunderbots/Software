@@ -9,9 +9,9 @@
 
 
 /**
- * Builds motion constraints based on gamestate and tactic
+ * Builds motion constraints based on game_state and tactic
  *
- * @param gamestate Current GameState to process
+ * @param game_state Current GameState to process
  * @param tactic Current Tactic to process
  *
  * @return set of MotionConstraints
@@ -23,7 +23,7 @@ std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
 
 /**
  * Builds a set of motion constraints by adding motion constraints determined from
- * gamestate
+ * game state
  *
  * @param game_state GameState to generate move constraints from
  *

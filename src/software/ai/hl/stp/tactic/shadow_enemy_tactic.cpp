@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/autochip_move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
@@ -35,7 +35,7 @@ void ShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_threat,
     this->shadow_distance = shadow_distance;
 }
 
-double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &world)
+double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     if (!enemy_threat)
     {
@@ -51,14 +51,14 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
 
 void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>(false, 0, Angle());
-    auto stop_action = std::make_shared<StopAction>(true);
+    auto autochip_move_action = std::make_shared<AutochipMoveAction>(false, 0, Angle());
+    auto stop_action          = std::make_shared<StopAction>(true);
 
     do
     {
         if (!enemy_threat)
         {
-            stop_action->updateControlParams(*robot, false);
+            stop_action->updateControlParams(*robot_, false);
             yield(stop_action);
         }
 
@@ -73,14 +73,14 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             Point position_to_block_pass =
                 enemy_robot.position() +
                 enemy_to_passer_vector.normalize(this->shadow_distance);
-            move_action->updateControlParams(
-                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
-                DribblerMode::OFF, AutochickType::NONE, BallCollisionType::AVOID);
-            yield(move_action);
+            autochip_move_action->updateControlParams(
+                *robot_, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
+                DribblerMode::OFF, 0.0, BallCollisionType::AVOID);
+            yield(autochip_move_action);
         }
         else
         {
-            std::vector<Robot> robots_to_ignore = {*robot};
+            std::vector<Robot> robots_to_ignore = {*robot_};
             if (ignore_goalie && friendly_team.goalie())
             {
                 robots_to_ignore.emplace_back(*friendly_team.goalie());
@@ -108,23 +108,23 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             if (enemy_robot.isNearDribbler(ball.position()) &&
                 ball.velocity().length() <= ball_steal_speed)
             {
-                move_action->updateControlParams(
-                    *robot, ball.position(),
-                    (ball.position() - robot->position()).orientation(), 0,
-                    DribblerMode::MAX_FORCE, AutochickType::AUTOCHIP,
+                autochip_move_action->updateControlParams(
+                    *robot_, ball.position(),
+                    (ball.position() - robot_->position()).orientation(), 0,
+                    DribblerMode::MAX_FORCE, YEET_CHIP_DISTANCE_METERS,
                     BallCollisionType::AVOID);
-                yield(move_action);
+                yield(autochip_move_action);
             }
             else
             {
-                move_action->updateControlParams(
-                    *robot, position_to_block_shot,
+                autochip_move_action->updateControlParams(
+                    *robot_, position_to_block_shot,
                     enemy_shot_vector.orientation() + Angle::half(), 0, DribblerMode::OFF,
-                    AutochickType::NONE, BallCollisionType::AVOID);
-                yield(move_action);
+                    0.0, BallCollisionType::AVOID);
+                yield(autochip_move_action);
             }
         }
-    } while (!move_action->done());
+    } while (!autochip_move_action->done());
 }
 
 void ShadowEnemyTactic::accept(TacticVisitor &visitor) const

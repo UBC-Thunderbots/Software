@@ -61,34 +61,6 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     return move_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createLegacyMovePrimitive(
-    const Point &dest, const Angle &final_angle, double final_speed,
-    DribblerMode dribbler_mode, AutochickType autochick)
-{
-    // TODO (#1638): Remove this and use createMovePrimitive, createAutochipMovePrimitive,
-    // or createAutokickMovePrimitive instead. This should be done after trajectory
-    // planner is integrated in case the arguments for creating createMovePrimitive,
-    // createAutochipMovePrimitive, and createAutokickMovePrimitive changes.
-
-    if (autochick == AutochickType::AUTOKICK)
-    {
-        // The old move primitive hardcoded BALL_MAX_SPEED_METERS_PER_SECOND - 1 as the
-        // kick speed
-        return createAutokickMovePrimitive(dest, final_speed, final_angle, dribbler_mode,
-                                           BALL_MAX_SPEED_METERS_PER_SECOND - 1);
-    }
-    else if (autochick == AutochickType::AUTOCHIP)
-    {
-        // The old move primitive hardcoded 2 as the chip distance
-        return createAutochipMovePrimitive(dest, final_speed, final_angle, dribbler_mode,
-                                           2);
-    }
-    else
-    {
-        return createMovePrimitive(dest, final_speed, final_angle, dribbler_mode);
-    }
-}
-
 std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
     const Point &dest, double final_speed_meters_per_second,
     const AngularVelocity &angular_velocity, DribblerMode dribbler_mode)

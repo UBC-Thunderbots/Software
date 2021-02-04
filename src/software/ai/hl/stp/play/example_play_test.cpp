@@ -2,40 +2,57 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
+#include "software/time/duration.h"
+#include "software/world/world.h"
 
-TEST(ExamplePlayTest, test_example_play_never_applicable)
+class ExamplePlayTest : public SimulatedPlayTestFixture
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+};
 
-    ExamplePlay example_play;
-    EXPECT_FALSE(example_play.isApplicable(world));
-}
-
-TEST(ExamplePlayTest, test_example_play_invariant_always_holds)
+TEST_F(ExamplePlayTest, test_example_play)
 {
-    World world = ::TestUtil::createBlankTestingWorld();
+    setBallState(BallState(Point(-0.8, 0), Vector(0, 0)));
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(4, 0), Point(0.5, 0), Point(-3, 1), Point(-1, -3), Point(2, 0),
+         Point(3.5, 3)}));
+    setFriendlyGoalie(0);
+    setAIPlay(TYPENAME(ExamplePlay));
 
-    ExamplePlay example_play;
-    EXPECT_TRUE(example_play.invariantHolds(world));
-}
+    setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::HALT);
 
-TEST(ExamplePlayTest, test_example_play_returns_correct_tactics)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            auto friendly_robots_1_meter_from_ball =
+                [](std::shared_ptr<World> world_ptr) {
+                    Point ball_position = world_ptr->ball().position();
+                    for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
+                    {
+                        // Skips the robot assigned as goalie
+                        if (robot.id() == 0)
+                        {
+                            continue;
+                        }
+                        double abs_error =
+                            std::fabs((robot.position() - ball_position).length() - 1.0);
+                        if (abs_error > 0.05)
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                };
 
-    ExamplePlay example_play;
-    auto tactics = example_play.getTactics(world);
+            while (!friendly_robots_1_meter_from_ball(world_ptr))
+            {
+                yield();
+            }
+        }};
 
-    // Make sure the expected number of tactics was returned
-    EXPECT_EQ((tactics).size(), 6);
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    // Make sure each tactic is an ExampleTactic
-    for (const auto& t : tactics)
-    {
-        // The result of the dynamic_cast will be a nullptr if the pointer does not
-        // actually point to a conrete type of MoveTactic
-        EXPECT_NE(dynamic_cast<MoveTactic*>(t.get()), nullptr);
-    }
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(8));
 }

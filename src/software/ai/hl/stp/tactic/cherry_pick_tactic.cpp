@@ -17,7 +17,7 @@ void CherryPickTactic::updateWorldParams(const World& world)
     this->world = world;
 }
 
-double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& world)
+double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // Prefer robots closer to the target region
     return distance(robot.position(), target_region);
@@ -34,9 +34,9 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // Move the robot to be the best possible receiver for the best pass we can
         // find (within the target region)
         Pass pass = pass_generator.getBestPassSoFar().pass;
-        move_action->updateControlParams(*robot, pass.receiverPoint(),
+        move_action->updateControlParams(*robot_, pass.receiverPoint(),
                                          pass.receiverOrientation(), 0, DribblerMode::OFF,
-                                         AutochickType::NONE, BallCollisionType::AVOID);
+                                         BallCollisionType::AVOID);
         yield(move_action);
     } while (true);
 }

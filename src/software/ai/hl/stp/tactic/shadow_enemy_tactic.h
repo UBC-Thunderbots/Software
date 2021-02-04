@@ -53,7 +53,7 @@ class ShadowEnemyTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     void accept(TacticVisitor &visitor) const override;
 
@@ -61,6 +61,10 @@ class ShadowEnemyTactic : public Tactic
     Field getField() const;
     Team getFriendlyTeam() const;
     Team getEnemyTeam() const;
+
+    // Distance to chip the ball when trying to yeet it
+    // TODO (#1878): Replace this with a more intelligent chip distance system
+    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;

@@ -24,7 +24,8 @@ class SensorFusionTest : public ::testing::Test
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart()),
           referee_ball_placement_yellow(initRefereeBallPlacementYellow()),
-          referee_ball_placement_blue(initRefereeBallPlacementBlue())
+          referee_ball_placement_blue(initRefereeBallPlacementBlue()),
+          referee_goalie_id(initRefereeGoalieId())
     {
         config->mutableFriendlyColorYellow()->setValue(true);
 
@@ -47,6 +48,8 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
     std::unique_ptr<SSLProto::Referee> referee_ball_placement_yellow;
     std::unique_ptr<SSLProto::Referee> referee_ball_placement_blue;
+    std::unique_ptr<SSLProto::Referee> referee_goalie_id;
+
 
     BallState initBallState()
     {
@@ -211,7 +214,7 @@ class SensorFusionTest : public ::testing::Test
         chipper_kicker_status->set_ms_since_kicker_fired(9);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
 
-        return std::move(robot_msg);
+        return robot_msg;
     }
 
     std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusId2()
@@ -229,7 +232,7 @@ class SensorFusionTest : public ::testing::Test
         chipper_kicker_status->set_ms_since_kicker_fired(6);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
 
-        return std::move(robot_msg);
+        return robot_msg;
     }
 
     std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()
@@ -273,6 +276,19 @@ class SensorFusionTest : public ::testing::Test
         ref_point->set_y(35);
         *(ref_msg->mutable_designated_position()) = *ref_point;
         ref_msg->set_command(SSLProto::Referee_Command_BALL_PLACEMENT_BLUE);
+
+        return ref_msg;
+    }
+
+    std::unique_ptr<SSLProto::Referee> initRefereeGoalieId()
+    {
+        auto ref_msg           = std::make_unique<SSLProto::Referee>();
+        auto ref_friendly_team = std::make_unique<SSLProto::Referee_TeamInfo>();
+        auto ref_enemy_team    = std::make_unique<SSLProto::Referee_TeamInfo>();
+        ref_friendly_team->set_goalkeeper(2);
+        ref_enemy_team->set_goalkeeper(2);
+        *(ref_msg->mutable_yellow()) = *ref_friendly_team;
+        *(ref_msg->mutable_blue())   = *ref_enemy_team;
 
         return ref_msg;
     }
@@ -463,8 +479,62 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
     EXPECT_EQ(std::nullopt, returned_point);
 }
 
+TEST_F(SensorFusionTest, goalie_id_set_by_referee)
+{
+    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
+    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(false);
+
+    SensorProto sensor_msg;
+
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_goalie_id;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+    World result = *sensor_fusion.getWorld();
+
+    unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieID().value();
+    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieID().value();
+
+    EXPECT_EQ(2, friendly_goalie_id);
+    EXPECT_EQ(2, enemy_goalie_id);
+}
+
+TEST_F(SensorFusionTest, goalie_id_overridden)
+{
+    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(true);
+    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(true);
+    config->mutableFriendlyGoalieId()->setValue(1);
+    config->mutableEnemyGoalieId()->setValue(3);
+
+    SensorProto sensor_msg;
+
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_goalie_id;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+    World result = *sensor_fusion.getWorld();
+
+    unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieID().value();
+    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieID().value();
+
+    EXPECT_EQ(1, friendly_goalie_id);
+    EXPECT_EQ(3, enemy_goalie_id);
+}
+
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 {
+    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
+    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(false);
+    config->mutableFriendlyGoalieId()->setValue(0);
+    config->mutableEnemyGoalieId()->setValue(0);
     SensorProto sensor_msg;
     SensorProto sensor_msg_0;
     auto ssl_wrapper_packet =
@@ -495,6 +565,10 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
 {
+    config->mutableOverrideGameControllerFriendlyGoalieID()->setValue(false);
+    config->mutableOverrideGameControllerEnemyGoalieID()->setValue(false);
+    config->mutableFriendlyGoalieId()->setValue(0);
+    config->mutableEnemyGoalieId()->setValue(0);
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
