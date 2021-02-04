@@ -393,7 +393,7 @@ TEST_F(SensorFusionTest,
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
-            createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_dribble_motor_hot;
     sensor_fusion.processSensorProto(sensor_msg);
@@ -402,20 +402,20 @@ TEST_F(SensorFusionTest,
     std::optional<Robot> robot = friendly_team.getRobotById(2);
     ASSERT_TRUE(robot);
     std::set<RobotCapability> robot_unavailable_capabilities =
-            robot.value().getUnavailableCapabilities();
+        robot.value().getUnavailableCapabilities();
     EXPECT_EQ(1, robot_unavailable_capabilities.size());
 
-    bool is_kick_disabled = robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
-                            robot_unavailable_capabilities.end();
+    bool is_kick_disabled =
+        robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
+        robot_unavailable_capabilities.end();
     ASSERT_TRUE(is_kick_disabled);
 }
 
-TEST_F(SensorFusionTest,
-       test_emptying_robot_unavailable_capabilities_from_error_code)
+TEST_F(SensorFusionTest, test_emptying_robot_unavailable_capabilities_from_error_code)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
-            createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_no_error_code;
     sensor_fusion.processSensorProto(sensor_msg);
@@ -424,7 +424,7 @@ TEST_F(SensorFusionTest,
     std::optional<Robot> robot = friendly_team.getRobotById(2);
     ASSERT_TRUE(robot);
     std::set<RobotCapability> robot_unavailable_capabilities =
-            robot.value().getUnavailableCapabilities();
+        robot.value().getUnavailableCapabilities();
     EXPECT_EQ(0, robot_unavailable_capabilities.size());
 }
 
