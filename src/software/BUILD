@@ -25,10 +25,10 @@ cc_binary(
     name = "standalone_simulator_main",
     srcs = ["standalone_simulator_main.cpp"],
     deps = [
-        "//simulation:standalone_simulator",
         "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
+        "//software/simulation:standalone_simulator",
         "@boost//:program_options",
     ],
 )
@@ -37,9 +37,9 @@ cc_binary(
     name = "handheld_control",
     srcs = ["handheld_control_main.cpp"],
     deps = [
-        "//handheld_controller:controller_primitive_generator",
-        ":xbox_360_controller",
         "//software/backend:radio_backend",
+        "//software/handheld_controller:controller_primitive_generator",
+        "//software/handheld_controller:xbox_360_controller",
         "//software/parameter:dynamic_parameters",
     ],
 )
@@ -48,9 +48,9 @@ cc_binary(
     name = "robot_diagnostics_main",
     srcs = ["robot_diagnostics_main.cpp"],
     deps = [
-        "//robot_diagnostics:threaded_robot_diagnostics_gui",
         "//software/backend",
         "//software/backend:all_backends",
+        "//software/gui/robot_diagnostics:threaded_robot_diagnostics_gui",
         "//software/logger",
         "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
