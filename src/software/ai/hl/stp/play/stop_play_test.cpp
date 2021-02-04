@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/simulated_tests/simulated_test_fixture.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/simulated_tests/validation_functions/robot_slows_down_validation.h"
 #include "software/simulated_tests/validation_functions/robot_avoids_ball_validation.h"
@@ -10,7 +10,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class StopPlayTest : public SimulatedTestFixture
+class StopPlayTest : public SimulatedPlayTestFixture
 {
 };
 

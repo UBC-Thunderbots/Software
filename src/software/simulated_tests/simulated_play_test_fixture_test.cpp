@@ -1,4 +1,4 @@
-#include "software/simulated_tests/simulated_test_fixture.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
 
 #include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
@@ -20,11 +20,12 @@
  * they are as simple as possible and only test the behavior of the validation
  * functions and test pipeline
  */
-class SimulatedTestFixtureTest : public SimulatedTestFixture
+class SimulatedPlayTestFixtureTest : public SimulatedPlayTestFixture
 {
 };
 
-TEST_F(SimulatedTestFixtureTest, test_single_validation_function_passes_before_timeout)
+TEST_F(SimulatedPlayTestFixtureTest,
+       test_single_validation_function_passes_before_timeout)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -42,7 +43,8 @@ TEST_F(SimulatedTestFixtureTest, test_single_validation_function_passes_before_t
             Duration::fromSeconds(1.0));
 }
 
-TEST_F(SimulatedTestFixtureTest, test_single_validation_function_fails_if_it_times_out)
+TEST_F(SimulatedPlayTestFixtureTest,
+       test_single_validation_function_fails_if_it_times_out)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -62,7 +64,7 @@ TEST_F(SimulatedTestFixtureTest, test_single_validation_function_fails_if_it_tim
         "timeout duration");
 }
 
-TEST_F(SimulatedTestFixtureTest,
+TEST_F(SimulatedPlayTestFixtureTest,
        test_gtest_expect_statement_in_validation_function_causes_test_to_fail)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
@@ -85,7 +87,8 @@ TEST_F(SimulatedTestFixtureTest,
         "Timestamp");
 }
 
-TEST_F(SimulatedTestFixtureTest, test_multiple_validation_function_pass_before_timeout)
+TEST_F(SimulatedPlayTestFixtureTest,
+       test_multiple_validation_function_pass_before_timeout)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -109,7 +112,8 @@ TEST_F(SimulatedTestFixtureTest, test_multiple_validation_function_pass_before_t
             Duration::fromSeconds(0.7));
 }
 
-TEST_F(SimulatedTestFixtureTest, test_should_fail_if_not_all_validation_functions_pass)
+TEST_F(SimulatedPlayTestFixtureTest,
+       test_should_fail_if_not_all_validation_functions_pass)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -135,7 +139,8 @@ TEST_F(SimulatedTestFixtureTest, test_should_fail_if_not_all_validation_function
         "timeout duration");
 }
 
-TEST_F(SimulatedTestFixtureTest, test_single_non_terminating_validation_function_passes)
+TEST_F(SimulatedPlayTestFixtureTest,
+       test_single_non_terminating_validation_function_passes)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -150,7 +155,8 @@ TEST_F(SimulatedTestFixtureTest, test_single_non_terminating_validation_function
             Duration::fromSeconds(0.5));
 }
 
-TEST_F(SimulatedTestFixtureTest, test_multiple_non_terminating_validation_function_passes)
+TEST_F(SimulatedPlayTestFixtureTest,
+       test_multiple_non_terminating_validation_function_passes)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -169,7 +175,7 @@ TEST_F(SimulatedTestFixtureTest, test_multiple_non_terminating_validation_functi
 }
 
 TEST_F(
-    SimulatedTestFixtureTest,
+    SimulatedPlayTestFixtureTest,
     test_failing_gtest_expect_statement_in_non_terminating_validation_function_causes_test_to_fail)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
@@ -199,7 +205,7 @@ TEST_F(
 }
 
 TEST_F(
-    SimulatedTestFixtureTest,
+    SimulatedPlayTestFixtureTest,
     test_failing_gtest_expect_statement_in_non_terminating_validation_function_causes_test_to_fail_with_different_test_order)
 {
     // This test is basically the same as
@@ -236,7 +242,7 @@ TEST_F(
         "Timestamp");
 }
 
-TEST_F(SimulatedTestFixtureTest,
+TEST_F(SimulatedPlayTestFixtureTest,
        test_terminating_and_non_terminating_validation_functions_pass_together)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
