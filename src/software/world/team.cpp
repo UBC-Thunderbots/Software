@@ -129,8 +129,8 @@ void Team::setRobotExpiryBuffer(const Duration& new_robot_expiry_buffer_duration
     robot_expiry_buffer_duration = new_robot_expiry_buffer_duration;
 }
 
-void Team::setUnavailableRobotCapabilities(RobotId id,
-                                           const std::set<RobotCapability> & new_unavailable_robot_capabilities)
+void Team::setUnavailableRobotCapabilities(
+    RobotId id, const std::set<RobotCapability>& new_unavailable_robot_capabilities)
 {
     for (Robot& robot : team_robots)
     {

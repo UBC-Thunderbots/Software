@@ -127,8 +127,8 @@ class Team
      * @param new_unavailable_robot_capabilities a set of the updated unavailable
      * robot capabilities
      * */
-    void setUnavailableRobotCapabilities(RobotId id,
-                                         const std::set<RobotCapability> & new_unavailable_robot_capabilities);
+    void setUnavailableRobotCapabilities(
+        RobotId id, const std::set<RobotCapability>& new_unavailable_robot_capabilities);
 
     /**
      * Returns the robot with the given id. If this team does not have that robot,

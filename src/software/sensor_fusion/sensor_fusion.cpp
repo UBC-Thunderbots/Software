@@ -114,11 +114,13 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    for(auto &robot_status_msg : robot_status_msgs) {
+    for (auto &robot_status_msg : robot_status_msgs)
+    {
         int robot_id = robot_status_msg.robot_id();
         std::set<RobotCapability> unavailableCapabilities;
 
-        for(int i = 0; i < robot_status_msg.error_code_size(); i++) {
+        for (int i = 0; i < robot_status_msg.error_code_size(); i++)
+        {
             const TbotsProto::ErrorCode msg = robot_status_msg.error_code(i);
 
             if (msg == TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT ||
@@ -133,6 +135,10 @@ void SensorFusion::updateWorld(
             {
                 unavailableCapabilities.insert(RobotCapability::Kick);
                 unavailableCapabilities.insert(RobotCapability::Chip);
+            }
+            else if (msg == TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT)
+            {
+                unavailableCapabilities.insert(RobotCapability::Dribble);
             }
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
