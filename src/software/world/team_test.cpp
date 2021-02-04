@@ -382,7 +382,54 @@ TEST_F(TeamTest, set_robot_expiry_buffer)
 
     EXPECT_EQ(Duration::fromMilliseconds(831), team.getRobotExpiryBufferDuration());
 }
+///////////////////////////////////////////
+TEST_F(TeamTest, set_unavailable_robot_capabilities_multiple_robots)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
 
+    Robot robot_0 = Robot(0, Point(3, -1), Vector(), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(1, 0), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    team.updateRobots({robot_0, robot_1});
+
+    
+    std::set<RobotCapability> unavailableCapabilities_0;
+    std::set<RobotCapability> unavailableCapabilities_1;
+
+    unavailableCapabilities_0.insert(RobotCapability::Move);
+    unavailableCapabilities_0.insert(RobotCapability::Kick);
+    unavailableCapabilities_1.insert(RobotCapability::Chip);
+    unavailableCapabilities_1.insert(RobotCapability::Dribble);
+
+    team.setUnavailableRobotCapabilities(0, unavailableCapabilities_0);
+    team.setUnavailableRobotCapabilities(1, unavailableCapabilities_1);
+
+    EXPECT_EQ(unavailableCapabilities_0, team.getRobotById(0).value().getUnavailableCapabilities());
+    EXPECT_EQ(unavailableCapabilities_1, team.getRobotById(1).value().getUnavailableCapabilities());
+}
+
+TEST_F(TeamTest, set_unavailable_robot_capabilities_to_none)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
+    Robot robot_0 = Robot(0, Point(3, -1), Vector(), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+    team.updateRobots({robot_0});
+
+    // Make Move unavailable
+    std::set<RobotCapability> unavailableCapabilities;
+    unavailableCapabilities.insert(RobotCapability::Move);
+    team.setUnavailableRobotCapabilities(0, unavailableCapabilities);
+    EXPECT_EQ(unavailableCapabilities, team.getRobotById(0).value().getUnavailableCapabilities());
+
+    // Reset unavailable capabilities
+    std::set<RobotCapability> unavailableCapabilitiesEmpty;
+    team.setUnavailableRobotCapabilities(0, unavailableCapabilitiesEmpty);
+    EXPECT_EQ(unavailableCapabilitiesEmpty, team.getRobotById(0).value().getUnavailableCapabilities());
+}
+///////////////////////////////////////////
 TEST_F(TeamTest, nearest_friendy_one_robot)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
