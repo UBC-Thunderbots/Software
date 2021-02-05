@@ -395,7 +395,7 @@ TEST_F(TeamTest, set_unavailable_robot_capabilities_multiple_robots)
 
     team.updateRobots({robot_0, robot_1});
 
-    
+
     std::set<RobotCapability> unavailableCapabilities_0;
     std::set<RobotCapability> unavailableCapabilities_1;
 
@@ -407,13 +407,15 @@ TEST_F(TeamTest, set_unavailable_robot_capabilities_multiple_robots)
     team.setUnavailableRobotCapabilities(0, unavailableCapabilities_0);
     team.setUnavailableRobotCapabilities(1, unavailableCapabilities_1);
 
-    EXPECT_EQ(unavailableCapabilities_0, team.getRobotById(0).value().getUnavailableCapabilities());
-    EXPECT_EQ(unavailableCapabilities_1, team.getRobotById(1).value().getUnavailableCapabilities());
+    EXPECT_EQ(unavailableCapabilities_0,
+              team.getRobotById(0).value().getUnavailableCapabilities());
+    EXPECT_EQ(unavailableCapabilities_1,
+              team.getRobotById(1).value().getUnavailableCapabilities());
 }
 
 TEST_F(TeamTest, set_unavailable_robot_capabilities_to_none)
 {
-    Team team = Team(Duration::fromMilliseconds(1000));
+    Team team     = Team(Duration::fromMilliseconds(1000));
     Robot robot_0 = Robot(0, Point(3, -1), Vector(), Angle::half(),
                           AngularVelocity::threeQuarter(), current_time);
     team.updateRobots({robot_0});
@@ -422,12 +424,14 @@ TEST_F(TeamTest, set_unavailable_robot_capabilities_to_none)
     std::set<RobotCapability> unavailableCapabilities;
     unavailableCapabilities.insert(RobotCapability::Move);
     team.setUnavailableRobotCapabilities(0, unavailableCapabilities);
-    EXPECT_EQ(unavailableCapabilities, team.getRobotById(0).value().getUnavailableCapabilities());
+    EXPECT_EQ(unavailableCapabilities,
+              team.getRobotById(0).value().getUnavailableCapabilities());
 
     // Reset unavailable capabilities
     std::set<RobotCapability> unavailableCapabilitiesEmpty;
     team.setUnavailableRobotCapabilities(0, unavailableCapabilitiesEmpty);
-    EXPECT_EQ(unavailableCapabilitiesEmpty, team.getRobotById(0).value().getUnavailableCapabilities());
+    EXPECT_EQ(unavailableCapabilitiesEmpty,
+              team.getRobotById(0).value().getUnavailableCapabilities());
 }
 ///////////////////////////////////////////
 TEST_F(TeamTest, nearest_friendy_one_robot)
