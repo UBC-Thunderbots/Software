@@ -23,6 +23,7 @@ class DefenseShadowEnemyTactic;
 class MoveTestTactic;
 class StopTestTactic;
 class GoalieTestTactic;
+class InterceptBallTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
@@ -57,4 +58,5 @@ class TacticVisitor
     virtual void visit(const MoveTestTactic &tactic)           = 0;
     virtual void visit(const StopTestTactic &tactic)           = 0;
     virtual void visit(const GoalieTestTactic &tactic)         = 0;
+    virtual void visit(const InterceptBallTactic &tactic)      = 0;
 };

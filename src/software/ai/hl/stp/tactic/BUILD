@@ -163,6 +163,33 @@ cc_test(
 )
 
 cc_library(
+    name = "intercept_ball_tactic",
+    srcs = ["intercept_ball_tactic.cpp"],
+    hdrs = [
+        "intercept_ball_fsm.h",
+        "intercept_ball_tactic.h",
+    ],
+    deps = [
+        ":tactic",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:intercept_ball_action",
+        "//software/ai/hl/stp/action:stop_action",
+        "//software/ai/intent:move_intent",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "intercept_ball_fsm_test",
+    srcs = ["intercept_ball_fsm_test.cpp"],
+    deps = [
+        ":intercept_ball_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "move_tactic",
     srcs = ["move_tactic.cpp"],
     hdrs = [
@@ -418,6 +445,7 @@ cc_library(
         ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
+        ":intercept_ball_tactic",
         ":kickoff_chip_tactic",
         ":move_tactic",
         ":passer_tactic",
