@@ -382,7 +382,7 @@ TEST_F(TeamTest, set_robot_expiry_buffer)
 
     EXPECT_EQ(Duration::fromMilliseconds(831), team.getRobotExpiryBufferDuration());
 }
-///////////////////////////////////////////
+
 TEST_F(TeamTest, set_unavailable_robot_capabilities_multiple_robots)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
@@ -433,7 +433,7 @@ TEST_F(TeamTest, set_unavailable_robot_capabilities_to_none)
     EXPECT_EQ(unavailableCapabilitiesEmpty,
               team.getRobotById(0).value().getUnavailableCapabilities());
 }
-///////////////////////////////////////////
+
 TEST_F(TeamTest, nearest_friendy_one_robot)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
