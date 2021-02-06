@@ -1,35 +1,44 @@
-#include "software/ai/hl/stp/play/shoot_or_pass_play.h"
+#include "software/ai/hl/stp/play/shoot_or_chip_play.h"
 
 #include <gtest/gtest.h>
 
-#include "software/simulated_tests/simulated_test_fixture.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class ShootOrPassPlayTest : public SimulatedTestFixture
+class ShootOrChipPlayTest : public SimulatedPlayTestFixture
 {
 };
 
-TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
+TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
 {
-    setBallState(BallState(Point(-4.4, 2.9), Vector(0, 0)));
+    setBallState(BallState(Point(-1.4, 2), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({
         field().friendlyGoalCenter(),
-        Point(-4.5, 3.0),
+        Point(-1.5, 2),
         Point(-2, 1.5),
         Point(-2, 0.5),
         Point(-2, -0.5),
         Point(-2, -1.5),
     }));
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({
+        field().enemyGoalCenter(),
+        field().enemyDefenseArea().negXNegYCorner(),
+        field().enemyDefenseArea().negXPosYCorner(),
+        Point(-1, 0),
+        Point(1, -2.5),
+    }));
+    addEnemyRobots({
+        RobotStateWithId{
+            .id          = 5,
+            .robot_state = RobotState(Point(1, 2), Vector(-4.6, 0), Angle::half(),
+                                      AngularVelocity::zero())},
+    });
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(ShootOrPassPlay));
+    setAIPlay(TYPENAME(ShootOrChipPlay));
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
