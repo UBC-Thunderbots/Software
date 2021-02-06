@@ -120,7 +120,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
 }
 
 void SensorFusion::updateWorld(const SSLProto::Referee &packet)
-{  
+{
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->FriendlyColorYellow()->value())

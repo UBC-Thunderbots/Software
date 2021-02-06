@@ -64,9 +64,9 @@ class PenaltyKickTactic : public Tactic
     // offset from the goal post in y direction when shooting
     static constexpr double PENALTY_KICK_POST_OFFSET = 0.04;
 
-    // timeout that forces a shot after the robot approaches the ball and advances 
+    // timeout that forces a shot after the robot approaches the ball and advances
     // towards the keeper
     // these two timeouts together must be <= 9 seconds
-    const Duration PENALTY_FORCE_SHOOT_TIMEOUT = Duration::fromSeconds(4);
+    const Duration PENALTY_FORCE_SHOOT_TIMEOUT     = Duration::fromSeconds(4);
     const Duration PENALTY_FINISH_APPROACH_TIMEOUT = Duration::fromSeconds(4);
 };
