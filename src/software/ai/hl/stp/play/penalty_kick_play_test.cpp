@@ -4,7 +4,6 @@
 
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/simulated_tests/validation_functions/friendly_scored_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
