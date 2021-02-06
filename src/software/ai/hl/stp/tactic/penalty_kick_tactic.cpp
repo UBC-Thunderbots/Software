@@ -60,19 +60,48 @@ bool PenaltyKickTactic::evaluatePenaltyShot()
 
     if (!intersections.empty())
     {
-        // If we have an intersection, calculate if we have a viable shot
+        /**
+                               +-------------------+
+                               |                   |
+                               |       goal        |
+                               |                   |
+                               +-------------------+
+                                  \       (     ) goalie
+                                   \      /-----
+                                  B \   _/
+                                     \ /  A
+                                    C \
+                                       \
+                                      -----
+                                     ( bot )
+                                      -----
+            B is the line from the robot to the goal with the robot's orientation as the
+                direction
+            A is the perpendicular line from the goalie to the B line. It is the closest
+                distance the goalie must travel to intercept the shot.
+            C is the closest position at which the goalie can intercept the ball.
 
+            It returns true when the enemy goalie doesn't have enough time to block the
+           shot at C before the ball moves past that point.
+        */
+
+        // If we have an intersection, calculate if we have a viable shot
         const Segment ball_to_goal = Segment(intersections[0], ball.position());
+
+        // point C in the diagram
         const Point block_position =
             closestPoint(enemy_goalie.value().position(), ball_to_goal);
+        // line A in the diagram
         const Vector goalie_to_block_position =
             (block_position - enemy_goalie.value().position());
+
+        // segment from the robot's position to point C
         const Segment ball_to_block = Segment(ball.position(), block_position);
+
         const double time_to_pass_keeper =
             fabs(ball_to_block.length() / PENALTY_KICK_SHOT_SPEED) + SSL_VISION_DELAY;
 
         // Based on constant acceleration -> // dX = init_vel*t + 0.5*a*t^2
-        //          dX - init_vel - (0.5*a*t)t
         const double max_enemy_movement_x =
             enemy_goalie.value().velocity().x() * time_to_pass_keeper +
             0.5 * std::copysign(1, goalie_to_block_position.x()) *
