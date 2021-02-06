@@ -22,9 +22,9 @@ cc_library(
 )
 
 cc_library(
-    name = "ai_wrapper",
-    srcs = ["ai_wrapper.cpp"],
-    hdrs = ["ai_wrapper.h"],
+    name = "threaded_ai",
+    srcs = ["threaded_ai.cpp"],
+    hdrs = ["threaded_ai.h"],
     deps = [
         "//software/ai",
         "//software/gui/drawing:draw_functions",

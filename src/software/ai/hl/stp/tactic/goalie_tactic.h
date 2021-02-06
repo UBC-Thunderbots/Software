@@ -1,10 +1,14 @@
 #pragma once
 
 #include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/action/autochip_move_action.h"
+#include "software/ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
@@ -22,9 +26,19 @@ class GoalieTactic : public Tactic
    public:
     /**
      * Creates a new GoalieTactic
+     *
+     * @param ball The ball
+     * @param field The field
+     * @param friendly_team The friendly team
+     * @param enemy_team The enemy team
+     * @param goalie_tactic_config The config to fetch parameters from
      */
     explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
-                          const Team &enemy_team);
+                          const Team &enemy_team,
+                          std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
+                              DynamicParameters->getAIConfig()->getGoalieTacticConfig());
+
+    GoalieTactic() = delete;
 
     /*
      * Restrains the goalie to a rectangle, with the preferred point being the one
@@ -38,27 +52,60 @@ class GoalieTactic : public Tactic
     std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
                                                    Rectangle goalie_restricted_area);
 
-    /**
-     * Updates the world parameters for this GoalieTactic.
-     *
-     * @param ball The const reference to the ball on the field
-     * @param field The const reference to the field this tactic will run
-     * @param friendly_team The friendly team
-     * @param enemy_team The enemy team
-     */
-    void updateWorldParams(const Ball &ball, const Field &field,
-                           const Team &friendly_team, const Team &enemy_team);
+    void updateWorldParams(const World &world) override;
 
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
+
+    /**
+     * Gets intersections between the ball velocity ray and the full goal segment
+     */
+    std::vector<Point> getIntersectionsBetweenBallVelocityAndFullGoalSegment();
+
+    /**
+     * Creates action to panic and stop the ball
+     *
+     * @param autochip_move_action The action to reuse
+     * @param stop_ball_point The point to the stop the ball
+     *
+     * @return the action to use to stop the ball
+     */
+    std::shared_ptr<Action> panicAndStopBall(
+        std::shared_ptr<AutochipMoveAction> autochip_move_action,
+        const Point &stop_ball_point);
+
+    /**
+     * Chip ball if safe
+     *
+     * @param chip_action The chip action to reuse
+     * @param stop_action The stop action to reuse
+     *
+     * @return Action to chip the ball if it is safe to do so
+     */
+    std::shared_ptr<Action> chipBallIfSafe(std::shared_ptr<ChipAction> chip_action,
+                                           std::shared_ptr<StopAction> stop_action);
+
+    /**
+     * Position robot to block potential shots
+     *
+     * @param autochip_move_action The action to reuse
+     *
+     * @return The Action to position the robot to block the shot
+     */
+    std::shared_ptr<Action> positionToBlockShot(
+        std::shared_ptr<AutochipMoveAction> autochip_move_action);
 
     bool isGoalieTactic() const override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) const override;
 
     Ball getBall() const;
     Field getField() const;
     Team getFriendlyTeam() const;
     Team getEnemyTeam() const;
+
+    // Distance to chip the ball when trying to yeet it
+    // TODO (#1878): Replace this with a more intelligent chip distance system
+    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
@@ -68,4 +115,5 @@ class GoalieTactic : public Tactic
     Field field;
     Team friendly_team;
     Team enemy_team;
+    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
 };

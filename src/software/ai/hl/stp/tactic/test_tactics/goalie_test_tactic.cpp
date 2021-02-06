@@ -5,12 +5,14 @@ GoalieTestTactic::GoalieTestTactic(bool loop_forever)
 {
 }
 
+void GoalieTestTactic::updateWorldParams(const World &world) {}
+
 bool GoalieTestTactic::isGoalieTactic() const
 {
     return true;
 }
 
-double GoalieTestTactic::calculateRobotCost(const Robot &robot, const World &world)
+double GoalieTestTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // Prefer all robots equally with a cost of 0.5
     return 0.5;
@@ -21,7 +23,7 @@ void GoalieTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     // Yield nothing
 }
 
-void GoalieTestTactic::accept(MutableTacticVisitor &visitor)
+void GoalieTestTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

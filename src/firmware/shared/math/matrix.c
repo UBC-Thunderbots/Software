@@ -1,103 +1,142 @@
-#include "matrix.h"
+#include "firmware/shared/math/matrix.h"
 
+#include <assert.h>
 #include <stdlib.h>
 
-
-Matrix create_matrix(int n_rows, int n_cols)
+struct Matrix
 {
-    Matrix matrix;
-    matrix.rows   = (float **)malloc(sizeof(float *) * n_rows);
-    matrix.n_rows = n_rows;
-    matrix.n_cols = n_cols;
-    int i;
-    for (i = 0; i < n_rows; i++)
+    float** rows;
+    unsigned int n_cols;
+    unsigned int n_rows;
+};
+
+Matrix_t* shared_matrix_createBlank(unsigned int n_rows, unsigned int n_cols)
+{
+    Matrix_t* matrix = (Matrix_t*)malloc(sizeof(Matrix_t));
+
+    matrix->rows   = (float**)malloc(sizeof(float*) * n_rows);
+    matrix->n_rows = n_rows;
+    matrix->n_cols = n_cols;
+
+    for (unsigned int i = 0; i < n_rows; i++)
     {
-        matrix.rows[i] = (float *)calloc((unsigned)n_cols, sizeof(float));
+        matrix->rows[i] = (float*)calloc(n_cols, sizeof(float));
     }
     return matrix;
 }
 
-void free_matrix(Matrix matrix)
+void shared_matrix_setValues(Matrix_t* matrix, float** values)
 {
-    int i, j;
-    for (i = 0; i < matrix.n_rows; i++)
+    const unsigned int num_columns = matrix->n_cols;
+    const unsigned int num_rows    = matrix->n_rows;
+
+    for (unsigned int row = 1; row <= num_rows; row++)
     {
-        free(matrix.rows[i]);
+        shared_matrix_insertRow(row, values[row - 1], num_columns, matrix);
     }
-    free(matrix.rows);
 }
 
-Matrix matmul(Matrix A, Matrix B)
+void shared_matrix_destroy(Matrix_t* matrix)
 {
-    int i;
-    int j;
-    int k;
-    Matrix C = create_matrix(A.n_rows, B.n_cols);
-    for (i = 0; i < B.n_cols; i++)
+    for (unsigned int i = 0; i < matrix->n_rows; i++)
     {
-        for (j = 0; j < A.n_rows; j++)
+        free(matrix->rows[i]);
+    }
+    free(matrix->rows);
+    free(matrix);
+}
+
+Matrix_t* shared_matrix_multiply(Matrix_t* A, Matrix_t* B)
+{
+    Matrix_t* return_matrix = shared_matrix_createBlank(A->n_rows, B->n_cols);
+    for (unsigned int i = 0; i < B->n_cols; i++)
+    {
+        for (unsigned int j = 0; j < A->n_rows; j++)
         {
-            C.rows[j][i] = 0.0f;
-            for (k = 0; k < A.n_cols; k++)
+            return_matrix->rows[j][i] = 0.0f;
+            for (unsigned int k = 0; k < A->n_cols; k++)
             {
-                C.rows[j][i] += A.rows[j][k] * B.rows[k][i];
+                return_matrix->rows[j][i] += A->rows[j][k] * B->rows[k][i];
             }
         }
     }
-    return C;
+    return return_matrix;
 }
 
-/**
- * Rotates the given vector by using the given rotation matrix.
- *
- * @param vector a 2D vector to rotate
- * @param rotation_matrix the rotation operator
- */
-void do_rotation(float vector_array[2], Matrix rotation_matrix)
+Matrix_t* shared_matrix_transpose(Matrix_t* in_matrix)
 {
-    Matrix vector     = create_matrix(2, 1);
-    vector.rows[0][0] = vector_array[0];
-    vector.rows[1][0] = vector_array[1];
-    Matrix rotated    = matmul(rotation_matrix, vector);
-    vector_array[0]   = rotated.rows[0][0];
-    vector_array[1]   = rotated.rows[1][0];
-    free_matrix(vector);
-    free_matrix(rotated);
-    free_matrix(rotation_matrix);
-}
-
-void rotate_axis_2D(float vector[2], const float unit_vector[2])
-{
-    Matrix rotation_matrix     = create_matrix(2, 2);
-    rotation_matrix.rows[0][0] = unit_vector[0];
-    rotation_matrix.rows[0][1] = unit_vector[1];
-    rotation_matrix.rows[1][0] = -unit_vector[1];
-    rotation_matrix.rows[1][1] = unit_vector[0];
-    do_rotation(vector, rotation_matrix);
-}
-
-void rotate_vector_2D(float vector[2], const float unit_vector[2])
-{
-    Matrix rotation_matrix     = create_matrix(2, 2);
-    rotation_matrix.rows[0][0] = unit_vector[0];
-    rotation_matrix.rows[0][1] = -unit_vector[1];
-    rotation_matrix.rows[1][0] = unit_vector[1];
-    rotation_matrix.rows[1][1] = unit_vector[0];
-    do_rotation(vector, rotation_matrix);
-}
-
-
-Matrix transpose(Matrix in_matrix)
-{
-    int i;
-    int j;
-    Matrix out_matrix = create_matrix(in_matrix.n_cols, in_matrix.n_rows);
-    for (i = 0; i < in_matrix.n_rows; i++)
+    Matrix_t* out_matrix =
+        shared_matrix_createBlank(in_matrix->n_cols, in_matrix->n_rows);
+    for (unsigned int i = 0; i < in_matrix->n_rows; i++)
     {
-        for (j = 0; j < in_matrix.n_cols; j++)
+        for (unsigned int j = 0; j < in_matrix->n_cols; j++)
         {
-            out_matrix.rows[j][i] = in_matrix.rows[i][j];
+            out_matrix->rows[j][i] = in_matrix->rows[i][j];
         }
     }
     return out_matrix;
+}
+
+void shared_matrix_setValueAtIndex(unsigned int row, unsigned int column, float value,
+                                   Matrix_t* matrix)
+{
+    assert(row <= matrix->n_rows && row >= 1);
+    assert(column <= matrix->n_cols && column >= 1);
+
+    // If the row or column are out of the range of the array then return.
+    // It is likely safer to do nothing than segfault
+    if (row > matrix->n_rows || column > matrix->n_cols)
+    {
+        return;
+    }
+    matrix->rows[row - 1][column - 1] = value;
+}
+
+float shared_matrix_getValueAtIndex(unsigned int row, unsigned int column,
+                                    Matrix_t* matrix)
+{
+    assert(row <= matrix->n_rows && row >= 1);
+    assert(column <= matrix->n_cols && column >= 1);
+
+    // If the row or column are out of the range of the array then return.
+    // It is likely safer to do nothing than segfault
+    if (row > matrix->n_rows || column > matrix->n_cols || row < 1 || column < 1)
+    {
+        return 0.0f;
+    }
+
+    return matrix->rows[row - 1][column - 1];
+}
+
+unsigned int shared_matrix_getNumRows(Matrix_t* matrix)
+{
+    return matrix->n_rows;
+}
+
+unsigned int shared_matrix_getNumColumns(Matrix_t* matrix)
+{
+    return matrix->n_cols;
+}
+
+void shared_matrix_insertRow(unsigned int row, float column_values[],
+                             unsigned int num_columns, Matrix_t* matrix)
+{
+    for (unsigned int column = 1; column <= num_columns; column++)
+    {
+        shared_matrix_setValueAtIndex(row, column, column_values[column - 1], matrix);
+    }
+}
+
+Matrix_t* shared_matrix_createMatrixFromValues(float** matrix_values,
+                                               unsigned int num_rows,
+                                               unsigned int num_columns)
+{
+    Matrix_t* matrix = shared_matrix_createBlank(num_rows, num_columns);
+
+    for (unsigned int row = 1; row <= num_rows; row++)
+    {
+        shared_matrix_insertRow(row, matrix_values[row - 1], num_columns, matrix);
+    }
+
+    return matrix;
 }

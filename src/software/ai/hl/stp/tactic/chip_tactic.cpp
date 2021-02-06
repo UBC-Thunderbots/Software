@@ -9,11 +9,12 @@ ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
 {
 }
 
-void ChipTactic::updateWorldParams(const Ball &ball)
+
+void ChipTactic::updateWorldParams(const World &world)
 {
-    // update the world parameters stored by this tactic
-    this->ball = ball;
+    this->ball = world.ball();
 }
+
 
 void ChipTactic::updateControlParams(Point chip_origin, Point chip_target)
 {
@@ -22,7 +23,7 @@ void ChipTactic::updateControlParams(Point chip_origin, Point chip_target)
     this->chip_target = chip_target;
 }
 
-double ChipTactic::calculateRobotCost(const Robot &robot, const World &world)
+double ChipTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // the closer the robot is to a ball, the cheaper it is to perform the chip
     double cost = (robot.position() - world.ball().position()).length() /
@@ -36,12 +37,12 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     do
     {
-        chip_action->updateControlParams(*robot, chip_origin, chip_target);
+        chip_action->updateControlParams(*robot_, chip_origin, chip_target);
         yield(chip_action);
     } while (!chip_action->done());
 }
 
-void ChipTactic::accept(MutableTacticVisitor &visitor)
+void ChipTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

@@ -1,11 +1,11 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 
 #include "shared/constants.h"
-#include "software/ai/evaluation/ball.h"
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/logger/logger.h"
+#include "software/world/ball.h"
 
 PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
                            bool loop_forever)
@@ -16,10 +16,10 @@ PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
 {
 }
 
-void PasserTactic::updateWorldParams(const Ball& updated_ball, const Field& updated_field)
+void PasserTactic::updateWorldParams(const World& world)
 {
-    this->ball  = updated_ball;
-    this->field = updated_field;
+    this->ball  = world.ball();
+    this->field = world.field();
 }
 
 void PasserTactic::updateControlParams(const Pass& updated_pass)
@@ -27,7 +27,7 @@ void PasserTactic::updateControlParams(const Pass& updated_pass)
     this->pass = updated_pass;
 }
 
-double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
+double PasserTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // Prefer robots closer to the pass start position
     // We normalize with the total field length so that robots that are within the field
@@ -47,7 +47,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         auto intercept_action = std::make_shared<InterceptBallAction>(field, ball);
         do
         {
-            intercept_action->updateControlParams(*robot);
+            intercept_action->updateControlParams(*robot_);
             yield(intercept_action);
         } while (!intercept_action->done());
     }
@@ -65,9 +65,8 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
                 .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
         Point wait_position = pass.passerPoint() - ball_offset;
 
-        move_action->updateControlParams(*robot, wait_position, pass.passerOrientation(),
-                                         0, DribblerEnable::OFF, MoveType::NORMAL,
-                                         AutochickType::NONE, BallCollisionType::ALLOW);
+        move_action->updateControlParams(*robot_, wait_position, pass.passerOrientation(),
+                                         0, DribblerMode::OFF, BallCollisionType::ALLOW);
         yield(move_action);
     }
 
@@ -78,7 +77,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     {
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
-        kick_action->updateControlParams(*robot, ball.position(), pass.receiverPoint(),
+        kick_action->updateControlParams(*robot_, ball.position(), pass.receiverPoint(),
                                          pass.speed());
         yield(kick_action);
 
@@ -86,10 +85,10 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         // vector with sufficient velocity
         kick_direction = (pass.receiverPoint() - ball.position()).orientation();
 
-    } while (!hasBallBeenKicked(ball, kick_direction));
+    } while (!ball.hasBallBeenKicked(kick_direction));
 }
 
-void PasserTactic::accept(MutableTacticVisitor& visitor)
+void PasserTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

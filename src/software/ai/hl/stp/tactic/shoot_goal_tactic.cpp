@@ -6,12 +6,12 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/rectangle.h"
-#include "software/parameter/dynamic_parameters.h"
 
-ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
-                                 const Team &enemy_team, const Ball &ball,
-                                 Angle min_net_open_angle,
-                                 std::optional<Point> chip_target, bool loop_forever)
+ShootGoalTactic::ShootGoalTactic(
+    const Field &field, const Team &friendly_team, const Team &enemy_team,
+    const Ball &ball, Angle min_net_open_angle, std::optional<Point> chip_target,
+    bool loop_forever,
+    std::shared_ptr<const ShootGoalTacticConfig> shoot_goal_tactic_config)
     : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
       field(field),
       friendly_team(friendly_team),
@@ -19,17 +19,17 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
       ball(ball),
       min_net_open_angle(min_net_open_angle),
       chip_target(chip_target),
-      has_shot_available(false)
+      has_shot_available(false),
+      shoot_goal_tactic_config(shoot_goal_tactic_config)
 {
 }
 
-void ShootGoalTactic::updateWorldParams(const Field &field, const Team &friendly_team,
-                                        const Team &enemy_team, const Ball &ball)
+void ShootGoalTactic::updateWorldParams(const World &world)
 {
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
-    this->ball          = ball;
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
+    this->ball          = world.ball();
 }
 
 void ShootGoalTactic::updateControlParams(std::optional<Point> chip_target)
@@ -37,7 +37,7 @@ void ShootGoalTactic::updateControlParams(std::optional<Point> chip_target)
     this->chip_target = chip_target;
 }
 
-double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)
+double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     auto ball_intercept_opt =
         findBestInterceptForBall(world.ball(), world.field(), robot);
@@ -73,20 +73,17 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     // we rotate all the robot positions about the origin so we can construct
     // a rectangle that is aligned with the axis
     Vector front_of_robot_dir =
-        Vector(robot->orientation().cos(), robot->orientation().sin());
+        Vector(robot_->orientation().cos(), robot_->orientation().sin());
 
-    auto steal_ball_rect_width = DynamicParameters->getAIConfig()
-                                     ->getShootGoalTacticConfig()
-                                     ->EnemyAboutToStealBallRectangleWidth()
-                                     ->value();
-    auto steal_ball_rect_length = DynamicParameters->getAIConfig()
-                                      ->getShootGoalTacticConfig()
-                                      ->EnemyAboutToStealBallRectangleExtensionLength()
-                                      ->value();
+    auto steal_ball_rect_width =
+        shoot_goal_tactic_config->EnemyAboutToStealBallRectangleWidth()->value();
+    auto steal_ball_rect_length =
+        shoot_goal_tactic_config->EnemyAboutToStealBallRectangleExtensionLength()
+            ->value();
     Rectangle baller_frontal_area = Rectangle(
-        (robot->position() +
+        (robot_->position() +
          front_of_robot_dir.perpendicular().normalize(steal_ball_rect_width / 2.0)),
-        robot->position() + front_of_robot_dir.normalize(steal_ball_rect_length) -
+        robot_->position() + front_of_robot_dir.normalize(steal_ball_rect_length) -
             front_of_robot_dir.perpendicular().normalize(ROBOT_MAX_RADIUS_METERS));
 
     for (const auto &enemy : enemy_team.getAllRobots())
@@ -112,7 +109,7 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
     {
         if (!isEnemyAboutToStealBall())
         {
-            kick_action->updateControlParams(*robot, ball.position(),
+            kick_action->updateControlParams(*robot_, ball.position(),
                                              shot_target->getPointToShootAt(),
                                              BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
             yield(kick_action);
@@ -123,7 +120,7 @@ void ShootGoalTactic::shootUntilShotBlocked(std::shared_ptr<KickAction> kick_act
             // steal the ball we chip instead to just get over the enemy. We do not adjust
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
-            chip_action->updateControlParams(*robot, ball.position(),
+            chip_action->updateControlParams(*robot_, ball.position(),
                                              shot_target->getPointToShootAt());
             yield(chip_action);
         }
@@ -162,19 +159,19 @@ void ShootGoalTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             // and directly losing possession that way
             Point fallback_chip_target =
                 chip_target ? *chip_target : field.enemyGoalCenter();
-            chip_action->updateControlParams(*robot, ball.position(),
+            chip_action->updateControlParams(*robot_, ball.position(),
                                              fallback_chip_target);
             yield(chip_action);
         }
         else
         {
-            intercept_action->updateControlParams(*robot);
+            intercept_action->updateControlParams(*robot_);
             yield(intercept_action);
         }
     } while (!(kick_action->done() || chip_action->done()));
 }
 
-void ShootGoalTactic::accept(MutableTacticVisitor &visitor)
+void ShootGoalTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

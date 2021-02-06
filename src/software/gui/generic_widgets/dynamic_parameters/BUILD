@@ -7,6 +7,7 @@ qt_cc_library(
     src = "dynamic_parameter_widget.cpp",
     hdr = "dynamic_parameter_widget.h",
     deps = [
+        "//software/gui/generic_widgets/slider",
         "//software/gui/shared:parameters_spinbox",
         "//software/logger",
         "//software/parameter",

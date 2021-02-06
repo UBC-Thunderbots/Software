@@ -1,7 +1,9 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
+#include "software/ai/hl/stp/tactic/stop_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/intent/stop_intent.h"
 
 /**
  * The StopTactic will stop the robot from moving. The robot will actively try and brake
@@ -18,6 +20,10 @@ class StopTactic : public Tactic
      */
     explicit StopTactic(bool coast);
 
+    StopTactic() = delete;
+
+    void updateWorldParams(const World& world) override;
+
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally
@@ -27,14 +33,18 @@ class StopTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double calculateRobotCost(const Robot& robot, const World& world) const override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
+    bool done() const override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
-    // Tactic parameters
+    void updateIntent(const TacticUpdate& tactic_update) override;
+
+    BaseFSM<StopFSM> fsm;
+
     // Whether or not the robot should coast to a stop
     bool coast;
 };

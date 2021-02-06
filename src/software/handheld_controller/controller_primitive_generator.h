@@ -39,7 +39,6 @@ class ControllerPrimitiveGenerator
     static std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
         const Vector& velocity, AngularVelocity angular_velocity, double dribbler_rpm);
 
-   private:
     /**
      * Given a ControllerInput, creates a Primitive to implement the desired behavior
      *
@@ -47,8 +46,10 @@ class ControllerPrimitiveGenerator
      *
      * @return A Primitive that will implement the behavior of the given ControllerInput
      */
-    std::unique_ptr<TbotsProto::Primitive> createPrimitiveFromControllerInput(
-        const ControllerInput& controller_input);
+    static std::unique_ptr<TbotsProto::Primitive> createPrimitiveFromControllerInput(
+        const ControllerInput& controller_input,
+        std::shared_ptr<const HandheldControllerConfig> controller_input_config);
 
+   private:
     std::shared_ptr<const HandheldControllerConfig> controller_input_config;
 };

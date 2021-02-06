@@ -63,6 +63,7 @@ cc_binary(
     deps = [
         ":legacy_stm32f405.ld",
         "//firmware/app/control",
+        "//firmware/app/logger",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//firmware/shared:physics",

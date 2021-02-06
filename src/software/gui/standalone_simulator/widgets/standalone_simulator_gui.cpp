@@ -51,8 +51,14 @@ StandaloneSimulatorGUI::StandaloneSimulatorGUI(
     });
 
     main_widget->simulation_graphics_view->setStandaloneSimulator(standalone_simulator);
-    main_widget->dynamic_parameter_widget->setupParameters(
+    main_widget->simulator_dynamic_parameter_widget->setupParameters(
         MutableDynamicParameters->getMutableSimulatorConfig());
+    main_widget->standalone_simulator_dynamic_parameter_widget->setupParameters(
+        MutableDynamicParameters->getMutableStandaloneSimulatorConfig());
+    // standalone_simulator_dynamic_parameter_widget will match the height of
+    // simulator_dynamic_parameter_widget
+    main_widget->standalone_simulator_dynamic_parameter_widget->setSizePolicy(
+        QSizePolicy::Preferred, QSizePolicy::Ignored);
 
     connect(update_timer, &QTimer::timeout, this, &StandaloneSimulatorGUI::handleUpdate);
     update_timer->start(static_cast<int>(
@@ -68,9 +74,10 @@ void StandaloneSimulatorGUI::handleUpdate()
 void StandaloneSimulatorGUI::draw()
 {
     auto ssl_wrapper_packet = standalone_simulator->getSSLWrapperPacket();
-    auto draw_function      = getDrawSSLWrapperPacketFunction(ssl_wrapper_packet);
     main_widget->simulation_graphics_view->clearAndDraw(
-        {draw_function.getDrawFunction()});
+        {main_widget->simulation_graphics_view->getDrawBallVelocityFunction()
+             .getDrawFunction(),
+         getDrawSSLWrapperPacketFunction(ssl_wrapper_packet).getDrawFunction()});
 }
 
 void StandaloneSimulatorGUI::updateDrawViewArea()

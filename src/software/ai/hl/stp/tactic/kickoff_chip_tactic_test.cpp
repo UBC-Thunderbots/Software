@@ -10,4 +10,6 @@ TEST(KickoffChipTacticTest, constructor_test)
     world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
 
     KickoffChipTactic tactic = KickoffChipTactic(world.ball(), true);
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(Point(0, 0), tactic.getBall().position());
 }

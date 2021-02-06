@@ -24,7 +24,7 @@ std::unique_ptr<TbotsProto::Vision> createVision(const World& world)
     // set ball state
     *(vision_msg->mutable_ball_state()) = *createBallState(world.ball());
 
-    return std::move(vision_msg);
+    return vision_msg;
 }
 
 std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot)
@@ -41,7 +41,7 @@ std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot)
     *(robot_state_msg->mutable_global_velocity())         = *velocity;
     *(robot_state_msg->mutable_global_angular_velocity()) = *angular_velocity;
 
-    return std::move(robot_state_msg);
+    return robot_state_msg;
 }
 
 std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)
@@ -53,7 +53,7 @@ std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)
     *(ball_state_msg->mutable_global_position()) = *position;
     *(ball_state_msg->mutable_global_velocity()) = *velocity;
 
-    return std::move(ball_state_msg);
+    return ball_state_msg;
 }
 
 std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
@@ -67,5 +67,5 @@ std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
         MICROSECONDS_PER_SECOND;
 
     timestamp_msg->set_epoch_timestamp_seconds(time_in_seconds);
-    return std::move(timestamp_msg);
+    return timestamp_msg;
 }

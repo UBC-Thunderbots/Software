@@ -13,8 +13,8 @@
 // on the floor by each of the four wheels and converts it into forces
 // within the robot domain, the third component is is newtons and not
 // torque as the matrix is unitless (multiply by ROBOT_RADIUS to unnormalize)
-// the transpose of this matrix is the velocity coupling matrix and can convert
-// speeds in the robot coordinates into linear wheel speeds
+// the transpose of this matrix is the velocity coupling matrix and can
+// convert speeds in the robot coordinates into linear wheel speeds
 static const float force4_to_force3_mat[3][4] = {{-0.8192f, -0.7071f, 0.7071f, 0.8192f},
                                                  {0.5736f, -0.7071f, -0.7071f, 0.5736f},
                                                  {1.0000f, 1.0000f, 1.0000f, 1.0000f}};

@@ -6,7 +6,7 @@
 #include "software/geom/triangle.h"
 #include "software/world/world.h"
 
-Point deflect_off_enemy_target(World world)
+Point deflectOffEnemyTarget(World world)
 {
     Point enemy_goal_positive = world.field().enemyGoalpostPos();
     Point enemy_goal_negative = world.field().enemyGoalpostNeg();

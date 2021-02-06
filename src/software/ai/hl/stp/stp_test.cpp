@@ -24,6 +24,11 @@ class STPTest : public ::testing::Test
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
             return std::make_unique<HaltTestPlay>();
         };
+        // Explicitly setting override AI Play to be false because we can't rely on
+        // default values
+        MutableDynamicParameters->getMutableAIControlConfig()
+            ->mutableOverrideAIPlay()
+            ->setValue(false);
         // Give an explicit seed to STP so that our tests are deterministic
         stp   = STP(default_play_constructor, DynamicParameters->getAIControlConfig(), 0);
         world = ::TestUtil::createBlankTestingWorld();
@@ -47,7 +52,8 @@ TEST_F(STPTest, test_exception_thrown_when_no_play_applicable)
 {
     // Put the ball where both its x and y coordinates are negative. Neither test Play
     // is applicable in this case
-    world = ::TestUtil::setBallPosition(world, Point(-1, -1), Timestamp::fromSeconds(0));
+    world = world =
+        ::TestUtil::setBallPosition(world, Point(-1, -1), Timestamp::fromSeconds(0));
     EXPECT_THROW(stp.calculateNewPlay(world), std::runtime_error);
 }
 
@@ -161,9 +167,9 @@ TEST_F(STPTest, test_get_play_info)
 
     auto play_info = stp.getPlayInfo();
     std::string expected_referee_command, expected_play_name;
-    expected_referee_command                                         = "HALT";
-    expected_play_name                                               = "HaltTestPlay";
-    std::unordered_set<std::string> expected_robot_tactic_assignment = {
+    expected_referee_command                                  = "HALT";
+    expected_play_name                                        = "HaltTestPlay";
+    std::vector<std::string> expected_robot_tactic_assignment = {
         "Robot 0  -  StopTestTactic", "Robot 1  -  StopTestTactic"};
     PlayInfo expected_play_info = PlayInfo(expected_referee_command, expected_play_name,
                                            expected_robot_tactic_assignment);

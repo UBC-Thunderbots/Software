@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "firmware/app/control/control.h"
+#include "firmware/app/logger/logger.h"
 
 typedef struct DirectControlPrimitiveState
 {
@@ -54,8 +55,7 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
         default:
         {
             // Do nothing
-            // TODO (Issue #1652): LOG(WARNING)<<"Wheel control command is not a valid
-            // type"
+            TLOG_WARNING("Wheel control command is not a valid type");
             state->direct_velocity = false;
         }
     }
@@ -109,7 +109,7 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
         default:
         {
             // Do nothing
-            // TODO (Issue #1652): LOG(WARNING)<<"Chick command is not a valid type"
+            TLOG_WARNING("Chick command is not a valid type");
         }
     }
 

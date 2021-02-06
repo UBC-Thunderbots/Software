@@ -30,16 +30,9 @@ class ShadowEnemyTactic : public Tactic
                                const Ball &ball, const double ball_steal_speed,
                                bool enemy_team_can_pass, bool loop_forever);
 
-    /**
-     * Updates the world parameters for this ShadowEnemyTactic.
-     *
-     * @param field The field being played on
-     * @param friendly_team The friendly team
-     * @param enemy_team The enemy team
-     * @param ball The ball
-     */
-    void updateWorldParams(const Field &field, const Team &friendly_team,
-                           const Team &enemy_team, const Ball &ball);
+    ShadowEnemyTactic() = delete;
+
+    void updateWorldParams(const World &world) override;
 
     /**
      * Updates the control parameters for this ShadowEnemyTactic
@@ -60,14 +53,18 @@ class ShadowEnemyTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) const override;
 
     Ball getBall() const;
     Field getField() const;
     Team getFriendlyTeam() const;
     Team getEnemyTeam() const;
+
+    // Distance to chip the ball when trying to yeet it
+    // TODO (#1878): Replace this with a more intelligent chip distance system
+    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;

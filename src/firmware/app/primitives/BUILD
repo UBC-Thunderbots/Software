@@ -47,6 +47,7 @@ cc_library(
     deps = [
         ":primitive",
         "//firmware/app/control",
+        "//firmware/app/logger",
     ],
 )
 
@@ -59,6 +60,7 @@ cc_library(
         "//firmware/app/control",
         "//firmware/app/control:bangbang",
         "//firmware/app/control:physbot",
+        "//firmware/app/control:trajectory_planner",
         "//firmware/shared:physics",
         "//firmware/shared:util",
     ],
@@ -107,6 +109,7 @@ cc_library(
         "//firmware/app/control",
         "//firmware/app/control:bangbang",
         "//firmware/app/control:physbot",
+        "//firmware/app/control:trajectory_planner",
         "//firmware/shared:physics",
         "//firmware/shared:util",
         "//shared:constants",
@@ -141,6 +144,25 @@ cc_library(
     deps = [
         "move_helper",
         ":primitive",
+    ],
+)
+
+cc_test(
+    name = "autochip_move_test",
+    srcs = ["autochip_move_primitive_test.cpp"],
+    deps = [
+        ":autochip_move",
+        ":test_util_world",
+    ],
+)
+
+cc_library(
+    name = "test_util_world",
+    hdrs = ["test_util_world.h"],
+    deps = [
+        ":primitive_manager",
+        "@fff",
+        "@gtest//:gtest_main",
     ],
 )
 

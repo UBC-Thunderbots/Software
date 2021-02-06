@@ -1,5 +1,6 @@
 #include "software/geom/algorithms/contains.h"
 
+#include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/almost_equal.h"
 #include "software/geom/algorithms/collinear.h"
 #include "software/geom/algorithms/distance.h"
@@ -13,7 +14,7 @@ bool contains(const Circle& container, const Segment& contained)
 
 bool contains(const Circle& container, const Point& contained)
 {
-    return distance(container.getOrigin(), contained) <= container.getRadius();
+    return distance(container.origin(), contained) <= container.radius();
 }
 
 bool contains(const Polygon& container, const Point& contained)
@@ -66,8 +67,8 @@ bool contains(const Ray& container, const Point& contained)
     bool point_collinear_with_ray =
         collinear(contained, container.getStart(), point_in_ray_direction);
     bool point_is_in_ray_direction =
-        ((contained - container.getStart()).normalize() - container.toUnitVector())
-            .length() < FIXED_EPSILON;
+        acuteAngle(container.toUnitVector(), contained - container.getStart()).abs() <
+        Angle::quarter();
     return point_is_ray_start || (point_collinear_with_ray && point_is_in_ray_direction);
 }
 

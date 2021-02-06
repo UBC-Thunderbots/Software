@@ -13,7 +13,9 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       ball_filter(),
       friendly_team_filter(),
       enemy_team_filter(),
-      team_with_possession(TeamSide::ENEMY)
+      team_with_possession(TeamSide::ENEMY),
+      friendly_goalie_id(0),
+      enemy_goalie_id(0)
 {
     if (!sensor_fusion_config)
     {
@@ -40,7 +42,7 @@ std::optional<World> SensorFusion::getWorld() const
     }
 }
 
-void SensorFusion::updateWorld(const SensorProto &sensor_msg)
+void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 {
     if (sensor_msg.has_ssl_vision_msg())
     {
@@ -53,6 +55,22 @@ void SensorFusion::updateWorld(const SensorProto &sensor_msg)
     }
 
     updateWorld(sensor_msg.robot_status_msgs());
+
+    friendly_team.assignGoalie(friendly_goalie_id);
+    enemy_team.assignGoalie(enemy_goalie_id);
+
+    if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value())
+    {
+        RobotId friendly_goalie_id_override =
+            sensor_fusion_config->FriendlyGoalieId()->value();
+        friendly_team.assignGoalie(friendly_goalie_id_override);
+    }
+
+    if (sensor_fusion_config->OverrideGameControllerEnemyGoalieID()->value())
+    {
+        RobotId enemy_goalie_id_override = sensor_fusion_config->EnemyGoalieId()->value();
+        enemy_team.assignGoalie(enemy_goalie_id_override);
+    }
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
@@ -64,6 +82,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 
     if (packet.has_detection())
     {
+        checkForVisionReset(packet.detection().t_capture());
         updateWorld(packet.detection());
     }
 }
@@ -86,10 +105,14 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
     if (sensor_fusion_config->FriendlyColorYellow()->value())
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
+        friendly_goalie_id = packet.yellow().goalkeeper();
+        enemy_goalie_id    = packet.blue().goalkeeper();
     }
     else
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
+        friendly_goalie_id = packet.blue().goalkeeper();
+        enemy_goalie_id    = packet.yellow().goalkeeper();
     }
 
     if (game_state.isOurBallPlacement())
@@ -113,7 +136,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    // TODO (issue #1149): incorporate RobotStatus into world and update world
+    // TODO (#1819): Update robot capabilities based on robot status msgs
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
@@ -223,16 +246,12 @@ Team SensorFusion::createFriendlyTeam(const std::vector<RobotDetection> &robot_d
 {
     Team new_friendly_team =
         friendly_team_filter.getFilteredData(friendly_team, robot_detections);
-    RobotId friendly_goalie_id = sensor_fusion_config->FriendlyGoalieId()->value();
-    new_friendly_team.assignGoalie(friendly_goalie_id);
     return new_friendly_team;
 }
 
 Team SensorFusion::createEnemyTeam(const std::vector<RobotDetection> &robot_detections)
 {
     Team new_enemy_team = enemy_team_filter.getFilteredData(enemy_team, robot_detections);
-    RobotId enemy_goalie_id = sensor_fusion_config->EnemyGoalieId()->value();
-    new_enemy_team.assignGoalie(enemy_goalie_id);
     return new_enemy_team;
 }
 
@@ -261,4 +280,42 @@ bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
         }
     }
     return false;
+}
+
+void SensorFusion::checkForVisionReset(double t_capture)
+{
+    static unsigned int reset_time_vision_packets_detected = 0;
+    static double last_t_capture                           = 0;
+
+    if (t_capture < last_t_capture && t_capture < VISION_PACKET_RESET_TIME_THRESHOLD)
+    {
+        reset_time_vision_packets_detected++;
+    }
+    else
+    {
+        reset_time_vision_packets_detected = 0;
+        last_t_capture                     = t_capture;
+    }
+
+    if (reset_time_vision_packets_detected > VISION_PACKET_RESET_COUNT_THRESHOLD)
+    {
+        LOG(WARNING) << "Vision reset detected... Resetting SensorFusion!" << std::endl;
+        resetWorldComponents();
+        last_t_capture                     = 0;
+        reset_time_vision_packets_detected = 0;
+    }
+}
+
+void SensorFusion::resetWorldComponents()
+{
+    field                = std::nullopt;
+    ball                 = std::nullopt;
+    friendly_team        = Team();
+    enemy_team           = Team();
+    game_state           = GameState();
+    referee_stage        = std::nullopt;
+    ball_filter          = BallFilter();
+    friendly_team_filter = RobotTeamFilter();
+    enemy_team_filter    = RobotTeamFilter();
+    team_with_possession = TeamSide::ENEMY;
 }

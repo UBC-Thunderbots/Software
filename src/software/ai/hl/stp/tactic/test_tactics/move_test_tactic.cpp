@@ -9,13 +9,15 @@ MoveTestTactic::MoveTestTactic(bool loop_forever)
 {
 }
 
+void MoveTestTactic::updateWorldParams(const World &world) {}
+
 void MoveTestTactic::updateControlParams(Point destination_)
 {
     // Update the parameters stored by this Tactic
     this->destination = destination_;
 }
 
-double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world)
+double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // Prefer robots closer to the destination
     // We normalize with a constant factor so test results to not change based on any
@@ -29,10 +31,10 @@ void MoveTestTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     do
     {
         yield(std::make_shared<MoveAction>(false));
-    } while ((this->robot->position() - this->destination).length() > 0.01);
+    } while ((this->robot_->position() - this->destination).length() > 0.01);
 }
 
-void MoveTestTactic::accept(MutableTacticVisitor &visitor)
+void MoveTestTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

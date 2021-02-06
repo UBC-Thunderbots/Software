@@ -13,7 +13,7 @@ class PlayInfoWidget : public QTextEdit
     Q_OBJECT
 
    public:
-    PlayInfoWidget(QWidget* parent = 0);
+    PlayInfoWidget(QWidget* parent = nullptr);
 
     /**
      * Updates the PlayInfo being displayed by this widget

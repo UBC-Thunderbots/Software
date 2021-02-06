@@ -4,7 +4,9 @@
 
 PenaltySetupTactic::PenaltySetupTactic(bool loop_forever) : MoveTactic(loop_forever) {}
 
-void PenaltySetupTactic::accept(MutableTacticVisitor& visitor)
+void PenaltySetupTactic::updateWorldParams(const World& world) {}
+
+void PenaltySetupTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

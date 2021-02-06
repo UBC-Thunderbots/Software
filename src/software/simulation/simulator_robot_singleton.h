@@ -13,6 +13,7 @@ extern "C"
 #include "firmware/app/world/wheel.h"
 #include "firmware/shared/physics.h"
 #include "shared/proto/primitive.nanopb.h"
+#include "shared/proto/robot_log_msg.nanopb.h"
 #include "software/simulation/firmware_object_deleter.h"
 }
 
@@ -90,8 +91,18 @@ class SimulatorRobotSingleton
     static void runPrimitiveOnCurrentSimulatorRobot(
         std::shared_ptr<FirmwareWorld_t> firmware_world);
 
+    /**
+     * Handler for the firmware logger, runs on every TLOG_* event. Since we can have
+     * two robots with the same ID, we have a log handler for each robot color
+     *
+     * @param the nanopb RobotLog proto logged by a robot
+     */
+    static void handleBlueRobotLogProto(TbotsProto_RobotLog log);
+    static void handleYellowRobotLogProto(TbotsProto_RobotLog log);
+
    private:
-    /** * Returns the x-position of the robot, in global field coordinates, in meters
+    /**
+     * Returns the x-position of the robot, in global field coordinates, in meters
      *
      * @return the x-position of the robot, in global field coordinates, in meters
      */
@@ -264,6 +275,15 @@ class SimulatorRobotSingleton
      * is POS_X
      */
     static float invertValueToMatchFieldSide(float value);
+
+    /**
+     * Helper function for handling robot logs with given team color string
+     *
+     * @param log The nanopb RobotLog proto logged by a robot
+     * @param robot_colour The color of the robot logging
+     */
+    static void handleRobotLogProto(TbotsProto_RobotLog log,
+                                    const std::string& robot_colour);
 
     // The simulator robot being controlled by this class
     static std::shared_ptr<SimulatorRobot> simulator_robot;

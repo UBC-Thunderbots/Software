@@ -18,6 +18,8 @@ class MoveTestTactic : public Tactic
      */
     explicit MoveTestTactic(bool loop_forever = false);
 
+    void updateWorldParams(const World& world) override;
+
     /**
      * Updates the parameters for this MoveTestTactic.
      *
@@ -34,7 +36,7 @@ class MoveTestTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     /*
      * Throws std::invalid_argument always
@@ -43,7 +45,7 @@ class MoveTestTactic : public Tactic
      *
      * @throws std::invalid_argument always
      */
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

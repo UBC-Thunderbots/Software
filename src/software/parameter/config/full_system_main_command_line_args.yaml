@@ -15,14 +15,21 @@ FullSystemMainCommandLineArgs:
         default: False
         description: >-
             Run without the FullSystemGui
-    replay_output_dir:
+    proto_log_output_dir:
         type: "std::string"
         default: ""
         description: >-
-            The directory to output logged data to. Replays will not be logged if this
+            The directory to output logged Protobuf data to. Protobufs will not be logged if this
             argument is not used.
     replay_input_dir:
         type: "std::string"
         default: ""
         description: >-
-            The directory to replay logged data from, if the 'replay' backend is selected
+            The directory to replay logged data from, if the 'replay' backend is selected. This must
+            be the `SensorMsg` folder outputted by `proto_log_output_dir`.
+    logging_dir:
+        type: "std::string"
+        default: ""
+        description: >-
+            The directory to output logs to. Absolute paths are recommended as the working directory
+            is inside the bazel-out directory.

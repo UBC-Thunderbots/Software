@@ -66,8 +66,11 @@ const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
 const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 
-// Converts dribbler RPM to a smaller number firmware uses
-const double DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR = 1.0 / 300.0;
+// Indefinite dribbler mode sets a speed that can be maintained indefinitely
+const double INDEFINITE_DRIBBLER_SPEED = 1000.0;
+// Max force dribbler mode sets the speed that applies the maximum amount of force on the
+// ball
+const double MAX_FORCE_DRIBBLER_SPEED = 16000.0;
 
 const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
 
@@ -105,21 +108,29 @@ const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] 
 };
 
 // the port robots are listening to for vision and primitives
-const unsigned VISION_PORT    = 42069;
-const unsigned PRIMITIVE_PORT = 42070;
+const short unsigned int VISION_PORT    = 42069;
+const short unsigned int PRIMITIVE_PORT = 42070;
+
 // the port the AI receives msgs from the robot
-const unsigned ROBOT_STATUS_PORT = 42071;
+const short unsigned int ROBOT_STATUS_PORT = 42071;
+const short unsigned int ROBOT_LOGS_PORT   = 42072;
+
 // the port to listen to for what side of the field to defend
-const unsigned DEFENDING_SIDE_PORT = 42072;
+const unsigned DEFENDING_SIDE_PORT = 42073;
 
 // the timeout to recv a network packet
-const unsigned NETWORK_TIMEOUT_MS = 1000;
+const int NETWORK_TIMEOUT_MS = 1000;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
-const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+
+// The total number of possible robot ids between two teams
+const unsigned int MAX_ROBOT_IDS = 16;
 
 // We currently have 4s batteries on the robot that charge up to a little over
 // 16V, so we use 16 here to approximate a fully-charged battery
 // Makes the battery max voltage a constant now that we are simulating firmware
 const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
+
+const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;

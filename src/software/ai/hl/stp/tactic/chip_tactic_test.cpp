@@ -30,6 +30,9 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 
     Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
 
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), ball.position());
+
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Point(1, 1));
     auto action_ptr = tactic.getNextAction();
@@ -58,6 +61,9 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
     ChipTactic tactic = ChipTactic(world.ball(), true);
 
     Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), ball.position());
 
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Point(-1, 1));
@@ -88,6 +94,9 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 
     Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
 
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), ball.position());
+
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Point(-1, -1));
     auto action_ptr = tactic.getNextAction();
@@ -116,6 +125,9 @@ TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
     ChipTactic tactic = ChipTactic(world.ball(), true);
 
     Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), ball.position());
 
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Point(1, -1));
@@ -146,6 +158,9 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
 
     Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
 
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), ball.position());
+
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Point(1, 1));
     auto action_ptr = tactic.getNextAction();
@@ -174,6 +189,9 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
     ChipTactic tactic = ChipTactic(world.ball(), true);
 
     Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), ball.position());
 
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Point(-1, 1));
@@ -204,6 +222,9 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
 
     Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
 
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), ball.position());
+
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Point(-1, -1));
     auto action_ptr = tactic.getNextAction();
@@ -232,6 +253,9 @@ TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_negative_
     ChipTactic tactic = ChipTactic(world.ball(), true);
 
     Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
+
+    tactic.updateWorldParams(world);
+    EXPECT_EQ(tactic.getBall().position(), ball.position());
 
     tactic.updateRobot(robot);
     tactic.updateControlParams(Point(0, 0), Point(1, -1));

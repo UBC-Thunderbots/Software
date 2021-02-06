@@ -176,3 +176,69 @@ TEST_F(BallTest, estimate_future_state_friction)
     EXPECT_EQ(expected_future_ball_state,
               ball.estimateFutureState(Duration::fromSeconds(1.0)));
 }
+
+TEST(HasBallBeenKickedTest, ball_over_speed_threshold_and_no_direction_difference)
+{
+    Ball ball({0, 0}, {5, 5}, Timestamp::fromSeconds(0));
+
+    Vector expected_direction(4, 4);
+
+    EXPECT_TRUE(ball.hasBallBeenKicked(expected_direction.orientation()));
+}
+
+TEST(HasBallBeenKickedTest, ball_under_speed_threshold_and_no_direction_difference)
+{
+    Ball ball({5, 2}, {0, 0.2}, Timestamp::fromSeconds(0));
+
+    Angle expected_direction = Angle::fromDegrees(90);
+
+    EXPECT_FALSE(ball.hasBallBeenKicked(expected_direction));
+}
+
+TEST(HasBallBeenKickedTest,
+     ball_under_optional_speed_threshold_and_small_direction_difference)
+{
+    Ball ball({0, 0}, {3, 0}, Timestamp::fromSeconds(0));
+
+    Angle expected_direction = Angle::fromRadians(0);
+
+    EXPECT_FALSE(ball.hasBallBeenKicked(expected_direction, 5));
+}
+
+TEST(HasBallBeenKickedTest,
+     ball_over_speed_threshold_and_small_negative_direction_difference)
+{
+    Ball ball({0, 1}, {3, 0}, Timestamp::fromSeconds(0));
+
+    Angle expected_direction = Angle::fromDegrees(-15);
+
+    EXPECT_TRUE(ball.hasBallBeenKicked(expected_direction));
+}
+
+TEST(HasBallBeenKickedTest,
+     ball_over_speed_threshold_and_small_positive_direction_difference)
+{
+    Ball ball({0, 1}, {3, 0}, Timestamp::fromSeconds(0));
+
+    Angle expected_direction = Angle::fromDegrees(15);
+
+    EXPECT_TRUE(ball.hasBallBeenKicked(expected_direction));
+}
+
+TEST(HasBallBeenKickedTest, ball_over_speed_threshold_and_large_direction_difference)
+{
+    Ball ball({-5, 2}, {-3, 0}, Timestamp::fromSeconds(0));
+
+    Angle expected_direction = Angle::fromRadians(0);
+
+    EXPECT_FALSE(ball.hasBallBeenKicked(expected_direction));
+}
+
+TEST(HasBallBeenKickedTest, ball_under_speed_threshold_and_large_direction_difference)
+{
+    Ball ball({2, 2}, {0.2, 0.2}, Timestamp::fromSeconds(0));
+
+    Angle expected_direction = Angle::fromDegrees(90);
+
+    EXPECT_FALSE(ball.hasBallBeenKicked(expected_direction));
+}

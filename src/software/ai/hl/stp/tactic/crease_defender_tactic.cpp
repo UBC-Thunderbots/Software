@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/autochip_move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/point.h"
@@ -23,18 +23,17 @@ CreaseDefenderTactic::CreaseDefenderTactic(
 {
 }
 
-void CreaseDefenderTactic::updateWorldParams(const Ball &ball, const Field &field,
-                                             const Team &friendly_team,
-                                             const Team &enemy_team)
+void CreaseDefenderTactic::updateWorldParams(const World &world)
 {
-    // Update the world parameters stored by this Tactic
-    this->ball          = ball;
-    this->field         = field;
-    this->friendly_team = friendly_team;
-    this->enemy_team    = enemy_team;
+    this->ball          = world.ball();
+    this->field         = world.field();
+    this->friendly_team = world.friendlyTeam();
+    this->enemy_team    = world.enemyTeam();
 }
 
-double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World &world)
+
+double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
+                                                const World &world) const
 {
     // Prefer robots closer to the crease defender desired position
     // We normalize with the total field length so that robots that are within the field
@@ -50,7 +49,7 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World 
 }
 
 std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredState(
-    const Robot &robot)
+    const Robot &robot) const
 {
     if (friendly_team.goalie())
     {
@@ -160,28 +159,28 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
 
 void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>(false, 0, Angle());
-    auto stop_action = std::make_shared<StopAction>(false);
+    auto autochip_move_action = std::make_shared<AutochipMoveAction>(false, 0, Angle());
+    auto stop_action          = std::make_shared<StopAction>(false);
     do
     {
         std::optional<std::pair<Point, Angle>> desired_robot_state_opt =
-            calculateDesiredState(*this->robot);
+            calculateDesiredState(*this->robot_);
         if (desired_robot_state_opt)
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
-            move_action->updateControlParams(
-                *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
-                MoveType::NORMAL, AutochickType::AUTOCHIP, BallCollisionType::ALLOW);
-            yield(move_action);
+            autochip_move_action->updateControlParams(
+                *robot_, defender_position, defender_orientation, 0.0, DribblerMode::OFF,
+                YEET_CHIP_DISTANCE_METERS, BallCollisionType::ALLOW);
+            yield(autochip_move_action);
         }
         else
         {
             LOG(WARNING) << "Error updating robot state, stopping";
 
-            stop_action->updateControlParams(*robot, false);
+            stop_action->updateControlParams(*robot_, false);
             yield(stop_action);
         }
-    } while (!move_action->done());
+    } while (!autochip_move_action->done());
 }
 
 std::vector<Segment> CreaseDefenderTactic::getPathSegments(Field field)
@@ -226,7 +225,7 @@ std::optional<Point> CreaseDefenderTactic::getPointOnCreasePath(Field field, Rob
     return std::nullopt;
 }
 
-void CreaseDefenderTactic::accept(MutableTacticVisitor &visitor)
+void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }

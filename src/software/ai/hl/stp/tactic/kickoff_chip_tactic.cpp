@@ -9,7 +9,9 @@ KickoffChipTactic::KickoffChipTactic(const Ball& ball, bool loop_forever)
 {
 }
 
-void KickoffChipTactic::accept(MutableTacticVisitor& visitor)
+void KickoffChipTactic::updateWorldParams(const World& world) {}
+
+void KickoffChipTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }

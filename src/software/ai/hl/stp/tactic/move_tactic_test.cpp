@@ -29,24 +29,20 @@ TEST(MoveTacticTest, robot_far_from_destination)
 
 TEST(MoveTacticTest, robot_at_destination)
 {
+    World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
     MoveTactic tactic = MoveTactic(false);
-    tactic.updateRobot(robot);
+
+    EXPECT_FALSE(tactic.done());
     tactic.updateControlParams(Point(0, 0), Angle::zero(), 0.0);
+    // We call the Action twice. The first time the Tactic is starting up so it's not
+    // done. In all future calls, the action will be done
+    EXPECT_TRUE(tactic.get(robot, world));
+    EXPECT_FALSE(tactic.done());
+    EXPECT_TRUE(tactic.get(robot, world));
 
-    auto action_ptr = tactic.getNextAction();
-    ASSERT_NE(action_ptr, nullptr);
-
-    // We call the Action twice. The first time the Intent will always be returned to
-    // ensure the Robot is doing the right thing. In all future calls, the action will be
-    // done and so will return a null pointer
-    EXPECT_NE(nullptr, action_ptr->getNextIntent());
-    EXPECT_EQ(nullptr, action_ptr->getNextIntent());
-
-    action_ptr = tactic.getNextAction();
-    EXPECT_EQ(nullptr, tactic.getNextAction());
     EXPECT_TRUE(tactic.done());
 }
 
@@ -58,6 +54,7 @@ TEST(MoveTacticTest, test_calculate_robot_cost)
                         Timestamp::fromSeconds(0));
 
     MoveTactic tactic = MoveTactic(false);
+    tactic.updateWorldParams(world);
     tactic.updateControlParams(Point(3, -4), Angle::zero(), 0.0);
 
     EXPECT_EQ(5 / world.field().totalXLength(), tactic.calculateRobotCost(robot, world));

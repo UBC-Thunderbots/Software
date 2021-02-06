@@ -20,25 +20,18 @@ typedef struct InfineonTLE5009E1000AngleSensor InfineonTLE5009E1000AngleSensor_t
  *
  * @param x_max_value [in] The maximum value observed over a full period of the X output
  * waveform
- *
  * @param x_min_value [in] The minimum value observed over a full period of the X output
  * waveform
- *
  * @param y_max_value [in] The maximum value observed over a full period of the Y output
  * waveform
- *
  * @param y_min_value [in] The minimum value observed over a full period of the Y output
  * waveform
- *
  * @param x_magnitude_45_degrees [in] The X waveform magnitude at 45 degrees (as read by
  * the sensor)
- *
  * @param y_magnitude_45_degrees [in] The Y waveform magnitude at 45 degrees (as read by
  * the sensor)
- *
  * @param x_magnitude_135_degrees [in] The X waveform magnitude at 135 degrees (as read by
  * the sensor)
- *
  * @param y_magnitude_135_degrees [in] The Y waveform magnitude at 135 degrees (as read by
  * the sensor)
  *
@@ -60,9 +53,7 @@ void io_infineon_TLE5009_E1000_destroy(InfineonTLE5009E1000AngleSensor_t* sensor
  * Returns the calibration-corrected angle value from the input X and Y values
  *
  * @param sensor [in] The sensor abstraction
- *
  * @param x_value [in] The sampled value of the X sinusoid
- *
  * @param y_value [in] The sampled value of the Y sinusoid
  *
  * @return The calibration-corrected equivalent angle in radians

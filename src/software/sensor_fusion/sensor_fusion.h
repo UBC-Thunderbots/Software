@@ -31,11 +31,12 @@ class SensorFusion
     virtual ~SensorFusion() = default;
 
     /**
-     * Updates components of world based on a new data
+     * Processes a new SensorProto, which may update the latest representation of the
+     * World
      *
      * @param new data
      */
-    void updateWorld(const SensorProto &sensor_msg);
+    void processSensorProto(const SensorProto &sensor_msg);
 
     /**
      * Returns the most up-to-date world if enough data has been received
@@ -45,6 +46,13 @@ class SensorFusion
      * to create one.
      */
     std::optional<World> getWorld() const;
+
+    // Number of vision packets to indicate that the vision client most likely reset,
+    // determined experimentally with the simulator
+    static constexpr unsigned int VISION_PACKET_RESET_COUNT_THRESHOLD = 5;
+    // Vision packets before this threshold time indicate that the vision client has just
+    // started, determined experimentally with the simulator
+    static constexpr double VISION_PACKET_RESET_TIME_THRESHOLD = 0.5;
 
    private:
     /**
@@ -96,6 +104,18 @@ class SensorFusion
     BallDetection invert(BallDetection ball_detection) const;
 
     /**
+     * Checks for a vision reset and if there is one, then reset SensorFusion
+     *
+     * @param t_capture The t_capture of a new packet
+     */
+    void checkForVisionReset(double t_capture);
+
+    /**
+     * Resets the world components to initial state
+     */
+    void resetWorldComponents();
+
+    /**
      * Determines if the team has control over the given ball
      *
      * @param team The team to check
@@ -118,4 +138,7 @@ class SensorFusion
     RobotTeamFilter enemy_team_filter;
 
     TeamSide team_with_possession;
+
+    unsigned int friendly_goalie_id;
+    unsigned int enemy_goalie_id;
 };

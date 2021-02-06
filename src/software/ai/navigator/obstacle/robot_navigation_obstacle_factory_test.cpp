@@ -89,7 +89,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, create_rectangle_obstacle)
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacle);
         EXPECT_EQ(expected, polygon_obstacle.getGeom());
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created for a rectangle";
     }
@@ -108,7 +108,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, create_ball_obstacle)
         auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
         EXPECT_EQ(expected, circle_obstacle.getGeom());
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "GeomObstacle<Circle>Ptr was not created for a ball";
     }
@@ -127,7 +127,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, create_robot_obstacle)
         auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
         EXPECT_EQ(expected, circle_obstacle.getGeom());
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "GeomObstacle<Circle>Ptr was not created for a robot";
     }
@@ -149,7 +149,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, stationary_robot_obstacle)
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "GeomObstacle<Circle>Ptr was not created for a stationary robot";
     }
@@ -170,7 +170,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, slow_moving_robot_obstacle)
         auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacle);
         EXPECT_EQ(expected, circle_obstacle.getGeom());
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE()
             << "GeomObstacle<Circle>Ptr was not created for a slow moving robot";
@@ -194,7 +194,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, fast_moving_robot_obstacle)
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
     }
@@ -217,7 +217,7 @@ TEST_F(RobotNavigationObstacleFactoryTest, another_fast_moving_robot_obstacle)
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
     }
@@ -235,7 +235,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_robots_collisio
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Circle Obstacle was not created for stationary enemy robot";
     }
@@ -252,7 +252,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_robots_collisio
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
     }
@@ -270,7 +270,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, centre_circle)
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Circle Obstacle was not created";
     }
@@ -288,7 +288,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, half_metre_around_bal
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Circle Obstacle was not created";
     }
@@ -306,7 +306,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, inflated_enemy_defens
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created";
     }
@@ -325,7 +325,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_defense_area
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created";
     }
@@ -343,7 +343,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_defense_area)
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created";
     }
@@ -361,7 +361,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_half)
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created";
     }
@@ -380,7 +380,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "Polygon Obstacle was not created";
     }

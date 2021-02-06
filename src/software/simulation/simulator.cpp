@@ -9,9 +9,11 @@
 
 extern "C"
 {
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/world/firmware_ball.h"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/firmware_world.h"
+#include "shared/proto/robot_log_msg.nanopb.h"
 }
 
 Simulator::Simulator(const Field& field,
@@ -50,28 +52,47 @@ void Simulator::removeBall()
 void Simulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
     physics_world.addYellowRobots(robots);
-    updateSimulatorRobots(physics_world.getYellowPhysicsRobots(),
-                          yellow_simulator_robots);
+    updateSimulatorRobots(physics_world.getYellowPhysicsRobots(), yellow_simulator_robots,
+                          TeamColour::YELLOW);
 }
 
 void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
     physics_world.addBlueRobots(robots);
-    updateSimulatorRobots(physics_world.getBluePhysicsRobots(), blue_simulator_robots);
+    updateSimulatorRobots(physics_world.getBluePhysicsRobots(), blue_simulator_robots,
+                          TeamColour::BLUE);
 }
 
 void Simulator::updateSimulatorRobots(
     const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
     std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-        simulator_robots)
+        simulator_robots,
+    TeamColour team_colour)
 {
     for (const auto& physics_robot : physics_robots)
     {
         auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
-        auto firmware_robot  = SimulatorRobotSingleton::createFirmwareRobot();
-        auto firmware_ball   = SimulatorBallSingleton::createFirmwareBall();
+
+        // we initialize the logger with the appropriate logging function based
+        // on the team color and the robot id to propagate any logs when creating
+        // the firmware_robot and firmware_ball
+        if (team_colour == TeamColour::BLUE)
+        {
+            app_logger_init(simulator_robot->getRobotId(),
+                            &SimulatorRobotSingleton::handleBlueRobotLogProto);
+        }
+        else if (team_colour == TeamColour::YELLOW)
+        {
+            app_logger_init(simulator_robot->getRobotId(),
+                            &SimulatorRobotSingleton::handleYellowRobotLogProto);
+        }
+
+        auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
+        auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
+
         FirmwareWorld_t* firmware_world_raw =
-            app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
+            app_firmware_world_create(firmware_robot.release(), firmware_ball.release(),
+                                      &(Simulator::getCurrentFirmwareTimeSeconds));
         auto firmware_world =
             std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 
@@ -176,10 +197,16 @@ void Simulator::stepSimulation(const Duration& time_step)
     Duration remaining_time = time_step;
     while (remaining_time > Duration::fromSeconds(0))
     {
+        current_firmware_time = physics_world.getTimestamp();
+
         for (auto& iter : blue_simulator_robots)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
+
+            app_logger_init(simulator_robot->getRobotId(),
+                            &SimulatorRobotSingleton::handleBlueRobotLogProto);
+
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
                                                        blue_team_defending_side);
             SimulatorBallSingleton::setSimulatorBall(simulator_ball,
@@ -191,6 +218,10 @@ void Simulator::stepSimulation(const Duration& time_step)
         {
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
+
+            app_logger_init(simulator_robot->getRobotId(),
+                            &SimulatorRobotSingleton::handleYellowRobotLogProto);
+
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
                                                        yellow_team_defending_side);
             SimulatorBallSingleton::setSimulatorBall(simulator_ball,
@@ -255,7 +286,7 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> Simulator::getSSLWrapperPacket() co
         createGeometryData(physics_world.getField(), FIELD_LINE_THICKNESS_METRES);
     auto wrapper_packet =
         createSSLWrapperPacket(std::move(geometry_data), std::move(detection_frame));
-    return std::move(wrapper_packet);
+    return wrapper_packet;
 }
 
 Field Simulator::getField() const
@@ -295,3 +326,12 @@ void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
 {
     physics_world.removeRobot(robot);
 }
+
+float Simulator::getCurrentFirmwareTimeSeconds()
+{
+    return static_cast<float>(current_firmware_time.toSeconds());
+}
+
+// We must give this variable a value here, as non-const static variables must be
+// initialized out-of-line
+Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);

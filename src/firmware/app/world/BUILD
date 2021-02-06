@@ -77,6 +77,9 @@ cc_test(
     srcs = ["firmware_robot_test.cpp"],
     deps = [
         ":firmware_robot",
+        "//firmware/app/logger",
+        "//software/logger",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

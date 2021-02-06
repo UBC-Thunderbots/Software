@@ -25,13 +25,9 @@ class PasserTactic : public Tactic
     explicit PasserTactic(Pass pass, const Ball& ball, const Field& field,
                           bool loop_forever);
 
-    /**
-     * Updates the world parameters for this PasserTactic.
-     *
-     * @param updated_ball The ball we're passing
-     * @param updated_field The field being played on
-     */
-    void updateWorldParams(const Ball& updated_ball, const Field& updated_field);
+    PasserTactic() = delete;
+
+    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the control parameters for this PasserTactic.
@@ -49,9 +45,9 @@ class PasserTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double calculateRobotCost(const Robot& robot, const World& world) const override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
     Ball getBall() const;
 

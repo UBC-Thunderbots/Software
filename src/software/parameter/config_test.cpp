@@ -71,6 +71,10 @@ class TestAutogenParameterList : public YamlLoadFixture
                             [&](std::shared_ptr<const Parameter<double>> param) {
                                 assert_parameter<double>(param, current_config);
                             },
+                            [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
+                                // This will be tested as part of the new parameter system
+                                // (issue #1298)
+                            },
                             [&](std::shared_ptr<const Config> param) {
                                 for (auto& v : param->getParameterList())
                                 {
@@ -85,7 +89,7 @@ class TestAutogenParameterList : public YamlLoadFixture
      * and checks that the yaml was generated correctly into the expected
      * parameter.
      *
-     * Interally asserts and creates failures
+     * Internally asserts and creates failures
      */
     template <typename T>
     void assert_parameter(const std::shared_ptr<const Parameter<T>>& param,
@@ -146,6 +150,10 @@ class TestParameterMutation : public YamlLoadFixture
                             [&](std::shared_ptr<Parameter<double>> param) {
                                 param->setValue(param->value() - 2.0);
                             },
+                            [&](std::shared_ptr<NumericParameter<unsigned>> param) {
+                                // This will be tested as part of the new parameter system
+                                // (issue #1298)
+                            },
                             [&](std::shared_ptr<Config> param) {
                                 for (auto& v : param->getMutableParameterList())
                                 {
@@ -182,6 +190,10 @@ class TestParameterMutation : public YamlLoadFixture
                 [&](std::shared_ptr<const Parameter<double>> param) {
                     ASSERT_NEAR(current_config[param->name()]["default"].as<double>(),
                                 param->value() + 2.0, 1E-10);
+                },
+                [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
+                    // This will be tested as part of the new parameter system (issue
+                    // #1298)
                 },
                 [&](std::shared_ptr<const Config> param) {
                     for (auto& v : param->getParameterList())

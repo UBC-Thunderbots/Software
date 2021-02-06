@@ -19,13 +19,9 @@ class CherryPickTactic : public Tactic
      */
     explicit CherryPickTactic(const World& world, const Rectangle& target_region);
 
-    /**
-     * Updates the world parameters for this tactic
-     *
-     * @param world The current state of the world
-     */
+    CherryPickTactic() = delete;
 
-    void updateWorldParams(const World& world);
+    void updateWorldParams(const World& world) override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -36,9 +32,9 @@ class CherryPickTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double calculateRobotCost(const Robot& robot, const World& world) const override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
     /**
      *
      * @return

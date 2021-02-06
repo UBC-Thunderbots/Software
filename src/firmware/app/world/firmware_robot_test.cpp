@@ -1,9 +1,13 @@
 extern "C"
 {
 #include "firmware/app/world/firmware_robot.h"
+
+#include "firmware/app/logger/logger.h"
 }
 
 #include <gtest/gtest.h>
+
+#include "software/test_util/test_util.h"
 
 class FirmwareRobotTest : public testing::Test
 {
@@ -18,6 +22,8 @@ class FirmwareRobotTest : public testing::Test
         controller_state.last_applied_acceleration_x       = 2.33f;
         controller_state.last_applied_acceleration_y       = 1.22f;
         controller_state.last_applied_acceleration_angular = 3.22f;
+
+        app_logger_init(0, &TestUtil::handleTestRobotLog);
 
         firmware_robot = app_firmware_robot_create(
             charger, chicker, dribbler, &(this->returnEight), &(this->returnNine),
@@ -130,6 +136,12 @@ TEST_F(FirmwareRobotTest, getVelocityX)
 TEST_F(FirmwareRobotTest, getVelocityY)
 {
     EXPECT_EQ(12, app_firmware_robot_getVelocityY(firmware_robot));
+}
+
+TEST_F(FirmwareRobotTest, getSpeedLinear)
+{
+    EXPECT_FLOAT_EQ(16.278820596099706f,
+                    app_firmware_robot_getSpeedLinear(firmware_robot));
 }
 
 TEST_F(FirmwareRobotTest, getVelocityAngular)

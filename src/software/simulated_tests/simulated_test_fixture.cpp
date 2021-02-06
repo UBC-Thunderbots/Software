@@ -1,34 +1,31 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
-#include "software/gui/drawing/navigator.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
-#include "software/time/duration.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
     : simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField())),
       sensor_fusion(DynamicParameters->getSensorFusionConfig()),
-      ai(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig()),
       run_simulation_in_realtime(false)
 {
 }
 
 void SimulatedTestFixture::SetUp()
 {
-    LoggerSingleton::initializeLogger();
+    LoggerSingleton::initializeLogger(
+        DynamicParameters->getStandaloneSimulatorMainCommandLineArgs()
+            ->logging_dir()
+            ->value());
 
-    // TODO: Ideally we should reset all DynamicParameters for each test. However
-    // because DynamicParameters are still partially global, this can't be done
-    // until https://github.com/UBC-Thunderbots/Software/issues/1483 is complete
-
-    // Re-create all objects for each test so we start from a clean setup
-    // every time. Because the simulator is created initially in the
-    // constructor's initialization list, and before every test in this SetUp function, we
-    // can guarantee the pointer will never be null / empty
-    simulator = std::make_unique<Simulator>(Field::createSSLDivisionBField());
-    ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
+    // init() resets all DynamicParameters for each test. Since DynamicParameters are
+    // still partially global, we need to reinitialize simulator, sensor_fusion, and ai,
+    // so that they can grab the new dynamic parameter pointers. Note that this is a bit
+    // of hack because we're changing a global variable, but it can't be easily fixed
+    // through dependency injection until
+    // https://github.com/UBC-Thunderbots/Software/issues/1299
+    MutableDynamicParameters->init();
+    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
+    sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
 
     MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
 
@@ -46,11 +43,12 @@ void SimulatedTestFixture::SetUp()
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideGameControllerFriendlyTeamColor()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->mutableFriendlyColorYellow()
         ->setValue(true);
+    if (SimulatedTestFixture::enable_visualizer)
+    {
+        enableVisualizer();
+    }
 }
 
 void SimulatedTestFixture::setBallState(const BallState &ball)
@@ -71,30 +69,6 @@ void SimulatedTestFixture::addEnemyRobots(const std::vector<RobotStateWithId> &r
 Field SimulatedTestFixture::field() const
 {
     return simulator->getField();
-}
-
-void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
-{
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableFriendlyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
-}
-
-void SimulatedTestFixture::setEnemyGoalie(RobotId goalie_id)
-{
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableEnemyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
-}
-
-void SimulatedTestFixture::setAIPlay(const std::string &ai_play)
-{
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideAIPlay()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentAIPlay()
-        ->setValue(ai_play);
 }
 
 void SimulatedTestFixture::setRefereeCommand(
@@ -142,7 +116,7 @@ void SimulatedTestFixture::updateSensorFusion()
     auto sensor_msg                        = SensorProto();
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
 
-    sensor_fusion.updateWorld(sensor_msg);
+    sensor_fusion.processSensorProto(sensor_msg);
 }
 
 void SimulatedTestFixture::sleep(
@@ -198,6 +172,10 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {
+        if (!DynamicParameters->getAIControlConfig()->RunAI()->value())
+        {
+            continue;
+        }
         auto wall_start_time = std::chrono::steady_clock::now();
         for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
         {
@@ -216,9 +194,7 @@ void SimulatedTestFixture::runTest(
                 break;
             }
 
-            auto primitive_set_msg = ai.getPrimitives(*world);
-            simulator->setYellowRobotPrimitiveSet(
-                createNanoPbPrimitiveSet(*primitive_set_msg));
+            updatePrimitives(*world_opt, simulator);
 
             if (run_simulation_in_realtime)
             {
@@ -228,8 +204,11 @@ void SimulatedTestFixture::runTest(
             if (full_system_gui)
             {
                 full_system_gui->onValueReceived(*world);
-                full_system_gui->onValueReceived(ai.getPlayInfo());
-                full_system_gui->onValueReceived(drawNavigator(ai.getNavigator()));
+                if (auto play_info = getPlayInfo())
+                {
+                    full_system_gui->onValueReceived(*play_info);
+                }
+                full_system_gui->onValueReceived(getDrawFunctions());
             }
         }
         else

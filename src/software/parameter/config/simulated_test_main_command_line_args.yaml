@@ -1,0 +1,12 @@
+SimulatedTestMainCommandLineArgs:
+    enable_visualizer:
+        type: "bool"
+        default: false
+        description: >-
+            Displays simulated test on visualizer
+    logging_dir:
+        type: "std::string"
+        default: ""
+        description: >-
+            The directory to output logs to. Absolute paths are recommended as the working directory
+            is inside the bazel-out directory.

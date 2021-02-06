@@ -30,15 +30,10 @@ class ReceiverTactic : public Tactic
                             const Team& enemy_team, const Pass pass, const Ball& ball,
                             bool loop_forever);
 
-    /**
-     * Updates the world parameters for this ReceiverTactic.
-     *
-     * @param updated_friendly_team The current state of the friendly team
-     * @param updated_enemy_team The current state of the enemy team
-     * @param updated_ball The ball being passed
-     */
-    void updateWorldParams(const Team& updated_friendly_team,
-                           const Team& updated_enemy_team, const Ball& updated_ball);
+    ReceiverTactic() = delete;
+
+    void updateWorldParams(const World& world) override;
+
 
     /**
      * Updates the control parameters for this ReceiverTactic.
@@ -56,7 +51,7 @@ class ReceiverTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     /**
      * Calculate the angle the robot should be at in order to perform the given shot
@@ -83,7 +78,7 @@ class ReceiverTactic : public Tactic
     static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
                                                      const Point& best_shot_target);
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
     Ball getBall() const;
     Field getField() const;

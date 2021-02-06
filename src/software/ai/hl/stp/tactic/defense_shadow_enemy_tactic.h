@@ -2,6 +2,7 @@
 
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * The ShadowEnemyTactic will shadow and mark the robot specified in the given
@@ -21,22 +22,18 @@ class DefenseShadowEnemyTactic : public Tactic
      * @param ignore_goalie Whether or not to ignore the friendly goalie when determining
      * the best position to shadow in order to block shots
      * @param shadow_distance How far away to shadow the enemy from
-     * @param loop_forever Whether or not this tactic should loop forever
+     * @param defense_shadow_enemy_tactic_config The config to fetch parameters from
      */
-    explicit DefenseShadowEnemyTactic(const Field &field, const Team &friendly_team,
-                                      const Team &enemy_team, const Ball &ball,
-                                      bool ignore_goalie, double shadow_distance);
+    explicit DefenseShadowEnemyTactic(
+        const Field &field, const Team &friendly_team, const Team &enemy_team,
+        const Ball &ball, bool ignore_goalie, double shadow_distance,
+        std::shared_ptr<const DefenseShadowEnemyTacticConfig>
+            defense_shadow_enemy_tactic_config =
+                DynamicParameters->getAIConfig()->getDefenseShadowEnemyTacticConfig());
 
-    /**
-     * Updates the world parameters for this Tactic.
-     *
-     * @param field The current state of the field
-     * @param friendly_team The current state of the friendly team
-     * @param enemy_team The current state of the enemy team
-     * @param ball The current state of the ball
-     */
-    void updateWorldParams(const Field &field, const Team &friendly_team,
-                           const Team &enemy_team, const Ball &ball);
+    DefenseShadowEnemyTactic() = delete;
+
+    void updateWorldParams(const World &world) override;
 
     /**
      * Updates the control parameters for this Tactic
@@ -45,15 +42,18 @@ class DefenseShadowEnemyTactic : public Tactic
      */
     void updateControlParams(const EnemyThreat &enemy_threat);
 
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
-    void accept(MutableTacticVisitor &visitor) override;
+    void accept(TacticVisitor &visitor) const override;
 
     Ball getBall() const;
     Field getField() const;
     Team getFriendlyTeam() const;
     Team getEnemyTeam() const;
 
+    // Distance to chip the ball when trying to yeet it
+    // TODO (#1878): Replace this with a more intelligent chip distance system
+    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
@@ -73,4 +73,6 @@ class DefenseShadowEnemyTactic : public Tactic
     bool ignore_goalie;
     // How far from the enemy the robot will position itself to shadow
     double shadow_distance;
+    std::shared_ptr<const DefenseShadowEnemyTacticConfig>
+        defense_shadow_enemy_tactic_config;
 };

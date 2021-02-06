@@ -18,12 +18,9 @@ class ChipTactic : public Tactic
      */
     explicit ChipTactic(const Ball& ball, bool loop_forever);
 
-    /**
-     * Updates the world parameters for this ChipTactic.
-     *
-     * @param ball The ball being kicked
-     */
-    void updateWorldParams(const Ball& ball);
+    ChipTactic() = delete;
+
+    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the control parameters for this ChipTactic.
@@ -42,9 +39,9 @@ class ChipTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double calculateRobotCost(const Robot& robot, const World& world) const override;
 
-    void accept(MutableTacticVisitor& visitor) override;
+    void accept(TacticVisitor& visitor) const override;
 
     Ball getBall() const;
 

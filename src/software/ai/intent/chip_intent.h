@@ -15,10 +15,9 @@ class ChipIntent : public DirectPrimitiveIntent
      * @param chip_direction The orientation the Robot will chip at
      * @param chip_distance_meters The distance between the starting location
      * of the chip and the location of the first bounce
-     * @param priority The priority of this Intent. A larger number indicates a higher
-     * priority
      */
     explicit ChipIntent(unsigned int robot_id, const Point& chip_origin,
-                        const Angle& chip_direction, double chip_distance_meters,
-                        unsigned int priority);
+                        const Angle& chip_direction, double chip_distance_meters);
+
+    ChipIntent() = delete;
 };

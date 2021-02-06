@@ -1,7 +1,9 @@
 #include "software/backend/wifi_backend.h"
 
 #include "shared/constants.h"
+#include "shared/proto/robot_log_msg.pb.h"
 #include "software/constants.h"
+#include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/message_translation/defending_side.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
@@ -15,15 +17,14 @@ WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config,
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->getSSLCommunicationConfig())
 {
-    std::string network_interface =
-        DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
-    int channel = DynamicParameters->getNetworkConfig()->Channel()->value();
+    std::string network_interface = this->network_config->NetworkInterface()->value();
+    int channel                   = this->network_config->Channel()->value();
 
     MutableDynamicParameters->getMutableNetworkConfig()
         ->mutableChannel()
         ->registerCallbackFunction([this](int new_channel) {
             std::string new_network_interface =
-                DynamicParameters->getNetworkConfig()->NetworkInterface()->value();
+                this->network_config->NetworkInterface()->value();
             joinMulticastChannel(new_channel, new_network_interface);
         });
 
@@ -52,6 +53,14 @@ void WifiBackend::onValueReceived(World world)
     vision_output->sendProto(*createVision(world));
 }
 
+void WifiBackend::receiveRobotLogs(TbotsProto::RobotLog log)
+{
+    LOG(INFO) << "[ROBOT " << log.robot_id() << " " << LogLevel_Name(log.log_level())
+              << "]"
+              << "[" << log.file_name() << ":" << log.line_number()
+              << "]: " << log.log_msg() << std::endl;
+}
+
 void WifiBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ThreadedProtoMulticastSender<TbotsProto::Vision>(
@@ -60,9 +69,13 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
     primitive_output.reset(new ThreadedProtoMulticastSender<TbotsProto::PrimitiveSet>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, PRIMITIVE_PORT));
 
-    robot_msg_input.reset(new ThreadedProtoMulticastListener<TbotsProto::RobotStatus>(
+    robot_status_input.reset(new ThreadedProtoMulticastListener<TbotsProto::RobotStatus>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
         boost::bind(&Backend::receiveRobotStatus, this, _1)));
+
+    robot_log_input.reset(new ThreadedProtoMulticastListener<TbotsProto::RobotLog>(
+        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_LOGS_PORT,
+        boost::bind(&WifiBackend::receiveRobotLogs, this, _1)));
 
     defending_side_output.reset(new ThreadedProtoMulticastSender<DefendingSideProto>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, DEFENDING_SIDE_PORT));
