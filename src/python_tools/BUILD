@@ -36,6 +36,7 @@ py_binary(
         requirement("numpy"),
         requirement("matplotlib"),
         requirement("bokeh"),
+        requirement("ipywidgets"),
         ":proto_log",
         ":sensor_proto_log",
         "//python_tools/plotting:plot_ssl_wrapper",
