@@ -423,8 +423,7 @@ TEST_F(SensorFusionTest,
     ASSERT_TRUE(is_dribble_disabled);
 }
 
-TEST_F(SensorFusionTest,
-       test_making_all_robot_capabilities_unavailable_from_error_code)
+TEST_F(SensorFusionTest, test_making_all_robot_capabilities_unavailable_from_error_code)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
@@ -444,7 +443,7 @@ TEST_F(SensorFusionTest,
         robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
         robot_unavailable_capabilities.end();
     ASSERT_TRUE(is_dribble_disabled);
-    
+
     bool is_kick_disabled = robot_unavailable_capabilities.find(RobotCapability::Kick) !=
                             robot_unavailable_capabilities.end();
     ASSERT_TRUE(is_kick_disabled);
