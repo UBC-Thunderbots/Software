@@ -17,17 +17,14 @@ void robotSlowsDown(RobotId robot_id, std::shared_ptr<World> world_ptr,
         double speed        = robot.velocity().length();
         const double MAX_SPEED = 1.5;
         if (speed > MAX_SPEED) {
-            LOG(WARNING) << "Robot" + std::to_string(robot_id) + "'s speed: " + std::to_string(speed);
+            LOG(WARNING) << "Robot " + std::to_string(robot_id) + "'s speed: " + std::to_string(speed);
         }
 
         return (speed <= MAX_SPEED);
     };
 
-    if (robot_slowed_down(world_ptr))
+    if (!robot_slowed_down(world_ptr))
     {
-        LOG(WARNING) << "Robot " + std::to_string(robot_id) + " slowed down!";
-    }
-    else {
         throw std::runtime_error("Robot " + std::to_string(robot_id) + " did not slow down!");
     }
 }

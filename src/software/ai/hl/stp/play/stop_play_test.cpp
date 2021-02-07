@@ -16,7 +16,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
 
 TEST_F(StopPlayTest, test_stop_play)
 {
-    setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
+    setBallState(BallState(Point(-2, 0.5), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(4.6, -3.1)}));
@@ -38,10 +38,10 @@ TEST_F(StopPlayTest, test_stop_play)
             // https://github.com/UBC-Thunderbots/Software/issues/1396
 
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                /*while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(5))
                 {
                     yield();
-                }*/
+                }
                 robotSlowsDown(0, world_ptr, yield);
                 robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
@@ -62,7 +62,7 @@ TEST_F(StopPlayTest, test_stop_play)
             Duration::fromSeconds(10));
 }
 
-TEST_F(StopPlayTest, test_stop_play_enemy_half_near_ball)
+/*TEST_F(StopPlayTest, test_stop_play_enemy_half_near_ball)
 {
     setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
@@ -79,8 +79,6 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_near_ball)
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-            // This will keep the test running for 9.5 seconds to give everything enough
-            // time to settle into position and be observed with the Visualizer
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
                 robotSlowsDown(1, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
@@ -89,9 +87,9 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_near_ball)
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}
+}*/
 
-TEST_F(StopPlayTest, test_stop_play_friendly_half_far_from_ball)
+/*TEST_F(StopPlayTest, test_stop_play_friendly_half_far_from_ball)
 {
     setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
@@ -108,8 +106,6 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_far_from_ball)
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-            // This will keep the test running for 9.5 seconds to give everything enough
-            // time to settle into position and be observed with the Visualizer
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
                 robotSlowsDown(1, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
@@ -118,13 +114,16 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_far_from_ball)
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}
+}*/
 
-TEST_F(StopPlayTest, test_stop_play_at_ball)
+/*TEST_F(StopPlayTest, test_stop_play_too_close_to_ball)
 {
     setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
+    Point too_close_to_ball = Point(0, 0.8);
+    Point far_from_the_ball = Point(4.6, -3.1);
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-            {Point(-3, 2.5), Point(0, 0.8)}));
+            {Point(-3, 2.5), too_close_to_ball, Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
+             far_from_the_ball}));
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
@@ -137,19 +136,27 @@ TEST_F(StopPlayTest, test_stop_play_at_ball)
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-            // This will keep the test running for 9.5 seconds to give everything enough
-            // time to settle into position and be observed with the Visualizer
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+                {
+                    yield();
+                }
+                robotSlowsDown(0, world_ptr, yield);
                 robotSlowsDown(1, world_ptr, yield);
+                robotSlowsDown(2, world_ptr, yield);
+                robotSlowsDown(3, world_ptr, yield);
+                robotSlowsDown(4, world_ptr, yield);
+                robotSlowsDown(5, world_ptr, yield);
+
+                robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
+                robotAvoidsBall(2, world_ptr, yield);
+                robotAvoidsBall(3, world_ptr, yield);
+                robotAvoidsBall(4, world_ptr, yield);
+                robotAvoidsBall(5, world_ptr, yield);
             }
     };
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}
-
-TEST_F(StopPlayTest, test_stop_play_robots_too_fast)
-{
-
-}
+}*/
