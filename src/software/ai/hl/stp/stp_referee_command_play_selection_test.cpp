@@ -26,7 +26,7 @@ class STPRefereeCommandPlaySelectionTestWithPositions
    public:
     STPRefereeCommandPlaySelectionTestWithPositions()
         : stp([]() { return std::make_unique<HaltPlay>(); },
-              std::make_shared<const AIControlConfig>(), 0)
+              std::make_shared<const AiControlConfig>(), 0)
     {
     }
 
@@ -184,7 +184,7 @@ class STPRefereeCommandPlaySelectionTest
 {
    public:
     STPRefereeCommandPlaySelectionTest()
-        : stp([]() { return nullptr; }, std::make_shared<const AIControlConfig>(), 0)
+        : stp([]() { return nullptr; }, std::make_shared<const AiControlConfig>(), 0)
     {
     }
 

@@ -91,6 +91,7 @@ cc_library(
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom/algorithms",
         "//software/logger",
+        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -146,6 +147,7 @@ cc_library(
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
+        "//software/parameter:dynamic_parameters",
     ],
 )
 

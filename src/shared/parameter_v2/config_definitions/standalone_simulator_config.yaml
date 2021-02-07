@@ -1,33 +1,32 @@
-StandaloneSimulatorConfig:
-  YellowTeamChannel:
+- int:
+    name: yellow_team_channel
     min: 0
-    max: 16
-    type: "int"
-    default: 0
+    max: 15
+    value: 0
     description: >-
       The multicast channel to use to communicate with the yellow robots
       in the simulator
-  BlueTeamChannel:
+- int:
+    name: blue_team_channel
     min: 0
-    max: 16
-    type: "int"
-    default: 1
+    max: 15
+    value: 1
     description: >-
       The multicast channel to use to communicate with the blue robots
       in the simulator
-  NetworkInterface:
-    default: "wlp3s0"
-    type: "std::string"
+- string:
+    name: network_interface
+    value: "wlp3s0"
     description: >-
       The network interface to use for multicast network communication.
       Can be found using the `ifconfig` command.
-  VisionIPv4Address:
-    default: "224.5.23.2"
-    type: "std::string"
+- string:
+    name: vision_ipv4_address
+    value: "224.5.23.2"
     description: The IPv4 address to send vision data to
-  VisionPort:
+- int:
+    name: vision_port
     min: 1
     max: 65535
-    default: 10020
-    type: "int"
+    value: 10020
     description: The port to send vision data to

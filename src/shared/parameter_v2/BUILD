@@ -1,6 +1,6 @@
 load(":parameter.bzl", "c_dynamic_parameters", "cpp_dynamic_parameters")
 
-package(default_visibility = ["//visibility:private"])
+package(default_visibility = ["//visibility:public"])
 
 cpp_dynamic_parameters(
     name = "cpp_params",
@@ -27,8 +27,7 @@ cc_library(
         ":cpp_params",
     ],
     deps = [
-        "//software/ai/hl/stp/play:example_play",
-        "//software/ai/hl/stp/play:halt_play",
+        "//software/ai/hl/stp/play",
         "//software/parameter",
         "//software/parameter:config",
         "//software/util/design_patterns:generic_factory",
@@ -43,7 +42,7 @@ cc_test(
     ],
     data = [
         "c_parameters.h",
-        "//shared/parameter_v2/config_definitions:test_configs",
+        "//shared/parameter_v2/config_definitions:parameter_configs",
     ],
     deps = [
         "//shared/parameter_v2:c_configs",
@@ -60,7 +59,7 @@ cc_test(
         "cpp_config_test.cpp",
     ],
     data = [
-        "//shared/parameter_v2/config_definitions:test_configs",
+        "//shared/parameter_v2/config_definitions:parameter_configs",
     ],
     deps = [
         "//shared/parameter_v2:cpp_configs",
