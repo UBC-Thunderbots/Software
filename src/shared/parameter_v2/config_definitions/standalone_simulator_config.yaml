@@ -1,7 +1,7 @@
 - int:
     name: yellow_team_channel
     min: 0
-    max: 16
+    max: 15
     value: 0
     description: >-
       The multicast channel to use to communicate with the yellow robots
@@ -9,7 +9,7 @@
 - int:
     name: blue_team_channel
     min: 0
-    max: 16
+    max: 15
     value: 1
     description: >-
       The multicast channel to use to communicate with the blue robots
