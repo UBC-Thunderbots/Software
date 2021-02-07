@@ -141,24 +141,22 @@ void SensorFusion::updateWorld(
         int robot_id = robot_status_msg.robot_id();
         std::set<RobotCapability> unavailableCapabilities;
 
-        for (int i = 0; i < robot_status_msg.error_code_size(); i++)
+        for (const auto& error_code_msg : robot_status_msg.error_code())
         {
-            const TbotsProto::ErrorCode msg = robot_status_msg.error_code(i);
-
-            if (msg == TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT ||
-                msg == TbotsProto::ErrorCode::WHEEL_1_MOTOR_HOT ||
-                msg == TbotsProto::ErrorCode::WHEEL_2_MOTOR_HOT ||
-                msg == TbotsProto::ErrorCode::WHEEL_3_MOTOR_HOT)
+            if (error_code_msg == TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT ||
+                error_code_msg == TbotsProto::ErrorCode::WHEEL_1_MOTOR_HOT ||
+                error_code_msg == TbotsProto::ErrorCode::WHEEL_2_MOTOR_HOT ||
+                error_code_msg == TbotsProto::ErrorCode::WHEEL_3_MOTOR_HOT)
             {
                 unavailableCapabilities.insert(RobotCapability::Move);
             }
-            else if (msg == TbotsProto::ErrorCode::LOW_CAP ||
-                     msg == TbotsProto::ErrorCode::CHARGE_TIMEOUT)
+            else if (error_code_msg == TbotsProto::ErrorCode::LOW_CAP ||
+                     error_code_msg == TbotsProto::ErrorCode::CHARGE_TIMEOUT)
             {
                 unavailableCapabilities.insert(RobotCapability::Kick);
                 unavailableCapabilities.insert(RobotCapability::Chip);
             }
-            else if (msg == TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT)
+            else if (error_code_msg == TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT)
             {
                 unavailableCapabilities.insert(RobotCapability::Dribble);
             }
