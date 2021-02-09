@@ -53,11 +53,11 @@ cc_test(
     srcs = ["stp_tactic_assignment_test.cpp"],
     deps = [
         ":stp",
-        "//software/parameter:dynamic_parameters",
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/tactic/test_tactics:goalie_test_tactic",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
         "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
+        "//software/parameter:dynamic_parameters",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

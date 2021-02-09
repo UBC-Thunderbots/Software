@@ -14,7 +14,8 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
-ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const PlayConfig> config) : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4)) 
+ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const PlayConfig> config)
+    : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4))
 {
     play_config = config;
 }

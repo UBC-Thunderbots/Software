@@ -8,7 +8,7 @@
 class PenaltyKickPlay : public Play
 {
    public:
-    PenaltyKickPlay(std::shared_ptr<const PlayConfig> config) ;
+    PenaltyKickPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 

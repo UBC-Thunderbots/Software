@@ -31,7 +31,7 @@ class ExamplePlay : public Play
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
-    
+
    private:
-     std::shared_ptr<const PlayConfig> play_config;
+    std::shared_ptr<const PlayConfig> play_config;
 };

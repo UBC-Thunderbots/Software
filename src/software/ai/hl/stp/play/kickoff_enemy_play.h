@@ -11,7 +11,7 @@
 class KickoffEnemyPlay : public Play
 {
    public:
-    KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config) ;
+    KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 

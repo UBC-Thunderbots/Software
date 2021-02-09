@@ -10,7 +10,7 @@
 class DefensePlay : public Play
 {
    public:
-    DefensePlay(std::shared_ptr<const PlayConfig> config) ;
+    DefensePlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 

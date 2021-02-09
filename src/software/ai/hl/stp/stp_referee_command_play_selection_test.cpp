@@ -4,9 +4,9 @@
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
+#include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
-#include "software/parameter/dynamic_parameters.h"
 
 
 struct PlaySelectionTestParams
@@ -26,7 +26,10 @@ class STPRefereeCommandPlaySelectionTestWithPositions
 {
    public:
     STPRefereeCommandPlaySelectionTestWithPositions()
-        : stp([]() { return std::make_unique<HaltPlay>(DynamicParameters->getPlayConfig()); },
+        : stp(
+              []() {
+                  return std::make_unique<HaltPlay>(DynamicParameters->getPlayConfig());
+              },
               std::make_shared<const AiControlConfig>(), 0)
     {
     }

@@ -180,8 +180,8 @@ bool STP::overrideAIPlayIfApplicable()
         {
             try
             {
-                current_play =
-                    GenericFactory<std::string, Play, PlayConfig>::create(override_play_name, DynamicParameters->getPlayConfig());
+                current_play = GenericFactory<std::string, Play, PlayConfig>::create(
+                    override_play_name, DynamicParameters->getPlayConfig());
             }
             catch (std::invalid_argument&)
             {

@@ -3,10 +3,7 @@
 #include "software/ai/hl/stp/tactic/test_tactics/move_test_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-MoveTestPlay::MoveTestPlay(std::shared_ptr<const PlayConfig> config)
-{
-
-}
+MoveTestPlay::MoveTestPlay(std::shared_ptr<const PlayConfig> config) {}
 
 bool MoveTestPlay::isApplicable(const World &world) const
 {

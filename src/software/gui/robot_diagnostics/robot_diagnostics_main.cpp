@@ -33,7 +33,8 @@ int main(int argc, char **argv)
         }
 
         std::shared_ptr<Backend> backend =
-            GenericFactory<std::string, Backend, BackendConfig>::create(args->getBackend()->value(), DynamicParameters->getBackendConfig());
+            GenericFactory<std::string, Backend, BackendConfig>::create(
+                args->getBackend()->value(), DynamicParameters->getBackendConfig());
 
         std::shared_ptr<ThreadedRobotDiagnosticsGUI> threaded_robot_diagnostics_gui;
         threaded_robot_diagnostics_gui =

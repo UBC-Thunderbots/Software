@@ -9,7 +9,7 @@
 class KickoffFriendlyPlay : public Play
 {
    public:
-    KickoffFriendlyPlay(std::shared_ptr<const PlayConfig> config) ;
+    KickoffFriendlyPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 

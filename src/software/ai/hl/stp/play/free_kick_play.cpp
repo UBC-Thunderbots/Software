@@ -12,7 +12,8 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
 
-FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config) : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
+    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
     play_config = config;
 }

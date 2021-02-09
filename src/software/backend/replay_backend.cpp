@@ -5,7 +5,8 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 ReplayBackend::ReplayBackend(std::shared_ptr<const BackendConfig> config)
-    : replay_reader(config->getFullSystemMainCommandLineArgs()->getReplayInputDir()->value()),
+    : replay_reader(
+          config->getFullSystemMainCommandLineArgs()->getReplayInputDir()->value()),
       pull_from_replay_thread(
           boost::bind(&ReplayBackend::continuouslyPullFromReplayFiles, this))
 {

@@ -260,8 +260,8 @@ cc_library(
     srcs = ["play.cpp"],
     hdrs = ["play.h"],
     deps = [
-        "//software/parameter:dynamic_parameters",
         "//software/ai/hl/stp/tactic",
+        "//software/parameter:dynamic_parameters",
         "@boost//:coroutine2",
     ],
 )

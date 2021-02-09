@@ -11,7 +11,8 @@
 // A quality of life typedef to make things shorter and more readable
 template <class IndexType, class TypeToCreate, class ConfigType>
 using GenericRegistry =
-    std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>;
+    std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>(
+                                      std::shared_ptr<const ConfigType>)>>;
 /**
  * The GenericFactory is an Abstract class that provides an interface for Generic type
  * Factories to follow. This makes it easy to maintain a list of factories and get the
@@ -31,8 +32,8 @@ class GenericFactory
      *
      * @return a unique pointer to a newly constructed type of the given type/name
      */
-    static std::unique_ptr<TypeToCreate> create(
-            const std::string& generic_name, std::shared_ptr<const ConfigType> config);
+    static std::unique_ptr<TypeToCreate> create(const std::string& generic_name,
+                                                std::shared_ptr<const ConfigType> config);
 
     /**
      * Returns a const reference to the generic type registry. The registry is a map of
@@ -55,7 +56,8 @@ class GenericFactory
      *
      * @return a list of creator functions that are registered in this factory
      */
-    static std::vector<std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>
+    static std::vector<
+        std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>
     getRegisteredConstructors();
 
    protected:
@@ -68,7 +70,8 @@ class GenericFactory
      */
     static void registerCreator(
         std::string generic_name,
-        std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)> generic_creator);
+        std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>
+            generic_creator);
 
    private:
     /**
@@ -115,11 +118,10 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate, ConfigTyp
     TGenericFactory()
     {
         // TODO (Issue #1142): Change to use a function instead of a static variable
-        auto generic_creator = [](std::shared_ptr<const ConfigType> config) -> std::unique_ptr<TypeToCreate> {
-            return std::make_unique<T>(config);
-        };
-        GenericFactory<IndexType, TypeToCreate, ConfigType>::registerCreator(TYPENAME(T),
-                                                                 generic_creator);
+        auto generic_creator = [](std::shared_ptr<const ConfigType> config)
+            -> std::unique_ptr<TypeToCreate> { return std::make_unique<T>(config); };
+        GenericFactory<IndexType, TypeToCreate, ConfigType>::registerCreator(
+            TYPENAME(T), generic_creator);
     }
 };
 #include "software/util/design_patterns/generic_factory.tpp"

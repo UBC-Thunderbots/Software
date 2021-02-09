@@ -10,7 +10,7 @@
 class StopPlay : public Play
 {
    public:
-    StopPlay(std::shared_ptr<const PlayConfig> config) ;
+    StopPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
