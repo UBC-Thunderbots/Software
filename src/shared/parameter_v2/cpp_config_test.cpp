@@ -57,7 +57,7 @@ std::string toCamelCase(const std::string& snake_case_input)
  */
 bool isValidParamType(const std::string& str)
 {
-    const static std::set<std::string> types = {"bool",   "int",  "uint",   "float",
+    const static std::set<std::string> types = {"bool",   "int",  "uint",   "double",
                                                 "string", "enum", "factory"};
     return types.find(str) != types.end();
 }
@@ -155,7 +155,7 @@ class YamlLoadFixture : public ::testing::Test
     void SetUp() override
     {
         // this is loaded from bazel data
-        boost::filesystem::path path("./shared/parameter_v2/config_definitions/test");
+        boost::filesystem::path path("./shared/parameter_v2/config_definitions/");
 
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {
@@ -179,14 +179,14 @@ class YamlLoadFixture : public ::testing::Test
                     // document) or both includes and parameters (2 documents).  See a
                     // yaml config for an example
                     //
-                    // We try to load the first document as a parameter definitions, and
-                    // if the conversion doesn't match, we load it as an include list.
-                    current_config_yaml = config[0];
+                    // We try to load the first document as a include list, and
+                    // if the conversion doesn't match, we load it as parameters.
+                    config_name_to_includes_map[config_name] =
+                        config[0]["include"].as<std::vector<std::string>>();
                 }
                 catch (const YAML::BadConversion& e)
                 {
-                    config_name_to_includes_map[config_name] =
-                        config[0]["include"].as<std::vector<std::string>>();
+                    current_config_yaml = config[0];
                 }
             }
             else if (config.size() == 2)
@@ -199,7 +199,7 @@ class YamlLoadFixture : public ::testing::Test
                 current_config_yaml = config[1];
             }
 
-            config_yaml["ThunderbotsConfigNew"][config_name] = current_config_yaml;
+            config_yaml["ThunderbotsConfig"][config_name] = current_config_yaml;
         }
 
         for (auto const& p : config_name_to_includes_map)
@@ -209,8 +209,8 @@ class YamlLoadFixture : public ::testing::Test
                 boost::filesystem::path included_config_path(included_config);
                 std::string included_config_name =
                     toCamelCase(included_config_path.stem().string());
-                config_yaml["ThunderbotsConfigNew"][p.first][included_config_name] =
-                    config_yaml["ThunderbotsConfigNew"][included_config_name];
+                config_yaml["ThunderbotsConfig"][p.first][included_config_name] =
+                    config_yaml["ThunderbotsConfig"][included_config_name];
             }
         }
     }
@@ -282,12 +282,12 @@ class TestAutogenParameterList : public YamlLoadFixture
 TEST_F(TestAutogenParameterList, DynamicParametersTest)
 {
     // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
-    const std::shared_ptr<ThunderbotsConfigNew> MutableDynamicParameters =
-        std::make_shared<ThunderbotsConfigNew>();
+    const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
+        std::make_shared<ThunderbotsConfig>();
 
     // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
-    const std::shared_ptr<const ThunderbotsConfigNew> DynamicParameters =
-        std::const_pointer_cast<const ThunderbotsConfigNew>(MutableDynamicParameters);
+    const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
+        std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
 
     visit_parameters(DynamicParameters, config_yaml);
 }
@@ -299,9 +299,8 @@ class TestParameterMutation : public YamlLoadFixture
      * Visits each parameter and mutates on the following policy
      *
      * std::string gets "test" appended at the end
-     * int gets incremented by 2
-     * double gets decremented by 2
-     * unsigned gets decremented by 1
+     * int gets set to max
+     * double gets set to max
      * bool gets flipped
      *
      * Some parameters such as example_enum_param has a specific value set
@@ -310,8 +309,8 @@ class TestParameterMutation : public YamlLoadFixture
     {
         static std::set<MutableParameterVariant> visited;
         visited.insert(paramvar);
-        std::visit(overload{[&](std::shared_ptr<Parameter<int>> param) {
-                                param->setValue(param->value() + 2);
+        std::visit(overload{[&](std::shared_ptr<NumericParameter<int>> param) {
+                                param->setValue(param->getMax());
                             },
                             [&](std::shared_ptr<Parameter<bool>> param) {
                                 param->setValue(!param->value());
@@ -319,11 +318,11 @@ class TestParameterMutation : public YamlLoadFixture
                             [&](std::shared_ptr<Parameter<std::string>> param) {
                                 param->setValue(param->value() + "test");
                             },
-                            [&](std::shared_ptr<Parameter<double>> param) {
-                                param->setValue(param->value() - 2.0);
+                            [&](std::shared_ptr<NumericParameter<double>> param) {
+                                param->setValue(param->getMax());
                             },
                             [&](std::shared_ptr<NumericParameter<unsigned>> param) {
-                                param->setValue(param->value() - 1);
+                                param->setValue(param->getMax());
                             },
                             [&](std::shared_ptr<EnumeratedParameter<std::string>> param) {
                                 if (param->name() == "example_factory_param")
@@ -355,12 +354,12 @@ class TestParameterMutation : public YamlLoadFixture
     void assert_mutation(ParameterVariant paramvar, const YAML::Node& current_config)
     {
         std::visit(
-            overload{[&](std::shared_ptr<const Parameter<int>> param) {
+            overload{[&](std::shared_ptr<const NumericParameter<int>> param) {
                          const YAML::Node param_node =
                              findParamNode(current_config, param->name());
                          if (!(isParamConstant(param_node)))
                          {
-                             ASSERT_EQ(getParamField<int>(param_node, "value") + 2,
+                             ASSERT_EQ(getParamField<int>(param_node, "max"),
                                        param->value());
                          }
                          else
@@ -398,12 +397,12 @@ class TestParameterMutation : public YamlLoadFixture
                                        param->value());
                          }
                      },
-                     [&](std::shared_ptr<const Parameter<double>> param) {
+                     [&](std::shared_ptr<const NumericParameter<double>> param) {
                          const YAML::Node param_node =
                              findParamNode(current_config, param->name());
                          if (!(isParamConstant(param_node)))
                          {
-                             ASSERT_NEAR(getParamField<double>(param_node, "value") - 2.0,
+                             ASSERT_NEAR(getParamField<double>(param_node, "max"),
                                          param->value(), 1E-10);
                          }
                          else
@@ -417,7 +416,7 @@ class TestParameterMutation : public YamlLoadFixture
                              findParamNode(current_config, param->name());
                          if (!(isParamConstant(param_node)))
                          {
-                             ASSERT_EQ(getParamField<unsigned>(param_node, "value") - 1,
+                             ASSERT_EQ(getParamField<unsigned>(param_node, "max"),
                                        param->value());
                          }
                          else
@@ -461,12 +460,12 @@ class TestParameterMutation : public YamlLoadFixture
 TEST_F(TestParameterMutation, DynamicParametersTest)
 {
     // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
-    const std::shared_ptr<ThunderbotsConfigNew> MutableDynamicParameters =
-        std::make_shared<ThunderbotsConfigNew>();
+    const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
+        std::make_shared<ThunderbotsConfig>();
 
     // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
-    const std::shared_ptr<const ThunderbotsConfigNew> DynamicParameters =
-        std::const_pointer_cast<const ThunderbotsConfigNew>(MutableDynamicParameters);
+    const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
+        std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
 
     mutate_all_parameters(MutableDynamicParameters);
     assert_mutation(DynamicParameters, config_yaml);

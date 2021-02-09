@@ -14,7 +14,7 @@ void SimulatedTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(
         DynamicParameters->getStandaloneSimulatorMainCommandLineArgs()
-            ->logging_dir()
+            ->getLoggingDir()
             ->value());
 
     // init() resets all DynamicParameters for each test. Since DynamicParameters are
@@ -27,15 +27,16 @@ void SimulatedTestFixture::SetUp()
     simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
 
-    MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
+    MutableDynamicParameters->getMutableAiControlConfig()->getMutableRunAi()->setValue(
+        true);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideGameControllerDefendingSide()
+        ->getMutableOverrideGameControllerDefendingSide()
         ->setValue(true);
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableDefendingPositiveSide()
+        ->getMutableDefendingPositiveSide()
         ->setValue(false);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
@@ -43,7 +44,7 @@ void SimulatedTestFixture::SetUp()
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableFriendlyColorYellow()
+        ->getMutableFriendlyColorYellow()
         ->setValue(true);
     if (SimulatedTestFixture::enable_visualizer)
     {
@@ -75,14 +76,14 @@ void SimulatedTestFixture::setRefereeCommand(
     const RefereeCommand &current_referee_command,
     const RefereeCommand &previous_referee_command)
 {
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideRefereeCommand()
+    MutableDynamicParameters->getMutableAiControlConfig()
+        ->getMutableOverrideRefereeCommand()
         ->setValue(true);
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentRefereeCommand()
+    MutableDynamicParameters->getMutableAiControlConfig()
+        ->getMutableCurrentRefereeCommand()
         ->setValue(toString(current_referee_command));
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutablePreviousRefereeCommand()
+    MutableDynamicParameters->getMutableAiControlConfig()
+        ->getMutablePreviousRefereeCommand()
         ->setValue(toString(previous_referee_command));
 }
 
@@ -172,7 +173,7 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time)
     {
-        if (!DynamicParameters->getAIControlConfig()->RunAI()->value())
+        if (!DynamicParameters->getAiControlConfig()->getRunAi()->value())
         {
             continue;
         }

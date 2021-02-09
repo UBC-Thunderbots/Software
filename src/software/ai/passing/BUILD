@@ -9,6 +9,7 @@ cc_library(
         "//software/ai/evaluation:pass",
         "//software/logger",
         "//software/math:math_functions",
+        "//software/parameter:dynamic_parameters",
         "//software/util/make_enum",
         "//software/world",
     ],

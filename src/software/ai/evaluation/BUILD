@@ -136,6 +136,7 @@ cc_library(
     deps = [
         ":shot",
         "//software/geom/algorithms",
+        "//software/parameter:dynamic_parameters",
         "//software/world",
     ],
 )

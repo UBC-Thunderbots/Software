@@ -20,7 +20,7 @@
 #include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-         std::shared_ptr<const AIControlConfig> control_config, long random_seed)
+         std::shared_ptr<const AiControlConfig> control_config, long random_seed)
     : default_play_constructor(default_play_constructor),
       current_play(nullptr),
       readable_robot_tactic_assignment(),
@@ -43,12 +43,12 @@ void STP::updateSTPState(const World& world)
 void STP::updateGameState(const World& world)
 {
     current_game_state = world.gameState();
-    if (control_config->OverrideRefereeCommand()->value())
+    if (control_config->getOverrideRefereeCommand()->value())
     {
         std::string previous_state_string =
-            control_config->PreviousRefereeCommand()->value();
+            control_config->getPreviousRefereeCommand()->value();
         std::string current_state_string =
-            control_config->CurrentRefereeCommand()->value();
+            control_config->getCurrentRefereeCommand()->value();
         try
         {
             RefereeCommand previous_state =
@@ -163,11 +163,11 @@ PlayInfo STP::getPlayInfo()
 bool STP::overrideAIPlayIfApplicable()
 {
     previous_override_play           = override_play;
-    override_play                    = control_config->OverrideAIPlay()->value();
+    override_play                    = control_config->getOverrideAiPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
-    override_play_name          = control_config->CurrentAIPlay()->value();
+    override_play_name          = control_config->getCurrentAiPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
