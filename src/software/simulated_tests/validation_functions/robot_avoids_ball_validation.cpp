@@ -17,7 +17,7 @@ void robotAvoidsBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
         double distance_from_ball           = (robot.position() - world_ptr->ball().position()).length();
         const double MIN_DISTANCE_FROM_BALL = ROBOT_MAX_RADIUS_METERS + 0.5;
         if (distance_from_ball < MIN_DISTANCE_FROM_BALL) {
-            LOG(WARNING) << "Robot " + std::to_string(robot_id) + "is " + std::to_string(distance_from_ball) + "m away from the ball!";
+            LOG(WARNING) << "Robot " + std::to_string(robot_id) + " is " + std::to_string(distance_from_ball) + "m away from the ball!";
         }
 
         return (distance_from_ball >= MIN_DISTANCE_FROM_BALL);
