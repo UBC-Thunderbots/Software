@@ -15,8 +15,7 @@
 #include "software/world/game_state.h"
 #include "software/world/team.h"
 
-DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config)
-      : play_config(config)
+DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : play_config(config)
 {
 }
 

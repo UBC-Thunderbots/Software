@@ -3,8 +3,7 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-ExamplePlay::ExamplePlay(std::shared_ptr<const PlayConfig> config)
-    : play_config(config)
+ExamplePlay::ExamplePlay(std::shared_ptr<const PlayConfig> config) : play_config(config)
 {
 }
 

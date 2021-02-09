@@ -79,7 +79,8 @@ void STP::updateAIPlay(const World& world)
             }
             catch (const std::runtime_error& e)
             {
-                auto default_play = default_play_constructor(DynamicParameters->getPlayConfig());
+                auto default_play =
+                    default_play_constructor(DynamicParameters->getPlayConfig());
                 LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
                              << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "
