@@ -29,7 +29,6 @@ class FreeKickPlay : public Play
     // The minimum pass score we will attempt
     static constexpr double MIN_ACCEPTABLE_PASS_SCORE = 0.05;
 
-    // The play_config
     std::shared_ptr<const PlayConfig> play_config;
 
     /**

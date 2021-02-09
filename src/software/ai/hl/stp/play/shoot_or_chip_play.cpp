@@ -15,9 +15,9 @@
 #include "software/world/game_state.h"
 
 ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const PlayConfig> config)
-    : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4))
+    : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4)),
+    play_config(config)
 {
-    play_config = config;
 }
 
 bool ShootOrChipPlay::isApplicable(const World &world) const

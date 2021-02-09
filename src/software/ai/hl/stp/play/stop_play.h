@@ -18,6 +18,6 @@ class StopPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
-    // The play_config
+   private:
     std::shared_ptr<const PlayConfig> play_config;
 };

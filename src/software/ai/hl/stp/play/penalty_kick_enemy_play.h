@@ -17,6 +17,5 @@ class PenaltyKickEnemyPlay : public Play
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
    private:
-    // The play_config
     std::shared_ptr<const PlayConfig> play_config;
 };

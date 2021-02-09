@@ -10,8 +10,8 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)
+    : play_config(config)
 {
-    play_config = config;
 }
 
 bool KickoffEnemyPlay::isApplicable(const World &world) const

@@ -6,8 +6,8 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 StopPlay::StopPlay(std::shared_ptr<const PlayConfig> config)
+    : play_config (config)
 {
-    play_config = config;
 }
 
 bool StopPlay::isApplicable(const World &world) const

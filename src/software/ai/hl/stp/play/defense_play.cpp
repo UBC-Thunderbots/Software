@@ -16,8 +16,8 @@
 #include "software/world/team.h"
 
 DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config)
+      : play_config(config)
 {
-    play_config = config;
 }
 
 bool DefensePlay::isApplicable(const World &world) const

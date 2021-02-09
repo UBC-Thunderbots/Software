@@ -20,7 +20,7 @@
 # Config files can include other configs. This is how the parameter hierarchy is built
 # up, and allows us to share parameters between configs. For example, this makes it
 # easy to define some passing parameters in one location, and share those parameters
-# with the subset of Play(std::shared_ptr<const PlayConfig>)s that need them.
+# with the subset of Plays that need them.
 #
 # All included config files need to be listed under a single `include` section.
 # Because all config filenames must be unique, just the filename needs to be
@@ -104,12 +104,12 @@ include:
 - factory:
     name: example_factory_param
     index_type: std::string
-    type_to_create: Play(std::shared_ptr<const PlayConfig>)
-    value: "HaltPlay(std::shared_ptr<const PlayConfig>)"
+    type_to_create: Play
+    value: "HaltPlay"
     description: >-
       Accepts all registered IndexType values for the GenericFactory<index_type, type_to_create>.
 
-      For example, if there was a GenericFactory<std::string, Play(std::shared_ptr<const PlayConfig>)> with 3 entries registered
+      For example, if there was a GenericFactory<std::string, Play> with 3 entries registered
       as ("Stop", "Defense", "Offense"), then this parameter would only accept
       "Stop", "Defense", and "Offense" as valid values.
 

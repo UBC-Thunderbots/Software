@@ -7,8 +7,8 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const PlayConfig> config)
+    : play_config(config)
 {
-    play_config = config;
 }
 
 bool PenaltyKickPlay::isApplicable(const World &world) const

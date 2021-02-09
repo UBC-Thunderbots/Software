@@ -21,6 +21,5 @@ class ShootOrChipPlay : public Play
     // The minimum open net angle we will try to shoot at
     const Angle MIN_OPEN_ANGLE_FOR_SHOT;
 
-    // The play_config
     std::shared_ptr<const PlayConfig> play_config;
 };

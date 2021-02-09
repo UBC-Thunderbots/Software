@@ -16,9 +16,9 @@ CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
           Duration::fromSeconds(DynamicParameters->getAiConfig()
                                     ->getCornerKickPlayConfig()
                                     ->getMaxTimeCommitToPassSeconds()
-                                    ->value()))
+                                    ->value())),
+      play_config(config)
 {
-    play_config = config;
 }
 
 bool CornerKickPlay::isApplicable(const World &world) const

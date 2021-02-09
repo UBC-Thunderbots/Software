@@ -25,6 +25,7 @@ class CornerKickPlay : public Play
    private:
     // The maximum time that we will wait before committing to a pass
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
+
     std::shared_ptr<const PlayConfig> play_config;
 
     /**

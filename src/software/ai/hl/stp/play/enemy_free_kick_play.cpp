@@ -12,8 +12,8 @@
 #include "software/world/game_state.h"
 
 EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config)
+    : play_config(config)
 {
-    play_config = config;
 }
 
 bool EnemyFreekickPlay::isApplicable(const World &world) const

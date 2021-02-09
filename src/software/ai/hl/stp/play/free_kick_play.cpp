@@ -13,9 +13,9 @@
 #include "software/world/ball.h"
 
 FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)),
+    play_config(config)
 {
-    play_config = config;
 }
 
 bool FreeKickPlay::isApplicable(const World &world) const
