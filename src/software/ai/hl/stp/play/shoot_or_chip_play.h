@@ -9,7 +9,7 @@
 class ShootOrChipPlay : public Play
 {
    public:
-    ShootOrChipPlay();
+    ShootOrChipPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
@@ -20,4 +20,7 @@ class ShootOrChipPlay : public Play
    private:
     // The minimum open net angle we will try to shoot at
     const Angle MIN_OPEN_ANGLE_FOR_SHOT;
+
+    // The play_config
+    std::shared_ptr<const PlayConfig> play_config;
 };

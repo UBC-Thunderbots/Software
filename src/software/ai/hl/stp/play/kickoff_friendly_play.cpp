@@ -6,6 +6,11 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<const PlayConfig> config)
+{
+    play_config = config;
+}
+
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
     return ((world.gameState().isReadyState() || world.gameState().isSetupState()) &&
@@ -140,4 +145,4 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffFriendlyPlay> factory;
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay, PlayConfig> factory;

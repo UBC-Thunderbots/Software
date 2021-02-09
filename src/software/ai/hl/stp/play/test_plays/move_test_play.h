@@ -17,7 +17,7 @@
 class MoveTestPlay : public Play
 {
    public:
-    MoveTestPlay() = default;
+    MoveTestPlay() ;
 
     bool isApplicable(const World &world) const override;
 

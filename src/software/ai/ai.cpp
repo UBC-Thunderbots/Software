@@ -19,7 +19,7 @@ AI::AI(std::shared_ptr<const AiConfig> ai_config,
           ai_config->getNavigatorConfig())),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
-          []() { return std::make_unique<HaltPlay>(); }, control_config,
+          []() { return std::make_unique<HaltPlay>(DynamicParameters->getPlayConfig()); }, control_config,
           std::chrono::system_clock::now().time_since_epoch().count()))
 {
 }

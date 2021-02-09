@@ -5,6 +5,11 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+StopPlay::StopPlay(std::shared_ptr<const PlayConfig> config)
+{
+    play_config = config;
+}
+
 bool StopPlay::isApplicable(const World &world) const
 {
     return world.gameState().isStopped();
@@ -128,4 +133,4 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, StopPlay> factory;
+static TGenericFactory<std::string, Play, StopPlay, PlayConfig> factory;

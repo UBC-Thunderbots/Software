@@ -8,11 +8,14 @@
 class EnemyFreekickPlay : public Play
 {
    public:
-    EnemyFreekickPlay() = default;
+    EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+
+    private:
+     std::shared_ptr<const PlayConfig> play_config;
 };

@@ -10,11 +10,14 @@
 class StopPlay : public Play
 {
    public:
-    StopPlay() = default;
+    StopPlay(std::shared_ptr<const PlayConfig> config) ;
 
     bool isApplicable(const World &world) const override;
 
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+
+    // The play_config
+    std::shared_ptr<const PlayConfig> play_config;
 };

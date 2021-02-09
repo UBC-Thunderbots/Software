@@ -16,7 +16,7 @@
 class HaltTestPlay : public Play
 {
    public:
-    HaltTestPlay() = default;
+    HaltTestPlay() ;
 
     bool isApplicable(const World &world) const override;
 

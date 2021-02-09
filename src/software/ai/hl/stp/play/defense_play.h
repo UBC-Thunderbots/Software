@@ -10,7 +10,7 @@
 class DefensePlay : public Play
 {
    public:
-    DefensePlay() = default;
+    DefensePlay(std::shared_ptr<const PlayConfig> config) ;
 
     bool isApplicable(const World &world) const override;
 
@@ -31,4 +31,6 @@ class DefensePlay : public Play
      */
     std::vector<std::shared_ptr<MoveTactic>> moveRobotsToSwarmEnemyWithBall(
         std::vector<std::shared_ptr<MoveTactic>> move_tactics, const World &world);
+
+    std::shared_ptr<const PlayConfig> play_config;
 };

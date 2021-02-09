@@ -11,13 +11,14 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
 
-CornerKickPlay::CornerKickPlay()
+CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
     : MAX_TIME_TO_COMMIT_TO_PASS(
           Duration::fromSeconds(DynamicParameters->getAiConfig()
                                     ->getCornerKickPlayConfig()
                                     ->getMaxTimeCommitToPassSeconds()
                                     ->value()))
 {
+    play_config = config;
 }
 
 bool CornerKickPlay::isApplicable(const World &world) const
@@ -234,4 +235,4 @@ void CornerKickPlay::updatePassGenerator(PassGenerator &pass_generator,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, CornerKickPlay> factory;
+static TGenericFactory<std::string, Play, CornerKickPlay, PlayConfig> factory;

@@ -8,7 +8,7 @@
 class ExamplePlay : public Play
 {
    public:
-    ExamplePlay() = default;
+    explicit ExamplePlay(std::shared_ptr<const PlayConfig> config);
 
     /**
      * This function returns whether the play is applicable
@@ -31,4 +31,7 @@ class ExamplePlay : public Play
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    
+   private:
+     std::shared_ptr<const PlayConfig> play_config;
 };

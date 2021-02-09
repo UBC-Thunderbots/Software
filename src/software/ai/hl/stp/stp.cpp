@@ -111,9 +111,9 @@ std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
 {
     std::vector<std::unique_ptr<Play>> applicable_plays;
     for (const auto& play_constructor :
-         GenericFactory<std::string, Play>::getRegisteredConstructors())
+         GenericFactory<std::string, Play, PlayConfig>::getRegisteredConstructors())
     {
-        auto play = play_constructor();
+        auto play = play_constructor(DynamicParameters->getPlayConfig());
         if (play->isApplicable(world))
         {
             applicable_plays.emplace_back(std::move(play));
@@ -181,7 +181,7 @@ bool STP::overrideAIPlayIfApplicable()
             try
             {
                 current_play =
-                    GenericFactory<std::string, Play>::create(override_play_name);
+                    GenericFactory<std::string, Play, PlayConfig>::create(override_play_name, DynamicParameters->getPlayConfig());
             }
             catch (std::invalid_argument&)
             {

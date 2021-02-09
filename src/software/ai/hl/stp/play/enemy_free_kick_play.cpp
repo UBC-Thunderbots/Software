@@ -11,6 +11,11 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
+EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config)
+{
+    play_config = config;
+}
+
 bool EnemyFreekickPlay::isApplicable(const World &world) const
 {
     return world.gameState().isTheirFreeKick();
@@ -132,4 +137,4 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreekickPlay> factory;
+static TGenericFactory<std::string, Play, EnemyFreekickPlay, PlayConfig> factory;

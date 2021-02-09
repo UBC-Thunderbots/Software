@@ -6,6 +6,11 @@
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const PlayConfig> config)
+{
+    play_config = config;
+}
+
 bool PenaltyKickPlay::isApplicable(const World &world) const
 {
     return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
@@ -86,4 +91,4 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickPlay> factory;
+static TGenericFactory<std::string, Play, PenaltyKickPlay, PlayConfig> factory;

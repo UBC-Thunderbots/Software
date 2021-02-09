@@ -8,8 +8,7 @@
 class RadioBackend : public Backend
 {
    public:
-    RadioBackend(std::shared_ptr<const SslCommunicationConfig> ssl_communication_config =
-                     DynamicParameters->getNetworkConfig()->getSslCommunicationConfig());
+    RadioBackend(std::shared_ptr<const BackendConfig> config);
 
    private:
     static const int DEFAULT_RADIO_CONFIG = 0;

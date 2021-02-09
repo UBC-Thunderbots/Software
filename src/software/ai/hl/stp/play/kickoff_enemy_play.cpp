@@ -9,6 +9,11 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)
+{
+    play_config = config;
+}
+
 bool KickoffEnemyPlay::isApplicable(const World &world) const
 {
     return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
@@ -148,4 +153,4 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffEnemyPlay> factory;
+static TGenericFactory<std::string, Play, KickoffEnemyPlay, PlayConfig> factory;

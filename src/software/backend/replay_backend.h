@@ -11,10 +11,7 @@
 class ReplayBackend : public Backend
 {
    public:
-    explicit ReplayBackend(const std::string& replay_input_dir =
-                               DynamicParameters->getFullSystemMainCommandLineArgs()
-                                   ->getReplayInputDir()
-                                   ->value());
+    explicit ReplayBackend(std::shared_ptr<const BackendConfig> config);
 
    private:
     void onValueReceived(TbotsProto::PrimitiveSet primitives) override;

@@ -5,9 +5,8 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-RadioBackend::RadioBackend(
-    std::shared_ptr<const SslCommunicationConfig> ssl_communication_config)
-    : ssl_communication_config(ssl_communication_config),
+RadioBackend::RadioBackend(std::shared_ptr<const BackendConfig> config)
+    : ssl_communication_config(config->getRadioBackendConfig()->getSslCommunicationConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        ssl_communication_config),

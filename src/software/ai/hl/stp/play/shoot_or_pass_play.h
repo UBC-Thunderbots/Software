@@ -14,7 +14,7 @@
 class ShootOrPassPlay : public Play
 {
    public:
-    ShootOrPassPlay();
+    ShootOrPassPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
@@ -29,6 +29,9 @@ class ShootOrPassPlay : public Play
 
     // The speed each patrolling robot should be moving through its control point
     static constexpr double SPEED_AT_PATROL_POINTS = 0.0;
+
+    // The play_config
+    std::shared_ptr<const PlayConfig> play_config;
 
     /**
      * Updates the pass generator

@@ -12,7 +12,10 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
 
-FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
+FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config) : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+{
+    play_config = config;
+}
 
 bool FreeKickPlay::isApplicable(const World &world) const
 {
@@ -257,4 +260,4 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay, PlayConfig> factory;

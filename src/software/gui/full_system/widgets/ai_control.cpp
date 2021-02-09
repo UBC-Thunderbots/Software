@@ -162,7 +162,7 @@ void setupPlayOverrideComboBox(
     std::shared_ptr<Parameter<bool>> play_override_parameter,
     std::shared_ptr<Parameter<std::string>> current_play_parameter)
 {
-    auto play_names = GenericFactory<std::string, Play>::getRegisteredNames();
+    auto play_names = GenericFactory<std::string, Play, PlayConfig>::getRegisteredNames();
 
     // Sort the entries in alphabetical order from a-z
     std::sort(play_names.begin(), play_names.end());

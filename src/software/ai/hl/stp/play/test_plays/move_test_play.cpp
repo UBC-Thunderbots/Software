@@ -32,4 +32,4 @@ void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, MoveTestPlay> factory;
+static TGenericFactory<std::string, Play, MoveTestPlay, PlayConfig> factory;

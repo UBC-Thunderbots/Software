@@ -9,10 +9,9 @@
 #include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-WifiBackend::WifiBackend(std::shared_ptr<const NetworkConfig> network_config,
-                         std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
-    : network_config(network_config),
-      sensor_fusion_config(sensor_fusion_config),
+WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
+    : network_config(config->getWifiBackendConfig()->getNetworkConfig()),
+      sensor_fusion_config(config->getWifiBackendConfig()->getSensorFusionConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->getSslCommunicationConfig())

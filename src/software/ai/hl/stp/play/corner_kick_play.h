@@ -10,7 +10,7 @@
 class CornerKickPlay : public Play
 {
    public:
-    CornerKickPlay();
+    CornerKickPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
@@ -25,6 +25,7 @@ class CornerKickPlay : public Play
    private:
     // The maximum time that we will wait before committing to a pass
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
+    std::shared_ptr<const PlayConfig> play_config;
 
     /**
      * Update the tactic that aligns the robot to the ball in preparation to pass

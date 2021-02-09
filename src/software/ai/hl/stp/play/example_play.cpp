@@ -3,6 +3,11 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+ExamplePlay::ExamplePlay(std::shared_ptr<const PlayConfig> config)
+{
+    play_config = config;
+}
+
 bool ExamplePlay::isApplicable(const World &world) const
 {
     // This play is never applicable so it will never be chosen during gameplay
@@ -61,4 +66,4 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ExamplePlay> factory;
+static TGenericFactory<std::string, Play, ExamplePlay, PlayConfig> factory;

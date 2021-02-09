@@ -13,7 +13,10 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-ShootOrPassPlay::ShootOrPassPlay() {}
+ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
+{
+    play_config = config;
+}
 
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
@@ -202,4 +205,4 @@ void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator,
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrPassPlay> factory;
+static TGenericFactory<std::string, Play, ShootOrPassPlay, PlayConfig> factory;

@@ -13,10 +13,7 @@
 class WifiBackend : public Backend
 {
    public:
-    WifiBackend(std::shared_ptr<const NetworkConfig> network_config =
-                    DynamicParameters->getNetworkConfig(),
-                std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
-                    DynamicParameters->getSensorFusionConfig());
+    WifiBackend(std::shared_ptr<const BackendConfig> config);
 
 
    private:

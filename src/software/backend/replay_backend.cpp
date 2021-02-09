@@ -4,8 +4,8 @@
 
 #include "software/util/design_patterns/generic_factory.h"
 
-ReplayBackend::ReplayBackend(const std::string& replay_input_dir)
-    : replay_reader(replay_input_dir),
+ReplayBackend::ReplayBackend(std::shared_ptr<const BackendConfig> config)
+    : replay_reader(config->getFullSystemMainCommandLineArgs()->getReplayInputDir()->value()),
       pull_from_replay_thread(
           boost::bind(&ReplayBackend::continuouslyPullFromReplayFiles, this))
 {
@@ -74,4 +74,4 @@ void ReplayBackend::continuouslyPullFromReplayFiles()
 }
 
 // Register this backend in the genericFactory
-static TGenericFactory<std::string, Backend, ReplayBackend> factory;
+static TGenericFactory<std::string, Backend, ReplayBackend, BackendConfig> factory;
