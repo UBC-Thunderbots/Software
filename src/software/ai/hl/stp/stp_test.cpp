@@ -22,7 +22,7 @@ class STPTest : public ::testing::Test
     void SetUp() override
     {
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltTestPlay>();
+            return std::make_unique<HaltTestPlay>(DynamicParameters->getPlayConfig());
         };
         // Explicitly setting override AI Play to be false because we can't rely on
         // default values
@@ -40,7 +40,7 @@ class STPTest : public ::testing::Test
 
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
 {
-    auto play_names = GenericFactory<std::string, Play>::getRegisteredNames();
+    auto play_names = GenericFactory<std::string, Play, PlayConfig>::getRegisteredNames();
     EXPECT_EQ(2, play_names.size());
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), TYPENAME(MoveTestPlay)),
               1);

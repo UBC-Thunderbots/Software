@@ -25,7 +25,7 @@ class STPTacticAssignmentTest : public ::testing::Test
     void SetUp() override
     {
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltTestPlay>();
+            return std::make_unique<HaltTestPlay>(DynamicParameters->getPlayConfig());
         };
         // Give an explicit seed to STP so that our tests are deterministic
         stp   = STP(default_play_constructor, 0);

@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/stp.h"
 #include "software/test_util/test_util.h"
 #include "software/world/world.h"
+#include "software/parameter/dynamic_parameters.h"
 
 
 struct PlaySelectionTestParams
@@ -25,7 +26,7 @@ class STPRefereeCommandPlaySelectionTestWithPositions
 {
    public:
     STPRefereeCommandPlaySelectionTestWithPositions()
-        : stp([]() { return std::make_unique<HaltPlay>(std::make_shared<const PlayConfig>()); },
+        : stp([]() { return std::make_unique<HaltPlay>(DynamicParameters->getPlayConfig()); },
               std::make_shared<const AiControlConfig>(), 0)
     {
     }
@@ -192,7 +193,7 @@ class STPRefereeCommandPlaySelectionTest
     void SetUp() override
     {
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltPlay>();
+            return std::make_unique<HaltPlay>(DynamicParameters->getPlayConfig());
         };
         // Give an explicit seed to STP so that our tests are deterministic
         stp = STP(default_play_constructor, 0);
