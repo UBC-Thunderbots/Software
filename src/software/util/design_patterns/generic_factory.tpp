@@ -51,15 +51,15 @@ void GenericFactory<IndexType, TypeToCreate>::registerCreator(
         std::make_pair(generic_name, generic_creator));
 }
 
-template <class IndexType, class TypeToCreate>
-std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate>::create(
-    const std::string& generic_name)
+template <class IndexType, class TypeToCreate, class ConfigType>
+std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate, ConfigType>::create(
+    std::shared_ptr<const ConfigType> config, const std::string& generic_name)
 {
     auto registry = GenericFactory<IndexType, TypeToCreate>::getRegistry();
     auto iter     = registry.find(generic_name);
     if (iter != registry.end())
     {
-        return iter->second();
+        return iter->second(config);
     }
     else
     {

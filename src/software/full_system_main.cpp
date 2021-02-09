@@ -67,7 +67,9 @@ int main(int argc, char** argv)
         }
 
         std::shared_ptr<Backend> backend =
-            GenericFactory<std::string, Backend>::create(args->getBackend()->value());
+            GenericFactory<std::string, Backend, BackendConfig>::create(
+                    args->getBackend()->value(), 
+                    DynamicParameters->getBackendConfig());
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(sensor_fusion_config);
         auto ai            = std::make_shared<ThreadedAI>(ai_config, ai_control_config);
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;

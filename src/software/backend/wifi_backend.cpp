@@ -83,4 +83,4 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
 }
 
 // Register this backend in the genericFactory
-static TGenericFactory<std::string, Backend, WifiBackend> factory;
+static TGenericFactory<std::string, Backend, WifiBackend, BackendConfig> factory;

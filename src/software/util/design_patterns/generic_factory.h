@@ -9,15 +9,15 @@
 #include "software/util/typename/typename.h"
 
 // A quality of life typedef to make things shorter and more readable
-template <class IndexType, class TypeToCreate>
+template <class IndexType, class TypeToCreate, class ConfigType>
 using GenericRegistry =
-    std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>()>>;
+    std::unordered_map<IndexType, std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>;
 /**
  * The GenericFactory is an Abstract class that provides an interface for Generic type
  * Factories to follow. This makes it easy to maintain a list of factories and get the
  * corresponding generic types through the generic interface.
  */
-template <class IndexType, class TypeToCreate>
+template <class IndexType, class TypeToCreate, class ConfigType>
 class GenericFactory
 {
    public:
@@ -31,7 +31,7 @@ class GenericFactory
      *
      * @return a unique pointer to a newly constructed type of the given type/name
      */
-    static std::unique_ptr<TypeToCreate> create(const std::string& generic_name);
+    static std::unique_ptr<TypeToCreate> create(const std::string& generic_name, std::shared_ptr<const ConfigType> config);
 
     /**
      * Returns a const reference to the generic type registry. The registry is a map of
@@ -40,7 +40,7 @@ class GenericFactory
      *
      * @return a const reference to the generic registry
      */
-    static const GenericRegistry<IndexType, TypeToCreate>& getRegistry();
+    static const GenericRegistry<IndexType, TypeToCreate, ConfigType>& getRegistry();
 
     /**
      * Returns the list of names for all creator functions registered in the factory
@@ -54,7 +54,7 @@ class GenericFactory
      *
      * @return a list of creator functions that are registered in this factory
      */
-    static std::vector<std::function<std::unique_ptr<TypeToCreate>()>>
+    static std::vector<std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>
     getRegisteredConstructors();
 
    protected:
@@ -103,8 +103,8 @@ class GenericFactory
  * Generic), the following line should be added to the end of the .cpp file (without the
  * quotations): "static TGenericFactory<MoveBackend> factory;"
  */
-template <class IndexType, class TypeToCreate, class T>
-class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
+template <class IndexType, class TypeToCreate, class T, class ConfigType>
+class TGenericFactory : public GenericFactory<IndexType, TypeToCreate, ConfigType>
 {
     // compile time type checking that T is derived class of Generic
     static_assert(std::is_base_of<TypeToCreate, T>::value,
@@ -114,10 +114,10 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate>
     TGenericFactory()
     {
         // TODO (Issue #1142): Change to use a function instead of a static variable
-        auto generic_creator = []() -> std::unique_ptr<TypeToCreate> {
-            return std::make_unique<T>();
+        auto generic_creator = [](std::shared_ptr<const ConfigType> config) -> std::unique_ptr<TypeToCreate> {
+            return std::make_unique<T>(config);
         };
-        GenericFactory<IndexType, TypeToCreate>::registerCreator(TYPENAME(T),
+        GenericFactory<IndexType, TypeToCreate,>::registerCreator(TYPENAME(T),
                                                                  generic_creator);
     }
 };

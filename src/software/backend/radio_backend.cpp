@@ -33,4 +33,4 @@ void RadioBackend::receiveRobotStatus(RadioRobotStatus robot_status)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Backend, RadioBackend> factory;
+static TGenericFactory<std::string, Backend, RadioBackend, BackendConfig> factory;
