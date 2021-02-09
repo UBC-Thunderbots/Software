@@ -3,9 +3,9 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/distance.h"
 
-CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
+CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region, std::shared_ptr<const PassingConfig> passing_config)
     : Tactic(true, {RobotCapability::Move}),
-      pass_generator(world, world.ball().position(), PassType::ONE_TOUCH_SHOT),
+      pass_generator(world, world.ball().position(), PassType::ONE_TOUCH_SHOT, passing_config),
       world(world),
       target_region(target_region)
 {

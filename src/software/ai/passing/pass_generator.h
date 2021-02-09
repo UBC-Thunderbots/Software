@@ -66,6 +66,7 @@ class PassGenerator
      *                  NOTE: this will _try_ to generate a pass of the type given,
      *                  but it is not guaranteed, and can change during pass
      *                  execution because of Passer/Receiver decisions
+     * @param passing_config The dynamic parameter config to use to tune the PassGenerator
      * @param run_deterministically If true, this disables all threading so that
      *                              the same sequence of calls to this function always
      *                              returns the same values, no matter how much time
@@ -73,6 +74,7 @@ class PassGenerator
      */
     explicit PassGenerator(const World& world, const Point& passer_point,
                            const PassType& pass_type,
+                           std::shared_ptr<const PassingConfig> passing_config, 
                            const bool run_deterministically = false);
 
     /**
@@ -328,6 +330,8 @@ class PassGenerator
 
     // The mutex for the in_destructor flag
     std::mutex in_destructor_mutex;
+
+    std::shared_ptr<const PassingConfig> passing_config;
 
     // This flag is used to indicate that we are in the destructor. We use this to
     // communicate with pass_generation_thread that it is

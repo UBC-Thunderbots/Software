@@ -187,15 +187,16 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
     auto cherry_pick_tactic_1 =
-        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region);
+        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region, play_config->getPassingConfig());
     auto cherry_pick_tactic_2 =
-        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region);
+        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region, play_config->getPassingConfig());
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
     PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::RECEIVE_AND_DRIBBLE);
+                                 PassType::RECEIVE_AND_DRIBBLE,
+                                 play_config->getPassingConfig());
     pass_generator.setTargetRegion(world.field().enemyHalf());
 
     // Wait for a robot to be assigned to aligned to the ball to pass

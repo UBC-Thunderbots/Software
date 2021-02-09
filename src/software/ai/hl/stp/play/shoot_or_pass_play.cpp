@@ -127,13 +127,14 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     }
 
     std::array<std::shared_ptr<CherryPickTactic>, 2> cherry_pick_tactics = {
-        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region),
-        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region)};
+        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region, play_config->getPassingConfig()),
+        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region, play_config->getPassingConfig())};
 
     // Start a PassGenerator that will continuously optimize passes into the enemy half
     // of the field
     PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::RECEIVE_AND_DRIBBLE);
+                                 PassType::RECEIVE_AND_DRIBBLE,
+                                 play_config->getPassingConfig());
     pass_generator.setTargetRegion(world.field().enemyHalf());
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
