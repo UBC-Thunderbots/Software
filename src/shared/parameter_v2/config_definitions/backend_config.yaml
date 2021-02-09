@@ -1,0 +1,3 @@
+include:
+  - wifi_backend_config.yaml
+  - radio_backend_config.yaml

@@ -10,24 +10,24 @@
     value: true
     description: >-
         Overrides the current play with the play
-        specified by currentPlay parameter
+        specified by currentPlay(std::shared_ptr<const PlayConfig>) parameter
 
 - string:
     name: current_ai_play
-    value: "Halt Play"
+    value: "Halt Play(std::shared_ptr<const PlayConfig>)"
     options:
-        - "Example Play"
-        - "Stop Play"
-        - "Halt Play"
-        - "Corner Kick Play"
-        - "Free Kick Play"
-        - "Defense Play"
-        - "KickoffEnemy Play"
-        - "KickoffFriendly Play"
-        - "Enemy Freekick Play"
-        - "Penalty Kick Play"
-        - "Penalty Kick Enemy Play"
-        - "ShootOrChip Play"
+        - "Example Play(std::shared_ptr<const PlayConfig>)"
+        - "Stop Play(std::shared_ptr<const PlayConfig>)"
+        - "Halt Play(std::shared_ptr<const PlayConfig>)"
+        - "Corner Kick Play(std::shared_ptr<const PlayConfig>)"
+        - "Free Kick Play(std::shared_ptr<const PlayConfig>)"
+        - "Defense Play(std::shared_ptr<const PlayConfig>)"
+        - "KickoffEnemy Play(std::shared_ptr<const PlayConfig>)"
+        - "KickoffFriendly Play(std::shared_ptr<const PlayConfig>)"
+        - "Enemy Freekick Play(std::shared_ptr<const PlayConfig>)"
+        - "Penalty Kick Play(std::shared_ptr<const PlayConfig>)"
+        - "Penalty Kick Enemy Play(std::shared_ptr<const PlayConfig>)"
+        - "ShootOrChip Play(std::shared_ptr<const PlayConfig>)"
     description: >-
         Specifies the ai play that should be in use
 
