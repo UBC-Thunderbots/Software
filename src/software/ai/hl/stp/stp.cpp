@@ -80,8 +80,7 @@ void STP::updateAIPlay(const World& world)
             catch (const std::runtime_error& e)
             {
                 // TODO this default play stuff doesn't work
-                auto default_play =
-                    default_play_constructor();
+                auto default_play = default_play_constructor();
                 LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
                              << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "

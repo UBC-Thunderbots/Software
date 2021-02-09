@@ -127,8 +127,10 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     }
 
     std::array<std::shared_ptr<CherryPickTactic>, 2> cherry_pick_tactics = {
-        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region, play_config->getPassingConfig()),
-        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region, play_config->getPassingConfig())};
+        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region,
+                                           play_config->getPassingConfig()),
+        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region,
+                                           play_config->getPassingConfig())};
 
     // Start a PassGenerator that will continuously optimize passes into the enemy half
     // of the field

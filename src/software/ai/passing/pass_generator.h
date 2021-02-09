@@ -74,7 +74,7 @@ class PassGenerator
      */
     explicit PassGenerator(const World& world, const Point& passer_point,
                            const PassType& pass_type,
-                           std::shared_ptr<const PassingConfig> passing_config, 
+                           std::shared_ptr<const PassingConfig> passing_config,
                            const bool run_deterministically = false);
 
     /**

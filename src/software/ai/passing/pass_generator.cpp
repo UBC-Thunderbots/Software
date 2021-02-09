@@ -7,7 +7,9 @@
 #include "software/ai/passing/pass_generator.h"
 
 PassGenerator::PassGenerator(const World& world, const Point& passer_point,
-                             const PassType& pass_type, std::shared_ptr<const PassingConfig> passing_config, bool running_deterministically)
+                             const PassType& pass_type,
+                             std::shared_ptr<const PassingConfig> passing_config,
+                             bool running_deterministically)
     : running_deterministically(running_deterministically),
       updated_world(world),
       world(world),
@@ -25,7 +27,8 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point,
       in_destructor(false)
 {
     // Generate the initial set of passes
-    passes_to_optimize = generatePasses(passing_config->getNumPassesToOptimize()->value());
+    passes_to_optimize =
+        generatePasses(passing_config->getNumPassesToOptimize()->value());
 
     // Start the thread to do the pass generation in the background
     // The lambda expression here is needed so that we can call
@@ -175,10 +178,9 @@ void PassGenerator::optimizePasses()
     std::vector<Pass> updated_passes;
     for (Pass& pass : passes_to_optimize)
     {
-        auto pass_array =
-            optimizer.maximize(objective_function, convertPassToArray(pass),
-                                   passing_config->getNumberOfGradientDescentStepsPerIter()
-                                   ->value());
+        auto pass_array = optimizer.maximize(
+            objective_function, convertPassToArray(pass),
+            passing_config->getNumberOfGradientDescentStepsPerIter()->value());
         try
         {
             updated_passes.emplace_back(convertArrayToPass(pass_array));
@@ -217,12 +219,13 @@ void PassGenerator::pruneAndReplacePasses()
 
     // Replace the least promising passes
     passes_to_optimize.erase(
-        passes_to_optimize.begin() + passing_config->getNumPassesToKeepAfterPruning()->value(),
+        passes_to_optimize.begin() +
+            passing_config->getNumPassesToKeepAfterPruning()->value(),
         passes_to_optimize.end());
 
     // Generate new passes to replace the ones we just removed
-    int num_new_passes =
-        passing_config->getNumPassesToOptimize()->value() - static_cast<int>(passes_to_optimize.size());
+    int num_new_passes = passing_config->getNumPassesToOptimize()->value() -
+                         static_cast<int>(passes_to_optimize.size());
     if (num_new_passes > 0)
     {
         std::vector<Pass> new_passes = generatePasses(num_new_passes);
@@ -254,7 +257,7 @@ unsigned int PassGenerator::getNumPassesToKeepAfterPruning()
     // We want to use the parameter value for this, but clamp it so that it is
     // <= the number of passes we're optimizing
     return std::min(passing_config->getNumPassesToKeepAfterPruning()->value(),
-                                    passing_config->getNumPassesToOptimize()->value());
+                    passing_config->getNumPassesToOptimize()->value());
 }
 
 void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
@@ -298,17 +301,16 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
     std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
                                                   world.field().yLength() / 2);
 
-    double curr_time             = world.getMostRecentTimestamp().toSeconds();
-    double min_start_time_offset = passing_config->getMinTimeOffsetForPassSeconds()
-                                       ->value();
-    double max_start_time_offset = passing_config->getMaxTimeOffsetForPassSeconds()
-                                       ->value();
+    double curr_time = world.getMostRecentTimestamp().toSeconds();
+    double min_start_time_offset =
+        passing_config->getMinTimeOffsetForPassSeconds()->value();
+    double max_start_time_offset =
+        passing_config->getMaxTimeOffsetForPassSeconds()->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
-    std::uniform_real_distribution speed_distribution(passing_config->getMinPassSpeedMPerS()
-                                                          ->value(),
-                                                          passing_config->getMaxPassSpeedMPerS()
-                                                          ->value());
+    std::uniform_real_distribution speed_distribution(
+        passing_config->getMinPassSpeedMPerS()->value(),
+        passing_config->getMaxPassSpeedMPerS()->value());
 
     std::vector<Pass> passes;
     for (unsigned i = 0; i < num_passes_to_gen; i++)
@@ -334,14 +336,11 @@ bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)
 bool PassGenerator::passesEqual(Pass pass1, Pass pass2)
 {
     double max_position_difference_meters =
-            passing_config->getPassEqualityMaxPositionDifferenceMeters()
-            ->value();
+        passing_config->getPassEqualityMaxPositionDifferenceMeters()->value();
     double max_time_difference_seconds =
-            passing_config->getPassEqualityMaxStartTimeDifferenceSeconds()
-            ->value();
-    double max_speed_difference = passing_config
-                                      ->getPassEqualityMaxSpeedDifferenceMetersPerSecond()
-                                      ->value();
+        passing_config->getPassEqualityMaxStartTimeDifferenceSeconds()->value();
+    double max_speed_difference =
+        passing_config->getPassEqualityMaxSpeedDifferenceMetersPerSecond()->value();
 
     double receiver_position_difference =
         (pass1.receiverPoint() - pass2.receiverPoint()).length();

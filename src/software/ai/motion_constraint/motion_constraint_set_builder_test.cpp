@@ -21,7 +21,8 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new MoveTactic(false), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CherryPickTactic(world, Rectangle({0, 0}, {1, 1})),
+                new CherryPickTactic(world, Rectangle({0, 0}, {1, 1}),
+                                     DynamicParameters->getPassingConfig()),
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new CreaseDefenderTactic(world.field(), world.ball(),

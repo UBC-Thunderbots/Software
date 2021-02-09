@@ -138,13 +138,12 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_pos_y =
-        std::make_shared<CherryPickTactic>(world, pos_y_cherry_pick_rectangle, play_config->getPassingConfig());
-    auto cherry_pick_tactic_neg_y =
-        std::make_shared<CherryPickTactic>(world, neg_y_cherry_pick_rectangle, play_config->getPassingConfig());
+    auto cherry_pick_tactic_pos_y = std::make_shared<CherryPickTactic>(
+        world, pos_y_cherry_pick_rectangle, play_config->getPassingConfig());
+    auto cherry_pick_tactic_neg_y = std::make_shared<CherryPickTactic>(
+        world, neg_y_cherry_pick_rectangle, play_config->getPassingConfig());
 
-    PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::ONE_TOUCH_SHOT, 
+    PassGenerator pass_generator(world, world.ball().position(), PassType::ONE_TOUCH_SHOT,
                                  play_config->getPassingConfig());
 
     // Target any pass in the enemy half of the field, shifted up by 1 meter
