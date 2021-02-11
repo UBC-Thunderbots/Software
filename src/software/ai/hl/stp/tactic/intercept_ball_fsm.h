@@ -15,7 +15,7 @@ struct InterceptBallFSM
     class idle_state;
     class block_ball_state;
     class wait_for_ball_state;
-    class slow_intercept_1_state;
+    class chase_ball_state;
     class slow_intercept_2_state;
 
     // this struct defines the unique control parameters that the InterceptBallFSM
@@ -55,10 +55,10 @@ struct InterceptBallFSM
         using namespace boost::sml;
 
         // idle_s and move_s are the two _states_ used in the transition table
-        const auto idle_s             = state<idle_state>;
-        const auto block_ball_s       = state<block_ball_state>;
-        const auto wait_for_ball_s    = state<wait_for_ball_state>;
-        const auto slow_intercept_1_s = state<slow_intercept_1_state>;
+        const auto idle_s          = state<idle_state>;
+        const auto block_ball_s    = state<block_ball_state>;
+        const auto wait_for_ball_s = state<wait_for_ball_state>;
+        const auto chase_ball_s    = state<chase_ball_state>;
         //        const auto slow_intercept_2_s = state<slow_intercept_2_state>;
 
         // update_e is the _event_ that the InterceptBallFSM responds to
@@ -82,6 +82,15 @@ struct InterceptBallFSM
                 event.common.robot.id(), intercept_position,
                 (-event.common.world.ball().velocity()).orientation(), 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::AVOID));
+        };
+
+        const auto chase_ball = [this](auto event) {
+            auto ball_position = event.common.world.ball().position();
+            auto face_ball_orientation =
+                (ball_position - event.common.robot.position()).orientation();
+            event.common.set_intent(std::make_unique<MoveIntent>(
+                event.common.robot.id(), ball_position, face_ball_orientation, 0,
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW));
         };
 
         const auto ball_moving_slow = [](auto event) {
@@ -115,15 +124,12 @@ struct InterceptBallFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest state
             *idle_s + update_e[!ball_moving_slow] / block_ball = block_ball_s,
-            *idle_s + update_e[ball_moving_slow]               = slow_intercept_1_s,
+            *idle_s + update_e[ball_moving_slow] / chase_ball  = chase_ball_s,
             block_ball_s + update_e[!robot_in_position] / block_ball,
             block_ball_s + update_e[robot_in_position] / wait_for_ball = wait_for_ball_s,
             wait_for_ball_s + update_e[intercepted]                    = X,
             wait_for_ball_s + update_e[!intercepted] / wait_for_ball,
-            slow_intercept_1_s = X
-            // move_s + update_e[!move_done] / update_move = move_s,
-            // move_s + update_e[move_done] / update_move  = X,
-            // X + update_e[move_done] / update_move       = X
-        );
+            chase_ball_s + update_e[intercepted] = X,
+            chase_ball_s + update_e[!intercepted] / chase_ball);
     }
 };
