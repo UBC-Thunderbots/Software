@@ -55,9 +55,9 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
 
     // Have a robot keep trying to take a shot
-    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAIConfig()
+    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAiConfig()
                                                            ->getShootOrPassPlayConfig()
-                                                           ->MinOpenAngleForShotDeg()
+                                                           ->getMinOpenAngleForShotDeg()
                                                            ->value());
 
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
@@ -143,13 +143,13 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     // Whether or not we've set the passer robot in the PassGenerator
     bool set_passer_robot_in_passgenerator = false;
 
-    double abs_min_pass_score = DynamicParameters->getAIConfig()
+    double abs_min_pass_score = DynamicParameters->getAiConfig()
                                     ->getShootOrPassPlayConfig()
-                                    ->AbsMinPassScore()
+                                    ->getAbsMinPassScore()
                                     ->value();
-    double pass_score_ramp_down_duration = DynamicParameters->getAIConfig()
+    double pass_score_ramp_down_duration = DynamicParameters->getAiConfig()
                                                ->getShootOrPassPlayConfig()
-                                               ->PassScoreRampDownDuration()
+                                               ->getPassScoreRampDownDuration()
                                                ->value();
     do
     {

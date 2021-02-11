@@ -130,7 +130,7 @@ class ConfigYamlLoader(object):
                             }
 
                         # parameter definitions only in file
-                        if isinstance(raw_config_metadata[tail][0], list):
+                        elif isinstance(raw_config_metadata[tail][0], list):
                             raw_config_metadata[tail] = {
                                 PARAMETER_KEY: raw_config_metadata[tail][0]
                             }
@@ -152,6 +152,10 @@ class ConfigYamlLoader(object):
                     raise ConfigYamlMalformed(
                         "Check malformed {} \n {}".format(tail, ymle)
                     ) from None
+                except Exception as exc:
+                    raise ConfigYamlMalformed(
+                        "Check malformed {} \n {}".format(tail, exc)
+                    ) from exc
 
         return raw_config_metadata
 
@@ -196,7 +200,6 @@ class ConfigYamlLoader(object):
                         )
 
             if PARAMETER_KEY in metadata:
-
                 # validate correct format with schema
                 try:
                     jsonschema.validate(metadata[PARAMETER_KEY], PARAM_DEF_SCHEMA)

@@ -14,7 +14,7 @@
 class STPTest : public ::testing::Test
 {
    public:
-    STPTest() : stp([]() { return nullptr; }, DynamicParameters->getAIControlConfig(), 0)
+    STPTest() : stp([]() { return nullptr; }, DynamicParameters->getAiControlConfig(), 0)
     {
     }
 
@@ -26,11 +26,11 @@ class STPTest : public ::testing::Test
         };
         // Explicitly setting override AI Play to be false because we can't rely on
         // default values
-        MutableDynamicParameters->getMutableAIControlConfig()
-            ->mutableOverrideAIPlay()
+        MutableDynamicParameters->getMutableAiControlConfig()
+            ->getMutableOverrideAiPlay()
             ->setValue(false);
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, DynamicParameters->getAIControlConfig(), 0);
+        stp   = STP(default_play_constructor, DynamicParameters->getAiControlConfig(), 0);
         world = ::TestUtil::createBlankTestingWorld();
     }
 

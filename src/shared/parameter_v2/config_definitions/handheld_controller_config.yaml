@@ -1,41 +1,42 @@
- HandheldControllerConfig:
-  RobotId:
+- int:
+    name: robot_id
     min: 0
     max: 32
-    default: 0
+    value: 0
     type: "int"
     description: "The ID of the robot being controller by the game controller"
-  KickSpeedMetersPerSecond:
+- double:
+    name: kick_speed_meters_per_second
     min: 0.0
     max: 6.5
-    default: 4.0
-    type: "double"
+    value: 4.0
     description: "The robot's kick speed in meters per second"
-  ChipDistanceMeters:
+- double:
+    const: true
+    name: chip_distance_meters
     min: 0.0
     max: 5.0
-    default: 1.0
-    type: "double"
+    value: 1.0
     description: "How far in meters the robot will chip"
-  DribblerRpm:
+- int:
+    name: dribbler_rpm
     min: 0
     max: 10000
-    default: 1000
-    type: "int"
+    value: 1000
     description: "The RPM of the robot's dribbler when turned on"
-  MaxLinearSpeed:
+- double:
+    name: max_linear_speed
     min: 0.0
     max: 3.0
-    default: 1.0
-    type: "double"
+    value: 1.0
     description: "The max allowed linear speed of the robot in m/s"
-  MaxAngularSpeed:
+- double:
+    name: max_angular_speed
     min: 0.0
     max: 12.0
-    default: 6.0
-    type: "double"
+    value: 6.0
     description: "The max allowed angular speed of the robot, in rad/s"
-  DevicePath:
-    type: "std::string"
-    default: "/dev/input/js0"
+- string: 
+    name: device_path
+    value: "/dev/input/js0"
     description: "The filepath to the controller on the system"

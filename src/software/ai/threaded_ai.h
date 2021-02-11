@@ -26,8 +26,8 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
      *
      * @param config The AI configuration
      */
-    explicit ThreadedAI(std::shared_ptr<const AIConfig> ai_config,
-                        std::shared_ptr<const AIControlConfig> control_config);
+    explicit ThreadedAI(std::shared_ptr<const AiConfig> ai_config,
+                        std::shared_ptr<const AiControlConfig> control_config);
 
    private:
     void onValueReceived(World world) override;
@@ -45,5 +45,5 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
     void drawAI();
 
     AI ai;
-    std::shared_ptr<const AIControlConfig> control_config;
+    std::shared_ptr<const AiControlConfig> control_config;
 };

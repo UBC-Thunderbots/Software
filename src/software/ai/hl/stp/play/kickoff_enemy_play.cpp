@@ -32,23 +32,23 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            DynamicParameters->getAIConfig()
+                                            DynamicParameters->getAiConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
-                                                ->BallStealSpeed()
+                                                ->getBallStealSpeed()
                                                 ->value(),
                                             false, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            DynamicParameters->getAIConfig()
+                                            DynamicParameters->getAiConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
-                                                ->BallStealSpeed()
+                                                ->getBallStealSpeed()
                                                 ->value(),
                                             false, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            DynamicParameters->getAIConfig()
+                                            DynamicParameters->getAiConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
-                                                ->BallStealSpeed()
+                                                ->getBallStealSpeed()
                                                 ->value(),
                                             false, true)};
 

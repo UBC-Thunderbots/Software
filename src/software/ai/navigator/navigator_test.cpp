@@ -15,13 +15,13 @@ class NoPathNavigatorTest : public testing::Test
    public:
     NoPathNavigatorTest()
         : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
-              DynamicParameters->getAIConfig()
+              DynamicParameters->getAiConfig()
                   ->getRobotNavigationObstacleFactoryConfig())),
           navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<NoPathTestPathPlanner>(),
                         robot_navigation_obstacle_factory),
                     robot_navigation_obstacle_factory,
-                    DynamicParameters->getAIConfig()->getNavigatorConfig()),
+                    DynamicParameters->getAiConfig()->getNavigatorConfig()),
           current_time(Timestamp::fromSeconds(123)),
           field(Field::createSSLDivisionBField()),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
@@ -47,13 +47,13 @@ class ThetaStarNavigatorTest : public testing::Test
    public:
     ThetaStarNavigatorTest()
         : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
-              DynamicParameters->getAIConfig()
+              DynamicParameters->getAiConfig()
                   ->getRobotNavigationObstacleFactoryConfig())),
           navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<ThetaStarPathPlanner>(),
                         robot_navigation_obstacle_factory),
                     robot_navigation_obstacle_factory,
-                    DynamicParameters->getAIConfig()->getNavigatorConfig())
+                    DynamicParameters->getAiConfig()->getNavigatorConfig())
     {
     }
 
@@ -191,10 +191,10 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
         std::make_unique<VelocityObstaclePathManager>(
             std::make_unique<OnePointPathTestPathPlanner>(),
             RobotNavigationObstacleFactory(
-                DynamicParameters->getAIConfig()
+                DynamicParameters->getAiConfig()
                     ->getRobotNavigationObstacleFactoryConfig())),
         RobotNavigationObstacleFactory(
-            DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig()),
+            DynamicParameters->getAiConfig()->getRobotNavigationObstacleFactoryConfig()),
         std::make_shared<NavigatorConfig>());
 
     std::vector<std::unique_ptr<Intent>> intents;

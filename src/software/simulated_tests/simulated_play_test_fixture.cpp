@@ -4,37 +4,37 @@
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 
 SimulatedPlayTestFixture::SimulatedPlayTestFixture()
-    : ai(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig())
+    : ai(DynamicParameters->getAiConfig(), DynamicParameters->getAiControlConfig())
 {
 }
 
 void SimulatedPlayTestFixture::SetUp()
 {
     SimulatedTestFixture::SetUp();
-    ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
+    ai = AI(DynamicParameters->getAiConfig(), DynamicParameters->getAiControlConfig());
 }
 
 void SimulatedPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableFriendlyGoalieId()
+        ->getMutableFriendlyGoalieId()
         ->setValue(static_cast<int>(goalie_id));
 }
 
 void SimulatedPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableEnemyGoalieId()
+        ->getMutableEnemyGoalieId()
         ->setValue(static_cast<int>(goalie_id));
 }
 
 void SimulatedPlayTestFixture::setAIPlay(const std::string& ai_play)
 {
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideAIPlay()
+    MutableDynamicParameters->getMutableAiControlConfig()
+        ->getMutableOverrideAiPlay()
         ->setValue(true);
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentAIPlay()
+    MutableDynamicParameters->getMutableAiControlConfig()
+        ->getMutableCurrentAiPlay()
         ->setValue(ai_play);
 }
 
