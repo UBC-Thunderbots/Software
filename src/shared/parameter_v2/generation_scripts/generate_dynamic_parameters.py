@@ -15,20 +15,27 @@ from c_writer import CWriter
 # Path relative to the bazel WORKSPACE root
 # This path is included in the data for the py_binary bazel target
 PARAMETER_CONFIG_PATH = Path(os.path.dirname(__file__), "../config_definitions")
+PARAMETER_TEST_CONFIG_PATH = Path(
+    os.path.dirname(__file__), "../config_definitions/test"
+)
 
 
 def generate_dynamic_parameters(output_file, include_headers, generate_for_cpp):
-    yamls = list(PARAMETER_CONFIG_PATH.glob("**/*.yaml"))
-    config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
-
     if generate_for_cpp:
-        # TODO: Naming this ThunderbotsConfig was causing issues due to conflicting type name,
-        # the 'New' suffix will be dropped when the old system is replaced (issue #1298)
+
+        yamls = list(PARAMETER_CONFIG_PATH.glob("*.yaml"))
+        config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
+
         CppWriter.write_config_metadata(
-            output_file, include_headers, "ThunderbotsConfigNew", config_metadata
+            output_file, include_headers, "ThunderbotsConfig", config_metadata
         )
     else:
-        CWriter.write_config_metadata(output_file, "ThunderbotsConfig", config_metadata)
+        # Genernate this properly as part of https://github.com/UBC-Thunderbots/Software/issues/1731
+        test_yamls = list(PARAMETER_TEST_CONFIG_PATH.glob("*.yaml"))
+        test_config_metadata = ConfigYamlLoader.get_config_metadata(test_yamls)
+        CWriter.write_config_metadata(
+            output_file, "ThunderbotsConfig", test_config_metadata
+        )
 
 
 def main():

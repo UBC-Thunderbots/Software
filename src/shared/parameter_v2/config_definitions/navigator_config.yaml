@@ -1,0 +1,13 @@
+- double:
+    name: transition_speed_factor
+    min: 0
+    max: 1.0
+    value: 0.6
+    description: "Factor of max speed to use for transition speed calculations"
+- double:
+    name: enemy_robot_proximity_limit
+    min: 0
+    max: 10.0
+    value: 2.0
+    description: "Distance to nearest robot when we stop slowing down to avoid collisions"
+

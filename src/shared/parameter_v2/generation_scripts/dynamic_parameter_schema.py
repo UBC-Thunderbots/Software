@@ -8,6 +8,7 @@ SUPPORTED_TYPES = [
     "int",
     "uint",
     "float",
+    "double",
     "string",
     "factory",
     "enum",

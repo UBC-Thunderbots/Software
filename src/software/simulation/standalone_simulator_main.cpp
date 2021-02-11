@@ -12,30 +12,30 @@ int main(int argc, char **argv)
         MutableDynamicParameters->getMutableStandaloneSimulatorMainCommandLineArgs();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    LoggerSingleton::initializeLogger(args->logging_dir()->value());
+    LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
 
     if (!help_requested)
     {
         // TODO remove this when we move to the new dynamic parameter system
         // https://github.com/UBC-Thunderbots/Software/issues/1298
-        if (!args->interface()->value().empty())
+        if (!args->getInterface()->value().empty())
         {
             MutableDynamicParameters->getMutableStandaloneSimulatorConfig()
-                ->mutableNetworkInterface()
-                ->setValue(args->interface()->value());
+                ->getMutableNetworkInterface()
+                ->setValue(args->getInterface()->value());
         }
 
         // Experimentally determined restitution value
         MutableDynamicParameters->getMutableSimulatorConfig()
-            ->mutableBallRestitution()
+            ->getMutableBallRestitution()
             ->setValue(0.8);
         // Measured these values from fig. 9 on page 8 of
         // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
         MutableDynamicParameters->getMutableSimulatorConfig()
-            ->mutableSlidingFrictionAcceleration()
+            ->getMutableSlidingFrictionAcceleration()
             ->setValue(6.9);
         MutableDynamicParameters->getMutableSimulatorConfig()
-            ->mutableRollingFrictionAcceleration()
+            ->getMutableRollingFrictionAcceleration()
             ->setValue(0.5);
 
         auto standalone_simulator = std::make_shared<StandaloneSimulator>(

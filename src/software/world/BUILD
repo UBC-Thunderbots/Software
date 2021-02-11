@@ -182,7 +182,6 @@ cc_library(
         ":game_state",
         ":robot",
         ":team",
-        "//software/parameter:dynamic_parameters",
         "@boost//:circular_buffer",
     ],
 )

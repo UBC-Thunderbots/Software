@@ -12,11 +12,11 @@ SimulatedTacticTestFixture::SimulatedTacticTestFixture()
           std::make_unique<VelocityObstaclePathManager>(
               std::make_unique<ThetaStarPathPlanner>(),
               RobotNavigationObstacleFactory(
-                  DynamicParameters->getAIConfig()
+                  DynamicParameters->getAiConfig()
                       ->getRobotNavigationObstacleFactoryConfig())),
-          RobotNavigationObstacleFactory(DynamicParameters->getAIConfig()
+          RobotNavigationObstacleFactory(DynamicParameters->getAiConfig()
                                              ->getRobotNavigationObstacleFactoryConfig()),
-          DynamicParameters->getAIConfig()->getNavigatorConfig()))
+          DynamicParameters->getAiConfig()->getNavigatorConfig()))
 {
 }
 
@@ -27,11 +27,11 @@ void SimulatedTacticTestFixture::SetUp()
         std::make_unique<VelocityObstaclePathManager>(
             std::make_unique<ThetaStarPathPlanner>(),
             RobotNavigationObstacleFactory(
-                DynamicParameters->getAIConfig()
+                DynamicParameters->getAiConfig()
                     ->getRobotNavigationObstacleFactoryConfig())),
         RobotNavigationObstacleFactory(
-            DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig()),
-        DynamicParameters->getAIConfig()->getNavigatorConfig());
+            DynamicParameters->getAiConfig()->getRobotNavigationObstacleFactoryConfig()),
+        DynamicParameters->getAiConfig()->getNavigatorConfig());
 }
 
 void SimulatedTacticTestFixture::setTactic(std::shared_ptr<Tactic> tactic)

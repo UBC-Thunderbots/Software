@@ -2,7 +2,7 @@ CPP_TYPE_MAP = {
     "bool": "bool",
     "int": "int",
     "uint": "unsigned",
-    "float": "double",
+    "double": "double",
     "string": "std::string",
     "enum": "std::string",
 }

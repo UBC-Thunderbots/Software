@@ -1,0 +1,12 @@
+- bool:
+    name: enable_visualizer
+    value: false
+    description: >-
+        Displays simulated test on visualizer
+
+- string:
+    name: logging_dir
+    value: ""
+    description: >-
+        The directory to output logs to. Absolute paths are recommended as the working directory
+        is inside the bazel-out directory.
