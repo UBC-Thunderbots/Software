@@ -12,15 +12,7 @@
 class InterceptBallTactic : public Tactic
 {
    public:
-    /**
-     * Creates a new InterceptBallTactic
-     *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
-     */
-    explicit InterceptBallTactic(bool loop_forever);
-
-    InterceptBallTactic() = delete;
+    explicit InterceptBallTactic();
 
     void updateWorldParams(const World& world) override;
 

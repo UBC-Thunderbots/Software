@@ -4,8 +4,8 @@
 
 #include "software/ai/hl/stp/action/stop_action.h"  // TODO (#1888): remove this dependency
 
-InterceptBallTactic::InterceptBallTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Move}), fsm()
+InterceptBallTactic::InterceptBallTactic()
+    : Tactic(false, {RobotCapability::Move, RobotCapability::Dribble}), fsm()
 {
 }
 

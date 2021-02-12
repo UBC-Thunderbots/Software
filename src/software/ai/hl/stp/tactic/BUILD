@@ -191,6 +191,21 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "simulated_intercept_ball_tactic_test",
+    srcs = ["simulated_intercept_ball_tactic_test.cpp"],
+    deps = [
+        "//software/ai/hl/stp/tactic:intercept_ball_tactic",
+        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests:simulated_test_main",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/simulated_tests/validation_functions",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+    ],
+)
+
 cc_library(
     name = "move_tactic",
     srcs = ["move_tactic.cpp"],
