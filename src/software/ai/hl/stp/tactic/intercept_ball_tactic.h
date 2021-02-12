@@ -45,7 +45,7 @@ class InterceptBallTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    BaseFSM<InterceptBallFSM> fsm;
+    HFSM<InterceptBallFSM> fsm;
 
     InterceptBallFSM::ControlParams control_params;
 };

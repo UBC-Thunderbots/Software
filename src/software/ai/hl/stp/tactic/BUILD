@@ -172,6 +172,7 @@ cc_library(
         "intercept_ball_tactic.h",
     ],
     deps = [
+        ":move_tactic",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:intercept_ball_action",

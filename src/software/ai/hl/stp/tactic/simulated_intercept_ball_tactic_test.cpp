@@ -20,7 +20,7 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(2.5, -1.1);
     // setBallState(BallState(Point(4.5, -3), Vector(-1, 1)));
-    setBallState(BallState(Point(3, -2), Vector(0, 0.5)));
+    setBallState(BallState(Point(3, -2), Vector(0, 1)));
     addFriendlyRobots(
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(

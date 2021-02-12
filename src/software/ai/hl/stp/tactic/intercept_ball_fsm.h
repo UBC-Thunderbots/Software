@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/pass.h"
+#include "software/ai/hl/stp/tactic/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
@@ -13,7 +14,6 @@ struct InterceptBallFSM
     // these classes define the states used in the transition table
     // they are exposed so that tests can check if the FSM is in a particular state
     class idle_state;
-    class block_ball_state;
     class wait_for_ball_state;
     class chase_ball_state;
     class slow_intercept_2_state;
@@ -54,24 +54,26 @@ struct InterceptBallFSM
     {
         using namespace boost::sml;
 
-        // idle_s and move_s are the two _states_ used in the transition table
         const auto idle_s          = state<idle_state>;
-        const auto block_ball_s    = state<block_ball_state>;
         const auto wait_for_ball_s = state<wait_for_ball_state>;
         const auto chase_ball_s    = state<chase_ball_state>;
-        //        const auto slow_intercept_2_s = state<slow_intercept_2_state>;
+        const auto move_s          = state<MoveFSM>;
 
         // update_e is the _event_ that the InterceptBallFSM responds to
         const auto update_e = event<Update>;
 
-        const auto block_ball = [this](auto event) {
+        const auto block_ball = [this](auto event,
+                                       back::process<MoveFSM::Update> processEvent) {
             Point intercept_position =
                 fastInterceptionPoint(event.common.robot, event.common.world.ball(),
                                       event.common.world.field());
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), intercept_position,
-                (-event.common.world.ball().velocity()).orientation(), 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::AVOID));
+            MoveFSM::ControlParams control_params{
+                .destination = intercept_position,
+                .final_orientation =
+                    (-event.common.world.ball().velocity()).orientation(),
+                .final_speed = 0};
+
+            processEvent(MoveFSM::Update(control_params, event.common));
         };
 
         const auto wait_for_ball = [this](auto event) {
@@ -99,23 +101,6 @@ struct InterceptBallFSM
                    BALL_MOVING_SLOW_SPEED_THRESHOLD;
         };
 
-        const auto robot_in_position = [this](auto event) {
-            static const double ROBOT_STOPPED_SPEED_M_PER_S = 0.03;
-            Point intercept_position =
-                fastInterceptionPoint(event.common.robot, event.common.world.ball(),
-                                      event.common.world.field());
-            auto ball = event.common.world.ball();
-            bool intercept_point_in_front_of_ball =
-                acuteAngle(ball.velocity(), intercept_position - ball.position()) <
-                Angle::quarter();
-            bool robot_at_intercept_point =
-                distance(event.common.robot.position(), intercept_position) < 0.05;
-            bool robot_stopped =
-                event.common.robot.velocity().length() < ROBOT_STOPPED_SPEED_M_PER_S;
-            return intercept_point_in_front_of_ball && robot_at_intercept_point &&
-                   robot_stopped;
-        };
-
         const auto intercepted = [](auto event) {
             return event.common.robot.isNearDribbler(
                 event.common.world.ball().position());
@@ -123,13 +108,13 @@ struct InterceptBallFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *idle_s + update_e[!ball_moving_slow] / block_ball = block_ball_s,
+            *idle_s + update_e[!ball_moving_slow] / block_ball = move_s,
             *idle_s + update_e[ball_moving_slow] / chase_ball  = chase_ball_s,
-            block_ball_s + update_e[!robot_in_position] / block_ball,
-            block_ball_s + update_e[robot_in_position] / wait_for_ball = wait_for_ball_s,
-            wait_for_ball_s + update_e[intercepted]                    = X,
+            move_s + update_e / block_ball,
+            move_s = wait_for_ball_s,  // wait for ball when in position
             wait_for_ball_s + update_e[!intercepted] / wait_for_ball,
-            chase_ball_s + update_e[intercepted] = X,
-            chase_ball_s + update_e[!intercepted] / chase_ball);
+            wait_for_ball_s + update_e[intercepted] = X,
+            chase_ball_s + update_e[!intercepted && ball_moving_slow] / chase_ball,
+            chase_ball_s + update_e[intercepted] = X);
     }
 };
