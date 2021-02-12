@@ -20,6 +20,11 @@ class SensorFusionTest : public ::testing::Test
           geom_data(initSSLDivBGeomData()),
           robot_status_msg_id_1(initRobotStatusId1()),
           robot_status_msg_id_2(initRobotStatusId2()),
+          robot_status_msg_wheel_motor_hot(initWheelMotorHotErrorCode()),
+          robot_status_msg_low_cap(initLowCapErrorCode()),
+          robot_status_msg_dribble_motor_hot(initDribbleMotorHotErrorCode()),
+          robot_status_msg_multiple_error_codes(initMultipleErrorCode()),
+          robot_status_msg_no_error_code(initNoErrorCode()),
           referee_indirect_yellow(initRefereeIndirectYellow()),
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart()),
@@ -43,6 +48,11 @@ class SensorFusionTest : public ::testing::Test
     // world associated with geom_data and detection_frame only
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_wheel_motor_hot;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_low_cap;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_dribble_motor_hot;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_multiple_error_codes;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_no_error_code;
     std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
     std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
@@ -235,6 +245,55 @@ class SensorFusionTest : public ::testing::Test
         return robot_msg;
     }
 
+    std::unique_ptr<TbotsProto::RobotStatus> initWheelMotorHotErrorCode()
+    {
+        // Adding a WHEEL_0_MOTOR_HOT error code to robotStatus of robot 2
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
+
+        return std::move(robot_msg);
+    }
+
+    std::unique_ptr<TbotsProto::RobotStatus> initLowCapErrorCode()
+    {
+        // Adding a LOW_CAP error code to robotStatus of robot 2
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
+
+        return std::move(robot_msg);
+    }
+
+    std::unique_ptr<TbotsProto::RobotStatus> initDribbleMotorHotErrorCode()
+    {
+        // Adding a DRIBBLER_MOTOR_HOT error code to robotStatus of robot 2
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
+
+        return std::move(robot_msg);
+    }
+
+    std::unique_ptr<TbotsProto::RobotStatus> initMultipleErrorCode()
+    {
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
+
+        return std::move(robot_msg);
+    }
+
+    std::unique_ptr<TbotsProto::RobotStatus> initNoErrorCode()
+    {
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+
+        return std::move(robot_msg);
+    }
+
     std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()
     {
         auto ref_msg = std::make_unique<SSLProto::Referee>();
@@ -293,6 +352,128 @@ class SensorFusionTest : public ::testing::Test
         return ref_msg;
     }
 };
+
+TEST_F(SensorFusionTest, test_making_robot_move_capability_unavailable_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_wheel_motor_hot;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(1, robot_unavailable_capabilities.size());
+    bool is_movement_disabled =
+        robot_unavailable_capabilities.find(RobotCapability::Move) !=
+        robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_movement_disabled);
+}
+
+TEST_F(SensorFusionTest,
+       test_making_chip_and_kick_robot_capabilities_unavailable_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_low_cap;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(2, robot_unavailable_capabilities.size());
+
+    bool is_kick_disabled = robot_unavailable_capabilities.find(RobotCapability::Kick) !=
+                            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_kick_disabled);
+
+    bool is_chip_disabled = robot_unavailable_capabilities.find(RobotCapability::Chip) !=
+                            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_chip_disabled);
+}
+
+TEST_F(SensorFusionTest,
+       test_making_dribble_robot_capabilities_unavailable_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_dribble_motor_hot;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(1, robot_unavailable_capabilities.size());
+
+    bool is_dribble_disabled =
+        robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
+        robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_dribble_disabled);
+}
+
+TEST_F(SensorFusionTest, test_making_all_robot_capabilities_unavailable_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_multiple_error_codes;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(4, robot_unavailable_capabilities.size());
+
+    bool is_dribble_disabled =
+        robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
+        robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_dribble_disabled);
+
+    bool is_kick_disabled = robot_unavailable_capabilities.find(RobotCapability::Kick) !=
+                            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_kick_disabled);
+
+    bool is_chip_disabled = robot_unavailable_capabilities.find(RobotCapability::Chip) !=
+                            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_chip_disabled);
+
+    bool is_movement_disabled =
+        robot_unavailable_capabilities.find(RobotCapability::Move) !=
+        robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_movement_disabled);
+}
+
+TEST_F(SensorFusionTest, test_emptying_robot_unavailable_capabilities_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_no_error_code;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(0, robot_unavailable_capabilities.size());
+}
 
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 {
