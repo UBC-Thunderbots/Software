@@ -5,8 +5,8 @@
 #include "software/gui/drawing/navigator.h"
 #include "software/parameter/dynamic_parameters.h"
 
-ThreadedAI::ThreadedAI(std::shared_ptr<const AIConfig> ai_config,
-                       std::shared_ptr<const AIControlConfig> control_config)
+ThreadedAI::ThreadedAI(std::shared_ptr<const AiConfig> ai_config,
+                       std::shared_ptr<const AiControlConfig> control_config)
     : ai(ai_config, control_config), control_config(control_config)
 {
 }
@@ -19,7 +19,7 @@ void ThreadedAI::onValueReceived(World world)
 
 void ThreadedAI::runAIAndSendPrimitives(const World &world)
 {
-    if (control_config->RunAI()->value())
+    if (control_config->getRunAi()->value())
     {
         auto new_primitives = ai.getPrimitives(world);
 

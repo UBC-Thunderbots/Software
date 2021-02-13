@@ -56,9 +56,9 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
-    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAIConfig()
+    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAiConfig()
                                                            ->getShootOrPassPlayConfig()
-                                                           ->MinOpenAngleForShotDeg()
+                                                           ->getMinOpenAngleForShotDeg()
                                                            ->value());
     auto shoot_tactic             = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),

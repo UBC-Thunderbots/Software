@@ -23,23 +23,23 @@ class PassingEvaluationTest : public testing::Test
     }
 
     // We get these values here so we can make these tests robust to change
-    double min_pass_speed_param = DynamicParameters->getAIConfig()
+    double min_pass_speed_param = DynamicParameters->getAiConfig()
                                       ->getPassingConfig()
-                                      ->MinPassSpeedMPerS()
+                                      ->getMinPassSpeedMPerS()
                                       ->value();
-    double max_pass_speed_param = DynamicParameters->getAIConfig()
+    double max_pass_speed_param = DynamicParameters->getAiConfig()
                                       ->getPassingConfig()
-                                      ->MaxPassSpeedMPerS()
+                                      ->getMaxPassSpeedMPerS()
                                       ->value();
     double avg_desired_pass_speed;
 
-    double min_time_offset_for_pass_seconds_param = DynamicParameters->getAIConfig()
+    double min_time_offset_for_pass_seconds_param = DynamicParameters->getAiConfig()
                                                         ->getPassingConfig()
-                                                        ->MinTimeOffsetForPassSeconds()
+                                                        ->getMinTimeOffsetForPassSeconds()
                                                         ->value();
-    double max_time_offset_for_pass_seconds_param = DynamicParameters->getAIConfig()
+    double max_time_offset_for_pass_seconds_param = DynamicParameters->getAiConfig()
                                                         ->getPassingConfig()
-                                                        ->MaxTimeOffsetForPassSeconds()
+                                                        ->getMaxTimeOffsetForPassSeconds()
                                                         ->value();
     double avg_time_offset_for_pass_seconds;
 };
@@ -99,23 +99,23 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
                                                   world.field().yLength() / 2);
 
     double curr_time             = world.getMostRecentTimestamp().toSeconds();
-    double min_start_time_offset = DynamicParameters->getAIConfig()
+    double min_start_time_offset = DynamicParameters->getAiConfig()
                                        ->getPassingConfig()
-                                       ->MinTimeOffsetForPassSeconds()
+                                       ->getMinTimeOffsetForPassSeconds()
                                        ->value();
-    double max_start_time_offset = DynamicParameters->getAIConfig()
+    double max_start_time_offset = DynamicParameters->getAiConfig()
                                        ->getPassingConfig()
-                                       ->MaxTimeOffsetForPassSeconds()
+                                       ->getMaxTimeOffsetForPassSeconds()
                                        ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
-    std::uniform_real_distribution speed_distribution(DynamicParameters->getAIConfig()
+    std::uniform_real_distribution speed_distribution(DynamicParameters->getAiConfig()
                                                           ->getPassingConfig()
-                                                          ->MinPassSpeedMPerS()
+                                                          ->getMinPassSpeedMPerS()
                                                           ->value(),
-                                                      DynamicParameters->getAIConfig()
+                                                      DynamicParameters->getAiConfig()
                                                           ->getPassingConfig()
-                                                          ->MaxPassSpeedMPerS()
+                                                          ->getMaxPassSpeedMPerS()
                                                           ->value());
 
     std::vector<Pass> passes;

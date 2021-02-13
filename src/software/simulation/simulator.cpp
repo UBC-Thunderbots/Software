@@ -91,7 +91,8 @@ void Simulator::updateSimulatorRobots(
         auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
 
         FirmwareWorld_t* firmware_world_raw =
-            app_firmware_world_create(firmware_robot.release(), firmware_ball.release());
+            app_firmware_world_create(firmware_robot.release(), firmware_ball.release(),
+                                      &(Simulator::getCurrentFirmwareTimeSeconds));
         auto firmware_world =
             std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 
@@ -196,6 +197,8 @@ void Simulator::stepSimulation(const Duration& time_step)
     Duration remaining_time = time_step;
     while (remaining_time > Duration::fromSeconds(0))
     {
+        current_firmware_time = physics_world.getTimestamp();
+
         for (auto& iter : blue_simulator_robots)
         {
             auto simulator_robot = iter.first;
@@ -283,7 +286,7 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> Simulator::getSSLWrapperPacket() co
         createGeometryData(physics_world.getField(), FIELD_LINE_THICKNESS_METRES);
     auto wrapper_packet =
         createSSLWrapperPacket(std::move(geometry_data), std::move(detection_frame));
-    return std::move(wrapper_packet);
+    return wrapper_packet;
 }
 
 Field Simulator::getField() const
@@ -323,3 +326,12 @@ void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
 {
     physics_world.removeRobot(robot);
 }
+
+float Simulator::getCurrentFirmwareTimeSeconds()
+{
+    return static_cast<float>(current_firmware_time.toSeconds());
+}
+
+// We must give this variable a value here, as non-const static variables must be
+// initialized out-of-line
+Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);

@@ -1,0 +1,57 @@
+- bool:
+    name: run_ai
+    value: true
+    description: >-
+        Selecting will allow HL and Navigator to run, unselecting will
+        stop new decisions from being made, but the robots will finish
+        the last commands they were given. DO NOT USE in place of the e-stop.
+- bool:
+    name: override_ai_play
+    value: true
+    description: >-
+        Overrides the current play with the play
+        specified by currentPlay parameter
+
+- string:
+    name: current_ai_play
+    value: "Halt Play"
+    options:
+        - "Example Play"
+        - "Stop Play"
+        - "Halt Play"
+        - "Corner Kick Play"
+        - "Free Kick Play"
+        - "Defense Play"
+        - "KickoffEnemy Play"
+        - "KickoffFriendly Play"
+        - "Enemy Freekick Play"
+        - "Penalty Kick Play"
+        - "Penalty Kick Enemy Play"
+        - "ShootOrChip Play"
+    description: >-
+        Specifies the ai play that should be in use
+
+- bool:
+    name: override_referee_command
+    value: true
+    description: >-
+        Overrides the current referee command with the play 
+        specified by CurrentRefereeCommand and PreviousRefereeCommand
+        parameter
+
+- string:
+    name: current_referee_command
+    value: "HALT"
+    description: >-
+        Specifies the referee command that should be in use
+
+- string:
+    name: previous_referee_command
+    value: "HALT"
+    description: >-
+        Specifies the previous referee command to correctly set up 
+        the referee command state machine when overriding the referee command.
+        For example, if `PREPARE_KICKOFF_US` followed by `NORMAL_START`, 
+        then `isOurRestart()` will be `true`, while 
+        `PREPARE_KICKOFF_THEM` followed by `NORMAL_START` will set 
+        `isOurRestart()` to `false`

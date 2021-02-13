@@ -50,7 +50,7 @@ class CreaseDefenderTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     void accept(TacticVisitor &visitor) const override;
 
@@ -72,7 +72,8 @@ class CreaseDefenderTactic : public Tactic
      * @return The position and orientation we would like the defender to be in, or
      * std::nullopt if we could not compute one
      */
-    std::optional<std::pair<Point, Angle>> calculateDesiredState(const Robot &robot);
+    std::optional<std::pair<Point, Angle>> calculateDesiredState(
+        const Robot &robot) const;
 
     /**
      * Gets the segments that make up the path the Crease Defender should follow

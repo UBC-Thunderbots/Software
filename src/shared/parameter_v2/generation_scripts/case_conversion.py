@@ -6,8 +6,8 @@ def to_pascal_case(snake_str):
 
 
 def to_camel_case(snake_str):
-    upper_camel_case = to_pascal_case(snake_str)
-    return upper_camel_case[0].lower() + upper_camel_case[1:]
+    pascal_case = to_pascal_case(snake_str)
+    return pascal_case[0].lower() + pascal_case[1:]
 
 
 def to_snake_case(camel_str):

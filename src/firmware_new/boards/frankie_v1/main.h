@@ -53,6 +53,8 @@ extern "C"
 
     /* Exported functions prototypes ---------------------------------------------*/
     void Error_Handler(void);
+    void initIoDrivetrain(void);
+    void initIoNetworking(void);
 
 /* USER CODE BEGIN EFP */
 

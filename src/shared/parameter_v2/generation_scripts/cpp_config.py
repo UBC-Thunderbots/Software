@@ -63,10 +63,17 @@ IMMUTABLE_PARAMETER_LIST_CONFIG_ENTRY = (
     "std::const_pointer_cast<const {config_name}>({config_variable_name})"
 )
 
+
+# NOTE the init() function allow us to reset dynamic parameters, but it should be removed once we have dependency injection,
+# which we can do after https://github.com/UBC-Thunderbots/Software/issues/1299
 CONFIG_CLASS = """class {config_name} : public Config
 {{
    public:
     {config_constructor_header}
+    {{
+        init();
+    }}
+    void init()
     {{
         {constructor_entries}
         mutable_internal_param_list = {{

@@ -1,0 +1,19 @@
+- double:
+    name: enemy_about_to_steal_ball_rectangle_width
+    min: 0.0
+    max: 2.0
+    value: 0.18
+    description: >-
+        The total width ('sideways' of the robot) of the rectangle starting
+        from the friendly robot inside which we think an enemy is about to
+        steal the ball
+
+- double:
+    name: enemy_about_to_steal_ball_rectangle_extension_length
+    min: 0.0
+    max: 2.0
+    value: 0.27
+    description: >-
+        The total length (in the direction the robot is facing) of the rectangle
+        starting from the friendly robot inside which we think an enemy is about to
+        steal the ball

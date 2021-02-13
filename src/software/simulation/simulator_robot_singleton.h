@@ -101,7 +101,8 @@ class SimulatorRobotSingleton
     static void handleYellowRobotLogProto(TbotsProto_RobotLog log);
 
    private:
-    /** * Returns the x-position of the robot, in global field coordinates, in meters
+    /**
+     * Returns the x-position of the robot, in global field coordinates, in meters
      *
      * @return the x-position of the robot, in global field coordinates, in meters
      */
