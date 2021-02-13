@@ -207,7 +207,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
                 robotSlowsDown(4, world_ptr, yield);
                 robotSlowsDown(5, world_ptr, yield);*//*
 
-                    robotAvoidsBall(0, world_ptr, yield);
+                robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
                 robotAvoidsBall(2, world_ptr, yield);
                 robotAvoidsBall(3, world_ptr, yield);
@@ -219,6 +219,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }*/
+
 // Warning: "Navigator's path manager could not find a path for RobotId = 3"
 /*TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
 {
@@ -266,7 +267,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
             Duration::fromSeconds(10));
 }*/
 
-TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
+/*TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
 {
     setBallState(BallState(Point(0,0), Vector(0, 0)));
 
@@ -292,12 +293,12 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
                     yield();
                 }
                 // TODO: #1882 implement robots slow down when responding to stop command
-                /*robotSlowsDown(0, world_ptr, yield);
+                *//*robotSlowsDown(0, world_ptr, yield);
                         robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
                 robotSlowsDown(3, world_ptr, yield);
                 robotSlowsDown(4, world_ptr, yield);
-                robotSlowsDown(5, world_ptr, yield);*/
+                robotSlowsDown(5, world_ptr, yield);*//*
 
                     robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
@@ -310,4 +311,4 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}
+}*/
