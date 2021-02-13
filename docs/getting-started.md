@@ -184,7 +184,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
     - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
 5. Run Robot Diagnostics: `bazel run //software/gui/robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
-6. Run our SimulatedTests in the visualizer: `bazel test //software/simulated_tests:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/simulated_tests:[some_target_here] -- --enable_visualizer`
+6. Run our SimulatedTests in the visualizer: `bazel test //software/ai/hl/stp/play:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/play:[some_target_here] -- --enable_visualizer`
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
 
 ### Running AI vs AI
