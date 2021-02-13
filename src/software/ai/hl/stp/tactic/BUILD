@@ -28,8 +28,12 @@ cc_test(
 cc_library(
     name = "chip_tactic",
     srcs = ["chip_tactic.cpp"],
-    hdrs = ["chip_tactic.h"],
+    hdrs = [
+        "chip_fsm.h",
+        "chip_tactic.h",
+    ],
     deps = [
+        ":get_behind_ball_tactic",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
@@ -38,10 +42,46 @@ cc_library(
 )
 
 cc_test(
+    name = "chip_fsm_test",
+    srcs = ["chip_fsm_test.cpp"],
+    deps = [
+        ":chip_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "chip_tactic_test",
     srcs = ["chip_tactic_test.cpp"],
     deps = [
         ":chip_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "kick_tactic",
+    srcs = ["kick_tactic.cpp"],
+    hdrs = [
+        "kick_fsm.h",
+        "kick_tactic.h",
+    ],
+    deps = [
+        ":get_behind_ball_tactic",
+        ":tactic",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:kick_action",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "kick_fsm_test",
+    srcs = ["kick_fsm_test.cpp"],
+    deps = [
+        ":kick_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -212,6 +252,34 @@ cc_test(
         "//software/test_util",
         "//software/time:duration",
         "//software/world",
+    ],
+)
+
+cc_library(
+    name = "get_behind_ball_tactic",
+    srcs = ["get_behind_ball_tactic.cpp"],
+    hdrs = [
+        "get_behind_ball_fsm.h",
+        "get_behind_ball_tactic.h",
+    ],
+    deps = [
+        ":tactic",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/intent:move_intent",
+        "//software/geom:triangle",
+        "//software/geom/algorithms",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "get_behind_ball_fsm_test",
+    srcs = ["get_behind_ball_fsm_test.cpp"],
+    deps = [
+        ":get_behind_ball_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -419,7 +487,9 @@ cc_library(
         ":chip_tactic",
         ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
+        ":get_behind_ball_tactic",
         ":goalie_tactic",
+        ":kick_tactic",
         ":kickoff_chip_tactic",
         ":move_tactic",
         ":passer_tactic",
