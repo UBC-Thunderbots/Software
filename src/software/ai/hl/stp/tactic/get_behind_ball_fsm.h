@@ -110,6 +110,6 @@ struct GetBehindBallFSM
             *idle_s + update_e / update_move = get_behind_ball_s,
             get_behind_ball_s + update_e[!behind_ball] / update_move,
             get_behind_ball_s + update_e[behind_ball] / update_move = X,
-            X + update_e[behind_ball] / update_move);
+            X + update_e[!behind_ball] / update_move                = get_behind_ball_s);
     }
 };
