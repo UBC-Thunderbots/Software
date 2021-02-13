@@ -28,8 +28,12 @@ cc_test(
 cc_library(
     name = "chip_tactic",
     srcs = ["chip_tactic.cpp"],
-    hdrs = ["chip_tactic.h"],
+    hdrs = [
+        "chip_fsm.h",
+        "chip_tactic.h",
+    ],
     deps = [
+        ":get_behind_ball_tactic",
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
@@ -38,10 +42,46 @@ cc_library(
 )
 
 cc_test(
+    name = "chip_fsm_test",
+    srcs = ["chip_fsm_test.cpp"],
+    deps = [
+        ":chip_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "chip_tactic_test",
     srcs = ["chip_tactic_test.cpp"],
     deps = [
         ":chip_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "kick_tactic",
+    srcs = ["kick_tactic.cpp"],
+    hdrs = [
+        "kick_fsm.h",
+        "kick_tactic.h",
+    ],
+    deps = [
+        ":get_behind_ball_tactic",
+        ":tactic",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:kick_action",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "kick_fsm_test",
+    srcs = ["kick_fsm_test.cpp"],
+    deps = [
+        ":kick_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -91,6 +131,7 @@ cc_library(
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom/algorithms",
         "//software/logger",
+        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -146,6 +187,7 @@ cc_library(
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
+        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -165,12 +207,26 @@ cc_test(
 cc_library(
     name = "move_tactic",
     srcs = ["move_tactic.cpp"],
-    hdrs = ["move_tactic.h"],
+    hdrs = [
+        "move_fsm.h",
+        "move_tactic.h",
+    ],
     deps = [
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/intent:move_intent",
         "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "move_fsm_test",
+    srcs = ["move_fsm_test.cpp"],
+    deps = [
+        ":move_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -179,6 +235,49 @@ cc_test(
     srcs = ["move_tactic_test.cpp"],
     deps = [
         ":move_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "simulated_move_tactic_test",
+    srcs = ["simulated_move_tactic_test.cpp"],
+    deps = [
+        "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests:simulated_test_main",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/simulated_tests/validation_functions",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+    ],
+)
+
+cc_library(
+    name = "get_behind_ball_tactic",
+    srcs = ["get_behind_ball_tactic.cpp"],
+    hdrs = [
+        "get_behind_ball_fsm.h",
+        "get_behind_ball_tactic.h",
+    ],
+    deps = [
+        ":tactic",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/intent:move_intent",
+        "//software/geom:triangle",
+        "//software/geom/algorithms",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "get_behind_ball_fsm_test",
+    srcs = ["get_behind_ball_fsm_test.cpp"],
+    deps = [
+        ":get_behind_ball_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -291,9 +390,9 @@ cc_test(
 )
 
 cc_library(
-    name = "shadow_freekicker_tactic",
-    srcs = ["shadow_freekicker_tactic.cpp"],
-    hdrs = ["shadow_freekicker_tactic.h"],
+    name = "shadow_free_kicker_tactic",
+    srcs = ["shadow_free_kicker_tactic.cpp"],
+    hdrs = ["shadow_free_kicker_tactic.h"],
     deps = [
         ":tactic",
         "//shared:constants",
@@ -306,10 +405,10 @@ cc_library(
 )
 
 cc_test(
-    name = "shadow_freekicker_tactic_test",
-    srcs = ["shadow_freekicker_tactic_test.cpp"],
+    name = "shadow_free_kicker_tactic_test",
+    srcs = ["shadow_free_kicker_tactic_test.cpp"],
     deps = [
-        ":shadow_freekicker_tactic",
+        ":shadow_free_kicker_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -345,13 +444,28 @@ cc_test(
 cc_library(
     name = "stop_tactic",
     srcs = ["stop_tactic.cpp"],
-    hdrs = ["stop_tactic.h"],
+    hdrs = [
+        "stop_fsm.h",
+        "stop_tactic.h",
+    ],
     deps = [
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
+        "//software/ai/intent:move_intent",
+        "//software/ai/intent:stop_intent",
         "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "stop_fsm_test",
+    srcs = ["stop_fsm_test.cpp"],
+    deps = [
+        ":stop_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -373,7 +487,9 @@ cc_library(
         ":chip_tactic",
         ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
+        ":get_behind_ball_tactic",
         ":goalie_tactic",
+        ":kick_tactic",
         ":kickoff_chip_tactic",
         ":move_tactic",
         ":passer_tactic",
@@ -381,7 +497,7 @@ cc_library(
         ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_enemy_tactic",
-        ":shadow_freekicker_tactic",
+        ":shadow_free_kicker_tactic",
         ":shoot_goal_tactic",
         ":stop_tactic",
         ":tactic",
@@ -391,11 +507,19 @@ cc_library(
 cc_library(
     name = "tactic",
     srcs = ["tactic.cpp"],
-    hdrs = ["tactic.h"],
+    hdrs = [
+        "tactic.h",
+        "tactic_fsm.h",
+        "tactic_visitor.h",
+    ],
     deps = [
-        "tactic_visitor",
+        ":transition_conditions",
         "//software/ai/hl/stp/action",
+        "//software/ai/intent",
+        "//software/ai/intent:stop_intent",
+        "//software/util/typename",
         "//software/world",
+        "@sml",
     ],
 )
 
@@ -411,6 +535,20 @@ cc_test(
 )
 
 cc_library(
-    name = "tactic_visitor",
-    hdrs = ["tactic_visitor.h"],
+    name = "transition_conditions",
+    srcs = ["transition_conditions.cpp"],
+    hdrs = ["transition_conditions.h"],
+    deps = [
+        "//software/world",
+    ],
+)
+
+cc_library(
+    name = "transition_conditions_test",
+    srcs = ["transition_conditions_test.cpp"],
+    deps = [
+        ":tactic",
+        "//software/world",
+        "@gtest//:gtest_main",
+    ],
 )

@@ -8,8 +8,8 @@
 class RadioBackend : public Backend
 {
    public:
-    RadioBackend(std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config =
-                     DynamicParameters->getNetworkConfig()->getSSLCommunicationConfig());
+    RadioBackend(std::shared_ptr<const SslCommunicationConfig> ssl_communication_config =
+                     DynamicParameters->getNetworkConfig()->getSslCommunicationConfig());
 
    private:
     static const int DEFAULT_RADIO_CONFIG = 0;
@@ -25,7 +25,7 @@ class RadioBackend : public Backend
      */
     void receiveRobotStatus(RadioRobotStatus robot_status);
 
-    const std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config;
+    const std::shared_ptr<const SslCommunicationConfig> ssl_communication_config;
 
     // Client to listen for SSL protobufs
     SSLProtoClient ssl_proto_client;

@@ -71,7 +71,7 @@ void io_proto_multicast_sender_task(void* communication_profile)
         // serialize proto into buffer
         io_proto_multicast_communication_profile_acquireLock(profile);
 
-        // we ingore the error returned by pb_encode, it is up to the receiver to handle
+        // we ignore the error returned by pb_encode, it is up to the receiver to handle
         // malformed proto, so we send the buffer regardless
         pb_encode(&stream,
                   io_proto_multicast_communication_profile_getProtoFields(profile),

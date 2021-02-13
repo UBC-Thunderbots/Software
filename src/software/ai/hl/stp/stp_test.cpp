@@ -14,7 +14,7 @@
 class STPTest : public ::testing::Test
 {
    public:
-    STPTest() : stp([]() { return nullptr; }, DynamicParameters->getAIControlConfig(), 0)
+    STPTest() : stp([]() { return nullptr; }, DynamicParameters->getAiControlConfig(), 0)
     {
     }
 
@@ -26,11 +26,11 @@ class STPTest : public ::testing::Test
         };
         // Explicitly setting override AI Play to be false because we can't rely on
         // default values
-        MutableDynamicParameters->getMutableAIControlConfig()
-            ->mutableOverrideAIPlay()
+        MutableDynamicParameters->getMutableAiControlConfig()
+            ->getMutableOverrideAiPlay()
             ->setValue(false);
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, DynamicParameters->getAIControlConfig(), 0);
+        stp   = STP(default_play_constructor, DynamicParameters->getAiControlConfig(), 0);
         world = ::TestUtil::createBlankTestingWorld();
     }
 
@@ -167,9 +167,9 @@ TEST_F(STPTest, test_get_play_info)
 
     auto play_info = stp.getPlayInfo();
     std::string expected_referee_command, expected_play_name;
-    expected_referee_command                                         = "HALT";
-    expected_play_name                                               = "HaltTestPlay";
-    std::unordered_set<std::string> expected_robot_tactic_assignment = {
+    expected_referee_command                                  = "HALT";
+    expected_play_name                                        = "HaltTestPlay";
+    std::vector<std::string> expected_robot_tactic_assignment = {
         "Robot 0  -  StopTestTactic", "Robot 1  -  StopTestTactic"};
     PlayInfo expected_play_info = PlayInfo(expected_referee_command, expected_play_name,
                                            expected_robot_tactic_assignment);

@@ -9,21 +9,27 @@ ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
 {
 }
 
-
 void ChipTactic::updateWorldParams(const World &world)
 {
     this->ball = world.ball();
 }
 
-
-void ChipTactic::updateControlParams(Point chip_origin, Point chip_target)
+void ChipTactic::updateControlParams(const Point &chip_origin,
+                                     const Angle &chip_direction,
+                                     double chip_distance_meters)
 {
-    // update the control parameters stored by this tactic
-    this->chip_origin = chip_origin;
-    this->chip_target = chip_target;
+    control_params.chip_origin          = chip_origin;
+    control_params.chip_direction       = chip_direction;
+    control_params.chip_distance_meters = chip_distance_meters;
 }
 
-double ChipTactic::calculateRobotCost(const Robot &robot, const World &world)
+void ChipTactic::updateControlParams(const Point &chip_origin, const Point &chip_target)
+{
+    updateControlParams(chip_origin, (chip_target - chip_origin).orientation(),
+                        (chip_target - chip_origin).length());
+}
+
+double ChipTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // the closer the robot is to a ball, the cheaper it is to perform the chip
     double cost = (robot.position() - world.ball().position()).length() /
@@ -37,7 +43,9 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
     auto chip_action = std::make_shared<ChipAction>();
     do
     {
-        chip_action->updateControlParams(*robot, chip_origin, chip_target);
+        chip_action->updateControlParams(*robot_, control_params.chip_origin,
+                                         control_params.chip_direction,
+                                         control_params.chip_distance_meters);
         yield(chip_action);
     } while (!chip_action->done());
 }
@@ -50,4 +58,14 @@ void ChipTactic::accept(TacticVisitor &visitor) const
 Ball ChipTactic::getBall() const
 {
     return this->ball;
+}
+
+bool ChipTactic::done() const
+{
+    return fsm.is(boost::sml::X);
+}
+
+void ChipTactic::updateIntent(const TacticUpdate &tactic_update)
+{
+    fsm.process_event(ChipFSM::Update(control_params, tactic_update));
 }

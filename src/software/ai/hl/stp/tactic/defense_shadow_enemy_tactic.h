@@ -29,7 +29,7 @@ class DefenseShadowEnemyTactic : public Tactic
         const Ball &ball, bool ignore_goalie, double shadow_distance,
         std::shared_ptr<const DefenseShadowEnemyTacticConfig>
             defense_shadow_enemy_tactic_config =
-                DynamicParameters->getAIConfig()->getDefenseShadowEnemyTacticConfig());
+                DynamicParameters->getAiConfig()->getDefenseShadowEnemyTacticConfig());
 
     DefenseShadowEnemyTactic() = delete;
 
@@ -42,7 +42,7 @@ class DefenseShadowEnemyTactic : public Tactic
      */
     void updateControlParams(const EnemyThreat &enemy_threat);
 
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     void accept(TacticVisitor &visitor) const override;
 

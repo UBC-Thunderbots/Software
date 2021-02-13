@@ -9,6 +9,7 @@ py_binary(
         ":c_config.py",
         ":c_parameter.py",
         ":c_writer.py",
+        ":case_conversion.py",
         ":cpp_config.py",
         ":cpp_parameter.py",
         ":cpp_writer.py",
@@ -16,6 +17,7 @@ py_binary(
         ":type_map.py",
     ],
     data = [
+        "//shared/parameter_v2/config_definitions:parameter_configs",
         "//shared/parameter_v2/config_definitions:test_configs",
     ],
     main = ":generate_dynamic_parameters.py",

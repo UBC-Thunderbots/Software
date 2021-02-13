@@ -138,4 +138,7 @@ class SensorFusion
     RobotTeamFilter enemy_team_filter;
 
     TeamSide team_with_possession;
+
+    unsigned int friendly_goalie_id;
+    unsigned int enemy_goalie_id;
 };

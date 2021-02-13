@@ -29,6 +29,7 @@
 /* USER CODE BEGIN Includes */
 #include "firmware/app/logger/logger.h"
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware_new/boards/frankie_v1/io/network_logger.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_tasks.h"
 #include "firmware_new/boards/frankie_v1/io/ublox_odinw262_communicator.h"
@@ -259,13 +260,13 @@ void test_msg_update(void *argument)
         // We change the power status values randomly so that robot diagnostics
         // can "see" this robot on the network. This is a stopgap until we have
         // actual values for RobotStatus
-        robot_status_msg.power_status.battery_voltage   = sys_now() % 100;
-        robot_status_msg.power_status.capacitor_voltage = sys_now() % 100;
+        robot_status_msg.power_status.battery_voltage   = (float)(sys_now() % 100);
+        robot_status_msg.power_status.capacitor_voltage = (float)(sys_now() % 100);
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
         // run loop at 100hz
-        osDelay(1 / 10 * MILLISECONDS_PER_SECOND);
+        osDelay((unsigned int)MILLISECONDS_PER_SECOND / 10);
     }
     /* USER CODE END test_msg_update */
 }
@@ -276,7 +277,7 @@ void initIoNetworking()
 {
     // TODO channel and robot_id need to be hooked up to the dials on the robot, when
     // available https://github.com/UBC-Thunderbots/Software/issues/1517
-    unsigned channel = 0;
+    unsigned short int channel = 0;
 
     // initialize multicast communication
     io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);

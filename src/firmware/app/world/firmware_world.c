@@ -6,14 +6,17 @@ struct FirmwareWorld
 {
     FirmwareRobot_t* robot;
     FirmwareBall_t* ball;
+    float (*get_current_time_seconds)(void);
 };
 
-FirmwareWorld_t* app_firmware_world_create(FirmwareRobot_t* robot, FirmwareBall_t* ball)
+FirmwareWorld_t* app_firmware_world_create(FirmwareRobot_t* robot, FirmwareBall_t* ball,
+                                           float (*get_current_time_seconds)(void))
 {
     FirmwareWorld_t* new_world = malloc(sizeof(FirmwareWorld_t));
 
-    new_world->robot = robot;
-    new_world->ball  = ball;
+    new_world->robot                    = robot;
+    new_world->ball                     = ball;
+    new_world->get_current_time_seconds = get_current_time_seconds;
 
     return new_world;
 }
@@ -31,4 +34,9 @@ FirmwareRobot_t* app_firmware_world_getRobot(FirmwareWorld_t* world)
 FirmwareBall_t* app_firmware_world_getBall(FirmwareWorld_t* world)
 {
     return world->ball;
+}
+
+float app_firmware_world_getCurrentTime(FirmwareWorld_t* world)
+{
+    return world->get_current_time_seconds();
 }

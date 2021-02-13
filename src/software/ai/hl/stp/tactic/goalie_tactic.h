@@ -36,7 +36,7 @@ class GoalieTactic : public Tactic
     explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
                           const Team &enemy_team,
                           std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-                              DynamicParameters->getAIConfig()->getGoalieTacticConfig());
+                              DynamicParameters->getAiConfig()->getGoalieTacticConfig());
 
     GoalieTactic() = delete;
 
@@ -54,7 +54,7 @@ class GoalieTactic : public Tactic
 
     void updateWorldParams(const World &world) override;
 
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment

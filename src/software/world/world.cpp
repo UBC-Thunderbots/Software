@@ -1,7 +1,6 @@
 #include "software/world/world.h"
 
 #include "boost/circular_buffer.hpp"
-#include "software/parameter/dynamic_parameters.h"
 
 World::World(const Field &field, const Ball &ball, const Team &friendly_team,
              const Team &enemy_team, unsigned int buffer_size)
@@ -78,8 +77,8 @@ void World::updateRefereeCommand(const RefereeCommand &command)
     // Take the consensus of the previous referee messages
     if (!referee_command_history_.empty() &&
         std::all_of(referee_command_history_.begin(), referee_command_history_.end(),
-                    [&](auto gamestate) {
-                        return gamestate == referee_command_history_.front();
+                    [&](auto game_state) {
+                        return game_state == referee_command_history_.front();
                     }))
     {
         current_game_state_.updateRefereeCommand(command);

@@ -171,6 +171,17 @@ class Simulator
 
    private:
     /**
+     * Get the current time.
+     *
+     * This is passed into a `FirmwareWorld`, which requires that it is static (as it
+     * is C code). This will just return `current_firmware_time`, which should be updated
+     * to the actual current time before ticking any firmware.
+     *
+     * @return The value of `current_firmware_time`, in seconds.
+     */
+    static float getCurrentFirmwareTimeSeconds();
+
+    /**
      * Updates the given simulator_robots to contain and control the given physics_robots
      *
      * @param physics_robots The physics robots to add to the simulator robots
@@ -219,4 +230,8 @@ class Simulator
     // 200Hz is approximately how fast our robot firmware runs, so we
     // mimic that here for physics and primitive updates
     static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / 200.0;
+
+    // The current time. This is static so that it may be used by the firmware,
+    // and so must be set before each firmware tick
+    static Timestamp current_firmware_time;
 };

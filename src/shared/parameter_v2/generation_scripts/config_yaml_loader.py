@@ -55,7 +55,7 @@ class ConfigYamlLoader(object):
 
         :raises ConfigYamlMalformed: when the yaml is malformed
         :raises ConfigSchemaViolation: When the shema is violated
-        :raises ConfigYamlCycleDetected: When a cycle is detected in the incldues
+        :raises ConfigYamlCycleDetected: When a cycle is detected in the includes
 
         :param yaml_paths: the path to all the config yamls
         :type yaml_paths: list of str
@@ -130,7 +130,7 @@ class ConfigYamlLoader(object):
                             }
 
                         # parameter definitions only in file
-                        if isinstance(raw_config_metadata[tail][0], list):
+                        elif isinstance(raw_config_metadata[tail][0], list):
                             raw_config_metadata[tail] = {
                                 PARAMETER_KEY: raw_config_metadata[tail][0]
                             }
@@ -152,6 +152,10 @@ class ConfigYamlLoader(object):
                     raise ConfigYamlMalformed(
                         "Check malformed {} \n {}".format(tail, ymle)
                     ) from None
+                except Exception as exc:
+                    raise ConfigYamlMalformed(
+                        "Check malformed {} \n {}".format(tail, exc)
+                    ) from exc
 
         return raw_config_metadata
 
@@ -196,7 +200,6 @@ class ConfigYamlLoader(object):
                         )
 
             if PARAMETER_KEY in metadata:
-
                 # validate correct format with schema
                 try:
                     jsonschema.validate(metadata[PARAMETER_KEY], PARAM_DEF_SCHEMA)
@@ -243,7 +246,7 @@ class ConfigYamlLoader(object):
         """Creates a DiGraph from all the included configs and checks if there
         are cycles. Raises to the main thread if a cycle is detected
 
-        :raises ConfigYamlCycleDetected: When a cycle is detected in the incldues
+        :raises ConfigYamlCycleDetected: When a cycle is detected in the includes
         :param config_metadata: Metadata describing params and config includes
         :type config_metadata: dict
 
