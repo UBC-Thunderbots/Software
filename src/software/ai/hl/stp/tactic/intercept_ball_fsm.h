@@ -9,24 +9,49 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
-struct InterceptBallFSM
+struct SlowBallInterceptFSM
 {
-    // these classes define the states used in the transition table
-    // they are exposed so that tests can check if the FSM is in a particular state
-    class idle_state;
-    class wait_for_ball_state;
-    class chase_ball_state;
-    class slow_intercept_2_state;
+    class chase_ball;
 
-    // this struct defines the unique control parameters that the InterceptBallFSM
-    // requires in its update
     struct ControlParams
     {
     };
 
-    // this struct defines the only event that the InterceptBallFSM responds to
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    auto operator()()
+    {
+        using namespace boost::sml;
+
+        const auto chase_ball_s = state<chase_ball>;
+
+        // update_e is the _event_ that the InterceptBallFSM responds to
+        const auto update_e = event<Update>;
+
+        const auto chase_ball = [this](auto event) {
+            auto ball_position = event.common.world.ball().position();
+            auto face_ball_orientation =
+                (ball_position - event.common.robot.position()).orientation();
+            event.common.set_intent(std::make_unique<MoveIntent>(
+                event.common.robot.id(), ball_position, face_ball_orientation, 0,
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW));
+        };
+
+        return make_transition_table(
+            // src_state + event [guard] / action = dest state
+            *chase_ball_s + update_e / chase_ball);
+    }
+};
+
+struct FastBallInterceptFSM
+{
+    class wait_for_ball;
+
+    struct ControlParams
+    {
+    };
+
+    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     Point fastInterceptionPoint(const Robot &robot, const Ball &ball, const Field &field)
     {
@@ -54,10 +79,8 @@ struct InterceptBallFSM
     {
         using namespace boost::sml;
 
-        const auto idle_s          = state<idle_state>;
-        const auto wait_for_ball_s = state<wait_for_ball_state>;
-        const auto chase_ball_s    = state<chase_ball_state>;
         const auto move_s          = state<MoveFSM>;
+        const auto wait_for_ball_s = state<wait_for_ball>;
 
         // update_e is the _event_ that the InterceptBallFSM responds to
         const auto update_e = event<Update>;
@@ -86,16 +109,33 @@ struct InterceptBallFSM
                 DribblerMode::MAX_FORCE, BallCollisionType::AVOID));
         };
 
-        const auto chase_ball = [this](auto event) {
-            auto ball_position = event.common.world.ball().position();
-            auto face_ball_orientation =
-                (ball_position - event.common.robot.position()).orientation();
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), ball_position, face_ball_orientation, 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW));
-        };
+        return make_transition_table(
+            // src_state + event [guard] / action = dest state
+            *move_s + update_e / block_ball,
+            move_s = wait_for_ball_s,  // wait for ball when in position
+            wait_for_ball_s + update_e / wait_for_ball);
+    }
+};
 
-        const auto ball_moving_slow = [](auto event) {
+struct InterceptBallFSM
+{
+    struct ControlParams
+    {
+    };
+
+    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+
+    auto operator()()
+    {
+        using namespace boost::sml;
+
+        const auto slow_intercept_s = state<SlowBallInterceptFSM>;
+        const auto fast_intercept_s = state<FastBallInterceptFSM>;
+
+        // update_e is the _event_ that the InterceptBallFSM responds to
+        const auto update_e = event<Update>;
+
+        const auto slow_ball = [](auto event) {
             static const double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
             return event.common.world.ball().velocity().length() <
                    BALL_MOVING_SLOW_SPEED_THRESHOLD;
@@ -106,15 +146,23 @@ struct InterceptBallFSM
                 event.common.world.ball().position());
         };
 
+        const auto slow_intercept =
+            [](auto event, back::process<SlowBallInterceptFSM::Update> processEvent) {
+                processEvent(SlowBallInterceptFSM::Update({}, event.common));
+            };
+
+        const auto fast_intercept =
+            [](auto event, back::process<FastBallInterceptFSM::Update> processEvent) {
+                processEvent(FastBallInterceptFSM::Update({}, event.common));
+            };
+
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *idle_s + update_e[!ball_moving_slow] / block_ball = move_s,
-            *idle_s + update_e[ball_moving_slow] / chase_ball  = chase_ball_s,
-            move_s + update_e / block_ball,
-            move_s = wait_for_ball_s,  // wait for ball when in position
-            wait_for_ball_s + update_e[!intercepted] / wait_for_ball,
-            wait_for_ball_s + update_e[intercepted] = X,
-            chase_ball_s + update_e[!intercepted && ball_moving_slow] / chase_ball,
-            chase_ball_s + update_e[intercepted] = X);
+            *slow_intercept_s + update_e[intercepted] = X,
+            *slow_intercept_s + update_e[slow_ball] / slow_intercept,
+            *slow_intercept_s + update_e[!slow_ball] / fast_intercept = fast_intercept_s,
+            fast_intercept_s + update_e[intercepted]                  = X,
+            fast_intercept_s + update_e[!slow_ball] / fast_intercept,
+            fast_intercept_s + update_e[slow_ball] / slow_intercept = slow_intercept_s);
     }
 };
