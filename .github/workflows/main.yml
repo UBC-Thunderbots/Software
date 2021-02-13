@@ -79,7 +79,7 @@ jobs:
           # https://github.com/UBCFormulaElectric/Consolidated-Firmware/blob/master/.github/workflows/githubactions.yml
           sudo apt-get install xvfb
           sudo apt-get install systemd              
-          sudo cp ./github/xvfb.service /etc/systemd/system/xvfb.service
+          sudo cp "${GITHUB_WORKSPACE}"/github/xvfb.service /etc/systemd/system/xvfb.service
           sudo systemctl start xvfb
 
       - name: STM32CubeMX Code Generation
