@@ -73,9 +73,19 @@ jobs:
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
 
-      - name: CubeMX Code Generation Check
-        run: xvfb-run --auto-servernum .travis/check_cubemx_ci.sh
-            
+      - name: Setup Virtual X Server
+        run: |           
+          # Use xvfb to run programs requiring a GUI (e.g. STM32CubeMX code generation)                                  
+          # https://github.com/UBCFormulaElectric/Consolidated-Firmware/blob/master/.github/workflows/githubactions.yml
+          sudo apt-get install xvfb
+          sudo apt-get install systemd              
+          sudo cp ./github/xvfb.service /etc/systemd/system/xvfb.service
+          sudo systemctl start xvfb
+
+      - name: STM32CubeMX Code Generation
+        run: |
+          .travis/check_cubemx_ci.sh
+
       - name: New Robot Firmware Build
         run: |
          cd src

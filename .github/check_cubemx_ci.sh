@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# This script is used to check for corrupt ioc files in CI
+# This script checks that the generated code and the ioc file match
 #
 
 # The directory this script is in
