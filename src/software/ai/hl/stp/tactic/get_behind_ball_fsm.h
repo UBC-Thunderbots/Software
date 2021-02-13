@@ -56,6 +56,11 @@ struct GetBehindBallFSM
         //                 V
         //         direction of chip/kick
 
+        /**
+         * Action that updates the MoveIntent
+         *
+         * @param event GetBehindBallFSM::Update event
+         */
         const auto update_move = [size_of_region_behind_ball](auto event) {
             Vector behind_ball = Vector::createFromAngle(
                 event.control_params.chick_direction + Angle::half());
@@ -68,6 +73,13 @@ struct GetBehindBallFSM
                 BallCollisionType::AVOID));
         };
 
+        /**
+         * Guard that checks if the robot is behind the ball
+         *
+         * @param event GetBehindBallFSM::Update event
+         *
+         * @return if the robot is behind the ball
+         */
         const auto behind_ball = [size_of_region_behind_ball](auto event) {
             // A vector in the direction opposite the chip (behind the ball)
             Vector behind_ball = Vector::createFromAngle(
