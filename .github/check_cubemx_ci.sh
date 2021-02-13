@@ -18,9 +18,9 @@ if [[ "$?" != 0 ]]; then
     exit 1
 fi
 
-cd ..
-
 # Fix formatting
+../formatting_scripts/fix_formatting.sh
+
 git diff --ignore-space-at-eol -b -w --ignore-blank-lines --exit-code
 if [[ "$?" != 0 ]]; then
     echo "Code generated is different from code committed, stopping now."
