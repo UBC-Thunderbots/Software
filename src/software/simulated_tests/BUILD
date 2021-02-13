@@ -72,3 +72,16 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_test(
+    name = "simulated_tactic_test_fixture_test",
+    srcs = ["simulated_tactic_test_fixture_test.cpp"],
+    deps = [
+        ":simulated_tactic_test_fixture",
+        ":simulated_test_main",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/time:duration",
+        "//software/time:timestamp",
+        "//software/world",
+    ],
+)
