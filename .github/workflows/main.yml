@@ -72,13 +72,13 @@ jobs:
     
       - name: Environment Setup
         run: |
+          sudo apt-get install xvfb
+          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
 
       - name: STM32CubeMX Code Generation
         run: |
-          sudo apt-get install xvfb
-          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
           "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
 
       - name: New Robot Firmware Build
