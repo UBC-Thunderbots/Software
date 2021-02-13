@@ -84,7 +84,7 @@ jobs:
 
       - name: STM32CubeMX Code Generation
         run: |
-          .travis/check_cubemx_ci.sh
+          "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
 
       - name: New Robot Firmware Build
         run: |
