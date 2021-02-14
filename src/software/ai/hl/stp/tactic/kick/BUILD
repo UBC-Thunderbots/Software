@@ -8,10 +8,10 @@ cc_library(
         "kick_tactic.h",
     ],
     deps = [
-        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
-        "//software/ai/hl/stp/tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:kick_action",
+        "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/logger",
     ],
 )

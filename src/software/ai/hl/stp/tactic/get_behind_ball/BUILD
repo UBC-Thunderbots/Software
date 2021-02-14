@@ -8,9 +8,9 @@ cc_library(
         "get_behind_ball_tactic.h",
     ],
     deps = [
-        "//software/ai/hl/stp/tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/tactic",
         "//software/ai/intent:move_intent",
         "//software/geom:triangle",
         "//software/geom/algorithms",

@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 bool PenaltyKickEnemyPlay::isApplicable(const World &world) const

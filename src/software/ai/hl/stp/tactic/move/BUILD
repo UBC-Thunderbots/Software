@@ -8,9 +8,9 @@ cc_library(
         "move_tactic.h",
     ],
     deps = [
-        "//software/ai/hl/stp/tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/tactic",
         "//software/ai/intent:move_intent",
         "//software/logger",
     ],
@@ -50,4 +50,3 @@ cc_test(
         "//software/world",
     ],
 )
-

@@ -50,9 +50,9 @@ cc_library(
     srcs = ["kickoff_chip_tactic.cpp"],
     hdrs = ["kickoff_chip_tactic.h"],
     deps = [
-            "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
+        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/logger",
     ],
 )
@@ -188,11 +188,11 @@ cc_library(
     srcs = ["penalty_setup_tactic.cpp"],
     hdrs = ["penalty_setup_tactic.h"],
     deps = [
-        "//software/ai/hl/stp/tactic/move:move_tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
     ],
 )
@@ -305,14 +305,10 @@ cc_library(
     hdrs = ["all_tactics.h"],
     deps = [
         ":cherry_pick_tactic",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
-        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         ":goalie_tactic",
-        "//software/ai/hl/stp/tactic/kick:kick_tactic",
         ":kickoff_chip_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
         ":passer_tactic",
         ":penalty_kick_tactic",
         ":penalty_setup_tactic",
@@ -320,8 +316,12 @@ cc_library(
         ":shadow_enemy_tactic",
         ":shadow_free_kicker_tactic",
         ":shoot_goal_tactic",
-        "//software/ai/hl/stp/tactic/stop:stop_tactic",
         ":tactic",
+        "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
+        "//software/ai/hl/stp/tactic/kick:kick_tactic",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )
 
