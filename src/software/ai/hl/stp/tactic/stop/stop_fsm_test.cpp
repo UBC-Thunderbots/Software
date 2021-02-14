@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/stop_fsm.h"
+#include "software/ai/hl/stp/tactic/stop/stop_fsm.h"
 
 #include <gtest/gtest.h>
 

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/get_behind_ball_fsm.h"
+#include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 
 #include <gtest/gtest.h>
 

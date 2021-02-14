@@ -1,0 +1,39 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "stop_tactic",
+    srcs = ["stop_tactic.cpp"],
+    hdrs = [
+        "stop_fsm.h",
+        "stop_tactic.h",
+    ],
+    deps = [
+        "//software/ai/hl/stp/tactic",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:stop_action",
+        "//software/ai/intent:move_intent",
+        "//software/ai/intent:stop_intent",
+        "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "stop_fsm_test",
+    srcs = ["stop_fsm_test.cpp"],
+    deps = [
+        ":stop_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "stop_tactic_test",
+    srcs = ["stop_tactic_test.cpp"],
+    deps = [
+        ":stop_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/kick_fsm.h"
+#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 
 #include <gtest/gtest.h>
 

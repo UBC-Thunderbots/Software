@@ -2,7 +2,7 @@
 
 #include <queue>
 
-#include "software/ai/hl/stp/tactic/kick_fsm.h"
+#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/kick_intent.h"
 

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/chip_fsm.h"
+#include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 
 #include <gtest/gtest.h>
 
