@@ -11,12 +11,6 @@ InterceptBallTactic::InterceptBallTactic()
 
 void InterceptBallTactic::updateWorldParams(const World &world) {}
 
-void InterceptBallTactic::updateControlParams(Point destination, Angle final_orientation,
-                                              double final_speed)
-{
-    // Update the control parameters stored by this Tactic
-}
-
 double InterceptBallTactic::calculateRobotCost(const Robot &robot,
                                                const World &world) const
 {
@@ -46,7 +40,7 @@ bool InterceptBallTactic::done() const
 
 void InterceptBallTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(InterceptBallFSM::Update(control_params, tactic_update));
+    fsm.process_event(InterceptBallFSM::Update({}, tactic_update));
 }
 
 void InterceptBallTactic::accept(TacticVisitor &visitor) const

@@ -17,17 +17,6 @@ class InterceptBallTactic : public Tactic
     void updateWorldParams(const World& world) override;
 
     /**
-     * Updates the control parameters for this InterceptBallTactic.
-     *
-     * @param destination The destination to move to (in global coordinates)
-     * @param final_orientation The final orientation the robot should have at
-     * the destination
-     * @param final_speed The final speed the robot should have at the destination
-     */
-    void updateControlParams(Point destination, Angle final_orientation,
-                             double final_speed);
-
-    /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
      * closer to the destination
      *
@@ -46,6 +35,4 @@ class InterceptBallTactic : public Tactic
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     HFSM<InterceptBallFSM> fsm;
-
-    InterceptBallFSM::ControlParams control_params;
 };
