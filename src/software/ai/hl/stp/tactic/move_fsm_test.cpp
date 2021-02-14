@@ -14,20 +14,31 @@ TEST(MoveFSMTest, test_transitions)
 
     BaseFSM<MoveFSM> fsm;
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::idle_state>));
+
+    // robot far from destination
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    // robot far from destination
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));
+
+    // robot close to destination
     robot = ::TestUtil::createRobotAtPos(Point(2, 2));
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    // robot close to destination
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));
+
+    // robot at destination and facing the right way
     robot.updateState(
         RobotState(Point(2, 3), Vector(), Angle::half(), AngularVelocity::zero()),
         Timestamp::fromSeconds(0));
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    // robot at destination and facing the right way
     EXPECT_TRUE(fsm.is(boost::sml::X));
+
+    // destination updated so robot needs to move to new destination
+    control_params = MoveFSM::ControlParams{.destination       = Point(1, -3),
+                                            .final_orientation = Angle::half(),
+                                            .final_speed       = 0.0};
+    fsm.process_event(MoveFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));
 }
