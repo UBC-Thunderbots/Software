@@ -14,10 +14,10 @@ TEST(KickFSMTest, test_transitions)
 
     HFSM<KickFSM> fsm;
 
-    // Start in GetBehindBallFSM state's idle_state
+    // Start in GetBehindBallFSM state's get_behind_ball_state
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
-        boost::sml::state<GetBehindBallFSM::idle_state>));
+        boost::sml::state<GetBehindBallFSM::get_behind_ball_state>));
 
     // Transition to GetBehindBallFSM state's get_behind_ball_state
     fsm.process_event(KickFSM::Update(

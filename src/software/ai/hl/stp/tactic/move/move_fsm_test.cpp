@@ -13,7 +13,7 @@ TEST(MoveFSMTest, test_transitions)
                                           .final_speed       = 0.0};
 
     BaseFSM<MoveFSM> fsm;
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::idle_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));
 
     // robot far from destination
     fsm.process_event(MoveFSM::Update(
