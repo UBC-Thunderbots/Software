@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/pass.h"
-#include "software/ai/hl/stp/tactic/move_fsm.h"
+#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
