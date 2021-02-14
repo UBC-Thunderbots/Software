@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/intercept_ball_action.h"  // TODO (#1888): remove this dependency
-#include "software/ai/hl/stp/tactic/intercept_ball_fsm.h"
+#include "software/ai/hl/stp/tactic/intercept_ball/intercept_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 

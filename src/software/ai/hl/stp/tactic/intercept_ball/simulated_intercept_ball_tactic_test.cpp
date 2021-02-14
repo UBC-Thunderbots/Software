@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/intercept_ball_tactic.h"
+#include "software/ai/hl/stp/tactic/intercept_ball/intercept_ball_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"

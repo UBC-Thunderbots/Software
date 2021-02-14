@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/intercept_ball_tactic.h"
+#include "software/ai/hl/stp/tactic/intercept_ball/intercept_ball_tactic.h"
 
 #include <algorithm>
 
