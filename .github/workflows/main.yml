@@ -88,7 +88,7 @@ jobs:
          cd src
          bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin         
              
-  gameplay-tests:
+  simulated-gameplay-tests:
     name: Simulated Gameplay Tests
     runs-on: ubuntu-18.04
     steps:
@@ -103,7 +103,6 @@ jobs:
         run: |
           cd src
           bazel test //software/simulated_tests/... \
-            //software/simulated_tests/... \
             //software/ai/hl/stp/play/... \
             //software/ai/hl/stp/tactic/... \
           

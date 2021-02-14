@@ -1,43 +1,32 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
-#include "software/ai/hl/stp/tactic/move_fsm.h"
+#include "software/ai/hl/stp/tactic/stop/stop_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
+#include "software/ai/intent/stop_intent.h"
 
 /**
- * The MoveTactic will move the assigned robot to the given destination and arrive
- * with the specified final orientation and speed
+ * The StopTactic will stop the robot from moving. The robot will actively try and brake
+ * to come to a halt unless is it told to coast, in which case it will coast to a stop.
  */
-class MoveTactic : public Tactic
+class StopTactic : public Tactic
 {
    public:
     /**
-     * Creates a new MoveTactic
-     *
+     * Creates a new StopTactic
+     t
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit MoveTactic(bool loop_forever);
+    explicit StopTactic(bool coast);
 
-    MoveTactic() = delete;
+    StopTactic() = delete;
 
     void updateWorldParams(const World& world) override;
 
     /**
-     * Updates the control parameters for this MoveTactic.
-     *
-     * @param destination The destination to move to (in global coordinates)
-     * @param final_orientation The final orientation the robot should have at
-     * the destination
-     * @param final_speed The final speed the robot should have at the destination
-     */
-    void updateControlParams(Point destination, Angle final_orientation,
-                             double final_speed);
-
-    /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-     * closer to the destination
+     * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
+     * equally
      *
      * @param robot The robot to evaluate the cost for
      * @param world The state of the world with which to perform the evaluation
@@ -51,9 +40,11 @@ class MoveTactic : public Tactic
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
+
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    BaseFSM<MoveFSM> fsm;
+    BaseFSM<StopFSM> fsm;
 
-    MoveFSM::ControlParams control_params;
+    // Whether or not the robot should coast to a stop
+    bool coast;
 };

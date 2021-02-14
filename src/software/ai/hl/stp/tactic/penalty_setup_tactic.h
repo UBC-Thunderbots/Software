@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 
 /**
  * The PenaltySetupTactic will move the assigned robot to the given destination and
