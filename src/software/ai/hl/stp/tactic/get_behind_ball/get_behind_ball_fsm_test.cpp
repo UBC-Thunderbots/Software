@@ -12,7 +12,7 @@ TEST(GetBehindBallFSMTest, test_transitions)
                                                    .chick_direction = Angle::quarter()};
 
     BaseFSM<GetBehindBallFSM> fsm;
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::idle_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::get_behind_ball_state>));
     fsm.process_event(GetBehindBallFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::get_behind_ball_state>));

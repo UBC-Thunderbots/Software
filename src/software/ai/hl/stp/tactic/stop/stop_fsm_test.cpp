@@ -13,7 +13,7 @@ TEST(StopFSMTest, test_transitions)
                 Timestamp::fromSeconds(123));
 
     BaseFSM<StopFSM> fsm;
-    EXPECT_TRUE(fsm.is(boost::sml::state<StopFSM::idle_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<StopFSM::stop_state>));
     fsm.process_event(
         StopFSM::Update(StopFSM::ControlParams{.coast = false},
                         TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));

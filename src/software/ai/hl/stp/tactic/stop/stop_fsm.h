@@ -5,7 +5,6 @@
 
 struct StopFSM
 {
-    class idle_state;
     class stop_state;
 
     struct ControlParams
@@ -21,7 +20,6 @@ struct StopFSM
     {
         using namespace boost::sml;
 
-        const auto idle_s   = state<idle_state>;
         const auto stop_s   = state<stop_state>;
         const auto update_e = event<Update>;
 
@@ -48,10 +46,9 @@ struct StopFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *idle_s + update_e / update_stop            = stop_s,
-            stop_s + update_e[!stop_done] / update_stop = stop_s,
-            stop_s + update_e[stop_done] / update_stop  = X,
-            X + update_e[!stop_done] / update_stop      = stop_s,
-            X + update_e[stop_done] / update_stop       = X);
+            *stop_s + update_e[!stop_done] / update_stop = stop_s,
+            stop_s + update_e[stop_done] / update_stop   = X,
+            X + update_e[!stop_done] / update_stop       = stop_s,
+            X + update_e[stop_done] / update_stop        = X);
     }
 };
