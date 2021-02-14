@@ -4,33 +4,51 @@
 
 #include "software/test_util/test_util.h"
 
-TEST(InterceptBallFSMTest, test_transitions)
+TEST(InterceptBallFSMTest, test_transitions_fast_ball)
 {
-    //    World world = ::TestUtil::createBlankTestingWorld();
-    //    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    //    InterceptBallFSM::ControlParams control_params{.destination       = Point(2, 3),
-    //                                          .final_orientation = Angle::half(),
-    //                                          .final_speed       = 0.0};
-    //
-    //    BaseFSM<InterceptBallFSM> fsm;
-    //    EXPECT_TRUE(fsm.is(boost::sml::state<InterceptBallFSM::idle_state>));
-    //    fsm.process_event(InterceptBallFSM::Update(
-    //        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>)
-    //        {})));
-    //    // robot far from destination
-    //    EXPECT_TRUE(fsm.is(boost::sml::state<InterceptBallFSM::move_state>));
-    //    robot = ::TestUtil::createRobotAtPos(Point(2, 2));
-    //    fsm.process_event(InterceptBallFSM::Update(
-    //        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>)
-    //        {})));
-    //    // robot close to destination
-    //    EXPECT_TRUE(fsm.is(boost::sml::state<InterceptBallFSM::move_state>));
-    //    robot.updateState(
-    //        RobotState(Point(2, 3), Vector(), Angle::half(), AngularVelocity::zero()),
-    //        Timestamp::fromSeconds(0));
-    //    fsm.process_event(InterceptBallFSM::Update(
-    //        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>)
-    //        {})));
-    //    // robot at destination and facing the right way
-    //    EXPECT_TRUE(fsm.is(boost::sml::X));
+    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world =
+        ::TestUtil::setBallPosition(world, Point(0.5, 0), Timestamp::fromSeconds(123));
+    world =
+        ::TestUtil::setBallVelocity(world, Vector(0, -1), Timestamp::fromSeconds(123));
+
+    HFSM<InterceptBallFSM> fsm;
+
+    // Start in chase_ball_state
+    EXPECT_TRUE(fsm.is(boost::sml::state<InterceptBallFSM::chase_ball>));
+
+    // Transition to FastBallInterceptFSM to block the ball
+    fsm.process_event(InterceptBallFSM::Update(
+        {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+
+    // At ball point so transition to done
+    robot = ::TestUtil::createRobotAtPos(Point(0.5, 0));
+    fsm.process_event(InterceptBallFSM::Update(
+        {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::X));
+}
+
+TEST(InterceptBallFSMTest, test_transitions_slow_ball)
+{
+    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
+    World world = ::TestUtil::createBlankTestingWorld();
+    world = ::TestUtil::setBallPosition(world, Point(2, 0), Timestamp::fromSeconds(123));
+
+    HFSM<InterceptBallFSM> fsm;
+
+    // Start in chase_ball_state
+    EXPECT_TRUE(fsm.is(boost::sml::state<InterceptBallFSM::chase_ball>));
+
+    // Stay in chase_ball state
+    fsm.process_event(InterceptBallFSM::Update(
+        {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<InterceptBallFSM::chase_ball>));
+
+    // At interception point so transition to waiting for the ball
+    robot = ::TestUtil::createRobotAtPos(Point(2, 0));
+    fsm.process_event(InterceptBallFSM::Update(
+        {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::X));
 }
