@@ -5,6 +5,7 @@
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/simulated_tests/validation_functions/robots_on_friendly_half_validation.h"
+#include "software/simulated_tests/validation_functions/robots_on_center_circle_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -49,7 +50,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
             robotAtPosition(1, world_ptr, robotOneExpectedPos, 0.05, yield);
             robotAtPosition(2, world_ptr, robotTwoExpectedPos, 0.05, yield);
 
-            // check three shadowing robots positions
+            // check the positions of the three robots shadowing enemy robots
             // add a TODO for robot 3 and comment the check out, since it is bugged and will not go to correct spot, thus failing the test
 
             robotAtPosition(3, world_ptr, robotThreeExpectedPos, 0.05, yield);
@@ -68,6 +69,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) 
         {
             robotsOnFriendlyHalf(world_ptr, yield);
+            robotsOnCenterCircle(world_ptr, yield);
         }
     };
 
