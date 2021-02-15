@@ -4,8 +4,7 @@
 #include "software/world/world.h"
 
 /**
- * Checks if the friendly robots are in friendly half of the field and not in the
- * center circle, else assertion fails.
+ * Checks if the friendly robots are in friendly half of the field, else assertion fails.
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param yield yields control to the next routine (coroutines)
  */

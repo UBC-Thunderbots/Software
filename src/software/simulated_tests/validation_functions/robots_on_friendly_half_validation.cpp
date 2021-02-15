@@ -1,9 +1,11 @@
 #include "software/simulated_tests/validation_functions/robots_on_friendly_half_validation.h"
 
+#include <gtest/gtest.h>
+
 void robotsOnFriendlyHalf(std::shared_ptr<World> world_ptr,
                           ValidationCoroutine::push_type& yield)
 {
-    for(auto robot : world_ptr->friendlyTeam()) {
+    for(auto robot : world_ptr->friendlyTeam().getAllRobots()) {
         if (world_ptr->field().pointInEnemyHalf(robot.position()))
         {
             ASSERT(false) << "Robot entered enemy half during";
