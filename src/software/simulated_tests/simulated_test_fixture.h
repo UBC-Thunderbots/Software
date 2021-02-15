@@ -23,6 +23,9 @@ class SimulatedTestFixture : public ::testing::Test
     // if false, visualizer does not run during simulated tests
     // if true, running tests are displayed on the visualizer
     static bool enable_visualizer;
+
+    // Controls whether the AI will be stopped when the simulated test starts
+    // only if enable_visualizer is true
     static bool stop_ai_on_start;
 
    protected:

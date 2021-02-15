@@ -8,7 +8,7 @@
     name: stop_ai_on_start
     value: false
     description: >-
-        Displays simulated test on visualizer
+        If enable_visualizer is true, then stops the AI when the test starts
 
 - string:
     name: logging_dir

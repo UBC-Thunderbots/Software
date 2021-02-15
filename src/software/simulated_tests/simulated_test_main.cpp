@@ -20,7 +20,10 @@ int main(int argc, char **argv)
     if (!help_requested)
     {
         SimulatedTestFixture::enable_visualizer = args->getEnableVisualizer()->value();
-        SimulatedTestFixture::stop_ai_on_start  = args->getStopAiOnStart()->value();
+        if (SimulatedTestFixture::enable_visualizer)
+        {
+            SimulatedTestFixture::stop_ai_on_start = args->getStopAiOnStart()->value();
+        }
     }
 
     return RUN_ALL_TESTS();
