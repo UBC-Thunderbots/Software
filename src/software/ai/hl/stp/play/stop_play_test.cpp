@@ -312,3 +312,99 @@ class StopPlayTest : public SimulatedPlayTestFixture
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }*/
+
+// Warning: "Navigator's path manager could not find a path..."
+/*TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
+{
+    setBallState(BallState(Point(3,0), Vector(0, 0)));
+
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+            {Point(-4.5, 2), Point(0,0.3), Point(0.3, 0), Point(0,-0.3),
+             Point(-0.3,0), Point(0.2, 0.2)}));
+    setFriendlyGoalie(0);
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+            {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
+             field().enemyDefenseArea().negXNegYCorner(),
+             field().enemyDefenseArea().negXPosYCorner()}));
+    setEnemyGoalie(0);
+    setAIPlay(TYPENAME(StopPlay));
+    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+                {
+                    yield();
+                }
+                // TODO: #1882 implement robots slow down when responding to stop command
+                *//*robotSlowsDown(0, world_ptr, yield);
+                robotSlowsDown(1, world_ptr, yield);
+                robotSlowsDown(2, world_ptr, yield);
+                robotSlowsDown(3, world_ptr, yield);
+                robotSlowsDown(4, world_ptr, yield);
+                robotSlowsDown(5, world_ptr, yield);*//*
+
+                robotAvoidsBall(0, world_ptr, yield);
+                robotAvoidsBall(1, world_ptr, yield);
+                robotAvoidsBall(2, world_ptr, yield);
+                robotAvoidsBall(3, world_ptr, yield);
+                robotAvoidsBall(4, world_ptr, yield);
+                robotAvoidsBall(5, world_ptr, yield);
+            }
+    };
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
+}*/
+
+// Failed - robot moved too close to the ball
+// Robots can't enter defense area, so could not get fully behind the ball
+// Warning: "Navigator's path manager could not find a path..."
+TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_friendly_defense_area)
+{
+    setBallState(BallState(Point(-3,0), Vector(0, 0)));
+
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+            {Point(-4.5, 2), Point(0,3), Point(-1, -1), Point(0,0),
+             Point(-1,0), Point(2, 2)}));
+    setFriendlyGoalie(0);
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+            {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
+             field().enemyDefenseArea().negXNegYCorner(),
+             field().enemyDefenseArea().negXPosYCorner()}));
+    setEnemyGoalie(0);
+    setAIPlay(TYPENAME(StopPlay));
+    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+                {
+                    yield();
+                }
+                // TODO: #1882 implement robots slow down when responding to stop command
+                /*robotSlowsDown(0, world_ptr, yield);
+                robotSlowsDown(1, world_ptr, yield);
+                robotSlowsDown(2, world_ptr, yield);
+                robotSlowsDown(3, world_ptr, yield);
+                robotSlowsDown(4, world_ptr, yield);
+                robotSlowsDown(5, world_ptr, yield);*/
+
+                robotAvoidsBall(0, world_ptr, yield);
+                robotAvoidsBall(1, world_ptr, yield);
+                robotAvoidsBall(2, world_ptr, yield);
+                robotAvoidsBall(3, world_ptr, yield);
+                robotAvoidsBall(4, world_ptr, yield);
+                robotAvoidsBall(5, world_ptr, yield);
+            }
+    };
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
+}
