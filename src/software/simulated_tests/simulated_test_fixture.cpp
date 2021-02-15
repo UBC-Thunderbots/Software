@@ -28,7 +28,7 @@ void SimulatedTestFixture::SetUp()
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
 
     MutableDynamicParameters->getMutableAiControlConfig()->getMutableRunAi()->setValue(
-        true);
+        !SimulatedTestFixture::stop_ai_on_start);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team

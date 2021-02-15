@@ -4,6 +4,12 @@
     description: >-
         Displays simulated test on visualizer
 
+- bool:
+    name: stop_ai_on_start
+    value: false
+    description: >-
+        Displays simulated test on visualizer
+
 - string:
     name: logging_dir
     value: ""

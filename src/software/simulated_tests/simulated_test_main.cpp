@@ -5,6 +5,7 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
 bool SimulatedTestFixture::enable_visualizer = false;
+bool SimulatedTestFixture::stop_ai_on_start  = false;
 
 int main(int argc, char **argv)
 {
@@ -19,6 +20,7 @@ int main(int argc, char **argv)
     if (!help_requested)
     {
         SimulatedTestFixture::enable_visualizer = args->getEnableVisualizer()->value();
+        SimulatedTestFixture::stop_ai_on_start  = args->getStopAiOnStart()->value();
     }
 
     return RUN_ALL_TESTS();

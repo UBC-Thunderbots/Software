@@ -23,6 +23,7 @@ class SimulatedTestFixture : public ::testing::Test
     // if false, visualizer does not run during simulated tests
     // if true, running tests are displayed on the visualizer
     static bool enable_visualizer;
+    static bool stop_ai_on_start;
 
    protected:
     void SetUp() override;
