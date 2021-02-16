@@ -5,7 +5,7 @@
 #include "software/geom/algorithms/contains.h"
 
 void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
-                          ValidationCoroutine::push_type& yield)
+                             ValidationCoroutine::push_type& yield)
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {

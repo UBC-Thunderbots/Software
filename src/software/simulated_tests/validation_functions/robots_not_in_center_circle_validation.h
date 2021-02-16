@@ -9,4 +9,4 @@
  * @param yield yields control to the next routine (coroutines)
  */
 void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
-                          ValidationCoroutine::push_type& yield);
+                             ValidationCoroutine::push_type& yield);

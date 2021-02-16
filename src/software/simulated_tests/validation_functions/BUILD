@@ -6,15 +6,15 @@ cc_library(
         "friendly_scored_validation.cpp",
         "robot_at_position_validation.cpp",
         "robot_received_ball_validation.cpp",
-        "robots_not_in_center_circle_validation.cpp",
         "robots_in_friendly_half_validation.cpp",
+        "robots_not_in_center_circle_validation.cpp",
     ],
     hdrs = [
         "friendly_scored_validation.h",
         "robot_at_position_validation.h",
         "robot_received_ball_validation.h",
-        "robots_not_in_center_circle_validation.h",
         "robots_in_friendly_half_validation.h",
+        "robots_not_in_center_circle_validation.h",
     ],
     deps = [
         "//software/geom/algorithms",
