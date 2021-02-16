@@ -49,7 +49,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                           BALL_MAX_RADIUS_METERS + 0.1);
         double ball_position_x = world.field().penaltyEnemy().x();
 
-        // Move all non-shooter robots to the center of the field
+        // Move all non-shooter robots to a position behind the ball
         move_tactic_2->updateControlParams(
             Point(ball_position_x - 1.25, 0),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
