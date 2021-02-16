@@ -19,8 +19,10 @@ from python_tools.proto_log import ProtoLog
 import ipywidgets
 from IPython.display import display
 
-wrapper_proto_log = ProtoLog("/home/jordan/log_ssl_wrapper_filtered_world_test/SensorFusion_SSL_WrapperPacket", 
-                             SSL_WrapperPacket)
+wrapper_proto_log = ProtoLog(
+    "/home/jordan/log_ssl_wrapper_filtered_world_test/SensorFusion_SSL_WrapperPacket",
+    SSL_WrapperPacket,
+)
 
 
 # +
@@ -34,14 +36,14 @@ fig = figure(plot_width=900, plot_height=900, match_aspect=True)
 
 ssl_wrapper_plotter = SSLWrapperPlotter(fig)
 
+
 def plot_ssl_wrapper_at_idx(idx):
     ssl_wrapper_plotter.plot_ssl_wrapper(wrapper_proto_log[idx])
     push_notebook()
-    
+
+
 show(fig, notebook_handle=True)
-    
+
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
 # -
-
-
