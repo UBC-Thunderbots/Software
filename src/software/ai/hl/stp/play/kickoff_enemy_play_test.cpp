@@ -32,19 +32,14 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // check that robots 1, 3, 5 are shadowing enemy robots
             auto robotsShadowingEnemy = [](std::shared_ptr<World> world_ptr) -> bool {
                 // TODO: Fix bug with robot three not shadowing the enemy kicker in
                 // kickoff_enemy_play
                 // https://github.com/UBC-Thunderbots/Software/issues/1945
 
-                // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,
-                // -0.1));
                 Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
                 Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
 
-                // Point robotThreePos =
-                // world_ptr->friendlyTeam().getRobotById(3).value().position();
                 Point robotOnePos =
                     world_ptr->friendlyTeam().getRobotById(1).value().position();
                 Point robotFivePos =
@@ -52,10 +47,8 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 
                 return contains(robotOneShadowingRect, robotOnePos) &&
                        contains(robotFiveShadowingRect, robotFivePos);
-                //     && contains(robotThreeShadowingRect, robotThreePos);
             };
 
-            // check that robot 2 and 4 are defending the goal posts
             auto robotsDefendingPosts = [](std::shared_ptr<World> world_ptr) -> bool {
                 // Positions taken from kickoff_enemy_play
                 Point robotTwoExpectedPos =
@@ -69,10 +62,8 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                               2 * ROBOT_MAX_RADIUS_METERS,
                           -world_ptr->field().defenseAreaYLength() / 2.0);
 
-                // Radius of circle the robots must be within
                 double tolerance = 0.05;
 
-                // The expected circles that the robots must be within
                 Circle robotTwoCircle(robotTwoExpectedPos, tolerance);
                 Circle robotFourCircle(robotFourExpectedPos, tolerance);
 
