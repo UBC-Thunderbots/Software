@@ -6,6 +6,7 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/simulated_tests/validation_functions/robots_on_friendly_half_validation.h"
 #include "software/simulated_tests/validation_functions/robots_on_center_circle_validation.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -30,32 +31,49 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // This will keep the test running for 9.5 seconds to give everything enough
-        // time to settle into position and be observed with the FullSystemGUI
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1397
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            // check that robots 1, 3, 5 are shadowing enemy robots
+            auto robotsShadowingEnemy = [](std::shared_ptr<World> world_ptr) -> bool
             {
+                // TODO: Fix bug with robot three not shadowing the enemy kicker in kickoff_enemy_play
+                // https://github.com/UBC-Thunderbots/Software/issues/
+
+                // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75, -0.1));
+                Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
+                Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
+
+                return contains(robotOneShadowingRect, world_ptr->friendlyTeam().getRobotById(1).value().position()) &&
+                       contains(robotFiveShadowingRect, world_ptr->friendlyTeam().getRobotById(5).value().position());
+                //     && contains(robotThreeShadowingRect, world_ptr->friendlyTeam().getRobotById(3).value().position());
+            };
+
+            // check that robot 2 and 4 are defending the goal posts
+            auto robotsDefendingPosts = [](std::shared_ptr<World> world_ptr) -> bool
+            {
+                // Positions taken from kickoff_enemy_play
+                Point robotTwoExpectedPos = Point(world_ptr->field().friendlyGoalpostPos().x() +
+                        world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                        world_ptr->field().defenseAreaYLength() / 2.0);
+                Point robotFourExpectedPos = Point(world_ptr->field().friendlyGoalpostNeg().x() +
+                        world_ptr->field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                        -world_ptr->field().defenseAreaYLength() / 2.0);
+
+                // Radius of circle the robots must be within
+                double tolerance = 0.05;
+
+                // The expected circles that the robots must be within
+                Circle robotTwoCircle(robotTwoExpectedPos, tolerance);
+                Circle robotFourCircle(robotFourExpectedPos, tolerance);
+
+                return contains(robotTwoCircle, world_ptr->friendlyTeam().getRobotById(2).value().position()) &&
+                       contains(robotFourCircle, world_ptr->friendlyTeam().getRobotById(4).value().position());
+            };
+
+            while (!robotsDefendingPosts(world_ptr) && !robotsShadowingEnemy(world_ptr)) {
                 yield();
             }
-            // // check two defending robots positions
-            // Point robotOneExpectedPos = Point(world.field().friendlyGoalpostNeg().x() +
-            //         world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-            //         -world.field().defenseAreaYLength() / 2.0);
-            // Point robotTwoExpectedPos = Point(world.field().friendlyGoalpostPos().x() +
-            //         world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-            //         world.field().defenseAreaYLength() / 2.0);
-
-            // robotAtPosition(1, world_ptr, robotOneExpectedPos, 0.05, yield);
-            // robotAtPosition(2, world_ptr, robotTwoExpectedPos, 0.05, yield);
-
-
-            // // check the positions of the three robots shadowing enemy robots
-            // // add a TODO for robot 3 and comment the check out, since it is bugged and will not go to correct spot, thus failing the test
-            // robotAtPosition(3, world_ptr, robotThreeExpectedPos, 0.05, yield);
-            // robotAtPosition(4, world_ptr, robotFourExpectedPos, 0.05, yield);
-            // robotAtPosition(5, world_ptr, robotFiveExpectedPos, 0.05, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
