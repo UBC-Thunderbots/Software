@@ -78,3 +78,35 @@ TEST_F(SimulatedMoveTacticTest, test_stopped_ball)
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
+
+TEST_F(SimulatedMoveTacticTest, test_ball_bounce_of_enemy_robot)
+{
+    Point initial_position = Point(-3, 1.5);
+    setBallState(BallState(Point(0, 0), Vector(2.5, 0)));
+    addFriendlyRobots(
+        TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position}));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
+         field().enemyDefenseArea().negXNegYCorner(),
+         field().enemyDefenseArea().negXPosYCorner()}));
+    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
+
+    auto tactic = std::make_shared<InterceptBallTactic>();
+    setTactic(tactic);
+    setRobotId(1);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [tactic](std::shared_ptr<World> world_ptr,
+                 ValidationCoroutine::push_type& yield) {
+            while (!tactic->done())
+            {
+                yield();
+            }
+            robotReceivedBall(1, world_ptr, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
+}
