@@ -317,11 +317,11 @@ cc_test(
     srcs = ["kickoff_enemy_play_test.cpp"],
     deps = [
         "//software/ai/hl/stp/play:kickoff_enemy_play",
+        "//software/geom/algorithms",
         "//software/simulated_tests:simulated_play_test_fixture",
         "//software/simulated_tests:simulated_test_main",
         "//software/simulated_tests/validation:validation_function",
         "//software/simulated_tests/validation_functions",
-        "//software/geom/algorithms",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",

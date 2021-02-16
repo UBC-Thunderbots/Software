@@ -21,6 +21,6 @@ cc_library(
         "//software/simulated_tests/validation:validation_function",
         "//software/world",
         "@boost//:coroutine2",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
