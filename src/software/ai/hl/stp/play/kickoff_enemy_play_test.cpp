@@ -43,15 +43,16 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                 Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
                 Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
 
-                return contains(robotOneShadowingRect, world_ptr->friendlyTeam()
-                                                           .getRobotById(1)
-                                                           .value()
-                                                           .position()) &&
-                       contains(
-                           robotFiveShadowingRect,
-                           world_ptr->friendlyTeam().getRobotById(5).value().position());
-                //     && contains(robotThreeShadowingRect,
-                //     world_ptr->friendlyTeam().getRobotById(3).value().position());
+                // Point robotThreePos =
+                // world_ptr->friendlyTeam().getRobotById(3).value().position();
+                Point robotOnePos =
+                    world_ptr->friendlyTeam().getRobotById(1).value().position();
+                Point robotFivePos =
+                    world_ptr->friendlyTeam().getRobotById(5).value().position();
+
+                return contains(robotOneShadowingRect, robotOnePos) &&
+                       contains(robotFiveShadowingRect, robotFivePos);
+                //     && contains(robotThreeShadowingRect, robotThreePos);
             };
 
             // check that robot 2 and 4 are defending the goal posts
@@ -75,13 +76,13 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                 Circle robotTwoCircle(robotTwoExpectedPos, tolerance);
                 Circle robotFourCircle(robotFourExpectedPos, tolerance);
 
-                return contains(robotTwoCircle, world_ptr->friendlyTeam()
-                                                    .getRobotById(2)
-                                                    .value()
-                                                    .position()) &&
-                       contains(
-                           robotFourCircle,
-                           world_ptr->friendlyTeam().getRobotById(4).value().position());
+                Point robotTwoPos =
+                    world_ptr->friendlyTeam().getRobotById(2).value().position();
+                Point robotFourPos =
+                    world_ptr->friendlyTeam().getRobotById(4).value().position();
+
+                return contains(robotTwoCircle, robotTwoPos) &&
+                       contains(robotFourCircle, robotFourPos);
             };
 
             while (!robotsDefendingPosts(world_ptr) && !robotsShadowingEnemy(world_ptr))
