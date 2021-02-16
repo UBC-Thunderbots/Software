@@ -9,7 +9,7 @@ void robotsInFriendlyHalf(std::shared_ptr<World> world_ptr,
     {
         if (world_ptr->field().pointInEnemyHalf(robot.position()))
         {
-            FAIL() << "Robot entered enemy half during";
+            FAIL() << "Robot " + std::to_string(robot.id()) + " entered enemy half";
         }
     }
 }

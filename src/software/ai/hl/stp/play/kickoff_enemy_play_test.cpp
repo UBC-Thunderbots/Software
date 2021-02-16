@@ -5,7 +5,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/simulated_tests/validation_functions/robots_in_center_circle_validation.h"
+#include "software/simulated_tests/validation_functions/robots_not_in_center_circle_validation.h"
 #include "software/simulated_tests/validation_functions/robots_in_friendly_half_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -76,7 +76,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                        contains(robotFourCircle, robotFourPos);
             };
 
-            while (!robotsDefendingPosts(world_ptr) && !robotsShadowingEnemy(world_ptr))
+            while (!robotsDefendingPosts(world_ptr) || !robotsShadowingEnemy(world_ptr))
             {
                 yield();
             }
@@ -85,7 +85,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             robotsInFriendlyHalf(world_ptr, yield);
-            robotsInCenterCircle(world_ptr, yield);
+            robotsNotInCenterCircle(world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
