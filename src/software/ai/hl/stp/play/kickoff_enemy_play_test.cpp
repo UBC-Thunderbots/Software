@@ -6,6 +6,7 @@
 #include "software/simulated_tests/non_terminating_validation_functions/robots_in_friendly_half_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_not_in_center_circle_validation.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -37,21 +38,14 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                 // kickoff_enemy_play
                 // https://github.com/UBC-Thunderbots/Software/issues/1945
 
-                // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,
-                // -0.1));
                 Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
                 Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
+                // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,
+                // -0.1));
 
-                // Point robotThreePos =
-                // world_ptr->friendlyTeam().getRobotById(3).value().position();
-                Point robotOnePos =
-                    world_ptr->friendlyTeam().getRobotById(1).value().position();
-                Point robotFivePos =
-                    world_ptr->friendlyTeam().getRobotById(5).value().position();
-
-                return contains(robotOneShadowingRect, robotOnePos) &&
-                       contains(robotFiveShadowingRect, robotFivePos);
-                //     && contains(robotThreeShadowingRect, robotThreePos);
+                return robotInPolygon(1, robotOneShadowingRect, world_ptr) &&
+                       robotInPolygon(5, robotFiveShadowingRect, world_ptr);
+                //     && robotInPolygon(3, robotThreeShadowingRect, world_ptr);
             };
 
             auto robotsDefendingPosts = [](std::shared_ptr<World> world_ptr) -> bool {

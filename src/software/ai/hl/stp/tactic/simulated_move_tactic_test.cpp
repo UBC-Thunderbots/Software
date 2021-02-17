@@ -6,7 +6,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/simulated_tests/validation_functions/robot_at_position_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
