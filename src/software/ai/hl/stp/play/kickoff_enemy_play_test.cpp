@@ -33,20 +33,19 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            auto robotsShadowingEnemy = [](std::shared_ptr<World> world_ptr) -> bool {
-                // TODO: Fix bug with robot three not shadowing the enemy kicker in
-                // kickoff_enemy_play
-                // https://github.com/UBC-Thunderbots/Software/issues/1945
+            // TODO: Fix bug with robot three not shadowing the enemy kicker in
+            // kickoff_enemy_play
+            // https://github.com/UBC-Thunderbots/Software/issues/1945
 
-                Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
-                Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
-                // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,
-                // -0.1));
+            // Friendly robots in position to shadow enemy robots
+            Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
+            Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
+            // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,
+            // -0.1));
 
-                return robotInPolygon(1, robotOneShadowingRect, world_ptr) &&
-                       robotInPolygon(5, robotFiveShadowingRect, world_ptr);
-                //     && robotInPolygon(3, robotThreeShadowingRect, world_ptr);
-            };
+            robotInPolygon(1, robotOneShadowingRect, world_ptr, yield);
+            robotInPolygon(5, robotFiveShadowingRect, world_ptr, yield);
+            // robotInPolygon(3, robotThreeShadowingRect, world_ptr);
 
             auto robotsDefendingPosts = [](std::shared_ptr<World> world_ptr) -> bool {
                 // Positions taken from kickoff_enemy_play
@@ -75,7 +74,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                        contains(robotFourCircle, robotFourPos);
             };
 
-            while (!robotsDefendingPosts(world_ptr) || !robotsShadowingEnemy(world_ptr))
+            while (!robotsDefendingPosts(world_ptr))
             {
                 yield();
             }

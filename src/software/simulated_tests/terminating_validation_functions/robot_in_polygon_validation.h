@@ -9,7 +9,6 @@
  * for the given robot_id
  * @param polygon the polygon the robot should be within
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
- *
- * @return true if the polygon contains the robot
  */
-bool robotInPolygon(RobotId robot_id, Polygon polygon, std::shared_ptr<World> world_ptr);
+void robotInPolygon(RobotId robot_id, Polygon polygon, std::shared_ptr<World> world_ptr,
+                    ValidationCoroutine::push_type& yield);
