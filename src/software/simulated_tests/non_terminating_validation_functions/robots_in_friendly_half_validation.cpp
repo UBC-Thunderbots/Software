@@ -7,7 +7,7 @@ void robotsInFriendlyHalf(std::shared_ptr<World> world_ptr,
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
-        if (world_ptr->field().pointInEnemyHalf(robot.position()))
+        if (!world_ptr->field().pointInFriendlyHalf(robot.position()))
         {
             FAIL() << "Robot " + std::to_string(robot.id()) + " entered enemy half";
         }
