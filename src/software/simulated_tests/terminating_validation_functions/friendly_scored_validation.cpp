@@ -1,4 +1,4 @@
-#include "software/simulated_tests/validation_functions/friendly_scored_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 
 #include "software/geom/algorithms/contains.h"
 

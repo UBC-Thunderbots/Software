@@ -1,4 +1,4 @@
-#include "software/simulated_tests/validation_functions/robots_not_in_center_circle_validation.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robots_not_in_center_circle_validation.h"
 
 #include <gtest/gtest.h>
 

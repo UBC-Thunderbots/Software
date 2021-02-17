@@ -3,10 +3,10 @@
 #include <gtest/gtest.h>
 
 #include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robots_in_friendly_half_validation.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robots_not_in_center_circle_validation.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/simulated_tests/validation_functions/robots_in_friendly_half_validation.h"
-#include "software/simulated_tests/validation_functions/robots_not_in_center_circle_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -37,9 +37,13 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
                 // kickoff_enemy_play
                 // https://github.com/UBC-Thunderbots/Software/issues/1945
 
+                // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,
+                // -0.1));
                 Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
                 Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
 
+                // Point robotThreePos =
+                // world_ptr->friendlyTeam().getRobotById(3).value().position();
                 Point robotOnePos =
                     world_ptr->friendlyTeam().getRobotById(1).value().position();
                 Point robotFivePos =
@@ -47,6 +51,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 
                 return contains(robotOneShadowingRect, robotOnePos) &&
                        contains(robotFiveShadowingRect, robotFivePos);
+                //     && contains(robotThreeShadowingRect, robotThreePos);
             };
 
             auto robotsDefendingPosts = [](std::shared_ptr<World> world_ptr) -> bool {

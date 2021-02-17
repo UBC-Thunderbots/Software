@@ -1,6 +1,5 @@
-#include "software/simulated_tests/validation_functions/robot_received_ball_validation.h"
-
 #include "software/logger/logger.h"
+#include "software/simulated_tests/validation_functions/robot_terminating_received_ball_validation.h"
 
 
 void robotReceivedBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
