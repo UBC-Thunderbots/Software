@@ -102,19 +102,11 @@ jobs:
       - name: Simulated Test
         run: |
           cd src
-          bazel coverage //software/simulated_tests/... \
+          bazel test //software/simulated_tests/... \
             //software/simulated_tests/... \
             //software/ai/hl/stp/play/... \
             //software/ai/hl/stp/tactic/... \
           
-      # uploads coverage data to codecov
-      - name: Upload Coverage
-        run: |
-         cd src
-         bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ > codecov.log
-         cat codecov.log | head -n100
-         cat codecov.log | tail -n100
-         
   memory-leak-checks:
     name: Memory Leak Checks
     runs-on: ubuntu-18.04
