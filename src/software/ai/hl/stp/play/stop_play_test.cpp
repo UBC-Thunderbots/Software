@@ -13,7 +13,7 @@
 class StopPlayTest : public SimulatedPlayTestFixture
 {
 };
-
+//TODO: fix warning where "Navigator's path manager could not find a path" (open new issue and link here)
 /*TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
@@ -120,7 +120,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
             Duration::fromSeconds(10));
 }*/
 
-// Robots went out of bounds when trying to position themselves around the ball!!
+// Robots went out of bounds when trying to position themselves around the ball!! This is ok
 /*TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
 {
     setBallState(BallState(Point(-4,-2.5), Vector(0, 0)));
