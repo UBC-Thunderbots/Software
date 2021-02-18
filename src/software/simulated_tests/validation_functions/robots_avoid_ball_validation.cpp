@@ -6,32 +6,21 @@
 void robotsAvoidBall(std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield)
 {
-    for (int robot_id = 0; robot_id <= 5; robot_id++)
+    for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
-        auto robot_avoids_ball = [robot_id](std::shared_ptr<World> world_ptr) {
-            std::optional<Robot> robotOptional =
-                world_ptr->friendlyTeam().getRobotById(robot_id);
-            if (!robotOptional.has_value())
-            {
-                LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
-            }
+        int robot_id = robot.id();
+        double distance_from_ball = (robot.position() - world_ptr->ball().position()).length();
+        const double MIN_DISTANCE_FROM_BALL = ROBOT_MAX_RADIUS_METERS + 0.5;
+        if (distance_from_ball < MIN_DISTANCE_FROM_BALL)
+        {
+            LOG(WARNING) << "Robot " + std::to_string(robot_id) + " is " +
+            std::to_string(distance_from_ball -
+            ROBOT_MAX_RADIUS_METERS) +
+            "m away from the ball!";
+        }
 
-            Robot robot = robotOptional.value();
-            double distance_from_ball =
-                (robot.position() - world_ptr->ball().position()).length();
-            const double MIN_DISTANCE_FROM_BALL = ROBOT_MAX_RADIUS_METERS + 0.5;
-            if (distance_from_ball < MIN_DISTANCE_FROM_BALL)
-            {
-                LOG(WARNING) << "Robot " + std::to_string(robot_id) + " is " +
-                                    std::to_string(distance_from_ball -
-                                                   ROBOT_MAX_RADIUS_METERS) +
-                                    "m away from the ball!";
-            }
-
-            return (distance_from_ball >= MIN_DISTANCE_FROM_BALL);
-        };
-
-        if (!robot_avoids_ball(world_ptr))
+        bool robot_avoided_ball = distance_from_ball >= MIN_DISTANCE_FROM_BALL;
+        if (!robot_avoided_ball)
         {
             // TODO: change from throwing exception to FAIL(), once PR #1946 is merged
             throw std::runtime_error("Robot " + std::to_string(robot_id) +
