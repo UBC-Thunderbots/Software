@@ -14,9 +14,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
 {
 };
 
-// TODO: #1948 fix warning messages and bugs in stop play test
-
-// This test produced the warning, "No intent set for this tactic: MoveTactic"
+// TODO: (#1948) fix warning message "No intent set for this tactic: MoveTactic"
 TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
@@ -41,7 +39,7 @@ TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
             {
                 yield();
             }
-            // TODO: #1882 implement robots slow down when responding to stop command
+            // TODO: (#1882) implement robots slow down when responding to stop command
             // robotsSlowDown(world_ptr, yield);
             robotsAvoidBall(world_ptr, yield);
         }};
@@ -50,7 +48,7 @@ TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
             Duration::fromSeconds(10));
 }
 
-// This test produced the warning, "No intent set for this tactic: MoveTactic"
+// TODO: (#1948) fix warning message "No intent set for this tactic: MoveTactic"
 TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
 {
     setBallState(BallState(Point(-1, 0), Vector(0, 0)));
@@ -75,7 +73,7 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
             {
                 yield();
             }
-            // TODO: #1882 implement robots slow down when responding to stop command
+            // TODO: (#1882) implement robots slow down when responding to stop command
             // robotsSlowDown(world_ptr, yield);
             robotsAvoidBall(world_ptr, yield);
         }};
@@ -84,8 +82,8 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
             Duration::fromSeconds(10));
 }
 
-// Robots' positioning was bad, two went outside of the field and were not goal-side.
-// This test produced warning, "Navigator's path manager could not find a path"
+// TODO: (#1948) fix warning message "Navigator's path manager could not find a path" and
+// improve robot positioning
 TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
 {
     setBallState(BallState(Point(-4, -2.5), Vector(0, 0)));
@@ -110,7 +108,7 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
             {
                 yield();
             }
-            // TODO: #1882 implement robots slow down when responding to stop command
+            // TODO: (#1882) implement robots slow down when responding to stop command
             // robotsSlowDown(world_ptr, yield);
             robotsAvoidBall(world_ptr, yield);
         }};
@@ -143,7 +141,7 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_robots_spread_out)
             {
                 yield();
             }
-            // TODO: #1882 implement robots slow down when responding to stop command
+            // TODO: (#1882) implement robots slow down when responding to stop command
             // robotsSlowDown(world_ptr, yield);
             robotsAvoidBall(world_ptr, yield);
         }};
@@ -152,8 +150,7 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_robots_spread_out)
             Duration::fromSeconds(10));
 }
 
-// This test produced the warning, "Navigator's path manager could not find a path for
-// RobotId = 3"
+// TODO: (#1948) fix warning message "Navigator's path manager could not find a path"
 TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
 {
     setBallState(BallState(Point(4, -2.5), Vector(0, 0)));
@@ -178,7 +175,7 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
             {
                 yield();
             }
-            // TODO: #1882 implement robots slow down when responding to stop command
+            // TODO: (#1882) implement robots slow down when responding to stop command
             // robotsSlowDown(world_ptr, yield);
             robotsAvoidBall(world_ptr, yield);
         }};
@@ -211,7 +208,7 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
             {
                 yield();
             }
-            // TODO: #1882 implement robots slow down when responding to stop command
+            // TODO: (#1882) implement robots slow down when responding to stop command
             // robotsSlowDown(world_ptr, yield);
             robotsAvoidBall(world_ptr, yield);
         }};
@@ -220,7 +217,7 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
             Duration::fromSeconds(10));
 }
 
-// This test produced the warning, "Navigator's path manager could not find a path"
+// TODO: #1948 fix warning message "Navigator's path manager could not find a path"
 TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
 {
     setBallState(BallState(Point(3, 0), Vector(0, 0)));
@@ -245,7 +242,7 @@ TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
             {
                 yield();
             }
-            // TODO: #1882 implement robots slow down when responding to stop command
+            // TODO: (#1882) implement robots slow down when responding to stop command
             // robotsSlowDown(world_ptr, yield);
             robotsAvoidBall(world_ptr, yield);
         }};
@@ -254,10 +251,9 @@ TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
             Duration::fromSeconds(10));
 }
 
+// TODO: (#1948) Re-enable test once bug is fixed, fix warning and robot positioning
 // This test is disabled due to a bug that causes Robot 2 to move too close to the ball.
-// Robot 2 is boxed in by defence area, Robot 5, and the ball, so it moves closer to the
-// ball to try to make space. Robots' positioning was not good, two robots were on the
-// wrong side of the ball.
+// Robots' positioning was not good, two robots were on the wrong side of the ball.
 // This test produced the warning, "Navigator's path manager could not find a path"
 TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_in_front_of_friendly_defense_area)
 {
@@ -283,7 +279,7 @@ TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_in_front_of_friendly_defense_a
             {
                 yield();
             }
-            // TODO: #1882 implement robots slow down when responding to stop command
+            // TODO: (#1882) implement robots slow down when responding to stop command
             // robotsSlowDown(world_ptr, yield);
             robotsAvoidBall(world_ptr, yield);
         }};
