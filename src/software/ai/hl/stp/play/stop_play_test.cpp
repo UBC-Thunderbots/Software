@@ -14,6 +14,9 @@ class StopPlayTest : public SimulatedPlayTestFixture
 {
 };
 
+// TODO: #1948 fix warning messages and bugs in stop play test
+
+// This test produced the warning, "No intent set for this tactic: MoveTactic"
 TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
@@ -218,7 +221,6 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
 }
 
 // This test produced the warning, "Navigator's path manager could not find a path"
-// Robot positioning was good.
 TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
 {
     setBallState(BallState(Point(3, 0), Vector(0, 0)));
