@@ -12,6 +12,17 @@
 
 class StopPlayTest : public SimulatedPlayTestFixture
 {
+    void SetUp() override
+    {
+        setFriendlyGoalie(0);
+        addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+                {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
+                 field().enemyDefenseArea().negXNegYCorner(),
+                 field().enemyDefenseArea().negXPosYCorner()}));
+        setEnemyGoalie(0);
+        setAIPlay(TYPENAME(StopPlay));
+        setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
+    }
 };
 
 // TODO: (#1948) fix warning message "No intent set for this tactic: MoveTactic"
@@ -21,14 +32,6 @@ TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4, 0), Point(-0.3, 0), Point(0.3, 0), Point(0, 0.3), Point(-3, -1.5),
          Point(4.6, -3.1)}));
-    setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
-    setEnemyGoalie(0);
-    setAIPlay(TYPENAME(StopPlay));
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
@@ -55,14 +58,6 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4, 0), Point(-2.3, 0), Point(-1.7, 0), Point(-2, 0.3), Point(-3, -1.5),
          Point(4.6, -3.1)}));
-    setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
-    setEnemyGoalie(0);
-    setAIPlay(TYPENAME(StopPlay));
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
@@ -90,14 +85,6 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, -2.5), Point(-4, -2), Point(-2, -2.5), Point(-3, -2), Point(-3.5, -2),
          Point(-3, -1)}));
-    setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
-    setEnemyGoalie(0);
-    setAIPlay(TYPENAME(StopPlay));
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
@@ -123,14 +110,6 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_robots_spread_out)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4, 0), Point(1.7, 0), Point(2.3, 0), Point(2, 0.3), Point(-3, -1.5),
          Point(3, -3)}));
-    setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
-    setEnemyGoalie(0);
-    setAIPlay(TYPENAME(StopPlay));
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
@@ -157,14 +136,6 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(2, -2.5), Point(4, -1), Point(3, -2.5), Point(3, -2), Point(3.5, -2),
          Point(3, -1)}));
-    setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
-    setEnemyGoalie(0);
-    setAIPlay(TYPENAME(StopPlay));
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
@@ -190,14 +161,6 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-2, 0), Point(0, 0.3), Point(0.3, 0), Point(0, -0.3), Point(-0.3, 0),
          Point(0.2, 0.2)}));
-    setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
-    setEnemyGoalie(0);
-    setAIPlay(TYPENAME(StopPlay));
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
@@ -224,14 +187,6 @@ TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4.5, 2), Point(0, 0.3), Point(0.3, 0), Point(0, -0.3), Point(-0.3, 0),
          Point(0.2, 0.2)}));
-    setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
-    setEnemyGoalie(0);
-    setAIPlay(TYPENAME(StopPlay));
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
@@ -261,14 +216,6 @@ TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_in_front_of_friendly_defense_a
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4.5, 2), Point(0, 3), Point(-1, -1), Point(0, 0), Point(-1, 0),
          Point(2, 2)}));
-    setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
-    setEnemyGoalie(0);
-    setAIPlay(TYPENAME(StopPlay));
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
