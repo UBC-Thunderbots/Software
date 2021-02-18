@@ -37,47 +37,19 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
             // kickoff_enemy_play
             // https://github.com/UBC-Thunderbots/Software/issues/1945
 
-            // Friendly robots in position to shadow enemy robots
+            // Three Friendly robots in position to shadow enemy robots
             Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
             Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
             // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,
             // -0.1));
-
             robotInPolygon(1, robotOneShadowingRect, world_ptr, yield);
             robotInPolygon(5, robotFiveShadowingRect, world_ptr, yield);
             // robotInPolygon(3, robotThreeShadowingRect, world_ptr);
 
-            auto robotsDefendingPosts = [](std::shared_ptr<World> world_ptr) -> bool {
-                // Positions taken from kickoff_enemy_play
-                Point robotTwoExpectedPos =
-                    Point(world_ptr->field().friendlyGoalpostPos().x() +
-                              world_ptr->field().defenseAreaXLength() +
-                              2 * ROBOT_MAX_RADIUS_METERS,
-                          world_ptr->field().defenseAreaYLength() / 2.0);
-                Point robotFourExpectedPos =
-                    Point(world_ptr->field().friendlyGoalpostNeg().x() +
-                              world_ptr->field().defenseAreaXLength() +
-                              2 * ROBOT_MAX_RADIUS_METERS,
-                          -world_ptr->field().defenseAreaYLength() / 2.0);
-
-                double tolerance = 0.05;
-
-                Circle robotTwoCircle(robotTwoExpectedPos, tolerance);
-                Circle robotFourCircle(robotFourExpectedPos, tolerance);
-
-                Point robotTwoPos =
-                    world_ptr->friendlyTeam().getRobotById(2).value().position();
-                Point robotFourPos =
-                    world_ptr->friendlyTeam().getRobotById(4).value().position();
-
-                return contains(robotTwoCircle, robotTwoPos) &&
-                       contains(robotFourCircle, robotFourPos);
-            };
-
-            while (!robotsDefendingPosts(world_ptr))
-            {
-                yield();
-            }
+            // Two Friendly robots defending the exterior of defense box
+            Rectangle robotsDefendingRect(Point(-3.2, 1.1), Point(-3.5, -1.1));
+            robotInPolygon(2, robotsDefendingRect, world_ptr, yield);
+            robotInPolygon(4, robotsDefendingRect, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
