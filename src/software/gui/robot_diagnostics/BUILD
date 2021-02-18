@@ -14,17 +14,3 @@ cc_library(
         "@qt//:qt_widgets",
     ],
 )
-
-cc_binary(
-    name = "robot_diagnostics_main",
-    srcs = ["robot_diagnostics_main.cpp"],
-    deps = [
-        ":threaded_robot_diagnostics_gui",
-        "//software/backend",
-        "//software/backend:all_backends",
-        "//software/logger",
-        "//software/parameter:dynamic_parameters",
-        "//software/util/design_patterns:generic_factory",
-        "@boost//:program_options",
-    ],
-)

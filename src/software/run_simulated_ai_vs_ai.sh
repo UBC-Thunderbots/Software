@@ -37,4 +37,4 @@ tmux new-session \; \
   send-keys "fg" C-m \; \
   select-pane -t 0 \; \
   split-window -v \; \
-  send-keys "bazel run //software/simulation:standalone_simulator_main -- --interface=$1" C-m \;
+  send-keys "bazel run //software:standalone_simulator_main -- --interface=$1" C-m \;
