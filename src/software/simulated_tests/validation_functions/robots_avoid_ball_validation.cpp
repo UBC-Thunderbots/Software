@@ -9,14 +9,15 @@ void robotsAvoidBall(std::shared_ptr<World> world_ptr,
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
         int robot_id = robot.id();
-        double distance_from_ball = (robot.position() - world_ptr->ball().position()).length();
+        double distance_from_ball =
+            (robot.position() - world_ptr->ball().position()).length();
         const double MIN_DISTANCE_FROM_BALL = ROBOT_MAX_RADIUS_METERS + 0.5;
         if (distance_from_ball < MIN_DISTANCE_FROM_BALL)
         {
             LOG(WARNING) << "Robot " + std::to_string(robot_id) + " is " +
-            std::to_string(distance_from_ball -
-            ROBOT_MAX_RADIUS_METERS) +
-            "m away from the ball!";
+                                std::to_string(distance_from_ball -
+                                               ROBOT_MAX_RADIUS_METERS) +
+                                "m away from the ball!";
         }
 
         bool robot_avoided_ball = distance_from_ball >= MIN_DISTANCE_FROM_BALL;

@@ -8,19 +8,21 @@ void robotsSlowDown(std::shared_ptr<World> world_ptr,
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
-        int robot_id = robot.id();
+        int robot_id           = robot.id();
         double speed           = robot.velocity().length();
         const double MAX_SPEED = 1.5;
         if (speed > MAX_SPEED)
         {
-            LOG(WARNING) << "Robot " + std::to_string(robot_id) + "'s speed: " + std::to_string(speed);
+            LOG(WARNING) << "Robot " + std::to_string(robot_id) +
+                                "'s speed: " + std::to_string(speed);
         }
 
         bool robot_slowed_down = speed <= MAX_SPEED;
         if (!robot_slowed_down)
         {
             // TODO: change from throwing exception to FAIL(), once PR #1946 is merged
-            throw std::runtime_error("Robot " + std::to_string(robot_id) + " did not slow down!");
+            throw std::runtime_error("Robot " + std::to_string(robot_id) +
+                                     " did not slow down!");
         }
     }
 }

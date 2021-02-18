@@ -16,9 +16,9 @@ class StopPlayTest : public SimulatedPlayTestFixture
     {
         setFriendlyGoalie(0);
         addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-                {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-                 field().enemyDefenseArea().negXNegYCorner(),
-                 field().enemyDefenseArea().negXPosYCorner()}));
+            {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
+             field().enemyDefenseArea().negXNegYCorner(),
+             field().enemyDefenseArea().negXPosYCorner()}));
         setEnemyGoalie(0);
         setAIPlay(TYPENAME(StopPlay));
         setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
