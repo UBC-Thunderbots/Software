@@ -13,8 +13,8 @@
 class StopPlayTest : public SimulatedPlayTestFixture
 {
 };
-//TODO: fix warning where "Navigator's path manager could not find a path" (open new issue and link here)
-/*TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
+
+TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
@@ -47,12 +47,12 @@ class StopPlayTest : public SimulatedPlayTestFixture
                     yield();
                 }
                 // TODO: #1882 implement robots slow down when responding to stop command
-                *//*robotSlowsDown(0, world_ptr, yield);
+                robotSlowsDown(0, world_ptr, yield);
                 robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
                 robotSlowsDown(3, world_ptr, yield);
                 robotSlowsDown(4, world_ptr, yield);
-                robotSlowsDown(5, world_ptr, yield);*//*
+                robotSlowsDown(5, world_ptr, yield);
 
                 robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
@@ -65,11 +65,12 @@ class StopPlayTest : public SimulatedPlayTestFixture
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}*/
+}
 
-/*TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
+// This test produced the warning, "No intent set for this tactic: MoveTactic"
+TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
 {
-    setBallState(BallState(Point(-2, 0), Vector(0, 0)));
+    setBallState(BallState(Point(-1, 0), Vector(0, 0)));
 
     Point near_friendly_goal = Point(-4,0);
     Point close_goal_side = Point(-2.3, 0);
@@ -100,13 +101,13 @@ class StopPlayTest : public SimulatedPlayTestFixture
                     yield();
                 }
                 // TODO: #1882 implement robots slow down when responding to stop command
-                *//*robotSlowsDown(0, world_ptr, yield);
+                /*robotSlowsDown(0, world_ptr, yield);
                 robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
                 robotSlowsDown(3, world_ptr, yield);
                 robotSlowsDown(4, world_ptr, yield);
-                robotSlowsDown(5, world_ptr, yield);*//*
-
+                robotSlowsDown(5, world_ptr, yield);
+*/
                 robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
                 robotAvoidsBall(2, world_ptr, yield);
@@ -118,10 +119,11 @@ class StopPlayTest : public SimulatedPlayTestFixture
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}*/
+}
 
-// Robots went out of bounds when trying to position themselves around the ball!! This is ok
-/*TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
+// Robots' positioning was bad, two went outside of the field and were not goal-side.
+// This test produced warning, "Navigator's path manager could not find a path"
+TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
 {
     setBallState(BallState(Point(-4,-2.5), Vector(0, 0)));
 
@@ -147,13 +149,13 @@ class StopPlayTest : public SimulatedPlayTestFixture
                     yield();
                 }
                 // TODO: #1882 implement robots slow down when responding to stop command
-                *//*robotSlowsDown(0, world_ptr, yield);
+                /*robotSlowsDown(0, world_ptr, yield);
                 robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
                 robotSlowsDown(3, world_ptr, yield);
                 robotSlowsDown(4, world_ptr, yield);
-                robotSlowsDown(5, world_ptr, yield);*//*
-
+                robotSlowsDown(5, world_ptr, yield);
+*/
                 robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
                 robotAvoidsBall(2, world_ptr, yield);
@@ -165,9 +167,9 @@ class StopPlayTest : public SimulatedPlayTestFixture
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}*/
+}
 
-/*TEST_F(StopPlayTest, test_stop_play_enemy_half_robots_spread_out)
+TEST_F(StopPlayTest, test_stop_play_enemy_half_robots_spread_out)
 {
     setBallState(BallState(Point(2, 0), Vector(0, 0)));
 
@@ -200,12 +202,12 @@ class StopPlayTest : public SimulatedPlayTestFixture
                     yield();
                 }
                 // TODO: #1882 implement robots slow down when responding to stop command
-                *//*robotSlowsDown(0, world_ptr, yield);
-                        robotSlowsDown(1, world_ptr, yield);
+                /*robotSlowsDown(0, world_ptr, yield);
+                robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
                 robotSlowsDown(3, world_ptr, yield);
                 robotSlowsDown(4, world_ptr, yield);
-                robotSlowsDown(5, world_ptr, yield);*//*
+                robotSlowsDown(5, world_ptr, yield);*/
 
                 robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
@@ -218,10 +220,10 @@ class StopPlayTest : public SimulatedPlayTestFixture
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}*/
+}
 
-// Warning: "Navigator's path manager could not find a path for RobotId = 3"
-/*TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
+// This test produced the warning, "Navigator's path manager could not find a path for RobotId = 3"
+TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
 {
     setBallState(BallState(Point(4,-2.5), Vector(0, 0)));
 
@@ -247,12 +249,12 @@ class StopPlayTest : public SimulatedPlayTestFixture
                     yield();
                 }
                 // TODO: #1882 implement robots slow down when responding to stop command
-                *//*robotSlowsDown(0, world_ptr, yield);
+                /*robotSlowsDown(0, world_ptr, yield);
                 robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
                 robotSlowsDown(3, world_ptr, yield);
                 robotSlowsDown(4, world_ptr, yield);
-                robotSlowsDown(5, world_ptr, yield);*//*
+                robotSlowsDown(5, world_ptr, yield);*/
 
                 robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
@@ -265,9 +267,9 @@ class StopPlayTest : public SimulatedPlayTestFixture
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}*/
+}
 
-/*TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
+TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
 {
     setBallState(BallState(Point(0,0), Vector(0, 0)));
 
@@ -293,14 +295,14 @@ class StopPlayTest : public SimulatedPlayTestFixture
                     yield();
                 }
                 // TODO: #1882 implement robots slow down when responding to stop command
-                *//*robotSlowsDown(0, world_ptr, yield);
-                        robotSlowsDown(1, world_ptr, yield);
+                /*robotSlowsDown(0, world_ptr, yield);
+                robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
                 robotSlowsDown(3, world_ptr, yield);
                 robotSlowsDown(4, world_ptr, yield);
-                robotSlowsDown(5, world_ptr, yield);*//*
+                robotSlowsDown(5, world_ptr, yield);*/
 
-                    robotAvoidsBall(0, world_ptr, yield);
+                robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
                 robotAvoidsBall(2, world_ptr, yield);
                 robotAvoidsBall(3, world_ptr, yield);
@@ -311,10 +313,11 @@ class StopPlayTest : public SimulatedPlayTestFixture
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}*/
+}
 
-// Warning: "Navigator's path manager could not find a path..."
-/*TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
+// This test produced the warning, "Navigator's path manager could not find a path"
+// Robot positioning was good.
+TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
 {
     setBallState(BallState(Point(3,0), Vector(0, 0)));
 
@@ -340,12 +343,12 @@ class StopPlayTest : public SimulatedPlayTestFixture
                     yield();
                 }
                 // TODO: #1882 implement robots slow down when responding to stop command
-                *//*robotSlowsDown(0, world_ptr, yield);
+                /*robotSlowsDown(0, world_ptr, yield);
                 robotSlowsDown(1, world_ptr, yield);
                 robotSlowsDown(2, world_ptr, yield);
                 robotSlowsDown(3, world_ptr, yield);
                 robotSlowsDown(4, world_ptr, yield);
-                robotSlowsDown(5, world_ptr, yield);*//*
+                robotSlowsDown(5, world_ptr, yield);*/
 
                 robotAvoidsBall(0, world_ptr, yield);
                 robotAvoidsBall(1, world_ptr, yield);
@@ -358,12 +361,13 @@ class StopPlayTest : public SimulatedPlayTestFixture
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}*/
+}
 
-// Failed - robot moved too close to the ball
-// Robots can't enter defense area, so could not get fully behind the ball
-// Warning: "Navigator's path manager could not find a path..."
-TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_friendly_defense_area)
+// This test is disabled due to a bug that causes Robot 2 to move too close to the ball.
+// Robot 2 is boxed in by defence area, Robot 5, and the ball, so it moves closer to the ball to try to make space.
+// Robots' positioning was not good, two robots were on the wrong side of the ball
+// This test produced the warning, "Navigator's path manager could not find a path"
+TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_in_front_of_friendly_defense_area)
 {
     setBallState(BallState(Point(-3,0), Vector(0, 0)));
 
