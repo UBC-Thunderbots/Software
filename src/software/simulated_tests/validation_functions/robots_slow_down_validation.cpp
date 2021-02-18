@@ -25,10 +25,8 @@ void robotsSlowDown(std::shared_ptr<World> world_ptr,
         };
 
         if (!robot_slowed_down(world_ptr)) {
+            // TODO: change from throwing exception to FAIL(), once PR #1946 is merged
             throw std::runtime_error("Robot " + std::to_string(robot_id) + " did not slow down!");
-        }
-        else {
-            LOG(WARNING) << "Robot " + std::to_string(robot_id) + " slowed down!";
         }
     }
 }

@@ -33,7 +33,7 @@ TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                // Wait 2 seconds for robots that start too close to the ball to move away
                 while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
                 {
                     yield();
@@ -68,7 +68,7 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                // Wait 2 seconds for robots that start too close to the ball to move away
                 while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
                 {
                     yield();
@@ -104,7 +104,7 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                // Wait 2 seconds for robots that start too close to the ball to move away
                 while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
                 {
                     yield();
@@ -138,7 +138,7 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_robots_spread_out)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                // Wait 2 seconds for robots that start too close to the ball to move away
                 while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
                 {
                     yield();
@@ -173,7 +173,7 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                // Wait 2 seconds for robots that start too close to the ball to move away
                 while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
                 {
                     yield();
@@ -207,7 +207,7 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                // Wait 2 seconds for robots that start too close to the ball to move away
                 while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
                 {
                     yield();
@@ -243,7 +243,7 @@ TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                // Wait 2 seconds for robots that start too close to the ball to move away
                 while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
                 {
                     yield();
@@ -281,7 +281,7 @@ TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_in_front_of_friendly_defense_a
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                // this waits 2 seconds to allow robots that are initially too close to the ball to move away from it
+                // Wait 2 seconds for robots that start too close to the ball to move away
                 while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
                 {
                     yield();

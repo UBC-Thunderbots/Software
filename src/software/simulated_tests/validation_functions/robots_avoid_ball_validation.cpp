@@ -26,10 +26,8 @@ void robotsAvoidBall(std::shared_ptr<World> world_ptr,
         };
 
         if (!robot_avoids_ball(world_ptr)) {
+            // TODO: change from throwing exception to FAIL(), once PR #1946 is merged
             throw std::runtime_error("Robot " + std::to_string(robot_id) + " did not avoid the ball!");
-        }
-        else {
-            LOG(WARNING) << "Robot " + std::to_string(robot_id) + " avoided the ball!";
         }
     }
 }
