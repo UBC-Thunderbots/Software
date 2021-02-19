@@ -201,18 +201,6 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "standalone_simulator_main",
-    srcs = ["standalone_simulator_main.cpp"],
-    deps = [
-        ":standalone_simulator",
-        "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
-        "//software/logger",
-        "//software/parameter:dynamic_parameters",
-        "@boost//:program_options",
-    ],
-)
-
 cc_library(
     name = "firmware_object_deleter",
     hdrs = ["firmware_object_deleter.h"],

@@ -28,7 +28,7 @@ void SimulatedTestFixture::SetUp()
     sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
 
     MutableDynamicParameters->getMutableAiControlConfig()->getMutableRunAi()->setValue(
-        true);
+        !SimulatedTestFixture::stop_ai_on_start);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
@@ -170,52 +170,20 @@ void SimulatedTestFixture::runTest(
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
     const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
                                                         CAMERA_FRAMES_PER_AI_TICK);
-    bool validation_functions_done = false;
+
+    // Tick one frame to aid with visualization
+    bool validation_functions_done =
+        tickTest(terminating_validation_functions, non_terminating_validation_functions,
+                 simulation_time_step, ai_time_step, world);
     while (simulator->getTimestamp() < timeout_time)
     {
         if (!DynamicParameters->getAiControlConfig()->getRunAi()->value())
         {
             continue;
         }
-        auto wall_start_time = std::chrono::steady_clock::now();
-        for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
-        {
-            simulator->stepSimulation(simulation_time_step);
-            updateSensorFusion();
-        }
-
-        if (auto world_opt = sensor_fusion.getWorld())
-        {
-            *world = world_opt.value();
-
-            validation_functions_done = validateAndCheckCompletion(
-                terminating_function_validators, non_terminating_function_validators);
-            if (validation_functions_done)
-            {
-                break;
-            }
-
-            updatePrimitives(*world_opt, simulator);
-
-            if (run_simulation_in_realtime)
-            {
-                sleep(wall_start_time, ai_time_step);
-            }
-
-            if (full_system_gui)
-            {
-                full_system_gui->onValueReceived(*world);
-                if (auto play_info = getPlayInfo())
-                {
-                    full_system_gui->onValueReceived(*play_info);
-                }
-                full_system_gui->onValueReceived(getDrawFunctions());
-            }
-        }
-        else
-        {
-            LOG(WARNING) << "SensorFusion did not output a valid World";
-        }
+        validation_functions_done = tickTest(terminating_validation_functions,
+                                             non_terminating_validation_functions,
+                                             simulation_time_step, ai_time_step, world);
     }
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
@@ -223,4 +191,52 @@ void SimulatedTestFixture::runTest(
         ADD_FAILURE()
             << "Not all validation functions passed within the timeout duration";
     }
+}
+
+bool SimulatedTestFixture::tickTest(
+    const std::vector<ValidationFunction> &terminating_validation_functions,
+    const std::vector<ValidationFunction> &non_terminating_validation_functions,
+    Duration simulation_time_step, Duration ai_time_step, std::shared_ptr<World> world)
+{
+    auto wall_start_time           = std::chrono::steady_clock::now();
+    bool validation_functions_done = false;
+    for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
+    {
+        simulator->stepSimulation(simulation_time_step);
+        updateSensorFusion();
+    }
+
+    if (auto world_opt = sensor_fusion.getWorld())
+    {
+        *world = world_opt.value();
+
+        validation_functions_done = validateAndCheckCompletion(
+            terminating_function_validators, non_terminating_function_validators);
+        if (validation_functions_done)
+        {
+            return validation_functions_done;
+        }
+
+        updatePrimitives(*world_opt, simulator);
+
+        if (run_simulation_in_realtime)
+        {
+            sleep(wall_start_time, ai_time_step);
+        }
+
+        if (full_system_gui)
+        {
+            full_system_gui->onValueReceived(*world);
+            if (auto play_info = getPlayInfo())
+            {
+                full_system_gui->onValueReceived(*play_info);
+            }
+            full_system_gui->onValueReceived(getDrawFunctions());
+        }
+    }
+    else
+    {
+        LOG(WARNING) << "SensorFusion did not output a valid World";
+    }
+    return validation_functions_done;
 }

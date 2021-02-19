@@ -177,15 +177,19 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 3. Run our AI: `bazel run //software:full_system -- --interface=[interface_here] --backend=WifiBackend`
     - This will launch the Visualizer, which displays what the AI is currently "seeing" and allows us to interact with the AI through the dynamic parameters.
     - The field should be empty, as we are currently not receiving SSL Vision packets.
-4. Run our Simulator: `bazel run //software/simulation:standalone_simulator_main -- --interface=[interface_here]`
+4. Run our Simulator: `bazel run //software:standalone_simulator_main -- --interface=[interface_here]`
     - The Simulator runs our firmware and Box2D (a physics engine) to simulate how our robots would behave on the field.
     - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
     - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
     - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
-5. Run Robot Diagnostics: `bazel run //software/gui/robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
+5. Run Robot Diagnostics: `bazel run //software:robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
-6. Run our SimulatedTests in the visualizer: `bazel test //software/ai/hl/stp/play:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/play:[some_target_here] -- --enable_visualizer`
+6. Run our SimulatedPlayTests in the visualizer: `bazel test //software/ai/hl/stp/play:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/play:[some_target_here] -- --enable_visualizer`
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
+7. Run our SimulatedTacticTests in the visualizer: `bazel test //software/ai/hl/stp/tactic:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/tactic:[some_target_here] -- --enable_visualizer`
+    - This will launch the visualizer and simulate AI Tactic on a single robot
+
+** NOTE: If we want to run SimulatedTests with the AI initially stopped, then use the `--stop_ai_on_start` flag **
 
 ### Running AI vs AI
 1. Open your terminal, `cd` into `Software/src`

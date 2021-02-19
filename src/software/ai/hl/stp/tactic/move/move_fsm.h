@@ -35,7 +35,7 @@ struct MoveFSM
         const auto update_e = event<Update>;
 
         /**
-         * This is an Action sets the intent to a move intent corresponding to the
+         * This is an Action that sets the intent to a move intent corresponding to the
          * update_e event
          *
          * @param event MoveFSM::Update event
@@ -48,7 +48,7 @@ struct MoveFSM
         };
 
         /**
-         * This guard is used check if the robot is done moving
+         * This guard is used to check if the robot is done moving
          *
          * @param event MoveFSM::Update event
          *
