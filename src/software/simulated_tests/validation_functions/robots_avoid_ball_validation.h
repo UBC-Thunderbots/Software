@@ -4,8 +4,8 @@
 #include "software/world/world.h"
 
 /**
- * Checks if robots are keeping appropriate distance from
- * the ball when the Referee has issued a STOP command
+ * Checks if robots are keeping at least 0.5 meters from
+ * the ball
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param yield yields control to the next routine (coroutines)
  */
