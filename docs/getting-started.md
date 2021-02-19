@@ -189,6 +189,8 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 7. Run our SimulatedTacticTests in the visualizer: `bazel test //software/ai/hl/stp/tactic:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/tactic:[some_target_here] -- --enable_visualizer`
     - This will launch the visualizer and simulate AI Tactic on a single robot
 
+** NOTE: If we want to run SimulatedTests with the AI initially stopped, then use the `--stop_ai_on_start` flag ** 
+
 ### Running AI vs AI
 1. Open your terminal, `cd` into `Software/src`
 2. Run `./software/run_ai_vs_ai.sh interface_name`, using the same interface as from [above](#running-our-ai-simulator-or-robot-diagnostics)
