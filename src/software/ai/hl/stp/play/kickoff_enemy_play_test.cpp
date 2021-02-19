@@ -55,10 +55,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotsInFriendlyHalf(world_ptr, yield);
-            robotsNotInCenterCircle(world_ptr, yield);
-        }};
+        robotsInFriendlyHalf, robotsNotInCenterCircle};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
