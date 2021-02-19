@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/kick_tactic.h"
+#include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 
 #include <algorithm>
 

@@ -88,7 +88,7 @@ jobs:
          cd src
          bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin         
              
-  gameplay-tests:
+  simulated-gameplay-tests:
     name: Simulated Gameplay Tests
     runs-on: ubuntu-18.04
     steps:
@@ -102,11 +102,18 @@ jobs:
       - name: Simulated Test
         run: |
           cd src
-          bazel test //software/simulated_tests/... \
-            //software/simulated_tests/... \
+          bazel coverage //software/simulated_tests/... \
             //software/ai/hl/stp/play/... \
             //software/ai/hl/stp/tactic/... \
           
+      # uploads coverage data to codecov
+      - name: Upload Coverage
+        run: |
+         cd src
+         bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ > codecov.log
+         cat codecov.log | head -n100
+         cat codecov.log | tail -n100
+
   memory-leak-checks:
     name: Memory Leak Checks
     runs-on: ubuntu-18.04

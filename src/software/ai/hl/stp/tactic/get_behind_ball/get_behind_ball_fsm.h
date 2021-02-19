@@ -7,7 +7,6 @@
 
 struct GetBehindBallFSM
 {
-    class idle_state;
     class get_behind_ball_state;
 
     struct ControlParams
@@ -25,7 +24,6 @@ struct GetBehindBallFSM
     {
         using namespace boost::sml;
 
-        const auto idle_s            = state<idle_state>;
         const auto get_behind_ball_s = state<get_behind_ball_state>;
         const auto update_e          = event<Update>;
 
@@ -56,6 +54,11 @@ struct GetBehindBallFSM
         //                 V
         //         direction of chip/kick
 
+        /**
+         * Action that updates the MoveIntent
+         *
+         * @param event GetBehindBallFSM::Update event
+         */
         const auto update_move = [size_of_region_behind_ball](auto event) {
             Vector behind_ball = Vector::createFromAngle(
                 event.control_params.chick_direction + Angle::half());
@@ -68,6 +71,13 @@ struct GetBehindBallFSM
                 BallCollisionType::AVOID));
         };
 
+        /**
+         * Guard that checks if the robot is behind the ball
+         *
+         * @param event GetBehindBallFSM::Update event
+         *
+         * @return if the robot is behind the ball
+         */
         const auto behind_ball = [size_of_region_behind_ball](auto event) {
             // A vector in the direction opposite the chip (behind the ball)
             Vector behind_ball = Vector::createFromAngle(
@@ -95,9 +105,8 @@ struct GetBehindBallFSM
         };
 
         return make_transition_table(
-            *idle_s + update_e / update_move = get_behind_ball_s,
-            get_behind_ball_s + update_e[!behind_ball] / update_move,
+            *get_behind_ball_s + update_e[!behind_ball] / update_move,
             get_behind_ball_s + update_e[behind_ball] / update_move = X,
-            X + update_e[behind_ball] / update_move);
+            X + update_e[!behind_ball] / update_move                = get_behind_ball_s);
     }
 };
