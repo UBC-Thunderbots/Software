@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/get_behind_ball_fsm.h"
+#include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/kick_intent.h"
 
@@ -28,6 +28,11 @@ struct KickFSM
         const auto kick_s            = state<kick_state>;
         const auto update_e          = event<Update>;
 
+        /**
+         * Action that updates the KickIntent
+         *
+         * @param event KickFSM::Update event
+         */
         const auto update_kick = [](auto event) {
             event.common.set_intent(std::make_unique<KickIntent>(
                 event.common.robot.id(), event.control_params.kick_origin,
@@ -35,6 +40,12 @@ struct KickFSM
                 event.control_params.kick_speed_meters_per_second));
         };
 
+        /**
+         * Action that updates the GetBehindBallFSM
+         *
+         * @param event KickFSM::Update event
+         * @param processEvent processes the GetBehindBallFSM::Update
+         */
         const auto update_get_behind_ball =
             [](auto event, back::process<GetBehindBallFSM::Update> processEvent) {
                 GetBehindBallFSM::ControlParams control_params{
@@ -45,6 +56,13 @@ struct KickFSM
                 processEvent(GetBehindBallFSM::Update(control_params, event.common));
             };
 
+        /**
+         * Guard that checks if the ball has been chicked
+         *
+         * @param event KickFSM::Update event
+         *
+         * @return if the ball has been chicked
+         */
         const auto ball_chicked = [](auto event) {
             return event.common.world.ball().hasBallBeenKicked(
                 event.control_params.kick_direction);

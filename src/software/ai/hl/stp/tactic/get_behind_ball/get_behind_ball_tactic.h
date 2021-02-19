@@ -1,39 +1,35 @@
 #pragma once
 
 #include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
-#include "software/ai/hl/stp/tactic/move_fsm.h"
+#include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 
 /**
- * The MoveTactic will move the assigned robot to the given destination and arrive
- * with the specified final orientation and speed
+ * The GetBehindBallTactic will move the assigned robot to the given destination and
+ * arrive with the specified final orientation and speed
  */
-class MoveTactic : public Tactic
+class GetBehindBallTactic : public Tactic
 {
    public:
     /**
-     * Creates a new MoveTactic
+     * Creates a new GetBehindBallTactic
      *
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit MoveTactic(bool loop_forever);
+    explicit GetBehindBallTactic(bool loop_forever);
 
-    MoveTactic() = delete;
+    GetBehindBallTactic() = delete;
 
     void updateWorldParams(const World& world) override;
 
     /**
-     * Updates the control parameters for this MoveTactic.
+     * Updates the control parameters for this GetBehindBallTactic.
      *
-     * @param destination The destination to move to (in global coordinates)
-     * @param final_orientation The final orientation the robot should have at
-     * the destination
-     * @param final_speed The final speed the robot should have at the destination
+     * @param ball_location The location of the ball when it will be chipped or kicked
+     * @param chick_direction The direction to kick or chip
      */
-    void updateControlParams(Point destination, Angle final_orientation,
-                             double final_speed);
+    void updateControlParams(const Point& ball_location, Angle chick_direction);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -53,7 +49,7 @@ class MoveTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    BaseFSM<MoveFSM> fsm;
+    BaseFSM<GetBehindBallFSM> fsm;
 
-    MoveFSM::ControlParams control_params;
+    GetBehindBallFSM::ControlParams control_params;
 };
