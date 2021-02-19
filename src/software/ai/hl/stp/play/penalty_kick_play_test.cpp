@@ -6,6 +6,7 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/simulated_tests/validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/validation_functions/robot_at_position_validation.h"
+#include "software/simulated_tests/validation_functions/ball_in_play_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -13,15 +14,6 @@
 class PenaltyKickPlayTest : public SimulatedPlayTestFixture
 {
 };
-
-/**
-   Non-terminating functions:
-   - ball never moves
-
-   terminating:
-   - shooter robot near ball
-   - non shooter robot at least 1 m behind ball
- **/
 
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 {
@@ -36,7 +28,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
     setAIPlay(TYPENAME(PenaltyKickPlay));
     setRefereeCommand(RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::NORMAL_START);
 
-    RobotId shooter_id = 1;
+    RobotId shooter_id = 5;
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
@@ -44,10 +36,8 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
         // https://github.com/UBC-Thunderbots/Software/issues/1396
 		[shooter_id](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             auto friendly_robots_except_shooter_1_meter_from_ball =
-                [](std::shared_ptr<World> world_ptr) {
+                [shooter_id](std::shared_ptr<World> world_ptr) {
                     Point ball_position = world_ptr->ball().position();
-					Robot shooter =
-						world_ptr->friendlyTeam().getNearestRobot(ball_position).value();
                     for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
                     {
 						if ((robot.id() != shooter_id) &&
@@ -66,7 +56,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 		[shooter_id](std::shared_ptr<World> world_ptr,
 		   ValidationCoroutine::push_type& yield) {
 			robotAtPosition(shooter_id, world_ptr,
-			 			    world_ptr->field().penaltyEnemy(), 0.3, 
+			 			    world_ptr->field().penaltyEnemy(), 0.4, 
                             yield);
 		}};     
 
@@ -74,7 +64,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 		[](std::shared_ptr<World> world_ptr,
 		   ValidationCoroutine::push_type& yield)
 		{
-			EXPECT_EQ(world_ptr->field().penaltyEnemy(), world_ptr->ball().position());
+			ASSERT_EQ(world_ptr->field().penaltyEnemy(), world_ptr->ball().position());
 		}
 	};
 
@@ -82,13 +72,6 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
             Duration::fromSeconds(9.5));
 }
 
-
-//terminating:
-// - goal is scored
-//
-//non-terminating function
-// - ball doesn't go out of play
-// - should be less than 9.5 seconds
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 {
     Vector behind_ball_direction =
@@ -122,24 +105,10 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 	  }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, 
-        ValidationCoroutine::push_type& yield) {
-            Point ball = world_ptr->ball().position();
-            Rectangle inPlayRect = world_ptr->field().fieldLines();
-            bool isInPlay = (inPlayRect.xMin() <= ball.x()) &&
-                (ball.x() <= inPlayRect.xMax()) &&
-                (inPlayRect.yMin() <= ball.y())
-                && (ball.y() <= inPlayRect.yMax());
-            if (!isInPlay) 
-            {
-                if (!((ball.x() >= inPlayRect.xMax())
-                        && (ball.y() >= world_ptr->field().enemyGoalpostNeg().y())
-                        && (ball.y() <= world_ptr->field().enemyGoalpostPos().y()))) 
-                {
-                    FAIL();
-                }
-            }
-        },
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
+            ballInPlay(world_ptr, yield);
+        }
     };
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
