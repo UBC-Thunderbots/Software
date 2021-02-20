@@ -163,13 +163,6 @@ class Field
     double defenseAreaXLength() const;
 
     /**
-     * The distance from the goal centre to the penalty mark
-     *
-     * @return the x coordinate distance from the goal to the penalty mark
-     */
-    double goalToPenaltyMark() const;
-
-    /**
      * Gets the friendly defense area as a Rectangle.
      *
      * @return defense area of the friendly team
@@ -275,14 +268,14 @@ class Field
      *
      * @return the position of the penalty mark near the enemy goal
      */
-    Point penaltyEnemy() const;
+    Point enemyPenaltyMark() const;
 
     /**
      * Gets the position of the penalty mark near the friendly goal.
      *
      * @return the position of the penalty mark near the friendly goal
      */
-    Point penaltyFriendly() const;
+    Point friendlyPenaltyMark() const;
 
     /**
      * Gets the position of our corner with the positive y-axis
@@ -436,4 +429,6 @@ class Field
     double boundary_buffer_size_;
     // The radius of the center circle in metres
     double center_circle_radius_;
+    // The x-coordinate distance from the goal centre to the penalty mark
+    double goal_centre_to_penalty_;
 };

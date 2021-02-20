@@ -17,7 +17,7 @@ class PenaltyKickPlayTest : public SimulatedPlayTestFixture
 
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 {
-    setBallState(BallState(field().penaltyEnemy(), Vector(0, 0)));
+    setBallState(BallState(field().enemyPenaltyMark(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-2, -2), Point(-3, -1), Point(-3, 0), Point(-3, 1), Point(-3, 2),
          Point(2, 2.5)}));
@@ -56,7 +56,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 		[shooter_id](std::shared_ptr<World> world_ptr,
 		   ValidationCoroutine::push_type& yield) {
 			robotAtPosition(shooter_id, world_ptr,
-			 			    world_ptr->field().penaltyEnemy(), 0.4, 
+			 			    world_ptr->field().enemyPenaltyMark(), 0.4, 
                             yield);
 		}};     
 
@@ -64,7 +64,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 		[](std::shared_ptr<World> world_ptr,
 		   ValidationCoroutine::push_type& yield)
 		{
-			ASSERT_EQ(world_ptr->field().penaltyEnemy(), world_ptr->ball().position());
+			ASSERT_EQ(world_ptr->field().enemyPenaltyMark(), world_ptr->ball().position());
 		}
 	};
 
@@ -75,13 +75,13 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 {
     Vector behind_ball_direction =
-        (field().penaltyEnemy() - field().enemyGoalpostPos()).normalize();
+        (field().enemyPenaltyMark() - field().enemyGoalpostPos()).normalize();
 
-    Point behind_ball = field().penaltyEnemy() +
+    Point behind_ball = field().enemyPenaltyMark() +
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS + 0.1);
-    double non_shooter_x_pos = field().penaltyEnemy().x() - 1.5;
-    setBallState(BallState(field().penaltyEnemy(), Vector(0, 0)));
+    double non_shooter_x_pos = field().enemyPenaltyMark().x() - 1.5;
+    setBallState(BallState(field().enemyPenaltyMark(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4, 0), behind_ball, Point(non_shooter_x_pos, 0),
          Point(non_shooter_x_pos, 1), Point(non_shooter_x_pos, -1),

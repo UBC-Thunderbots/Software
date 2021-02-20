@@ -47,7 +47,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Point behind_ball = world.ball().position() + behind_ball_direction.normalize(
                                                           DIST_TO_FRONT_OF_ROBOT_METERS +
                                                           BALL_MAX_RADIUS_METERS + 0.1);
-        double ball_position_x = world.field().penaltyEnemy().x();
+        double ball_position_x = world.field().enemyPenaltyMark().x();
 
         // Move all non-shooter robots to a position behind the ball
         move_tactic_2->updateControlParams(
@@ -76,7 +76,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         }
 
         tactics_to_run.emplace_back(goalie_tactic);
-        // Move all non-shooter robots to the center of the field
+        // Move all non-shooter robots behind the ball
         tactics_to_run.emplace_back(move_tactic_2);
         tactics_to_run.emplace_back(move_tactic_3);
         tactics_to_run.emplace_back(move_tactic_4);
