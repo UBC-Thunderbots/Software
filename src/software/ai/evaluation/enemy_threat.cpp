@@ -222,9 +222,9 @@ std::vector<EnemyThreat> getAllEnemyThreats(const Field &field, const Team &frie
                                             Team enemy_team, const Ball &ball,
                                             bool include_goalie)
 {
-    if (!include_goalie && enemy_team.getGoalieID())
+    if (!include_goalie && enemy_team.getGoalieId())
     {
-        enemy_team.removeRobotWithId(*enemy_team.getGoalieID());
+        enemy_team.removeRobotWithId(*enemy_team.getGoalieId());
     }
 
     std::vector<EnemyThreat> threats;

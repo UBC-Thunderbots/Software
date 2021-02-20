@@ -8,7 +8,7 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
-#include "software/ai/hl/stp/tactic/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -30,7 +30,7 @@ bool DefensePlay::invariantHolds(const World &world) const
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     bool enemy_team_can_pass =
-        DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
+        DynamicParameters->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value();
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());

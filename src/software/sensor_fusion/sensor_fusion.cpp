@@ -59,16 +59,17 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
     friendly_team.assignGoalie(friendly_goalie_id);
     enemy_team.assignGoalie(enemy_goalie_id);
 
-    if (sensor_fusion_config->OverrideGameControllerFriendlyGoalieID()->value())
+    if (sensor_fusion_config->getOverrideGameControllerFriendlyGoalieId()->value())
     {
         RobotId friendly_goalie_id_override =
-            sensor_fusion_config->FriendlyGoalieId()->value();
+            sensor_fusion_config->getFriendlyGoalieId()->value();
         friendly_team.assignGoalie(friendly_goalie_id_override);
     }
 
-    if (sensor_fusion_config->OverrideGameControllerEnemyGoalieID()->value())
+    if (sensor_fusion_config->getOverrideGameControllerEnemyGoalieId()->value())
     {
-        RobotId enemy_goalie_id_override = sensor_fusion_config->EnemyGoalieId()->value();
+        RobotId enemy_goalie_id_override =
+            sensor_fusion_config->getEnemyGoalieId()->value();
         enemy_team.assignGoalie(enemy_goalie_id_override);
     }
 
@@ -123,7 +124,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    if (sensor_fusion_config->FriendlyColorYellow()->value())
+    if (sensor_fusion_config->getFriendlyColorYellow()->value())
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
         friendly_goalie_id = packet.yellow().goalkeeper();
@@ -157,32 +158,59 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    // TODO (#1819): Update robot capabilities based on robot status msgs
+    for (auto &robot_status_msg : robot_status_msgs)
+    {
+        int robot_id = robot_status_msg.robot_id();
+        std::set<RobotCapability> unavailableCapabilities;
+
+        for (const auto &error_code_msg : robot_status_msg.error_code())
+        {
+            if (error_code_msg == TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT ||
+                error_code_msg == TbotsProto::ErrorCode::WHEEL_1_MOTOR_HOT ||
+                error_code_msg == TbotsProto::ErrorCode::WHEEL_2_MOTOR_HOT ||
+                error_code_msg == TbotsProto::ErrorCode::WHEEL_3_MOTOR_HOT)
+            {
+                unavailableCapabilities.insert(RobotCapability::Move);
+            }
+            else if (error_code_msg == TbotsProto::ErrorCode::LOW_CAP ||
+                     error_code_msg == TbotsProto::ErrorCode::CHARGE_TIMEOUT)
+            {
+                unavailableCapabilities.insert(RobotCapability::Kick);
+                unavailableCapabilities.insert(RobotCapability::Chip);
+            }
+            else if (error_code_msg == TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT)
+            {
+                unavailableCapabilities.insert(RobotCapability::Dribble);
+            }
+        }
+        friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
+    }
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    double min_valid_x = sensor_fusion_config->MinValidX()->value();
-    double max_valid_x = sensor_fusion_config->MaxValidX()->value();
+    double min_valid_x = sensor_fusion_config->getMinValidX()->value();
+    double max_valid_x = sensor_fusion_config->getMaxValidX()->value();
     bool ignore_invalid_camera_data =
-        sensor_fusion_config->IgnoreInvalidCameraData()->value();
+        sensor_fusion_config->getIgnoreInvalidCameraData()->value();
 
     // We invert the field side if we explicitly choose to override the values
     // provided by the game controller. The 'defending_positive_side' parameter dictates
     // the side we are defending if we are overriding the value
     // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
     const bool override_game_controller_defending_side =
-        sensor_fusion_config->OverrideGameControllerDefendingSide()->value();
+        sensor_fusion_config->getOverrideGameControllerDefendingSide()->value();
     const bool defending_positive_side =
-        sensor_fusion_config->DefendingPositiveSide()->value();
+        sensor_fusion_config->getDefendingPositiveSide()->value();
     const bool should_invert_field =
         override_game_controller_defending_side && defending_positive_side;
 
     // TODO remove DynamicParameters as part of
     // https://github.com/UBC-Thunderbots/Software/issues/960
-    bool friendly_team_is_yellow = sensor_fusion_config->FriendlyColorYellow()->value();
+    bool friendly_team_is_yellow =
+        sensor_fusion_config->getFriendlyColorYellow()->value();
 
     std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,

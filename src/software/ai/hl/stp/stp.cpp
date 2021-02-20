@@ -20,7 +20,7 @@
 #include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-         std::shared_ptr<const AIControlConfig> control_config, long random_seed)
+         std::shared_ptr<const AiControlConfig> control_config, long random_seed)
     : default_play_constructor(default_play_constructor),
       current_play(nullptr),
       readable_robot_tactic_assignment(),
@@ -143,11 +143,11 @@ PlayInfo STP::getPlayInfo()
 bool STP::overrideAIPlayIfApplicable()
 {
     previous_override_play           = override_play;
-    override_play                    = control_config->OverrideAIPlay()->value();
+    override_play                    = control_config->getOverrideAiPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
-    override_play_name          = control_config->CurrentAIPlay()->value();
+    override_play_name          = control_config->getCurrentAiPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 

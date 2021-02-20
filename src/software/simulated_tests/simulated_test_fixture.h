@@ -24,6 +24,10 @@ class SimulatedTestFixture : public ::testing::Test
     // if true, running tests are displayed on the visualizer
     static bool enable_visualizer;
 
+    // Controls whether the AI will be stopped when the simulated test starts
+    // only if enable_visualizer is true
+    static bool stop_ai_on_start;
+
    protected:
     void SetUp() override;
 
@@ -103,6 +107,25 @@ class SimulatedTestFixture : public ::testing::Test
     Field field() const;
 
    private:
+    /**
+     * Runs one tick of the test and checks if the validation function is done
+     *
+     * @param terminating_validation_functions The terminating validation functions
+     * to check during the test
+     * @param non_terminating_validation_functions The non-terminating validation
+     * functions to check during the test
+     * @param simulation_time_step time step for stepping the simulation
+     * @param ai_time_step minimum time for one tick of AI
+     * @param world the shared_ptr to the world that is updated by this function
+     *
+     * @return if validation functions are done
+     */
+    bool tickTest(
+        const std::vector<ValidationFunction>& terminating_validation_functions,
+        const std::vector<ValidationFunction>& non_terminating_validation_functions,
+        Duration simulation_time_step, Duration ai_time_step,
+        std::shared_ptr<World> world);
+
     /**
      * A helper function that updates SensorFusion with the latest data from the Simulator
      */
