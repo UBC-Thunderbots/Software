@@ -319,10 +319,10 @@ static void udev_task(void *UNUSED(param))
             .NOVBUSSENS = udev_info->flags.vbus_sensing
                               ? 0
                               : 1,  // VBUS sensing may or may not be done.
-            .SOFOUTEN   = 0,        // Do not output SOF pulses to I/O pin.
-            .VBUSBSEN   = 1,        // VBUS sensing B device enabled.
-            .VBUSASEN   = 0,        // VBUS sensing A device disabled.
-            .PWRDWN     = 1,        // Transceiver active.
+            .SOFOUTEN = 0,          // Do not output SOF pulses to I/O pin.
+            .VBUSBSEN = 1,          // VBUS sensing B device enabled.
+            .VBUSASEN = 0,          // VBUS sensing A device disabled.
+            .PWRDWN   = 1,          // Transceiver active.
         };
         OTG_FS.GCCFG = tmp;
     }
@@ -330,9 +330,9 @@ static void udev_task(void *UNUSED(param))
         OTG_FS_GAHBCFG_t gahbcfg = {
             .PTXFELVL = 0,  // Only used in host mode.
             .TXFELVL  = udev_info->flags.minimize_interrupts
-                            ? 1
-                            : 0,  // Interrupt on TX FIFO half empty or fully empty.
-            .GINTMSK  = 1,        // Enable interrupts.
+                           ? 1
+                           : 0,  // Interrupt on TX FIFO half empty or fully empty.
+            .GINTMSK = 1,        // Enable interrupts.
         };
         OTG_FS.GAHBCFG = gahbcfg;
     }
