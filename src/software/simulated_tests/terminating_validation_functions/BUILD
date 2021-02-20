@@ -8,14 +8,12 @@ cc_library(
         "robot_at_position_validation.cpp",
         "robot_in_polygon_validation.cpp",
         "robot_received_ball_validation.cpp",
-        "ball_in_play_validation.cpp",
     ],
     hdrs = [
         "friendly_scored_validation.h",
         "robot_at_position_validation.h",
         "robot_in_polygon_validation.h",
         "robot_received_ball_validation.h",
-        "ball_in_play_validation.h",
     ],
     deps = [
         "//software/geom/algorithms",

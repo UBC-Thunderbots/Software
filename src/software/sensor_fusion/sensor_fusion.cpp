@@ -73,12 +73,12 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
         enemy_team.assignGoalie(enemy_goalie_id_override);
     }
 
-    if (sensor_fusion_config->OverrideRefereeCommand()->value())
+    if (sensor_fusion_config->getOverrideRefereeCommand()->value())
     {
         std::string previous_state_string =
-            sensor_fusion_config->PreviousRefereeCommand()->value();
+            sensor_fusion_config->getPreviousRefereeCommand()->value();
         std::string current_state_string =
-            sensor_fusion_config->CurrentRefereeCommand()->value();
+            sensor_fusion_config->getCurrentRefereeCommand()->value();
         try
         {
             RefereeCommand previous_state =

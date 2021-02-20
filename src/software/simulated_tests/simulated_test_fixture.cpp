@@ -78,13 +78,13 @@ void SimulatedTestFixture::setRefereeCommand(
     const RefereeCommand &previous_referee_command)
 {
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableCurrentRefereeCommand()
+        ->getMutableCurrentRefereeCommand()
         ->setValue(toString(current_referee_command));
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutablePreviousRefereeCommand()
+        ->getMutablePreviousRefereeCommand()
         ->setValue(toString(previous_referee_command));
     MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideRefereeCommand()
+        ->getMutableOverrideRefereeCommand()
         ->setValue(true);
 }
 

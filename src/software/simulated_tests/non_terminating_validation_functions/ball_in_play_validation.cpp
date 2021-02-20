@@ -1,4 +1,4 @@
-#include "software/simulated_tests/validation_functions/ball_in_play_validation.h"
+#include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_validation.h"
 
 void ballInPlay(std::shared_ptr<World> world_ptr,
                     ValidationCoroutine::push_type& yield)
