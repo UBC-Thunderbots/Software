@@ -5,7 +5,7 @@
 #
 
 # The version of the clang executable to use
-export CLANG_VERSION=10.0
+export CLANG_VERSION=11.0
 # The version of black to use
 export BLACK_VERSION=19-10b0
 
@@ -105,7 +105,7 @@ function run_eof_new_line(){
 }
 
 # Run formatting
-run_code_spell
+ #run_code_spell
 run_clang_format
 run_bazel_formatting
 run_black_formatting
