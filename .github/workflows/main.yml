@@ -64,23 +64,18 @@ jobs:
   firmware-tests:
     name: Firmware Tests
     runs-on: ubuntu-18.04
+    env:
+      DISPLAY: :0
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
     
       - name: Environment Setup
         run: |
+          sudo apt-get install xvfb
+          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
-
-      - name: Setup Virtual X Server
-        run: |           
-          # Use xvfb to run programs requiring a GUI (e.g. STM32CubeMX code generation)                                  
-          # https://github.com/UBCFormulaElectric/Consolidated-Firmware/blob/master/.github/workflows/githubactions.yml
-          sudo apt-get install xvfb
-          sudo apt-get install systemd              
-          sudo cp "${GITHUB_WORKSPACE}"/.github/xvfb.service /etc/systemd/system/xvfb.service
-          sudo systemctl start xvfb
 
       - name: STM32CubeMX Code Generation
         run: |
