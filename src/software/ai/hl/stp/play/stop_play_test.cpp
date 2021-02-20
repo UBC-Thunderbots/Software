@@ -14,6 +14,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
 {
     void SetUp() override
     {
+        SimulatedPlayTestFixture::SetUp();
         setFriendlyGoalie(0);
         addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
@@ -24,6 +25,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
         setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
     }
 };
+
 
 // TODO: (#1948) fix warning message "No intent set for this tactic: MoveTactic"
 TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
