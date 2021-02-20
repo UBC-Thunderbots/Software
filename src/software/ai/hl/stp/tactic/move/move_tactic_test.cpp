@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 
 #include <gtest/gtest.h>
 
@@ -40,7 +40,6 @@ TEST(MoveTacticTest, robot_at_destination)
     // We call the Action twice. The first time the Tactic is starting up so it's not
     // done. In all future calls, the action will be done
     EXPECT_TRUE(tactic.get(robot, world));
-    EXPECT_FALSE(tactic.done());
     EXPECT_TRUE(tactic.get(robot, world));
 
     EXPECT_TRUE(tactic.done());
