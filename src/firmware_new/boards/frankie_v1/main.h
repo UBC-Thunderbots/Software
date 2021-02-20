@@ -56,6 +56,9 @@ extern "C"
 
 /* USER CODE BEGIN EFP */
 
+    void initIoDrivetrain(void);
+    void initIoNetworking(void);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
