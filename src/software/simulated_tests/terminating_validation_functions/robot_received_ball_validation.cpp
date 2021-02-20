@@ -1,4 +1,4 @@
-#include "software/simulated_tests/validation_functions/robot_received_ball_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 
 #include "software/logger/logger.h"
 
