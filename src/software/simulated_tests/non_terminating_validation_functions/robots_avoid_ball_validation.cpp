@@ -5,18 +5,19 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
-void robotsAvoidBall(std::shared_ptr<World> world_ptr,
+void robotsAvoidBall(double min_distance, std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield)
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
-        double distance = (robot.position() - world_ptr->ball().position()).length();
-        const double MIN_DISTANCE_FROM_BALL = ROBOT_MAX_RADIUS_METERS + 0.5;
+        double current_distance =
+            (robot.position() - world_ptr->ball().position()).length() -
+            ROBOT_MAX_RADIUS_METERS;
 
-        if (distance < MIN_DISTANCE_FROM_BALL)
+        if (current_distance < min_distance)
         {
-            FAIL() << "Robot " + std::to_string(robot.id()) +
-                          " less than 0.5 m away from the ball!";
+            FAIL() << "Robot " + std::to_string(robot.id()) + " is less than " +
+                          std::to_string(min_distance) + " m away from the ball!";
         }
     }
 }

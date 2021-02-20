@@ -44,8 +44,8 @@ TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
                 yield();
             }
             // TODO: (#1882) implement robots slow down when responding to stop command
-            // robotsSlowDown(world_ptr, yield);
-            robotsAvoidBall(world_ptr, yield);
+            // robotsSlowDown(1.5, world_ptr, yield);
+            robotsAvoidBall(0.5, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -70,8 +70,8 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
                 yield();
             }
             // TODO: (#1882) implement robots slow down when responding to stop command
-            // robotsSlowDown(world_ptr, yield);
-            robotsAvoidBall(world_ptr, yield);
+            // robotsSlowDown(1.5, world_ptr, yield);
+            robotsAvoidBall(0.5, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -97,8 +97,8 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
                 yield();
             }
             // TODO: (#1882) implement robots slow down when responding to stop command
-            // robotsSlowDown(world_ptr, yield);
-            robotsAvoidBall(world_ptr, yield);
+            // robotsSlowDown(1.5, world_ptr, yield);
+            robotsAvoidBall(0.5, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -122,8 +122,8 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_robots_spread_out)
                 yield();
             }
             // TODO: (#1882) implement robots slow down when responding to stop command
-            // robotsSlowDown(world_ptr, yield);
-            robotsAvoidBall(world_ptr, yield);
+            // robotsSlowDown(1.5, world_ptr, yield);
+            robotsAvoidBall(0.5, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -148,8 +148,8 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
                 yield();
             }
             // TODO: (#1882) implement robots slow down when responding to stop command
-            // robotsSlowDown(world_ptr, yield);
-            robotsAvoidBall(world_ptr, yield);
+            // robotsSlowDown(1.5, world_ptr, yield);
+            robotsAvoidBall(0.5, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -173,8 +173,8 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
                 yield();
             }
             // TODO: (#1882) implement robots slow down when responding to stop command
-            // robotsSlowDown(world_ptr, yield);
-            robotsAvoidBall(world_ptr, yield);
+            // robotsSlowDown(1.5, world_ptr, yield);
+            robotsAvoidBall(0.5, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -199,8 +199,8 @@ TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
                 yield();
             }
             // TODO: (#1882) implement robots slow down when responding to stop command
-            // robotsSlowDown(world_ptr, yield);
-            robotsAvoidBall(world_ptr, yield);
+            // robotsSlowDown(1.5, world_ptr, yield);
+            robotsAvoidBall(0.5, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -228,8 +228,8 @@ TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_in_front_of_friendly_defense_a
                 yield();
             }
             // TODO: (#1882) implement robots slow down when responding to stop command
-            // robotsSlowDown(world_ptr, yield);
-            robotsAvoidBall(world_ptr, yield);
+            // robotsSlowDown(1.5, world_ptr, yield);
+            robotsAvoidBall(0.5, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

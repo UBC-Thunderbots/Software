@@ -5,18 +5,17 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
-void robotsSlowDown(std::shared_ptr<World> world_ptr,
+void robotsSlowDown(double max_speed, std::shared_ptr<World> world_ptr,
                     ValidationCoroutine::push_type& yield)
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
-        double speed           = robot.velocity().length();
-        const double MAX_SPEED = 1.5;
+        double speed = robot.velocity().length();
 
-        if (speed > MAX_SPEED)
+        if (speed > max_speed)
         {
             FAIL() << "Robot " + std::to_string(robot.id()) +
-                          " moving faster than 1.5 m/s!";
+                          " is moving faster than 1.5 m/s!";
         }
     }
 }
