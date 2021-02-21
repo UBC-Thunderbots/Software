@@ -4,9 +4,18 @@
 #include "software/world/world.h"
 
 /**
- * Checks if the friendly robots are in friendly half of the field, else assertion fails.
+ * Checks if the friendly robots are in the friendly half of the field, else assertion
+ * fails.
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param yield yields control to the next routine (coroutines)
  */
 void robotsInFriendlyHalf(std::shared_ptr<World> world_ptr,
                           ValidationCoroutine::push_type& yield);
+
+/**
+ * Checks if a friendly robot is in the friendly half of the field, else assertion fails.
+ * @param world_ptr the world pointer given by the simulator. Gets updated every tick
+ * @param yield yields control to the next routine (coroutines)
+ */
+void robotInFriendlyHalf(Robot robot, std::shared_ptr<World> world_ptr,
+                         ValidationCoroutine::push_type& yield);

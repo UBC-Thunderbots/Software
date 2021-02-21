@@ -9,9 +9,15 @@ void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
-        if (contains(world_ptr->field().centerCircle(), robot.position()))
-        {
-            FAIL() << "Robot " + std::to_string(robot.id()) + " entered center circle";
-        }
+        robotNotInCenterCircle(robot, world_ptr, yield);
+    }
+}
+
+void robotNotInCenterCircle(Robot robot, std::shared_ptr<World> world_ptr,
+                            ValidationCoroutine::push_type& yield)
+{
+    if (contains(world_ptr->field().centerCircle(), robot.position()))
+    {
+        FAIL() << "Robot " + std::to_string(robot.id()) + " entered center circle";
     }
 }
