@@ -34,10 +34,6 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // This will keep the test running for 9.5 seconds to give everything enough
-        // time to settle into position and be observed with the FullSystemGUI
-        // TODO: Implement proper validation
-        // https://github.com/UBC-Thunderbots/Software/issues/1396
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // Two friendly robots near the half line setting up for offense
             Rectangle robotsOffensiveRect(Point(-1.75, 2.5), Point(-1.5, -2.5));
