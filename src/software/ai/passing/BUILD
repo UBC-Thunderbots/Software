@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+
 cc_library(
     name = "evaluation",
     srcs = ["cost_function.cpp"],
@@ -74,5 +76,28 @@ cc_test(
         ":pass_generator",
         "//software/test_util",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "cost_function_python_lib",
+    srcs = ["cost_function_python.cpp"],
+    deps = [
+        ":evaluation",
+        "//software/parameter:dynamic_parameters",
+        "//software/proto:sensor_msg_cc_proto",
+        "//software/proto:ssl_cc_proto",
+        "//software/sensor_fusion",
+        "@pybind11",
+        "@local_config_python//:python_headers"
+    ],
+    copts = ["-fexceptions"],
+    features = ["-use_header_modules", "-parse_headers"],
+)
+
+pybind_extension(
+    name = "cost_function_python",
+    deps = [
+        ":cost_function_python_lib",
     ],
 )

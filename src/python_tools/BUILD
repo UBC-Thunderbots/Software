@@ -29,7 +29,10 @@ py_binary(
     name = "jupyter",
     srcs = ["jupyter.py"],
     # glob all the notebooks in this directory
-    data = [":notebooks"],
+    data = [
+        ":notebooks",
+        "//software/ai/passing:cost_function_python.so",
+    ],
     deps = [
         requirement("jupyter"),
         requirement("notebook"),
