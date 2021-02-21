@@ -60,7 +60,7 @@ bool PenaltyKickTactic::evaluatePenaltyShot()
 
     if (!intersections.empty())
     {
-        /**                             
+        /**
                     enemy goal +-------------------+
                                   \       (     ) goalie
                                    \      /-----

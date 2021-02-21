@@ -30,7 +30,7 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       goal_y_length_(goal_y_length),
       boundary_buffer_size_(boundary_buffer_size),
       center_circle_radius_(center_circle_radius),
-      goal_centre_to_penalty_((double) field_x_length_ * 2/3)
+      goal_centre_to_penalty_((double)field_x_length_ * 2 / 3)
 {
     if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
         defense_y_length_ <= 0 || goal_x_length_ <= 0 || goal_y_length_ <= 0 ||

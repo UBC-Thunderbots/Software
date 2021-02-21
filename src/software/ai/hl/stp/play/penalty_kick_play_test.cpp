@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
+#include "software/simulated_tests/non_terminating_validation_functions/ball_always_moves_forward_validation.h"
+#include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
-#include "software/simulated_tests/validation/validation_function.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
-#include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
-#include "software/simulated_tests/non_terminating_validation_functions/ball_always_moves_forward_validation.h"
+#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -29,45 +29,44 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
     setAIPlay(TYPENAME(PenaltyKickPlay));
     setRefereeCommand(RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::NORMAL_START);
 
-    RobotId shooter_id = 5;
+    RobotId shooter_id                                               = 5;
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
-		[shooter_id](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [shooter_id](std::shared_ptr<World> world_ptr,
+                     ValidationCoroutine::push_type& yield) {
             auto friendly_robots_except_shooter_1_meter_from_ball =
                 [shooter_id](std::shared_ptr<World> world_ptr) {
                     Point ball_position = world_ptr->ball().position();
                     for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
                     {
-						if ((robot.id() != shooter_id) &&
-							((robot.position()-ball_position).length() < 1))
+                        if ((robot.id() != shooter_id) &&
+                            ((robot.position() - ball_position).length() < 1))
                         {
-							return false;
+                            return false;
                         }
                     }
-                return true;
+                    return true;
                 };
 
             while (!friendly_robots_except_shooter_1_meter_from_ball(world_ptr))
             {
-				yield();
-			}},
-		[shooter_id](std::shared_ptr<World> world_ptr,
-		   ValidationCoroutine::push_type& yield) {
-			robotAtPosition(shooter_id, world_ptr,
-			 			    world_ptr->field().enemyPenaltyMark(), 0.4, 
-                            yield);
-		}};     
+                yield();
+            }
+        },
+        [shooter_id](std::shared_ptr<World> world_ptr,
+                     ValidationCoroutine::push_type& yield) {
+            robotAtPosition(shooter_id, world_ptr, world_ptr->field().enemyPenaltyMark(),
+                            0.4, yield);
+        }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-		[](std::shared_ptr<World> world_ptr,
-		   ValidationCoroutine::push_type& yield)
-		{
-			ASSERT_EQ(world_ptr->field().enemyPenaltyMark(), world_ptr->ball().position());
-		}
-	};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            ASSERT_EQ(world_ptr->field().enemyPenaltyMark(),
+                      world_ptr->ball().position());
+        }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(9.5));
@@ -89,8 +88,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
          Point(non_shooter_x_pos, 2)}));
     setFriendlyGoalie(0);
     Point goalie = Point(field().enemyGoalCenter().x(), 0);
-    addEnemyRobots(
-		   TestUtil::createStationaryRobotStatesWithId({goalie}));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({goalie}));
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_US);
@@ -100,18 +98,15 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
-        [](std::shared_ptr<World> world_ptr, 
-        ValidationCoroutine::push_type& yield) {
-		  friendlyScored(world_ptr, yield);
-	  }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            friendlyScored(world_ptr, yield);
+        }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             ballInPlay(world_ptr, yield);
         },
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             ballAlwaysMovesForward(world_ptr, yield);
         },
     };
