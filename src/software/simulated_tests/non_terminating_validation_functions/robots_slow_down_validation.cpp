@@ -14,8 +14,8 @@ void robotsSlowDown(double max_speed, std::shared_ptr<World> world_ptr,
 
         if (speed > max_speed)
         {
-            FAIL() << "Robot " + std::to_string(robot.id()) +
-                          " is moving faster than 1.5 m/s!";
+            FAIL() << "Robot " + std::to_string(robot.id()) + " is moving faster than " +
+                          std::to_string(max_speed) + " m/s!";
         }
     }
 }
