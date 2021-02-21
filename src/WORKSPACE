@@ -325,9 +325,14 @@ bind(
 
 # pybind11 for Python bindings
 # quval's repo for pybind11 bazel rules has a fix for hermetic python interpreter
-local_repository(
+http_archive(
     name = "pybind11_bazel",
-    path = "/home/jordan/thunderbots_software/pybind11_bazel"
+    patch_args = ["-p1"],
+    patches = [
+        "//external:pybind11_bazel_pyconfig_fix.patch",
+    ],
+    strip_prefix = "pybind11_bazel-938e4c46b8d66967cda41a1d2513f69d37faa2b3",
+    urls = ["https://github.com/quval/pybind11_bazel/archive/938e4c46b8d66967cda41a1d2513f69d37faa2b3.zip"],
 )
 
 # We still require the pybind library.
@@ -341,6 +346,6 @@ http_archive(
 load("@pybind11_bazel//:python_configure.bzl", "python_configure")
 
 python_configure(
-    name="local_config_python", 
-    python_interpreter_target = "@python_interpreter//:python_bin"
+    name = "local_config_python",
+    python_interpreter_target = "@python_interpreter//:python_bin",
 )
