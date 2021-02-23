@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/get_behind_ball_tactic.h"
+#include "software/ai/hl/stp/tactic/get_behind_ball/get_behind_ball_tactic.h"
 
 #include <algorithm>
 

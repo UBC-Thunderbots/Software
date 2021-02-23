@@ -7,7 +7,6 @@ struct MoveFSM
 {
     // these classes define the states used in the transition table
     // they are exposed so that tests can check if the FSM is in a particular state
-    class idle_state;
     class move_state;
 
     // this struct defines the unique control parameters that the MoveFSM requires in its
@@ -29,15 +28,18 @@ struct MoveFSM
     {
         using namespace boost::sml;
 
-        // idle_s and move_s are the two _states_ used in the transition table
-        const auto idle_s = state<idle_state>;
+        // move_s is the _state_ used in the transition table
         const auto move_s = state<move_state>;
 
         // update_e is the _event_ that the MoveFSM responds to
         const auto update_e = event<Update>;
 
-        // this action sets the intent to a move intent corresponding to the update_e
-        // event
+        /**
+         * This is an Action that sets the intent to a move intent corresponding to the
+         * update_e event
+         *
+         * @param event MoveFSM::Update event
+         */
         const auto update_move = [](auto event) {
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), event.control_params.destination,
@@ -45,7 +47,13 @@ struct MoveFSM
                 DribblerMode::OFF, BallCollisionType::AVOID));
         };
 
-        // this guard is used check if the robot is done moving
+        /**
+         * This guard is used to check if the robot is done moving
+         *
+         * @param event MoveFSM::Update event
+         *
+         * @return if robot has reached the destination
+         */
         const auto move_done = [](auto event) {
             return robotReachedDestination(event.common.robot,
                                            event.control_params.destination,
@@ -54,9 +62,8 @@ struct MoveFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *idle_s + update_e / update_move            = move_s,
-            move_s + update_e[!move_done] / update_move = move_s,
-            move_s + update_e[move_done] / update_move  = X,
-            X + update_e[move_done] / update_move       = X);
+            *move_s + update_e[!move_done] / update_move = move_s,
+            move_s + update_e[move_done] / update_move   = X,
+            X + update_e[!move_done] / update_move       = move_s);
     }
 };
