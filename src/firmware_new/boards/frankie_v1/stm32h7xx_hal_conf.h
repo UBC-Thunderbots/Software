@@ -1,3 +1,4 @@
+//clang-format off
 /**
  ******************************************************************************
  * @file    stm32h7xx_hal_conf.h
@@ -497,3 +498,4 @@ extern "C"
 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+//clang-format on
