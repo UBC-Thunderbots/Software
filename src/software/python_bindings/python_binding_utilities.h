@@ -7,8 +7,7 @@
 
 namespace py = pybind11;
 
-template <typename ConfigType>
-void updateDynamicParametersConfigFromDict(std::shared_ptr<ConfigType> config,
+void updateDynamicParametersConfigFromDict(std::shared_ptr<Config> config,
                                            const py::dict& config_update_dict);
 
-#include "software/python_bindings/python_binding_utilities.tpp"
+py::dict copyDynamicParametersConfigToDict(const std::shared_ptr<const Config> config);

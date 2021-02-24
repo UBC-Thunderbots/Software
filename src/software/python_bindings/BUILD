@@ -4,9 +4,11 @@ load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
 cc_library(
     name = "python_binding_utilities",
+    srcs = [
+        "python_binding_utilities.cpp",
+    ],
     hdrs = [
         "python_binding_utilities.h",
-        "python_binding_utilities.tpp",
     ],
     deps = [
         "//software/parameter:config",

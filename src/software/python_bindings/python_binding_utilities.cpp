@@ -1,5 +1,5 @@
-#pragma once
 #include "software/python_bindings/python_binding_utilities.h"
+
 #include "software/util/variant_visitor/variant_visitor.h"
 
 template <typename ParamValueType>
@@ -13,8 +13,7 @@ void setParameterValueFromDictIfExists(std::shared_ptr<Parameter<ParamValueType>
     }
 }
 
-template <typename ConfigType>
-void updateDynamicParametersConfigFromDict(std::shared_ptr<ConfigType> config,
+void updateDynamicParametersConfigFromDict(std::shared_ptr<Config> config,
                                            const py::dict& config_update_dict)
 {
     for (auto param_ptr_variant : config->getMutableParameterList())
@@ -47,4 +46,33 @@ void updateDynamicParametersConfigFromDict(std::shared_ptr<ConfigType> config,
                      }},
             param_ptr_variant);
     }
+}
+
+py::dict copyDynamicParametersConfigToDict(const std::shared_ptr<const Config> config)
+{
+    py::dict result;
+    for (auto param_ptr_variant : config->getParameterList())
+    {
+        std::visit(overload{[&](std::shared_ptr<const Parameter<int>> param) {
+                                result[param->name().c_str()] = param->value();
+                            },
+                            [&](std::shared_ptr<const Parameter<bool>> param) {
+                                result[param->name().c_str()] = param->value();
+                            },
+                            [&](std::shared_ptr<const Parameter<std::string>> param) {
+                                result[param->name().c_str()] = param->value();
+                            },
+                            [&](std::shared_ptr<const Parameter<double>> param) {
+                                result[param->name().c_str()] = param->value();
+                            },
+                            [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
+                                result[param->name().c_str()] = param->value();
+                            },
+                            [&](std::shared_ptr<const Config> param) {
+                                result[param->name().c_str()] =
+                                    copyDynamicParametersConfigToDict(param);
+                            }},
+                   param_ptr_variant);
+    }
+    return result;
 }

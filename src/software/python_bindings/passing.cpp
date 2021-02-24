@@ -9,6 +9,17 @@
 
 namespace py = pybind11;
 
+void updatePassingConfigFromDict(const py::dict& config_update_dict)
+{
+    updateDynamicParametersConfigFromDict(
+        MutableDynamicParameters->getMutablePassingConfig(), config_update_dict);
+}
+
+py::dict getPassingConfig()
+{
+    return copyDynamicParametersConfigToDict(DynamicParameters->getPassingConfig());
+}
+
 double ratePassWrapper(const std::string& ssl_wrapper_world_string, py::dict pass_dict,
                        bool receive_and_dribble)
 {
@@ -42,8 +53,11 @@ double ratePassWrapper(const std::string& ssl_wrapper_world_string, py::dict pas
     return ratePass(*world_or_null, pass, std::nullopt, std::nullopt, pass_type);
 }
 
-PYBIND11_MODULE(cost_function_python, m)
+PYBIND11_MODULE(passing, m)
 {
+    m.def("updatePassingConfigFromDict", &updatePassingConfigFromDict,
+          py::arg("config_update_dict"));
+    m.def("getPassingConfig", &getPassingConfig);
     m.def("ratePass", &ratePassWrapper, py::arg("ssl_wrapper_world_string"),
           py::arg("pass_dict"), py::arg("receive_and_dribble"));
 }

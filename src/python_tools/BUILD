@@ -31,7 +31,7 @@ py_binary(
     # glob all the notebooks in this directory
     data = [
         ":notebooks",
-        "//software/ai/passing:cost_function_python.so",
+        "//software/python_bindings:passing.so",
     ],
     deps = [
         requirement("jupyter"),
