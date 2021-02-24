@@ -47,7 +47,7 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
 {
     World world         = ::TestUtil::createBlankTestingWorld();
     GoalieTactic tactic = GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                                       world.enemyTeam());
+                                       world.enemyTeam(), std::make_shared<const GoalieTacticConfig>());
 
     // test to make sure that points given outside of the rectangle
     // are constrained inside
@@ -97,8 +97,8 @@ class GoalieTacticTest : public testing::Test
         new_team.assignGoalie(0);
         world.updateFriendlyTeamState(new_team);
 
-        GoalieTactic tactic = GoalieTactic(world.ball(), world.field(),
-                                           world.friendlyTeam(), world.enemyTeam());
+        GoalieTactic tactic = GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
+                                       world.enemyTeam(), std::make_shared<const GoalieTacticConfig>());
         tactic.updateRobot(goalie);
         auto action_ptr = tactic.getNextAction();
 
@@ -122,8 +122,8 @@ class GoalieTacticTest : public testing::Test
         new_team.assignGoalie(0);
         world.updateFriendlyTeamState(new_team);
 
-        GoalieTactic tactic = GoalieTactic(world.ball(), world.field(),
-                                           world.friendlyTeam(), world.enemyTeam());
+        GoalieTactic tactic = GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
+                                       world.enemyTeam(), std::make_shared<const GoalieTacticConfig>());
         tactic.updateRobot(goalie);
         auto action_ptr = tactic.getNextAction();
 
@@ -144,8 +144,8 @@ class GoalieTacticTest : public testing::Test
         new_team.assignGoalie(0);
         world.updateFriendlyTeamState(new_team);
 
-        GoalieTactic tactic = GoalieTactic(world.ball(), world.field(),
-                                           world.friendlyTeam(), world.enemyTeam());
+        GoalieTactic tactic = GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
+                                       world.enemyTeam(), std::make_shared<const GoalieTacticConfig>());
         tactic.updateRobot(goalie);
         auto action_ptr = tactic.getNextAction();
 

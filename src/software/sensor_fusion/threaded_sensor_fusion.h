@@ -12,8 +12,7 @@ class ThreadedSensorFusion : public Subject<World>,
 {
    public:
     explicit ThreadedSensorFusion(
-        std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
-            DynamicParameters->getSensorFusionConfig());
+        std::shared_ptr<const SensorFusionConfig> sensor_fusion_config);
     virtual ~ThreadedSensorFusion() = default;
 
    private:

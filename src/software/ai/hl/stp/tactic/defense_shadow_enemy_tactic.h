@@ -28,8 +28,7 @@ class DefenseShadowEnemyTactic : public Tactic
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Ball &ball, bool ignore_goalie, double shadow_distance,
         std::shared_ptr<const DefenseShadowEnemyTacticConfig>
-            defense_shadow_enemy_tactic_config =
-                DynamicParameters->getAiConfig()->getDefenseShadowEnemyTacticConfig());
+            defense_shadow_enemy_tactic_config);
 
     DefenseShadowEnemyTactic() = delete;
 

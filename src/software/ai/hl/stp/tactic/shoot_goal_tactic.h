@@ -32,8 +32,7 @@ class ShootGoalTactic : public Tactic
         const Field& field, const Team& friendly_team, const Team& enemy_team,
         const Ball& ball, Angle min_net_open_angle, std::optional<Point> chip_target,
         bool loop_forever,
-        std::shared_ptr<const ShootGoalTacticConfig> shoot_goal_tactic_config =
-            DynamicParameters->getAiConfig()->getShootGoalTacticConfig());
+        std::shared_ptr<const ShootGoalTacticConfig> shoot_goal_tactic_config);
 
     ShootGoalTactic() = delete;
 

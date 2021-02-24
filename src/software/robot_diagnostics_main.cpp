@@ -11,18 +11,21 @@
 int main(int argc, char **argv)
 {
     // load command line arguments
-    auto args = MutableDynamicParameters->getMutableRobotDiagnosticsMainCommandLineArgs();
+    auto args = std::make_shared<const RobotDiagnosticsCommandLineArgs>(); 
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
 
     if (!help_requested)
     {
-        // TODO remove this when we move to the new dynamic parameter system
-        // https://github.com/UBC-Thunderbots/Software/issues/1298
+        // Setup dynamic parameters
+        auto mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+        auto thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
+
+        // Override default network interface
         if (!args->getInterface()->value().empty())
         {
-            MutableDynamicParameters->getMutableNetworkConfig()
+            mutable_thunderbots_config->getMutableNetworkConfig()
                 ->getMutableNetworkInterface()
                 ->setValue(args->getInterface()->value());
         }
@@ -34,7 +37,7 @@ int main(int argc, char **argv)
 
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend, BackendConfig>::create(
-                args->getBackend()->value(), DynamicParameters->getBackendConfig());
+                args->getBackend()->value(), thunderbots_config->getBackendConfig());
 
         std::shared_ptr<ThreadedRobotDiagnosticsGUI> threaded_robot_diagnostics_gui;
         threaded_robot_diagnostics_gui =

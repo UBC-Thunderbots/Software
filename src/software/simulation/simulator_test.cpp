@@ -560,7 +560,7 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     // unlikely to be significantly changed or removed, and its behaviour is easy to
     // validate
 
-    Simulator simulator(Field::createSSLDivisionBField());
+    Simulator simulator(Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
 
     RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero());

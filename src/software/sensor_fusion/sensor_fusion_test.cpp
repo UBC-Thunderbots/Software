@@ -11,7 +11,7 @@ class SensorFusionTest : public ::testing::Test
 {
    public:
     SensorFusionTest()
-        : config(MutableDynamicParameters->getMutableSensorFusionConfig()),
+        : config(std::make_shared<SensorFusionConfig>()),
           sensor_fusion(config),
           yellow_robot_states(initYellowRobotStates()),
           blue_robot_states(initBlueRobotStates()),

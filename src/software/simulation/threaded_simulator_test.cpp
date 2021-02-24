@@ -9,7 +9,7 @@
 class ThreadedSimulatorTest : public ::testing::Test
 {
    protected:
-    ThreadedSimulatorTest() : threaded_simulator(Field::createSSLDivisionBField()) {}
+    ThreadedSimulatorTest() : threaded_simulator(Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>()) {}
 
     void SetUp() override
     {

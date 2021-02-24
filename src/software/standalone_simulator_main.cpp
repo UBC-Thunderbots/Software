@@ -8,39 +8,41 @@
 int main(int argc, char **argv)
 {
     // load command line arguments
-    auto args =
-        MutableDynamicParameters->getMutableStandaloneSimulatorMainCommandLineArgs();
+    auto args = std::make_shared<StandaloneSimulatorMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
 
     if (!help_requested)
     {
-        // TODO remove this when we move to the new dynamic parameter system
-        // https://github.com/UBC-Thunderbots/Software/issues/1298
+        // Setup dynamic parameters
+        auto mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+        auto thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
+
+        // Override default network interface
         if (!args->getInterface()->value().empty())
         {
-            MutableDynamicParameters->getMutableStandaloneSimulatorConfig()
+            mutable_thunderbots_config->getMutableNetworkConfig()
                 ->getMutableNetworkInterface()
                 ->setValue(args->getInterface()->value());
         }
 
         // Experimentally determined restitution value
-        MutableDynamicParameters->getMutableSimulatorConfig()
+        mutable_thunderbots_config->getMutableSimulatorConfig()
             ->getMutableBallRestitution()
             ->setValue(0.8);
         // Measured these values from fig. 9 on page 8 of
         // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
-        MutableDynamicParameters->getMutableSimulatorConfig()
+        mutable_thunderbots_config->getMutableSimulatorConfig()
             ->getMutableSlidingFrictionAcceleration()
             ->setValue(6.9);
-        MutableDynamicParameters->getMutableSimulatorConfig()
+        mutable_thunderbots_config->getMutableSimulatorConfig()
             ->getMutableRollingFrictionAcceleration()
             ->setValue(0.5);
 
         auto standalone_simulator = std::make_shared<StandaloneSimulator>(
-            MutableDynamicParameters->getMutableStandaloneSimulatorConfig(),
-            MutableDynamicParameters->getMutableSimulatorConfig());
+            mutable_thunderbots_config->getMutableStandaloneSimulatorConfig(),
+            mutable_thunderbots_config->getMutableSimulatorConfig());
         standalone_simulator->setupInitialSimulationState();
 
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(

@@ -12,7 +12,7 @@ int main(int argc, char **argv)
     testing::InitGoogleTest(&argc, argv);
 
     // load command line arguments
-    auto args = MutableDynamicParameters->getMutableSimulatedTestMainCommandLineArgs();
+    auto args = std::make_shared<SimulatedTestMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     LoggerSingleton::initializeLogger(args->getLoggingDir()->value());

@@ -106,6 +106,10 @@ class SimulatedTestFixture : public ::testing::Test
      */
     Field field() const;
 
+    // The dynamic params being used in the tests
+    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config;
+    std::shared_ptr<const ThunderbotsConfig> thunderbots_config;
+
    private:
     /**
      * Runs one tick of the test and checks if the validation function is done

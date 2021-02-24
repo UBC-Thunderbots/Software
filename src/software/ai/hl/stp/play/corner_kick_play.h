@@ -23,8 +23,6 @@ class CornerKickPlay : public Play
     static constexpr double BALL_IN_CORNER_RADIUS = 0.5;
 
    private:
-    // The maximum time that we will wait before committing to a pass
-    const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 
     std::shared_ptr<const PlayConfig> play_config;
 

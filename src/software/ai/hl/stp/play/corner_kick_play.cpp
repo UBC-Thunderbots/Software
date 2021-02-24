@@ -12,12 +12,7 @@
 #include "software/world/ball.h"
 
 CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
-    : MAX_TIME_TO_COMMIT_TO_PASS(
-          Duration::fromSeconds(DynamicParameters->getAiConfig()
-                                    ->getCornerKickPlayConfig()
-                                    ->getMaxTimeCommitToPassSeconds()
-                                    ->value())),
-      play_config(config)
+      : play_config(config)
 {
 }
 
@@ -62,7 +57,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
      */
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(), play_config->getGoalieTacticConfig());
 
     // Setup two bait robots on the opposite side of the field to where the corner kick
     // is taking place to pull enemies away from the goal
@@ -203,8 +198,9 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
         min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
-                                     MAX_TIME_TO_COMMIT_TO_PASS.toSeconds(),
-                                 1.0);
+                                    play_config->getCornerKickPlayConfig()
+                                    ->getMaxTimeCommitToPassSeconds()
+                                    ->value(), 1.0);
     } while (best_pass_and_score_so_far.rating < min_score);
 
     // Commit to a pass

@@ -27,8 +27,7 @@ class ThreadedSimulator
      * @param simulator_config The config to fetch parameters from
      */
     explicit ThreadedSimulator(const Field& field,
-                               std::shared_ptr<const SimulatorConfig> simulator_config =
-                                   DynamicParameters->getSimulatorConfig());
+                               std::shared_ptr<const SimulatorConfig> simulator_config);
     ~ThreadedSimulator();
 
     /**

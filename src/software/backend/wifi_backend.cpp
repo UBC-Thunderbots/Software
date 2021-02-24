@@ -19,8 +19,7 @@ WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
     std::string network_interface = this->network_config->getNetworkInterface()->value();
     int channel                   = this->network_config->getChannel()->value();
 
-    MutableDynamicParameters->getMutableNetworkConfig()
-        ->getMutableChannel()
+    network_config->getChannel()
         ->registerCallbackFunction([this](int new_channel) {
             std::string new_network_interface =
                 this->network_config->getNetworkInterface()->value();

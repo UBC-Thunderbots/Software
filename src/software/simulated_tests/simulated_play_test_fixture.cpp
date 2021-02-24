@@ -4,37 +4,36 @@
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 
 SimulatedPlayTestFixture::SimulatedPlayTestFixture()
-    : ai(DynamicParameters->getAiConfig(), DynamicParameters->getAiControlConfig())
+    : ai_config(mutable_thunderbots_config->getMutableAiConfig()),
+      ai_control_config(mutable_thunderbots_config->getMutableAiControlConfig()),
+      sensor_fusion_config(mutable_thunderbots_config->getMutableSensorFusionConfig()),
+      ai(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(), thunderbots_config->getPlayConfig())
 {
 }
 
 void SimulatedPlayTestFixture::SetUp()
 {
     SimulatedTestFixture::SetUp();
-    ai = AI(DynamicParameters->getAiConfig(), DynamicParameters->getAiControlConfig());
+    ai = AI(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(), thunderbots_config->getPlayConfig());
 }
 
 void SimulatedPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->getMutableFriendlyGoalieId()
+        sensor_fusion_config->getMutableFriendlyGoalieId()
         ->setValue(static_cast<int>(goalie_id));
 }
 
 void SimulatedPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->getMutableEnemyGoalieId()
+        sensor_fusion_config->getMutableEnemyGoalieId()
         ->setValue(static_cast<int>(goalie_id));
 }
 
 void SimulatedPlayTestFixture::setAIPlay(const std::string& ai_play)
 {
-    MutableDynamicParameters->getMutableAiControlConfig()
-        ->getMutableOverrideAiPlay()
+        ai_control_config->getMutableOverrideAiPlay()
         ->setValue(true);
-    MutableDynamicParameters->getMutableAiControlConfig()
-        ->getMutableCurrentAiPlay()
+        ai_control_config->getMutableCurrentAiPlay()
         ->setValue(ai_play);
 }
 

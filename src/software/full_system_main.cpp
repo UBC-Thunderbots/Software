@@ -34,8 +34,10 @@ int main(int argc, char** argv)
 {
     std::cout << BANNER << std::endl;
 
+    std::shared_ptr<const FullSystemMainCommandLineArgs> args =
+                    std::make_shared<const FullSystemMainCommandLineArgs>();
+
     // load command line arguments
-    auto args = MutableDynamicParameters->getMutableFullSystemMainCommandLineArgs();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
@@ -43,20 +45,12 @@ int main(int argc, char** argv)
     if (!help_requested)
     {
         // Setup dynamic parameters
-        // TODO (Issue #960): Once we're using injected parameters everywhere (instead of
-        //                    just global accesses, `DynamicParameters` should be
-        //                    deleted, and we should just create an instance here instead)
-        std::shared_ptr<const AiConfig> ai_config = DynamicParameters->getAiConfig();
-        std::shared_ptr<const AiControlConfig> ai_control_config =
-            DynamicParameters->getAiControlConfig();
-        std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
-            DynamicParameters->getSensorFusionConfig();
+        std::shared_ptr<const ThunderbotsConfig> thunderbots_config = std::make_shared<const ThunderbotsConfig>();
 
-        // TODO remove this when we move to the new dynamic parameter system
-        // https://github.com/UBC-Thunderbots/Software/issues/1298
+        // Override default network interface
         if (!args->getInterface()->value().empty())
         {
-            MutableDynamicParameters->getMutableNetworkConfig()
+            thunderbots_config->getMutableNetworkConfig()
                 ->getMutableNetworkInterface()
                 ->setValue(args->getInterface()->value());
         }
@@ -68,9 +62,9 @@ int main(int argc, char** argv)
 
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend, BackendConfig>::create(
-                args->getBackend()->value(), DynamicParameters->getBackendConfig());
-        auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(sensor_fusion_config);
-        auto ai            = std::make_shared<ThreadedAI>(ai_config, ai_control_config);
+                args->getBackend()->value(), thunderbots_config->getBackendConfig());
+        auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(thunderbots_config->getSensorFusionConfig());
+        auto ai            = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig());
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers
@@ -113,7 +107,7 @@ int main(int argc, char** argv)
             // log filtered world state
 
             constexpr auto world_to_ssl_wrapper_conversion_fn = [](const World& world) {
-                bool friendly_colour_yellow = DynamicParameters->getSensorFusionConfig()
+                bool friendly_colour_yellow = thunderbots_config->getSensorFusionConfig()
                                                   ->getFriendlyColorYellow()
                                                   ->value();
                 auto friendly_team_colour =

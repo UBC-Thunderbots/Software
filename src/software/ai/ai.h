@@ -18,9 +18,11 @@ class AI final
      * Create an AI with given configurations
      * @param ai_config The AI configuration
      * @param control_config The AI Control configuration
+     * @param control_config The Play configuration
      */
     explicit AI(std::shared_ptr<const AiConfig> ai_config,
-                std::shared_ptr<const AiControlConfig> control_config);
+                std::shared_ptr<const AiControlConfig> control_config,
+                std::shared_ptr<const PlayConfig> play_config);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current

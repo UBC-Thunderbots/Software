@@ -87,7 +87,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // specific tactics
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(), play_config->getGoalieTacticConfig());
     auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(world.ball(), true);
 
     // Part 1: setup state (move to key positions)

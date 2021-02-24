@@ -30,29 +30,26 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       const World &world)
 {
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(), play_config->getGoalieTacticConfig());
 
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            DynamicParameters->getAiConfig()
-                                                ->getDefenseShadowEnemyTacticConfig()
+                                                play_config->getDefenseShadowEnemyTacticConfig()
                                                 ->getBallStealSpeed()
                                                 ->value(),
                                             false, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            DynamicParameters->getAiConfig()
-                                                ->getDefenseShadowEnemyTacticConfig()
+                                            play_config->getDefenseShadowEnemyTacticConfig()
                                                 ->getBallStealSpeed()
                                                 ->value(),
                                             false, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            DynamicParameters->getAiConfig()
-                                                ->getDefenseShadowEnemyTacticConfig()
+                                            play_config->getDefenseShadowEnemyTacticConfig()
                                                 ->getBallStealSpeed()
                                                 ->value(),
                                             false, true)};

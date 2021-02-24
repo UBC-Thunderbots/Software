@@ -20,12 +20,13 @@
 #include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-         std::shared_ptr<const AiControlConfig> control_config, long random_seed)
+         std::shared_ptr<const AiControlConfig> control_config, std::shared_ptr<const PlayConfig> play_config, long random_seed)
     : default_play_constructor(default_play_constructor),
       current_play(nullptr),
       readable_robot_tactic_assignment(),
       random_number_generator(random_seed),
       control_config(control_config),
+      play_config(play_config),
       override_play_name(""),
       previous_override_play_name(""),
       override_play(false),
@@ -113,7 +114,7 @@ std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
     for (const auto& play_constructor :
          GenericFactory<std::string, Play, PlayConfig>::getRegisteredConstructors())
     {
-        auto play = play_constructor(DynamicParameters->getPlayConfig());
+        auto play = play_constructor(play_config);
         if (play->isApplicable(world))
         {
             applicable_plays.emplace_back(std::move(play));
@@ -181,7 +182,7 @@ bool STP::overrideAIPlayIfApplicable()
             try
             {
                 current_play = GenericFactory<std::string, Play, PlayConfig>::create(
-                    override_play_name, DynamicParameters->getPlayConfig());
+                    override_play_name, play_config);
             }
             catch (std::invalid_argument&)
             {

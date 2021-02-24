@@ -47,7 +47,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     // Setup the goalie
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(), play_config->getGoalieTacticConfig());
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -59,13 +59,12 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
-    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAiConfig()
-                                                           ->getShootOrPassPlayConfig()
+    Angle min_open_angle_for_shot = Angle::fromDegrees(play_config->getShootOrPassPlayConfig()
                                                            ->getMinOpenAngleForShotDeg()
                                                            ->value());
     auto shoot_tactic             = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        min_open_angle_for_shot, std::nullopt, false);
+        min_open_angle_for_shot, std::nullopt, false, play_config->getShootGoalTacticConfig());
 
     PassWithRating best_pass_and_score_so_far = shootOrFindPassStage(
         yield, shoot_tactic, crease_defender_tactics, goalie_tactic, world);
