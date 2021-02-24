@@ -56,9 +56,8 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
         *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
             input, handheld_controller_config);
 
-    double kick_speed = handheld_controller_config
-                            ->getKickSpeedMetersPerSecond()
-                            ->value();
+    double kick_speed =
+        handheld_controller_config->getKickSpeedMetersPerSecond()->value();
     auto expected_kick_primitive =
         *createKickPrimitive(Point(), Angle::zero(), kick_speed);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
@@ -77,9 +76,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1
         *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
             input, handheld_controller_config);
 
-    double chip_distance = handheld_controller_config
-                               ->getChipDistanceMeters()
-                               ->value();
+    double chip_distance = handheld_controller_config->getChipDistanceMeters()->value();
     auto expected_chip_primitive =
         *createChipPrimitive(Point(0, 0), Angle::zero(), chip_distance);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
@@ -106,15 +103,12 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input2
         input.isDribblerButtonPressed()
             ? handheld_controller_config->getDribblerRpm()->value()
             : 0;
-    double x_velocity =
-        input.getLinearMotionX() *
-        handheld_controller_config->getMaxLinearSpeed()->value();
-    double y_velocity =
-        input.getLinearMotionY() *
-        handheld_controller_config->getMaxLinearSpeed()->value();
-    double angular_velocity =
-        input.getAngularMotion() *
-        handheld_controller_config->getMaxAngularSpeed()->value();
+    double x_velocity = input.getLinearMotionX() *
+                        handheld_controller_config->getMaxLinearSpeed()->value();
+    double y_velocity = input.getLinearMotionY() *
+                        handheld_controller_config->getMaxLinearSpeed()->value();
+    double angular_velocity = input.getAngularMotion() *
+                              handheld_controller_config->getMaxAngularSpeed()->value();
     auto expected_direct_velocity_primitive =
         *ControllerPrimitiveGenerator::createDirectControlPrimitive(
             Vector(x_velocity, y_velocity),

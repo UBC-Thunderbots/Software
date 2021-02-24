@@ -11,7 +11,7 @@
 int main(int argc, char **argv)
 {
     // load command line arguments
-    auto args = std::make_shared<RobotDiagnosticsMainCommandLineArgs>(); 
+    auto args           = std::make_shared<RobotDiagnosticsMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
@@ -20,7 +20,8 @@ int main(int argc, char **argv)
     {
         // Setup dynamic parameters
         auto mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-        auto thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
+        auto thunderbots_config =
+            std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
 
         // Override default network interface
         if (!args->getInterface()->value().empty())

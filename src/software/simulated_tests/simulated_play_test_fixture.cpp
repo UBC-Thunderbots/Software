@@ -7,34 +7,34 @@ SimulatedPlayTestFixture::SimulatedPlayTestFixture()
     : ai_config(mutable_thunderbots_config->getMutableAiConfig()),
       ai_control_config(mutable_thunderbots_config->getMutableAiControlConfig()),
       sensor_fusion_config(mutable_thunderbots_config->getMutableSensorFusionConfig()),
-      ai(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(), thunderbots_config->getPlayConfig())
+      ai(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(),
+         thunderbots_config->getPlayConfig())
 {
 }
 
 void SimulatedPlayTestFixture::SetUp()
 {
     SimulatedTestFixture::SetUp();
-    ai = AI(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(), thunderbots_config->getPlayConfig());
+    ai = AI(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(),
+            thunderbots_config->getPlayConfig());
 }
 
 void SimulatedPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
-        sensor_fusion_config->getMutableFriendlyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
+    sensor_fusion_config->getMutableFriendlyGoalieId()->setValue(
+        static_cast<int>(goalie_id));
 }
 
 void SimulatedPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
-        sensor_fusion_config->getMutableEnemyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
+    sensor_fusion_config->getMutableEnemyGoalieId()->setValue(
+        static_cast<int>(goalie_id));
 }
 
 void SimulatedPlayTestFixture::setAIPlay(const std::string& ai_play)
 {
-        ai_control_config->getMutableOverrideAiPlay()
-        ->setValue(true);
-        ai_control_config->getMutableCurrentAiPlay()
-        ->setValue(ai_play);
+    ai_control_config->getMutableOverrideAiPlay()->setValue(true);
+    ai_control_config->getMutableCurrentAiPlay()->setValue(ai_play);
 }
 
 void SimulatedPlayTestFixture::updatePrimitives(

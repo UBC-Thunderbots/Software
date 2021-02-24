@@ -13,9 +13,10 @@ int main(int argc, char **argv)
     auto thunderbots_config =
         std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
 
-    auto controller = std::make_shared<Xbox360Controller>(thunderbots_config->getHandheldControllerConfig());
-    auto primitive_generator =
-        std::make_shared<ControllerPrimitiveGenerator>(thunderbots_config->getHandheldControllerConfig());
+    auto controller = std::make_shared<Xbox360Controller>(
+        thunderbots_config->getHandheldControllerConfig());
+    auto primitive_generator = std::make_shared<ControllerPrimitiveGenerator>(
+        thunderbots_config->getHandheldControllerConfig());
     auto backend = std::make_shared<RadioBackend>(thunderbots_config->getBackendConfig());
 
     controller->Subject<ControllerInput>::registerObserver(primitive_generator);

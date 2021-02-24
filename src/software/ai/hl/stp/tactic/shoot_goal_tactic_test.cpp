@@ -12,7 +12,7 @@ class ShootGoalTacticTest : public ::testing::Test
 {
    protected:
     void SetUp() override
-    {    
+    {
         shoot_goal_tactic = std::make_shared<ShootGoalTacticConfig>();
     }
 
@@ -29,9 +29,9 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
     BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
     world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
-    ShootGoalTactic tactic =
-        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::zero(), std::nullopt, false, shoot_goal_tactic);
+    ShootGoalTactic tactic = ShootGoalTactic(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        Angle::zero(), std::nullopt, false, shoot_goal_tactic);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world);
 
@@ -59,9 +59,9 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
     world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
-    ShootGoalTactic tactic =
-        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::fromDegrees(4), std::nullopt, false, shoot_goal_tactic);
+    ShootGoalTactic tactic = ShootGoalTactic(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        Angle::fromDegrees(4), std::nullopt, false, shoot_goal_tactic);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world);
 
@@ -127,9 +127,9 @@ TEST(ShootGoalTacticTest, robot_will_intercept_ball_if_shot_is_blocked)
     BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
     world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
-    ShootGoalTactic tactic =
-        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
+    ShootGoalTactic tactic = ShootGoalTactic(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world);
 
@@ -157,9 +157,9 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
     BallState ball_state(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0));
     world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
-    ShootGoalTactic tactic =
-        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
+    ShootGoalTactic tactic = ShootGoalTactic(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world);
 
@@ -186,9 +186,9 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
     BallState ball_state(Point(0.5, 0), Vector(0, 0));
     world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
-    ShootGoalTactic tactic =
-        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
+    ShootGoalTactic tactic = ShootGoalTactic(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
 
     double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.0520833333;
@@ -205,9 +205,9 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
     BallState ball_state(Point(3, -2.5), Vector(0, 0));
     world.updateBall(Ball(ball_state, Timestamp::fromSeconds(0)));
 
-    ShootGoalTactic tactic =
-        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
+    ShootGoalTactic tactic = ShootGoalTactic(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
 
     double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.40678383728;

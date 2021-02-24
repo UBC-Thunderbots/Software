@@ -19,12 +19,11 @@ WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
     std::string network_interface = this->network_config->getNetworkInterface()->value();
     int channel                   = this->network_config->getChannel()->value();
 
-    network_config->getChannel()
-        ->registerCallbackFunction([this](int new_channel) {
-            std::string new_network_interface =
-                this->network_config->getNetworkInterface()->value();
-            joinMulticastChannel(new_channel, new_network_interface);
-        });
+    network_config->getChannel()->registerCallbackFunction([this](int new_channel) {
+        std::string new_network_interface =
+            this->network_config->getNetworkInterface()->value();
+        joinMulticastChannel(new_channel, new_network_interface);
+    });
 
     // connect to current channel
     joinMulticastChannel(channel, network_interface);

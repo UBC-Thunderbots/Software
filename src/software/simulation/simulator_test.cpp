@@ -431,7 +431,8 @@ TEST(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positive
     // because it is very commonly used and so unlikely to be significantly changed
     // or removed, and its behaviour is easy to validate
 
-    Simulator simulator(Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
+    Simulator simulator(Field::createSSLDivisionBField(),
+                        std::make_shared<const SimulatorConfig>());
 
     auto defending_side = DefendingSideProto();
     defending_side.set_defending_side(
@@ -560,7 +561,8 @@ TEST(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     // unlikely to be significantly changed or removed, and its behaviour is easy to
     // validate
 
-    Simulator simulator(Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
+    Simulator simulator(Field::createSSLDivisionBField(),
+                        std::make_shared<const SimulatorConfig>());
 
     RobotState blue_robot_state1(Point(-1, 0), Vector(0, 0), Angle::zero(),
                                  AngularVelocity::zero());

@@ -21,7 +21,7 @@ class PhysicsFieldTest : public testing::Test
     virtual void SetUp()
     {
         b2Vec2 gravity(0, 0);
-        world = std::make_shared<b2World>(gravity);
+        world            = std::make_shared<b2World>(gravity);
         simulator_config = std::make_shared<const SimulatorConfig>();
     }
 

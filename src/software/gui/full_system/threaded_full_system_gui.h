@@ -28,7 +28,8 @@ class ThreadedFullSystemGUI
       public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
    public:
-    explicit ThreadedFullSystemGUI(std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config);
+    explicit ThreadedFullSystemGUI(
+        std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config);
 
     ~ThreadedFullSystemGUI() override;
 

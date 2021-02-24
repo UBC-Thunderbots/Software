@@ -16,15 +16,17 @@ class RobotNavigationObstacleFactoryTest : public testing::Test
    public:
     RobotNavigationObstacleFactoryTest()
         : current_time(Timestamp::fromSeconds(123)),
-          robot_navigation_obstacle_factory_config(std::make_shared<RobotNavigationObstacleFactoryConfig>()),
+          robot_navigation_obstacle_factory_config(
+              std::make_shared<RobotNavigationObstacleFactoryConfig>()),
           robot_navigation_obstacle_factory(robot_navigation_obstacle_factory_config)
     {
-            robot_navigation_obstacle_factory_config->getMutableRobotObstacleInflationFactor()
+        robot_navigation_obstacle_factory_config->getMutableRobotObstacleInflationFactor()
             ->setValue(1.3);
     }
 
     Timestamp current_time;
-    std::shared_ptr<RobotNavigationObstacleFactoryConfig> robot_navigation_obstacle_factory_config;
+    std::shared_ptr<RobotNavigationObstacleFactoryConfig>
+        robot_navigation_obstacle_factory_config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 };
 
@@ -40,7 +42,7 @@ class RobotNavigationObstacleFactoryMotionConstraintTest : public testing::Test
           enemy_team(Duration::fromMilliseconds(1000)),
           world(field, ball, friendly_team, enemy_team),
           robot_navigation_obstacle_factory(
-                  std::make_shared<RobotNavigationObstacleFactoryConfig>())
+              std::make_shared<RobotNavigationObstacleFactoryConfig>())
     {
     }
 

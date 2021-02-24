@@ -47,7 +47,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // Setup the goalie and crease defenders
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(), play_config->getGoalieTacticConfig());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
                                                world.friendlyTeam(), world.enemyTeam(),
@@ -58,13 +59,13 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
 
     // Have a robot keep trying to take a shot
-    Angle min_open_angle_for_shot = Angle::fromDegrees(play_config->getShootOrPassPlayConfig()
-                                                           ->getMinOpenAngleForShotDeg()
-                                                           ->value());
+    Angle min_open_angle_for_shot = Angle::fromDegrees(
+        play_config->getShootOrPassPlayConfig()->getMinOpenAngleForShotDeg()->value());
 
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        min_open_angle_for_shot, std::nullopt, false, play_config->getShootGoalTacticConfig());
+        min_open_angle_for_shot, std::nullopt, false,
+        play_config->getShootGoalTacticConfig());
 
     PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
         yield, goalie_tactic, crease_defender_tactics, shoot_tactic, world);
@@ -148,14 +149,10 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     // Whether or not we've set the passer robot in the PassGenerator
     bool set_passer_robot_in_passgenerator = false;
 
-    double abs_min_pass_score = play_config
-                                    ->getShootOrPassPlayConfig()
-                                    ->getAbsMinPassScore()
-                                    ->value();
-    double pass_score_ramp_down_duration = play_config
-                                               ->getShootOrPassPlayConfig()
-                                               ->getPassScoreRampDownDuration()
-                                               ->value();
+    double abs_min_pass_score =
+        play_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
+    double pass_score_ramp_down_duration =
+        play_config->getShootOrPassPlayConfig()->getPassScoreRampDownDuration()->value();
     do
     {
         updatePassGenerator(pass_generator, world);

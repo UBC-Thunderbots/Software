@@ -29,7 +29,7 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
      * @param play_config The play configuration
      */
     explicit ThreadedAI(std::shared_ptr<const AiConfig> ai_config,
-                        std::shared_ptr<const AiControlConfig> control_config, 
+                        std::shared_ptr<const AiControlConfig> control_config,
                         std::shared_ptr<const PlayConfig> play_config);
 
    private:

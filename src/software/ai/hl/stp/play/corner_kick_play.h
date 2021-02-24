@@ -23,7 +23,6 @@ class CornerKickPlay : public Play
     static constexpr double BALL_IN_CORNER_RADIUS = 0.5;
 
    private:
-
     std::shared_ptr<const PlayConfig> play_config;
 
     /**

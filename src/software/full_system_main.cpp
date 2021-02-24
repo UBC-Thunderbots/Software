@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     std::cout << BANNER << std::endl;
 
     std::shared_ptr<const FullSystemMainCommandLineArgs> args =
-                    std::make_shared<const FullSystemMainCommandLineArgs>();
+        std::make_shared<const FullSystemMainCommandLineArgs>();
 
     // load command line arguments
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
@@ -45,7 +45,8 @@ int main(int argc, char** argv)
     if (!help_requested)
     {
         // Setup dynamic parameters
-        std::shared_ptr<const ThunderbotsConfig> thunderbots_config = std::make_shared<const ThunderbotsConfig>();
+        std::shared_ptr<const ThunderbotsConfig> thunderbots_config =
+            std::make_shared<const ThunderbotsConfig>();
 
         // Override default network interface
         if (!args->getInterface()->value().empty())
@@ -63,8 +64,10 @@ int main(int argc, char** argv)
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend, BackendConfig>::create(
                 args->getBackend()->value(), thunderbots_config->getBackendConfig());
-        auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(thunderbots_config->getSensorFusionConfig());
-        auto ai            = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig());
+        auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
+            thunderbots_config->getSensorFusionConfig());
+        auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig(),
+                                               thunderbots_config->getAiControlConfig());
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers

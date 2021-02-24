@@ -21,7 +21,8 @@ AI::AI(std::shared_ptr<const AiConfig> ai_config,
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
           [play_config]() { return std::make_unique<HaltPlay>(play_config); },
-          control_config, play_config, std::chrono::system_clock::now().time_since_epoch().count()))
+          control_config, play_config,
+          std::chrono::system_clock::now().time_since_epoch().count()))
 {
 }
 

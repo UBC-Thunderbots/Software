@@ -6,7 +6,8 @@
 #include "software/gui/drawing/world.h"
 #include "software/parameter/dynamic_parameters.h"
 
-ThreadedFullSystemGUI::ThreadedFullSystemGUI(std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
+ThreadedFullSystemGUI::ThreadedFullSystemGUI(
+    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
     : FirstInFirstOutThreadedObserver<World>(),
       FirstInFirstOutThreadedObserver<AIDrawFunction>(),
       FirstInFirstOutThreadedObserver<PlayInfo>(),
@@ -85,10 +86,11 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
 
 void ThreadedFullSystemGUI::onValueReceived(World world)
 {
-    auto friendly_team_colour =
-        mutable_thunderbots_config->getSensorFusionConfig()->getFriendlyColorYellow()->value()
-            ? TeamColour::YELLOW
-            : TeamColour::BLUE;
+    auto friendly_team_colour = mutable_thunderbots_config->getSensorFusionConfig()
+                                        ->getFriendlyColorYellow()
+                                        ->value()
+                                    ? TeamColour::YELLOW
+                                    : TeamColour::BLUE;
     auto world_draw_function = getDrawWorldFunction(world, friendly_team_colour);
     world_draw_functions_buffer->push(world_draw_function);
 

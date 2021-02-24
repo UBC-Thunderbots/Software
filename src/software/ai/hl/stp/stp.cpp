@@ -20,7 +20,8 @@
 #include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-         std::shared_ptr<const AiControlConfig> control_config, std::shared_ptr<const PlayConfig> play_config, long random_seed)
+         std::shared_ptr<const AiControlConfig> control_config,
+         std::shared_ptr<const PlayConfig> play_config, long random_seed)
     : default_play_constructor(default_play_constructor),
       current_play(nullptr),
       readable_robot_tactic_assignment(),

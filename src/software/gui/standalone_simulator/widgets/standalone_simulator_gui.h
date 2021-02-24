@@ -27,11 +27,13 @@ class StandaloneSimulatorGUI : public QMainWindow
      *
      * @param simulator The StandaloneSimulator this GUI will control
      * @param mutable_simulator_config The simulator config params this GUI will change
-     * @param mutable_standalone_simulator_config The standalone simulator config params this GUI will change
+     * @param mutable_standalone_simulator_config The standalone simulator config params
+     * this GUI will change
      */
-    explicit StandaloneSimulatorGUI(std::shared_ptr<StandaloneSimulator> simulator, 
-                std::shared_ptr<SimulatorConfig> mutable_simulator_config,
-                std::shared_ptr<StandaloneSimulatorConfig> mutable_standalone_simulator_config);
+    explicit StandaloneSimulatorGUI(
+        std::shared_ptr<StandaloneSimulator> simulator,
+        std::shared_ptr<SimulatorConfig> mutable_simulator_config,
+        std::shared_ptr<StandaloneSimulatorConfig> mutable_standalone_simulator_config);
 
    private:
     /**

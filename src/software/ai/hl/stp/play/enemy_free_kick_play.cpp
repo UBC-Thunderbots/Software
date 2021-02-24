@@ -31,7 +31,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     // Init our goalie tactic
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(), play_config->getGoalieTacticConfig());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
 
     // Init a Crease Defender Tactic
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
@@ -54,16 +55,14 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             ->getDefenseShadowEnemyTacticConfig()
             ->getBallStealSpeed()
             ->value(),
-        play_config->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value(),
-        true);
+        play_config->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value(), true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
         play_config->getAiConfig()
             ->getDefenseShadowEnemyTacticConfig()
             ->getBallStealSpeed()
             ->value(),
-        play_config->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value(),
-        true);
+        play_config->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value(), true);
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
     // shadow)

@@ -7,7 +7,8 @@ SimulatedTestFixture::SimulatedTestFixture()
     : mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
       thunderbots_config(
           std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config)),
-      simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField(), thunderbots_config->getSimulatorConfig())),
+      simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField(),
+                                            thunderbots_config->getSimulatorConfig())),
       sensor_fusion(thunderbots_config->getSensorFusionConfig()),
       run_simulation_in_realtime(false)
 {
@@ -21,9 +22,11 @@ void SimulatedTestFixture::SetUp()
             ->value());
 
     mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-    thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
+    thunderbots_config =
+        std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
 
-    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField(), thunderbots_config->getSimulatorConfig());
+    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField(),
+                                            thunderbots_config->getSimulatorConfig());
     sensor_fusion = SensorFusion(thunderbots_config->getSensorFusionConfig());
 
     mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
@@ -88,7 +91,7 @@ void SimulatedTestFixture::setRefereeCommand(
 
 void SimulatedTestFixture::enableVisualizer()
 {
-    full_system_gui            = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
+    full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
     run_simulation_in_realtime = true;
 }
 
