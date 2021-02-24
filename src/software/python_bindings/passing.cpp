@@ -4,8 +4,8 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/sensor_msg.pb.h"
+#include "software/python_bindings/python_binding_utilities.h"
 #include "software/sensor_fusion/sensor_fusion.h"
-
 
 namespace py = pybind11;
 

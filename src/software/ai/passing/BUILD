@@ -78,29 +78,3 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
-
-cc_library(
-    name = "cost_function_python_lib",
-    srcs = ["cost_function_python.cpp"],
-    copts = ["-fexceptions"],
-    features = [
-        "-use_header_modules",
-        "-parse_headers",
-    ],
-    deps = [
-        ":evaluation",
-        "//software/parameter:dynamic_parameters",
-        "//software/proto:sensor_msg_cc_proto",
-        "//software/proto:ssl_cc_proto",
-        "//software/sensor_fusion",
-        "@local_config_python//:python_headers",
-        "@pybind11",
-    ],
-)
-
-pybind_extension(
-    name = "cost_function_python",
-    deps = [
-        ":cost_function_python_lib",
-    ],
-)
