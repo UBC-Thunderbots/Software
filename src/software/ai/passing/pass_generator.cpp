@@ -280,7 +280,8 @@ double PassGenerator::ratePass(const Pass& pass)
     double rating = 0;
     try
     {
-        rating = ::ratePass(world, pass, target_region, passer_robot_id, pass_type);
+        rating = ::ratePass(world, pass, target_region, passer_robot_id, pass_type,
+                            passing_config);
     }
     catch (std::invalid_argument& e)
     {

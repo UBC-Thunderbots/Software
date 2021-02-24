@@ -15,6 +15,7 @@ class PassGeneratorTest : public testing::Test
         pass_generator =
             std::make_shared<PassGenerator>(world, Point(0, 0), PassType::ONE_TOUCH_SHOT,
                                             DynamicParameters->getPassingConfig(), true);
+        passing_config = std::make_shared<const PassingConfig>();
     }
 
     /**
@@ -55,6 +56,7 @@ class PassGeneratorTest : public testing::Test
 
     World world = ::TestUtil::createBlankTestingWorld();
     std::shared_ptr<PassGenerator> pass_generator;
+    std::shared_ptr<const PassingConfig> passing_config;
 };
 
 TEST_F(PassGeneratorTest, check_pass_converges)
@@ -208,7 +210,8 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     auto converged_pass_and_score          = pass_generator->getBestPassSoFar();
     auto [converged_pass, converged_score] = converged_pass_and_score;
 
-    ::ratePass(world, converged_pass, std::nullopt, 0, PassType::ONE_TOUCH_SHOT);
+    ::ratePass(world, converged_pass, std::nullopt, 0, PassType::ONE_TOUCH_SHOT,
+               passing_config);
 
     // We expect to have converged to a point near robot 2. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
