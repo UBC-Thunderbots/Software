@@ -12,10 +12,10 @@ class PassGeneratorTest : public testing::Test
    protected:
     virtual void SetUp()
     {
+        passing_config = std::make_shared<const PassingConfig>();
         pass_generator =
             std::make_shared<PassGenerator>(world, Point(0, 0), PassType::ONE_TOUCH_SHOT,
-                                            DynamicParameters->getPassingConfig(), true);
-        passing_config = std::make_shared<const PassingConfig>();
+                                            passing_config, true);
     }
 
     /**

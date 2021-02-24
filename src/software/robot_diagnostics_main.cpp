@@ -11,7 +11,7 @@
 int main(int argc, char **argv)
 {
     // load command line arguments
-    auto args = std::make_shared<const RobotDiagnosticsCommandLineArgs>(); 
+    auto args = std::make_shared<RobotDiagnosticsMainCommandLineArgs>(); 
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
