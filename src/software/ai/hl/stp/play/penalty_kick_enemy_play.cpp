@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const PlayConfig> config)

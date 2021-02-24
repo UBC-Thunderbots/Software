@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
 #include "software/parameter/dynamic_parameters.h"

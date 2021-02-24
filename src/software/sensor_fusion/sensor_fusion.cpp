@@ -137,7 +137,33 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-    // TODO (#1819): Update robot capabilities based on robot status msgs
+    for (auto &robot_status_msg : robot_status_msgs)
+    {
+        int robot_id = robot_status_msg.robot_id();
+        std::set<RobotCapability> unavailableCapabilities;
+
+        for (const auto &error_code_msg : robot_status_msg.error_code())
+        {
+            if (error_code_msg == TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT ||
+                error_code_msg == TbotsProto::ErrorCode::WHEEL_1_MOTOR_HOT ||
+                error_code_msg == TbotsProto::ErrorCode::WHEEL_2_MOTOR_HOT ||
+                error_code_msg == TbotsProto::ErrorCode::WHEEL_3_MOTOR_HOT)
+            {
+                unavailableCapabilities.insert(RobotCapability::Move);
+            }
+            else if (error_code_msg == TbotsProto::ErrorCode::LOW_CAP ||
+                     error_code_msg == TbotsProto::ErrorCode::CHARGE_TIMEOUT)
+            {
+                unavailableCapabilities.insert(RobotCapability::Kick);
+                unavailableCapabilities.insert(RobotCapability::Chip);
+            }
+            else if (error_code_msg == TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT)
+            {
+                unavailableCapabilities.insert(RobotCapability::Dribble);
+            }
+        }
+        friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
+    }
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
