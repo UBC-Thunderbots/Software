@@ -1,5 +1,5 @@
 #include "software/logger/logger.h"
-#include "software/simulated_tests/validation_functions/robot_received_ball_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 
 void robotAtPosition(RobotId robot_id, std::shared_ptr<World> world_ptr,
                      const Point& destination, double close_to_destination_threshold,
