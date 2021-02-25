@@ -33,22 +33,20 @@ class PenaltyGoalieTactic : public Tactic
      */
     explicit PenaltyGoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
                           const Team &enemy_team,
-                          std::shared_ptr<const PenaltyGoalieTacticConfig> goalie_tactic_config =
-                              DynamicParameters->getAIConfig()->getPenaltyGoalieTacticConfig());
+                          std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
+                              DynamicParameters->getAIConfig()->getGoalieTacticConfig());
 
     PenaltyGoalieTactic() = delete;
 
     /*
-     * Restrains the goalie to a rectangle, with the preferred point being the one
+     * Restrains the goalie to the goal line, with the preferred point being the one
      * that intersects the point the goalie wants to move to and the center of the
      * goal
      *
      * @param goalie_desired_position The point the goalie would like to go to
-     * @param goalie_restricted_area The rectangle that the goalie is to stay in
      * @returns goalie_suggested_position That the goalie should go to
      */
-    std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
-                                                   Rectangle goalie_restricted_area);
+    Point restrainPenaltyGoalieInGoalLine(Point goalie_desired_position);
 
     void updateWorldParams(const World &world) override;
 
