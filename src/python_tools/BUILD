@@ -32,6 +32,7 @@ py_binary(
     data = [
         ":notebooks",
         "//software/python_bindings:passing.so",
+        "//software/python_bindings:world.so",
     ],
     deps = [
         requirement("jupyter"),

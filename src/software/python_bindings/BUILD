@@ -44,3 +44,36 @@ pybind_extension(
         ":passing_lib",
     ],
 )
+
+cc_library(
+    name = "world_lib",
+    srcs = ["world.cpp"],
+    copts = ["-fexceptions"],
+    features = [
+        "-use_header_modules",
+        "-parse_headers",
+    ],
+    deps = [
+        ":python_binding_utilities",
+        "//software/geom:angle",
+        "//software/geom:point",
+        "//software/geom:vector",
+        "//software/parameter:dynamic_parameters",
+        "//software/proto:sensor_msg_cc_proto",
+        "//software/proto:ssl_cc_proto",
+        "//software/sensor_fusion",
+        "//software/world",
+        "//software/world:ball",
+        "//software/world:field",
+        "//software/world:robot",
+        "@local_config_python//:python_headers",
+        "@pybind11",
+    ],
+)
+
+pybind_extension(
+    name = "world",
+    deps = [
+        ":world_lib",
+    ],
+)

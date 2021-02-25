@@ -20,37 +20,25 @@ py::dict getPassingConfig()
     return copyDynamicParametersConfigToDict(DynamicParameters->getPassingConfig());
 }
 
-double ratePassWrapper(const std::string& ssl_wrapper_world_string, py::dict pass_dict,
-                       bool receive_and_dribble)
+double ratePassWrapper(const World& world, py::dict pass_dict)
 {
-    SSLProto::SSL_WrapperPacket wrapper_packet;
-    wrapper_packet.ParseFromString(ssl_wrapper_world_string);
+    Point passer_point = world.ball().position();
 
-    SensorProto sensor_proto;
-    *sensor_proto.mutable_ssl_vision_msg() = wrapper_packet;
-
-    // use a SensorFusion to do the conversion from SSL_WrapperPacket to World
-    auto sensor_fusion_config = std::make_shared<SensorFusionConfig>();
-    SensorFusion sensor_fusion(sensor_fusion_config);
-    sensor_fusion.processSensorProto(sensor_proto);
-    auto world_or_null = sensor_fusion.getWorld();
-    if (!world_or_null)
+    if (pass_dict.contains("passer_point"))
     {
-        throw std::invalid_argument("SensorFusion does not have a world!");
+        passer_point = pass_dict["passer_point"].cast<Point>();
     }
 
-    // TODO: maybe make the passer point not hardcoded to the ball position
-    Point passer_point = world_or_null->ball().position();
-    Point receiver_point(pass_dict["receiver_point_x"].cast<double>(),
-                         pass_dict["receiver_point_y"].cast<double>());
-    auto pass_speed = pass_dict["pass_speed"].cast<double>();
-    PassType pass_type =
-        receive_and_dribble ? PassType::RECEIVE_AND_DRIBBLE : PassType::ONE_TOUCH_SHOT;
+    Point receiver_point(pass_dict["receiver_point"].cast<Point>());
+    auto pass_speed    = pass_dict["pass_speed"].cast<double>();
+    PassType pass_type = pass_dict.contains("receive_and_dribble") &&
+                                 pass_dict["receive_and_dribble"].cast<bool>()
+                             ? PassType::RECEIVE_AND_DRIBBLE
+                             : PassType::ONE_TOUCH_SHOT;
 
-    Pass pass(passer_point, receiver_point, pass_speed,
-              world_or_null->getMostRecentTimestamp());
+    Pass pass(passer_point, receiver_point, pass_speed, world.getMostRecentTimestamp());
 
-    return ratePass(*world_or_null, pass, std::nullopt, std::nullopt, pass_type);
+    return ratePass(world, pass, std::nullopt, std::nullopt, pass_type);
 }
 
 PYBIND11_MODULE(passing, m)
@@ -59,5 +47,5 @@ PYBIND11_MODULE(passing, m)
           py::arg("config_update_dict"));
     m.def("getPassingConfig", &getPassingConfig);
     m.def("ratePass", &ratePassWrapper, py::arg("ssl_wrapper_world_string"),
-          py::arg("pass_dict"), py::arg("receive_and_dribble"));
+          py::arg("pass_dict"));
 }
