@@ -9,9 +9,9 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
-struct InterceptBallFSM
+struct GetPossessionFSM
 {
-    class chase_ball;
+    class ChaseBallState;
 
     struct ControlParams
     {
@@ -19,7 +19,16 @@ struct InterceptBallFSM
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    static Point fastInterceptionPoint(const Robot &robot, const Ball &ball,
+    /**
+     * Calculates the interception point for intercepting balls
+     *
+     * @param robot The robot to do the interception
+     * @param ball The ball to intercept
+     * @field The field to intercept on
+     *
+     * @return the best interception point
+     */
+    static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
                                        const Field &field)
     {
         static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
@@ -42,37 +51,37 @@ struct InterceptBallFSM
         return intercept_position;
     }
 
+    static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
+
     auto operator()()
     {
         using namespace boost::sml;
 
-        const auto chase_ball_s = state<chase_ball>;
-        const auto block_ball_s = state<MoveFSM>;
+        const auto chase_ball_s     = state<ChaseBallState>;
+        const auto intercept_ball_s = state<MoveFSM>;
 
-        // update_e is the _event_ that the InterceptBallFSM responds to
         const auto update_e = event<Update>;
 
         /**
          * Guard that checks if the ball is slow
          *
-         * @param event InterceptBallFSM::Update
+         * @param event GetPossessionFSM::Update
          *
          * @return if the ball is slow
          */
-        const auto slow_ball = [](auto event) {
-            static const double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
+        const auto slow_ball = [this](auto event) {
             return event.common.world.ball().velocity().length() <
                    BALL_MOVING_SLOW_SPEED_THRESHOLD;
         };
 
         /**
-         * Guard that checks if the ball has been intercepted
+         * Guard that checks if the ball has been have_possession
          *
-         * @param event InterceptBallFSM::Update
+         * @param event GetPossessionFSM::Update
          *
-         * @return if the ball has been intercepted
+         * @return if the ball has been have_possession
          */
-        const auto intercepted = [](auto event) {
+        const auto have_possession = [](auto event) {
             return event.common.robot.isNearDribbler(
                 event.common.world.ball().position());
         };
@@ -80,27 +89,31 @@ struct InterceptBallFSM
         /**
          * Action to update the MoveIntent to chase the ball
          *
-         * @param event InterceptBallFSM::Update
+         * @param event GetPossessionFSM::Update
          */
         const auto chase_ball = [this](auto event) {
-            auto ball_position = event.common.world.ball().position();
-            auto face_ball_orientation =
-                (ball_position - event.common.robot.position()).orientation();
+            auto ball_position    = event.common.world.ball().position();
+            auto face_ball_vector = (ball_position - event.common.robot.position());
+            auto point_in_front_of_ball =
+                ball_position - face_ball_vector.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                                                           BALL_MAX_RADIUS_METERS);
             event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), ball_position, face_ball_orientation, 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW));
+                event.common.robot.id(), point_in_front_of_ball,
+                face_ball_vector.orientation(), 0, DribblerMode::MAX_FORCE,
+                BallCollisionType::ALLOW));
         };
 
         /**
-         * Action to update MoveFSM
+         * Action to update MoveFSM to intercept the ball by getting in front of the ball
+         * at the interception point
          *
          * @param event FastBallInterceptFSM::Update event
          * @param processEvent processes the Move::Update
          */
-        const auto block_ball = [this](auto event,
-                                       back::process<MoveFSM::Update> processEvent) {
+        const auto intercept_ball = [this](auto event,
+                                           back::process<MoveFSM::Update> processEvent) {
             Point intercept_position =
-                fastInterceptionPoint(event.common.robot, event.common.world.ball(),
+                findInterceptionPoint(event.common.robot, event.common.world.ball(),
                                       event.common.world.field());
             MoveFSM::ControlParams control_params{
                 .destination = intercept_position,
@@ -111,15 +124,19 @@ struct InterceptBallFSM
             processEvent(MoveFSM::Update(control_params, event.common));
         };
 
+        /**
+         * If the ball is moving quickly, then move to interception point
+         * If the ball is moving slowly, then chase the ball
+         */
         return make_transition_table(
             // src_state + event [guard] / action = dest state
-            *chase_ball_s + update_e[intercepted] / chase_ball = X,
+            *chase_ball_s + update_e[have_possession] / chase_ball = X,
             chase_ball_s + update_e[slow_ball] / chase_ball,
-            chase_ball_s + update_e[!slow_ball] / block_ball  = block_ball_s,
-            block_ball_s + update_e[intercepted] / chase_ball = X,
-            block_ball_s + update_e[!slow_ball] / block_ball,
-            block_ball_s + update_e[slow_ball] / chase_ball = chase_ball_s,
-            X + update_e[!intercepted] / chase_ball         = chase_ball_s,
-            X + update_e[intercepted] / chase_ball);
+            chase_ball_s + update_e[!slow_ball] / intercept_ball      = intercept_ball_s,
+            intercept_ball_s + update_e[have_possession] / chase_ball = X,
+            intercept_ball_s + update_e[!slow_ball] / intercept_ball,
+            intercept_ball_s + update_e[slow_ball] / chase_ball = chase_ball_s,
+            X + update_e[!have_possession] / chase_ball         = chase_ball_s,
+            X + update_e[have_possession] / chase_ball);
     }
 };

@@ -319,7 +319,7 @@ cc_library(
         ":tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
-        "//software/ai/hl/stp/tactic/intercept_ball:intercept_ball_tactic",
+        "//software/ai/hl/stp/tactic/get_possession:get_possession_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",

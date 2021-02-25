@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/intercept_ball/intercept_ball_tactic.h"
+#include "software/ai/hl/stp/tactic/get_possession/get_possession_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -27,7 +27,7 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<InterceptBallTactic>();
+    auto tactic = std::make_shared<GetPossessionTactic>();
     setTactic(tactic);
     setRobotId(1);
 
@@ -59,7 +59,7 @@ TEST_F(SimulatedMoveTacticTest, test_stopped_ball)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<InterceptBallTactic>();
+    auto tactic = std::make_shared<GetPossessionTactic>();
     setTactic(tactic);
     setRobotId(1);
 
@@ -91,7 +91,7 @@ TEST_F(SimulatedMoveTacticTest, test_ball_bounce_of_enemy_robot)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<InterceptBallTactic>();
+    auto tactic = std::make_shared<GetPossessionTactic>();
     setTactic(tactic);
     setRobotId(1);
 
