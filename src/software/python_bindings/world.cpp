@@ -13,6 +13,11 @@
 
 namespace py = pybind11;
 
+py::dict getDefaultSensorFusionConfig()
+{
+    return copyDynamicParametersConfigToDict(std::make_shared<SensorFusionConfig>());
+}
+
 World createWorldFromSSLWrapperString(const std::string& ssl_wrapper_string,
                                       py::dict sensor_fusion_config_overrides)
 {
@@ -39,7 +44,8 @@ World createWorldFromSSLWrapperString(const std::string& ssl_wrapper_string,
 
 PYBIND11_MODULE(world, m)
 {
-    // World Classes
+    m.def("getDefaultSensorFusionConfig", &getDefaultSensorFusionConfig);
+
     py::class_<Point>(m, "Point")
         .def(py::init<double, double>())
         .def("x", &Point::x)
