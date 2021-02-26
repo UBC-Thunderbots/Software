@@ -7,14 +7,14 @@ void robotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
                          ValidationCoroutine::push_type& yield)
 {
     auto robot_in_center_circle = [robot_id](std::shared_ptr<World> world_ptr) {
-        std::optional<Robot> robotOptional =
+        std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
-        if (!robotOptional.has_value())
+        if (!robot_optional.has_value())
         {
             LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
         }
 
-        Point position = robotOptional.value().position();
+        Point position = robot_optional.value().position();
         return contains(world_ptr->field().centerCircle(), position);
     };
 

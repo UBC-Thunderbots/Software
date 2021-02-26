@@ -56,22 +56,13 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            Robot robot0 = world_ptr->friendlyTeam().getRobotById(0).value();
-            Robot robot1 = world_ptr->friendlyTeam().getRobotById(1).value();
-            Robot robot2 = world_ptr->friendlyTeam().getRobotById(2).value();
-            Robot robot3 = world_ptr->friendlyTeam().getRobotById(3).value();
-            Robot robot5 = world_ptr->friendlyTeam().getRobotById(5).value();
-
-            robotInFriendlyHalf(robot0, world_ptr, yield);
-            robotInFriendlyHalf(robot1, world_ptr, yield);
-            robotInFriendlyHalf(robot2, world_ptr, yield);
-            robotInFriendlyHalf(robot3, world_ptr, yield);
-            robotInFriendlyHalf(robot5, world_ptr, yield);
-            robotNotInCenterCircle(robot0, world_ptr, yield);
-            robotNotInCenterCircle(robot1, world_ptr, yield);
-            robotNotInCenterCircle(robot2, world_ptr, yield);
-            robotNotInCenterCircle(robot3, world_ptr, yield);
-            robotNotInCenterCircle(robot5, world_ptr, yield);
+            for (int robot_id : {0, 1, 2, 3, 5})
+            {
+                {
+                    robotInFriendlyHalf(robot_id, world_ptr, yield);
+                    robotNotInCenterCircle(robot_id, world_ptr, yield);
+                }
+            }
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

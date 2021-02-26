@@ -2,20 +2,32 @@
 
 #include <gtest/gtest.h>
 
+#include "software/logger/logger.h"
+
 void robotsInFriendlyHalf(std::shared_ptr<World> world_ptr,
                           ValidationCoroutine::push_type& yield)
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
-        robotInFriendlyHalf(robot, world_ptr, yield);
+        if (!world_ptr->field().pointInFriendlyHalf(robot.position()))
+        {
+            FAIL() << "Robot " + std::to_string(robot.id()) + " entered enemy half";
+        }
     }
 }
 
-void robotInFriendlyHalf(Robot robot, std::shared_ptr<World> world_ptr,
+void robotInFriendlyHalf(RobotId robot_id, std::shared_ptr<World> world_ptr,
                          ValidationCoroutine::push_type& yield)
 {
-    if (!world_ptr->field().pointInFriendlyHalf(robot.position()))
+    std::optional<Robot> robot_optional =
+        world_ptr->friendlyTeam().getRobotById(robot_id);
+    if (!robot_optional.has_value())
     {
-        FAIL() << "Robot " + std::to_string(robot.id()) + " entered enemy half";
+        LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
+    }
+    Point position = robot_optional.value().position();
+    if (!world_ptr->field().pointInFriendlyHalf(position))
+    {
+        FAIL() << "Robot " + std::to_string(robot_id) + " entered enemy half";
     }
 }

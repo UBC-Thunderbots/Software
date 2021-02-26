@@ -13,9 +13,10 @@ void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
 
 /**
  * Checks if a friendly robot is not in center circle of field, else fails assertion.
- * @param robot the robot in question
+ * @param robot_id the ID of the robot in question, there must exist a robot
+ * for the given robot_id
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param yield yields control to the next routine (coroutines)
  */
-void robotNotInCenterCircle(Robot robot, std::shared_ptr<World> world_ptr,
+void robotNotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
                             ValidationCoroutine::push_type& yield);
