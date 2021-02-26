@@ -43,6 +43,7 @@ py_binary(
         requirement("ipywidgets"),
         ":proto_log",
         ":sensor_proto_log",
+        "//python_tools/plotting:plot_heatmap",
         "//python_tools/plotting:plot_ssl_wrapper",
         "//shared/proto:tbots_py_proto",
         "//software/proto:software_py_proto",

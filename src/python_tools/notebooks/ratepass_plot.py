@@ -33,44 +33,26 @@ world.getDefaultSensorFusionConfig()
 # +
 from bokeh.plotting import figure
 from bokeh.io import output_notebook, show, push_notebook
-from python_tools.plotting.plot_ssl_wrapper import SSLWrapperPlotter
-from bokeh import palettes
-from bokeh.models import ColorBar, tickers
-from bokeh.layouts import row
+from python_tools.plotting.plot_ssl_wrapper import SSLWrapperPlotter, MM_PER_M
+from python_tools.plotting.plot_heatmap import HeatmapPlotter
 
 output_notebook()
 
 fig = figure(plot_width=900, plot_height=900, match_aspect=True)
 
+field_length = wrapper_proto_log[0].geometry.field.field_length / MM_PER_M
+field_width = wrapper_proto_log[0].geometry.field.field_width / MM_PER_M
+heatmap_x_bounds = (-field_length / 2, field_length / 2)
+heatmap_y_bounds = (-field_width / 2, field_width / 2)
+heatmap_grid_size = 0.05
+
 ssl_wrapper_plotter = SSLWrapperPlotter(fig)
 
-color_bar = ColorBar(label_standoff=12)
+ratepass_heatmap_plotter = HeatmapPlotter(
+    fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePass"
+)
 
-
-def get_ratepass_grid(ssl_wrapper):
-    the_world = world.World(ssl_wrapper.SerializeToString(), dict())
-
-    field_length = ssl_wrapper.geometry.field.field_length / 1000
-    field_width = ssl_wrapper.geometry.field.field_width / 1000
-
-    grid_size = 0.05
-    grid_dims = (int(field_length // grid_size), int(field_width // grid_size))
-    ratepass_grid = np.ndarray(grid_dims)
-
-    xcoords = np.arange(-field_length / 2, field_length / 2, grid_size)
-    ycoords = np.arange(-field_width / 2, field_width / 2, grid_size)
-
-    for x_idx, x in enumerate(xcoords):
-        for y_idx, y in enumerate(ycoords):
-            pass_dict = {
-                "passer_point": world.Point(4, 2),
-                "receiver_point": world.Point(x, y),
-                "pass_speed": 5.0,
-                "receive_and_dribble": False,
-            }
-            if x_idx < grid_dims[0] and y_idx < grid_dims[1]:
-                ratepass_grid[x_idx, y_idx] = passing.ratePassShootScore(the_world, pass_dict)
-    return np.flip(np.rot90(ratepass_grid), axis=0)
+heatmap_grid_size = 0.05
 
 
 def plot_ssl_wrapper_at_idx(idx):
@@ -79,18 +61,19 @@ def plot_ssl_wrapper_at_idx(idx):
     field_length = wrapper_proto_log[idx].geometry.field.field_length / 1000
     field_width = wrapper_proto_log[idx].geometry.field.field_width / 1000
 
-    ratepass_grid = get_ratepass_grid(wrapper_proto_log[idx])
-    image = fig.image(
-        image=[ratepass_grid],
-        x=-field_length / 2,
-        y=-field_width / 2,
-        dh=field_width,
-        dw=field_length,
-        palette=palettes.viridis(100),
-        level="image",
-    )
-    color_bar = ColorBar(color_mapper=image.glyph.color_mapper, label_standoff=12)
-    fig.add_layout(color_bar, 'right')
+    the_world = world.World(wrapper_proto_log[idx].SerializeToString(), dict())
+
+    def pass_cost(x, y):
+        receiver_point = world.Point(x, y)
+        pass_dict = {
+            "passer_point": world.Point(4, 2),
+            "receiver_point": receiver_point,
+            "pass_speed": 5.0,
+            "receive_and_dribble": False,
+        }
+        return passing.ratePassEnemyRisk(the_world, pass_dict)
+
+    ratepass_heatmap_plotter.plot_heatmap(pass_cost)
     push_notebook()
 
 
@@ -99,5 +82,3 @@ show(fig, notebook_handle=True)
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
 # -
-
-
