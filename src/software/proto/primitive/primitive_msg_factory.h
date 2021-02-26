@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/constants.h"
 #include "shared/proto/primitive.pb.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
@@ -44,12 +45,14 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
  * @param final_angle The final orientation the robot should have at the end
  * of the movement
  * @param dribbler_mode The dribbler mode
+ * @param max_speed_m_per_s The maximum speed in meters per second
  *
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode);
+    DribblerMode dribbler_mode,
+    double max_speed_m_per_s = ROBOT_MAX_SPEED_METERS_PER_SECOND);
 
 /**
  * Create a Spinning Move Primitive Message
