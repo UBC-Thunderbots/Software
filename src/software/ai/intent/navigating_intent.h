@@ -17,9 +17,12 @@ class NavigatingIntent : public Intent
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
      * @param ball_collision_type how to navigate around the ball
+     * @param max_speed_m_per_s The maximum speed in meters per second
      */
-    explicit NavigatingIntent(unsigned int robot_id, Point destination,
-                              double final_speed, BallCollisionType ball_collision_type);
+    explicit NavigatingIntent(
+        unsigned int robot_id, Point destination, double final_speed,
+        BallCollisionType ball_collision_type,
+        double max_speed_m_per_s = ROBOT_MAX_SPEED_METERS_PER_SECOND);
 
     NavigatingIntent() = delete;
 
@@ -43,6 +46,13 @@ class NavigatingIntent : public Intent
      * @return the final speed
      */
     double getFinalSpeed() const;
+
+    /**
+     * Gets the maximum speed
+     *
+     * @return the maximum speed
+     */
+    double getMaxSpeed() const;
 
     /**
      * Gets the ball collision type
@@ -74,4 +84,5 @@ class NavigatingIntent : public Intent
     Point destination;
     double final_speed;
     BallCollisionType ball_collision_type;
+    double max_speed_m_per_s;
 };
