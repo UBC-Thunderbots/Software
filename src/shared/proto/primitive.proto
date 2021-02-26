@@ -13,10 +13,8 @@ message Primitive
         KickPrimitive kick                    = 3;
         MovePrimitive move                    = 4;
         SpinningMovePrimitive spinning_move   = 5;
-        AutochipMovePrimitive autochip_move   = 6;
-        AutokickMovePrimitive autokick_move   = 7;
-        StopPrimitive stop                    = 8;
-        DirectControlPrimitive direct_control = 9;
+        StopPrimitive stop                    = 6;
+        DirectControlPrimitive direct_control = 7;
     }
 }
 
@@ -55,22 +53,6 @@ message SpinningMovePrimitive
     float final_speed_meters_per_second = 2;
     AngularVelocity angular_velocity    = 3;
     float dribbler_speed_rpm            = 4;
-}
-
-message AutochipMovePrimitive
-{
-    MovePositionParams position_params = 1;
-    Angle final_angle                  = 2;
-    float dribbler_speed_rpm           = 3;
-    float chip_distance_meters         = 4;
-}
-
-message AutokickMovePrimitive
-{
-    MovePositionParams position_params = 1;
-    Angle final_angle                  = 2;
-    float dribbler_speed_rpm           = 3;
-    float kick_speed_meters_per_second = 4;
 }
 
 message StopPrimitive
@@ -120,10 +102,4 @@ message DirectControlPrimitive
         float autochip_distance_meters         = 7;
     }
     float dribbler_speed_rpm = 8;
-}
-
-message MovePositionParams
-{
-    Point destination                   = 1;
-    float final_speed_meters_per_second = 2;
 }
