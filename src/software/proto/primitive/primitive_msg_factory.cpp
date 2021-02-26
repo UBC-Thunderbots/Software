@@ -20,9 +20,9 @@ std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(const Point &chip_ori
     return chip_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
-    const Point &kick_origin, const Angle &kick_direction,
-    double kick_speed_meters_per_second)
+std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(const Point &kick_origin,
+                                                           const Angle &kick_direction,
+                                                           double kick_speed_m_per_s)
 {
     auto kick_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -32,15 +32,16 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
     auto kick_direction_msg = createAngleProto(kick_direction);
     *(kick_primitive_msg->mutable_kick()->mutable_kick_direction()) = *kick_direction_msg;
 
-    kick_primitive_msg->mutable_kick()->set_kick_speed_meters_per_second(
-        static_cast<float>(kick_speed_meters_per_second));
+    kick_primitive_msg->mutable_kick()->set_kick_speed_m_per_s(
+        static_cast<float>(kick_speed_m_per_s));
 
     return kick_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode)
+std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(const Point &dest,
+                                                           double final_speed_m_per_s,
+                                                           const Angle &final_angle,
+                                                           DribblerMode dribbler_mode)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -48,8 +49,8 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     auto final_angle_msg = createAngleProto(final_angle);
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) = *final_angle_msg;
     *(move_primitive_msg->mutable_move()->mutable_destination()) = *dest_msg;
-    move_primitive_msg->mutable_move()->set_final_speed_meters_per_second(
-        static_cast<float>(final_speed_meters_per_second));
+    move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
+        static_cast<float>(final_speed_m_per_s));
 
     move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(
         static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
@@ -58,7 +59,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 }
 
 std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second,
+    const Point &dest, double final_speed_m_per_s,
     const AngularVelocity &angular_velocity, DribblerMode dribbler_mode)
 {
     auto spinning_move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
@@ -69,9 +70,8 @@ std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
         *angular_velocity_msg;
     *(spinning_move_primitive_msg->mutable_spinning_move()->mutable_destination()) =
         *dest_msg;
-    spinning_move_primitive_msg->mutable_spinning_move()
-        ->set_final_speed_meters_per_second(
-            static_cast<float>(final_speed_meters_per_second));
+    spinning_move_primitive_msg->mutable_spinning_move()->set_final_speed_m_per_s(
+        static_cast<float>(final_speed_m_per_s));
 
     spinning_move_primitive_msg->mutable_spinning_move()->set_dribbler_speed_rpm(
         static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));

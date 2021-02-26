@@ -36,7 +36,7 @@ void app_spinning_move_primitive_start(TbotsProto_SpinningMovePrimitive prim_msg
     state->x_final    = prim_msg.destination.x_meters;
     state->y_final    = prim_msg.destination.y_meters;
     state->avel_final = prim_msg.angular_velocity.radians_per_second;
-    state->end_speed  = prim_msg.final_speed_meters_per_second;
+    state->end_speed  = prim_msg.final_speed_m_per_s;
 
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
 

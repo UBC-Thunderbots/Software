@@ -29,6 +29,9 @@ typedef struct MoveState
     // The start time of this primitive, in seconds
     float primitive_start_time_seconds;
 
+    // The maximum speed of the move primitive
+    float max_speed_m_per_s;
+
 } MoveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveState_t);
 
@@ -56,7 +59,7 @@ void plan_move_rotation(PhysBot* pb, float avel)
 }
 
 void start_motion(void* void_state_ptr, FirmwareWorld_t* world,
-                  TbotsProto_Point destination, float final_speed_meters_per_second,
+                  TbotsProto_Point destination, float final_speed_m_per_s,
                   float final_angle)
 {
     MoveState_t* state = (MoveState_t*)void_state_ptr;
@@ -65,7 +68,7 @@ void start_motion(void* void_state_ptr, FirmwareWorld_t* world,
     const float destination_x           = destination.x_meters;
     const float destination_y           = destination.y_meters;
     const float destination_orientation = final_angle;
-    const float speed_at_dest_m_per_s   = final_speed_meters_per_second;
+    const float speed_at_dest_m_per_s   = final_speed_m_per_s;
 
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
@@ -108,9 +111,7 @@ void start_motion(void* void_state_ptr, FirmwareWorld_t* world,
 void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_state_ptr,
                               FirmwareWorld_t* world)
 {
-    start_motion(void_state_ptr, world, prim_msg.destination,
-                 prim_msg.final_speed_meters_per_second, prim_msg.final_angle.radians);
-
+    /* Handle dribbler and autochip/autokick settings */
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
 
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(robot);
@@ -118,10 +119,10 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     app_dribbler_setSpeed(dribbler, (uint32_t)prim_msg.dribbler_speed_rpm);
     switch (prim_msg.which_autochick)
     {
-        case TbotsProto_MovePrimitive_autokick_speed_meters_per_second_tag:
+        case TbotsProto_MovePrimitive_autokick_speed_m_per_s_tag:
         {
-            app_chicker_enableAutokick(
-                chicker, prim_msg.autochick.autokick_speed_meters_per_second);
+            app_chicker_enableAutokick(chicker,
+                                       prim_msg.autochick.autokick_speed_m_per_s);
             break;
         }
         case TbotsProto_MovePrimitive_autochip_distance_meters_tag:
@@ -131,9 +132,57 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
             break;
         }
     }
+
+    /* Handle robot movement */
+    MoveState_t* state = (MoveState_t*)void_state_ptr;
+
+    // parameters from the primitive message
+    const float destination_x           = prim_msg.destination.x_meters;
+    const float destination_y           = prim_msg.destination.y_meters;
+    const float destination_orientation = prim_msg.final_angle.radians;
+    const float speed_at_dest_m_per_s   = prim_msg.final_speed_m_per_s;
+
+    float max_speed_m_per_s = prim_msg.max_speed_m_per_s;
+    clamp(&max_speed_m_per_s, 0, (float)ROBOT_MAX_SPEED_METERS_PER_SECOND);
+
+    const float current_x           = app_firmware_robot_getPositionX(robot);
+    const float current_y           = app_firmware_robot_getPositionY(robot);
+    const float current_orientation = app_firmware_robot_getOrientation(robot);
+    const float current_speed       = app_firmware_robot_getSpeedLinear(robot);
+
+    // Plan a trajectory to move to the target position/orientation
+    FirmwareRobotPathParameters_t path_parameters = {
+        .path = {.x = {.coefficients = {0, 0, destination_x - current_x, current_x}},
+                 .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
+        .orientation_profile = {.coefficients = {0, 0,
+                                                 fmodf(destination_orientation -
+                                                           current_orientation,
+                                                       (float)(2 * M_PI)),
+                                                 current_orientation}},
+        .t_start             = 0,
+        .t_end               = 1.0f,
+        .num_elements        = 10,
+        .max_allowable_linear_acceleration =
+            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+        .max_allowable_linear_speed = max_speed_m_per_s,
+        .max_allowable_angular_acceleration =
+            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
+        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+        .initial_linear_speed        = current_speed,
+        .final_linear_speed          = speed_at_dest_m_per_s};
+    state->num_trajectory_elems = path_parameters.num_elements;
+    app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
+        path_parameters, &(state->position_trajectory));
+
+    // NOTE: We set this after doing the trajectory generation in case the generation
+    //       took a while, since we're going to use this as our reference time when
+    //       tracking the trajectory, and so what it to be as close as possible to
+    //       the time that we actually start _executing_ the trajectory
+    state->primitive_start_time_seconds = app_firmware_world_getCurrentTime(world);
+    state->max_speed_m_per_s            = max_speed_m_per_s;
 }
 
-void tick_motion(void* void_state_ptr, FirmwareWorld_t* world)
+static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world)
 {
     MoveState_t* state           = (MoveState_t*)(void_state_ptr);
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
@@ -171,13 +220,13 @@ void tick_motion(void* void_state_ptr, FirmwareWorld_t* world)
 
     // plan major axis movement
     float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    float max_major_v     = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND;
+    float max_major_v     = state->max_speed_m_per_s;
     float major_params[3] = {dest_speed, max_major_a, max_major_v};
     app_physbot_planMove(&pb.maj, major_params);
 
     // plan minor axis movement
     float max_minor_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f;
-    float max_minor_v = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND / 2.0f;
+    float max_minor_v = state->max_speed_m_per_s / 2.0f;
     float minor_params[3] = {0, max_minor_a, max_minor_v};
     app_physbot_planMove(&pb.min, minor_params);
 
@@ -191,11 +240,6 @@ void tick_motion(void* void_state_ptr, FirmwareWorld_t* world)
         accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
 
     app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
-}
-
-static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world)
-{
-    tick_motion(void_state_ptr, world);
 }
 
 /**
