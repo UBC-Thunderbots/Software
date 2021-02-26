@@ -40,6 +40,41 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive)
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
               static_cast<float>(Angle::threeQuarter().toRadians()));
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(), INDEFINITE_DRIBBLER_SPEED);
+    EXPECT_FALSE(move_primitive->move().has_autochick_command());
+}
+
+TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
+{
+    auto move_primitive =
+        createMovePrimitive(Point(-5, 1), 3.0, Angle::threeQuarter(),
+                            DribblerMode::INDEFINITE, createAutoChipCommand(2.5));
+
+    ASSERT_TRUE(move_primitive->has_move());
+    EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
+    EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
+    EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
+    EXPECT_EQ(move_primitive->move().final_angle().radians(),
+              static_cast<float>(Angle::threeQuarter().toRadians()));
+    EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(), INDEFINITE_DRIBBLER_SPEED);
+    ASSERT_TRUE(move_primitive->move().has_autochick_command());
+    EXPECT_EQ(move_primitive->move().autochick_command().autokick_speed_m_per_s(), 2.5);
+}
+
+TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
+{
+    auto move_primitive =
+        createMovePrimitive(Point(-5, 1), 3.0, Angle::threeQuarter(),
+                            DribblerMode::INDEFINITE, createAutoKickCommand(3.5));
+
+    ASSERT_TRUE(move_primitive->has_move());
+    EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
+    EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
+    EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
+    EXPECT_EQ(move_primitive->move().final_angle().radians(),
+              static_cast<float>(Angle::threeQuarter().toRadians()));
+    EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(), INDEFINITE_DRIBBLER_SPEED);
+    ASSERT_TRUE(move_primitive->move().has_autochick_command());
+    EXPECT_EQ(move_primitive->move().autochick_command().autochip_distance_meters(), 3.5);
 }
 
 TEST(PrimitiveFactoryTest, test_create_spinning_move_primitive)

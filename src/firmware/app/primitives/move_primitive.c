@@ -120,16 +120,16 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     Chicker_t* chicker = app_firmware_robot_getChicker(robot);
     switch (prim_msg.autochick_command.which_autochick)
     {
-        case TbotsProto_AutochickCommand_autokick_speed_m_per_s_tag:
-        {
-            app_chicker_enableAutokick(
-                chicker, prim_msg.autochick_command.autochick.autokick_speed_m_per_s);
-            break;
-        }
         case TbotsProto_AutochickCommand_autochip_distance_meters_tag:
         {
             app_chicker_enableAutochip(
                 chicker, prim_msg.autochick_command.autochick.autochip_distance_meters);
+            break;
+        }
+        case TbotsProto_AutochickCommand_autokick_speed_m_per_s_tag:
+        {
+            app_chicker_enableAutokick(
+                chicker, prim_msg.autochick_command.autochick.autokick_speed_m_per_s);
             break;
         }
     }
