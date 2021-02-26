@@ -10,10 +10,10 @@ TEST_F(FirmwareTestUtilWorld, app_move_primitive_test_autochip)
     primitive_msg.which_primitive = TbotsProto_Primitive_move_tag;
     TbotsProto_MovePrimitive move_primitive_msg;
     move_primitive_msg.dribbler_speed_rpm = 1.0;
-    move_primitive_msg.which_autochick =
-        TbotsProto_MovePrimitive_autochip_distance_meters_tag;
-    move_primitive_msg.autochick.autochip_distance_meters = 2.0;
-    primitive_msg.primitive.move                          = move_primitive_msg;
+    move_primitive_msg.autochick_command.which_autochick =
+        TbotsProto_AutochickCommand_autochip_distance_meters_tag;
+    move_primitive_msg.autochick_command.autochick.autochip_distance_meters = 2.0;
+    primitive_msg.primitive.move = move_primitive_msg;
 
     PrimitiveManager_t* manager = app_primitive_manager_create();
 
@@ -31,10 +31,10 @@ TEST_F(FirmwareTestUtilWorld, app_move_primitive_test_autokick)
     primitive_msg.which_primitive = TbotsProto_Primitive_move_tag;
     TbotsProto_MovePrimitive move_primitive_msg;
     move_primitive_msg.dribbler_speed_rpm = 1.0;
-    move_primitive_msg.which_autochick =
-        TbotsProto_MovePrimitive_autokick_speed_m_per_s_tag;
-    move_primitive_msg.autochick.autokick_speed_m_per_s = 3.0;
-    primitive_msg.primitive.move                        = move_primitive_msg;
+    move_primitive_msg.autochick_command.which_autochick =
+        TbotsProto_AutochickCommand_autokick_speed_m_per_s_tag;
+    move_primitive_msg.autochick_command.autochick.autokick_speed_m_per_s = 3.0;
+    primitive_msg.primitive.move = move_primitive_msg;
 
     PrimitiveManager_t* manager = app_primitive_manager_create();
 
