@@ -101,9 +101,9 @@ cc_library(
 )
 
 cc_library(
-    name = "move_helper",
-    srcs = ["move_helper.c"],
-    hdrs = ["move_helper.h"],
+    name = "move",
+    srcs = ["move_primitive.c"],
+    hdrs = ["move_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/app/control",
@@ -114,16 +114,6 @@ cc_library(
         "//firmware/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
-    ],
-)
-
-cc_library(
-    name = "move",
-    srcs = ["move_primitive.c"],
-    hdrs = ["move_primitive.h"],
-    deps = [
-        "move_helper",
-        ":primitive",
     ],
 )
 

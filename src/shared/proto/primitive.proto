@@ -38,16 +38,23 @@ message KickPrimitive
 
 message MovePrimitive
 {
-    MovePositionParams position_params = 1;
-    Angle final_angle                  = 2;
-    float dribbler_speed_rpm           = 3;
+    Point destination                   = 1;
+    float final_speed_meters_per_second = 2;
+    Angle final_angle                   = 3;
+    float dribbler_speed_rpm            = 4;
+    oneof autochick
+    {
+        float autokick_speed_meters_per_second = 5;
+        float autochip_distance_meters         = 6;
+    }
 }
 
 message SpinningMovePrimitive
 {
-    MovePositionParams position_params = 1;
-    AngularVelocity angular_velocity   = 2;
-    float dribbler_speed_rpm           = 3;
+    Point destination                   = 1;
+    float final_speed_meters_per_second = 2;
+    AngularVelocity angular_velocity    = 3;
+    float dribbler_speed_rpm            = 4;
 }
 
 message AutochipMovePrimitive
