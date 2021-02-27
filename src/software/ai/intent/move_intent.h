@@ -16,13 +16,13 @@ class MoveIntent : public NavigatingIntent
      * @param dribbler_mode Dribbler mode
      * @param ball_collision_type how to navigate around the ball
      * @param autochipkick The command to autochip or autokick
-     * @param max_speed_m_per_s The maximum speed in meters per second
+ * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
                         DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
                         std::optional<TbotsProto::Autochipkick> autochipkick,
-                        double max_speed_m_per_s);
+                        MaxAllowedSpeedMode max_allowed_speed_mode);
 
     MoveIntent() = delete;
 

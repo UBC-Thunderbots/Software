@@ -3,7 +3,7 @@
 NavigatingIntent::NavigatingIntent(unsigned int robot_id, Point destination,
                                    double final_speed,
                                    BallCollisionType ball_collision_type,
-                                   double max_speed_m_per_s)
+                                   MaxAllowedSpeedMode max_allowed_speed_mode)
     : Intent(robot_id),
       destination(destination),
       final_speed(final_speed),

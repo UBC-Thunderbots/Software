@@ -20,7 +20,7 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      DribblerMode dribbler_mode,
                                      BallCollisionType ball_collision_type,
                                      std::optional<TbotsProto::Autochipkick> autochipkick,
-                                     double max_speed_m_per_s)
+                                     MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     this->robot               = robot;
     this->destination         = destination;

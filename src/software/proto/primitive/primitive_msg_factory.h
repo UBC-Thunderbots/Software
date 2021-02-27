@@ -7,7 +7,18 @@
 #include "software/geom/point.h"
 #include "software/util/make_enum/make_enum.h"
 
+/**
+ * OFF - dribbler is off
+ * INDEFINITE - the dribbler can be run at this speed indefinitely
+ * MAX_FORCE - the dribbler applies maximum force to the ball
+ */
 MAKE_ENUM(DribblerMode, OFF, INDEFINITE, MAX_FORCE);
+
+/**
+ * PHYSICAL_LIMIT maximum speed allowed by the physical limits of the robot
+ * STOP_COMMAND maximum speed allowed when responding to a stop command
+ */
+MAKE_ENUM(MaxAllowedSpeedMode, PHYSICAL_LIMIT, STOP_COMMAND);
 
 /**
  * Create a Chip Primitive Message
@@ -46,14 +57,14 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
  * of the movement
  * @param dribbler_mode The dribbler mode
  * @param autochipkick The command to autochip or autokick
- * @param max_speed_m_per_s The maximum speed in meters per second
+ * @param max_allowed_speed_mode The mode of maximum speed allowed
  *
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
     DribblerMode dribbler_mode, std::optional<TbotsProto::Autochipkick> autochipkick,
-    double max_speed_m_per_s);
+    MaxAllowedSpeedMode max_allowed_speed_mode);
 
 /**
  * Create an Autochip command
@@ -139,3 +150,13 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
  * @return the dribbler speed in RPM
  */
 double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode);
+
+/**
+ * Convert max allowed speed mode to max allowed speed
+ *
+ * @param max_allowed_speed_mode The MaxAllowedSpeedMode
+ *
+ * @return the max allowed speed in m/s
+ */
+double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+    MaxAllowedSpeedMode max_allowed_speed_mode);

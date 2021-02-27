@@ -32,7 +32,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive)
 {
     auto move_primitive = createMovePrimitive(Point(-5, 1), 3.0, Angle::threeQuarter(),
                                               DribblerMode::INDEFINITE, std::nullopt,
-                                              ROBOT_MAX_SPEED_METERS_PER_SECOND);
+                                              MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ASSERT_TRUE(move_primitive->has_move());
     EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
@@ -50,7 +50,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
 {
     auto move_primitive = createMovePrimitive(
         Point(-5, 1), 3.0, Angle::threeQuarter(), DribblerMode::INDEFINITE,
-        createAutoChipCommand(2.5), ROBOT_MAX_SPEED_METERS_PER_SECOND);
+        createAutoChipCommand(2.5), MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ASSERT_TRUE(move_primitive->has_move());
     EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
@@ -69,7 +69,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
 {
     auto move_primitive = createMovePrimitive(
         Point(-5, 1), 3.0, Angle::threeQuarter(), DribblerMode::INDEFINITE,
-        createAutoKickCommand(3.5), ROBOT_MAX_SPEED_METERS_PER_SECOND - 1);
+        createAutoKickCommand(3.5), MaxAllowedSpeedMode::STOP_COMMAND);
 
     ASSERT_TRUE(move_primitive->has_move());
     EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
@@ -81,7 +81,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
     ASSERT_TRUE(move_primitive->move().has_autochipkick());
     EXPECT_EQ(move_primitive->move().autochipkick().autokick_speed_m_per_s(), 3.5);
     EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),
-              ROBOT_MAX_SPEED_METERS_PER_SECOND - 1);
+              STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND);
 }
 
 TEST(PrimitiveFactoryTest, test_create_spinning_move_primitive)

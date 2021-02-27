@@ -41,14 +41,14 @@ class MoveAction : public Action
      * @param dribbler_mode The dribbler mode
      * @param ball_collision_type how to navigate around the ball
      * @param autochipkick The command to autochip or autokick
-     * @param max_speed_m_per_s The maximum speed in meters per second
+ * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
     void updateControlParams(
         const Robot& robot, Point destination, Angle final_orientation,
         double final_speed, DribblerMode dribbler_mode,
         BallCollisionType ball_collision_type,
         std::optional<TbotsProto::Autochipkick> autochipkick = std::nullopt,
-        double max_speed_m_per_s = ROBOT_MAX_SPEED_METERS_PER_SECOND);
+        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     /**
      * Get the destination this MoveAction is going to
@@ -103,7 +103,7 @@ class MoveAction : public Action
     double close_to_dest_threshold;
     Angle close_to_orientation_threshold;
     std::optional<TbotsProto::Autochipkick> autochipkick;
-    double max_speed_m_per_s;
+    MaxAllowedSpeedMode max_allowed_speed_mode;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
