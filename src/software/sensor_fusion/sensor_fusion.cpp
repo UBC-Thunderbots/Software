@@ -101,8 +101,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
 
 void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
-    // TODO remove DynamicParameters as part of
-    // https://github.com/UBC-Thunderbots/Software/issues/960
     if (sensor_fusion_config->getFriendlyColorYellow()->value())
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
@@ -168,8 +166,6 @@ void SensorFusion::updateWorld(
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)
 {
-    // TODO remove DynamicParameters as part of
-    // https://github.com/UBC-Thunderbots/Software/issues/960
     double min_valid_x = sensor_fusion_config->getMinValidX()->value();
     double max_valid_x = sensor_fusion_config->getMaxValidX()->value();
     bool ignore_invalid_camera_data =
@@ -178,7 +174,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     // We invert the field side if we explicitly choose to override the values
     // provided by the game controller. The 'defending_positive_side' parameter dictates
     // the side we are defending if we are overriding the value
-    // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
     const bool override_game_controller_defending_side =
         sensor_fusion_config->getOverrideGameControllerDefendingSide()->value();
     const bool defending_positive_side =
@@ -186,8 +181,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     const bool should_invert_field =
         override_game_controller_defending_side && defending_positive_side;
 
-    // TODO remove DynamicParameters as part of
-    // https://github.com/UBC-Thunderbots/Software/issues/960
     bool friendly_team_is_yellow =
         sensor_fusion_config->getFriendlyColorYellow()->value();
 
