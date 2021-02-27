@@ -56,7 +56,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
             robotAtPosition(shooter_id, world_ptr, world_ptr->field().friendlyPenaltyMark(),
-                            0.4, yield);
+                            0.3, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -94,11 +94,12 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
         friendlyScored,
     };
 
+    RobotId shooter_id = 1;;
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         ballInPlay,
         ballAlwaysMovesForward,
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotsAvoidBall(1, world_ptr, yield, {1});
+        [shooter_id](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
         }
     };
 

@@ -176,7 +176,7 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done =
         tickTest(terminating_validation_functions, non_terminating_validation_functions,
                  simulation_time_step, ai_time_step, world);
-    while (simulator->getTimestamp() < timeout_time)
+    while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
         if (!DynamicParameters->getAiControlConfig()->getRunAi()->value())
         {
