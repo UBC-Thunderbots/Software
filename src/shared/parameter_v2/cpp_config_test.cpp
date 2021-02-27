@@ -5,6 +5,7 @@
 #include <set>
 
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/parameter/parameter.h"
 #include "software/util/variant_visitor/variant_visitor.h"
 #include "yaml-cpp/yaml.h"

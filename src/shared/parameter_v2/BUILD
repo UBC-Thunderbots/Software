@@ -63,6 +63,7 @@ cc_test(
     ],
     deps = [
         "//shared/parameter_v2:cpp_configs",
+        "//software/ai/hl/stp/play:halt_play",
         "//software/util/variant_visitor",
         "@boost//:filesystem",
         "@gtest//:gtest_main",
