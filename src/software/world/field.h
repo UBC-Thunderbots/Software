@@ -264,16 +264,16 @@ class Field
     Rectangle enemyGoal() const;
 
     /**
-     * Gets the position of the enemy team's penalty mark.
+     * Gets the position of the friendly team's penalty mark.
      *
-     * @return the position of the penalty mark near the enemy goal
+     * @return the position of the penalty mark for the friendly team.
      */
     Point friendlyPenaltyMark() const;
 
     /**
-     * Gets the position of the friendly team's penalty mark.
+     * Gets the position of the enemy team's penalty mark.
      *
-     * @return the position of the penalty mark near the friendly goal
+     * @return the position of the penalty mark for the enemy team.
      */
     Point enemyPenaltyMark() const;
 

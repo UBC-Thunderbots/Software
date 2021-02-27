@@ -8,6 +8,7 @@
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robots_away_from_ball_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -34,24 +35,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
-            auto friendly_robots_except_shooter_1_meter_from_ball =
-                [shooter_id](std::shared_ptr<World> world_ptr) {
-                    Point ball_position = world_ptr->ball().position();
-                    for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
-                    {
-                        if ((robot.id() != shooter_id) &&
-                            ((robot.position() - ball_position).length() < 1))
-                        {
-                            return false;
-                        }
-                    }
-                    return true;
-                };
-
-            while (!friendly_robots_except_shooter_1_meter_from_ball(world_ptr))
-            {
-                yield();
-            }
+            robotsAwayFromBall(1.0, {shooter_id}, world_ptr, yield);
         },
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
@@ -61,6 +45,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            // making sure that the robot doesn't move the ball while the tactic is setting up
             ASSERT_EQ(world_ptr->field().friendlyPenaltyMark(),
                       world_ptr->ball().position());
         }};
