@@ -42,11 +42,20 @@ class PenaltyKickTactic : public Tactic
     Ball getBall() const;
     Field getField() const;
 
-    // Evaluation function designed specifically for 1-on-1 penalty shots
+    /**
+     * Helper function that determines whether the shooter robot has a viable shot on net.
+     * 
+     * @return true if the robot has a viable shot and false if the enemy goalkeeper will likely
+     * save the shot.
+     */
     bool evaluatePenaltyShot();
 
-    // Evaluation function designed specifically for determining the next potential shot
-    // in a penalty kick
+    /**
+     * Helper function that returns the point on the enemy goal line where the shooter 
+     * should aim at.
+     * 
+     * @return the Point on the goalie line where the shooter robot should aim
+     */
     Point evaluateNextShotPosition();
 
    private:

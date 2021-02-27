@@ -199,7 +199,7 @@ void PenaltyKickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         shot_angle = (next_shot_position - ball.position()).orientation();
         double time =
             (robot_->timestamp() - penalty_start_approaching_goalie).toSeconds();
-        const Point next_robot_position = field.enemyPenaltyMark() + speed * time;
+        const Point next_robot_position = field.friendlyPenaltyMark() + speed * time;
         approach_goalie_action->updateControlParams(
             *robot_, next_robot_position, shot_angle, 0, DribblerMode::MAX_FORCE,
             BallCollisionType::ALLOW);

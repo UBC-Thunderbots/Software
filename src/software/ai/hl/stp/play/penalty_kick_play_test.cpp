@@ -18,7 +18,7 @@ class PenaltyKickPlayTest : public SimulatedPlayTestFixture
 
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 {
-    setBallState(BallState(field().enemyPenaltyMark(), Vector(0, 0)));
+    setBallState(BallState(field().friendlyPenaltyMark(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-2, -2), Point(-3, -1), Point(-3, 0), Point(-3, 1), Point(-3, 2),
          Point(2, 2.5)}));
@@ -31,10 +31,6 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 
     RobotId shooter_id                                               = 5;
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // This will keep the test running for 9.5 seconds to give everything enough
-        // time to settle into position and be observed with the Visualizer
-        // TODO: Implement proper validation
-        // https://github.com/UBC-Thunderbots/Software/issues/1396
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
             auto friendly_robots_except_shooter_1_meter_from_ball =
@@ -58,13 +54,13 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
         },
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
-            robotAtPosition(shooter_id, world_ptr, world_ptr->field().enemyPenaltyMark(),
+            robotAtPosition(shooter_id, world_ptr, world_ptr->field().friendlyPenaltyMark(),
                             0.4, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            ASSERT_EQ(world_ptr->field().enemyPenaltyMark(),
+            ASSERT_EQ(world_ptr->field().friendlyPenaltyMark(),
                       world_ptr->ball().position());
         }};
 
@@ -75,13 +71,13 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 {
     Vector behind_ball_direction =
-        (field().enemyPenaltyMark() - field().enemyGoalpostPos()).normalize();
+        (field().friendlyPenaltyMark() - field().enemyGoalpostPos()).normalize();
 
-    Point behind_ball = field().enemyPenaltyMark() +
+    Point behind_ball = field().friendlyPenaltyMark() +
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS + 0.1);
-    double non_shooter_x_pos = field().enemyPenaltyMark().x() - 1.5;
-    setBallState(BallState(field().enemyPenaltyMark(), Vector(0, 0)));
+    double non_shooter_x_pos = field().friendlyPenaltyMark().x() - 1.5;
+    setBallState(BallState(field().friendlyPenaltyMark(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4, 0), behind_ball, Point(non_shooter_x_pos, 0),
          Point(non_shooter_x_pos, 1), Point(non_shooter_x_pos, -1),
@@ -94,21 +90,12 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // This will keep the test srunning for 9.5 seconds to give everything enough
-        // time to settle into position and be observed with the Visualizer
-        // TODO: Implement proper validation
-        // https://github.com/UBC-Thunderbots/Software/issues/1396
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            friendlyScored(world_ptr, yield);
-        }};
+        friendlyScored,
+    };
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            ballInPlay(world_ptr, yield);
-        },
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            ballAlwaysMovesForward(world_ptr, yield);
-        },
+        ballInPlay,
+        ballAlwaysMovesForward,
     };
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

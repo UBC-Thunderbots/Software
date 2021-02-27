@@ -78,8 +78,8 @@ TEST(TestUtilsTest, create_division_b_field)
     EXPECT_EQ(Rectangle(Point(4.68, -0.5), Point(4.5, 0.5)).getPoints(),
               field.enemyGoal().getPoints());
 
-    EXPECT_EQ(Point(1.5, 0.0), field.friendlyPenaltyMark());
-    EXPECT_EQ(Point(-1.5, 0.0), field.enemyPenaltyMark());
+    EXPECT_EQ(Point(1.5, 0.0), field.enemyPenaltyMark());
+    EXPECT_EQ(Point(-1.5, 0.0), field.friendlyPenaltyMark());
 
     EXPECT_EQ(Point(-4.5, 3.0), field.friendlyCornerPos());
     EXPECT_EQ(Point(-4.5, -3.0), field.friendlyCornerNeg());
@@ -136,8 +136,8 @@ TEST(TestUtilsTest, create_division_a_field)
     EXPECT_EQ(Rectangle(Point(6.18, -0.9), Point(6, 0.9)).getPoints(),
               field.enemyGoal().getPoints());
 
-    EXPECT_EQ(Point(2.0, 0.0), field.friendlyPenaltyMark());
-    EXPECT_EQ(Point(-2.0, 0.0), field.enemyPenaltyMark());
+    EXPECT_EQ(Point(2.0, 0.0), field.enemyPenaltyMark());
+    EXPECT_EQ(Point(-2.0, 0.0), field.friendlyPenaltyMark());
 
     EXPECT_EQ(Point(-6, 4.5), field.friendlyCornerPos());
     EXPECT_EQ(Point(-6, -4.5), field.friendlyCornerNeg());
@@ -194,8 +194,8 @@ TEST_F(FieldTest, construct_with_parameters)
     EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, 3.0)), field.enemyPositiveYQuadrant());
     EXPECT_EQ(Rectangle(Point(0, 0), Point(4.5, -3.0)), field.enemyNegativeYQuadrant());
 
-    EXPECT_EQ(Point(1.5, 0.0), field.friendlyPenaltyMark());
-    EXPECT_EQ(Point(-1.5, 0.0), field.enemyPenaltyMark());
+    EXPECT_EQ(Point(1.5, 0.0), field.enemyPenaltyMark());
+    EXPECT_EQ(Point(-1.5, 0.0), field.friendlyPenaltyMark());
 
     EXPECT_EQ(Point(-4.5, 3.0), field.friendlyCornerPos());
     EXPECT_EQ(Point(-4.5, -3.0), field.friendlyCornerNeg());
