@@ -56,7 +56,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            for (int robot_id : {0, 1, 2, 3, 5})
+            for (RobotId robot_id : {0, 1, 2, 3, 5})
             {
                 {
                     robotInFriendlyHalf(robot_id, world_ptr, yield);
