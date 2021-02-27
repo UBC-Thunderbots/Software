@@ -12,19 +12,19 @@ TEST(MoveIntentTest, test_equality_operator_intents_equal)
 {
     MoveIntent move_intent = MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
                                         BallCollisionType::AVOID, std::nullopt,
-                                        ROBOT_MAX_SPEED_METERS_PER_SECOND);
+                                        MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     MoveIntent move_intent_other = MoveIntent(
         0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        std::nullopt, ROBOT_MAX_SPEED_METERS_PER_SECOND);
+        std::nullopt, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     EXPECT_EQ(move_intent, move_intent_other);
 }
 
 TEST(MoveIntentTest, test_get_destination_ball_collision)
 {
-    MoveIntent move_intent = MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3,
-                                        DribblerMode::OFF, BallCollisionType::AVOID,
-                                        std::nullopt, ROBOT_MAX_SPEED_METERS_PER_SECOND);
+    MoveIntent move_intent = MoveIntent(
+        0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
+        BallCollisionType::AVOID, std::nullopt, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     EXPECT_EQ(move_intent.getDestination(), Point(1, 2));
     EXPECT_EQ(move_intent.getBallCollisionType(), BallCollisionType::AVOID);
 }
@@ -34,7 +34,7 @@ TEST(AutochipMoveIntentTest, test_get_destination_ball_collision_chip)
     MoveIntent intent =
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, createAutoChipCommand(3.2),
-                   ROBOT_MAX_SPEED_METERS_PER_SECOND);
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
     ASSERT_TRUE(intent.getAutochipkick());
     EXPECT_EQ(intent.getAutochipkick()->autochip_distance_meters(), 3.2f);
@@ -48,7 +48,7 @@ TEST(AutochipMoveIntentTest, test_intent_pointer)
     std::shared_ptr<Intent> intent = std::make_shared<MoveIntent>(
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, createAutoChipCommand(3.2),
-                   ROBOT_MAX_SPEED_METERS_PER_SECOND));
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT));
     EXPECT_EQ("MoveIntent", TYPENAME(*intent));
 }
 
@@ -57,7 +57,7 @@ TEST(MoveIntentTest, test_get_destination_ball_collision_kick)
     MoveIntent intent =
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, createAutoKickCommand(3.2),
-                   ROBOT_MAX_SPEED_METERS_PER_SECOND);
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
     ASSERT_TRUE(intent.getAutochipkick());
     EXPECT_EQ(intent.getAutochipkick()->autokick_speed_m_per_s(), 3.2f);

@@ -69,7 +69,7 @@ struct GetBehindBallFSM
                 event.common.robot.id(), point_behind_ball,
                 event.control_params.chick_direction, 0.0, DribblerMode::OFF,
                 BallCollisionType::AVOID, std::nullopt,
-                ROBOT_MAX_SPEED_METERS_PER_SECOND));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT));
         };
 
         /**

@@ -45,7 +45,7 @@ struct MoveFSM
                 event.common.robot.id(), event.control_params.destination,
                 event.control_params.final_orientation, event.control_params.final_speed,
                 DribblerMode::OFF, BallCollisionType::AVOID, std::nullopt,
-                ROBOT_MAX_SPEED_METERS_PER_SECOND));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT));
         };
 
         /**

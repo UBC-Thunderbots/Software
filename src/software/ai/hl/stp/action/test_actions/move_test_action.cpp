@@ -24,7 +24,7 @@ void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), destination, Angle::zero(), 0.0, DribblerMode::OFF,
-            BallCollisionType::AVOID, std::nullopt, ROBOT_MAX_SPEED_METERS_PER_SECOND));
+            BallCollisionType::AVOID, std::nullopt, MaxAllowedSpeedMode::PHYSICAL_LIMIT));
     } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }
 

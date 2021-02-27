@@ -22,14 +22,14 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      std::optional<TbotsProto::Autochipkick> autochipkick,
                                      MaxAllowedSpeedMode max_allowed_speed_mode)
 {
-    this->robot               = robot;
-    this->destination         = destination;
-    this->final_orientation   = final_orientation;
-    this->final_speed         = final_speed;
-    this->dribbler_mode       = dribbler_mode;
-    this->ball_collision_type = ball_collision_type;
-    this->autochipkick        = autochipkick;
-    this->max_speed_m_per_s   = max_speed_m_per_s;
+    this->robot                  = robot;
+    this->destination            = destination;
+    this->final_orientation      = final_orientation;
+    this->final_speed            = final_speed;
+    this->dribbler_mode          = dribbler_mode;
+    this->ball_collision_type    = ball_collision_type;
+    this->autochipkick           = autochipkick;
+    this->max_allowed_speed_mode = max_allowed_speed_mode;
 }
 
 Point MoveAction::getDestination()
@@ -75,6 +75,6 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), destination, final_orientation, final_speed, dribbler_mode,
-            ball_collision_type, autochipkick, max_speed_m_per_s));
+            ball_collision_type, autochipkick, max_allowed_speed_mode));
     } while (robotCloseToDestination());
 }

@@ -6,7 +6,7 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &destination,
                        std::optional<TbotsProto::Autochipkick> autochipkick,
                        MaxAllowedSpeedMode max_allowed_speed_mode)
     : NavigatingIntent(robot_id, destination, final_speed, ball_collision_type,
-                       max_speed_m_per_s),
+                       max_allowed_speed_mode),
       final_angle(final_angle),
       dribbler_mode(dribbler_mode),
       autochipkick(autochipkick)

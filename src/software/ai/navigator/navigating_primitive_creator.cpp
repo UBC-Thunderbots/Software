@@ -25,9 +25,10 @@ TbotsProto::Primitive NavigatingPrimitiveCreator::createNavigatingPrimitive(
 
 void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
 {
-    current_primitive = *createMovePrimitive(
-        new_destination, new_final_speed, intent.getFinalAngle(),
-        intent.getDribblerMode(), intent.getAutochipkick(), intent.getMaxSpeed());
+    current_primitive =
+        *createMovePrimitive(new_destination, new_final_speed, intent.getFinalAngle(),
+                             intent.getDribblerMode(), intent.getAutochipkick(),
+                             intent.getMaxAllowedSpeedMode());
 }
 
 std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFinalSpeed(

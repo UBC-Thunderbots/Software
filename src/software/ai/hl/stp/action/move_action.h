@@ -41,7 +41,7 @@ class MoveAction : public Action
      * @param dribbler_mode The dribbler mode
      * @param ball_collision_type how to navigate around the ball
      * @param autochipkick The command to autochip or autokick
- * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
     void updateControlParams(
         const Robot& robot, Point destination, Angle final_orientation,

@@ -8,7 +8,7 @@ NavigatingIntent::NavigatingIntent(unsigned int robot_id, Point destination,
       destination(destination),
       final_speed(final_speed),
       ball_collision_type(ball_collision_type),
-      max_speed_m_per_s(max_speed_m_per_s)
+      max_allowed_speed_mode(max_allowed_speed_mode)
 {
 }
 
@@ -27,9 +27,9 @@ double NavigatingIntent::getFinalSpeed() const
     return final_speed;
 }
 
-double NavigatingIntent::getMaxSpeed() const
+MaxAllowedSpeedMode NavigatingIntent::getMaxAllowedSpeedMode() const
 {
-    return max_speed_m_per_s;
+    return max_allowed_speed_mode;
 }
 
 bool NavigatingIntent::operator==(const NavigatingIntent &other) const
