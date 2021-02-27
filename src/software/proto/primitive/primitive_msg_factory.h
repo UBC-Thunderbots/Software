@@ -45,7 +45,7 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
  * @param final_angle The final orientation the robot should have at the end
  * of the movement
  * @param dribbler_mode The dribbler mode
- * @param autochick_command The command to autochip or autokick
+ * @param autochipkick The command to autochip or autokick
  * @param max_speed_m_per_s The maximum speed in meters per second
  *
  * @return Pointer to Move Primitive Message
@@ -53,7 +53,7 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
     DribblerMode dribbler_mode,
-    std::optional<TbotsProto::AutochickCommand> autochick_command = std::nullopt,
+    std::optional<TbotsProto::Autochipkick> autochipkick = std::nullopt,
     double max_speed_m_per_s = ROBOT_MAX_SPEED_METERS_PER_SECOND);
 
 /**
@@ -63,7 +63,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  *
  * @return Pointer to Autochip command message
  */
-TbotsProto::AutochickCommand createAutoChipCommand(double autochip_distance_meters);
+TbotsProto::Autochipkick createAutoChipCommand(double autochip_distance_meters);
 
 /**
  * Create an Autokick command
@@ -72,7 +72,7 @@ TbotsProto::AutochickCommand createAutoChipCommand(double autochip_distance_mete
  *
  * @return Pointer to Autokick command message
  */
-TbotsProto::AutochickCommand createAutoKickCommand(double autokick_speed_m_per_s);
+TbotsProto::Autochipkick createAutoKickCommand(double autokick_speed_m_per_s);
 
 /**
  * Create a Spinning Move Primitive Message

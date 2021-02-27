@@ -40,8 +40,7 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(const Point &kick_ori
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
-    DribblerMode dribbler_mode,
-    std::optional<TbotsProto::AutochickCommand> autochick_command,
+    DribblerMode dribbler_mode, std::optional<TbotsProto::Autochipkick> autochipkick,
     double max_speed_m_per_s)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
@@ -58,25 +57,24 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(
         static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
 
-    if (autochick_command)
+    if (autochipkick)
     {
-        *(move_primitive_msg->mutable_move()->mutable_autochick_command()) =
-            *autochick_command;
+        *(move_primitive_msg->mutable_move()->mutable_autochipkick()) = *autochipkick;
     }
 
     return move_primitive_msg;
 }
 
-TbotsProto::AutochickCommand createAutoChipCommand(double autokick_speed_m_per_s)
+TbotsProto::Autochipkick createAutoChipCommand(double autokick_speed_m_per_s)
 {
-    TbotsProto::AutochickCommand command;
+    TbotsProto::Autochipkick command;
     command.set_autochip_distance_meters(static_cast<float>(autokick_speed_m_per_s));
     return command;
 }
 
-TbotsProto::AutochickCommand createAutoKickCommand(double autochip_distance_meters)
+TbotsProto::Autochipkick createAutoKickCommand(double autochip_distance_meters)
 {
-    TbotsProto::AutochickCommand command;
+    TbotsProto::Autochipkick command;
     command.set_autokick_speed_m_per_s(static_cast<float>(autochip_distance_meters));
     return command;
 }

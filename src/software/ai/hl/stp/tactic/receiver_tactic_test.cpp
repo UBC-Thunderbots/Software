@@ -124,8 +124,8 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
     EXPECT_GT(move_action->getFinalOrientation().toDegrees(), -90);
 
     EXPECT_EQ(DribblerMode::OFF, move_action->getDribblerMode());
-    ASSERT_TRUE(move_action->getAutochickCommand());
-    EXPECT_EQ(move_action->getAutochickCommand().value().autokick_speed_m_per_s(),
+    ASSERT_TRUE(move_action->getAutochipkick());
+    EXPECT_EQ(move_action->getAutochipkick().value().autokick_speed_m_per_s(),
               BALL_MAX_SPEED_METERS_PER_SECOND - 1);
 }
 

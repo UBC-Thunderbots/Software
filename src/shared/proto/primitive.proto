@@ -36,12 +36,12 @@ message KickPrimitive
 
 message MovePrimitive
 {
-    Point destination                  = 1;
-    float final_speed_m_per_s          = 2;
-    Angle final_angle                  = 3;
-    float dribbler_speed_rpm           = 4;
-    float max_speed_m_per_s            = 5;
-    AutochickCommand autochick_command = 6;
+    Point destination         = 1;
+    float final_speed_m_per_s = 2;
+    Angle final_angle         = 3;
+    float dribbler_speed_rpm  = 4;
+    float max_speed_m_per_s   = 5;
+    Autochipkick autochipkick = 6;
 }
 
 message SpinningMovePrimitive
@@ -102,9 +102,9 @@ message DirectControlPrimitive
 }
 
 // Defined separately so that the definition can be shared
-message AutochickCommand
+message Autochipkick
 {
-    oneof autochick
+    oneof autochipkick
     {
         float autokick_speed_m_per_s   = 1;
         float autochip_distance_meters = 2;

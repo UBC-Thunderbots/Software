@@ -15,11 +15,12 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
 
 void MoveAction::updateWorldParams(const World& world) {}
 
-void MoveAction::updateControlParams(
-    const Robot& robot, Point destination, Angle final_orientation, double final_speed,
-    DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
-    std::optional<TbotsProto::AutochickCommand> autochick_command,
-    double max_speed_m_per_s)
+void MoveAction::updateControlParams(const Robot& robot, Point destination,
+                                     Angle final_orientation, double final_speed,
+                                     DribblerMode dribbler_mode,
+                                     BallCollisionType ball_collision_type,
+                                     std::optional<TbotsProto::Autochipkick> autochipkick,
+                                     double max_speed_m_per_s)
 {
     this->robot               = robot;
     this->destination         = destination;
@@ -27,7 +28,7 @@ void MoveAction::updateControlParams(
     this->final_speed         = final_speed;
     this->dribbler_mode       = dribbler_mode;
     this->ball_collision_type = ball_collision_type;
-    this->autochick_command   = autochick_command;
+    this->autochipkick        = autochipkick;
     this->max_speed_m_per_s   = max_speed_m_per_s;
 }
 
@@ -51,9 +52,9 @@ DribblerMode MoveAction::getDribblerMode()
     return dribbler_mode;
 }
 
-std::optional<TbotsProto::AutochickCommand> MoveAction::getAutochickCommand() const
+std::optional<TbotsProto::Autochipkick> MoveAction::getAutochipkick() const
 {
-    return autochick_command;
+    return autochipkick;
 }
 
 bool MoveAction::robotCloseToDestination()
@@ -74,6 +75,6 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), destination, final_orientation, final_speed, dribbler_mode,
-            ball_collision_type, autochick_command, max_speed_m_per_s));
+            ball_collision_type, autochipkick, max_speed_m_per_s));
     } while (robotCloseToDestination());
 }
