@@ -203,7 +203,7 @@ Debugging from the command line is certainly possible, but debugging in a full I
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
 
 ### Debugging from the Command line
-`bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see (here)[https://www.cs.cmu.edu/~gilpin/tutorial/] for a tutorial on how to use `gdb` if you're not familiar with it.
+`bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it.
 
 
 ## Profiling 
