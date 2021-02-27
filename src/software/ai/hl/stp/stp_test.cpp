@@ -14,28 +14,31 @@
 class STPTest : public ::testing::Test
 {
    public:
-    STPTest() : stp([]() { return nullptr; }, DynamicParameters->getAiControlConfig(), 0)
+    STPTest() : stp([]() { return nullptr; }, ai_control_config, 0)
     {
     }
 
    protected:
     void SetUp() override
     {
+        mutable_ai_control_config = std::make_shared<AiControlConfig>();
+        ai_control_config = std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config);
+
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltTestPlay>(DynamicParameters->getPlayConfig());
+            return std::make_unique<HaltTestPlay>(std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
         };
         // Explicitly setting override AI Play to be false because we can't rely on
         // default values
-        MutableDynamicParameters->getMutableAiControlConfig()
-            ->getMutableOverrideAiPlay()
-            ->setValue(false);
+        mutable_ai_control_config->getMutableOverrideAiPlay()->setValue(false);
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, DynamicParameters->getAiControlConfig(), 0);
+        stp   = STP(default_play_constructor, ai_control_config, 0);
         world = ::TestUtil::createBlankTestingWorld();
     }
 
     STP stp;
     World world = ::TestUtil::createBlankTestingWorld();
+    std::shared_ptr<const AiControlConfig> ai_control_config;
+    std::shared_ptr<AiControlConfig> mutable_ai_control_config;
 };
 
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)

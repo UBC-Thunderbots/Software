@@ -6,8 +6,12 @@
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 
 ThreadedStandaloneSimulatorGUI::ThreadedStandaloneSimulatorGUI(
-    std::shared_ptr<StandaloneSimulator> simulator)
-    : termination_promise_ptr(std::make_shared<std::promise<void>>()),
+    std::shared_ptr<StandaloneSimulator> simulator,
+    std::shared_ptr<SimulatorConfig> mutable_simulator_config,
+    std::shared_ptr<StandaloneSimulatorConfig> mutable_standalone_simulator_config)
+    : mutable_simulator_config(mutable_simulator_config),
+      mutable_standalone_simulator_config(mutable_standalone_simulator_config),
+      termination_promise_ptr(std::make_shared<std::promise<void>>()),
       application_shutting_down(false)
 {
     if (!simulator)
@@ -57,7 +61,7 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
     StandaloneSimulatorGUI* standalone_simulator_gui =
-        new StandaloneSimulatorGUI(simulator);
+        new StandaloneSimulatorGUI(simulator, mutable_simulator_config, mutable_standalone_simulator_config);
     standalone_simulator_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block

@@ -7,7 +7,7 @@ class NavigatingPrimitiveCreatorTest : public testing::Test
    public:
     NavigatingPrimitiveCreatorTest()
         : navigating_primitive_creator(
-              DynamicParameters->getAiConfig()->getNavigatorConfig())
+                std::make_shared<const NavigatorConfig>())
     {
     }
 

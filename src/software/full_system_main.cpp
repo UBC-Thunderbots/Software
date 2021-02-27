@@ -34,10 +34,8 @@ int main(int argc, char** argv)
 {
     std::cout << BANNER << std::endl;
 
-    std::shared_ptr<const FullSystemMainCommandLineArgs> args =
-        std::make_shared<const FullSystemMainCommandLineArgs>();
-
     // load command line arguments
+    auto args           = std::make_shared<FullSystemMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
@@ -45,13 +43,14 @@ int main(int argc, char** argv)
     if (!help_requested)
     {
         // Setup dynamic parameters
-        std::shared_ptr<const ThunderbotsConfig> thunderbots_config =
-            std::make_shared<const ThunderbotsConfig>();
+        auto mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+        auto thunderbots_config =
+            std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
 
         // Override default network interface
         if (!args->getInterface()->value().empty())
         {
-            thunderbots_config->getMutableNetworkConfig()
+            mutable_thunderbots_config->getMutableNetworkConfig()
                 ->getMutableNetworkInterface()
                 ->setValue(args->getInterface()->value());
         }
@@ -67,7 +66,7 @@ int main(int argc, char** argv)
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
             thunderbots_config->getSensorFusionConfig());
         auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig(),
-                                               thunderbots_config->getAiControlConfig());
+                                               thunderbots_config->getAiControlConfig(), thunderbots_config->getPlayConfig());
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers
@@ -76,7 +75,7 @@ int main(int argc, char** argv)
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         if (!args->getHeadless()->value())
         {
-            visualizer = std::make_shared<ThreadedFullSystemGUI>();
+            visualizer = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
 
             sensor_fusion->Subject<World>::registerObserver(visualizer);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
@@ -107,14 +106,15 @@ int main(int argc, char** argv)
                     proto_log_output_dir / "AI_PrimitiveSet");
             backend->Subject<SensorProto>::registerObserver(sensor_msg_logger);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(primitive_set_logger);
-            // log filtered world state
 
-            constexpr auto world_to_ssl_wrapper_conversion_fn = [](const World& world) {
-                bool friendly_colour_yellow = thunderbots_config->getSensorFusionConfig()
-                                                  ->getFriendlyColorYellow()
-                                                  ->value();
-                auto friendly_team_colour =
-                    friendly_colour_yellow ? TeamColour::YELLOW : TeamColour::BLUE;
+            // log filtered world state 
+            bool friendly_colour_yellow = thunderbots_config->getSensorFusionConfig()
+                                              ->getFriendlyColorYellow()
+                                              ->value();
+            auto friendly_team_colour =
+                friendly_colour_yellow ? TeamColour::YELLOW : TeamColour::BLUE;
+
+            auto world_to_ssl_wrapper_conversion_fn = [friendly_team_colour](const World& world) {
                 return *createSSLWrapperPacket(world, friendly_team_colour);
             };
 

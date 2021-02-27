@@ -7,7 +7,18 @@
 #include "software/ai/hl/stp/action/autochip_move_action.h"
 #include "software/test_util/test_util.h"
 
-TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
+class DefenseShadowEnemyTacticTest : public ::testing::Test
+{
+   protected:
+    void SetUp() override
+    {
+        defense_shadow_enemy_tactic_config = std::make_shared<const DefenseShadowEnemyTacticConfig>();
+    }
+
+    std::shared_ptr<const DefenseShadowEnemyTacticConfig> defense_shadow_enemy_tactic_config;
+};
+
+TEST_F(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
 {
     Robot enemy_robot(1, Point(0, 0), Vector(0, 0), Angle::zero(),
                       AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -23,7 +34,7 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
     World world = World(field, ball, friendly_team, enemy_team);
 
     DefenseShadowEnemyTactic tactic =
-        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5);
+        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, defense_shadow_enemy_tactic_config);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat);
@@ -42,7 +53,7 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
               DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }
 
-TEST(DefenseShadowEnemyTacticTest,
+TEST_F(DefenseShadowEnemyTacticTest,
      test_shadower_steals_ball_if_the_enemy_has_possession_and_ball_is_moving_slow_enough)
 {
     Robot enemy_robot(1, Point(0, 0), Vector(0, 0), Angle::half(),
@@ -60,7 +71,7 @@ TEST(DefenseShadowEnemyTacticTest,
     World world = World(field, ball, friendly_team, enemy_team);
 
     DefenseShadowEnemyTactic tactic =
-        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5);
+        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, defense_shadow_enemy_tactic_config);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat);
@@ -81,7 +92,7 @@ TEST(DefenseShadowEnemyTacticTest,
 }
 
 
-TEST(
+TEST_F(
     DefenseShadowEnemyTacticTest,
     test_shadower_does_not_steal_ball_if_the_enemy_has_possession_but_the_ball_is_moving_quickly)
 {
@@ -100,7 +111,7 @@ TEST(
     World world = World(field, ball, friendly_team, enemy_team);
 
     DefenseShadowEnemyTactic tactic =
-        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5);
+        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, defense_shadow_enemy_tactic_config);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(world);
     tactic.updateControlParams(enemy_threat);

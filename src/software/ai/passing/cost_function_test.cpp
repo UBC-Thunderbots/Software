@@ -15,33 +15,21 @@ class PassingEvaluationTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        avg_desired_pass_speed =
-            (max_pass_speed_param - min_pass_speed_param) / 2 + min_pass_speed_param;
-        avg_time_offset_for_pass_seconds = (min_time_offset_for_pass_seconds_param +
-                                            max_time_offset_for_pass_seconds_param) /
-                                           2;
         passing_config = std::make_shared<const PassingConfig>();
+
+        avg_desired_pass_speed = (passing_config->getMaxPassSpeedMPerS()->value() -
+                                  passing_config->getMinPassSpeedMPerS()->value()) /
+                                     2 +
+                                 passing_config->getMinPassSpeedMPerS()->value();
+
+        avg_time_offset_for_pass_seconds =
+            (passing_config->getMinTimeOffsetForPassSeconds()->value() +
+             passing_config->getMaxTimeOffsetForPassSeconds()->value()) /
+            2;
     }
 
     // We get these values here so we can make these tests robust to change
-    double min_pass_speed_param = DynamicParameters->getAiConfig()
-                                      ->getPassingConfig()
-                                      ->getMinPassSpeedMPerS()
-                                      ->value();
-    double max_pass_speed_param = DynamicParameters->getAiConfig()
-                                      ->getPassingConfig()
-                                      ->getMaxPassSpeedMPerS()
-                                      ->value();
     double avg_desired_pass_speed;
-
-    double min_time_offset_for_pass_seconds_param = DynamicParameters->getAiConfig()
-                                                        ->getPassingConfig()
-                                                        ->getMinTimeOffsetForPassSeconds()
-                                                        ->value();
-    double max_time_offset_for_pass_seconds_param = DynamicParameters->getAiConfig()
-                                                        ->getPassingConfig()
-                                                        ->getMaxTimeOffsetForPassSeconds()
-                                                        ->value();
     double avg_time_offset_for_pass_seconds;
 
     std::shared_ptr<const PassingConfig> passing_config;
@@ -102,23 +90,15 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
                                                   world.field().yLength() / 2);
 
     double curr_time             = world.getMostRecentTimestamp().toSeconds();
-    double min_start_time_offset = DynamicParameters->getAiConfig()
-                                       ->getPassingConfig()
-                                       ->getMinTimeOffsetForPassSeconds()
+    double min_start_time_offset = passing_config->getMinTimeOffsetForPassSeconds()
                                        ->value();
-    double max_start_time_offset = DynamicParameters->getAiConfig()
-                                       ->getPassingConfig()
-                                       ->getMaxTimeOffsetForPassSeconds()
+    double max_start_time_offset = passing_config->getMaxTimeOffsetForPassSeconds()
                                        ->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
-    std::uniform_real_distribution speed_distribution(DynamicParameters->getAiConfig()
-                                                          ->getPassingConfig()
-                                                          ->getMinPassSpeedMPerS()
+    std::uniform_real_distribution speed_distribution(passing_config->getMinPassSpeedMPerS()
                                                           ->value(),
-                                                      DynamicParameters->getAiConfig()
-                                                          ->getPassingConfig()
-                                                          ->getMaxPassSpeedMPerS()
+                                                          passing_config->getMaxPassSpeedMPerS()
                                                           ->value());
 
     std::vector<Pass> passes;
@@ -158,8 +138,8 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
 {
     // A pass from halfway up the +y side of the field to the origin.
     // There is an enemy defender right on the pass trajectory
-    Pass pass({2, 2}, {0, 0}, max_pass_speed_param - 0.2,
-              Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
+    Pass pass({2, 2}, {0, 0}, passing_config->getMaxPassSpeedMPerS()->value() - 0.2,
+              Timestamp::fromSeconds(passing_config->getMinTimeOffsetForPassSeconds()->value() + 0.1));
 
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
@@ -186,8 +166,8 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     // A pass from halfway up the +y side of the field to the origin.
     // There is a defender closely marking one friendly robot on the field, but the
     // friendly robot at the origin is free.
-    Pass pass({2, 2}, {0, 0}, max_pass_speed_param - 0.2,
-              Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
+    Pass pass({2, 2}, {0, 0}, passing_config->getMaxPassSpeedMPerS()->value() - 0.2,
+              Timestamp::fromSeconds(passing_config->getMinTimeOffsetForPassSeconds()->value() + 0.1));
 
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
@@ -216,8 +196,8 @@ TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked)
     // A pass from the +y side of the field to the -y side of the field, roughly 1/2 way
     // up the enemy half of the field. There is a defender closely marking the only
     // friendly robot on the field.
-    Pass pass({2, 2}, {1, -1}, max_pass_speed_param - 0.2,
-              Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
+    Pass pass({2, 2}, {1, -1}, passing_config->getMaxPassSpeedMPerS()->value() - 0.2,
+              Timestamp::fromSeconds(passing_config->getMinTimeOffsetForPassSeconds()->value() + 0.1));
 
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
@@ -244,8 +224,8 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_n
     // A pass from the +y side of the field to the -y side of the field,
     // roughly 1/2 way up the enemy half of the field. There is a defender somewhat close
     // to the pass, but not close enough to get there in time.
-    Pass pass({2, 2}, {1, -1}, max_pass_speed_param - 0.2,
-              Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
+    Pass pass({2, 2}, {1, -1}, passing_config->getMaxPassSpeedMPerS()->value() - 0.2,
+              Timestamp::fromSeconds(passing_config->getMinTimeOffsetForPassSeconds()->value() + 0.1));
 
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
@@ -273,7 +253,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     // roughly 1/2 way up the enemy half of the field, with a goalie in the net, but off
     // to the positive side. We also pass as soon as we can
     Pass pass({2, 2}, {1, -1}, avg_desired_pass_speed,
-              Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
+              Timestamp::fromSeconds(passing_config->getMinTimeOffsetForPassSeconds()->value() + 0.1));
 
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
@@ -454,7 +434,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
     });
     world.updateFriendlyTeamState(friendly_team);
     world.updateTimestamp(
-        Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20));
+        Timestamp::fromSeconds(passing_config->getMaxTimeOffsetForPassSeconds()->value() + 20));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(20000000));
 
@@ -476,7 +456,7 @@ TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
     });
     world.updateFriendlyTeamState(friendly_team);
 
-    Pass pass({3, 0}, {2, 0}, min_pass_speed_param - 0.1, Timestamp::fromSeconds(1));
+    Pass pass({3, 0}, {2, 0}, passing_config->getMinPassSpeedMPerS()->value() - 0.1, Timestamp::fromSeconds(1));
 
     double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt,
                                   PassType::ONE_TOUCH_SHOT, passing_config);
@@ -496,7 +476,7 @@ TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
     });
     world.updateFriendlyTeamState(friendly_team);
 
-    Pass pass({3, 0}, {2, 0}, max_pass_speed_param + 0.1, Timestamp::fromSeconds(1));
+    Pass pass({3, 0}, {2, 0}, passing_config->getMaxPassSpeedMPerS()->value() + 0.1, Timestamp::fromSeconds(1));
 
     double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt,
                                   PassType::ONE_TOUCH_SHOT, passing_config);

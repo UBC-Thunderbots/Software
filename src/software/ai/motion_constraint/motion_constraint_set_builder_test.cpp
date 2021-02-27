@@ -22,7 +22,7 @@ namespace
                 new MoveTactic(false), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new CherryPickTactic(world, Rectangle({0, 0}, {1, 1}),
-                                     DynamicParameters->getPassingConfig()),
+                                     std::make_shared<const PassingConfig>()),
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new CreaseDefenderTactic(world.field(), world.ball(),
@@ -31,7 +31,7 @@ namespace
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                                 world.enemyTeam()),
+                                 world.enemyTeam(), std::make_shared<const GoalieTacticConfig>()),
                 std::set<MotionConstraint>({MotionConstraint::FRIENDLY_DEFENSE_AREA,
                                             MotionConstraint::FRIENDLY_DEFENSE_AREA,
                                             MotionConstraint::HALF_METER_AROUND_BALL,
@@ -70,7 +70,7 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ShootGoalTactic(world.field(), world.friendlyTeam(),
                                     world.enemyTeam(), world.ball(), Angle::zero(),
-                                    std::nullopt, false),
+                                    std::nullopt, false, std::make_shared<const ShootGoalTacticConfig>()),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new PasserTactic(pass, world.ball(), world.field(), false),

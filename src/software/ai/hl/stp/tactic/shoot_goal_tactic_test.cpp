@@ -13,14 +13,14 @@ class ShootGoalTacticTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        shoot_goal_tactic = std::make_shared<ShootGoalTacticConfig>();
+        shoot_goal_tactic_config = std::make_shared<ShootGoalTacticConfig>();
     }
 
-    std::shared_ptr<ShootGoalTacticConfig> shoot_goal_tactic;
-}
+    std::shared_ptr<ShootGoalTacticConfig> shoot_goal_tactic_config;
+};
 
 
-TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
+TEST_F(ShootGoalTacticTest, robot_will_shoot_on_open_net)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
@@ -31,7 +31,7 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
 
     ShootGoalTactic tactic = ShootGoalTactic(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        Angle::zero(), std::nullopt, false, shoot_goal_tactic);
+        Angle::zero(), std::nullopt, false, shoot_goal_tactic_config);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world);
 
@@ -48,7 +48,7 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
     EXPECT_EQ(0, kick_action->getRobot()->id());
 }
 
-TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_blocked)
+TEST_F(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_blocked)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
@@ -61,7 +61,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
 
     ShootGoalTactic tactic = ShootGoalTactic(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        Angle::fromDegrees(4), std::nullopt, false, shoot_goal_tactic);
+        Angle::fromDegrees(4), std::nullopt, false, shoot_goal_tactic_config);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world);
 
@@ -116,7 +116,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     EXPECT_EQ(0, intercept_action->getRobot()->id());
 }
 
-TEST(ShootGoalTacticTest, robot_will_intercept_ball_if_shot_is_blocked)
+TEST_F(ShootGoalTacticTest, robot_will_intercept_ball_if_shot_is_blocked)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
@@ -129,7 +129,7 @@ TEST(ShootGoalTacticTest, robot_will_intercept_ball_if_shot_is_blocked)
 
     ShootGoalTactic tactic = ShootGoalTactic(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
+        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic_config);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world);
 
@@ -146,7 +146,7 @@ TEST(ShootGoalTacticTest, robot_will_intercept_ball_if_shot_is_blocked)
     EXPECT_EQ(0, intercept_action->getRobot()->id());
 }
 
-TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
+TEST_F(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
@@ -159,7 +159,7 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
 
     ShootGoalTactic tactic = ShootGoalTactic(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
+        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic_config);
     tactic.updateRobot(robot);
     tactic.updateWorldParams(world);
 
@@ -176,7 +176,7 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
     EXPECT_EQ(0, chip_action->getRobot()->id());
 }
 
-TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
+TEST_F(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
@@ -188,14 +188,14 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
 
     ShootGoalTactic tactic = ShootGoalTactic(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
+        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic_config);
 
     double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.0520833333;
     EXPECT_NEAR(cost, expected_cost, 1e-6);
 }
 
-TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
+TEST_F(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
@@ -207,7 +207,7 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
 
     ShootGoalTactic tactic = ShootGoalTactic(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic);
+        Angle::fromDegrees(1.27), std::nullopt, false, shoot_goal_tactic_config);
 
     double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.40678383728;
