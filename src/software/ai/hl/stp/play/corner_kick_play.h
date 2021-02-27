@@ -3,6 +3,7 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * A Play for Corner Kicks

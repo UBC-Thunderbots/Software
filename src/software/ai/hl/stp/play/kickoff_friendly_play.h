@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/play/play.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * A play that runs when its currently the friendly kick off,

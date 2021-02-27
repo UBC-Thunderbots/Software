@@ -12,22 +12,12 @@
         Overrides the current play with the play
         specified by currentPlay parameter
 
-- string:
+- factory:
     name: current_ai_play
-    value: "Halt Play"
-    options:
-        - "Example Play"
-        - "Stop Play"
-        - "Halt Play"
-        - "Corner Kick Play"
-        - "Free Kick Play"
-        - "Defense Play"
-        - "KickoffEnemy Play"
-        - "KickoffFriendly Play"
-        - "Enemy Freekick Play"
-        - "Penalty Kick Play"
-        - "Penalty Kick Enemy Play"
-        - "ShootOrChip Play"
+    index_type: std::string
+    type_to_create: Play
+    config_type: PlayConfig
+    value: "HaltPlay"
     description: >-
         Specifies the ai play that should be in use
 

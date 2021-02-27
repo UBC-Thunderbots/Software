@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/play/play.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * An example Play that moves the robots in a circle around the ball

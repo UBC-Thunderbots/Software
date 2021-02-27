@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * Play that tries to find a shot on net, passes if it couldn't.

@@ -78,6 +78,7 @@ cc_library(
     hdrs = ["example_play.h"],
     deps = [
         ":play",
+        "//software/parameter:dynamic_parameters",
         "//shared:constants",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
@@ -92,6 +93,7 @@ cc_library(
     hdrs = ["halt_play.h"],
     deps = [
         ":play",
+        "//software/parameter:dynamic_parameters",
         "//shared:constants",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
@@ -107,6 +109,7 @@ cc_library(
     deps = [
         ":corner_kick_play",
         ":play",
+        "//software/parameter:dynamic_parameters",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
@@ -132,6 +135,7 @@ cc_library(
     hdrs = ["kickoff_enemy_play.h"],
     deps = [
         ":play",
+        "//software/parameter:dynamic_parameters",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
@@ -150,6 +154,7 @@ cc_library(
     hdrs = ["kickoff_friendly_play.h"],
     deps = [
         ":play",
+        "//software/parameter:dynamic_parameters",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
@@ -166,6 +171,7 @@ cc_library(
     hdrs = ["penalty_kick_enemy_play.h"],
     deps = [
         ":play",
+        "//software/parameter:dynamic_parameters",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
@@ -181,6 +187,7 @@ cc_library(
     hdrs = ["penalty_kick_play.h"],
     deps = [
         ":play",
+        "//software/parameter:dynamic_parameters",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
         "//software/ai/hl/stp/tactic:penalty_setup_tactic",
@@ -261,7 +268,6 @@ cc_library(
     hdrs = ["play.h"],
     deps = [
         "//software/ai/hl/stp/tactic",
-        "//software/parameter:dynamic_parameters",
         "@boost//:coroutine2",
     ],
 )

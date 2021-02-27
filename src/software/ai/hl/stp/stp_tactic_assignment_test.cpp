@@ -20,7 +20,9 @@ class STPTacticAssignmentTest : public ::testing::Test
 {
    public:
     STPTacticAssignmentTest()
-        : stp([]() { return nullptr; }, thunderbots_config->getAiControlConfig(),
+        : 
+            thunderbots_config(std::make_shared<const ThunderbotsConfig>()),
+            stp([]() { return nullptr; }, thunderbots_config->getAiControlConfig(),
               thunderbots_config->getPlayConfig(), 0)
     {
     }
@@ -63,8 +65,8 @@ class STPTacticAssignmentTest : public ::testing::Test
         return all_tactics_have_robot_assigned;
     }
 
-    STP stp;
     std::shared_ptr<const ThunderbotsConfig> thunderbots_config;
+    STP stp;
     World world = ::TestUtil::createBlankTestingWorld();
 };
 

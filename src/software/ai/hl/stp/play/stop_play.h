@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/play/play.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * This Play moves our robots in a formation while keeping them at least 0.5m from the

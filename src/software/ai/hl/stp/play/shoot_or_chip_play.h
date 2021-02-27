@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/play/play.h"
+#include "software/parameter/dynamic_parameters.h"
 
 /**
  * The Defense Play tries to grab the ball from the enemy that has it, and all other

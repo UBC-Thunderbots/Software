@@ -101,6 +101,7 @@ include:
       of the bazel rule (otherwise compilation should fail).
 
       Will only generate for CPP code.
+
 - factory:
     name: example_factory_param
     index_type: std::string
