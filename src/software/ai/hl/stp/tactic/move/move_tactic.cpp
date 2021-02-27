@@ -10,12 +10,32 @@ MoveTactic::MoveTactic(bool loop_forever)
 void MoveTactic::updateWorldParams(const World &world) {}
 
 void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
-                                     double final_speed)
+                                     double final_speed, DribblerMode dribbler_mode,
+                                     BallCollisionType ball_collision_type,
+                                     std::optional<TbotsProto::Autochipkick> autochipkick)
 {
     // Update the control parameters stored by this Tactic
-    control_params.destination       = destination;
-    control_params.final_orientation = final_orientation;
-    control_params.final_speed       = final_speed;
+    control_params.destination            = destination;
+    control_params.final_orientation      = final_orientation;
+    control_params.final_speed            = final_speed;
+    control_params.dribbler_mode          = dribbler_mode;
+    control_params.ball_collision_type    = ball_collision_type;
+    control_params.autochipkick           = autochipkick;
+    control_params.max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
+}
+
+void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
+                                     double final_speed,
+                                     MaxAllowedSpeedMode max_allowed_speed_mode)
+{
+    // Update the control parameters stored by this Tactic
+    control_params.destination            = destination;
+    control_params.final_orientation      = final_orientation;
+    control_params.final_speed            = final_speed;
+    control_params.dribbler_mode          = DribblerMode::OFF;
+    control_params.ball_collision_type    = BallCollisionType::AVOID;
+    control_params.autochipkick           = std::nullopt;
+    control_params.max_allowed_speed_mode = max_allowed_speed_mode;
 }
 
 double MoveTactic::calculateRobotCost(const Robot &robot, const World &world) const

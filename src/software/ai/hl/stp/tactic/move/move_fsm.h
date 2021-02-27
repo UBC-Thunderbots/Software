@@ -19,6 +19,14 @@ struct MoveFSM
         Angle final_orientation;
         // The speed the robot should have when it arrives at its destination
         double final_speed;
+        // How to run the dribbler
+        DribblerMode dribbler_mode;
+        // How to navigate around the ball
+        BallCollisionType ball_collision_type;
+        // The command to autochip or autokick
+        std::optional<TbotsProto::Autochipkick> autochipkick;
+        // The maximum allowed speed mode
+        MaxAllowedSpeedMode max_allowed_speed_mode;
     };
 
     // this struct defines the only event that the MoveFSM responds to

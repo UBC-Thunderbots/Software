@@ -25,15 +25,35 @@ class MoveTactic : public Tactic
     void updateWorldParams(const World& world) override;
 
     /**
-     * Updates the control parameters for this MoveTactic.
+     * Updates the params assuming that the max allowed speed mode is the physical limits
      *
      * @param destination The destination to move to (in global coordinates)
      * @param final_orientation The final orientation the robot should have at
      * the destination
      * @param final_speed The final speed the robot should have at the destination
+     * @param dribbler_mode The dribbler mode
+     * @param ball_collision_type how to navigate around the ball
+     * @param autochipkick The command to autochip or autokick
+     */
+    void updateControlParams(
+        Point destination, Angle final_orientation, double final_speed,
+        DribblerMode dribbler_mode                           = DribblerMode::OFF,
+        BallCollisionType ball_collision_type                = BallCollisionType::AVOID,
+        std::optional<TbotsProto::Autochipkick> autochipkick = std::nullopt);
+
+    /**
+     * Updates the params assuming that the dribbler and chicker and while avoiding the
+     * ball
+     *
+     * @param destination The destination to move to (in global coordinates)
+     * @param final_orientation The final orientation the robot should have at
+     * the destination
+     * @param final_speed The final speed the robot should have at the destination
+     * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
     void updateControlParams(Point destination, Angle final_orientation,
-                             double final_speed);
+                             double final_speed,
+                             MaxAllowedSpeedMode max_allowed_speed_mode);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
