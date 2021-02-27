@@ -16,6 +16,7 @@ extern "C"
 #include "firmware/app/world/firmware_robot.h"
 }
 
+#include "shared/test_util/test_util.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"

@@ -183,7 +183,7 @@ void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
         }
         else if (kick_pressed)
         {
-            primitive_msg.mutable_direct_control()->set_kick_speed_meters_per_second(
+            primitive_msg.mutable_direct_control()->set_kick_speed_m_per_s(
                 main_widget->lineEdit_chicker_power->text().toFloat());
             kick_pressed = false;
         }
@@ -197,7 +197,7 @@ void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
     else if (main_widget->buttonGroup_autochick->checkedButton() ==
              main_widget->radioButton_autokick)
     {
-        primitive_msg.mutable_direct_control()->set_autokick_speed_meters_per_second(
+        primitive_msg.mutable_direct_control()->set_autokick_speed_m_per_s(
             main_widget->lineEdit_chicker_power->text().toFloat());
     }
 }

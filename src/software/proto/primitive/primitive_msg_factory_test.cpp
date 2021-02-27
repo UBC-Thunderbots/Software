@@ -57,7 +57,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
               static_cast<float>(Angle::threeQuarter().toRadians()));
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(), INDEFINITE_DRIBBLER_SPEED);
     ASSERT_TRUE(move_primitive->move().has_autochick_command());
-    EXPECT_EQ(move_primitive->move().autochick_command().autokick_speed_m_per_s(), 2.5);
+    EXPECT_EQ(move_primitive->move().autochick_command().autochip_distance_meters(), 2.5);
 }
 
 TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
@@ -74,7 +74,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
               static_cast<float>(Angle::threeQuarter().toRadians()));
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(), INDEFINITE_DRIBBLER_SPEED);
     ASSERT_TRUE(move_primitive->move().has_autochick_command());
-    EXPECT_EQ(move_primitive->move().autochick_command().autochip_distance_meters(), 3.5);
+    EXPECT_EQ(move_primitive->move().autochick_command().autokick_speed_m_per_s(), 3.5);
 }
 
 TEST(PrimitiveFactoryTest, test_create_spinning_move_primitive)
