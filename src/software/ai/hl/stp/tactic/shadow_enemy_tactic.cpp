@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/autochip_move_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
@@ -51,8 +51,8 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
 
 void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto autochip_move_action = std::make_shared<AutochipMoveAction>(false, 0, Angle());
-    auto stop_action          = std::make_shared<StopAction>(true);
+    auto move_action = std::make_shared<MoveAction>(false, 0, Angle());
+    auto stop_action = std::make_shared<StopAction>(true);
 
     do
     {
@@ -73,10 +73,10 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             Point position_to_block_pass =
                 enemy_robot.position() +
                 enemy_to_passer_vector.normalize(this->shadow_distance);
-            autochip_move_action->updateControlParams(
-                *robot_, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
-                DribblerMode::OFF, 0.0, BallCollisionType::AVOID);
-            yield(autochip_move_action);
+            move_action->updateControlParams(*robot_, position_to_block_pass,
+                                             enemy_to_passer_vector.orientation(), 0,
+                                             DribblerMode::OFF, BallCollisionType::AVOID);
+            yield(move_action);
         }
         else
         {
@@ -108,23 +108,23 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
             if (enemy_robot.isNearDribbler(ball.position()) &&
                 ball.velocity().length() <= ball_steal_speed)
             {
-                autochip_move_action->updateControlParams(
+                move_action->updateControlParams(
                     *robot_, ball.position(),
                     (ball.position() - robot_->position()).orientation(), 0,
-                    DribblerMode::MAX_FORCE, YEET_CHIP_DISTANCE_METERS,
-                    BallCollisionType::AVOID);
-                yield(autochip_move_action);
+                    DribblerMode::MAX_FORCE, BallCollisionType::AVOID,
+                    createAutoChipCommand(YEET_CHIP_DISTANCE_METERS));
+                yield(move_action);
             }
             else
             {
-                autochip_move_action->updateControlParams(
+                move_action->updateControlParams(
                     *robot_, position_to_block_shot,
                     enemy_shot_vector.orientation() + Angle::half(), 0, DribblerMode::OFF,
-                    0.0, BallCollisionType::AVOID);
-                yield(autochip_move_action);
+                    BallCollisionType::AVOID);
+                yield(move_action);
             }
         }
-    } while (!autochip_move_action->done());
+    } while (!move_action->done());
 }
 
 void ShadowEnemyTactic::accept(TacticVisitor &visitor) const

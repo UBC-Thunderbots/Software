@@ -40,11 +40,15 @@ class MoveAction : public Action
      * @param final_speed The final speed the robot should have at the destination
      * @param dribbler_mode The dribbler mode
      * @param ball_collision_type how to navigate around the ball
+     * @param autochick_command The command to autochip or autokick
+     * @param max_speed_m_per_s The maximum speed in meters per second
      */
-    void updateControlParams(const Robot& robot, Point destination,
-                             Angle final_orientation, double final_speed,
-                             DribblerMode dribbler_mode,
-                             BallCollisionType ball_collision_type);
+    void updateControlParams(
+        const Robot& robot, Point destination, Angle final_orientation,
+        double final_speed, DribblerMode dribbler_mode,
+        BallCollisionType ball_collision_type,
+        std::optional<TbotsProto::AutochickCommand> autochick_command = std::nullopt,
+        double max_speed_m_per_s = ROBOT_MAX_SPEED_METERS_PER_SECOND);
 
     /**
      * Get the destination this MoveAction is going to
@@ -74,6 +78,13 @@ class MoveAction : public Action
      */
     DribblerMode getDribblerMode();
 
+    /**
+     * Gets the AutochickCommand for this move intent
+     *
+     * @return the autochick command
+     */
+    std::optional<TbotsProto::AutochickCommand> getAutochickCommand() const;
+
    protected:
     /**
      * Checks if robot is close to the destination
@@ -91,6 +102,8 @@ class MoveAction : public Action
 
     double close_to_dest_threshold;
     Angle close_to_orientation_threshold;
+    std::optional<TbotsProto::AutochickCommand> autochick_command;
+    double max_speed_m_per_s;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

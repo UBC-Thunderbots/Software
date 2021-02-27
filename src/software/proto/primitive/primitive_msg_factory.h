@@ -63,7 +63,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  *
  * @return Pointer to Autochip command message
  */
-TbotsProto::AutochickCommand createAutoChipCommand(double autokick_speed_m_per_s);
+TbotsProto::AutochickCommand createAutoChipCommand(double autochip_distance_meters);
 
 /**
  * Create an Autokick command
@@ -72,7 +72,7 @@ TbotsProto::AutochickCommand createAutoChipCommand(double autokick_speed_m_per_s
  *
  * @return Pointer to Autokick command message
  */
-TbotsProto::AutochickCommand createAutoKickCommand(double autochip_distance_meters);
+TbotsProto::AutochickCommand createAutoKickCommand(double autokick_speed_m_per_s);
 
 /**
  * Create a Spinning Move Primitive Message

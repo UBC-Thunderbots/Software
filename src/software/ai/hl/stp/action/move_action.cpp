@@ -15,10 +15,11 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
 
 void MoveAction::updateWorldParams(const World& world) {}
 
-void MoveAction::updateControlParams(const Robot& robot, Point destination,
-                                     Angle final_orientation, double final_speed,
-                                     DribblerMode dribbler_mode,
-                                     BallCollisionType ball_collision_type)
+void MoveAction::updateControlParams(
+    const Robot& robot, Point destination, Angle final_orientation, double final_speed,
+    DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
+    std::optional<TbotsProto::AutochickCommand> autochick_command,
+    double max_speed_m_per_s)
 {
     this->robot               = robot;
     this->destination         = destination;
@@ -26,6 +27,8 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
     this->final_speed         = final_speed;
     this->dribbler_mode       = dribbler_mode;
     this->ball_collision_type = ball_collision_type;
+    this->autochick_command   = autochick_command;
+    this->max_speed_m_per_s   = max_speed_m_per_s;
 }
 
 Point MoveAction::getDestination()
@@ -48,6 +51,11 @@ DribblerMode MoveAction::getDribblerMode()
     return dribbler_mode;
 }
 
+std::optional<TbotsProto::AutochickCommand> MoveAction::getAutochickCommand() const
+{
+    return autochick_command;
+}
+
 bool MoveAction::robotCloseToDestination()
 {
     return (robot->position() - destination).length() > close_to_dest_threshold ||
@@ -64,8 +72,8 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // location
     do
     {
-        yield(std::make_unique<MoveIntent>(robot->id(), destination, final_orientation,
-                                           final_speed, dribbler_mode,
-                                           ball_collision_type));
+        yield(std::make_unique<MoveIntent>(
+            robot->id(), destination, final_orientation, final_speed, dribbler_mode,
+            ball_collision_type, autochick_command, max_speed_m_per_s));
     } while (robotCloseToDestination());
 }

@@ -70,14 +70,14 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 TbotsProto::AutochickCommand createAutoChipCommand(double autokick_speed_m_per_s)
 {
     TbotsProto::AutochickCommand command;
-    command.set_autokick_speed_m_per_s(static_cast<float>(autokick_speed_m_per_s));
+    command.set_autochip_distance_meters(static_cast<float>(autokick_speed_m_per_s));
     return command;
 }
 
 TbotsProto::AutochickCommand createAutoKickCommand(double autochip_distance_meters)
 {
     TbotsProto::AutochickCommand command;
-    command.set_autochip_distance_meters(static_cast<float>(autochip_distance_meters));
+    command.set_autokick_speed_m_per_s(static_cast<float>(autochip_distance_meters));
     return command;
 }
 

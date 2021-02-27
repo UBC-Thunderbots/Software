@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/action/autochip_move_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
 
 TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
@@ -32,13 +32,13 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
 
     ASSERT_TRUE(action_ptr);
 
-    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
-    ASSERT_NE(nullptr, autochip_move_action);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(nullptr, move_action);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
                                                Point(-0.5, 0), 0.01));
-    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(Angle::zero()),
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_EQ(autochip_move_action->getChipDistance(), 0.0);
+    EXPECT_FALSE(move_action->getAutochickCommand());
 }
 
 TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
@@ -73,13 +73,13 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
 
     ASSERT_TRUE(action_ptr);
 
-    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
-    ASSERT_NE(nullptr, autochip_move_action);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(nullptr, move_action);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
                                                Point(0, 0.2), 0.01));
-    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(Angle::quarter()),
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::quarter()),
               Angle::fromDegrees(1));
-    EXPECT_EQ(autochip_move_action->getChipDistance(), 0.0);
+    EXPECT_FALSE(move_action->getAutochickCommand());
 }
 
 
@@ -110,14 +110,15 @@ TEST(ShadowEnemyTacticTest,
 
     ASSERT_TRUE(action_ptr);
 
-    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
-    ASSERT_NE(nullptr, autochip_move_action);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(nullptr, move_action);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
                                                ball.position(), 0.01));
-    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (ball.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_EQ(autochip_move_action->getChipDistance(),
+    ASSERT_TRUE(move_action->getAutochickCommand());
+    EXPECT_EQ(move_action->getAutochickCommand().value().autochip_distance_meters(),
               ShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }
 
@@ -149,11 +150,11 @@ TEST(
 
     ASSERT_TRUE(action_ptr);
 
-    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
-    ASSERT_NE(nullptr, autochip_move_action);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(nullptr, move_action);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
                                                Point(-0.5, 0), 0.01));
-    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(Angle::zero()),
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_EQ(autochip_move_action->getChipDistance(), 0.0);
+    EXPECT_FALSE(move_action->getAutochickCommand());
 }
