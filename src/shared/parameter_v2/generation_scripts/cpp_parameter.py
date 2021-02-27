@@ -182,7 +182,9 @@ class CppParameter(object):
                 quote=self.quote,
                 value=self.param_value,
                 allowed_values="GenericFactory<{index_type}, {type_to_create}, {config_type}>::getRegisteredNames()".format(
-                    index_type=param_index_type, type_to_create=param_type_to_create, config_type=param_config_type
+                    index_type=param_index_type,
+                    type_to_create=param_type_to_create,
+                    config_type=param_config_type,
                 ),
             )
         else:

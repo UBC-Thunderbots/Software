@@ -27,9 +27,9 @@ cc_library(
         ":cpp_params",
     ],
     deps = [
+        "//software/ai/hl/stp/play",
         "//software/parameter",
         "//software/parameter:config",
-        "//software/ai/hl/stp/play:play",
         "//software/util/design_patterns:generic_factory",
         "//software/world:game_state",
     ],

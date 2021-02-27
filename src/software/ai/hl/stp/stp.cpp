@@ -182,11 +182,6 @@ bool STP::overrideAIPlayIfApplicable()
         {
             try
             {
-                std::cerr<<override_play_name<<std::endl;
-                for (auto name: GenericFactory<std::string, Play, PlayConfig>::getRegisteredNames())
-                {
-                    std::cerr<<name<<std::endl;
-                }
                 current_play = GenericFactory<std::string, Play, PlayConfig>::create(
                     override_play_name, play_config);
             }

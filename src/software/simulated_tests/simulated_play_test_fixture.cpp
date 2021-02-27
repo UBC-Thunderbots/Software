@@ -15,6 +15,11 @@ SimulatedPlayTestFixture::SimulatedPlayTestFixture()
 void SimulatedPlayTestFixture::SetUp()
 {
     SimulatedTestFixture::SetUp();
+
+    ai_config            = mutable_thunderbots_config->getMutableAiConfig();
+    ai_control_config    = mutable_thunderbots_config->getMutableAiControlConfig();
+    sensor_fusion_config = mutable_thunderbots_config->getMutableSensorFusionConfig();
+
     ai = AI(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(),
             thunderbots_config->getPlayConfig());
 }

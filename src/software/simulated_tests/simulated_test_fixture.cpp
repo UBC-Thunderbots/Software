@@ -16,14 +16,14 @@ SimulatedTestFixture::SimulatedTestFixture()
 
 void SimulatedTestFixture::SetUp()
 {
+    mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+    thunderbots_config =
+        std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
+
     LoggerSingleton::initializeLogger(
         thunderbots_config->getStandaloneSimulatorMainCommandLineArgs()
             ->getLoggingDir()
             ->value());
-
-    mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-    thunderbots_config =
-        std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
 
     simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField(),
                                             thunderbots_config->getSimulatorConfig());

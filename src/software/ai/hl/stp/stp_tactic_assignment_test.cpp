@@ -20,9 +20,8 @@ class STPTacticAssignmentTest : public ::testing::Test
 {
    public:
     STPTacticAssignmentTest()
-        : 
-            thunderbots_config(std::make_shared<const ThunderbotsConfig>()),
-            stp([]() { return nullptr; }, thunderbots_config->getAiControlConfig(),
+        : thunderbots_config(std::make_shared<const ThunderbotsConfig>()),
+          stp([]() { return nullptr; }, thunderbots_config->getAiControlConfig(),
               thunderbots_config->getPlayConfig(), 0)
     {
     }
