@@ -233,11 +233,10 @@ new_git_repository(
     shallow_since = "1596403987 -0600",
 )
 
-git_repository(
+http_archive(
     name = "rules_python",
-    commit = "c8c79aae9aa1b61d199ad03d5fe06338febd0774",
-    remote = "https://github.com/bazelbuild/rules_python.git",
-    shallow_since = "1586444447 +0200",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
+    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
 )
 
 # Based on the hermetic Python 3 guide found here
