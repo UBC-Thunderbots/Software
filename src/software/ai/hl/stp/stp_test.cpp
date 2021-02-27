@@ -14,18 +14,18 @@
 class STPTest : public ::testing::Test
 {
    public:
-    STPTest() : stp([]() { return nullptr; }, ai_control_config, 0)
-    {
-    }
+    STPTest() : stp([]() { return nullptr; }, ai_control_config, 0) {}
 
    protected:
     void SetUp() override
     {
         mutable_ai_control_config = std::make_shared<AiControlConfig>();
-        ai_control_config = std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config);
+        ai_control_config =
+            std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config);
 
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltTestPlay>(std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
+            return std::make_unique<HaltTestPlay>(
+                std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
         };
         // Explicitly setting override AI Play to be false because we can't rely on
         // default values

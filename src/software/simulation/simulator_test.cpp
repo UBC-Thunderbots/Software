@@ -12,11 +12,12 @@ class SimulatorTest : public ::testing::Test
     void SetUp() override
     {
         simulator_config = std::make_shared<const SimulatorConfig>();
-        simulator = std::make_shared<Simulator>(Field::createSSLDivisionBField(), simulator_config);
+        simulator        = std::make_shared<Simulator>(Field::createSSLDivisionBField(),
+                                                simulator_config);
     }
 
     std::shared_ptr<Simulator> simulator;
-    std::shared_ptr<const  SimulatorConfig> simulator_config;
+    std::shared_ptr<const SimulatorConfig> simulator_config;
 };
 
 TEST_F(SimulatorTest, get_field)
@@ -38,7 +39,6 @@ TEST_F(SimulatorTest, timestamp_updates_with_simulation_steps)
 
 TEST_F(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 {
-
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator->setBallState(ball_state);
 
@@ -54,7 +54,6 @@ TEST_F(SimulatorTest, set_ball_state_when_ball_does_not_already_exist)
 
 TEST_F(SimulatorTest, set_ball_state_when_ball_already_exists)
 {
-
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator->setBallState(ball_state);
 
@@ -73,7 +72,6 @@ TEST_F(SimulatorTest, set_ball_state_when_ball_already_exists)
 
 TEST_F(SimulatorTest, remove_ball_when_no_ball_exists)
 {
-
     simulator->removeBall();
 
     auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
@@ -85,7 +83,6 @@ TEST_F(SimulatorTest, remove_ball_when_no_ball_exists)
 
 TEST_F(SimulatorTest, remove_ball_when_the_ball_already_exists)
 {
-
     BallState ball_state(Point(1, 2), Vector(0, -3));
     simulator->setBallState(ball_state);
     simulator->removeBall();
@@ -99,7 +96,6 @@ TEST_F(SimulatorTest, remove_ball_when_the_ball_already_exists)
 
 TEST_F(SimulatorTest, add_zero_yellow_robots)
 {
-
     simulator->addYellowRobots({});
 
     auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
@@ -111,7 +107,6 @@ TEST_F(SimulatorTest, add_zero_yellow_robots)
 
 TEST_F(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -134,7 +129,6 @@ TEST_F(SimulatorTest, add_multiple_yellow_robots_with_valid_ids)
 
 TEST_F(SimulatorTest, add_yellow_robots_with_duplicate_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -149,7 +143,6 @@ TEST_F(SimulatorTest, add_yellow_robots_with_duplicate_ids)
 
 TEST_F(SimulatorTest, add_yellow_robots_with_ids_that_already_exist_in_the_simulation)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     std::vector<RobotStateWithId> states1 = {
@@ -169,7 +162,6 @@ TEST_F(SimulatorTest, add_yellow_robots_with_ids_that_already_exist_in_the_simul
 
 TEST_F(SimulatorTest, add_zero_blue_robots)
 {
-
     simulator->addBlueRobots({});
 
     auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
@@ -181,7 +173,6 @@ TEST_F(SimulatorTest, add_zero_blue_robots)
 
 TEST_F(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -204,7 +195,6 @@ TEST_F(SimulatorTest, add_multiple_blue_robots_with_valid_ids)
 
 TEST_F(SimulatorTest, add_blue_robots_with_duplicate_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -219,7 +209,6 @@ TEST_F(SimulatorTest, add_blue_robots_with_duplicate_ids)
 
 TEST_F(SimulatorTest, add_blue_robots_with_ids_that_already_exist_in_the_simulation)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     std::vector<RobotStateWithId> states1 = {
@@ -239,7 +228,6 @@ TEST_F(SimulatorTest, add_blue_robots_with_ids_that_already_exist_in_the_simulat
 
 TEST_F(SimulatorTest, add_yellow_robot)
 {
-
     auto wrapper_packet = simulator->getSSLWrapperPacket();
     ASSERT_TRUE(wrapper_packet->has_detection());
     EXPECT_EQ(0, wrapper_packet->detection().robots_yellow_size());
@@ -256,7 +244,6 @@ TEST_F(SimulatorTest, add_yellow_robot)
 
 TEST_F(SimulatorTest, add_blue_robot)
 {
-
     auto wrapper_packet = simulator->getSSLWrapperPacket();
     ASSERT_TRUE(wrapper_packet->has_detection());
     EXPECT_EQ(0, wrapper_packet->detection().robots_blue_size());
@@ -292,7 +279,6 @@ TEST_F(SimulatorTest, simulation_step_updates_the_ball)
 
 TEST_F(SimulatorTest, simulate_yellow_robots_with_no_primitives)
 {
-
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
     std::vector<RobotStateWithId> states = {
@@ -352,7 +338,6 @@ TEST_F(SimulatorTest, simulate_single_yellow_robot_with_primitive)
 
 TEST_F(SimulatorTest, simulate_blue_robots_with_no_primitives)
 {
-
     RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
                             AngularVelocity::zero());
     std::vector<RobotStateWithId> states = {

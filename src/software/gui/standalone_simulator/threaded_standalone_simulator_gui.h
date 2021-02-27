@@ -22,10 +22,9 @@ class ThreadedStandaloneSimulatorGUI
      * @param simulator The StandaloneSimulator this GUI will control
      */
     explicit ThreadedStandaloneSimulatorGUI(
-        std::shared_ptr<StandaloneSimulator> simulator, 
+        std::shared_ptr<StandaloneSimulator> simulator,
         std::shared_ptr<SimulatorConfig> mutable_simulator_config,
-        std::shared_ptr<StandaloneSimulatorConfig> mutable_standalone_simulator_config
-        );
+        std::shared_ptr<StandaloneSimulatorConfig> mutable_standalone_simulator_config);
 
     ~ThreadedStandaloneSimulatorGUI();
 

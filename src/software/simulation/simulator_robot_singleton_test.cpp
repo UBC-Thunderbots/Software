@@ -38,8 +38,8 @@ class SimulatorRobotSingletonTest : public testing::Test
     createWorldWithEnemyRobots(Robot robot, Ball ball,
                                std::vector<Point> enemy_robot_positions)
     {
-        auto physics_world =
-            std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
+        auto physics_world = std::make_shared<PhysicsWorld>(
+            Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
         physics_world->setBallState(ball.currentState());
         RobotStateWithId robot_state{.id          = robot.id(),
                                      .robot_state = robot.currentState()};
@@ -1410,8 +1410,9 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spin
 
 TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
 {
-    auto physics_world = std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
-    auto robot_states  = std::vector<RobotStateWithId>{
+    auto physics_world = std::make_unique<PhysicsWorld>(
+        Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
+    auto robot_states = std::vector<RobotStateWithId>{
         RobotStateWithId{.id          = 7,
                          .robot_state = RobotState(Point(1.2, 0), Vector(-2.3, 0.2),
                                                    Angle::fromRadians(-1.2),

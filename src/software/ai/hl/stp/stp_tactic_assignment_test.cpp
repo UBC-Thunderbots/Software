@@ -19,17 +19,22 @@
 class STPTacticAssignmentTest : public ::testing::Test
 {
    public:
-    STPTacticAssignmentTest() : stp([]() { return nullptr; }, thunderbots_config->getAiControlConfig(), thunderbots_config->getPlayConfig(), 0) {}
+    STPTacticAssignmentTest()
+        : stp([]() { return nullptr; }, thunderbots_config->getAiControlConfig(),
+              thunderbots_config->getPlayConfig(), 0)
+    {
+    }
 
    protected:
     void SetUp() override
     {
-        thunderbots_config = std::make_shared<const ThunderbotsConfig>();
+        thunderbots_config            = std::make_shared<const ThunderbotsConfig>();
         auto default_play_constructor = [this]() -> std::unique_ptr<Play> {
             return std::make_unique<HaltTestPlay>(thunderbots_config->getPlayConfig());
         };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, thunderbots_config->getAiControlConfig(), thunderbots_config->getPlayConfig(), 0);
+        stp   = STP(default_play_constructor, thunderbots_config->getAiControlConfig(),
+                  thunderbots_config->getPlayConfig(), 0);
         world = ::TestUtil::createBlankTestingWorld();
     }
 

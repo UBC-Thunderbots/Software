@@ -12,8 +12,9 @@ SimulatedTacticTestFixture::SimulatedTacticTestFixture()
           std::make_unique<VelocityObstaclePathManager>(
               std::make_unique<ThetaStarPathPlanner>(),
               RobotNavigationObstacleFactory(
-                      thunderbots_config->getRobotNavigationObstacleFactoryConfig())),
-          RobotNavigationObstacleFactory(thunderbots_config ->getRobotNavigationObstacleFactoryConfig()),
+                  thunderbots_config->getRobotNavigationObstacleFactoryConfig())),
+          RobotNavigationObstacleFactory(
+              thunderbots_config->getRobotNavigationObstacleFactoryConfig()),
           thunderbots_config->getNavigatorConfig()))
 {
 }
@@ -25,7 +26,7 @@ void SimulatedTacticTestFixture::SetUp()
         std::make_unique<VelocityObstaclePathManager>(
             std::make_unique<ThetaStarPathPlanner>(),
             RobotNavigationObstacleFactory(
-                    thunderbots_config->getRobotNavigationObstacleFactoryConfig())),
+                thunderbots_config->getRobotNavigationObstacleFactoryConfig())),
         RobotNavigationObstacleFactory(
             thunderbots_config->getRobotNavigationObstacleFactoryConfig()),
         thunderbots_config->getNavigatorConfig());

@@ -12,7 +12,8 @@ class PhysicsWorldTest : public ::testing::Test
     void SetUp() override
     {
         simulator_config = std::make_shared<const SimulatorConfig>();
-        physics_world    = std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField(), simulator_config);
+        physics_world = std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField(),
+                                                       simulator_config);
     }
 
     std::shared_ptr<const SimulatorConfig> simulator_config;
@@ -39,7 +40,6 @@ TEST_F(PhysicsWorldTest, default_construct_physics_world)
 
 TEST_F(PhysicsWorldTest, test_set_ball_state_when_no_ball_exists)
 {
-
     BallState ball_state(Point(1, -2), Vector(0, 0.5));
     physics_world->setBallState(ball_state);
 
@@ -49,7 +49,6 @@ TEST_F(PhysicsWorldTest, test_set_ball_state_when_no_ball_exists)
 
 TEST_F(PhysicsWorldTest, test_set_ball_state_when_ball_already_exists)
 {
-
     BallState ball_state1(Point(1, -2), Vector(0, 0.5));
     physics_world->setBallState(ball_state1);
 
@@ -62,7 +61,6 @@ TEST_F(PhysicsWorldTest, test_set_ball_state_when_ball_already_exists)
 
 TEST_F(PhysicsWorldTest, test_remove_existing_ball)
 {
-
     BallState ball_state(Point(1, -2), Vector(0, 0.5));
     physics_world->setBallState(ball_state);
 
@@ -75,14 +73,12 @@ TEST_F(PhysicsWorldTest, test_remove_existing_ball)
 
 TEST_F(PhysicsWorldTest, test_remove_nonexistant_ball)
 {
-
     physics_world->removeBall();
     EXPECT_FALSE(physics_world->getBallState());
 }
 
 TEST_F(PhysicsWorldTest, test_add_zero_yellow_robots)
 {
-
     physics_world->addYellowRobots({});
 
     EXPECT_TRUE(physics_world->getYellowRobotStates().empty());
@@ -90,7 +86,6 @@ TEST_F(PhysicsWorldTest, test_add_zero_yellow_robots)
 
 TEST_F(PhysicsWorldTest, test_add_single_yellow_robot_with_valid_id)
 {
-
     RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::quarter(),
                            AngularVelocity::half());
     std::vector<RobotStateWithId> states = {
@@ -104,7 +99,6 @@ TEST_F(PhysicsWorldTest, test_add_single_yellow_robot_with_valid_id)
 
 TEST_F(PhysicsWorldTest, test_add_multiple_yellow_robot_with_valid_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -126,7 +120,6 @@ TEST_F(PhysicsWorldTest, test_add_multiple_yellow_robot_with_valid_ids)
 
 TEST_F(PhysicsWorldTest, test_add_yellow_robots_with_duplicate_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -141,7 +134,6 @@ TEST_F(PhysicsWorldTest, test_add_yellow_robots_with_duplicate_ids)
 
 TEST_F(PhysicsWorldTest, test_add_yellow_robots_to_physics_world_with_existing_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     std::vector<RobotStateWithId> states1 = {
@@ -161,7 +153,6 @@ TEST_F(PhysicsWorldTest, test_add_yellow_robots_to_physics_world_with_existing_i
 
 TEST_F(PhysicsWorldTest, test_add_zero_blue_robots)
 {
-
     physics_world->addBlueRobots({});
 
     EXPECT_TRUE(physics_world->getBlueRobotStates().empty());
@@ -169,7 +160,6 @@ TEST_F(PhysicsWorldTest, test_add_zero_blue_robots)
 
 TEST_F(PhysicsWorldTest, test_add_single_blue_robot_with_valid_id)
 {
-
     RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::quarter(),
                            AngularVelocity::half());
     std::vector<RobotStateWithId> states = {
@@ -183,7 +173,6 @@ TEST_F(PhysicsWorldTest, test_add_single_blue_robot_with_valid_id)
 
 TEST_F(PhysicsWorldTest, test_add_multiple_blue_robot_with_valid_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -205,7 +194,6 @@ TEST_F(PhysicsWorldTest, test_add_multiple_blue_robot_with_valid_ids)
 
 TEST_F(PhysicsWorldTest, test_add_blue_robots_with_duplicate_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -220,7 +208,6 @@ TEST_F(PhysicsWorldTest, test_add_blue_robots_with_duplicate_ids)
 
 TEST_F(PhysicsWorldTest, test_add_blue_robots_to_physics_world_with_existing_ids)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     std::vector<RobotStateWithId> states1 = {
@@ -240,7 +227,6 @@ TEST_F(PhysicsWorldTest, test_add_blue_robots_to_physics_world_with_existing_ids
 
 TEST_F(PhysicsWorldTest, test_remove_robot_with_invalid_ptr)
 {
-
     EXPECT_TRUE(physics_world->getBluePhysicsRobots().empty());
     EXPECT_TRUE(physics_world->getYellowPhysicsRobots().empty());
 
@@ -252,7 +238,6 @@ TEST_F(PhysicsWorldTest, test_remove_robot_with_invalid_ptr)
 
 TEST_F(PhysicsWorldTest, remove_existing_yellow_team_robot)
 {
-
     EXPECT_TRUE(physics_world->getBluePhysicsRobots().empty());
     EXPECT_TRUE(physics_world->getYellowPhysicsRobots().empty());
 
@@ -276,7 +261,6 @@ TEST_F(PhysicsWorldTest, remove_existing_yellow_team_robot)
 
 TEST_F(PhysicsWorldTest, remove_existing_blue_team_robot)
 {
-
     EXPECT_TRUE(physics_world->getBluePhysicsRobots().empty());
     EXPECT_TRUE(physics_world->getYellowPhysicsRobots().empty());
 
@@ -300,7 +284,6 @@ TEST_F(PhysicsWorldTest, remove_existing_blue_team_robot)
 
 TEST_F(PhysicsWorldTest, remove_existing_robot_twice)
 {
-
     EXPECT_TRUE(physics_world->getBluePhysicsRobots().empty());
     EXPECT_TRUE(physics_world->getYellowPhysicsRobots().empty());
 
@@ -325,13 +308,11 @@ TEST_F(PhysicsWorldTest, remove_existing_robot_twice)
 
 TEST_F(PhysicsWorldTest, get_available_yellow_robot_ids_with_no_existing_robots)
 {
-
     EXPECT_EQ(0, physics_world->getAvailableYellowRobotId());
 }
 
 TEST_F(PhysicsWorldTest, get_available_yellow_robot_ids_with_existing_robots)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -347,13 +328,11 @@ TEST_F(PhysicsWorldTest, get_available_yellow_robot_ids_with_existing_robots)
 
 TEST_F(PhysicsWorldTest, get_available_blue_robot_ids_with_no_existing_robots)
 {
-
     EXPECT_EQ(0, physics_world->getAvailableBlueRobotId());
 }
 
 TEST_F(PhysicsWorldTest, get_available_blue_robot_ids_with_existing_robots)
 {
-
     RobotState robot_state1(Point(1, 0), Vector(0, 0), Angle::quarter(),
                             AngularVelocity::half());
     RobotState robot_state2(Point(0, 0), Vector(3, 0), Angle::half(),
@@ -467,14 +446,12 @@ TEST_F(PhysicsWorldTest, test_single_small_time_step)
 
 TEST_F(PhysicsWorldTest, test_get_robot_at_position_without_robot)
 {
-
     auto result = physics_world->getRobotAtPosition(Point(1, 1));
     EXPECT_FALSE(result.lock());
 }
 
 TEST_F(PhysicsWorldTest, test_get_robot_at_position_with_exact_robot_position)
 {
-
     RobotState robot_state(Point(1, 0), Vector(0, 0), Angle::quarter(),
                            AngularVelocity::zero());
     std::vector<RobotStateWithId> states = {

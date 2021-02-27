@@ -21,7 +21,7 @@ class PhysicsBallTest : public testing::Test
     virtual void SetUp()
     {
         b2Vec2 gravity(0, 0);
-        world = std::make_shared<b2World>(gravity);
+        world            = std::make_shared<b2World>(gravity);
         simulator_config = std::make_shared<const SimulatorConfig>();
     }
 
@@ -105,7 +105,7 @@ TEST_F(PhysicsBallTest, test_physics_ball_is_removed_from_world_when_destroyed)
 
         EXPECT_EQ(0, world->GetBodyCount());
 
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+        auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
 
         EXPECT_EQ(1, world->GetBodyCount());
     }

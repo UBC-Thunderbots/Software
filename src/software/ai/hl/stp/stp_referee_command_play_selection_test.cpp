@@ -28,7 +28,8 @@ class STPRefereeCommandPlaySelectionTestWithPositions
     STPRefereeCommandPlaySelectionTestWithPositions()
         : stp(
               []() {
-                  return std::make_unique<HaltPlay>(std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
+                  return std::make_unique<HaltPlay>(
+                      std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
               },
               std::make_shared<const AiControlConfig>(), 0)
     {
@@ -196,7 +197,8 @@ class STPRefereeCommandPlaySelectionTest
     void SetUp() override
     {
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltPlay>(std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
+            return std::make_unique<HaltPlay>(
+                std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
         };
         // Give an explicit seed to STP so that our tests are deterministic
         stp = STP(default_play_constructor, std::make_shared<const AiControlConfig>(), 0);

@@ -66,7 +66,8 @@ int main(int argc, char** argv)
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
             thunderbots_config->getSensorFusionConfig());
         auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig(),
-                                               thunderbots_config->getAiControlConfig(), thunderbots_config->getPlayConfig());
+                                               thunderbots_config->getAiControlConfig(),
+                                               thunderbots_config->getPlayConfig());
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers
@@ -75,7 +76,8 @@ int main(int argc, char** argv)
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         if (!args->getHeadless()->value())
         {
-            visualizer = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
+            visualizer =
+                std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
 
             sensor_fusion->Subject<World>::registerObserver(visualizer);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
@@ -107,16 +109,17 @@ int main(int argc, char** argv)
             backend->Subject<SensorProto>::registerObserver(sensor_msg_logger);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(primitive_set_logger);
 
-            // log filtered world state 
+            // log filtered world state
             bool friendly_colour_yellow = thunderbots_config->getSensorFusionConfig()
                                               ->getFriendlyColorYellow()
                                               ->value();
             auto friendly_team_colour =
                 friendly_colour_yellow ? TeamColour::YELLOW : TeamColour::BLUE;
 
-            auto world_to_ssl_wrapper_conversion_fn = [friendly_team_colour](const World& world) {
-                return *createSSLWrapperPacket(world, friendly_team_colour);
-            };
+            auto world_to_ssl_wrapper_conversion_fn =
+                [friendly_team_colour](const World& world) {
+                    return *createSSLWrapperPacket(world, friendly_team_colour);
+                };
 
             auto vision_logger =
                 std::make_shared<ProtoLogger<SSLProto::SSL_WrapperPacket>>(
