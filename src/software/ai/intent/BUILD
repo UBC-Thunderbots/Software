@@ -72,6 +72,7 @@ cc_test(
     srcs = ["move_intent_test.cpp"],
     deps = [
         ":move_intent",
+        "//software/util/typename",
         "@gtest//:gtest_main",
     ],
 )

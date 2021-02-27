@@ -113,7 +113,8 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
         {
             yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball,
                                                kick_direction, 0.0, DribblerMode::OFF,
-                                               BallCollisionType::AVOID));
+                                               BallCollisionType::AVOID, std::nullopt,
+                                               ROBOT_MAX_SPEED_METERS_PER_SECOND));
         }
         else
         {

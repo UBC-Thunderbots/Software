@@ -18,12 +18,11 @@ class MoveIntent : public NavigatingIntent
      * @param autochipkick The command to autochip or autokick
      * @param max_speed_m_per_s The maximum speed in meters per second
      */
-    explicit MoveIntent(
-        unsigned int robot_id, const Point& destination, const Angle& final_angle,
-        double final_speed, DribblerMode dribbler_mode,
-        BallCollisionType ball_collision_type,
-        std::optional<TbotsProto::Autochipkick> autochipkick = std::nullopt,
-        double max_speed_m_per_s = ROBOT_MAX_SPEED_METERS_PER_SECOND);
+    explicit MoveIntent(unsigned int robot_id, const Point& destination,
+                        const Angle& final_angle, double final_speed,
+                        DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
+                        std::optional<TbotsProto::Autochipkick> autochipkick,
+                        double max_speed_m_per_s);
 
     MoveIntent() = delete;
 

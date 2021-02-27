@@ -52,9 +52,8 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode,
-    std::optional<TbotsProto::Autochipkick> autochipkick = std::nullopt,
-    double max_speed_m_per_s = ROBOT_MAX_SPEED_METERS_PER_SECOND);
+    DribblerMode dribbler_mode, std::optional<TbotsProto::Autochipkick> autochipkick,
+    double max_speed_m_per_s);
 
 /**
  * Create an Autochip command

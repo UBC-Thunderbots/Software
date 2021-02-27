@@ -68,7 +68,8 @@ struct GetBehindBallFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), point_behind_ball,
                 event.control_params.chick_direction, 0.0, DribblerMode::OFF,
-                BallCollisionType::AVOID));
+                BallCollisionType::AVOID, std::nullopt,
+                ROBOT_MAX_SPEED_METERS_PER_SECOND));
         };
 
         /**

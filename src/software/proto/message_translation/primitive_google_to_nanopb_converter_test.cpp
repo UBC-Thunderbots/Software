@@ -15,8 +15,9 @@
 
 TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 {
-    TbotsProto::Primitive google_primitive =
-        *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE);
+    TbotsProto::Primitive google_primitive = *createMovePrimitive(
+        Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE,
+        createAutoChipCommand(2.5), ROBOT_MAX_SPEED_METERS_PER_SECOND);
 
     TbotsProto_Primitive nanopb_primitive = createNanoPbPrimitive(google_primitive);
 
@@ -27,16 +28,21 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
     EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
               static_cast<float>(M_PI));
     EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);
+    EXPECT_EQ(nanopb_primitive.primitive.move.autochipkick.autochipkick
+                  .autochip_distance_meters,
+              2.5);
+    EXPECT_EQ(nanopb_primitive.primitive.move.max_speed_m_per_s,
+              ROBOT_MAX_SPEED_METERS_PER_SECOND);
 }
 
 TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
 {
-    *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE);
-    *createMovePrimitive(Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE);
     TbotsProto::Primitive google_primitive_1 =
-        *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE);
+        *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE,
+                             std::nullopt, ROBOT_MAX_SPEED_METERS_PER_SECOND);
     TbotsProto::Primitive google_primitive_2 =
-        *createMovePrimitive(Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE);
+        *createMovePrimitive(Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE,
+                             std::nullopt, ROBOT_MAX_SPEED_METERS_PER_SECOND);
 
     auto google_primitive_set  = std::make_unique<TbotsProto::PrimitiveSet>();
     auto& robot_primitives_map = *google_primitive_set->mutable_robot_primitives();

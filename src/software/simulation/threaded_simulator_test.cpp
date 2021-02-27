@@ -170,18 +170,22 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     threaded_simulator.addYellowRobots(yellow_robot_states);
 
     threaded_simulator.setBlueRobotPrimitive(
-        1, createNanoPbPrimitive(*createMovePrimitive(Point(-1, -1), 0.0, Angle::zero(),
-                                                      DribblerMode::OFF)));
+        1, createNanoPbPrimitive(
+               *createMovePrimitive(Point(-1, -1), 0.0, Angle::zero(), DribblerMode::OFF,
+                                    std::nullopt, ROBOT_MAX_SPEED_METERS_PER_SECOND)));
     threaded_simulator.setBlueRobotPrimitive(
-        2, createNanoPbPrimitive(*createMovePrimitive(Point(-3, 0), 0.0, Angle::half(),
-                                                      DribblerMode::OFF)));
+        2, createNanoPbPrimitive(
+               *createMovePrimitive(Point(-3, 0), 0.0, Angle::half(), DribblerMode::OFF,
+                                    std::nullopt, ROBOT_MAX_SPEED_METERS_PER_SECOND)));
 
     threaded_simulator.setYellowRobotPrimitive(
         1, createNanoPbPrimitive(
-               *createMovePrimitive(Point(1, 1), 0.0, Angle::zero(), DribblerMode::OFF)));
+               *createMovePrimitive(Point(1, 1), 0.0, Angle::zero(), DribblerMode::OFF,
+                                    std::nullopt, ROBOT_MAX_SPEED_METERS_PER_SECOND)));
     threaded_simulator.setYellowRobotPrimitive(
-        2, createNanoPbPrimitive(*createMovePrimitive(Point(3, -2), 0.0, Angle::zero(),
-                                                      DribblerMode::OFF)));
+        2, createNanoPbPrimitive(
+               *createMovePrimitive(Point(3, -2), 0.0, Angle::zero(), DribblerMode::OFF,
+                                    std::nullopt, ROBOT_MAX_SPEED_METERS_PER_SECOND)));
 
     std::this_thread::yield();
     std::this_thread::sleep_for(std::chrono::milliseconds(2500));
