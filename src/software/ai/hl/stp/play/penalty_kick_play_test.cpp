@@ -4,6 +4,7 @@
 
 #include "software/simulated_tests/non_terminating_validation_functions/ball_always_moves_forward_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
@@ -96,6 +97,9 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         ballInPlay,
         ballAlwaysMovesForward,
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            robotsAvoidBall(1, world_ptr, yield, {1});
+        }
     };
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

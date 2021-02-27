@@ -11,7 +11,7 @@ cc_library(
         "robots_not_in_center_circle_validation.cpp",
         "robots_slow_down_validation.cpp",
     ],
-    hdrs = [s
+    hdrs = [
         "ball_always_moves_forward_validation.h",
         "ball_in_play_or_scored_validation.h",
         "robots_avoid_ball_validation.h",

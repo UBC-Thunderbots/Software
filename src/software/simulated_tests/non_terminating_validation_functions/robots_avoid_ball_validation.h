@@ -2,6 +2,7 @@
 
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/world/world.h"
+#include <algorithm>
 
 /**
  * Checks if robots are keeping at least the minimum required distance from
@@ -11,4 +12,5 @@
  * @param yield yields control to the next routine (coroutines)
  */
 void robotsAvoidBall(double min_distance, std::shared_ptr<World> world_ptr,
-                     ValidationCoroutine::push_type& yield);
+                     ValidationCoroutine::push_type& yield, 
+                     std::vector<RobotId> excluded_robots);
