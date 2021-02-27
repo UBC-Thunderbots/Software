@@ -5,7 +5,8 @@ void ballInPlay(std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type
     Point ball           = world_ptr->ball().position();
     Rectangle inPlayRect = world_ptr->field().fieldLines();
 
-    if (contains(world_ptr->field().enemyGoal(), ball)) {
+    if (contains(world_ptr->field().enemyGoal(), ball))
+    {
         return;
     }
     if (!contains(inPlayRect, ball))

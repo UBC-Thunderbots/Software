@@ -44,16 +44,16 @@ class PenaltyKickTactic : public Tactic
 
     /**
      * Helper function that determines whether the shooter robot has a viable shot on net.
-     * 
-     * @return true if the robot has a viable shot and false if the enemy goalkeeper will likely
-     * save the shot.
+     *
+     * @return true if the robot has a viable shot and false if the enemy goalkeeper will
+     * likely save the shot.
      */
     bool evaluatePenaltyShot();
 
     /**
-     * Helper function that returns the point on the enemy goal line where the shooter 
+     * Helper function that returns the point on the enemy goal line where the shooter
      * should aim at.
-     * 
+     *
      * @return the Point on the goalie line where the shooter robot should aim
      */
     Point evaluateNextShotPosition();

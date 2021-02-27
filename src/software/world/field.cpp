@@ -185,7 +185,8 @@ Rectangle Field::enemyGoal() const
 
 Point Field::friendlyPenaltyMark() const
 {
-    return Point(enemyGoalCenter().x() - goal_centre_to_penalty_mark_, enemyGoalCenter().y());
+    return Point(enemyGoalCenter().x() - goal_centre_to_penalty_mark_,
+                 enemyGoalCenter().y());
 }
 
 Point Field::enemyPenaltyMark() const
