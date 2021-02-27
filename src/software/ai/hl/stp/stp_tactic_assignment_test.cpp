@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
+#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/hl/stp/tactic/test_tactics/goalie_test_tactic.h"
@@ -31,7 +31,7 @@ class STPTacticAssignmentTest : public ::testing::Test
     {
         thunderbots_config            = std::make_shared<const ThunderbotsConfig>();
         auto default_play_constructor = [this]() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltTestPlay>(thunderbots_config->getPlayConfig());
+            return std::make_unique<HaltPlay>(thunderbots_config->getPlayConfig());
         };
         // Give an explicit seed to STP so that our tests are deterministic
         stp   = STP(default_play_constructor, thunderbots_config->getAiControlConfig(),

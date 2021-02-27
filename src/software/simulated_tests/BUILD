@@ -18,6 +18,8 @@ cc_library(
         "//software/test_util",
         "//software/time:duration",
         "@gtest",
+        # TODO (#1889) Remove this dep after optional params are implemented
+        "//software/ai/hl/stp/play:halt_play",
     ],
 )
 

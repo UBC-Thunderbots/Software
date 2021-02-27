@@ -53,6 +53,7 @@ cc_test(
     srcs = ["stp_tactic_assignment_test.cpp"],
     deps = [
         ":stp",
+        "//software/ai/hl/stp/play:halt_play",
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/tactic/test_tactics:goalie_test_tactic",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
@@ -68,6 +69,7 @@ cc_test(
     srcs = ["stp_test.cpp"],
     deps = [
         ":stp",
+        "//software/ai/hl/stp/play:halt_play",
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/play/test_plays:move_test_play",
         "//software/test_util",

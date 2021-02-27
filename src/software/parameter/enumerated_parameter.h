@@ -33,8 +33,8 @@ class EnumeratedParameter : public Parameter<T>
         if (std::find(allowed_values.begin(), allowed_values.end(), value) ==
             allowed_values.end())
         {
-            throw std::invalid_argument(
-                "EnumeratedParameter constructed with invalid value");
+            throw std::invalid_argument("EnumeratedParameter " + name +
+                                        " constructed with invalid value");
         }
 
         allowed_values_ = allowed_values;

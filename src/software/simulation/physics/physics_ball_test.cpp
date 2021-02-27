@@ -450,6 +450,8 @@ TEST_F(PhysicsBallFrictionTest, test_no_friction_kick)
     Point position(3, 5);
     Vector velocity(1, -1);
     BallState initial_ball_state(position, velocity);
+    simulator_config->getMutableSlidingFrictionAcceleration()->setValue(0);
+    simulator_config->getMutableRollingFrictionAcceleration()->setValue(0);
     auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
     physics_ball.setInitialKickSpeed(velocity.length());
     physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.0));
