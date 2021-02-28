@@ -3,7 +3,7 @@
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 #include "software/simulation/physics/physics_robot.h"

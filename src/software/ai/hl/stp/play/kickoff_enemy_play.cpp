@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)

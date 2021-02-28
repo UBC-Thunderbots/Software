@@ -10,7 +10,7 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 #include "software/world/team.h"

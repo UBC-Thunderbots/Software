@@ -10,7 +10,7 @@
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/observer_subject_adapter.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/proto/logging/proto_logger.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"

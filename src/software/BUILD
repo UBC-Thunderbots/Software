@@ -12,7 +12,7 @@ cc_binary(
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//software/multithreading:observer_subject_adapter",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "//software/proto/logging:proto_logger",
         "//software/proto/message_translation:ssl_wrapper",
         "//software/sensor_fusion:threaded_sensor_fusion",
@@ -27,7 +27,7 @@ cc_binary(
     deps = [
         "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "//software/simulation:standalone_simulator",
         "@boost//:program_options",
     ],
@@ -40,7 +40,7 @@ cc_binary(
         "//software/backend:radio_backend",
         "//software/handheld_controller:controller_primitive_generator",
         "//software/handheld_controller:xbox_360_controller",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -52,7 +52,7 @@ cc_binary(
         "//software/backend:all_backends",
         "//software/gui/robot_diagnostics:threaded_robot_diagnostics_gui",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "//software/util/design_patterns:generic_factory",
         "@boost//:program_options",
     ],

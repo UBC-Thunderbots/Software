@@ -26,7 +26,7 @@ cc_library(
         "//software/ai/motion_constraint",
         "//software/geom:point",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "//software/world",
     ],
 )

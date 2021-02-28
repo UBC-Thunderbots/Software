@@ -7,7 +7,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 /**
  * A Play for Direct Free kicks
@@ -29,8 +29,6 @@ class FreeKickPlay : public Play
 
     // The minimum pass score we will attempt
     static constexpr double MIN_ACCEPTABLE_PASS_SCORE = 0.05;
-
-    std::shared_ptr<const PlayConfig> play_config;
 
     /**
      * Finds a place to chip the ball near the net and chips there.

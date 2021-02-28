@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//software/geom:rectangle",
         "//software/gui/standalone_simulator/widgets:standalone_simulator_gui",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "//software/proto:ssl_cc_proto",
         "//software/simulation:standalone_simulator",
         "@qt//:qt_widgets",

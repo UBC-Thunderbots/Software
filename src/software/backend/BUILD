@@ -90,7 +90,7 @@ cc_library(
     deps = [
         "//software:constants",
         "//software/networking:threaded_proto_multicast_listener",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "//software/proto:ssl_cc_proto",
     ],
 )

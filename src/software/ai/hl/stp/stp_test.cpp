@@ -8,7 +8,7 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/test_util/test_util.h"
 #include "software/util/design_patterns/generic_factory.h"
 

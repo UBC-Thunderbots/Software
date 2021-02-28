@@ -25,7 +25,7 @@ cc_library(
         "//software/logger",
         "//software/math:math_functions",
         "//software/multithreading:subject",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -54,7 +54,7 @@ cc_test(
     srcs = ["controller_primitive_generator_test.cpp"],
     deps = [
         ":controller_primitive_generator",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "@gtest//:gtest_main",
     ],
 )

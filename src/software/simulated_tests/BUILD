@@ -57,7 +57,7 @@ cc_library(
     deps = [
         ":simulated_test_fixture",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "@gtest",
     ],
 )

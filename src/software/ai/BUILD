@@ -31,7 +31,7 @@ cc_library(
         "//software/gui/drawing:navigator",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "//software/world",
         "@boost//:bind",
     ],

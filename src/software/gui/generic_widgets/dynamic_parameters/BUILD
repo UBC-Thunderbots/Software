@@ -11,7 +11,7 @@ qt_cc_library(
         "//software/gui/shared:parameters_spinbox",
         "//software/logger",
         "//software/parameter",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
         "//software/util/variant_visitor",
         "@qt//:qt_widgets",
     ],

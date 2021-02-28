@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/proto/primitive/primitive_msg_factory.h"
 
 class ControllerPrimitiveGeneratorTest : public testing::Test

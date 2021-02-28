@@ -9,7 +9,7 @@
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,

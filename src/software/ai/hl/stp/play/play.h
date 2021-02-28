@@ -153,4 +153,7 @@ class Play
 
     // The Play's knowledge of the most up-to-date World
     std::optional<World> world;
+
+    // The Play configuration
+    std::shared_ptr<const PlayConfig> play_config;
 };

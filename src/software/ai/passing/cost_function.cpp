@@ -8,7 +8,7 @@
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 double ratePass(const World& world, const Pass& pass,
                 const std::optional<Rectangle>& target_region,

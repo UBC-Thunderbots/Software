@@ -6,7 +6,7 @@
 
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/time/duration.h"
 #include "software/world/ball_state.h"
 

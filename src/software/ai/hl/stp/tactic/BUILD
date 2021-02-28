@@ -69,7 +69,7 @@ cc_library(
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -97,7 +97,7 @@ cc_library(
         "//software/ai/hl/stp/action:autochip_move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -125,7 +125,7 @@ cc_library(
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -259,7 +259,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -286,7 +286,7 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
     ],
 )
 

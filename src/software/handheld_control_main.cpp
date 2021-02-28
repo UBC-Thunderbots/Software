@@ -4,7 +4,7 @@
 #include "software/backend/radio_backend.h"
 #include "software/handheld_controller/controller_primitive_generator.h"
 #include "software/handheld_controller/xbox_360_controller.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 int main(int argc, char **argv)
 {

@@ -2,7 +2,7 @@
 
 #include "software/gui/standalone_simulator/threaded_standalone_simulator_gui.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/simulation/standalone_simulator.h"
 
 int main(int argc, char **argv)

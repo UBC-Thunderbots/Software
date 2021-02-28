@@ -4,7 +4,7 @@
 #include <QtWidgets/QApplication>
 
 #include "software/gui/drawing/world.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 ThreadedFullSystemGUI::ThreadedFullSystemGUI(
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)

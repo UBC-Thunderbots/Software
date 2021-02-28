@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/stp/play/play.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 /**
  * An example Play that moves the robots in a circle around the ball
@@ -33,6 +33,4 @@ class ExamplePlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
-   private:
-    std::shared_ptr<const PlayConfig> play_config;
 };

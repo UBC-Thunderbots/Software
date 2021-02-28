@@ -8,7 +8,7 @@
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic

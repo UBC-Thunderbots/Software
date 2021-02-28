@@ -23,7 +23,7 @@ cc_library(
     deps = [
         ":path_manager",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter_v2:cpp_configs",
     ],
 )
 

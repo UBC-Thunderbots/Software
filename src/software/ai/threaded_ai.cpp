@@ -3,7 +3,7 @@
 #include <boost/bind.hpp>
 
 #include "software/gui/drawing/navigator.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 ThreadedAI::ThreadedAI(std::shared_ptr<const AiConfig> ai_config,
                        std::shared_ptr<const AiControlConfig> control_config,
