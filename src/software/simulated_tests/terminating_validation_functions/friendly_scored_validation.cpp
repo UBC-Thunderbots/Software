@@ -9,6 +9,4 @@ void friendlyScored(std::shared_ptr<World> world_ptr,
     {
         yield();
     }
-
-    printf("Validation function compelte\n");
 }

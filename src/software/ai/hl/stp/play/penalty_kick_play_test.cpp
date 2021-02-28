@@ -45,7 +45,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // making sure that the robot doesn't move the ball while the tactic is
+            // making sure that the robot doesn't move the ball while the penalty is
             // setting up
             ASSERT_EQ(world_ptr->field().friendlyPenaltyMark(),
                       world_ptr->ball().position());
