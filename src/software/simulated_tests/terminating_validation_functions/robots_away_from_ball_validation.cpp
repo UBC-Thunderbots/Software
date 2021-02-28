@@ -11,7 +11,7 @@ void robotsAwayFromBall(double min_distance, std::vector<RobotId> excluded_robot
             {
                 if ((std::find(excluded_robots.begin(), excluded_robots.end(),
                                robot.id()) == excluded_robots.end()) &&
-                    ((robot.position() - ball_position).length() < 1))
+                    ((robot.position() - ball_position).length() < min_distance))
                 {
                     return false;
                 }
