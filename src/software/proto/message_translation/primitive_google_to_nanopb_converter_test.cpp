@@ -17,7 +17,7 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 {
     TbotsProto::Primitive google_primitive = *createMovePrimitive(
         Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE,
-        createAutoChipCommand(2.5), MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        {AutoChipOrKickMode::AUTOCHIP, 2.5}, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     TbotsProto_Primitive nanopb_primitive = createNanoPbPrimitive(google_primitive);
 
@@ -37,12 +37,12 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 
 TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
 {
-    TbotsProto::Primitive google_primitive_1 =
-        *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE,
-                             std::nullopt, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-    TbotsProto::Primitive google_primitive_2 =
-        *createMovePrimitive(Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE,
-                             std::nullopt, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    TbotsProto::Primitive google_primitive_1 = *createMovePrimitive(
+        Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE,
+        {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    TbotsProto::Primitive google_primitive_2 = *createMovePrimitive(
+        Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE,
+        {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     auto google_primitive_set  = std::make_unique<TbotsProto::PrimitiveSet>();
     auto& robot_primitives_map = *google_primitive_set->mutable_robot_primitives();

@@ -15,11 +15,12 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
 
 void MoveAction::updateWorldParams(const World& world) {}
 
-void MoveAction::updateControlParams(
-    const Robot& robot, Point destination, Angle final_orientation, double final_speed,
-    DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
-    std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick,
-    MaxAllowedSpeedMode max_allowed_speed_mode)
+void MoveAction::updateControlParams(const Robot& robot, Point destination,
+                                     Angle final_orientation, double final_speed,
+                                     DribblerMode dribbler_mode,
+                                     BallCollisionType ball_collision_type,
+                                     AutoChipOrKick auto_chip_or_kick,
+                                     MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     this->robot                  = robot;
     this->destination            = destination;
@@ -51,7 +52,7 @@ DribblerMode MoveAction::getDribblerMode()
     return dribbler_mode;
 }
 
-std::optional<TbotsProto::AutoChipOrKick> MoveAction::getAutoChipOrKick() const
+AutoChipOrKick MoveAction::getAutoChipOrKick() const
 {
     return auto_chip_or_kick;
 }

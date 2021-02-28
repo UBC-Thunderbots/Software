@@ -21,7 +21,7 @@ class MoveIntent : public NavigatingIntent
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
                         DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
-                        std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick,
+                        AutoChipOrKick auto_chip_or_kick,
                         MaxAllowedSpeedMode max_allowed_speed_mode);
 
     MoveIntent() = delete;
@@ -48,7 +48,7 @@ class MoveIntent : public NavigatingIntent
      *
      * @return the chip kick command
      */
-    std::optional<TbotsProto::AutoChipOrKick> getAutoChipOrKick() const;
+    AutoChipOrKick getAutoChipOrKick() const;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
@@ -72,5 +72,5 @@ class MoveIntent : public NavigatingIntent
    private:
     Angle final_angle;
     DribblerMode dribbler_mode;
-    std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick;
+    AutoChipOrKick auto_chip_or_kick;
 };

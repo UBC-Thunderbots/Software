@@ -24,7 +24,7 @@ struct MoveFSM
         // How to navigate around the ball
         BallCollisionType ball_collision_type;
         // The command to autochip or autokick
-        std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick;
+        AutoChipOrKick auto_chip_or_kick;
         // The maximum allowed speed mode
         MaxAllowedSpeedMode max_allowed_speed_mode;
     };
@@ -52,7 +52,8 @@ struct MoveFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), event.control_params.destination,
                 event.control_params.final_orientation, event.control_params.final_speed,
-                DribblerMode::OFF, BallCollisionType::AVOID, std::nullopt,
+                DribblerMode::OFF, BallCollisionType::AVOID,
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT));
         };
 

@@ -68,7 +68,7 @@ struct GetBehindBallFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), point_behind_ball,
                 event.control_params.chick_direction, 0.0, DribblerMode::OFF,
-                BallCollisionType::AVOID, std::nullopt,
+                BallCollisionType::AVOID, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT));
         };
 

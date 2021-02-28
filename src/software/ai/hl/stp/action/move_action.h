@@ -47,7 +47,7 @@ class MoveAction : public Action
         const Robot& robot, Point destination, Angle final_orientation,
         double final_speed, DribblerMode dribbler_mode,
         BallCollisionType ball_collision_type,
-        std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick = std::nullopt,
+        AutoChipOrKick auto_chip_or_kick           = {AutoChipOrKickMode::OFF, 0},
         MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     /**
@@ -83,7 +83,7 @@ class MoveAction : public Action
      *
      * @return the chip kick command
      */
-    std::optional<TbotsProto::AutoChipOrKick> getAutoChipOrKick() const;
+    AutoChipOrKick getAutoChipOrKick() const;
 
    protected:
     /**
@@ -102,7 +102,7 @@ class MoveAction : public Action
 
     double close_to_dest_threshold;
     Angle close_to_orientation_threshold;
-    std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick;
+    AutoChipOrKick auto_chip_or_kick;
     MaxAllowedSpeedMode max_allowed_speed_mode;
 
    private:

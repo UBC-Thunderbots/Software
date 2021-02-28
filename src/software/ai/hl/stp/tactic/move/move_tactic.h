@@ -39,7 +39,7 @@ class MoveTactic : public Tactic
         Point destination, Angle final_orientation, double final_speed,
         DribblerMode dribbler_mode            = DribblerMode::OFF,
         BallCollisionType ball_collision_type = BallCollisionType::AVOID,
-        std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick = std::nullopt);
+        AutoChipOrKick auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0});
 
     /**
      * Updates the params assuming that the dribbler and chicker and while avoiding the

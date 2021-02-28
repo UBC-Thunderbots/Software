@@ -103,7 +103,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             move_action->updateControlParams(
                 *robot_, ideal_position, ideal_orientation, 0, DribblerMode::OFF,
                 BallCollisionType::ALLOW,
-                createAutoKickCommand(BALL_MAX_SPEED_METERS_PER_SECOND - 1));
+                {AutoChipOrKickMode::AUTOKICK, BALL_MAX_SPEED_METERS_PER_SECOND - 1});
             yield(move_action);
 
             // Calculations to check for termination conditions

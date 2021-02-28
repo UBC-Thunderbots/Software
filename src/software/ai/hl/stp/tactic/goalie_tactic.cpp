@@ -206,9 +206,10 @@ std::shared_ptr<Action> GoalieTactic::panicAndStopBall(
         closestPoint((*robot_).position(), Segment(ball.position(), stop_ball_point));
     Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-    move_action->updateControlParams(*robot_, goalie_pos, goalie_orientation, 0.0,
-                                     DribblerMode::OFF, BallCollisionType::ALLOW,
-                                     createAutoChipCommand(YEET_CHIP_DISTANCE_METERS));
+    move_action->updateControlParams(
+        *robot_, goalie_pos, goalie_orientation, 0.0, DribblerMode::OFF,
+        BallCollisionType::ALLOW,
+        {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
     return move_action;
 }
 
@@ -302,7 +303,8 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
     auto goalie_final_speed = goalie_tactic_config->getGoalieFinalSpeed()->value();
     move_action->updateControlParams(
         *robot_, goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
-        BallCollisionType::ALLOW, createAutoChipCommand(YEET_CHIP_DISTANCE_METERS));
+        BallCollisionType::ALLOW,
+        {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
     return move_action;
 }
 

@@ -38,7 +38,8 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
                                                Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_FALSE(move_action->getAutoChipOrKick());
+    EXPECT_EQ(move_action->getAutoChipOrKick().auto_chip_kick_mode,
+              AutoChipOrKickMode::OFF);
 }
 
 TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
@@ -79,7 +80,8 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
                                                Point(0, 0.2), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::quarter()),
               Angle::fromDegrees(1));
-    EXPECT_FALSE(move_action->getAutoChipOrKick());
+    EXPECT_EQ(move_action->getAutoChipOrKick().auto_chip_kick_mode,
+              AutoChipOrKickMode::OFF);
 }
 
 
@@ -117,8 +119,9 @@ TEST(ShadowEnemyTacticTest,
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (ball.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    ASSERT_TRUE(move_action->getAutoChipOrKick());
-    EXPECT_EQ(move_action->getAutoChipOrKick().value().autochip_distance_meters(),
+    ASSERT_EQ(move_action->getAutoChipOrKick().auto_chip_kick_mode,
+              AutoChipOrKickMode::AUTOCHIP);
+    EXPECT_EQ(move_action->getAutoChipOrKick().autochip_distance_m,
               ShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }
 
@@ -156,5 +159,6 @@ TEST(
                                                Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_FALSE(move_action->getAutoChipOrKick());
+    EXPECT_EQ(move_action->getAutoChipOrKick().auto_chip_kick_mode,
+              AutoChipOrKickMode::OFF);
 }

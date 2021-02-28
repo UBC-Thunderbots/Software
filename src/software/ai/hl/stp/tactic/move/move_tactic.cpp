@@ -9,10 +9,10 @@ MoveTactic::MoveTactic(bool loop_forever)
 
 void MoveTactic::updateWorldParams(const World &world) {}
 
-void MoveTactic::updateControlParams(
-    Point destination, Angle final_orientation, double final_speed,
-    DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
-    std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick)
+void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
+                                     double final_speed, DribblerMode dribbler_mode,
+                                     BallCollisionType ball_collision_type,
+                                     AutoChipOrKick auto_chip_or_kick)
 {
     // Update the control parameters stored by this Tactic
     control_params.destination            = destination;
@@ -34,7 +34,7 @@ void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
     control_params.final_speed            = final_speed;
     control_params.dribbler_mode          = DribblerMode::OFF;
     control_params.ball_collision_type    = BallCollisionType::AVOID;
-    control_params.auto_chip_or_kick      = std::nullopt;
+    control_params.auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0};
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
 }
 

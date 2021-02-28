@@ -171,7 +171,7 @@ void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield
             move_action->updateControlParams(
                 *robot_, defender_position, defender_orientation, 0.0, DribblerMode::OFF,
                 BallCollisionType::ALLOW,
-                createAutoChipCommand(YEET_CHIP_DISTANCE_METERS));
+                {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
             yield(move_action);
         }
         else

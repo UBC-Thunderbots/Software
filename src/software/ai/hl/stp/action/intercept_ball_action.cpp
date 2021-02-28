@@ -39,7 +39,8 @@ void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)
         auto face_ball_orientation = (ball.position() - robot->position()).orientation();
         yield(std::make_unique<MoveIntent>(
             robot->id(), ball.position(), face_ball_orientation, 0,
-            DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, std::nullopt,
+            DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
         // Restart the action if the ball's speed has sped up substantially.
@@ -80,7 +81,8 @@ void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)
 
         yield(std::make_unique<MoveIntent>(
             robot->id(), robot->position(), face_ball_orientation, 0,
-            DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, std::nullopt,
+            DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             MaxAllowedSpeedMode::PHYSICAL_LIMIT));
     } while (robot->velocity().length() > ROBOT_STOPPED_SPEED_M_PER_S);
 }
@@ -111,7 +113,8 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), intercept_position, (-ball.velocity()).orientation(), 0,
-            DribblerMode::MAX_FORCE, BallCollisionType::AVOID, std::nullopt,
+            DribblerMode::MAX_FORCE, BallCollisionType::AVOID,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
         // Restart the action if the ball's speed has slowed down substantially.
@@ -138,7 +141,8 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), intercept_position, (-ball.velocity()).orientation(), 0,
-            DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, std::nullopt,
+            DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
+            AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
         if (!intercept_done &&

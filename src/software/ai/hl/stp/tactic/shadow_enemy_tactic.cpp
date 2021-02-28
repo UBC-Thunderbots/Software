@@ -112,7 +112,7 @@ void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
                     *robot_, ball.position(),
                     (ball.position() - robot_->position()).orientation(), 0,
                     DribblerMode::MAX_FORCE, BallCollisionType::AVOID,
-                    createAutoChipCommand(YEET_CHIP_DISTANCE_METERS));
+                    {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
                 yield(move_action);
             }
             else

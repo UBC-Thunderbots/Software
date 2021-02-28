@@ -14,7 +14,7 @@ TEST(MoveFSMTest, test_transitions)
         .final_speed            = 0.0,
         .dribbler_mode          = DribblerMode::OFF,
         .ball_collision_type    = BallCollisionType::AVOID,
-        .auto_chip_or_kick      = std::nullopt,
+        .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
 
     BaseFSM<MoveFSM> fsm;
@@ -46,7 +46,7 @@ TEST(MoveFSMTest, test_transitions)
         .final_speed            = 0.0,
         .dribbler_mode          = DribblerMode::OFF,
         .ball_collision_type    = BallCollisionType::AVOID,
-        .auto_chip_or_kick      = std::nullopt,
+        .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));

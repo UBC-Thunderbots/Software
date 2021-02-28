@@ -96,7 +96,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
             move_action->updateControlParams(
                 *robot_, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
                 0, DribblerMode::MAX_FORCE, BallCollisionType::AVOID,
-                createAutoChipCommand(YEET_CHIP_DISTANCE_METERS));
+                {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
             yield(move_action);
         }
         else
@@ -106,7 +106,7 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
             move_action->updateControlParams(
                 *robot_, position_to_block_shot, facing_enemy_robot, 0, DribblerMode::OFF,
                 BallCollisionType::AVOID,
-                createAutoChipCommand(YEET_CHIP_DISTANCE_METERS));
+                {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
             yield(move_action);
         }
 

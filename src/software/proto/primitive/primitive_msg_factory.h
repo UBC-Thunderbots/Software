@@ -21,7 +21,7 @@ struct AutoChipOrKick
     AutoChipOrKickMode auto_chip_kick_mode;
     union
     {
-        double autokick_speed_m_p_s;
+        double autokick_speed_m_per_s;
         double autochip_distance_m;
     };
 };
