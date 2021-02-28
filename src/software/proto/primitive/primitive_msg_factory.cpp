@@ -1,5 +1,7 @@
 #include "software/proto/primitive/primitive_msg_factory.h"
 
+#include "software/logger/logger.h"
+
 #include "software/proto/message_translation/tbots_protobuf.h"
 
 std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(const Point &chip_origin,
@@ -129,6 +131,7 @@ double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode)
         case DribblerMode::OFF:
             return 0.0;
         default:
+            LOG(WARNING)<<"DribblerMode is invalid"<<std::endl;
             return 0.0;
     }
 }
@@ -143,6 +146,7 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         case MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         default:
-            return ROBOT_MAX_SPEED_METERS_PER_SECOND;
+            LOG(WARNING)<<"MaxAllowedSpeedMode is invalid"<<std::endl;
+            return 0.0;
     }
 }
