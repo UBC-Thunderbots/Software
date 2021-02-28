@@ -52,9 +52,10 @@ struct MoveFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), event.control_params.destination,
                 event.control_params.final_orientation, event.control_params.final_speed,
-                DribblerMode::OFF, BallCollisionType::AVOID,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+                event.control_params.dribbler_mode,
+                event.control_params.ball_collision_type,
+                event.control_params.auto_chip_or_kick,
+                event.control_params.max_allowed_speed_mode));
         };
 
         /**
