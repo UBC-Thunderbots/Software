@@ -24,8 +24,7 @@ class CherryPickTactic : public Tactic
     void updateWorldParams(const World& world) override;
 
     /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-     * closer to the block destination
+     * Calculates the cost of assigning the given robot to this Tactic.
      *
      * @param robot The robot to evaluate the cost for
      * @param world The state of the world with which to perform the evaluation
@@ -43,14 +42,4 @@ class CherryPickTactic : public Tactic
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
-
-    // The pass optimizer being used to figure out the best position for the robot
-    PassGenerator pass_generator;
-
-    // Tactic parameters
-    // The current state of the world
-    World world;
-
-    // The region in which we want to position the cherry picking robot
-    Rectangle target_region;
 };

@@ -19,14 +19,10 @@ class Pass
     /**
      * Create a pass with given parameters
      *
-     * @param passer_point The point the pass should start at
      * @param receiver_point The point the receiver should be at to receive the pass
      * @param pass_speed_m_per_s The speed of the pass, in meters/second
-     * @param pass_start_time The time that the pass should start at (ie. the time
-     *                        that the ball should be kicked)
      */
-    Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
-         Timestamp pass_start_time);
+    Pass(Point receiver_point, double pass_speed_m_per_s);
 
     /**
      * Gets the value of the receiver point
@@ -63,21 +59,6 @@ class Pass
      */
     double speed() const;
 
-    /**
-     * Gets the value of the pass start time
-     *
-     * @return The value of the pass start time
-     */
-    Timestamp startTime() const;
-
-    /**
-     * Estimate the time when the pass should be received
-     *
-     * This estimate does not account for friction on the ball
-     *
-     * @return An estimate of the time when the pass should be received
-     */
-    Timestamp estimateReceiveTime() const;
 
     /**
      * Estimate how long the pass will take, from kicking to receiving

@@ -55,6 +55,15 @@ cc_library(
 )
 
 cc_library(
+    name = "field_pitch_division",
+    hdrs = ["field_pitch_division.h"],
+    deps = [
+        "//software/geom:rectangle",
+        "//software/geom:point",
+    ],
+)
+
+cc_library(
     name = "pass_generator",
     srcs = ["pass_generator.cpp"],
     hdrs = ["pass_generator.h"],

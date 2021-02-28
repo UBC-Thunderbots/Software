@@ -10,26 +10,17 @@
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 
-double ratePass(const World& world, const Pass& pass,
-                const std::optional<Rectangle>& target_region,
-                std::optional<unsigned int> passer_robot_id, PassType pass_type)
+double ratePass(const World& world, const Pass& pass)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
 
     double friendly_pass_rating =
-        ratePassFriendlyCapability(world.friendlyTeam(), pass, passer_robot_id);
+        ratePassFriendlyCapability(world.friendlyTeam(), pass);
 
     double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
 
     double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
-
-    // Rate all passes outside our target region as 0 if we have one
-    double in_region_quality = 1;
-    if (target_region)
-    {
-        in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
-    }
 
     // Place strict limits on pass start time
     double min_pass_time_offset = DynamicParameters->getAiConfig()
@@ -64,12 +55,11 @@ double ratePass(const World& world, const Pass& pass,
     {
         case PassType::RECEIVE_AND_DRIBBLE:
             pass_quality = static_pass_quality * friendly_pass_rating *
-                           enemy_pass_rating * in_region_quality *
-                           pass_time_offset_quality * pass_speed_quality;
+                           enemy_pass_rating * pass_time_offset_quality * pass_speed_quality;
             break;
         case PassType::ONE_TOUCH_SHOT:
             pass_quality = static_pass_quality * friendly_pass_rating *
-                           enemy_pass_rating * shoot_pass_rating * in_region_quality *
+                           enemy_pass_rating * shoot_pass_rating *
                            pass_time_offset_quality * pass_speed_quality;
             break;
         default:
@@ -231,16 +221,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
-                                  std::optional<unsigned int> passer_robot_id)
+double ratePassFriendlyCapability(Team friendly_team, const Pass& pass)
 {
-    // Remove the passer robot from the friendly team before evaluating, as we assume
-    // the passer is not passing to itself
-    if (passer_robot_id)
-    {
-        friendly_team.removeRobotWithId(*passer_robot_id);
-    }
-
     // We need at least one robot to pass to
     if (friendly_team.getAllRobots().empty())
     {
