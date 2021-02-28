@@ -19,7 +19,7 @@ void robotKickedBall(RobotId robot_id, Angle angle, std::shared_ptr<World> world
         return robot.isNearDribbler(ball_position);
     };
 
-    while (!(ball_near_dribbler(world_ptr) && world_ptr->ball().hasBallBeenKicked(angle)))
+    while ((ball_near_dribbler(world_ptr) && !world_ptr->ball().hasBallBeenKicked(angle)))
     {
         yield();
     }

@@ -88,7 +88,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             kick_intent.getPrimitive().kick().kick_direction(),
             *createAngleProto(Angle::zero())));
-        EXPECT_EQ(5.0, kick_intent.getPrimitive().kick().kick_speed_meters_per_second());
+        EXPECT_EQ(5.0, kick_intent.getPrimitive().kick().kick_speed_m_per_s());
     }
     catch (...)
     {
@@ -126,7 +126,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_positive_y)
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             kick_intent.getPrimitive().kick().kick_direction(),
             *createAngleProto(Angle::fromDegrees(105))));
-        EXPECT_EQ(5.0, kick_intent.getPrimitive().kick().kick_speed_meters_per_second());
+        EXPECT_EQ(5.0, kick_intent.getPrimitive().kick().kick_speed_m_per_s());
     }
     catch (...)
     {
@@ -164,7 +164,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_negative_y)
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             kick_intent.getPrimitive().kick().kick_direction(),
             *createAngleProto(Angle::fromDegrees(255))));
-        EXPECT_EQ(3.0, kick_intent.getPrimitive().kick().kick_speed_meters_per_second());
+        EXPECT_EQ(3.0, kick_intent.getPrimitive().kick().kick_speed_m_per_s());
     }
     catch (...)
     {
@@ -202,7 +202,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_negative_y)
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
             kick_intent.getPrimitive().kick().kick_direction(),
             *createAngleProto(Angle::fromDegrees(306))));
-        EXPECT_EQ(5.0, kick_intent.getPrimitive().kick().kick_speed_meters_per_second());
+        EXPECT_EQ(5.0, kick_intent.getPrimitive().kick().kick_speed_m_per_s());
     }
     catch (...)
     {

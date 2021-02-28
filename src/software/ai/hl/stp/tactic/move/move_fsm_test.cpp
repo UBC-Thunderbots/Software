@@ -8,9 +8,14 @@ TEST(MoveFSMTest, test_transitions)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    MoveFSM::ControlParams control_params{.destination       = Point(2, 3),
-                                          .final_orientation = Angle::half(),
-                                          .final_speed       = 0.0};
+    MoveFSM::ControlParams control_params{
+        .destination            = Point(2, 3),
+        .final_orientation      = Angle::half(),
+        .final_speed            = 0.0,
+        .dribbler_mode          = DribblerMode::OFF,
+        .ball_collision_type    = BallCollisionType::AVOID,
+        .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
 
     BaseFSM<MoveFSM> fsm;
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));
@@ -35,9 +40,14 @@ TEST(MoveFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // destination updated so robot needs to move to new destination
-    control_params = MoveFSM::ControlParams{.destination       = Point(1, -3),
-                                            .final_orientation = Angle::half(),
-                                            .final_speed       = 0.0};
+    control_params = MoveFSM::ControlParams{
+        .destination            = Point(1, -3),
+        .final_orientation      = Angle::half(),
+        .final_speed            = 0.0,
+        .dribbler_mode          = DribblerMode::OFF,
+        .ball_collision_type    = BallCollisionType::AVOID,
+        .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));

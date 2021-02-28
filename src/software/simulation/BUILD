@@ -84,6 +84,7 @@ cc_test(
         "//firmware/app/world:firmware_robot",
         "//shared/proto:tbots_cc_proto",
         "//shared/proto:tbots_nanopb_proto",
+        "//shared/test_util",
         "//software/simulation/physics:physics_robot",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
