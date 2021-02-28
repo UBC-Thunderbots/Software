@@ -4,7 +4,7 @@
 
 #include "software/test_util/test_util.h"
 
-TEST(GetPossessionFSMTest, test_transitions_fast_ball)
+TEST(GetPossessionFSMTest, test_transitions)
 {
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
     World world = ::TestUtil::createBlankTestingWorld();
@@ -15,39 +15,16 @@ TEST(GetPossessionFSMTest, test_transitions_fast_ball)
 
     HFSM<GetPossessionFSM> fsm;
 
-    // Start in ChaseBallState
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::ChaseBallState>));
+    // Start in InterceptBallState
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::InterceptBallState>));
 
-    // Transition to FastBallInterceptFSM to block the ball
+    // Stay in InterceptBallState since ball not in possession yet
     fsm.process_event(GetPossessionFSM::Update(
         {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::InterceptBallState>));
 
     // At ball point so transition to done
     robot = ::TestUtil::createRobotAtPos(Point(0.5, 0));
-    fsm.process_event(GetPossessionFSM::Update(
-        {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::X));
-}
-
-TEST(GetPossessionFSMTest, test_transitions_slow_ball)
-{
-    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(2, 0), Timestamp::fromSeconds(123));
-
-    HFSM<GetPossessionFSM> fsm;
-
-    // Start in ChaseBallState
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::ChaseBallState>));
-
-    // Stay in ChaseBallState
-    fsm.process_event(GetPossessionFSM::Update(
-        {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::ChaseBallState>));
-
-    // At interception point so transition to waiting for the ball
-    robot = ::TestUtil::createRobotAtPos(Point(2, 0));
     fsm.process_event(GetPossessionFSM::Update(
         {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
