@@ -1,3 +1,4 @@
+pip==21.0.1
 jupyter==1.0.0
 notebook==6.1.5
 numpy==1.19.4

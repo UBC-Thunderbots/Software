@@ -1,3 +1,4 @@
+pip==21.0.1
 PyYAML==5.3.1
 jsonschema==2.6.0
 colorama==0.3.7
