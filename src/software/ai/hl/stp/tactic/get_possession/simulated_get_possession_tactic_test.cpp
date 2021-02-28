@@ -13,6 +13,24 @@
 
 class SimulatedMoveTacticTest : public SimulatedTacticTestFixture
 {
+   protected:
+    void checkPossession(std::shared_ptr<GetPossessionTactic> tactic,
+                         std::shared_ptr<World> world_ptr,
+                         ValidationCoroutine::push_type& yield)
+    {
+        while (!tactic->done())
+        {
+            yield();
+        }
+        robotReceivedBall(1, world_ptr, yield);
+        auto received_ball_time = world_ptr->getMostRecentTimestamp();
+        while (world_ptr->getMostRecentTimestamp() <
+               received_ball_time + Duration::fromSeconds(1))
+        {
+            yield();
+        }
+        robotReceivedBall(1, world_ptr, yield);
+    }
 };
 
 TEST_F(SimulatedMoveTacticTest, test_moving_ball)
@@ -32,13 +50,9 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball)
     setRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
-            while (!tactic->done())
-            {
-                yield();
-            }
-            robotReceivedBall(1, world_ptr, yield);
+        [this, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
+            checkPossession(tactic, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -64,13 +78,9 @@ TEST_F(SimulatedMoveTacticTest, test_stopped_ball)
     setRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
-            while (!tactic->done())
-            {
-                yield();
-            }
-            robotReceivedBall(1, world_ptr, yield);
+        [this, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
+            checkPossession(tactic, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -96,13 +106,9 @@ TEST_F(SimulatedMoveTacticTest, test_ball_bounce_of_enemy_robot)
     setRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
-            while (!tactic->done())
-            {
-                yield();
-            }
-            robotReceivedBall(1, world_ptr, yield);
+        [this, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
+            checkPossession(tactic, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};

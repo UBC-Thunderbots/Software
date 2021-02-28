@@ -17,7 +17,9 @@ double GetPossessionTactic::calculateRobotCost(const Robot &robot,
     // Prefer robots closer to the destination
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost = (robot.position() - world.ball().position()).length() /
+    double cost = (robot.position() - GetPossessionFSM::findInterceptionPoint(
+                                          robot, world.ball(), world.field()))
+                      .length() /
                   world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
