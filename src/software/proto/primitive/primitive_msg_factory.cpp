@@ -41,8 +41,7 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(const Point &kick_ori
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
-    DribblerMode dribbler_mode,
-    std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick,
+    DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
     MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
@@ -59,27 +58,22 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(
         static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
 
-    if (auto_chip_or_kick)
+    if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
     {
-        *(move_primitive_msg->mutable_move()->mutable_auto_chip_or_kick()) =
-            *auto_chip_or_kick;
+        move_primitive_msg->mutable_move()
+            ->mutable_auto_chip_or_kick()
+            ->set_autokick_speed_m_per_s(
+                static_cast<float>(auto_chip_or_kick.autokick_speed_m_p_s));
+    }
+    else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
+    {
+        move_primitive_msg->mutable_move()
+            ->mutable_auto_chip_or_kick()
+            ->set_autochip_distance_meters(
+                static_cast<float>(auto_chip_or_kick.autochip_distance_m));
     }
 
     return move_primitive_msg;
-}
-
-TbotsProto::AutoChipOrKick createAutoChipCommand(double autokick_speed_m_per_s)
-{
-    TbotsProto::AutoChipOrKick command;
-    command.set_autochip_distance_meters(static_cast<float>(autokick_speed_m_per_s));
-    return command;
-}
-
-TbotsProto::AutoChipOrKick createAutoKickCommand(double autochip_distance_meters)
-{
-    TbotsProto::AutoChipOrKick command;
-    command.set_autokick_speed_m_per_s(static_cast<float>(autochip_distance_meters));
-    return command;
 }
 
 std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(

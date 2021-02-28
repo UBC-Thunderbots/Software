@@ -36,6 +36,15 @@ message KickPrimitive
 
 message MovePrimitive
 {
+    message AutoChipOrKick
+    {
+        oneof auto_chip_or_kick
+        {
+            float autokick_speed_m_per_s   = 1;
+            float autochip_distance_meters = 2;
+        };
+    }
+
     Point destination                = 1;
     float final_speed_m_per_s        = 2;
     Angle final_angle                = 3;
@@ -99,14 +108,4 @@ message DirectControlPrimitive
         float autochip_distance_meters = 7;
     }
     float dribbler_speed_rpm = 8;
-}
-
-// Defined separately so that the definition can be shared
-message AutoChipOrKick
-{
-    oneof auto_chip_or_kick
-    {
-        float autokick_speed_m_per_s   = 1;
-        float autochip_distance_meters = 2;
-    };
 }

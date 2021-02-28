@@ -14,6 +14,18 @@
  */
 MAKE_ENUM(DribblerMode, OFF, INDEFINITE, MAX_FORCE);
 
+MAKE_ENUM(AutoChipOrKickMode, AUTOKICK, AUTOCHIP, OFF);
+
+struct AutoChipOrKick
+{
+    AutoChipOrKickMode auto_chip_kick_mode;
+    union
+    {
+        double autokick_speed_m_p_s;
+        double autochip_distance_m;
+    };
+};
+
 /**
  * PHYSICAL_LIMIT maximum speed allowed by the physical limits of the robot
  * STOP_COMMAND maximum speed allowed when responding to a stop command
@@ -39,20 +51,20 @@ std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(const Point &chip_ori
  *
  * @param kick_origin The location where the kick will be taken
  * @param kick_direction The orientation the Robot will kick at
- * @param kick_speed_meters_per_second The speed of how fast the Robot
+ * @param kick_speed_m_per_s The speed of how fast the Robot
  * will kick the ball in meters per second
  *
  * @return Pointer to Kick Primitive Message
  */
-std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
-    const Point &kick_origin, const Angle &kick_direction,
-    double kick_speed_meters_per_second);
+std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(const Point &kick_origin,
+                                                           const Angle &kick_direction,
+                                                           double kick_speed_m_per_s);
 
 /**
  * Create a Move Primitive Message
  *
  * @param dest The final destination of the movement
- * @param final_speed_meters_per_second The speed at final destination
+ * @param final_speed_m_per_s The speed at final destination
  * @param final_angle The final orientation the robot should have at the end
  * of the movement
  * @param dribbler_mode The dribbler mode
@@ -62,34 +74,15 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode,
-    std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick,
+    const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
+    DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
     MaxAllowedSpeedMode max_allowed_speed_mode);
-
-/**
- * Create an Autochip command
- *
- * @param autokick_speed_m_per_s The speed to autokick the ball in meters per second
- *
- * @return Pointer to Autochip command message
- */
-TbotsProto::AutoChipOrKick createAutoChipCommand(double autochip_distance_meters);
-
-/**
- * Create an Autokick command
- *
- * @param autochip_distance_meters The distance to autochip the ball in meters
- *
- * @return Pointer to Autokick command message
- */
-TbotsProto::AutoChipOrKick createAutoKickCommand(double autokick_speed_m_per_s);
 
 /**
  * Create a Spinning Move Primitive Message
  *
  * @param dest The final destination of the movement
- * @param final_speed_meters_per_second The speed at final destination
+ * @param final_speed_m_per_s The speed at final destination
  * @param angular_velocity The angular velocity of the robot
  * of the movement
  * @param dribbler_mode The dribbler mode
@@ -97,7 +90,7 @@ TbotsProto::AutoChipOrKick createAutoKickCommand(double autokick_speed_m_per_s);
  * @return Pointer to Spinning Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second,
+    const Point &dest, double final_speed_m_per_s,
     const AngularVelocity &angular_velocity, DribblerMode dribbler_mode);
 
 /**
