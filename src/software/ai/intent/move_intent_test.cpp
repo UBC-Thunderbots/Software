@@ -39,7 +39,7 @@ TEST(AutochipMoveIntentTest, test_get_destination_ball_collision_chip)
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
     ASSERT_TRUE(intent.getAutoChipOrKick().auto_chip_kick_mode ==
                 AutoChipOrKickMode::AUTOCHIP);
-    EXPECT_EQ(intent.getAutoChipOrKick().autochip_distance_m, 3.2f);
+    EXPECT_EQ(intent.getAutoChipOrKick().autochip_distance_m, 3.2);
     EXPECT_EQ(intent.getFinalAngle(), Angle::quarter());
     EXPECT_EQ(intent.getDribblerMode(), DribblerMode::OFF);
     EXPECT_EQ(intent.getBallCollisionType(), BallCollisionType::AVOID);
@@ -63,7 +63,7 @@ TEST(MoveIntentTest, test_get_destination_ball_collision_kick)
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
     ASSERT_EQ(intent.getAutoChipOrKick().auto_chip_kick_mode,
               AutoChipOrKickMode::AUTOKICK);
-    EXPECT_EQ(intent.getAutoChipOrKick().autokick_speed_m_per_s, 3.2f);
+    EXPECT_EQ(intent.getAutoChipOrKick().autokick_speed_m_per_s, 3.2);
     EXPECT_EQ(intent.getFinalAngle(), Angle::quarter());
     EXPECT_EQ(intent.getDribblerMode(), DribblerMode::OFF);
     EXPECT_EQ(intent.getBallCollisionType(), BallCollisionType::AVOID);

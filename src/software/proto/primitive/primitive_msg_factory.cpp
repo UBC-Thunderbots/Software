@@ -62,17 +62,16 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     {
         move_primitive_msg->mutable_move()
             ->mutable_auto_chip_or_kick()
-            ->set_autokick_speed_m_per_s(
-                static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
-    }
-    else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
-    {
-        move_primitive_msg->mutable_move()
-            ->mutable_auto_chip_or_kick()
             ->set_autochip_distance_meters(
                 static_cast<float>(auto_chip_or_kick.autochip_distance_m));
     }
-
+    else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOKICK)
+    {
+        move_primitive_msg->mutable_move()
+            ->mutable_auto_chip_or_kick()
+            ->set_autokick_speed_m_per_s(
+                static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
+    }
     return move_primitive_msg;
 }
 
