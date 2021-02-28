@@ -92,8 +92,20 @@ if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     exit 1
 fi
 
+# Upgrade python3 pip, which some pip packages require
 echo "================================================================"
-echo "Done Installing Newer Valgrind Version"
+echo "Upgrading Pip Version"
+echo "================================================================"
+
+if ! /usr/bin/python3 -m pip install --upgrade pip ; then
+    echo "##############################################################"
+    echo "Error: Upgrading pip version failed"
+    echo "##############################################################"
+    exit 1
+fi
+
+echo "================================================================"
+echo "Done Upgrading Pip Version"
 echo "================================================================"
 
 # Install Bazel
