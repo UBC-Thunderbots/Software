@@ -15,12 +15,11 @@ MoveAction::MoveAction(bool loop_forever, double close_to_dest_threshold,
 
 void MoveAction::updateWorldParams(const World& world) {}
 
-void MoveAction::updateControlParams(const Robot& robot, Point destination,
-                                     Angle final_orientation, double final_speed,
-                                     DribblerMode dribbler_mode,
-                                     BallCollisionType ball_collision_type,
-                                     std::optional<TbotsProto::Autochipkick> autochipkick,
-                                     MaxAllowedSpeedMode max_allowed_speed_mode)
+void MoveAction::updateControlParams(
+    const Robot& robot, Point destination, Angle final_orientation, double final_speed,
+    DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
+    std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick,
+    MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     this->robot                  = robot;
     this->destination            = destination;
@@ -28,7 +27,7 @@ void MoveAction::updateControlParams(const Robot& robot, Point destination,
     this->final_speed            = final_speed;
     this->dribbler_mode          = dribbler_mode;
     this->ball_collision_type    = ball_collision_type;
-    this->autochipkick           = autochipkick;
+    this->auto_chip_or_kick      = auto_chip_or_kick;
     this->max_allowed_speed_mode = max_allowed_speed_mode;
 }
 
@@ -52,9 +51,9 @@ DribblerMode MoveAction::getDribblerMode()
     return dribbler_mode;
 }
 
-std::optional<TbotsProto::Autochipkick> MoveAction::getAutochipkick() const
+std::optional<TbotsProto::AutoChipOrKick> MoveAction::getAutoChipOrKick() const
 {
-    return autochipkick;
+    return auto_chip_or_kick;
 }
 
 bool MoveAction::robotCloseToDestination()
@@ -75,6 +74,6 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), destination, final_orientation, final_speed, dribbler_mode,
-            ball_collision_type, autochipkick, max_allowed_speed_mode));
+            ball_collision_type, auto_chip_or_kick, max_allowed_speed_mode));
     } while (robotCloseToDestination());
 }

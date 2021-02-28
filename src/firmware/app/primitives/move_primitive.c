@@ -118,18 +118,20 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     app_dribbler_setSpeed(dribbler, (uint32_t)prim_msg.dribbler_speed_rpm);
 
     Chicker_t* chicker = app_firmware_robot_getChicker(robot);
-    switch (prim_msg.autochipkick.which_autochipkick)
+    switch (prim_msg.auto_chip_or_kick.which_auto_chip_or_kick)
     {
-        case TbotsProto_Autochipkick_autochip_distance_meters_tag:
+        case TbotsProto_AutoChipOrKick_autochip_distance_meters_tag:
         {
             app_chicker_enableAutochip(
-                chicker, prim_msg.autochipkick.autochipkick.autochip_distance_meters);
+                chicker,
+                prim_msg.auto_chip_or_kick.auto_chip_or_kick.autochip_distance_meters);
             break;
         }
-        case TbotsProto_Autochipkick_autokick_speed_m_per_s_tag:
+        case TbotsProto_AutoChipOrKick_autokick_speed_m_per_s_tag:
         {
             app_chicker_enableAutokick(
-                chicker, prim_msg.autochipkick.autochipkick.autokick_speed_m_per_s);
+                chicker,
+                prim_msg.auto_chip_or_kick.auto_chip_or_kick.autokick_speed_m_per_s);
             break;
         }
     }

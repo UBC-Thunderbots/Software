@@ -38,8 +38,8 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
                                                Point(-0.5, 0), 0.01));
     EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    ASSERT_TRUE(move_action->getAutochipkick());
-    EXPECT_EQ(move_action->getAutochipkick().value().autochip_distance_meters(),
+    ASSERT_TRUE(move_action->getAutoChipOrKick());
+    EXPECT_EQ(move_action->getAutoChipOrKick().value().autochip_distance_meters(),
               DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }
 
@@ -77,8 +77,8 @@ TEST(DefenseShadowEnemyTacticTest,
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - field.friendlyGoalCenter()).orientation()),
               Angle::fromDegrees(1));
-    ASSERT_TRUE(move_action->getAutochipkick());
-    EXPECT_EQ(move_action->getAutochipkick().value().autochip_distance_meters(),
+    ASSERT_TRUE(move_action->getAutoChipOrKick());
+    EXPECT_EQ(move_action->getAutoChipOrKick().value().autochip_distance_meters(),
               DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }
 
@@ -118,7 +118,7 @@ TEST(
     EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    ASSERT_TRUE(move_action->getAutochipkick());
-    EXPECT_EQ(move_action->getAutochipkick().value().autochip_distance_meters(),
+    ASSERT_TRUE(move_action->getAutoChipOrKick());
+    EXPECT_EQ(move_action->getAutoChipOrKick().value().autochip_distance_meters(),
               DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }

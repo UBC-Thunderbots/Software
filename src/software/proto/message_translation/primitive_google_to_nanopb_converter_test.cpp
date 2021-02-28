@@ -28,7 +28,7 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
     EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
               static_cast<float>(M_PI));
     EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);
-    EXPECT_EQ(nanopb_primitive.primitive.move.autochipkick.autochipkick
+    EXPECT_EQ(nanopb_primitive.primitive.move.auto_chip_or_kick.auto_chip_or_kick
                   .autochip_distance_meters,
               2.5);
     EXPECT_EQ(nanopb_primitive.primitive.move.max_speed_m_per_s,

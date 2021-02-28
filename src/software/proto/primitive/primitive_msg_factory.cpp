@@ -1,7 +1,6 @@
 #include "software/proto/primitive/primitive_msg_factory.h"
 
 #include "software/logger/logger.h"
-
 #include "software/proto/message_translation/tbots_protobuf.h"
 
 std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(const Point &chip_origin,
@@ -42,7 +41,8 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(const Point &kick_ori
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
-    DribblerMode dribbler_mode, std::optional<TbotsProto::Autochipkick> autochipkick,
+    DribblerMode dribbler_mode,
+    std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick,
     MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
@@ -59,24 +59,25 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(
         static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
 
-    if (autochipkick)
+    if (auto_chip_or_kick)
     {
-        *(move_primitive_msg->mutable_move()->mutable_autochipkick()) = *autochipkick;
+        *(move_primitive_msg->mutable_move()->mutable_auto_chip_or_kick()) =
+            *auto_chip_or_kick;
     }
 
     return move_primitive_msg;
 }
 
-TbotsProto::Autochipkick createAutoChipCommand(double autokick_speed_m_per_s)
+TbotsProto::AutoChipOrKick createAutoChipCommand(double autokick_speed_m_per_s)
 {
-    TbotsProto::Autochipkick command;
+    TbotsProto::AutoChipOrKick command;
     command.set_autochip_distance_meters(static_cast<float>(autokick_speed_m_per_s));
     return command;
 }
 
-TbotsProto::Autochipkick createAutoKickCommand(double autochip_distance_meters)
+TbotsProto::AutoChipOrKick createAutoKickCommand(double autochip_distance_meters)
 {
-    TbotsProto::Autochipkick command;
+    TbotsProto::AutoChipOrKick command;
     command.set_autokick_speed_m_per_s(static_cast<float>(autochip_distance_meters));
     return command;
 }
@@ -131,7 +132,7 @@ double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode)
         case DribblerMode::OFF:
             return 0.0;
         default:
-            LOG(WARNING)<<"DribblerMode is invalid"<<std::endl;
+            LOG(WARNING) << "DribblerMode is invalid" << std::endl;
             return 0.0;
     }
 }
@@ -146,7 +147,7 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
         case MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         default:
-            LOG(WARNING)<<"MaxAllowedSpeedMode is invalid"<<std::endl;
+            LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;
     }
 }

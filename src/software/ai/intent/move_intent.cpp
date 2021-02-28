@@ -3,13 +3,13 @@
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &destination,
                        const Angle &final_angle, double final_speed,
                        DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
-                       std::optional<TbotsProto::Autochipkick> autochipkick,
+                       std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick,
                        MaxAllowedSpeedMode max_allowed_speed_mode)
     : NavigatingIntent(robot_id, destination, final_speed, ball_collision_type,
                        max_allowed_speed_mode),
       final_angle(final_angle),
       dribbler_mode(dribbler_mode),
-      autochipkick(autochipkick)
+      auto_chip_or_kick(auto_chip_or_kick)
 {
 }
 
@@ -33,9 +33,9 @@ const DribblerMode &MoveIntent::getDribblerMode() const
     return dribbler_mode;
 }
 
-std::optional<TbotsProto::Autochipkick> MoveIntent::getAutochipkick() const
+std::optional<TbotsProto::AutoChipOrKick> MoveIntent::getAutoChipOrKick() const
 {
-    return autochipkick;
+    return auto_chip_or_kick;
 }
 
 bool MoveIntent::operator==(const MoveIntent &other) const

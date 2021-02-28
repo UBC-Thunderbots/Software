@@ -56,14 +56,15 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
  * @param final_angle The final orientation the robot should have at the end
  * of the movement
  * @param dribbler_mode The dribbler mode
- * @param autochipkick The command to autochip or autokick
+ * @param auto_chip_or_kick The command to autochip or autokick
  * @param max_allowed_speed_mode The mode of maximum speed allowed
  *
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode, std::optional<TbotsProto::Autochipkick> autochipkick,
+    DribblerMode dribbler_mode,
+    std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick,
     MaxAllowedSpeedMode max_allowed_speed_mode);
 
 /**
@@ -73,7 +74,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  *
  * @return Pointer to Autochip command message
  */
-TbotsProto::Autochipkick createAutoChipCommand(double autochip_distance_meters);
+TbotsProto::AutoChipOrKick createAutoChipCommand(double autochip_distance_meters);
 
 /**
  * Create an Autokick command
@@ -82,7 +83,7 @@ TbotsProto::Autochipkick createAutoChipCommand(double autochip_distance_meters);
  *
  * @return Pointer to Autokick command message
  */
-TbotsProto::Autochipkick createAutoKickCommand(double autokick_speed_m_per_s);
+TbotsProto::AutoChipOrKick createAutoKickCommand(double autokick_speed_m_per_s);
 
 /**
  * Create a Spinning Move Primitive Message
@@ -98,40 +99,6 @@ TbotsProto::Autochipkick createAutoKickCommand(double autokick_speed_m_per_s);
 std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
     const Point &dest, double final_speed_meters_per_second,
     const AngularVelocity &angular_velocity, DribblerMode dribbler_mode);
-
-/**
- * Create an Autochip Move Primitive Message
- *
- * @param dest The final destination of the movement
- * @param final_speed_meters_per_second The speed at final destination
- * @param final_angle The final orientation the robot should have at the end
- * of the movement
- * @param dribbler_mode The dribbler mode
- * @param chip_distance_meters The distance between the starting location
- * of the chip and the location of the first bounce
- *
- * @return Pointer to Autochip Move Primitive Message
- */
-std::unique_ptr<TbotsProto::Primitive> createAutochipMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode, double chip_distance_meters);
-
-/**
- * Create an Autokick Move Primitive Message
- *
- * @param dest The final destination of the movement
- * @param final_speed_meters_per_second The speed at final destination
- * @param final_angle The final orientation the robot should have at the end
- * of the movement
- * @param dribbler_mode The dribbler mode
- * @param kick_speed_meters_per_second The speed of how fast the Robot
- * will kick the ball in meters per second
- *
- * @return Pointer to Autokick Move Primitive Message
- */
-std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode, double kick_speed_meters_per_second);
 
 /**
  * Create a Stop Move Primitive Message

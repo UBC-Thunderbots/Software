@@ -24,7 +24,7 @@ struct MoveFSM
         // How to navigate around the ball
         BallCollisionType ball_collision_type;
         // The command to autochip or autokick
-        std::optional<TbotsProto::Autochipkick> autochipkick;
+        std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick;
         // The maximum allowed speed mode
         MaxAllowedSpeedMode max_allowed_speed_mode;
     };

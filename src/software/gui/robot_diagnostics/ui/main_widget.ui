@@ -881,7 +881,7 @@
                  <string>Autokick</string>
                 </property>
                 <attribute name="buttonGroup">
-                 <string notr="true">buttonGroup_autochipkick</string>
+                 <string notr="true">buttonGroup_auto_chip_or_kick</string>
                 </attribute>
                </widget>
               </item>
@@ -891,17 +891,17 @@
                  <string>Autochip</string>
                 </property>
                 <attribute name="buttonGroup">
-                 <string notr="true">buttonGroup_autochipkick</string>
+                 <string notr="true">buttonGroup_auto_chip_or_kick</string>
                 </attribute>
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="radioButton_autochipkick_none">
+               <widget class="QRadioButton" name="radioButton_auto_chip_or_kick_none">
                 <property name="text">
                  <string>No Auto</string>
                 </property>
                 <attribute name="buttonGroup">
-                 <string notr="true">buttonGroup_autochipkick</string>
+                 <string notr="true">buttonGroup_auto_chip_or_kick</string>
                 </attribute>
                </widget>
               </item>
@@ -1068,7 +1068,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup_autochipkick"/>
+  <buttongroup name="buttonGroup_auto_chip_or_kick"/>
   <buttongroup name="buttonGroup_charge_state"/>
  </buttongroups>
 </ui>

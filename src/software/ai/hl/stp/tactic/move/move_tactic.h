@@ -33,13 +33,13 @@ class MoveTactic : public Tactic
      * @param final_speed The final speed the robot should have at the destination
      * @param dribbler_mode The dribbler mode
      * @param ball_collision_type how to navigate around the ball
-     * @param autochipkick The command to autochip or autokick
+     * @param auto_chip_or_kick The command to autochip or autokick
      */
     void updateControlParams(
         Point destination, Angle final_orientation, double final_speed,
-        DribblerMode dribbler_mode                           = DribblerMode::OFF,
-        BallCollisionType ball_collision_type                = BallCollisionType::AVOID,
-        std::optional<TbotsProto::Autochipkick> autochipkick = std::nullopt);
+        DribblerMode dribbler_mode            = DribblerMode::OFF,
+        BallCollisionType ball_collision_type = BallCollisionType::AVOID,
+        std::optional<TbotsProto::AutoChipOrKick> auto_chip_or_kick = std::nullopt);
 
     /**
      * Updates the params assuming that the dribbler and chicker and while avoiding the

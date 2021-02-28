@@ -36,8 +36,8 @@ TEST(AutochipMoveIntentTest, test_get_destination_ball_collision_chip)
                    BallCollisionType::AVOID, createAutoChipCommand(3.2),
                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
-    ASSERT_TRUE(intent.getAutochipkick());
-    EXPECT_EQ(intent.getAutochipkick()->autochip_distance_meters(), 3.2f);
+    ASSERT_TRUE(intent.getAutoChipOrKick());
+    EXPECT_EQ(intent.getAutoChipOrKick()->autochip_distance_meters(), 3.2f);
     EXPECT_EQ(intent.getFinalAngle(), Angle::quarter());
     EXPECT_EQ(intent.getDribblerMode(), DribblerMode::OFF);
     EXPECT_EQ(intent.getBallCollisionType(), BallCollisionType::AVOID);
@@ -59,8 +59,8 @@ TEST(MoveIntentTest, test_get_destination_ball_collision_kick)
                    BallCollisionType::AVOID, createAutoKickCommand(3.2),
                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
-    ASSERT_TRUE(intent.getAutochipkick());
-    EXPECT_EQ(intent.getAutochipkick()->autokick_speed_m_per_s(), 3.2f);
+    ASSERT_TRUE(intent.getAutoChipOrKick());
+    EXPECT_EQ(intent.getAutoChipOrKick()->autokick_speed_m_per_s(), 3.2f);
     EXPECT_EQ(intent.getFinalAngle(), Angle::quarter());
     EXPECT_EQ(intent.getDribblerMode(), DribblerMode::OFF);
     EXPECT_EQ(intent.getBallCollisionType(), BallCollisionType::AVOID);
