@@ -19,8 +19,6 @@ struct GetPossessionFSM
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
-
     /**
      * Calculates the interception point for intercepting balls
      *
@@ -30,9 +28,12 @@ struct GetPossessionFSM
      *
      * @return the best interception point
      */
+    // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
+    // evaluation folder
     static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
                                        const Field &field)
     {
+        static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
         static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
         if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
         {
@@ -42,10 +43,6 @@ struct GetPossessionFSM
                 face_ball_vector.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                            BALL_MAX_RADIUS_METERS);
             return point_in_front_of_ball;
-        }
-        if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
-        {
-            return ball.position();
         }
         Point intercept_position = ball.position();
         while (contains(field.fieldLines(), intercept_position))
