@@ -39,7 +39,6 @@ CONFIG_H = (
     '#include "shared/parameter_v2/enumerated_parameter.h"\n'
     '#include "shared/parameter_v2/numeric_parameter.h"\n'
     '#include "software/util/design_patterns/generic_factory.h"\n'
-    "class Play;"
     "\n"
     "{include_headers}\n"
     "\n"
