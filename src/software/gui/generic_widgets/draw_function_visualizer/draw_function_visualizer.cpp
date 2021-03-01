@@ -4,6 +4,9 @@
 #include "software/gui/geometry_conversion.h"
 #include "software/logger/logger.h"
 
+#include <QtWidgets/QMenu>
+#include <string>
+
 DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent)
     : ZoomableQGraphicsView(parent),
       graphics_scene(new QGraphicsScene(this)),
@@ -72,4 +75,22 @@ void DrawFunctionVisualizer::setViewArea(const Rectangle &view_area)
 {
     // Moves and scales the view to fit the view_area in the scene
     fitInView(createQRectF(view_area), Qt::KeepAspectRatio);
+}
+
+void DrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent* event)
+{
+    Point point_in_scene = createPoint(mapToScene(event->pos()));
+    auto robot_under_cursor = standalone_simulator->getRobotAtPosition(point_in_scene);
+
+    QMenu menu(this);
+    auto resetViewAction = createResetView();
+    menu.addAction("Reset View", resetViewAction);
+
+    menu.exec(event->globalPos());
+}
+
+std::function<void()> DrawFunctionVisualizer::createResetView(){
+
+    std::function func = []() { };
+    return func;
 }

@@ -39,4 +39,10 @@ class DrawFunctionVisualizer : public ZoomableQGraphicsView
     // it, so we don't have to
     QGraphicsScene* graphics_scene;
     QOpenGLWidget* open_gl_widget;
+
+    protected:
+    // Functions to be inherited by standalone_simulator_draw_function_visualizer
+    void contextMenuEvent(QContextMenuEvent *event);
+    std::function<void(void)> createResetView();
+
 };
