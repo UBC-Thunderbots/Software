@@ -1,11 +1,11 @@
 #pragma once
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "shared/proto/primitive.pb.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/navigating_intent.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/path_planner/path_planner.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/world/world.h"
 
 /**

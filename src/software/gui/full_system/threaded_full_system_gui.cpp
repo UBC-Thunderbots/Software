@@ -3,8 +3,8 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
 
-#include "software/gui/drawing/world.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "software/gui/drawing/world.h"
 
 ThreadedFullSystemGUI::ThreadedFullSystemGUI(
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)

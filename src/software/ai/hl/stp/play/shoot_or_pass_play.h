@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
@@ -7,7 +8,6 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 /**
  * Play that tries to find a shot on net, passes if it couldn't.

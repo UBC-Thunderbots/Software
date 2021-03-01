@@ -11,10 +11,7 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
 
-CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
-: Play(config)
-{
-}
+CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {

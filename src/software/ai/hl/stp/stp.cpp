@@ -8,6 +8,7 @@
 #include <exception>
 #include <random>
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
@@ -15,7 +16,6 @@
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/util/typename/typename.h"
 

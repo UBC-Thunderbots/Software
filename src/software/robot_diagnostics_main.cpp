@@ -2,10 +2,10 @@
 #include <iostream>
 #include <numeric>
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/backend/backend.h"
 #include "software/gui/robot_diagnostics/threaded_robot_diagnostics_gui.h"
 #include "software/logger/logger.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 int main(int argc, char **argv)

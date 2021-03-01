@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/shoot_or_pass_play.h"
 
 #include "shared/constants.h"
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
@@ -10,11 +11,9 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/logger/logger.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config)
+ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config) : Play(config)
 {
 }
 

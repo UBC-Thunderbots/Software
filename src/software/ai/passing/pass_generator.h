@@ -4,11 +4,11 @@
 #include <random>
 #include <thread>
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/optimization/gradient_descent_optimizer.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 

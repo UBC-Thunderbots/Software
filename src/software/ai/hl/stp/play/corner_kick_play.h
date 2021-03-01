@@ -1,9 +1,9 @@
 #pragma once
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 /**
  * A Play for Corner Kicks
@@ -24,7 +24,6 @@ class CornerKickPlay : public Play
     static constexpr double BALL_IN_CORNER_RADIUS = 0.5;
 
    private:
-
     /**
      * Update the tactic that aligns the robot to the ball in preparation to pass
      *

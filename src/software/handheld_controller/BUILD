@@ -22,10 +22,10 @@ cc_library(
     hdrs = ["controller.h"],
     deps = [
         ":controller_input",
+        "//shared/parameter_v2:cpp_configs",
         "//software/logger",
         "//software/math:math_functions",
         "//software/multithreading:subject",
-        "//shared/parameter_v2:cpp_configs",
     ],
 )
 

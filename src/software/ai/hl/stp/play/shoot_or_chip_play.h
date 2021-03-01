@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/play/play.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/play/play.h"
 
 /**
  * The Defense Play tries to grab the ball from the enemy that has it, and all other
@@ -21,5 +21,4 @@ class ShootOrChipPlay : public Play
    private:
     // The minimum open net angle we will try to shoot at
     const Angle MIN_OPEN_ANGLE_FOR_SHOT;
-
 };

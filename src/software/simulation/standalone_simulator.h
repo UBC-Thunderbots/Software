@@ -1,9 +1,9 @@
 #pragma once
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/proto/defending_side_msg.pb.h"
 #include "software/simulation/threaded_simulator.h"
 

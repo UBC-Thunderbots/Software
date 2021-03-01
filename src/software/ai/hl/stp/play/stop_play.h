@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/play/play.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/play/play.h"
 
 /**
  * This Play moves our robots in a formation while keeping them at least 0.5m from the
@@ -18,5 +18,4 @@ class StopPlay : public Play
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
-
 };

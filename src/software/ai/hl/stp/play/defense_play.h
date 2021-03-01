@@ -1,8 +1,8 @@
 #pragma once
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 /**
  * The Defense Play tries to grab the ball from the enemy that has it, and all other

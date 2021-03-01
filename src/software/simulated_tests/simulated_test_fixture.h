@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
 #include "software/simulation/simulator.h"
-#include "software/ai/hl/stp/play/halt_play.h"
 
 /**
  * This is a test fixture designed to make it easy to write integration tests. It provides

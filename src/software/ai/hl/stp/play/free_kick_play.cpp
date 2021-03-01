@@ -13,7 +13,7 @@
 #include "software/world/ball.h"
 
 FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)), Play(config)
+    : Play(config), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
 }
 

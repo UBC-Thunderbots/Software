@@ -4,11 +4,11 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
-#include "software/gui/generic_widgets/slider/slider.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "shared/parameter_v2/enumerated_parameter.h"
 #include "shared/parameter_v2/numeric_parameter.h"
 #include "shared/parameter_v2/parameter.h"
+#include "software/gui/generic_widgets/slider/slider.h"
 
 /**
  * This widget displays all our DynamicParameters and allows the user to

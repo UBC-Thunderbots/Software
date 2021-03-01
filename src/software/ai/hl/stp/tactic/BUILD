@@ -64,12 +64,12 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter_v2:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:autochip_move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom/algorithms",
         "//software/logger",
-        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -92,12 +92,12 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter_v2:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:autochip_move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/logger",
-        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -118,6 +118,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter_v2:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:autochip_move_action",
         "//software/ai/hl/stp/action:chip_action",
@@ -125,7 +126,6 @@ cc_library(
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
-        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -255,11 +255,11 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter_v2:cpp_configs",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom/algorithms",
         "//software/logger",
-        "//shared/parameter_v2:cpp_configs",
     ],
 )
 
@@ -280,13 +280,13 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter_v2:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:intercept_ball_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/logger",
-        "//shared/parameter_v2:cpp_configs",
     ],
 )
 

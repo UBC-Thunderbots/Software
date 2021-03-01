@@ -56,8 +56,8 @@ cc_library(
     srcs = ["simulated_test_main.cpp"],
     deps = [
         ":simulated_test_fixture",
-        "//software/logger",
         "//shared/parameter_v2:cpp_configs",
+        "//software/logger",
         "@gtest",
     ],
 )

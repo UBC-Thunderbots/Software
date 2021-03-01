@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/find_open_areas.h"
 
-#include "software/geom/algorithms/find_open_circles.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "software/geom/algorithms/find_open_circles.h"
 
 std::vector<Circle> findGoodChipTargets(const World& world)
 {

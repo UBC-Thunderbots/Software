@@ -6,8 +6,8 @@
 #include <random>
 
 #include "shared/constants.h"
-#include "software/math/math_functions.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "software/math/math_functions.h"
 #include "software/test_util/test_util.h"
 
 class PassingEvaluationTest : public testing::Test

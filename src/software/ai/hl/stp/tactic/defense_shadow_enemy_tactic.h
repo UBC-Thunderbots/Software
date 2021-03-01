@@ -1,8 +1,8 @@
 #pragma once
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 /**
  * The ShadowEnemyTactic will shadow and mark the robot specified in the given

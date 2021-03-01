@@ -7,9 +7,9 @@
 #include <atomic>
 #include <thread>
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/handheld_controller/controller_input.h"
 #include "software/multithreading/subject.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 /**
  * Abstracts any handheld game controller, like an XBox or Playstation controller.

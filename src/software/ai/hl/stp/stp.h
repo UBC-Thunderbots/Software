@@ -2,10 +2,10 @@
 
 #include <random>
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/ai/hl/hl.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/intent/intent.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 
 /**
  * The STP module is an implementation of the high-level logic Abstract class, that

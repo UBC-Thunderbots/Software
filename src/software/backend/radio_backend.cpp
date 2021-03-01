@@ -1,8 +1,8 @@
 #include "software/backend/radio_backend.h"
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/backend/radio/robot_status.h"
 #include "software/constants.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 RadioBackend::RadioBackend(std::shared_ptr<const BackendConfig> config)

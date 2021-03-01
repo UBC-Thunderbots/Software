@@ -42,10 +42,10 @@ class STPTest : public ::testing::Test
         world = ::TestUtil::createBlankTestingWorld();
     }
 
-    STP stp;
     World world = ::TestUtil::createBlankTestingWorld();
-    std::shared_ptr<const AiControlConfig> ai_control_config;
     std::shared_ptr<AiControlConfig> mutable_ai_control_config;
+    std::shared_ptr<const AiControlConfig> ai_control_config;
+    STP stp;
 };
 
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)

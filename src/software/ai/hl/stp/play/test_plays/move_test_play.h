@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/play/play.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/play/play.h"
 
 /**
  * A test Play that moves a robot to the friendly goal, a robot to the enemy goal, and

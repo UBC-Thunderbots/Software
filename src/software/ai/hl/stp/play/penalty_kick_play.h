@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/play/play.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/play/play.h"
 
 /**
  * Play for shooting penalty kicks

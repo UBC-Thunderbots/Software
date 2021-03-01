@@ -5,8 +5,8 @@
 #include <memory>
 #include <vector>
 
-#include "software/ai/hl/stp/tactic/tactic.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
