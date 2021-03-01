@@ -11,6 +11,16 @@ def generate_heatmap(
     grid_size: float,
     heatmap_function: Callable[[float, float], float],
 ) -> np.ndarray:
+    """
+    Generate a heatmap by creating a grid where each grid cell has grid_size length and width
+    and contains the value of the heatmap function called at its position.
+
+    :param x_bounds: the x-axis boundaries of the heatmap
+    :param y_bounds: the y-axis boundaries of the heatmapo
+    :param grid_size: the size of one grid cell on the heatmap
+    :param heatmap_function: the function to generate the heatmap
+    :return: a heatmap
+    """
     grid_dims = (
         int((max(x_bounds) - min(x_bounds)) // grid_size),
         int((max(y_bounds) - min(y_bounds)) // grid_size),
@@ -37,6 +47,15 @@ class HeatmapPlotter:
         grid_size: float,
         legend_label: str,
     ):
+        """
+        Creates a HeatmapPlotter for the given figure, with the given x-axis and y-axis bounds and
+        grid cell size. This will show up in the Bokeh figure legend as legend_label.
+        :param fig: a Bokeh figure
+        :param x_bounds: the x-axis bounds of the heatmap
+        :param y_bounds: the y-axis bounds of the heatmap
+        :param grid_size: the size of a grid cell on the heatmap
+        :param legend_label: the legend label of the heatmap
+        """
         self.image_data_source = ColumnDataSource(dict(image=[]))
         self.x_bounds = x_bounds
         self.y_bounds = y_bounds
@@ -54,6 +73,10 @@ class HeatmapPlotter:
         )
 
     def plot_heatmap(self, heatmap_function: Callable[[float, float], float]):
+        """
+        Plot a heatmap for the given function.
+        :param heatmap_function: a function to evaluate on a grid to generate a heatmap
+        """
         heatmap = generate_heatmap(
             self.x_bounds, self.y_bounds, self.grid_size, heatmap_function
         )

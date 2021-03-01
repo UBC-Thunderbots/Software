@@ -5,9 +5,20 @@
 
 #include "software/parameter/config.h"
 
-namespace py = pybind11;
-
+/**
+ * Update a dynamic parameters config from a pybind11 dictionary, assigning the values
+ * with a key corresponding to the name of a parameter, to that parameter.
+ *
+ * @param config a DynamicParameters config
+ * @param config_update_dict a dict to update the config from
+ */
 void updateDynamicParametersConfigFromDict(std::shared_ptr<Config> config,
-                                           const py::dict& config_update_dict);
+                                           const pybind11::dict& config_update_dict);
 
-py::dict copyDynamicParametersConfigToDict(const std::shared_ptr<const Config> config);
+/**
+ * Copy all the parameter names and values from a DynamicParameters config to a pybind11
+ * dict.
+ * @param config a DynamicParameters config
+ * @return a pybind11 dict containing the names and values of parameters.
+ */
+pybind11::dict copyDynamicParametersConfigToDict(std::shared_ptr<const Config> config);

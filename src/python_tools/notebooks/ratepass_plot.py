@@ -51,6 +51,18 @@ ssl_wrapper_plotter = SSLWrapperPlotter(fig)
 ratepass_heatmap_plotter = HeatmapPlotter(
     fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePass"
 )
+ratepassenemy_heatmap_plotter = HeatmapPlotter(
+    fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePassEnemyRisk"
+)
+ratepassfriendly_heatmap_plotter = HeatmapPlotter(
+    fig,
+    heatmap_x_bounds,
+    heatmap_y_bounds,
+    heatmap_grid_size,
+    "ratePassFriendlyCapability",
+)
+
+fig.legend.click_policy = "hide"
 
 heatmap_grid_size = 0.05
 
@@ -63,7 +75,17 @@ def plot_ssl_wrapper_at_idx(idx):
 
     the_world = world.World(wrapper_proto_log[idx].SerializeToString(), dict())
 
-    def pass_cost(x, y):
+    def ratepass_cost(x, y):
+        receiver_point = world.Point(x, y)
+        pass_dict = {
+            "passer_point": world.Point(4, 2),
+            "receiver_point": receiver_point,
+            "pass_speed": 5.0,
+            "receive_and_dribble": False,
+        }
+        return passing.ratePass(the_world, pass_dict)
+
+    def ratepassenemyrisk_cost(x, y):
         receiver_point = world.Point(x, y)
         pass_dict = {
             "passer_point": world.Point(4, 2),
@@ -73,7 +95,19 @@ def plot_ssl_wrapper_at_idx(idx):
         }
         return passing.ratePassEnemyRisk(the_world, pass_dict)
 
-    ratepass_heatmap_plotter.plot_heatmap(pass_cost)
+    def ratepassfriendly_cost(x, y):
+        receiver_point = world.Point(x, y)
+        pass_dict = {
+            "passer_point": world.Point(4, 2),
+            "receiver_point": receiver_point,
+            "pass_speed": 5.0,
+            "receive_and_dribble": False,
+        }
+        return passing.ratePassFriendlyCapability(the_world, pass_dict)
+
+    ratepass_heatmap_plotter.plot_heatmap(ratepass_cost)
+    ratepassenemy_heatmap_plotter.plot_heatmap(ratepassenemyrisk_cost)
+    ratepassfriendly_heatmap_plotter.plot_heatmap(ratepassfriendly_cost)
     push_notebook()
 
 

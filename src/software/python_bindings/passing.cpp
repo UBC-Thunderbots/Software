@@ -22,6 +22,7 @@ py::dict getPassingConfig()
 
 Pass createPassFromDict(py::dict pass_dict, Timestamp pass_start_time)
 {
+    // unpack values from the py::dict and put them into a pass
     Point passer_point = pass_dict["passer_point"].cast<Point>();
     Point receiver_point(pass_dict["receiver_point"].cast<Point>());
     auto pass_speed = pass_dict["pass_speed"].cast<double>();

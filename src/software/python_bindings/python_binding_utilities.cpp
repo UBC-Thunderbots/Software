@@ -2,6 +2,8 @@
 
 #include "software/util/variant_visitor/variant_visitor.h"
 
+namespace py = pybind11;
+
 template <typename ParamValueType>
 void setParameterValueFromDictIfExists(std::shared_ptr<Parameter<ParamValueType>> param,
                                        const py::dict& config_update_dict)
