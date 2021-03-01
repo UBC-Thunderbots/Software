@@ -7,11 +7,6 @@
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
 #include "software/simulation/simulator.h"
-
-// We need this include here for now so that the HaltPlay gets registered in the generic
-// factory, and the current_ai_play param doesn't complain that its been constructed w/ an
-// invalid default value
-// TODO (#1889) Remove this after optional params are implemented
 #include "software/ai/hl/stp/play/halt_play.h"
 
 /**

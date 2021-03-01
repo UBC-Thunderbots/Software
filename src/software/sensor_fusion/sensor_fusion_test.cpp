@@ -746,10 +746,6 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
 {
-    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
-    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
-    config->getMutableFriendlyGoalieId()->setValue(0);
-    config->getMutableEnemyGoalieId()->setValue(0);
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());

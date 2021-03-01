@@ -10,7 +10,7 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)
-    : play_config(config)
+    : Play(config)
 {
 }
 

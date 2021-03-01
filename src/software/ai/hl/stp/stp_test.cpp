@@ -5,17 +5,23 @@
 #include <algorithm>
 #include <exception>
 
+#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
 #include "software/test_util/test_util.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 class STPTest : public ::testing::Test
 {
    public:
-    STPTest() : stp([]() { return nullptr; }, ai_control_config, 0) {}
+    STPTest()
+        : mutable_ai_control_config(std::make_shared<AiControlConfig>()),
+          ai_control_config(
+              std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config)),
+          stp([]() { return nullptr; }, ai_control_config, 0)
+    {
+    }
 
    protected:
     void SetUp() override

@@ -267,6 +267,7 @@ cc_library(
     srcs = ["play.cpp"],
     hdrs = ["play.h"],
     deps = [
+        "//shared/parameter_v2:cpp_configs",
         "//software/ai/hl/stp/tactic",
         "@boost//:coroutine2",
     ],

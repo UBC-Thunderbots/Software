@@ -6,9 +6,9 @@
 
 #include "software/gui/generic_widgets/slider/slider.h"
 #include "shared/parameter_v2/cpp_dynamic_parameters.h"
-#include "software/parameter/enumerated_parameter.h"
-#include "software/parameter/numeric_parameter.h"
-#include "software/parameter/parameter.h"
+#include "shared/parameter_v2/enumerated_parameter.h"
+#include "shared/parameter_v2/numeric_parameter.h"
+#include "shared/parameter_v2/parameter.h"
 
 /**
  * This widget displays all our DynamicParameters and allows the user to

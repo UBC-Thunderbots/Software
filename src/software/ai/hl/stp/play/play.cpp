@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/play.h"
 
-Play::Play() : tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)) {}
+Play::Play(std::shared_ptr<const PlayConfig> play_config) : play_config(play_config), tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1))  {}
 
 bool Play::done() const
 {

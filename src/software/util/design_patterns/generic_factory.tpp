@@ -1,4 +1,5 @@
 #include "software/util/design_patterns/generic_factory.h"
+#include <stdexcept>
 
 template <class IndexType, class TypeToCreate, class ConfigType>
 GenericRegistry<IndexType, TypeToCreate, ConfigType>&
@@ -20,11 +21,9 @@ std::vector<std::string>
 GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegisteredNames()
 {
     std::vector<std::string> names;
+    auto registry = GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegistry();
 
-    for (auto iter =
-             GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegistry().begin();
-         iter != GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegistry().end();
-         iter++)
+    for (auto iter = registry.begin(); iter != registry.end(); iter++)
     {
         names.emplace_back(iter->first);
     }
@@ -39,9 +38,9 @@ GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegisteredConstructors()
     std::vector<
         std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>
         constructors;
+    auto registry = GenericFactory::getRegistry();
 
-    for (auto iter = GenericFactory::getRegistry().begin();
-         iter != GenericFactory::getRegistry().end(); iter++)
+    for (auto iter = registry.begin(); iter != registry.end(); iter++)
     {
         constructors.emplace_back(iter->second);
     }

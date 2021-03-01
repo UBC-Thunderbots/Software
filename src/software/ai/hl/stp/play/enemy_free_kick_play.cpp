@@ -11,8 +11,7 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config)
-    : play_config(config)
+EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config) : Play(config)
 {
 }
 

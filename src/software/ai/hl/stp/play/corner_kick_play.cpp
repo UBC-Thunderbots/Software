@@ -12,7 +12,7 @@
 #include "software/world/ball.h"
 
 CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
-    : play_config(config)
+: Play(config)
 {
 }
 

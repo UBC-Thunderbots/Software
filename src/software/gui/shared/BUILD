@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["parameters_spinbox.h"],
     deps = [
         "//software/logger",
-        "//software/parameter",
+        "//shared/parameter_v2:parameter",
         "//shared/parameter_v2:cpp_configs",
         "//software/util/variant_visitor",
         "@qt//:qt_widgets",

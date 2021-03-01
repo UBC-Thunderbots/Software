@@ -1,8 +1,8 @@
 #include <QtWidgets/QSpinBox>
 #include <memory>
 
-#include "software/parameter/numeric_parameter.h"
-#include "software/parameter/parameter.h"
+#include "shared/parameter_v2/parameter.h"
+#include "shared/parameter_v2/numeric_parameter.h"
 
 void setupSpinBox(QSpinBox* spin_box, std::shared_ptr<NumericParameter<int>>& parameter)
 {

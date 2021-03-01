@@ -3,7 +3,7 @@
 #include <QtWidgets/QSpinBox>
 #include <memory>
 
-#include "software/parameter/parameter.h"
+#include "shared/parameter_v2/parameter.h"
 
 /**
  * Helper function for setting the value of the spinbox
