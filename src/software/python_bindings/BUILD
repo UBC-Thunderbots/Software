@@ -2,6 +2,11 @@ package(default_visibility = ["//visibility:public"])
 
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
+PYBIND_DEPS = [
+    "@local_config_python//:python_headers",
+    "@pybind11",
+]
+
 cc_library(
     name = "python_binding_utilities",
     srcs = [
@@ -13,9 +18,7 @@ cc_library(
     deps = [
         "//software/parameter:config",
         "//software/util/variant_visitor",
-        "@local_config_python//:python_headers",
-        "@pybind11",
-    ],
+    ] + PYBIND_DEPS,
 )
 
 cc_library(
@@ -33,9 +36,7 @@ cc_library(
         "//software/proto:sensor_msg_cc_proto",
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion",
-        "@local_config_python//:python_headers",
-        "@pybind11",
-    ],
+    ] + PYBIND_DEPS,
 )
 
 pybind_extension(
@@ -66,9 +67,7 @@ cc_library(
         "//software/world:ball",
         "//software/world:field",
         "//software/world:robot",
-        "@local_config_python//:python_headers",
-        "@pybind11",
-    ],
+    ] + PYBIND_DEPS,
 )
 
 pybind_extension(
