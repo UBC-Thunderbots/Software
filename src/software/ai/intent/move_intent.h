@@ -15,11 +15,14 @@ class MoveIntent : public NavigatingIntent
      * destination
      * @param dribbler_mode Dribbler mode
      * @param ball_collision_type how to navigate around the ball
+     * @param auto_chip_or_kick The command to autochip or autokick
+     * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
-                        DribblerMode dribbler_mode,
-                        BallCollisionType ball_collision_type);
+                        DribblerMode dribbler_mode, BallCollisionType ball_collision_type,
+                        AutoChipOrKick auto_chip_or_kick,
+                        MaxAllowedSpeedMode max_allowed_speed_mode);
 
     MoveIntent() = delete;
 
@@ -39,6 +42,13 @@ class MoveIntent : public NavigatingIntent
      * @return dribbler mode
      */
     const DribblerMode& getDribblerMode() const;
+
+    /**
+     * Gets the AutoChipOrKick for this move intent
+     *
+     * @return the chip kick command
+     */
+    AutoChipOrKick getAutoChipOrKick() const;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
@@ -62,4 +72,5 @@ class MoveIntent : public NavigatingIntent
    private:
     Angle final_angle;
     DribblerMode dribbler_mode;
+    AutoChipOrKick auto_chip_or_kick;
 };

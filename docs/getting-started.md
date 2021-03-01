@@ -23,7 +23,7 @@
 * [Building and Running the Code](#building-and-running-the-code)
    * [Building from the command-line](#building-from-the-command-line)
    * [Building with CLion](#building-with-clion)
-   * [Running our AI, Simulator, or Robot Diagnostics](#running-our-ai-simulator-or-robot-diagnostics)
+   * [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
    * [Running AI vs AI](#running-ai-vs-ai)
 * [Debugging](#debugging)
    * [Debugging with CLion](#debugging-with-clion)
@@ -189,7 +189,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 7. Run our SimulatedTacticTests in the visualizer: `bazel test //software/ai/hl/stp/tactic:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/tactic:[some_target_here] -- --enable_visualizer`
     - This will launch the visualizer and simulate AI Tactic on a single robot
 
-** NOTE: If we want to run SimulatedTests with the AI initially stopped, then use the `--stop_ai_on_start` flag ** 
+** NOTE: If you want to run SimulatedTests with the AI initially stopped, then use the `--stop_ai_on_start` flag ** 
 
 ### Running AI vs AI
 1. Open your terminal, `cd` into `Software/src`

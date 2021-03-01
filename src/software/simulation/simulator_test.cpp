@@ -317,9 +317,10 @@ TEST_F(SimulatorTest, simulate_single_yellow_robot_with_primitive)
     };
     simulator->addYellowRobots(states);
 
-    simulator->setYellowRobotPrimitive(
-        1, createNanoPbPrimitive(
-               *createMovePrimitive(Point(1, 0), 0.0, Angle::zero(), DribblerMode::OFF)));
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createMovePrimitive(
+               Point(1, 0), 0.0, Angle::zero(), DribblerMode::OFF,
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -382,7 +383,9 @@ TEST_F(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_negati
 
     simulator->setBlueRobotPrimitive(
         1, createNanoPbPrimitive(
-               *createMovePrimitive(Point(1, 0), 0.0, Angle::zero(), DribblerMode::OFF)));
+               *createMovePrimitive(Point(1, 0), 0.0, Angle::zero(), DribblerMode::OFF,
+                                    AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                                    MaxAllowedSpeedMode::PHYSICAL_LIMIT)));
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -418,9 +421,16 @@ TEST_F(SimulatorTest, simulate_single_blue_robot_with_primitive_defending_positi
     };
     simulator->addBlueRobots(states);
 
+<<<<<<< HEAD
     simulator->setBlueRobotPrimitive(
         1, createNanoPbPrimitive(*createMovePrimitive(Point(1, -0.5), 0.0, Angle::zero(),
                                                       DribblerMode::OFF)));
+=======
+    simulator.setBlueRobotPrimitive(
+        1, createNanoPbPrimitive(*createMovePrimitive(
+               Point(1, -0.5), 0.0, Angle::zero(), DribblerMode::OFF,
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT)));
+>>>>>>> 7a67956c2eaff949b0b11fa24426114f40cbf9f0
 
     for (unsigned int i = 0; i < 240; i++)
     {
@@ -460,9 +470,16 @@ TEST_F(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_nega
     };
     simulator->addYellowRobots(states);
 
+<<<<<<< HEAD
     simulator->setYellowRobotPrimitive(
         1, createNanoPbPrimitive(
                *createMovePrimitive(Point(1, 0), 0.0, Angle::zero(), DribblerMode::OFF)));
+=======
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createMovePrimitive(
+               Point(1, 0), 0.0, Angle::zero(), DribblerMode::OFF,
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT)));
+>>>>>>> 7a67956c2eaff949b0b11fa24426114f40cbf9f0
 
     for (unsigned int i = 0; i < 120; i++)
     {
@@ -498,9 +515,16 @@ TEST_F(SimulatorTest, simulate_single_yellow_robot_with_primitive_defending_posi
     };
     simulator->addYellowRobots(states);
 
+<<<<<<< HEAD
     simulator->setYellowRobotPrimitive(
         1, createNanoPbPrimitive(*createMovePrimitive(Point(1, -0.5), 0.0, Angle::zero(),
                                                       DribblerMode::OFF)));
+=======
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createMovePrimitive(
+               Point(1, -0.5), 0.0, Angle::zero(), DribblerMode::OFF,
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT)));
+>>>>>>> 7a67956c2eaff949b0b11fa24426114f40cbf9f0
 
     for (unsigned int i = 0; i < 240; i++)
     {
@@ -549,6 +573,7 @@ TEST_F(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     };
     simulator->addYellowRobots(yellow_robot_states);
 
+<<<<<<< HEAD
     simulator->setBlueRobotPrimitive(
         1, createNanoPbPrimitive(*createMovePrimitive(Point(-1, -1), 0.0, Angle::zero(),
                                                       DribblerMode::OFF)));
@@ -562,6 +587,25 @@ TEST_F(SimulatorTest, simulate_multiple_blue_and_yellow_robots_with_primitives)
     simulator->setYellowRobotPrimitive(
         2, createNanoPbPrimitive(*createMovePrimitive(Point(3, -2), 0.0, Angle::zero(),
                                                       DribblerMode::OFF)));
+=======
+    simulator.setBlueRobotPrimitive(
+        1, createNanoPbPrimitive(*createMovePrimitive(
+               Point(-1, -1), 0.0, Angle::zero(), DribblerMode::OFF,
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT)));
+    simulator.setBlueRobotPrimitive(
+        2, createNanoPbPrimitive(*createMovePrimitive(
+               Point(-3, 0), 0.0, Angle::half(), DribblerMode::OFF,
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT)));
+
+    simulator.setYellowRobotPrimitive(
+        1, createNanoPbPrimitive(*createMovePrimitive(
+               Point(1, 1), 0.0, Angle::zero(), DribblerMode::OFF,
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT)));
+    simulator.setYellowRobotPrimitive(
+        2, createNanoPbPrimitive(*createMovePrimitive(
+               Point(3, -2), 0.0, Angle::zero(), DribblerMode::OFF,
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT)));
+>>>>>>> 7a67956c2eaff949b0b11fa24426114f40cbf9f0
 
     for (unsigned int i = 0; i < 120; i++)
     {

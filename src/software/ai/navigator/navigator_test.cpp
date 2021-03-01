@@ -196,15 +196,17 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(
-        0, poi, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID));
+        0, poi, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive =
-        *createMovePrimitive(poi, 0, Angle::zero(), DribblerMode::OFF);
+    auto expected_primitive = *createMovePrimitive(
+        poi, 0, Angle::zero(), DribblerMode::OFF,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -234,7 +236,8 @@ TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID));
+        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 

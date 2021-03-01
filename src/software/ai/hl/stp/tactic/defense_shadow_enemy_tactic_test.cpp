@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/action/autochip_move_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/test_util/test_util.h"
 
 class DefenseShadowEnemyTacticTest : public ::testing::Test
@@ -46,13 +46,15 @@ TEST_F(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_
 
     ASSERT_TRUE(action_ptr);
 
-    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
-    ASSERT_NE(autochip_move_action, nullptr);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(move_action, nullptr);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
                                                Point(-0.5, 0), 0.01));
-    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(Angle::zero()),
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(Angle::zero()),
               Angle::fromDegrees(1));
-    EXPECT_EQ(autochip_move_action->getChipDistance(),
+    ASSERT_TRUE(move_action->getAutoChipOrKick().auto_chip_kick_mode ==
+                AutoChipOrKickMode::AUTOCHIP);
+    EXPECT_EQ(move_action->getAutoChipOrKick().autochip_distance_m,
               DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }
 
@@ -85,14 +87,16 @@ TEST_F(
 
     ASSERT_TRUE(action_ptr);
 
-    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
-    ASSERT_NE(autochip_move_action, nullptr);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(move_action, nullptr);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
                                                ball.position(), 0.01));
-    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - field.friendlyGoalCenter()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_EQ(autochip_move_action->getChipDistance(),
+    ASSERT_TRUE(move_action->getAutoChipOrKick().auto_chip_kick_mode ==
+                AutoChipOrKickMode::AUTOCHIP);
+    EXPECT_EQ(move_action->getAutoChipOrKick().autochip_distance_m,
               DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }
 
@@ -126,13 +130,15 @@ TEST_F(
 
     ASSERT_TRUE(action_ptr);
 
-    auto autochip_move_action = std::dynamic_pointer_cast<AutochipMoveAction>(action_ptr);
-    ASSERT_NE(autochip_move_action, nullptr);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(autochip_move_action->getDestination(),
+    auto move_action = std::dynamic_pointer_cast<MoveAction>(action_ptr);
+    ASSERT_NE(move_action, nullptr);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(move_action->getDestination(),
                                                Point(-0.5, 0), 0.01));
-    EXPECT_LT(autochip_move_action->getFinalOrientation().minDiff(
+    EXPECT_LT(move_action->getFinalOrientation().minDiff(
                   (enemy_robot.position() - friendly_robot.position()).orientation()),
               Angle::fromDegrees(1));
-    EXPECT_EQ(autochip_move_action->getChipDistance(),
+    ASSERT_TRUE(move_action->getAutoChipOrKick().auto_chip_kick_mode ==
+                AutoChipOrKickMode::AUTOCHIP);
+    EXPECT_EQ(move_action->getAutoChipOrKick().autochip_distance_m,
               DefenseShadowEnemyTactic::YEET_CHIP_DISTANCE_METERS);
 }

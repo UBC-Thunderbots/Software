@@ -62,8 +62,6 @@ class Navigator : public IntentVisitor
      */
     void visit(const DirectPrimitiveIntent &intent) override;
     void visit(const MoveIntent &intent) override;
-    void visit(const AutochipMoveIntent &intent) override;
-    void visit(const AutokickMoveIntent &intent) override;
 
    private:
     /**
