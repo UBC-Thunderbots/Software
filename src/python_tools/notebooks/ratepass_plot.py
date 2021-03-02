@@ -22,8 +22,7 @@ from software.python_bindings import world, passing
 import numpy as np
 
 wrapper_proto_log = ProtoLog(
-    "/home/jordan/log_ssl_wrapper_filtered_world_test/SensorFusion_SSL_WrapperPacket",
-    SSL_WrapperPacket,
+    "test_data/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
 )
 # -
 

@@ -14,7 +14,9 @@ class NotebooksTestCase(unittest.TestCase):
         for notebook in glob.glob(os.path.join(notebooks_dir, "*.py"), recursive=False):
             notebook_path = os.path.join(notebooks_dir, notebook)
             print(f"Found notebook {notebook_path}")
-            subprocess.check_call([sys.executable, "-m", "IPython", notebook_path])
+            subprocess.check_call(
+                [sys.executable, "-m", "IPython", notebook_path], cwd=notebooks_dir
+            )
 
 
 if __name__ == "__main__":
