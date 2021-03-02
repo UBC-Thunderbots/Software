@@ -78,8 +78,8 @@ cc_test(
     deps = [
         ":firmware_robot",
         "//firmware/app/logger",
+        "//shared/test_util",
         "//software/logger",
-        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

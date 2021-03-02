@@ -27,16 +27,6 @@ void Navigator::visit(const MoveIntent &intent)
     navigating_intents.push_back(std::make_shared<MoveIntent>(intent));
 }
 
-void Navigator::visit(const AutochipMoveIntent &intent)
-{
-    navigating_intents.push_back(std::make_shared<AutochipMoveIntent>(intent));
-}
-
-void Navigator::visit(const AutokickMoveIntent &intent)
-{
-    navigating_intents.push_back(std::make_shared<AutokickMoveIntent>(intent));
-}
-
 std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &intents)
 {
