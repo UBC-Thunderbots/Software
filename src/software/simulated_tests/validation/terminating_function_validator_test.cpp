@@ -10,8 +10,9 @@
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_does_nothing_reports_success)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {};
+    TerminatingValidationFunction validation_function =
+        [](std::shared_ptr<World> world,
+           TerminatingValidationCoroutine::push_type& yield) {};
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
@@ -22,13 +23,14 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_has_code_but_does_not_yield_reports_success)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        int foo = 0;
-        int bar = 3;
-        int baz = foo + bar;
-        baz++;
-    };
+    TerminatingValidationFunction validation_function =
+        [](std::shared_ptr<World> world,
+           TerminatingValidationCoroutine::push_type& yield) {
+            int foo = 0;
+            int bar = 3;
+            int baz = foo + bar;
+            baz++;
+        };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
@@ -39,10 +41,9 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_yields_once_succeeds_on_the_second_execution)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        yield();
-    };
+    TerminatingValidationFunction validation_function =
+        [](std::shared_ptr<World> world,
+           TerminatingValidationCoroutine::push_type& yield) { yield(""); };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
@@ -55,14 +56,15 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_that_yields_five_time_succeeds_on_the_sixth_execution)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        yield();
-        yield();
-        yield();
-        yield();
-        yield();
-    };
+    TerminatingValidationFunction validation_function =
+        [](std::shared_ptr<World> world,
+           TerminatingValidationCoroutine::push_type& yield) {
+            yield("");
+            yield("");
+            yield("");
+            yield("");
+            yield("");
+        };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
@@ -80,12 +82,13 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_with_early_return_reports_success_after_return)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        yield();
-        return;
-        yield();
-    };
+    TerminatingValidationFunction validation_function =
+        [](std::shared_ptr<World> world,
+           TerminatingValidationCoroutine::push_type& yield) {
+            yield("");
+            return;
+            yield("");
+        };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
@@ -100,13 +103,14 @@ TEST(TerminatingFunctionValidatorTest,
 TEST(TerminatingFunctionValidatorTest,
      test_validation_function_with_single_loop_succeeds_after_loop_termination)
 {
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        while (world->ball().position().x() < 0)
-        {
-            yield();
-        }
-    };
+    TerminatingValidationFunction validation_function =
+        [](std::shared_ptr<World> world,
+           TerminatingValidationCoroutine::push_type& yield) {
+            while (world->ball().position().x() < 0)
+            {
+                yield("");
+            }
+        };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
@@ -132,18 +136,19 @@ TEST(TerminatingFunctionValidatorTest,
 {
     // This validation function will only pass if the ball's x-coordinate becomes positive
     // before the ball's y-coordinate becomes positive
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        while (world->ball().position().x() < 0)
-        {
-            yield();
-        }
+    TerminatingValidationFunction validation_function =
+        [](std::shared_ptr<World> world,
+           TerminatingValidationCoroutine::push_type& yield) {
+            while (world->ball().position().x() < 0)
+            {
+                yield("");
+            }
 
-        while (world->ball().position().y() < 0)
-        {
-            yield();
-        }
-    };
+            while (world->ball().position().y() < 0)
+            {
+                yield("");
+            }
+        };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
@@ -171,14 +176,15 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
     // Unfortunately we can't have an example of a failing tests since GoogleTest doesn't
     // have a way of expecting a test to fail, so we just have an example of a passing
     // test.
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        while (world->gameState().isStopped())
-        {
-            EXPECT_LT(world->ball().velocity().length(), 1.0);
-            yield();
-        }
-    };
+    TerminatingValidationFunction validation_function =
+        [](std::shared_ptr<World> world,
+           TerminatingValidationCoroutine::push_type& yield) {
+            while (world->gameState().isStopped())
+            {
+                EXPECT_LT(world->ball().velocity().length(), 1.0);
+                yield("");
+            }
+        };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);

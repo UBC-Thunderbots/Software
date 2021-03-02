@@ -138,7 +138,7 @@ void SimulatedTestFixture::sleep(
 }
 
 void SimulatedTestFixture::runTest(
-    const std::vector<ValidationFunction> &terminating_validation_functions,
+    const std::vector<TerminatingValidationFunction> &terminating_validation_functions,
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
@@ -194,7 +194,7 @@ void SimulatedTestFixture::runTest(
 }
 
 bool SimulatedTestFixture::tickTest(
-    const std::vector<ValidationFunction> &terminating_validation_functions,
+    const std::vector<TerminatingValidationFunction> &terminating_validation_functions,
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     Duration simulation_time_step, Duration ai_time_step, std::shared_ptr<World> world)
 {

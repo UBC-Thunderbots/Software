@@ -62,7 +62,8 @@ class SimulatedTestFixture : public ::testing::Test
      * will fail.
      */
     void runTest(
-        const std::vector<ValidationFunction>& terminating_validation_functions,
+        const std::vector<TerminatingValidationFunction>&
+            terminating_validation_functions,
         const std::vector<ValidationFunction>& non_terminating_validation_functions,
         const Duration& timeout);
 
@@ -121,7 +122,8 @@ class SimulatedTestFixture : public ::testing::Test
      * @return if validation functions are done
      */
     bool tickTest(
-        const std::vector<ValidationFunction>& terminating_validation_functions,
+        const std::vector<TerminatingValidationFunction>&
+            terminating_validation_functions,
         const std::vector<ValidationFunction>& non_terminating_validation_functions,
         Duration simulation_time_step, Duration ai_time_step,
         std::shared_ptr<World> world);
