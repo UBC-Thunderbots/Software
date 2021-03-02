@@ -52,7 +52,7 @@ py_binary(
     deps = NOTEBOOK_DEPS,
 )
 
-py_binary(
+py_test(
     name = "notebooks_test",
     srcs = ["notebooks_test.py"],
     data = [

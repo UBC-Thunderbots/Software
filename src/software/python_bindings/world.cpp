@@ -51,9 +51,6 @@ PYBIND11_MODULE(world, m)
         .def("x", &Point::x)
         .def("y", &Point::y);
 
-    py::class_<Field>(m, "Field")
-        .def(py::init<double, double, double, double, double, double, double, double>());
-
     py::class_<Robot>(m, "Robot")
         .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
         .def("timestamp", &Robot::timestamp)
