@@ -18,6 +18,15 @@ py::dict getDefaultSensorFusionConfig()
     return copyDynamicParametersConfigToDict(std::make_shared<SensorFusionConfig>());
 }
 
+/**
+ * Creates a world from a string that represents an encoded SSL_WrapperPacket, using a
+ * SensorFusion with the given parameter overrides in a pybind11 dict.
+ * @param ssl_wrapper_string an encoded SSL_WrapperPacket
+ * @param sensor_fusion_config_overrides a dict with SensorFusion dynamic parameters to
+ * override
+ * @return a World created by a SensorFusion with the given SSL_WrapperPacket and config
+ * overrides
+ */
 World createWorldFromSSLWrapperString(const std::string& ssl_wrapper_string,
                                       py::dict sensor_fusion_config_overrides)
 {
