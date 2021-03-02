@@ -172,31 +172,30 @@ void SimulatedTestFixture::runTest(
                                                         CAMERA_FRAMES_PER_AI_TICK);
 
     // Tick one frame to aid with visualization
-    bool validation_functions_done =
-        tickTest(terminating_validation_functions, non_terminating_validation_functions,
-                 simulation_time_step, ai_time_step, world);
+    bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
     while (simulator->getTimestamp() < timeout_time)
     {
         if (!DynamicParameters->getAiControlConfig()->getRunAi()->value())
         {
             continue;
         }
-        validation_functions_done = tickTest(terminating_validation_functions,
-                                             non_terminating_validation_functions,
-                                             simulation_time_step, ai_time_step, world);
+        validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
     }
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
     {
-        ADD_FAILURE()
-            << "Not all validation functions passed within the timeout duration";
+        std::string failure_message =
+            "Not all validation functions passed within the timeout duration:\n";
+        for (const auto &fun : terminating_function_validators)
+        {
+            failure_message += fun.currentErrorMessage() + std::string("\n");
+        }
+        ADD_FAILURE() << failure_message;
     }
 }
 
-bool SimulatedTestFixture::tickTest(
-    const std::vector<TerminatingValidationFunction> &terminating_validation_functions,
-    const std::vector<ValidationFunction> &non_terminating_validation_functions,
-    Duration simulation_time_step, Duration ai_time_step, std::shared_ptr<World> world)
+bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
+                                    std::shared_ptr<World> world)
 {
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;

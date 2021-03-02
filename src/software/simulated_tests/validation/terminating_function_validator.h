@@ -37,7 +37,7 @@ class TerminatingFunctionValidator
      */
     bool executeAndCheckForSuccess();
 
-    std::string currentErrorMessage();
+    std::string currentErrorMessage() const;
 
    private:
     /**

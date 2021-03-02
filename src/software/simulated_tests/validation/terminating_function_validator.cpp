@@ -16,7 +16,7 @@ TerminatingFunctionValidator::TerminatingFunctionValidator(
 {
 }
 
-std::string TerminatingFunctionValidator::currentErrorMessage()
+std::string TerminatingFunctionValidator::currentErrorMessage() const
 {
     return current_error_message;
 }
