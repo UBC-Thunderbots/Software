@@ -1,5 +1,8 @@
 #include "software/python_bindings/python_binding_utilities.h"
 
+#include <sstream>
+#include <unordered_set>
+
 #include "software/util/variant_visitor/variant_visitor.h"
 
 namespace py = pybind11;
@@ -18,27 +21,34 @@ void setParameterValueFromDictIfExists(std::shared_ptr<Parameter<ParamValueType>
 void updateDynamicParametersConfigFromDict(std::shared_ptr<Config> config,
                                            const py::dict& config_update_dict)
 {
+    std::unordered_set<std::string> visited_param_names;
     for (auto param_ptr_variant : config->getMutableParameterList())
     {
         std::visit(
             overload{[&](std::shared_ptr<Parameter<int>> param) {
+                         visited_param_names.emplace(param->name());
                          setParameterValueFromDictIfExists(param, config_update_dict);
                      },
                      [&](std::shared_ptr<Parameter<bool>> param) {
+                         visited_param_names.emplace(param->name());
                          setParameterValueFromDictIfExists(param, config_update_dict);
                      },
                      [&](std::shared_ptr<Parameter<std::string>> param) {
+                         visited_param_names.emplace(param->name());
                          setParameterValueFromDictIfExists(param, config_update_dict);
                      },
                      [&](std::shared_ptr<Parameter<double>> param) {
+                         visited_param_names.emplace(param->name());
                          setParameterValueFromDictIfExists(param, config_update_dict);
                      },
                      [&](std::shared_ptr<NumericParameter<unsigned>> param) {
+                         visited_param_names.emplace(param->name());
                          setParameterValueFromDictIfExists(
                              std::static_pointer_cast<Parameter<unsigned>>(param),
                              config_update_dict);
                      },
                      [&](std::shared_ptr<Config> param) {
+                         visited_param_names.emplace(param->name());
                          if (config_update_dict.contains(param->name()))
                          {
                              updateDynamicParametersConfigFromDict(
@@ -47,6 +57,19 @@ void updateDynamicParametersConfigFromDict(std::shared_ptr<Config> config,
                          }
                      }},
             param_ptr_variant);
+    }
+
+    // check that all the parameters we tried to set in the dict actually exist
+    for (const auto& kv_pair : config_update_dict)
+    {
+        auto key_str = kv_pair.first.cast<std::string>();
+        if (visited_param_names.find(key_str) == visited_param_names.end())
+        {
+            std::stringstream ss;
+            ss << key_str << " is not a valid parameter name in the config "
+               << config->name();
+            throw std::invalid_argument(ss.str());
+        }
     }
 }
 

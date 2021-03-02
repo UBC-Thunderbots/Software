@@ -324,7 +324,10 @@ bind(
 )
 
 # pybind11 for Python bindings
-# quval's repo for pybind11 bazel rules has a fix for hermetic python interpreter
+# quval's repo for pybind11 bazel rules has a fix for hermetic python interpreter. The pybind11 project's own
+# bazel repo uses the system shell to find the system python interpreter and associated headers, and will not
+# work with how we build our own interpreter. This has an additional patch for Python 3.7.9, as pyconfig.h
+# is placed in a different directory than the rest of the Python headers.
 http_archive(
     name = "pybind11_bazel",
     patch_args = ["-p1"],

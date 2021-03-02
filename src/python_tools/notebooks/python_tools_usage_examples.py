@@ -34,12 +34,12 @@ robot_0_primitives = [
 ]
 plt.figure(figsize=(20, 5))
 
-# build a list of autochip move final angles and their corresponding timestamps from the list of robot 0 primitives
+# build a list of move primitive final angles and their corresponding timestamps from the list of robot 0 primitives
 final_angles = []
 timestamps = []
 for idx, prim in enumerate(robot_0_primitives):
-    if prim.HasField("autochip_move"):
-        final_angles.append(prim.autochip_move.final_angle.radians)
+    if prim.HasField("move"):
+        final_angles.append(prim.move.final_angle.radians)
         timestamps.append(
             primitive_set_proto_log[idx].time_sent.epoch_timestamp_seconds
         )
