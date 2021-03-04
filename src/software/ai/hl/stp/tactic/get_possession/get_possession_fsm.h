@@ -97,7 +97,8 @@ struct GetPossessionFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), point_in_front_of_ball,
                 face_ball_vector.orientation(), 0, DribblerMode::MAX_FORCE,
-                BallCollisionType::ALLOW));
+                BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT));
         };
 
         /**
@@ -117,7 +118,9 @@ struct GetPossessionFSM
                                       event.common.world.field());
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW));
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT));
         };
 
         return make_transition_table(
