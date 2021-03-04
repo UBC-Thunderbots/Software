@@ -43,9 +43,6 @@ bool TerminatingFunctionValidator::executeAndCheckForSuccess()
         // Run the coroutine. This will call the bound executeAndCheckForSuccessWrapper
         // function
         validation_sequence();
-    }
-    if (validation_sequence)
-    {
         current_error_message = validation_sequence.get();
     }
     else

@@ -9,6 +9,9 @@
  *
  * This class will run the provided coroutine continuously by restarting it every time the
  * coroutine has completed.
+ *
+ * If the Validation Function yields a non-empty error message, then the validator will
+ * add a failure with the error message
  */
 class NonTerminatingFunctionValidator
 {

@@ -1,5 +1,6 @@
 #include "software/simulated_tests/validation/terminating_function_validator.h"
 
+#include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
 #include <boost/coroutine2/all.hpp>
@@ -179,14 +180,11 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
 {
     // This shows an example of using GoogleTest statements within a validation function.
     // Just like regular unit tests, if the condition is not met the test will fail.
-    // Unfortunately we can't have an example of a failing tests since GoogleTest doesn't
-    // have a way of expecting a test to fail, so we just have an example of a passing
-    // test.
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
         while (world->gameState().isStopped())
         {
-            EXPECT_LT(world->ball().velocity().length(), 1.0);
+            EXPECT_GT(world->ball().velocity().length(), 1.0);
             yield("Test message");
         }
     };
@@ -198,6 +196,10 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
     world->updateBall(
         Ball(BallState(Point(0, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
 
+    EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForSuccess(), "velocity");
+
+    world->updateBall(
+        Ball(BallState(Point(0, 0), Vector(1, 1)), Timestamp::fromSeconds(0)));
     for (unsigned int i = 0; i < 10; i++)
     {
         bool result = function_validator.executeAndCheckForSuccess();
