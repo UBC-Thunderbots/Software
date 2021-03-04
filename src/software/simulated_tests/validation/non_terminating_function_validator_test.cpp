@@ -1,5 +1,6 @@
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 
+#include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
 #include <boost/coroutine2/all.hpp>
@@ -114,4 +115,21 @@ TEST(NonTerminatingFunctionValidatorTest,
     function_validator.executeAndCheckForFailures();
     function_validator.executeAndCheckForFailures();
     EXPECT_THROW(function_validator.executeAndCheckForFailures(), std::runtime_error);
+}
+
+TEST(NonTerminatingFunctionValidatorTest, test_create_non_terminating_validation_function)
+{
+    ValidationFunction validation_function = createNonTerminatingValidationFunction(
+        {[](std::shared_ptr<World> world) -> bool {
+             return world->ball().position() == Point(1, 1);
+         },
+         "Ball not at (1,1)"});
+
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    NonTerminatingFunctionValidator function_validator(validation_function, world);
+    EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForFailures(),
+                            "Ball not at (1,1)");
+    world->updateBall(
+        Ball(BallState(Point(1, 1), Vector()), Timestamp::fromSeconds(123)));
+    function_validator.executeAndCheckForFailures();
 }
