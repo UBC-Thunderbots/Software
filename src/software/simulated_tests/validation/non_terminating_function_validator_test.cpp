@@ -1,5 +1,6 @@
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 
+#include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
 #include <boost/coroutine2/all.hpp>
@@ -114,4 +115,24 @@ TEST(NonTerminatingFunctionValidatorTest,
     function_validator.executeAndCheckForFailures();
     function_validator.executeAndCheckForFailures();
     EXPECT_THROW(function_validator.executeAndCheckForFailures(), std::runtime_error);
+}
+
+TEST(NonTerminatingFunctionValidatorTest, test_yielding_error_message)
+{
+    // This validation_functions uses exceptions as a way for the test to observe it's
+    // internal state The exception will not be reached until the 3rd function call
+    ValidationFunction validation_function = [](std::shared_ptr<World> world,
+                                                ValidationCoroutine::push_type& yield) {
+        yield("This is an error message 1");
+        yield("This is an error message 2");
+    };
+
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    NonTerminatingFunctionValidator function_validator(validation_function, world);
+
+    function_validator.executeAndCheckForFailures();
+    EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForFailures(),
+                            "This is an error message 1");
+    EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForFailures(),
+                            "This is an error message 2");
 }

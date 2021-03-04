@@ -33,7 +33,7 @@ void NonTerminatingFunctionValidator::executeAndCheckForFailures()
         std::string error_msg = validation_sequence.get();
         if (error_msg != "")
         {
-            FAIL() << error_msg;
+            ADD_FAILURE() << error_msg;
         }
     }
 
