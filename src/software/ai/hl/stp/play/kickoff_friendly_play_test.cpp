@@ -5,9 +5,9 @@
 #include "software/simulated_tests/non_terminating_validation_functions/robots_in_friendly_half_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_not_in_center_circle_validation.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_center_circle_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_kicked_ball_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
@@ -52,7 +52,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             // the kickoff
             robotInCenterCircle(4, world_ptr, yield);
             robotReceivedBall(4, world_ptr, yield);
-            ballHasBeenKicked(Angle::zero(), world_ptr, yield);
+            ballKicked(Angle::zero(), world_ptr, yield);
         }};
 
     std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {

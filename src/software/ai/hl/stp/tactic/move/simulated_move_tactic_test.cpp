@@ -5,8 +5,8 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_kicked_ball_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -79,7 +79,7 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
                 yield("Tactic not done");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            ballHasBeenKicked(Angle::zero(), world_ptr, yield);
+            ballKicked(Angle::zero(), world_ptr, yield);
         }};
 
     std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
@@ -117,7 +117,7 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
                 yield("Tactic not done");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            ballHasBeenKicked(Angle::threeQuarter(), world_ptr, yield);
+            ballKicked(Angle::threeQuarter(), world_ptr, yield);
         }};
 
     std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
