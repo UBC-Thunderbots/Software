@@ -3,7 +3,7 @@
 
 void robotAtPosition(RobotId robot_id, std::shared_ptr<World> world_ptr,
                      const Point& destination, double close_to_destination_threshold,
-                     ValidationCoroutine::push_type& yield)
+                     TerminatingValidationCoroutine::push_type& yield)
 {
     auto robot_at_destination = [robot_id, destination, close_to_destination_threshold](
                                     std::shared_ptr<World> world_ptr) {
@@ -20,6 +20,9 @@ void robotAtPosition(RobotId robot_id, std::shared_ptr<World> world_ptr,
 
     while (!robot_at_destination(world_ptr))
     {
-        yield();
+        std::stringstream ss;
+        ss << destination;
+        yield("Robot with ID " + std::to_string(robot_id) + " is not at position " +
+              ss.str());
     }
 }

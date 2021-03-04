@@ -31,7 +31,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_play)
     setAIPlay(TYPENAME(EnemyFreekickPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_THEM);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         // TODO: Implement proper validation

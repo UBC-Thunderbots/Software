@@ -34,12 +34,12 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
     setTactic(tactic);
     setRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {
+    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              TerminatingValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
-                yield();
+                yield("Tactic not done");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
@@ -70,15 +70,15 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
     setTactic(tactic);
     setRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {
+    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              TerminatingValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
-                yield();
+                yield("Tactic not done");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotKickedBall(1, Angle::zero(), world_ptr, yield);
+            ballHasBeenKicked(Angle::zero(), world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -107,15 +107,15 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
     setTactic(tactic);
     setRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {
+    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              ValidationCoroutine::push_type& yield) {
+                              TerminatingValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
-                yield();
+                yield("Tactic not done");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotKickedBall(1, Angle::threeQuarter(), world_ptr, yield);
+            ballHasBeenKicked(Angle::threeQuarter(), world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};

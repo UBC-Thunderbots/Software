@@ -27,15 +27,16 @@ TEST_F(HaltPlayTest, test_halt_play)
     setAIPlay(TYPENAME(HaltPlay));
     setRefereeCommand(RefereeCommand::HALT, RefereeCommand::HALT);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {
+    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr,
+           TerminatingValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
-                yield();
+                yield("Timestamp not at 9.5s");
             }
         }};
 

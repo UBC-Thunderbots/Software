@@ -31,7 +31,7 @@ TEST_F(DefensePlayTest, test_defense_play)
     setAIPlay(TYPENAME(DefensePlay));
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::NORMAL_START);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         // TODO: Implement proper validation
