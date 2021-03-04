@@ -283,7 +283,7 @@ pip_install(
 pip_install(
     name = "dynamic_parameter_deps",
     python_interpreter_target = "@python_interpreter//:python_bin",
-    requirements = "//shared/parameter_v2/generation_scripts:requirements.txt",
+    requirements = "//shared/parameter/generation_scripts:requirements.txt",
 )
 
 pip_install(
