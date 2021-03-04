@@ -139,7 +139,8 @@ void SimulatedTestFixture::sleep(
 
 void SimulatedTestFixture::runTest(
     const std::vector<TerminatingValidationFunction> &terminating_validation_functions,
-    const std::vector<ValidationFunction> &non_terminating_validation_functions,
+    const std::vector<NonTerminatingValidationFunction>
+        &non_terminating_validation_functions,
     const Duration &timeout)
 {
     updateSensorFusion();

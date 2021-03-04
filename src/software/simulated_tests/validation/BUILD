@@ -3,7 +3,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "validation_function",
     testonly = True,
-    srcs = ["validation_function.cpp"],
     hdrs = ["validation_function.h"],
     deps = [
         "//software/world",

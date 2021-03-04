@@ -55,7 +55,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
             robotInPolygon(4, robotsDefendingRect, world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
         robotsInFriendlyHalf, robotsNotInCenterCircle};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

@@ -6,7 +6,7 @@
 #include "software/logger/logger.h"
 
 void robotsAvoidBall(double min_distance, std::shared_ptr<World> world_ptr,
-                     ValidationCoroutine::push_type& yield)
+                     NonTerminatingValidationCoroutine::push_type& yield)
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {

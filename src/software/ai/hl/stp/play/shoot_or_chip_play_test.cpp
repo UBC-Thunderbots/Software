@@ -54,7 +54,8 @@ TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
             }
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));

@@ -10,7 +10,7 @@
  * @param yield yields control to the next routine (coroutines)
  */
 void robotsInFriendlyHalf(std::shared_ptr<World> world_ptr,
-                          ValidationCoroutine::push_type& yield);
+                          NonTerminatingValidationCoroutine::push_type& yield);
 
 /**
  * Checks if a friendly robot is in the friendly half of the field, else assertion fails.
@@ -20,4 +20,4 @@ void robotsInFriendlyHalf(std::shared_ptr<World> world_ptr,
  * @param yield yields control to the next routine (coroutines)
  */
 void robotInFriendlyHalf(RobotId robot_id, std::shared_ptr<World> world_ptr,
-                         ValidationCoroutine::push_type& yield);
+                         NonTerminatingValidationCoroutine::push_type& yield);

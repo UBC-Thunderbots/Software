@@ -3,9 +3,10 @@
 #include "software/simulated_tests/validation/validation_function.h"
 
 /**
- * This class is a wrapper to make it easier to work with ValidationFunctions. It provides
- * an easy way to manage the coroutines required to run ValidationFunctions as well as see
- * if the function has succeeded / passed.
+ * This class is a wrapper to make it easier to work with
+ * NonTerminatingValidationFunctions. It provides an easy way to manage the coroutines
+ * required to run NonTerminatingValidationFunctions as well as see if the function has
+ * succeeded / passed.
  *
  * This class will run the provided coroutine continuously by restarting it every time the
  * coroutine has completed.
@@ -16,19 +17,22 @@ class NonTerminatingFunctionValidator
     /**
      * Creates a new NonTerminatingFunctionValidator.
      *
-     * @param validation_function The ValidationFunction this
+     * @param validation_function The NonTerminatingValidationFunction this
      * NonTerminatingFunctionValidator should manage and run
-     * @param world The world that will be given to the ValidationFunction in order to run
-     * it
+     * @param world The world that will be given to the NonTerminatingValidationFunction
+     * in order to run it
      */
-    explicit NonTerminatingFunctionValidator(ValidationFunction validation_function,
-                                             std::shared_ptr<World> world);
+    explicit NonTerminatingFunctionValidator(
+        NonTerminatingValidationFunction validation_function,
+        std::shared_ptr<World> world);
 
     /**
-     * Runs the ValidationFunction that was given to this NonTerminatingFunctionValidator
-     * on construction. The ValidationFunction will be restarted if it has completed. As
-     * such, the ValidationFunction can never be "done" and will only terminate due to
-     * failures within the ValidationFunction, such as a failed GoogleTest assert
+     * Runs the NonTerminatingValidationFunction that was given to this
+     * NonTerminatingFunctionValidator on construction. The
+     * NonTerminatingValidationFunction will be restarted if it has completed. As such,
+     * the NonTerminatingValidationFunction can never be "done" and will only terminate
+     * due to failures within the NonTerminatingValidationFunction, such as a failed
+     * GoogleTest assert
      */
     void executeAndCheckForFailures();
 
@@ -49,12 +53,12 @@ class NonTerminatingFunctionValidator
      * inside the validation_function.
      * @param validation_function The validation_function to run in the coroutine
      */
-    void executeAndCheckForFailuresWrapper(ValidationCoroutine::push_type& yield,
-                                           std::shared_ptr<World> world,
-                                           ValidationFunction validation_function);
+    void executeAndCheckForFailuresWrapper(
+        NonTerminatingValidationCoroutine::push_type& yield, std::shared_ptr<World> world,
+        NonTerminatingValidationFunction validation_function);
 
     // The coroutine that will be given to the validation function
-    ValidationCoroutine::pull_type validation_sequence;
+    NonTerminatingValidationCoroutine::pull_type validation_sequence;
     std::shared_ptr<World> world_;
-    ValidationFunction validation_function_;
+    NonTerminatingValidationFunction validation_function_;
 };

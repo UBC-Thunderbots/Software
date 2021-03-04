@@ -40,8 +40,8 @@ class SimulatedTestFixture : public ::testing::Test
 
     /**
      * Starts the simulation using the current state of the simulator, and runs
-     * the given ValidationFunctions on each new state of the World. The test
-     * will succeed if
+     * the given NonTerminatingValidationFunctions on each new state of the World. The
+     * test will succeed if
      * - There are no terminating validation functions and all non-terminating
      *   validation functions pass for the duration of the test. In this case
      *   the test will run for the duration of the timeout.
@@ -61,11 +61,11 @@ class SimulatedTestFixture : public ::testing::Test
      * If the test has not passed by the time this timeout is exceeded, the test
      * will fail.
      */
-    void runTest(
-        const std::vector<TerminatingValidationFunction>&
-            terminating_validation_functions,
-        const std::vector<ValidationFunction>& non_terminating_validation_functions,
-        const Duration& timeout);
+    void runTest(const std::vector<TerminatingValidationFunction>&
+                     terminating_validation_functions,
+                 const std::vector<NonTerminatingValidationFunction>&
+                     non_terminating_validation_functions,
+                 const Duration& timeout);
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist

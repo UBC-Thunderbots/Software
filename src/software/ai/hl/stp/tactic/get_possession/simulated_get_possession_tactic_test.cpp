@@ -55,7 +55,8 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball)
             checkPossession(tactic, world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
@@ -83,7 +84,8 @@ TEST_F(SimulatedMoveTacticTest, test_stopped_ball)
             checkPossession(tactic, world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
@@ -111,7 +113,8 @@ TEST_F(SimulatedMoveTacticTest, test_ball_bounce_of_enemy_robot)
             checkPossession(tactic, world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));

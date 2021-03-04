@@ -39,7 +39,8 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play)
             friendlyScored(world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));

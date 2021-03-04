@@ -3,7 +3,7 @@
 #include <boost/bind.hpp>
 
 NonTerminatingFunctionValidator::NonTerminatingFunctionValidator(
-    ValidationFunction validation_function, std::shared_ptr<World> world)
+    NonTerminatingValidationFunction validation_function, std::shared_ptr<World> world)
     :  // We need to provide the world and validation_function in the coroutine function
        // binding so that the wrapper function has access to the correct variable context,
        // otherwise the World inside the coroutine will not update properly when the
@@ -22,7 +22,7 @@ void NonTerminatingFunctionValidator::executeAndCheckForFailures()
     if (!validation_sequence)
     {
         // Re-start the coroutine by re-creating it
-        validation_sequence = ValidationCoroutine::pull_type(boost::bind(
+        validation_sequence = NonTerminatingValidationCoroutine::pull_type(boost::bind(
             &NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper, this, _1,
             world_, validation_function_));
     }
@@ -33,8 +33,8 @@ void NonTerminatingFunctionValidator::executeAndCheckForFailures()
 }
 
 void NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper(
-    ValidationCoroutine::push_type &yield, std::shared_ptr<World> world,
-    ValidationFunction validation_function)
+    NonTerminatingValidationCoroutine::push_type &yield, std::shared_ptr<World> world,
+    NonTerminatingValidationFunction validation_function)
 {
     // Yield the very first time the function is called, so that the validation_function
     // is not run until this coroutine / wrapper function is called again by

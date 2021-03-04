@@ -44,7 +44,8 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
@@ -81,7 +82,8 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
             ballHasBeenKicked(Angle::zero(), world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
@@ -118,7 +120,8 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
             ballHasBeenKicked(Angle::threeQuarter(), world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));

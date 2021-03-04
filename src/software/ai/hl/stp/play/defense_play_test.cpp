@@ -44,10 +44,11 @@ TEST_F(DefensePlayTest, test_defense_play)
             }
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1971
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {}};
+        [](std::shared_ptr<World> world_ptr,
+           NonTerminatingValidationCoroutine::push_type& yield) {}};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));

@@ -55,8 +55,9 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             ballHasBeenKicked(Angle::zero(), world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr,
+           NonTerminatingValidationCoroutine::push_type& yield) {
             for (RobotId robot_id : {0, 1, 2, 3, 5})
             {
                 {

@@ -42,7 +42,8 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_enemy_half)
             }
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
@@ -76,7 +77,8 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_friendly_half)
             }
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+        {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
