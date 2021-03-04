@@ -5,8 +5,8 @@ cc_library(
     srcs = ["parameters_spinbox.cpp"],
     hdrs = ["parameters_spinbox.h"],
     deps = [
+        "//shared/parameter",
         "//shared/parameter:cpp_configs",
-        "//shared/parameter:parameter",
         "//software/logger",
         "//software/util/variant_visitor",
         "@qt//:qt_widgets",
