@@ -19,16 +19,19 @@ TEST_F(SimulatedThetaStarTest, test_move_across_field)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(1, 0);
-    setBallState(BallState(Point(4.5, -3), Vector(0, 0)));
+    setBallState(BallState(Point(0.25, 0.12), Vector(0, 0)));
     addFriendlyRobots(
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
-
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setRobotId(1);
+
+    std::set<MotionConstraint> motion_constraints;
+    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
+    setMotionConstraints(motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -43,5 +46,5 @@ TEST_F(SimulatedThetaStarTest, test_move_across_field)
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(15));
 }
