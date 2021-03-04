@@ -33,7 +33,7 @@ TEST_F(SimulatedPlayTestFixtureTest,
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.5))
             {
-                yield("");
+                yield("Waiting for timestamp of at least 0.5s");
             }
         }};
 
@@ -52,7 +52,7 @@ TEST_F(SimulatedPlayTestFixtureTest,
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(1.0))
             {
-                yield("");
+                yield("Waiting for timestamp of at least 1s");
             }
         }};
 
@@ -61,7 +61,7 @@ TEST_F(SimulatedPlayTestFixtureTest,
     EXPECT_NONFATAL_FAILURE(
         runTest(terminating_validation_functions, non_terminating_validation_functions,
                 Duration::fromSeconds(0.5)),
-        "timeout duration");
+        "Waiting for timestamp of at least 1s");
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
@@ -73,7 +73,7 @@ TEST_F(SimulatedPlayTestFixtureTest,
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() <= Timestamp::fromSeconds(0.5))
             {
-                yield("");
+                yield("Waiting for timestamp of at least 0.5s");
             }
 
             EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.5));
@@ -96,13 +96,13 @@ TEST_F(SimulatedPlayTestFixtureTest,
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.4))
             {
-                yield("");
+                yield("Waiting for timestamp of at least 0.4s");
             }
         },
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.6))
             {
-                yield("");
+                yield("Waiting for timestamp of at least 0.6s");
             }
         }};
 
@@ -121,13 +121,13 @@ TEST_F(SimulatedPlayTestFixtureTest,
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.4))
             {
-                yield("");
+                yield("Waiting for timestamp of at least 0.4s");
             }
         },
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.8))
             {
-                yield("");
+                yield("Waiting for timestamp of at least 0.8s");
             }
         }};
 
@@ -136,7 +136,7 @@ TEST_F(SimulatedPlayTestFixtureTest,
     EXPECT_NONFATAL_FAILURE(
         runTest(terminating_validation_functions, non_terminating_validation_functions,
                 Duration::fromSeconds(0.6)),
-        "timeout duration");
+        "Waiting for timestamp of at least 0.8s");
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
@@ -148,7 +148,10 @@ TEST_F(SimulatedPlayTestFixtureTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
+            if (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0))
+            {
+                yield("Timestamp was less than 0");
+            }
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -164,10 +167,16 @@ TEST_F(SimulatedPlayTestFixtureTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
+            if (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0))
+            {
+                yield("Timestamp was less than 0");
+            }
         },
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(100));
+            if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(100))
+            {
+                yield("Timestamp was greater than or equal to 100");
+            }
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -185,12 +194,18 @@ TEST_F(
     // test. To do this we check the timestamp very close to the test timeout
     auto failing_validation_function = [](std::shared_ptr<World> world_ptr,
                                           ValidationCoroutine::push_type& yield) {
-        EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.5));
+        if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(0.5))
+        {
+            yield("Timestamp was greater than or equal than 0.5");
+        }
     };
 
     auto passing_validation_function = [](std::shared_ptr<World> world_ptr,
                                           ValidationCoroutine::push_type& yield) {
-        EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
+        if (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0))
+        {
+            yield("Timestamp was less than 0");
+        }
     };
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
@@ -201,7 +216,7 @@ TEST_F(
     EXPECT_NONFATAL_FAILURE(
         runTest(terminating_validation_functions, non_terminating_validation_functions,
                 Duration::fromSeconds(0.5)),
-        "Timestamp");
+        "Timestamp was greater than or equal than 0.5");
 }
 
 TEST_F(
@@ -221,12 +236,18 @@ TEST_F(
     // test. To do this we check the timestamp very close to the test timeout
     auto failing_validation_function = [](std::shared_ptr<World> world_ptr,
                                           ValidationCoroutine::push_type& yield) {
-        EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.5));
+        if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(0.5))
+        {
+            yield("Timestamp was greater than or equal than 0.5");
+        }
     };
 
     auto passing_validation_function = [](std::shared_ptr<World> world_ptr,
                                           ValidationCoroutine::push_type& yield) {
-        EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
+        if (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0))
+        {
+            yield("Timestamp was less than 0");
+        }
     };
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
@@ -239,7 +260,7 @@ TEST_F(
     EXPECT_NONFATAL_FAILURE(
         runTest(terminating_validation_functions, non_terminating_validation_functions,
                 Duration::fromSeconds(0.5)),
-        "Timestamp");
+        "Timestamp was greater than or equal than 0.5");
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,

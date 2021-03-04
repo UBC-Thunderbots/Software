@@ -41,13 +41,14 @@ TEST(TerminatingFunctionValidatorTest,
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
-        yield("");
+        yield("Test message");
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("Test message", function_validator.currentErrorMessage());
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
 }
@@ -57,11 +58,11 @@ TEST(TerminatingFunctionValidatorTest,
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
-        yield("");
-        yield("");
-        yield("");
-        yield("");
-        yield("");
+        yield("Test message");
+        yield("Test message");
+        yield("Test message");
+        yield("Test message");
+        yield("Test message");
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
@@ -71,6 +72,7 @@ TEST(TerminatingFunctionValidatorTest,
     {
         bool result = function_validator.executeAndCheckForSuccess();
         EXPECT_FALSE(result);
+        EXPECT_EQ("Test message", function_validator.currentErrorMessage());
     }
 
     bool result = function_validator.executeAndCheckForSuccess();
@@ -82,9 +84,9 @@ TEST(TerminatingFunctionValidatorTest,
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
-        yield("");
+        yield("Test message");
         return;
-        yield("");
+        yield("Test message");
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
@@ -92,6 +94,7 @@ TEST(TerminatingFunctionValidatorTest,
 
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("Test message", function_validator.currentErrorMessage());
 
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
@@ -104,7 +107,7 @@ TEST(TerminatingFunctionValidatorTest,
                                                 ValidationCoroutine::push_type& yield) {
         while (world->ball().position().x() < 0)
         {
-            yield("");
+            yield("Ball x position not less than 0");
         }
     };
 
@@ -115,11 +118,15 @@ TEST(TerminatingFunctionValidatorTest,
         Ball(BallState(Point(-1, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("Ball x position not less than 0",
+              function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(-0.1, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("Ball x position not less than 0",
+              function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(0.05, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
@@ -136,12 +143,12 @@ TEST(TerminatingFunctionValidatorTest,
                                                 ValidationCoroutine::push_type& yield) {
         while (world->ball().position().x() < 0)
         {
-            yield("");
+            yield("Ball x position not less than 0");
         }
 
         while (world->ball().position().y() < 0)
         {
-            yield("");
+            yield("Ball y position not less than 0");
         }
     };
 
@@ -152,11 +159,15 @@ TEST(TerminatingFunctionValidatorTest,
         Ball(BallState(Point(-1, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("Ball x position not less than 0",
+              function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(1, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("Ball y position not less than 0",
+              function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(1, 1), Vector(0, 0)), Timestamp::fromSeconds(0)));
@@ -176,7 +187,7 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
         while (world->gameState().isStopped())
         {
             EXPECT_LT(world->ball().velocity().length(), 1.0);
-            yield("");
+            yield("Test message");
         }
     };
 
@@ -191,6 +202,7 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
     {
         bool result = function_validator.executeAndCheckForSuccess();
         EXPECT_FALSE(result);
+        EXPECT_EQ("Test message", function_validator.currentErrorMessage());
     }
 
     for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE; i++)
@@ -200,33 +212,4 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
 
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
-}
-
-TEST(TerminatingFunctionValidatorTest, test_create_terminating_validation_function)
-{
-    std::shared_ptr<World> world =
-        std::make_shared<World>(TestUtil::createBlankTestingWorld());
-
-    ValidationFunction validation_function = [](std::shared_ptr<World> world,
-                                                ValidationCoroutine::push_type& yield) {
-        while (world->ball().position() != Point(1, 1))
-        {
-            yield("Ball not at (1,1)");
-        }
-        while (world->ball().position() != Point(2, 2))
-        {
-            yield("Ball not at (2,2)");
-        }
-    };
-
-    TerminatingFunctionValidator validator(validation_function, world);
-    EXPECT_FALSE(validator.executeAndCheckForSuccess());
-    EXPECT_EQ("Ball not at (1,1)", validator.currentErrorMessage());
-    world->updateBall(
-        Ball(BallState(Point(1, 1), Vector()), Timestamp::fromSeconds(123)));
-    EXPECT_FALSE(validator.executeAndCheckForSuccess());
-    EXPECT_EQ("Ball not at (2,2)", validator.currentErrorMessage());
-    world->updateBall(
-        Ball(BallState(Point(2, 2), Vector()), Timestamp::fromSeconds(234)));
-    EXPECT_TRUE(validator.executeAndCheckForSuccess());
 }

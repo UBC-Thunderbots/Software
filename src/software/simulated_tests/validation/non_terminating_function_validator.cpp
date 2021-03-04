@@ -28,18 +28,15 @@ void NonTerminatingFunctionValidator::executeAndCheckForFailures()
             &NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper, this, _1,
             world_, validation_function_));
     }
-    else
-    {
-        std::string error_msg = validation_sequence.get();
-        if (error_msg != "")
-        {
-            ADD_FAILURE() << error_msg;
-        }
-    }
 
     // Run the coroutine. This will call the bound executeAndCheckForFailuresWrapper
     // function
     validation_sequence();
+    std::string error_msg = validation_sequence.get();
+    if (error_msg != "")
+    {
+        ADD_FAILURE() << error_msg;
+    }
 }
 
 void NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper(
