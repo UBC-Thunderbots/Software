@@ -22,7 +22,7 @@ cc_library(
     hdrs = ["velocity_obstacle_path_manager.h"],
     deps = [
         ":path_manager",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
     ],
 )

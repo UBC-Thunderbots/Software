@@ -26,7 +26,7 @@ cc_library(
     srcs = ["threaded_ai.cpp"],
     hdrs = ["threaded_ai.h"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:navigator",

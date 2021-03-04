@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/enemy_free_kick_play.h"
 
 #include "shared/constants.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"

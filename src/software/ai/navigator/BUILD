@@ -7,7 +7,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":navigating_primitive_creator",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/intent",
         "//software/ai/intent:all_intents",
         "//software/ai/intent:intent_visitor",
@@ -41,7 +41,7 @@ cc_library(
     hdrs = ["navigating_primitive_creator.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/intent:all_intents",
         "//software/ai/intent:navigating_intent",
         "//software/ai/intent:navigating_intent_visitor",

@@ -4,7 +4,7 @@ cc_binary(
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/ai:threaded_ai",
         "//software/ai/hl/stp:play_info",
@@ -25,7 +25,7 @@ cc_binary(
     name = "standalone_simulator_main",
     srcs = ["standalone_simulator_main.cpp"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
         "//software/logger",
         "//software/simulation:standalone_simulator",
@@ -37,7 +37,7 @@ cc_binary(
     name = "handheld_control",
     srcs = ["handheld_control_main.cpp"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/backend:radio_backend",
         "//software/handheld_controller:controller_primitive_generator",
         "//software/handheld_controller:xbox_360_controller",
@@ -48,7 +48,7 @@ cc_binary(
     name = "robot_diagnostics_main",
     srcs = ["robot_diagnostics_main.cpp"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/backend",
         "//software/backend:all_backends",
         "//software/gui/robot_diagnostics:threaded_robot_diagnostics_gui",

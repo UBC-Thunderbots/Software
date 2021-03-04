@@ -1,7 +1,7 @@
 #include "software/backend/wifi_backend.h"
 
 #include "shared/constants.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "software/constants.h"
 #include "software/logger/logger.h"

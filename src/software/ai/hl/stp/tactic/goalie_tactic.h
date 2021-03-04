@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "shared/constants.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/tactic/tactic.h"

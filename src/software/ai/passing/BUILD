@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["cost_function.h"],
     deps = [
         ":pass",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:pass",
         "//software/logger",
         "//software/math:math_functions",

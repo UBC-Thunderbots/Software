@@ -64,7 +64,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
@@ -92,7 +92,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:move_action",
@@ -118,7 +118,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
@@ -254,7 +254,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom/algorithms",
@@ -279,7 +279,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:intercept_ball_action",

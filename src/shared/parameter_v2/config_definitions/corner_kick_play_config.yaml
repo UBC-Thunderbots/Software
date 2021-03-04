@@ -1,6 +1,0 @@
-- double:
-    name: max_time_commit_to_pass_seconds
-    min: 0.0
-    max: 5.0
-    value: 3.0
-    description: The maximum time that we will wait before committing to a pass

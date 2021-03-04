@@ -7,7 +7,7 @@ cc_library(
     srcs = ["threaded_standalone_simulator_gui.cpp"],
     hdrs = ["threaded_standalone_simulator_gui.h"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/geom:rectangle",
         "//software/gui/standalone_simulator/widgets:standalone_simulator_gui",
         "//software/proto:ssl_cc_proto",

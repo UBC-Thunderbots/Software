@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <exception>
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"

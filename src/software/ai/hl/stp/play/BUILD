@@ -32,7 +32,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
@@ -57,7 +57,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
@@ -79,7 +79,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
@@ -94,7 +94,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
@@ -110,7 +110,7 @@ cc_library(
         ":corner_kick_play",
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:cherry_pick_tactic",
@@ -136,7 +136,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:goalie_tactic",
@@ -155,7 +155,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
@@ -172,7 +172,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
@@ -188,7 +188,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
         "//software/ai/hl/stp/tactic:penalty_setup_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
@@ -205,7 +205,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
         "//software/ai/evaluation:possession",
@@ -229,7 +229,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:cherry_pick_tactic",
@@ -267,7 +267,7 @@ cc_library(
     srcs = ["play.cpp"],
     hdrs = ["play.h"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic",
         "@boost//:coroutine2",
     ],

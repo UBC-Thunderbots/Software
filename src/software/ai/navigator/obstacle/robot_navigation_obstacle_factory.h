@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/point.h"

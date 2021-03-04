@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "shared/constants.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/possession.h"
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,

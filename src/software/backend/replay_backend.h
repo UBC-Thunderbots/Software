@@ -1,5 +1,5 @@
 #pragma once
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"

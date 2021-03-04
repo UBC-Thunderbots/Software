@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/shoot_or_pass_play.h"
 
 #include "shared/constants.h"
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"

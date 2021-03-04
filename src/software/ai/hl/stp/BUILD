@@ -7,7 +7,7 @@ cc_library(
     ],
     hdrs = ["stp.h"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic",
@@ -53,7 +53,7 @@ cc_test(
     srcs = ["stp_tactic_assignment_test.cpp"],
     deps = [
         ":stp",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play:halt_play",
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/tactic/test_tactics:goalie_test_tactic",

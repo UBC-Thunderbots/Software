@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/logger/logger.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 

@@ -4,10 +4,10 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
-#include "shared/parameter_v2/enumerated_parameter.h"
-#include "shared/parameter_v2/numeric_parameter.h"
-#include "shared/parameter_v2/parameter.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "shared/parameter/enumerated_parameter.h"
+#include "shared/parameter/numeric_parameter.h"
+#include "shared/parameter/parameter.h"
 #include "software/gui/generic_widgets/slider/slider.h"
 
 /**

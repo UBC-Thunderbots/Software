@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/backend/backend.h"
 #include "software/backend/radio/radio_output.h"
 #include "software/backend/ssl_proto_client.h"

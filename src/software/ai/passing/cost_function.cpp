@@ -2,7 +2,7 @@
 
 #include <numeric>
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/pass.h"

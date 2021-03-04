@@ -1,6 +1,6 @@
 #include <boost/program_options.hpp>
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/gui/standalone_simulator/threaded_standalone_simulator_gui.h"
 #include "software/logger/logger.h"
 #include "software/simulation/standalone_simulator.h"

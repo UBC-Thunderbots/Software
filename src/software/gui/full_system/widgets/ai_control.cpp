@@ -3,7 +3,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QPushButton>
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/gui/shared/parameters_spinbox.h"
 #include "software/logger/logger.h"

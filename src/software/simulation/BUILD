@@ -136,7 +136,7 @@ cc_library(
         ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software/proto:defending_side_msg_cc_proto",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/proto/message_translation:ssl_detection",
@@ -191,7 +191,7 @@ cc_library(
     hdrs = ["standalone_simulator.h"],
     deps = [
         ":threaded_simulator",
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//shared/proto:tbots_cc_proto",
         "//software/logger",
         "//software/networking:threaded_proto_multicast_listener",

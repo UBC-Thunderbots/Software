@@ -88,7 +88,7 @@ cc_library(
     srcs = ["ssl_proto_client.cpp"],
     hdrs = ["ssl_proto_client.h"],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/networking:threaded_proto_multicast_listener",
         "//software/proto:ssl_cc_proto",

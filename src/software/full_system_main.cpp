@@ -3,7 +3,7 @@
 #include <iostream>
 #include <numeric>
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
