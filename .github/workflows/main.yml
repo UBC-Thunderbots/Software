@@ -43,7 +43,7 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel test                     \
+          bazel coverage                     \
             --compilation_mode=fastbuild     \
             --verbose_test_summary           \
             --instrumentation_filter=//...   \
@@ -52,7 +52,7 @@ jobs:
             -//software/ai/hl/stp/play/... \
             -//software/ai/hl/stp/tactic/... \
             -//firmware_new/...
-         
+             
   firmware-tests:
     name: Firmware Tests
     runs-on: ubuntu-18.04
@@ -102,7 +102,7 @@ jobs:
       - name: Simulated Test
         run: |
           cd src
-          bazel test //software/simulated_tests/... \
+          bazel coverage //software/simulated_tests/... \
             //software/ai/hl/stp/play/... \
             //software/ai/hl/stp/tactic/... \
           
