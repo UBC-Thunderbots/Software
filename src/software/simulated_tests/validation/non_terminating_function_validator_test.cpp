@@ -1,6 +1,5 @@
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 
-#include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
 #include <boost/coroutine2/all.hpp>
