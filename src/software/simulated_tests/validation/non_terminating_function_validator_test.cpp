@@ -136,3 +136,24 @@ TEST(NonTerminatingFunctionValidatorTest, test_yielding_error_message)
     EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForFailures(),
                             "This is an error message 2");
 }
+
+TEST(NonTerminatingFunctionValidatorTest, test_modifying_world_make_test_pass)
+{
+    ValidationFunction validation_function = [](std::shared_ptr<World> world,
+                                                ValidationCoroutine::push_type& yield) {
+        if (world->ball().position() != Point(1, 1))
+        {
+            yield("Ball not at (1,1)");
+        }
+    };
+
+    auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
+    NonTerminatingFunctionValidator function_validator(validation_function, world);
+    // run once before getting to the first yield
+    function_validator.executeAndCheckForFailures();
+    EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForFailures(),
+                            "Ball not at (1,1)");
+    world->updateBall(
+        Ball(BallState(Point(1, 1), Vector()), Timestamp::fromSeconds(123)));
+    function_validator.executeAndCheckForFailures();
+}
