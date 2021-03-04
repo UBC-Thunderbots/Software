@@ -43,11 +43,7 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel coverage                     \
-            --compilation_mode=fastbuild     \
-            --verbose_test_summary           \
-            --instrumentation_filter=//...   \
-            --test_output=errors             \
+          bazel test --show_timestamps\
             -- //... -//software/simulated_tests/... \
             -//software/ai/hl/stp/play/... \
             -//software/ai/hl/stp/tactic/... \
@@ -102,9 +98,10 @@ jobs:
       - name: Simulated Test
         run: |
           cd src
-          bazel coverage //software/simulated_tests/... \
-            //software/ai/hl/stp/play/... \
-            //software/ai/hl/stp/tactic/... \
+          bazel test --show_timestamps   \
+            //software/simulated_tests/...   \
+            //software/ai/hl/stp/play/...    \
+            //software/ai/hl/stp/tactic/...
           
   memory-leak-checks:
     name: Memory Leak Checks
