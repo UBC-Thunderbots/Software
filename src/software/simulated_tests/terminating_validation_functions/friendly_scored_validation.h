@@ -9,4 +9,4 @@
  * @param yield yields control to the next routine (coroutines)
  */
 void friendlyScored(std::shared_ptr<World> world_ptr,
-                    ValidationCoroutine::push_type& yield);
+                    TerminatingValidationCoroutine::push_type& yield);

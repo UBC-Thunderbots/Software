@@ -32,8 +32,9 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play)
     setAIPlay(TYPENAME(CornerKickPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr,
+           TerminatingValidationCoroutine::push_type& yield) {
             robotReceivedBall(5, world_ptr, yield);
             friendlyScored(world_ptr, yield);
         }};

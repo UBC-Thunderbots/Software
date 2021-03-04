@@ -4,7 +4,7 @@
 #include "software/logger/logger.h"
 
 void robotInPolygon(RobotId robot_id, Polygon polygon, std::shared_ptr<World> world_ptr,
-                    ValidationCoroutine::push_type& yield)
+                    TerminatingValidationCoroutine::push_type& yield)
 {
     auto robot_in_polygon = [robot_id, polygon](std::shared_ptr<World> world_ptr) {
         std::optional<Robot> robotOptional =
@@ -20,6 +20,9 @@ void robotInPolygon(RobotId robot_id, Polygon polygon, std::shared_ptr<World> wo
 
     while (!robot_in_polygon(world_ptr))
     {
-        yield();
+        std::stringstream ss;
+        ss << polygon;
+        yield("Robot with ID " + std::to_string(robot_id) +
+              " did not enter the polygon " + ss.str());
     }
 }

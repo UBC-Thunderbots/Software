@@ -3,10 +3,10 @@
 #include "software/geom/algorithms/contains.h"
 
 void friendlyScored(std::shared_ptr<World> world_ptr,
-                    ValidationCoroutine::push_type& yield)
+                    TerminatingValidationCoroutine::push_type& yield)
 {
     while (!contains(world_ptr->field().enemyGoal(), world_ptr->ball().position()))
     {
-        yield();
+        yield("The friendly team has not scored");
     }
 }

@@ -4,7 +4,7 @@
 #include "software/logger/logger.h"
 
 void robotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
-                         ValidationCoroutine::push_type& yield)
+                         TerminatingValidationCoroutine::push_type& yield)
 {
     auto robot_in_center_circle = [robot_id](std::shared_ptr<World> world_ptr) {
         std::optional<Robot> robot_optional =
@@ -20,6 +20,7 @@ void robotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
 
     while (!robot_in_center_circle(world_ptr))
     {
-        yield();
+        yield("Robot with ID " + std::to_string(robot_id) +
+              " did not enter the center circle");
     }
 }
