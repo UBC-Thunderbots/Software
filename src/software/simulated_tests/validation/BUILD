@@ -42,6 +42,7 @@ cc_library(
     deps = [
         ":validation_function",
         "@boost//:coroutine2",
+        "@gtest",
     ],
 )
 

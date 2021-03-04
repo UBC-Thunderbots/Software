@@ -1,5 +1,7 @@
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 
+#include <gtest/gtest.h>
+
 #include <boost/bind.hpp>
 
 NonTerminatingFunctionValidator::NonTerminatingFunctionValidator(
@@ -26,6 +28,10 @@ void NonTerminatingFunctionValidator::executeAndCheckForFailures()
             &NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper, this, _1,
             world_, validation_function_));
     }
+    else
+    {
+        ADD_FAILURE() << validation_sequence.get();
+    }
 
     // Run the coroutine. This will call the bound executeAndCheckForFailuresWrapper
     // function
@@ -39,7 +45,7 @@ void NonTerminatingFunctionValidator::executeAndCheckForFailuresWrapper(
     // Yield the very first time the function is called, so that the validation_function
     // is not run until this coroutine / wrapper function is called again by
     // executeAndCheckForFailures
-    yield();
+    yield("");
 
     // Anytime after the first function call, the validation_function will be
     // used to perform the real logic.

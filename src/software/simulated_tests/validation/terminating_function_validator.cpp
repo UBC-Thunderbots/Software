@@ -44,7 +44,14 @@ bool TerminatingFunctionValidator::executeAndCheckForSuccess()
         // function
         validation_sequence();
     }
-    current_error_message = validation_sequence.get();
+    if (validation_sequence)
+    {
+        current_error_message = validation_sequence.get();
+    }
+    else
+    {
+        current_error_message = "";
+    }
 
     // The validation_function is done if the coroutine evaluates to false, which means
     // execution has "dropped out" the bottom of the function and there is no more work to
