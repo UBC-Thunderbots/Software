@@ -30,7 +30,11 @@ void NonTerminatingFunctionValidator::executeAndCheckForFailures()
     }
     else
     {
-        ADD_FAILURE() << validation_sequence.get();
+        std::string error_msg = validation_sequence.get();
+        if (error_msg != "")
+        {
+            FAIL() << error_msg;
+        }
     }
 
     // Run the coroutine. This will call the bound executeAndCheckForFailuresWrapper

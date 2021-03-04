@@ -103,8 +103,8 @@ TEST(NonTerminatingFunctionValidatorTest,
     // internal state The exception will not be reached until the 3rd function call
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
-        yield();
-        yield();
+        yield("");
+        yield("");
         throw std::runtime_error("coroutine reached end of yield statements");
     };
 
