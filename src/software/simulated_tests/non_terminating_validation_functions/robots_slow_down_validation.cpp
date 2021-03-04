@@ -6,7 +6,7 @@
 #include "software/logger/logger.h"
 
 void robotsSlowDown(double max_speed, std::shared_ptr<World> world_ptr,
-                    NonTerminatingValidationCoroutine::push_type& yield)
+                    ValidationCoroutine::push_type& yield)
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {

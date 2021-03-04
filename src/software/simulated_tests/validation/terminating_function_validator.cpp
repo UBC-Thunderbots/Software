@@ -3,7 +3,7 @@
 #include <boost/bind.hpp>
 
 TerminatingFunctionValidator::TerminatingFunctionValidator(
-    TerminatingValidationFunction validation_function,
+    ValidationFunction validation_function,
     std::shared_ptr<World> world)
     :  // We need to provide the world and validation_function in the coroutine function
        // binding so that the wrapper function has access to the correct variable context,
@@ -22,8 +22,8 @@ std::string TerminatingFunctionValidator::currentErrorMessage() const
 }
 
 void TerminatingFunctionValidator::executeAndCheckForSuccessWrapper(
-    TerminatingValidationCoroutine::push_type &yield, std::shared_ptr<World> world,
-    TerminatingValidationFunction validation_function)
+    ValidationCoroutine::push_type &yield, std::shared_ptr<World> world,
+    ValidationFunction validation_function)
 {
     // Yield the very first time the function is called, so that the validation_function
     // is not run until this coroutine / wrapper function is called again by

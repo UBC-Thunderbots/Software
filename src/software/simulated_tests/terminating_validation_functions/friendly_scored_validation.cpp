@@ -3,7 +3,7 @@
 #include "software/geom/algorithms/contains.h"
 
 void friendlyScored(std::shared_ptr<World> world_ptr,
-                    TerminatingValidationCoroutine::push_type& yield)
+                    ValidationCoroutine::push_type& yield)
 {
     while (!contains(world_ptr->field().enemyGoal(), world_ptr->ball().position()))
     {

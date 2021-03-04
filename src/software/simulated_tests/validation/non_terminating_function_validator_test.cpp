@@ -10,9 +10,8 @@
 TEST(NonTerminatingFunctionValidatorTest,
      test_validation_function_that_does_nothing_does_not_report_failure)
 {
-    NonTerminatingValidationFunction validation_function =
-        [](std::shared_ptr<World> world,
-           NonTerminatingValidationCoroutine::push_type& yield) {};
+    ValidationFunction validation_function = [](std::shared_ptr<World> world,
+                                                ValidationCoroutine::push_type& yield) {};
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     world->updateBall(
@@ -30,23 +29,22 @@ TEST(NonTerminatingFunctionValidatorTest,
 {
     // This validation_functions uses exceptions as a way for the test to observe it's
     // internal state
-    NonTerminatingValidationFunction validation_function =
-        [](std::shared_ptr<World> world,
-           NonTerminatingValidationCoroutine::push_type& yield) {
-            if (world->ball().position().x() < -1)
-            {
-                throw std::runtime_error("x < -1");
-            }
-            else if (world->ball().position().x() < 0)
-            {
-                throw std::runtime_error("x < 0");
-            }
-            else if (world->ball().position().x() < 1)
-            {
-                throw std::runtime_error("x < 1");
-            }
-            return;
-        };
+    ValidationFunction validation_function = [](std::shared_ptr<World> world,
+                                                ValidationCoroutine::push_type& yield) {
+        if (world->ball().position().x() < -1)
+        {
+            throw std::runtime_error("x < -1");
+        }
+        else if (world->ball().position().x() < 0)
+        {
+            throw std::runtime_error("x < 0");
+        }
+        else if (world->ball().position().x() < 1)
+        {
+            throw std::runtime_error("x < 1");
+        }
+        return;
+    };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     NonTerminatingFunctionValidator function_validator(validation_function, world);
@@ -103,13 +101,12 @@ TEST(NonTerminatingFunctionValidatorTest,
 {
     // This validation_functions uses exceptions as a way for the test to observe it's
     // internal state The exception will not be reached until the 3rd function call
-    NonTerminatingValidationFunction validation_function =
-        [](std::shared_ptr<World> world,
-           NonTerminatingValidationCoroutine::push_type& yield) {
-            yield();
-            yield();
-            throw std::runtime_error("coroutine reached end of yield statements");
-        };
+    ValidationFunction validation_function = [](std::shared_ptr<World> world,
+                                                ValidationCoroutine::push_type& yield) {
+        yield();
+        yield();
+        throw std::runtime_error("coroutine reached end of yield statements");
+    };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     NonTerminatingFunctionValidator function_validator(validation_function, world);

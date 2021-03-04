@@ -12,4 +12,4 @@
  * @param yield yields control to the next routine (coroutines) with error message
  */
 void robotReceivedBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
-                       TerminatingValidationCoroutine::push_type& yield);
+                       ValidationCoroutine::push_type& yield);

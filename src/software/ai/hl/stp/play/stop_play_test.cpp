@@ -15,22 +15,22 @@ class StopPlayTest : public SimulatedPlayTestFixture
    public:
     StopPlayTest() : stop_play_rules(initStopPlayRules()) {}
 
-    std::vector<NonTerminatingValidationFunction> stop_play_rules;
+    std::vector<ValidationFunction> stop_play_rules;
 
 
-    std::vector<NonTerminatingValidationFunction> initStopPlayRules()
+    std::vector<ValidationFunction> initStopPlayRules()
     {
-        return {[](std::shared_ptr<World> world_ptr,
-                   NonTerminatingValidationCoroutine::push_type& yield) {
-            // Wait 2 seconds for robots that start too close to the ball to move away
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
-            {
-                yield();
-            }
-            // TODO: (#1882) implement robots slow down for stop play
-            // robotsSlowDown(1.5, world_ptr, yield);
-            robotsAvoidBall(0.5, world_ptr, yield);
-        }};
+        return {
+            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+                // Wait 2 seconds for robots that start too close to the ball to move away
+                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+                {
+                    yield();
+                }
+                // TODO: (#1882) implement robots slow down for stop play
+                // robotsSlowDown(1.5, world_ptr, yield);
+                robotsAvoidBall(0.5, world_ptr, yield);
+            }};
     }
 
     void SetUp() override
@@ -55,8 +55,8 @@ TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
         {Point(-4, 0), Point(-0.3, 0), Point(0.3, 0), Point(0, 0.3), Point(-3, -1.5),
          Point(4.6, -3.1)}));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions =
         stop_play_rules;
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -71,8 +71,8 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
         {Point(-4, 0), Point(-2.3, 0), Point(-1.7, 0), Point(-2, 0.3), Point(-3, -1.5),
          Point(4.6, -3.1)}));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions =
         stop_play_rules;
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -88,8 +88,8 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
         {Point(-3, -2.5), Point(-4, -2), Point(-2, -2.5), Point(-3, -2), Point(-3.5, -2),
          Point(-3, -1)}));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions =
         stop_play_rules;
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -103,8 +103,8 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_robots_spread_out)
         {Point(-4, 0), Point(1.7, 0), Point(2.3, 0), Point(2, 0.3), Point(-3, -1.5),
          Point(3, -3)}));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions =
         stop_play_rules;
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -119,8 +119,8 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
         {Point(2, -2.5), Point(4, -1), Point(3, -2.5), Point(3, -2), Point(3.5, -2),
          Point(3, -1)}));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions =
         stop_play_rules;
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -134,8 +134,8 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
         {Point(-2, 0), Point(0, 0.3), Point(0.3, 0), Point(0, -0.3), Point(-0.3, 0),
          Point(0.2, 0.2)}));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions =
         stop_play_rules;
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -150,8 +150,8 @@ TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
         {Point(-4.5, 2), Point(0, 0.3), Point(0.3, 0), Point(0, -0.3), Point(-0.3, 0),
          Point(0.2, 0.2)}));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions =
         stop_play_rules;
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -169,8 +169,8 @@ TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_in_front_of_friendly_defense_a
         {Point(-4.5, 2), Point(0, 3), Point(-1, -1), Point(0, 0), Point(-1, 0),
          Point(2, 2)}));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions =
         stop_play_rules;
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

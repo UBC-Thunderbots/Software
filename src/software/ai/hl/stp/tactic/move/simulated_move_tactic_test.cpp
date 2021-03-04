@@ -34,9 +34,9 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
     setTactic(tactic);
     setRobotId(1);
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
+    std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              TerminatingValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -44,8 +44,7 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
-        {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
@@ -71,9 +70,9 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
     setTactic(tactic);
     setRobotId(1);
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
+    std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              TerminatingValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -82,8 +81,7 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
             ballKicked(Angle::zero(), world_ptr, yield);
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
-        {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
@@ -109,9 +107,9 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
     setTactic(tactic);
     setRobotId(1);
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
+    std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
-                              TerminatingValidationCoroutine::push_type& yield) {
+                              ValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -120,8 +118,7 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
             ballKicked(Angle::threeQuarter(), world_ptr, yield);
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
-        {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));

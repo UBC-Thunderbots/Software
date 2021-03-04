@@ -4,7 +4,7 @@
 #include "software/logger/logger.h"
 
 void robotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
-                         TerminatingValidationCoroutine::push_type& yield)
+                         ValidationCoroutine::push_type& yield)
 {
     auto robot_in_center_circle = [robot_id](std::shared_ptr<World> world_ptr) {
         std::optional<Robot> robot_optional =

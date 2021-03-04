@@ -3,7 +3,7 @@
 
 void robotAtPosition(RobotId robot_id, std::shared_ptr<World> world_ptr,
                      const Point& destination, double close_to_destination_threshold,
-                     TerminatingValidationCoroutine::push_type& yield)
+                     ValidationCoroutine::push_type& yield)
 {
     auto robot_at_destination = [robot_id, destination, close_to_destination_threshold](
                                     std::shared_ptr<World> world_ptr) {

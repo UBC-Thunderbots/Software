@@ -33,9 +33,8 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
     setAIPlay(TYPENAME(KickoffFriendlyPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // Two friendly robots near the half line setting up for offense
             Rectangle robotsOffensiveRect(Point(-1.75, 2.5), Point(-1.5, -2.5));
             robotInPolygon(1, robotsOffensiveRect, world_ptr, yield);
@@ -55,9 +54,8 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             ballKicked(Angle::zero(), world_ptr, yield);
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             for (RobotId robot_id : {0, 1, 2, 3, 5})
             {
                 {

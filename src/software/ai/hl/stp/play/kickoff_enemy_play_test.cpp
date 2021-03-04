@@ -31,9 +31,8 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
     setAIPlay(TYPENAME(KickoffEnemyPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_THEM);
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // TODO: Fix bug with robot three not shadowing the enemy kicker in
             // kickoff_enemy_play
             // https://github.com/UBC-Thunderbots/Software/issues/1945
@@ -55,7 +54,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
             robotInPolygon(4, robotsDefendingRect, world_ptr, yield);
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
         robotsInFriendlyHalf, robotsNotInCenterCircle};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

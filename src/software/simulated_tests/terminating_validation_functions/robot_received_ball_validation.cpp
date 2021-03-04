@@ -4,7 +4,7 @@
 
 
 void robotReceivedBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
-                       TerminatingValidationCoroutine::push_type& yield)
+                       ValidationCoroutine::push_type& yield)
 {
     auto ball_near_dribbler = [robot_id](std::shared_ptr<World> world_ptr) {
         std::optional<Robot> robotOptional =

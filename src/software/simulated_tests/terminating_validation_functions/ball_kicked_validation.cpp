@@ -4,7 +4,7 @@
 
 
 void ballKicked(Angle angle, std::shared_ptr<World> world_ptr,
-                TerminatingValidationCoroutine::push_type& yield)
+                ValidationCoroutine::push_type& yield)
 {
     while (!world_ptr->ball().hasBallBeenKicked(angle))
     {

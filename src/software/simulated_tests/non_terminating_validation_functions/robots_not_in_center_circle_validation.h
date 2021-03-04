@@ -9,7 +9,7 @@
  * @param yield yields control to the next routine (coroutines)
  */
 void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
-                             NonTerminatingValidationCoroutine::push_type& yield);
+                             ValidationCoroutine::push_type& yield);
 
 /**
  * Checks if a friendly robot is not in center circle of field, else fails assertion.
@@ -19,4 +19,4 @@ void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
  * @param yield yields control to the next routine (coroutines)
  */
 void robotNotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
-                            NonTerminatingValidationCoroutine::push_type& yield);
+                            ValidationCoroutine::push_type& yield);

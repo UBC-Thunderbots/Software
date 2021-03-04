@@ -6,7 +6,7 @@
 #include "software/logger/logger.h"
 
 void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
-                             NonTerminatingValidationCoroutine::push_type& yield)
+                             ValidationCoroutine::push_type& yield)
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
@@ -18,7 +18,7 @@ void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
 }
 
 void robotNotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
-                            NonTerminatingValidationCoroutine::push_type& yield)
+                            ValidationCoroutine::push_type& yield)
 {
     std::optional<Robot> robot_optional =
         world_ptr->friendlyTeam().getRobotById(robot_id);

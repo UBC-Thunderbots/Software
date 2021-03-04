@@ -11,4 +11,4 @@
  * @param yield yields control to the next routine (coroutines)
  */
 void robotsAvoidBall(double min_distance, std::shared_ptr<World> world_ptr,
-                     NonTerminatingValidationCoroutine::push_type& yield);
+                     ValidationCoroutine::push_type& yield);

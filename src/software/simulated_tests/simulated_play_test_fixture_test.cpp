@@ -29,17 +29,15 @@ TEST_F(SimulatedPlayTestFixtureTest,
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.5))
             {
                 yield("");
             }
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
-        {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(1.0));
@@ -50,17 +48,15 @@ TEST_F(SimulatedPlayTestFixtureTest,
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(1.0))
             {
                 yield("");
             }
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
-        {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     EXPECT_NONFATAL_FAILURE(
         runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -73,9 +69,8 @@ TEST_F(SimulatedPlayTestFixtureTest,
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() <= Timestamp::fromSeconds(0.5))
             {
                 yield("");
@@ -84,8 +79,7 @@ TEST_F(SimulatedPlayTestFixtureTest,
             EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.5));
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
-        {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     EXPECT_NONFATAL_FAILURE(
         runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -98,24 +92,21 @@ TEST_F(SimulatedPlayTestFixtureTest,
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.4))
             {
                 yield("");
             }
         },
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.6))
             {
                 yield("");
             }
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
-        {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(0.7));
@@ -126,24 +117,21 @@ TEST_F(SimulatedPlayTestFixtureTest,
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.4))
             {
                 yield("");
             }
         },
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.8))
             {
                 yield("");
             }
         }};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions =
-        {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     EXPECT_NONFATAL_FAILURE(
         runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -156,11 +144,10 @@ TEST_F(SimulatedPlayTestFixtureTest,
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> terminating_validation_functions = {};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
         }};
 
@@ -173,15 +160,13 @@ TEST_F(SimulatedPlayTestFixtureTest,
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> terminating_validation_functions = {};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
         },
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(100));
         }};
 
@@ -198,21 +183,19 @@ TEST_F(
     // Because the EXPECT_NONFATAL_FAILURE macro only captures a single failure, we have
     // to write this failing function in such a way that it will only fail once during the
     // test. To do this we check the timestamp very close to the test timeout
-    auto failing_validation_function =
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
-            EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.5));
-        };
+    auto failing_validation_function = [](std::shared_ptr<World> world_ptr,
+                                          ValidationCoroutine::push_type& yield) {
+        EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.5));
+    };
 
-    auto passing_validation_function =
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
-            EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
-        };
+    auto passing_validation_function = [](std::shared_ptr<World> world_ptr,
+                                          ValidationCoroutine::push_type& yield) {
+        EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
+    };
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> terminating_validation_functions = {};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
         passing_validation_function, failing_validation_function};
 
     EXPECT_NONFATAL_FAILURE(
@@ -236,21 +219,19 @@ TEST_F(
     // Because the EXPECT_NONFATAL_FAILURE macro only captures a single failure, we have
     // to write this failing function in such a way that it will only fail once during the
     // test. To do this we check the timestamp very close to the test timeout
-    auto failing_validation_function =
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
-            EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.5));
-        };
+    auto failing_validation_function = [](std::shared_ptr<World> world_ptr,
+                                          ValidationCoroutine::push_type& yield) {
+        EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.5));
+    };
 
-    auto passing_validation_function =
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
-            EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
-        };
+    auto passing_validation_function = [](std::shared_ptr<World> world_ptr,
+                                          ValidationCoroutine::push_type& yield) {
+        EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
+    };
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {};
+    std::vector<ValidationFunction> terminating_validation_functions = {};
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
         failing_validation_function,
         passing_validation_function,
     };
@@ -266,20 +247,17 @@ TEST_F(SimulatedPlayTestFixtureTest,
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
 
-    std::vector<TerminatingValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           TerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.4));
         },
     };
 
-    std::vector<NonTerminatingValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
         },
-        [](std::shared_ptr<World> world_ptr,
-           NonTerminatingValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(100));
         }};
 

@@ -10,4 +10,4 @@
  * @param yield yields control to the next routine (coroutines)
  */
 void robotsSlowDown(double max_speed, std::shared_ptr<World> world_ptr,
-                    NonTerminatingValidationCoroutine::push_type& yield);
+                    ValidationCoroutine::push_type& yield);
