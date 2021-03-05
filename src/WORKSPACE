@@ -4,8 +4,8 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
 http_archive(
     name = "rules_foreign_cc",
-    strip_prefix = "rules_foreign_cc-main",
     sha256 = "6f0ae307292d6ce3a5499e675430a7e8d9be5bead0defce5cb75695608045eb8",
+    strip_prefix = "rules_foreign_cc-main",
     url = "https://github.com/bazelbuild/rules_foreign_cc/archive/main.zip",
 )
 
