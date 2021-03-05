@@ -6,4 +6,3 @@ cc_library(
     hdrs = ["UARTCommunication.h"],
     deps = ["@boost//:asio"],
 )
-

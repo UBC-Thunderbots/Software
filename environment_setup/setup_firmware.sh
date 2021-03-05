@@ -41,4 +41,3 @@ sudo ln -sf ~/.platformio/penv/bin/pio /usr/local/bin/pio
 echo "================================================================"
 echo "Done platformio Setup, please reboot for changes to take place"
 echo "================================================================"
-

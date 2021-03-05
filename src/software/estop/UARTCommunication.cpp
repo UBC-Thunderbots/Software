@@ -1,6 +1,3 @@
-//
-// Created by amr on 2020-12-01.
-//
 
 #include "UARTCommunication.h"
 
@@ -9,6 +6,7 @@
 #include <g3log/g3log.hpp>
 #include <iostream>
 #include <boost/function.hpp>
+#include <boost/exception/all.hpp>
 
 UARTCommunication::UARTCommunication(){}
 
@@ -32,8 +30,8 @@ int UARTCommunication::openPort(io_service &ioService, int baudRate, std::string
     }
     catch(boost::exception const&  ex)
     {
-        //LOG(WARNING) << "Unable to setup serial communication with port: " << port<< std::endl;
-        std::cout << "Unable to setup serial communication with port: " << port << std::endl;
+        LOG(WARNING) << "Unable to setup serial communication with port: " << port;
+        LOG(WARNING) << "Boost exception: " <<diagnostic_information(ex);
         return -1;
     }
 

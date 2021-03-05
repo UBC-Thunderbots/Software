@@ -16,6 +16,7 @@ class UARTCommunication
 
     /**
      * Attempts to open a serial connection with the given device port
+     * setting used: No flow control, No parity, 1 stop bit
      *
      * @param ioService boost asio construct for managing io operations
      * @param baudRate the desired baud rate of the connection
