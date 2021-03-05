@@ -16,7 +16,7 @@ def generate_heatmap(
     and contains the value of the heatmap function called at its position.
 
     :param x_bounds: the x-axis boundaries of the heatmap
-    :param y_bounds: the y-axis boundaries of the heatmapo
+    :param y_bounds: the y-axis boundaries of the heatmap
     :param grid_size: the size of one grid cell on the heatmap
     :param heatmap_function: the function to generate the heatmap
     :return: a heatmap
