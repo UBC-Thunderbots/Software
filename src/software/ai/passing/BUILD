@@ -58,10 +58,35 @@ cc_library(
     name = "field_pitch_division",
     hdrs = ["field_pitch_division.h"],
     deps = [
+        "//software/world:field",
         "//software/geom:rectangle",
         "//software/geom:point",
     ],
 )
+
+cc_library(
+    name = "eighteen_zone_pitch_division",
+    hdrs = ["eighteen_zone_pitch_division.h"],
+    srcs = [
+            "eighteen_zone_pitch_division.cpp"],
+    deps = [
+        ":field_pitch_division",
+        "//software/util/make_enum",
+        "//software/geom:rectangle",
+        "//software/geom:point",
+    ],
+)
+
+cc_test(
+    name = "eighteen_zone_pitch_division_test",
+    srcs = ["eighteen_zone_pitch_division_test.cpp"],
+    deps = [
+        ":eighteen_zone_pitch_division",
+        "//software/geom/algorithms:algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
 
 cc_library(
     name = "pass_generator",
