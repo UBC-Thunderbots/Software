@@ -1,23 +1,23 @@
 from type_map import CPP_TYPE_MAP
 from dynamic_parameter_schema import CONSTANT_KEY
-from case_conversion import to_pascal_case, to_camel_case
+from case_conversion import to_pascal_case
 import re
 
 #######################################################################
 #                            CPP Parameter                            #
 #######################################################################
 
-PARAMETER_PUBLIC_ENTRY = """const std::shared_ptr<const {param_class}<{type}>> {immutable_accessor_name}() const
+PARAMETER_PUBLIC_ENTRY = """const std::shared_ptr<const {param_class}<{type}>> get{immutable_accessor_name}() const
     {{
         return std::const_pointer_cast<const {param_class}<{type}>>({param_variable_name});
     }}
 
-    const std::shared_ptr<{param_class}<{type}>> {mutable_accessor_name}()
+    const std::shared_ptr<{param_class}<{type}>> get{mutable_accessor_name}()
     {{
         return {param_variable_name};
     }}"""
 
-PARAMETER_PUBLIC_ENTRY_CONST = """const std::shared_ptr<const {param_class}<{type}>> {immutable_accessor_name}() const
+PARAMETER_PUBLIC_ENTRY_CONST = """const std::shared_ptr<const {param_class}<{type}>> get{immutable_accessor_name}() const
     {{
         return std::const_pointer_cast<const {param_class}<{type}>>({param_variable_name});
     }}"""
@@ -40,11 +40,7 @@ PARAMETER_COMMAND_LINE_OPTION_ENTRY = 'desc.add_options()("{arg_prefix}{param_na
 
 COMMAND_LINE_ARG_ENTRY = "{param_type} {param_name} = {quote}{value}{quote};"
 
-LOAD_COMMAND_LINE_ARG_INTO_CONFIG = "this->{dependencies}mutable{param_accessor_name}()->setValue(args.{arg_prefix}{param_name});"
-
-# These are to be used of minimum and maximum value attributes are missing from numeric parameters
-NUMERIC_PARAMETER_MIN = "std::numeric_limits<{type}>::min()"
-NUMERIC_PARAMETER_MAX = "std::numeric_limits<{type}>::max()"
+LOAD_COMMAND_LINE_ARG_INTO_CONFIG = "this->{dependencies}getMutable{param_accessor_name}()->setValue(args.{arg_prefix}{param_name});"
 
 
 class CppParameter(object):
@@ -75,7 +71,7 @@ class CppParameter(object):
 
     @staticmethod
     def is_numeric_type(param_type: str) -> bool:
-        return re.match("int|uint|float", param_type)
+        return re.match("int|uint|double", param_type)
 
     @staticmethod
     def find_quote(param_type: str) -> str:
@@ -133,15 +129,15 @@ class CppParameter(object):
             PARAMETER_PUBLIC_ENTRY_CONST.format(
                 param_class=self.param_class,
                 type=self.cpp_type,
-                immutable_accessor_name=to_camel_case(self.param_name),
+                immutable_accessor_name=to_pascal_case(self.param_name),
                 param_variable_name=self.param_variable_name,
             )
             if self.is_constant
             else PARAMETER_PUBLIC_ENTRY.format(
                 param_class=self.param_class,
                 type=self.cpp_type,
-                immutable_accessor_name=to_camel_case(self.param_name),
-                mutable_accessor_name="mutable" + to_pascal_case(self.param_name),
+                immutable_accessor_name=to_pascal_case(self.param_name),
+                mutable_accessor_name="Mutable" + to_pascal_case(self.param_name),
                 param_variable_name=self.param_variable_name,
             )
         )
@@ -157,23 +153,13 @@ class CppParameter(object):
     @property
     def constructor_entry(self):
         if CppParameter.is_numeric_type(self.param_type):
-            min_value = (
-                self.param_metadata["min"]
-                if "min" in self.param_metadata
-                else NUMERIC_PARAMETER_MIN.format(type=self.param_type)
-            )
-            max_value = (
-                self.param_metadata["max"]
-                if "max" in self.param_metadata
-                else NUMERIC_PARAMETER_MAX.format(type=self.param_type)
-            )
             return NUMERIC_PARAMETER_CONSTRUCTOR_ENTRY.format(
                 param_variable_name=self.param_variable_name,
                 type=self.cpp_type,
                 param_name=self.param_name,
                 value=self.param_value,
-                min_value=min_value,
-                max_value=max_value,
+                min_value=self.param_metadata["min"],
+                max_value=self.param_metadata["max"],
             )
         elif self.param_type == "enum":
             param_enum = self.param_metadata["enum"]

@@ -25,6 +25,9 @@ const double BALL_MAX_RADIUS_METERS = 0.0215;
 const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
 // The mass of a standard golf ball, as defined by https://en.wikipedia.org/wiki/Golf_ball
 const double BALL_MASS_KG = 0.004593;
+// The max allowed speed of the robot when the stop command is issued, in meters per
+// second
+const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
 // The maximum number of robots we can communicate with over radio.
 const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 /* Robot Attributes */
@@ -108,22 +111,22 @@ const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] 
 };
 
 // the port robots are listening to for vision and primitives
-const unsigned VISION_PORT    = 42069;
-const unsigned PRIMITIVE_PORT = 42070;
+const short unsigned int VISION_PORT    = 42069;
+const short unsigned int PRIMITIVE_PORT = 42070;
 
 // the port the AI receives msgs from the robot
-const unsigned ROBOT_STATUS_PORT = 42071;
-const unsigned ROBOT_LOGS_PORT   = 42072;
+const short unsigned int ROBOT_STATUS_PORT = 42071;
+const short unsigned int ROBOT_LOGS_PORT   = 42072;
 
 // the port to listen to for what side of the field to defend
 const unsigned DEFENDING_SIDE_PORT = 42073;
 
 // the timeout to recv a network packet
-const unsigned NETWORK_TIMEOUT_MS = 1000;
+const int NETWORK_TIMEOUT_MS = 1000;
 
 // maximum transfer unit of the network interface
 // this is an int to avoid Wconversion with lwip
-const int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
 
 // The total number of possible robot ids between two teams
 const unsigned int MAX_ROBOT_IDS = 16;
@@ -132,3 +135,5 @@ const unsigned int MAX_ROBOT_IDS = 16;
 // 16V, so we use 16 here to approximate a fully-charged battery
 // Makes the battery max voltage a constant now that we are simulating firmware
 const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
+
+const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;

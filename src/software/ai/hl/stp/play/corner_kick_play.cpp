@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/passing/pass_generator.h"
@@ -12,10 +12,11 @@
 #include "software/world/ball.h"
 
 CornerKickPlay::CornerKickPlay()
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(DynamicParameters->getAIConfig()
-                                                           ->getCornerKickPlayConfig()
-                                                           ->MaxTimeCommitToPassSeconds()
-                                                           ->value()))
+    : MAX_TIME_TO_COMMIT_TO_PASS(
+          Duration::fromSeconds(DynamicParameters->getAiConfig()
+                                    ->getCornerKickPlayConfig()
+                                    ->getMaxTimeCommitToPassSeconds()
+                                    ->value()))
 {
 }
 

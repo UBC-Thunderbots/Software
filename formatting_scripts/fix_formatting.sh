@@ -86,7 +86,7 @@ function run_code_spell(){
 
 function run_git_diff_check(){
     printf "Checking for merge conflict markers...\n\n"
-    cd $CURR_DIR && git --no-pager diff --check
+    cd $CURR_DIR && git -c "core.whitespace=-trailing-space" --no-pager diff --check
     if [[ "$?" != 0 ]]; then
         printf "***Please fix merge conflict markers!***\n\n"
         exit 1

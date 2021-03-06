@@ -49,27 +49,29 @@ jobs:
             --instrumentation_filter=//...   \
             --test_output=errors             \
             -- //... -//software/simulated_tests/... \
+            -//software/ai/hl/stp/play/... \
+            -//software/ai/hl/stp/tactic/... \
             -//firmware_new/...
              
-      # uploads coverage data to codecov
-      - name: Upload Coverage
-        run: |
-         cd src
-         bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/ > codecov.log
-         cat codecov.log | head -n100
-         cat codecov.log | tail -n100
-         
   firmware-tests:
     name: Firmware Tests
     runs-on: ubuntu-18.04
+    env:
+      DISPLAY: :0
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
     
       - name: Environment Setup
         run: |
+          sudo apt-get install xvfb
+          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
+
+      - name: STM32CubeMX Code Generation
+        run: |
+          "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
 
       - name: New Robot Firmware Build
         run: |
@@ -100,7 +102,9 @@ jobs:
       - name: Simulated Test
         run: |
           cd src
-          bazel test //software/simulated_tests/...
+          bazel coverage //software/simulated_tests/... \
+            //software/ai/hl/stp/play/... \
+            //software/ai/hl/stp/tactic/... \
           
   memory-leak-checks:
     name: Memory Leak Checks

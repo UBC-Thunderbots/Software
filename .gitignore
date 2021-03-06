@@ -42,6 +42,8 @@ Makefile
 *.swo
 *.swp
 src/compile_commands.json
+src/external/external
+.cache/
 
 # Emacs
 \#*#
@@ -139,3 +141,6 @@ src/core*
 # SSL GameController
 src/config
 *.stream
+
+# ipynb Jupyter Notebooks
+*.ipynb

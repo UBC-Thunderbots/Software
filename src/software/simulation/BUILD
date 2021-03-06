@@ -84,6 +84,7 @@ cc_test(
         "//firmware/app/world:firmware_robot",
         "//shared/proto:tbots_cc_proto",
         "//shared/proto:tbots_nanopb_proto",
+        "//shared/test_util",
         "//software/simulation/physics:physics_robot",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
@@ -198,18 +199,6 @@ cc_library(
         "//software/proto:defending_side_msg_cc_proto",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/world:field",
-    ],
-)
-
-cc_binary(
-    name = "standalone_simulator_main",
-    srcs = ["standalone_simulator_main.cpp"],
-    deps = [
-        ":standalone_simulator",
-        "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
-        "//software/logger",
-        "//software/parameter:dynamic_parameters",
-        "@boost//:program_options",
     ],
 )
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "software/ai/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/action/autochip_move_action.h"
 #include "software/ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/point.h"
@@ -36,7 +36,7 @@ class GoalieTactic : public Tactic
     explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
                           const Team &enemy_team,
                           std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-                              DynamicParameters->getAIConfig()->getGoalieTacticConfig());
+                              DynamicParameters->getAiConfig()->getGoalieTacticConfig());
 
     GoalieTactic() = delete;
 
@@ -54,7 +54,7 @@ class GoalieTactic : public Tactic
 
     void updateWorldParams(const World &world) override;
 
-    double calculateRobotCost(const Robot &robot, const World &world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     /**
      * Gets intersections between the ball velocity ray and the full goal segment
@@ -64,14 +64,13 @@ class GoalieTactic : public Tactic
     /**
      * Creates action to panic and stop the ball
      *
-     * @param autochip_move_action The action to reuse
+     * @param move_action The action to reuse
      * @param stop_ball_point The point to the stop the ball
      *
      * @return the action to use to stop the ball
      */
-    std::shared_ptr<Action> panicAndStopBall(
-        std::shared_ptr<AutochipMoveAction> autochip_move_action,
-        const Point &stop_ball_point);
+    std::shared_ptr<Action> panicAndStopBall(std::shared_ptr<MoveAction> move_action,
+                                             const Point &stop_ball_point);
 
     /**
      * Chip ball if safe
@@ -87,12 +86,11 @@ class GoalieTactic : public Tactic
     /**
      * Position robot to block potential shots
      *
-     * @param autochip_move_action The action to reuse
+     * @param move_action The action to reuse
      *
      * @return The Action to position the robot to block the shot
      */
-    std::shared_ptr<Action> positionToBlockShot(
-        std::shared_ptr<AutochipMoveAction> autochip_move_action);
+    std::shared_ptr<Action> positionToBlockShot(std::shared_ptr<MoveAction> move_action);
 
     bool isGoalieTactic() const override;
 

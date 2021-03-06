@@ -3,6 +3,7 @@ from c_parameter import CParameter
 from typing import List, Set
 from dynamic_parameter_schema import PARAMETER_KEY, INCLUDE_KEY, CONSTANT_KEY
 from type_map import C_TYPE_MAP
+from case_conversion import to_pascal_case
 
 #######################################################################
 #                              C Writer                               #
@@ -50,9 +51,9 @@ class CWriter(object):
 
         for config, metadata in config_metadata.items():
 
-            # we convert the yaml file name to camel case
+            # we convert the yaml file name to pascal case
             # and store that as the config_name
-            config_name = CWriter.to_camel_case(config.split(".")[0])
+            config_name = to_pascal_case(config.split(".")[0])
 
             config = CConfig(
                 config_name, "{}_ptr->{}".format(top_level_config_name, config_name)
@@ -95,9 +96,7 @@ class CWriter(object):
             # add all the valid included configs to the CConfig
             if INCLUDE_KEY in metadata:
                 for included_yaml in metadata["include"]:
-                    config.include_config(
-                        CWriter.to_camel_case(included_yaml.split(".")[0])
-                    )
+                    config.include_config(to_pascal_case(included_yaml.split(".")[0]))
                     config_empty = False
 
             if not config_empty:
@@ -127,7 +126,7 @@ class CWriter(object):
         # generate header file
         with open(f"{output_file}", "w") as header_file:
 
-            # forward declerations and definitions
+            # forward declarations and definitions
             contents = "".join([conf.forward_declaration for conf in c_configs])
             contents += "".join([conf.definition for conf in c_configs])
 
@@ -159,7 +158,3 @@ class CWriter(object):
                     app_dynamic_parameters_destroy_impl=app_dynamic_parameters_destroy_impl,
                 )
             )
-
-    @staticmethod
-    def to_camel_case(snake_str):
-        return "".join(x.title() for x in snake_str.split("_"))

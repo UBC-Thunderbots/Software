@@ -77,7 +77,7 @@ class YamlLoadFixture : public ::testing::Test
     void SetUp() override
     {
         // this is loaded from bazel data
-        boost::filesystem::path path("./shared/parameter_v2/config_definitions/test");
+        boost::filesystem::path path("./shared/parameter_v2/config_definitions");
 
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {
@@ -131,15 +131,6 @@ class YamlLoadFixture : public ::testing::Test
     // in a mapping to the config file it was loaded from
     std::map<std::string, ConfigMetadata_t> config_file_to_metadata_map;
 };
-
-TEST_F(YamlLoadFixture, MemoryInitializationSanityCheck)
-{
-    const ThunderbotsConfig_t* config = app_dynamic_parameters_create();
-    ASSERT_EQ(config->Example->example_bool_param, true);
-    ASSERT_EQ(config->Example->example_int_param, 3);
-    ASSERT_EQ(std::string(config->Example->example_string_param), "Hello World");
-    app_dynamic_parameters_destroy(config);
-}
 
 TEST_F(YamlLoadFixture, TestProperGeneration)
 {

@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/autochip_move_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/logger/logger.h"
 
@@ -36,7 +36,7 @@ void DefenseShadowEnemyTactic::updateControlParams(const EnemyThreat &enemy_thre
 }
 
 double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
-                                                    const World &world)
+                                                    const World &world) const
 {
     if (!enemy_threat)
     {
@@ -52,20 +52,20 @@ double DefenseShadowEnemyTactic::calculateRobotCost(const Robot &robot,
 
 void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto autochip_move_action = std::make_shared<AutochipMoveAction>(false);
-    auto stop_action          = std::make_shared<StopAction>(true);
+    auto move_action = std::make_shared<MoveAction>(false);
+    auto stop_action = std::make_shared<StopAction>(true);
 
     do
     {
         if (!enemy_threat)
         {
             LOG(WARNING) << "Running DefenseShadowEnemyTactic without an enemy threat";
-            stop_action->updateControlParams(*robot, false);
+            stop_action->updateControlParams(*robot_, false);
             yield(stop_action);
         }
 
         Robot enemy_robot                   = enemy_threat->robot;
-        std::vector<Robot> robots_to_ignore = {*robot};
+        std::vector<Robot> robots_to_ignore = {*robot_};
 
         if (ignore_goalie && friendly_team.goalie())
         {
@@ -91,25 +91,26 @@ void DefenseShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &y
         // received the pass
         if (enemy_robot.isNearDribbler(ball.position()) &&
             ball.velocity().length() <
-                defense_shadow_enemy_tactic_config->BallStealSpeed()->value())
+                defense_shadow_enemy_tactic_config->getBallStealSpeed()->value())
         {
-            autochip_move_action->updateControlParams(
-                *robot, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
-                0, DribblerMode::MAX_FORCE, YEET_CHIP_DISTANCE_METERS,
-                BallCollisionType::AVOID);
-            yield(autochip_move_action);
+            move_action->updateControlParams(
+                *robot_, ball.position(), enemy_shot_vector.orientation() + Angle::half(),
+                0, DribblerMode::MAX_FORCE, BallCollisionType::AVOID,
+                {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
+            yield(move_action);
         }
         else
         {
             Angle facing_enemy_robot =
-                (enemy_robot.position() - robot->position()).orientation();
-            autochip_move_action->updateControlParams(
-                *robot, position_to_block_shot, facing_enemy_robot, 0, DribblerMode::OFF,
-                YEET_CHIP_DISTANCE_METERS, BallCollisionType::AVOID);
-            yield(autochip_move_action);
+                (enemy_robot.position() - robot_->position()).orientation();
+            move_action->updateControlParams(
+                *robot_, position_to_block_shot, facing_enemy_robot, 0, DribblerMode::OFF,
+                BallCollisionType::AVOID,
+                {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
+            yield(move_action);
         }
 
-    } while (!autochip_move_action->done());
+    } while (!move_action->done());
 }
 
 void DefenseShadowEnemyTactic::accept(TacticVisitor &visitor) const

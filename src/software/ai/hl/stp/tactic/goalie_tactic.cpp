@@ -114,7 +114,7 @@ bool GoalieTactic::isGoalieTactic() const
     return true;
 }
 
-double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
+double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // We don't prefer any particular robot to be the goalie, as there should only
     // ever be one robot that can act as the goalie
@@ -123,9 +123,9 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
 
 void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto autochip_move_action = std::make_shared<AutochipMoveAction>(true);
-    auto chip_action          = std::make_shared<ChipAction>();
-    auto stop_action          = std::make_shared<StopAction>(false);
+    auto move_action = std::make_shared<MoveAction>(true);
+    auto chip_action = std::make_shared<ChipAction>();
+    auto stop_action = std::make_shared<StopAction>(false);
 
     do
     {
@@ -153,13 +153,13 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         auto intersections = getIntersectionsBetweenBallVelocityAndFullGoalSegment();
 
         // when should the goalie start panicking to move into place to stop the ball
-        auto ball_speed_panic = goalie_tactic_config->BallSpeedPanic()->value();
+        auto ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
 
         // case 1: goalie should panic and stop the ball, its moving too fast towards the
         // net
         if (!intersections.empty() && ball.velocity().length() > ball_speed_panic)
         {
-            next_action = panicAndStopBall(autochip_move_action, intersections[0]);
+            next_action = panicAndStopBall(move_action, intersections[0]);
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
@@ -172,11 +172,11 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         // position goalie in best position to block shot
         else
         {
-            next_action = positionToBlockShot(autochip_move_action);
+            next_action = positionToBlockShot(move_action);
         }
 
         yield(next_action);
-    } while (!autochip_move_action->done());
+    } while (!move_action->done());
 }
 
 std::vector<Point> GoalieTactic::getIntersectionsBetweenBallVelocityAndFullGoalSegment()
@@ -196,21 +196,21 @@ std::vector<Point> GoalieTactic::getIntersectionsBetweenBallVelocityAndFullGoalS
 }
 
 std::shared_ptr<Action> GoalieTactic::panicAndStopBall(
-    std::shared_ptr<AutochipMoveAction> autochip_move_action,
-    const Point &stop_ball_point)
+    std::shared_ptr<MoveAction> move_action, const Point &stop_ball_point)
 {
     // the ball is heading towards the net, move to intercept the shot
     // the final speed is a dynamic parameter so that if the goalie needs
     // to dive for the shot instead of stop when reaching the intersection
     // point it can do so.
     Point goalie_pos =
-        closestPoint((*robot).position(), Segment(ball.position(), stop_ball_point));
+        closestPoint((*robot_).position(), Segment(ball.position(), stop_ball_point));
     Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-    autochip_move_action->updateControlParams(
-        *robot, goalie_pos, goalie_orientation, 0.0, DribblerMode::OFF,
-        YEET_CHIP_DISTANCE_METERS, BallCollisionType::ALLOW);
-    return autochip_move_action;
+    move_action->updateControlParams(
+        *robot_, goalie_pos, goalie_orientation, 0.0, DribblerMode::OFF,
+        BallCollisionType::ALLOW,
+        {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
+    return move_action;
 }
 
 std::shared_ptr<Action> GoalieTactic::chipBallIfSafe(
@@ -228,7 +228,7 @@ std::shared_ptr<Action> GoalieTactic::chipBallIfSafe(
     // for now we just stop
     if (contains(dont_chip_rectangle, ball.position()) == true)
     {
-        stop_action->updateControlParams(*robot, false);
+        stop_action->updateControlParams(*robot_, false);
         return stop_action;
     }
     // if the ball is slow or stationary inside our defense area, and is safe
@@ -236,14 +236,14 @@ std::shared_ptr<Action> GoalieTactic::chipBallIfSafe(
     else
     {
         chip_action->updateControlParams(
-            *robot, ball.position(),
+            *robot_, ball.position(),
             (ball.position() - field.friendlyGoalCenter()).orientation(), 2);
         return chip_action;
     }
 }
 
 std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
-    std::shared_ptr<AutochipMoveAction> autochip_move_action)
+    std::shared_ptr<MoveAction> move_action)
 {
     // compute angle between two vectors, negative goal post to ball and positive
     // goal post to ball
@@ -254,7 +254,7 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
 
     // how far in should the goalie wedge itself into the block cone, to block
     // balls
-    auto block_cone_radius = goalie_tactic_config->BlockConeRadius()->value();
+    auto block_cone_radius = goalie_tactic_config->getBlockConeRadius()->value();
     // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
     // either side
     Point goalie_pos = calculateBlockCone(
@@ -263,7 +263,8 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
 
     // by how much should the defense area be decreased so the goalie stays close
     // towards the net
-    auto defense_area_deflation = goalie_tactic_config->DefenseAreaDeflation()->value();
+    auto defense_area_deflation =
+        goalie_tactic_config->getDefenseAreaDeflation()->value();
     // we want to restrict the block cone to the friendly crease, also potentially
     // scaled by a defense_area_deflation_parameter
     Rectangle deflated_defense_area = field.friendlyDefenseArea();
@@ -299,11 +300,12 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
 
     // what should the final goalie speed be, so that the goalie accelerates
     // faster
-    auto goalie_final_speed = goalie_tactic_config->GoalieFinalSpeed()->value();
-    autochip_move_action->updateControlParams(
-        *robot, goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
-        YEET_CHIP_DISTANCE_METERS, BallCollisionType::ALLOW);
-    return autochip_move_action;
+    auto goalie_final_speed = goalie_tactic_config->getGoalieFinalSpeed()->value();
+    move_action->updateControlParams(
+        *robot_, goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
+        BallCollisionType::ALLOW,
+        {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
+    return move_action;
 }
 
 void GoalieTactic::accept(TacticVisitor &visitor) const

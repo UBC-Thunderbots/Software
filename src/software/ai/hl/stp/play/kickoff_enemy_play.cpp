@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -32,23 +32,23 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            DynamicParameters->getAIConfig()
+                                            DynamicParameters->getAiConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
-                                                ->BallStealSpeed()
+                                                ->getBallStealSpeed()
                                                 ->value(),
                                             false, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            DynamicParameters->getAIConfig()
+                                            DynamicParameters->getAiConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
-                                                ->BallStealSpeed()
+                                                ->getBallStealSpeed()
                                                 ->value(),
                                             false, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, world.ball(),
-                                            DynamicParameters->getAIConfig()
+                                            DynamicParameters->getAiConfig()
                                                 ->getDefenseShadowEnemyTacticConfig()
-                                                ->BallStealSpeed()
+                                                ->getBallStealSpeed()
                                                 ->value(),
                                             false, true)};
 
@@ -117,7 +117,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             {
                 // Assign the first 3 robots to shadow enemies, if the enemies exist
                 auto enemy_threat = enemy_threats.at(i);
-                // Shadow with a distance slighlty more than the distance from the enemy
+                // Shadow with a distance slightly more than the distance from the enemy
                 // robot to the center line, so we are always just on our side of the
                 // center line
                 double shadow_dist = std::fabs(enemy_threat.robot.position().x()) +

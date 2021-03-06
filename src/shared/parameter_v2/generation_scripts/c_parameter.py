@@ -16,7 +16,7 @@ class CParameter(object):
         are available through read-only properties.
 
         :param param_name: The name of the parameter, as defined in the yaml
-        :param param_type: The type of the paramater, as defined in the yaml
+        :param param_type: The type of the parameter, as defined in the yaml
         :param param_value: The constant value the parameter should hold
 
         """

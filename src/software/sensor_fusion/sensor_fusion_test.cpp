@@ -20,16 +20,22 @@ class SensorFusionTest : public ::testing::Test
           geom_data(initSSLDivBGeomData()),
           robot_status_msg_id_1(initRobotStatusId1()),
           robot_status_msg_id_2(initRobotStatusId2()),
+          robot_status_msg_wheel_motor_hot(initWheelMotorHotErrorCode()),
+          robot_status_msg_low_cap(initLowCapErrorCode()),
+          robot_status_msg_dribble_motor_hot(initDribbleMotorHotErrorCode()),
+          robot_status_msg_multiple_error_codes(initMultipleErrorCode()),
+          robot_status_msg_no_error_code(initNoErrorCode()),
           referee_indirect_yellow(initRefereeIndirectYellow()),
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart()),
           referee_ball_placement_yellow(initRefereeBallPlacementYellow()),
-          referee_ball_placement_blue(initRefereeBallPlacementBlue())
+          referee_ball_placement_blue(initRefereeBallPlacementBlue()),
+          referee_goalie_id(initRefereeGoalieId())
     {
-        config->mutableFriendlyColorYellow()->setValue(true);
+        config->getMutableFriendlyColorYellow()->setValue(true);
 
-        config->mutableOverrideGameControllerDefendingSide()->setValue(true);
-        config->mutableDefendingPositiveSide()->setValue(false);
+        config->getMutableOverrideGameControllerDefendingSide()->setValue(true);
+        config->getMutableDefendingPositiveSide()->setValue(false);
     }
 
     std::shared_ptr<SensorFusionConfig> config;
@@ -42,11 +48,18 @@ class SensorFusionTest : public ::testing::Test
     // world associated with geom_data and detection_frame only
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_1;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_id_2;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_wheel_motor_hot;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_low_cap;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_dribble_motor_hot;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_multiple_error_codes;
+    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_no_error_code;
     std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
     std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
     std::unique_ptr<SSLProto::Referee> referee_ball_placement_yellow;
     std::unique_ptr<SSLProto::Referee> referee_ball_placement_blue;
+    std::unique_ptr<SSLProto::Referee> referee_goalie_id;
+
 
     BallState initBallState()
     {
@@ -211,7 +224,7 @@ class SensorFusionTest : public ::testing::Test
         chipper_kicker_status->set_ms_since_kicker_fired(9);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
 
-        return std::move(robot_msg);
+        return robot_msg;
     }
 
     std::unique_ptr<TbotsProto::RobotStatus> initRobotStatusId2()
@@ -228,6 +241,55 @@ class SensorFusionTest : public ::testing::Test
         chipper_kicker_status->set_ms_since_chipper_fired(11);
         chipper_kicker_status->set_ms_since_kicker_fired(6);
         *(robot_msg->mutable_chipper_kicker_status()) = *chipper_kicker_status;
+
+        return robot_msg;
+    }
+
+    std::unique_ptr<TbotsProto::RobotStatus> initWheelMotorHotErrorCode()
+    {
+        // Adding a WHEEL_0_MOTOR_HOT error code to robotStatus of robot 2
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
+
+        return std::move(robot_msg);
+    }
+
+    std::unique_ptr<TbotsProto::RobotStatus> initLowCapErrorCode()
+    {
+        // Adding a LOW_CAP error code to robotStatus of robot 2
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
+
+        return std::move(robot_msg);
+    }
+
+    std::unique_ptr<TbotsProto::RobotStatus> initDribbleMotorHotErrorCode()
+    {
+        // Adding a DRIBBLER_MOTOR_HOT error code to robotStatus of robot 2
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
+
+        return std::move(robot_msg);
+    }
+
+    std::unique_ptr<TbotsProto::RobotStatus> initMultipleErrorCode()
+    {
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
+        robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
+
+        return std::move(robot_msg);
+    }
+
+    std::unique_ptr<TbotsProto::RobotStatus> initNoErrorCode()
+    {
+        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
+        robot_msg->set_robot_id(2);
 
         return std::move(robot_msg);
     }
@@ -276,7 +338,142 @@ class SensorFusionTest : public ::testing::Test
 
         return ref_msg;
     }
+
+    std::unique_ptr<SSLProto::Referee> initRefereeGoalieId()
+    {
+        auto ref_msg           = std::make_unique<SSLProto::Referee>();
+        auto ref_friendly_team = std::make_unique<SSLProto::Referee_TeamInfo>();
+        auto ref_enemy_team    = std::make_unique<SSLProto::Referee_TeamInfo>();
+        ref_friendly_team->set_goalkeeper(2);
+        ref_enemy_team->set_goalkeeper(2);
+        *(ref_msg->mutable_yellow()) = *ref_friendly_team;
+        *(ref_msg->mutable_blue())   = *ref_enemy_team;
+
+        return ref_msg;
+    }
 };
+
+TEST_F(SensorFusionTest, test_making_robot_move_capability_unavailable_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_wheel_motor_hot;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(1, robot_unavailable_capabilities.size());
+    bool is_movement_disabled =
+        robot_unavailable_capabilities.find(RobotCapability::Move) !=
+        robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_movement_disabled);
+}
+
+TEST_F(SensorFusionTest,
+       test_making_chip_and_kick_robot_capabilities_unavailable_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_low_cap;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(2, robot_unavailable_capabilities.size());
+
+    bool is_kick_disabled = robot_unavailable_capabilities.find(RobotCapability::Kick) !=
+                            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_kick_disabled);
+
+    bool is_chip_disabled = robot_unavailable_capabilities.find(RobotCapability::Chip) !=
+                            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_chip_disabled);
+}
+
+TEST_F(SensorFusionTest,
+       test_making_dribble_robot_capabilities_unavailable_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_dribble_motor_hot;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(1, robot_unavailable_capabilities.size());
+
+    bool is_dribble_disabled =
+        robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
+        robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_dribble_disabled);
+}
+
+TEST_F(SensorFusionTest, test_making_all_robot_capabilities_unavailable_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_multiple_error_codes;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(4, robot_unavailable_capabilities.size());
+
+    bool is_dribble_disabled =
+        robot_unavailable_capabilities.find(RobotCapability::Dribble) !=
+        robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_dribble_disabled);
+
+    bool is_kick_disabled = robot_unavailable_capabilities.find(RobotCapability::Kick) !=
+                            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_kick_disabled);
+
+    bool is_chip_disabled = robot_unavailable_capabilities.find(RobotCapability::Chip) !=
+                            robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_chip_disabled);
+
+    bool is_movement_disabled =
+        robot_unavailable_capabilities.find(RobotCapability::Move) !=
+        robot_unavailable_capabilities.end();
+    ASSERT_TRUE(is_movement_disabled);
+}
+
+TEST_F(SensorFusionTest, test_emptying_robot_unavailable_capabilities_from_error_code)
+{
+    SensorProto sensor_msg;
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_no_error_code;
+    sensor_fusion.processSensorProto(sensor_msg);
+
+    std::optional<Robot> robot =
+        sensor_fusion.getWorld().value().friendlyTeam().getRobotById(2);
+    ASSERT_TRUE(robot);
+    std::set<RobotCapability> robot_unavailable_capabilities =
+        robot.value().getUnavailableCapabilities();
+    EXPECT_EQ(0, robot_unavailable_capabilities.size());
+}
 
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
 {
@@ -302,7 +499,7 @@ TEST_F(SensorFusionTest, test_detection_frame_wrapper_packet)
 
 TEST_F(SensorFusionTest, test_inverted_detection_frame_wrapper_packet)
 {
-    config->mutableDefendingPositiveSide()->setValue(true);
+    config->getMutableDefendingPositiveSide()->setValue(true);
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
@@ -463,8 +660,62 @@ TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
     EXPECT_EQ(std::nullopt, returned_point);
 }
 
+TEST_F(SensorFusionTest, goalie_id_set_by_referee)
+{
+    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
+    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
+
+    SensorProto sensor_msg;
+
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_goalie_id;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+    World result = *sensor_fusion.getWorld();
+
+    unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieId().value();
+    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieId().value();
+
+    EXPECT_EQ(2, friendly_goalie_id);
+    EXPECT_EQ(2, enemy_goalie_id);
+}
+
+TEST_F(SensorFusionTest, goalie_id_overridden)
+{
+    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(true);
+    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(true);
+    config->getMutableFriendlyGoalieId()->setValue(1);
+    config->getMutableEnemyGoalieId()->setValue(3);
+
+    SensorProto sensor_msg;
+
+    *(sensor_msg.mutable_ssl_referee_msg()) = *referee_goalie_id;
+
+    auto ssl_wrapper_packet =
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+    // set vision msg so that world is valid
+    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+
+    sensor_fusion.processSensorProto(sensor_msg);
+    World result = *sensor_fusion.getWorld();
+
+    unsigned int friendly_goalie_id = result.friendlyTeam().getGoalieId().value();
+    unsigned int enemy_goalie_id    = result.enemyTeam().getGoalieId().value();
+
+    EXPECT_EQ(1, friendly_goalie_id);
+    EXPECT_EQ(3, enemy_goalie_id);
+}
+
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 {
+    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
+    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
+    config->getMutableFriendlyGoalieId()->setValue(0);
+    config->getMutableEnemyGoalieId()->setValue(0);
     SensorProto sensor_msg;
     SensorProto sensor_msg_0;
     auto ssl_wrapper_packet =
@@ -495,6 +746,10 @@ TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_trigger_reset)
 
 TEST_F(SensorFusionTest, test_sensor_fusion_reset_behaviour_ignore_bad_packets)
 {
+    config->getMutableOverrideGameControllerFriendlyGoalieId()->setValue(false);
+    config->getMutableOverrideGameControllerEnemyGoalieId()->setValue(false);
+    config->getMutableFriendlyGoalieId()->setValue(0);
+    config->getMutableEnemyGoalieId()->setValue(0);
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
         createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());

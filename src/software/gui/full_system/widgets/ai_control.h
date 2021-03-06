@@ -56,15 +56,15 @@ void setupDefendingSideComboBox(
 /**
  * Sets up the ComboBox widget that will be used to override the AI GameState
  *
- * @param gamestate_override_combo_box The ComboBox to set up
- * @param gamestate_override_parameter The parameter that controls whether or not
- * we override the gamestate
- * @param previous_game_state_parameter The parameter that holds the previous gamestate
- * @param current_game_state_parameter The parameter that holds the current gamestate
+ * @param game_state_override_combo_box The ComboBox to set up
+ * @param game_state_override_parameter The parameter that controls whether or not
+ * we override the game_state
+ * @param previous_game_state_parameter The parameter that holds the previous game state
+ * @param current_game_state_parameter The parameter that holds the current game state
  */
 void setupGameStateOverrideComboBox(
-    QComboBox *gamestate_override_combo_box,
-    std::shared_ptr<Parameter<bool>> gamestate_override_parameter,
+    QComboBox *game_state_override_combo_box,
+    std::shared_ptr<Parameter<bool>> game_state_override_parameter,
     std::shared_ptr<Parameter<std::string>> previous_game_state_parameter,
     std::shared_ptr<Parameter<std::string>> current_game_state_parameter);
 
@@ -88,7 +88,7 @@ void setupPlayOverrideComboBox(
  * @param channel_parameter The parameter that controls the communication channel
  */
 void setupChannelSpinBox(QSpinBox *channel_spin_box,
-                         std::shared_ptr<Parameter<int>> channel_parameter);
+                         std::shared_ptr<NumericParameter<int>> channel_parameter);
 
 /**
  * Sets up a ComboBox widget that will be used to override either the
@@ -99,6 +99,6 @@ void setupChannelSpinBox(QSpinBox *channel_spin_box,
  * we override the goalie id
  * @param goalie_id_parameter The parameter that controls the goalie id
  */
-void setupGoalieIDComboBox(QComboBox *id_comboBox,
+void setupGoalieIdComboBox(QComboBox *id_comboBox,
                            std::shared_ptr<Parameter<bool>> override_goalie_id_parameter,
-                           std::shared_ptr<Parameter<int>> goalie_id_parameter);
+                           std::shared_ptr<NumericParameter<int>> goalie_id_parameter);

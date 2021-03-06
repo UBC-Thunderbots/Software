@@ -44,7 +44,7 @@ void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
 {
     assert(!g_initialized);
 
-    // create a binary sempahore
+    // create a binary semaphore
     g_dma_receive_semaphore  = osSemaphoreNew(1U, 1U, NULL);
     g_ublox_uart_handle      = uart_handle;
     g_ublox_reset_pin        = ublox_reset;

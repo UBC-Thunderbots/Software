@@ -35,15 +35,10 @@ TEST(SpinningMoveActionTest, robot_far_from_destination)
     EXPECT_EQ(0, spinning_move_intent.getRobotId());
 
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        spinning_move_intent.getPrimitive()
-            .spinning_move()
-            .position_params()
-            .destination(),
+        spinning_move_intent.getPrimitive().spinning_move().destination(),
         *createPointProto(Point(1, 0))));
-    EXPECT_EQ(1.0, spinning_move_intent.getPrimitive()
-                       .spinning_move()
-                       .position_params()
-                       .final_speed_meters_per_second());
+    EXPECT_EQ(1.0,
+              spinning_move_intent.getPrimitive().spinning_move().final_speed_m_per_s());
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         spinning_move_intent.getPrimitive().spinning_move().angular_velocity(),
         *createAngularVelocityProto(AngularVelocity::quarter())));

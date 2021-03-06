@@ -3,8 +3,8 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
-#include "software/ai/hl/stp/tactic/chip_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
@@ -56,9 +56,9 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
-    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAIConfig()
+    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAiConfig()
                                                            ->getShootOrPassPlayConfig()
-                                                           ->MinOpenAngleForShotDeg()
+                                                           ->getMinOpenAngleForShotDeg()
                                                            ->value());
     auto shoot_tactic             = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),

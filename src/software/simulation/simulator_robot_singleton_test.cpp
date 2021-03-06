@@ -16,6 +16,7 @@ extern "C"
 #include "firmware/app/world/firmware_robot.h"
 }
 
+#include "shared/test_util/test_util.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
@@ -739,8 +740,8 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_backwards)
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
-    // We use an arbitrarily large number here for speed
-    app_dribbler_setSpeed(dribbler, 10000);
+    // We use max force dribbler speed
+    app_dribbler_setSpeed(dribbler, MAX_FORCE_DRIBBLER_SPEED);
 
     // Simulate for 2 seconds
     for (unsigned int i = 0; i < 120; i++)
@@ -756,6 +757,29 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_backwards)
     EXPECT_LT((simulator_ball->velocity() - robot_velocity).length(), 0.001);
     Point final_dribbling_point = getDribblingPoint(firmware_robot);
     EXPECT_LT((simulator_ball->position() - final_dribbling_point).length(), 0.01);
+}
+
+TEST_F(SimulatorRobotSingletonTest, test_losing_ball_while_zipping_backwards)
+{
+    Robot robot(0, Point(0, 0), Vector(-4, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+    Point dribbling_point = getDribblingPoint(robot.position(), robot.orientation());
+    Ball ball(dribbling_point, Vector(0, 0), Timestamp::fromSeconds(0));
+    auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
+
+    Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
+    // We use max force dribbler speed
+    app_dribbler_setSpeed(dribbler, MAX_FORCE_DRIBBLER_SPEED);
+
+    // Simulate for 2 seconds
+    for (unsigned int i = 0; i < 120; i++)
+    {
+        world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+    }
+
+    // Check the ball has not stuck to the dribbler
+    Point final_dribbling_point = getDribblingPoint(firmware_robot);
+    EXPECT_GT((simulator_ball->position() - final_dribbling_point).length(), 1);
 }
 
 TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_forwards)
@@ -794,7 +818,7 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
 
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
     // We use an arbitrarily large number here for speed
-    app_dribbler_setSpeed(dribbler, 10000);
+    app_dribbler_setSpeed(dribbler, 1.5 * MAX_FORCE_DRIBBLER_SPEED);
 
     // Simulate for 0.5 second so the ball makes contact with the dribbler
     for (unsigned int i = 0; i < 30; i++)
