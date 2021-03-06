@@ -83,10 +83,9 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
 
     switch (prim_msg.which_chick_command)
     {
-        case TbotsProto_DirectControlPrimitive_kick_speed_meters_per_second_tag:
+        case TbotsProto_DirectControlPrimitive_kick_speed_m_per_s_tag:
         {
-            app_chicker_kick(chicker,
-                             prim_msg.chick_command.kick_speed_meters_per_second);
+            app_chicker_kick(chicker, prim_msg.chick_command.kick_speed_m_per_s);
             break;
         }
         case TbotsProto_DirectControlPrimitive_chip_distance_meters_tag:
@@ -94,10 +93,10 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
             app_chicker_chip(chicker, prim_msg.chick_command.chip_distance_meters);
             break;
         }
-        case TbotsProto_DirectControlPrimitive_autokick_speed_meters_per_second_tag:
+        case TbotsProto_DirectControlPrimitive_autokick_speed_m_per_s_tag:
         {
-            app_chicker_enableAutokick(
-                chicker, prim_msg.chick_command.autokick_speed_meters_per_second);
+            app_chicker_enableAutokick(chicker,
+                                       prim_msg.chick_command.autokick_speed_m_per_s);
             break;
         }
         case TbotsProto_DirectControlPrimitive_autochip_distance_meters_tag:

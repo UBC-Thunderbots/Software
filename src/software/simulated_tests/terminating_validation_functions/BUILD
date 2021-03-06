@@ -6,13 +6,17 @@ cc_library(
     srcs = [
         "friendly_scored_validation.cpp",
         "robot_at_position_validation.cpp",
+        "robot_in_center_circle_validation.cpp",
         "robot_in_polygon_validation.cpp",
+        "robot_kicked_ball_validation.cpp",
         "robot_received_ball_validation.cpp",
     ],
     hdrs = [
         "friendly_scored_validation.h",
         "robot_at_position_validation.h",
+        "robot_in_center_circle_validation.h",
         "robot_in_polygon_validation.h",
+        "robot_kicked_ball_validation.h",
         "robot_received_ball_validation.h",
     ],
     deps = [
