@@ -2,10 +2,11 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -110,27 +111,50 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
                                std::shared_ptr<GoalieTactic> goalie_tactic,
                                const World &world)
 {
+    auto pitch_division = std::make_shared<const EighteenZonePitchDivision>(world.field());
+
     // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
     // field in the +x half. We also further offset the rectangle from the goal line
     // for the cherry-picker closer to where we're taking the corner kick from
-    Vector pos_y_goalline_x_offset(world.field().enemyDefenseArea().yLength(), 0);
-    Vector neg_y_goalline_x_offset(world.field().enemyDefenseArea().yLength(), 0);
-    if (world.ball().position().y() > 0)
+    //
+    //              ENEMY HALF
+    //       ┌───────┬───────┬──────┐
+    //       │10     │13     │16    │
+    //       │       │       │      │
+    //       │       │       │      │
+    //       ├───────┼───────┼──────┤
+    //       │11     │14     │17    ├─┐
+    //       │       │       │      │ │
+    //       │       │       │      │ │
+    //       │       │       │      ├─┘
+    //       ├───────┼───────┼──────┤
+    //       │12     │15     │18    │
+    //       │       │       │      │
+    //       │       │       │      │
+    //       └───────┴───────┴──────┘
+    //
+    std::unordered_set<unsigned> cherry_pick_region_1;
+    std::unordered_set<unsigned> cherry_pick_region_2;
+
+    if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
     {
-        pos_y_goalline_x_offset += {world.field().enemyDefenseArea().yLength(), 0};
+        cherry_pick_region_1 = {10, 13, 16};
+        cherry_pick_region_2 = {11, 14, 12, 15, 18};
     }
     else
     {
-        // kick from neg corner
-        neg_y_goalline_x_offset += {world.field().enemyDefenseArea().yLength(), 0};
+        cherry_pick_region_1 = {12, 15, 18};
+        cherry_pick_region_2 = {10, 11, 13, 14, 16};
     }
-    Vector center_line_x_offset(1, 0);
-    Rectangle pos_y_cherry_pick_rectangle(
-        world.field().centerPoint() + center_line_x_offset,
-        world.field().enemyCornerPos() - pos_y_goalline_x_offset);
-    Rectangle neg_y_cherry_pick_rectangle(
-        world.field().centerPoint() + center_line_x_offset,
-        world.field().enemyCornerNeg() - neg_y_goalline_x_offset);
+
+    // TODO (ticket here) run this globally and dependency inject the pass evaluation
+    PassGenerator pass_generator(pitch_division);
+
+    // Target any pass in the enemy half of the field
+    std::unordered_set<unsigned> ENEMY_HALF = {10, 11, 12, 13, 14, 15, 16, 17, 18};
+
+    auto pass_eval = pass_generator.generatePassEvaluation(world);
+    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
@@ -138,26 +162,24 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
     auto cherry_pick_tactic_pos_y =
-        std::make_shared<CherryPickTactic>(world, pos_y_cherry_pick_rectangle);
+        std::make_shared<CherryPickTactic>(world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
     auto cherry_pick_tactic_neg_y =
-        std::make_shared<CherryPickTactic>(world, neg_y_cherry_pick_rectangle);
-
-    PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::ONE_TOUCH_SHOT);
-
-    // Target any pass in the enemy half of the field, shifted up by 1 meter
-    // from the center line
-    pass_generator.setTargetRegion(
-        Rectangle(Point(1, world.field().yLength() / 2), world.field().enemyCornerNeg()));
-
-    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+        std::make_shared<CherryPickTactic>(world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
     // Wait for a robot to be assigned to align to take the corner
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic, world);
-        updatePassGenerator(pass_generator, world);
+
+        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
+        // we need to evaluate here until then.
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        cherry_pick_tactic_pos_y->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_neg_y->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -165,7 +187,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
 
 
     // Set the passer on the pass generator
-    pass_generator.setPasserRobotId(align_to_ball_tactic->getAssignedRobot()->id());
     LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
                << "as the passer";
 
@@ -174,7 +195,15 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
-        updatePassGenerator(pass_generator, world);
+
+        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
+        // we need to evaluate here until then.
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        cherry_pick_tactic_pos_y->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_neg_y->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -190,12 +219,23 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
-        updatePassGenerator(pass_generator, world);
+
+        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
+        // we need to evaluate here until then.
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        cherry_pick_tactic_pos_y->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_neg_y->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
 
-        best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+        best_pass_and_score_so_far =
+            pass_generator.generatePassEvaluation(world).getBestPassInZones(ENEMY_HALF);
+
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
@@ -224,13 +264,6 @@ void CornerKickPlay::updateAlignToBallTactic(
         world.ball().position() -
             (ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2)),
         ball_to_center_vec.orientation(), 0);
-}
-
-void CornerKickPlay::updatePassGenerator(PassGenerator &pass_generator,
-                                         const World &world)
-{
-    pass_generator.setWorld(world);
-    pass_generator.setPasserPoint(world.ball().position());
 }
 
 // Register this play in the genericFactory

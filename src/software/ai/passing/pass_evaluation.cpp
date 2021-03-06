@@ -45,7 +45,7 @@ PassWithRating PassEvaluation::getBestPassInZones(
     }
 
     std::for_each(zone_ids.begin(), zone_ids.end(), [this](unsigned zone) {
-        if (zone < 1 || zone >= pitch_division_->getTotalNumberOfZones())
+        if (zone < 1 || zone > pitch_division_->getTotalNumberOfZones())
         {
             throw std::invalid_argument("zone_id is out of bounds");
         }

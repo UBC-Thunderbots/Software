@@ -33,7 +33,7 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world) 
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =
-        (robot.position() - pass.passerPoint()).length() / world.field().totalXLength();
+        (robot.position() - world.ball().position()).length() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -56,16 +56,27 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // until it's time to perform the pass
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
-    while (ball.timestamp() < pass.startTime())
+
+    // TODO (ticket here) we shouldn't wait to take the pass here. The play should
+    // align itself up to the ball and wait while looking at enemy shadowers, and
+    // then pivot/pass when necessary.
+    //
+    // For now we allow for 2 second setup time, but this tactic shouldn't care.
+    auto setup_time = ball.timestamp() + Duration::fromSeconds(2.0);
+    while (ball.timestamp() < setup_time)
     {
+        // The passer should be facing the receiver
+        auto passer_orientation =
+            pass.receiverOrientation(ball.position()) + Angle::fromDegrees(180);
+
         // We want to wait just behind where the pass is supposed to start, so that the
         // ball is *almost* touching the kicker
         Vector ball_offset =
-            Vector::createFromAngle(pass.passerOrientation())
+            Vector::createFromAngle(passer_orientation)
                 .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
-        Point wait_position = pass.passerPoint() - ball_offset;
+        Point wait_position = ball.position() - ball_offset;
 
-        move_action->updateControlParams(*robot_, wait_position, pass.passerOrientation(),
+        move_action->updateControlParams(*robot_, wait_position, passer_orientation,
                                          0, DribblerMode::OFF, BallCollisionType::ALLOW);
         yield(move_action);
     }
@@ -76,7 +87,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     do
     {
         // We want the robot to move to the starting position for the shot and also
-        // rotate to the correct orientation to face the shot
+        // rotate to the clorrect orientation to face the shot
         kick_action->updateControlParams(*robot_, ball.position(), pass.receiverPoint(),
                                          pass.speed());
         yield(kick_action);

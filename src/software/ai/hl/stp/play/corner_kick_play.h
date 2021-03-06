@@ -50,12 +50,4 @@ class CornerKickPlay : public Play
                    std::shared_ptr<MoveTactic> bait_move_tactic_1,
                    std::shared_ptr<MoveTactic> bait_move_tactic_2,
                    std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
-
-    /**
-     * Updates the pass generator
-     *
-     * @param pass_generator
-     * @param world The current state of the world
-     */
-    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
 };

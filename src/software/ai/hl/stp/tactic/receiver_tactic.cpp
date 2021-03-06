@@ -51,13 +51,13 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // ourselves in the best position possible to take the pass
     // We wait for the ball to start moving at least a bit to make sure the passer
     // has actually started the pass
-    while (ball.timestamp() < pass.startTime() || ball.velocity().length() < 0.5)
+    while (ball.velocity().length() < 0.5)
     {
         // If there is a feasible shot we can take, we want to wait for the pass at the
         // halfway point between the angle required to receive the ball and the angle
         // for a one-time shot
         std::optional<Shot> shot = findFeasibleShot();
-        Angle desired_angle      = pass.receiverOrientation();
+        Angle desired_angle      = pass.receiverOrientation(ball.position());
         if (shot)
         {
             Point target_position = shot->getPointToShootAt();
@@ -68,7 +68,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             // the pass vector and shot vector, so the robot can quickly orient itself
             // to either receive the pass, or take the shot. Also, not directly facing
             // where we plan on kicking may throw off the enemy AI
-            desired_angle = (shot_angle + pass.receiverOrientation()) / 2;
+            desired_angle = (shot_angle + pass.receiverOrientation(ball.position())) / 2;
         }
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation

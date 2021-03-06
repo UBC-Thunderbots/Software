@@ -1,4 +1,3 @@
-#include "software/ai/passing/pass_generator.h"
 
 #include <algorithm>
 #include <numeric>
@@ -7,7 +6,7 @@
 #include "software/ai/passing/pass_evaluation.h"
 #include "software/ai/passing/pass_generator.h"
 
-PassGenerator::PassGenerator(std::shared_ptr<const FieldPitchDivision>& pitch_division)
+PassGenerator::PassGenerator(std::shared_ptr<const FieldPitchDivision> pitch_division)
     : optimizer_(optimizer_param_weights),
       pitch_division_(pitch_division),
       random_num_gen_(PASS_GENERATOR_SEED)
@@ -82,6 +81,13 @@ std::vector<PassWithRating> PassGenerator::optimizePasses(
     std::vector<PassWithRating> optimized_passes;
     for (const PassWithRating& pass_with_rating : generated_passes)
     {
+        // We currently don't do useful work if the score is really bad, remove this.
+        // TODO (ticket here) remove this when this is fixed
+        if (pass_with_rating.rating < 0.05)
+        {
+            optimized_passes.emplace_back(pass_with_rating);
+            continue;
+        }
         auto pass_array =
             optimizer_.maximize(objective_function, pass_with_rating.pass.toPassArray(),
                                 DynamicParameters->getAiConfig()

@@ -29,7 +29,7 @@ class PassGenerator
      *
      * @param pitch_division The pitch division to use when looking for passes
      */
-    explicit PassGenerator(std::shared_ptr<const FieldPitchDivision>& pitch_division);
+    explicit PassGenerator(std::shared_ptr<const FieldPitchDivision> pitch_division);
 
     /**
      * Creates a PassEvaluation given a world and a field pitch division.

@@ -17,6 +17,11 @@ Point Pass::receiverPoint() const
     return receiver_point;
 }
 
+Angle Pass::receiverOrientation(const Point& ball_position) const
+{
+    return (ball_position - receiverPoint()).orientation();
+}
+
 double Pass::speed() const
 {
     return pass_speed_m_per_s;

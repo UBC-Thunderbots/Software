@@ -8,7 +8,9 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -104,35 +106,51 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     TacticCoroutine::push_type &yield, std::shared_ptr<GoalieTactic> goalie_tactic,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<ShootGoalTactic> shoot_tactic, const World &world)
+
 {
+    auto pitch_division =
+        std::make_shared<const EighteenZonePitchDivision>(world.field());
+
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
-    Rectangle cherry_pick_1_target_region = world.field().enemyPositiveYQuadrant();
-    Rectangle cherry_pick_2_target_region = world.field().enemyNegativeYQuadrant();
+    //
+    // TODO (ticket here) This is not an optimial configuration for cherry pickers
+    std::unordered_set<unsigned> cherry_pick_region_1 = {10, 13, 16};
+    std::unordered_set<unsigned> cherry_pick_region_2 = {12, 15, 18};
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
     if (world.ball().position().x() > -1)
     {
-        double y_offset =
-            -std::copysign(world.field().yLength() / 2, world.ball().position().y());
-        cherry_pick_1_target_region =
-            Rectangle(Point(0, 0), Point(world.field().xLength() / 4, y_offset));
-        cherry_pick_2_target_region =
-            Rectangle(Point(world.field().xLength() / 4, 0),
-                      Point(world.field().xLength() / 2, y_offset));
+        if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
+        {
+            cherry_pick_region_1 = {11, 12};
+            cherry_pick_region_2 = {14, 15, 18};  // ignore the defense area zone
+        }
+        else
+        {
+            cherry_pick_region_1 = {10, 11};
+            cherry_pick_region_2 = {13, 14, 16};  // ignore the defense area zone
+        }
     }
-
-    std::array<std::shared_ptr<CherryPickTactic>, 2> cherry_pick_tactics = {
-        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region),
-        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region)};
 
     // Start a PassGenerator that will continuously optimize passes into the enemy half
     // of the field
-    PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::RECEIVE_AND_DRIBBLE);
-    pass_generator.setTargetRegion(world.field().enemyHalf());
-    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+    // TODO (ticket here) run this globally and dependency inject the pass evaluation
+    PassGenerator pass_generator(pitch_division);
+
+    // Target any pass in the enemy half of the field
+    std::unordered_set<unsigned> ENEMY_HALF = {10, 11, 12, 13, 14, 15, 16, 17, 18};
+
+    auto pass_eval = pass_generator.generatePassEvaluation(world);
+    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);
+
+    // These two tactics will set robots to roam around the field, trying to put
+    // themselves into a good position to receive a pass
+    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
+        world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+    auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
+        world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
     // Wait for a good pass by starting out only looking for "perfect" passes (with a
     // score of 1) and decreasing this threshold over time
@@ -153,16 +171,22 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
                                                ->value();
     do
     {
-        updatePassGenerator(pass_generator, world);
-
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
-        yield({goalie_tactic, shoot_tactic, std::get<0>(cherry_pick_tactics),
-               std::get<0>(crease_defender_tactics), std::get<1>(cherry_pick_tactics),
+        yield({goalie_tactic, shoot_tactic, cherry_pick_tactic_1,
+               std::get<0>(crease_defender_tactics), cherry_pick_tactic_2,
                std::get<1>(crease_defender_tactics)});
 
-        best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
+        // we need to evaluate here until then.
+        pass_eval = pass_generator.generatePassEvaluation(world);
+        best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);
+
+        cherry_pick_tactic_1->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_2->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold
@@ -173,7 +197,6 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         // that will be taking the shot
         if (shoot_tactic->getAssignedRobot())
         {
-            pass_generator.setPasserRobotId(shoot_tactic->getAssignedRobot()->id());
             set_passer_robot_in_passgenerator = true;
         }
 
@@ -192,14 +215,6 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     } while (!ready_to_pass || shoot_tactic->hasShotAvailable());
     return best_pass_and_score_so_far;
 }
-
-void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator,
-                                          const World &world)
-{
-    pass_generator.setWorld(world);
-    pass_generator.setPasserPoint(world.ball().position());
-}
-
 
 // Register this play in the genericFactory
 static TGenericFactory<std::string, Play, ShootOrPassPlay> factory;

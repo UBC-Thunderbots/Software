@@ -31,14 +31,6 @@ class ShootOrPassPlay : public Play
     static constexpr double SPEED_AT_PATROL_POINTS = 0.0;
 
     /**
-     * Updates the pass generator
-     *
-     * @param pass_generator
-     * @param world The current state of the world
-     */
-    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
-
-    /**
      * Sets up the pass for the corner kick: aligns the passer and positions the cherry
      * pickers
      *

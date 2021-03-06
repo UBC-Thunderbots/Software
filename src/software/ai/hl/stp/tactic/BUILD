@@ -8,7 +8,7 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass_generator",
+        "//software/ai/passing:pass",
         "//software/geom/algorithms",
         "//software/logger",
         "//software/world",

@@ -2,10 +2,12 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/logger/logger.h"
@@ -101,12 +103,6 @@ void FreeKickPlay::updateAlignToBallTactic(
         ball_to_center_vec.orientation(), 0);
 }
 
-void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator, const World &world)
-{
-    pass_generator.setWorld(world);
-    pass_generator.setPasserPoint(world.ball().position());
-}
-
 void FreeKickPlay::chipAtGoalStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
@@ -163,44 +159,66 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic, const World &world)
 {
+    auto pitch_division = std::make_shared<const EighteenZonePitchDivision>(world.field());
+
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
-    Rectangle cherry_pick_1_target_region = world.field().enemyPositiveYQuadrant();
-    Rectangle cherry_pick_2_target_region = world.field().enemyNegativeYQuadrant();
+    //
+    // TODO (ticket here) This is not an optimial configuration for cherry pickers
+    std::unordered_set<unsigned> cherry_pick_region_1 = {10, 13, 16};
+    std::unordered_set<unsigned> cherry_pick_region_2 = {12, 15, 18};
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
     if (world.ball().position().x() > -1)
     {
-        double cherry_pick_region_y_length =
-            -std::copysign(world.field().yLength() / 2, world.ball().position().y());
-        cherry_pick_1_target_region = Rectangle(
-            Point(0, 0), Point(world.field().xLength() / 4, cherry_pick_region_y_length));
-        cherry_pick_2_target_region =
-            Rectangle(Point(world.field().xLength() / 4, 0),
-                      Point(world.field().xLength() / 2, cherry_pick_region_y_length));
+        if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
+        {
+            cherry_pick_region_1 = {11, 12};
+            cherry_pick_region_2 = {14, 15, 18}; // ignore the defense area zone
+        }
+        else
+        {
+            cherry_pick_region_1 = {10, 11};
+            cherry_pick_region_2 = {13, 14, 16}; // ignore the defense area zone
+        }
     }
+
+    // TODO (ticket here) run this globally and dependency inject the pass evaluation
+    // NOTE: the updatePassGenerator is removed here because it will get updated every
+    // tick in AI when dependency injected
+    PassGenerator pass_generator(pitch_division);
+
+    // Target any pass in the enemy half of the field, shifted up by 1.5 meters
+    // from the center line
+    std::unordered_set<unsigned> ENEMY_HALF = {13, 14, 15, 16, 17, 18};
+
+    auto pass_eval = pass_generator.generatePassEvaluation(world);
+    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
     auto cherry_pick_tactic_1 =
-        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region);
+        std::make_shared<CherryPickTactic>(world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
     auto cherry_pick_tactic_2 =
-        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region);
+        std::make_shared<CherryPickTactic>(world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
-
-    PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::RECEIVE_AND_DRIBBLE);
-    pass_generator.setTargetRegion(world.field().enemyHalf());
 
     // Wait for a robot to be assigned to aligned to the ball to pass
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic, world);
-        updatePassGenerator(pass_generator, world);
+
+        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
+        // we need to evaluate here until then.
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        cherry_pick_tactic_1->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_2->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
@@ -209,7 +227,6 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
 
     // Set the passer on the pass generator
-    pass_generator.setPasserRobotId(align_to_ball_tactic->getAssignedRobot()->id());
     LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
                << "as the passer";
 
@@ -218,7 +235,15 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
-        updatePassGenerator(pass_generator, world);
+
+        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
+        // we need to evaluate here until then.
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        cherry_pick_tactic_1->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_2->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
@@ -227,7 +252,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
     LOG(DEBUG) << "Finished aligning to ball";
 
-    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+    best_pass_and_score_so_far =
+        pass_generator.generatePassEvaluation(world).getBestPassInZones(ENEMY_HALF);
     // Align the kicker to pass and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
@@ -236,13 +262,22 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
-        updatePassGenerator(pass_generator, world);
+
+        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
+        // we need to evaluate here until then.
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        cherry_pick_tactic_1->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_2->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
         yield({goalie_tactic, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});
 
-        best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+        best_pass_and_score_so_far =
+            pass_generator.generatePassEvaluation(world).getBestPassInZones(ENEMY_HALF);
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
