@@ -7,7 +7,7 @@
 #include "software/world/world.h"
 
 /**
- * Checks that the ball always moves forward.
+ * Checks that the ball doesn't move backward.
  *
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param yield yields control to the next routine (coroutines)
