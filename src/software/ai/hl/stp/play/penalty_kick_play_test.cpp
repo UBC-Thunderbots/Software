@@ -2,13 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#include "software/simulated_tests/non_terminating_validation_functions/ball_always_moves_forward_validation.h"
+#include "software/simulated_tests/non_terminating_validation_functions/ball_never_moves_backward_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
-#include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robots_away_from_ball_validation.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -34,8 +33,13 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
     RobotId shooter_id                                               = 5;
     std::vector<ValidationFunction> terminating_validation_functions = {
         [shooter_id](std::shared_ptr<World> world_ptr,
-                     ValidationCoroutine::push_type& yield) {
-            robotsAwayFromBall(1.0, {shooter_id}, world_ptr, yield);
+                    ValidationCoroutine::push_type& yield) {
+            // Wait 2 seconds for robots to start moving adequately far away from the ball
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+            {
+                yield();
+            }
+            robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
         },
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
@@ -81,9 +85,8 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
     };
 
     RobotId shooter_id = 1;
-    ;
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        ballInPlay, ballAlwaysMovesForward,
+        ballInPlay, ballNeverMovesBackward,
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
             robotsAvoidBall(1, {shooter_id}, world_ptr, yield);

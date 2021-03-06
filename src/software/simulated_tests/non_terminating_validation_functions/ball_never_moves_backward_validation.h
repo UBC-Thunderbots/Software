@@ -7,10 +7,10 @@
 #include "software/world/world.h"
 
 /**
- * Checks that the ball always moves forward until it is scored.
+ * Checks that the ball always moves forward.
  *
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param yield yields control to the next routine (coroutines)
  */
-void ballAlwaysMovesForward(std::shared_ptr<World> world_ptr,
+void ballNeverMovesBackward(std::shared_ptr<World> world_ptr,
                             ValidationCoroutine::push_type& yield);
