@@ -44,8 +44,8 @@ class EighteenZonePitchDivision : public FieldPitchDivision
     // clang-format on
     EighteenZonePitchDivision(const Field& field);
 
-    const Rectangle& getZone(unsigned zone_id) override;
-    inline size_t getTotalNumberOfZones(void) override;
+    const Rectangle& getZone(unsigned zone_id) const override;
+    size_t getTotalNumberOfZones() const override;
 
    private:
     std::vector<Rectangle> pitch_division;

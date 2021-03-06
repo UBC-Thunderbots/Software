@@ -77,6 +77,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "eighteen_zone_pitch_division_test",
+    srcs = ["eighteen_zone_pitch_division_test.cpp"],
+    deps = [
+        ":eighteen_zone_pitch_division",
+        "//software/geom/algorithms:algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "pass_evaluation",
     hdrs = ["pass_evaluation.h"],
@@ -93,10 +103,12 @@ cc_library(
 )
 
 cc_test(
-    name = "eighteen_zone_pitch_division_test",
-    srcs = ["eighteen_zone_pitch_division_test.cpp"],
+    name = "pass_evaluation_test",
+    srcs = ["pass_evaluation_test.cpp"],
     deps = [
+        ":pass",
         ":eighteen_zone_pitch_division",
+        ":pass_evaluation",
         "//software/geom/algorithms:algorithms",
         "@gtest//:gtest_main",
     ],

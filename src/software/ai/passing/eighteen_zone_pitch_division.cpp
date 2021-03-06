@@ -20,7 +20,7 @@ EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
     }
 }
 
-const Rectangle& EighteenZonePitchDivision::getZone(unsigned zone_id)
+const Rectangle& EighteenZonePitchDivision::getZone(unsigned zone_id) const
 {
     if (zone_id < 1 || zone_id >= getTotalNumberOfZones())
     {
@@ -29,7 +29,7 @@ const Rectangle& EighteenZonePitchDivision::getZone(unsigned zone_id)
     return pitch_division[zone_id - 1];
 }
 
-inline size_t EighteenZonePitchDivision::getTotalNumberOfZones(void)
+inline size_t EighteenZonePitchDivision::getTotalNumberOfZones() const
 {
     return 18;
 }

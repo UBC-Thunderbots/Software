@@ -19,12 +19,12 @@ class FieldPitchDivision
      * @param zone_id The zone id
      * @return The rectangle on the field corresponding to the zone
      */
-    virtual const Rectangle& getZone(unsigned zone_id) = 0;
+    virtual const Rectangle& getZone(unsigned zone_id) const = 0;
 
     /**
      * Returns the total number of zones in this pitch division
      *
      * @return The total number of zones
      */
-    virtual size_t getTotalNumberOfZones(void) = 0;
+    virtual size_t getTotalNumberOfZones(void) const = 0;
 };

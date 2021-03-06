@@ -2,10 +2,13 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <set>
+#include <algorithm>
+#include <unordered_set>
 #include <vector>
+#include <memory>
 
 #include "software/ai/passing/pass_with_rating.h"
+#include "software/ai/passing/field_pitch_division.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
 
@@ -20,10 +23,11 @@ class PassEvaluation
      * @param best_pass_in_zone A vector of the best passes in each zone,
      *                          the index in the vector should correspond
      *                          with the FieldZone enum.
-     *                          TODO
+     * @param timestamp The timestamp this pass evaluation was created
      */
-    explicit PassEvaluation(const FieldPitchDivision& pitch_division,
-                            std::vector<PassWithRating> best_pass_in_zones, Timestamp timestamp);
+    explicit PassEvaluation(std::shared_ptr<const FieldPitchDivision> pitch_division,
+                               std::vector<PassWithRating> best_pass_in_zones,
+                               Timestamp timestamp);
 
     PassEvaluation() = delete;
 
@@ -35,16 +39,10 @@ class PassEvaluation
     PassWithRating getBestPassOnField() const;
 
     /**
-     * Given the zone_id, returns the best PassWithRating
-     *
-     * @param zone_id
-     * @return PassWithRating w/ the best pass in the given zone
-     */
-    PassWithRating getBestPassInZone(unsigned zone_id) const;
-
-    /**
      * Given a set of zone_ids, returns the best PassWithRating in those zones
      *
+     * @raises std::invalid_argument if the zone_ids set is empty or if the zone_ids
+     *         are out of bounds
      * @param zone_ids A set of zone_ids to find the best pass in
      * @return PassWithRating w/ the best pass in the given zones
      */
@@ -56,7 +54,7 @@ class PassEvaluation
      *
      * @return FieldPitchDivision defining how the field is divided
      */
-    const FieldPitchDivision& getFieldPitchDivsion() const;
+    std::shared_ptr<const FieldPitchDivision> getFieldPitchDivsion() const;
 
     /**
      * Returns a timestamp of when this pass evaluation was created
@@ -67,7 +65,12 @@ class PassEvaluation
 
    private:
 
-    Timestamp timestamp_;
-    FieldPitchDivision pitch_division_;
+    // The pitch division this pass evaluation was computed for
+    std::shared_ptr<const FieldPitchDivision> pitch_division_;
+
+    // Stores the best passes indexed by zone - 1
     std::vector<PassWithRating> best_pass_in_zones_;
+
+    // The timestamp when this evaluation was created
+    Timestamp timestamp_;
 };
