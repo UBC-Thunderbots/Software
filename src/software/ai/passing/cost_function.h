@@ -31,7 +31,7 @@ double ratePass(const World& world, const Pass& pass);
  *         the pass, and 1 indicating that it is guaranteed to be able to score off of
  *         the pass
  */
-double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass);
+double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team, const Pass& pass);
 
 /**
  * Calculates the risk of an enemy robot interfering with a given pass
@@ -44,7 +44,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
  *         to run without interference, and 0 indicating that the pass will certainly
  *         be interfered with (and so is very poor)
  */
-double ratePassEnemyRisk(const Ball& ball, const Team& enemy_team, const Pass& pass)
+double ratePassEnemyRisk(const Ball& ball, const Team& enemy_team, const Pass& pass);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted
@@ -57,7 +57,7 @@ double ratePassEnemyRisk(const Ball& ball, const Team& enemy_team, const Pass& p
  *         guaranteed to be intercepted, and 0 indicating it's impossible for the
  *         pass to be intercepted
  */
-double calculateInterceptRisk(const Ball& ball, const Team& enemy_team, const Pass& pass)
+double calculateInterceptRisk(const Ball& ball, const Team& enemy_team, const Pass& pass);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted by a given robot
@@ -70,7 +70,7 @@ double calculateInterceptRisk(const Ball& ball, const Team& enemy_team, const Pa
  *         be intercepted, and 0 indicating it's impossible for the pass to be
  *         intercepted
  */
-double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot, const Pass& pass)
+double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot, const Pass& pass);
 
 
 /**
@@ -87,7 +87,7 @@ double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot, const 
  *         friendly team to receive the given pass, with 1 being very likely, 0
  *         being impossible
  */
-double ratePassFriendlyCapability(const Ball& ball, Team friendly_team, const Pass& pass)
+double ratePassFriendlyCapability(const Ball& ball, Team friendly_team, const Pass& pass);
 
 /**
  * Calculates the static position quality for a given position on a given field

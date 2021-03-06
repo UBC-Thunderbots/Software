@@ -37,7 +37,7 @@ class Pass
      * @returns the pass array: [receiver_point.x(), receiver_point.y(),
      * pass_speed_m_per_s]
      */
-    std::array<double, 3> toPassArray();
+    std::array<double, 3> toPassArray() const;
 
     /**
      * Gets the value of the receiver point

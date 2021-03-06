@@ -18,14 +18,6 @@ double ratePass(const World& world, const Pass& pass)
     double friendly_pass_rating =
         ratePassFriendlyCapability(world.ball(), world.friendlyTeam(), pass);
 
-    // If the static_pass_quality and the friendly_pass_rating are really bad,
-    // this means that the receive location is in a bad spot with no friendly robots
-    // nearby, so we can exit out early and save the expensive computation.
-    if (static_pass_quality * friendly_pass_rating < 0.001)
-    {
-        return 0.0;
-    }
-
     double enemy_pass_rating = ratePassEnemyRisk(world.ball(), world.enemyTeam(), pass);
 
     double shoot_pass_rating = ratePassShootScore(world.ball(), world.field(), world.enemyTeam(), pass);
@@ -46,9 +38,8 @@ double ratePass(const World& world, const Pass& pass)
            shoot_pass_rating * pass_speed_quality;
 }
 
-double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass)
+double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team, const Pass& pass)
 {
-    // TODO: You don't even use this first parameter, but stuff is hardcoded below
     double ideal_max_rotation_to_shoot_degrees = DynamicParameters->getAiConfig()
                                                      ->getPassingConfig()
                                                      ->getIdealMaxRotationToShootDegrees()
@@ -79,11 +70,24 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 
     // Create the shoot score by creating a sigmoid that goes to a large value as
     // the section of net we're shooting on approaches 100% (ie. completely open)
-    double shot_openness_score = sigmoid(net_percent_open, 0.5, 0.95);
+    //
+    // TODO (ticket here) This sigmoid is partially responsible for the vanishing
+    // gradient. When we don't have a shot on net, we should still be able to look
+    // for passes because not all passes need to have a shot on net. But this sigmoid
+    // zeros out the score when the net is blocked off.
+    //
+    // For now, this will be a "leaky sigmoid" where even when there is
+    // NO shot on net, the shot_openness_score > 0.
+    //
+    // This should be fixed w/ a better activation function or potentially changing
+    // how we combine the scores together (or both).
+    double shot_openness_score = sigmoid(net_percent_open, 0.2, 0.95);
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)
-    Angle rotation_to_shot_target_after_pass = pass.receiverOrientation().minDiff(
+    
+    auto receiver_orientation = (ball.position() - pass.receiverPoint()).orientation();
+    Angle rotation_to_shot_target_after_pass = receiver_orientation.minDiff(
         (shot_target - pass.receiverPoint()).orientation());
     double required_rotation_for_shot_score =
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
@@ -149,13 +153,13 @@ double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot, const 
     // Figure out how long the enemy robot and ball will take to reach the closest
     // point on the pass to the enemy's current position
     Point closest_point_on_pass_to_robot = closestPoint(
-        enemy_robot.position(), Segment(ball().position(), pass.receiverPoint()));
+        enemy_robot.position(), Segment(ball.position(), pass.receiverPoint()));
     Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(
         enemy_robot.position(), closest_point_on_pass_to_robot,
         ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
-        (closest_point_on_pass_to_robot - ball().position()).length() / pass.speed());
+        (closest_point_on_pass_to_robot - ball.position()).length() / pass.speed());
 
     // Check for division by 0
     if (pass.speed() == 0)
@@ -172,9 +176,9 @@ double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot, const 
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
 
     Duration ball_time_to_pass_receive_position = Duration::fromSeconds(
-        (pass.receiverPoint() - ball().position()).length() / pass.speed());
+        (pass.receiverPoint() - ball.position()).length() / pass.speed());
 
-    Duration nemy_reaction_time = Duration::fromSeconds(DynamicParameters->getAiConfig()
+    Duration enemy_reaction_time = Duration::fromSeconds(DynamicParameters->getAiConfig()
                                                              ->getPassingConfig()
                                                              ->getEnemyReactionTime()
                                                              ->value());
@@ -228,8 +232,8 @@ double ratePassFriendlyCapability(const Ball& ball, Team friendly_team, const Pa
 
     // Figure out what time the robot would have to receive the ball at
     Duration ball_travel_time = Duration::fromSeconds(
-        (pass.receiverPoint() - ball().position()).length() / pass.speed());
-    Timestamp receive_time = world.getMostRecentTimestamp() + ball_travel_time;
+        (pass.receiverPoint() - ball.position()).length() / pass.speed());
+    Timestamp receive_time = ball.timestamp() + ball_travel_time;
 
     // Figure out how long it would take our robot to get there
     Duration min_robot_travel_time = getTimeToPositionForRobot(
@@ -239,7 +243,7 @@ double ratePassFriendlyCapability(const Ball& ball, Team friendly_team, const Pa
         best_receiver.timestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
-    Angle receive_angle = (ball().position() - best_receiver.position()).orientation();
+    Angle receive_angle = (ball.position() - best_receiver.position()).orientation();
     Duration time_to_receive_angle = getTimeToOrientationForRobot(
         best_receiver.orientation(), receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
         ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
@@ -253,7 +257,7 @@ double ratePassFriendlyCapability(const Ball& ball, Team friendly_team, const Pa
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
     return sigmoid(receive_time.toSeconds(),
-                   latest_time_to_reciever_state.toSeconds() + 0.25, 0.5);
+                   latest_time_to_reciever_state.toSeconds() + 0.25, 0.4);
 }
 
 double getStaticPositionQuality(const Field& field, const Point& position)

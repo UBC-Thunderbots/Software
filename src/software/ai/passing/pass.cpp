@@ -27,7 +27,7 @@ Pass Pass::fromPassArray(const std::array<double, 3>& array)
     return Pass(Point(array.at(0), array.at(1)), array.at(2));
 }
 
-std::array<double, 3> Pass::toPassArray()
+std::array<double, 3> Pass::toPassArray() const
 {
     return pass_array;
 }

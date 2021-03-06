@@ -81,21 +81,20 @@ class PassGenerator
      * Given a vector of passes, runs a gradient descent optimizer to find
      * better passes
      *
+     * @param The world
      * @param The passes to be optimized
      * @returns The optimized passes
      */
-    std::vector<PassWithRating> optimizePasses(const std::vector<Pass>& initial_passes);
+    std::vector<PassWithRating> optimizePasses(const World& world, const std::vector<Pass>& initial_passes);
 
     /**
      * Re-evaluates ratePass on the "previous ticks" passes and keeps the higher pass
      * w/ the higher score in passes_;
      *
+     * @param The world
      * @param optimized_passes The optimized_passes to update our internal passes with.
      */
-    void updatePasses(const std::vector<PassWithRating>& optimized_passes);
-
-    // world buffer
-    World world_;
+    void updatePasses(const World& world, const std::vector<PassWithRating>& optimized_passes);
 
     // All the passes that we are currently trying to optimize in gradient descent
     std::vector<PassWithRating> passes_;
@@ -103,9 +102,9 @@ class PassGenerator
     // The optimizer we're using to find passes
     GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer_;
 
-    // A random number generator for use across the class
-    std::mt19937 random_num_gen_;
-
     // Pitch division
     std::shared_ptr<const FieldPitchDivision> pitch_division_;
+
+    // A random number generator for use across the class
+    std::mt19937 random_num_gen_;
 };
