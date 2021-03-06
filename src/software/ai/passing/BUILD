@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "evaluation",
+    name = "cost_functions",
     srcs = ["cost_function.cpp"],
     hdrs = ["cost_function.h"],
     deps = [
@@ -19,7 +19,7 @@ cc_test(
     name = "evaluation_test",
     srcs = ["cost_function_test.cpp"],
     deps = [
-        ":evaluation",
+        ":cost_functions",
         "//software/math:math_functions",
         "//software/test_util",
         "@gtest//:gtest_main",
@@ -120,7 +120,8 @@ cc_library(
     srcs = ["pass_generator.cpp"],
     hdrs = ["pass_generator.h"],
     deps = [
-        ":evaluation",
+        ":pass_evaluation",
+        ":cost_functions",
         ":pass",
         ":pass_with_rating",
         "//software/optimization:gradient_descent",

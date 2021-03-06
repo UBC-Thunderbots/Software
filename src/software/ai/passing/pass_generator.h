@@ -21,9 +21,16 @@ const int PASS_GENERATOR_SEED = 13;
 class PassGenerator
 {
    public:
-    PassGenerator& operator=(const PassGenerator&) = delete;
-    PassGenerator(const PassGenerator&)            = delete;
-    PassGenerator(const FieldPitchDivision& pitch_division) = default;
+
+    /**
+     * Creates a new PassGenerator with the given pitch_division.
+     *
+     * The PassGenerator will use this pitch division to guide initial random samples
+     * in each zone after the pitch has been divided.
+     *
+     * @param pitch_division The pitch division to use when looking for passes
+     */
+    explicit PassGenerator(std::shared_ptr<const FieldPitchDivision>& pitch_division);
 
     /**
      * Creates a PassEvaluation given a world and a field pitch division.
@@ -43,7 +50,7 @@ class PassGenerator
      *
      * @return The best currently known pass and the rating of that pass (in [0-1])
      */
-    PassEvaluation getPassEvaluation(const World& world);
+    PassEvaluation generatePassEvaluation(const World& world);
 
 
    private:
@@ -63,33 +70,42 @@ class PassGenerator
         PASS_SPACE_WEIGHT, PASS_SPACE_WEIGHT, PASS_SPEED_WEIGHT};
 
     /**
-     * Updates, Optimizes, And Prunes the Passes
+     * Randomly samples a recieve point across every zone and assigns a random
+     * speed to each pass.
+     *
+     * @returns a vector of sampled passes
      */
-    std::vector<Pass> generatePasses();
+    std::vector<Pass> samplePasses();
 
     /**
-     * Optimizes all current passes
+     * Given a vector of passes, runs a gradient descent optimizer to find
+     * better passes
+     *
+     * @param The passes to be optimized
+     * @returns The optimized passes
      */
-    std::vector<PassWithRating> optimizePasses(
-                const std::vector<PassWithRating>& generated_passes);
+    std::vector<PassWithRating> optimizePasses(const std::vector<Pass>& initial_passes);
 
     /**
-     * Prunes un-promising passes and replaces them with newly generated ones
+     * Re-evaluates ratePass on the "previous ticks" passes and keeps the higher pass
+     * w/ the higher score in passes_;
+     *
+     * @param optimized_passes The optimized_passes to update our internal passes with.
      */
-    void prunePasses();
+    void updatePasses(const std::vector<PassWithRating>& optimized_passes);
 
-    // This world is what is used in the optimization loop
-    World world;
+    // world buffer
+    World world_;
 
     // All the passes that we are currently trying to optimize in gradient descent
-    std::vector<Pass> passes_to_optimize;
+    std::vector<PassWithRating> passes_;
 
     // The optimizer we're using to find passes
-    GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
+    GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer_;
 
     // A random number generator for use across the class
-    std::mt19937 random_num_gen;
+    std::mt19937 random_num_gen_;
 
     // Pitch division
-    FieldPitchDivision pitch_division;
+    std::shared_ptr<const FieldPitchDivision> pitch_division_;
 };
