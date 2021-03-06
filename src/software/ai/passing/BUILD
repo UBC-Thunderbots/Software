@@ -121,8 +121,8 @@ cc_library(
     srcs = ["pass_generator.cpp"],
     hdrs = ["pass_generator.h"],
     deps = [
-        ":eighteen_zone_pitch_division",
         ":cost_functions",
+        ":eighteen_zone_pitch_division",
         ":pass",
         ":pass_evaluation",
         ":pass_with_rating",

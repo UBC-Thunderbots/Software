@@ -1,7 +1,8 @@
 #pragma once
 
-#include <unordered_set>
 #include <optional>
+#include <unordered_set>
+
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/rectangle.h"

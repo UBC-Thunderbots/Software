@@ -32,8 +32,8 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world) 
     // Prefer robots closer to the pass start position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost =
-        (robot.position() - world.ball().position()).length() / world.field().totalXLength();
+    double cost = (robot.position() - world.ball().position()).length() /
+                  world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -76,8 +76,8 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
                 .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
         Point wait_position = ball.position() - ball_offset;
 
-        move_action->updateControlParams(*robot_, wait_position, passer_orientation,
-                                         0, DribblerMode::OFF, BallCollisionType::ALLOW);
+        move_action->updateControlParams(*robot_, wait_position, passer_orientation, 0,
+                                         DribblerMode::OFF, BallCollisionType::ALLOW);
         yield(move_action);
     }
 

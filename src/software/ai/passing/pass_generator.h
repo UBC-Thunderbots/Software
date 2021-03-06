@@ -84,8 +84,8 @@ class PassGenerator
      * @param The passes to be optimized
      * @returns The optimized passes
      */
-    std::vector<PassWithRating> optimizePasses(const World& world,
-                                               const std::vector<PassWithRating>& initial_passes);
+    std::vector<PassWithRating> optimizePasses(
+        const World& world, const std::vector<PassWithRating>& initial_passes);
 
     /**
      * Re-evaluates ratePass on the "previous ticks" passes and keeps the higher pass

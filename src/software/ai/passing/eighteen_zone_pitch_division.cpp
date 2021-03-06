@@ -24,7 +24,8 @@ const Rectangle& EighteenZonePitchDivision::getZone(unsigned zone_id) const
 {
     if (zone_id < 1 || zone_id > getTotalNumberOfZones())
     {
-        std::cerr<<"test: "<<(int)zone_id<<std::endl;;
+        std::cerr << "test: " << (int)zone_id << std::endl;
+        ;
         throw std::invalid_argument("zone_id is out of bounds");
     }
     return pitch_division[zone_id - 1];

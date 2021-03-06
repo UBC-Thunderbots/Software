@@ -1,13 +1,12 @@
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
+
 #include <numeric>
 
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/distance.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Pass& pass)
-    : Tactic(true, {RobotCapability::Move}),
-      world_(world),
-      pass_(pass)
+    : Tactic(true, {RobotCapability::Move}), world_(world), pass_(pass)
 {
 }
 

@@ -1,10 +1,11 @@
 
+#include "software/ai/passing/pass_generator.h"
+
 #include <algorithm>
 #include <numeric>
 
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass_evaluation.h"
-#include "software/ai/passing/pass_generator.h"
 
 PassGenerator::PassGenerator(std::shared_ptr<const FieldPitchDivision> pitch_division)
     : optimizer_(optimizer_param_weights),
@@ -83,7 +84,7 @@ std::vector<PassWithRating> PassGenerator::optimizePasses(
     {
         // We currently don't do useful work if the score is really bad, remove this.
         // TODO (ticket here) remove this when this is fixed
-        if (pass_with_rating.rating < 0.05)
+        if (pass_with_rating.rating < 0.01)
         {
             optimized_passes.emplace_back(pass_with_rating);
             continue;

@@ -2,14 +2,14 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/geom/algorithms/contains.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
-#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
@@ -159,7 +159,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic, const World &world)
 {
-    auto pitch_division = std::make_shared<const EighteenZonePitchDivision>(world.field());
+    auto pitch_division =
+        std::make_shared<const EighteenZonePitchDivision>(world.field());
 
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
@@ -175,12 +176,12 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
         {
             cherry_pick_region_1 = {11, 12};
-            cherry_pick_region_2 = {14, 15, 18}; // ignore the defense area zone
+            cherry_pick_region_2 = {14, 15, 18};  // ignore the defense area zone
         }
         else
         {
             cherry_pick_region_1 = {10, 11};
-            cherry_pick_region_2 = {13, 14, 16}; // ignore the defense area zone
+            cherry_pick_region_2 = {13, 14, 16};  // ignore the defense area zone
         }
     }
 
@@ -198,10 +199,10 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 =
-        std::make_shared<CherryPickTactic>(world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-    auto cherry_pick_tactic_2 =
-        std::make_shared<CherryPickTactic>(world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
+        world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+    auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
+        world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);

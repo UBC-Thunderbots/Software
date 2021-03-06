@@ -4,9 +4,9 @@
 #include <string.h>
 
 #include "software/ai/passing/cost_function.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/test_util/test_util.h"
-#include "software/ai/passing/eighteen_zone_pitch_division.h"
 
 class PassGeneratorTest : public testing::Test
 {
@@ -31,7 +31,8 @@ class PassGeneratorTest : public testing::Test
      * @param max_iters The maximum number of iterations of the PassGenerator to run
      */
     static void waitForConvergence(std::shared_ptr<PassGenerator> pass_generator,
-                                   const World& world, double min_score_diff, int max_iters)
+                                   const World& world, double min_score_diff,
+                                   int max_iters)
     {
         double curr_score = 0;
         double prev_score = 0;
@@ -40,7 +41,7 @@ class PassGeneratorTest : public testing::Test
             prev_score = curr_score;
 
             auto pass_eval = pass_generator->generatePassEvaluation(world);
-            curr_score               = pass_eval.getBestPassOnField().rating;
+            curr_score     = pass_eval.getBestPassOnField().rating;
 
             // Run until the pass has converged with sufficient tolerance or the given
             // time has expired, whichever comes first. We also check that the score
@@ -101,12 +102,14 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     waitForConvergence(pass_generator, world, 0.0015, 30);
 
     // Find what pass we converged to
-    auto [converged_pass, converged_score] = pass_generator->generatePassEvaluation(world).getBestPassOnField();
+    auto [converged_pass, converged_score] =
+        pass_generator->generatePassEvaluation(world).getBestPassOnField();
 
     // Check that we keep converging to the same pass
     for (int i = 0; i < 7; i++)
     {
-        auto [pass, score] = pass_generator->generatePassEvaluation(world).getBestPassOnField();
+        auto [pass, score] =
+            pass_generator->generatePassEvaluation(world).getBestPassOnField();
 
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).length(), 0.3);
         EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.3);
@@ -242,7 +245,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Find what pass we converged to
     auto pass_evaluation = pass_generator->generatePassEvaluation(world);
-    auto converged_pass           = pass_evaluation.getBestPassOnField().pass;
+    auto converged_pass  = pass_evaluation.getBestPassOnField().pass;
 
     // We expect to have converged to a point near the robot in +y. The tolerance is
     // fairly generous here because the enemies on the field can "force" the point
@@ -259,7 +262,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Find what pass we converged to
     pass_evaluation = pass_generator->generatePassEvaluation(world);
-    converged_pass           = pass_evaluation.getBestPassOnField().pass;
+    converged_pass  = pass_evaluation.getBestPassOnField().pass;
 
     // We expect to have converged to a point near the robot in +y. The tolerance is
     // fairly generous here because the enemies on the field can "force" the point
@@ -267,37 +270,38 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
     EXPECT_LE((converged_pass.receiverPoint() - neg_y_friendly.position()).length(), 0.7);
 }
 
-TEST_F(PassGeneratorTest, DISABLED_test_receiver_point_converges_to_point_in_target_region)
+TEST_F(PassGeneratorTest,
+       DISABLED_test_receiver_point_converges_to_point_in_target_region)
 {
     // Test that when given a target region, the pass generator returns a pass
     // with the receiver point in that target region
 
-    //pass_generator->setPasserPoint({3, 3});
-    //Rectangle target_region({0.5, 0.5}, {1.5, -0.5});
-    //pass_generator->setTargetRegion(target_region);
+    // pass_generator->setPasserPoint({3, 3});
+    // Rectangle target_region({0.5, 0.5}, {1.5, -0.5});
+    // pass_generator->setTargetRegion(target_region);
 
-    //Team friendly_team(Duration::fromSeconds(10));
-    //friendly_team.updateRobots({
-        //Robot(0, {1, -1.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-              //Timestamp::fromSeconds(0)),
+    // Team friendly_team(Duration::fromSeconds(10));
+    // friendly_team.updateRobots({
+    // Robot(0, {1, -1.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+    // Timestamp::fromSeconds(0)),
     //});
-    //world.updateFriendlyTeamState(friendly_team);
+    // world.updateFriendlyTeamState(friendly_team);
 
-    //Team enemy_team(Duration::fromSeconds(10));
-    //enemy_team.updateRobots({
-        //Robot(0, {0, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-              //Timestamp::fromSeconds(0)),
+    // Team enemy_team(Duration::fromSeconds(10));
+    // enemy_team.updateRobots({
+    // Robot(0, {0, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+    // Timestamp::fromSeconds(0)),
     //});
-    //world.updateEnemyTeamState(enemy_team);
+    // world.updateEnemyTeamState(enemy_team);
 
     //// Wait for the pass to converge, or 30 seconds, whichever come first
-    //waitForConvergence(pass_generator, 0.001, 30);
+    // waitForConvergence(pass_generator, 0.001, 30);
 
     //// With no target region set, the pass generator would like to pass more to
     //// the -y side of the field (away from the enemy and closer to the friendly).
     //// With a target region set, we expect the receiver point to be within the
     //// target region instead.
-    //auto [converged_pass, score] = pass_generator->getBestPassSoFar();
-    //EXPECT_TRUE(contains(target_region, converged_pass.receiverPoint()));
-    //UNUSED(score);
+    // auto [converged_pass, score] = pass_generator->getBestPassSoFar();
+    // EXPECT_TRUE(contains(target_region, converged_pass.receiverPoint()));
+    // UNUSED(score);
 }

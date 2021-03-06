@@ -146,7 +146,7 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(1, {-0.1, -0.1}, {0, 0}, pass.receiverOrientation(ball),
+        Robot(1, {-0.1, -0.1}, {0, 0}, pass.receiverOrientation(ball.position()),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
@@ -174,9 +174,9 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(0, {3, -0.8}, {0, 0}, pass.receiverOrientation(ball),
+        Robot(0, {3, -0.8}, {0, 0}, pass.receiverOrientation(ball.position()),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(1, {-0.1, -0.1}, {0, 0}, pass.receiverOrientation(ball),
+        Robot(1, {-0.1, -0.1}, {0, 0}, pass.receiverOrientation(ball.position()),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
@@ -204,7 +204,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked)
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(ball),
+        Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(ball.position()),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
@@ -232,7 +232,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_n
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(ball),
+        Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(ball.position()),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
@@ -260,7 +260,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(ball),
+        Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(ball.position()),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
@@ -906,7 +906,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({1, 0}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0.1));
     team.updateRobots(
-        {Robot(0, {1, 0}, {0, 0}, calculateReceiverOrientation(ball, pass),
+        {Robot(0, {1, 0}, {0, 0}, pass.receiverOrientation(ball.position()),
                AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
 
     EXPECT_GE(ratePassFriendlyCapability(ball, team, pass), 0.90);
