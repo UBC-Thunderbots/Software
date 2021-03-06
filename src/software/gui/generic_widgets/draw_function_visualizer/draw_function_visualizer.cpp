@@ -79,8 +79,7 @@ void DrawFunctionVisualizer::setViewArea(const Rectangle &view_area)
 
 void DrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent* event)
 {
-    Point point_in_scene = createPoint(mapToScene(event->pos()));
-    auto robot_under_cursor = standalone_simulator->getRobotAtPosition(point_in_scene);
+    // Point point_in_scene = createPoint(mapToScene(event->pos()));
 
     QMenu menu(this);
     auto resetViewAction = createResetView();
