@@ -1,14 +1,14 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include <algorithm>
+#include <memory>
 #include <unordered_set>
 #include <vector>
-#include <memory>
 
-#include "software/ai/passing/pass_with_rating.h"
 #include "software/ai/passing/field_pitch_division.h"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
 
@@ -26,8 +26,8 @@ class PassEvaluation
      * @param timestamp The timestamp this pass evaluation was created
      */
     explicit PassEvaluation(std::shared_ptr<const FieldPitchDivision> pitch_division,
-                               std::vector<PassWithRating> best_pass_in_zones,
-                               Timestamp timestamp);
+                            std::vector<PassWithRating> best_pass_in_zones,
+                            Timestamp timestamp);
 
     PassEvaluation() = delete;
 
@@ -46,8 +46,7 @@ class PassEvaluation
      * @param zone_ids A set of zone_ids to find the best pass in
      * @return PassWithRating w/ the best pass in the given zones
      */
-    PassWithRating getBestPassInZones(
-        const std::unordered_set<unsigned>& zone_ids) const;
+    PassWithRating getBestPassInZones(const std::unordered_set<unsigned>& zone_ids) const;
 
     /**
      * Returns the field pitch division this pass evaluation was computed for
@@ -64,7 +63,6 @@ class PassEvaluation
     Timestamp getEvaluationTime() const;
 
    private:
-
     // The pitch division this pass evaluation was computed for
     std::shared_ptr<const FieldPitchDivision> pitch_division_;
 

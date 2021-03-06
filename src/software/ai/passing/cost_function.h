@@ -31,7 +31,8 @@ double ratePass(const World& world, const Pass& pass);
  *         the pass, and 1 indicating that it is guaranteed to be able to score off of
  *         the pass
  */
-double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team, const Pass& pass);
+double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team,
+                          const Pass& pass);
 
 /**
  * Calculates the risk of an enemy robot interfering with a given pass
@@ -70,7 +71,8 @@ double calculateInterceptRisk(const Ball& ball, const Team& enemy_team, const Pa
  *         be intercepted, and 0 indicating it's impossible for the pass to be
  *         intercepted
  */
-double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot, const Pass& pass);
+double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot,
+                              const Pass& pass);
 
 
 /**

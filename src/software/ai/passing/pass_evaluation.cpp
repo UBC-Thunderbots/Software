@@ -51,11 +51,11 @@ PassWithRating PassEvaluation::getBestPassInZones(
         }
     });
 
-    auto best_pass = std::max_element(
-        zone_ids.begin(), zone_ids.end(), [this](unsigned zone_a, unsigned zone_b) {
-           return best_pass_in_zones_[zone_a - 1].rating <
-                   best_pass_in_zones_[zone_b - 1].rating;
-        });
+    auto best_pass = std::max_element(zone_ids.begin(), zone_ids.end(),
+                                      [this](unsigned zone_a, unsigned zone_b) {
+                                          return best_pass_in_zones_[zone_a - 1].rating <
+                                                 best_pass_in_zones_[zone_b - 1].rating;
+                                      });
 
     return best_pass_in_zones_[*best_pass - 1];
 }

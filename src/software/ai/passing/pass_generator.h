@@ -6,8 +6,8 @@
 
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass.h"
-#include "software/ai/passing/pass_with_rating.h"
 #include "software/ai/passing/pass_evaluation.h"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/optimization/gradient_descent_optimizer.h"
 #include "software/parameter/dynamic_parameters.h"
 #include "software/time/timestamp.h"
@@ -21,7 +21,6 @@ const int PASS_GENERATOR_SEED = 13;
 class PassGenerator
 {
    public:
-
     /**
      * Creates a new PassGenerator with the given pitch_division.
      *
@@ -85,7 +84,8 @@ class PassGenerator
      * @param The passes to be optimized
      * @returns The optimized passes
      */
-    std::vector<PassWithRating> optimizePasses(const World& world, const std::vector<Pass>& initial_passes);
+    std::vector<PassWithRating> optimizePasses(const World& world,
+                                               const std::vector<Pass>& initial_passes);
 
     /**
      * Re-evaluates ratePass on the "previous ticks" passes and keeps the higher pass
@@ -94,7 +94,8 @@ class PassGenerator
      * @param The world
      * @param optimized_passes The optimized_passes to update our internal passes with.
      */
-    void updatePasses(const World& world, const std::vector<PassWithRating>& optimized_passes);
+    void updatePasses(const World& world,
+                      const std::vector<PassWithRating>& optimized_passes);
 
     // All the passes that we are currently trying to optimize in gradient descent
     std::vector<PassWithRating> passes_;

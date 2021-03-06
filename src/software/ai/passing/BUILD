@@ -58,22 +58,23 @@ cc_library(
     name = "field_pitch_division",
     hdrs = ["field_pitch_division.h"],
     deps = [
-        "//software/world:field",
-        "//software/geom:rectangle",
         "//software/geom:point",
+        "//software/geom:rectangle",
+        "//software/world:field",
     ],
 )
 
 cc_library(
     name = "eighteen_zone_pitch_division",
-    hdrs = ["eighteen_zone_pitch_division.h"],
     srcs = [
-            "eighteen_zone_pitch_division.cpp"],
+        "eighteen_zone_pitch_division.cpp",
+    ],
+    hdrs = ["eighteen_zone_pitch_division.h"],
     deps = [
         ":field_pitch_division",
-        "//software/util/make_enum",
-        "//software/geom:rectangle",
         "//software/geom:point",
+        "//software/geom:rectangle",
+        "//software/util/make_enum",
     ],
 )
 
@@ -82,23 +83,24 @@ cc_test(
     srcs = ["eighteen_zone_pitch_division_test.cpp"],
     deps = [
         ":eighteen_zone_pitch_division",
-        "//software/geom/algorithms:algorithms",
+        "//software/geom/algorithms",
         "@gtest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "pass_evaluation",
-    hdrs = ["pass_evaluation.h"],
     srcs = [
-            "pass_evaluation.cpp"],
+        "pass_evaluation.cpp",
+    ],
+    hdrs = ["pass_evaluation.h"],
     deps = [
-            ":pass",
-            ":pass_with_rating",
         ":field_pitch_division",
-        "//software/util/make_enum",
-        "//software/geom:rectangle",
+        ":pass",
+        ":pass_with_rating",
         "//software/geom:point",
+        "//software/geom:rectangle",
+        "//software/util/make_enum",
     ],
 )
 
@@ -106,23 +108,22 @@ cc_test(
     name = "pass_evaluation_test",
     srcs = ["pass_evaluation_test.cpp"],
     deps = [
-        ":pass",
         ":eighteen_zone_pitch_division",
+        ":pass",
         ":pass_evaluation",
-        "//software/geom/algorithms:algorithms",
+        "//software/geom/algorithms",
         "@gtest//:gtest_main",
     ],
 )
-
 
 cc_library(
     name = "pass_generator",
     srcs = ["pass_generator.cpp"],
     hdrs = ["pass_generator.h"],
     deps = [
-        ":pass_evaluation",
         ":cost_functions",
         ":pass",
+        ":pass_evaluation",
         ":pass_with_rating",
         "//software/optimization:gradient_descent",
         "//software/world",

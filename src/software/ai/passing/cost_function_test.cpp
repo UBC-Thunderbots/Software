@@ -187,8 +187,8 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(0, {3, -0.8}, {0, 0}, calculateReceiverOrientation(ball, pass), AngularVelocity::zero(),
-              Timestamp::fromSeconds(0)),
+        Robot(0, {3, -0.8}, {0, 0}, calculateReceiverOrientation(ball, pass),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
         Robot(1, {-0.1, -0.1}, {0, 0}, calculateReceiverOrientation(ball, pass),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
@@ -217,8 +217,8 @@ TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked)
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(0, {1, -0.8}, {0, 0}, calculateReceiverOrientation(ball, pass), AngularVelocity::zero(),
-              Timestamp::fromSeconds(0)),
+        Robot(0, {1, -0.8}, {0, 0}, calculateReceiverOrientation(ball, pass),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
@@ -245,8 +245,8 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_n
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(0, {1, -0.8}, {0, 0}, calculateReceiverOrientation(ball, pass), AngularVelocity::zero(),
-              Timestamp::fromSeconds(0)),
+        Robot(0, {1, -0.8}, {0, 0}, calculateReceiverOrientation(ball, pass),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
@@ -273,8 +273,8 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     World world = ::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(0, {1, -0.8}, {0, 0}, calculateReceiverOrientation(ball, pass), AngularVelocity::zero(),
-              Timestamp::fromSeconds(0)),
+        Robot(0, {1, -0.8}, {0, 0}, calculateReceiverOrientation(ball, pass),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
@@ -433,7 +433,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_passer_on_field)
 TEST_F(PassingEvaluationTest, DISABLED_ratePass_attempting_to_pass_and_receive_no_shot)
 {
     // TODO (ticket here) see note at cost_function.cpp:79, updated this test
-    // when that ticket is resolved. 
+    // when that ticket is resolved.
 
     // Test that a pass which does NOT result in a good shot on goal is rated
     // highly if we are rating it as a pass which is intended to be received
@@ -551,7 +551,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_decreasing_open_angle_to_goal)
               Timestamp::fromSeconds(0)),
     });
     std::vector<Robot> robots_on_field = {};
-    double pass_shoot_score0           = ratePassShootScore(ball, field, enemy_team, pass);
+    double pass_shoot_score0 = ratePassShootScore(ball, field, enemy_team, pass);
     enemy_team.updateRobots({
         Robot(0, {3.5, 0.2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
@@ -845,7 +845,7 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_should_ignore_passer_ro
     // The net result should be a poor friendly capability, as we can only pass to the
     // one robot that can't get to the pass reception point in time
 
-    Robot passer                 = Robot(13, {2, 2}, {0, 0}, Angle::fromDegrees(270),
+    Robot passer = Robot(13, {2, 2}, {0, 0}, Angle::fromDegrees(270),
                          AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0));
     Robot potential_receiver =
         Robot(1, {-3, 3}, {0, 0}, Angle::fromDegrees(0), AngularVelocity::fromDegrees(0),

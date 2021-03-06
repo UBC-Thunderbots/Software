@@ -20,7 +20,8 @@ double ratePass(const World& world, const Pass& pass)
 
     double enemy_pass_rating = ratePassEnemyRisk(world.ball(), world.enemyTeam(), pass);
 
-    double shoot_pass_rating = ratePassShootScore(world.ball(), world.field(), world.enemyTeam(), pass);
+    double shoot_pass_rating =
+        ratePassShootScore(world.ball(), world.field(), world.enemyTeam(), pass);
 
     // Place strict limits on the ball speed
     double min_pass_speed = DynamicParameters->getAiConfig()
@@ -38,7 +39,8 @@ double ratePass(const World& world, const Pass& pass)
            shoot_pass_rating * pass_speed_quality;
 }
 
-double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team, const Pass& pass)
+double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team,
+                          const Pass& pass)
 {
     double ideal_max_rotation_to_shoot_degrees = DynamicParameters->getAiConfig()
                                                      ->getPassingConfig()
@@ -85,10 +87,10 @@ double ratePassShootScore(const Ball& ball, const Field& field, const Team& enem
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)
-    
+
     auto receiver_orientation = (ball.position() - pass.receiverPoint()).orientation();
-    Angle rotation_to_shot_target_after_pass = receiver_orientation.minDiff(
-        (shot_target - pass.receiverPoint()).orientation());
+    Angle rotation_to_shot_target_after_pass =
+        receiver_orientation.minDiff((shot_target - pass.receiverPoint()).orientation());
     double required_rotation_for_shot_score =
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
                     ideal_max_rotation_to_shoot_degrees, 4);
@@ -134,13 +136,14 @@ double calculateInterceptRisk(const Ball& ball, const Team& enemy_team, const Pa
         return 0;
     }
     std::vector<double> enemy_intercept_risks(enemy_robots.size());
-    std::transform(enemy_robots.begin(), enemy_robots.end(),
-                   enemy_intercept_risks.begin(),
-                   [&](Robot robot) { return calculateInterceptRisk(ball, robot, pass); });
+    std::transform(
+        enemy_robots.begin(), enemy_robots.end(), enemy_intercept_risks.begin(),
+        [&](Robot robot) { return calculateInterceptRisk(ball, robot, pass); });
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot, const Pass& pass)
+double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot,
+                              const Pass& pass)
 {
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to

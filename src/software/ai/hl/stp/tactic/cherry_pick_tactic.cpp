@@ -3,7 +3,8 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/distance.h"
 
-CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region, std::set<FieldZone> zones)
+CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region,
+                                   std::set<FieldZone> zones)
     : Tactic(true, {RobotCapability::Move}),
 {
 }

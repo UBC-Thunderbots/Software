@@ -4,8 +4,8 @@
 #include <numeric>
 
 #include "software/ai/passing/cost_function.h"
-#include "software/ai/passing/pass_generator.h"
 #include "software/ai/passing/pass_evaluation.h"
+#include "software/ai/passing/pass_generator.h"
 
 PassGenerator::PassGenerator(std::shared_ptr<const FieldPitchDivision>& pitch_division)
     : optimizer_(optimizer_param_weights),
@@ -80,14 +80,15 @@ std::vector<PassWithRating> PassGenerator::optimizePasses(
     {
         auto pass_array =
             optimizer_.maximize(objective_function, pass.toPassArray(),
-                               DynamicParameters->getAiConfig()
-                                   ->getPassingConfig()
-                                   ->getNumberOfGradientDescentStepsPerIter()
-                                   ->value());
+                                DynamicParameters->getAiConfig()
+                                    ->getPassingConfig()
+                                    ->getNumberOfGradientDescentStepsPerIter()
+                                    ->value());
         try
         {
             auto new_pass = Pass::fromPassArray(pass_array);
-            optimized_passes.emplace_back(PassWithRating{new_pass, ratePass(world, new_pass)});
+            optimized_passes.emplace_back(
+                PassWithRating{new_pass, ratePass(world, new_pass)});
         }
         catch (std::invalid_argument& e)
         {
@@ -101,11 +102,14 @@ std::vector<PassWithRating> PassGenerator::optimizePasses(
     return optimized_passes;
 }
 
-void PassGenerator::updatePasses(const World& world, const std::vector<PassWithRating>& optimized_passes)
+void PassGenerator::updatePasses(const World& world,
+                                 const std::vector<PassWithRating>& optimized_passes)
 {
-    for (unsigned zone_id = 1; zone_id <= pitch_division_->getTotalNumberOfZones(); ++zone_id)
+    for (unsigned zone_id = 1; zone_id <= pitch_division_->getTotalNumberOfZones();
+         ++zone_id)
     {
-        if (ratePass(world, passes_[zone_id - 1].pass) < optimized_passes[zone_id - 1].rating)
+        if (ratePass(world, passes_[zone_id - 1].pass) <
+            optimized_passes[zone_id - 1].rating)
         {
             passes_[zone_id - 1] = optimized_passes[zone_id - 1];
         }
