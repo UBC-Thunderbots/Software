@@ -15,6 +15,12 @@ rules_foreign_cc_dependencies()
 all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
 
 http_archive(
+    name = "rules_python",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
+    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
+)
+
+http_archive(
     name = "rapidcheck",
     build_file_content = all_contents,
     strip_prefix = "rapidcheck-master",
@@ -231,12 +237,6 @@ new_git_repository(
     commit = "07a503cc3f18de2b861ea15d8357d3b3c0c978d6",  # Version `1.1.3`
     remote = "https://github.com/boost-ext/sml.git",
     shallow_since = "1596403987 -0600",
-)
-
-http_archive(
-    name = "rules_python",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
-    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
 )
 
 # Based on the hermetic Python 3 guide found here
