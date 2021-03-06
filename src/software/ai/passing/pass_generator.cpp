@@ -6,25 +6,52 @@
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass_generator.h"
 
-PassGenerator::PassGenerator()
+PassGenerator::PassGenerator(const FieldPitchDivision& pitch_division)
     : optimizer(optimizer_param_weights),
-      // We initialize the random number generator with a specific value to
-      // allow generated passes to be deterministic. The value used here has
-      // no special meaning.
-      random_num_gen(13),
+      pitch_division(pitch_division),
+      random_num_gen(PASS_GENERATOR_SEED),
 {
-    // Generate the initial set of passes
-    passes_to_optimize = generatePasses(getNumPassesToOptimize());
 }
 
-PassWithRating PassGenerator::getBestPassSoFar()
+PassEvaluation PassGenerator::getPassEvaluation(const World& world)
 {
-    optimizePasses();
-    pruneAndReplacePasses();
-    saveBestPass();
+    auto generated_passes             = generatePasses();
+    auto optimized_passes_with_rating = optimizePasses(generated_passes);
 }
 
-void PassGenerator::optimizePasses()
+std::vector<PassWithRating> PassGenerator::generatePasses()
+{
+    std::uniform_real_distribution speed_distribution(DynamicParameters->getAiConfig()
+                                                          ->getPassingConfig()
+                                                          ->getMinPassSpeedMPerS()
+                                                          ->value(),
+                                                      DynamicParameters->getAiConfig()
+                                                          ->getPassingConfig()
+                                                          ->getMaxPassSpeedMPerS()
+                                                          ->value());
+    std::vector<PassWithRating> passes;
+
+    // Randomly sample a pass in each zone
+    for (unsigned zone_id = 1; zone_id < pitch_division.getTotalNumberOfZones();
+         ++zone_id)
+    {
+        auto zone = pitch_division.getZone(zone_id);
+
+        std::uniform_real_distribution x_distribution(zone.xMin(), zone.xMax());
+        std::uniform_real_distribution y_distribution(zone.yMin(), zone.yMax());
+
+        auto pass =
+            Pass(Point(x_distribution(random_num_gen), y_distribution(random_num_gen)),
+                 speed_distribution(random_num_gen));
+
+        passes.emplace_back(PassWithRating{pass, ratePass(pass)});
+    }
+
+    return passes;
+}
+
+std::vector<PassWithRating> PassGenerator::optimizePasses(
+    const std::vector<Pass>& generated_passes)
 {
     // The objective function we minimize in gradient descent to improve each pass
     // that we're optimizing
@@ -32,8 +59,7 @@ void PassGenerator::optimizePasses()
         [this](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
             try
             {
-                Pass pass = convertArrayToPass(pass_array);
-                return ratePass(world, pass);
+                return ratePass(world, Pass::fromPassArray(pass_array));
             }
             catch (std::invalid_argument& e)
             {
@@ -45,105 +71,28 @@ void PassGenerator::optimizePasses()
     // of iterations
     // NOTE: Parallelizing this `for` loop would probably be safe and potentially more
     //       performant
-    std::vector<Pass> updated_passes;
-    for (Pass& pass : passes_to_optimize)
+    std::vector<Pass> optimized_passes;
+    for (Pass& pass : generated_passes)
     {
         auto pass_array =
-            optimizer.maximize(objective_function, convertPassToArray(pass),
+            optimizer.maximize(objective_function, pass.toPassArray(),
                                DynamicParameters->getAiConfig()
                                    ->getPassingConfig()
                                    ->getNumberOfGradientDescentStepsPerIter()
                                    ->value());
         try
         {
-            updated_passes.emplace_back(convertArrayToPass(pass_array));
+            auto new_pass = Pass::fromPassArray(pass_array);
+            optimized_passes.emplace_back(PassWithRating{new_pass, ratePass(new_pass)});
         }
         catch (std::invalid_argument& e)
         {
-            // Sometimes the gradient descent algorithm could return an invalid pass, if
-            // so, we can just ignore it and carry on
+            // Sometimes the gradient descent algorithm could return an invalid pass
+            // (i.e a pass w/ a negative speed). We just keep the initial pass in that
+            // case.
+            optimized_passes.emplace_back(PassWithRating{pass, ratePass(pass)});
         }
     }
-    passes_to_optimize = updated_passes;
-}
 
-double PassGenerator::ratePass(const Pass& pass)
-{
-    double rating = 0;
-    try
-    {
-        rating = ::ratePass(world, pass, target_region, passer_robot_id, pass_type);
-    }
-    catch (std::invalid_argument& e)
-    {
-        // If the pass is invalid, just rate it as poorly as possible
-        rating = 0;
-    }
-
-    return rating;
-}
-
-std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
-{
-    std::uniform_real_distribution x_distribution(-world.field().xLength() / 2,
-                                                  world.field().xLength() / 2);
-    std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
-                                                  world.field().yLength() / 2);
-
-    double curr_time             = world.getMostRecentTimestamp().toSeconds();
-    double min_start_time_offset = DynamicParameters->getAiConfig()
-                                       ->getPassingConfig()
-                                       ->getMinTimeOffsetForPassSeconds()
-                                       ->value();
-    double max_start_time_offset = DynamicParameters->getAiConfig()
-                                       ->getPassingConfig()
-                                       ->getMaxTimeOffsetForPassSeconds()
-                                       ->value();
-    std::uniform_real_distribution start_time_distribution(
-        curr_time + min_start_time_offset, curr_time + max_start_time_offset);
-    std::uniform_real_distribution speed_distribution(DynamicParameters->getAiConfig()
-                                                          ->getPassingConfig()
-                                                          ->getMinPassSpeedMPerS()
-                                                          ->value(),
-                                                      DynamicParameters->getAiConfig()
-                                                          ->getPassingConfig()
-                                                          ->getMaxPassSpeedMPerS()
-                                                          ->value());
-
-    std::vector<Pass> passes;
-    for (unsigned i = 0; i < num_passes_to_gen; i++)
-    {
-        Point receiver_point(x_distribution(random_num_gen),
-                             y_distribution(random_num_gen));
-        Timestamp start_time =
-            Timestamp::fromSeconds(start_time_distribution(random_num_gen));
-        double pass_speed = speed_distribution(random_num_gen);
-
-        Pass p(passer_point, receiver_point, pass_speed, start_time);
-        passes.emplace_back(p);
-    }
-
-    return passes;
-}
-
-bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)
-{
-    return ratePass(pass1) > ratePass(pass2);
-}
-
-std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>
-PassGenerator::convertPassToArray(const Pass& pass)
-{
-    return {pass.receiverPoint().x(), pass.receiverPoint().y(), pass.speed(),
-            pass.startTime().toSeconds()};
-}
-
-Pass PassGenerator::convertArrayToPass(
-    const std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>& array)
-{
-    // Clamp the time to be >= 0, otherwise the TimeStamp will throw an exception
-    double time_offset_seconds = std::max(0.0, array.at(3));
-
-    return Pass(passer_point, Point(array.at(0), array.at(1)), array.at(2),
-                Timestamp::fromSeconds(time_offset_seconds));
+    return optimized_passes;
 }

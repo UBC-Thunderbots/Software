@@ -2,108 +2,72 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <set>
 #include <vector>
 
-#include "software/ai/passing/pass.h"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
 
-/**
- * This class represents a Pass, with a given start position, end position,
- * speed, and start time
- */
 class PassEvaluation
 {
    public:
     /**
      * Create a new PassEvaluation with the best pass in each zone
      *
+     * @param pitch_division The FieldPitchDivision that was used to create
+     *                       this pass evaluation.
      * @param best_pass_in_zone A vector of the best passes in each zone,
      *                          the index in the vector should correspond
      *                          with the FieldZone enum.
+     *                          TODO
      */
-    explicit PassEvaluation(std::vector<Pass> best_pass_in_zone);
+    explicit PassEvaluation(const FieldPitchDivision& pitch_division,
+                            std::vector<PassWithRating> best_pass_in_zones, Timestamp timestamp);
+
     PassEvaluation() = delete;
 
     /**
-     * Gets the value of the receiver point
+     * Get the best pass on the entire field.
      *
-     * @return The value of the receiver point
+     * @returns PassWithRating containing the best pass
      */
-    Point receiverPoint() const;
+    PassWithRating getBestPassOnField() const;
 
     /**
-     * Gets the angle the receiver should be facing to receive the pass
+     * Given the zone_id, returns the best PassWithRating
      *
-     * @return The angle the receiver should be facing to receive the pass
+     * @param zone_id
+     * @return PassWithRating w/ the best pass in the given zone
      */
-    Angle receiverOrientation() const;
+    PassWithRating getBestPassInZone(unsigned zone_id) const;
 
     /**
-     * Gets the angle the passer should be facing to perform the pass
+     * Given a set of zone_ids, returns the best PassWithRating in those zones
      *
-     * @return The angle the passer should be facing to perform the pass
+     * @param zone_ids A set of zone_ids to find the best pass in
+     * @return PassWithRating w/ the best pass in the given zones
      */
-    Angle passerOrientation() const;
+    PassWithRating getBestPassInZones(
+        const std::unordered_set<unsigned>& zone_ids) const;
 
     /**
-     * Gets the value of the passer point
+     * Returns the field pitch division this pass evaluation was computed for
      *
-     * @return The value of the passer point
+     * @return FieldPitchDivision defining how the field is divided
      */
-    Point passerPoint() const;
+    const FieldPitchDivision& getFieldPitchDivsion() const;
 
     /**
-     * Gets the value of the pass speed
+     * Returns a timestamp of when this pass evaluation was created
      *
-     * @return The value of the pass speed, in meters/second
+     * @return Timestamp the timestamp of when this pass evaluation was created
      */
-    double speed() const;
-
-    /**
-     * Gets the value of the pass start time
-     *
-     * @return The value of the pass start time
-     */
-    Timestamp startTime() const;
-
-    /**
-     * Estimate the time when the pass should be received
-     *
-     * This estimate does not account for friction on the ball
-     *
-     * @return An estimate of the time when the pass should be received
-     */
-    Timestamp estimateReceiveTime() const;
-
-    /**
-     * Estimate how long the pass will take, from kicking to receiving
-     *
-     * This estimate does not account for friction on the ball
-     *
-     * @return An estimate of how long the pass will take, from kicking to receiving
-     */
-    Duration estimatePassDuration() const;
-
-    /**
-     * Implement the "<<" operator for printing
-     *
-     * @param output_stream The stream to print to
-     * @param pass The pass to print
-     * @return The output stream with the string representation of the class appended
-     */
-    friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass);
+    Timestamp getEvaluationTime() const;
 
    private:
-    // The location of the receiver
-    Point receiver_point;
 
-    // The location of the passer
-    Point passer_point;
-
-    // The speed of the pass in meters/second
-    double pass_speed_m_per_s;
-
-    // The time to perform the pass at
-    Timestamp pass_start_time;
+    Timestamp timestamp_;
+    FieldPitchDivision pitch_division_;
+    std::vector<PassWithRating> best_pass_in_zones_;
 };

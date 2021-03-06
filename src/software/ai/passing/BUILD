@@ -77,6 +77,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "pass_evaluation",
+    hdrs = ["pass_evaluation.h"],
+    srcs = [
+            "pass_evaluation.cpp"],
+    deps = [
+            ":pass",
+            ":pass_with_rating",
+        ":field_pitch_division",
+        "//software/util/make_enum",
+        "//software/geom:rectangle",
+        "//software/geom:point",
+    ],
+)
+
 cc_test(
     name = "eighteen_zone_pitch_division_test",
     srcs = ["eighteen_zone_pitch_division_test.cpp"],

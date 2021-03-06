@@ -8,8 +8,7 @@
 #include "software/time/timestamp.h"
 
 /**
- * This class represents a Pass, with a given start position, end position,
- * speed, and start time
+ * This class represents a Pass, a receive point with a speed
  */
 class Pass
 {
@@ -25,6 +24,22 @@ class Pass
     Pass(Point receiver_point, double pass_speed_m_per_s);
 
     /**
+     * Create a pass from the given pass array
+     *
+     * @param pass_array [receiver_point.x(), receiver_point.y(), pass_speed_m_per_s]
+     * @return The Pass constructed from the pass array
+     */
+    static Pass fromPassArray(const std::array<double, 3>& pass_array);
+
+    /**
+     * Converts a pass to an array
+     *
+     * @returns the pass array: [receiver_point.x(), receiver_point.y(),
+     * pass_speed_m_per_s]
+     */
+    std::array<double, 3> toPassArray();
+
+    /**
      * Gets the value of the receiver point
      *
      * @return The value of the receiver point
@@ -32,42 +47,11 @@ class Pass
     Point receiverPoint() const;
 
     /**
-     * Gets the angle the receiver should be facing to receive the pass
-     *
-     * @return The angle the receiver should be facing to receive the pass
-     */
-    Angle receiverOrientation() const;
-
-    /**
-     * Gets the angle the passer should be facing to perform the pass
-     *
-     * @return The angle the passer should be facing to perform the pass
-     */
-    Angle passerOrientation() const;
-
-    /**
-     * Gets the value of the passer point
-     *
-     * @return The value of the passer point
-     */
-    Point passerPoint() const;
-
-    /**
      * Gets the value of the pass speed
      *
      * @return The value of the pass speed, in meters/second
      */
     double speed() const;
-
-
-    /**
-     * Estimate how long the pass will take, from kicking to receiving
-     *
-     * This estimate does not account for friction on the ball
-     *
-     * @return An estimate of how long the pass will take, from kicking to receiving
-     */
-    Duration estimatePassDuration() const;
 
     /**
      * Implement the "<<" operator for printing
@@ -82,12 +66,9 @@ class Pass
     // The location of the receiver
     Point receiver_point;
 
-    // The location of the passer
-    Point passer_point;
-
     // The speed of the pass in meters/second
     double pass_speed_m_per_s;
 
-    // The time to perform the pass at
-    Timestamp pass_start_time;
+    // Store the pass as a pass array
+    std::array<double, 3> pass_array;
 };
