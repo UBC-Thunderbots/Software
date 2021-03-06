@@ -86,8 +86,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
         bait_move_tactic_2_pos,
         (world.field().enemyGoalCenter() - bait_move_tactic_2_pos).orientation(), 0.0);
 
-    Pass pass =
-        setupPass(yield, goalie_tactic, world);
+    Pass pass = setupPass(yield, goalie_tactic, world);
 
     // Perform the pass and wait until the receiver is finished
     auto passer =
