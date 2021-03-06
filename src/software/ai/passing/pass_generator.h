@@ -74,7 +74,7 @@ class PassGenerator
      *
      * @returns a vector of sampled passes
      */
-    std::vector<Pass> samplePasses();
+    std::vector<PassWithRating> samplePasses(const World& world);
 
     /**
      * Given a vector of passes, runs a gradient descent optimizer to find
@@ -85,7 +85,7 @@ class PassGenerator
      * @returns The optimized passes
      */
     std::vector<PassWithRating> optimizePasses(const World& world,
-                                               const std::vector<Pass>& initial_passes);
+                                               const std::vector<PassWithRating>& initial_passes);
 
     /**
      * Re-evaluates ratePass on the "previous ticks" passes and keeps the higher pass

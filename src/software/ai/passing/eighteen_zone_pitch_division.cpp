@@ -22,7 +22,7 @@ EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
 
 const Rectangle& EighteenZonePitchDivision::getZone(unsigned zone_id) const
 {
-    if (zone_id < 1 || zone_id >= getTotalNumberOfZones())
+    if (zone_id < 1 || zone_id > getTotalNumberOfZones())
     {
         throw std::invalid_argument("zone_id is out of bounds");
     }
