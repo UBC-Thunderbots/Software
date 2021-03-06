@@ -44,6 +44,15 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
             // setting up
             ASSERT_EQ(world_ptr->field().friendlyPenaltyMark(),
                       world_ptr->ball().position());
+        },
+        [shooter_id](std::shared_ptr<World> world_ptr,
+                     ValidationCoroutine::push_type& yield) {
+            // Wait 2 seconds for robots to start moving adequately far away from the ball
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+            {
+                yield();
+            }
+            robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
@@ -80,15 +89,6 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
         ballInPlay, ballNeverMovesBackward,
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
-            robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
-        },
-        [shooter_id](std::shared_ptr<World> world_ptr,
-                     ValidationCoroutine::push_type& yield) {
-            // Wait 2 seconds for robots to start moving adequately far away from the ball
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
-            {
-                yield();
-            }
             robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
         }};
 
