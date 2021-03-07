@@ -1,11 +1,11 @@
 #include "software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h"
 
+#include <QtWidgets/QMenu>
+#include <string>
+
 #include "software/gui/drawing/colors.h"
 #include "software/gui/geometry_conversion.h"
 #include "software/logger/logger.h"
-
-#include <QtWidgets/QMenu>
-#include <string>
 
 DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent)
     : ZoomableQGraphicsView(parent),
@@ -80,20 +80,20 @@ void DrawFunctionVisualizer::setViewArea(const Rectangle &view_area)
     // Moves and scales the view to fit the view_area in the scene
     lastViewArea = view_area;
 
-    if(remaining_attempts_to_set_view_area > 0) {
+    if (remaining_attempts_to_set_view_area > 0)
+    {
         fitInView(createQRectF(view_area), Qt::KeepAspectRatio);
         remaining_attempts_to_set_view_area--;
     }
-
 }
 
-void DrawFunctionVisualizer::resetView(const Rectangle &view_area) {
+void DrawFunctionVisualizer::resetView(const Rectangle &view_area)
+{
     fitInView(createQRectF(view_area), Qt::KeepAspectRatio);
 }
 
-void DrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent* event)
+void DrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent *event)
 {
-
     QMenu menu(this);
     auto resetViewAction = createResetView();
     menu.addAction("Reset View", resetViewAction);
@@ -101,11 +101,8 @@ void DrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent* event)
     menu.exec(event->globalPos());
 }
 
-std::function<void()> DrawFunctionVisualizer::createResetView(){
-
-    std::function func = [this]() {
-
-        DrawFunctionVisualizer::resetView(lastViewArea);
-    };
+std::function<void()> DrawFunctionVisualizer::createResetView()
+{
+    std::function func = [this]() { DrawFunctionVisualizer::resetView(lastViewArea); };
     return func;
 }
