@@ -90,7 +90,8 @@ void STP::updateAIPlay(const World& world)
     }
 }
 
-std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
+std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(
+    const World& world, const PassEvaluation& pass_evaluation)
 {
     return current_play->get(
         [this](const std::vector<std::shared_ptr<const Tactic>>& tactics,
@@ -98,13 +99,14 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
         [this](const Tactic& tactic) {
             return buildMotionConstraintSet(current_game_state, tactic);
         },
-        world);
+        world, pass_evaluation);
 }
 
-std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
+std::vector<std::unique_ptr<Intent>> STP::getIntents(
+    const World& world, const PassEvaluation& pass_evaluation)
 {
     updateSTPState(world);
-    return getIntentsFromCurrentPlay(world);
+    return getIntentsFromCurrentPlay(world, pass_evaluation);
 }
 
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)

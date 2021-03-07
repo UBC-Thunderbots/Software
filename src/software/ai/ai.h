@@ -3,6 +3,9 @@
 #include "software/ai/hl/hl.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/navigator/navigator.h"
+#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/field_pitch_division.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
@@ -46,4 +49,5 @@ class AI final
    private:
     std::shared_ptr<Navigator> navigator;
     std::unique_ptr<HL> high_level;
+    std::unique_ptr<PassGenerator> pass_generator;
 };
