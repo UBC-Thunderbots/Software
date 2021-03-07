@@ -37,8 +37,7 @@ bool CornerKickPlay::invariantHolds(const World &world) const
            (world.getTeamWithPossession() == TeamSide::FRIENDLY);
 }
 
-void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world,
-                                    const PassEvaluation &pass_evaluation)
+void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     /**
      * There are three main stages to this Play:
@@ -61,6 +60,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
      *    the pass
      *
      */
+
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
@@ -112,9 +112,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
-    // Target any pass in the enemy half of the field, pushed up by 1.5 m
-    std::unordered_set<unsigned> ENEMY_HALF = {13, 14, 15, 16, 17, 18};
-
     // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
     // field in the +x half. We also further offset the rectangle from the goal line
     // for the cherry-picker closer to where we're taking the corner kick from
@@ -135,7 +132,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     //       │       │       │      │
     //       └───────┴───────┴──────┘
     //
-    std::unordered_set<unsigned> cherry_pick_region_1 = ENEMY_HALF;
+    std::unordered_set<unsigned> cherry_pick_region_1 = {15};
     std::unordered_set<unsigned> cherry_pick_region_2 = {14};
     std::unordered_set<unsigned> cherry_pick_region_3 = {13};
     std::unordered_set<unsigned> cherry_pick_region_4;
@@ -151,6 +148,9 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
 
     // TODO (ticket here) run this globally and dependency inject the pass evaluation
     PassGenerator pass_generator(pitch_division);
+
+    // Target any pass in the enemy half of the field, pushed up by 1.5 m
+    std::unordered_set<unsigned> ENEMY_HALF = {13, 14, 15, 16, 17, 18};
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);

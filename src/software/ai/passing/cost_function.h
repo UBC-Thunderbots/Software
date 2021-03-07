@@ -14,12 +14,11 @@
  *
  * @param world The world in which to rate the pass
  * @param pass The pass to rate
- * @param zone The zone to limit the pass in
  *
  * @return A value in [0,1] representing the quality of the pass, with 1 being an
  *         ideal pass, and 0 being the worst pass possible
  */
-double ratePass(const World& world, const Pass& pass, const Rectangle& zone);
+double ratePass(const World& world, const Pass& pass);
 
 /**
  * Rate pass based on the probability of scoring once we receive the pass

@@ -20,20 +20,13 @@ AI::AI(std::shared_ptr<const AiConfig> ai_config,
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
           []() { return std::make_unique<HaltPlay>(); }, control_config,
-          std::chrono::system_clock::now().time_since_epoch().count())),
-      // TODO (ticket-here) We should NOT hard code the div B field here, but the "world"
-      // isn't ready yet
-      pass_generator(std::make_unique<PassGenerator>(
-          std::make_shared<EighteenZonePitchDivision>(Field::createSSLDivisionBField())))
+          std::chrono::system_clock::now().time_since_epoch().count()))
 {
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world) const
 {
-    auto pass_evaluation = pass_generator->generatePassEvaluation(world);
-
-    std::vector<std::unique_ptr<Intent>> assigned_intents =
-        high_level->getIntents(world, pass_evaluation);
+    std::vector<std::unique_ptr<Intent>> assigned_intents = high_level->getIntents(world);
 
     return navigator->getAssignedPrimitives(world, assigned_intents);
 }

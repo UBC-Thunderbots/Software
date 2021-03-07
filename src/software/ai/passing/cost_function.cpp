@@ -10,7 +10,7 @@
 #include "software/logger/logger.h"
 #include "software/parameter/dynamic_parameters.h"
 
-double ratePass(const World& world, const Pass& pass, const Rectangle& zone)
+double ratePass(const World& world, const Pass& pass)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
@@ -22,9 +22,6 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone)
 
     double shoot_pass_rating =
         ratePassShootScore(world.ball(), world.field(), world.enemyTeam(), pass);
-
-    // Limit the pass from leaving the zone
-    double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.1);
 
     // Place strict limits on the ball speed
     double min_pass_speed = DynamicParameters->getAiConfig()
@@ -39,7 +36,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone)
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
     return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-           shoot_pass_rating * pass_speed_quality * in_region_quality;
+           shoot_pass_rating * pass_speed_quality;
 }
 
 double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team,

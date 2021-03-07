@@ -9,16 +9,13 @@ bool Play::done() const
     return !static_cast<bool>(tactic_sequence);
 }
 
-std::vector<std::shared_ptr<Tactic>> Play::getTactics(
-    const World &world, const PassEvaluation &pass_evaluation)
+std::vector<std::shared_ptr<Tactic>> Play::getTactics(const World &world)
 {
     // Update the member variable that stores the world. This will be used by the
     // getNextTacticsWrapper function (inside the coroutine) to pass the World data to
     // the getNextTactics function. This is easier than directly passing the World data
     // into the coroutine
-    this->world           = world;
-    this->pass_evaluation = pass_evaluation;
-
+    this->world = world;
     // Check the coroutine status to see if it has any more work to do.
     if (tactic_sequence)
     {
@@ -44,11 +41,10 @@ std::vector<std::shared_ptr<Tactic>> Play::getTactics(
 
 std::vector<std::unique_ptr<Intent>> Play::get(
     RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
-    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world,
-    const PassEvaluation &pass_evaluation)
+    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    auto tactics = getTactics(new_world, pass_evaluation);
+    auto tactics = getTactics(new_world);
     std::vector<std::shared_ptr<const Tactic>> const_tactics;
     const_tactics.reserve(tactics.size());
     // convert pointers to const pointers
