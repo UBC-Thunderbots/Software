@@ -7,7 +7,6 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/world/world.h"
-#include "software/ai/passing/pass_evaluation.h"
 
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
@@ -91,14 +90,12 @@ class Play
      * tactics
      * @param motion_constraint_builder Builds motion constraints from tactics
      * @param world The updated world
-     * @param pass_evaluation The pass evaluation on the provided world
      *
      * @return the vector of intents to execute
      */
     std::vector<std::unique_ptr<Intent>> get(
         RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
-        MotionConstraintBuildFunction motion_constraint_builder, const World& new_world,
-        const PassEvaluation& pass_evaluation);
+        MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
 
     virtual ~Play() = default;
 
@@ -118,7 +115,7 @@ class Play
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    std::vector<std::shared_ptr<Tactic>> getTactics(const World& world, const PassEvaluation& pass_evaluation);
+    std::vector<std::shared_ptr<Tactic>> getTactics(const World& world);
 
     /**
      * A wrapper function for the getNextTactics function.
@@ -157,5 +154,4 @@ class Play
 
     // The Play's knowledge of the most up-to-date World
     std::optional<World> world;
-    std::optional<PassEvaluation> pass_evaluation;
 };

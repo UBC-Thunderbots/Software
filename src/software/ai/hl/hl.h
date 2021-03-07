@@ -5,7 +5,6 @@
 
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/intent/intent.h"
-#include "software/ai/passing/pass_evaluation.h"
 #include "software/world/world.h"
 
 /**
@@ -30,8 +29,7 @@ class HL
      * @return A vector of unique pointers to the Intents our friendly robots should be
      * running
      */
-    virtual std::vector<std::unique_ptr<Intent>> getIntents(
-        const World& world, const PassEvaluation& pass_evaluation) = 0;
+    virtual std::vector<std::unique_ptr<Intent>> getIntents(const World &world) = 0;
 
     /**
      * Returns information about the currently running plays and tactics, including the

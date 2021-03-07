@@ -6,7 +6,6 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/intent/intent.h"
 #include "software/parameter/dynamic_parameters.h"
-#include "software/ai/passing/pass_evaluation.h"
 
 /**
  * The STP module is an implementation of the high-level logic Abstract class, that
@@ -89,8 +88,7 @@ class STP : public HL
                  std::shared_ptr<const AiControlConfig> control_config,
                  long random_seed = 0);
 
-    std::vector<std::unique_ptr<Intent>> getIntents(
-        const World &world, const PassEvaluation &pass_evaluation) override;
+    std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
 
     /**
      * Given the state of the world, returns a unique_ptr to the Play that should be run
@@ -203,7 +201,7 @@ class STP : public HL
      *
      * @return The vector of intents that should be run right now to execute the play
      */
-    std::vector<std::unique_ptr<Intent>> getIntentsFromCurrentPlay(const World &world, const PassEvaluation& pass_evaluation);
+    std::vector<std::unique_ptr<Intent>> getIntentsFromCurrentPlay(const World &world);
 
     /**
      * Overrides the AI Play if override is true

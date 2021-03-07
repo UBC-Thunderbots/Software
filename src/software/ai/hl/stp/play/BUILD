@@ -264,7 +264,6 @@ cc_library(
     srcs = ["play.cpp"],
     hdrs = ["play.h"],
     deps = [
-        "//software/ai/passing:pass_evaluation",
         "//software/ai/hl/stp/tactic",
         "@boost//:coroutine2",
     ],
