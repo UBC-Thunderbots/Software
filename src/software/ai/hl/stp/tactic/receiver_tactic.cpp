@@ -82,7 +82,6 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     std::optional<Shot> best_shot = findFeasibleShot();
     if (best_shot)
     {
-        LOG(DEBUG) << "Taking one-touch shot";
         auto best_shot_target = best_shot->getPointToShootAt();
 
         // The angle between the ball velocity and a vector from the ball to the robot
@@ -242,24 +241,4 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
 void ReceiverTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
-}
-
-Ball ReceiverTactic::getBall() const
-{
-    return this->ball;
-}
-
-Field ReceiverTactic::getField() const
-{
-    return this->field;
-}
-
-Team ReceiverTactic::getEnemyTeam() const
-{
-    return this->enemy_team;
-}
-
-Team ReceiverTactic::getFriendlyTeam() const
-{
-    return this->friendly_team;
 }
