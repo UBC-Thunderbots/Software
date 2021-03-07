@@ -42,7 +42,12 @@ class DrawFunctionVisualizer : public ZoomableQGraphicsView
 
     protected:
     // Functions to be inherited by standalone_simulator_draw_function_visualizer
-    void contextMenuEvent(QContextMenuEvent *event);
-    std::function<void(void)> createResetView();
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    std::function<void()> createResetView();
 
+    int remaining_attempts_to_set_view_area;
+    static constexpr int NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA = 5;
+
+    Rectangle lastViewArea;
+    void resetView(const Rectangle &view_area);
 };
