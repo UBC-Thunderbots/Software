@@ -49,7 +49,7 @@ TEST(PassTest, receiverOrientation_passer_diagonal_to_receiver)
 TEST(PassTest, passerOrientation_receiver_at_center_and_passer_on_neg_x_axis)
 {
     Pass p({0, 0}, 1);
-    EXPECT_DOUBLE_EQ(0, p.receiverOrientation({-1, 0}).mod(Angle::full()).toDegrees() + 180);
+    EXPECT_DOUBLE_EQ(0, p.receiverOrientation({-1, 0}).mod(Angle::full()).toDegrees() - 180);
 }
 
 TEST(PassTest, passerOrientation_receiver_at_center_and_passer_on_neg_y_axis)
@@ -67,12 +67,12 @@ TEST(PassTest, passerOrientation_receiver_at_center_and_passer_on_pos_x_axis)
 TEST(PassTest, passerOrientation_receiver_at_center_and_passer_on_pos_y_axis)
 {
     Pass p({0, 0}, 1);
-    EXPECT_DOUBLE_EQ(-90, p.receiverOrientation({0, 1}).mod(Angle::full()).toDegrees() + 180);
+    EXPECT_DOUBLE_EQ(-90, p.receiverOrientation({0, 1}).mod(Angle::full()).toDegrees() - 180);
 }
 
 TEST(PassTest, passerOrientation_passer_diagonal_to_receiver)
 {
     Pass p({1, -1}, 1);
     EXPECT_DOUBLE_EQ(-180 + atan(2.0 / 3.0) * 180 / M_PI,
-                     p.receiverOrientation({4, 1}).mod(Angle::full()).toDegrees() + 180);
+                     p.receiverOrientation({4, 1}).mod(Angle::full()).toDegrees() - 180);
 }

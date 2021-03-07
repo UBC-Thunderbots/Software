@@ -52,7 +52,7 @@ std::vector<PassWithRating> PassGenerator::samplePasses(const World& world)
             Pass(Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
                  speed_distribution(random_num_gen_));
 
-        passes.emplace_back(PassWithRating{pass, ratePass(world, pass)});
+        passes.emplace_back(PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id))});
     }
 
     return passes;
@@ -61,13 +61,15 @@ std::vector<PassWithRating> PassGenerator::samplePasses(const World& world)
 std::vector<PassWithRating> PassGenerator::optimizePasses(
     const World& world, const std::vector<PassWithRating>& generated_passes)
 {
+    unsigned zone = 0;
+
     // The objective function we minimize in gradient descent to improve each pass
     // that we're optimizing
     const auto objective_function =
-        [this, &world](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
+        [this, &world, zone](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
             try
             {
-                return ratePass(world, Pass::fromPassArray(pass_array));
+                return ratePass(world, Pass::fromPassArray(pass_array), pitch_division_->getZone(zone));
             }
             catch (std::invalid_argument& e)
             {
@@ -80,17 +82,10 @@ std::vector<PassWithRating> PassGenerator::optimizePasses(
     // NOTE: Parallelizing this `for` loop would probably be safe and potentially more
     //       performant
     std::vector<PassWithRating> optimized_passes;
-    for (const PassWithRating& pass_with_rating : generated_passes)
+    for (zone = 1; zone <= pitch_division_->getTotalNumberOfZones(); ++zone)
     {
-        // We currently don't do useful work if the score is really bad, remove this.
-        // TODO (ticket here) remove this when this is fixed
-        if (pass_with_rating.rating < 0.01)
-        {
-            optimized_passes.emplace_back(pass_with_rating);
-            continue;
-        }
         auto pass_array =
-            optimizer_.maximize(objective_function, pass_with_rating.pass.toPassArray(),
+            optimizer_.maximize(objective_function, generated_passes[zone - 1].pass.toPassArray(),
                                 DynamicParameters->getAiConfig()
                                     ->getPassingConfig()
                                     ->getNumberOfGradientDescentStepsPerIter()
@@ -99,14 +94,14 @@ std::vector<PassWithRating> PassGenerator::optimizePasses(
         {
             auto new_pass = Pass::fromPassArray(pass_array);
             optimized_passes.emplace_back(
-                PassWithRating{new_pass, ratePass(world, new_pass)});
+                PassWithRating{new_pass, ratePass(world, new_pass, pitch_division_->getZone(zone))});
         }
         catch (std::invalid_argument& e)
         {
             // Sometimes the gradient descent algorithm could return an invalid pass
             // (i.e a pass w/ a negative speed). We just keep the initial pass in that
             // case.
-            optimized_passes.emplace_back(pass_with_rating);
+            optimized_passes.emplace_back(generated_passes[zone - 1]);
         }
     }
 
@@ -119,7 +114,7 @@ void PassGenerator::updatePasses(const World& world,
     for (unsigned zone_id = 1; zone_id <= pitch_division_->getTotalNumberOfZones();
          ++zone_id)
     {
-        if (ratePass(world, passes_[zone_id - 1].pass) <
+        if (ratePass(world, passes_[zone_id - 1].pass, pitch_division_->getZone(zone_id)) <
             optimized_passes[zone_id - 1].rating)
         {
             passes_[zone_id - 1] = optimized_passes[zone_id - 1];
