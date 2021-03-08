@@ -6,10 +6,10 @@
  * A FieldPitchDivision is abstraction around how we split up the field.
  */
 
-template <class E>
+template <class ZoneEnum>
 class FieldPitchDivision
 {
-   static_assert(std::is_enum<E>::value, "FieldPitchDivision: E must be an enum");
+   static_assert(std::is_enum<ZoneEnum>::value, "FieldPitchDivision: ZoneEnum must be an enum");
 
    public:
     FieldPitchDivision()          = default;
@@ -26,12 +26,12 @@ class FieldPitchDivision
      * @param zone_id The zone id
      * @return The rectangle on the field corresponding to the zone
      */
-    virtual const Rectangle& getZone(E zone_id) const = 0;
+    virtual const Rectangle& getZone(ZoneEnum zone_id) const = 0;
 
     /**
-     * Returns the total number of zones in this pitch division
+     * Returns all the zone enums in this field pitch division
      *
-     * @return The total number of zones
+     * @return A vector of all the zone ids
      */
-    virtual size_t getTotalNumberOfZones(void) const = 0;
+    virtual const std::vector<ZoneEnum>& getAllZoneIds() const = 0;
 };

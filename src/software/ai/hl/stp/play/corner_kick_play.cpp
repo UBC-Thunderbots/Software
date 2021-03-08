@@ -132,25 +132,29 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     //       │       │       │      │
     //       └───────┴───────┴──────┘
     //
-    std::unordered_set<unsigned> cherry_pick_region_1 = {16};
-    std::unordered_set<unsigned> cherry_pick_region_2 = {2};
-    std::unordered_set<unsigned> cherry_pick_region_3 = {3};
-    std::unordered_set<unsigned> cherry_pick_region_4;
+    std::unordered_set<EighteenZoneId> cherry_pick_region_1 = {EighteenZoneId::ZONE_10};
+    std::unordered_set<EighteenZoneId> cherry_pick_region_2 = {EighteenZoneId::ZONE_12};
+    std::unordered_set<EighteenZoneId> cherry_pick_region_3 = {EighteenZoneId::ZONE_14};
+    std::unordered_set<EighteenZoneId> cherry_pick_region_4;
 
     if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
     {
-        cherry_pick_region_4 = {18};
+        cherry_pick_region_4 = {EighteenZoneId::ZONE_18};
     }
     else
     {
-        cherry_pick_region_4 = {16};
+        cherry_pick_region_4 = {EighteenZoneId::ZONE_16};
     }
 
     // TODO (ticket here) run this globally and dependency inject the pass evaluation
-    PassGenerator pass_generator(pitch_division);
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division);
 
-    // Target any pass in the enemy half of the field, pushed up by 1.5 m
-    std::unordered_set<unsigned> ENEMY_HALF = {13, 14, 15, 16, 17, 18};
+    // Target any pass in the enemy half of the field
+    std::unordered_set<EighteenZoneId> ENEMY_HALF = {
+        EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12,
+        EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15,
+        EighteenZoneId::ZONE_16, EighteenZoneId::ZONE_17, EighteenZoneId::ZONE_18,
+    };
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);

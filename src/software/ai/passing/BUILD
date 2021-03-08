@@ -117,8 +117,8 @@ cc_test(
 
 cc_library(
     name = "pass_generator",
-    srcs = ["pass_generator.cpp"],
-    hdrs = ["pass_generator.h"],
+    hdrs = ["pass_generator.h", 
+            "pass_generator.cpp"],
     deps = [
         ":cost_functions",
         ":eighteen_zone_pitch_division",

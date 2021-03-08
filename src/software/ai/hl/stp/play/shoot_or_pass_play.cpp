@@ -115,8 +115,10 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     // across the x-axis in the enemy half
     //
     // TODO (ticket here) This is not an optimial configuration for cherry pickers
-    std::unordered_set<unsigned> cherry_pick_region_1 = {10, 13, 16};
-    std::unordered_set<unsigned> cherry_pick_region_2 = {12, 15, 18};
+    std::unordered_set<EighteenZoneId> cherry_pick_region_1 = {
+        EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_16};
+    std::unordered_set<EighteenZoneId> cherry_pick_region_2 = {
+        EighteenZoneId::ZONE_12, EighteenZoneId::ZONE_15, EighteenZoneId::ZONE_18};
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
@@ -124,23 +126,27 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     {
         if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
         {
-            cherry_pick_region_1 = {11, 12};
-            cherry_pick_region_2 = {14, 15, 18};  // ignore the defense area zone
+            cherry_pick_region_1 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12};
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15, EighteenZoneId::ZONE_18};  // ignore the defense area zone
         }
         else
         {
-            cherry_pick_region_1 = {10, 11};
-            cherry_pick_region_2 = {13, 14, 16};  // ignore the defense area zone
+            cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11};
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_16};  // ignore the defense area zone
         }
     }
 
     // Start a PassGenerator that will continuously optimize passes into the enemy half
     // of the field
     // TODO (ticket here) run this globally and dependency inject the pass evaluation
-    PassGenerator pass_generator(pitch_division);
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division);
 
     // Target any pass in the enemy half of the field
-    std::unordered_set<unsigned> ENEMY_HALF = {10, 11, 12, 13, 14, 15, 16, 17, 18};
+    std::unordered_set<EighteenZoneId> ENEMY_HALF = {
+        EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12,
+        EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15,
+        EighteenZoneId::ZONE_16, EighteenZoneId::ZONE_17, EighteenZoneId::ZONE_18,
+    };
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);

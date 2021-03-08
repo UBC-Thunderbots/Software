@@ -18,6 +18,8 @@ EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
                 Point(pos_x, pos_y), Point(pos_x + zone_width, pos_y - zone_height)));
         }
     }
+
+    zones = allValuesEighteenZoneId();
 }
 
 const Rectangle& EighteenZonePitchDivision::getZone(EighteenZoneId zone_id) const
@@ -25,7 +27,7 @@ const Rectangle& EighteenZonePitchDivision::getZone(EighteenZoneId zone_id) cons
     return pitch_division[static_cast<unsigned>(zone_id)];
 }
 
-inline size_t EighteenZonePitchDivision::getTotalNumberOfZones() const
+const std::vector<EighteenZoneId>& EighteenZonePitchDivision::getAllZoneIds() const
 {
-    return sizeEighteenZoneId();
+    return zones;
 }

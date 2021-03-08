@@ -13,15 +13,20 @@
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
-const int PASS_GENERATOR_SEED = 13;
+// The random seed to initialize the random number generator
+static const int PASS_GENERATOR_SEED = 13;
+
+template <class ZoneEnum>
+using ZonePassMap = std::unordered_map<ZoneEnum, PassWithRating>;
 
 /**
  * This class is responsible for generating passes for us to perform
  */
-template <class E>
+template <class ZoneEnum>
 class PassGenerator
 {
-   static_assert(std::is_enum<E>::value, "PassGenerator: E must be an zone id enum");
+    static_assert(std::is_enum<ZoneEnum>::value,
+                  "PassGenerator: ZoneEnum must be an zone id enum");
 
    public:
     /**
@@ -32,7 +37,8 @@ class PassGenerator
      *
      * @param pitch_division The pitch division to use when looking for passes
      */
-    explicit PassGenerator(std::shared_ptr<const FieldPitchDivision<E>> pitch_division);
+    explicit PassGenerator(
+        std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division);
 
     /**
      * Creates a PassEvaluation given a world and a field pitch division.
@@ -52,7 +58,7 @@ class PassGenerator
      *
      * @return The best currently known pass and the rating of that pass (in [0-1])
      */
-    PassEvaluation generatePassEvaluation(const World& world);
+    PassEvaluation<ZoneEnum> generatePassEvaluation(const World& world);
 
 
    private:
@@ -75,40 +81,42 @@ class PassGenerator
      * Randomly samples a recieve point across every zone and assigns a random
      * speed to each pass.
      *
-     * @returns a vector of sampled passes
+     * @returns a mapping of the Zone id to the sampled pass
      */
-    std::vector<PassWithRating> samplePasses(const World& world);
+    ZonePassMap<ZoneEnum> samplePasses(const World& world);
 
     /**
      * Given a vector of passes, runs a gradient descent optimizer to find
      * better passes
      *
      * @param The world
-     * @param The passes to be optimized
-     * @returns The optimized passes
+     * @param The passes to be optimized mapped to the zone
+     * @returns a mapping of the Zone id to the optimized pass
      */
-    std::vector<PassWithRating> optimizePasses(
-        const World& world, const std::vector<PassWithRating>& initial_passes);
+    ZonePassMap<ZoneEnum> optimizePasses(const World& world,
+                                         const ZonePassMap<ZoneEnum>& initial_passes);
 
     /**
      * Re-evaluates ratePass on the "previous ticks" passes and keeps the higher pass
      * w/ the higher score in passes_;
      *
      * @param The world
-     * @param optimized_passes The optimized_passes to update our internal passes with.
+     * @param optimized_passes The optimized_passes to update our internal cached passes
+     * with.
      */
-    void updatePasses(const World& world,
-                      const std::vector<PassWithRating>& optimized_passes);
+    void updatePasses(const World& world, const ZonePassMap<ZoneEnum>& optimized_passes);
 
     // All the passes that we are currently trying to optimize in gradient descent
-    std::vector<PassWithRating> passes_;
+    ZonePassMap<ZoneEnum> passes_;
 
     // The optimizer we're using to find passes
     GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer_;
 
     // Pitch division
-    std::shared_ptr<const FieldPitchDivision> pitch_division_;
+    std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
 
     // A random number generator for use across the class
     std::mt19937 random_num_gen_;
 };
+
+#include "software/ai/passing/pass_generator.cpp"

@@ -82,12 +82,4 @@ class FreeKickPlay : public Play
      */
     void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
                                  const World &world);
-
-    /**
-     * Updates the pass generator
-     *
-     * @param pass_generator
-     * @param world The current state of the world
-     */
-    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
 };

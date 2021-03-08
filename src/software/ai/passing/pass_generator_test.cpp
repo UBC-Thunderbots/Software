@@ -14,7 +14,7 @@ class PassGeneratorTest : public testing::Test
     virtual void SetUp()
     {
         pitch_division = std::make_shared<const EighteenZonePitchDivision>(world.field());
-        pass_generator = std::make_shared<PassGenerator>(pitch_division);
+        pass_generator = std::make_shared<PassGenerator<EighteenZoneId>>(pitch_division);
     }
 
     /**
@@ -30,7 +30,7 @@ class PassGeneratorTest : public testing::Test
      *                       converged
      * @param max_iters The maximum number of iterations of the PassGenerator to run
      */
-    static void waitForConvergence(std::shared_ptr<PassGenerator> pass_generator,
+    static void waitForConvergence(std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator,
                                    const World& world, double min_score_diff,
                                    int max_iters)
     {
@@ -56,8 +56,8 @@ class PassGeneratorTest : public testing::Test
     }
 
     World world = ::TestUtil::createBlankTestingWorld();
-    std::shared_ptr<const FieldPitchDivision> pitch_division;
-    std::shared_ptr<PassGenerator> pass_generator;
+    std::shared_ptr<const FieldPitchDivision<EighteenZoneId>> pitch_division;
+    std::shared_ptr<PassGenerator<EighteenZoneId>> pass_generator;
 };
 
 TEST_F(PassGeneratorTest, check_pass_converges)

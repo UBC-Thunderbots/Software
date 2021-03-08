@@ -34,9 +34,9 @@
 //     └────────────┴────────────┴─────────────┴─────────────┴────────────┴───────────┘
 //
 // clang-format on
-MAKE_ENUM(EighteenZoneId, ZONE_1, ZONE_2, ZONE_3, ZONE_4, ZONE_5, ZONE_6, ZONE_7,
-          ZONE_8, ZONE_9, ZONE_10, ZONE_11, ZONE_12, ZONE_13, ZONE_14, ZONE_15, ZONE_16,
-          ZONE_17, ZONE_18);
+MAKE_ENUM(EighteenZoneId, ZONE_1, ZONE_2, ZONE_3, ZONE_4, ZONE_5, ZONE_6, ZONE_7, ZONE_8,
+          ZONE_9, ZONE_10, ZONE_11, ZONE_12, ZONE_13, ZONE_14, ZONE_15, ZONE_16, ZONE_17,
+          ZONE_18);
 
 class EighteenZonePitchDivision : public FieldPitchDivision<EighteenZoneId>
 {
@@ -48,8 +48,9 @@ class EighteenZonePitchDivision : public FieldPitchDivision<EighteenZoneId>
      */
     EighteenZonePitchDivision(const Field& field);
     const Rectangle& getZone(EighteenZoneId zone_id) const override;
-    size_t getTotalNumberOfZones() const override;
+    const std::vector<EighteenZoneId>& getAllZoneIds() const override;
 
    private:
     std::vector<Rectangle> pitch_division;
+    std::vector<EighteenZoneId> zones;
 };
