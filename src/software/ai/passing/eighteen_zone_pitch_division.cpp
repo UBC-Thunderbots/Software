@@ -20,16 +20,12 @@ EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
     }
 }
 
-const Rectangle& EighteenZonePitchDivision::getZone(unsigned zone_id) const
+const Rectangle& EighteenZonePitchDivision::getZone(EighteenZoneId zone_id) const
 {
-    if (zone_id < 1 || zone_id > getTotalNumberOfZones())
-    {
-        throw std::invalid_argument("zone_id is out of bounds");
-    }
-    return pitch_division[zone_id - 1];
+    return pitch_division[static_cast<unsigned>(zone_id)];
 }
 
 inline size_t EighteenZonePitchDivision::getTotalNumberOfZones() const
 {
-    return 18;
+    return sizeEighteenZoneId();
 }

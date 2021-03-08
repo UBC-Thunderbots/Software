@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <numeric>
+#include <chrono>
 
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass_evaluation.h"
@@ -16,13 +17,26 @@ PassGenerator::PassGenerator(std::shared_ptr<const FieldPitchDivision> pitch_div
 
 PassEvaluation PassGenerator::generatePassEvaluation(const World& world)
 {
+    auto start = std::chrono::system_clock::now();
     auto generated_passes = samplePasses(world);
+    auto end = std::chrono::system_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout <<"samplePasses: "<< elapsed.count() << '\n';
     if (passes_.empty())
     {
         passes_ = generated_passes;
     }
+    start = std::chrono::system_clock::now();
     auto optimized_passes = optimizePasses(world, generated_passes);
+    end = std::chrono::system_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "optimizePasses: " << elapsed.count() << '\n';
+
+    start = std::chrono::system_clock::now();
     updatePasses(world, optimized_passes);
+    end = std::chrono::system_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "updatePasses: " << elapsed.count() << '\n';
 
     return PassEvaluation(pitch_division_, passes_, world.getMostRecentTimestamp());
 }
@@ -52,29 +66,26 @@ std::vector<PassWithRating> PassGenerator::samplePasses(const World& world)
             Pass(Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
                  speed_distribution(random_num_gen_));
 
-        passes.emplace_back(PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id))});
+        passes.emplace_back(PassWithRating{
+            pass, ratePass(world, pass, pitch_division_->getZone(zone_id))});
     }
 
     return passes;
 }
 
+template <class E>
 std::vector<PassWithRating> PassGenerator::optimizePasses(
     const World& world, const std::vector<PassWithRating>& generated_passes)
 {
-    unsigned zone = 0;
+    unsigned zone = 1;
 
     // The objective function we minimize in gradient descent to improve each pass
     // that we're optimizing
     const auto objective_function =
-        [this, &world, zone](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
-            try
-            {
-                return ratePass(world, Pass::fromPassArray(pass_array), pitch_division_->getZone(zone));
-            }
-            catch (std::invalid_argument& e)
-            {
-                return 0.0;
-            }
+        [this, &world,
+         zone](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
+            return ratePass(world, Pass::fromPassArray(pass_array),
+                            pitch_division_->getZone(zone));
         };
 
     // Run gradient descent to optimize the passes to for the requested number
@@ -84,17 +95,20 @@ std::vector<PassWithRating> PassGenerator::optimizePasses(
     std::vector<PassWithRating> optimized_passes;
     for (zone = 1; zone <= pitch_division_->getTotalNumberOfZones(); ++zone)
     {
-        auto pass_array =
-            optimizer_.maximize(objective_function, generated_passes[zone - 1].pass.toPassArray(),
-                                DynamicParameters->getAiConfig()
-                                    ->getPassingConfig()
-                                    ->getNumberOfGradientDescentStepsPerIter()
-                                    ->value());
+        auto start            = std::chrono::system_clock::now();
+        auto pass_array = optimizer_.maximize(
+            objective_function, generated_passes[zone - 1].pass.toPassArray(), 10);
+        auto end              = std::chrono::system_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::cout <<"optimizer: "<< elapsed.count() << '\n';
         try
         {
             auto new_pass = Pass::fromPassArray(pass_array);
-            optimized_passes.emplace_back(
-                PassWithRating{new_pass, ratePass(world, new_pass, pitch_division_->getZone(zone))});
+            auto old_score = ratePass(world, generated_passes[zone - 1].pass, pitch_division_->getZone(zone));
+            auto score = ratePass(world, new_pass, pitch_division_->getZone(zone));
+
+            std::cerr<<score - old_score<<std::endl;
+            optimized_passes.emplace_back(PassWithRating{new_pass, score});
         }
         catch (std::invalid_argument& e)
         {
@@ -107,17 +121,17 @@ std::vector<PassWithRating> PassGenerator::optimizePasses(
 
     return optimized_passes;
 }
-
+ 
+template <class E>
 void PassGenerator::updatePasses(const World& world,
                                  const std::vector<PassWithRating>& optimized_passes)
 {
-    for (unsigned zone_id = 1; zone_id <= pitch_division_->getTotalNumberOfZones();
-         ++zone_id)
+    for (E zone_id = 1; zone_id <= pitch_division_->getTotalNumberOfZones(); ++zone_id)
     {
-        if (ratePass(world, passes_[zone_id - 1].pass, pitch_division_->getZone(zone_id)) <
-            optimized_passes[zone_id - 1].rating)
+        if (ratePass(world, passes_[zone_id].pass, pitch_division_->getZone(zone_id)) <
+            optimized_passes[zone_id].rating)
         {
-            passes_[zone_id - 1] = optimized_passes[zone_id - 1];
+            passes_[zone_id] = optimized_passes[zone_id];
         }
     }
 }

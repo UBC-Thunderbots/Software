@@ -3,48 +3,51 @@
 #include "software/geom/rectangle.h"
 #include "software/util/make_enum/make_enum.h"
 
-class EighteenZonePitchDivision : public FieldPitchDivision
+// clang-format off
+//
+//  18 Zone Pitch Division
+//     ┌────────────┬────────────┬─────────────┬─────────────┬────────────┬───────────┐
+//     │ 1          │ 4          │ 7           │ 10          │ 13         │ 16        │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     ├────────────┼────────────┼─────────────┼─────────────┼────────────┼───────────┤
+//  ┌──┤ 2          │ 5          │ 8           │ 11          │ 14         │ 17        ├──┐
+//  │  │            │            │             │             │            │           │  │
+//  │  │            │            │             │             │            │           │  │
+//  │  │            │            │             │             │            │           │  │
+//  │  │            │            │             │             │            │           │  │
+//  │  │            │            │             │             │            │           │  │
+//  │  │            │            │             │             │            │           │  │
+//  └──┤            │            │             │             │            │           ├──┘
+//     ├────────────┼────────────┼─────────────┼─────────────┼────────────┼───────────┤
+//     │ 3          │ 6          │ 9           │ 12          │ 15         │ 18        │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     │            │            │             │             │            │           │
+//     └────────────┴────────────┴─────────────┴─────────────┴────────────┴───────────┘
+//
+// clang-format on
+MAKE_ENUM(EighteenZoneId, ZONE_1, ZONE_2, ZONE_3, ZONE_4, ZONE_5, ZONE_6, ZONE_7,
+          ZONE_8, ZONE_9, ZONE_10, ZONE_11, ZONE_12, ZONE_13, ZONE_14, ZONE_15, ZONE_16,
+          ZONE_17, ZONE_18);
+
+class EighteenZonePitchDivision : public FieldPitchDivision<EighteenZoneId>
 {
    public:
-    // clang-format off
-   /**
-    *   18 Zone Pitch Division
-    *      ┌────────────┬────────────┬─────────────┬─────────────┬────────────┬───────────┐
-    *      │ 1          │ 4          │ 7           │ 10          │ 13         │ 16        │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      ├────────────┼────────────┼─────────────┼─────────────┼────────────┼───────────┤
-    *   ┌──┤ 2          │ 5          │ 8           │ 11          │ 14         │ 17        ├──┐
-    *   │  │            │            │             │             │            │           │  │
-    *   │  │            │            │             │             │            │           │  │
-    *   │  │            │            │             │             │            │           │  │
-    *   │  │            │            │             │             │            │           │  │
-    *   │  │            │            │             │             │            │           │  │
-    *   │  │            │            │             │             │            │           │  │
-    *   └──┤            │            │             │             │            │           ├──┘
-    *      ├────────────┼────────────┼─────────────┼─────────────┼────────────┼───────────┤
-    *      │ 3          │ 6          │ 9           │ 12          │ 15         │ 18        │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      │            │            │             │             │            │           │
-    *      └────────────┴────────────┴─────────────┴─────────────┴────────────┴───────────┘
-    *
-    * The field is divided into 18 equally sized rectangles.  The enemy defense area falls
-    * into in ZONE_17 and the friendly defense area is in ZONE_2.
-    *
-    * @param field The field to divide up into 18 zones (see unicode art above)
-    */
-    // clang-format on
+    /**
+     * The field is divided into 18 equally sized rectangles.
+     *
+     * @param field The field to divide up into 18 zones (see unicode art above)
+     */
     EighteenZonePitchDivision(const Field& field);
-
-    const Rectangle& getZone(unsigned zone_id) const override;
+    const Rectangle& getZone(EighteenZoneId zone_id) const override;
     size_t getTotalNumberOfZones() const override;
 
    private:

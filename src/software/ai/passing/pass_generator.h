@@ -18,8 +18,11 @@ const int PASS_GENERATOR_SEED = 13;
 /**
  * This class is responsible for generating passes for us to perform
  */
+template <class E>
 class PassGenerator
 {
+   static_assert(std::is_enum<E>::value, "PassGenerator: E must be an zone id enum");
+
    public:
     /**
      * Creates a new PassGenerator with the given pitch_division.
@@ -29,7 +32,7 @@ class PassGenerator
      *
      * @param pitch_division The pitch division to use when looking for passes
      */
-    explicit PassGenerator(std::shared_ptr<const FieldPitchDivision> pitch_division);
+    explicit PassGenerator(std::shared_ptr<const FieldPitchDivision<E>> pitch_division);
 
     /**
      * Creates a PassEvaluation given a world and a field pitch division.

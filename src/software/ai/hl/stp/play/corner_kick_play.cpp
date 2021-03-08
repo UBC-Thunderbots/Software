@@ -132,9 +132,9 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     //       │       │       │      │
     //       └───────┴───────┴──────┘
     //
-    std::unordered_set<unsigned> cherry_pick_region_1 = {15};
-    std::unordered_set<unsigned> cherry_pick_region_2 = {14};
-    std::unordered_set<unsigned> cherry_pick_region_3 = {13};
+    std::unordered_set<unsigned> cherry_pick_region_1 = {16};
+    std::unordered_set<unsigned> cherry_pick_region_2 = {2};
+    std::unordered_set<unsigned> cherry_pick_region_3 = {3};
     std::unordered_set<unsigned> cherry_pick_region_4;
 
     if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
