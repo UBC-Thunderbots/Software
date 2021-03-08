@@ -15,7 +15,10 @@ cc_library(
 cc_library(
     name = "enumerated_parameter",
     hdrs = ["enumerated_parameter.h"],
-    deps = ["//software/logger"],
+    deps = [
+        ":parameter",
+        "//software/logger",
+    ],
 )
 
 cc_library(
