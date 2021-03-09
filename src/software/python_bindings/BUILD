@@ -31,7 +31,7 @@ cc_library(
     ],
     deps = [
         ":python_binding_utilities",
-        "//software/ai/passing:evaluation",
+        "//software/ai/passing:cost_functions",
         "//software/parameter:dynamic_parameters",
         "//software/proto:sensor_msg_cc_proto",
         "//software/proto:ssl_cc_proto",
