@@ -112,31 +112,33 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division);
+
     using Zones = std::unordered_set<EighteenZoneId>;
 
     // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
     // field in the +x half. We also further offset the rectangle from the goal line
     // for the cherry-picker closer to where we're taking the corner kick from
     //
-    //              ENEMY HALF
-    //       ┌───────┬───────┬──────┐
-    //       │10     │13     │16    │
-    //       │       │       │      │
-    //       │       │       │      │
-    //       ├───────┼───────┼──────┤
-    //       │11     │14     │17    ├─┐
-    //       │       │       │      │ │
-    //       │       │       │      │ │
-    //       │       │       │      ├─┘
-    //       ├───────┼───────┼──────┤
-    //       │12     │15     │18    │
-    //       │       │       │      │
-    //       │       │       │      │
-    //       └───────┴───────┴──────┘
+    //                FRIENDLY          ENEMY
+    //        ┌──────┬──────┬──────┬──────┬──────┬─────┐
+    //        │1     │4     │7     │10    │13    │16   │
+    //        │      │      │      │      │      │     │
+    //        │      │      │      │      │      │     │
+    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
+    //      ┌─┤2     │5     │8     │11    │14    │17   ├─┐
+    //      │ │      │      │      │      │      │     │ │
+    //      │ │      │      │      │      │      │     │ │
+    //      └─┤      │      │      │      │      │     ├─┘
+    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
+    //        │3     │6     │9     │12    │15    │18   │
+    //        │      │      │      │      │      │     │
+    //        │      │      │      │      │      │     │
+    //        └──────┴──────┴──────┴──────┴──────┴─────┘
     //
-    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_10};
-    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_12};
-    Zones cherry_pick_region_3 = {EighteenZoneId::ZONE_14};
+    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_13};
+    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_14};
+    Zones cherry_pick_region_3 = {EighteenZoneId::ZONE_15};
     Zones cherry_pick_region_4;
 
     if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
@@ -147,9 +149,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     {
         cherry_pick_region_4 = {EighteenZoneId::ZONE_16};
     }
-
-    // TODO (ticket here) run this globally and dependency inject the pass evaluation
-    PassGenerator<EighteenZoneId> pass_generator(pitch_division);
 
     // Target any pass in the enemy half of the field
     Zones ENEMY_HALF = {
@@ -164,8 +163,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
-    // These two tactics will set robots to roam around the field, trying to put
-    // themselves into a good position to receive a pass
     auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
         world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
     auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
@@ -175,15 +172,9 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     auto cherry_pick_tactic_4 = std::make_shared<CherryPickTactic>(
         world, pass_eval.getBestPassInZones(cherry_pick_region_4).pass);
 
-    // Wait for a robot to be assigned to align to take the corner
-    while (!align_to_ball_tactic->getAssignedRobot())
-    {
-        LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic, world);
-
-        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
-        // we need to evaluate here until then.
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
+    // These two tactics will set robots to roam around the field, trying to put
+    // themselves into a good position to receive a pass
+    auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
 
         cherry_pick_tactic_1->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
@@ -193,6 +184,14 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
             pass_eval.getBestPassInZones(cherry_pick_region_3).pass);
         cherry_pick_tactic_4->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_4).pass);
+    };
+
+    // Wait for a robot to be assigned to align to take the corner
+    while (!align_to_ball_tactic->getAssignedRobot())
+    {
+        LOG(DEBUG) << "Nothing assigned to align to ball yet";
+        updateAlignToBallTactic(align_to_ball_tactic, world);
+        update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, cherry_pick_tactic_3, cherry_pick_tactic_4});
@@ -208,19 +207,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
-
-        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
-        // we need to evaluate here until then.
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
-
-        cherry_pick_tactic_1->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-        cherry_pick_tactic_2->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
-        cherry_pick_tactic_3->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_3).pass);
-        cherry_pick_tactic_4->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_4).pass);
+        update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, cherry_pick_tactic_3, cherry_pick_tactic_4});
@@ -236,19 +223,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
-
-        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
-        // we need to evaluate here until then.
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
-
-        cherry_pick_tactic_1->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-        cherry_pick_tactic_2->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
-        cherry_pick_tactic_3->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_3).pass);
-        cherry_pick_tactic_4->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_4).pass);
+        update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, cherry_pick_tactic_3, cherry_pick_tactic_4});
