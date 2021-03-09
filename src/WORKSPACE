@@ -253,6 +253,12 @@ filegroup(
     srcs = glob(["bazel_install/**"], exclude = ["**/* *"]),
     visibility = ["//visibility:public"],
 )
+cc_library(
+    name = "python_headers",
+    hdrs = glob(["bazel_install/include/python3.7/*.h"]),
+    includes = ["bazel_install/include/python3.7"],
+    visibility = ["//visibility:public"]
+)
 """,
     patch_cmds = [
         "mkdir $(pwd)/bazel_install",
@@ -315,4 +321,34 @@ http_archive(
 bind(
     name = "six",
     actual = "@six_archive//:six",
+)
+
+# pybind11 for Python bindings
+# quval's repo for pybind11 bazel rules has a fix for hermetic python interpreter. The pybind11 project's own
+# bazel repo uses the system shell to find the system python interpreter and associated headers, and will not
+# work with how we build our own interpreter. This has an additional patch for Python 3.7.9, as pyconfig.h
+# is placed in a different directory than the rest of the Python headers.
+http_archive(
+    name = "pybind11_bazel",
+    patch_args = ["-p1"],
+    patches = [
+        "//external:pybind11_bazel_pyconfig_fix.patch",
+    ],
+    strip_prefix = "pybind11_bazel-938e4c46b8d66967cda41a1d2513f69d37faa2b3",
+    urls = ["https://github.com/quval/pybind11_bazel/archive/938e4c46b8d66967cda41a1d2513f69d37faa2b3.zip"],
+)
+
+# We still require the pybind library.
+http_archive(
+    name = "pybind11",
+    build_file = "@pybind11_bazel//:pybind11.BUILD",
+    strip_prefix = "pybind11-2.6.2",
+    urls = ["https://github.com/pybind/pybind11/archive/v2.6.2.tar.gz"],
+)
+
+load("@pybind11_bazel//:python_configure.bzl", "python_configure")
+
+python_configure(
+    name = "local_config_python",
+    python_interpreter_target = "@python_interpreter//:python_bin",
 )

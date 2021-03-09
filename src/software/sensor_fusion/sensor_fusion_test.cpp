@@ -33,9 +33,9 @@ class SensorFusionTest : public ::testing::Test
           referee_goalie_id(initRefereeGoalieId())
     {
         config->getMutableFriendlyColorYellow()->setValue(true);
-
         config->getMutableOverrideGameControllerDefendingSide()->setValue(true);
         config->getMutableDefendingPositiveSide()->setValue(false);
+        config->getMutableOverrideRefereeCommand()->setValue(false);
     }
 
     std::shared_ptr<SensorFusionConfig> config;

@@ -42,23 +42,40 @@ class PenaltyKickTactic : public Tactic
     Ball getBall() const;
     Field getField() const;
 
+    /**
+     * Helper function that determines whether the shooter robot has a viable shot on net.
+     *
+     * @return true if the robot has a viable shot and false if the enemy goalkeeper will
+     * likely save the shot.
+     */
+    bool evaluatePenaltyShot();
+
+    /**
+     * Helper function that returns the point on the enemy goal line where the shooter
+     * should aim at.
+     *
+     * @return the Point on the goalie line where the shooter robot should aim
+     */
+    Point evaluateNextShotPosition();
+
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
-
-    // Evaluation function designed specifically for 1-on-1 penalty shots
-    bool evaluate_penalty_shot();
-    // Evaluation function designed specifically for determining the next potential shot
-    // in a penalty kick
-    Point evaluate_next_position();
 
     // Tactic parameters
     Ball ball;
     Field field;
     std::optional<Robot> enemy_goalie;
 
-    static constexpr double PENALTY_KICK_SHOT_SPEED     = 5.0;
+    static constexpr double PENALTY_KICK_SHOT_SPEED = 5.0;
+    // expected maximum acceleration of the opposition goalie robot
     static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
     static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds
+    // offset from the goal post in y direction when shooting
+    static constexpr double PENALTY_KICK_POST_OFFSET = 0.04;
 
-    const Duration penalty_shot_timeout = Duration::fromSeconds(10);
+    // timeout that forces a shot after the robot approaches the ball and advances
+    // towards the keeper
+    // these two timeouts together must be <= 9 seconds
+    const Duration PENALTY_FORCE_SHOOT_TIMEOUT     = Duration::fromSeconds(4);
+    const Duration PENALTY_FINISH_APPROACH_TIMEOUT = Duration::fromSeconds(4);
 };
