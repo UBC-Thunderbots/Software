@@ -90,9 +90,10 @@ cc_test(
 
 cc_library(
     name = "pass_evaluation",
-    hdrs = ["pass_evaluation.h",
-            "pass_evaluation.cpp",
-            ],
+    hdrs = [
+        "pass_evaluation.cpp",
+        "pass_evaluation.h",
+    ],
     deps = [
         ":field_pitch_division",
         ":pass",
@@ -117,8 +118,10 @@ cc_test(
 
 cc_library(
     name = "pass_generator",
-    hdrs = ["pass_generator.h", 
-            "pass_generator.cpp"],
+    hdrs = [
+        "pass_generator.cpp",
+        "pass_generator.h",
+    ],
     deps = [
         ":cost_functions",
         ":eighteen_zone_pitch_division",

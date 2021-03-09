@@ -29,7 +29,7 @@ MAKE_ENUM(EighteenZoneId,
             ZONE_11, ZONE_12, ZONE_13, ZONE_14, ZONE_15,
             ZONE_16, ZONE_17, ZONE_18);
 // clang-format on
-  
+
 class EighteenZonePitchDivision : public FieldPitchDivision<EighteenZoneId>
 {
    public:

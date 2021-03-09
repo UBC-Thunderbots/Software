@@ -94,8 +94,9 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
 
     Ball ball({1, -3}, {-1, 3}, Timestamp::fromSeconds(5));
 
-    Robot receiver = Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(5));
+    Robot receiver =
+        Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
+              AngularVelocity::zero(), Timestamp::fromSeconds(5));
 
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({receiver});
@@ -140,8 +141,9 @@ TEST(ReceiverTacticTest,
 
     Ball ball({-1, -1}, {1, 1}, Timestamp::fromSeconds(5));
 
-    Robot receiver = Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(5));
+    Robot receiver =
+        Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
+              AngularVelocity::zero(), Timestamp::fromSeconds(5));
 
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({receiver});
@@ -162,7 +164,8 @@ TEST(ReceiverTacticTest,
     EXPECT_EQ(13, move_action->getRobot()->id());
     EXPECT_NEAR(0.0, move_action->getDestination().x(), 0.0001);
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
-    EXPECT_EQ(pass.receiverOrientation(ball.position()), move_action->getFinalOrientation());
+    EXPECT_EQ(pass.receiverOrientation(ball.position()),
+              move_action->getFinalOrientation());
 
     EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerMode());
 }
@@ -175,8 +178,9 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
 
     Ball ball({0.5, 0.5}, {-0.5, -0.5}, Timestamp::fromSeconds(5));
 
-    Robot receiver = Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(5));
+    Robot receiver =
+        Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
+              AngularVelocity::zero(), Timestamp::fromSeconds(5));
 
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({receiver});
@@ -206,7 +210,8 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
     EXPECT_EQ(13, move_action->getRobot()->id());
     EXPECT_NEAR(0.0, move_action->getDestination().x(), 0.0001);
     EXPECT_NEAR(0.0, move_action->getDestination().y(), 0.0001);
-    EXPECT_EQ(pass.receiverOrientation(ball.position()), move_action->getFinalOrientation());
+    EXPECT_EQ(pass.receiverOrientation(ball.position()),
+              move_action->getFinalOrientation());
 
     EXPECT_EQ(DribblerMode::MAX_FORCE, move_action->getDribblerMode());
 }
@@ -220,8 +225,9 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     // Ball is travelling towards the robot
     Ball ball({-0.5, 0.5}, {-1, 1}, Timestamp::fromSeconds(5));
 
-    Robot receiver = Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(5));
+    Robot receiver =
+        Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
+              AngularVelocity::zero(), Timestamp::fromSeconds(5));
 
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({receiver});
@@ -263,8 +269,9 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_one_touch_kicked)
     // The ball is travelling away from the origin towards the enemy net
     Ball ball({1, 0}, {4, 0}, Timestamp::fromSeconds(5));
 
-    Robot receiver = Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
-                           AngularVelocity::zero(), Timestamp::fromSeconds(5));
+    Robot receiver =
+        Robot(13, Point(0, 0), Vector(), pass.receiverOrientation(ball.position()),
+              AngularVelocity::zero(), Timestamp::fromSeconds(5));
 
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({receiver});
@@ -339,7 +346,8 @@ class OneTimeShotPositionTest
  * any strange edge cases in the logic that would cause the robot to move to the wrong
  * position
  */
-TEST_P(OneTimeShotPositionTest, DISABLED_test_receiver_moves_to_correct_one_time_shot_position)
+TEST_P(OneTimeShotPositionTest,
+       DISABLED_test_receiver_moves_to_correct_one_time_shot_position)
 {
     Point robot_position(std::get<0>(GetParam()), std::get<1>(GetParam()));
     Point ball_position(std::get<2>(GetParam()), std::get<3>(GetParam()));

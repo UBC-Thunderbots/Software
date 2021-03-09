@@ -175,7 +175,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         world, pass_eval.getBestPassInZones(cherry_pick_region_4).pass);
 
     auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
-
         cherry_pick_tactic_1->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
         cherry_pick_tactic_2->updateControlParams(
