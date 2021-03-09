@@ -162,12 +162,36 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division);
+
+    using Zones = std::unordered_set<EighteenZoneId>;
+
+    // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
+    // field in the +x half. We also further offset the rectangle from the goal line
+    // for the cherry-picker closer to where we're taking the corner kick from
+    //
+    //                FRIENDLY          ENEMY
+    //        ┌──────┬──────┬──────┬──────┬──────┬─────┐
+    //        │1     │4     │7     │10    │13    │16   │
+    //        │      │      │      │      │      │     │
+    //        │      │      │      │      │      │     │
+    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
+    //      ┌─┤2     │5     │8     │11    │14    │17   ├─┐
+    //      │ │      │      │      │      │      │     │ │
+    //      │ │      │      │      │      │      │     │ │
+    //      └─┤      │      │      │      │      │     ├─┘
+    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
+    //        │3     │6     │9     │12    │15    │18   │
+    //        │      │      │      │      │      │     │
+    //        │      │      │      │      │      │     │
+    //        └──────┴──────┴──────┴──────┴──────┴─────┘
+    //
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
-    //
-    // TODO (ticket here) This is not an optimial configuration for cherry pickers
-    std::unordered_set<EighteenZoneId> cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_16};
-    std::unordered_set<EighteenZoneId> cherry_pick_region_2 = {EighteenZoneId::ZONE_12, EighteenZoneId::ZONE_15, EighteenZoneId::ZONE_18};
+    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13,
+                                  EighteenZoneId::ZONE_16};
+    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_12, EighteenZoneId::ZONE_15,
+                                  EighteenZoneId::ZONE_18};
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
@@ -189,20 +213,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         }
     }
 
-    // TODO (ticket here) run this globally and dependency inject the pass evaluation
-    // NOTE: the updatePassGenerator is removed here because it will get updated every
-    // tick in AI when dependency injected
-    PassGenerator<EighteenZoneId> pass_generator(pitch_division);
-
-    // Target any pass in the enemy half of the field, shifted up by 1.5 meters
-    // from the center line
-    std::unordered_set<EighteenZoneId> ENEMY_HALF = {
-        EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15,
-        EighteenZoneId::ZONE_16, EighteenZoneId::ZONE_17, EighteenZoneId::ZONE_18,
-    };
-
     auto pass_eval = pass_generator.generatePassEvaluation(world);
-    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);
+    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -219,8 +231,6 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
 
-        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
-        // we need to evaluate here until then.
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
         cherry_pick_tactic_1->updateControlParams(
@@ -244,8 +254,6 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
 
-        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
-        // we need to evaluate here until then.
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
         cherry_pick_tactic_1->updateControlParams(
@@ -261,7 +269,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     LOG(DEBUG) << "Finished aligning to ball";
 
     best_pass_and_score_so_far =
-        pass_generator.generatePassEvaluation(world).getBestPassInZones(ENEMY_HALF);
+        pass_generator.generatePassEvaluation(world).getBestPassOnField();
     // Align the kicker to pass and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
@@ -271,8 +279,6 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
 
-        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
-        // we need to evaluate here until then.
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
         cherry_pick_tactic_1->updateControlParams(
@@ -285,7 +291,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
                std::get<1>(crease_defender_tactics)});
 
         best_pass_and_score_so_far =
-            pass_generator.generatePassEvaluation(world).getBestPassInZones(ENEMY_HALF);
+            pass_generator.generatePassEvaluation(world).getBestPassOnField();
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 

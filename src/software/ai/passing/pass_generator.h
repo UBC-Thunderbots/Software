@@ -86,7 +86,7 @@ class PassGenerator
     ZonePassMap<ZoneEnum> samplePasses(const World& world);
 
     /**
-     * Given a vector of passes, runs a gradient descent optimizer to find
+     * Given a map of passes, runs a gradient descent optimizer to find
      * better passes
      *
      * @param The world

@@ -27,7 +27,7 @@ PassWithRating PassEvaluation<ZoneEnum>::getBestPassOnField() const
         std::max_element(best_pass_in_zones_.begin(), best_pass_in_zones_.end(),
                          [](const std::pair<ZoneEnum, PassWithRating> &p1,
                             const std::pair<ZoneEnum, PassWithRating> &p2) {
-                             return p1.second.rating < p1.second.rating;
+                             return p1.second.rating > p1.second.rating;
                          });
     return (*best_pass).second;
 }

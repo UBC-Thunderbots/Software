@@ -61,8 +61,10 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     // align itself up to the ball and wait while looking at enemy shadowers, and
     // then pivot/pass when necessary.
     //
-    // For now we allow for 2 second setup time, but this tactic shouldn't care.
-    auto setup_time = ball.timestamp() + Duration::fromSeconds(2.0);
+    // For now we allow for 1 second setup time because the rest of the system is used
+    // to there being a setup delay, but this tactic really shouldn't care.
+    auto setup_time = ball.timestamp() + Duration::fromSeconds(1.0);
+
     while (ball.timestamp() < setup_time)
     {
         // The passer should be facing the receiver

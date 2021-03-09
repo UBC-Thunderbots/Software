@@ -58,8 +58,9 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
             Pass(Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
                  speed_distribution(random_num_gen_));
 
-        passes.emplace(zone_id, PassWithRating{
-            pass, ratePass(world, pass, pitch_division_->getZone(zone_id))});
+        passes.emplace(
+            zone_id, PassWithRating{
+                         pass, ratePass(world, pass, pitch_division_->getZone(zone_id))});
     }
 
     return passes;

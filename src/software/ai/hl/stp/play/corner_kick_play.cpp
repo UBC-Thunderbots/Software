@@ -136,9 +136,9 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     //        │      │      │      │      │      │     │
     //        └──────┴──────┴──────┴──────┴──────┴─────┘
     //
-    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_13};
-    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_14};
-    Zones cherry_pick_region_3 = {EighteenZoneId::ZONE_15};
+    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_14};
+    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_15};
+    Zones cherry_pick_region_3 = {EighteenZoneId::ZONE_16};
     Zones cherry_pick_region_4;
 
     if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
@@ -163,6 +163,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
+    // These tactics will set robots to roam around the field, trying to put
+    // themselves into a good position to receive a pass
     auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
         world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
     auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
@@ -172,8 +174,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     auto cherry_pick_tactic_4 = std::make_shared<CherryPickTactic>(
         world, pass_eval.getBestPassInZones(cherry_pick_region_4).pass);
 
-    // These two tactics will set robots to roam around the field, trying to put
-    // themselves into a good position to receive a pass
     auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
 
         cherry_pick_tactic_1->updateControlParams(

@@ -111,14 +111,33 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division);
+
+    using Zones = std::unordered_set<EighteenZoneId>;
+
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
     //
-    // TODO (ticket here) This is not an optimial configuration for cherry pickers
-    std::unordered_set<EighteenZoneId> cherry_pick_region_1 = {
-        EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_16};
-    std::unordered_set<EighteenZoneId> cherry_pick_region_2 = {
-        EighteenZoneId::ZONE_12, EighteenZoneId::ZONE_15, EighteenZoneId::ZONE_18};
+    //                FRIENDLY          ENEMY
+    //        ┌──────┬──────┬──────┬──────┬──────┬─────┐
+    //        │1     │4     │7     │10    │13    │16   │
+    //        │      │      │      │      │      │     │
+    //        │      │      │      │      │      │     │
+    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
+    //      ┌─┤2     │5     │8     │11    │14    │17   ├─┐
+    //      │ │      │      │      │      │      │     │ │
+    //      │ │      │      │      │      │      │     │ │
+    //      └─┤      │      │      │      │      │     ├─┘
+    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
+    //        │3     │6     │9     │12    │15    │18   │
+    //        │      │      │      │      │      │     │
+    //        │      │      │      │      │      │     │
+    //        └──────┴──────┴──────┴──────┴──────┴─────┘
+    //
+    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_4, EighteenZoneId::ZONE_7,
+                                  EighteenZoneId::ZONE_8};
+    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_5, EighteenZoneId::ZONE_6,
+                                  EighteenZoneId::ZONE_9};
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
@@ -127,29 +146,19 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
         {
             cherry_pick_region_1 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12};
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15, EighteenZoneId::ZONE_18};  // ignore the defense area zone
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15,
+                                    EighteenZoneId::ZONE_18};
         }
         else
         {
             cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11};
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_16};  // ignore the defense area zone
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14,
+                                    EighteenZoneId::ZONE_16};
         }
     }
 
-    // Start a PassGenerator that will continuously optimize passes into the enemy half
-    // of the field
-    // TODO (ticket here) run this globally and dependency inject the pass evaluation
-    PassGenerator<EighteenZoneId> pass_generator(pitch_division);
-
-    // Target any pass in the enemy half of the field
-    std::unordered_set<EighteenZoneId> ENEMY_HALF = {
-        EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12,
-        EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15,
-        EighteenZoneId::ZONE_16, EighteenZoneId::ZONE_17, EighteenZoneId::ZONE_18,
-    };
-
     auto pass_eval = pass_generator.generatePassEvaluation(world);
-    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);
+    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -164,8 +173,6 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     Timestamp pass_optimization_start_time = world.getMostRecentTimestamp();
     // This boolean indicates if we're ready to perform a pass
     bool ready_to_pass = false;
-    // Whether or not we've set the passer robot in the PassGenerator
-    bool set_passer_robot_in_passgenerator = false;
 
     double abs_min_pass_score = DynamicParameters->getAiConfig()
                                     ->getShootOrPassPlayConfig()
@@ -187,7 +194,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         // TODO (ticket here) get rid of this when the pass evaluation is updated globally
         // we need to evaluate here until then.
         pass_eval                  = pass_generator.generatePassEvaluation(world);
-        best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);
+        best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
         cherry_pick_tactic_1->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
@@ -196,28 +203,17 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
 
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold
-        ready_to_pass = set_passer_robot_in_passgenerator &&
-                        best_pass_and_score_so_far.rating > min_pass_score_threshold;
-
-        // If there is a robot assigned to shoot, we assume this is the robot
-        // that will be taking the shot
-        if (shoot_tactic->getAssignedRobot())
-        {
-            set_passer_robot_in_passgenerator = true;
-        }
+        ready_to_pass = best_pass_and_score_so_far.rating > min_pass_score_threshold;
 
         // If we've assigned a robot as the passer in the PassGenerator, we lower
         // our threshold based on how long the PassGenerator as been running since
         // we set it
-        if (set_passer_robot_in_passgenerator)
-        {
-            Duration time_since_commit_stage_start =
-                world.getMostRecentTimestamp() - pass_optimization_start_time;
-            min_pass_score_threshold =
-                1 - std::min(time_since_commit_stage_start.toSeconds() /
-                                 pass_score_ramp_down_duration,
-                             1.0 - abs_min_pass_score);
-        }
+        Duration time_since_commit_stage_start =
+            world.getMostRecentTimestamp() - pass_optimization_start_time;
+        min_pass_score_threshold =
+            1 - std::min(time_since_commit_stage_start.toSeconds() /
+                             pass_score_ramp_down_duration,
+                         1.0 - abs_min_pass_score);
     } while (!ready_to_pass || shoot_tactic->hasShotAvailable());
     return best_pass_and_score_so_far;
 }
