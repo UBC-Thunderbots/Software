@@ -78,7 +78,7 @@ class PassGenerator
         PASS_SPACE_WEIGHT, PASS_SPACE_WEIGHT, PASS_SPEED_WEIGHT};
 
     /**
-     * Randomly samples a recieve point across every zone and assigns a random
+     * Randomly samples a receive point across every zone and assigns a random
      * speed to each pass.
      *
      * @returns a mapping of the Zone Id to the sampled pass

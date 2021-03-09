@@ -36,7 +36,7 @@ class EighteenZonePitchDivision : public FieldPitchDivision<EighteenZoneId>
     /**
      * The field is divided into 18 equally sized rectangles.
      *
-     * @param field The field to divide up into 18 zones (see unicode art above)
+     * @param field The field to divide up into 18 zones (see ascii art above)
      */
     EighteenZonePitchDivision(const Field& field);
 
