@@ -19,6 +19,14 @@ struct MoveFSM
         Angle final_orientation;
         // The speed the robot should have when it arrives at its destination
         double final_speed;
+        // How to run the dribbler
+        DribblerMode dribbler_mode;
+        // How to navigate around the ball
+        BallCollisionType ball_collision_type;
+        // The command to autochip or autokick
+        AutoChipOrKick auto_chip_or_kick;
+        // The maximum allowed speed mode
+        MaxAllowedSpeedMode max_allowed_speed_mode;
     };
 
     // this struct defines the only event that the MoveFSM responds to
@@ -44,7 +52,10 @@ struct MoveFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), event.control_params.destination,
                 event.control_params.final_orientation, event.control_params.final_speed,
-                DribblerMode::OFF, BallCollisionType::AVOID));
+                event.control_params.dribbler_mode,
+                event.control_params.ball_collision_type,
+                event.control_params.auto_chip_or_kick,
+                event.control_params.max_allowed_speed_mode));
         };
 
         /**

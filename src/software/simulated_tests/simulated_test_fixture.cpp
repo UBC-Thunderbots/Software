@@ -46,6 +46,7 @@ void SimulatedTestFixture::SetUp()
     MutableDynamicParameters->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
         ->setValue(true);
+
     if (SimulatedTestFixture::enable_visualizer)
     {
         enableVisualizer();
@@ -76,15 +77,15 @@ void SimulatedTestFixture::setRefereeCommand(
     const RefereeCommand &current_referee_command,
     const RefereeCommand &previous_referee_command)
 {
-    MutableDynamicParameters->getMutableAiControlConfig()
-        ->getMutableOverrideRefereeCommand()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableAiControlConfig()
+    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->getMutableCurrentRefereeCommand()
         ->setValue(toString(current_referee_command));
-    MutableDynamicParameters->getMutableAiControlConfig()
+    MutableDynamicParameters->getMutableSensorFusionConfig()
         ->getMutablePreviousRefereeCommand()
         ->setValue(toString(previous_referee_command));
+    MutableDynamicParameters->getMutableSensorFusionConfig()
+        ->getMutableOverrideRefereeCommand()
+        ->setValue(true);
 }
 
 void SimulatedTestFixture::enableVisualizer()
@@ -175,7 +176,7 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done =
         tickTest(terminating_validation_functions, non_terminating_validation_functions,
                  simulation_time_step, ai_time_step, world);
-    while (simulator->getTimestamp() < timeout_time)
+    while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
         if (!DynamicParameters->getAiControlConfig()->getRunAi()->value())
         {

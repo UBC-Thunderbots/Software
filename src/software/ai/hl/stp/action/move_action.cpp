@@ -18,14 +18,18 @@ void MoveAction::updateWorldParams(const World& world) {}
 void MoveAction::updateControlParams(const Robot& robot, Point destination,
                                      Angle final_orientation, double final_speed,
                                      DribblerMode dribbler_mode,
-                                     BallCollisionType ball_collision_type)
+                                     BallCollisionType ball_collision_type,
+                                     AutoChipOrKick auto_chip_or_kick,
+                                     MaxAllowedSpeedMode max_allowed_speed_mode)
 {
-    this->robot               = robot;
-    this->destination         = destination;
-    this->final_orientation   = final_orientation;
-    this->final_speed         = final_speed;
-    this->dribbler_mode       = dribbler_mode;
-    this->ball_collision_type = ball_collision_type;
+    this->robot                  = robot;
+    this->destination            = destination;
+    this->final_orientation      = final_orientation;
+    this->final_speed            = final_speed;
+    this->dribbler_mode          = dribbler_mode;
+    this->ball_collision_type    = ball_collision_type;
+    this->auto_chip_or_kick      = auto_chip_or_kick;
+    this->max_allowed_speed_mode = max_allowed_speed_mode;
 }
 
 Point MoveAction::getDestination()
@@ -48,6 +52,11 @@ DribblerMode MoveAction::getDribblerMode()
     return dribbler_mode;
 }
 
+AutoChipOrKick MoveAction::getAutoChipOrKick() const
+{
+    return auto_chip_or_kick;
+}
+
 bool MoveAction::robotCloseToDestination()
 {
     return (robot->position() - destination).length() > close_to_dest_threshold ||
@@ -64,8 +73,8 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // location
     do
     {
-        yield(std::make_unique<MoveIntent>(robot->id(), destination, final_orientation,
-                                           final_speed, dribbler_mode,
-                                           ball_collision_type));
+        yield(std::make_unique<MoveIntent>(
+            robot->id(), destination, final_orientation, final_speed, dribbler_mode,
+            ball_collision_type, auto_chip_or_kick, max_allowed_speed_mode));
     } while (robotCloseToDestination());
 }

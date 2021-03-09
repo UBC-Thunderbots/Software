@@ -184,6 +184,7 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
+        "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
         "//software/ai/hl/stp/tactic:penalty_setup_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
@@ -456,6 +457,8 @@ cc_test(
         "//software/ai/hl/stp/play:penalty_kick_play",
         "//software/simulated_tests:simulated_play_test_fixture",
         "//software/simulated_tests:simulated_test_main",
+        "//software/simulated_tests/non_terminating_validation_functions",
+        "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
