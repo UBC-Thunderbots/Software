@@ -1,9 +1,9 @@
 #include <pybind11/pybind11.h>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/sensor_msg.pb.h"
 #include "software/python_bindings/python_binding_utilities.h"

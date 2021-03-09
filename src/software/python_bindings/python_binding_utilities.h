@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "software/parameter/config.h"
+#include "shared/parameter/config.h"
 
 /**
  * Update a dynamic parameters config from a pybind11 dictionary, assigning the values
