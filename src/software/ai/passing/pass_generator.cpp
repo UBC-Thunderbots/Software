@@ -93,20 +93,11 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
                 ->getPassingConfig()
                 ->getNumberOfGradientDescentStepsPerIter()
                 ->value());
-        try
-        {
-            auto new_pass = Pass::fromPassArray(pass_array);
-            auto score    = ratePass(world, new_pass, pitch_division_->getZone(zone_id));
 
-            optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
-        }
-        catch (std::invalid_argument& e)
-        {
-            // Sometimes the gradient descent algorithm could return an invalid pass
-            // (i.e a pass w/ a negative speed). We just keep the initial pass in that
-            // case.
-            optimized_passes.emplace(zone_id, generated_passes.at(zone_id));
-        }
+        auto new_pass = Pass::fromPassArray(pass_array);
+        auto score    = ratePass(world, new_pass, pitch_division_->getZone(zone_id));
+
+        optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
     }
 
     return optimized_passes;

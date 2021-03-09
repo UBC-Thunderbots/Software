@@ -188,28 +188,22 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     //
     // If the passing is coming from the friendly end, we split the cherry-pickers
     // across the x-axis in the enemy half
-    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13,
-                                  EighteenZoneId::ZONE_16};
-    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_12, EighteenZoneId::ZONE_15,
-                                  EighteenZoneId::ZONE_18};
+    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13};
+    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_12, EighteenZoneId::ZONE_15};
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
-    if (world.ball().position().x() > -1)
+    if (world.ball().position().x() > 0)
     {
         if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
         {
             cherry_pick_region_1 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12};
-            cherry_pick_region_2 = {
-                EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15,
-                EighteenZoneId::ZONE_18};  // ignore the defense area zone
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15};
         }
         else
         {
             cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11};
-            cherry_pick_region_2 = {
-                EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14,
-                EighteenZoneId::ZONE_16};  // ignore the defense area zone
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14};
         }
     }
 
