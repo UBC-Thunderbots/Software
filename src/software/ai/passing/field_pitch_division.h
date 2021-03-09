@@ -5,11 +5,11 @@
 /**
  * A FieldPitchDivision is abstraction around how we split up the field.
  */
-
 template <class ZoneEnum>
 class FieldPitchDivision
 {
-   static_assert(std::is_enum<ZoneEnum>::value, "FieldPitchDivision: ZoneEnum must be an enum");
+    static_assert(std::is_enum<ZoneEnum>::value,
+                  "FieldPitchDivision: ZoneEnum must be an enum");
 
    public:
     FieldPitchDivision()          = default;

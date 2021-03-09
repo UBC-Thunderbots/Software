@@ -14,6 +14,9 @@
 #include "software/time/timestamp.h"
 
 template <class ZoneEnum>
+using ZonePassMap = std::unordered_map<ZoneEnum, PassWithRating>;
+
+template <class ZoneEnum>
 class PassEvaluation
 {
     static_assert(std::is_enum<ZoneEnum>::value,
@@ -32,8 +35,7 @@ class PassEvaluation
      */
     explicit PassEvaluation(
         std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
-        std::unordered_map<ZoneEnum, PassWithRating> best_pass_in_zones,
-        Timestamp timestamp);
+        ZonePassMap<ZoneEnum> best_pass_in_zones, Timestamp timestamp);
 
     PassEvaluation() = delete;
 
@@ -73,7 +75,7 @@ class PassEvaluation
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
 
     // Stores the best passes indexed by E
-    mutable std::unordered_map<ZoneEnum, PassWithRating> best_pass_in_zones_;
+    ZonePassMap<ZoneEnum> best_pass_in_zones_;
 
     // The timestamp when this evaluation was created
     Timestamp timestamp_;

@@ -58,8 +58,8 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
             Pass(Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
                  speed_distribution(random_num_gen_));
 
-        passes.at(zone_id) = PassWithRating{
-            pass, ratePass(world, pass, pitch_division_->getZone(zone_id))};
+        passes.emplace(zone_id, PassWithRating{
+            pass, ratePass(world, pass, pitch_division_->getZone(zone_id))});
     }
 
     return passes;
@@ -87,21 +87,24 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
             };
 
         auto pass_array = optimizer_.maximize(
-            objective_function, generated_passes.at(zone_id).pass.toPassArray(), 10);
-
+            objective_function, generated_passes.at(zone_id).pass.toPassArray(),
+            DynamicParameters->getAiConfig()
+                ->getPassingConfig()
+                ->getNumberOfGradientDescentStepsPerIter()
+                ->value());
         try
         {
             auto new_pass = Pass::fromPassArray(pass_array);
             auto score    = ratePass(world, new_pass, pitch_division_->getZone(zone_id));
 
-            optimized_passes.at(zone_id) = PassWithRating{new_pass, score};
+            optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
         }
         catch (std::invalid_argument& e)
         {
             // Sometimes the gradient descent algorithm could return an invalid pass
             // (i.e a pass w/ a negative speed). We just keep the initial pass in that
             // case.
-            optimized_passes.at(zone_id) = generated_passes.at(zone_id);
+            optimized_passes.emplace(zone_id, generated_passes.at(zone_id));
         }
     }
 
@@ -117,7 +120,7 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
         if (ratePass(world, passes_.at(zone_id).pass, pitch_division_->getZone(zone_id)) <
             optimized_passes.at(zone_id).rating)
         {
-            passes_.emplace(zone_id, optimized_passes.at(zone_id));
+            passes_.at(zone_id) = optimized_passes.at(zone_id);
         }
     }
 }

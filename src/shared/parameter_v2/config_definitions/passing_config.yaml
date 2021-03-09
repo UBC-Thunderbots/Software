@@ -95,7 +95,7 @@
      name: number_of_gradient_descent_steps_per_iter
      min: 0
      max: 1000
-     value: 10
+     value: 2 # TODO (ticket here) find optimal iterations after tuning, for now 2 does the trick
      description: "The number of steps of gradient descent to perform in each iteration"
  - double:
      name: pass_equality_max_position_difference_meters

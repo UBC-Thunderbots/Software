@@ -112,6 +112,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
+    using Zones = std::unordered_set<EighteenZoneId>;
+
     // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
     // field in the +x half. We also further offset the rectangle from the goal line
     // for the cherry-picker closer to where we're taking the corner kick from
@@ -132,10 +134,10 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     //       │       │       │      │
     //       └───────┴───────┴──────┘
     //
-    std::unordered_set<EighteenZoneId> cherry_pick_region_1 = {EighteenZoneId::ZONE_10};
-    std::unordered_set<EighteenZoneId> cherry_pick_region_2 = {EighteenZoneId::ZONE_12};
-    std::unordered_set<EighteenZoneId> cherry_pick_region_3 = {EighteenZoneId::ZONE_14};
-    std::unordered_set<EighteenZoneId> cherry_pick_region_4;
+    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_10};
+    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_12};
+    Zones cherry_pick_region_3 = {EighteenZoneId::ZONE_14};
+    Zones cherry_pick_region_4;
 
     if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
     {
@@ -150,7 +152,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     PassGenerator<EighteenZoneId> pass_generator(pitch_division);
 
     // Target any pass in the enemy half of the field
-    std::unordered_set<EighteenZoneId> ENEMY_HALF = {
+    Zones ENEMY_HALF = {
         EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12,
         EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15,
         EighteenZoneId::ZONE_16, EighteenZoneId::ZONE_17, EighteenZoneId::ZONE_18,

@@ -35,6 +35,9 @@ class CornerKickPlay : public Play
     void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
                                  const World &world);
 
+    void updateCherryPickerTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
+                                  const World &world);
+
     /**
      * Sets up the pass for the corner kick: aligns the passer and positions the cherry
      * pickers

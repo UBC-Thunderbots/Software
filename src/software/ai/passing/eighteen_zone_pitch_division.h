@@ -47,6 +47,7 @@ class EighteenZonePitchDivision : public FieldPitchDivision<EighteenZoneId>
      * @param field The field to divide up into 18 zones (see unicode art above)
      */
     EighteenZonePitchDivision(const Field& field);
+
     const Rectangle& getZone(EighteenZoneId zone_id) const override;
     const std::vector<EighteenZoneId>& getAllZoneIds() const override;
 

@@ -81,7 +81,7 @@ class PassGenerator
      * Randomly samples a recieve point across every zone and assigns a random
      * speed to each pass.
      *
-     * @returns a mapping of the Zone id to the sampled pass
+     * @returns a mapping of the Zone Id to the sampled pass
      */
     ZonePassMap<ZoneEnum> samplePasses(const World& world);
 
