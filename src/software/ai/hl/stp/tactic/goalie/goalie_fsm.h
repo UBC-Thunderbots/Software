@@ -6,6 +6,7 @@
 #include "software/parameter/dynamic_parameters.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
@@ -14,7 +15,6 @@
 struct GoalieFSM
 {
     class panic_and_stop_ball_state;
-    class chip_if_safe_state;
     class position_to_block_shot_state;
 
     struct ControlParams
@@ -137,7 +137,7 @@ struct GoalieFSM
         using namespace boost::sml;
 
         const auto panic_and_stop_ball_s = state<panic_and_stop_ball_state>;
-        const auto chip_if_safe_s = state<chip_if_safe_state>;
+        const auto chip_if_safe_s = state<ChipFSM>;
         const auto position_to_block_shot_s = state<position_to_block_shot_state>;
 
         const auto update_e = event<Update>;
@@ -174,7 +174,7 @@ struct GoalieFSM
          * @return if the ball is moving slower than the panic threshold and is
          * inside the friendly defense area
          */
-        const auto slow_ball_in_friendly_defense_area = [ball_speed_panic](auto event) {
+        const auto safe_ball_near_goal = [ball_speed_panic](auto event) {
 
             return event.common.world.ball().velocity().length() <= ball_speed_panic &&
                    event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position());
@@ -301,13 +301,14 @@ struct GoalieFSM
         };
 
         return make_transition_table(
-                *position_to_block_shot_s + update_e[panic] / update_panic_and_stop_ball = panic_and_stop_ball_s,
-                position_to_block_shot_s + update_e[slow_ball_in_friendly_defense_area] / update_chip_if_safe = chip_if_safe_s,
+                *position_to_block_shot_s + update_e[panic] / update_panic_and_stop_ball       = panic_and_stop_ball_s,
+                position_to_block_shot_s + update_e[safe_ball_near_goal] / update_chip_if_safe = chip_if_safe_s,
+                position_to_block_shot_s + update_e / update_position_to_block_shot,
                 panic_and_stop_ball_s + update_e[panic] / update_panic_and_stop_ball,
-                panic_and_stop_ball_s + update_e[!panic] = X,
-                chip_if_safe_s + update_e[slow_ball_in_friendly_defense_area] / update_chip_if_safe,
-                chip_if_safe_s + update_e[!slow_ball_in_friendly_defense_area] = X,
-                X + update_e / update_position_to_block_shot = position_to_block_shot_s);
+                panic_and_stop_ball_s + update_e[!panic]                                       = X,
+                chip_if_safe_s + update_e[safe_ball_near_goal] / update_chip_if_safe,
+                chip_if_safe_s + update_e[!safe_ball_near_goal]                                = X,
+                X + update_e / update_position_to_block_shot                                   = position_to_block_shot_s);
     }
 
 };
