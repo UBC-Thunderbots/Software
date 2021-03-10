@@ -48,7 +48,6 @@ void SimulatedTestFixture::SetUp()
     mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
         ->setValue(true);
-
     if (SimulatedTestFixture::enable_visualizer)
     {
         enableVisualizer();
@@ -86,7 +85,7 @@ void SimulatedTestFixture::setRefereeCommand(
         ->getMutableCurrentRefereeCommand()
         ->setValue(toString(current_referee_command));
     mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableCurrentRefereeCommand()
+        ->getMutablePreviousRefereeCommand()
         ->setValue(toString(previous_referee_command));
 }
 
