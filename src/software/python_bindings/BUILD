@@ -16,7 +16,7 @@ cc_library(
         "python_binding_utilities.h",
     ],
     deps = [
-        "//software/parameter:config",
+        "//shared/parameter:cpp_configs",
         "//software/util/variant_visitor",
     ] + PYBIND_DEPS,
 )
@@ -32,7 +32,7 @@ cc_library(
     deps = [
         ":python_binding_utilities",
         "//software/ai/passing:cost_functions",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter:cpp_configs",
         "//software/proto:sensor_msg_cc_proto",
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion",
@@ -59,7 +59,7 @@ cc_library(
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter:cpp_configs",
         "//software/proto:sensor_msg_cc_proto",
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion",

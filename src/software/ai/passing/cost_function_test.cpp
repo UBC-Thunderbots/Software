@@ -6,8 +6,8 @@
 #include <random>
 
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/math/math_functions.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
 
 class PassingEvaluationTest : public testing::Test
@@ -18,29 +18,23 @@ class PassingEvaluationTest : public testing::Test
         avg_desired_pass_speed = 3.9;
         entire_field =
             std::make_shared<Rectangle>(Field::createSSLDivisionBField().fieldLines());
+        passing_config = std::make_shared<PassingConfig>();
     }
 
     // We get these values here so we can make these tests robust to change
-    double min_pass_speed_param = DynamicParameters->getAiConfig()
-                                      ->getPassingConfig()
-                                      ->getMinPassSpeedMPerS()
-                                      ->value();
-    double max_pass_speed_param = DynamicParameters->getAiConfig()
-                                      ->getPassingConfig()
-                                      ->getMaxPassSpeedMPerS()
-                                      ->value();
-    double avg_desired_pass_speed;
+    // We get these values here so we can make these tests robust to change
+    double min_pass_speed_param = passing_config->getMinPassSpeedMPerS()->value();
+    double max_pass_speed_param = passing_config->getMaxPassSpeedMPerS()->value();
 
-    double min_time_offset_for_pass_seconds_param = DynamicParameters->getAiConfig()
-                                                        ->getPassingConfig()
-                                                        ->getMinTimeOffsetForPassSeconds()
-                                                        ->value();
-    double max_time_offset_for_pass_seconds_param = DynamicParameters->getAiConfig()
-                                                        ->getPassingConfig()
-                                                        ->getMaxTimeOffsetForPassSeconds()
-                                                        ->value();
+    double min_time_offset_for_pass_seconds_param =
+        passing_config->getMinTimeOffsetForPassSeconds()->value();
+    double max_time_offset_for_pass_seconds_param =
+        passing_config->getMaxTimeOffsetForPassSeconds()->value();
+
+    double avg_desired_pass_speed;
     double avg_time_offset_for_pass_seconds;
     std::shared_ptr<Rectangle> entire_field;
+    std::shared_ptr<const PassingConfig> passing_config;
 };
 
 // This test is disabled to speed up CI, it can be enabled by removing "DISABLED_" from
@@ -97,14 +91,9 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
     std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
                                                   world.field().yLength() / 2);
 
-    std::uniform_real_distribution speed_distribution(DynamicParameters->getAiConfig()
-                                                          ->getPassingConfig()
-                                                          ->getMinPassSpeedMPerS()
-                                                          ->value(),
-                                                      DynamicParameters->getAiConfig()
-                                                          ->getPassingConfig()
-                                                          ->getMaxPassSpeedMPerS()
-                                                          ->value());
+    std::uniform_real_distribution speed_distribution(
+        passing_config->getMinPassSpeedMPerS()->value(),
+        passing_config->getMaxPassSpeedMPerS()->value());
 
     std::vector<Pass> passes;
     std::vector<Ball> balls;
@@ -127,7 +116,8 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
     for (int k = 0; k < num_passes_to_gen; k++)
     {
         world.updateBall(balls[k]);
-        ratePass(world, passes[k], *entire_field);
+        ratePass(world, passes[k], *entire_field, 
+                 passing_config);
     }
 
     double duration_ms = ::TestUtil::millisecondsSince(start_time);
@@ -161,7 +151,8 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
     world.updateEnemyTeamState(enemy_team);
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating =     ratePass(world, passes[k], *entire_field, 
+                 passing_config);
     EXPECT_GE(pass_rating, 0.0);
     EXPECT_LE(pass_rating, 0.1);
 }
@@ -191,7 +182,7 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     world.updateEnemyTeamState(enemy_team);
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_GE(pass_rating, 0.65);
     EXPECT_LE(pass_rating, 0.9);
 }
@@ -219,7 +210,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked)
     world.updateEnemyTeamState(enemy_team);
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_GE(pass_rating, 0.0);
     EXPECT_LE(pass_rating, 0.02);
 }
@@ -247,7 +238,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_n
     world.updateEnemyTeamState(enemy_team);
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_GE(pass_rating, 0.5);
     EXPECT_LE(pass_rating, 1.0);
 }
@@ -275,7 +266,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net)
     world.updateEnemyTeamState(enemy_team);
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_GE(pass_rating, 0.7);
     EXPECT_LE(pass_rating, 0.9);
 }
@@ -296,7 +287,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net)
     Ball ball({3, 2}, Vector(0, 0), Timestamp::fromSeconds(0));
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_LE(0.8, pass_rating);
     EXPECT_GE(1.0, pass_rating);
 }
@@ -317,7 +308,7 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies)
     Ball ball(world.field().enemyCornerPos(), Vector(0, 0), Timestamp::fromSeconds(0));
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_LE(0.95, pass_rating);
     EXPECT_GE(1.0, pass_rating);
 }
@@ -353,7 +344,7 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_cent
     Ball ball(world.field().enemyCornerPos(), Vector(0, 0), Timestamp::fromSeconds(0));
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_GE(pass_rating, 0.1);
     EXPECT_LE(pass_rating, 0.7);
 }
@@ -374,7 +365,7 @@ TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
     Ball ball({3, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_LE(0.0, pass_rating);
     EXPECT_GE(0.05, pass_rating);
 }
@@ -396,7 +387,7 @@ TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
 
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_LE(0.0, pass_rating);
     EXPECT_GE(0.05, pass_rating);
 }
@@ -416,7 +407,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_passer_on_field)
 
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_DOUBLE_EQ(0, pass_rating);
 }
 
@@ -450,7 +441,7 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_attempting_to_pass_and_receive_n
 
     world.updateBall(ball);
 
-    double pass_rating = ratePass(world, pass, *entire_field);
+    double pass_rating = ratePass(world, pass, *entire_field, passing_config);
     EXPECT_GE(pass_rating, 0.9);
     EXPECT_LE(pass_rating, 1.0);
 }
@@ -465,7 +456,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_g
     Pass pass({3.5, 0}, 1);
     Ball ball({4, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double pass_shoot_score = ratePassShootScore(ball, field, enemy_team, pass);
+    double pass_shoot_score = ratePassShootScore(ball, field, enemy_team, pass, passing_config);
     EXPECT_LE(0.95, pass_shoot_score);
     EXPECT_GE(1, pass_shoot_score);
 }
@@ -481,7 +472,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({0, 0}, 1);
     Ball ball({-1, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double pass_shoot_score = ratePassShootScore(ball, field, enemy_team, pass);
+    double pass_shoot_score = ratePassShootScore(ball, field, enemy_team, pass, passing_config);
     EXPECT_GE(pass_shoot_score, 0.0);
     EXPECT_LE(pass_shoot_score, 0.05);
 }
@@ -501,7 +492,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({3, 0}, 1);
     Ball ball({3.5, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double pass_shoot_score = ratePassShootScore(ball, field, enemy_team, pass);
+    double pass_shoot_score = ratepassshootscore(ball, field, enemy_team, pass, passing_config);
     EXPECT_GE(pass_shoot_score, 0.9);
     EXPECT_LE(pass_shoot_score, 1.0);
 }
@@ -519,7 +510,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
     Pass pass({0, 0}, 1);
     Ball ball({1, 1}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double pass_shoot_score = ratePassShootScore(ball, field, enemy_team, pass);
+    double pass_shoot_score = ratePassShootScore(ball, field, enemy_team, pass, passing_config);
     EXPECT_LE(0, pass_shoot_score);
     // TODO (ticket here) see note at cost_function.cpp:79, updated this test
     // when that ticket is resolved
@@ -541,21 +532,21 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_decreasing_open_angle_to_goal)
               Timestamp::fromSeconds(0)),
     });
     std::vector<Robot> robots_on_field = {};
-    double pass_shoot_score0 = ratePassShootScore(ball, field, enemy_team, pass);
+    double pass_shoot_score0 = ratePassShootScore(ball, field, enemy_team, pass, passing_config);
     enemy_team.updateRobots({
         Robot(0, {3.5, 0.2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
         Robot(1, {3.5, 0.2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    double pass_shoot_score1 = ratePassShootScore(ball, field, enemy_team, pass);
+    double pass_shoot_score1 = ratePassShootScore(ball, field, enemy_team, pass, passing_config);
     enemy_team.updateRobots({
         Robot(0, {3.5, 0.3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
         Robot(1, {3.5, 0.3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    double pass_shoot_score2 = ratePassShootScore(ball, field, enemy_team, pass);
+    double pass_shoot_score2 = ratePassShootScore(ball, field, enemy_team, pass, passing_config);
     EXPECT_LT(pass_shoot_score0, pass_shoot_score1);
     EXPECT_LT(pass_shoot_score1, pass_shoot_score2);
 }
@@ -566,7 +557,7 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_enemy_robots)
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass);
+    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass, passing_config);
     EXPECT_EQ(1, pass_rating);
 }
 
@@ -582,7 +573,7 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near)
     Pass pass({10, 10}, 4);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass);
+    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass, passing_config);
     EXPECT_GE(pass_rating, 0.9);
     EXPECT_LE(pass_rating, 1.0);
 }
@@ -595,7 +586,7 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_one_robot_near_receiver_point)
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass);
+    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass, passing_config);
     EXPECT_LE(0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -608,7 +599,7 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_robot_near_center_of_pass)
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass);
+    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass, passing_config);
     EXPECT_LE(0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -624,7 +615,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass);
+    double pass_rating = ratePassEnemyRisk(ball, enemy_team, pass, passing_config);
     EXPECT_LE(0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -635,7 +626,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_team_no_robots)
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_team, pass);
+    double intercept_risk = calculateInterceptRisk(ball, enemy_team, pass, passing_config);
     EXPECT_EQ(0, intercept_risk);
 }
 
@@ -654,7 +645,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_team, pass);
+    double intercept_risk = calculateInterceptRisk(ball, enemy_team, pass, passing_config);
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -674,7 +665,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_team, pass);
+    double intercept_risk = calculateInterceptRisk(ball, enemy_team, pass, passing_config);
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -688,7 +679,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_sitting_on_pass_t
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass);
+    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass, passing_config);
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -703,7 +694,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_tra
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass);
+    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass, passing_config);
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -717,7 +708,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_far_away_from_tra
     Pass pass({10, 10}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass);
+    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass, passing_config);
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -731,7 +722,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_robot_at_far_end_of_field)
     Pass pass({3, 3}, 3);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass);
+    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass, passing_config);
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -745,22 +736,9 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_enemy_moving_far_away)
     Pass pass({4, 4}, 2);
     Ball ball({1, 1}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass);
+    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass, passing_config);
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
-}
-
-TEST_F(PassingEvaluationTest,
-       calculateInterceptRisk_enemy_off_pass_trajectory_and_late_pass_start_time)
-{
-    // Test where the enemy is a fair distance off the pass trajectory
-    Robot enemy_robot(0, {2, 5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                      Timestamp::fromSeconds(0));
-    Pass pass({0, 10}, 10);
-    Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
-
-    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass);
-    EXPECT_LE(intercept_risk, 0.01);
 }
 
 TEST_F(PassingEvaluationTest,
@@ -776,7 +754,7 @@ TEST_F(PassingEvaluationTest,
     Pass pass({0, 2}, 0.5);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass);
+    double intercept_risk = calculateInterceptRisk(ball, enemy_robot, pass, passing_config);
     EXPECT_LE(0.5, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -789,7 +767,7 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_no_robots_on_team)
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
     // If there are no robots on the team, then there is no way we can receive a pass
-    EXPECT_EQ(0, ratePassFriendlyCapability(ball, team, pass));
+    EXPECT_EQ(0, ratePassFriendlyCapability(ball, team, pass, passing_config));
 }
 
 TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_pass_speed_0)
@@ -804,7 +782,7 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_pass_speed_0)
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
     // If there are no robots on the team, then there is no way we can receive a pass
-    EXPECT_EQ(0, ratePassFriendlyCapability(ball, team, pass));
+    EXPECT_EQ(0, ratePassFriendlyCapability(ball, team, pass, passing_config));
 }
 
 TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_one_robot_near_pass_one_far_away)
@@ -821,8 +799,8 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_one_robot_near_pass_one
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
     // There should be a very high probability that we can receive this pass
-    EXPECT_LE(0.9, ratePassFriendlyCapability(ball, team, pass));
-    EXPECT_GE(1, ratePassFriendlyCapability(ball, team, pass));
+    EXPECT_LE(0.9, ratePassFriendlyCapability(ball, team, pass, passing_config));
+    EXPECT_GE(1, ratePassFriendlyCapability(ball, team, pass, passing_config));
 }
 
 TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_should_ignore_passer_robot)
@@ -845,7 +823,7 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_should_ignore_passer_ro
     Pass pass({0, 0}, 10);
     Ball ball({2, -2}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    double friendly_capability = ratePassFriendlyCapability(ball, team, pass);
+    double friendly_capability = ratePassFriendlyCapability(ball, team, pass, passing_config);
     EXPECT_GE(friendly_capability, 0);
     EXPECT_LE(friendly_capability, 0.05);
 }
@@ -864,8 +842,8 @@ TEST_F(PassingEvaluationTest,
     Pass pass({1, 1}, 10);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    EXPECT_GE(0.1, ratePassFriendlyCapability(ball, team, pass));
-    EXPECT_LE(0, ratePassFriendlyCapability(ball, team, pass));
+    EXPECT_GE(0.1, ratePassFriendlyCapability(ball, team, pass, passing_config));
+    EXPECT_LE(0, ratePassFriendlyCapability(ball, team, pass, passing_config));
 }
 
 TEST_F(PassingEvaluationTest,
@@ -882,8 +860,8 @@ TEST_F(PassingEvaluationTest,
     Pass pass({120, 105}, 1);
     Ball ball({100, 100}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    EXPECT_LE(0.9, ratePassFriendlyCapability(ball, team, pass));
-    EXPECT_GE(1, ratePassFriendlyCapability(ball, team, pass));
+    EXPECT_LE(0.9, ratePassFriendlyCapability(ball, team, pass, passing_config));
+    EXPECT_GE(1, ratePassFriendlyCapability(ball, team, pass, passing_config));
 }
 
 TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_cant_turn_in_time)
@@ -897,8 +875,8 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_cant_turn_
     Pass pass({1, 0}, 6);
     Ball ball({0, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
-    EXPECT_GE(ratePassFriendlyCapability(ball, team, pass), 0.0);
-    EXPECT_LE(ratePassFriendlyCapability(ball, team, pass), 0.1);
+    EXPECT_GE(ratePassFriendlyCapability(ball, team, pass, passing_config), 0.0);
+    EXPECT_LE(ratePassFriendlyCapability(ball, team, pass, passing_config), 0.1);
 }
 
 TEST_F(PassingEvaluationTest,
@@ -912,8 +890,8 @@ TEST_F(PassingEvaluationTest,
         {Robot(0, {1, 0}, {0, 0}, pass.receiverOrientation(ball.position()),
                AngularVelocity::fromDegrees(0), Timestamp::fromSeconds(0))});
 
-    EXPECT_GE(ratePassFriendlyCapability(ball, team, pass), 0.90);
-    EXPECT_LE(ratePassFriendlyCapability(ball, team, pass), 1.0);
+    EXPECT_GE(ratePassFriendlyCapability(ball, team, pass, passing_config), 0.90);
+    EXPECT_LE(ratePassFriendlyCapability(ball, team, pass, passing_config), 1.0);
 }
 
 
@@ -922,10 +900,10 @@ TEST_F(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)
     Field f = Field::createSSLDivisionBField();
 
     // Check that the static quality is basically 0 at the edge of the field
-    EXPECT_LE(getStaticPositionQuality(f, Point(-4.5, 0)), 0.13);
-    EXPECT_LE(getStaticPositionQuality(f, Point(4.5, 0)), 0.13);
-    EXPECT_LE(getStaticPositionQuality(f, Point(0, -3.0)), 0.13);
-    EXPECT_LE(getStaticPositionQuality(f, Point(0, 3.0)), 0.13);
+    EXPECT_LE(getStaticPositionQuality(f, Point(-4.5, 0), passing_config), 0.13);
+    EXPECT_LE(getStaticPositionQuality(f, Point(4.5, 0), passing_config), 0.13);
+    EXPECT_LE(getStaticPositionQuality(f, Point(0, -3.0), passing_config), 0.13);
+    EXPECT_LE(getStaticPositionQuality(f, Point(0, 3.0), passing_config), 0.13);
 }
 
 TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_own_goal_quality)
@@ -933,7 +911,7 @@ TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_own_goal_quality)
     Field f = Field::createSSLDivisionBField();
 
     // Check that we have a static quality of almost 0 near our goal
-    EXPECT_LE(getStaticPositionQuality(f, Point(-4.0, 0)), 0.14);
+    EXPECT_LE(getStaticPositionQuality(f, Point(-4.0, 0), passing_config), 0.14);
 }
 
 TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_enemy_goal_quality)
@@ -941,12 +919,12 @@ TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_enemy_goal_quality)
     Field f = Field::createSSLDivisionBField();
 
     // Check that we have a large static quality near the enemy goal
-    EXPECT_GE(getStaticPositionQuality(f, Point(3.0, 0)), 0.80);
+    EXPECT_GE(getStaticPositionQuality(f, Point(3.0, 0), passing_config), 0.80);
 
     // But we should have basically 0 static quality too close to the enemy goal,
     // as there is a defense area around the net that we cannot pass to
-    EXPECT_NEAR(getStaticPositionQuality(f, Point(4.3, 1.9)), 0.0, 0.1);
-    EXPECT_NEAR(getStaticPositionQuality(f, Point(4.3, -1.9)), 0.0, 0.1);
-    EXPECT_NEAR(getStaticPositionQuality(f, Point(4.4, 1.9)), 0.0, 0.1);
-    EXPECT_NEAR(getStaticPositionQuality(f, Point(4.4, -1.9)), 0.0, 0.1);
+    EXPECT_NEAR(getStaticPositionQuality(f, Point(4.3, 1.9), passing_config), 0.0, 0.1);
+    EXPECT_NEAR(getStaticPositionQuality(f, Point(4.3, -1.9), passing_config), 0.0, 0.1);
+    EXPECT_NEAR(getStaticPositionQuality(f, Point(4.4, 1.9), passing_config), 0.0, 0.1);
+    EXPECT_NEAR(getStaticPositionQuality(f, Point(4.4, -1.9), passing_config), 0.0, 0.1);
 }

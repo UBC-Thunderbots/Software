@@ -25,7 +25,7 @@ generate_dynamic_parameters = rule(
     attrs = {
         "enum_deps": attr.label_list(),
         "_generation_script": attr.label(
-            default = Label("//shared/parameter_v2/generation_scripts:generate_dynamic_parameters"),
+            default = Label("//shared/parameter/generation_scripts:generate_dynamic_parameters"),
             executable = True,
             cfg = "host",
         ),

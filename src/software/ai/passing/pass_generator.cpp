@@ -10,9 +10,11 @@
 
 template <class ZoneEnum>
 PassGenerator<ZoneEnum>::PassGenerator(
-    std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division)
+    std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
+    std::shared_ptr<const PassingConfig> passing_config)
     : optimizer_(optimizer_param_weights),
       pitch_division_(pitch_division),
+      passing_config_(passing_config),
       random_num_gen_(PASS_GENERATOR_SEED)
 {
 }
@@ -36,14 +38,10 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
 template <class ZoneEnum>
 ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 {
-    std::uniform_real_distribution speed_distribution(DynamicParameters->getAiConfig()
-                                                          ->getPassingConfig()
-                                                          ->getMinPassSpeedMPerS()
-                                                          ->value(),
-                                                      DynamicParameters->getAiConfig()
-                                                          ->getPassingConfig()
-                                                          ->getMaxPassSpeedMPerS()
-                                                          ->value());
+    std::uniform_real_distribution speed_distribution(
+        passing_config_->getMinPassSpeedMPerS()->value(),
+        passing_config_->getMaxPassSpeedMPerS()->value());
+
     ZonePassMap<ZoneEnum> passes;
 
     // Randomly sample a pass in each zone
@@ -60,7 +58,7 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 
         passes.emplace(
             zone_id, PassWithRating{
-                         pass, ratePass(world, pass, pitch_division_->getZone(zone_id))});
+                         pass, ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_)});
     }
 
     return passes;
@@ -84,18 +82,16 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
             [this, &world,
              zone_id](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
                 return ratePass(world, Pass::fromPassArray(pass_array),
-                                pitch_division_->getZone(zone_id));
+                                pitch_division_->getZone(zone_id), passing_config_);
             };
 
         auto pass_array = optimizer_.maximize(
             objective_function, generated_passes.at(zone_id).pass.toPassArray(),
-            DynamicParameters->getAiConfig()
-                ->getPassingConfig()
-                ->getNumberOfGradientDescentStepsPerIter()
-                ->value());
+            passing_config_->getNumberOfGradientDescentStepsPerIter()->value());
 
         auto new_pass = Pass::fromPassArray(pass_array);
-        auto score    = ratePass(world, new_pass, pitch_division_->getZone(zone_id));
+        auto score =
+            ratePass(world, new_pass, pitch_division_->getZone(zone_id), pass_array, passing_config_);
 
         optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
     }
@@ -109,7 +105,7 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
 {
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
     {
-        if (ratePass(world, passes_.at(zone_id).pass, pitch_division_->getZone(zone_id)) <
+        if (ratePass(world, passes_.at(zone_id).pass, pitch_division_->getZone(zone_id), passing_config_) <
             optimized_passes.at(zone_id).rating)
         {
             passes_.at(zone_id) = optimized_passes.at(zone_id);

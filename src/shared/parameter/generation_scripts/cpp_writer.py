@@ -35,9 +35,9 @@ CONFIG_H = (
     "#include <iostream>\n"
     "#include <limits>\n"
     "\n"
-    '#include "software/parameter/config.h"\n'
-    '#include "software/parameter/enumerated_parameter.h"\n'
-    '#include "software/parameter/numeric_parameter.h"\n'
+    '#include "shared/parameter/config.h"\n'
+    '#include "shared/parameter/enumerated_parameter.h"\n'
+    '#include "shared/parameter/numeric_parameter.h"\n'
     '#include "software/util/design_patterns/generic_factory.h"\n'
     "\n"
     "{include_headers}\n"

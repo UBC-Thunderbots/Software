@@ -9,7 +9,7 @@
 #include "software/ai/passing/pass_evaluation.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/optimization/gradient_descent_optimizer.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
@@ -38,7 +38,8 @@ class PassGenerator
      * @param pitch_division The pitch division to use when looking for passes
      */
     explicit PassGenerator(
-        std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division);
+        std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
+        std::shared_ptr<const PassingConfig> passing_config);
 
     /**
      * Creates a PassEvaluation given a world and a field pitch division.
@@ -114,6 +115,9 @@ class PassGenerator
 
     // Pitch division
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
+
+    // Pitch division
+    std::shared_ptr<const PassingConfig> passing_config_;
 
     // A random number generator for use across the class
     std::mt19937 random_num_gen_;

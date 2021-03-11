@@ -6,6 +6,10 @@
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const PlayConfig> config) : Play(config)
+{
+}
+
 bool PenaltyKickPlay::isApplicable(const World &world) const
 {
     return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
@@ -28,7 +32,8 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // Setup the goalie
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
 
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
@@ -88,4 +93,4 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickPlay> factory;
+static TGenericFactory<std::string, Play, PenaltyKickPlay, PlayConfig> factory;

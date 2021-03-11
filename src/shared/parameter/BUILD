@@ -6,7 +6,6 @@ cpp_dynamic_parameters(
     name = "cpp_params",
     enum_deps = [
         "//software/world:game_state",
-        "//software/ai/hl/stp/play",
     ],
     generated_parameter_file = "cpp_dynamic_parameters.h",
 )
@@ -27,9 +26,10 @@ cc_library(
         ":cpp_params",
     ],
     deps = [
-        "//software/ai/hl/stp/play",
-        "//software/parameter",
-        "//software/parameter:config",
+        ":config",
+        ":enumerated_parameter",
+        ":numeric_parameter",
+        ":parameter",
         "//software/util/design_patterns:generic_factory",
         "//software/world:game_state",
     ],
@@ -42,10 +42,10 @@ cc_test(
     ],
     data = [
         "c_parameters.h",
-        "//shared/parameter_v2/config_definitions:parameter_configs",
+        "//shared/parameter/config_definitions:parameter_configs",
     ],
     deps = [
-        "//shared/parameter_v2:c_configs",
+        "//shared/parameter:c_configs",
         "@boost//:filesystem",
         "@gtest//:gtest_main",
         "@libclang",
@@ -59,13 +59,54 @@ cc_test(
         "cpp_config_test.cpp",
     ],
     data = [
-        "//shared/parameter_v2/config_definitions:parameter_configs",
+        "//shared/parameter/config_definitions:parameter_configs",
     ],
     deps = [
-        "//shared/parameter_v2:cpp_configs",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/hl/stp/play:halt_play",
         "//software/util/variant_visitor",
         "@boost//:filesystem",
         "@gtest//:gtest_main",
         "@yaml-cpp",
+    ],
+)
+
+cc_library(
+    name = "parameter",
+    hdrs = ["parameter.h"],
+    deps = [],
+)
+
+cc_library(
+    name = "numeric_parameter",
+    hdrs = ["numeric_parameter.h"],
+    deps = ["//software/logger"],
+)
+
+cc_library(
+    name = "enumerated_parameter",
+    hdrs = ["enumerated_parameter.h"],
+    deps = ["//software/logger"],
+)
+
+cc_library(
+    name = "config",
+    hdrs = ["config.h"],
+    deps = [
+        ":enumerated_parameter",
+        ":numeric_parameter",
+        "@boost//:program_options",
+    ],
+)
+
+cc_test(
+    name = "parameter_test",
+    srcs = ["parameter_test.cpp"],
+    deps = [
+        ":enumerated_parameter",
+        ":numeric_parameter",
+        ":parameter",
+        "//software/util/make_enum",
+        "@gtest//:gtest_main",
     ],
 )

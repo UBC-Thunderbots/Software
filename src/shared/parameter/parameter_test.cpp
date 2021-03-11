@@ -1,11 +1,11 @@
-#include "software/parameter/parameter.h"
+#include "shared/parameter/parameter.h"
 
 #include <gtest/gtest.h>
 
 #include <optional>
 
-#include "software/parameter/enumerated_parameter.h"
-#include "software/parameter/numeric_parameter.h"
+#include "shared/parameter/enumerated_parameter.h"
+#include "shared/parameter/numeric_parameter.h"
 #include "software/util/make_enum/make_enum.h"
 
 MAKE_ENUM(TestEnum, TEST1, TEST2, TEST3, TEST4, TEST5, )

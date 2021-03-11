@@ -14,7 +14,10 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
 
-FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
+FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+{
+}
 
 bool FreeKickPlay::isApplicable(const World &world) const
 {
@@ -46,7 +49,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     // Setup the goalie
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -58,13 +62,12 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
-    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAiConfig()
-                                                           ->getShootOrPassPlayConfig()
-                                                           ->getMinOpenAngleForShotDeg()
-                                                           ->value());
-    auto shoot_tactic             = std::make_shared<ShootGoalTactic>(
+    Angle min_open_angle_for_shot = Angle::fromDegrees(
+        play_config->getShootOrPassPlayConfig()->getMinOpenAngleForShotDeg()->value());
+    auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        min_open_angle_for_shot, std::nullopt, false);
+        min_open_angle_for_shot, std::nullopt, false,
+        play_config->getShootGoalTacticConfig());
 
     PassWithRating best_pass_and_score_so_far = shootOrFindPassStage(
         yield, shoot_tactic, crease_defender_tactics, goalie_tactic, world);
@@ -300,4 +303,4 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay, PlayConfig> factory;

@@ -7,8 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "shared/parameter/parameter.h"
 #include "software/logger/logger.h"
-#include "software/parameter/parameter.h"
 
 template <class T>
 class NumericParameter : public Parameter<T>
