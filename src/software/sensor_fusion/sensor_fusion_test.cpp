@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
@@ -11,7 +11,7 @@ class SensorFusionTest : public ::testing::Test
 {
    public:
     SensorFusionTest()
-        : config(MutableDynamicParameters->getMutableSensorFusionConfig()),
+        : config(std::make_shared<SensorFusionConfig>()),
           sensor_fusion(config),
           yellow_robot_states(initYellowRobotStates()),
           blue_robot_states(initBlueRobotStates()),
