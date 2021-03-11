@@ -19,7 +19,7 @@ TEST(
     Field field = Field::createSSLDivisionBField();
 
     // We want to pass from the origin to 1 meter in the -y direction
-    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(5));
+    Pass pass({0, 0}, 2.29);
     PasserTactic tactic(pass, ball, field, false);
 
     tactic.updateRobot(robot);
@@ -42,7 +42,7 @@ TEST(
     Field field = Field::createSSLDivisionBField();
 
     // We want to pass from the origin to 1 meter in the -y direction
-    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(5));
+    Pass pass({0, 0}, 2.29);
     PasserTactic tactic(pass, ball, field, false);
 
     tactic.updateRobot(robot);
@@ -66,7 +66,7 @@ TEST(
 
     // We want to pass from the origin to 1 meter in the -y direction. This means the
     // robot needs to move around the ball to get toa point where it can kick
-    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(5));
+    Pass pass({0, 0}, 2.29);
     PasserTactic tactic(pass, ball, field, false);
 
     tactic.updateRobot(robot);
@@ -90,7 +90,7 @@ TEST(PasserTacticTest,
     Field field = Field::createSSLDivisionBField();
 
     // We want to pass from the origin to 1 meter in the -y direction
-    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(5));
+    Pass pass({0, 0}, 2.29);
     PasserTactic tactic(pass, ball, field, false);
 
     tactic.updateRobot(robot);
@@ -134,7 +134,7 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
     Field field = Field::createSSLDivisionBField();
 
     // We want to pass from the origin to 1 meter in the -y direction
-    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(5));
+    Pass pass({0, 0}, 2.29);
     PasserTactic tactic(pass, ball, field, false);
 
     tactic.updateRobot(robot);
@@ -175,7 +175,7 @@ TEST(PasserTacticTest, kick_pass_started_with_moving_ball)
     Field field = Field::createSSLDivisionBField();
 
     // We want to pass from the origin to 1 meter in the -y direction
-    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, 2.29);
     PasserTactic tactic(pass, ball, field, false);
 
     tactic.updateRobot(robot);
@@ -200,7 +200,7 @@ TEST(PasserTacticTest, kick_pass_not_yet_started_with_moving_ball)
     Field field = Field::createSSLDivisionBField();
 
     // We want to pass from the origin to 1 meter in the -y direction
-    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(5));
+    Pass pass({0, 0}, 2.29);
     PasserTactic tactic(pass, ball, field, false);
 
     tactic.updateRobot(robot);

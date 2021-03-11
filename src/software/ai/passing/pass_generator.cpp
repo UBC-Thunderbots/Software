@@ -57,8 +57,9 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
                  speed_distribution(random_num_gen_));
 
         passes.emplace(
-            zone_id, PassWithRating{
-                         pass, ratePass(world, pass, pitch_division_->getZone(zone_id), passing_config_)});
+            zone_id,
+            PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id),
+                                          passing_config_)});
     }
 
     return passes;
@@ -91,7 +92,7 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
 
         auto new_pass = Pass::fromPassArray(pass_array);
         auto score =
-            ratePass(world, new_pass, pitch_division_->getZone(zone_id), pass_array, passing_config_);
+            ratePass(world, new_pass, pitch_division_->getZone(zone_id), passing_config_);
 
         optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
     }
@@ -105,8 +106,8 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
 {
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
     {
-        if (ratePass(world, passes_.at(zone_id).pass, pitch_division_->getZone(zone_id), passing_config_) <
-            optimized_passes.at(zone_id).rating)
+        if (ratePass(world, passes_.at(zone_id).pass, pitch_division_->getZone(zone_id),
+                     passing_config_) < optimized_passes.at(zone_id).rating)
         {
             passes_.at(zone_id) = optimized_passes.at(zone_id);
         }

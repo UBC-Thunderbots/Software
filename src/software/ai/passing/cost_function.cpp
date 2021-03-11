@@ -16,13 +16,14 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
-    double friendly_pass_rating =
-        ratePassFriendlyCapability(world.ball(), world.friendlyTeam(), pass, passing_config);
+    double friendly_pass_rating = ratePassFriendlyCapability(
+        world.ball(), world.friendlyTeam(), pass, passing_config);
 
-    double enemy_pass_rating = ratePassEnemyRisk(world.ball(), world.enemyTeam(), pass, passing_config);
+    double enemy_pass_rating =
+        ratePassEnemyRisk(world.ball(), world.enemyTeam(), pass, passing_config);
 
-    double shoot_pass_rating =
-        ratePassShootScore(world.ball(), world.field(), world.enemyTeam(), pass, passing_config);
+    double shoot_pass_rating = ratePassShootScore(
+        world.ball(), world.field(), world.enemyTeam(), pass, passing_config);
 
     // Passes outside the zone are rated poorly
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.1);
@@ -117,7 +118,8 @@ double ratePassEnemyRisk(const Ball& ball, const Team& enemy_team, const Pass& p
         enemy_receiver_proximity_risk = 0;
     }
 
-    double intercept_risk = calculateInterceptRisk(ball, enemy_team, pass, passing_config);
+    double intercept_risk =
+        calculateInterceptRisk(ball, enemy_team, pass, passing_config);
 
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
     return 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
@@ -133,13 +135,15 @@ double calculateInterceptRisk(const Ball& ball, const Team& enemy_team, const Pa
         return 0;
     }
     std::vector<double> enemy_intercept_risks(enemy_robots.size());
-    std::transform(
-        enemy_robots.begin(), enemy_robots.end(), enemy_intercept_risks.begin(),
-        [&](Robot robot) { return calculateInterceptRisk(ball, robot, pass, passing_config); });
+    std::transform(enemy_robots.begin(), enemy_robots.end(),
+                   enemy_intercept_risks.begin(), [&](Robot robot) {
+                       return calculateInterceptRisk(ball, robot, pass, passing_config);
+                   });
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot, const Pass& pass,
+double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot,
+                              const Pass& pass,
                               std::shared_ptr<const PassingConfig> passing_config)
 {
     // We estimate the intercept by the risk that the robot will get to the closest

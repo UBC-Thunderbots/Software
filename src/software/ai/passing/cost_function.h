@@ -37,7 +37,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
  *         the pass
  */
 double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team,
-                          const Pass& pass, std::shared_ptr<const PassingConfig> passing_config);
+                          const Pass& pass,
+                          std::shared_ptr<const PassingConfig> passing_config);
 /**
  * Calculates the risk of an enemy robot interfering with a given pass
  *

@@ -165,7 +165,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
-    PassGenerator<EighteenZoneId> pass_generator(pitch_division);
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
+                                                 play_config->getPassingConfig());
 
     using Zones = std::unordered_set<EighteenZoneId>;
 
