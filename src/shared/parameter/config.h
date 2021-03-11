@@ -4,9 +4,9 @@
 #include <variant>
 #include <vector>
 
-#include "software/parameter/enumerated_parameter.h"
-#include "software/parameter/numeric_parameter.h"
-#include "software/parameter/parameter.h"
+#include "shared/parameter/enumerated_parameter.h"
+#include "shared/parameter/numeric_parameter.h"
+#include "shared/parameter/parameter.h"
 
 class Config;
 

@@ -17,12 +17,12 @@ py_binary(
         ":type_map.py",
     ],
     data = [
-        "//shared/parameter_v2/config_definitions:parameter_configs",
-        "//shared/parameter_v2/config_definitions:test_configs",
+        "//shared/parameter/config_definitions:parameter_configs",
+        "//shared/parameter/config_definitions:test_configs",
     ],
     main = ":generate_dynamic_parameters.py",
     python_version = "PY3",
-    visibility = ["//shared/parameter_v2:__subpackages__"],
+    visibility = ["//shared/parameter:__subpackages__"],
     deps = [
         requirement("PyYAML"),
         requirement("jsonschema"),

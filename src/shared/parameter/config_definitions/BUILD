@@ -5,7 +5,7 @@ filegroup(
     srcs = glob([
         "test/**/*.yaml",
     ]),
-    visibility = ["//shared/parameter_v2:__subpackages__"],
+    visibility = ["//shared/parameter:__subpackages__"],
 )
 
 filegroup(
@@ -14,5 +14,5 @@ filegroup(
         ["**/*.yaml"],
         exclude = ["test/**/*.yaml"],
     ),
-    visibility = ["//shared/parameter_v2:__subpackages__"],
+    visibility = ["//shared/parameter:__subpackages__"],
 )

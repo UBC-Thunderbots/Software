@@ -1,5 +1,5 @@
 // This is an example for what a generated dynamic parameters file would look like, based
-// on the configs found in /src/shared/parameter_v2/config_definitions/test
+// on the configs found in /src/shared/parameter/config_definitions/test
 
 #pragma once
 #include <boost/program_options.hpp>

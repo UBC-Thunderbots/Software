@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/proto/defending_side_msg.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
@@ -35,8 +35,7 @@ class Simulator
      * and robot primitives.
      */
     explicit Simulator(const Field& field,
-                       std::shared_ptr<const SimulatorConfig> simulator_config =
-                           DynamicParameters->getSimulatorConfig(),
+                       std::shared_ptr<const SimulatorConfig> simulator_config,
                        const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
     Simulator() = delete;

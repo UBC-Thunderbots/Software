@@ -9,7 +9,7 @@
 
 extern "C"
 {
-#include "shared/parameter_v2/c_parameters.h"
+#include "shared/parameter/c_parameters.h"
 }
 /**
  * This function converts a config file names into config struct names.
@@ -77,7 +77,7 @@ class YamlLoadFixture : public ::testing::Test
     void SetUp() override
     {
         // this is loaded from bazel data
-        boost::filesystem::path path("./shared/parameter_v2/config_definitions");
+        boost::filesystem::path path("./shared/parameter/config_definitions");
 
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {
@@ -147,9 +147,9 @@ TEST_F(YamlLoadFixture, TestProperGeneration)
             CXIndex index = clang_createIndex(0, 0);
 
             // Parse the translation unit
-            CXTranslationUnit unit = clang_parseTranslationUnit(
-                index, "shared/parameter_v2/c/config.h", nullptr, 0, nullptr, 0,
-                CXTranslationUnit_None);
+            CXTranslationUnit unit =
+                clang_parseTranslationUnit(index, "shared/parameter/c/config.h", nullptr,
+                                           0, nullptr, 0, CXTranslationUnit_None);
 
             CXCursor cursor = clang_getTranslationUnitCursor(unit);
 

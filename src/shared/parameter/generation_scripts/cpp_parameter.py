@@ -28,7 +28,7 @@ PARAMETER_PRIVATE_ENTRY = (
 
 PARAMETER_CONSTRUCTOR_ENTRY = '{param_variable_name} = std::make_shared<Parameter<{type}>>("{param_name}", {quote}{value}{quote});'
 NUMERIC_PARAMETER_CONSTRUCTOR_ENTRY = '{param_variable_name} = std::make_shared<NumericParameter<{type}>>("{param_name}", {value}, {min_value}, {max_value});'
-ENUMERATED_PARAMETER_CONSTRUCTOR_ENTRY = '{param_variable_name} = std::make_shared<EnumeratedParameter<{type}>>("{param_name}", {quote}{value}{quote}, {allowed_values});'
+ENUMERATED_PARAMETER_CONSTRUCTOR_ENTRY = 'class {forward_declare}; {param_variable_name} = std::make_shared<EnumeratedParameter<{type}>>("{param_name}", {quote}{value}{quote}, {allowed_values});'
 
 IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY = (
     "std::const_pointer_cast<const {param_class}<{type}>>({param_variable_name})"
@@ -174,14 +174,18 @@ class CppParameter(object):
         elif self.param_type == "factory":
             param_index_type = self.param_metadata["index_type"]
             param_type_to_create = self.param_metadata["type_to_create"]
+            param_config_type = self.param_metadata["config_type"]
             return ENUMERATED_PARAMETER_CONSTRUCTOR_ENTRY.format(
                 param_variable_name=self.param_variable_name,
                 type=param_index_type,
                 param_name=self.param_name,
                 quote=self.quote,
                 value=self.param_value,
-                allowed_values="GenericFactory<{index_type}, {type_to_create}>::getRegisteredNames()".format(
-                    index_type=param_index_type, type_to_create=param_type_to_create
+                forward_declare=param_type_to_create,
+                allowed_values="GenericFactory<{index_type}, {type_to_create}, {config_type}>::getRegisteredNames()".format(
+                    index_type=param_index_type,
+                    type_to_create=param_type_to_create,
+                    config_type=param_config_type,
                 ),
             )
         else:

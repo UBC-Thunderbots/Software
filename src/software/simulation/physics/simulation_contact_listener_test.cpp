@@ -3,6 +3,7 @@
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 #include "software/simulation/physics/physics_robot.h"
@@ -18,9 +19,10 @@ class SimulationContactListenerTest : public testing::Test
     createWorld(const Robot& robot, const Ball& ball)
     {
         b2Vec2 gravity(0, 0);
-        physics_world = std::make_shared<b2World>(gravity);
-        physics_ball =
-            std::make_shared<PhysicsBall>(physics_world, ball.currentState(), 1.0);
+        simulator_config = std::make_shared<const SimulatorConfig>();
+        physics_world    = std::make_shared<b2World>(gravity);
+        physics_ball  = std::make_shared<PhysicsBall>(physics_world, ball.currentState(),
+                                                     1.0, simulator_config);
         physics_robot = std::make_shared<PhysicsRobot>(robot.id(), physics_world,
                                                        robot.currentState(), 1.0);
 
@@ -40,6 +42,7 @@ class SimulationContactListenerTest : public testing::Test
    private:
     std::shared_ptr<b2World> physics_world;
     std::shared_ptr<PhysicsBall> physics_ball;
+    std::shared_ptr<const SimulatorConfig> simulator_config;
     std::shared_ptr<PhysicsRobot> physics_robot;
 };
 

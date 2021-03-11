@@ -87,7 +87,7 @@
      description: "The number of passes to try to optimize at any given time"
  - int:
      name: num_passes_to_keep_after_pruning
-     min: 0
+     min: 1
      max: 1000
      value: 3
      description: "The number of passes to keep after pruning"

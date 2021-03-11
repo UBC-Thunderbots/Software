@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
@@ -8,7 +9,6 @@
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
-#include "software/parameter/dynamic_parameters.h"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
@@ -35,8 +35,7 @@ class GoalieTactic : public Tactic
      */
     explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
                           const Team &enemy_team,
-                          std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-                              DynamicParameters->getAiConfig()->getGoalieTacticConfig());
+                          std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
 
     GoalieTactic() = delete;
 

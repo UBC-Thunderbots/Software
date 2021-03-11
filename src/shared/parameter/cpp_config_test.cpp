@@ -4,8 +4,9 @@
 #include <boost/filesystem.hpp>
 #include <set>
 
-#include "shared/parameter_v2/cpp_dynamic_parameters.h"
-#include "software/parameter/parameter.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "shared/parameter/parameter.h"
+#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/util/variant_visitor/variant_visitor.h"
 #include "yaml-cpp/yaml.h"
 
@@ -155,7 +156,7 @@ class YamlLoadFixture : public ::testing::Test
     void SetUp() override
     {
         // this is loaded from bazel data
-        boost::filesystem::path path("./shared/parameter_v2/config_definitions/");
+        boost::filesystem::path path("./shared/parameter/config_definitions/");
 
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {
