@@ -15,24 +15,19 @@ class PassingEvaluationTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        avg_desired_pass_speed = 3.9;
         entire_field =
             std::make_shared<Rectangle>(Field::createSSLDivisionBField().fieldLines());
         passing_config = std::make_shared<PassingConfig>();
+
+        min_pass_speed_param   = passing_config->getMinPassSpeedMPerS()->value();
+        max_pass_speed_param   = passing_config->getMaxPassSpeedMPerS()->value();
+        avg_desired_pass_speed = 3.9;
     }
 
-    // We get these values here so we can make these tests robust to change
-    // We get these values here so we can make these tests robust to change
-    double min_pass_speed_param = passing_config->getMinPassSpeedMPerS()->value();
-    double max_pass_speed_param = passing_config->getMaxPassSpeedMPerS()->value();
-
-    double min_time_offset_for_pass_seconds_param =
-        passing_config->getMinTimeOffsetForPassSeconds()->value();
-    double max_time_offset_for_pass_seconds_param =
-        passing_config->getMaxTimeOffsetForPassSeconds()->value();
-
+    double min_pass_speed_param;
+    double max_pass_speed_param;
     double avg_desired_pass_speed;
-    double avg_time_offset_for_pass_seconds;
+
     std::shared_ptr<Rectangle> entire_field;
     std::shared_ptr<const PassingConfig> passing_config;
 };

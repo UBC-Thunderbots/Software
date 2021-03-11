@@ -11,7 +11,7 @@ TEST(EighteenZonePitchDivision, test_pitch_division_div_a)
     auto field          = Field::createSSLDivisionAField();
     auto pitch_division = EighteenZonePitchDivision(field);
 
-    // from the pitch divison diagram in eighteen_zone_pitch_division.h
+    // from the pitch division diagram in eighteen_zone_pitch_division.h
     // we know that zones 1 - 9 should be on the friendly side and
     // zones 10 - 18 should be on the enemy side.
     for (EighteenZoneId zone : {
@@ -51,7 +51,7 @@ TEST(EighteenZonePitchDivision, test_pitch_division_div_b)
     auto field          = Field::createSSLDivisionBField();
     auto pitch_division = EighteenZonePitchDivision(field);
 
-    // from the pitch divison diagram in eighteen_zone_pitch_division.h
+    // from the pitch division diagram in eighteen_zone_pitch_division.h
     // we know that zones 1 - 9 should be on the friendly side and
     // zones 10 - 18 should be on the enemy side.
     for (EighteenZoneId zone : {
