@@ -16,37 +16,32 @@ class STPTest : public ::testing::Test
 {
    public:
     STPTest()
-        : mutable_ai_control_config(std::make_shared<AiControlConfig>()),
+        : world(::TestUtil::createBlankTestingWorld()),
+          mutable_ai_control_config(std::make_shared<AiControlConfig>()),
           ai_control_config(
               std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config)),
           play_config(std::make_shared<const ThunderbotsConfig>()->getPlayConfig()),
-          stp([]() { return nullptr; }, ai_control_config, play_config, 123)
+          default_play_constructor([this]() -> std::unique_ptr<Play> {
+              return std::make_unique<HaltTestPlay>(play_config);
+          }),
+          // Give an explicit seed to STP so that our tests are deterministic
+          stp(default_play_constructor, ai_control_config, play_config, 123)
     {
+        std::cout << "Constructor called";
     }
 
    protected:
     void SetUp() override
     {
-        mutable_ai_control_config = std::make_shared<AiControlConfig>();
-        ai_control_config =
-            std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config);
-        play_config = std::make_shared<const ThunderbotsConfig>()->getPlayConfig();
-
-        auto default_play_constructor = [this]() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltTestPlay>(play_config);
-        };
-        // Explicitly setting override AI Play to be false because we can't rely on
-        // default values
+        // Explicitly setting override AI Play to be false
         mutable_ai_control_config->getMutableOverrideAiPlay()->setValue(false);
-        // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, ai_control_config, play_config, 123);
-        world = ::TestUtil::createBlankTestingWorld();
     }
 
-    World world = ::TestUtil::createBlankTestingWorld();
+    World world;
     std::shared_ptr<AiControlConfig> mutable_ai_control_config;
     std::shared_ptr<const AiControlConfig> ai_control_config;
     std::shared_ptr<const PlayConfig> play_config;
+    std::function<std::unique_ptr<Play>()> default_play_constructor;
     STP stp;
 };
 
