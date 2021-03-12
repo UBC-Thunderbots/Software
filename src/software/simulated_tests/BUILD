@@ -18,6 +18,8 @@ cc_library(
         "//software/test_util",
         "//software/time:duration",
         "@gtest",
+        # TODO (#1889) Remove this dep after optional params are implemented
+        "//software/ai/hl/stp/play:halt_play",
     ],
 )
 
@@ -54,8 +56,8 @@ cc_library(
     srcs = ["simulated_test_main.cpp"],
     deps = [
         ":simulated_test_fixture",
+        "//shared/parameter:cpp_configs",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
         "@gtest",
     ],
 )

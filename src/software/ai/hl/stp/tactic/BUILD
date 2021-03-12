@@ -64,12 +64,12 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -92,12 +92,12 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -118,6 +118,7 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
@@ -125,7 +126,6 @@ cc_library(
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -180,6 +180,16 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/geom/algorithms",
         "//software/logger",
+    ],
+)
+
+cc_test(
+    name = "penalty_kick_tactic_test",
+    srcs = ["penalty_kick_tactic_test.cpp"],
+    deps = [
+        ":penalty_kick_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -254,11 +264,11 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -279,13 +289,13 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:intercept_ball_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 

@@ -3,7 +3,7 @@
 #include <atomic>
 #include <thread>
 
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/proto/defending_side_msg.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/simulator.h"
@@ -27,8 +27,7 @@ class ThreadedSimulator
      * @param simulator_config The config to fetch parameters from
      */
     explicit ThreadedSimulator(const Field& field,
-                               std::shared_ptr<const SimulatorConfig> simulator_config =
-                                   DynamicParameters->getSimulatorConfig());
+                               std::shared_ptr<const SimulatorConfig> simulator_config);
     ~ThreadedSimulator();
 
     /**
