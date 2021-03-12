@@ -1,8 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "arduinoSerialWrapper",
-    srcs = ["UARTCommunication.cpp"],
-    hdrs = ["UARTCommunication.h"],
+    name = "uart_communication",
+    srcs = ["uart_communication.cpp"],
+    hdrs = ["uart_communication.h"],
     deps = ["@boost//:asio"],
 )
