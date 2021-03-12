@@ -19,7 +19,8 @@ class STPTest : public ::testing::Test
         : mutable_ai_control_config(std::make_shared<AiControlConfig>()),
           ai_control_config(
               std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config)),
-          stp([]() { return nullptr; }, ai_control_config, 0)
+          play_config(std::make_shared<const ThunderbotsConfig>()->getPlayConfig()),
+          stp([]() { return nullptr; }, ai_control_config, play_config, 123)
     {
     }
 
@@ -29,22 +30,23 @@ class STPTest : public ::testing::Test
         mutable_ai_control_config = std::make_shared<AiControlConfig>();
         ai_control_config =
             std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config);
+        play_config = std::make_shared<const ThunderbotsConfig>()->getPlayConfig();
 
-        auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltTestPlay>(
-                std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
+        auto default_play_constructor = [this]() -> std::unique_ptr<Play> {
+            return std::make_unique<HaltTestPlay>(play_config);
         };
         // Explicitly setting override AI Play to be false because we can't rely on
         // default values
         mutable_ai_control_config->getMutableOverrideAiPlay()->setValue(false);
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, ai_control_config, 0);
+        stp   = STP(default_play_constructor, ai_control_config, play_config, 123);
         world = ::TestUtil::createBlankTestingWorld();
     }
 
     World world = ::TestUtil::createBlankTestingWorld();
     std::shared_ptr<AiControlConfig> mutable_ai_control_config;
     std::shared_ptr<const AiControlConfig> ai_control_config;
+    std::shared_ptr<const PlayConfig> play_config;
     STP stp;
 };
 
@@ -96,10 +98,10 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
     }
 
     std::vector<std::string> expected_play_names = {
-        TYPENAME(HaltTestPlay), TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay),
-        TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay),
-        TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay),
-        TYPENAME(HaltTestPlay),
+        TYPENAME(HaltTestPlay), TYPENAME(HaltTestPlay), TYPENAME(HaltPlay),
+        TYPENAME(MoveTestPlay), TYPENAME(HaltPlay),     TYPENAME(HaltTestPlay),
+        TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay), TYPENAME(HaltTestPlay),
+        TYPENAME(MoveTestPlay),
     };
 
     EXPECT_EQ(expected_play_names, actual_play_names);
