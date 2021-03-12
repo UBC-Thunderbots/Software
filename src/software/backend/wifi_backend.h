@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
@@ -7,16 +8,12 @@
 #include "software/backend/ssl_proto_client.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/defending_side_msg.pb.h"
 
 class WifiBackend : public Backend
 {
    public:
-    WifiBackend(std::shared_ptr<const NetworkConfig> network_config =
-                    DynamicParameters->getNetworkConfig(),
-                std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
-                    DynamicParameters->getSensorFusionConfig());
+    WifiBackend(std::shared_ptr<const BackendConfig> config);
 
 
    private:
