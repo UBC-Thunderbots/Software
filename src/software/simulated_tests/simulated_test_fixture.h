@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
@@ -105,6 +106,10 @@ class SimulatedTestFixture : public ::testing::Test
      * @return the field in the simulated test
      */
     Field field() const;
+
+    // The dynamic params being used in the tests
+    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config;
+    std::shared_ptr<const ThunderbotsConfig> thunderbots_config;
 
    private:
     /**

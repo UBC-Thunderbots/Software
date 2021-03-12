@@ -4,38 +4,40 @@
 #include "software/test_util/test_util.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
-    : simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField())),
-      sensor_fusion(DynamicParameters->getSensorFusionConfig()),
+    : mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
+      thunderbots_config(
+          std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config)),
+      simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField(),
+                                            thunderbots_config->getSimulatorConfig())),
+      sensor_fusion(thunderbots_config->getSensorFusionConfig()),
       run_simulation_in_realtime(false)
 {
 }
 
 void SimulatedTestFixture::SetUp()
 {
+    mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+    thunderbots_config =
+        std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
+
     LoggerSingleton::initializeLogger(
-        DynamicParameters->getStandaloneSimulatorMainCommandLineArgs()
+        thunderbots_config->getStandaloneSimulatorMainCommandLineArgs()
             ->getLoggingDir()
             ->value());
 
-    // init() resets all DynamicParameters for each test. Since DynamicParameters are
-    // still partially global, we need to reinitialize simulator, sensor_fusion, and ai,
-    // so that they can grab the new dynamic parameter pointers. Note that this is a bit
-    // of hack because we're changing a global variable, but it can't be easily fixed
-    // through dependency injection until
-    // https://github.com/UBC-Thunderbots/Software/issues/1299
-    MutableDynamicParameters->init();
-    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
-    sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
+    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField(),
+                                            thunderbots_config->getSimulatorConfig());
+    sensor_fusion = SensorFusion(thunderbots_config->getSensorFusionConfig());
 
-    MutableDynamicParameters->getMutableAiControlConfig()->getMutableRunAi()->setValue(
+    mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
         !SimulatedTestFixture::stop_ai_on_start);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
-    MutableDynamicParameters->getMutableSensorFusionConfig()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableOverrideGameControllerDefendingSide()
         ->setValue(true);
-    MutableDynamicParameters->getMutableSensorFusionConfig()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableDefendingPositiveSide()
         ->setValue(false);
 
@@ -43,7 +45,7 @@ void SimulatedTestFixture::SetUp()
     // is always defending the "negative" side of the field. This is so that the
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
-    MutableDynamicParameters->getMutableSensorFusionConfig()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
         ->setValue(true);
     if (SimulatedTestFixture::enable_visualizer)
@@ -76,20 +78,20 @@ void SimulatedTestFixture::setRefereeCommand(
     const RefereeCommand &current_referee_command,
     const RefereeCommand &previous_referee_command)
 {
-    MutableDynamicParameters->getMutableAiControlConfig()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableOverrideRefereeCommand()
         ->setValue(true);
-    MutableDynamicParameters->getMutableAiControlConfig()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableCurrentRefereeCommand()
         ->setValue(toString(current_referee_command));
-    MutableDynamicParameters->getMutableAiControlConfig()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutablePreviousRefereeCommand()
         ->setValue(toString(previous_referee_command));
 }
 
 void SimulatedTestFixture::enableVisualizer()
 {
-    full_system_gui            = std::make_shared<ThreadedFullSystemGUI>();
+    full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
     run_simulation_in_realtime = true;
 }
 
@@ -173,9 +175,9 @@ void SimulatedTestFixture::runTest(
 
     // Tick one frame to aid with visualization
     bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
-    while (simulator->getTimestamp() < timeout_time)
+    while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
-        if (!DynamicParameters->getAiControlConfig()->getRunAi()->value())
+        if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
             continue;
         }

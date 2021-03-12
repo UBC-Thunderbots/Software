@@ -2,27 +2,29 @@
 
 #include <numeric>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
 
 double ratePass(const World& world, const Pass& pass,
                 const std::optional<Rectangle>& target_region,
-                std::optional<unsigned int> passer_robot_id, PassType pass_type)
+                std::optional<unsigned int> passer_robot_id, PassType pass_type,
+                std::shared_ptr<const PassingConfig> passing_config)
 {
     double static_pass_quality =
-        getStaticPositionQuality(world.field(), pass.receiverPoint());
+        getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
-    double friendly_pass_rating =
-        ratePassFriendlyCapability(world.friendlyTeam(), pass, passer_robot_id);
+    double friendly_pass_rating = ratePassFriendlyCapability(
+        world.friendlyTeam(), pass, passer_robot_id, passing_config);
 
-    double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
+    double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass, passing_config);
 
-    double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
+    double shoot_pass_rating =
+        ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
     // Rate all passes outside our target region as 0 if we have one
     double in_region_quality = 1;
@@ -32,14 +34,10 @@ double ratePass(const World& world, const Pass& pass,
     }
 
     // Place strict limits on pass start time
-    double min_pass_time_offset = DynamicParameters->getAiConfig()
-                                      ->getPassingConfig()
-                                      ->getMinTimeOffsetForPassSeconds()
-                                      ->value();
-    double max_pass_time_offset = DynamicParameters->getAiConfig()
-                                      ->getPassingConfig()
-                                      ->getMaxTimeOffsetForPassSeconds()
-                                      ->value();
+    double min_pass_time_offset =
+        passing_config->getMinTimeOffsetForPassSeconds()->value();
+    double max_pass_time_offset =
+        passing_config->getMaxTimeOffsetForPassSeconds()->value();
     double pass_time_offset_quality =
         sigmoid(pass.startTime().toSeconds(),
                 min_pass_time_offset + world.getMostRecentTimestamp().toSeconds(), 0.5) *
@@ -47,14 +45,8 @@ double ratePass(const World& world, const Pass& pass,
                      max_pass_time_offset + world.ball().timestamp().toSeconds(), 0.5));
 
     // Place strict limits on the ball speed
-    double min_pass_speed = DynamicParameters->getAiConfig()
-                                ->getPassingConfig()
-                                ->getMinPassSpeedMPerS()
-                                ->value();
-    double max_pass_speed = DynamicParameters->getAiConfig()
-                                ->getPassingConfig()
-                                ->getMaxPassSpeedMPerS()
-                                ->value();
+    double min_pass_speed     = passing_config->getMinPassSpeedMPerS()->value();
+    double max_pass_speed     = passing_config->getMaxPassSpeedMPerS()->value();
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
@@ -79,13 +71,11 @@ double ratePass(const World& world, const Pass& pass,
     return pass_quality;
 }
 
-double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass)
+double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
+                          std::shared_ptr<const PassingConfig> passing_config)
 {
-    // TODO: You don't even use this first parameter, but stuff is hardcoded below
-    double ideal_max_rotation_to_shoot_degrees = DynamicParameters->getAiConfig()
-                                                     ->getPassingConfig()
-                                                     ->getIdealMaxRotationToShootDegrees()
-                                                     ->value();
+    double ideal_max_rotation_to_shoot_degrees =
+        passing_config->getIdealMaxRotationToShootDegrees()->value();
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
@@ -125,12 +115,11 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     return shot_openness_score * required_rotation_for_shot_score;
 }
 
-double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
+double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
+                         std::shared_ptr<const PassingConfig> passing_config)
 {
-    double enemy_proximity_importance = DynamicParameters->getAiConfig()
-                                            ->getPassingConfig()
-                                            ->getEnemyProximityImportance()
-                                            ->value();
+    double enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
 
     // Calculate a risk score based on the distance of the enemy robots from the receive
     // point, based on an exponential function of the distance of each robot from the
@@ -148,13 +137,14 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
         enemy_receiver_proximity_risk = 0;
     }
 
-    double intercept_risk = calculateInterceptRisk(enemy_team, pass);
+    double intercept_risk = calculateInterceptRisk(enemy_team, pass, passing_config);
 
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
     return 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
 }
 
-double calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
+double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
+                              std::shared_ptr<const PassingConfig> passing_config)
 {
     // Return the highest risk for all the enemy robots, if there are any
     const std::vector<Robot>& enemy_robots = enemy_team.getAllRobots();
@@ -163,13 +153,14 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
         return 0;
     }
     std::vector<double> enemy_intercept_risks(enemy_robots.size());
-    std::transform(enemy_robots.begin(), enemy_robots.end(),
-                   enemy_intercept_risks.begin(),
-                   [&](Robot robot) { return calculateInterceptRisk(robot, pass); });
+    std::transform(
+        enemy_robots.begin(), enemy_robots.end(), enemy_intercept_risks.begin(),
+        [&](Robot robot) { return calculateInterceptRisk(robot, pass, passing_config); });
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
+double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
+                              std::shared_ptr<const PassingConfig> passing_config)
 {
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to
@@ -205,11 +196,9 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
-    Duration time_until_pass     = pass.startTime() - enemy_robot.timestamp();
-    Duration enemy_reaction_time = Duration::fromSeconds(DynamicParameters->getAiConfig()
-                                                             ->getPassingConfig()
-                                                             ->getEnemyReactionTime()
-                                                             ->value());
+    Duration time_until_pass = pass.startTime() - enemy_robot.timestamp();
+    Duration enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
 
     double robot_ball_time_diff_at_closest_pass_point =
         ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
@@ -232,7 +221,8 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass)
 }
 
 double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
-                                  std::optional<unsigned int> passer_robot_id)
+                                  std::optional<unsigned int> passer_robot_id,
+                                  std::shared_ptr<const PassingConfig> passing_config)
 {
     // Remove the passer robot from the friendly team before evaluating, as we assume
     // the passer is not passing to itself
@@ -296,24 +286,17 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
                    latest_time_to_reciever_state.toSeconds() + 0.25, 0.5);
 }
 
-double getStaticPositionQuality(const Field& field, const Point& position)
+double getStaticPositionQuality(const Field& field, const Point& position,
+                                std::shared_ptr<const PassingConfig> passing_config)
 {
     // This constant is used to determine how steep the sigmoid slopes below are
     static const double sig_width = 0.1;
 
     // The offset from the sides of the field for the center of the sigmoid functions
-    double x_offset = DynamicParameters->getAiConfig()
-                          ->getPassingConfig()
-                          ->getStaticFieldPositionQualityXOffset()
-                          ->value();
-    double y_offset = DynamicParameters->getAiConfig()
-                          ->getPassingConfig()
-                          ->getStaticFieldPositionQualityYOffset()
-                          ->value();
+    double x_offset = passing_config->getStaticFieldPositionQualityXOffset()->value();
+    double y_offset = passing_config->getStaticFieldPositionQualityYOffset()->value();
     double friendly_goal_weight =
-        DynamicParameters->getAiConfig()
-            ->getPassingConfig()
-            ->getStaticFieldPositionQualityFriendlyGoalDistanceWeight()
+        passing_config->getStaticFieldPositionQualityFriendlyGoalDistanceWeight()
             ->value();
 
     // Make a slightly smaller field, and positive weight values in this reduced field

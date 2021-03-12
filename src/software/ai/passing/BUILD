@@ -1,15 +1,17 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+
 cc_library(
     name = "evaluation",
     srcs = ["cost_function.cpp"],
     hdrs = ["cost_function.h"],
     deps = [
         ":pass",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:pass",
         "//software/logger",
         "//software/math:math_functions",
-        "//software/parameter:dynamic_parameters",
         "//software/util/make_enum",
         "//software/world",
     ],

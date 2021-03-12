@@ -1,8 +1,8 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/constants.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_gc_referee_message.pb.h"
 
