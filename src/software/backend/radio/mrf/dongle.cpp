@@ -55,7 +55,7 @@ namespace
 }  // namespace
 
 MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
-    : estop_state(EStopState::STOP),
+    : eStopState(EStopState::STOP),
       context(),
       device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
       radio_interface(-1),
@@ -307,7 +307,7 @@ void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &tran
 void MRFDongle::handle_status(AsyncOperation<void> &)
 {
     status_transfer.result();
-    estop_state      = static_cast<EStopState>(status_transfer.data()[0] & 3U);
+    eStopState       = static_cast<EStopState>(status_transfer.data()[0] & 3U);
     auto dongle_msgs = annunciator.handle_dongle_messages(status_transfer.data()[0U]);
     status_transfer.submit();
 

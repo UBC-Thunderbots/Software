@@ -5,7 +5,7 @@
 
 struct StopFSM
 {
-    class stop_state;
+    class StopState;
 
     struct ControlParams
     {
@@ -20,7 +20,7 @@ struct StopFSM
     {
         using namespace boost::sml;
 
-        const auto stop_s   = state<stop_state>;
+        const auto stop_s   = state<StopState>;
         const auto update_e = event<Update>;
 
         /**

@@ -6,7 +6,7 @@
 
 struct KickFSM
 {
-    class kick_state;
+    class KickState;
 
     struct ControlParams
     {
@@ -25,7 +25,7 @@ struct KickFSM
         using namespace boost::sml;
 
         const auto get_behind_ball_s = state<GetBehindBallFSM>;
-        const auto kick_s            = state<kick_state>;
+        const auto kick_s            = state<KickState>;
         const auto update_e          = event<Update>;
 
         /**

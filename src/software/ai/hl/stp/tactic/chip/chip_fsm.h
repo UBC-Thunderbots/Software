@@ -6,7 +6,7 @@
 
 struct ChipFSM
 {
-    class chip_state;
+    class ChipState;
 
     struct ControlParams
     {
@@ -25,7 +25,7 @@ struct ChipFSM
         using namespace boost::sml;
 
         const auto get_behind_ball_s = state<GetBehindBallFSM>;
-        const auto chip_s            = state<chip_state>;
+        const auto chip_s            = state<ChipState>;
         const auto update_e          = event<Update>;
 
         /**
