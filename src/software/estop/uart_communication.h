@@ -17,9 +17,9 @@ class UartCommunication
     enum flush_type
     {
         flush_receive = TCIFLUSH,  // flushes data received but not read
-        flush_send = TCOFLUSH,     // flushes data written but not transmitted
-        flush_both = TCIOFLUSH     // flushes both data received but not read and data
-                                // written but not transmitted
+        flush_send    = TCOFLUSH,  // flushes data written but not transmitted
+        flush_both    = TCIOFLUSH  // flushes both data received but not read and data
+                                   // written but not transmitted
     };
 
     UartCommunication();
