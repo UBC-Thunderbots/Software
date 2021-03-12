@@ -85,9 +85,9 @@ TEST(TerminatingFunctionValidatorTest,
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
-        yield("Test message");
+        yield("First validation not done yet");
         return;
-        yield("Test message");
+        yield("Second validation not done yet");
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
@@ -95,7 +95,7 @@ TEST(TerminatingFunctionValidatorTest,
 
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
-    EXPECT_EQ("Test message", function_validator.currentErrorMessage());
+    EXPECT_EQ("First validation not done yet", function_validator.currentErrorMessage());
 
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);

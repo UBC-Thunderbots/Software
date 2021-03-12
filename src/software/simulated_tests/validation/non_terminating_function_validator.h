@@ -32,8 +32,10 @@ class NonTerminatingFunctionValidator
      * on construction. The ValidationFunction will be restarted if it has completed. As
      * such, the ValidationFunction can never be "done" and will only terminate due to
      * failures within the ValidationFunction, such as a failed GoogleTest assert
+     *
+     * @return Error message if the non-terminating validation function failed
      */
-    void executeAndCheckForFailures();
+    std::optional<std::string> executeAndCheckForFailures();
 
    private:
     /**

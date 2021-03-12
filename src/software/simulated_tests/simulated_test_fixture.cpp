@@ -101,7 +101,11 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
 {
     for (auto &function_validator : non_terminating_function_validators)
     {
-        function_validator.executeAndCheckForFailures();
+        auto error_message = function_validator.executeAndCheckForFailures();
+        if (error_message)
+        {
+            ADD_FAILURE() << error_message.value();
+        }
     }
 
     bool validation_successful = std::all_of(
@@ -179,6 +183,9 @@ void SimulatedTestFixture::runTest(
     {
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
+            auto ms_to_sleep = std::chrono::milliseconds(
+                static_cast<int>(ai_time_step.toMilliseconds()));
+            std::this_thread::sleep_for(ms_to_sleep);
             continue;
         }
         validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);

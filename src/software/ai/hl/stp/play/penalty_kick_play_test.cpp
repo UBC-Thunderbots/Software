@@ -48,11 +48,10 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
             // Wait 2 seconds for robots to start moving adequately far away from the ball
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+            if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(2))
             {
-                yield("Timestamp not at 9.5s");
+                robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
             }
-            robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

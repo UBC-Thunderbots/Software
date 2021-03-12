@@ -27,11 +27,8 @@ class StopPlayTest : public SimulatedPlayTestFixture
                 {
                     // TODO: (#1882) implement robots slow down for stop play
                     // robotsSlowDown(1.5, world_ptr, yield);
-                    robotsAvoidBall(0.5, world_ptr, yield);
+                    robotsAvoidBall(0.5, {}, world_ptr, yield);
                 }
-                // TODO: (#1882) implement robots slow down for stop play
-                // robotsSlowDown(1.5, world_ptr, yield);
-                robotsAvoidBall(0.5, {}, world_ptr, yield);
             }};
     }
 

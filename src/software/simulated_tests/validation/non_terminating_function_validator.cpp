@@ -18,7 +18,7 @@ NonTerminatingFunctionValidator::NonTerminatingFunctionValidator(
 {
 }
 
-void NonTerminatingFunctionValidator::executeAndCheckForFailures()
+std::optional<std::string> NonTerminatingFunctionValidator::executeAndCheckForFailures()
 {
     // Check the coroutine status to see if it has any more work to do.
     if (!validation_sequence)
@@ -35,7 +35,11 @@ void NonTerminatingFunctionValidator::executeAndCheckForFailures()
     std::string error_msg = validation_sequence.get();
     if (error_msg != "")
     {
-        ADD_FAILURE() << error_msg;
+        return error_msg;
+    }
+    else
+    {
+        return std::nullopt;
     }
 }
 

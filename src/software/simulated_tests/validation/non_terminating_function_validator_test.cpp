@@ -21,7 +21,7 @@ TEST(NonTerminatingFunctionValidatorTest,
 
     for (unsigned int i = 0; i < 10; i++)
     {
-        function_validator.executeAndCheckForFailures();
+        EXPECT_FALSE(function_validator.executeAndCheckForFailures());
     }
 }
 
@@ -37,10 +37,10 @@ TEST(NonTerminatingFunctionValidatorTest, test_yielding_error_message)
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     NonTerminatingFunctionValidator function_validator(validation_function, world);
-    EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForFailures(),
-                            "This is an error message 1");
-    EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForFailures(),
-                            "This is an error message 2");
+    EXPECT_EQ(function_validator.executeAndCheckForFailures(),
+              "This is an error message 1");
+    EXPECT_EQ(function_validator.executeAndCheckForFailures(),
+              "This is an error message 2");
 }
 
 TEST(NonTerminatingFunctionValidatorTest,
@@ -56,9 +56,8 @@ TEST(NonTerminatingFunctionValidatorTest,
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     NonTerminatingFunctionValidator function_validator(validation_function, world);
-    EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForFailures(),
-                            "Ball not at (1,1)");
+    EXPECT_EQ(function_validator.executeAndCheckForFailures(), "Ball not at (1,1)");
     world->updateBall(
         Ball(BallState(Point(1, 1), Vector()), Timestamp::fromSeconds(123)));
-    function_validator.executeAndCheckForFailures();
+    EXPECT_FALSE(function_validator.executeAndCheckForFailures());
 }
