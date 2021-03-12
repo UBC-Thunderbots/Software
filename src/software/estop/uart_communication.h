@@ -4,21 +4,22 @@
 #include <boost/function.hpp>
 
 /*
- * A boost::asio wrapper class that is used to synchronously communicate with a serial device via UART
+ * A boost::asio wrapper class that is used to synchronously communicate with a serial
+ * device via UART
  */
 
 class UartCommunication
 {
-    using io_service = boost::asio::io_service;
-    using serial_port_ptr =  std::shared_ptr<boost::asio::serial_port>;
+    using io_service      = boost::asio::io_service;
+    using serial_port_ptr = std::shared_ptr<boost::asio::serial_port>;
 
-public:
-
+   public:
     enum flush_type
     {
-        flush_receive = TCIFLUSH, //flushes data received but not read
-        flush_send = TCOFLUSH,    //flushes data written but not transmitted
-        flush_both = TCIOFLUSH    //flushes both data received but not read and data written but not transmitted
+        flush_receive = TCIFLUSH,  // flushes data received but not read
+        flush_send = TCOFLUSH,     // flushes data written but not transmitted
+        flush_both = TCIOFLUSH     // flushes both data received but not read and data
+                                // written but not transmitted
     };
 
     UartCommunication();
@@ -44,8 +45,8 @@ public:
     virtual bool serialWrite(std::vector<unsigned char> &write_val);
 
     /**
-     * Reads a given number of bytes from serial port until num_read_bytes is read or error occurs.
-     * Blocks current thread.
+     * Reads a given number of bytes from serial port until num_read_bytes is read or
+     * error occurs. Blocks current thread.
      *
      * @param read_val buffer that will be set to the read data
      * @param num_read_bytes number of bytes that should be read
@@ -68,5 +69,4 @@ public:
 
    private:
     serial_port_ptr serial_port;
-
 };
