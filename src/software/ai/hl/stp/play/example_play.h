@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 
 /**
@@ -8,7 +9,7 @@
 class ExamplePlay : public Play
 {
    public:
-    ExamplePlay() = default;
+    explicit ExamplePlay(std::shared_ptr<const PlayConfig> config);
 
     /**
      * This function returns whether the play is applicable

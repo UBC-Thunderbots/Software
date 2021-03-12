@@ -76,6 +76,10 @@ printf "$CUBE_SCRIPT" $IOC_FILE $TEMP_DIR > regen.stm32cube.script
 # generate code
 $CUBE_EXECUTABLE -s $TEMP_DIR/regen.stm32cube.script
 
+# the stm32h7xx_hal_conf.h file doesn't play well with clang-format, so disable formatting
+# the file does not have any "USER-CODE" sections, so this won't cause any problems
+echo "$(echo '// clang-format off'; cat ./Inc/stm32h7xx_hal_conf.h; echo '// clang-format on')" > ./Inc/stm32h7xx_hal_conf.h
+
 # move the generated files to the right path
 mv $TEMP_DIR/Src/*.c $FIRMWARE_DIR/
 mv $TEMP_DIR/Inc/*.h $FIRMWARE_DIR/

@@ -84,6 +84,7 @@ cc_test(
         "//firmware/app/world:firmware_robot",
         "//shared/proto:tbots_cc_proto",
         "//shared/proto:tbots_nanopb_proto",
+        "//shared/test_util",
         "//software/simulation/physics:physics_robot",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
@@ -135,7 +136,7 @@ cc_library(
         ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter:cpp_configs",
         "//software/proto:defending_side_msg_cc_proto",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/proto/message_translation:ssl_detection",
@@ -190,26 +191,14 @@ cc_library(
     hdrs = ["standalone_simulator.h"],
     deps = [
         ":threaded_simulator",
+        "//shared/parameter:cpp_configs",
         "//shared/proto:tbots_cc_proto",
         "//software/logger",
         "//software/networking:threaded_proto_multicast_listener",
         "//software/networking:threaded_proto_multicast_sender",
-        "//software/parameter:dynamic_parameters",
         "//software/proto:defending_side_msg_cc_proto",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/world:field",
-    ],
-)
-
-cc_binary(
-    name = "standalone_simulator_main",
-    srcs = ["standalone_simulator_main.cpp"],
-    deps = [
-        ":standalone_simulator",
-        "//software/gui/standalone_simulator:threaded_standalone_simulator_gui",
-        "//software/logger",
-        "//software/parameter:dynamic_parameters",
-        "@boost//:program_options",
     ],
 )
 

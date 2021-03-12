@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/defense_play.h"
 
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
@@ -8,12 +9,13 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
-#include "software/ai/hl/stp/tactic/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 #include "software/world/team.h"
+
+DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
 
 bool DefensePlay::isApplicable(const World &world) const
 {
@@ -30,17 +32,20 @@ bool DefensePlay::invariantHolds(const World &world) const
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     bool enemy_team_can_pass =
-        DynamicParameters->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value();
+        play_config->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value();
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
+
     auto shoot_goal_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        Angle::fromDegrees(5), std::nullopt, true);
+        Angle::fromDegrees(5), std::nullopt, true,
+        play_config->getShootGoalTacticConfig());
 
     auto defense_shadow_enemy_tactic = std::make_shared<DefenseShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), true,
-        3 * ROBOT_MAX_RADIUS_METERS);
+        3 * ROBOT_MAX_RADIUS_METERS, play_config->getDefenseShadowEnemyTacticConfig());
 
     std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
@@ -160,4 +165,4 @@ std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWith
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DefensePlay> factory;
+static TGenericFactory<std::string, Play, DefensePlay, PlayConfig> factory;

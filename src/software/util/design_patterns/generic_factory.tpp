@@ -1,65 +1,72 @@
+#include <stdexcept>
+
 #include "software/util/design_patterns/generic_factory.h"
 
-template <class IndexType, class TypeToCreate>
-GenericRegistry<IndexType, TypeToCreate>&
-GenericFactory<IndexType, TypeToCreate>::getMutableRegistry()
+template <class IndexType, class TypeToCreate, class ConfigType>
+GenericRegistry<IndexType, TypeToCreate, ConfigType>&
+GenericFactory<IndexType, TypeToCreate, ConfigType>::getMutableRegistry()
 {
-    static GenericRegistry<IndexType, TypeToCreate> instance;
+    static GenericRegistry<IndexType, TypeToCreate, ConfigType> instance;
     return instance;
 }
 
-template <class IndexType, class TypeToCreate>
-const GenericRegistry<IndexType, TypeToCreate>&
-GenericFactory<IndexType, TypeToCreate>::getRegistry()
+template <class IndexType, class TypeToCreate, class ConfigType>
+const GenericRegistry<IndexType, TypeToCreate, ConfigType>&
+GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegistry()
 {
     return GenericFactory::getMutableRegistry();
 }
 
-template <class IndexType, class TypeToCreate>
-std::vector<std::string> GenericFactory<IndexType, TypeToCreate>::getRegisteredNames()
+template <class IndexType, class TypeToCreate, class ConfigType>
+std::vector<std::string>
+GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegisteredNames()
 {
     std::vector<std::string> names;
+    auto registry = GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegistry();
 
-    for (auto iter = GenericFactory<IndexType, TypeToCreate>::getRegistry().begin();
-         iter != GenericFactory<IndexType, TypeToCreate>::getRegistry().end(); iter++)
+    for (auto iter = registry.begin(); iter != registry.end(); iter++)
     {
         names.emplace_back(iter->first);
     }
     return names;
 }
 
-template <class IndexType, class TypeToCreate>
-std::vector<std::function<std::unique_ptr<TypeToCreate>()>>
-GenericFactory<IndexType, TypeToCreate>::getRegisteredConstructors()
+template <class IndexType, class TypeToCreate, class ConfigType>
+std::vector<
+    std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>
+GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegisteredConstructors()
 {
-    std::vector<std::function<std::unique_ptr<TypeToCreate>()>> constructors;
+    std::vector<
+        std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>>
+        constructors;
+    auto registry = GenericFactory::getRegistry();
 
-    for (auto iter = GenericFactory::getRegistry().begin();
-         iter != GenericFactory::getRegistry().end(); iter++)
+    for (auto iter = registry.begin(); iter != registry.end(); iter++)
     {
         constructors.emplace_back(iter->second);
     }
     return constructors;
 }
 
-template <class IndexType, class TypeToCreate>
-void GenericFactory<IndexType, TypeToCreate>::registerCreator(
+template <class IndexType, class TypeToCreate, class ConfigType>
+void GenericFactory<IndexType, TypeToCreate, ConfigType>::registerCreator(
     std::string generic_name,
-    std::function<std::unique_ptr<TypeToCreate>()> generic_creator)
+    std::function<std::unique_ptr<TypeToCreate>(std::shared_ptr<const ConfigType>)>
+        generic_creator)
 {
     GenericFactory::getMutableRegistry().insert(
         std::make_pair(generic_name, generic_creator));
 }
 
-template <class IndexType, class TypeToCreate>
-std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate>::create(
-    const std::string& generic_name)
+template <class IndexType, class TypeToCreate, class ConfigType>
+std::unique_ptr<TypeToCreate> GenericFactory<IndexType, TypeToCreate, ConfigType>::create(
+    const std::string& generic_name, std::shared_ptr<const ConfigType> config)
 {
-    auto registry = GenericFactory<IndexType, TypeToCreate>::getRegistry();
+    auto registry = GenericFactory<IndexType, TypeToCreate, ConfigType>::getRegistry();
     auto iter     = registry.find(generic_name);
     if (iter != registry.end())
     {
-        return iter->second();
+        return iter->second(config);
     }
     else
     {

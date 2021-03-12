@@ -1,5 +1,6 @@
 #include "software/proto/primitive/primitive_msg_factory.h"
 
+#include "software/logger/logger.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
 
 std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(const Point &chip_origin,
@@ -20,9 +21,9 @@ std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(const Point &chip_ori
     return chip_primitive_msg;
 }
 
-std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
-    const Point &kick_origin, const Angle &kick_direction,
-    double kick_speed_meters_per_second)
+std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(const Point &kick_origin,
+                                                           const Angle &kick_direction,
+                                                           double kick_speed_m_per_s)
 {
     auto kick_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -32,112 +33,67 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
     auto kick_direction_msg = createAngleProto(kick_direction);
     *(kick_primitive_msg->mutable_kick()->mutable_kick_direction()) = *kick_direction_msg;
 
-    kick_primitive_msg->mutable_kick()->set_kick_speed_meters_per_second(
-        static_cast<float>(kick_speed_meters_per_second));
+    kick_primitive_msg->mutable_kick()->set_kick_speed_m_per_s(
+        static_cast<float>(kick_speed_m_per_s));
 
     return kick_primitive_msg;
 }
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode)
+    const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
+    DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
+    MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    auto position_params_msg = std::make_unique<TbotsProto::MovePositionParams>();
-    auto dest_msg            = createPointProto(Point(dest.x(), dest.y()));
-    *(position_params_msg->mutable_destination()) = *dest_msg;
-    position_params_msg->set_final_speed_meters_per_second(
-        static_cast<float>(final_speed_meters_per_second));
-    *(move_primitive_msg->mutable_move()->mutable_position_params()) =
-        *position_params_msg;
-
+    auto dest_msg        = createPointProto(Point(dest.x(), dest.y()));
     auto final_angle_msg = createAngleProto(final_angle);
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) = *final_angle_msg;
+    *(move_primitive_msg->mutable_move()->mutable_destination()) = *dest_msg;
+    move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
+        static_cast<float>(final_speed_m_per_s));
+    move_primitive_msg->mutable_move()->set_max_speed_m_per_s(static_cast<float>(
+        convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode)));
 
     move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(
         static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
 
+    if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
+    {
+        move_primitive_msg->mutable_move()
+            ->mutable_auto_chip_or_kick()
+            ->set_autochip_distance_meters(
+                static_cast<float>(auto_chip_or_kick.autochip_distance_m));
+    }
+    else if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOKICK)
+    {
+        move_primitive_msg->mutable_move()
+            ->mutable_auto_chip_or_kick()
+            ->set_autokick_speed_m_per_s(
+                static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
+    }
     return move_primitive_msg;
 }
 
 std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second,
+    const Point &dest, double final_speed_m_per_s,
     const AngularVelocity &angular_velocity, DribblerMode dribbler_mode)
 {
     auto spinning_move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    auto position_params_msg = std::make_unique<TbotsProto::MovePositionParams>();
-    auto dest_msg            = createPointProto(Point(dest.x(), dest.y()));
-    *(position_params_msg->mutable_destination()) = *dest_msg;
-    position_params_msg->set_final_speed_meters_per_second(
-        static_cast<float>(final_speed_meters_per_second));
-    *(spinning_move_primitive_msg->mutable_spinning_move()->mutable_position_params()) =
-        *position_params_msg;
-
+    auto dest_msg             = createPointProto(Point(dest.x(), dest.y()));
     auto angular_velocity_msg = createAngularVelocityProto(angular_velocity);
     *(spinning_move_primitive_msg->mutable_spinning_move()->mutable_angular_velocity()) =
         *angular_velocity_msg;
+    *(spinning_move_primitive_msg->mutable_spinning_move()->mutable_destination()) =
+        *dest_msg;
+    spinning_move_primitive_msg->mutable_spinning_move()->set_final_speed_m_per_s(
+        static_cast<float>(final_speed_m_per_s));
 
     spinning_move_primitive_msg->mutable_spinning_move()->set_dribbler_speed_rpm(
         static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
 
     return spinning_move_primitive_msg;
-}
-
-std::unique_ptr<TbotsProto::Primitive> createAutochipMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode, double chip_distance_meters)
-{
-    auto autochip_move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
-
-    auto position_params_msg = std::make_unique<TbotsProto::MovePositionParams>();
-    auto dest_msg            = createPointProto(Point(dest.x(), dest.y()));
-    *(position_params_msg->mutable_destination()) = *dest_msg;
-    position_params_msg->set_final_speed_meters_per_second(
-        static_cast<float>(final_speed_meters_per_second));
-    *(autochip_move_primitive_msg->mutable_autochip_move()->mutable_position_params()) =
-        *position_params_msg;
-
-    auto final_angle_msg = createAngleProto(final_angle);
-    *(autochip_move_primitive_msg->mutable_autochip_move()->mutable_final_angle()) =
-        *final_angle_msg;
-
-    autochip_move_primitive_msg->mutable_autochip_move()->set_dribbler_speed_rpm(
-        static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
-
-    autochip_move_primitive_msg->mutable_autochip_move()->set_chip_distance_meters(
-        static_cast<float>(chip_distance_meters));
-
-    return autochip_move_primitive_msg;
-}
-
-std::unique_ptr<TbotsProto::Primitive> createAutokickMovePrimitive(
-    const Point &dest, double final_speed_meters_per_second, const Angle &final_angle,
-    DribblerMode dribbler_mode, double kick_speed_meters_per_second)
-{
-    auto autokick_move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
-
-    auto position_params_msg = std::make_unique<TbotsProto::MovePositionParams>();
-    auto dest_msg            = createPointProto(Point(dest.x(), dest.y()));
-    *(position_params_msg->mutable_destination()) = *dest_msg;
-    position_params_msg->set_final_speed_meters_per_second(
-        static_cast<float>(final_speed_meters_per_second));
-    *(autokick_move_primitive_msg->mutable_autokick_move()->mutable_position_params()) =
-        *position_params_msg;
-
-    auto final_angle_msg = createAngleProto(final_angle);
-    *(autokick_move_primitive_msg->mutable_autokick_move()->mutable_final_angle()) =
-        *final_angle_msg;
-
-    autokick_move_primitive_msg->mutable_autokick_move()->set_dribbler_speed_rpm(
-        static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
-
-    autokick_move_primitive_msg->mutable_autokick_move()
-        ->set_kick_speed_meters_per_second(
-            static_cast<float>(kick_speed_meters_per_second));
-
-    return autokick_move_primitive_msg;
 }
 
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
@@ -169,6 +125,22 @@ double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode)
         case DribblerMode::OFF:
             return 0.0;
         default:
+            LOG(WARNING) << "DribblerMode is invalid" << std::endl;
+            return 0.0;
+    }
+}
+
+double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+    MaxAllowedSpeedMode max_allowed_speed_mode)
+{
+    switch (max_allowed_speed_mode)
+    {
+        case MaxAllowedSpeedMode::PHYSICAL_LIMIT:
+            return ROBOT_MAX_SPEED_METERS_PER_SECOND;
+        case MaxAllowedSpeedMode::STOP_COMMAND:
+            return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+        default:
+            LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;
     }
 }

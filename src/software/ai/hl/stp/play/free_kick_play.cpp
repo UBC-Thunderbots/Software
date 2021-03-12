@@ -3,8 +3,8 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
-#include "software/ai/hl/stp/tactic/chip_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
@@ -12,7 +12,10 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
 
-FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
+FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+{
+}
 
 bool FreeKickPlay::isApplicable(const World &world) const
 {
@@ -44,7 +47,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     // Setup the goalie
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -56,13 +60,12 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
-    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAiConfig()
-                                                           ->getShootOrPassPlayConfig()
-                                                           ->getMinOpenAngleForShotDeg()
-                                                           ->value());
-    auto shoot_tactic             = std::make_shared<ShootGoalTactic>(
+    Angle min_open_angle_for_shot = Angle::fromDegrees(
+        play_config->getShootOrPassPlayConfig()->getMinOpenAngleForShotDeg()->value());
+    auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        min_open_angle_for_shot, std::nullopt, false);
+        min_open_angle_for_shot, std::nullopt, false,
+        play_config->getShootGoalTacticConfig());
 
     PassWithRating best_pass_and_score_so_far = shootOrFindPassStage(
         yield, shoot_tactic, crease_defender_tactics, goalie_tactic, world);
@@ -183,16 +186,17 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 =
-        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region);
-    auto cherry_pick_tactic_2 =
-        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region);
+    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
+        world, cherry_pick_1_target_region, play_config->getPassingConfig());
+    auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
+        world, cherry_pick_2_target_region, play_config->getPassingConfig());
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
     PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::RECEIVE_AND_DRIBBLE);
+                                 PassType::RECEIVE_AND_DRIBBLE,
+                                 play_config->getPassingConfig());
     pass_generator.setTargetRegion(world.field().enemyHalf());
 
     // Wait for a robot to be assigned to aligned to the ball to pass
@@ -257,4 +261,4 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay, PlayConfig> factory;

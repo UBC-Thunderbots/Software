@@ -1,8 +1,9 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 
 /**
  * A Play for Corner Kicks
@@ -10,7 +11,7 @@
 class CornerKickPlay : public Play
 {
    public:
-    CornerKickPlay();
+    CornerKickPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
@@ -23,9 +24,6 @@ class CornerKickPlay : public Play
     static constexpr double BALL_IN_CORNER_RADIUS = 0.5;
 
    private:
-    // The maximum time that we will wait before committing to a pass
-    const Duration MAX_TIME_TO_COMMIT_TO_PASS;
-
     /**
      * Update the tactic that aligns the robot to the ball in preparation to pass
      *
