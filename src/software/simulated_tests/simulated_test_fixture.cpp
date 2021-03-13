@@ -16,18 +16,10 @@ SimulatedTestFixture::SimulatedTestFixture()
 
 void SimulatedTestFixture::SetUp()
 {
-    mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-    thunderbots_config =
-        std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
-
     LoggerSingleton::initializeLogger(
         thunderbots_config->getStandaloneSimulatorMainCommandLineArgs()
             ->getLoggingDir()
             ->value());
-
-    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField(),
-                                            thunderbots_config->getSimulatorConfig());
-    sensor_fusion = SensorFusion(thunderbots_config->getSensorFusionConfig());
 
     mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
         !SimulatedTestFixture::stop_ai_on_start);
