@@ -21,6 +21,6 @@ void robotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
     while (!robot_in_center_circle(world_ptr))
     {
         yield("Robot with ID " + std::to_string(robot_id) +
-              " did not enter the center circle");
+              " has not entered the center circle");
     }
 }

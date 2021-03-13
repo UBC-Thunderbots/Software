@@ -23,6 +23,6 @@ void robotInPolygon(RobotId robot_id, Polygon polygon, std::shared_ptr<World> wo
         std::stringstream ss;
         ss << polygon;
         yield("Robot with ID " + std::to_string(robot_id) +
-              " did not enter the polygon " + ss.str());
+              " has not entered the polygon " + ss.str());
     }
 }

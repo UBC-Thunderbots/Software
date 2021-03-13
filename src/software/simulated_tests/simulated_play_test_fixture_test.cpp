@@ -196,7 +196,7 @@ TEST_F(
                                           ValidationCoroutine::push_type& yield) {
         if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(0.5))
         {
-            yield("Timestamp was greater than or equal than 0.5");
+            yield("Timestamp was greater than or equal to 0.5");
         }
     };
 
@@ -216,7 +216,7 @@ TEST_F(
     EXPECT_NONFATAL_FAILURE(
         runTest(terminating_validation_functions, non_terminating_validation_functions,
                 Duration::fromSeconds(0.5)),
-        "Timestamp was greater than or equal than 0.5");
+        "Timestamp was greater than or equal to 0.5");
 }
 
 TEST_F(
@@ -238,7 +238,7 @@ TEST_F(
                                           ValidationCoroutine::push_type& yield) {
         if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(0.5))
         {
-            yield("Timestamp was greater than or equal than 0.5");
+            yield("Timestamp was greater than or equal to 0.5");
         }
     };
 
@@ -260,7 +260,7 @@ TEST_F(
     EXPECT_NONFATAL_FAILURE(
         runTest(terminating_validation_functions, non_terminating_validation_functions,
                 Duration::fromSeconds(0.5)),
-        "Timestamp was greater than or equal than 0.5");
+        "Timestamp was greater than or equal to 0.5");
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
