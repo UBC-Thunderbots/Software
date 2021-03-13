@@ -22,6 +22,12 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double enemy_pass_rating =
         ratePassEnemyRisk(world.ball(), world.enemyTeam(), pass, passing_config);
 
+    // TODO (#1988) This score is partially responsible for the vanishing
+    // gradient. When we don't have a shot on net, we should still be able to look
+    // for passes because not all passes need to have a shot on net. But this sigmoid
+    // zeros out the score when the net is blocked off.
+    //
+    // This should be fixed w/ a changing how we combine the scores together.
     double shoot_pass_rating = ratePassShootScore(
         world.ball(), world.field(), world.enemyTeam(), pass, passing_config);
 
@@ -70,18 +76,7 @@ double ratePassShootScore(const Ball& ball, const Field& field, const Team& enem
 
     // Create the shoot score by creating a sigmoid that goes to a large value as
     // the section of net we're shooting on approaches 100% (ie. completely open)
-    //
-    // TODO (ticket here) This sigmoid is partially responsible for the vanishing
-    // gradient. When we don't have a shot on net, we should still be able to look
-    // for passes because not all passes need to have a shot on net. But this sigmoid
-    // zeros out the score when the net is blocked off.
-    //
-    // For now, this will be a "leaky sigmoid" where even when there is
-    // NO shot on net, the shot_openness_score > 0.
-    //
-    // This should be fixed w/ a better activation function or potentially changing
-    // how we combine the scores together (or both).
-    double shot_openness_score = sigmoid(net_percent_open, 0.2, 0.95);
+    double shot_openness_score = sigmoid(net_percent_open, 0.5, 0.95);
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)
@@ -179,8 +174,10 @@ double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot,
         ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
 
-    Duration ball_time_to_pass_receive_position = Duration::fromSeconds(
-        (pass.receiverPoint() - ball.position()).length() / pass.speed());
+    Duration ball_time_to_pass_receive_position =
+        Duration::fromSeconds((pass.receiverPoint() - ball.position()).length() /
+                              pass.speed()) +
+        Duration::fromSeconds(1.0);
 
     Duration enemy_reaction_time =
         Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());

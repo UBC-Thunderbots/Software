@@ -190,7 +190,6 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
                std::get<0>(crease_defender_tactics), cherry_pick_tactic_2,
                std::get<1>(crease_defender_tactics)});
 
-        // TODO (ticket here) get rid of this when the pass evaluation is updated globally
         // we need to evaluate here until then.
         pass_eval                  = pass_generator.generatePassEvaluation(world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();

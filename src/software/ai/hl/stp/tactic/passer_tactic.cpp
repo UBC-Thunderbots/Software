@@ -57,10 +57,6 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
 
-    // TODO (ticket here) we shouldn't wait to take the pass here. The play should
-    // align itself up to the ball and wait while looking at enemy shadowers, and
-    // then pivot/pass when necessary.
-    //
     // For now we allow for 1 second setup time because the rest of the system is used
     // to there being a setup delay, but this tactic really shouldn't care.
     auto setup_time = ball.timestamp() + Duration::fromSeconds(1.0);
@@ -96,7 +92,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
         // We want to keep trying to kick until the ball is moving along the pass
         // vector with sufficient velocity
-        kick_direction = (pass.receiverPoint() - ball.position()).orientation();
+        kick_direction = pass.passerOrientation(ball.position());
 
     } while (!ball.hasBallBeenKicked(kick_direction));
 }

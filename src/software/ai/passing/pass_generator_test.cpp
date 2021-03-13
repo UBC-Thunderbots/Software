@@ -20,7 +20,7 @@ class PassGeneratorTest : public testing::Test
     }
 
     /**
-     * Calls generatePassEvaluation to step the pass generator a couple times 
+     * Calls generatePassEvaluation to step the pass generator a couple times
      * to find better passes.
      *
      * The pass generator starts with bad passes and improves on them as time goes on
