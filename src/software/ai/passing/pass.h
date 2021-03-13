@@ -56,6 +56,15 @@ class Pass
     Angle receiverOrientation(const Point& ball_position) const;
 
     /**
+     * Given the ball position, returns the angle the passer should be
+     * facing to pass.
+     *
+     * @param ball_position The position of the ball
+     * @return The angle the passer should be facing
+     */
+    Angle passerOrientation(const Point& ball_position) const;
+
+    /**
      * Gets the value of the pass speed
      *
      * @return The value of the pass speed, in meters/second
