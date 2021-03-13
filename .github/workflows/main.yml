@@ -33,13 +33,6 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           
-      - name: Cache Bazel External Dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            "${GITHUB_WORKSPACE}"/src/bazel-src/external
-          key: bazel
-          
       - name: Software Test
         run: |
           cd src
