@@ -72,7 +72,7 @@ struct MoveFSM
         };
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest state
+            // src_state + event [guard] / action = dest_state
             *move_s + update_e[!move_done] / update_move = move_s,
             move_s + update_e[move_done] / update_move   = X,
             X + update_e[!move_done] / update_move       = move_s);

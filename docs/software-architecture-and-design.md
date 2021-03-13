@@ -28,6 +28,11 @@
   * [What Coroutines Do We Use?](#what-coroutines-do-we-use)
   * [How Do We Use Coroutines?](#how-do-we-use-coroutines)
   * [Best Practices](#couroutine-best-practices)
+* [Finite State Machines](#finite-state-machines)
+  * [What Are Finite State Machines?](#what-are-finite-state-machines)
+  * [Boost-Ext SML Library](#boost-ext-sml-library)
+  * [How Do We Use SML?](#how-do-we-use-sml)
+  * [SML Best Practices](#sml-best-practices)
 * [Conventions](#conventions)
   * [Coordinates](#coordinates)
   * [Angles](#angles)
@@ -289,6 +294,53 @@ To summarize, the best practices are as follows:
 2. Avoid using coroutines with resizeable containers. If they must be used, make sure that the coroutines are allocated on the heap.
 3. Pass data to the coroutine on creation as much as possible, avoid using member variables.
 
+# Finite State Machines
+## What Are Finite State Machines?
+A finite state machine (FSM) is a system with a finite number of states with defined transitions and outputs based on the inputs to the system. We are interested in hierarchical state machines that where transitions between states are defined by _guards_ and transitions cause _actions_ to be performed. Hierarchical state machines treat a sub-FSM as a state with guards and actions when transitioning to and from the sub-FSM. When the sub-FSM enters a terminal state, the parent FSM is able to automatically transition to another state.
+
+![Finite State Machine Diagram](images/finite_state_machine_diagram.png)
+
+## Boost-ext SML Library
+We use the [Boost-Ext SML](https://github.com/boost-ext/sml), short for State Machine Library, to manage our finite state machines. This library defines state machines in terms of a transition table that defines _when_ states should transition (_guards_) and _what_ should happen when transitions occur (_actions_). The syntax of a row of the transition table looks like this:
+```
+src_state + event [guard] / action = dest_state
+```
+where the src_state transitions to the dest_state if the _event_ is processed and the _guard_ is true and performs the _action_ indicated. Events are the new information that FSMs receive, so _guards_ and _actions_ take events are arguments. _Guards_ must return a boolean and _actions_ must return void.
+
+The library also supports hierarchical FSMs. Sub-FSMs are treated as states where an unconditional transition occurs when the sub-FSM is in the terminal state, X.
+```
+/* omitted rows of transition table */
+SubFSM = next_state, // Transitions to next_state only when the SubFSM is in the terminal state, X
+/* omitted rows of transition table */
+```
+In order to update a subFSM with new information, we need to do the following:
+```
+const auto update_sub_fsm_action =
+    [](auto event, back::process<SubFSM::NameOfEvent> processEvent) {
+        auto sub_fsm_event = // initialize the subFSM event
+        processEvent(sub_fsm_event);
+    };
+```
+The convenience of this syntax comes at the cost of debuggability as the functor and templating system used makes error messages hard to read.
+
+## How Do We Use SML?
+We use SML to manage our [Tactics](#tactic). Each state represents a stage in the tactic where the robot should be doing a particular action or looking for certain conditions to be true. An example of this is the MoveFSM. While the robot is not at the destination and oriented correctly, the FSM is in a move state. Once the robot reaches its destination, it enters to the terminal state, _X_, to indicate that it's done. SML also allows us to easily reuse FSMs in other tactics. For example, if a shadowing tactic needs to move to a particular destination with a certain orientation, then it can use the MoveFSM as a sub-FSM state.
+
+## SML Best Practices
+Boost-ext SML is a library that supports complex functionality with similarly complex syntax and semantics. If complex syntax is misused, the complicated error messages can make development difficult. Thus, we need to carefully choose a standardized and simplified subset of the library's syntax to implement our functionality with high readability.
+* Only use one _event_ per FSM: In gameplay, we react to changes in the [World](#world), so since there's only one source of new information, we should only need one _event_
+* Only one guard or action per transition: For readability of the transition table, we should only have one guard or action per transition. This can always be achieved by defining a special guard or action outside of the transition table.
+* Define guards and actions outside of the transition table: The names of guards and actions should be succint so that transition tables rows fit on one line and readers can easily understand the FSM from the transition table. In other words, no lambdas/anonymous functions in transition tables.
+* States should be defined as classes in the FSM struct so that users of the FSM can check what state the FSM is in: 
+```
+    // inside the struct
+    class KickState;
+    // inside the operator()()
+    const auto kick_s = state<KickState>;
+```
+* Avoid entry and exit conditions: Everything that can be implement with entry and exit conditions can just as easily be implemented as actions, so this rule reduces one syntax that the reader needs to consider
+* Avoid self transitions, i.e. `src_state + event [guard] / action = src_state`: self transitions call entry and exit conditions, which complicates the FSM. If we want to state in the same state while performing an action, then we should use an internal transition, i.e. `src_state + event [guard] / action`.
+* Use callbacks in _events_ to return information from the FSM: Since the SML library cannot directly return information, we need to return information through callbacks. For example, if we want to return a double from an FSM, we can pass in `std::function<void(double)> callback` as part of the event and then make the _action_ call that function with the value we want returned.
 
 # Conventions
 Various conventions we use and follow that you need to know.

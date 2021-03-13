@@ -69,7 +69,7 @@ struct ChipFSM
         };
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest state
+            // src_state + event [guard] / action = dest_state
             *get_behind_ball_s + update_e / update_get_behind_ball,
             get_behind_ball_s                              = chip_s,
             chip_s + update_e[!ball_chicked] / update_chip = chip_s,

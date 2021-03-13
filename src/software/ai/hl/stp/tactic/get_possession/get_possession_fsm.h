@@ -102,7 +102,7 @@ struct GetPossessionFSM
         };
 
         /**
-         * Action to update MoveFSM to intercept the ball
+         * Action to update to get possession of the ball
          *
          * If the ball is moving quickly, then move in front of the ball
          * If the ball is moving slowly, then chase the ball
@@ -124,7 +124,7 @@ struct GetPossessionFSM
         };
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest state
+            // src_state + event [guard] / action = dest_state
             *get_possession_s + update_e[have_possession] / get_possession = X,
             get_possession_s + update_e[!have_possession] / get_possession,
             X + update_e[!have_possession] / get_possession = get_possession_s,

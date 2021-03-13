@@ -69,7 +69,7 @@ struct KickFSM
         };
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest state
+            // src_state + event [guard] / action = dest_state
             *get_behind_ball_s + update_e / update_get_behind_ball,
             get_behind_ball_s                              = kick_s,
             kick_s + update_e[!ball_chicked] / update_kick = kick_s,
