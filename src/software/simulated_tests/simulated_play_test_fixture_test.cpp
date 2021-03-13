@@ -285,3 +285,35 @@ TEST_F(SimulatedPlayTestFixtureTest,
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(0.5));
 }
+
+TEST_F(SimulatedPlayTestFixtureTest,
+       non_terminating_validation_functions_are_ignored_after_terminating_functions_pass)
+{
+    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.5))
+            {
+                yield("Waiting for timestamp of at least 0.5s");
+            }
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            if (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0))
+            {
+                yield("Timestamp was less than 0");
+            }
+        },
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(1.0))
+            {
+                yield("Timestamp was greater than or equal to 1.0");
+            }
+        }};
+
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(1.5));
+}
