@@ -6,7 +6,7 @@ http_archive(
     name = "rules_foreign_cc",
     sha256 = "39223a1a9f6eb1bf88d5f0e0969803b0dae4b274daabbdb073a7a0ee98ed16d8",
     strip_prefix = "rules_foreign_cc-main",
-    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/main.zip",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.1.0.zip",
 )
 
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
@@ -18,8 +18,9 @@ all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = [
 http_archive(
     name = "rapidcheck",
     build_file_content = all_contents,
-    strip_prefix = "rapidcheck-master",
-    urls = ["https://github.com/emil-e/rapidcheck/archive/master.zip"],
+    sha256 = "93f73c2c39ff91fd3a265b87b429ed266631c2425d9287d4548b149b99168736",
+    strip_prefix = "rapidcheck-7acca63b8e834a74fd47fe8fbf17668d22cc6331",
+    urls = ["https://github.com/emil-e/rapidcheck/archive/7acca63b8e834a74fd47fe8fbf17668d22cc6331.zip"],
 )
 
 http_archive(
