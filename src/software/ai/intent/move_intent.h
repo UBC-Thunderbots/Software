@@ -17,7 +17,7 @@ class MoveIntent : public NavigatingIntent
      * @param ball_collision_type how to navigate around the ball
      * @param auto_chip_or_kick The command to autochip or autokick
      * @param max_allowed_speed_mode The mode of maximum speed allowed
-     * @param spin_speed The angular velocity of fixed spin spped while moving
+     * @param spin_speed The angular velocity of fixed spin speed while moving
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,

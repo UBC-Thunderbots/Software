@@ -12,7 +12,8 @@ void MoveTactic::updateWorldParams(const World &world) {}
 void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
                                      double final_speed, DribblerMode dribbler_mode,
                                      BallCollisionType ball_collision_type,
-                                     AutoChipOrKick auto_chip_or_kick)
+                                     AutoChipOrKick auto_chip_or_kick,
+                                     AngularVelocity spin_speed)
 {
     // Update the control parameters stored by this Tactic
     control_params.destination            = destination;
@@ -22,6 +23,7 @@ void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
     control_params.ball_collision_type    = ball_collision_type;
     control_params.auto_chip_or_kick      = auto_chip_or_kick;
     control_params.max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
+    control_params.spin_speed             = spin_speed;
 }
 
 void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
@@ -36,6 +38,7 @@ void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
     control_params.ball_collision_type    = BallCollisionType::AVOID;
     control_params.auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0};
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
+    control_params.spin_speed             = AngularVelocity::zero();
 }
 
 double MoveTactic::calculateRobotCost(const Robot &robot, const World &world) const
