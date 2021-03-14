@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         // Override default network interface
         if (!args->getInterface()->value().empty())
         {
-            mutable_thunderbots_config->getMutableNetworkConfig()
+            mutable_thunderbots_config->getMutableStandaloneSimulatorConfig()
                 ->getMutableNetworkInterface()
                 ->setValue(args->getInterface()->value());
         }
