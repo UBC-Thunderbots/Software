@@ -69,7 +69,6 @@ cc_test(
     srcs = ["stp_test.cpp"],
     deps = [
         ":stp",
-        "//software/ai/hl/stp/play:halt_play",
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/play/test_plays:move_test_play",
         "//software/test_util",
