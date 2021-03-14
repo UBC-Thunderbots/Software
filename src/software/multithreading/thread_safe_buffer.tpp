@@ -48,7 +48,7 @@ void ThreadSafeBuffer<T>::push(const T& value)
     if (log_buffer_full && buffer.full())
     {
         LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: "
-                     << CLASS_TYPENAME(T) << std::endl;
+                     << TYPENAME(T) << std::endl;
     }
     buffer.push_back(value);
     received_new_value.notify_all();

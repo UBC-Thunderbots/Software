@@ -49,10 +49,10 @@ TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
     auto play_names = GenericFactory<std::string, Play, PlayConfig>::getRegisteredNames();
     EXPECT_EQ(2, play_names.size());
     EXPECT_EQ(
-        std::count(play_names.begin(), play_names.end(), CLASS_TYPENAME(MoveTestPlay)),
+        std::count(play_names.begin(), play_names.end(), TYPENAME(MoveTestPlay)),
         1);
     EXPECT_EQ(
-        std::count(play_names.begin(), play_names.end(), CLASS_TYPENAME(HaltTestPlay)),
+        std::count(play_names.begin(), play_names.end(), TYPENAME(HaltTestPlay)),
         1);
 }
 
@@ -71,7 +71,7 @@ TEST_F(STPTest, test_calculate_new_play_when_one_play_valid)
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     auto play = stp.calculateNewPlay(world);
     EXPECT_TRUE(play);
-    EXPECT_EQ(objectTypeName(*play), CLASS_TYPENAME(HaltTestPlay));
+    EXPECT_EQ(objectTypeName(*play), TYPENAME(HaltTestPlay));
 }
 
 TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
@@ -92,11 +92,11 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
     }
 
     std::vector<std::string> expected_play_names = {
-        CLASS_TYPENAME(MoveTestPlay), CLASS_TYPENAME(MoveTestPlay),
-        CLASS_TYPENAME(HaltTestPlay), CLASS_TYPENAME(HaltTestPlay),
-        CLASS_TYPENAME(HaltTestPlay), CLASS_TYPENAME(MoveTestPlay),
-        CLASS_TYPENAME(MoveTestPlay), CLASS_TYPENAME(MoveTestPlay),
-        CLASS_TYPENAME(MoveTestPlay), CLASS_TYPENAME(HaltTestPlay),
+        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay),
+        TYPENAME(HaltTestPlay), TYPENAME(HaltTestPlay),
+        TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay),
+        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay),
+        TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay),
     };
 
     EXPECT_EQ(expected_play_names, actual_play_names);
@@ -113,7 +113,7 @@ TEST_F(STPTest, test_play_assignment_transition_from_unassigned_to_assigned)
     // Only the HaltTestPlay should be applicable
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), CLASS_TYPENAME(HaltTestPlay));
+    EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 }
 
 TEST_F(
@@ -123,14 +123,14 @@ TEST_F(
     // Only the HaltTestPlay should be applicable
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), CLASS_TYPENAME(HaltTestPlay));
+    EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 
     // The HaltTestPlays invariant should no longer hold, and the MoveTestPlay should now
     // be applicable
     world = ::TestUtil::setBallPosition(
         world, world.field().enemyCornerNeg() + Vector(1, 0), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), CLASS_TYPENAME(MoveTestPlay));
+    EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(MoveTestPlay));
 }
 
 TEST_F(STPTest, test_play_assignment_from_one_play_to_another_when_current_play_is_done)
@@ -138,13 +138,13 @@ TEST_F(STPTest, test_play_assignment_from_one_play_to_another_when_current_play_
     // Only the MoveTestPlay should be applicable
     world = ::TestUtil::setBallPosition(world, Point(1, -1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), CLASS_TYPENAME(MoveTestPlay));
+    EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(MoveTestPlay));
 
     // Now only the HaltTestPlay should be applicable, and the MoveTestPlay's invariant
     // no longer holds, so we expect the current play to become the HaltTestPlay
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), CLASS_TYPENAME(HaltTestPlay));
+    EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 }
 
 TEST_F(STPTest, test_fallback_play_assigned_when_no_new_plays_are_applicable)
@@ -155,13 +155,13 @@ TEST_F(STPTest, test_fallback_play_assigned_when_no_new_plays_are_applicable)
     // Only the HaltTestPlay should be applicable
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), CLASS_TYPENAME(HaltTestPlay));
+    EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 
     // Put the ball where both its x and y coordinates are negative. Neither test Play
     // is applicable in this case
     world = ::TestUtil::setBallPosition(world, Point(-1, -1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), CLASS_TYPENAME(HaltTestPlay));
+    EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 }
 
 TEST_F(STPTest, test_get_play_info)
@@ -172,7 +172,7 @@ TEST_F(STPTest, test_get_play_info)
                                                   Timestamp::fromSeconds(0));
     world.updateRefereeCommand(RefereeCommand::HALT);
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), CLASS_TYPENAME(HaltTestPlay));
+    EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 
     auto play_info = stp.getPlayInfo();
     std::string expected_referee_command, expected_play_name;

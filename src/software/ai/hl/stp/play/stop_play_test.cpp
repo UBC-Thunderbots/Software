@@ -42,7 +42,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
              field().enemyDefenseArea().negXNegYCorner(),
              field().enemyDefenseArea().negXPosYCorner()}));
         setEnemyGoalie(0);
-        setAIPlay(CLASS_TYPENAME(StopPlay));
+        setAIPlay(TYPENAME(StopPlay));
         setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
     }
 };

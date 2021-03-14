@@ -19,7 +19,7 @@ TEST_F(ExamplePlayTest, test_example_play)
         {Point(4, 0), Point(0.5, 0), Point(-3, 1), Point(-1, -3), Point(2, 0),
          Point(3.5, 3)}));
     setFriendlyGoalie(0);
-    setAIPlay(CLASS_TYPENAME(ExamplePlay));
+    setAIPlay(TYPENAME(ExamplePlay));
 
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::HALT);
 

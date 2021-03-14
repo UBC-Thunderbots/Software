@@ -38,7 +38,7 @@ TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
                                       AngularVelocity::zero())},
     });
     setEnemyGoalie(0);
-    setAIPlay(CLASS_TYPENAME(ShootOrChipPlay));
+    setAIPlay(TYPENAME(ShootOrChipPlay));
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

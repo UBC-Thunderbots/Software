@@ -23,6 +23,6 @@ TEST(TypeNameTest, abstract_base_class_concrete_subtype)
 
 TEST(TypeNameTest, test_class_type_name)
 {
-    EXPECT_EQ("TestType", CLASS_TYPENAME(TestType));
-    EXPECT_EQ("TestTypeA", CLASS_TYPENAME(TestTypeA));
+    EXPECT_EQ("TestType", TYPENAME(TestType));
+    EXPECT_EQ("TestTypeA", TYPENAME(TestTypeA));
 }

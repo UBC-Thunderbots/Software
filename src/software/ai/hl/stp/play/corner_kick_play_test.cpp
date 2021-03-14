@@ -29,7 +29,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(CLASS_TYPENAME(CornerKickPlay));
+    setAIPlay(TYPENAME(CornerKickPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

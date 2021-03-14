@@ -40,4 +40,4 @@ std::string objectTypeName(const T& obj_ref)
  *
  * @return the string representation of the object
  */
-#define CLASS_TYPENAME(object) (demangleTypeId(typeid(object).name()))
+#define TYPENAME(object) (demangleTypeId(typeid(object).name()))
