@@ -41,30 +41,12 @@ class DrawFunctionVisualizer : public ZoomableQGraphicsView
     QOpenGLWidget* open_gl_widget;
 
    protected:
-    // Functions to be inherited by standalone_simulator_draw_function_visualizer
-
     /**
      * When the context menu is called by right-clicking on the simulator field
      *
      * @param event The QContextMenuEvent to open
      */
     void contextMenuEvent(QContextMenuEvent* event) override;
-
-    /**
-     * Called to get the reset view function reference
-     *
-     * @return a reference of a function to reset view of the simulator
-     */
-    std::function<void()> createResetView();
-
-    /**
-     * Resets the view of the simulator, using the last saved {@code Rectangle
-     * lastViewArea} as reference
-     */
-    void resetView(const Rectangle& view_area);
-
-    int remaining_attempts_to_set_view_area;
-    static constexpr int NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA = 5;
 
     Rectangle lastViewArea;
 };

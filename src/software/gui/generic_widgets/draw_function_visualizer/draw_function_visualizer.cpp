@@ -15,7 +15,6 @@ DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent)
       lastViewArea(Rectangle(Point(1, 1), Point(0, 0)))
 
 {
-    remaining_attempts_to_set_view_area = NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA;
     setScene(graphics_scene);
 
     // Performance optimizations
@@ -79,30 +78,14 @@ void DrawFunctionVisualizer::setViewArea(const Rectangle &view_area)
 {
     // Moves and scales the view to fit the view_area in the scene
     lastViewArea = view_area;
-
-    if (remaining_attempts_to_set_view_area > 0)
-    {
-        fitInView(createQRectF(view_area), Qt::KeepAspectRatio);
-        remaining_attempts_to_set_view_area--;
-    }
-}
-
-void DrawFunctionVisualizer::resetView(const Rectangle &view_area)
-{
     fitInView(createQRectF(view_area), Qt::KeepAspectRatio);
 }
 
 void DrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    auto resetViewAction = createResetView();
-    menu.addAction("Reset View", resetViewAction);
+    menu.addAction("Reset View",
+                   [this]() { DrawFunctionVisualizer::setViewArea(lastViewArea); });
 
     menu.exec(event->globalPos());
-}
-
-std::function<void()> DrawFunctionVisualizer::createResetView()
-{
-    std::function func = [this]() { DrawFunctionVisualizer::resetView(lastViewArea); };
-    return func;
 }

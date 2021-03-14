@@ -89,8 +89,8 @@ void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEve
     auto robot_under_cursor = standalone_simulator->getRobotAtPosition(point_in_scene);
 
     QMenu menu(this);
-    auto resetViewAction = createResetView();
-    menu.addAction("Reset View", resetViewAction);
+    menu.addAction("Reset View",
+                   [this]() { DrawFunctionVisualizer::setViewArea(lastViewArea); });
     menu.addAction("Place Ball Here", [&]() {
         standalone_simulator->setBallState(BallState{
             .position_ = point_in_scene, .velocity_ = Vector(0, 0), .height_ = 0});
