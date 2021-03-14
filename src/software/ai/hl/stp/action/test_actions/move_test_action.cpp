@@ -22,10 +22,10 @@ void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // different location
     do
     {
-        yield(std::make_unique<MoveIntent>(robot->id(), destination, Angle::zero(), 0.0,
-                                           DribblerMode::OFF, BallCollisionType::AVOID,
-                                           AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                                           MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+        yield(std::make_unique<MoveIntent>(
+            robot->id(), destination, Angle::zero(), 0.0, DribblerMode::OFF,
+            BallCollisionType::AVOID, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero()));
     } while ((robot->position() - destination).length() > close_to_dest_threshold);
 }
 
