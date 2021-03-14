@@ -10,14 +10,57 @@
 // since Intents inherit from Primitives
 TEST(MoveIntentTest, test_equality_operator_intents_equal)
 {
-    MoveIntent move_intent = MoveIntent(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-    MoveIntent move_intent_other = MoveIntent(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
+    MoveIntent move_intent =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 2},
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero());
+    MoveIntent move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 4},
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero());
     EXPECT_EQ(move_intent, move_intent_other);
+
+    move_intent =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOKICK, 3},
+                   MaxAllowedSpeedMode::STOP_COMMAND, AngularVelocity::quarter());
+    move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOKICK, 3},
+                   MaxAllowedSpeedMode::STOP_COMMAND, AngularVelocity::quarter());
+    EXPECT_EQ(move_intent, move_intent_other);
+}
+
+TEST(MoveIntentTest, test_equality_operator_intents_not_equal)
+{
+    MoveIntent move_intent =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 1.5},
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::half());
+    MoveIntent move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 3.5},
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::half());
+    EXPECT_NE(move_intent, move_intent_other);
+
+    move_intent =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 20},
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero());
+    move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 20},
+                   MaxAllowedSpeedMode::STOP_COMMAND, AngularVelocity::zero());
+    EXPECT_NE(move_intent, move_intent_other);
+
+    move_intent = MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                             BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 20},
+                             MaxAllowedSpeedMode::STOP_COMMAND, AngularVelocity::zero());
+    move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 20},
+                   MaxAllowedSpeedMode::STOP_COMMAND, AngularVelocity::quarter());
+    EXPECT_NE(move_intent, move_intent_other);
 }
 
 TEST(MoveIntentTest, test_get_destination_ball_collision)
@@ -25,7 +68,7 @@ TEST(MoveIntentTest, test_get_destination_ball_collision)
     MoveIntent move_intent =
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero());
     EXPECT_EQ(move_intent.getDestination(), Point(1, 2));
     EXPECT_EQ(move_intent.getBallCollisionType(), BallCollisionType::AVOID);
 }
@@ -35,7 +78,7 @@ TEST(AutochipMoveIntentTest, test_get_destination_ball_collision_chip)
     MoveIntent intent =
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 3.2},
-                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero());
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
     ASSERT_TRUE(intent.getAutoChipOrKick().auto_chip_kick_mode ==
                 AutoChipOrKickMode::AUTOCHIP);
@@ -50,8 +93,8 @@ TEST(AutochipMoveIntentTest, test_intent_pointer)
     std::shared_ptr<Intent> intent = std::make_shared<MoveIntent>(
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 3.2},
-                   MaxAllowedSpeedMode::PHYSICAL_LIMIT));
-    EXPECT_EQ("MoveIntent", TYPENAME(*intent));
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero()));
+    EXPECT_EQ("MoveIntent", TYPENAME(intent.get()));
 }
 
 TEST(MoveIntentTest, test_get_destination_ball_collision_kick)
@@ -59,7 +102,7 @@ TEST(MoveIntentTest, test_get_destination_ball_collision_kick)
     MoveIntent intent =
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOKICK, 3.2},
-                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero());
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
     ASSERT_EQ(intent.getAutoChipOrKick().auto_chip_kick_mode,
               AutoChipOrKickMode::AUTOKICK);

@@ -4,6 +4,19 @@
 
 #include "shared/constants.h"
 
+TEST(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
+{
+    AutoChipOrKick auto_chip_or_kick       = {AutoChipOrKickMode::AUTOCHIP, 3.2};
+    AutoChipOrKick auto_chip_or_kick_other = {AutoChipOrKickMode::AUTOCHIP, 3.2};
+    EXPECT_EQ(auto_chip_or_kick, auto_chip_or_kick_other);
+    auto_chip_or_kick       = {AutoChipOrKickMode::OFF, 3.2};
+    auto_chip_or_kick_other = {AutoChipOrKickMode::AUTOCHIP, 3.2};
+    EXPECT_NE(auto_chip_or_kick, auto_chip_or_kick_other);
+    auto_chip_or_kick       = {AutoChipOrKickMode::OFF, 3.2};
+    auto_chip_or_kick_other = {AutoChipOrKickMode::OFF, 2};
+    EXPECT_EQ(auto_chip_or_kick, auto_chip_or_kick_other);
+}
+
 TEST(PrimitiveFactoryTest, test_create_chip_primitive)
 {
     auto chip_primitive = createChipPrimitive(Point(1, 2), Angle::quarter(), 5.0);

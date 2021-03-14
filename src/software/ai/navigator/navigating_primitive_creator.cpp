@@ -28,7 +28,7 @@ void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
     current_primitive =
         *createMovePrimitive(new_destination, new_final_speed, intent.getFinalAngle(),
                              intent.getDribblerMode(), intent.getAutoChipOrKick(),
-                             intent.getMaxAllowedSpeedMode());
+                             intent.getMaxAllowedSpeedMode(), intent.getSpinSpeed());
 }
 
 std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFinalSpeed(
