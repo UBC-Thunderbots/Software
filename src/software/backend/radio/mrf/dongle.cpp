@@ -55,7 +55,7 @@ namespace
 }  // namespace
 
 MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
-    : eStopState(EStopState::STOP),
+    : estop_state(EStopState::STOP),
       context(),
       device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
       radio_interface(-1),

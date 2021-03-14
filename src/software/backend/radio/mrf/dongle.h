@@ -107,7 +107,7 @@ class MRFDongle final
     /**
      * The current state of the emergency stop switch.
      */
-    EStopState eStopState;
+    EStopState estop_state;
 
    private:
     // We are currently uncertain if the limit on radio messages is 64 or 100 bytes. So

@@ -296,7 +296,7 @@ To summarize, the best practices are as follows:
 
 # Finite State Machines
 ## What Are Finite State Machines?
-A finite state machine (FSM) is a system with a finite number of states with defined transitions and outputs based on the inputs to the system. In particular, we are interested in hierarchical state machines where we can transition between states in terms of _when_ states should transition (_guards_) and _what_ should happen when transitions occur (_actions_), given a specific input (_event_). Hierarchical state machines treat a sub-FSM as a state with _guards_ and _actions_ when transitioning to and from the sub-FSM. When the sub-FSM enters a terminal state, the parent FSM is able to automatically transition to another state.
+A finite state machine (FSM) is a system with a finite number of states with defined transitions and outputs based on the inputs to the system. In particular, we are interested in hierarchical state machines where we can transition between states in terms of _when_ states should transition (_guards_) and _what_ should happen when transitions occur (_actions_), given a specific input (_event_). Hierarchical state machines are state machines that are composed of one or more FSMs, which we call sub-FSMs. The parent FSM can treat a sub-FSM as a state with _guards_ and _actions_ when transitioning to and from the sub-FSM. When the sub-FSM enters a terminal state, the parent FSM is able to automatically transition to another state.
 
 ![Finite State Machine Diagram](images/finite_state_machine_diagram.png)
 [source](https://www.block-net.de/Programmierung/cpp/fsm/fsm.html)
@@ -330,8 +330,8 @@ We use SML to manage our [Tactics](#tactic). Each state represents a stage in th
 ## SML Best Practices
 Boost-ext SML is a library that supports complex functionality with similarly complex syntax and semantics. If complex syntax is misused, the complicated error messages can make development difficult. Thus, we need to carefully choose a standardized subset of the library's syntax to implement our functionality while maintaining high readability.
 * Only use one _event_ per FSM: In gameplay, we react to changes in the [World](#world), so since there's only one source of new information, we should only need one _event_
-* Only one _guard_ or _action_ per transition: For readability of the transition table, we should only have one _guard_ or _action_ per transition. This can always be achieved by defining a special _guard_ or _action_ outside of the transition table.
-* Define _guards_ and _actions_ outside of the transition table: The names of _guards_ and _actions_ should be succint so that transition tables rows fit on one line and readers can easily understand the FSM from the transition table. In other words, no lambdas/anonymous functions in transition tables.
+* Only one _guard_ or _action_ per transition: For readability of the transition table, we should only have one _guard_ or _action_ per transition. This can always be achieved by defining a _guard_ or _action_ outside of the transition table that checks multiple conditions or performs multiple actions if that's required.
+* Define _guards_ and _actions_ outside of the transition table: The names of _guards_ and _actions_ should be succinct so that transition tables rows fit on one line and readers can easily understand the FSM from the transition table. In other words, no lambdas/anonymous functions in transition tables.
 * States should be defined as classes in the FSM struct so that users of the FSM can check what state the FSM is in: 
 ```
     // inside the struct
