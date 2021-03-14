@@ -48,12 +48,10 @@ TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
 {
     auto play_names = GenericFactory<std::string, Play, PlayConfig>::getRegisteredNames();
     EXPECT_EQ(2, play_names.size());
-    EXPECT_EQ(
-        std::count(play_names.begin(), play_names.end(), TYPENAME(MoveTestPlay)),
-        1);
-    EXPECT_EQ(
-        std::count(play_names.begin(), play_names.end(), TYPENAME(HaltTestPlay)),
-        1);
+    EXPECT_EQ(std::count(play_names.begin(), play_names.end(), TYPENAME(MoveTestPlay)),
+              1);
+    EXPECT_EQ(std::count(play_names.begin(), play_names.end(), TYPENAME(HaltTestPlay)),
+              1);
 }
 
 TEST_F(STPTest, test_exception_thrown_when_no_play_applicable)
@@ -92,11 +90,10 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
     }
 
     std::vector<std::string> expected_play_names = {
-        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay),
-        TYPENAME(HaltTestPlay), TYPENAME(HaltTestPlay),
-        TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay),
-        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay),
-        TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay),
+        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay),
+        TYPENAME(HaltTestPlay), TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay),
+        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay),
+        TYPENAME(HaltTestPlay),
     };
 
     EXPECT_EQ(expected_play_names, actual_play_names);
