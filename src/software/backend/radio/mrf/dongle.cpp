@@ -307,7 +307,7 @@ void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &tran
 void MRFDongle::handle_status(AsyncOperation<void> &)
 {
     status_transfer.result();
-    eStopState       = static_cast<EStopState>(status_transfer.data()[0] & 3U);
+    estop_state      = static_cast<EStopState>(status_transfer.data()[0] & 3U);
     auto dongle_msgs = annunciator.handle_dongle_messages(status_transfer.data()[0U]);
     status_transfer.submit();
 
