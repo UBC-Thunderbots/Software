@@ -77,7 +77,7 @@ std::optional<MsgT> ProtoLogReader::getNextMsg()
 
     if (!success)
     {
-        throw std::invalid_argument("Failed to parse " + TYPENAME(MsgT) + " into " +
+        throw std::invalid_argument("Failed to parse " + CLASS_TYPENAME(MsgT) + " into " +
                                     cur_chunk.messages(cur_msg_idx).type_url());
     }
 

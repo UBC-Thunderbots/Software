@@ -30,7 +30,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(KickoffFriendlyPlay));
+    setAIPlay(CLASS_TYPENAME(KickoffFriendlyPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

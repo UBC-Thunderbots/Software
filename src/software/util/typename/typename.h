@@ -15,6 +15,9 @@ std::string demangleTypeId(const char* mangled_name);
 
 /**
  * Gets the demangled typeid name of an object reference
+ * Note: Setting up the arguments as const reference avoids evaluating expressions with
+ * side effects as operand to typeid
+ * https://stackoverflow.com/questions/46494928/clang-warning-on-expression-side-effects
  *
  * @param obj_ref The reference to the object
  *
@@ -23,7 +26,7 @@ std::string demangleTypeId(const char* mangled_name);
 template <typename T>
 std::string objectTypeName(const T& obj_ref)
 {
-return demangleTypeId(typeid(obj_ref).name());
+    return demangleTypeId(typeid(obj_ref).name());
 }
 
 /**
@@ -37,4 +40,4 @@ return demangleTypeId(typeid(obj_ref).name());
  *
  * @return the string representation of the object
  */
-#define CLASS_TYPENAME(object) (demangle_typeid(typeid(object).name()))
+#define CLASS_TYPENAME(object) (demangleTypeId(typeid(object).name()))

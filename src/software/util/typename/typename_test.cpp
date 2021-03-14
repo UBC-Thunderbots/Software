@@ -17,6 +17,12 @@ class TestTypeA : public TestType
 TEST(TypeNameTest, abstract_base_class_concrete_subtype)
 {
     std::shared_ptr<TestType> test_type = std::make_shared<TestTypeA>();
-    EXPECT_EQ("std::shared_ptr<TestType>", TYPENAME(test_type));
-    EXPECT_EQ("TestTypeA", TYPENAME(*test_type));
+    EXPECT_EQ("std::shared_ptr<TestType>", objectTypeName(test_type));
+    EXPECT_EQ("TestTypeA", objectTypeName(*test_type));
+}
+
+TEST(TypeNameTest, test_class_type_name)
+{
+    EXPECT_EQ("TestType", CLASS_TYPENAME(TestType));
+    EXPECT_EQ("TestTypeA", CLASS_TYPENAME(TestTypeA));
 }

@@ -117,7 +117,7 @@ template <typename PlannerT>
 std::pair<std::string, PathPlannerConstructor> nameAndConstructor()
 {
     return std::pair<std::string, PathPlannerConstructor>(
-        TYPENAME(PlannerT), []() { return std::make_unique<PlannerT>(); });
+        CLASS_TYPENAME(PlannerT), []() { return std::make_unique<PlannerT>(); });
 }
 
 std::vector<std::pair<std::string, PathPlannerConstructor>>
