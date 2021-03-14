@@ -174,13 +174,13 @@ class PhysicsRobot
     void brakeMotorFrontRight();
 
     /**
-     * Sets the position of the PhysicsRobot to the given position. The robot
-     * will maintain its orientation, but will have its linear and angular
-     * velocity set to zero.
+     * Sets the position and orientation of the PhysicsRobot to the given position
+     * and angle. The robot will have its linear and angular velocity set to zero.
      *
      * @param position The new position of the robot
+     * @param angle The new angle of the robot
      */
-    void setPosition(const Point &position);
+    void setPosition(const Point &position, const Angle &angle);
 
     /**
      * Applies the given force vector to the robot at its center of mass

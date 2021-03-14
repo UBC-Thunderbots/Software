@@ -37,6 +37,7 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
     WorldDrawFunction getDrawBallVelocityFunction();
 
    private:
+    void keyPressEvent(QKeyEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
@@ -45,13 +46,19 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
     // The robot currently being placed by the user, if any
     std::weak_ptr<PhysicsRobot> robot;
 
+    // Boolean to check if user shift clicked
+    bool shift_clicked = false;
+
     // Boolean to check if the user ctrl clicked
     bool ctrl_clicked = false;
 
-    // The initial point when adding force to the ball, if any
+    // Boolean to check if user has r pressed
+    bool r_clicked = false;
+
+    // The final point when adding force to the ball, or rotating robot, if any
     Point initial_point;
 
-    // The final point when adding force to the ball, if any
+    // The final point when adding force to the ball, or rotating robot, if any
     Point final_point;
 
     std::shared_ptr<StandaloneSimulator> standalone_simulator;

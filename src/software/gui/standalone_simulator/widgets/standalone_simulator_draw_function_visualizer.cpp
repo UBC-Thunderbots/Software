@@ -21,6 +21,14 @@ void StandaloneSimulatorDrawFunctionVisualizer::setStandaloneSimulator(
     standalone_simulator = simulator;
 }
 
+void StandaloneSimulatorDrawFunctionVisualizer::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_R)
+    {
+        r_clicked = true;
+    }
+}
+
 void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* event)
 {
     // If Ctrl is pressed, place the ball where the user clicks
@@ -33,8 +41,14 @@ void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* eve
     }
     else if (event->modifiers() & Qt::ShiftModifier && standalone_simulator)
     {
+        shift_clicked        = true;
         Point point_in_scene = createPoint(mapToScene(event->pos()));
         robot                = standalone_simulator->getRobotAtPosition(point_in_scene);
+    }
+    else if (r_clicked && standalone_simulator)
+    {
+        initial_point = createPoint(mapToScene(event->pos()));
+        robot         = standalone_simulator->getRobotAtPosition(initial_point);
     }
     else
     {
@@ -55,6 +69,16 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseReleaseEvent(QMouseEvent* e
         final_point   = Point(0, 0);
         ctrl_clicked  = false;
     }
+    else if (shift_clicked)
+    {
+        shift_clicked = false;
+    }
+    else if (r_clicked)
+    {
+        initial_point = Point(0, 0);
+        final_point   = Point(0, 0);
+        r_clicked     = false;
+    }
 
     DrawFunctionVisualizer::mouseReleaseEvent(event);
 }
@@ -64,23 +88,46 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseMoveEvent(QMouseEvent* even
     auto physics_robot = robot.lock();
     if (physics_robot && standalone_simulator)
     {
-        Point point_in_scene = createPoint(mapToScene(event->pos()));
-        physics_robot->setPosition(point_in_scene);
+        if (shift_clicked)
+        {
+            Point point_in_scene = createPoint(mapToScene(event->pos()));
+            physics_robot->setPosition(point_in_scene, physics_robot->orientation());
+        }
+        else if (r_clicked)
+        {
+            final_point = createPoint(mapToScene(event->pos()));
+            Vector vec  = Vector(final_point.x() - initial_point.x(),
+                                final_point.y() - initial_point.y());
+            Angle angle = vec.orientation();
+            physics_robot->setPosition(initial_point, angle);
+        }
     }
-    if (ctrl_clicked && standalone_simulator)
+    else if (ctrl_clicked && standalone_simulator)
     {
         final_point = createPoint(mapToScene(event->pos()));
     }
+
     DrawFunctionVisualizer::mouseMoveEvent(event);
 }
 
 WorldDrawFunction StandaloneSimulatorDrawFunctionVisualizer::getDrawBallVelocityFunction()
 {
-    auto draw_function = [this](QGraphicsScene* scene) {
-        drawBallVelocity(scene, initial_point, initial_point - final_point,
-                         ball_speed_slow_color, ball_speed_fast_color);
-    };
-    return WorldDrawFunction(draw_function);
+    if (ctrl_clicked)
+    {
+        auto draw_function = [this](QGraphicsScene* scene) {
+            drawBallVelocity(scene, initial_point, initial_point - final_point,
+                             ball_speed_slow_color, ball_speed_fast_color);
+        };
+        return WorldDrawFunction(draw_function);
+    }
+    else
+    {
+        auto draw_function = [this](QGraphicsScene* scene) {
+            drawBallVelocity(scene, initial_point, Vector(0, 0), ball_speed_slow_color,
+                             ball_speed_fast_color);
+        };
+        return WorldDrawFunction(draw_function);
+    }
 }
 
 void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent* event)

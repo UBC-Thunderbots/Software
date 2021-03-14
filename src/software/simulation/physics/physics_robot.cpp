@@ -353,7 +353,8 @@ float PhysicsRobot::getMotorBrakeForce(float motor_speed) const
     return -0.5f * robot_body->GetMass() * motor_speed;
 }
 
-void PhysicsRobot::setPosition(const Point& position)
+
+void PhysicsRobot::setPosition(const Point& position, const Angle& angle)
 {
     auto func = [=]() {
         b2World* world = robot_body->GetWorld();
@@ -361,7 +362,8 @@ void PhysicsRobot::setPosition(const Point& position)
         {
             robot_body->SetLinearVelocity(createVec2(Vector(0, 0)));
             robot_body->SetAngularVelocity(0.0);
-            robot_body->SetTransform(createVec2(position), robot_body->GetAngle());
+            robot_body->SetTransform(createVec2(position),
+                                     static_cast<float>(angle.toRadians()));
         }
     };
 
