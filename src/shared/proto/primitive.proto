@@ -51,6 +51,7 @@ message MovePrimitive
     float dribbler_speed_rpm         = 4;
     float max_speed_m_per_s          = 5;
     AutoChipOrKick auto_chip_or_kick = 6;
+    AngularVelocity spin_speed       = 7;
 }
 
 message SpinningMovePrimitive
