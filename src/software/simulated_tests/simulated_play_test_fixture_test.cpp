@@ -65,29 +65,6 @@ TEST_F(SimulatedPlayTestFixtureTest,
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
-       test_gtest_expect_statement_in_validation_function_causes_test_to_fail)
-{
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
-
-    std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() <= Timestamp::fromSeconds(0.5))
-            {
-                yield("Waiting for timestamp of at least 0.5s");
-            }
-
-            EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.5));
-        }};
-
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
-
-    EXPECT_NONFATAL_FAILURE(
-        runTest(terminating_validation_functions, non_terminating_validation_functions,
-                Duration::fromSeconds(1.0)),
-        "Timestamp");
-}
-
-TEST_F(SimulatedPlayTestFixtureTest,
        test_multiple_validation_function_pass_before_timeout)
 {
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
@@ -183,86 +160,6 @@ TEST_F(SimulatedPlayTestFixtureTest,
             Duration::fromSeconds(0.5));
 }
 
-TEST_F(
-    SimulatedPlayTestFixtureTest,
-    test_failing_gtest_expect_statement_in_non_terminating_validation_function_causes_test_to_fail)
-{
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
-
-    // Because the EXPECT_NONFATAL_FAILURE macro only captures a single failure, we have
-    // to write this failing function in such a way that it will only fail once during the
-    // test. To do this we check the timestamp very close to the test timeout
-    auto failing_validation_function = [](std::shared_ptr<World> world_ptr,
-                                          ValidationCoroutine::push_type& yield) {
-        if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(0.5))
-        {
-            yield("Timestamp was greater than or equal to 0.5");
-        }
-    };
-
-    auto passing_validation_function = [](std::shared_ptr<World> world_ptr,
-                                          ValidationCoroutine::push_type& yield) {
-        if (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0))
-        {
-            yield("Timestamp was less than 0");
-        }
-    };
-
-    std::vector<ValidationFunction> terminating_validation_functions = {};
-
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
-        passing_validation_function, failing_validation_function};
-
-    EXPECT_NONFATAL_FAILURE(
-        runTest(terminating_validation_functions, non_terminating_validation_functions,
-                Duration::fromSeconds(0.5)),
-        "Timestamp was greater than or equal to 0.5");
-}
-
-TEST_F(
-    SimulatedPlayTestFixtureTest,
-    test_failing_gtest_expect_statement_in_non_terminating_validation_function_causes_test_to_fail_with_different_test_order)
-{
-    // This test is basically the same as
-    // "test_failing_gtest_expect_statement_in_non_terminating_validation_function_causes_test_to_fail"
-    // but exists as a regression test because there was a bug with the Terminating
-    // and non-terminating FunctionValidator that caused only the last validation_function
-    // in the vectors to be run, so we re-order the validation_functions in this test to
-    // catch future failures of this type
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
-
-    // Because the EXPECT_NONFATAL_FAILURE macro only captures a single failure, we have
-    // to write this failing function in such a way that it will only fail once during the
-    // test. To do this we check the timestamp very close to the test timeout
-    auto failing_validation_function = [](std::shared_ptr<World> world_ptr,
-                                          ValidationCoroutine::push_type& yield) {
-        if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(0.5))
-        {
-            yield("Timestamp was greater than or equal to 0.5");
-        }
-    };
-
-    auto passing_validation_function = [](std::shared_ptr<World> world_ptr,
-                                          ValidationCoroutine::push_type& yield) {
-        if (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0))
-        {
-            yield("Timestamp was less than 0");
-        }
-    };
-
-    std::vector<ValidationFunction> terminating_validation_functions = {};
-
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
-        failing_validation_function,
-        passing_validation_function,
-    };
-
-    EXPECT_NONFATAL_FAILURE(
-        runTest(terminating_validation_functions, non_terminating_validation_functions,
-                Duration::fromSeconds(0.5)),
-        "Timestamp was greater than or equal to 0.5");
-}
-
 TEST_F(SimulatedPlayTestFixtureTest,
        test_terminating_and_non_terminating_validation_functions_pass_together)
 {
@@ -270,16 +167,25 @@ TEST_F(SimulatedPlayTestFixtureTest,
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0.4));
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.4))
+            {
+                yield("Waiting for timestamp of at least 0.4s");
+            }
         },
     };
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            EXPECT_GE(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(0));
+            if (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.0))
+            {
+                yield("Timestamp was Negative");
+            }
         },
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            EXPECT_LT(world_ptr->getMostRecentTimestamp(), Timestamp::fromSeconds(100));
+            if (world_ptr->getMostRecentTimestamp() > Timestamp::fromSeconds(100.0))
+            {
+                yield("Timestamp was greater than 100");
+            }
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

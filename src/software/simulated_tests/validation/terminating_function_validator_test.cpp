@@ -108,7 +108,7 @@ TEST(TerminatingFunctionValidatorTest,
                                                 ValidationCoroutine::push_type& yield) {
         while (world->ball().position().x() < 0)
         {
-            yield("Ball x position not less than 0");
+            yield("The ball's x position is not less than 0");
         }
     };
 
@@ -119,14 +119,14 @@ TEST(TerminatingFunctionValidatorTest,
         Ball(BallState(Point(-1, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
-    EXPECT_EQ("Ball x position not less than 0",
+    EXPECT_EQ("The ball's x position is not less than 0",
               function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(-0.1, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
-    EXPECT_EQ("Ball x position not less than 0",
+    EXPECT_EQ("The ball's x position is not less than 0",
               function_validator.currentErrorMessage());
 
     world->updateBall(
@@ -144,12 +144,12 @@ TEST(TerminatingFunctionValidatorTest,
                                                 ValidationCoroutine::push_type& yield) {
         while (world->ball().position().x() < 0)
         {
-            yield("Ball x position not less than 0");
+            yield("The ball's x position is not less than 0");
         }
 
         while (world->ball().position().y() < 0)
         {
-            yield("Ball y position not less than 0");
+            yield("The ball's y position not less than 0");
         }
     };
 
@@ -160,14 +160,14 @@ TEST(TerminatingFunctionValidatorTest,
         Ball(BallState(Point(-1, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
-    EXPECT_EQ("Ball x position not less than 0",
+    EXPECT_EQ("The ball's x position is not less than 0",
               function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(1, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
-    EXPECT_EQ("Ball y position not less than 0",
+    EXPECT_EQ("The ball's y position not less than 0",
               function_validator.currentErrorMessage());
 
     world->updateBall(
@@ -176,7 +176,7 @@ TEST(TerminatingFunctionValidatorTest,
     EXPECT_TRUE(result);
 }
 
-TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_statements)
+TEST(TerminatingFunctionValidatorTest, test_validation_function_error_message)
 {
     // This shows an example of using GoogleTest statements within a validation function.
     // Just like regular unit tests, if the condition is not met the test will fail.
@@ -184,7 +184,6 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
                                                 ValidationCoroutine::push_type& yield) {
         while (world->gameState().isStopped())
         {
-            EXPECT_GT(world->ball().velocity().length(), 1.0);
             yield("Test message");
         }
     };
@@ -193,11 +192,6 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
     TerminatingFunctionValidator function_validator(validation_function, world);
 
     world->updateRefereeCommand(RefereeCommand::STOP);
-    world->updateBall(
-        Ball(BallState(Point(0, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
-
-    EXPECT_NONFATAL_FAILURE(function_validator.executeAndCheckForSuccess(), "velocity");
-
     world->updateBall(
         Ball(BallState(Point(0, 0), Vector(1, 1)), Timestamp::fromSeconds(0)));
     for (unsigned int i = 0; i < 10; i++)

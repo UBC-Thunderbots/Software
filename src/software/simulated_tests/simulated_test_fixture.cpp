@@ -189,7 +189,10 @@ void SimulatedTestFixture::runTest(
             "Not all validation functions passed within the timeout duration:\n";
         for (const auto &fun : terminating_function_validators)
         {
-            failure_message += fun.currentErrorMessage() + std::string("\n");
+            if (fun.currentErrorMessage() != "")
+            {
+                failure_message += fun.currentErrorMessage() + std::string("\n");
+            }
         }
         ADD_FAILURE() << failure_message;
     }
