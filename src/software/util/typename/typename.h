@@ -15,6 +15,9 @@ std::string demangleTypeId(const char* mangled_name);
 
 /**
  * Gets the demangled typeid name of an object reference
+ *
+ * Note: This does not work on classes; instead use TYPENAME
+ *
  * Note: Setting up the arguments as const reference avoids evaluating expressions with
  * side effects as operand to typeid
  * https://stackoverflow.com/questions/46494928/clang-warning-on-expression-side-effects
