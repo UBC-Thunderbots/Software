@@ -50,8 +50,9 @@ struct AutoChipOrKick
 /**
  * PHYSICAL_LIMIT maximum speed allowed by the physical limits of the robot
  * STOP_COMMAND maximum speed allowed when responding to a stop command
+ * TIPTOE maximum speed allowed does not bump the ball to kick speed
  */
-MAKE_ENUM(MaxAllowedSpeedMode, PHYSICAL_LIMIT, STOP_COMMAND);
+MAKE_ENUM(MaxAllowedSpeedMode, PHYSICAL_LIMIT, STOP_COMMAND, TIPTOE);
 
 /**
  * Create a Chip Primitive Message

@@ -13,6 +13,7 @@ void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
                                      double final_speed, DribblerMode dribbler_mode,
                                      BallCollisionType ball_collision_type,
                                      AutoChipOrKick auto_chip_or_kick,
+                                     MaxAllowedSpeedMode max_allowed_speed_mode,
                                      AngularVelocity spin_speed)
 {
     // Update the control parameters stored by this Tactic
@@ -22,7 +23,7 @@ void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
     control_params.dribbler_mode          = dribbler_mode;
     control_params.ball_collision_type    = ball_collision_type;
     control_params.auto_chip_or_kick      = auto_chip_or_kick;
-    control_params.max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
+    control_params.max_allowed_speed_mode = max_allowed_speed_mode;
     control_params.spin_speed             = spin_speed;
 }
 

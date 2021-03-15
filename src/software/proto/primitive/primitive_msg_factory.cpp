@@ -141,6 +141,8 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             return ROBOT_MAX_SPEED_METERS_PER_SECOND;
         case MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+        case MaxAllowedSpeedMode::TIPTOE:
+            return 0.5;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;
