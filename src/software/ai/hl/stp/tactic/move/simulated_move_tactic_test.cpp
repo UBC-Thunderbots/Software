@@ -147,17 +147,13 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move)
     tactic->updateControlParams(destination, Angle::zero(), 0, DribblerMode::OFF,
                                 BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                                AngularVelocity::quarter());
+                                AngularVelocity::full());
     setTactic(tactic);
     setRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            while (!tactic->done())
-            {
-                yield();
-            }
             robotHasOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
                                 yield);
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
