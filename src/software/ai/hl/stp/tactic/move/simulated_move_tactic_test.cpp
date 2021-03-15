@@ -19,10 +19,11 @@ class SimulatedMoveTacticTest : public SimulatedTacticTestFixture
 
 TEST_F(SimulatedMoveTacticTest, test_move_across_field)
 {
-    Point initial_position = Point(-3, 2.5);
+    Point initial_position = Point(-3, 1.5);
     Point destination      = Point(2.5, -1.1);
     setBallState(BallState(Point(4.5, -3), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({initial_position}));
+    addFriendlyRobots(
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
          field().enemyDefenseArea().negXNegYCorner(),
@@ -32,7 +33,7 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(0);
+    setRobotId(1);
     setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -42,14 +43,14 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
             {
                 yield();
             }
-            robotAtPosition(0, world_ptr, destination, 0.05, yield);
+            robotAtPosition(1, world_ptr, destination, 0.05, yield);
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(1))
+                   stopped_time + Duration::fromSeconds(3))
             {
                 yield();
             }
-            robotAtPosition(0, world_ptr, destination, 0.05, yield);
+            robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -89,12 +90,11 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
             robotKickedBall(1, Angle::zero(), world_ptr, yield);
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(1))
+                   stopped_time + Duration::fromSeconds(3))
             {
                 yield();
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotKickedBall(1, Angle::zero(), world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -137,12 +137,11 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
             robotKickedBall(1, Angle::threeQuarter(), world_ptr, yield);
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(1))
+                   stopped_time + Duration::fromSeconds(3))
             {
                 yield();
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotKickedBall(1, Angle::threeQuarter(), world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -182,7 +181,7 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
             }
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(1))
+                   stopped_time + Duration::fromSeconds(3))
             {
                 yield();
             }
@@ -228,7 +227,7 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
             }
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(1))
+                   stopped_time + Duration::fromSeconds(3))
             {
                 yield();
             }
