@@ -28,7 +28,6 @@ cc_library(
         ":chip",
         ":direct_control",
         ":kick",
-        ":spinning_move",
         ":stop",
         "//firmware/app/world:firmware_world",
     ] + select({
@@ -87,18 +86,6 @@ cc_library(
 )
 
 cc_library(
-    name = "spinning_move",
-    srcs = ["spinning_move_primitive.c"],
-    hdrs = ["spinning_move_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
-    ],
-)
-
-cc_library(
     name = "move",
     srcs = ["move_primitive.c"],
     hdrs = ["move_primitive.h"],
@@ -128,7 +115,6 @@ cc_library(
     name = "test_util_world",
     hdrs = ["test_util_world.h"],
     deps = [
-        ":primitive_manager",
         "@fff",
         "@gtest//:gtest_main",
     ],

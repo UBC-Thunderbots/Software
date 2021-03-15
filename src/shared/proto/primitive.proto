@@ -12,9 +12,8 @@ message Primitive
         ChipPrimitive chip                    = 2;
         KickPrimitive kick                    = 3;
         MovePrimitive move                    = 4;
-        SpinningMovePrimitive spinning_move   = 5;
-        StopPrimitive stop                    = 6;
-        DirectControlPrimitive direct_control = 7;
+        StopPrimitive stop                    = 5;
+        DirectControlPrimitive direct_control = 6;
     }
 }
 
@@ -52,14 +51,6 @@ message MovePrimitive
     float max_speed_m_per_s          = 5;
     AutoChipOrKick auto_chip_or_kick = 6;
     AngularVelocity min_spin_speed   = 7;
-}
-
-message SpinningMovePrimitive
-{
-    Point destination                = 1;
-    float final_speed_m_per_s        = 2;
-    AngularVelocity angular_velocity = 3;
-    float dribbler_speed_rpm         = 4;
 }
 
 message StopPrimitive

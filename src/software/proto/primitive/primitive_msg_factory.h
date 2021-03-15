@@ -102,21 +102,6 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     MaxAllowedSpeedMode max_allowed_speed_mode, AngularVelocity min_spin_speed);
 
 /**
- * Create a Spinning Move Primitive Message
- *
- * @param dest The final destination of the movement
- * @param final_speed_m_per_s The speed at final destination
- * @param angular_velocity The angular velocity of the robot
- * of the movement
- * @param dribbler_mode The dribbler mode
- *
- * @return Pointer to Spinning Move Primitive Message
- */
-std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
-    const Point &dest, double final_speed_m_per_s,
-    const AngularVelocity &angular_velocity, DribblerMode dribbler_mode);
-
-/**
  * Create a Stop Move Primitive Message
  *
  * @param stop_type Indicate to brake or coast to a stop

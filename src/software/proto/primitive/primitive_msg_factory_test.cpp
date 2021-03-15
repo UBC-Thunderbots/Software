@@ -104,21 +104,6 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
     EXPECT_EQ(move_primitive->move().min_spin_speed().radians_per_second(), 0.0f);
 }
 
-TEST(PrimitiveFactoryTest, test_create_spinning_move_primitive)
-{
-    auto spinning_move_primitive = createSpinningMovePrimitive(
-        Point(1, -8), -6.0, AngularVelocity::full(), DribblerMode::OFF);
-
-    ASSERT_TRUE(spinning_move_primitive->has_spinning_move());
-    EXPECT_EQ(spinning_move_primitive->spinning_move().destination().x_meters(), 1);
-    EXPECT_EQ(spinning_move_primitive->spinning_move().destination().y_meters(), -8);
-    EXPECT_EQ(spinning_move_primitive->spinning_move().final_speed_m_per_s(), -6.0);
-    EXPECT_EQ(
-        spinning_move_primitive->spinning_move().angular_velocity().radians_per_second(),
-        static_cast<float>(AngularVelocity::full().toRadians()));
-    EXPECT_EQ(spinning_move_primitive->spinning_move().dribbler_speed_rpm(), 0.0);
-}
-
 TEST(PrimitiveFactoryTest, test_create_stop_primitive_brake)
 {
     auto stop_primitive = createStopPrimitive(false);
