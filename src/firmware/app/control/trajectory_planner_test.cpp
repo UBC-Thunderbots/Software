@@ -1090,12 +1090,26 @@ TEST_F(TrajectoryPlannerTest,
         app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
             path_parameters, &position_trajectory);
     EXPECT_EQ(status, OK);
+
+    float max_orientation = 0.0f;
+    for (unsigned int i = 0; i < path_parameters.num_elements - 1; i++)
+    {
+        // orientation should always be increasing
+        EXPECT_GE(position_trajectory.orientation[i], max_orientation);
+        if (position_trajectory.orientation[i] > max_orientation)
+        {
+            max_orientation = position_trajectory.orientation[i];
+        }
+    }
+    EXPECT_GT(max_orientation, 900.0f);
+
     app_trajectory_planner_generateVelocityTrajectory(
         &position_trajectory, path_parameters.num_elements, &velocity_trajectory);
 
     std::vector<Vector> directions =
         getDirectionVectorsFromPositionTrajectory(&position_trajectory, path_parameters);
 
+    float max_angular_speed = 0.0f;
     for (unsigned int i = 0; i < path_parameters.num_elements - 1; i++)
     {
         EXPECT_FLOAT_EQ(velocity_trajectory.angular_velocity[i],
@@ -1106,9 +1120,14 @@ TEST_F(TrajectoryPlannerTest,
         EXPECT_FLOAT_EQ(
             velocity_trajectory.y_velocity[i],
             position_trajectory.linear_speed[i] * static_cast<float>(directions[i].y()));
+        if (velocity_trajectory.angular_velocity[i] > max_angular_speed)
+        {
+            max_angular_speed = velocity_trajectory.angular_velocity[i];
+        }
         EXPECT_NEAR(velocity_trajectory.time_profile[i],
                     position_trajectory.time_profile[i], 0.00001);
     }
+    EXPECT_GT(max_angular_speed, 1.0f);
     EXPECT_FLOAT_EQ(
         velocity_trajectory.angular_velocity[path_parameters.num_elements - 1], 0);
 }
