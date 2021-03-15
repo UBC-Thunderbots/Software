@@ -105,14 +105,14 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     const float current_speed       = app_firmware_robot_getSpeedLinear(robot);
 
     const float distance_to_destination =
-        hypotf(destination_x - current_x, destination_y - current_y);
+        sqrtf(powf(destination_x - current_x, 2) + powf(destination_y - current_y, 2));
     // Number of revolutions to spin, assuming the time horizon is the simplistic
     // distance_to_destination over max_speed_m_per_s
-    const unsigned revolutions_to_spin =
-        (unsigned)(distance_to_destination / max_speed_m_per_s * target_spin_rps);
+    const int revolutions_to_spin =
+        (int)(distance_to_destination / max_speed_m_per_s * target_spin_rps);
     // Change in orientation to reach destination orientation
     const float net_change_in_orientation =
-        fmodf(destination_orientation - current_orientation, (float)(2 * M_PI));
+        min_angle_delta(destination_orientation, current_orientation);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {

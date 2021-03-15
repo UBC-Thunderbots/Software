@@ -16,8 +16,8 @@ PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
         .disp = dot2D(major_vec, dr), .vel = dot2D(major_vec, v), .accel = 0, .time = 0};
     const Component minor = {
         .disp = dot2D(minor_vec, dr), .vel = dot2D(minor_vec, v), .accel = 0, .time = 0};
-    const Component rot = {.disp = min_angle_delta(
-                               app_firmware_robot_getOrientation(robot), destination[2])};
+    const Component rot = {.disp =
+                               app_firmware_robot_getOrientation(robot) - destination[2]};
     PhysBot pb          = {.rot = rot, .maj = major, .min = minor};
     for (unsigned i = 0; i < 2; i++)
     {

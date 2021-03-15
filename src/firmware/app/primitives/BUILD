@@ -115,6 +115,7 @@ cc_library(
     name = "test_util_world",
     hdrs = ["test_util_world.h"],
     deps = [
+        ":primitive_manager",
         "@fff",
         "@gtest//:gtest_main",
     ],
