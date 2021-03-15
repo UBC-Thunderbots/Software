@@ -341,7 +341,7 @@ Boost-ext SML is a library that supports complex functionality with similarly co
     // allows for this syntax
     fsm.is(boost::sml::state<MyFSM::MyState>)
 ```
-* Avoid entry and exit conditions: Everything that can be implement with entry and exit conditions can easily be implemented as actions, so this rule reduces source of confusion for the reader
+* Avoid entry and exit conditions: Everything that can be implemented with entry and exit conditions can easily be implemented as actions, so this rule reduces source of confusion for the reader
 * Avoid self transitions, i.e. `src_state + event [guard] / action = src_state`: self transitions call entry and exit conditions, which complicates the FSM. If we want a state to stay in the same state while performing an action, then we should use an internal transition, i.e. `src_state + event [guard] / action`.
 * Avoid orthogonal regions: Multiple FSMs running in parallel is hard to reason about and isn't necessary for implementing single robot behaviour. Thus, only prefix one state with an asterix (\*)
 * Use callbacks in _events_ to return information from the FSM: Since the SML library cannot directly return information, we need to return information through callbacks. For example, if we want to return a double from an FSM, we can pass in `std::function<void(double)> callback` as part of the event and then make the _action_ call that function with the value we want returned.
