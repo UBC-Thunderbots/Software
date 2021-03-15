@@ -98,7 +98,7 @@ struct GetPossessionFSM
                 event.common.robot.id(), point_in_front_of_ball,
                 face_ball_vector.orientation(), 0, DribblerMode::MAX_FORCE,
                 BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero()));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
         /**
@@ -120,7 +120,7 @@ struct GetPossessionFSM
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, AngularVelocity::zero()));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
         return make_transition_table(

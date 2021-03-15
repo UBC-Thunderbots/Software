@@ -130,9 +130,9 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
 
 TEST_F(SimulatedMoveTacticTest, test_spinning_move)
 {
-    Point initial_position = Point(2.5, 2.5);
-    Point destination      = Point(2.5, -1);
-    setBallState(BallState(Point(2.5, -1), Vector(0, 0)));
+    Point initial_position = Point(-4, 2);
+    Point destination      = Point(4, 2);
+    setBallState(BallState(Point(4, 2), Vector(0, 0)));
     addFriendlyRobots({RobotStateWithId{
         .id          = 1,
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::zero(),
@@ -146,8 +146,7 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move)
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0, DribblerMode::OFF,
                                 BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
-                                MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                                AngularVelocity::full());
+                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 10.0);
     setTactic(tactic);
     setRobotId(1);
 

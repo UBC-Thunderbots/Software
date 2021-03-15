@@ -92,14 +92,14 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(const Point &kick_ori
  * @param dribbler_mode The dribbler mode
  * @param auto_chip_or_kick The command to autochip or autokick
  * @param max_allowed_speed_mode The mode of maximum speed allowed
- * @param target_spin_speed The target angular velocity of spinning while moving
+ * @param target_spin_rps The target spin while moving in revolutions per second
  *
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
     DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
-    MaxAllowedSpeedMode max_allowed_speed_mode, AngularVelocity target_spin_speed);
+    MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rps);
 
 /**
  * Create a Stop Move Primitive Message
