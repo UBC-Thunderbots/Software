@@ -27,8 +27,8 @@ struct MoveFSM
         AutoChipOrKick auto_chip_or_kick;
         // The maximum allowed speed mode
         MaxAllowedSpeedMode max_allowed_speed_mode;
-        // The spin speed for a spinning move behaviour
-        AngularVelocity spin_speed;
+        // The minimum angular velocity of spinning while moving
+        AngularVelocity min_spin_speed;
     };
 
     // this struct defines the only event that the MoveFSM responds to
@@ -58,7 +58,7 @@ struct MoveFSM
                 event.control_params.ball_collision_type,
                 event.control_params.auto_chip_or_kick,
                 event.control_params.max_allowed_speed_mode,
-                event.control_params.spin_speed));
+                event.control_params.min_spin_speed));
         };
 
         /**

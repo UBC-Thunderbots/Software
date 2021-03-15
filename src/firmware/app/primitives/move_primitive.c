@@ -58,56 +58,6 @@ void plan_move_rotation(PhysBot* pb, float avel)
     limit(&pb->rot.accel, MAX_T_A);
 }
 
-void start_motion(void* void_state_ptr, FirmwareWorld_t* world,
-                  TbotsProto_Point destination, float final_speed_m_per_s,
-                  float final_angle)
-{
-    MoveState_t* state = (MoveState_t*)void_state_ptr;
-
-    // Convert into m/s and rad/s because physics is in m and s
-    const float destination_x           = destination.x_meters;
-    const float destination_y           = destination.y_meters;
-    const float destination_orientation = final_angle;
-    const float speed_at_dest_m_per_s   = final_speed_m_per_s;
-
-    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-
-    const float current_x           = app_firmware_robot_getPositionX(robot);
-    const float current_y           = app_firmware_robot_getPositionY(robot);
-    const float current_orientation = app_firmware_robot_getOrientation(robot);
-    const float current_speed       = app_firmware_robot_getSpeedLinear(robot);
-
-    // Plan a trajectory to move to the target position/orientation
-    FirmwareRobotPathParameters_t path_parameters = {
-        .path = {.x = {.coefficients = {0, 0, destination_x - current_x, current_x}},
-                 .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
-        .orientation_profile = {.coefficients = {0, 0,
-                                                 fmodf(destination_orientation -
-                                                           current_orientation,
-                                                       (float)(2 * M_PI)),
-                                                 current_orientation}},
-        .t_start             = 0,
-        .t_end               = 1.0f,
-        .num_elements        = 10,
-        .max_allowable_linear_acceleration =
-            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-        .max_allowable_linear_speed = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND,
-        .max_allowable_angular_acceleration =
-            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
-        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-        .initial_linear_speed        = current_speed,
-        .final_linear_speed          = speed_at_dest_m_per_s};
-    state->num_trajectory_elems = path_parameters.num_elements;
-    app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
-        path_parameters, &(state->position_trajectory));
-
-    // NOTE: We set this after doing the trajectory generation in case the generation
-    //       took a while, since we're going to use this as our reference time when
-    //       tracking the trajectory, and so what it to be as close as possible to
-    //       the time that we actually start _executing_ the trajectory
-    state->primitive_start_time_seconds = app_firmware_world_getCurrentTime(world);
-}
-
 void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_state_ptr,
                               FirmwareWorld_t* world)
 {

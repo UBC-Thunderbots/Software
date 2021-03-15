@@ -6,13 +6,13 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point& destination,
                        const BallCollisionType& ball_collision_type,
                        const AutoChipOrKick& auto_chip_or_kick,
                        const MaxAllowedSpeedMode& max_allowed_speed_mode,
-                       const AngularVelocity& spin_speed)
+                       const AngularVelocity& min_spin_speed)
     : NavigatingIntent(robot_id, destination, final_speed, ball_collision_type,
                        max_allowed_speed_mode),
       final_angle(final_angle),
       dribbler_mode(dribbler_mode),
       auto_chip_or_kick(auto_chip_or_kick),
-      spin_speed(spin_speed)
+      min_spin_speed(min_spin_speed)
 {
 }
 
@@ -43,7 +43,7 @@ const AutoChipOrKick& MoveIntent::getAutoChipOrKick() const
 
 const AngularVelocity& MoveIntent::getSpinSpeed() const
 {
-    return spin_speed;
+    return min_spin_speed;
 }
 
 bool MoveIntent::operator==(const MoveIntent& other) const
@@ -52,7 +52,7 @@ bool MoveIntent::operator==(const MoveIntent& other) const
            this->final_angle == other.final_angle &&
            this->dribbler_mode == other.dribbler_mode &&
            this->auto_chip_or_kick == other.auto_chip_or_kick &&
-           this->spin_speed == other.spin_speed;
+           this->min_spin_speed == other.min_spin_speed;
 }
 
 bool MoveIntent::operator!=(const MoveIntent& other) const

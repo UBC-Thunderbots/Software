@@ -17,7 +17,7 @@ class MoveIntent : public NavigatingIntent
      * @param ball_collision_type how to navigate around the ball
      * @param auto_chip_or_kick The command to autochip or autokick
      * @param max_allowed_speed_mode The mode of maximum speed allowed
-     * @param spin_speed The angular velocity of fixed spin speed while moving
+     * @param min_spin_speed The minimum angular velocity of spinning while moving
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
@@ -25,7 +25,7 @@ class MoveIntent : public NavigatingIntent
                         const BallCollisionType& ball_collision_type,
                         const AutoChipOrKick& auto_chip_or_kick,
                         const MaxAllowedSpeedMode& max_allowed_speed_mode,
-                        const AngularVelocity& spin_speed);
+                        const AngularVelocity& min_spin_speed);
 
     MoveIntent() = delete;
 
@@ -83,5 +83,5 @@ class MoveIntent : public NavigatingIntent
     Angle final_angle;
     DribblerMode dribbler_mode;
     AutoChipOrKick auto_chip_or_kick;
-    AngularVelocity spin_speed;
+    AngularVelocity min_spin_speed;
 };
