@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -14,11 +14,12 @@
 
 struct GoalieFSM
 {
-    class panic_and_stop_ball_state;
-    class position_to_block_shot_state;
+    class PanicState;
+    class PositionToBlockState;
 
     struct ControlParams
     {
+        std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -136,56 +137,51 @@ struct GoalieFSM
     auto operator()() {
         using namespace boost::sml;
 
-        const auto panic_and_stop_ball_s = state<panic_and_stop_ball_state>;
+        const auto panic_s = state<PanicState>;
         const auto chip_if_safe_s = state<ChipFSM>;
-        const auto position_to_block_shot_s = state<position_to_block_shot_state>;
+        const auto position_to_block_s = state<PositionToBlockState>;
 
         const auto update_e = event<Update>;
-
-        std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-                DynamicParameters->getAiConfig()->getGoalieTacticConfig();
-
-        // when should the goalie start panicking to move into place to stop the ball
-        double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
 
         // Distance to chip the ball when trying to yeet it
         // TODO (#1878): Replace this with a more intelligent chip distance system
         static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
         /**
-         * Guard that checks if the ball is moving faster than the panic threshold and has a clear path to the goal
+         * Guard that checks if the ball is moving faster than the time_to_panic threshold and has a clear path to the goal
          *
          * @param event GoalieFSM::Update
          *
-         * @return if the ball is moving faster than the panic threshold and has a clear path to the goal
+         * @return if the ball is moving faster than the time_to_panic threshold and has a clear path to the goal
          */
-        const auto panic = [ball_speed_panic](auto event) {
+        const auto time_to_panic = [](auto event) {
+            double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
             std::vector<Point> intersections =
                     getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
             return event.common.world.ball().velocity().length() > ball_speed_panic && !intersections.empty();
         };
 
         /**
-         * Guard that checks if the ball is moving slower than the panic threshold and is
+         * Guard that checks if the ball is moving slower than the time_to_panic threshold and is
          * inside the friendly defense area
          *
          * @param event GoalieFSM::Update
          *
-         * @return if the ball is moving slower than the panic threshold and is
+         * @return if the ball is moving slower than the time_to_panic threshold and is
          * inside the friendly defense area
          */
-        const auto safe_ball_near_goal = [ball_speed_panic](auto event) {
-
+        const auto can_chip_ball = [](auto event) {
+            double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
             return event.common.world.ball().velocity().length() <= ball_speed_panic &&
                    event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position());
         };
 
         /**
-         * Action that updates the MoveIntent to panic and stop the ball
+         * Action that updates the MoveIntent to time_to_panic and stop the ball
          *
          * @param event GoalieFSM::Update event
          */
-        const auto update_panic_and_stop_ball = [](auto event) {
+        const auto update_panic = [](auto event) {
             std::vector<Point> intersections =
                     getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
             Point stop_ball_point = intersections[0];
@@ -225,8 +221,6 @@ struct GoalieFSM
                         .chip_direction = (event.common.world.ball().position() -
                                            event.common.world.field().friendlyGoalCenter()).orientation(),
                         .chip_distance_meters = YEET_CHIP_DISTANCE_METERS};
-
-                // Update the get behind ball fsm
                 processEvent(ChipFSM::Update(control_params, event.common));
             }
         };
@@ -236,7 +230,7 @@ struct GoalieFSM
         *
         * @param event GoalieFSM::Update event
         */
-        const auto update_position_to_block_shot = [goalie_tactic_config](auto event) {
+        const auto update_position_to_block = [](auto event) {
             // compute angle between two vectors, negative goal post to ball and positive
             // goal post to ball
             Angle block_cone_angle =
@@ -246,7 +240,7 @@ struct GoalieFSM
 
             // how far in should the goalie wedge itself into the block cone, to block
             // balls
-            auto block_cone_radius = goalie_tactic_config->getBlockConeRadius()->value();
+            auto block_cone_radius = event.control_params.goalie_tactic_config->getBlockConeRadius()->value();
             // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
             // either side
             Point goalie_pos = calculateBlockCone(
@@ -256,7 +250,7 @@ struct GoalieFSM
             // by how much should the defense area be decreased so the goalie stays close
             // towards the net
             auto defense_area_deflation =
-                    goalie_tactic_config->getDefenseAreaDeflation()->value();
+                    event.control_params.goalie_tactic_config->getDefenseAreaDeflation()->value();
             // we want to restrict the block cone to the friendly crease, also potentially
             // scaled by a defense_area_deflation_parameter
             Rectangle deflated_defense_area = event.common.world.field().friendlyDefenseArea();
@@ -292,7 +286,7 @@ struct GoalieFSM
 
             // what should the final goalie speed be, so that the goalie accelerates
             // faster
-            auto goalie_final_speed = goalie_tactic_config->getGoalieFinalSpeed()->value();
+            auto goalie_final_speed = event.control_params.goalie_tactic_config->getGoalieFinalSpeed()->value();
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                     event.common.robot.id(), goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
@@ -301,14 +295,14 @@ struct GoalieFSM
         };
 
         return make_transition_table(
-                *position_to_block_shot_s + update_e[panic] / update_panic_and_stop_ball       = panic_and_stop_ball_s,
-                position_to_block_shot_s + update_e[safe_ball_near_goal] / update_chip_if_safe = chip_if_safe_s,
-                position_to_block_shot_s + update_e / update_position_to_block_shot,
-                panic_and_stop_ball_s + update_e[panic] / update_panic_and_stop_ball,
-                panic_and_stop_ball_s + update_e[!panic]                                       = X,
-                chip_if_safe_s + update_e[safe_ball_near_goal] / update_chip_if_safe,
-                chip_if_safe_s + update_e[!safe_ball_near_goal]                                = X,
-                X + update_e / update_position_to_block_shot                                   = position_to_block_shot_s);
+                *position_to_block_s + update_e[time_to_panic] / update_panic       = panic_s,
+                position_to_block_s + update_e[can_chip_ball] / update_chip_if_safe = chip_if_safe_s,
+                position_to_block_s + update_e / update_position_to_block,
+                // chip_if_safe_s + update_e[can_chip_ball] / update_chip_if_safe,
+                chip_if_safe_s + update_e[time_to_panic] / update_panic             = panic_s,
+                chip_if_safe_s + update_e[!can_chip_ball]                           = X,
+                panic_s + update_e[!time_to_panic]                                  = X,
+                X + update_e / update_position_to_block                             = position_to_block_s);
     }
 
 };

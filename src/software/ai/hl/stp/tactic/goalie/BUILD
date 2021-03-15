@@ -9,6 +9,7 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
@@ -18,7 +19,6 @@ cc_library(
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
