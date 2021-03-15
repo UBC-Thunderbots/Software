@@ -178,7 +178,7 @@ TEST_F(SimulatedPlayTestFixtureTest,
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             if (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(0.0))
             {
-                yield("Timestamp was Negative");
+                yield("Timestamp was less than 0");
             }
         },
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
