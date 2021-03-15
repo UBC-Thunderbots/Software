@@ -44,13 +44,13 @@ message MovePrimitive
         };
     }
 
-    Point destination                = 1;
-    float final_speed_m_per_s        = 2;
-    Angle final_angle                = 3;
-    float dribbler_speed_rpm         = 4;
-    float max_speed_m_per_s          = 5;
-    AutoChipOrKick auto_chip_or_kick = 6;
-    AngularVelocity min_spin_speed   = 7;
+    Point destination                 = 1;
+    float final_speed_m_per_s         = 2;
+    Angle final_angle                 = 3;
+    float dribbler_speed_rpm          = 4;
+    float max_speed_m_per_s           = 5;
+    AutoChipOrKick auto_chip_or_kick  = 6;
+    AngularVelocity target_spin_speed = 7;
 }
 
 message StopPrimitive
