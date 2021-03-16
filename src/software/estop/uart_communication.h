@@ -14,7 +14,7 @@ class UartCommunication
     using serial_port_ptr = std::shared_ptr<boost::asio::serial_port>;
 
    public:
-    enum flush_type
+    enum FlushType
     {
         flush_receive = TCIFLUSH,  // flushes data received but not read
         flush_send    = TCOFLUSH,  // flushes data written but not transmitted
@@ -22,18 +22,32 @@ class UartCommunication
                                    // written but not transmitted
     };
 
-    UartCommunication();
-
     /**
-     * Attempts to open a serial connection with the given device port
-     * setting used: No flow control, No parity, 1 stop bit
+     * constructs and opens a serial connection with the given device port
+     * settings used: 8 bit data, No flow control, No parity, 1 stop bit
      *
      * @param ioService boost asio construct for managing io operations
      * @param baudRate the desired baud rate of the connection
-     * @param port the serial port that we want to communicate with
-     * @return true upon success, false otherwise
+     * @param device_serial_port the serial port that we want to communicate with
+     * @throws boost::exception if port could not be opened
      */
-    virtual bool openPort(io_service &ioService, int baudRate, std::string port);
+    UartCommunication(io_service &ioService, int baudRate, std::string device_serial_port);
+
+    UartCommunication(const UartCommunication&) = delete;
+
+    UartCommunication &  operator=(const  UartCommunication &)  = delete;
+
+    ~UartCommunication();
+
+
+    /**
+     * Stream output operator, writes to serial port
+     * @param write_val
+     * @return true if succeeded, false otherwise
+     * @throws boost::exception upon error
+     */
+    bool operator<<(std::vector<unsigned char> &write_val);
+
 
     /**
      * Writes writeVal into serial port. Blocks current thread.
@@ -42,7 +56,7 @@ class UartCommunication
      * @return true upon success, false otherwise
      * @throws boost::exception upon error during write
      */
-    virtual bool serialWrite(std::vector<unsigned char> &write_val);
+    bool serialWrite(std::vector<unsigned char> &write_val);
 
     /**
      * Reads a given number of bytes from serial port until num_read_bytes is read or
@@ -53,20 +67,33 @@ class UartCommunication
      * @return true upon success, false otherwise
      * @throws boost:exception upon error during read
      */
-    virtual bool serialRead(std::vector<unsigned char> &read_val, size_t num_read_bytes);
+    bool serialRead(std::vector<unsigned char> &read_val, size_t num_read_bytes);
 
     /**
      * Flushes serial port data
      * @param flushType enum that sets the data to be flushed (read, write, or both)
      * @return true upon success, false otherwise
      */
-    virtual bool flushSerialPort(flush_type flushType);
+    bool flushSerialPort(FlushType flushType);
+
+   private:
+
+    /**
+     * Attempts to open a serial connection with the given device port
+     * setting used: No flow control, No parity, 1 stop bit
+     *
+     * @param ioService boost asio construct for managing io operations
+     * @param baudRate the desired baud rate of the connection
+     * @param device_serial_port the serial port that we want to communicate with
+     * @return true upon success, false otherwise
+     */
+    void openPort(io_service &ioService, int baudRate, std::string device_serial_port);
 
     /**
      * closes serial port
      */
-    virtual void closePort();
+    void closePort();
 
-   private:
     serial_port_ptr serial_port;
+
 };
