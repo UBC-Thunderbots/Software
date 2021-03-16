@@ -65,7 +65,7 @@ void STP::updateAIPlay(const World& world)
                 LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
                              << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "
-                             << TYPENAME(*default_play) << std::endl;
+                             << objectTypeName(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
         }
@@ -121,7 +121,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 {
     if (current_play)
     {
-        return std::make_optional(TYPENAME(*current_play));
+        return std::make_optional(objectTypeName(*current_play));
     }
 
     return std::nullopt;
@@ -171,7 +171,7 @@ bool STP::overrideAIPlayIfApplicable()
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
                              << "\" specified in the override is not valid." << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "
-                             << TYPENAME(*default_play) << std::endl;
+                             << objectTypeName(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
         }
@@ -225,7 +225,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     readable_robot_tactic_assignment.clear();
     for (const auto& [tactic, robot] : robot_tactic_assignment)
     {
-        readable_robot_tactic_assignment.emplace(robot.id(), TYPENAME(*tactic));
+        readable_robot_tactic_assignment.emplace(robot.id(), objectTypeName(*tactic));
     }
 
     return robot_tactic_assignment;
