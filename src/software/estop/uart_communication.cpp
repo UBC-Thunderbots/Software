@@ -2,10 +2,7 @@
 #include "uart_communication.h"
 
 #include <boost/asio.hpp>
-#include <boost/exception/all.hpp>
-#include <boost/function.hpp>
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 #include <iostream>
 
 UartCommunication::UartCommunication(io_service& ioService, int baudRate,
