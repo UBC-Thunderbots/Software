@@ -5,16 +5,19 @@
 #include "software/ai/intent/move_intent.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/intent/stop_intent.h"
-#include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
+#include "software/ai/intent/chip_intent.h"
+//#include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
+#include "software/geom/algorithms/contains.h"
 
 struct GoalieFSM
 {
     class PanicState;
+    class ChipIfSafeState;
     class PositionToBlockState;
 
     struct ControlParams
@@ -138,7 +141,8 @@ struct GoalieFSM
         using namespace boost::sml;
 
         const auto panic_s = state<PanicState>;
-        const auto chip_if_safe_s = state<ChipFSM>;
+        const auto chip_if_safe_s = state<ChipIfSafeState>;
+        //const auto chip_if_safe_s = state<ChipFSM>;
         const auto position_to_block_s = state<PositionToBlockState>;
 
         const auto update_e = event<Update>;
@@ -201,7 +205,7 @@ struct GoalieFSM
          *
          * @param event GoalieFSM::Update event
          */
-        const auto update_chip_if_safe = [](auto event, back::process<ChipFSM::Update> processEvent) {
+        const auto update_chip_if_safe = [](auto event /*back::process<ChipFSM::Update> processEvent*/) {
             // if the ball is in the "don't chip rectangle" we do not chip the ball
             // as we risk bumping the ball into our own net trying to move behind
             // the ball
@@ -216,12 +220,16 @@ struct GoalieFSM
             if (contains(dont_chip_rectangle, event.common.world.ball().position())) {
                 event.common.set_intent(std::make_unique<StopIntent>(event.common.robot.id(), false));
             } else {
-                ChipFSM::ControlParams control_params{
+                event.common.set_intent(std::make_unique<ChipIntent>(event.common.robot.id(),
+                        event.common.world.ball().position(),
+                        (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
+                        YEET_CHIP_DISTANCE_METERS));
+                /*ChipFSM::ControlParams control_params{
                         .chip_origin   = event.common.world.ball().position(),
                         .chip_direction = (event.common.world.ball().position() -
                                            event.common.world.field().friendlyGoalCenter()).orientation(),
                         .chip_distance_meters = YEET_CHIP_DISTANCE_METERS};
-                processEvent(ChipFSM::Update(control_params, event.common));
+                processEvent(ChipFSM::Update(control_params, event.common));*/
             }
         };
 
@@ -298,7 +306,6 @@ struct GoalieFSM
                 *position_to_block_s + update_e[time_to_panic] / update_panic       = panic_s,
                 position_to_block_s + update_e[can_chip_ball] / update_chip_if_safe = chip_if_safe_s,
                 position_to_block_s + update_e / update_position_to_block,
-                // chip_if_safe_s + update_e[can_chip_ball] / update_chip_if_safe,
                 chip_if_safe_s + update_e[time_to_panic] / update_panic             = panic_s,
                 chip_if_safe_s + update_e[!can_chip_ball]                           = X,
                 panic_s + update_e[!time_to_panic]                                  = X,
