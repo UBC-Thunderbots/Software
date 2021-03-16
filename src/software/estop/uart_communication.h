@@ -31,11 +31,12 @@ class UartCommunication
      * @param device_serial_port the serial port that we want to communicate with
      * @throws boost::exception if port could not be opened
      */
-    UartCommunication(io_service &ioService, int baudRate, std::string device_serial_port);
+    UartCommunication(io_service &ioService, int baudRate,
+                      std::string device_serial_port);
 
-    UartCommunication(const UartCommunication&) = delete;
+    UartCommunication(const UartCommunication &) = delete;
 
-    UartCommunication &  operator=(const  UartCommunication &)  = delete;
+    UartCommunication &operator=(const UartCommunication &) = delete;
 
     ~UartCommunication();
 
@@ -77,7 +78,6 @@ class UartCommunication
     bool flushSerialPort(FlushType flushType);
 
    private:
-
     /**
      * Attempts to open a serial connection with the given device port
      * setting used: No flow control, No parity, 1 stop bit
@@ -95,5 +95,4 @@ class UartCommunication
     void closePort();
 
     serial_port_ptr serial_port;
-
 };

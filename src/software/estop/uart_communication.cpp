@@ -8,7 +8,9 @@
 #include <g3log/loglevels.hpp>
 #include <iostream>
 
-UartCommunication::UartCommunication(io_service& ioService, int baudRate, std::string device_serial_port) {
+UartCommunication::UartCommunication(io_service& ioService, int baudRate,
+                                     std::string device_serial_port)
+{
     openPort(ioService, baudRate, device_serial_port);
 }
 
@@ -36,35 +38,38 @@ bool UartCommunication::flushSerialPort(FlushType flushType)
     return (ret_val == 0);
 }
 
-void UartCommunication::openPort(io_service& ioService, int baudRate, std::string device_serial_port)
+void UartCommunication::openPort(io_service& ioService, int baudRate,
+                                 std::string device_serial_port)
 {
     int uart_character_size_bits = 8;
     serial_port = serial_port_ptr(std::make_shared<boost::asio::serial_port>(
-            boost::asio::serial_port(ioService, device_serial_port)));
+        boost::asio::serial_port(ioService, device_serial_port)));
 
     serial_port->set_option(boost::asio::serial_port_base::baud_rate(baudRate));
     serial_port->set_option(boost::asio::serial_port::flow_control(
-            boost::asio::serial_port::flow_control::none));
+        boost::asio::serial_port::flow_control::none));
     serial_port->set_option(
-            boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));
-    serial_port->set_option(boost::asio::serial_port::stop_bits(
-            boost::asio::serial_port::stop_bits::one));
+        boost::asio::serial_port::parity(boost::asio::serial_port::parity::none));
+    serial_port->set_option(
+        boost::asio::serial_port::stop_bits(boost::asio::serial_port::stop_bits::one));
     serial_port->set_option(boost::asio::serial_port::character_size(
-            boost::asio::serial_port::character_size(uart_character_size_bits)));
+        boost::asio::serial_port::character_size(uart_character_size_bits)));
 }
 
 void UartCommunication::closePort()
 {
-    if (serial_port!= nullptr && serial_port->is_open())
+    if (serial_port != nullptr && serial_port->is_open())
     {
         serial_port->close();
     }
 }
 
-bool UartCommunication::operator<<(std::vector<unsigned char> &write_val) {
+bool UartCommunication::operator<<(std::vector<unsigned char>& write_val)
+{
     return serialWrite(write_val);
 }
 
-UartCommunication::~UartCommunication() {
+UartCommunication::~UartCommunication()
+{
     closePort();
 }
