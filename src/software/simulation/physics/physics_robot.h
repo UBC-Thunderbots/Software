@@ -180,7 +180,7 @@ class PhysicsRobot
      * @param position The new position of the robot
      * @param angle The new angle of the robot
      */
-    void setPosition(const Point &position, const Angle &angle);
+    void setPositionAndOrientation(const Point &position, const Angle &angle);
 
     /**
      * Applies the given force vector to the robot at its center of mass
