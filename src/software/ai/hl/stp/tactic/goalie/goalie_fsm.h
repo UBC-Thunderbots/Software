@@ -306,9 +306,10 @@ struct GoalieFSM
                 *position_to_block_s + update_e[time_to_panic] / update_panic       = panic_s,
                 position_to_block_s + update_e[can_chip_ball] / update_chip_if_safe = chip_if_safe_s,
                 position_to_block_s + update_e / update_position_to_block,
+                panic_s + update_e[can_chip_ball] / update_chip_if_safe             = chip_if_safe_s,
                 chip_if_safe_s + update_e[time_to_panic] / update_panic             = panic_s,
-                chip_if_safe_s + update_e[!can_chip_ball]                           = X,
                 panic_s + update_e[!time_to_panic]                                  = X,
+                chip_if_safe_s + update_e[!can_chip_ball]                           = X,
                 X + update_e / update_position_to_block                             = position_to_block_s);
     }
 
