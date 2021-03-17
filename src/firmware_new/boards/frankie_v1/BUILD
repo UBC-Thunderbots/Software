@@ -28,6 +28,7 @@ cc_binary(
         ":i2c",
         ":lwip",
         "//firmware/app/logger",
+        "//firmware_new/boards/frankie_v1/io:INA226_power_monitor",
         "//firmware_new/boards/frankie_v1/io:drivetrain",
         "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
         "//firmware_new/boards/frankie_v1/io:gpio_pin",
@@ -345,6 +346,9 @@ cc_library(
     srcs = [
     ],
     hdrs = [
+        "Drivers/CMSIS/DSP/Include/arm_common_tables.h",
+        "Drivers/CMSIS/DSP/Include/arm_const_structs.h",
+        "Drivers/CMSIS/DSP/Include/arm_math.h",
         "Drivers/CMSIS/Include/cmsis_compiler.h",
         "Drivers/CMSIS/Include/cmsis_gcc.h",
         "Drivers/CMSIS/Include/cmsis_version.h",
@@ -357,9 +361,11 @@ cc_library(
     ],
     defines = [
         "STM32H743xx",
+        "ARM_MATH_CM7",
     ],
     includes = [
         "./",
+        "Drivers/CMSIS/DSP/Include/",
         "Drivers/CMSIS/Device/ST/STM32H7xx/Include/",
         "Drivers/CMSIS/Include/",
         "Drivers/CMSIS/RTOS2/Include/",

@@ -265,6 +265,7 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
+        TLOG_DEBUG("Running test msg update");
         // run loop at 100hz
         osDelay((unsigned int)MILLISECONDS_PER_SECOND / 10);
     }

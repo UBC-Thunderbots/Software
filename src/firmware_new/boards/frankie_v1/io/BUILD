@@ -157,3 +157,19 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "INA226_power_monitor",
+    srcs = ["INA226_power_monitor.c"],
+    hdrs = ["INA226_power_monitor.h"],
+    #TODO: Fix errors and remove the copts
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware_new/boards/frankie_v1:cmsis",
+        "//firmware_new/boards/frankie_v1:hal",
+    ],
+)
