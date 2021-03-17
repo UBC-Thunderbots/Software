@@ -17,7 +17,7 @@ std::set<MotionConstraint> buildMotionConstraintSet(const GameState &game_state,
         current_allowed_constraints =
             motion_constraint_visitor.getCurrentAllowedConstraints(tactic);
     }
-    catch (std::invalid_argument)
+    catch (std::invalid_argument &)
     {
         // Tactic didn't implement accept so don't add any more motion constraints
     }

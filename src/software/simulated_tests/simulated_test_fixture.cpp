@@ -1,55 +1,52 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
-#include "software/gui/drawing/navigator.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
-#include "software/time/duration.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
-    : simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField())),
-      sensor_fusion(DynamicParameters->getSensorFusionConfig()),
-      ai(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig()),
+    : mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
+      thunderbots_config(
+          std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config)),
+      simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField(),
+                                            thunderbots_config->getSimulatorConfig())),
+      sensor_fusion(thunderbots_config->getSensorFusionConfig()),
       run_simulation_in_realtime(false)
 {
 }
 
 void SimulatedTestFixture::SetUp()
 {
+    mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+    thunderbots_config =
+        std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
+
     LoggerSingleton::initializeLogger(
-        DynamicParameters->getStandaloneSimulatorMainCommandLineArgs()
-            ->logging_dir()
+        thunderbots_config->getStandaloneSimulatorMainCommandLineArgs()
+            ->getLoggingDir()
             ->value());
 
-    // init() resets all DynamicParameters for each test. Since DynamicParameters are
-    // still partially global, we need to reinitialize simulator, sensor_fusion, and ai,
-    // so that they can grab the new dynamic parameter pointers. Note that this is a bit
-    // of hack because we're changing a global variable, but it can't be easily fixed
-    // through dependency injection until
-    // https://github.com/UBC-Thunderbots/Software/issues/1299
-    MutableDynamicParameters->init();
-    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField());
-    sensor_fusion = SensorFusion(DynamicParameters->getSensorFusionConfig());
-    ai = AI(DynamicParameters->getAIConfig(), DynamicParameters->getAIControlConfig());
+    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField(),
+                                            thunderbots_config->getSimulatorConfig());
+    sensor_fusion = SensorFusion(thunderbots_config->getSensorFusionConfig());
 
-    MutableDynamicParameters->getMutableAIControlConfig()->mutableRunAI()->setValue(true);
+    mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
+        !SimulatedTestFixture::stop_ai_on_start);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableOverrideGameControllerDefendingSide()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableOverrideGameControllerDefendingSide()
         ->setValue(true);
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableDefendingPositiveSide()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableDefendingPositiveSide()
         ->setValue(false);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always defending the "negative" side of the field. This is so that the
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableFriendlyColorYellow()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableFriendlyColorYellow()
         ->setValue(true);
     if (SimulatedTestFixture::enable_visualizer)
     {
@@ -77,48 +74,24 @@ Field SimulatedTestFixture::field() const
     return simulator->getField();
 }
 
-void SimulatedTestFixture::setFriendlyGoalie(RobotId goalie_id)
-{
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableFriendlyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
-}
-
-void SimulatedTestFixture::setEnemyGoalie(RobotId goalie_id)
-{
-    MutableDynamicParameters->getMutableSensorFusionConfig()
-        ->mutableEnemyGoalieId()
-        ->setValue(static_cast<int>(goalie_id));
-}
-
-void SimulatedTestFixture::setAIPlay(const std::string &ai_play)
-{
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideAIPlay()
-        ->setValue(true);
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentAIPlay()
-        ->setValue(ai_play);
-}
-
 void SimulatedTestFixture::setRefereeCommand(
     const RefereeCommand &current_referee_command,
     const RefereeCommand &previous_referee_command)
 {
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableOverrideRefereeCommand()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableOverrideRefereeCommand()
         ->setValue(true);
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutableCurrentRefereeCommand()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableCurrentRefereeCommand()
         ->setValue(toString(current_referee_command));
-    MutableDynamicParameters->getMutableAIControlConfig()
-        ->mutablePreviousRefereeCommand()
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutablePreviousRefereeCommand()
         ->setValue(toString(previous_referee_command));
 }
 
 void SimulatedTestFixture::enableVisualizer()
 {
-    full_system_gui            = std::make_shared<ThreadedFullSystemGUI>();
+    full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
     run_simulation_in_realtime = true;
 }
 
@@ -199,51 +172,20 @@ void SimulatedTestFixture::runTest(
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
     const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
                                                         CAMERA_FRAMES_PER_AI_TICK);
-    bool validation_functions_done = false;
-    while (simulator->getTimestamp() < timeout_time)
+
+    // Tick one frame to aid with visualization
+    bool validation_functions_done =
+        tickTest(terminating_validation_functions, non_terminating_validation_functions,
+                 simulation_time_step, ai_time_step, world);
+    while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
-        if (!DynamicParameters->getAIControlConfig()->RunAI()->value())
+        if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
             continue;
         }
-        auto wall_start_time = std::chrono::steady_clock::now();
-        for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
-        {
-            simulator->stepSimulation(simulation_time_step);
-            updateSensorFusion();
-        }
-
-        if (auto world_opt = sensor_fusion.getWorld())
-        {
-            *world = world_opt.value();
-
-            validation_functions_done = validateAndCheckCompletion(
-                terminating_function_validators, non_terminating_function_validators);
-            if (validation_functions_done)
-            {
-                break;
-            }
-
-            auto primitive_set_msg = ai.getPrimitives(*world);
-            simulator->setYellowRobotPrimitiveSet(
-                createNanoPbPrimitiveSet(*primitive_set_msg));
-
-            if (run_simulation_in_realtime)
-            {
-                sleep(wall_start_time, ai_time_step);
-            }
-
-            if (full_system_gui)
-            {
-                full_system_gui->onValueReceived(*world);
-                full_system_gui->onValueReceived(ai.getPlayInfo());
-                full_system_gui->onValueReceived(drawNavigator(ai.getNavigator()));
-            }
-        }
-        else
-        {
-            LOG(WARNING) << "SensorFusion did not output a valid World";
-        }
+        validation_functions_done = tickTest(terminating_validation_functions,
+                                             non_terminating_validation_functions,
+                                             simulation_time_step, ai_time_step, world);
     }
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
@@ -251,4 +193,52 @@ void SimulatedTestFixture::runTest(
         ADD_FAILURE()
             << "Not all validation functions passed within the timeout duration";
     }
+}
+
+bool SimulatedTestFixture::tickTest(
+    const std::vector<ValidationFunction> &terminating_validation_functions,
+    const std::vector<ValidationFunction> &non_terminating_validation_functions,
+    Duration simulation_time_step, Duration ai_time_step, std::shared_ptr<World> world)
+{
+    auto wall_start_time           = std::chrono::steady_clock::now();
+    bool validation_functions_done = false;
+    for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
+    {
+        simulator->stepSimulation(simulation_time_step);
+        updateSensorFusion();
+    }
+
+    if (auto world_opt = sensor_fusion.getWorld())
+    {
+        *world = world_opt.value();
+
+        validation_functions_done = validateAndCheckCompletion(
+            terminating_function_validators, non_terminating_function_validators);
+        if (validation_functions_done)
+        {
+            return validation_functions_done;
+        }
+
+        updatePrimitives(*world_opt, simulator);
+
+        if (run_simulation_in_realtime)
+        {
+            sleep(wall_start_time, ai_time_step);
+        }
+
+        if (full_system_gui)
+        {
+            full_system_gui->onValueReceived(*world);
+            if (auto play_info = getPlayInfo())
+            {
+                full_system_gui->onValueReceived(*play_info);
+            }
+            full_system_gui->onValueReceived(getDrawFunctions());
+        }
+    }
+    else
+    {
+        LOG(WARNING) << "SensorFusion did not output a valid World";
+    }
+    return validation_functions_done;
 }

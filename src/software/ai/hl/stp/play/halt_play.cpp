@@ -1,7 +1,9 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 
-#include "software/ai/hl/stp/tactic/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
+
+HaltPlay::HaltPlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
 
 bool HaltPlay::isApplicable(const World &world) const
 {
@@ -32,4 +34,4 @@ void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltPlay> factory;
+static TGenericFactory<std::string, Play, HaltPlay, PlayConfig> factory;

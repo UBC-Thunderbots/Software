@@ -1,19 +1,21 @@
 #include "software/ai/hl/stp/play/shoot_or_pass_play.h"
 
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-ShootOrPassPlay::ShootOrPassPlay() {}
+ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config) : Play(config)
+{
+}
 
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
@@ -44,7 +46,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // Setup the goalie and crease defenders
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
                                                world.friendlyTeam(), world.enemyTeam(),
@@ -55,14 +58,13 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
 
     // Have a robot keep trying to take a shot
-    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAIConfig()
-                                                           ->getShootOrPassPlayConfig()
-                                                           ->MinOpenAngleForShotDeg()
-                                                           ->value());
+    Angle min_open_angle_for_shot = Angle::fromDegrees(
+        play_config->getShootOrPassPlayConfig()->getMinOpenAngleForShotDeg()->value());
 
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        min_open_angle_for_shot, std::nullopt, false);
+        min_open_angle_for_shot, std::nullopt, false,
+        play_config->getShootGoalTacticConfig());
 
     PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
         yield, goalie_tactic, crease_defender_tactics, shoot_tactic, world);
@@ -124,13 +126,16 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     }
 
     std::array<std::shared_ptr<CherryPickTactic>, 2> cherry_pick_tactics = {
-        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region),
-        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region)};
+        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region,
+                                           play_config->getPassingConfig()),
+        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region,
+                                           play_config->getPassingConfig())};
 
     // Start a PassGenerator that will continuously optimize passes into the enemy half
     // of the field
     PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::RECEIVE_AND_DRIBBLE);
+                                 PassType::RECEIVE_AND_DRIBBLE,
+                                 play_config->getPassingConfig());
     pass_generator.setTargetRegion(world.field().enemyHalf());
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
@@ -143,14 +148,10 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     // Whether or not we've set the passer robot in the PassGenerator
     bool set_passer_robot_in_passgenerator = false;
 
-    double abs_min_pass_score = DynamicParameters->getAIConfig()
-                                    ->getShootOrPassPlayConfig()
-                                    ->AbsMinPassScore()
-                                    ->value();
-    double pass_score_ramp_down_duration = DynamicParameters->getAIConfig()
-                                               ->getShootOrPassPlayConfig()
-                                               ->PassScoreRampDownDuration()
-                                               ->value();
+    double abs_min_pass_score =
+        play_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
+    double pass_score_ramp_down_duration =
+        play_config->getShootOrPassPlayConfig()->getPassScoreRampDownDuration()->value();
     do
     {
         updatePassGenerator(pass_generator, world);
@@ -202,4 +203,4 @@ void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator,
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrPassPlay> factory;
+static TGenericFactory<std::string, Play, ShootOrPassPlay, PlayConfig> factory;

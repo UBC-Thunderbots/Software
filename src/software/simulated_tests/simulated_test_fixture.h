@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/ai.h"
+#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
@@ -24,6 +24,10 @@ class SimulatedTestFixture : public ::testing::Test
     // if false, visualizer does not run during simulated tests
     // if true, running tests are displayed on the visualizer
     static bool enable_visualizer;
+
+    // Controls whether the AI will be stopped when the simulated test starts
+    // only if enable_visualizer is true
+    static bool stop_ai_on_start;
 
    protected:
     void SetUp() override;
@@ -88,22 +92,6 @@ class SimulatedTestFixture : public ::testing::Test
     void addEnemyRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Sets the goalie for the specified team. If this function is not called,
-     * the goalie will be set to the default ID of the DynamicParameters
-     *
-     * @param goalie_id The ID of the robot to be goalie
-     */
-    void setFriendlyGoalie(RobotId goalie_id);
-    void setEnemyGoalie(RobotId goalie_id);
-
-    /**
-     * Sets the AI play to run in the simulated test
-     *
-     * @param ai_play The name of the AI play
-     */
-    void setAIPlay(const std::string& ai_play);
-
-    /**
      * Sets the Referee command to override for the simulated test
      *
      * @param current_referee_command The name of the current referee command to set
@@ -119,11 +107,57 @@ class SimulatedTestFixture : public ::testing::Test
      */
     Field field() const;
 
+    // The dynamic params being used in the tests
+    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config;
+    std::shared_ptr<const ThunderbotsConfig> thunderbots_config;
+
    private:
+    /**
+     * Runs one tick of the test and checks if the validation function is done
+     *
+     * @param terminating_validation_functions The terminating validation functions
+     * to check during the test
+     * @param non_terminating_validation_functions The non-terminating validation
+     * functions to check during the test
+     * @param simulation_time_step time step for stepping the simulation
+     * @param ai_time_step minimum time for one tick of AI
+     * @param world the shared_ptr to the world that is updated by this function
+     *
+     * @return if validation functions are done
+     */
+    bool tickTest(
+        const std::vector<ValidationFunction>& terminating_validation_functions,
+        const std::vector<ValidationFunction>& non_terminating_validation_functions,
+        Duration simulation_time_step, Duration ai_time_step,
+        std::shared_ptr<World> world);
+
     /**
      * A helper function that updates SensorFusion with the latest data from the Simulator
      */
     void updateSensorFusion();
+
+    /**
+     * Updates primitives in the simulator based on the new world
+     *
+     * @param world to update primitives with
+     * @param simulator_to_update The simulator to update
+     */
+    virtual void updatePrimitives(const World& world,
+                                  std::shared_ptr<Simulator> simulator_to_update) = 0;
+
+    /**
+     * Gets play info for displaying on the FullSystemGUI
+     *
+     * @return play info to display, if any
+     */
+    virtual std::optional<PlayInfo> getPlayInfo() = 0;
+
+    /**
+     * Gets draw functions for visualizing on the FullSystemGUI
+     *
+     * @return draw functions to draw
+     */
+    virtual AIDrawFunction getDrawFunctions() = 0;
 
     /**
      * Runs the given function validators and returns whether or not the
@@ -158,11 +192,9 @@ class SimulatedTestFixture : public ::testing::Test
     // the object in the SetUp function. Because the simulator has no
     // copy assignment operator, we have to make it a dynamically-allocated
     // object so we can assign new instances to this variable
-    std::unique_ptr<Simulator> simulator;
+    std::shared_ptr<Simulator> simulator;
     // The SensorFusion being tested and used in simulation
     SensorFusion sensor_fusion;
-    // The AI being tested and used in simulation
-    AI ai;
 
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;

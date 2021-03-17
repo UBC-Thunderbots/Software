@@ -2,8 +2,8 @@
 
 #include <Box2D/Box2D.h>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_field.h"
 #include "software/simulation/physics/physics_robot.h"
@@ -29,8 +29,7 @@ class PhysicsWorld
      * @param simulator_config The config to fetch parameters from
      */
     explicit PhysicsWorld(const Field& field,
-                          std::shared_ptr<const SimulatorConfig> simulator_config =
-                              DynamicParameters->getSimulatorConfig());
+                          std::shared_ptr<const SimulatorConfig> simulator_config);
     PhysicsWorld() = delete;
 
     // Delete the copy and assignment operators because copying this class causes

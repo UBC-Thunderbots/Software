@@ -7,7 +7,7 @@ extern "C"
 
 #include <gtest/gtest.h>
 
-#include "software/test_util/test_util.h"
+#include "shared/test_util/test_util.h"
 
 class FirmwareRobotTest : public testing::Test
 {
@@ -136,6 +136,12 @@ TEST_F(FirmwareRobotTest, getVelocityX)
 TEST_F(FirmwareRobotTest, getVelocityY)
 {
     EXPECT_EQ(12, app_firmware_robot_getVelocityY(firmware_robot));
+}
+
+TEST_F(FirmwareRobotTest, getSpeedLinear)
+{
+    EXPECT_FLOAT_EQ(16.278820596099706f,
+                    app_firmware_robot_getSpeedLinear(firmware_robot));
 }
 
 TEST_F(FirmwareRobotTest, getVelocityAngular)

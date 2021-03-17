@@ -141,3 +141,6 @@ src/core*
 # SSL GameController
 src/config
 *.stream
+
+# ipynb Jupyter Notebooks
+*.ipynb

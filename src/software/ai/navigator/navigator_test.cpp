@@ -15,13 +15,12 @@ class NoPathNavigatorTest : public testing::Test
    public:
     NoPathNavigatorTest()
         : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
-              DynamicParameters->getAIConfig()
-                  ->getRobotNavigationObstacleFactoryConfig())),
+              std::make_shared<const RobotNavigationObstacleFactoryConfig>())),
           navigator(std::make_unique<VelocityObstaclePathManager>(
                         std::make_unique<NoPathTestPathPlanner>(),
                         robot_navigation_obstacle_factory),
                     robot_navigation_obstacle_factory,
-                    DynamicParameters->getAIConfig()->getNavigatorConfig()),
+                    std::make_shared<const NavigatorConfig>()),
           current_time(Timestamp::fromSeconds(123)),
           field(Field::createSSLDivisionBField()),
           ball(Ball(Point(1, 2), Vector(-0.3, 0), current_time)),
@@ -47,13 +46,12 @@ class ThetaStarNavigatorTest : public testing::Test
    public:
     ThetaStarNavigatorTest()
         : robot_navigation_obstacle_factory(RobotNavigationObstacleFactory(
-              DynamicParameters->getAIConfig()
-                  ->getRobotNavigationObstacleFactoryConfig())),
+              std::make_shared<const RobotNavigationObstacleFactoryConfig>())),
           navigator(std::make_unique<VelocityObstaclePathManager>(
-                        std::make_unique<ThetaStarPathPlanner>(),
+                        std::make_unique<NoPathTestPathPlanner>(),
                         robot_navigation_obstacle_factory),
                     robot_navigation_obstacle_factory,
-                    DynamicParameters->getAIConfig()->getNavigatorConfig())
+                    std::make_shared<const NavigatorConfig>())
     {
     }
 
@@ -191,23 +189,24 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
         std::make_unique<VelocityObstaclePathManager>(
             std::make_unique<OnePointPathTestPathPlanner>(),
             RobotNavigationObstacleFactory(
-                DynamicParameters->getAIConfig()
-                    ->getRobotNavigationObstacleFactoryConfig())),
+                std::make_shared<const RobotNavigationObstacleFactoryConfig>())),
         RobotNavigationObstacleFactory(
-            DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig()),
+            std::make_shared<const RobotNavigationObstacleFactoryConfig>()),
         std::make_shared<NavigatorConfig>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(
-        0, poi, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID));
+        0, poi, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive =
-        *createMovePrimitive(poi, 0, Angle::zero(), DribblerMode::OFF);
+    auto expected_primitive = *createMovePrimitive(
+        poi, 0, Angle::zero(), DribblerMode::OFF,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -237,7 +236,8 @@ TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID));
+        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 

@@ -1,5 +1,5 @@
 import numpy as np
-from bokeh.plotting import figure
+from bokeh.plotting import figure, Figure
 from bokeh.models import ColumnDataSource, LabelSet
 from software.proto.messages_robocup_ssl_geometry_pb2 import (
     SSL_FieldCircularArc,
@@ -17,24 +17,37 @@ MM_PER_M = 1000
 BALL_RADIUS = 0.02
 
 
-def plot_circular_section(
-    fig: figure,
-    center_x: float,
-    center_y: float,
-    radius: float,
-    start_angle: float,
-    end_angle: float,
-):
+def circular_arc_to_line_segs(arc: SSL_FieldCircularArc):
     """
-    Draw a circular section on to the given figure by drawing line segments between points sampled from the circle at
-    regular angle intervals between the start angle and end angle
+    Sample line segments from a circular section described by a SSL_FieldCircularArc proto and return them as a tuple
+    of a list of list of line segment x's, and a list of list of line segment y's
+
+    return will look like:
+    (
+        [[start x, end x],
+         ...
+         [start x, end x]],
+
+        [[start y, end y],
+         ...
+         [start y, end y]]
+    )
+
     :param fig: a Bokeh figure
     :param center_x: x of the center of the circle
     :param center_y: y of the center of the circle
     :param radius: radius of the circle
     :param start_angle: angle of the start of the circular section
     :param end_angle: angle of the end of the circular section
+    :return a tuple of list[list[x]], list[list[y]], a series of line segment x's and y's representing LINE SEGMENTS
+            sampled along the circular arc
     """
+    center_x = arc.center.x
+    center_y = arc.center.y
+    radius = arc.radius
+    start_angle = arc.a1
+    end_angle = arc.a2
+
     # decide how many samples to take along the arc, a full circle will be a 36-gon
     num_samples = (end_angle - start_angle) * (18 / np.pi)
     sample_angles = np.linspace(
@@ -44,34 +57,39 @@ def plot_circular_section(
     sampled_pt_ys = []
 
     for i in range(len(sample_angles) - 1):
+        # sometimes we have to convert to numpy arrays, do the MM_PER_M division, and then convert it back because
+        # bokeh really dislikes 2d numpy arrays in some circumstances
         sampled_pt_xs.append(
-            [
-                center_x + np.cos(sample_angles[i]) * radius,
-                center_x + np.cos(sample_angles[i + 1]) * radius,
-            ]
+            (
+                np.asarray(
+                    [
+                        center_x + np.cos(sample_angles[i]) * radius,
+                        center_x + np.cos(sample_angles[i + 1]) * radius,
+                    ]
+                )
+                / MM_PER_M
+            ).tolist()
         )
         sampled_pt_ys.append(
-            [
-                center_y + np.sin(sample_angles[i]) * radius,
-                center_y + np.sin(sample_angles[i + 1]) * radius,
-            ]
+            (
+                np.asarray(
+                    [
+                        center_y + np.sin(sample_angles[i]) * radius,
+                        center_y + np.sin(sample_angles[i + 1]) * radius,
+                    ]
+                )
+                / MM_PER_M
+            ).tolist()
         )
+    return sampled_pt_xs, sampled_pt_ys
 
-    fig.multi_line(sampled_pt_xs, sampled_pt_ys, line_color="black")
 
-
-def plot_robots(
-    fig: figure,
-    ssl_detectionrobots_protos: Iterable[SSL_DetectionRobot],
-    colour: str,
-    label_robot_ids: bool = True,
-):
+def get_robots_data(ssl_detectionrobots_protos: Iterable[SSL_DetectionRobot]):
     """
-    Plot the given robots onto the given figure.
-    :param fig: a Bokeh figure
+    Extract data from SSL_DetectionRobot protos into a dict with field names according to the SSLWrapperPlotter
+    ColumnDataSource for robots
     :param ssl_detectionrobots_protos: the SSL_DetectionRobot protos to plot
-    :param colour: colour of the robots
-    :param label_robot_ids: whether to label the robot IDs on top of the robots
+    :return a dict that can be assigned to a ColumnDataSource for robot plotters as per SSLWrapperPlotter
     """
     robot_xs = np.asarray([robot.x for robot in ssl_detectionrobots_protos]) / MM_PER_M
     robot_ys = np.asarray([robot.y for robot in ssl_detectionrobots_protos]) / MM_PER_M
@@ -93,102 +111,154 @@ def plot_robots(
         ]
     )
 
-    fig.circle(
-        robot_xs,
-        robot_ys,
-        radius=ROBOT_MAX_RADIUS,
-        fill_color=colour,
-        line_color="black",
-    )
-    fig.multi_line(
-        robot_ori_line_seg_xs.tolist(),
-        robot_ori_line_seg_ys.tolist(),
-        line_color="black",
+    robot_id_strs = [str(robot.robot_id) for robot in ssl_detectionrobots_protos]
+
+    return dict(
+        robot_xs=robot_xs,
+        robot_ys=robot_ys,
+        robot_ori_line_seg_xs=robot_ori_line_seg_xs.tolist(),
+        robot_ori_line_seg_ys=robot_ori_line_seg_ys.tolist(),
+        robot_ids=robot_id_strs,
     )
 
-    if label_robot_ids:
-        # draw labels for the robot ids
-        robot_id_strs = [str(robot.robot_id) for robot in ssl_detectionrobots_protos]
-        label_data_source = ColumnDataSource(
-            data=dict(xs=robot_xs, ys=robot_ys, ids=robot_id_strs)
-        )
 
-        labels = LabelSet(
-            x="xs", y="ys", text="ids", source=label_data_source, text_font_size="12pt"
-        )
-        fig.add_layout(labels)
-
-
-def plot_balls(fig: figure, ssl_detectionballs: Iterable[SSL_DetectionBall]):
+def get_balls_data(ssl_detectionballs: Iterable[SSL_DetectionBall]):
     """
-    Plot the given balls onto the given Bokeh figure.
-    :param fig: a Bokeh figure
+    Extract data from SSL_DetectionBall protos into a dict with field names according to the SSLWrapperPlotter
+    ColumnDataSource for balls
     :param ssl_detectionballs: the SSL_DetectionBall protos to plot
+    :return a dict that can be assigned to a ColumnDataSource for the ball plotter as per SSLWrapperPlotter
     """
     ball_xs = np.asarray([ball.x for ball in ssl_detectionballs]) / MM_PER_M
     ball_ys = np.asarray([ball.y for ball in ssl_detectionballs]) / MM_PER_M
 
-    fig.circle(ball_xs, ball_ys, radius=0.02, fill_color="orange", line_color="black")
+    return dict(ball_xs=ball_xs, ball_ys=ball_ys)
 
 
-def plot_field_line_segments(
-    fig: figure, field_lines_proto: Iterable[SSL_FieldLineSegment]
+def get_field_lines_data(
+    field_lines_proto: Iterable[SSL_FieldLineSegment],
+    field_circular_arcs_proto: Iterable[SSL_FieldCircularArc],
 ):
     """
-    Plot the given field line segments onto the given Bokeh figure.
-    :param fig: a Bokeh figure
-    :param field_lines_proto: an Iterable of SSL_FieldLineSegment
-    :return:
+    Extract data from SSL_FieldLineSegment and  SSL_FieldCircularArc protos into a dict with field names according
+    to the SSLWrapperPlotter ColumnDataSource for field line segments
+    :param field_lines_proto: the field line protos to plot
+    :param field_circular_arcs_proto: the field circular arc protos to plot
+    :return a dict that can be assigned to a ColumnDataSource for the field line segments plotter as per SSLWrapperPlotter
     """
+    # sometimes we have to convert to numpy arrays, do the MM_PER_M division, and then convert it back because
+    # bokeh really dislikes 2d numpy arrays in some circumstances
     field_line_xs = (
         np.asarray([[line.p1.x, line.p2.x] for line in field_lines_proto]) / MM_PER_M
-    )
+    ).tolist()
     field_line_ys = (
         np.asarray([[line.p1.y, line.p2.y] for line in field_lines_proto]) / MM_PER_M
-    )
-    fig.multi_line(
-        xs=field_line_xs.tolist(), ys=field_line_ys.tolist(), line_color="black"
-    )
+    ).tolist()
+
+    # convert all the field circular arcs to multilines and append them
+    for circular_arc in field_circular_arcs_proto:
+        arc_xs, arc_ys = circular_arc_to_line_segs(circular_arc)
+        field_line_xs.extend(arc_xs)
+        field_line_ys.extend(arc_ys)
+
+    return dict(field_line_xs=field_line_xs, field_line_ys=field_line_ys)
 
 
-def plot_field_circular_arcs(
-    fig, field_circular_arcs_proto: Iterable[SSL_FieldCircularArc]
-):
-    for arc in field_circular_arcs_proto:
-        plot_circular_section(
-            fig,
-            arc.center.x / MM_PER_M,
-            arc.center.y / MM_PER_M,
-            arc.radius / MM_PER_M,
-            arc.a1,
-            arc.a2,
+class SSLWrapperPlotter:
+    def __setup_robot_plotters(self, robot_colour, robot_plot_colour):
+        """
+        A helper function to set circles, orientation lines, and labels for a given robot colour and a corresponding
+        plot colour.
+        :param robot_colour: Robot colour to set the legend label and robot_sources dict key with
+        :param robot_plot_colour: Colour to actually plot the robot circles with
+        """
+        # blue robots
+        self.robots_sources[robot_colour] = ColumnDataSource(
+            dict(
+                robot_ids=[],
+                robot_xs=[],
+                robot_ys=[],
+                robot_ori_line_seg_xs=[[]],
+                robot_ori_line_seg_ys=[[]],
+            )
+        )
+        # circles representing the robots
+        self.fig.circle(
+            source=self.robots_sources[robot_colour],
+            x="robot_xs",
+            y="robot_ys",
+            radius=ROBOT_MAX_RADIUS,
+            fill_color=robot_plot_colour,
+            line_color="black",
+            legend_label=robot_colour + " robots",
+        )
+        # line segments representing robot orientations
+        self.fig.multi_line(
+            source=self.robots_sources[robot_colour],
+            xs="robot_ori_line_seg_xs",
+            ys="robot_ori_line_seg_ys",
+            line_color="black",
+            legend_label=robot_colour + " robot orientations",
+        )
+        # labels for the robot ids
+        labels = LabelSet(
+            x="robot_xs",
+            y="robot_ys",
+            text="robot_ids",
+            source=self.robots_sources[robot_colour],
+            text_font_size="12pt",
+        )
+        self.fig.add_layout(labels)
+
+    def __init__(self, fig: Figure):
+        """
+        Create a new SSL_WrapperPacket plotter associated to the given figure. This function sets up all the
+        ColumnDataSource's needed to live update the bokeh figure when we plot different SSL_WrapperPackets.
+        :param fig: a bokeh Figure
+        """
+        self.fig = fig
+        # field lines
+        self.field_lines_source = ColumnDataSource(
+            dict(field_line_xs=[[]], field_line_ys=[[]])
+        )
+        self.fig.multi_line(
+            source=self.field_lines_source,
+            xs="field_line_xs",
+            ys="field_line_ys",
+            line_color="black",
+            legend_label="Field lines",
         )
 
+        # ball
+        self.ball_source = ColumnDataSource(dict(ball_xs=[], ball_ys=[]))
+        self.fig.circle(
+            source=self.ball_source,
+            x="ball_xs",
+            y="ball_ys",
+            radius=0.02,
+            fill_color="orange",
+            line_color="black",
+            legend_label="Balls",
+        )
 
-def plot_ssl_wrapperpacket(
-    fig: figure, ssl_wrapperpacket: SSL_WrapperPacket, label_robot_ids: bool = True
-):
-    """
-    Plot the given SSL_WrapperPacket representing the state of the entire world onto the
-    given Bokeh figure.
-    :param fig: a Bokeh figure
-    :param ssl_wrapperpacket: an SSL_WrapperPacket proto to plot the world state from
-    :param label_robot_ids: whether to label robot IDs on top of the robots
-    """
-    if ssl_wrapperpacket.HasField("detection"):
-        plot_robots(
-            fig,
-            ssl_wrapperpacket.detection.robots_yellow,
-            "yellow",
-            label_robot_ids=label_robot_ids,
-        )
-        plot_robots(
-            fig,
-            ssl_wrapperpacket.detection.robots_blue,
-            "cyan",
-            label_robot_ids=label_robot_ids,
-        )
-        plot_balls(fig, ssl_wrapperpacket.detection.balls)
-    if ssl_wrapperpacket.HasField("geometry"):
-        plot_field_line_segments(fig, ssl_wrapperpacket.geometry.field.field_lines)
-        plot_field_circular_arcs(fig, ssl_wrapperpacket.geometry.field.field_arcs)
+        # robots
+        self.robots_sources = dict()
+        self.__setup_robot_plotters("blue", "cyan")
+        self.__setup_robot_plotters("yellow", "yellow")
+
+    def plot_ssl_wrapper(self, ssl_wrapper: SSL_WrapperPacket):
+        if ssl_wrapper.HasField("detection"):
+            self.robots_sources["blue"].data.update(
+                get_robots_data(ssl_wrapper.detection.robots_blue)
+            )
+            self.robots_sources["yellow"].data.update(
+                get_robots_data(ssl_wrapper.detection.robots_yellow)
+            )
+            self.ball_source.data.update(get_balls_data(ssl_wrapper.detection.balls))
+        if ssl_wrapper.HasField("geometry"):
+            self.field_lines_source.data.update(
+                get_field_lines_data(
+                    ssl_wrapper.geometry.field.field_lines,
+                    ssl_wrapper.geometry.field.field_arcs,
+                )
+            )

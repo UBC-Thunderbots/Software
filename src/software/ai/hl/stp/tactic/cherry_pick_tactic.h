@@ -17,7 +17,8 @@ class CherryPickTactic : public Tactic
     /**
      * Creates a new CherryPickTactic
      */
-    explicit CherryPickTactic(const World& world, const Rectangle& target_region);
+    explicit CherryPickTactic(const World& world, const Rectangle& target_region,
+                              std::shared_ptr<const PassingConfig> passing_config);
 
     CherryPickTactic() = delete;
 

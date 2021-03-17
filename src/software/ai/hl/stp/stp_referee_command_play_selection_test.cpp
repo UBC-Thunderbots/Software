@@ -2,6 +2,7 @@
 
 #include <exception>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
 #include "software/test_util/test_util.h"
@@ -25,8 +26,12 @@ class STPRefereeCommandPlaySelectionTestWithPositions
 {
    public:
     STPRefereeCommandPlaySelectionTestWithPositions()
-        : stp([]() { return std::make_unique<HaltPlay>(); },
-              std::make_shared<const AIControlConfig>(), 0)
+        : stp(
+              []() {
+                  return std::make_unique<HaltPlay>(
+                      std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
+              },
+              std::make_shared<const AiControlConfig>(), 0)
     {
     }
 
@@ -184,7 +189,7 @@ class STPRefereeCommandPlaySelectionTest
 {
    public:
     STPRefereeCommandPlaySelectionTest()
-        : stp([]() { return nullptr; }, std::make_shared<const AIControlConfig>(), 0)
+        : stp([]() { return nullptr; }, std::make_shared<const AiControlConfig>(), 0)
     {
     }
 
@@ -192,10 +197,11 @@ class STPRefereeCommandPlaySelectionTest
     void SetUp() override
     {
         auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltPlay>();
+            return std::make_unique<HaltPlay>(
+                std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
         };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp = STP(default_play_constructor, 0);
+        stp = STP(default_play_constructor, std::make_shared<const AiControlConfig>(), 0);
 
         Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));

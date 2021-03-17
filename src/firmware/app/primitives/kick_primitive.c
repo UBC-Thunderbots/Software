@@ -11,7 +11,7 @@ void app_kick_primitive_start(TbotsProto_KickPrimitive prim_msg, void *void_stat
 
     Chicker_t *chicker =
         app_firmware_robot_getChicker(app_firmware_world_getRobot(world));
-    app_chicker_enableAutokick(chicker, prim_msg.kick_speed_meters_per_second);
+    app_chicker_enableAutokick(chicker, prim_msg.kick_speed_m_per_s);
 }
 
 static void app_kick_primitive_tick(void *void_state_ptr, FirmwareWorld_t *world)

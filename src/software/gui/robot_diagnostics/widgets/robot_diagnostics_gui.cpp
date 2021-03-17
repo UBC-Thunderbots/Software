@@ -171,8 +171,8 @@ void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
     TbotsProto::Primitive& primitive_msg)
 {
     // Uses the auto chick button group to decide which chick command primitive to make
-    if (main_widget->buttonGroup_autochick->checkedButton() ==
-        main_widget->radioButton_autochick_none)
+    if (main_widget->buttonGroup_auto_chip_or_kick->checkedButton() ==
+        main_widget->radioButton_auto_chip_or_kick_none)
     {
         // Checks if chip/kick radio buttons were pressed
         if (chip_pressed)
@@ -183,21 +183,21 @@ void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
         }
         else if (kick_pressed)
         {
-            primitive_msg.mutable_direct_control()->set_kick_speed_meters_per_second(
+            primitive_msg.mutable_direct_control()->set_kick_speed_m_per_s(
                 main_widget->lineEdit_chicker_power->text().toFloat());
             kick_pressed = false;
         }
     }
-    else if (main_widget->buttonGroup_autochick->checkedButton() ==
+    else if (main_widget->buttonGroup_auto_chip_or_kick->checkedButton() ==
              main_widget->radioButton_autochip)
     {
         primitive_msg.mutable_direct_control()->set_autochip_distance_meters(
             main_widget->lineEdit_chicker_power->text().toFloat());
     }
-    else if (main_widget->buttonGroup_autochick->checkedButton() ==
+    else if (main_widget->buttonGroup_auto_chip_or_kick->checkedButton() ==
              main_widget->radioButton_autokick)
     {
-        primitive_msg.mutable_direct_control()->set_autokick_speed_meters_per_second(
+        primitive_msg.mutable_direct_control()->set_autokick_speed_m_per_s(
             main_widget->lineEdit_chicker_power->text().toFloat());
     }
 }

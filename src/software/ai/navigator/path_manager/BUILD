@@ -1,4 +1,7 @@
-package(default_visibility = ["//software/ai:__subpackages__"])
+package(default_visibility = [
+    "//software/ai:__subpackages__",
+    "//software/simulated_tests:__subpackages__",
+])
 
 cc_library(
     name = "path_manager",
@@ -19,8 +22,8 @@ cc_library(
     hdrs = ["velocity_obstacle_path_manager.h"],
     deps = [
         ":path_manager",
+        "//shared/parameter:cpp_configs",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
