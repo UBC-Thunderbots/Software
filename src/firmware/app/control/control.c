@@ -70,9 +70,10 @@ float app_control_getMaximalTorqueScaling(const Wheel_t* wheels[4],
  * @return The scaling constant to multiply the all acceleration values by in order to
  *         accelerate the robot as fast as physically possible
  */
-float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
-                                         const float linear_accel_x,
-                                         const float linear_accel_y, float angular_accel)
+float app_control_getMaximalAccelScaling(
+    const FirmwareRobot_t* robot, Wheel_t* front_left_wheel, Wheel_t* front_right_wheel,
+    Wheel_t* back_left_wheel, Wheel_t* back_right_wheel, const float linear_accel_x,
+    const float linear_accel_y, float angular_accel)
 {
     const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
 
@@ -88,24 +89,27 @@ float app_control_getMaximalAccelScaling(const FirmwareRobot_t* robot,
     force3_to_force4(normed_force, wheel_forces);
 
     const Wheel_t* wheels[4];
-    wheels[0] = app_firmware_robot_getFrontLeftWheel(robot);
-    wheels[1] = app_firmware_robot_getBackLeftWheel(robot);
-    wheels[2] = app_firmware_robot_getBackRightWheel(robot);
-    wheels[3] = app_firmware_robot_getFrontRightWheel(robot);
+    wheels[0] = front_left_wheel;
+    wheels[1] = back_left_wheel;
+    wheels[2] = back_right_wheel;
+    wheels[3] = front_right_wheel;
 
     float battery_voltage = app_firmware_robot_getBatteryVoltage(robot);
 
     return app_control_getMaximalTorqueScaling(wheels, wheel_forces, battery_voltage);
 }
 
-void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
+void app_control_applyAccel(const FirmwareRobot_t* robot, Wheel_t* front_left_wheel,
+                            Wheel_t* front_right_wheel, Wheel_t* back_left_wheel,
+                            Wheel_t* back_right_wheel, float linear_accel_x,
                             float linear_accel_y, float angular_accel)
 {
     const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
 
     // check for max acceleration in direction of the vel difference
-    float scaling = app_control_getMaximalAccelScaling(robot, linear_accel_x,
-                                                       linear_accel_y, angular_accel);
+    float scaling = app_control_getMaximalAccelScaling(
+        robot, front_left_wheel, front_right_wheel, back_left_wheel, back_right_wheel,
+        linear_accel_x, linear_accel_y, angular_accel);
 
     // if the (very naive) 1 tick acceleration violates the physical limits of the robot
     // scale it to maximum
@@ -117,6 +121,7 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
         angular_accel *= scaling;
     }
 
+    // TODO: Do we need to make sure we need to check it's not NULL?
     ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
     float prev_linear_accel_x           = controller_state->last_applied_acceleration_x;
     float prev_linear_accel_y           = controller_state->last_applied_acceleration_y;
@@ -151,16 +156,16 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
     float wheel_force[4];
     speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate system
 
-    app_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot), wheel_force[0]);
-    app_wheel_applyForce(app_firmware_robot_getFrontRightWheel(robot), wheel_force[3]);
-    app_wheel_applyForce(app_firmware_robot_getBackLeftWheel(robot), wheel_force[1]);
-    app_wheel_applyForce(app_firmware_robot_getBackRightWheel(robot), wheel_force[2]);
+    app_wheel_applyForce(front_left_wheel, wheel_force[0]);
+    app_wheel_applyForce(front_right_wheel, wheel_force[3]);
+    app_wheel_applyForce(back_left_wheel, wheel_force[1]);
+    app_wheel_applyForce(back_right_wheel, wheel_force[2]);
 }
 
-void app_control_trackVelocityInRobotFrame(FirmwareRobot_t* robot,
-                                           float linear_velocity_x,
-                                           float linear_velocity_y,
-                                           float angular_velocity)
+void app_control_trackVelocityInRobotFrame(
+    FirmwareRobot_t* robot, Wheel_t* front_left_wheel, Wheel_t* front_right_wheel,
+    Wheel_t* back_left_wheel, Wheel_t* back_right_wheel, float linear_velocity_x,
+    float linear_velocity_y, float angular_velocity)
 {
     float current_vx               = app_firmware_robot_getVelocityX(robot);
     float current_vy               = app_firmware_robot_getVelocityY(robot);
@@ -186,6 +191,7 @@ void app_control_trackVelocityInRobotFrame(FirmwareRobot_t* robot,
     float angular_acceleration =
         (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;
 
-    app_control_applyAccel(robot, desired_acceleration[0], desired_acceleration[1],
-                           angular_acceleration);
+    app_control_applyAccel(robot, front_left_wheel, front_right_wheel, back_left_wheel,
+                           back_right_wheel, desired_acceleration[0],
+                           desired_acceleration[1], angular_acceleration);
 }

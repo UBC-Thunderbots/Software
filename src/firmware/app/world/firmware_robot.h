@@ -1,9 +1,11 @@
 #pragma once
 
+#include "firmware/app/control/trajectory_planner.h"
 #include "firmware/app/world/charger.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/wheel.h"
+#include "shared/proto/primitive.nanopb.h"
 
 /**
  * This struct represents a robot from the perspective of firmware
@@ -70,7 +72,7 @@ typedef struct ControllerState
  * @return A pointer to a robot with the given hardware, ownership of the robot is
  *         given to the caller
  */
-FirmwareRobot_t* app_firmware_robot_create(
+FirmwareRobot_t* app_firmware_wheels_robot_create(
     Charger_t* charger, Chicker_t* chicker, Dribbler_t* dribbler,
     float (*get_robot_position_x)(void), float (*get_robot_position_y)(void),
     float (*get_robot_orientation)(void), float (*get_robot_velocity_x)(void),
@@ -78,6 +80,18 @@ FirmwareRobot_t* app_firmware_robot_create(
     float (*get_battery_voltage)(void), Wheel_t* front_right_wheel,
     Wheel_t* front_left_wheel, Wheel_t* back_right_wheel, Wheel_t* back_left_wheel,
     ControllerState_t* controller_state, RobotConstants_t robot_constants);
+
+FirmwareRobot_t* app_firmware_traj_follower_robot_create(
+    Charger_t* charger, Chicker_t* chicker, Dribbler_t* dribbler,
+    float (*get_robot_position_x)(void), float (*get_robot_position_y)(void),
+    float (*get_robot_orientation)(void), float (*get_robot_velocity_x)(void),
+    float (*get_robot_velocity_y)(void), float (*get_robot_velocity_angular)(void),
+    float (*get_battery_voltage)(void),
+    void (*follow_trajectory)(PositionTrajectory_t* trajectory),
+    void (*stop_robot)(TbotsProto_StopPrimitive_StopType stop_type),
+    void (*control_direct_wheel)(
+        TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg),
+    RobotConstants_t robot_constants);
 
 /**
  * Destroy the given robot, freeing any memory allocated for it
@@ -184,43 +198,6 @@ float app_firmware_robot_getSpeedLinear(const FirmwareRobot_t* robot);
 float app_firmware_robot_getBatteryVoltage(const FirmwareRobot_t* robot);
 
 /**
- * Get the front right wheel from the given robot
- *
- * @param robot The robot to get the front right wheel from
- *
- * @return The front right wheel from the given robot
- */
-Wheel_t* app_firmware_robot_getFrontRightWheel(const FirmwareRobot_t* robot);
-
-/**
- * Get the front left wheel from the given robot
- *
- * @param robot The robot to get the front left wheel from
- *
- * @return The front left wheel from the given robot
- */
-Wheel_t* app_firmware_robot_getFrontLeftWheel(const FirmwareRobot_t* robot);
-
-/**
- * Get the back right wheel from the given robot
- *
- * @param robot The robot to get the back right wheel from
- *
- * @return The back right wheel from the given robot
- */
-Wheel_t* app_firmware_robot_getBackRightWheel(const FirmwareRobot_t* robot);
-
-
-/**
- * Get the back left wheel from the given robot
- *
- * @param robot The robot to get the back left wheel from
- *
- * @return The back left wheel from the given robot
- */
-Wheel_t* app_firmware_robot_getBackLeftWheel(const FirmwareRobot_t* robot);
-
-/**
  * Get the constants for this robot
  *
  * @param robot The robot to get constants from
@@ -237,3 +214,16 @@ RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* rob
  * @return A pointer to the controller state for the given robot
  */
 ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* robot);
+
+// TODO: Headers
+void app_firmware_robot_follow_trajectory(const FirmwareRobot_t* robot,
+                                          PositionTrajectory_t* trajectory);
+
+// TODO: Headers
+void app_firmware_stop_robot(const FirmwareRobot_t* robot,
+                             TbotsProto_StopPrimitive_StopType stop_type);
+
+// TODO: Headers
+void app_firmware_direct_control_wheel(
+    const FirmwareRobot_t* robot,
+    TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);

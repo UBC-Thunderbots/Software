@@ -25,7 +25,7 @@ class FirmwareRobotTest : public testing::Test
 
         app_logger_init(0, &TestUtil::handleTestRobotLog);
 
-        firmware_robot = app_firmware_robot_create(
+        firmware_robot = app_firmware_wheels_robot_create(
             charger, chicker, dribbler, &(this->returnEight), &(this->returnNine),
             &(this->returnTen), &(this->returnEleven), &(this->returnTwelve),
             &(this->returnThirteen), &(this->returnFourteen), front_right_wheel,

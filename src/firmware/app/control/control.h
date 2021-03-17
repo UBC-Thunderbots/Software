@@ -12,7 +12,9 @@
  *                       (side-to-side) direction (m/s^2)
  * @param angular_accel The angular acceleration to apply to the robot (rad/s^2)
  */
-void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
+void app_control_applyAccel(const FirmwareRobot_t* robot, Wheel_t* front_left_wheel,
+                            Wheel_t* front_right_wheel, Wheel_t* back_left_wheel,
+                            Wheel_t* back_right_wheel, float linear_accel_x,
                             float linear_accel_y, float angular_accel);
 
 /**
@@ -25,7 +27,7 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, float linear_accel_x,
  *                          coordinate frame (m/s)
  * @param angular_velocity The angular velocity to move at (rad/s)
  */
-void app_control_trackVelocityInRobotFrame(FirmwareRobot_t* robot,
-                                           float linear_velocity_x,
-                                           float linear_velocity_y,
-                                           float angular_velocity);
+void app_control_trackVelocityInRobotFrame(
+    FirmwareRobot_t* robot, Wheel_t* front_left_wheel, Wheel_t* front_right_wheel,
+    Wheel_t* back_left_wheel, Wheel_t* back_right_wheel, float linear_velocity_x,
+    float linear_velocity_y, float angular_velocity);

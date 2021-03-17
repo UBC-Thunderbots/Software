@@ -91,7 +91,7 @@ SimulatorRobotSingleton::createFirmwareRobot()
         .last_applied_acceleration_y       = 0,
         .last_applied_acceleration_angular = 0,
     };
-    FirmwareRobot_t* firmware_robot = app_firmware_robot_create(
+    FirmwareRobot_t* firmware_robot = app_firmware_wheels_robot_create(
         charger, chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
         &(SimulatorRobotSingleton::getPositionY),
         &(SimulatorRobotSingleton::getOrientation),

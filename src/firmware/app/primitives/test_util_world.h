@@ -191,7 +191,7 @@ class FirmwareTestUtilWorld : public testing::Test
                              &(FirmwareTestUtil::brake_back_left),
                              &(FirmwareTestUtil::coast_back_left), wheel_constants);
 
-        robot = app_firmware_robot_create(
+        robot = app_firmware_wheels_robot_create(
             charger, chicker, dribbler, &(FirmwareTestUtil::get_robot_property),
             &(FirmwareTestUtil::get_robot_property),
             &(FirmwareTestUtil::get_robot_property),
