@@ -5,8 +5,8 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
-#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -70,7 +70,6 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
     Point bait_move_tactic_2_pos =
         opposite_corner_to_kick - Vector(world.field().enemyDefenseArea().yLength() * 1.5,
                                          copysign(0.5, opposite_corner_to_kick.y()));
-
     auto bait_move_tactic_1 = std::make_shared<MoveTactic>(true);
     auto bait_move_tactic_2 = std::make_shared<MoveTactic>(true);
     bait_move_tactic_1->updateControlParams(
@@ -80,7 +79,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
         bait_move_tactic_2_pos,
         (world.field().enemyGoalCenter() - bait_move_tactic_2_pos).orientation(), 0.0);
 
-    Pass pass = setupPass(yield, goalie_tactic, world);
+    Pass pass =
+        setupPass(yield, bait_move_tactic_1, bait_move_tactic_2, goalie_tactic, world);
 
     // Perform the pass and wait until the receiver is finished
     auto passer =
@@ -100,6 +100,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
 }
 
 Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
+                               std::shared_ptr<MoveTactic> bait_move_tactic_1,
+                               std::shared_ptr<MoveTactic> bait_move_tactic_2,
                                std::shared_ptr<GoalieTactic> goalie_tactic,
                                const World &world)
 {
@@ -132,28 +134,16 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     //        └──────┴──────┴──────┴──────┴──────┴─────┘
     //
     Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_14};
-    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_15};
-    Zones cherry_pick_region_3 = {EighteenZoneId::ZONE_16};
-    Zones cherry_pick_region_4;
+    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_15, EighteenZoneId::ZONE_18};
 
-    if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
+    if (contains(world.field().enemyNegativeYQuadrant(), world.ball().position()))
     {
-        cherry_pick_region_4 = {EighteenZoneId::ZONE_18};
+        cherry_pick_region_1 = {EighteenZoneId::ZONE_14};
+        cherry_pick_region_2 = {EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_16};
     }
-    else
-    {
-        cherry_pick_region_4 = {EighteenZoneId::ZONE_16};
-    }
-
-    // Target any pass in the enemy half of the field
-    Zones ENEMY_HALF = {
-        EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12,
-        EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15,
-        EighteenZoneId::ZONE_16, EighteenZoneId::ZONE_17, EighteenZoneId::ZONE_18,
-    };
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
-    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassInZones(ENEMY_HALF);
+    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
@@ -164,20 +154,12 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
     auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
         world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
-    auto cherry_pick_tactic_3 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones(cherry_pick_region_3).pass);
-    auto cherry_pick_tactic_4 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones(cherry_pick_region_4).pass);
 
     auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
         cherry_pick_tactic_1->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
-        cherry_pick_tactic_3->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_3).pass);
-        cherry_pick_tactic_4->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_4).pass);
     };
 
     // Wait for a robot to be assigned to align to take the corner
@@ -188,7 +170,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, cherry_pick_tactic_3, cherry_pick_tactic_4});
+               cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2});
     }
 
 
@@ -204,7 +186,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, cherry_pick_tactic_3, cherry_pick_tactic_4});
+               cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2});
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
@@ -220,10 +202,10 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, cherry_pick_tactic_3, cherry_pick_tactic_4});
+               cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2});
 
         best_pass_and_score_so_far =
-            pass_generator.generatePassEvaluation(world).getBestPassInZones(ENEMY_HALF);
+            pass_generator.generatePassEvaluation(world).getBestPassOnField();
 
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;

@@ -147,13 +147,44 @@ void FreeKickPlay::performPassStage(
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);
+
+    auto pitch_division =
+        std::make_shared<const EighteenZonePitchDivision>(world.field());
+
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
+                                                 play_config->getPassingConfig());
+
+    using Zones = std::unordered_set<EighteenZoneId>;
+
+    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_10};
+    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_14};
+    auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
+        world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+    auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
+        world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
     do
     {
         passer->updateControlParams(pass);
         receiver->updateControlParams(pass);
 
-        yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        if (!passer->done())
+        {
+            yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
+                   std::get<1>(crease_defender_tactics)});
+        } 
+        else
+        {
+            pass_eval = pass_generator.generatePassEvaluation(world);
+            cherry_pick_tactic_1->updateControlParams(
+                pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+            cherry_pick_tactic_2->updateControlParams(
+                pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+            yield({goalie_tactic, receiver, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                   std::get<0>(crease_defender_tactics),
+                   std::get<1>(crease_defender_tactics)});
+        }
     } while (!receiver->done());
 }
 
@@ -201,13 +232,13 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     {
         if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
         {
-            cherry_pick_region_1 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12};
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15};
+            cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_15};
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_14};
         }
         else
         {
-            cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11};
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14};
+            cherry_pick_region_1 = {EighteenZoneId::ZONE_12, EighteenZoneId::ZONE_15};
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_14};
         }
     }
 

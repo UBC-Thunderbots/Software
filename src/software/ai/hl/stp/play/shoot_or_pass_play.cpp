@@ -148,15 +148,13 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     {
         if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
         {
-            cherry_pick_region_1 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12};
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15,
-                                    EighteenZoneId::ZONE_18};
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_14};
+            cherry_pick_region_1 = {EighteenZoneId::ZONE_18, EighteenZoneId::ZONE_17};
         }
         else
         {
-            cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11};
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14,
-                                    EighteenZoneId::ZONE_16};
+            cherry_pick_region_1 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_14};
+            cherry_pick_region_2 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13};
         }
     }
 

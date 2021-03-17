@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@rules_foreign_cc//tools/build_defs:cmake.bzl", "cmake_external")
 
 cc_library(
     name = "cost_functions",
@@ -135,10 +136,18 @@ cc_library(
     ],
 )
 
+cmake_external(
+    name = "rapidcheck",
+    lib_source = "@rapidcheck//:all",
+    static_libraries = ["librapidcheck.a"],
+)
+
 cc_test(
     name = "pass_generator_test",
     srcs = ["pass_generator_test.cpp"],
     deps = [
+        "//software/world:world",
+        ":rapidcheck",
         ":pass_generator",
         "//software/test_util",
         "@gtest//:gtest_main",

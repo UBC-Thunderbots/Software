@@ -14,14 +14,14 @@ class ShootOrPassPlayTest : public SimulatedPlayTestFixture
 
 TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 {
-    setBallState(BallState(Point(2.4, 1.9), Vector(0, 0)));
+    setBallState(BallState(Point(-4.4, 2.9), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({
         field().friendlyGoalCenter(),
-        Point(4.5, 3.0),
-        Point(2, 1.5),
-        Point(2, 0.5),
-        Point(2, -0.5),
-        Point(2, -1.5),
+        Point(-4.5, 3.0),
+        Point(-2, 1.5),
+        Point(-2, 0.5),
+        Point(-2, -0.5),
+        Point(-2, -1.5),
     }));
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(

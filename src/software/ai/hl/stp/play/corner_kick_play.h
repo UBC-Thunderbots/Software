@@ -47,5 +47,7 @@ class CornerKickPlay : public Play
      * @return the pass that was committed to
      */
     Pass setupPass(TacticCoroutine::push_type &yield,
+                   std::shared_ptr<MoveTactic> bait_move_tactic_1,
+                   std::shared_ptr<MoveTactic> bait_move_tactic_2,
                    std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
 };

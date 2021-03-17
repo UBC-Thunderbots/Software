@@ -57,8 +57,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
 
-    // For now we allow for 1 second setup time because the rest of the system is used
-    // to there being a setup delay, but this tactic really shouldn't care.
+    // We allow for a second of time for the receiver to move to their final position
     auto setup_time = ball.timestamp() + Duration::fromSeconds(1.0);
 
     while (ball.timestamp() < setup_time)

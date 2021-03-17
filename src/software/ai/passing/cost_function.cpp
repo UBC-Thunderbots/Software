@@ -76,7 +76,11 @@ double ratePassShootScore(const Ball& ball, const Field& field, const Team& enem
 
     // Create the shoot score by creating a sigmoid that goes to a large value as
     // the section of net we're shooting on approaches 100% (ie. completely open)
-    double shot_openness_score = sigmoid(net_percent_open, 0.5, 0.95);
+    //
+    // TODO (#1988) This sigmoid limits our ability to find good passes,
+    // until 1988 is resolved, we use a "leaky" sigmoid here to allow the score to
+    // not be entirely 0 when we have no shot on net.
+    double shot_openness_score = sigmoid(net_percent_open, 0.1, 0.95);
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)
@@ -176,8 +180,7 @@ double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot,
 
     Duration ball_time_to_pass_receive_position =
         Duration::fromSeconds((pass.receiverPoint() - ball.position()).length() /
-                              pass.speed()) +
-        Duration::fromSeconds(1.0);
+                              pass.speed());
 
     Duration enemy_reaction_time =
         Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
@@ -216,6 +219,22 @@ double ratePassFriendlyCapability(const Ball& ball, Team friendly_team, const Pa
     {
         return 0;
     }
+
+    // Get the robot that is closest to where the pass would be received
+    Robot best_passer = friendly_team.getAllRobots()[0];
+    for (const Robot& robot : friendly_team.getAllRobots())
+    {
+        double distance = (robot.position() - ball.position()).length();
+        double curr_best_distance =
+            (best_passer.position() - pass.receiverPoint()).length();
+        if (distance < curr_best_distance)
+        {
+            best_passer = robot;
+        }
+    }
+
+    // Remove it from the team to not be considered as a potential receiver
+    friendly_team.removeRobotWithId(best_passer.id());
 
     // Get the robot that is closest to where the pass would be received
     Robot best_receiver = friendly_team.getAllRobots()[0];
