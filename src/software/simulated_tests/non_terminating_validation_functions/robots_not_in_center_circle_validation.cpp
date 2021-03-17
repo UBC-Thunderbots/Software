@@ -1,7 +1,5 @@
 #include "software/simulated_tests/non_terminating_validation_functions/robots_not_in_center_circle_validation.h"
 
-#include <gtest/gtest.h>
-
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
@@ -12,7 +10,7 @@ void robotsNotInCenterCircle(std::shared_ptr<World> world_ptr,
     {
         if (contains(world_ptr->field().centerCircle(), robot.position()))
         {
-            FAIL() << "Robot " + std::to_string(robot.id()) + " entered center circle";
+            yield("Robot " + std::to_string(robot.id()) + " entered center circle");
         }
     }
 }
@@ -29,6 +27,6 @@ void robotNotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
     Point position = robot_optional.value().position();
     if (contains(world_ptr->field().centerCircle(), position))
     {
-        FAIL() << "Robot " + std::to_string(robot_id) + " entered center circle";
+        yield("Robot " + std::to_string(robot_id) + " entered center circle");
     }
 }

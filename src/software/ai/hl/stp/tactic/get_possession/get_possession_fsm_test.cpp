@@ -15,13 +15,13 @@ TEST(GetPossessionFSMTest, test_transitions)
 
     HFSM<GetPossessionFSM> fsm;
 
-    // Start in InterceptBallState
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::InterceptBallState>));
+    // Start in GetPossessionState
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::GetPossessionState>));
 
-    // Stay in InterceptBallState since ball not in possession yet
+    // Stay in GetPossessionState since ball not in possession yet
     fsm.process_event(GetPossessionFSM::Update(
         {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::InterceptBallState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::GetPossessionState>));
 
     // At ball point so transition to done
     robot = ::TestUtil::createRobotAtPos(Point(0.5, 0));
