@@ -31,6 +31,11 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double shoot_pass_rating = ratePassShootScore(
         world.ball(), world.field(), world.enemyTeam(), pass, passing_config);
 
+    if (world.ball().position().x() < 0)
+    {
+        shoot_pass_rating = 1.0;
+    }
+
     // Passes outside the zone are rated poorly
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.1);
 
@@ -219,22 +224,6 @@ double ratePassFriendlyCapability(const Ball& ball, Team friendly_team, const Pa
     {
         return 0;
     }
-
-    // Get the robot that is closest to where the pass would be received
-    Robot best_passer = friendly_team.getAllRobots()[0];
-    for (const Robot& robot : friendly_team.getAllRobots())
-    {
-        double distance = (robot.position() - ball.position()).length();
-        double curr_best_distance =
-            (best_passer.position() - pass.receiverPoint()).length();
-        if (distance < curr_best_distance)
-        {
-            best_passer = robot;
-        }
-    }
-
-    // Remove it from the team to not be considered as a potential receiver
-    friendly_team.removeRobotWithId(best_passer.id());
 
     // Get the robot that is closest to where the pass would be received
     Robot best_receiver = friendly_team.getAllRobots()[0];

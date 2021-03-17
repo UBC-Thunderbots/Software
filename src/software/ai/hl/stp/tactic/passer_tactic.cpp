@@ -5,8 +5,7 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/logger/logger.h"
-#include "software/world/ball.h"
-
+#include "software/world/ball.h" 
 PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
                            bool loop_forever)
     : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
@@ -39,19 +38,6 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world) 
 
 void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    // If the ball is moving, we are likely already in a live game scenario and
-    // so we need to collect the ball before we can pass. If the ball is not moving,
-    // we are likely in a set play and so we don't need to initially collect the ball
-    if (ball.velocity().length() > INTERCEPT_BALL_SPEED_THRESHOLD)
-    {
-        auto intercept_action = std::make_shared<InterceptBallAction>(field, ball);
-        do
-        {
-            intercept_action->updateControlParams(*robot_);
-            yield(intercept_action);
-        } while (!intercept_action->done());
-    }
-
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass
     auto move_action = std::make_shared<MoveAction>(
@@ -63,8 +49,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     while (ball.timestamp() < setup_time)
     {
         // The passer should be facing the receiver
-        auto passer_orientation =
-            pass.receiverOrientation(ball.position()) + Angle::fromDegrees(180);
+        auto passer_orientation = pass.passerOrientation(ball.position());
 
         // We want to wait just behind where the pass is supposed to start, so that the
         // ball is *almost* touching the kicker
@@ -74,7 +59,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         Point wait_position = ball.position() - ball_offset;
 
         move_action->updateControlParams(*robot_, wait_position, passer_orientation, 0,
-                                         DribblerMode::OFF, BallCollisionType::ALLOW);
+                                         DribblerMode::OFF, BallCollisionType::AVOID);
         yield(move_action);
     }
 

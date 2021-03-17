@@ -29,6 +29,14 @@ class FieldPitchDivision
     virtual const Rectangle& getZone(ZoneEnum zone_id) const = 0;
 
     /**
+     * Given a point, returns the Zone Id the point is located in.
+     *
+     * @param position The position 
+     * @return the Zone Id of the zone the position is in
+     */
+    virtual ZoneEnum getZoneId(const Point& position) const = 0;
+
+    /**
      * Returns all the zone enums in this field pitch division
      *
      * @return A vector of all the zone ids

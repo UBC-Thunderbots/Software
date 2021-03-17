@@ -36,9 +36,7 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     // Prefer robots closer to the pass receive position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost =
-        (robot.position() - pass.receiverPoint()).length() / world.field().totalXLength();
-    return std::clamp<double>(cost, 0, 1);
+    return (robot.position() - pass.receiverPoint()).length();
 }
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
@@ -80,6 +78,7 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     std::optional<Shot> best_shot = findFeasibleShot();
     if (best_shot)
     {
+        LOG(DEBUG) << "Taking one-touch shot";
         auto best_shot_target = best_shot->getPointToShootAt();
 
         // The angle between the ball velocity and a vector from the ball to the robot

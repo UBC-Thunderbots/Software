@@ -2,6 +2,7 @@
 #include "software/ai/passing/field_pitch_division.h"
 #include "software/geom/rectangle.h"
 #include "software/util/make_enum/make_enum.h"
+#include <memory>
 
 // clang-format off
 //
@@ -42,8 +43,10 @@ class EighteenZonePitchDivision : public FieldPitchDivision<EighteenZoneId>
 
     const Rectangle& getZone(EighteenZoneId zone_id) const override;
     const std::vector<EighteenZoneId>& getAllZoneIds() const override;
+    EighteenZoneId getZoneId(const Point& position) const override;
 
    private:
-    std::vector<Rectangle> pitch_division;
-    std::vector<EighteenZoneId> zones;
+    std::unique_ptr<Field> field_;
+    std::vector<Rectangle> pitch_division_;
+    std::vector<EighteenZoneId> zones_;
 };

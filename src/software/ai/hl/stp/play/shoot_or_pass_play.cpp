@@ -31,6 +31,64 @@ bool ShootOrPassPlay::invariantHolds(const World &world) const
            (world.getTeamWithPossession() == TeamSide::FRIENDLY);
 }
 
+void ShootOrPassPlay::selectZone(
+    std::shared_ptr<const EighteenZonePitchDivision> pitch_division, const Point &ball_location,
+    Zones &cherry_pick_region_1, Zones &cherry_pick_region_2)
+{
+    // If the passing is coming from the friendly end, we split the cherry-pickers
+    // across the x-axis in the enemy half
+    //
+    //                FRIENDLY          ENEMY
+    //        ┌──────┬──────┬──────┬──────┬──────┬─────┐
+    //        │1     │4     │7     │10    │13    │16   │
+    //        │      │      │      │      │      │     │
+    //        │      │      │      │      │      │     │
+    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
+    //      ┌─┤2     │5     │8     │11    │14    │17   ├─┐
+    //      │ │      │      │      │      │      │     │ │
+    //      │ │      │      │      │      │      │     │ │
+    //      └─┤      │      │      │      │      │     ├─┘
+    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
+    //        │3     │6     │9     │12    │15    │18   │
+    //        │      │      │      │      │      │     │
+    //        │      │      │      │      │      │     │
+    //        └──────┴──────┴──────┴──────┴──────┴─────┘
+    //
+    cherry_pick_region_1 = {EighteenZoneId::ZONE_8, EighteenZoneId::ZONE_9,
+                                  EighteenZoneId::ZONE_6};
+    cherry_pick_region_2 = {EighteenZoneId::ZONE_7};
+
+    // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
+    // on the opposite side of the x-axis to wherever the pass is coming from
+    EighteenZoneId zone_with_ball = pitch_division->getZoneId(ball_location);
+
+    if (zone_with_ball == EighteenZoneId::ZONE_1 ||
+        zone_with_ball == EighteenZoneId::ZONE_3)
+    {
+        cherry_pick_region_1 = {EighteenZoneId::ZONE_4, EighteenZoneId::ZONE_5};
+        cherry_pick_region_2 = {EighteenZoneId::ZONE_8, EighteenZoneId::ZONE_9};
+    }
+    else if (zone_with_ball == EighteenZoneId::ZONE_4 ||
+             zone_with_ball == EighteenZoneId::ZONE_5 ||
+             zone_with_ball == EighteenZoneId::ZONE_6 ||
+             zone_with_ball == EighteenZoneId::ZONE_7 ||
+             zone_with_ball == EighteenZoneId::ZONE_8 ||
+             zone_with_ball == EighteenZoneId::ZONE_9)
+    {
+        cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13,
+                                EighteenZoneId::ZONE_16};
+        cherry_pick_region_2 = {EighteenZoneId::ZONE_12, EighteenZoneId::ZONE_15,
+                                EighteenZoneId::ZONE_18};
+    }
+    else
+    {
+        cherry_pick_region_1 = {EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14,
+                                EighteenZoneId::ZONE_16};
+        cherry_pick_region_2 = {EighteenZoneId::ZONE_18, EighteenZoneId::ZONE_15};
+    }
+
+}
+
 void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
 {
@@ -68,6 +126,12 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         min_open_angle_for_shot, std::nullopt, false,
         play_config->getShootGoalTacticConfig());
 
+    auto pitch_division =
+        std::make_shared<const EighteenZonePitchDivision>(world.field());
+
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
+                                                 play_config->getPassingConfig());
+
     PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
         yield, goalie_tactic, crease_defender_tactics, shoot_tactic, world);
 
@@ -88,12 +152,35 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto receiver = std::make_shared<ReceiverTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
             false);
+
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        Zones cherry_pick_region_1 = {};
+        Zones cherry_pick_region_2 = {};
+        selectZone(pitch_division, pass_eval.getBestPassOnField().pass.receiverPoint(),
+                   cherry_pick_region_1, cherry_pick_region_2);
+
+        auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
+            world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
+            world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
         do
         {
             passer->updateControlParams(pass);
             receiver->updateControlParams(pass);
-            yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
-                   std::get<1>(crease_defender_tactics)});
+            if (!passer->done())
+            {
+                yield({goalie_tactic, passer, receiver});
+            }
+            else
+            {
+                cherry_pick_tactic_1->updateControlParams(
+                    pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+                cherry_pick_tactic_2->updateControlParams(
+                    pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+                yield({goalie_tactic, receiver, cherry_pick_tactic_1,
+                       cherry_pick_tactic_2});
+            }
         } while (!receiver->done());
     }
     else
@@ -116,47 +203,9 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  play_config->getPassingConfig());
 
-    using Zones = std::unordered_set<EighteenZoneId>;
-
-    // If the passing is coming from the friendly end, we split the cherry-pickers
-    // across the x-axis in the enemy half
-    //
-    //                FRIENDLY          ENEMY
-    //        ┌──────┬──────┬──────┬──────┬──────┬─────┐
-    //        │1     │4     │7     │10    │13    │16   │
-    //        │      │      │      │      │      │     │
-    //        │      │      │      │      │      │     │
-    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
-    //      ┌─┤2     │5     │8     │11    │14    │17   ├─┐
-    //      │ │      │      │      │      │      │     │ │
-    //      │ │      │      │      │      │      │     │ │
-    //      └─┤      │      │      │      │      │     ├─┘
-    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
-    //        │3     │6     │9     │12    │15    │18   │
-    //        │      │      │      │      │      │     │
-    //        │      │      │      │      │      │     │
-    //        └──────┴──────┴──────┴──────┴──────┴─────┘
-    //
-    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_4, EighteenZoneId::ZONE_7,
-                                  EighteenZoneId::ZONE_8};
-    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_5, EighteenZoneId::ZONE_6,
-                                  EighteenZoneId::ZONE_9};
-
-    // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
-    // on the opposite side of the x-axis to wherever the pass is coming from
-    if (world.ball().position().x() > -1)
-    {
-        if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
-        {
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_14};
-            cherry_pick_region_1 = {EighteenZoneId::ZONE_18, EighteenZoneId::ZONE_17};
-        }
-        else
-        {
-            cherry_pick_region_1 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_14};
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13};
-        }
-    }
+    Zones cherry_pick_region_1 = {};
+    Zones cherry_pick_region_2 = {};
+    selectZone(pitch_division, world.ball().position(), cherry_pick_region_1, cherry_pick_region_2);
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
@@ -184,9 +233,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
-        yield({goalie_tactic, shoot_tactic, cherry_pick_tactic_1,
-               std::get<0>(crease_defender_tactics), cherry_pick_tactic_2,
-               std::get<1>(crease_defender_tactics)});
+        yield({goalie_tactic, shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2});
 
         // we need to evaluate here until then.
         pass_eval                  = pass_generator.generatePassEvaluation(world);

@@ -2,6 +2,7 @@
 
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/algorithms/contains.h"
 
 EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
 {
@@ -14,20 +15,35 @@ EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
         for (double pos_y = field.yLength() / 2; pos_y > -field.yLength() / 2;
              pos_y -= zone_height)
         {
-            pitch_division.emplace_back(Rectangle(
+            pitch_division_.emplace_back(Rectangle(
                 Point(pos_x, pos_y), Point(pos_x + zone_width, pos_y - zone_height)));
         }
     }
 
-    zones = allValuesEighteenZoneId();
+    zones_ = allValuesEighteenZoneId();
+    field_ = std::make_unique<Field>(field);
 }
 
 const Rectangle& EighteenZonePitchDivision::getZone(EighteenZoneId zone_id) const
 {
-    return pitch_division[static_cast<unsigned>(zone_id)];
+    return pitch_division_[static_cast<unsigned>(zone_id)];
+}
+
+EighteenZoneId EighteenZonePitchDivision::getZoneId(const Point& position) const
+{
+    if (!contains(field_->fieldLines(), position))
+    {
+        throw std::invalid_argument("requested position not on field!");
+    }
+
+    auto zone_id = *std::find_if(zones_.begin(), zones_.end(),
+                                 [this, position](const EighteenZoneId& id) {
+                                     return contains(getZone(id), position);
+                                 });
+    return zone_id;
 }
 
 const std::vector<EighteenZoneId>& EighteenZonePitchDivision::getAllZoneIds() const
 {
-    return zones;
+    return zones_;
 }

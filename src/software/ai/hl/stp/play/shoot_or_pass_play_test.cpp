@@ -18,10 +18,8 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({
         field().friendlyGoalCenter(),
         Point(-4.5, 3.0),
-        Point(-2, 1.5),
         Point(-2, 0.5),
-        Point(-2, -0.5),
-        Point(-2, -1.5),
+        Point(-2, -0.5)
     }));
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
@@ -38,7 +36,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1396
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(30))
             {
                 yield();
             }
@@ -47,5 +45,5 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(30));
 }

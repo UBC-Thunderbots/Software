@@ -42,6 +42,7 @@ class CornerKickPlay : public Play
      *
      * @param yield The coroutine to yield
      * @param goalie_tactic The goalie tactic to use
+     * @param bait_move_tactic_1, bait_move_tactic_2 The bait move tactics
      * @param world The current state of the world
      *
      * @return the pass that was committed to
