@@ -1,5 +1,6 @@
 #include "software/simulated_tests/validation/terminating_function_validator.h"
 
+#include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
 #include <boost/coroutine2/all.hpp>
@@ -41,13 +42,14 @@ TEST(TerminatingFunctionValidatorTest,
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
-        yield();
+        yield("Test message");
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
     TerminatingFunctionValidator function_validator(validation_function, world);
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("Test message", function_validator.currentErrorMessage());
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
 }
@@ -57,11 +59,11 @@ TEST(TerminatingFunctionValidatorTest,
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
-        yield();
-        yield();
-        yield();
-        yield();
-        yield();
+        yield("Test message");
+        yield("Test message");
+        yield("Test message");
+        yield("Test message");
+        yield("Test message");
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
@@ -71,6 +73,7 @@ TEST(TerminatingFunctionValidatorTest,
     {
         bool result = function_validator.executeAndCheckForSuccess();
         EXPECT_FALSE(result);
+        EXPECT_EQ("Test message", function_validator.currentErrorMessage());
     }
 
     bool result = function_validator.executeAndCheckForSuccess();
@@ -82,9 +85,9 @@ TEST(TerminatingFunctionValidatorTest,
 {
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
-        yield();
+        yield("First validation not done yet");
         return;
-        yield();
+        yield("Second validation not done yet");
     };
 
     auto world = std::make_shared<World>(::TestUtil::createBlankTestingWorld());
@@ -92,6 +95,7 @@ TEST(TerminatingFunctionValidatorTest,
 
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("First validation not done yet", function_validator.currentErrorMessage());
 
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_TRUE(result);
@@ -104,7 +108,7 @@ TEST(TerminatingFunctionValidatorTest,
                                                 ValidationCoroutine::push_type& yield) {
         while (world->ball().position().x() < 0)
         {
-            yield();
+            yield("The ball's x position is not less than 0");
         }
     };
 
@@ -115,11 +119,15 @@ TEST(TerminatingFunctionValidatorTest,
         Ball(BallState(Point(-1, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("The ball's x position is not less than 0",
+              function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(-0.1, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("The ball's x position is not less than 0",
+              function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(0.05, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
@@ -136,12 +144,12 @@ TEST(TerminatingFunctionValidatorTest,
                                                 ValidationCoroutine::push_type& yield) {
         while (world->ball().position().x() < 0)
         {
-            yield();
+            yield("The ball's x position is not less than 0");
         }
 
         while (world->ball().position().y() < 0)
         {
-            yield();
+            yield("The ball's y position not less than 0");
         }
     };
 
@@ -152,11 +160,15 @@ TEST(TerminatingFunctionValidatorTest,
         Ball(BallState(Point(-1, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
     bool result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("The ball's x position is not less than 0",
+              function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(1, -1), Vector(0, 0)), Timestamp::fromSeconds(0)));
     result = function_validator.executeAndCheckForSuccess();
     EXPECT_FALSE(result);
+    EXPECT_EQ("The ball's y position not less than 0",
+              function_validator.currentErrorMessage());
 
     world->updateBall(
         Ball(BallState(Point(1, 1), Vector(0, 0)), Timestamp::fromSeconds(0)));
@@ -164,19 +176,15 @@ TEST(TerminatingFunctionValidatorTest,
     EXPECT_TRUE(result);
 }
 
-TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_statements)
+TEST(TerminatingFunctionValidatorTest, test_validation_function_error_message)
 {
     // This shows an example of using GoogleTest statements within a validation function.
     // Just like regular unit tests, if the condition is not met the test will fail.
-    // Unfortunately we can't have an example of a failing tests since GoogleTest doesn't
-    // have a way of expecting a test to fail, so we just have an example of a passing
-    // test.
     ValidationFunction validation_function = [](std::shared_ptr<World> world,
                                                 ValidationCoroutine::push_type& yield) {
         while (world->gameState().isStopped())
         {
-            EXPECT_LT(world->ball().velocity().length(), 1.0);
-            yield();
+            yield("Test message");
         }
     };
 
@@ -185,12 +193,12 @@ TEST(TerminatingFunctionValidatorTest, test_validation_function_with_gtest_state
 
     world->updateRefereeCommand(RefereeCommand::STOP);
     world->updateBall(
-        Ball(BallState(Point(0, 0), Vector(0, 0)), Timestamp::fromSeconds(0)));
-
+        Ball(BallState(Point(0, 0), Vector(1, 1)), Timestamp::fromSeconds(0)));
     for (unsigned int i = 0; i < 10; i++)
     {
         bool result = function_validator.executeAndCheckForSuccess();
         EXPECT_FALSE(result);
+        EXPECT_EQ("Test message", function_validator.currentErrorMessage());
     }
 
     for (unsigned int i = 0; i < World::REFEREE_COMMAND_BUFFER_SIZE; i++)
