@@ -15,8 +15,7 @@ StandaloneSimulatorDrawFunctionVisualizer::StandaloneSimulatorDrawFunctionVisual
     this->setMouseTracking(true);
 
     shift_clicked = false;
-    ctrl_clicked = false;
-
+    ctrl_clicked  = false;
 }
 
 void StandaloneSimulatorDrawFunctionVisualizer::setStandaloneSimulator(
@@ -33,12 +32,13 @@ void StandaloneSimulatorDrawFunctionVisualizer::keyPressEvent(QKeyEvent* event)
     }
 }
 
-void StandaloneSimulatorDrawFunctionVisualizer::resetFlags() {
+void StandaloneSimulatorDrawFunctionVisualizer::resetFlags()
+{
     initial_click_point = Point(0, 0);
     final_click_point   = Point(0, 0);
-    ctrl_clicked  = false;
-    shift_clicked = false;
-    r_clicked     = false;
+    ctrl_clicked        = false;
+    shift_clicked       = false;
+    r_clicked           = false;
 }
 
 void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* event)
@@ -46,7 +46,7 @@ void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* eve
     // If Ctrl is pressed, place the ball where the user clicks
     if (event->modifiers() & Qt::ControlModifier && standalone_simulator)
     {
-        ctrl_clicked  = true;
+        ctrl_clicked        = true;
         initial_click_point = createPoint(mapToScene(event->pos()));
         final_click_point   = createPoint(mapToScene(event->pos()));
         standalone_simulator->setBallState(BallState(initial_click_point, Vector(0, 0)));
@@ -60,8 +60,8 @@ void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* eve
     else if (r_clicked && standalone_simulator)
     {
         initial_click_point = createPoint(mapToScene(event->pos()));
-        robot         = standalone_simulator->getRobotAtPosition(initial_click_point);
-        auto physics_robot = robot.lock();
+        robot = standalone_simulator->getRobotAtPosition(initial_click_point);
+        auto physics_robot  = robot.lock();
         initial_click_point = physics_robot->position();
     }
     else
@@ -74,10 +74,11 @@ void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* eve
 void StandaloneSimulatorDrawFunctionVisualizer::mouseReleaseEvent(QMouseEvent* event)
 {
     robot.reset();
-    if (ctrl_clicked) {
+    if (ctrl_clicked)
+    {
         final_click_point = createPoint(mapToScene(event->pos()));
         standalone_simulator->setBallState(
-                BallState(initial_click_point, initial_click_point - final_click_point));
+            BallState(initial_click_point, initial_click_point - final_click_point));
     }
 
     resetFlags();
@@ -93,14 +94,15 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseMoveEvent(QMouseEvent* even
         if (shift_clicked)
         {
             Point point_in_scene = createPoint(mapToScene(event->pos()));
-            physics_robot->setPositionAndOrientation(point_in_scene, physics_robot->orientation());
+            physics_robot->setPositionAndOrientation(point_in_scene,
+                                                     physics_robot->orientation());
         }
         else if (r_clicked)
         {
             final_click_point = createPoint(mapToScene(event->pos()));
-            Vector vec  = Vector(final_click_point.x() - initial_click_point.x(),
-                                 final_click_point.y() - initial_click_point.y());
-            Angle angle = vec.orientation();
+            Vector vec        = Vector(final_click_point.x() - initial_click_point.x(),
+                                final_click_point.y() - initial_click_point.y());
+            Angle angle       = vec.orientation();
             physics_robot->setPositionAndOrientation(initial_click_point, angle);
         }
     }
@@ -117,7 +119,8 @@ WorldDrawFunction StandaloneSimulatorDrawFunctionVisualizer::getDrawBallVelocity
     if (ctrl_clicked)
     {
         auto draw_function = [this](QGraphicsScene* scene) {
-            drawBallVelocity(scene, initial_click_point, initial_click_point - final_click_point,
+            drawBallVelocity(scene, initial_click_point,
+                             initial_click_point - final_click_point,
                              ball_speed_slow_color, ball_speed_fast_color);
         };
         return WorldDrawFunction(draw_function);
@@ -125,8 +128,8 @@ WorldDrawFunction StandaloneSimulatorDrawFunctionVisualizer::getDrawBallVelocity
     else
     {
         auto draw_function = [this](QGraphicsScene* scene) {
-            drawBallVelocity(scene, initial_click_point, Vector(0, 0), ball_speed_slow_color,
-                             ball_speed_fast_color);
+            drawBallVelocity(scene, initial_click_point, Vector(0, 0),
+                             ball_speed_slow_color, ball_speed_fast_color);
         };
         return WorldDrawFunction(draw_function);
     }
