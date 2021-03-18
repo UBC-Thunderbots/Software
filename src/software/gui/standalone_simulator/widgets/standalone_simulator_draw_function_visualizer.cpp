@@ -9,13 +9,10 @@
 
 StandaloneSimulatorDrawFunctionVisualizer::StandaloneSimulatorDrawFunctionVisualizer(
     QWidget* parent)
-    : DrawFunctionVisualizer(parent)
+    : DrawFunctionVisualizer(parent), shift_clicked(false), ctrl_clicked(false)
 {
     // Let mouseMoveEvents be triggered even if a mouse button is not pressed
     this->setMouseTracking(true);
-
-    shift_clicked = false;
-    ctrl_clicked  = false;
 }
 
 void StandaloneSimulatorDrawFunctionVisualizer::setStandaloneSimulator(
@@ -61,8 +58,6 @@ void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* eve
     {
         initial_click_point = createPoint(mapToScene(event->pos()));
         robot = standalone_simulator->getRobotAtPosition(initial_click_point);
-        auto physics_robot  = robot.lock();
-        initial_click_point = physics_robot->position();
     }
     else
     {
@@ -103,7 +98,7 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseMoveEvent(QMouseEvent* even
             Vector vec        = Vector(final_click_point.x() - initial_click_point.x(),
                                 final_click_point.y() - initial_click_point.y());
             Angle angle       = vec.orientation();
-            physics_robot->setPositionAndOrientation(initial_click_point, angle);
+            physics_robot->setPositionAndOrientation(physics_robot->position(), angle);
         }
     }
     else if (ctrl_clicked && standalone_simulator)
@@ -118,6 +113,7 @@ WorldDrawFunction StandaloneSimulatorDrawFunctionVisualizer::getDrawBallVelocity
 {
     if (ctrl_clicked)
     {
+        //Draw function will draw a line if the user is adding velocity to ball
         auto draw_function = [this](QGraphicsScene* scene) {
             drawBallVelocity(scene, initial_click_point,
                              initial_click_point - final_click_point,
@@ -127,6 +123,8 @@ WorldDrawFunction StandaloneSimulatorDrawFunctionVisualizer::getDrawBallVelocity
     }
     else
     {
+        //Draw function draws a vector of magnitude 0 if user is not manipulating the ball
+        //This is necessary to prevent a line being drawn on screen when manipulating the robots.
         auto draw_function = [this](QGraphicsScene* scene) {
             drawBallVelocity(scene, initial_click_point, Vector(0, 0),
                              ball_speed_slow_color, ball_speed_fast_color);
