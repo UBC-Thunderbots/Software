@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# The directory this script is in
+CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
+
+# the directory that contains the binary
+BIN_DIR=$(pwd)
+
 # The name of this script
 THIS_SCRIPT_FILENAME=$(basename "$0")
 
@@ -22,15 +28,11 @@ if [[ "$1" == "help" ]]; then
   exit 0
 fi
 
-#until bazel run //software:full_system -- --backend=WifiBackend --interface=$1; do
-#    echo "Full System crashed with exit code $?.  Respawning.." >&2
-#    sleep 1
-#done
-cd ../..
+cd "$CURR_DIR" || exit
+bazel build //software:full_system
+cd "$BIN_DIR/../.." || exit
 
 until ./full_system --backend=WifiBackend --interface=$1; do
     echo "Full System crashed with exit code $?.  Respawning.." >&2
     sleep 1
 done
-
-
