@@ -23,13 +23,12 @@ class StopPlayTest : public SimulatedPlayTestFixture
         return {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
                 // Wait 2 seconds for robots that start too close to the ball to move away
-                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+                if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(2))
                 {
-                    yield();
+                    // TODO: (#1882) implement robots slow down for stop play
+                    // robotsSlowDown(1.5, world_ptr, yield);
+                    robotsAvoidBall(0.5, {}, world_ptr, yield);
                 }
-                // TODO: (#1882) implement robots slow down for stop play
-                // robotsSlowDown(1.5, world_ptr, yield);
-                robotsAvoidBall(0.5, {}, world_ptr, yield);
             }};
     }
 

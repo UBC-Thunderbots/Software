@@ -69,7 +69,7 @@ TEST_F(STPTest, test_calculate_new_play_when_one_play_valid)
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     auto play = stp.calculateNewPlay(world);
     EXPECT_TRUE(play);
-    EXPECT_EQ(TYPENAME(*play), TYPENAME(HaltTestPlay));
+    EXPECT_EQ(objectTypeName(*play), TYPENAME(HaltTestPlay));
 }
 
 TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
@@ -86,7 +86,7 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
     for (unsigned int i = 0; i < 10; i++)
     {
         play = stp.calculateNewPlay(world);
-        actual_play_names.emplace_back(TYPENAME(*play));
+        actual_play_names.emplace_back(objectTypeName(*play));
     }
 
     std::vector<std::string> expected_play_names = {

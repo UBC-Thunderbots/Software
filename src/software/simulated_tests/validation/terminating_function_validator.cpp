@@ -11,8 +11,14 @@ TerminatingFunctionValidator::TerminatingFunctionValidator(
        // pointer is updated, and the wrong validation_function may be run.
       validation_sequence(
           boost::bind(&TerminatingFunctionValidator::executeAndCheckForSuccessWrapper,
-                      this, _1, world, validation_function))
+                      this, _1, world, validation_function)),
+      current_error_message("")
 {
+}
+
+std::string TerminatingFunctionValidator::currentErrorMessage() const
+{
+    return current_error_message;
 }
 
 void TerminatingFunctionValidator::executeAndCheckForSuccessWrapper(
@@ -22,7 +28,7 @@ void TerminatingFunctionValidator::executeAndCheckForSuccessWrapper(
     // Yield the very first time the function is called, so that the validation_function
     // is not run until this coroutine / wrapper function is called again by
     // executeAndCheckForSuccess
-    yield();
+    yield("");
 
     // Anytime after the first function call, the validation_function will be
     // used to perform the real logic.
@@ -37,6 +43,11 @@ bool TerminatingFunctionValidator::executeAndCheckForSuccess()
         // Run the coroutine. This will call the bound executeAndCheckForSuccessWrapper
         // function
         validation_sequence();
+        current_error_message = validation_sequence.get();
+    }
+    else
+    {
+        current_error_message = "";
     }
 
     // The validation_function is done if the coroutine evaluates to false, which means

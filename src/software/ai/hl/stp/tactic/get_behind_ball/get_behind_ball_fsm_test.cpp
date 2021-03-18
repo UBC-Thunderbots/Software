@@ -12,16 +12,16 @@ TEST(GetBehindBallFSMTest, test_transitions)
                                                    .chick_direction = Angle::quarter()};
 
     BaseFSM<GetBehindBallFSM> fsm;
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::get_behind_ball_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
     fsm.process_event(GetBehindBallFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::get_behind_ball_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // robot behind ball but far away
     robot = ::TestUtil::createRobotAtPos(Point(2, 2));
     fsm.process_event(GetBehindBallFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::get_behind_ball_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // robot behind ball and close enough
     robot = ::TestUtil::createRobotAtPos(Point(2, 2.8));
@@ -34,5 +34,5 @@ TEST(GetBehindBallFSMTest, test_transitions)
                                                      .chick_direction = Angle::quarter()};
     fsm.process_event(GetBehindBallFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::get_behind_ball_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 }
