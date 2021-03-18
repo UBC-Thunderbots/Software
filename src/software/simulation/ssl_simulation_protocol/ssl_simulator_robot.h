@@ -12,17 +12,44 @@ extern "C"
 }
 
 /**
- * 
+ * Represents a robot in SSL simulation, to be controlled by the SimulatorRobotSingleton
  */
-class SimulatorRobot
+class SslSimulatorRobot : public SimulatorRobot
 {
    public:
+    /**
+     * Create a new SslSimulatorRobot given robot id and state
+     *
+     * @param id the robot id
+     * @param robot_state the robot state
+     */
+    explicit SslSimulatorRobot(const RobotId id, const RobotState &robot_state);
+
     /**
      * Returns the ID of this robot
      *
      * @return the ID of this robot
      */
-    virtual unsigned int getRobotId() = 0;
+    unsigned int getRobotId() override;
+
+    /**
+     * Sets the robot state
+     * 
+     * @return the robot state
+     */
+    void setRobotState(RobotState robot_state); 
+
+    /**
+     * Returns the current robot command
+     * 
+     * @return the current robot command
+     */
+    SslSimulationProto::RobotCommand getRobotCommand();
+
+    /**
+     * Resets the robot command to only contain the robot id
+     */
+    void resetRobotCommand();
 
    protected:
     /**
@@ -30,49 +57,49 @@ class SimulatorRobot
      *
      * @return the x-position of the robot, in global field coordinates, in meters
      */
-    virtual float getPositionX() = 0;
+    float getPositionX() override;
 
     /**
      * Returns the y-position of the robot, in global field coordinates, in meters
      *
      * @return the y-position of the robot, in global field coordinates, in meters
      */
-    virtual float getPositionY() = 0;
+    float getPositionY() override;
 
     /**
      * Returns the orientation of the robot, in global field coordinates, in radians
      *
      * @return the orientation of the robot, in global field coordinates, in radians
      */
-    virtual float getOrientation() = 0;
+    float getOrientation() override;
 
     /**
      * Returns the x-velocity of the robot, in global field coordinates, in m/s
      *
      * @return the x-velocity of the robot, in global field coordinates, in m/s
      */
-    virtual float getVelocityX() = 0;
+    float getVelocityX() override;
 
     /**
      * Returns the y-velocity of the robot, in global field coordinates, in m/s
      *
      * @return the y-velocity of the robot, in global field coordinates, in m/s
      */
-    virtual float getVelocityY() = 0;
+    float getVelocityY() override;
 
     /**
      * Returns the angular velocity of the robot, in rad/s
      *
      * @return the angular of the robot, in rad/s
      */
-    virtual float getVelocityAngular() = 0;
+    float getVelocityAngular() override;
 
     /**
      * Returns the battery voltage, in volts
      *
      * @return the battery voltage, in volts
      */
-    virtual float getBatteryVoltage() = 0;
+    float getBatteryVoltage() override;
 
     /**
      * Fires the kicker, kicking the ball in the direction the robot is facing
@@ -80,7 +107,7 @@ class SimulatorRobot
      *
      * @param speed_m_per_s How fast to kick the ball, in meters per second
      */
-    virtual void kick(float speed_m_per_s) = 0;
+    void kick(float speed_m_per_s) override;
 
     /**
      * Fires the chipper, chipping the ball in the direction the robot is facing
@@ -89,7 +116,7 @@ class SimulatorRobot
      * @param speed_m_per_s How far to chip the ball (the distance to the first bounce)
      * in meters
      */
-    virtual void chip(float distance_m) = 0;
+    void chip(float distance_m) override;
 
     /**
      * Enables autokick on the robot. If the ball touches the kicker, the robot will
@@ -98,7 +125,7 @@ class SimulatorRobot
      * @param speed_m_per_s How fast to kick the ball in meters per second when
      * the kicker is fired
      */
-    virtual void enableAutokick(float speed_m_per_s) = 0;
+    void enableAutokick(float speed_m_per_s) override;
 
     /**
      * Enables autochip on the robot. If the ball touches the chipper, the robot will
@@ -107,84 +134,84 @@ class SimulatorRobot
      * @param speed_m_per_s How far to chip the ball (distance to the first bounce)
      * when the chipper is fired
      */
-    virtual void enableAutochip(float distance_m) = 0;
+    void enableAutochip(float distance_m) override;
 
     /**
      * Disables autokick
      */
-    virtual void disableAutokick() = 0;
+    void disableAutokick() override;
 
     /**
      * Disables autochip
      */
-    virtual void disableAutochip() = 0;
+    void disableAutochip() override;
 
     /**
      * Returns true if autokick is enabled and false otherwise
      *
      * @return true if autokick is enabled and false otherwise
      */
-    virtual bool isAutokickEnabled() = 0;
+    bool isAutokickEnabled() override; 
 
     /**
      * Returns true if autochip is enabled and false otherwise
      *
      * @return true if autochip is enabled and false otherwise
      */
-    virtual bool isAutochipEnabled() = 0;
+    bool isAutochipEnabled() override;
 
     /**
      * Sets the speed of the dribbler
      *
      * @param rpm The rpm to set for the dribbler
      */
-    virtual void setDribblerSpeed(uint32_t rpm) = 0;
+    void setDribblerSpeed(uint32_t rpm) override;
 
     /**
      * Makes the dribbler coast until another operation is applied to it
      */
-    virtual void dribblerCoast() = 0;
+    void dribblerCoast() override;
 
     /**
      * Returns the temperature of the dribbler, in degrees C
      *
      * @return the temperature of the dribbler, in degrees C
      */
-    virtual unsigned int getDribblerTemperatureDegC() = 0;
+    unsigned int getDribblerTemperatureDegC() override;
 
     /**
      * Applies the given force to the wheel
      *
      * @param force_in_newtons the force to apply to the wheel
      */
-    virtual void applyWheelForceFrontLeft(float force_in_newtons) = 0;
-    virtual void applyWheelForceBackLeft(float force_in_newtons) = 0;
-    virtual void applyWheelForceBackRight(float force_in_newtons) = 0;
-    virtual void applyWheelForceFrontRight(float force_in_newtons) = 0;
+    void applyWheelForceFrontLeft(float force_in_newtons) override;
+    void applyWheelForceBackLeft(float force_in_newtons) override;
+    void applyWheelForceBackRight(float force_in_newtons) override;
+    void applyWheelForceFrontRight(float force_in_newtons) override;
 
     /**
      * Gets the motor speed for the wheel, in RPM
      */
-    virtual float getMotorSpeedFrontLeft() = 0;
-    virtual float getMotorSpeedBackLeft() = 0;
-    virtual float getMotorSpeedBackRight() = 0;
-    virtual float getMotorSpeedFrontRight() = 0;
+    float getMotorSpeedFrontLeft() override;
+    float getMotorSpeedBackLeft() override;
+    float getMotorSpeedBackRight() override;
+    float getMotorSpeedFrontRight() override;
 
     /**
      * Sets the motor to coast (spin freely)
      */
-    virtual void coastMotorBackLeft() = 0;
-    virtual void coastMotorBackRight() = 0;
-    virtual void coastMotorFrontLeft() = 0;
-    virtual void coastMotorFrontRight() = 0;
+    virtual void coastMotorBackLeft() override;
+    virtual void coastMotorBackRight() override;
+    virtual void coastMotorFrontLeft() override;
+    virtual void coastMotorFrontRight() override;
 
     /**
      * Sets the motor to brake (act against the current direction of rotation)
      */
-    virtual void brakeMotorBackLeft() = 0;
-    virtual void brakeMotorBackRight() = 0;
-    virtual void brakeMotorFrontLeft() = 0;
-    virtual void brakeMotorFrontRight() = 0;
+    virtual void brakeMotorBackLeft() override;
+    virtual void brakeMotorBackRight() override;
+    virtual void brakeMotorFrontLeft() override;
+    virtual void brakeMotorFrontRight() override;
 
     /**
      * Sets the current primitive this robot is running to a new one
@@ -193,12 +220,25 @@ class SimulatorRobot
      * @param primitive_msg The primitive to start
      */
     virtual void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                           const TbotsProto_Primitive& primitive_msg) = 0;
+                           const TbotsProto_Primitive& primitive_msg) override;
 
     /**
      * Runs the current primitive
      *
      * @param world The world to run the primitive in
      */
-    virtual void runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world) = 0;
+    virtual void runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world) override;
+
+  private:
+    // The firmware will store the robot command here, to be sent out after each tick of simulator
+    // This will be reset at the beginning of every tick to be an empty command except the id
+    SslSimulationProto::RobotCommand robot_command;
+
+    std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter> primitive_manager;
+
+    // Robot states
+    unsigned int id;
+    RobotState robot_state; 
+    std::optional<float> autokick_speed_m_per_s;
+    std::optional<float> autochip_distance_m;
 };
