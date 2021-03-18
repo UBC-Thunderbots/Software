@@ -77,7 +77,7 @@ void app_bangbang_prepareTrajectoryMaxV(BBProfile *b, float d, float vi, float v
 {
     if (vf * d < 0)
         vf = 0;  // not allowed- must be in same direction
-    b->Distance = d + (vf * vf - vi * vi) / (2.0f * MaxA);
+    b->Distance = d + vf * vf / (2.0f * MaxA);
     b->Vinitial = vi;
     b->MaxA     = MaxA;
     b->MaxV     = MaxV;
