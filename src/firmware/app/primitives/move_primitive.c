@@ -47,13 +47,9 @@ void plan_move_rotation(PhysBot* pb, float avel);
 
 void plan_move_rotation(PhysBot* pb, float avel)
 {
-    float time_target = (pb->maj.time > TIME_HORIZON) ? pb->maj.time : TIME_HORIZON;
-    if (time_target > 0.5f)
-    {
-        time_target = 0.5f;
-    }
-    pb->rot.time  = time_target;
-    pb->rot.vel   = pb->rot.disp / pb->rot.time;
+    pb->rot.time = (pb->min.time > TIME_HORIZON) ? pb->min.time : TIME_HORIZON;
+    // 1.6f is a magic constant
+    pb->rot.vel   = 1.6f * pb->rot.disp / pb->rot.time;
     pb->rot.accel = (pb->rot.vel - avel) / TIME_HORIZON;
     limit(&pb->rot.accel, MAX_T_A);
 }

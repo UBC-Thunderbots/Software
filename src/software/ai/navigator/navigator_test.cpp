@@ -60,7 +60,7 @@ class ThetaStarNavigatorTest : public testing::Test
     Navigator navigator;
 };
 
-TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_move_with_autochip_primitive)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
@@ -72,12 +72,18 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_chip_primitive)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = *createChipPrimitive(Point(), Angle::quarter(), 0);
+    auto expected_primitive =
+        *createMovePrimitive(Point(), 0, Angle::quarter(), DribblerMode::OFF,
+                             AutoChipOrKick{
+                                 AutoChipOrKickMode::AUTOCHIP,
+                                 0,
+                             },
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
 
-TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
+TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_move_with_autokick_primitive)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
@@ -89,26 +95,13 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_kick_primitive)
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = *createKickPrimitive(Point(), Angle::quarter(), 0);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, primitive_set_msg->robot_primitives().at(0)));
-}
-
-TEST_F(ThetaStarNavigatorTest, convert_spinning_move_intent_to_spinning_move_primitive)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<SpinningMoveIntent>(0, Point(), AngularVelocity::full(), 1));
-
-    auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
-
-    // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
-
-    auto expected_primitive = *createSpinningMovePrimitive(
-        Point(), 1, AngularVelocity::full(), DribblerMode::OFF);
+    auto expected_primitive =
+        *createMovePrimitive(Point(), 0, Angle::quarter(), DribblerMode::OFF,
+                             AutoChipOrKick{
+                                 AutoChipOrKickMode::AUTOKICK,
+                                 0,
+                             },
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
