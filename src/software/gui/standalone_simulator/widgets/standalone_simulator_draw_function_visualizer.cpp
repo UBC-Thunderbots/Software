@@ -124,8 +124,8 @@ WorldDrawFunction StandaloneSimulatorDrawFunctionVisualizer::getDrawBallVelocity
     else
     {
         // Draw function draws a vector of magnitude 0 if user is not manipulating the
-        // ball This is necessary to prevent a line being drawn on screen when manipulating
-        // the robots.
+        // ball This is necessary to prevent a line being drawn on screen when
+        // manipulating the robots.
         auto draw_function = [this](QGraphicsScene* scene) {
             drawBallVelocity(scene, initial_click_point, Vector(0, 0),
                              ball_speed_slow_color, ball_speed_fast_color);
