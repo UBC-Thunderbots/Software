@@ -69,6 +69,8 @@ static TbotsProto_Vision vision_msg;
 static TbotsProto_RobotStatus robot_status_msg;
 static TbotsProto_RobotLog robot_log_msg;
 static TbotsProto_Primitive primitive_msg;
+/* Definitions for I2C INA226 Power Monitor */
+static I2C_HandleTypeDef I2c1Handle;
 
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
@@ -121,9 +123,6 @@ const osThreadAttr_t UbloxOdinTask_attributes = {
 /* Definitions for RobotLogProtoQ */
 osMessageQueueId_t RobotLogProtoQHandle;
 const osMessageQueueAttr_t RobotLogProtoQ_attributes = {.name = "RobotLogProtoQ"};
-
-/* Definitions for I2C INA226 Power Monitor */
-I2C_HandleTypeDef I2c1Handle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
