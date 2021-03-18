@@ -4,10 +4,7 @@
 
 #include "software/ai/hl/stp/action/chip_action.h"
 
-KickoffChipTactic::KickoffChipTactic(const Ball& ball, bool loop_forever)
-    : ChipTactic(ball, loop_forever)
-{
-}
+KickoffChipTactic::KickoffChipTactic(bool loop_forever) : ChipTactic(loop_forever) {}
 
 void KickoffChipTactic::updateWorldParams(const World& world) {}
 
