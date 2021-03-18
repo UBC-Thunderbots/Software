@@ -7,7 +7,7 @@ struct MoveFSM
 {
     // these classes define the states used in the transition table
     // they are exposed so that tests can check if the FSM is in a particular state
-    class move_state;
+    class MoveState;
 
     // this struct defines the unique control parameters that the MoveFSM requires in its
     // update
@@ -39,7 +39,7 @@ struct MoveFSM
         using namespace boost::sml;
 
         // move_s is the _state_ used in the transition table
-        const auto move_s = state<move_state>;
+        const auto move_s = state<MoveState>;
 
         // update_e is the _event_ that the MoveFSM responds to
         const auto update_e = event<Update>;
@@ -75,7 +75,7 @@ struct MoveFSM
         };
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest state
+            // src_state + event [guard] / action = dest_state
             *move_s + update_e[!move_done] / update_move = move_s,
             move_s + update_e[move_done] / update_move   = X,
             X + update_e[!move_done] / update_move       = move_s);

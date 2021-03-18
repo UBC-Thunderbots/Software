@@ -22,6 +22,9 @@ void robotHasOrientation(RobotId robot_id, std::shared_ptr<World> world_ptr,
 
     while (!robot_has_orientation(world_ptr))
     {
-        yield();
+        std::stringstream ss;
+        ss << orientation;
+        yield("Robot " + std::to_string(robot_id) + " does not have orientation of " +
+              ss.str());
     }
 }

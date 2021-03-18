@@ -87,7 +87,7 @@ TEST(AutochipMoveIntentTest, test_intent_pointer)
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 3.2},
                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
-    EXPECT_EQ("MoveIntent", TYPENAME(*intent));
+    EXPECT_EQ("MoveIntent", objectTypeName(*intent));
 }
 
 TEST(MoveIntentTest, test_get_destination_ball_collision_kick_stop_command_spin_speed)

@@ -5,9 +5,9 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_has_orientation_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_kicked_ball_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -41,14 +41,14 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
                               ValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
-                yield();
+                yield("Tactic not done");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
                    stopped_time + Duration::fromSeconds(3))
             {
-                yield();
+                yield("Waiting 3 seconds before re-checking conditions");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
@@ -84,15 +84,15 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
                               ValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
-                yield();
+                yield("Tactic not done");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotKickedBall(1, Angle::zero(), world_ptr, yield);
+            ballKicked(Angle::zero(), world_ptr, yield);
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
                    stopped_time + Duration::fromSeconds(3))
             {
-                yield();
+                yield("Waiting 3 seconds before re-checking conditions");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
@@ -131,15 +131,15 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
                               ValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
-                yield();
+                yield("Tactic not done");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotKickedBall(1, Angle::threeQuarter(), world_ptr, yield);
+            ballKicked(Angle::threeQuarter(), world_ptr, yield);
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
                    stopped_time + Duration::fromSeconds(3))
             {
-                yield();
+                yield("Waiting 3 seconds before re-checking conditions");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
@@ -177,13 +177,13 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
                                 yield);
             while (!tactic->done())
             {
-                yield();
+                yield("Tactic is not done");
             }
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
                    stopped_time + Duration::fromSeconds(3))
             {
-                yield();
+                yield("Waiting 3 seconds before re-checking conditions");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
             robotHasOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
@@ -223,13 +223,13 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
                                 yield);
             while (!tactic->done())
             {
-                yield();
+                yield("Tactic is not done");
             }
             auto stopped_time = world_ptr->getMostRecentTimestamp();
             while (world_ptr->getMostRecentTimestamp() <
                    stopped_time + Duration::fromSeconds(3))
             {
-                yield();
+                yield("Waiting 3 seconds before re-checking conditions");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
             robotHasOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),

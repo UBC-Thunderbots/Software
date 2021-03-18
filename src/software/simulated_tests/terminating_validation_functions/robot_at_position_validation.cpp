@@ -21,6 +21,9 @@ void robotAtPosition(RobotId robot_id, std::shared_ptr<World> world_ptr,
 
     while (!robot_at_destination(world_ptr))
     {
-        yield();
+        std::stringstream ss;
+        ss << destination;
+        yield("Robot with ID " + std::to_string(robot_id) + " is not at position " +
+              ss.str());
     }
 }

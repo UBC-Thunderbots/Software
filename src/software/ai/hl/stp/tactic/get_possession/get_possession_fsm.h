@@ -11,7 +11,7 @@
 
 struct GetPossessionFSM
 {
-    class InterceptBallState;
+    class GetPossessionState;
 
     struct ControlParams
     {
@@ -67,7 +67,7 @@ struct GetPossessionFSM
     {
         using namespace boost::sml;
 
-        const auto intercept_ball_s = state<InterceptBallState>;
+        const auto get_possession_s = state<GetPossessionState>;
 
         const auto update_e = event<Update>;
 
@@ -102,14 +102,14 @@ struct GetPossessionFSM
         };
 
         /**
-         * Action to update MoveFSM to intercept the ball
+         * Action to update to get possession of the ball
          *
          * If the ball is moving quickly, then move in front of the ball
          * If the ball is moving slowly, then chase the ball
          *
          * @param event GetPossessionFSM::Update
          */
-        const auto intercept_ball = [this](auto event) {
+        const auto get_possession = [this](auto event) {
             auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position()).orientation();
@@ -124,10 +124,10 @@ struct GetPossessionFSM
         };
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest state
-            *intercept_ball_s + update_e[have_possession] / intercept_ball = X,
-            intercept_ball_s + update_e[!have_possession] / intercept_ball,
-            X + update_e[!have_possession] / intercept_ball = intercept_ball_s,
+            // src_state + event [guard] / action = dest_state
+            *get_possession_s + update_e[have_possession] / get_possession = X,
+            get_possession_s + update_e[!have_possession] / get_possession,
+            X + update_e[!have_possession] / get_possession = get_possession_s,
             X + update_e[have_possession] / hold_ball);
     }
 };
