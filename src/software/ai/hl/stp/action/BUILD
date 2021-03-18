@@ -100,6 +100,24 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+cc_library(
+    name = "spinning_move_action",
+    srcs = ["spinning_move_action.cpp"],
+    hdrs = ["spinning_move_action.h"],
+    deps = [
+        ":action",
+        "//software/ai/intent:spinning_move_intent",
+    ],
+)
+
+cc_test(
+    name = "spinning_move_action_test",
+    srcs = ["spinning_move_action_test.cpp"],
+    deps = [
+        ":spinning_move_action",
+        "@gtest//:gtest_main",
+    ],
+)
 
 cc_library(
     name = "stop_action",
@@ -128,6 +146,7 @@ cc_library(
         ":intercept_ball_action",
         ":kick_action",
         ":move_action",
+        ":spinning_move_action",
         ":stop_action",
     ],
 )

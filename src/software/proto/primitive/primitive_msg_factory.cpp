@@ -39,6 +39,29 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     return move_primitive_msg;
 }
 
+std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
+    const Point &dest, double final_speed_meters_per_second,
+    const AngularVelocity &angular_velocity, DribblerMode dribbler_mode)
+{
+    auto spinning_move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
+
+    auto position_params_msg = std::make_unique<TbotsProto::MovePositionParams>();
+    auto dest_msg            = createPointProto(Point(dest.x(), dest.y()));
+    *(position_params_msg->mutable_destination()) = *dest_msg;
+    position_params_msg->set_final_speed_meters_per_second(
+        static_cast<float>(final_speed_meters_per_second));
+    *(spinning_move_primitive_msg->mutable_spinning_move()->mutable_position_params()) =
+        *position_params_msg;
+
+    auto angular_velocity_msg = createAngularVelocityProto(angular_velocity);
+    *(spinning_move_primitive_msg->mutable_spinning_move()->mutable_angular_velocity()) =
+        *angular_velocity_msg;
+
+    spinning_move_primitive_msg->mutable_spinning_move()->set_dribbler_speed_rpm(
+        static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
+
+    return spinning_move_primitive_msg;
+}
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
 {
     auto stop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
