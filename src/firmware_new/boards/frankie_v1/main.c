@@ -78,6 +78,8 @@ static void initIoLayer(void)
 {
     initIoDrivetrain();
     initIoNetworking();
+
+    InitI2C1();
 }
 
 /* USER CODE END 0 */

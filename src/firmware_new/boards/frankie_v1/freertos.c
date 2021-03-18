@@ -28,6 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware/app/logger/logger.h"
+#include "firmware_new/boards/frankie_v1/io/INA226_power_monitor.h"
 #include "firmware_new/boards/frankie_v1/io/drivetrain.h"
 #include "firmware_new/boards/frankie_v1/io/network_logger.h"
 #include "firmware_new/boards/frankie_v1/io/proto_multicast_communication_profile.h"
@@ -120,6 +121,9 @@ const osThreadAttr_t UbloxOdinTask_attributes = {
 /* Definitions for RobotLogProtoQ */
 osMessageQueueId_t RobotLogProtoQHandle;
 const osMessageQueueAttr_t RobotLogProtoQ_attributes = {.name = "RobotLogProtoQ"};
+
+/* Definitions for I2C INA226 Power Monitor */
+I2C_HandleTypeDef I2c1Handle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -265,7 +269,8 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
-        TLOG_DEBUG("Running test msg update");
+        float power_monitor_val = INA226_getBusV(&I2c1Handle, INA226_ADDRESS);
+        TLOG_DEBUG("Power Monitor: %f", power_monitor_val);
         // run loop at 100hz
         osDelay((unsigned int)MILLISECONDS_PER_SECOND / 10);
     }
@@ -353,6 +358,44 @@ void initIoDrivetrain(void)
 
     io_drivetrain_init(drivetrain_unit_front_left, drivetrain_unit_front_right,
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
+}
+
+// TODO: put this in the IO layer
+void InitI2C1(void)
+{
+    I2c1Handle.Instance             = I2C1;
+    I2c1Handle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
+    I2c1Handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    I2c1Handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    I2c1Handle.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
+    I2c1Handle.Init.OwnAddress1     = 0x00;
+    I2c1Handle.Init.Timing          = 0x80200F73;
+    if (HAL_I2C_Init(&I2c1Handle) != HAL_OK)
+
+        HAL_I2CEx_AnalogFilter_Config(&I2c1Handle, I2C_ANALOGFILTER_ENABLED);
+    // TODO: put this in the IO layer
+    INA226_setConfig(&I2c1Handle, INA226_ADDRESS,
+                     INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |
+                         INA226_VBUS_140uS | INA226_AVG_1024);
+}
+
+// TODO: put this in the IO layer
+void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
+{
+    GPIO_InitTypeDef GPIO_InitStruct;
+
+    if (hi2c->Instance == I2C1)
+    {
+        __HAL_RCC_I2C1_CLK_ENABLE();
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+
+        GPIO_InitStruct.Pin       = GPIO_PIN_8 | GPIO_PIN_9;
+        GPIO_InitStruct.Mode      = GPIO_MODE_AF_OD;
+        GPIO_InitStruct.Pull      = GPIO_NOPULL;
+        GPIO_InitStruct.Speed     = GPIO_SPEED_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    }
 }
 
 /* USER CODE END Application */

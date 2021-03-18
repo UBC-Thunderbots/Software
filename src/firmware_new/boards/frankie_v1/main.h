@@ -59,6 +59,9 @@ extern "C"
     void initIoDrivetrain(void);
     void initIoNetworking(void);
 
+    // TODO: put this in the IO layer
+    void InitI2C1(void);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
