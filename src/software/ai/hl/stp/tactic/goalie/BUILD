@@ -34,7 +34,7 @@ cc_test(
 
 cc_test(
     name = "goalie_tactic_test",
-    srcs = ["goalie/goalie_tactic_test.cpp"],
+    srcs = ["goalie_tactic_test.cpp"],
     deps = [
         ":goalie_tactic",
         "//software/ai/hl/stp/action:chip_action",
@@ -42,5 +42,21 @@ cc_test(
         "//software/ai/hl/stp/action:stop_action",
         "//software/test_util",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "simulated_goalie_tactic_test",
+    srcs = ["simulated_goalie_tactic_test.cpp"],
+    deps = [
+        ":goalie_tactic",
+        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests:simulated_test_main",
+        "//software/simulated_tests/non_terminating_validation_functions",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
     ],
 )

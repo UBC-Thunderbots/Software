@@ -11,19 +11,13 @@
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 
-GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
-                           const Team &friendly_team, const Team &enemy_team,
-                           std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
-    : Tactic(true, {RobotCapability::Move}),
-      ball(ball),
-      field(field),
-      friendly_team(friendly_team),
-      enemy_team(enemy_team),
+GoalieTactic::GoalieTactic(bool loop_forever, std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
+    : Tactic(loop_forever, {RobotCapability::Move}), fsm(),
       goalie_tactic_config(goalie_tactic_config)
 {
 }
 
-std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
+/*std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     Point goalie_desired_position, Rectangle goalie_restricted_area)
 {
     //           NW    pos_side   NE
@@ -99,14 +93,14 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     {
         return std::nullopt;
     }
-}
+}*/
 
-void GoalieTactic::updateWorldParams(const World &world)
+void GoalieTactic::updateWorldParams(const World &world) {}
+
+void GoalieTactic::updateControlParams()
 {
-    this->ball          = world.ball();
-    this->field         = world.field();
-    this->friendly_team = world.friendlyTeam();
-    this->enemy_team    = world.enemyTeam();
+    // Update the control parameters stored by this Tactic
+    control_params.goalie_tactic_config = goalie_tactic_config;
 }
 
 bool GoalieTactic::isGoalieTactic() const
@@ -123,7 +117,16 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) 
 
 void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto move_action = std::make_shared<MoveAction>(true);
+
+    auto stop_action = std::make_shared<StopAction>(false);
+
+    do
+    {
+        stop_action->updateControlParams(*robot_, false);
+        yield(stop_action);
+    } while (!stop_action->done());
+
+    /*auto move_action = std::make_shared<MoveAction>(true);
     auto chip_action = std::make_shared<ChipAction>();
     auto stop_action = std::make_shared<StopAction>(false);
 
@@ -176,10 +179,10 @@ void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
         }
 
         yield(next_action);
-    } while (!move_action->done());
+    } while (!move_action->done());*/
 }
 
-std::vector<Point> GoalieTactic::getIntersectionsBetweenBallVelocityAndFullGoalSegment()
+/*std::vector<Point> GoalieTactic::getIntersectionsBetweenBallVelocityAndFullGoalSegment()
 {
     // compute intersection points from ball position and velocity
     Ray ball_ray = Ray(ball.position(), ball.velocity());
@@ -193,9 +196,9 @@ std::vector<Point> GoalieTactic::getIntersectionsBetweenBallVelocityAndFullGoalS
                 field.friendlyGoalpostPos() + Vector(0, ROBOT_MAX_RADIUS_METERS));
 
     return intersection(ball_ray, full_goal_segment);
-}
+}*/
 
-std::shared_ptr<Action> GoalieTactic::panicAndStopBall(
+/*std::shared_ptr<Action> GoalieTactic::panicAndStopBall(
     std::shared_ptr<MoveAction> move_action, const Point &stop_ball_point)
 {
     // the ball is heading towards the net, move to intercept the shot
@@ -211,9 +214,9 @@ std::shared_ptr<Action> GoalieTactic::panicAndStopBall(
         BallCollisionType::ALLOW,
         {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
     return move_action;
-}
+}*/
 
-std::shared_ptr<Action> GoalieTactic::chipBallIfSafe(
+/*std::shared_ptr<Action> GoalieTactic::chipBallIfSafe(
     std::shared_ptr<ChipAction> chip_action, std::shared_ptr<StopAction> stop_action)
 {
     // if the ball is in the "don't chip rectangle" we do not chip the ball
@@ -240,9 +243,9 @@ std::shared_ptr<Action> GoalieTactic::chipBallIfSafe(
             (ball.position() - field.friendlyGoalCenter()).orientation(), 2);
         return chip_action;
     }
-}
+}*/
 
-std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
+/*std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
     std::shared_ptr<MoveAction> move_action)
 {
     // compute angle between two vectors, negative goal post to ball and positive
@@ -306,29 +309,19 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
         BallCollisionType::ALLOW,
         {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
     return move_action;
+}*/
+
+bool GoalieTactic::done() const
+{
+    return fsm.is(boost::sml::X);
+}
+
+void GoalieTactic::updateIntent(const TacticUpdate &tactic_update)
+{
+    fsm.process_event(GoalieFSM::Update(control_params, tactic_update));
 }
 
 void GoalieTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
-}
-
-Ball GoalieTactic::getBall() const
-{
-    return this->ball;
-}
-
-Field GoalieTactic::getField() const
-{
-    return this->field;
-}
-
-Team GoalieTactic::getFriendlyTeam() const
-{
-    return this->friendly_team;
-}
-
-Team GoalieTactic::getEnemyTeam() const
-{
-    return this->enemy_team;
 }

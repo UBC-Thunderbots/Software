@@ -6,7 +6,6 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/intent/chip_intent.h"
-//#include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -224,12 +223,6 @@ struct GoalieFSM
                         event.common.world.ball().position(),
                         (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
                         YEET_CHIP_DISTANCE_METERS));
-                /*ChipFSM::ControlParams control_params{
-                        .chip_origin   = event.common.world.ball().position(),
-                        .chip_direction = (event.common.world.ball().position() -
-                                           event.common.world.field().friendlyGoalCenter()).orientation(),
-                        .chip_distance_meters = YEET_CHIP_DISTANCE_METERS};
-                processEvent(ChipFSM::Update(control_params, event.common));*/
             }
         };
 

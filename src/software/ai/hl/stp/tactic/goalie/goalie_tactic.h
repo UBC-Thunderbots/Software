@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
@@ -27,15 +28,12 @@ class GoalieTactic : public Tactic
     /**
      * Creates a new GoalieTactic
      *
-     * @param ball The ball
-     * @param field The field
-     * @param friendly_team The friendly team
-     * @param enemy_team The enemy team
+     * @param loop_forever Whether or not this Tactic should never complete. If true, the
+     * tactic will be restarted every time it completes
      * @param goalie_tactic_config The config to fetch parameters from
      */
-    explicit GoalieTactic(const Ball &ball, const Field &field, const Team &friendly_team,
-                          const Team &enemy_team,
-                          std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
+    explicit GoalieTactic(bool loop_forever, std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config/* =
+            std::make_shared<const GoalieTacticConfig>()*/);
 
     GoalieTactic() = delete;
 
@@ -52,6 +50,13 @@ class GoalieTactic : public Tactic
                                                    Rectangle goalie_restricted_area);
 
     void updateWorldParams(const World &world) override;
+
+    /**
+     * Updates the params assuming that the max allowed speed mode is the physical limits
+     *
+     */
+    void updateControlParams();
+
 
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
@@ -94,23 +99,20 @@ class GoalieTactic : public Tactic
     bool isGoalieTactic() const override;
 
     void accept(TacticVisitor &visitor) const override;
+    bool done() const override;
 
-    Ball getBall() const;
-    Field getField() const;
-    Team getFriendlyTeam() const;
-    Team getEnemyTeam() const;
+   private:
+    void calculateNextAction(ActionCoroutine::push_type &yield) override;
+    void updateIntent(const TacticUpdate &tactic_update) override;
 
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
-   private:
-    void calculateNextAction(ActionCoroutine::push_type &yield) override;
-
     // Tactic parameters
-    Ball ball;
-    Field field;
-    Team friendly_team;
-    Team enemy_team;
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
+
+    BaseFSM<GoalieFSM> fsm;
+
+    GoalieFSM::ControlParams control_params;
 };

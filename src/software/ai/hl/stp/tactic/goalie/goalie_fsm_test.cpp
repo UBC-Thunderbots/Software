@@ -15,6 +15,7 @@ TEST(GoalieFSMTest, test_transitions)
     GoalieFSM::ControlParams control_params{.goalie_tactic_config   = std::make_shared<const GoalieTacticConfig>()};
 
     HFSM<GoalieFSM> fsm;
+
     // Start in GoalieFSM's PositionToBlockShotState
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
 
