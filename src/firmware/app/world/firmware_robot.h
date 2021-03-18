@@ -87,7 +87,7 @@ FirmwareRobot_t* app_firmware_traj_follower_robot_create(
     float (*get_robot_orientation)(void), float (*get_robot_velocity_x)(void),
     float (*get_robot_velocity_y)(void), float (*get_robot_velocity_angular)(void),
     float (*get_battery_voltage)(void),
-    void (*follow_trajectory)(PositionTrajectory_t* trajectory),
+    void (*follow_trajectory)(PositionTrajectory_t* trajectory, size_t trajectory_index),
     void (*stop_robot)(TbotsProto_StopPrimitive_StopType stop_type),
     void (*control_direct_wheel)(
         TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg),
@@ -217,7 +217,8 @@ ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* 
 
 // TODO: Headers
 void app_firmware_robot_follow_trajectory(const FirmwareRobot_t* robot,
-                                          PositionTrajectory_t* trajectory);
+                                          PositionTrajectory_t* trajectory,
+                                          size_t trajectory_index);
 
 // TODO: Headers
 void app_firmware_stop_robot(const FirmwareRobot_t* robot,

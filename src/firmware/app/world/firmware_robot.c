@@ -54,7 +54,8 @@ FirmwareRobot_t* app_firmware_robot_create(
     // TODO: Make those work with the wheel provided in the constructor
     // A whole bunch of code that deals with PhysBot that will become part of
     // firmware_robot Just grab the code from move primitive, should work
-    new_robot->stop_robot           = NULL;
+    new_robot->stop_robot = app_firmware_stop_robot_wheels(
+        front_left_wheel, front_right_wheel, back_left_wheel, back_right_wheel);
     new_robot->control_direct_wheel = NULL;
     new_robot->front_right_wheel    = front_right_wheel;
     new_robot->front_left_wheel     = front_left_wheel;
@@ -73,7 +74,7 @@ FirmwareRobot_t* app_firmware_traj_follower_robot_create(
     float (*get_robot_orientation)(void), float (*get_robot_velocity_x)(void),
     float (*get_robot_velocity_y)(void), float (*get_robot_velocity_angular)(void),
     float (*get_battery_voltage)(void),
-    void (*follow_trajectory)(PositionTrajectory_t* trajectory),
+    void (*follow_trajectory)(PositionTrajectory_t* trajectory, size_t trajectory_index),
     void (*stop_robot)(TbotsProto_StopPrimitive_StopType stop_type),
     void (*control_direct_wheel)(
         TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg),
@@ -177,12 +178,11 @@ ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* 
     return robot->controller_state;
 }
 
-// TODO: Is `idx` required?
-// Yes, it needs index
 void app_firmware_robot_follow_trajectory(const FirmwareRobot_t* robot,
-                                          PositionTrajectory_t* trajectory)
+                                          PositionTrajectory_t* trajectory,
+                                          size_t trajectory_index)
 {
-    return robot->follow_trajectory(trajectory);
+    return robot->follow_trajectory(trajectory, trajectory_index);
 }
 
 void app_firmware_stop_robot(const FirmwareRobot_t* robot,
@@ -196,4 +196,56 @@ void app_firmware_direct_control_wheel(
     TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg)
 {
     return robot->control_direct_wheel(control_msg);
+}
+
+// TODO
+void app_firmware_(void)
+{
+    PhysBot pb = app_physbot_create(robot, dest, major_vec, minor_vec);
+
+    const float dest_speed = state->position_trajectory.linear_speed[trajectory_index];
+
+    // plan major axis movement
+    float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    float max_major_v     = state->max_speed_m_per_s;
+    float major_params[3] = {dest_speed, max_major_a, max_major_v};
+    app_physbot_planMove(&pb.maj, major_params);
+
+    // plan minor axis movement
+    float max_minor_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f;
+    float max_minor_v = state->max_speed_m_per_s / 2.0f;
+    float minor_params[3] = {0, max_minor_a, max_minor_v};
+    app_physbot_planMove(&pb.min, minor_params);
+
+    // plan rotation movement
+    plan_move_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
+
+    float accel[3] = {0, 0, pb.rot.accel};
+
+    // rotate the accel and apply it
+    app_physbot_computeAccelInLocalCoordinates(
+        accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
+
+    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
+}
+
+// TODO: Come up with a better name
+void app_firmware_stop_robot_wheels(Wheel_t* front_left_wheel, Wheel_t* front_right_wheel,
+                                    Wheel_t* back_left_wheel, Wheel_t* back_right_wheel)
+{
+    void (*wheel_op)(const Wheel_t* wheel);
+    if (stop_type == TbotsProto_StopPrimitive_StopType_COAST)
+    {
+        wheel_op = app_wheel_coast;
+        app_dribbler_coast(dribbler);
+    }
+    else
+    {
+        wheel_op = app_wheel_brake;
+        app_dribbler_setSpeed(dribbler, 0);
+    }
+    wheel_op(front_left_wheel);
+    wheel_op(front_right_wheel);
+    wheel_op(back_left_wheel);
+    wheel_op(back_right_wheel);
 }
