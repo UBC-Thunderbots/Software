@@ -6,8 +6,6 @@
 // intent.h. Note: every subclass of this visitor must include all of the classes listed
 // below
 class MoveIntent;
-class AutochipMoveIntent;
-class AutokickMoveIntent;
 
 /**
  * This class provides an interface for all NavigatingIntent Visitors. The Visitor design
@@ -26,7 +24,5 @@ class NavigatingIntentVisitor
      *
      * @param The NavigatingIntent to visit
      */
-    virtual void visit(const MoveIntent &intent)         = 0;
-    virtual void visit(const AutochipMoveIntent &intent) = 0;
-    virtual void visit(const AutokickMoveIntent &intent) = 0;
+    virtual void visit(const MoveIntent &intent) = 0;
 };

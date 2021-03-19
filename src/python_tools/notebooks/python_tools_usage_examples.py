@@ -26,9 +26,7 @@ from shared.proto.tbots_software_msgs_pb2 import PrimitiveSet
 # +
 # Create a ProtoLog from the chunked Protobuf message files in the directory,
 # with contained message type PrimitiveSet
-primitive_set_proto_log = ProtoLog(
-    "/home/jordan/protologgertest/PrimitiveSet/", PrimitiveSet
-)
+primitive_set_proto_log = ProtoLog("test_data/AI_PrimitiveSet", PrimitiveSet)
 
 # create a list of primitives for robot 0 from the primitive sets
 robot_0_primitives = [
@@ -36,12 +34,12 @@ robot_0_primitives = [
 ]
 plt.figure(figsize=(20, 5))
 
-# build a list of autochip move final angles and their corresponding timestamps from the list of robot 0 primitives
+# build a list of move primitive final angles and their corresponding timestamps from the list of robot 0 primitives
 final_angles = []
 timestamps = []
 for idx, prim in enumerate(robot_0_primitives):
-    if prim.HasField("autochip_move"):
-        final_angles.append(prim.autochip_move.final_angle.radians)
+    if prim.HasField("move"):
+        final_angles.append(prim.move.final_angle.radians)
         timestamps.append(
             primitive_set_proto_log[idx].time_sent.epoch_timestamp_seconds
         )
@@ -52,7 +50,7 @@ plt.scatter(timestamps, final_angles)
 plt.title("Autochip Move final angles for robot 0")
 # -
 
-sensor_proto_log = SensorProtoLog("/home/jordan/protologgertest/SensorProto/")
+sensor_proto_log = SensorProtoLog("test_data/Backend_SensorProto")
 
 # +
 ball_xs = []

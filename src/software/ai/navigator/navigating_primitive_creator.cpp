@@ -27,21 +27,8 @@ void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
 {
     current_primitive =
         *createMovePrimitive(new_destination, new_final_speed, intent.getFinalAngle(),
-                             intent.getDribblerMode());
-}
-
-void NavigatingPrimitiveCreator::visit(const AutochipMoveIntent &intent)
-{
-    current_primitive = *createAutochipMovePrimitive(
-        new_destination, new_final_speed, intent.getFinalAngle(),
-        intent.getDribblerMode(), intent.getChipDistance());
-}
-
-void NavigatingPrimitiveCreator::visit(const AutokickMoveIntent &intent)
-{
-    current_primitive = *createAutokickMovePrimitive(
-        new_destination, new_final_speed, intent.getFinalAngle(),
-        intent.getDribblerMode(), intent.getKickSpeed());
+                             intent.getDribblerMode(), intent.getAutoChipOrKick(),
+                             intent.getMaxAllowedSpeedMode());
 }
 
 std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFinalSpeed(

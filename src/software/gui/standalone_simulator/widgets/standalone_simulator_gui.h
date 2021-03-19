@@ -26,8 +26,14 @@ class StandaloneSimulatorGUI : public QMainWindow
      * @pre simulator must point to a valid StandaloneSimulator (ie. must not be null)
      *
      * @param simulator The StandaloneSimulator this GUI will control
+     * @param mutable_simulator_config The simulator config params this GUI will change
+     * @param mutable_standalone_simulator_config The standalone simulator config params
+     * this GUI will change
      */
-    explicit StandaloneSimulatorGUI(std::shared_ptr<StandaloneSimulator> simulator);
+    explicit StandaloneSimulatorGUI(
+        std::shared_ptr<StandaloneSimulator> simulator,
+        std::shared_ptr<SimulatorConfig> mutable_simulator_config,
+        std::shared_ptr<StandaloneSimulatorConfig> mutable_standalone_simulator_config);
 
    private:
     /**
@@ -54,6 +60,8 @@ class StandaloneSimulatorGUI : public QMainWindow
     QTimer* update_timer;
 
     std::shared_ptr<StandaloneSimulator> standalone_simulator;
+    std::shared_ptr<SimulatorConfig> mutable_simulator_config;
+    std::shared_ptr<StandaloneSimulatorConfig> mutable_standalone_simulator_config;
 
     static constexpr double UPDATE_INTERVAL_SECONDS = 1.0 / 60.0;
 

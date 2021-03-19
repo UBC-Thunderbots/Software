@@ -64,12 +64,12 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:autochip_move_action",
+        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -92,12 +92,12 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:autochip_move_action",
+        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -118,14 +118,14 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:autochip_move_action",
         "//software/ai/hl/stp/action:chip_action",
+        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -183,6 +183,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "penalty_kick_tactic_test",
+    srcs = ["penalty_kick_tactic_test.cpp"],
+    deps = [
+        ":penalty_kick_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "penalty_setup_tactic",
     srcs = ["penalty_setup_tactic.cpp"],
@@ -205,7 +215,6 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:autokick_move_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom/algorithms",
@@ -232,7 +241,7 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:autochip_move_action",
+        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/logger",
     ],
@@ -255,11 +264,11 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -280,13 +289,13 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:intercept_ball_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -319,6 +328,7 @@ cc_library(
         ":tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
+        "//software/ai/hl/stp/tactic/get_possession:get_possession_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",

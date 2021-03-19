@@ -3,6 +3,8 @@
 #include "software/ai/hl/stp/tactic/test_tactics/move_test_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+MoveTestPlay::MoveTestPlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
+
 bool MoveTestPlay::isApplicable(const World &world) const
 {
     return world.ball().position().x() >= 0;
@@ -32,4 +34,4 @@ void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, MoveTestPlay> factory;
+static TGenericFactory<std::string, Play, MoveTestPlay, PlayConfig> factory;

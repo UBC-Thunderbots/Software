@@ -7,11 +7,11 @@ qt_cc_library(
     src = "dynamic_parameter_widget.cpp",
     hdr = "dynamic_parameter_widget.h",
     deps = [
+        "//shared/parameter",
+        "//shared/parameter:cpp_configs",
         "//software/gui/generic_widgets/slider",
         "//software/gui/shared:parameters_spinbox",
         "//software/logger",
-        "//software/parameter",
-        "//software/parameter:dynamic_parameters",
         "//software/util/variant_visitor",
         "@qt//:qt_widgets",
     ],

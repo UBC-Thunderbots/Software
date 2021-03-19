@@ -22,10 +22,10 @@ cc_library(
     hdrs = ["controller.h"],
     deps = [
         ":controller_input",
+        "//shared/parameter:cpp_configs",
         "//software/logger",
         "//software/math:math_functions",
         "//software/multithreading:subject",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -54,7 +54,7 @@ cc_test(
     srcs = ["controller_primitive_generator_test.cpp"],
     deps = [
         ":controller_primitive_generator",
-        "//software/parameter:dynamic_parameters",
+        "//shared/parameter:cpp_configs",
         "@gtest//:gtest_main",
     ],
 )

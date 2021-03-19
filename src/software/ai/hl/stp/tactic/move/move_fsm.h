@@ -7,7 +7,7 @@ struct MoveFSM
 {
     // these classes define the states used in the transition table
     // they are exposed so that tests can check if the FSM is in a particular state
-    class move_state;
+    class MoveState;
 
     // this struct defines the unique control parameters that the MoveFSM requires in its
     // update
@@ -19,6 +19,14 @@ struct MoveFSM
         Angle final_orientation;
         // The speed the robot should have when it arrives at its destination
         double final_speed;
+        // How to run the dribbler
+        DribblerMode dribbler_mode;
+        // How to navigate around the ball
+        BallCollisionType ball_collision_type;
+        // The command to autochip or autokick
+        AutoChipOrKick auto_chip_or_kick;
+        // The maximum allowed speed mode
+        MaxAllowedSpeedMode max_allowed_speed_mode;
     };
 
     // this struct defines the only event that the MoveFSM responds to
@@ -29,7 +37,7 @@ struct MoveFSM
         using namespace boost::sml;
 
         // move_s is the _state_ used in the transition table
-        const auto move_s = state<move_state>;
+        const auto move_s = state<MoveState>;
 
         // update_e is the _event_ that the MoveFSM responds to
         const auto update_e = event<Update>;
@@ -44,7 +52,10 @@ struct MoveFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), event.control_params.destination,
                 event.control_params.final_orientation, event.control_params.final_speed,
-                DribblerMode::OFF, BallCollisionType::AVOID));
+                event.control_params.dribbler_mode,
+                event.control_params.ball_collision_type,
+                event.control_params.auto_chip_or_kick,
+                event.control_params.max_allowed_speed_mode));
         };
 
         /**
@@ -61,7 +72,7 @@ struct MoveFSM
         };
 
         return make_transition_table(
-            // src_state + event [guard] / action = dest state
+            // src_state + event [guard] / action = dest_state
             *move_s + update_e[!move_done] / update_move = move_s,
             move_s + update_e[move_done] / update_move   = X,
             X + update_e[!move_done] / update_move       = move_s);

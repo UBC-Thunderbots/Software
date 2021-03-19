@@ -7,13 +7,13 @@ cc_library(
     ],
     hdrs = ["stp.h"],
     deps = [
+        "//shared/parameter:cpp_configs",
         "//software/ai/hl",
         "//software/ai/hl/stp/play",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic:all_tactics",
         "//software/ai/intent:stop_intent",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
-        "//software/parameter:dynamic_parameters",
         "//software/util/design_patterns:generic_factory",
         "//software/util/typename",
         "@munkres_cpp",
@@ -53,6 +53,8 @@ cc_test(
     srcs = ["stp_tactic_assignment_test.cpp"],
     deps = [
         ":stp",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/hl/stp/play:halt_play",
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/tactic/test_tactics:goalie_test_tactic",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",

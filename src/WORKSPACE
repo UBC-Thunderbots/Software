@@ -4,8 +4,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
 http_archive(
     name = "rules_foreign_cc",
-    strip_prefix = "rules_foreign_cc-master",
-    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/master.zip",
+    sha256 = "c2cdcf55ffaf49366725639e45dedd449b8c3fe22b54e31625eb80ce3a240f1e",
+    strip_prefix = "rules_foreign_cc-0.1.0",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.1.0.zip",
 )
 
 load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
@@ -17,8 +18,9 @@ all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = [
 http_archive(
     name = "rapidcheck",
     build_file_content = all_contents,
-    strip_prefix = "rapidcheck-master",
-    urls = ["https://github.com/emil-e/rapidcheck/archive/master.zip"],
+    sha256 = "93f73c2c39ff91fd3a265b87b429ed266631c2425d9287d4548b149b99168736",
+    strip_prefix = "rapidcheck-7acca63b8e834a74fd47fe8fbf17668d22cc6331",
+    urls = ["https://github.com/emil-e/rapidcheck/archive/7acca63b8e834a74fd47fe8fbf17668d22cc6331.zip"],
 )
 
 http_archive(
@@ -237,7 +239,7 @@ git_repository(
     name = "rules_python",
     commit = "c8c79aae9aa1b61d199ad03d5fe06338febd0774",
     remote = "https://github.com/bazelbuild/rules_python.git",
-    shallow_since = "1586444447 +0200",
+    shallow_since = "1602800469 +1100",
 )
 
 # Based on the hermetic Python 3 guide found here
@@ -252,6 +254,12 @@ filegroup(
     name = "files",
     srcs = glob(["bazel_install/**"], exclude = ["**/* *"]),
     visibility = ["//visibility:public"],
+)
+cc_library(
+    name = "python_headers",
+    hdrs = glob(["bazel_install/include/python3.7/*.h"]),
+    includes = ["bazel_install/include/python3.7"],
+    visibility = ["//visibility:public"]
 )
 """,
     patch_cmds = [
@@ -283,7 +291,7 @@ pip_install(
 pip_install(
     name = "dynamic_parameter_deps",
     python_interpreter_target = "@python_interpreter//:python_bin",
-    requirements = "//shared/parameter_v2/generation_scripts:requirements.txt",
+    requirements = "//shared/parameter/generation_scripts:requirements.txt",
 )
 
 pip_install(
@@ -315,4 +323,36 @@ http_archive(
 bind(
     name = "six",
     actual = "@six_archive//:six",
+)
+
+# pybind11 for Python bindings
+# quval's repo for pybind11 bazel rules has a fix for hermetic python interpreter. The pybind11 project's own
+# bazel repo uses the system shell to find the system python interpreter and associated headers, and will not
+# work with how we build our own interpreter. This has an additional patch for Python 3.7.9, as pyconfig.h
+# is placed in a different directory than the rest of the Python headers.
+http_archive(
+    name = "pybind11_bazel",
+    patch_args = ["-p1"],
+    patches = [
+        "//external:pybind11_bazel_pyconfig_fix.patch",
+    ],
+    sha256 = "b26d183b3b0ff09a8f6ed6332e92599500ca3363a451bfbda863f69782af5d91",
+    strip_prefix = "pybind11_bazel-938e4c46b8d66967cda41a1d2513f69d37faa2b3",
+    urls = ["https://github.com/quval/pybind11_bazel/archive/938e4c46b8d66967cda41a1d2513f69d37faa2b3.zip"],
+)
+
+# We still require the pybind library.
+http_archive(
+    name = "pybind11",
+    build_file = "@pybind11_bazel//:pybind11.BUILD",
+    sha256 = "8ff2fff22df038f5cd02cea8af56622bc67f5b64534f1b83b9f133b8366acff2",
+    strip_prefix = "pybind11-2.6.2",
+    urls = ["https://github.com/pybind/pybind11/archive/v2.6.2.tar.gz"],
+)
+
+load("@pybind11_bazel//:python_configure.bzl", "python_configure")
+
+python_configure(
+    name = "local_config_python",
+    python_interpreter_target = "@python_interpreter//:python_bin",
 )
