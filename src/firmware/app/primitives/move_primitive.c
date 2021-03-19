@@ -36,20 +36,23 @@ typedef struct MoveState
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveState_t);
 
 /**
- * Calculates the rotation time, velocity, and acceleration to be stored
- * in a PhysBot data container.
+ * Determines the rotation acceleration after setup_bot has been used and
+ * plan_move has been done along the minor axis. The minor time from bangbang
+ * is used to determine the rotation time, and thus the rotation velocity and
+ * acceleration. The rotational acceleration is clamped under the MAX_T_A.
  *
- * @param pb The data container that has information about major axis time
- * and will store the rotational information
- * @param avel The current rotational velocity of the bot
+ * @param pb [in/out] The PhysBot data container that should have minor axis time and
+ * will store the rotational information
+ * @param avel The rotational velocity of the bot
  */
 void plan_move_rotation(PhysBot* pb, float avel);
 
 void plan_move_rotation(PhysBot* pb, float avel)
 {
     pb->rot.time = (pb->min.time > TIME_HORIZON) ? pb->min.time : TIME_HORIZON;
-    // 1.6f is a magic constant
-    pb->rot.vel   = 1.6f * pb->rot.disp / pb->rot.time;
+    // 1.4f is a magic constant to force the robot to rotate faster to its final
+    // orientation.
+    pb->rot.vel   = 1.4f * pb->rot.disp / pb->rot.time;
     pb->rot.accel = (pb->rot.vel - avel) / TIME_HORIZON;
     limit(&pb->rot.accel, MAX_T_A);
 }
