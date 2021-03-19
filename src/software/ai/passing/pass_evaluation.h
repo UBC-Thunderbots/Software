@@ -28,14 +28,15 @@ class PassEvaluation
      *
      * @param pitch_division The FieldPitchDivision that was used to create
      *                       this pass evaluation.
-     * @param best_pass_in_zone A vector of the best passes in each zone,
-     *                          the index in the vector should correspond
-     *                          with the FieldZone enum.
+     * @param best_pass_in_zone A map of the best passes in each zone
+     * @param best_zones_to_cherry_pick A vector of zones sorted, where lower
+     *                       indexes are better cherry pick locations.
      * @param timestamp The timestamp this pass evaluation was created
      */
     explicit PassEvaluation(
         std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
-        ZonePassMap<ZoneEnum> best_pass_in_zones, Timestamp timestamp);
+        ZonePassMap<ZoneEnum> best_pass_in_zones,
+        std::vector<ZoneEnum> best_zones_to_cherry_pick, Timestamp timestamp);
 
     PassEvaluation() = delete;
 
@@ -64,6 +65,13 @@ class PassEvaluation
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> getFieldPitchDivsion() const;
 
     /**
+     * Returns the best zones to send robots to cherry pick in
+     *
+     * @return vector of ZoneEnums, sorted in ascending order of quality
+     */
+    std::vector<ZoneEnum> getBestZonesToCherryPick() const;
+
+    /**
      * Returns a timestamp of when this pass evaluation was created
      *
      * @return Timestamp the timestamp of when this pass evaluation was created
@@ -74,8 +82,11 @@ class PassEvaluation
     // The pitch division this pass evaluation was computed for
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
 
-    // Stores the best passes indexed by E
+    // Stores the best passes
     ZonePassMap<ZoneEnum> best_pass_in_zones_;
+
+    // Stores the best zones
+    std::vector<ZoneEnum> best_cherry_pick_zones_;
 
     // The timestamp when this evaluation was created
     Timestamp timestamp_;

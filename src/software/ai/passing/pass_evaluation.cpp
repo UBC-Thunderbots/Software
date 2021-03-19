@@ -13,7 +13,8 @@
 template <class ZoneEnum>
 PassEvaluation<ZoneEnum>::PassEvaluation(
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
-    std::unordered_map<ZoneEnum, PassWithRating> best_pass_in_zones, Timestamp timestamp)
+    std::unordered_map<ZoneEnum, PassWithRating> best_pass_in_zones,
+    std::vector<ZoneEnum> best_zones_to_cherry_pick, Timestamp timestamp)
     : pitch_division_(pitch_division),
       best_pass_in_zones_(best_pass_in_zones),
       timestamp_(timestamp)
@@ -63,4 +64,10 @@ template <class ZoneEnum>
 Timestamp PassEvaluation<ZoneEnum>::getEvaluationTime() const
 {
     return timestamp_;
+}
+
+template <class ZoneEnum>
+std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::getBestZonesToCherryPick() const
+{
+    return best_cherry_pick_zones_;
 }

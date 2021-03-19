@@ -34,10 +34,6 @@ class ShootOrPassPlay : public Play
     // The speed each patrolling robot should be moving through its control point
     static constexpr double SPEED_AT_PATROL_POINTS = 0.0;
 
-    void selectZone(std::shared_ptr<const EighteenZonePitchDivision> pitch_division,
-                    const Point &ball_location, Zones &cherry_pick_region_1,
-                    Zones &cherry_pick_region_2);
-
     /**
      * Sets up the pass for the corner kick: aligns the passer and positions the cherry
      * pickers

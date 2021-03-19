@@ -7,6 +7,7 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 
@@ -47,6 +48,25 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
            shoot_pass_rating * pass_speed_quality * in_region_quality;
+}
+
+double rateZone(const World& world, const Rectangle& zone,
+                std::shared_ptr<const PassingConfig> passing_config)
+{
+    // If the zone contains the ball, its not a good place to receive a pass
+    if (contains(zone, world.ball().position()))
+    {
+        return 0.0;
+    }
+
+    double static_pass_quality =
+        getStaticPositionQuality(world.field(), zone.centre(), passing_config);
+
+    double pass_distance_rating =
+        sigmoid((world.ball().position() - zone.centre()).length(),
+                passing_config->getIdealPassDistanceM()->value(), 0.50);
+
+    return pass_distance_rating * static_pass_quality;
 }
 
 double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team,
