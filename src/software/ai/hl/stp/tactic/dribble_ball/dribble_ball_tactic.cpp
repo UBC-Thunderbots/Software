@@ -45,7 +45,7 @@ bool DribbleBallTactic::done() const
 
 void DribbleBallTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(GetPossessionFSM::Update({}, tactic_update));
+    fsm.process_event(DribbleBallFSM::Update(control_params, tactic_update));
 }
 
 void DribbleBallTactic::accept(TacticVisitor &visitor) const
