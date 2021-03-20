@@ -9,29 +9,13 @@ message Primitive
     oneof primitive
     {
         EstopPrimitive estop                  = 1;
-        ChipPrimitive chip                    = 2;
-        KickPrimitive kick                    = 3;
-        MovePrimitive move                    = 4;
-        StopPrimitive stop                    = 5;
-        DirectControlPrimitive direct_control = 6;
+        MovePrimitive move                    = 2;
+        StopPrimitive stop                    = 3;
+        DirectControlPrimitive direct_control = 4;
     }
 }
 
 message EstopPrimitive {}
-
-message ChipPrimitive
-{
-    Point chip_origin          = 1;
-    Angle chip_direction       = 2;
-    float chip_distance_meters = 3;
-}
-
-message KickPrimitive
-{
-    Point kick_origin        = 1;
-    Angle kick_direction     = 2;
-    float kick_speed_m_per_s = 3;
-}
 
 message MovePrimitive
 {

@@ -26,16 +26,6 @@ cc_test(
 )
 
 cc_test(
-    name = "kickoff_chip_tactic_test",
-    srcs = ["kickoff_chip_tactic_test.cpp"],
-    deps = [
-        ":kickoff_chip_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
     name = "penalty_setup_tactic_test",
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [

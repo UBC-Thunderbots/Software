@@ -55,34 +55,6 @@ struct AutoChipOrKick
 MAKE_ENUM(MaxAllowedSpeedMode, PHYSICAL_LIMIT, STOP_COMMAND, TIPTOE);
 
 /**
- * Create a Chip Primitive Message
- *
- * @param chip_origin The location where the chip will be taken
- * @param chip_direction The orientation the Robot will chip at
- * @param chip_distance_meters The distance between the starting location
- * of the chip and the location of the first bounce
- *
- * @return Pointer to Chip Primitive Message
- */
-std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(const Point &chip_origin,
-                                                           const Angle &chip_direction,
-                                                           double chip_distance_meters);
-
-/**
- * Create a Kick Primitive Message
- *
- * @param kick_origin The location where the kick will be taken
- * @param kick_direction The orientation the Robot will kick at
- * @param kick_speed_m_per_s The speed of how fast the Robot
- * will kick the ball in meters per second
- *
- * @return Pointer to Kick Primitive Message
- */
-std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(const Point &kick_origin,
-                                                           const Angle &kick_direction,
-                                                           double kick_speed_m_per_s);
-
-/**
  * Create a Move Primitive Message
  *
  * @param dest The final destination of the movement

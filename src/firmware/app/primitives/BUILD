@@ -25,9 +25,7 @@ cc_library(
     deps = [
         ":move",
         ":primitive",
-        ":chip",
         ":direct_control",
-        ":kick",
         ":stop",
         "//firmware/app/world:firmware_world",
     ] + select({
@@ -45,43 +43,6 @@ cc_library(
         ":primitive",
         "//firmware/app/control",
         "//firmware/app/logger",
-    ],
-)
-
-cc_library(
-    name = "chick_motion",
-    srcs = ["chick_motion.c"],
-    hdrs = ["chick_motion.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/app/control:physbot",
-        "//firmware/app/control:trajectory_planner",
-        "//firmware/shared:physics",
-        "//firmware/shared:util",
-    ],
-)
-
-cc_library(
-    name = "chip",
-    srcs = [
-        "chip_primitive.c",
-    ],
-    hdrs = ["chip_primitive.h"],
-    deps = [
-        "chick_motion",
-        ":primitive",
-    ],
-)
-
-cc_library(
-    name = "kick",
-    srcs = ["kick_primitive.c"],
-    hdrs = ["kick_primitive.h"],
-    deps = [
-        "chick_motion",
-        ":primitive",
     ],
 )
 
