@@ -7,7 +7,7 @@
 
 struct GetBehindBallFSM
 {
-    class get_behind_ball_state;
+    class GetBehindBallState;
 
     struct ControlParams
     {
@@ -24,7 +24,7 @@ struct GetBehindBallFSM
     {
         using namespace boost::sml;
 
-        const auto get_behind_ball_s = state<get_behind_ball_state>;
+        const auto get_behind_ball_s = state<GetBehindBallState>;
         const auto update_e          = event<Update>;
 
         // How large the triangle is that defines the region where the robot is
@@ -106,6 +106,7 @@ struct GetBehindBallFSM
         };
 
         return make_transition_table(
+            // src_state + event [guard] / action = dest_state
             *get_behind_ball_s + update_e[!behind_ball] / update_move,
             get_behind_ball_s + update_e[behind_ball] / update_move = X,
             X + update_e[!behind_ball] / update_move                = get_behind_ball_s);
