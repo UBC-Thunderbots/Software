@@ -81,6 +81,8 @@ void MotionConstraintVisitor::visit(const GoalieTestTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const GetPossessionTactic &tactic) {}
 
+void MotionConstraintVisitor::visit(const DribbleBallTactic &tactic) {}
+
 void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 
 // clang-format on

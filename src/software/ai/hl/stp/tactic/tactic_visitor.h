@@ -26,6 +26,7 @@ class ShootGoalTactic;
 class StopTactic;
 class StopTestTactic;
 class GetPossessionTactic;
+class DribbleBallTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
@@ -63,4 +64,5 @@ class TacticVisitor
     virtual void visit(const StopTactic &tactic)               = 0;
     virtual void visit(const StopTestTactic &tactic)           = 0;
     virtual void visit(const GetPossessionTactic &tactic)      = 0;
+    virtual void visit(const DribbleBallTactic &tactic)      = 0;
 };
