@@ -1,7 +1,6 @@
 #include "software/ai/passing/pass_generator.h"
 
 #include <gtest/gtest.h>
-#include <rapidcheck.h>
 #include <string.h>
 
 #include "software//world/world.h"
