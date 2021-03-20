@@ -27,14 +27,15 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 /**
  * Calculate the quality of a given zone
  *
- * @param world The world in which to rate the zone
+ * @param field The field on which to rate the zone
  * @param zone The zone to rate
  * @param passing_config The passing config used for tuning
+ * @param ball_position The position of the ball
  *
  * @return A value in [0,1] representing the quality of the zone, with 1 being a
  *         great zone to send a cherry picker to, and 0 being a zone to avoid.
  */
-double rateZone(const World& world, const Rectangle& zone,
+double rateZone(const Field& field, const Rectangle& zone, const Point& ball_position,
                 std::shared_ptr<const PassingConfig> passing_config);
 
 /**

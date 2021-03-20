@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/passing/field_pitch_division.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/geom/point.h"
@@ -29,14 +30,13 @@ class PassEvaluation
      * @param pitch_division The FieldPitchDivision that was used to create
      *                       this pass evaluation.
      * @param best_pass_in_zone A map of the best passes in each zone
-     * @param best_zones_to_cherry_pick A vector of zones sorted, where lower
-     *                       indexes are better cherry pick locations.
+     * @param passing_config The passing_config
      * @param timestamp The timestamp this pass evaluation was created
      */
     explicit PassEvaluation(
         std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
         ZonePassMap<ZoneEnum> best_pass_in_zones,
-        std::vector<ZoneEnum> best_zones_to_cherry_pick, Timestamp timestamp);
+        std::shared_ptr<const PassingConfig> passing_config, Timestamp timestamp);
 
     PassEvaluation() = delete;
 
@@ -69,7 +69,8 @@ class PassEvaluation
      *
      * @return vector of ZoneEnums, sorted in ascending order of quality
      */
-    std::vector<ZoneEnum> getBestZonesToCherryPick() const;
+    std::vector<ZoneEnum> getBestZonesToCherryPick(const Field& field,
+                                                   const Point& position) const;
 
     /**
      * Returns a timestamp of when this pass evaluation was created
@@ -85,8 +86,8 @@ class PassEvaluation
     // Stores the best passes
     ZonePassMap<ZoneEnum> best_pass_in_zones_;
 
-    // Stores the best zones
-    std::vector<ZoneEnum> best_cherry_pick_zones_;
+    // Stores the passing config
+    std::shared_ptr<const PassingConfig> passing_config_;
 
     // The timestamp when this evaluation was created
     Timestamp timestamp_;

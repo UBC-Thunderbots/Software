@@ -28,17 +28,15 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     // for passes because not all passes need to have a shot on net. But this sigmoid
     // zeros out the score when the net is blocked off.
     //
+    // Most passes on the friendly side have a horrible shoot_pass_rating, so
+    // we set it to 1 for now to allow for friendly passes.
+    //
     // This should be fixed w/ a changing how we combine the scores together.
+    // Passes outside the zone are rated poorly
     double shoot_pass_rating = ratePassShootScore(
         world.ball(), world.field(), world.enemyTeam(), pass, passing_config);
 
-    if (world.ball().position().x() < 0)
-    {
-        shoot_pass_rating = 1.0;
-    }
-
-    // Passes outside the zone are rated poorly
-    double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.1);
+    double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
     // Place strict limits on the ball speed
     double min_pass_speed     = passing_config->getMinPassSpeedMPerS()->value();
@@ -50,23 +48,32 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
            shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
-double rateZone(const World& world, const Rectangle& zone,
+double rateZone(const Field& field, const Rectangle& zone, const Point& ball_position,
                 std::shared_ptr<const PassingConfig> passing_config)
 {
     // If the zone contains the ball, its not a good place to receive a pass
-    if (contains(zone, world.ball().position()))
+    if (contains(zone, ball_position))
     {
         return 0.0;
     }
 
+    // Zones with their centers in bad positions are not good
     double static_pass_quality =
-        getStaticPositionQuality(world.field(), zone.centre(), passing_config);
+        getStaticPositionQuality(field, zone.centre(), passing_config);
+
+    // Rate zones that are up the field higher to encourage progress up the field
+    double pass_up_field_rating = zone.centre().x() / field.xLength();
+
+    // Rate zones that are _near_ the ideal pass distance higher
+    double avg_pass_distance = (ball_position - zone.centre()).length();
 
     double pass_distance_rating =
-        sigmoid((world.ball().position() - zone.centre()).length(),
-                passing_config->getIdealPassDistanceM()->value(), 0.50);
+        sigmoid(avg_pass_distance, passing_config->getIdealPassDistanceM()->value(),
+                0.3) *
+        (1 - sigmoid(avg_pass_distance,
+                     passing_config->getIdealPassDistanceM()->value() + 1.0, 0.3));
 
-    return pass_distance_rating * static_pass_quality;
+    return pass_up_field_rating * pass_distance_rating * static_pass_quality;
 }
 
 double ratePassShootScore(const Ball& ball, const Field& field, const Team& enemy_team,
@@ -75,6 +82,14 @@ double ratePassShootScore(const Ball& ball, const Field& field, const Team& enem
 {
     double ideal_max_rotation_to_shoot_degrees =
         passing_config->getIdealMaxRotationToShootDegrees()->value();
+
+    // TODO (#1988) Passes on the friendly side
+    // until 1988 is resolved, we use a "leaky" sigmoid here to allow the score to
+    // not be entirely 0 when we have no shot on net.
+    if (ball.position().x() < 0)
+    {
+        ideal_max_rotation_to_shoot_degrees = 180;
+    }
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
@@ -99,13 +114,7 @@ double ratePassShootScore(const Ball& ball, const Field& field, const Team& enem
         net_percent_open = open_angle_to_goal.toDegrees() / goal_angle.toDegrees();
     }
 
-    // Create the shoot score by creating a sigmoid that goes to a large value as
-    // the section of net we're shooting on approaches 100% (ie. completely open)
-    //
-    // TODO (#1988) This sigmoid limits our ability to find good passes,
-    // until 1988 is resolved, we use a "leaky" sigmoid here to allow the score to
-    // not be entirely 0 when we have no shot on net.
-    double shot_openness_score = sigmoid(net_percent_open, 0.1, 0.95);
+    double shot_openness_score = sigmoid(net_percent_open, 0.5, 0.95);
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)

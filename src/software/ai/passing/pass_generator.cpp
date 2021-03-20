@@ -29,11 +29,10 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
         passes_ = generated_passes;
     }
     auto optimized_passes = optimizePasses(world, generated_passes);
-    auto evaluated_zones  = evaluateZones(world);
 
     updatePasses(world, optimized_passes);
 
-    return PassEvaluation<ZoneEnum>(pitch_division_, passes_, evaluated_zones,
+    return PassEvaluation<ZoneEnum>(pitch_division_, passes_, passing_config_,
                                     world.getMostRecentTimestamp());
 }
 
@@ -114,17 +113,4 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
             passes_.at(zone_id) = optimized_passes.at(zone_id);
         }
     }
-}
-
-template <class ZoneEnum>
-std::vector<ZoneEnum> PassGenerator<ZoneEnum>::evaluateZones(const World& world)
-{
-    std::vector<ZoneEnum> cherry_pick_zones = pitch_division_->getAllZoneIds();
-
-    std::sort(cherry_pick_zones.begin(), cherry_pick_zones.end(),
-              [this, &world](const ZoneEnum& z1, const ZoneEnum& z2) {
-                  return rateZone(world, pitch_division_->getZone(z1), passing_config_) <
-                         rateZone(world, pitch_division_->getZone(z2), passing_config_);
-              });
-    return cherry_pick_zones;
 }

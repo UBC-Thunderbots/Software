@@ -170,49 +170,13 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
     using Zones = std::unordered_set<EighteenZoneId>;
 
-    // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
-    // field in the +x half. We also further offset the rectangle from the goal line
-    // for the cherry-picker closer to where we're taking the corner kick from
-    //
-    //                FRIENDLY          ENEMY
-    //        ┌──────┬──────┬──────┬──────┬──────┬─────┐
-    //        │1     │4     │7     │10    │13    │16   │
-    //        │      │      │      │      │      │     │
-    //        │      │      │      │      │      │     │
-    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
-    //      ┌─┤2     │5     │8     │11    │14    │17   ├─┐
-    //      │ │      │      │      │      │      │     │ │
-    //      │ │      │      │      │      │      │     │ │
-    //      └─┤      │      │      │      │      │     ├─┘
-    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
-    //        │3     │6     │9     │12    │15    │18   │
-    //        │      │      │      │      │      │     │
-    //        │      │      │      │      │      │     │
-    //        └──────┴──────┴──────┴──────┴──────┴─────┘
-    //
-    // If the passing is coming from the friendly end, we split the cherry-pickers
-    // across the x-axis in the enemy half
-    Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_13};
-    Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_12, EighteenZoneId::ZONE_15};
-
-    // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
-    // on the opposite side of the x-axis to wherever the pass is coming from
-    if (world.ball().position().x() > 0)
-    {
-        if (contains(world.field().enemyPositiveYQuadrant(), world.ball().position()))
-        {
-            cherry_pick_region_1 = {EighteenZoneId::ZONE_11, EighteenZoneId::ZONE_12};
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_14, EighteenZoneId::ZONE_15};
-        }
-        else
-        {
-            cherry_pick_region_1 = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11};
-            cherry_pick_region_2 = {EighteenZoneId::ZONE_13, EighteenZoneId::ZONE_14};
-        }
-    }
-
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
+
+    Zones cherry_pick_region_1 = {pass_eval.getBestZonesToCherryPick(
+        world.field(), best_pass_and_score_so_far.pass.receiverPoint())[0]};
+    Zones cherry_pick_region_2 = {pass_eval.getBestZonesToCherryPick(
+        world.field(), best_pass_and_score_so_far.pass.receiverPoint())[1]};
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass

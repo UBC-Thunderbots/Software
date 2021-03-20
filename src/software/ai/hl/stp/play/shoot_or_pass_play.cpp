@@ -98,31 +98,33 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
-        for (auto zone : pass_eval.getBestZonesToCherryPick())
-        {
-            std::cerr << zone << std::endl;
-        }
-        Zones cherry_pick_region_1 = {pass_eval.getBestZonesToCherryPick()[0]};
-        Zones cherry_pick_region_2 = {pass_eval.getBestZonesToCherryPick()[1]};
+        Zones cherry_pick_region_1 = {pass_eval.getBestZonesToCherryPick(
+            world.field(), best_pass_and_score_so_far.pass.receiverPoint())[0]};
+        Zones cherry_pick_region_2 = {pass_eval.getBestZonesToCherryPick(
+            world.field(), best_pass_and_score_so_far.pass.receiverPoint())[1]};
 
         auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
             world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
         auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
             world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+
         do
         {
             passer->updateControlParams(pass);
             receiver->updateControlParams(pass);
+
             if (!passer->done())
             {
-                yield({goalie_tactic, passer, receiver});
+                yield({goalie_tactic, passer, receiver, cherry_pick_tactic_1});
             }
+
             else
             {
                 cherry_pick_tactic_1->updateControlParams(
                     pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
                 cherry_pick_tactic_2->updateControlParams(
                     pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+
                 yield({goalie_tactic, receiver, cherry_pick_tactic_1,
                        cherry_pick_tactic_2});
             }
@@ -148,13 +150,11 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  play_config->getPassingConfig());
 
-    auto pass_eval = pass_generator.generatePassEvaluation(world);
-    for (auto zone : pass_eval.getBestZonesToCherryPick())
-    {
-        std::cerr << zone << std::endl;
-    }
-    Zones cherry_pick_region_1 = {pass_eval.getBestZonesToCherryPick()[0]};
-    Zones cherry_pick_region_2 = {pass_eval.getBestZonesToCherryPick()[1]};
+    auto pass_eval             = pass_generator.generatePassEvaluation(world);
+    Zones cherry_pick_region_1 = {
+        pass_eval.getBestZonesToCherryPick(world.field(), world.ball().position())[0]};
+    Zones cherry_pick_region_2 = {
+        pass_eval.getBestZonesToCherryPick(world.field(), world.ball().position())[1]};
 
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 

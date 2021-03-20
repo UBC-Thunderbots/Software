@@ -14,9 +14,10 @@ template <class ZoneEnum>
 PassEvaluation<ZoneEnum>::PassEvaluation(
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
     std::unordered_map<ZoneEnum, PassWithRating> best_pass_in_zones,
-    std::vector<ZoneEnum> best_zones_to_cherry_pick, Timestamp timestamp)
+    std::shared_ptr<const PassingConfig> passing_config, Timestamp timestamp)
     : pitch_division_(pitch_division),
       best_pass_in_zones_(best_pass_in_zones),
+      passing_config_(passing_config),
       timestamp_(timestamp)
 {
 }
@@ -67,7 +68,17 @@ Timestamp PassEvaluation<ZoneEnum>::getEvaluationTime() const
 }
 
 template <class ZoneEnum>
-std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::getBestZonesToCherryPick() const
+std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::getBestZonesToCherryPick(
+    const Field& field, const Point& position) const
 {
-    return best_cherry_pick_zones_;
+    std::vector<ZoneEnum> cherry_pick_zones = pitch_division_->getAllZoneIds();
+
+    std::sort(cherry_pick_zones.begin(), cherry_pick_zones.end(),
+              [this, &field, &position](const ZoneEnum& z1, const ZoneEnum& z2) {
+                  return rateZone(field, pitch_division_->getZone(z1), position,
+                                  passing_config_) >
+                         rateZone(field, pitch_division_->getZone(z2), position,
+                                  passing_config_);
+              });
+    return cherry_pick_zones;
 }

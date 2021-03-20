@@ -71,7 +71,7 @@
      name: ideal_pass_distance_m
      min: 0.0
      max: 10.0
-     value: 2.0
+     value: 3.5
      description: >-
         How far the passes should be. Note that we may try to take passes longer/shorter
         than this, so this is more of a suggestion. It might be worth dialing this distance

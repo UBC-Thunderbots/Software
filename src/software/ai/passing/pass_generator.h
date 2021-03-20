@@ -98,16 +98,6 @@ class PassGenerator
                                          const ZonePassMap<ZoneEnum>& initial_passes);
 
     /**
-     * Given a world, evaluates the zones in the pitch division, and returns a vector
-     * ranking the zones from best to worst. Zones at lower indexes are better locations
-     * for cherry pickers.
-     *
-     * @param The world
-     * @returns a vector of zones sorted by decreasing quality
-     */
-    std::vector<ZoneEnum> evaluateZones(const World& world);
-
-    /**
      * Re-evaluates ratePass on the "previous ticks" passes and keeps the higher pass
      * w/ the higher score in passes_;
      *
