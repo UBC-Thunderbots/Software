@@ -38,9 +38,8 @@ class MotionConstraintVisitor : public TacticVisitor
     void visit(const MoveTestTactic &tactic) override;
     void visit(const StopTestTactic &tactic) override;
     void visit(const GoalieTestTactic &tactic) override;
-    void visit(const GetPossessionTactic &tactic) override;
+    void visit(const DribbleTactic &tactic) override;
     void visit(const GetBehindBallTactic &tactic) override;
-    void visit(const DribbleBallTactic &tactic) override;
 
     /**
      * Gets the current allowed constraints from a tactic

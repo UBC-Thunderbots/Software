@@ -9,7 +9,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
-struct GetPossessionFSM
+struct DribbleFSM
 {
     class GetPossessionState;
     class DribbleState;
@@ -78,7 +78,7 @@ struct GetPossessionFSM
         /**
          * Guard that checks if the ball has been have_possession
          *
-         * @param event GetPossessionFSM::Update
+         * @param event DribbleFSM::Update
          *
          * @return if the ball has been have_possession
          */
@@ -110,7 +110,7 @@ struct GetPossessionFSM
          * If the ball is moving quickly, then move in front of the ball
          * If the ball is moving slowly, then chase the ball
          *
-         * @param event GetPossessionFSM::Update
+         * @param event DribbleFSM::Update
          */
         const auto get_possession = [this](auto event) {
             auto ball_position = event.common.world.ball().position();

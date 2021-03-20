@@ -1,19 +1,18 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/intercept_ball_action.h"  // TODO (#1888): remove this dependency
-#include "software/ai/hl/stp/tactic/get_possession/get_possession_fsm.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 
 /**
- * The GetPossessionTactic will move the robot to intercept the ball.
+ * The DribbleTactic will move the robot to intercept the ball.
  *
  * Done: When the ball is near the dribbler of the robot
  */
-class GetPossessionTactic : public Tactic
+class DribbleTactic : public Tactic
 {
    public:
-    explicit GetPossessionTactic();
+    explicit DribbleTactic();
 
     void updateWorldParams(const World& world) override;
 
@@ -38,6 +37,6 @@ class GetPossessionTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    HFSM<GetPossessionFSM> fsm;
-    GetPossessionFSM::ControlParams control_params;
+    HFSM<DribbleFSM> fsm;
+    DribbleFSM::ControlParams control_params;
 };

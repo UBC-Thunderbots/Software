@@ -1,10 +1,10 @@
-#include "software/ai/hl/stp/tactic/get_possession/get_possession_fsm.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
 #include <gtest/gtest.h>
 
 #include "software/test_util/test_util.h"
 
-TEST(GetPossessionFSMTest, test_transitions)
+TEST(DribbleFSMTest, test_transitions)
 {
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
     World world = ::TestUtil::createBlankTestingWorld();
@@ -13,19 +13,19 @@ TEST(GetPossessionFSMTest, test_transitions)
     world =
         ::TestUtil::setBallVelocity(world, Vector(0, -1), Timestamp::fromSeconds(123));
 
-    HFSM<GetPossessionFSM> fsm;
+    HFSM<DribbleFSM> fsm;
 
-    // Start in GetPossessionState
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::GetPossessionState>));
+    // Start in DribbleState
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::DribbleState>));
 
-    // Stay in GetPossessionState since ball not in possession yet
-    fsm.process_event(GetPossessionFSM::Update(
+    // Stay in DribbleState since ball not in possession yet
+    fsm.process_event(DribbleFSM::Update(
         {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GetPossessionFSM::GetPossessionState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::DribbleState>));
 
     // At ball point so transition to done
     robot = ::TestUtil::createRobotAtPos(Point(0.5, 0));
-    fsm.process_event(GetPossessionFSM::Update(
+    fsm.process_event(DribbleFSM::Update(
         {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

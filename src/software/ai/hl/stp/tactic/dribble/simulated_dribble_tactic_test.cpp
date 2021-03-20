@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/get_possession/get_possession_tactic.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_at_point_validation.h"
@@ -15,7 +15,7 @@
 class SimulatedMoveTacticTest : public SimulatedTacticTestFixture
 {
    protected:
-    void checkPossession(std::shared_ptr<GetPossessionTactic> tactic,
+    void checkPossession(std::shared_ptr<DribbleTactic> tactic,
                          std::shared_ptr<World> world_ptr,
                          ValidationCoroutine::push_type& yield)
     {
@@ -46,7 +46,7 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<GetPossessionTactic>();
+    auto tactic = std::make_shared<DribbleTactic>();
     setTactic(tactic);
     setRobotId(1);
 
@@ -74,7 +74,7 @@ TEST_F(SimulatedMoveTacticTest, test_stopped_ball)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<GetPossessionTactic>();
+    auto tactic = std::make_shared<DribbleTactic>();
     setTactic(tactic);
     setRobotId(1);
 
@@ -102,7 +102,7 @@ TEST_F(SimulatedMoveTacticTest, test_ball_bounce_of_enemy_robot)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<GetPossessionTactic>();
+    auto tactic = std::make_shared<DribbleTactic>();
     setTactic(tactic);
     setRobotId(1);
 
@@ -131,7 +131,7 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball_dribble_dest)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<GetPossessionTactic>();
+    auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, std::nullopt);
     setTactic(tactic);
     setRobotId(1);
@@ -163,9 +163,10 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball_dribble_dest_and_orientation)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<GetPossessionTactic>();
+    auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, Angle::zero());
     setTactic(tactic);
+    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION});
     setRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -179,5 +180,5 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball_dribble_dest_and_orientation)
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(15));
 }
