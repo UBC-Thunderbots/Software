@@ -23,16 +23,6 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double enemy_pass_rating =
         ratePassEnemyRisk(world.ball(), world.enemyTeam(), pass, passing_config);
 
-    // TODO (#1988) This score is partially responsible for the vanishing
-    // gradient. When we don't have a shot on net, we should still be able to look
-    // for passes because not all passes need to have a shot on net. But this sigmoid
-    // zeros out the score when the net is blocked off.
-    //
-    // Most passes on the friendly side have a horrible shoot_pass_rating, so
-    // we set it to 1 for now to allow for friendly passes.
-    //
-    // This should be fixed w/ a changing how we combine the scores together.
-    // Passes outside the zone are rated poorly
     double shoot_pass_rating = ratePassShootScore(
         world.ball(), world.field(), world.enemyTeam(), pass, passing_config);
 
@@ -83,14 +73,6 @@ double ratePassShootScore(const Ball& ball, const Field& field, const Team& enem
     double ideal_max_rotation_to_shoot_degrees =
         passing_config->getIdealMaxRotationToShootDegrees()->value();
 
-    // TODO (#1988) Passes on the friendly side
-    // until 1988 is resolved, we use a "leaky" sigmoid here to allow the score to
-    // not be entirely 0 when we have no shot on net.
-    if (ball.position().x() < 0)
-    {
-        ideal_max_rotation_to_shoot_degrees = 180;
-    }
-
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
     auto shot_opt =
@@ -118,6 +100,14 @@ double ratePassShootScore(const Ball& ball, const Field& field, const Team& enem
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)
+    //
+    // Receive points on the friendly side, almost always, need to rotate a full 180
+    // degrees to shoot on net. So we relax that requirement for passes on the friendly
+    // side.
+    if (pass.receiverPoint().x() < 0)
+    {
+        ideal_max_rotation_to_shoot_degrees = 180;
+    }
 
     auto receiver_orientation = (ball.position() - pass.receiverPoint()).orientation();
     Angle rotation_to_shot_target_after_pass =

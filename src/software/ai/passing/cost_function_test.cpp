@@ -462,7 +462,7 @@ TEST_F(PassingEvaluationTest,
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({});
     Field field = Field::createSSLDivisionBField();
-    Pass pass({0, 0}, 1);
+    Pass pass({1, 0}, 1);
     Ball ball({-1, 0}, Vector(0, 0), Timestamp::fromSeconds(0));
 
     double pass_shoot_score =

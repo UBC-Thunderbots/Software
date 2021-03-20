@@ -102,7 +102,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     UNUSED(score);
 }
 
-TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
+TEST_F(PassGeneratorTest, DISABLED_check_passer_robot_is_ignored_for_friendly_capability)
 {
     // Test that the pass generator does not converge to use the robot set as the passer
 
@@ -143,7 +143,7 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
     UNUSED(converged_score);
 }
 
-TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
+TEST_F(PassGeneratorTest, DISABLED_check_pass_does_not_converge_to_self_pass)
 {
     // Test that we do not converge to a pass from the passer robot to itself
 
@@ -189,7 +189,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     UNUSED(converged_score);
 }
 
-TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
+TEST_F(PassGeneratorTest, DISABLED_test_passer_point_changes_are_respected)
 {
     // Test that changing the passer point is reflected in the optimized passes returned
 
