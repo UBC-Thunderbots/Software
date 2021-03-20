@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/get_possession/get_possession_tactic.h"
 #include "software/ai/hl/stp/tactic/dribble_ball/dribble_ball_tactic.h"
+#include "software/ai/hl/stp/tactic/get_possession/get_possession_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
@@ -47,7 +47,7 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
     auto tactic = std::make_shared<DribbleBallTactic>();
-    tactic->updateControlParams(Point(1,1));
+    tactic->updateControlParams(Point(1, 1));
     setTactic(tactic);
     setRobotId(1);
 
@@ -76,7 +76,7 @@ TEST_F(SimulatedMoveTacticTest, test_stopped_ball)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
     auto tactic = std::make_shared<DribbleBallTactic>();
-    tactic->updateControlParams(Point(1,1));
+    tactic->updateControlParams(Point(1, 1));
     setTactic(tactic);
     setRobotId(1);
 
@@ -105,7 +105,7 @@ TEST_F(SimulatedMoveTacticTest, test_ball_bounce_of_enemy_robot)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
     auto tactic = std::make_shared<DribbleBallTactic>();
-    tactic->updateControlParams(Point(1,1));
+    tactic->updateControlParams(Point(1, 1));
     setTactic(tactic);
     setRobotId(1);
 

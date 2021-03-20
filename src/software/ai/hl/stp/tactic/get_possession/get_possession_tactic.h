@@ -17,6 +17,9 @@ class GetPossessionTactic : public Tactic
 
     void updateWorldParams(const World& world) override;
 
+    void updateControlParams(std::optional<Point> dribble_destination,
+                             std::optional<Angle> dribble_orientation);
+
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
      * closer to the current position of the ball
@@ -36,4 +39,5 @@ class GetPossessionTactic : public Tactic
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     HFSM<GetPossessionFSM> fsm;
+    GetPossessionFSM::ControlParams control_params;
 };

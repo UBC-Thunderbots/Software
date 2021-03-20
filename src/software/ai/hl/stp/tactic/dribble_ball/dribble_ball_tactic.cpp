@@ -1,7 +1,8 @@
+#include "software/ai/hl/stp/tactic/dribble_ball/dribble_ball_tactic.h"
+
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/stop_action.h"  // TODO (#1888): remove this dependency
-#include "software/ai/hl/stp/tactic/dribble_ball/dribble_ball_tactic.h"
 
 DribbleBallTactic::DribbleBallTactic()
     : Tactic(false, {RobotCapability::Move, RobotCapability::Dribble}), fsm()
@@ -10,12 +11,12 @@ DribbleBallTactic::DribbleBallTactic()
 
 void DribbleBallTactic::updateWorldParams(const World &world) {}
 
-void DribbleBallTactic::updateControlParams(const Point& dribble_destination){
-control_params.dribble_destination = dribble_destination;
+void DribbleBallTactic::updateControlParams(const Point &dribble_destination)
+{
+    control_params.dribble_destination = dribble_destination;
 }
 
-double DribbleBallTactic::calculateRobotCost(const Robot &robot,
-                                               const World &world) const
+double DribbleBallTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // Prefer robots closer to the destination
     // We normalize with the total field length so that robots that are within the field

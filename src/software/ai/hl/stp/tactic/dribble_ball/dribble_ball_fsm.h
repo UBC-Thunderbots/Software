@@ -51,7 +51,9 @@ struct DribbleBallFSM
          * @return if the ball is at the dribble_destination
          */
         const auto ball_at_destination = [](auto event) {
-            return ((event.common.world.ball().position()-event.control_params.dribble_destination).length()<0.05);
+            return ((event.common.world.ball().position() -
+                     event.control_params.dribble_destination)
+                        .length() < 0.05);
         };
 
         /**

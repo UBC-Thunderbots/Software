@@ -5,11 +5,21 @@
 #include "software/ai/hl/stp/action/stop_action.h"  // TODO (#1888): remove this dependency
 
 GetPossessionTactic::GetPossessionTactic()
-    : Tactic(false, {RobotCapability::Move, RobotCapability::Dribble}), fsm()
+    : Tactic(false, {RobotCapability::Move, RobotCapability::Dribble}),
+      fsm(),
+      control_params{GetPossessionFSM::ControlParams{.dribble_destination = std::nullopt,
+                                                     .dribble_orientation = std::nullopt}}
 {
 }
 
 void GetPossessionTactic::updateWorldParams(const World &world) {}
+
+void GetPossessionTactic::updateControlParams(std::optional<Point> dribble_destination,
+                                              std::optional<Angle> dribble_orientation)
+{
+    control_params.dribble_destination = dribble_destination;
+    control_params.dribble_orientation = dribble_orientation;
+}
 
 double GetPossessionTactic::calculateRobotCost(const Robot &robot,
                                                const World &world) const
@@ -42,7 +52,7 @@ bool GetPossessionTactic::done() const
 
 void GetPossessionTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(GetPossessionFSM::Update({}, tactic_update));
+    fsm.process_event(GetPossessionFSM::Update(control_params, tactic_update));
 }
 
 void GetPossessionTactic::accept(TacticVisitor &visitor) const
