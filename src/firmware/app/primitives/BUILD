@@ -25,9 +25,7 @@ cc_library(
     deps = [
         ":move",
         ":primitive",
-        ":chip",
         ":direct_control",
-        ":kick",
         ":spinning_move",
         ":stop",
         "//firmware/app/world:firmware_world",
@@ -50,55 +48,6 @@ cc_library(
 )
 
 cc_library(
-    name = "chick_motion",
-    srcs = ["chick_motion.c"],
-    hdrs = ["chick_motion.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/app/control:physbot",
-        "//firmware/app/control:trajectory_planner",
-        "//firmware/shared:physics",
-        "//firmware/shared:util",
-    ],
-)
-
-cc_library(
-    name = "chip",
-    srcs = [
-        "chip_primitive.c",
-    ],
-    hdrs = ["chip_primitive.h"],
-    deps = [
-        "chick_motion",
-        ":primitive",
-    ],
-)
-
-cc_library(
-    name = "kick",
-    srcs = ["kick_primitive.c"],
-    hdrs = ["kick_primitive.h"],
-    deps = [
-        "chick_motion",
-        ":primitive",
-    ],
-)
-
-cc_library(
-    name = "spinning_move",
-    srcs = ["spinning_move_primitive.c"],
-    hdrs = ["spinning_move_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
-    ],
-)
-
-cc_library(
     name = "move",
     srcs = ["move_primitive.c"],
     hdrs = ["move_primitive.h"],
@@ -112,6 +61,18 @@ cc_library(
         "//firmware/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
+    ],
+)
+
+cc_library(
+    name = "spinning_move",
+    srcs = ["spinning_move_primitive.c"],
+    hdrs = ["spinning_move_primitive.h"],
+    deps = [
+        ":primitive",
+        "//firmware/app/control",
+        "//firmware/app/control:bangbang",
+        "//firmware/shared:physics",
     ],
 )
 

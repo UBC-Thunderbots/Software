@@ -20,7 +20,7 @@ class ChipTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit ChipTactic(const Ball& ball, bool loop_forever);
+    explicit ChipTactic(bool loop_forever);
 
     ChipTactic() = delete;
 
@@ -58,8 +58,6 @@ class ChipTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    Ball getBall() const;
-
     bool done() const override;
 
    private:
@@ -69,6 +67,5 @@ class ChipTactic : public Tactic
     HFSM<ChipFSM> fsm;
 
     // Tactic parameters
-    Ball ball;
     ChipFSM::ControlParams control_params;
 };

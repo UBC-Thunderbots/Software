@@ -16,10 +16,10 @@ cc_library(
 )
 
 cc_test(
-    name = "kickoff_chip_tactic_test",
-    srcs = ["kickoff_chip_tactic_test.cpp"],
+    name = "cherry_pick_tactic_test",
+    srcs = ["cherry_pick_tactic_test.cpp"],
     deps = [
-        ":kickoff_chip_tactic",
+        ":cherry_pick_tactic",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
