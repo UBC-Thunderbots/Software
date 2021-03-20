@@ -27,8 +27,8 @@ PassWithRating PassEvaluation<ZoneEnum>::getBestPassOnField() const
 {
     auto best_pass =
         std::max_element(best_pass_in_zones_.begin(), best_pass_in_zones_.end(),
-                         [](const std::pair<ZoneEnum, PassWithRating> &p1,
-                            const std::pair<ZoneEnum, PassWithRating> &p2) {
+                         [](const std::pair<ZoneEnum, PassWithRating>& p1,
+                            const std::pair<ZoneEnum, PassWithRating>& p2) {
                              return p1.second.rating < p2.second.rating;
                          });
     return (*best_pass).second;
@@ -36,7 +36,7 @@ PassWithRating PassEvaluation<ZoneEnum>::getBestPassOnField() const
 
 template <class ZoneEnum>
 PassWithRating PassEvaluation<ZoneEnum>::getBestPassInZones(
-    const std::unordered_set<ZoneEnum> &zone_ids) const
+    const std::unordered_set<ZoneEnum>& zone_ids) const
 {
     if (zone_ids.size() == 0)
     {

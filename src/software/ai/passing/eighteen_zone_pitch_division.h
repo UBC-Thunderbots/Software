@@ -1,8 +1,9 @@
 #pragma once
+#include <memory>
+
 #include "software/ai/passing/field_pitch_division.h"
 #include "software/geom/rectangle.h"
 #include "software/util/make_enum/make_enum.h"
-#include <memory>
 
 // clang-format off
 //

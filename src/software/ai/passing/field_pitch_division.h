@@ -31,7 +31,7 @@ class FieldPitchDivision
     /**
      * Given a point, returns the Zone Id the point is located in.
      *
-     * @param position The position 
+     * @param position The position
      * @return the Zone Id of the zone the position is in
      */
     virtual ZoneEnum getZoneId(const Point& position) const = 0;

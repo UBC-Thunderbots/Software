@@ -1,8 +1,8 @@
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 
+#include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
-#include "software/geom/algorithms/contains.h"
 
 EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
 {

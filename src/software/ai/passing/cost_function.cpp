@@ -7,8 +7,8 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/geom/algorithms/acute_angle.h"
-#include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
@@ -212,9 +212,8 @@ double calculateInterceptRisk(const Ball& ball, const Robot& enemy_robot,
         ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
 
-    Duration ball_time_to_pass_receive_position =
-        Duration::fromSeconds((pass.receiverPoint() - ball.position()).length() /
-                              pass.speed());
+    Duration ball_time_to_pass_receive_position = Duration::fromSeconds(
+        (pass.receiverPoint() - ball.position()).length() / pass.speed());
 
     Duration enemy_reaction_time =
         Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());

@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/logger/logger.h"
-#include "software/world/ball.h" 
+#include "software/world/ball.h"
 PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
                            bool loop_forever)
     : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),

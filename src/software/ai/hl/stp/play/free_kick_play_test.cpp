@@ -21,7 +21,8 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_enemy_half)
 
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter() + Vector(0,-0.5),
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5),
+         field().enemyGoalCenter() + Vector(0, -0.5),
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
 

@@ -25,8 +25,8 @@ double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& wor
     // Prefer robots closer to the target pass
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost =
-        (robot.position() - pass_.receiverPoint()).length() / world.field().totalXLength();
+    double cost = (robot.position() - pass_.receiverPoint()).length() /
+                  world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 

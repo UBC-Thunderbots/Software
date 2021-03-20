@@ -49,7 +49,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
     setBallState(BallState(Point(4.5, 3), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(0, 1.5), Point(0, 0.5), Point(0, -0.5), Point(0, -1.5),
-        Point(4.6, 3.1)}));
+         Point(4.6, 3.1)}));
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),

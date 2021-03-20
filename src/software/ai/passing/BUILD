@@ -146,10 +146,10 @@ cc_test(
     name = "pass_generator_test",
     srcs = ["pass_generator_test.cpp"],
     deps = [
-        "//software/world:world",
-        ":rapidcheck",
         ":pass_generator",
+        ":rapidcheck",
         "//software/test_util",
+        "//software/world",
         "@gtest//:gtest_main",
     ],
 )
