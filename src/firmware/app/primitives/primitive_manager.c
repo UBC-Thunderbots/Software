@@ -16,9 +16,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "firmware/app/primitives/chip_primitive.h"
 #include "firmware/app/primitives/direct_control_primitive.h"
-#include "firmware/app/primitives/kick_primitive.h"
 #include "firmware/app/primitives/move_primitive.h"
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/primitives/spinning_move_primitive.h"
@@ -133,22 +131,6 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
             manager->current_primitive       = &STOP_PRIMITIVE;
             manager->current_primitive_state = manager->current_primitive->create_state();
             app_stop_primitive_start(primitive_msg.primitive.stop,
-                                     manager->current_primitive_state, world);
-            break;
-        }
-        case TbotsProto_Primitive_chip_tag:
-        {
-            manager->current_primitive       = &CHIP_PRIMITIVE;
-            manager->current_primitive_state = manager->current_primitive->create_state();
-            app_chip_primitive_start(primitive_msg.primitive.chip,
-                                     manager->current_primitive_state, world);
-            break;
-        }
-        case TbotsProto_Primitive_kick_tag:
-        {
-            manager->current_primitive       = &KICK_PRIMITIVE;
-            manager->current_primitive_state = manager->current_primitive->create_state();
-            app_kick_primitive_start(primitive_msg.primitive.kick,
                                      manager->current_primitive_state, world);
             break;
         }

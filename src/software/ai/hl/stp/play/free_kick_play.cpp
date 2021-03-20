@@ -115,7 +115,7 @@ void FreeKickPlay::chipAtGoalStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic, const World &world)
 {
-    auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), false);
+    auto chip_tactic = std::make_shared<ChipTactic>(false);
 
     // Figure out where the fallback chip target is
     // This is exerimentally determined to be a reasonable value
