@@ -14,7 +14,7 @@ class PenaltyKickEnemyPlayTest : public SimulatedPlayTestFixture
 
 TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
 {
-    setBallState(BallState(field().penaltyEnemy(), Vector(0, 0)));
+    setBallState(BallState(field().friendlyPenaltyMark(), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(4.6, -3.1)}));
@@ -35,11 +35,11 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
-        // https://github.com/UBC-Thunderbots/Software/issues/1396
+        // https://github.com/UBC-Thunderbots/Software/issues/1971
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
-                yield();
+                yield("Timestamp not at 9.5s");
             }
         }};
 

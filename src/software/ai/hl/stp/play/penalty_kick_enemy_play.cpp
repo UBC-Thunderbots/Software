@@ -5,6 +5,11 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config)
+{
+}
+
 bool PenaltyKickEnemyPlay::isApplicable(const World &world) const
 {
     return world.gameState().isTheirPenalty();
@@ -20,7 +25,8 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                           const World &world)
 {
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
 
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
@@ -56,4 +62,4 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay> factory;
+static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, PlayConfig> factory;

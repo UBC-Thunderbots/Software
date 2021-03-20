@@ -18,18 +18,18 @@ TEST(MoveFSMTest, test_transitions)
         .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
 
     BaseFSM<MoveFSM> fsm;
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 
     // robot far from destination
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 
     // robot close to destination
     robot = ::TestUtil::createRobotAtPos(Point(2, 2));
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 
     // robot at destination and facing the right way
     robot.updateState(
@@ -50,5 +50,5 @@ TEST(MoveFSMTest, test_transitions)
         .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::move_state>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 }

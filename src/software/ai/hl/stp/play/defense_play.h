@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 
@@ -10,7 +11,7 @@
 class DefensePlay : public Play
 {
    public:
-    DefensePlay() = default;
+    DefensePlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 

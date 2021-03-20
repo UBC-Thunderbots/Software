@@ -41,6 +41,11 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
     AIDrawFunction getDrawFunctions() override;
 
    private:
+    // The configs being used in simulation
+    std::shared_ptr<AiConfig> ai_config;
+    std::shared_ptr<AiControlConfig> ai_control_config;
+    std::shared_ptr<SensorFusionConfig> sensor_fusion_config;
+
     // The AI being tested and used in simulation
     AI ai;
 };

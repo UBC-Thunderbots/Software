@@ -47,7 +47,7 @@ TEST_F(ExamplePlayTest, test_example_play)
 
             while (!friendly_robots_1_meter_from_ball(world_ptr))
             {
-                yield();
+                yield("Friendly robots not 1 meter away from ball");
             }
         }};
 

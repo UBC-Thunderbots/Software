@@ -33,21 +33,10 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           
-      - name: Cache Bazel External Dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            "${GITHUB_WORKSPACE}"/src/bazel-src/external
-          key: bazel
-          
       - name: Software Test
         run: |
           cd src
-          bazel coverage                     \
-            --compilation_mode=fastbuild     \
-            --verbose_test_summary           \
-            --instrumentation_filter=//...   \
-            --test_output=errors             \
+          bazel test --show_timestamps\
             -- //... -//software/simulated_tests/... \
             -//software/ai/hl/stp/play/... \
             -//software/ai/hl/stp/tactic/... \
@@ -102,9 +91,10 @@ jobs:
       - name: Simulated Test
         run: |
           cd src
-          bazel coverage //software/simulated_tests/... \
-            //software/ai/hl/stp/play/... \
-            //software/ai/hl/stp/tactic/... \
+          bazel test --show_timestamps   \
+            //software/simulated_tests/...   \
+            //software/ai/hl/stp/play/...    \
+            //software/ai/hl/stp/tactic/...
           
   memory-leak-checks:
     name: Memory Leak Checks
@@ -136,5 +126,5 @@ jobs:
           cd src
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
-            //shared/parameter_v2/...
+            //shared/parameter/...
 
