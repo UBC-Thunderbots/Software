@@ -163,6 +163,7 @@ struct GetPossessionFSM
             // src_state + event [guard] / action = dest_state
             *get_possession_s + update_e[have_possession] / dribble = dribble_s,
             get_possession_s + update_e[!have_possession] / get_possession,
+            dribble_s + update_e[!have_possession] / get_possession = get_possession_s,
             dribble_s + update_e[!ball_at_dest] / dribble,
             dribble_s + update_e[ball_at_dest] / dribble    = X,
             X + update_e[!have_possession] / get_possession = get_possession_s,
