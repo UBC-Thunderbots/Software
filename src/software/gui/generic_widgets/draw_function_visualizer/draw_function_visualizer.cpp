@@ -12,7 +12,7 @@ DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent)
       graphics_scene(new QGraphicsScene(this)),
       open_gl_widget(new QOpenGLWidget(this)),
       // Placeholder Rectangle
-      lastViewArea(Rectangle(Point(1, 1), Point(0, 0)))
+      last_view_area(Rectangle(Point(1, 1), Point(0, 0)))
 
 {
     setScene(graphics_scene);
@@ -77,7 +77,7 @@ void DrawFunctionVisualizer::clearAndDraw(const std::vector<DrawFunction> &draw_
 void DrawFunctionVisualizer::setViewArea(const Rectangle &view_area)
 {
     // Moves and scales the view to fit the view_area in the scene
-    lastViewArea = view_area;
+    last_view_area = view_area;
     fitInView(createQRectF(view_area), Qt::KeepAspectRatio);
 }
 
@@ -85,7 +85,7 @@ void DrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
     menu.addAction("Reset View",
-                   [this]() { DrawFunctionVisualizer::setViewArea(lastViewArea); });
+                   [this]() { DrawFunctionVisualizer::setViewArea(last_view_area); });
 
     menu.exec(event->globalPos());
 }

@@ -90,7 +90,7 @@ void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEve
 
     QMenu menu(this);
     menu.addAction("Reset View",
-                   [this]() { DrawFunctionVisualizer::setViewArea(lastViewArea); });
+                   [this]() { DrawFunctionVisualizer::setViewArea(last_view_area); });
     menu.addAction("Place Ball Here", [&]() {
         standalone_simulator->setBallState(BallState{
             .position_ = point_in_scene, .velocity_ = Vector(0, 0), .height_ = 0});

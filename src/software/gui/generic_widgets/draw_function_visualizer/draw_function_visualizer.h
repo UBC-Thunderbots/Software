@@ -48,5 +48,5 @@ class DrawFunctionVisualizer : public ZoomableQGraphicsView
      */
     void contextMenuEvent(QContextMenuEvent* event) override;
 
-    Rectangle lastViewArea;
+    Rectangle last_view_area;
 };
