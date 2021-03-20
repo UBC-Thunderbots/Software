@@ -100,6 +100,7 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
 cc_library(
     name = "spinning_move_action",
     srcs = ["spinning_move_action.cpp"],

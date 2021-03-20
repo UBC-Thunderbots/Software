@@ -75,6 +75,7 @@ cc_library(
         "//firmware/shared:physics",
     ],
 )
+
 cc_test(
     name = "move_test",
     srcs = ["move_primitive_test.cpp"],
