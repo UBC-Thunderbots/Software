@@ -307,7 +307,8 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies)
 }
 
 // TODO (#1988) renable this test
-TEST_F(PassingEvaluationTest, DISABLED_ratePass_corner_kick_to_marked_robot_at_field_center)
+TEST_F(PassingEvaluationTest,
+       DISABLED_ratePass_corner_kick_to_marked_robot_at_field_center)
 {
     // A corner kick from the +x, +y corner of the field to a robot on the +x axis part
     // way up the enemy half of the field. The receiver friendly is marked by an enemy,

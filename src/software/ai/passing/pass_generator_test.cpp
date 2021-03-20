@@ -24,7 +24,7 @@ class PassGeneratorTest : public testing::Test
      * Calls generatePassEvaluation to step the pass generator a couple times
      * to find better passes.
      *
-     * The pass generator starts with bad passes and improves on them as it recevies
+     * The pass generator starts with bad passes and improves on them as it receives
      * more "world" inputs
      *
      * @param world The world to evaluate passes on

@@ -20,7 +20,7 @@ class CherryPickTactic : public Tactic
     /**
      * Creates a new CherryPickTactic
      *
-     * @param world The world to intialize the cherry picker with
+     * @param world The world to initialize the cherry picker with
      * @param pass The pass to initialize the cherry picker with
      */
     explicit CherryPickTactic(const World& world, const Pass& pass);
