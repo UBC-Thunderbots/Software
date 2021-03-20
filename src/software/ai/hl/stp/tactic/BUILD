@@ -168,30 +168,29 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "penalty_kick_tactic",
-    srcs = ["penalty_kick_tactic.cpp"],
-    hdrs = ["penalty_kick_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/geom/algorithms",
-        "//software/logger",
-    ],
-)
+# cc_library(
+#     name = "penalty_kick_tactic",
+#     deps = [
+#         ":tactic",
+#         "//shared:constants",
+#         "//software/ai/evaluation:calc_best_shot",
+#         "//software/ai/hl/stp/action:kick_action",
+#         "//software/ai/hl/stp/action:move_action",
+#         "//software/geom/algorithms",
+#         "//software/logger",
+#         "//software/ai/hl/stp/tactic/penalty_kick_tactic:penalty_kick_tactic2"
+#     ],
+# )
 
-cc_test(
-    name = "penalty_kick_tactic_test",
-    srcs = ["penalty_kick_tactic_test.cpp"],
-    deps = [
-        ":penalty_kick_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
+# cc_test(
+#     name = "penalty_kick_tactic_test",
+#     srcs = ["penalty_kick_tactic_test.cpp"],
+#     deps = [
+#         ":penalty_kick_tactic",
+#         "//software/test_util",
+#         "@gtest//:gtest_main",
+#     ],
+# )
 
 cc_library(
     name = "penalty_setup_tactic",
@@ -319,7 +318,7 @@ cc_library(
         ":goalie_tactic",
         ":kickoff_chip_tactic",
         ":passer_tactic",
-        ":penalty_kick_tactic",
+        "//software/ai/hl/stp/tactic/penalty_kick_tactic:penalty_kick_tactic2",
         ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_enemy_tactic",

@@ -1,6 +1,17 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic_fsm.h"
+
+#include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/geom/algorithms/intersection.h"
+#include "software/logger/logger.h"
+
 
 /**
  * This tactic is for a robot performing a penalty kick.
@@ -18,13 +29,13 @@ class PenaltyKickTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PenaltyKickTactic(const Ball &ball, const Field &field,
-                               const std::optional<Robot> &enemy_goalie,
+    explicit PenaltyKickTactic(const Ball &ball,
                                bool loop_forever);
 
     PenaltyKickTactic() = delete;
 
     void updateWorldParams(const World &world) override;
+    void updateControlParams();
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -37,10 +48,11 @@ class PenaltyKickTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
+    bool done() const override;
     void accept(TacticVisitor &visitor) const override;
 
     Ball getBall() const;
-    Field getField() const;
+    //Field getField() const;
 
     /**
      * Helper function that determines whether the shooter robot has a viable shot on net.
@@ -48,7 +60,7 @@ class PenaltyKickTactic : public Tactic
      * @return true if the robot has a viable shot and false if the enemy goalkeeper will
      * likely save the shot.
      */
-    bool evaluatePenaltyShot();
+    //bool evaluatePenaltyShot();
 
     /**
      * Helper function that returns the point on the enemy goal line where the shooter
@@ -56,32 +68,14 @@ class PenaltyKickTactic : public Tactic
      *
      * @return the Point on the goalie line where the shooter robot should aim
      */
-    Point evaluateNextShotPosition();
-
-    void accept(TacticVisitor& visitor) const override;
-
-    bool done() const override;
+    //Point evaluateNextShotPosition();
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-
     // Tactic parameters
     Ball ball;
-    Field field;
-    std::optional<Robot> enemy_goalie;
-
-    static constexpr double PENALTY_KICK_SHOT_SPEED = 5.0;
-    // expected maximum acceleration of the opposition goalie robot
-    static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
-    static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds
-    // offset from the goal post in y direction when shooting
-    static constexpr double PENALTY_KICK_POST_OFFSET = 0.04;
-
-    // timeout that forces a shot after the robot approaches the ball and advances
-    // towards the keeper
-    // these two timeouts together must be <= 9 seconds
-    const Duration PENALTY_FORCE_SHOOT_TIMEOUT     = Duration::fromSeconds(4);
-    const Duration PENALTY_FINISH_APPROACH_TIMEOUT = Duration::fromSeconds(4);
+    HFSM<PenaltyKickTacticFSM> fsm;
+    PenaltyKickTacticFSM::ControlParams control_params;
 };
