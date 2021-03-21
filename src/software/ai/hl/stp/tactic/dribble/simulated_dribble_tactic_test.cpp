@@ -259,6 +259,10 @@ TEST_F(SimulatedMoveTacticTest, test_running_into_enemy_robot_knocking_ball_away
     setBallState(BallState(Point(2, -2), Vector(1, 2)));
     addFriendlyRobots(
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
+         field().enemyDefenseArea().negXNegYCorner(),
+         field().enemyDefenseArea().negXPosYCorner()}));
     addEnemyRobots({RobotStateWithId{
         .id          = 7,
         .robot_state = RobotState(Point(1, 1), Vector(), Angle::fromDegrees(-30),
