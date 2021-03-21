@@ -23,9 +23,8 @@ bool UartCommunication::serialRead(std::vector<unsigned char>& read_val,
 
 bool UartCommunication::serialWrite(const std::vector<unsigned char>& write_val)
 {
-    std::vector<unsigned char> temp_buffer(write_val);
     size_t write_size = boost::asio::write(
-        *serial_port, boost::asio::buffer(temp_buffer, write_val.size()));
+        *serial_port, boost::asio::buffer(write_val, write_val.size()));
     return write_size == write_val.size();
 }
 
