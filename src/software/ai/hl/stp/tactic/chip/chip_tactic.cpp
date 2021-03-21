@@ -4,15 +4,12 @@
 
 #include "software/ai/hl/stp/action/chip_action.h"
 
-ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Chip, RobotCapability::Move}), ball(ball)
+ChipTactic::ChipTactic(bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Chip, RobotCapability::Move})
 {
 }
 
-void ChipTactic::updateWorldParams(const World &world)
-{
-    this->ball = world.ball();
-}
+void ChipTactic::updateWorldParams(const World &world) {}
 
 void ChipTactic::updateControlParams(const Point &chip_origin,
                                      const Angle &chip_direction,
@@ -53,11 +50,6 @@ void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 void ChipTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
-}
-
-Ball ChipTactic::getBall() const
-{
-    return this->ball;
 }
 
 bool ChipTactic::done() const
