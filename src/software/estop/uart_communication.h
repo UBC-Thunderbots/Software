@@ -10,11 +10,10 @@
 
 class UartCommunication
 {
-    using IoService      = boost::asio::io_service;
+    using IoService     = boost::asio::io_service;
     using SerialPortPtr = std::shared_ptr<boost::asio::serial_port>;
 
    public:
-
     enum FlushType
     {
         flush_receive = TCIFLUSH,  // flushes data received but not read
