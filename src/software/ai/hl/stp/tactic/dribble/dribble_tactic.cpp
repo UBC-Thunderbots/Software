@@ -7,18 +7,18 @@
 DribbleTactic::DribbleTactic()
     : Tactic(false, {RobotCapability::Move, RobotCapability::Dribble}),
       fsm(),
-      control_params{DribbleFSM::ControlParams{.dribble_destination = std::nullopt,
-                                               .dribble_orientation = std::nullopt}}
+      control_params{DribbleFSM::ControlParams{.ball_destination          = std::nullopt,
+                                               .final_face_ball_oriention = std::nullopt}}
 {
 }
 
 void DribbleTactic::updateWorldParams(const World &world) {}
 
-void DribbleTactic::updateControlParams(std::optional<Point> dribble_destination,
-                                        std::optional<Angle> dribble_orientation)
+void DribbleTactic::updateControlParams(std::optional<Point> ball_destination,
+                                        std::optional<Angle> final_face_ball_oriention)
 {
-    control_params.dribble_destination = dribble_destination;
-    control_params.dribble_orientation = dribble_orientation;
+    control_params.ball_destination          = ball_destination;
+    control_params.final_face_ball_oriention = final_face_ball_oriention;
 }
 
 double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world) const

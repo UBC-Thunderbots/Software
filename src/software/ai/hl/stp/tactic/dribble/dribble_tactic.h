@@ -16,8 +16,8 @@ class DribbleTactic : public Tactic
 
     void updateWorldParams(const World& world) override;
 
-    void updateControlParams(std::optional<Point> dribble_destination,
-                             std::optional<Angle> dribble_orientation);
+    void updateControlParams(std::optional<Point> ball_destination,
+                             std::optional<Angle> final_face_ball_oriention);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

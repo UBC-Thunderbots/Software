@@ -16,8 +16,8 @@ struct DribbleFSM
 
     struct ControlParams
     {
-        std::optional<Point> dribble_destination;
-        std::optional<Angle> dribble_orientation;
+        std::optional<Point> ball_destination;
+        std::optional<Angle> final_face_ball_oriention;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -40,11 +40,9 @@ struct DribbleFSM
         static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
         if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
         {
-            auto face_ball_vector = (ball.position() - robot.position());
-            auto point_in_front_of_ball =
-                ball.position() -
-                face_ball_vector.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                           BALL_MAX_RADIUS_METERS);
+            auto face_ball_vector       = (ball.position() - robot.position());
+            auto point_in_front_of_ball = convertBallPositionToRobotPosition(
+                ball.position(), face_ball_vector.orientation());
             return point_in_front_of_ball;
         }
         Point intercept_position = ball.position();
@@ -64,6 +62,46 @@ struct DribbleFSM
                 ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
         }
         return intercept_position;
+    }
+
+    static Point convertBallPositionToRobotPosition(const Point &ball_position,
+                                                    const Angle &face_ball_angle)
+    {
+        return ball_position -
+               Vector::createFromAngle(face_ball_angle)
+                   .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+    }
+
+    /**
+     * Gets the ball destination from the update event
+     *
+     * @param event DribbleBallFSM::Update
+     *
+     * @return the final destination to dribble the ball to
+     */
+    static Point getBallDestination(DribbleFSM::Update event)
+    {
+        auto ball_position = event.common.world.ball().position();
+        // Default is the current ball position
+        Point target_dest = ball_position;
+        if (event.control_params.ball_destination)
+        {
+            target_dest = event.control_params.ball_destination.value();
+        }
+        return target_dest;
+    }
+
+    static Angle getFinalFaceBallOrientation(DribbleFSM::Update event)
+    {
+        // Default is face ball direction
+        Angle target_orientation =
+            (event.common.world.ball().position() - event.common.robot.position())
+                .orientation();
+        if (event.control_params.final_face_ball_oriention)
+        {
+            target_orientation = event.control_params.final_face_ball_oriention.value();
+        }
+        return target_orientation;
     }
 
     auto operator()()
@@ -88,20 +126,15 @@ struct DribbleFSM
         };
 
         /**
-         * Guard that checks if the ball is at the dribble_destination
+         * Guard that checks if the ball is at the ball_destination
          *
          * @param event DribbleBallFSM::Update
          *
-         * @return if the ball is at the dribble_destination
+         * @return if the ball is at the ball_destination
          */
         const auto ball_at_dest = [](auto event) {
-            auto dribble_dest = event.common.world.ball().position();
-            if (event.control_params.dribble_destination)
-            {
-                dribble_dest = event.control_params.dribble_destination.value();
-            }
-            return ((event.common.world.ball().position() - dribble_dest).length() <
-                    0.05);
+            return ((event.common.world.ball().position() - getBallDestination(event))
+                        .length() < 0.05);
         };
 
         /**
@@ -131,32 +164,46 @@ struct DribbleFSM
          *
          * @param event DribbleBallFSM::Update
          */
-        const auto dribble = [this](auto event) {
+        const auto dribble = [this, ball_at_dest](auto event) {
             auto ball_position    = event.common.world.ball().position();
-            auto face_ball_vector = (ball_position - event.common.robot.position());
-
-            // Default is face ball direction
-            Angle target_orientation = face_ball_vector.orientation();
-            if (event.control_params.dribble_orientation)
+            auto ball_destination = getBallDestination(event);
+            Angle to_destination_orientation =
+                (ball_destination - ball_position).orientation();
+            auto final_face_ball_oriention = getFinalFaceBallOrientation(event);
+            if (ball_at_dest(event))
             {
-                target_orientation = event.control_params.dribble_orientation.value();
+                // pivot to final face ball destination
+                auto target_destination = convertBallPositionToRobotPosition(
+                    ball_destination, final_face_ball_oriention);
+                event.common.set_intent(std::make_unique<MoveIntent>(
+                    event.common.robot.id(), target_destination,
+                    final_face_ball_oriention, 0, DribblerMode::MAX_FORCE,
+                    BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT));
             }
-
-            // Default is the current ball position
-            Point target_dest = ball_position;
-            if (event.control_params.dribble_destination)
+            else if (to_destination_orientation.minDiff(
+                         event.common.robot.orientation()) < Angle::fromDegrees(5))
             {
-                target_dest = event.control_params.dribble_destination.value();
+                // dribble towards ball destination
+                event.common.set_intent(std::make_unique<MoveIntent>(
+                    event.common.robot.id(),
+                    convertBallPositionToRobotPosition(ball_destination,
+                                                       to_destination_orientation),
+                    to_destination_orientation, 0, DribblerMode::MAX_FORCE,
+                    BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT));
             }
-            // Adjust destination for robot and ball radius
-            target_dest = target_dest - Vector::createFromAngle(target_orientation)
-                                            .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                                       BALL_MAX_RADIUS_METERS);
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), target_dest, target_orientation, 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+            else
+            {
+                // pivot to face ball destination
+                event.common.set_intent(std::make_unique<MoveIntent>(
+                    event.common.robot.id(),
+                    convertBallPositionToRobotPosition(ball_position,
+                                                       to_destination_orientation),
+                    to_destination_orientation, 0, DribblerMode::MAX_FORCE,
+                    BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+            }
         };
 
         return make_transition_table(
