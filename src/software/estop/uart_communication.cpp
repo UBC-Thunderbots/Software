@@ -4,10 +4,10 @@
 #include <boost/asio.hpp>
 #include <iostream>
 
-UartCommunication::UartCommunication(io_service& ioService, int baudRate,
+UartCommunication::UartCommunication(IoService& io_service, int baud_rate,
                                      std::string device_serial_port)
 {
-    openPort(ioService, baudRate, device_serial_port);
+    openPort(io_service, baud_rate, device_serial_port);
 }
 
 bool UartCommunication::serialRead(std::vector<unsigned char>& read_val,
@@ -21,27 +21,28 @@ bool UartCommunication::serialRead(std::vector<unsigned char>& read_val,
     return read_size == num_read_bytes;
 }
 
-bool UartCommunication::serialWrite(std::vector<unsigned char>& write_val)
+bool UartCommunication::serialWrite(const std::vector<unsigned char>& write_val)
 {
+    std::vector<unsigned char> temp_buffer(write_val);
     size_t write_size = boost::asio::write(
-        *serial_port, boost::asio::buffer(write_val, write_val.size()));
+        *serial_port, boost::asio::buffer(temp_buffer, write_val.size()));
     return write_size == write_val.size();
 }
 
-bool UartCommunication::flushSerialPort(FlushType flushType)
+bool UartCommunication::flushSerialPort(FlushType flush_type)
 {
-    int ret_val = tcflush(serial_port->lowest_layer().native_handle(), flushType);
+    int ret_val = tcflush(serial_port->lowest_layer().native_handle(), flush_type);
     return (ret_val == 0);
 }
 
-void UartCommunication::openPort(io_service& ioService, int baudRate,
+void UartCommunication::openPort(IoService& ioService, int baud_rate,
                                  std::string device_serial_port)
 {
     int uart_character_size_bits = 8;
-    serial_port = serial_port_ptr(std::make_shared<boost::asio::serial_port>(
+    serial_port = SerialPortPtr(std::make_shared<boost::asio::serial_port>(
         boost::asio::serial_port(ioService, device_serial_port)));
 
-    serial_port->set_option(boost::asio::serial_port_base::baud_rate(baudRate));
+    serial_port->set_option(boost::asio::serial_port_base::baud_rate(baud_rate));
     serial_port->set_option(boost::asio::serial_port::flow_control(
         boost::asio::serial_port::flow_control::none));
     serial_port->set_option(
@@ -60,7 +61,7 @@ void UartCommunication::closePort()
     }
 }
 
-bool UartCommunication::operator<<(std::vector<unsigned char>& write_val)
+bool UartCommunication::operator<<(const std::vector<unsigned char>& write_val)
 {
     return serialWrite(write_val);
 }
