@@ -37,7 +37,7 @@ class SimulatedMoveTacticTest : public SimulatedTacticTestFixture
 TEST_F(SimulatedMoveTacticTest, test_moving_ball)
 {
     Point initial_position = Point(-3, 1.5);
-    setBallState(BallState(Point(3, -2), Vector(-0.5, 1)));
+    setBallState(BallState(Point(3, -2), Vector(-1, 2)));
     addFriendlyRobots(
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
@@ -122,7 +122,7 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball_dribble_dest)
 {
     Point initial_position    = Point(-3, 1.5);
     Point dribble_destination = Point(-3, 1);
-    setBallState(BallState(Point(3, -2), Vector(-0.5, 1)));
+    setBallState(BallState(Point(3, -2), Vector(-1, 2)));
     addFriendlyRobots(
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
@@ -154,7 +154,7 @@ TEST_F(SimulatedMoveTacticTest, test_moving_ball_dribble_dest_and_orientation)
 {
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);
-    setBallState(BallState(Point(2, -2), Vector(0.5, 1)));
+    setBallState(BallState(Point(2, -2), Vector(1, 2)));
     addFriendlyRobots(
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
