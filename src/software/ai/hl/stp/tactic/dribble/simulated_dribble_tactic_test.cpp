@@ -250,3 +250,38 @@ TEST_F(SimulatedMoveTacticTest, test_dribble_dest_and_orientation_around_rectang
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
+
+TEST_F(SimulatedMoveTacticTest, test_running_into_enemy_robot_knocking_ball_away)
+{
+    Point initial_position    = Point(-2, 1.5);
+    Point dribble_destination = Point(-1, 2);
+    Angle dribble_orientation = Angle::zero();
+    setBallState(BallState(Point(2, -2), Vector(1, 2)));
+    addFriendlyRobots(
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
+    addEnemyRobots({RobotStateWithId{
+        .id          = 7,
+        .robot_state = RobotState(Point(1, 1), Vector(), Angle::fromDegrees(-30),
+                                  AngularVelocity::zero())}});
+    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
+
+    auto tactic = std::make_shared<DribbleTactic>();
+    tactic->updateControlParams(dribble_destination, dribble_orientation);
+    // Don't avoid enemy robots to knock ball away
+    setMotionConstraints({});
+    setTactic(tactic);
+    setRobotId(1);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [this, dribble_destination, tactic](std::shared_ptr<World> world_ptr,
+                                            ValidationCoroutine::push_type& yield) {
+            checkPossession(tactic, world_ptr, yield);
+            ballAtPoint(dribble_destination, world_ptr, yield);
+            checkPossession(tactic, world_ptr, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(15));
+}
