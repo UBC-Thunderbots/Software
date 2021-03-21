@@ -20,7 +20,7 @@ if [ $NUM_ARGS -ne 1 ]; then
   exit 1
 fi
 
-if [[ "$1" == "help" ]]; then
+if [[ "$1" == "--help" ]]; then
   echo "Runs full system and restarts on any crash"
   echo "Usage: $THIS_SCRIPT_FILENAME [interface_name]"
   echo "Choose from the following interfaces:"
