@@ -23,7 +23,7 @@ void DribbleTactic::updateControlParams(std::optional<Point> ball_destination,
 
 double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
-    // Prefer robots closer to the destination
+    // Prefer robots closer to the interception point
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost = (robot.position() -
