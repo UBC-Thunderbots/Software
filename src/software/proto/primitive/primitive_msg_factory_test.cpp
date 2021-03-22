@@ -33,7 +33,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive)
     EXPECT_FALSE(move_primitive->move().has_auto_chip_or_kick());
     EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),
               ROBOT_MAX_SPEED_METERS_PER_SECOND);
-    EXPECT_EQ(move_primitive->move().target_spin_rps(), 5);
+    EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 5);
 }
 
 TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
@@ -53,7 +53,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
     EXPECT_EQ(move_primitive->move().auto_chip_or_kick().autochip_distance_meters(), 2.5);
     EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),
               ROBOT_MAX_SPEED_METERS_PER_SECOND);
-    EXPECT_EQ(move_primitive->move().target_spin_rps(), 0.0f);
+    EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 0.0f);
 }
 
 TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
@@ -73,7 +73,7 @@ TEST(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
     EXPECT_EQ(move_primitive->move().auto_chip_or_kick().autokick_speed_m_per_s(), 3.5);
     EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),
               STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND);
-    EXPECT_EQ(move_primitive->move().target_spin_rps(), 0.0f);
+    EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 0.0f);
 }
 
 TEST(PrimitiveFactoryTest, test_create_stop_primitive_brake)

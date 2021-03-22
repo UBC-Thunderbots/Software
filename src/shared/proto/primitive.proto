@@ -34,7 +34,7 @@ message MovePrimitive
     float dribbler_speed_rpm         = 4;
     float max_speed_m_per_s          = 5;
     AutoChipOrKick auto_chip_or_kick = 6;
-    float target_spin_rps            = 7;
+    float target_spin_rev_per_s      = 7;
 }
 
 message StopPrimitive

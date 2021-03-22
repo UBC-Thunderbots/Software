@@ -93,7 +93,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     const float destination_y           = prim_msg.destination.y_meters;
     const float destination_orientation = prim_msg.final_angle.radians;
     const float speed_at_dest_m_per_s   = prim_msg.final_speed_m_per_s;
-    const float target_spin_rps         = prim_msg.target_spin_rps;
+    const float target_spin_rev_per_s   = prim_msg.target_spin_rev_per_s;
 
     float max_speed_m_per_s = prim_msg.max_speed_m_per_s;
     clamp(&max_speed_m_per_s, 0, (float)ROBOT_MAX_SPEED_METERS_PER_SECOND);
@@ -108,7 +108,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     // Number of revolutions to spin, assuming the time horizon is the simplistic
     // distance_to_destination over max_speed_m_per_s
     const int revolutions_to_spin =
-        (int)(distance_to_destination / max_speed_m_per_s * target_spin_rps);
+        (int)(distance_to_destination / max_speed_m_per_s * target_spin_rev_per_s);
     // Change in orientation to reach destination orientation
     const float net_change_in_orientation =
         min_angle_delta(current_orientation, destination_orientation);
@@ -119,8 +119,8 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
                  .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
         .orientation_profile = {.coefficients = {0, 0,
                                                  net_change_in_orientation +
-                                                     (float)revolutions_to_spin *
-                                                         (float)(2 * M_PI),
+                                                     (float)revolutions_to_spin * 2.0f *
+                                                         (float)M_PI,
                                                  current_orientation}},
         .t_start             = 0,
         .t_end               = 1.0f,

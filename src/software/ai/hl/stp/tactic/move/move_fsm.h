@@ -28,7 +28,7 @@ struct MoveFSM
         // The maximum allowed speed mode
         MaxAllowedSpeedMode max_allowed_speed_mode;
         // The target spin while moving in revolutions per second
-        double target_spin_rps;
+        double target_spin_rev_per_s;
     };
 
     // this struct defines the only event that the MoveFSM responds to
@@ -58,7 +58,7 @@ struct MoveFSM
                 event.control_params.ball_collision_type,
                 event.control_params.auto_chip_or_kick,
                 event.control_params.max_allowed_speed_mode,
-                event.control_params.target_spin_rps));
+                event.control_params.target_spin_rev_per_s));
         };
 
         /**

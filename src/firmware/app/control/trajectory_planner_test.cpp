@@ -1102,6 +1102,7 @@ TEST_F(TrajectoryPlannerTest,
         }
     }
     EXPECT_GT(max_orientation, 900.0f);
+    EXPECT_LT(max_orientation, 1000.0f);
 
     app_trajectory_planner_generateVelocityTrajectory(
         &position_trajectory, path_parameters.num_elements, &velocity_trajectory);
@@ -1128,6 +1129,7 @@ TEST_F(TrajectoryPlannerTest,
                     position_trajectory.time_profile[i], 0.00001);
     }
     EXPECT_GT(max_angular_speed, 1.0f);
+    EXPECT_LT(max_angular_speed, 1.5f);
     EXPECT_FLOAT_EQ(
         velocity_trajectory.angular_velocity[path_parameters.num_elements - 1], 0);
 }

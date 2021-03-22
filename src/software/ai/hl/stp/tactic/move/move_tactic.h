@@ -35,7 +35,7 @@ class MoveTactic : public Tactic
      * @param ball_collision_type how to navigate around the ball
      * @param auto_chip_or_kick The command to autochip or autokick
      * @param max_allowed_speed_mode The mode of maximum speed allowed
-     * @param target_spin_rps The target spin while moving in revolutions per second
+     * @param target_spin_rev_per_s The target spin while moving in revolutions per second
      */
     void updateControlParams(
         Point destination, Angle final_orientation, double final_speed,
@@ -43,7 +43,7 @@ class MoveTactic : public Tactic
         BallCollisionType ball_collision_type      = BallCollisionType::AVOID,
         AutoChipOrKick auto_chip_or_kick           = {AutoChipOrKickMode::OFF, 0},
         MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        double target_spin_rps                     = 0.0);
+        double target_spin_rev_per_s               = 0.0);
 
     /**
      * Updates the params assuming that the dribbler and chicker and while avoiding the

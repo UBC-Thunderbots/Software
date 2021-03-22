@@ -6,7 +6,7 @@
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
     DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
-    MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rps)
+    MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -36,8 +36,8 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
             ->set_autokick_speed_m_per_s(
                 static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
     }
-    move_primitive_msg->mutable_move()->set_target_spin_rps(
-        static_cast<float>(target_spin_rps));
+    move_primitive_msg->mutable_move()->set_target_spin_rev_per_s(
+        static_cast<float>(target_spin_rev_per_s));
     return move_primitive_msg;
 }
 
