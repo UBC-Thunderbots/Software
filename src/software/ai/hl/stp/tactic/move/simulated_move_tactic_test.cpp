@@ -6,8 +6,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_is_at_orientation_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -167,11 +166,11 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            robotIsAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
-                                 yield);
+            robotAtAngularVelocity(1, world_ptr, AngularVelocity::fromDegrees(1 * 360),
+                                   AngularVelocity::fromDegrees(50), yield);
+            robotAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotIsAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
-                                 yield);
+            robotAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             while (!tactic->done())
             {
                 yield("Tactic is not done");
@@ -181,8 +180,8 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
             for (unsigned i = 0; i < num_ticks; i++)
             {
                 robotAtPosition(1, world_ptr, destination, 0.05, yield);
-                robotIsAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
-                                     yield);
+                robotAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
+                                   yield);
             }
         }};
 
@@ -212,11 +211,11 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            robotIsAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
-                                 yield);
+            robotAtAngularVelocity(1, world_ptr, AngularVelocity::fromDegrees(-4 * 360),
+                                   AngularVelocity::fromDegrees(50), yield);
+            robotAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotIsAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
-                                 yield);
+            robotAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
             while (!tactic->done())
             {
                 yield("Tactic is not done");
@@ -226,8 +225,8 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
             for (unsigned i = 0; i < num_ticks; i++)
             {
                 robotAtPosition(1, world_ptr, destination, 0.05, yield);
-                robotIsAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
-                                     yield);
+                robotAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
+                                   yield);
             }
         }};
 
