@@ -7,7 +7,7 @@
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_has_orientation_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_is_at_orientation_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -44,13 +44,12 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
                 yield("Tactic not done");
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            auto stopped_time = world_ptr->getMostRecentTimestamp();
-            while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(3))
+            // Check that conditions hold for 1000 ticks
+            unsigned num_ticks = 1000;
+            for (unsigned i = 0; i < num_ticks; i++)
             {
-                yield("Waiting 3 seconds before re-checking conditions");
+                robotAtPosition(1, world_ptr, destination, 0.05, yield);
             }
-            robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -88,13 +87,12 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
             ballKicked(Angle::zero(), world_ptr, yield);
-            auto stopped_time = world_ptr->getMostRecentTimestamp();
-            while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(3))
+            // Check that conditions hold for 1000 ticks
+            unsigned num_ticks = 1000;
+            for (unsigned i = 0; i < num_ticks; i++)
             {
-                yield("Waiting 3 seconds before re-checking conditions");
+                robotAtPosition(1, world_ptr, destination, 0.05, yield);
             }
-            robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -135,13 +133,12 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
             }
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
             ballKicked(Angle::threeQuarter(), world_ptr, yield);
-            auto stopped_time = world_ptr->getMostRecentTimestamp();
-            while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(3))
+            // Check that conditions hold for 1000 ticks
+            unsigned num_ticks = 1000;
+            for (unsigned i = 0; i < num_ticks; i++)
             {
-                yield("Waiting 3 seconds before re-checking conditions");
+                robotAtPosition(1, world_ptr, destination, 0.05, yield);
             }
-            robotAtPosition(1, world_ptr, destination, 0.05, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -170,24 +167,23 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            robotHasOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
-                                yield);
+            robotIsAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
+                                 yield);
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotHasOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
-                                yield);
+            robotIsAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
+                                 yield);
             while (!tactic->done())
             {
                 yield("Tactic is not done");
             }
-            auto stopped_time = world_ptr->getMostRecentTimestamp();
-            while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(3))
+            // Check that conditions hold for 1000 ticks
+            unsigned num_ticks = 1000;
+            for (unsigned i = 0; i < num_ticks; i++)
             {
-                yield("Waiting 3 seconds before re-checking conditions");
+                robotAtPosition(1, world_ptr, destination, 0.05, yield);
+                robotIsAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
+                                     yield);
             }
-            robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotHasOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
-                                yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -216,24 +212,23 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            robotHasOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
-                                yield);
+            robotIsAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
+                                 yield);
             robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotHasOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
-                                yield);
+            robotIsAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
+                                 yield);
             while (!tactic->done())
             {
                 yield("Tactic is not done");
             }
-            auto stopped_time = world_ptr->getMostRecentTimestamp();
-            while (world_ptr->getMostRecentTimestamp() <
-                   stopped_time + Duration::fromSeconds(3))
+            // Check that conditions hold for 1000 ticks
+            unsigned num_ticks = 1000;
+            for (unsigned i = 0; i < num_ticks; i++)
             {
-                yield("Waiting 3 seconds before re-checking conditions");
+                robotAtPosition(1, world_ptr, destination, 0.05, yield);
+                robotIsAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
+                                     yield);
             }
-            robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotHasOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
-                                yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
