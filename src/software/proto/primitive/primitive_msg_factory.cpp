@@ -6,7 +6,7 @@
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
     DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
-    MaxAllowedSpeedMode max_allowed_speed_mode)
+    MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
@@ -36,28 +36,9 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
             ->set_autokick_speed_m_per_s(
                 static_cast<float>(auto_chip_or_kick.autokick_speed_m_per_s));
     }
+    move_primitive_msg->mutable_move()->set_target_spin_rev_per_s(
+        static_cast<float>(target_spin_rev_per_s));
     return move_primitive_msg;
-}
-
-std::unique_ptr<TbotsProto::Primitive> createSpinningMovePrimitive(
-    const Point &dest, double final_speed_m_per_s,
-    const AngularVelocity &angular_velocity, DribblerMode dribbler_mode)
-{
-    auto spinning_move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
-
-    auto dest_msg             = createPointProto(Point(dest.x(), dest.y()));
-    auto angular_velocity_msg = createAngularVelocityProto(angular_velocity);
-    *(spinning_move_primitive_msg->mutable_spinning_move()->mutable_angular_velocity()) =
-        *angular_velocity_msg;
-    *(spinning_move_primitive_msg->mutable_spinning_move()->mutable_destination()) =
-        *dest_msg;
-    spinning_move_primitive_msg->mutable_spinning_move()->set_final_speed_m_per_s(
-        static_cast<float>(final_speed_m_per_s));
-
-    spinning_move_primitive_msg->mutable_spinning_move()->set_dribbler_speed_rpm(
-        static_cast<float>(convertDribblerModeToDribblerSpeed(dribbler_mode)));
-
-    return spinning_move_primitive_msg;
 }
 
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
@@ -103,6 +84,8 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             return ROBOT_MAX_SPEED_METERS_PER_SECOND;
         case MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
+        case MaxAllowedSpeedMode::TIPTOE:
+            return 0.5;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;

@@ -6,18 +6,18 @@ cc_library(
     srcs = [
         "ball_kicked_validation.cpp",
         "friendly_scored_validation.cpp",
-        "robot_at_position_validation.cpp",
         "robot_in_center_circle_validation.cpp",
         "robot_in_polygon_validation.cpp",
         "robot_received_ball_validation.cpp",
+        "robot_state_validation.cpp",
     ],
     hdrs = [
         "ball_kicked_validation.h",
         "friendly_scored_validation.h",
-        "robot_at_position_validation.h",
         "robot_in_center_circle_validation.h",
         "robot_in_polygon_validation.h",
         "robot_received_ball_validation.h",
+        "robot_state_validation.h",
     ],
     deps = [
         "//software/geom/algorithms",
