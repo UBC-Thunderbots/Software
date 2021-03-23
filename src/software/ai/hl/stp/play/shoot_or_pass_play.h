@@ -10,8 +10,6 @@
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 
-using Zones = std::unordered_set<EighteenZoneId>;
-
 /**
  * Play that tries to find a shot on net, passes if it couldn't.
  */

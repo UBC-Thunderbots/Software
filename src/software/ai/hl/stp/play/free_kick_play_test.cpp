@@ -14,15 +14,14 @@ class FreeKickPlayTest : public SimulatedPlayTestFixture
 
 TEST_F(FreeKickPlayTest, test_free_kick_play_on_enemy_half)
 {
-    setBallState(BallState(Point(1.5, -2.8), Vector(0, 0)));
+    setBallState(BallState(Point(1.5, -3), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4.5, 0), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(4, -2.5)}));
 
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5),
-         field().enemyGoalCenter() + Vector(0, -0.5),
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
 
@@ -48,9 +47,9 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_enemy_half)
             Duration::fromSeconds(10));
 }
 
-TEST_F(FreeKickPlayTest, DISABLED_test_free_kick_play_on_friendly_half)
+TEST_F(FreeKickPlayTest, test_free_kick_play_on_friendly_half)
 {
-    setBallState(BallState(Point(-1.5, -2.8), Vector(0, 0)));
+    setBallState(BallState(Point(-1.5, -3), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-4.5, 0), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(4.6, -3.1)}));
@@ -69,7 +68,7 @@ TEST_F(FreeKickPlayTest, DISABLED_test_free_kick_play_on_friendly_half)
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1971
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(90.5))
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
                 yield("Timestamp not at 9.5s");
             }
@@ -78,5 +77,5 @@ TEST_F(FreeKickPlayTest, DISABLED_test_free_kick_play_on_friendly_half)
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(100));
+            Duration::fromSeconds(10));
 }

@@ -72,6 +72,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
+    using Zones = std::unordered_set<EighteenZoneId>;
+
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  play_config->getPassingConfig());
 

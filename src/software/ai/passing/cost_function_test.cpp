@@ -21,6 +21,7 @@ class PassingEvaluationTest : public testing::Test
 
         min_pass_speed_param   = passing_config->getMinPassSpeedMPerS()->value();
         max_pass_speed_param   = passing_config->getMaxPassSpeedMPerS()->value();
+
         avg_desired_pass_speed = 3.9;
     }
 
