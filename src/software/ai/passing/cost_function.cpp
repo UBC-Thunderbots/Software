@@ -59,9 +59,9 @@ double rateZone(const Field& field, const Rectangle& zone, const Point& ball_pos
 
     double pass_distance_rating =
         sigmoid(avg_pass_distance, passing_config->getIdealPassDistanceM()->value(),
-                0.3) *
+                0.4) *
         (1 - sigmoid(avg_pass_distance,
-                     passing_config->getIdealPassDistanceM()->value() + 1.0, 0.3));
+                     passing_config->getIdealPassDistanceM()->value() + 1.0, 0.4));
 
     return pass_up_field_rating * pass_distance_rating * static_pass_quality;
 }
@@ -96,7 +96,7 @@ double ratePassShootScore(const Ball& ball, const Field& field, const Team& enem
         net_percent_open = open_angle_to_goal.toDegrees() / goal_angle.toDegrees();
     }
 
-    double shot_openness_score = sigmoid(net_percent_open, 0.5, 0.95);
+    double shot_openness_score = sigmoid(net_percent_open, 0.2, 0.95);
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)
