@@ -6,10 +6,10 @@
 
 /**
  * The DribbleTactic will move the robot to intercept the ball and optionally dribble it
- * to the ball destination with the robot facing the given direction
+ * to the dribble destination with the robot facing the given direction
  *
- * Done: When the ball is near the dribbler of the robot and the optional ball destination
- * and face ball orientation conditions are satisfied
+ * Done: When the ball is near the dribbler of the robot and the optional dribble
+ * destination and face ball orientation conditions are satisfied
  */
 class DribbleTactic : public Tactic
 {
@@ -19,14 +19,15 @@ class DribbleTactic : public Tactic
     void updateWorldParams(const World& world) override;
 
     /**
-     * Updates control params for optionally moving the ball to a ball destination and
-     * with the robot at a final orientation
+     * Updates control params for optionally moving the ball to a dribble destination and
+     * with the robot at a final dribble orientation
      *
-     * @param ball_destination The destination for the ball
-     * @param final_face_ball_oriention the final orientation to face the ball
+     * @param dribble_destination The destination for dribbling the ball
+     * @param final_dribble_orientation The final orientation to face the ball when
+     * finishing dribbling
      */
-    void updateControlParams(std::optional<Point> ball_destination,
-                             std::optional<Angle> final_face_ball_oriention);
+    void updateControlParams(std::optional<Point> dribble_destination,
+                             std::optional<Angle> final_dribble_orientation);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

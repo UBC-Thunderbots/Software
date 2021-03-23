@@ -16,8 +16,10 @@ struct DribbleFSM
 
     struct ControlParams
     {
-        std::optional<Point> ball_destination;
-        std::optional<Angle> final_face_ball_oriention;
+        // The destination for dribbling the ball
+        std::optional<Point> dribble_destination;
+        // The final orientation to face the ball when finishing dribbling
+        std::optional<Angle> final_dribble_orientation;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -73,20 +75,20 @@ struct DribbleFSM
     }
 
     /**
-     * Gets the ball destination from the update event
+     * Gets the destination to dribble the ball to from the update event
      *
      * @param event DribbleBallFSM::Update
      *
-     * @return the final destination to dribble the ball to
+     * @return the destination to dribble the ball to
      */
-    static Point getBallDestination(DribbleFSM::Update event)
+    static Point getDribbleBallDestination(DribbleFSM::Update event)
     {
         auto ball_position = event.common.world.ball().position();
         // Default is the current ball position
         Point target_dest = ball_position;
-        if (event.control_params.ball_destination)
+        if (event.control_params.dribble_destination)
         {
-            target_dest = event.control_params.ball_destination.value();
+            target_dest = event.control_params.dribble_destination.value();
         }
         return target_dest;
     }
@@ -97,9 +99,9 @@ struct DribbleFSM
         Angle target_orientation =
             (event.common.world.ball().position() - event.common.robot.position())
                 .orientation();
-        if (event.control_params.final_face_ball_oriention)
+        if (event.control_params.final_dribble_orientation)
         {
-            target_orientation = event.control_params.final_face_ball_oriention.value();
+            target_orientation = event.control_params.final_dribble_orientation.value();
         }
         return target_orientation;
     }
@@ -126,22 +128,23 @@ struct DribbleFSM
         };
 
         /**
-         * Guard that checks if the ball is at the ball_destination
+         * Guard that checks if the ball is at the dribble_destination
          *
          * @param event DribbleBallFSM::Update
          *
-         * @return if the ball is at the ball_destination
+         * @return if the ball is at the dribble_destination
          */
         const auto ball_at_dest = [](auto event) {
             // Threshold to determine if the ball is at the destination determined
             // experimentally
             static const double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
-            return ((event.common.world.ball().position() - getBallDestination(event))
-                        .length() < BALL_CLOSE_TO_DEST_THRESHOLD);
+            return (
+                (event.common.world.ball().position() - getDribbleBallDestination(event))
+                    .length() < BALL_CLOSE_TO_DEST_THRESHOLD);
         };
 
         /**
-         * Action to update to get possession of the ball
+         * Action to get possession of the ball
          *
          * If the ball is moving quickly, then move in front of the ball
          * If the ball is moving slowly, then chase the ball
@@ -163,7 +166,10 @@ struct DribbleFSM
         };
 
         /**
-         * Action to update to get possession of the ball
+         * Action to dribble the ball
+         *
+         * This action will orient the robot towards the destination, dribble to the
+         * destination, and then pivot to face the expected orientation
          *
          * @param event DribbleBallFSM::Update
          */
@@ -171,33 +177,33 @@ struct DribbleFSM
             // Threshold to determine if the robot has the expected orientation
             static const Angle ROBOT_ORIENTATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
             // helper calculations
-            auto ball_position    = event.common.world.ball().position();
-            auto ball_destination = getBallDestination(event);
+            auto ball_position       = event.common.world.ball().position();
+            auto dribble_destination = getDribbleBallDestination(event);
             Angle to_destination_orientation =
-                (ball_destination - ball_position).orientation();
+                (dribble_destination - ball_position).orientation();
 
             // Default destination and orientation assume ball is at the destination
             // pivot to final face ball destination
             Angle target_orientation = getFinalFaceBallOrientation(event);
-            Point target_destination =
-                convertBallPositionToRobotPosition(ball_destination, target_orientation);
+            Point target_destination = convertBallPositionToRobotPosition(
+                dribble_destination, target_orientation);
 
             if (!ball_at_dest(event))
             {
+                // rotate to face the destination
+                target_orientation = to_destination_orientation;
                 if (to_destination_orientation.minDiff(event.common.robot.orientation()) <
                     ROBOT_ORIENTATION_CLOSE_THRESHOLD)
                 {
-                    // dribble towards ball destination
+                    // dribble the ball towards ball destination
                     target_destination = convertBallPositionToRobotPosition(
-                        ball_destination, to_destination_orientation);
-                    target_orientation = to_destination_orientation;
+                        dribble_destination, to_destination_orientation);
                 }
                 else
                 {
-                    // pivot to face ball destination
+                    // pivot in place with the ball to the right orientation
                     target_destination = convertBallPositionToRobotPosition(
                         ball_position, to_destination_orientation);
-                    target_orientation = to_destination_orientation;
                 }
             }
             event.common.set_intent(std::make_unique<MoveIntent>(

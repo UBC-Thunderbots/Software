@@ -10,6 +10,6 @@ void ballAtPoint(Point point, std::shared_ptr<World> world_ptr,
     {
         std::stringstream ss;
         ss << point;
-        yield("Ball was not at Point " + ss.str());
+        yield("Ball was not at Point " + ss.str() + " yet");
     }
 }

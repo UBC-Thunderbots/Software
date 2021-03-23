@@ -29,12 +29,12 @@ TEST(DribbleFSMTest, test_transitions)
         {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::DribbleState>));
 
-    // No ball destination set, so tactic is done
+    // No dribble destination set, so tactic is done
     fsm.process_event(DribbleFSM::Update(
         {}, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
-    // Set ball destination, so tactic should be undone
+    // Set dribble destination, so tactic should be undone
     fsm.process_event(
         DribbleFSM::Update({Point(1, -1), std::nullopt},
                            TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
