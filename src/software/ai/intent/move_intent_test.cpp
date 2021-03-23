@@ -78,7 +78,7 @@ TEST(AutochipMoveIntentTest, test_get_destination_ball_collision_chip)
     EXPECT_EQ(intent.getDribblerMode(), DribblerMode::OFF);
     EXPECT_EQ(intent.getBallCollisionType(), BallCollisionType::AVOID);
     EXPECT_EQ(intent.getMaxAllowedSpeedMode(), MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-    EXPECT_EQ(intent.getTargetSpinRps(), 0.0);
+    EXPECT_EQ(intent.getTargetSpinRevPerS(), 0.0);
 }
 
 TEST(AutochipMoveIntentTest, test_intent_pointer)
@@ -104,5 +104,5 @@ TEST(MoveIntentTest, test_get_destination_ball_collision_kick_stop_command_spin_
     EXPECT_EQ(intent.getDribblerMode(), DribblerMode::OFF);
     EXPECT_EQ(intent.getBallCollisionType(), BallCollisionType::AVOID);
     EXPECT_EQ(intent.getMaxAllowedSpeedMode(), MaxAllowedSpeedMode::STOP_COMMAND);
-    EXPECT_EQ(intent.getTargetSpinRps(), 4.5);
+    EXPECT_EQ(intent.getTargetSpinRevPerS(), 4.5);
 }

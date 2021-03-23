@@ -58,7 +58,7 @@ class MoveIntent : public NavigatingIntent
      *
      * @return the target spin speed
      */
-    double getTargetSpinRps() const;
+    double getTargetSpinRevPerS() const;
 
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all

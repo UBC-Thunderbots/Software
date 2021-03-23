@@ -41,7 +41,7 @@ const AutoChipOrKick& MoveIntent::getAutoChipOrKick() const
     return auto_chip_or_kick;
 }
 
-double MoveIntent::getTargetSpinRps() const
+double MoveIntent::getTargetSpinRevPerS() const
 {
     return target_spin_rev_per_s;
 }
