@@ -49,3 +49,8 @@ void CherryPickTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
+
+World CherryPickTactic::getWorld() const
+{
+    return this->world_;
+}

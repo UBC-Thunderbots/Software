@@ -16,16 +16,6 @@ cc_library(
 )
 
 cc_test(
-    name = "cherry_pick_tactic_test",
-    srcs = ["cherry_pick_tactic_test.cpp"],
-    deps = [
-        ":cherry_pick_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
     name = "penalty_setup_tactic_test",
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [

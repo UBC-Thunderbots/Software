@@ -36,8 +36,6 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     // Prefer robots closer to the pass receive position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    // TODO (#1859) this cost should be normalized to 1 after tier based tactic assignment
-    // is implemented.
     return (robot.position() - pass.receiverPoint()).length();
 }
 

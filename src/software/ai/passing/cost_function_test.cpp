@@ -456,7 +456,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_g
 }
 
 TEST_F(PassingEvaluationTest,
-       ratePassShootScore_no_robots_and_facing_directly_away_from_goal)
+       DISABLED_ratePassShootScore_no_robots_and_facing_directly_away_from_goal)
 {
     // No robots on the field, we receive the pass and are facing directly away from the
     // goal
