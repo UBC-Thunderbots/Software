@@ -15,6 +15,8 @@
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+using Zones = std::unordered_set<EighteenZoneId>;
+
 ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config) : Play(config)
 {
 }
@@ -71,8 +73,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
-
-    using Zones = std::unordered_set<EighteenZoneId>;
 
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  play_config->getPassingConfig());
