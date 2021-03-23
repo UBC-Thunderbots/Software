@@ -117,9 +117,10 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
             if (!passer->done())
             {
-                yield({goalie_tactic, passer, receiver, cherry_pick_tactic_1});
+                yield({goalie_tactic, passer, receiver, cherry_pick_tactic_1,
+                       std::get<0>(crease_defender_tactics),
+                       std::get<1>(crease_defender_tactics)});
             }
-
             else
             {
                 cherry_pick_tactic_1->updateControlParams(
@@ -128,7 +129,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
                 yield({goalie_tactic, receiver, cherry_pick_tactic_1,
-                       cherry_pick_tactic_2});
+                       cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+                       std::get<1>(crease_defender_tactics)});
             }
         } while (!receiver->done());
     }
@@ -185,7 +187,6 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
 
         yield({goalie_tactic, shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2});
 
-        // we need to evaluate here until then.
         pass_eval                  = pass_generator.generatePassEvaluation(world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
