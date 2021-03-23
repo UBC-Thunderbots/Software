@@ -67,7 +67,7 @@ class PassEvaluation
     /**
      * Returns the best zones to send robots to cherry pick in
      *
-     * @return vector of ZoneEnums, sorted in ascending order of quality
+     * @return vector of ZoneEnums, with the highest quality zones first
      */
     std::vector<ZoneEnum> getBestZonesToCherryPick(const Field& field,
                                                    const Point& position) const;
@@ -93,4 +93,4 @@ class PassEvaluation
     Timestamp timestamp_;
 };
 
-#include "software/ai/passing/pass_evaluation.cpp"
+#include "software/ai/passing/pass_evaluation.tpp"

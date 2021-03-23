@@ -1,12 +1,11 @@
 
-#include "software/ai/passing/pass_generator.h"
-
 #include <algorithm>
 #include <chrono>
 #include <numeric>
 
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass_evaluation.h"
+#include "software/ai/passing/pass_generator.h"
 
 template <class ZoneEnum>
 PassGenerator<ZoneEnum>::PassGenerator(

@@ -86,7 +86,4 @@ class Pass
 
     // The speed of the pass in meters/second
     double pass_speed_m_per_s;
-
-    // Store the pass as a pass array
-    std::array<double, 3> pass_array;
 };

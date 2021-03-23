@@ -70,9 +70,6 @@ void MotionConstraintVisitor::visit(const ShootGoalTactic &tactic)
 }
 
 void MotionConstraintVisitor::visit(const PasserTactic &tactic) {
-    current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::HALF_METER_AROUND_BALL
-    });
 }
 
 void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}

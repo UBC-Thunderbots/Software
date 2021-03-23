@@ -20,8 +20,8 @@ EighteenZonePitchDivision::EighteenZonePitchDivision(const Field& field)
         }
     }
 
-    zones_ = allValuesEighteenZoneId();
-    field_ = std::make_unique<Field>(field);
+    zones_       = allValuesEighteenZoneId();
+    field_lines_ = std::make_shared<Rectangle>(field.fieldLines());
 }
 
 const Rectangle& EighteenZonePitchDivision::getZone(EighteenZoneId zone_id) const
@@ -31,7 +31,7 @@ const Rectangle& EighteenZonePitchDivision::getZone(EighteenZoneId zone_id) cons
 
 EighteenZoneId EighteenZonePitchDivision::getZoneId(const Point& position) const
 {
-    if (!contains(field_->fieldLines(), position))
+    if (!contains(*field_lines_, position))
     {
         throw std::invalid_argument("requested position not on field!");
     }

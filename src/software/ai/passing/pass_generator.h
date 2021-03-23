@@ -14,7 +14,7 @@
 #include "software/world/world.h"
 
 // The random seed to initialize the random number generator
-static const int PASS_GENERATOR_SEED = 13;
+static const int PASS_GENERATOR_SEED = 14;
 
 template <class ZoneEnum>
 using ZonePassMap = std::unordered_map<ZoneEnum, PassWithRating>;
@@ -123,4 +123,4 @@ class PassGenerator
     std::mt19937 random_num_gen_;
 };
 
-#include "software/ai/passing/pass_generator.cpp"
+#include "software/ai/passing/pass_generator.tpp"

@@ -47,7 +47,7 @@ class EighteenZonePitchDivision : public FieldPitchDivision<EighteenZoneId>
     EighteenZoneId getZoneId(const Point& position) const override;
 
    private:
-    std::unique_ptr<Field> field_;
+    std::shared_ptr<Rectangle> field_lines_;
     std::vector<Rectangle> pitch_division_;
     std::vector<EighteenZoneId> zones_;
 };

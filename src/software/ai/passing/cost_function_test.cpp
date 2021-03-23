@@ -19,8 +19,8 @@ class PassingEvaluationTest : public testing::Test
             std::make_shared<Rectangle>(Field::createSSLDivisionBField().fieldLines());
         passing_config = std::make_shared<PassingConfig>();
 
-        min_pass_speed_param   = passing_config->getMinPassSpeedMPerS()->value();
-        max_pass_speed_param   = passing_config->getMaxPassSpeedMPerS()->value();
+        min_pass_speed_param = passing_config->getMinPassSpeedMPerS()->value();
+        max_pass_speed_param = passing_config->getMaxPassSpeedMPerS()->value();
 
         avg_desired_pass_speed = 3.9;
     }
@@ -307,7 +307,8 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies)
     EXPECT_GE(1.0, pass_rating);
 }
 
-// TODO (#1988) renable this test
+// TODO (#1988) renable this test once ratePass is fixed. Currently, since the
+// ratePassShootScore is probably 0, ratePass is ~0, so this test fails.
 TEST_F(PassingEvaluationTest,
        DISABLED_ratePass_corner_kick_to_marked_robot_at_field_center)
 {
@@ -407,7 +408,8 @@ TEST_F(PassingEvaluationTest, ratePass_only_passer_on_field)
     EXPECT_DOUBLE_EQ(0, pass_rating);
 }
 
-// TODO (#1988) renable this test
+// TODO (#1988) renable this test once ratePass is fixed. Currently, since the
+// ratePassShootScore is probably 0, ratePass is ~0, so this test fails.
 TEST_F(PassingEvaluationTest, DISABLED_ratePass_attempting_to_pass_and_receive_no_shot)
 {
     // Test that a pass which does NOT result in a good shot on goal is rated
@@ -493,7 +495,8 @@ TEST_F(PassingEvaluationTest,
     EXPECT_LE(pass_shoot_score, 1.0);
 }
 
-// TODO (#1988) renable this test
+// TODO (#1988) renable this test once ratePass is fixed. Currently, since the
+// ratePassShootScore is probably 0, ratePass is ~0, so this test fails.
 TEST_F(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
 {
     // Test rating a pass that results in no open shot to goal

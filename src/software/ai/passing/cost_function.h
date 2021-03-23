@@ -29,8 +29,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
  *
  * @param field The field on which to rate the zone
  * @param zone The zone to rate
- * @param passing_config The passing config used for tuning
  * @param ball_position The position of the ball
+ * @param passing_config The passing config used for tuning
  *
  * @return A value in [0,1] representing the quality of the zone, with 1 being a
  *         great zone to send a cherry picker to, and 0 being a zone to avoid.
@@ -41,6 +41,7 @@ double rateZone(const Field& field, const Rectangle& zone, const Point& ball_pos
 /**
  * Rate pass based on the probability of scoring once we receive the pass
  *
+ * @param ball The ball
  * @param field The field we are playing on
  * @param enemy_team The enemy team
  * @param pass The pass to rate

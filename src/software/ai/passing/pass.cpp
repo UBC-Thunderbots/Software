@@ -2,9 +2,7 @@
 
 
 Pass::Pass(Point receiver_point, double pass_speed_m_per_s)
-    : receiver_point(receiver_point),
-      pass_speed_m_per_s(pass_speed_m_per_s),
-      pass_array({receiver_point.x(), receiver_point.y(), pass_speed_m_per_s})
+    : receiver_point(receiver_point), pass_speed_m_per_s(pass_speed_m_per_s)
 {
     if (pass_speed_m_per_s < 0.0)
     {
@@ -39,7 +37,7 @@ Pass Pass::fromPassArray(const std::array<double, 3>& array)
 
 std::array<double, 3> Pass::toPassArray() const
 {
-    return pass_array;
+    return {receiver_point.x(), receiver_point.y(), pass_speed_m_per_s};
 }
 
 std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)

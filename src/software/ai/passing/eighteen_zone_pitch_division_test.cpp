@@ -97,3 +97,39 @@ TEST(EighteenZonePitchDivision, test_iteration)
             contains(field.fieldLines(), pitch_division.getZone(zone_id).centre()));
     }
 }
+
+TEST(EighteenZonePitchDivision, test_no_zone_overlap)
+{
+    auto field          = Field::createSSLDivisionBField();
+    auto pitch_division = EighteenZonePitchDivision(field);
+
+    // Check that the corners of each zone aren't inside any of the other zones
+    // for this pitch division
+    for (EighteenZoneId zone_id_a : pitch_division.getAllZoneIds())
+    {
+        for (EighteenZoneId zone_id_b : pitch_division.getAllZoneIds())
+        {
+            if (zone_id_a == zone_id_b)
+            {
+                continue;
+            }
+
+            // The edges of the zones are touching, so we slightly
+            // deflate the zone by 1 mm in every direction before
+            // checking for overlap.
+            Rectangle zone = pitch_division.getZone(zone_id_b);
+            Rectangle slightly_deflated_zone =
+                Rectangle(zone.negXNegYCorner() + Vector(0.001, 0.001),
+                          zone.posXPosYCorner() - Vector(0.001, 0.001));
+
+            EXPECT_FALSE(contains(slightly_deflated_zone,
+                                  pitch_division.getZone(zone_id_a).posXNegYCorner()));
+            EXPECT_FALSE(contains(slightly_deflated_zone,
+                                  pitch_division.getZone(zone_id_a).posXPosYCorner()));
+            EXPECT_FALSE(contains(slightly_deflated_zone,
+                                  pitch_division.getZone(zone_id_a).negXPosYCorner()));
+            EXPECT_FALSE(contains(slightly_deflated_zone,
+                                  pitch_division.getZone(zone_id_a).negXNegYCorner()));
+        }
+    }
+}

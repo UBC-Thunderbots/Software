@@ -185,7 +185,9 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
-        yield({goalie_tactic, shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2});
+        yield({goalie_tactic, shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+               std::get<0>(crease_defender_tactics),
+               std::get<1>(crease_defender_tactics)});
 
         pass_eval                  = pass_generator.generatePassEvaluation(world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
