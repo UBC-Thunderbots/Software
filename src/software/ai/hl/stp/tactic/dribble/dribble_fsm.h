@@ -20,9 +20,34 @@ struct DribbleFSM
         std::optional<Point> dribble_destination;
         // The final orientation to face the ball when finishing dribbling
         std::optional<Angle> final_dribble_orientation;
+        // whether to allow excessive dribbling, i.e. more than 1 metre at a time
+        bool allow_excessive_dribbling;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+
+    // Threshold to determine if the ball is at the destination determined experimentally
+    static constexpr double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
+    // Threshold to determine if the robot has the expected orientation
+    static constexpr Angle ROBOT_ORIENTATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
+
+    /**
+     * Converts the ball position to the robot's position given the direction that the
+     * robot faces the ball
+     *
+     * @param ball_position The ball position
+     * @param face_ball_angle The angle to face the ball
+     *
+     * @return the point that the robot should be positioned to face the ball and dribble
+     * the ball
+     */
+    static Point robotPositionToFaceBall(const Point &ball_position,
+                                         const Angle &face_ball_angle)
+    {
+        return ball_position -
+               Vector::createFromAngle(face_ball_angle)
+                   .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+    }
 
     /**
      * Calculates the interception point for intercepting balls
@@ -42,9 +67,9 @@ struct DribbleFSM
         static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
         if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
         {
-            auto face_ball_vector       = (ball.position() - robot.position());
-            auto point_in_front_of_ball = convertBallPositionToRobotPosition(
-                ball.position(), face_ball_vector.orientation());
+            auto face_ball_vector = (ball.position() - robot.position());
+            auto point_in_front_of_ball =
+                robotPositionToFaceBall(ball.position(), face_ball_vector.orientation());
             return point_in_front_of_ball;
         }
         Point intercept_position = ball.position();
@@ -66,44 +91,92 @@ struct DribbleFSM
         return intercept_position;
     }
 
-    static Point convertBallPositionToRobotPosition(const Point &ball_position,
-                                                    const Angle &face_ball_angle)
-    {
-        return ball_position -
-               Vector::createFromAngle(face_ball_angle)
-                   .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
-    }
-
     /**
      * Gets the destination to dribble the ball to from the update event
      *
-     * @param event DribbleBallFSM::Update
+     * @param event DribbleFSM::Update
      *
      * @return the destination to dribble the ball to
      */
-    static Point getDribbleBallDestination(DribbleFSM::Update event)
+    static Point getDribbleBallDestination(const Point &ball_position,
+                                           std::optional<Point> dribble_destination)
     {
-        auto ball_position = event.common.world.ball().position();
         // Default is the current ball position
         Point target_dest = ball_position;
-        if (event.control_params.dribble_destination)
+        if (dribble_destination)
         {
-            target_dest = event.control_params.dribble_destination.value();
+            target_dest = dribble_destination.value();
         }
         return target_dest;
     }
 
-    static Angle getFinalFaceBallOrientation(DribbleFSM::Update event)
+    /**
+     * Gets the final dribble orientation from the update event
+     *
+     * @param event DribbleFSM::Update
+     *
+     * @return the final orientation to finish dribbling facing
+     */
+    static Angle getFinalDribbleOrientation(
+        const Point &ball_position, const Point &robot_position,
+        std::optional<Angle> final_dribble_orientation)
     {
         // Default is face ball direction
-        Angle target_orientation =
-            (event.common.world.ball().position() - event.common.robot.position())
-                .orientation();
-        if (event.control_params.final_dribble_orientation)
+        Angle target_orientation = (ball_position - robot_position).orientation();
+        if (final_dribble_orientation)
         {
-            target_orientation = event.control_params.final_dribble_orientation.value();
+            target_orientation = final_dribble_orientation.value();
         }
         return target_orientation;
+    }
+
+    /**
+     * Calculates the next dribble destination and orientation
+     *
+     * @param ball The ball
+     * @param robot The robot
+     * @param dribble_destination_opt The dribble destination
+     * @param final_dribble_orientation_opt The final dribble orientation
+     *
+     * @return the next dribble destination and orientation
+     */
+    static std::tuple<Point, Angle> calculateNextDribbleDestinationAndOrientation(
+        const Ball &ball, const Robot &robot,
+        std::optional<Point> dribble_destination_opt,
+        std::optional<Angle> final_dribble_orientation_opt)
+    {
+        Point dribble_destination =
+            getDribbleBallDestination(ball.position(), dribble_destination_opt);
+        Angle to_destination_orientation =
+            (dribble_destination - ball.position()).orientation();
+
+        // Default destination and orientation assume ball is at the destination
+        // pivot to final face ball destination
+        Angle target_orientation = getFinalDribbleOrientation(
+            ball.position(), robot.position(), final_dribble_orientation_opt);
+        Point target_destination =
+            robotPositionToFaceBall(dribble_destination, target_orientation);
+
+        if (!comparePoints(dribble_destination, ball.position(),
+                           BALL_CLOSE_TO_DEST_THRESHOLD))
+        {
+            // rotate to face the destination
+            target_orientation = to_destination_orientation;
+            if (compareAngles(to_destination_orientation, robot.orientation(),
+                              ROBOT_ORIENTATION_CLOSE_THRESHOLD))
+            {
+                // dribble the ball towards ball destination
+                target_destination = robotPositionToFaceBall(dribble_destination,
+                                                             to_destination_orientation);
+            }
+            else
+            {
+                // pivot in place with the ball to the right orientation
+                target_destination =
+                    robotPositionToFaceBall(ball.position(), to_destination_orientation);
+            }
+        }
+        return std::make_tuple(target_destination, target_orientation);
     }
 
     auto operator()()
@@ -112,6 +185,7 @@ struct DribbleFSM
 
         const auto get_possession_s = state<GetPossessionState>;
         const auto dribble_s        = state<DribbleState>;
+        Point continuous_dribbling_start_point;
 
         const auto update_e = event<Update>;
 
@@ -128,19 +202,27 @@ struct DribbleFSM
         };
 
         /**
-         * Guard that checks if the ball is at the dribble_destination
+         * Guard that checks if the ball is at the dribble_destination and robot is facing
+         * the right direction with possession of the ball
          *
-         * @param event DribbleBallFSM::Update
+         * @param event DribbleFSM::Update
          *
-         * @return if the ball is at the dribble_destination
+         * @return if the ball is at the dribble_destination, robot is facing the correct
+         * direction and ahs possession of the ball
          */
-        const auto ball_at_dest = [](auto event) {
-            // Threshold to determine if the ball is at the destination determined
-            // experimentally
-            static const double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
-            return (
-                (event.common.world.ball().position() - getDribbleBallDestination(event))
-                    .length() < BALL_CLOSE_TO_DEST_THRESHOLD);
+        const auto dribbling_done = [have_possession](auto event) {
+            return comparePoints(event.common.world.ball().position(),
+                                 getDribbleBallDestination(
+                                     event.common.world.ball().position(),
+                                     event.control_params.dribble_destination),
+                                 BALL_CLOSE_TO_DEST_THRESHOLD) &&
+                   compareAngles(event.common.robot.orientation(),
+                                 getFinalDribbleOrientation(
+                                     event.common.world.ball().position(),
+                                     event.common.robot.position(),
+                                     event.control_params.final_dribble_orientation),
+                                 ROBOT_ORIENTATION_CLOSE_THRESHOLD) &&
+                   have_possession(event);
         };
 
         /**
@@ -171,41 +253,15 @@ struct DribbleFSM
          * This action will orient the robot towards the destination, dribble to the
          * destination, and then pivot to face the expected orientation
          *
-         * @param event DribbleBallFSM::Update
+         * @param event DribbleFSM::Update
          */
-        const auto dribble = [this, ball_at_dest](auto event) {
-            // Threshold to determine if the robot has the expected orientation
-            static const Angle ROBOT_ORIENTATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
-            // helper calculations
-            auto ball_position       = event.common.world.ball().position();
-            auto dribble_destination = getDribbleBallDestination(event);
-            Angle to_destination_orientation =
-                (dribble_destination - ball_position).orientation();
+        const auto dribble = [this](auto event) {
+            auto [target_destination, target_orientation] =
+                calculateNextDribbleDestinationAndOrientation(
+                    event.common.world.ball(), event.common.robot,
+                    event.control_params.dribble_destination,
+                    event.control_params.final_dribble_orientation);
 
-            // Default destination and orientation assume ball is at the destination
-            // pivot to final face ball destination
-            Angle target_orientation = getFinalFaceBallOrientation(event);
-            Point target_destination = convertBallPositionToRobotPosition(
-                dribble_destination, target_orientation);
-
-            if (!ball_at_dest(event))
-            {
-                // rotate to face the destination
-                target_orientation = to_destination_orientation;
-                if (to_destination_orientation.minDiff(event.common.robot.orientation()) <
-                    ROBOT_ORIENTATION_CLOSE_THRESHOLD)
-                {
-                    // dribble the ball towards ball destination
-                    target_destination = convertBallPositionToRobotPosition(
-                        dribble_destination, to_destination_orientation);
-                }
-                else
-                {
-                    // pivot in place with the ball to the right orientation
-                    target_destination = convertBallPositionToRobotPosition(
-                        ball_position, to_destination_orientation);
-                }
-            }
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
@@ -218,9 +274,9 @@ struct DribbleFSM
             *get_possession_s + update_e[have_possession] / dribble = dribble_s,
             get_possession_s + update_e[!have_possession] / get_possession,
             dribble_s + update_e[!have_possession] / get_possession = get_possession_s,
-            dribble_s + update_e[!ball_at_dest] / dribble,
-            dribble_s + update_e[ball_at_dest] / dribble    = X,
+            dribble_s + update_e[!dribbling_done] / dribble,
+            dribble_s + update_e[dribbling_done] / dribble  = X,
             X + update_e[!have_possession] / get_possession = get_possession_s,
-            X + update_e[!ball_at_dest] / dribble = dribble_s, X + update_e / dribble);
+            X + update_e[!dribbling_done] / dribble = dribble_s, X + update_e / dribble);
     }
 };

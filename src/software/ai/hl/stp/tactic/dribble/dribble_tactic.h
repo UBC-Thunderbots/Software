@@ -25,9 +25,12 @@ class DribbleTactic : public Tactic
      * @param dribble_destination The destination for dribbling the ball
      * @param final_dribble_orientation The final orientation to face the ball when
      * finishing dribbling
+     * @param allow_excessive_dribbling Whether to allow excessive dribbling, i.e. more
+     * than 1 metre at a time
      */
     void updateControlParams(std::optional<Point> dribble_destination,
-                             std::optional<Angle> final_dribble_orientation);
+                             std::optional<Angle> final_dribble_orientation,
+                             bool allow_excessive_dribbling = false);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

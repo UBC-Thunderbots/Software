@@ -8,17 +8,20 @@ DribbleTactic::DribbleTactic()
     : Tactic(false, {RobotCapability::Move, RobotCapability::Dribble}),
       fsm(),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
-                                               .final_dribble_orientation = std::nullopt}}
+                                               .final_dribble_orientation = std::nullopt,
+                                               .allow_excessive_dribbling = false}}
 {
 }
 
 void DribbleTactic::updateWorldParams(const World &world) {}
 
 void DribbleTactic::updateControlParams(std::optional<Point> dribble_destination,
-                                        std::optional<Angle> final_dribble_orientation)
+                                        std::optional<Angle> final_dribble_orientation,
+                                        bool allow_excessive_dribbling)
 {
     control_params.dribble_destination       = dribble_destination;
     control_params.final_dribble_orientation = final_dribble_orientation;
+    control_params.allow_excessive_dribbling = allow_excessive_dribbling;
 }
 
 double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world) const
