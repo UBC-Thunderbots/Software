@@ -246,7 +246,7 @@ struct DribbleFSM
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
         /**
@@ -279,7 +279,7 @@ struct DribbleFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, auto_chip_or_kick,
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
         const auto start_dribble = [this, &continuous_dribbling_start_point,
